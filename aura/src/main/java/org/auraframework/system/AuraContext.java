@@ -175,19 +175,14 @@ public interface AuraContext {
      */
     Action setCurrentAction(Action nextAction);
 
-    /**
-     * Set the current namespace.
-     *
-     * FIXME: this is an anti-pattern. it is used inside calls to set the
-     * current "calling" descr, but is never reset, so it persists in strange and
-     * interesting ways. Figure out another way to do this?
-     */
-    void setCurrentCaller(DefDescriptor<?> descriptor);
+    void pushCallingDescriptor(DefDescriptor<?> descriptor);
+
+    void popCallingDescriptor();
 
     /**
      * Get the current "calling" descriptor.
      */
-    DefDescriptor<?> getCurrentCaller();
+    DefDescriptor<?> getCurrentCallingDescriptor();
 
     /**
      * Get the descriptor for either the current instance or current def (runtime versus compile time).

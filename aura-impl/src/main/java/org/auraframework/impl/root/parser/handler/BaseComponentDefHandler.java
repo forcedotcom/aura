@@ -200,205 +200,209 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     protected void readAttributes() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         MasterDefRegistry mdr = context.getDefRegistry();
-        context.setCurrentCaller(builder.getDescriptor());
-        Mode mode = context.getMode();
+        context.pushCallingDescriptor(builder.getDescriptor());
+        try {
+            Mode mode = context.getMode();
 
-        super.readAttributes();
-        String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
-        DefDescriptor<ControllerDef> controllerDescriptor = null;
-        if (controllerName != null) {
-            controllerDescriptor = DefDescriptorImpl.getInstance(
-                    controllerName, ControllerDef.class);
-        } else {
-            String apexControllerName = String.format("apex://%s.%sController",
-                    defDescriptor.getNamespace(),
-                    AuraTextUtil.initCap(defDescriptor.getName()));
-            DefDescriptor<ControllerDef> apexDescriptor = DefDescriptorImpl
-                    .getInstance(apexControllerName, ControllerDef.class);
-            if (mdr.exists(apexDescriptor)) {
-                controllerDescriptor = apexDescriptor;
-            }
-        }
-
-        if (controllerDescriptor != null) {
-            builder.controllerDescriptors.add(controllerDescriptor);
-        }
-
-        String modelName = getAttributeValue(ATTRIBUTE_MODEL);
-        if (modelName != null) {
-            builder.modelDefDescriptor = DefDescriptorImpl.getInstance(
-                    modelName, ModelDef.class);
-        } else {
-            String jsModelName = String.format("js://%s.%s",
-                    defDescriptor.getNamespace(), defDescriptor.getName());
-            DefDescriptor<ModelDef> jsDescriptor = DefDescriptorImpl
-                    .getInstance(jsModelName, ModelDef.class);
-            if (mdr.exists(jsDescriptor)) {
-                builder.modelDefDescriptor = jsDescriptor;
+            super.readAttributes();
+            String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
+            DefDescriptor<ControllerDef> controllerDescriptor = null;
+            if (controllerName != null) {
+                controllerDescriptor = DefDescriptorImpl.getInstance(
+                        controllerName, ControllerDef.class);
             } else {
-                String apexModelName = String.format("apex://%s.%sModel",
+                String apexControllerName = String.format("apex://%s.%sController",
                         defDescriptor.getNamespace(),
                         AuraTextUtil.initCap(defDescriptor.getName()));
-                DefDescriptor<ModelDef> apexDescriptor = DefDescriptorImpl
-                        .getInstance(apexModelName, ModelDef.class);
+                DefDescriptor<ControllerDef> apexDescriptor = DefDescriptorImpl
+                        .getInstance(apexControllerName, ControllerDef.class);
                 if (mdr.exists(apexDescriptor)) {
-                    builder.modelDefDescriptor = apexDescriptor;
+                    controllerDescriptor = apexDescriptor;
                 }
             }
-        }
 
-        // See if there is a clientController that has the same qname.
-        String jsDescriptorName = String.format("js://%s.%s",
-                defDescriptor.getNamespace(), defDescriptor.getName());
-        DefDescriptor<ControllerDef> jsDescriptor = DefDescriptorImpl
-                .getInstance(jsDescriptorName, ControllerDef.class);
-        if (mdr.exists(jsDescriptor)) {
-            builder.controllerDescriptors.add(jsDescriptor);
-        }
-
-        //
-        // TODO: W-1501702
-        // Need to handle dual renderers for aura:placeholder
-        //
-        String rendererName = getAttributeValue(ATTRIBUTE_RENDERER);
-        if (rendererName != null) {
-            List<String> rendererNames = AuraTextUtil.splitSimpleAndTrim(
-                    rendererName, ",", 0);
-            for (String renderer : rendererNames) {
-                builder.addRenderer(renderer);
+            if (controllerDescriptor != null) {
+                builder.controllerDescriptors.add(controllerDescriptor);
             }
 
-        } else {
-            // See if there is a clientRenderer that has the same qname.
-            DefDescriptor<RendererDef> jsRendererDescriptor = DefDescriptorImpl
-                    .getInstance(jsDescriptorName, RendererDef.class);
-            if (mdr.exists(jsRendererDescriptor)) {
-                builder.addRenderer(jsRendererDescriptor.getQualifiedName());
+            String modelName = getAttributeValue(ATTRIBUTE_MODEL);
+            if (modelName != null) {
+                builder.modelDefDescriptor = DefDescriptorImpl.getInstance(
+                        modelName, ModelDef.class);
+            } else {
+                String jsModelName = String.format("js://%s.%s",
+                        defDescriptor.getNamespace(), defDescriptor.getName());
+                DefDescriptor<ModelDef> jsDescriptor = DefDescriptorImpl
+                        .getInstance(jsModelName, ModelDef.class);
+                if (mdr.exists(jsDescriptor)) {
+                    builder.modelDefDescriptor = jsDescriptor;
+                } else {
+                    String apexModelName = String.format("apex://%s.%sModel",
+                            defDescriptor.getNamespace(),
+                            AuraTextUtil.initCap(defDescriptor.getName()));
+                    DefDescriptor<ModelDef> apexDescriptor = DefDescriptorImpl
+                            .getInstance(apexModelName, ModelDef.class);
+                    if (mdr.exists(apexDescriptor)) {
+                        builder.modelDefDescriptor = apexDescriptor;
+                    }
+                }
             }
-        }
 
-        String helperName = getAttributeValue(ATTRIBUTE_HELPER);
-        if (helperName != null) {
-            List<String> helperNames = AuraTextUtil.splitSimpleAndTrim(
-                    helperName, ",", 0);
-            for (String helper : helperNames) {
-                builder.addHelper(helper);
-            }
-
-        } else {
-            // See if there is a helper that has the same qname.
-            DefDescriptor<HelperDef> jsHelperDescriptor = DefDescriptorImpl
-                    .getInstance(jsDescriptorName, HelperDef.class);
-            if (mdr.exists(jsHelperDescriptor)) {
-                builder.addHelper(jsHelperDescriptor.getQualifiedName());
-            }
-        }
-
-        DefDescriptor<ResourceDef> jsResourceDescriptor = DefDescriptorImpl
-                .getInstance(jsDescriptorName, ResourceDef.class);
-        if (mdr.exists(jsResourceDescriptor)) {
-            builder.addResource(jsResourceDescriptor.getQualifiedName());
-        }
-
-        // See if there is a style that has the same qname.
-        String styleName = getAttributeValue(ATTRIBUTE_STYLE);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(styleName)) {
-            styleName = String.format("css://%s.%s",
+            // See if there is a clientController that has the same qname.
+            String jsDescriptorName = String.format("js://%s.%s",
                     defDescriptor.getNamespace(), defDescriptor.getName());
-        }
-        DefDescriptor<StyleDef> cssDescriptor = DefDescriptorImpl.getInstance(
-                styleName, StyleDef.class);
-        if (mdr.exists(cssDescriptor)) {
-            builder.styleDescriptor = cssDescriptor;
-        }
-
-        DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName, ResourceDef.class);
-        if (mdr.exists(cssResourceDescriptor)) {
-            builder.addResource(cssResourceDescriptor.getQualifiedName());
-        }
-
-        // See if there is a themedef that has the same qname. todo -- add cmpTheme attr as well?
-        String themeName = String.format("%s:%s", defDescriptor.getNamespace(), defDescriptor.getName());
-        DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
-        if (mdr.exists(themeDesc)) {
-            builder.cmpThemeDescriptor = themeDesc;
-        }
-
-        // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
-        if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
-            // See if there is a test suite that has the same qname.
-            DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
-                    .getInstance(jsDescriptorName, TestSuiteDef.class);
-            if (mdr.exists(jsTestSuiteDescriptor)) {
-                builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
+            DefDescriptor<ControllerDef> jsDescriptor = DefDescriptorImpl
+                    .getInstance(jsDescriptorName, ControllerDef.class);
+            if (mdr.exists(jsDescriptor)) {
+                builder.controllerDescriptors.add(jsDescriptor);
             }
-        }
-        String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
-        if (extendsName != null) {
-            builder.extendsDescriptor = DefDescriptorImpl.getInstance(
-                    extendsName, (Class<T>) defDescriptor.getDefType()
-                            .getPrimaryInterface());
-        }
 
-        String implementsNames = getAttributeValue(ATTRIBUTE_IMPLEMENTS);
-        if (implementsNames != null) {
-            for (String implementsName : AuraTextUtil.splitSimple(",",
-                    implementsNames)) {
-                builder.interfaces.add(DefDescriptorImpl.getInstance(
-                        implementsName.trim(), InterfaceDef.class));
+            //
+            // TODO: W-1501702
+            // Need to handle dual renderers for aura:placeholder
+            //
+            String rendererName = getAttributeValue(ATTRIBUTE_RENDERER);
+            if (rendererName != null) {
+                List<String> rendererNames = AuraTextUtil.splitSimpleAndTrim(
+                        rendererName, ",", 0);
+                for (String renderer : rendererNames) {
+                    builder.addRenderer(renderer);
+                }
+
+            } else {
+                // See if there is a clientRenderer that has the same qname.
+                DefDescriptor<RendererDef> jsRendererDescriptor = DefDescriptorImpl
+                        .getInstance(jsDescriptorName, RendererDef.class);
+                if (mdr.exists(jsRendererDescriptor)) {
+                    builder.addRenderer(jsRendererDescriptor.getQualifiedName());
+                }
             }
-        }
 
-        builder.isAbstract = getBooleanAttributeValue(ATTRIBUTE_ABSTRACT);
-        // if a component is abstract, it should be extensible by default
-        if (builder.isAbstract
-                && getAttributeValue(ATTRIBUTE_EXTENSIBLE) == null) {
-            builder.isExtensible = true;
-        } else {
-            builder.isExtensible = getBooleanAttributeValue(ATTRIBUTE_EXTENSIBLE);
-        }
+            String helperName = getAttributeValue(ATTRIBUTE_HELPER);
+            if (helperName != null) {
+                List<String> helperNames = AuraTextUtil.splitSimpleAndTrim(
+                        helperName, ",", 0);
+                for (String helper : helperNames) {
+                    builder.addHelper(helper);
+                }
 
-        String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
-
-        if (providerName != null) {
-            List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(
-                    providerName, ",", 0);
-            for (String provider : providerNames) {
-                builder.addProvider(provider);
+            } else {
+                // See if there is a helper that has the same qname.
+                DefDescriptor<HelperDef> jsHelperDescriptor = DefDescriptorImpl
+                        .getInstance(jsDescriptorName, HelperDef.class);
+                if (mdr.exists(jsHelperDescriptor)) {
+                    builder.addHelper(jsHelperDescriptor.getQualifiedName());
+                }
             }
-        } else {
-            String apexProviderName = String.format("apex://%s.%sProvider",
-                    defDescriptor.getNamespace(),
-                    AuraTextUtil.initCap(defDescriptor.getName()));
-            DefDescriptor<ProviderDef> apexDescriptor = DefDescriptorImpl
-                    .getInstance(apexProviderName, ProviderDef.class);
-            if (mdr.exists(apexDescriptor)) {
-                builder.addProvider(apexDescriptor.getQualifiedName());
+
+            DefDescriptor<ResourceDef> jsResourceDescriptor = DefDescriptorImpl
+                    .getInstance(jsDescriptorName, ResourceDef.class);
+            if (mdr.exists(jsResourceDescriptor)) {
+                builder.addResource(jsResourceDescriptor.getQualifiedName());
             }
+
+            // See if there is a style that has the same qname.
+            String styleName = getAttributeValue(ATTRIBUTE_STYLE);
+            if (AuraTextUtil.isNullEmptyOrWhitespace(styleName)) {
+                styleName = String.format("css://%s.%s",
+                        defDescriptor.getNamespace(), defDescriptor.getName());
+            }
+            DefDescriptor<StyleDef> cssDescriptor = DefDescriptorImpl.getInstance(
+                    styleName, StyleDef.class);
+            if (mdr.exists(cssDescriptor)) {
+                builder.styleDescriptor = cssDescriptor;
+            }
+
+            DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName, ResourceDef.class);
+            if (mdr.exists(cssResourceDescriptor)) {
+                builder.addResource(cssResourceDescriptor.getQualifiedName());
+            }
+
+            // See if there is a themedef that has the same qname. todo -- add cmpTheme attr as well?
+            String themeName = String.format("%s:%s", defDescriptor.getNamespace(), defDescriptor.getName());
+            DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
+            if (mdr.exists(themeDesc)) {
+                builder.cmpThemeDescriptor = themeDesc;
+            }
+
+            // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
+            if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
+                // See if there is a test suite that has the same qname.
+                DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
+                        .getInstance(jsDescriptorName, TestSuiteDef.class);
+                if (mdr.exists(jsTestSuiteDescriptor)) {
+                    builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
+                }
+            }
+            String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
+            if (extendsName != null) {
+                builder.extendsDescriptor = DefDescriptorImpl.getInstance(
+                        extendsName, (Class<T>) defDescriptor.getDefType()
+                                .getPrimaryInterface());
+            }
+
+            String implementsNames = getAttributeValue(ATTRIBUTE_IMPLEMENTS);
+            if (implementsNames != null) {
+                for (String implementsName : AuraTextUtil.splitSimple(",",
+                        implementsNames)) {
+                    builder.interfaces.add(DefDescriptorImpl.getInstance(
+                            implementsName.trim(), InterfaceDef.class));
+                }
+            }
+
+            builder.isAbstract = getBooleanAttributeValue(ATTRIBUTE_ABSTRACT);
+            // if a component is abstract, it should be extensible by default
+            if (builder.isAbstract
+                    && getAttributeValue(ATTRIBUTE_EXTENSIBLE) == null) {
+                builder.isExtensible = true;
+            } else {
+                builder.isExtensible = getBooleanAttributeValue(ATTRIBUTE_EXTENSIBLE);
+            }
+
+            String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
+
+            if (providerName != null) {
+                List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(
+                        providerName, ",", 0);
+                for (String provider : providerNames) {
+                    builder.addProvider(provider);
+                }
+            } else {
+                String apexProviderName = String.format("apex://%s.%sProvider",
+                        defDescriptor.getNamespace(),
+                        AuraTextUtil.initCap(defDescriptor.getName()));
+                DefDescriptor<ProviderDef> apexDescriptor = DefDescriptorImpl
+                        .getInstance(apexProviderName, ProviderDef.class);
+                if (mdr.exists(apexDescriptor)) {
+                    builder.addProvider(apexDescriptor.getQualifiedName());
+                }
+            }
+
+            String templateName = getAttributeValue(ATTRIBUTE_TEMPLATE);
+            if (templateName != null) {
+                builder.templateDefDescriptor = DefDescriptorImpl.getInstance(
+                        templateName, ComponentDef.class);
+            }
+
+            DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
+                    builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
+
+            if (mdr.exists(documentationDescriptor)) {
+                builder.setDocumentation(documentationDescriptor.getQualifiedName());
+            }
+
+            builder.render = getAttributeValue(ATTRIBUTE_RENDER);
+
+            String whitespaceVal = getAttributeValue(ATTRIBUTE_WHITESPACE);
+            builder.whitespaceBehavior = whitespaceVal == null ? WhitespaceBehavior.OPTIMIZE
+                    : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
+
+            builder.isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
+
+            builder.setAccess(readAccessAttribute());
+        } finally {
+            context.popCallingDescriptor();
         }
-
-        String templateName = getAttributeValue(ATTRIBUTE_TEMPLATE);
-        if (templateName != null) {
-            builder.templateDefDescriptor = DefDescriptorImpl.getInstance(
-                    templateName, ComponentDef.class);
-        }
- 
-        DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
-        		builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
-
-        if (mdr.exists(documentationDescriptor)) {
-            builder.setDocumentation(documentationDescriptor.getQualifiedName());
-        }
-
-        builder.render = getAttributeValue(ATTRIBUTE_RENDER);
-
-        String whitespaceVal = getAttributeValue(ATTRIBUTE_WHITESPACE);
-        builder.whitespaceBehavior = whitespaceVal == null ? WhitespaceBehavior.OPTIMIZE
-                : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
-
-        builder.isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
-        
-        builder.setAccess(readAccessAttribute());
     }
 
 	public void setRender(String val) {

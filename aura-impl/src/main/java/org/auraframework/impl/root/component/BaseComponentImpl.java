@@ -390,7 +390,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
      */
     private void createModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setCurrentCaller(descriptor);
+        context.pushCallingDescriptor(descriptor);
         BaseComponent<?, ?> oldComponent = context.setCurrentComponent(this);
         try {
             ModelDef modelDef = getComponentDef().getModelDef();
@@ -405,6 +405,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
             }
         } finally {
             context.setCurrentComponent(oldComponent);
+            context.popCallingDescriptor();
         }
     }
 

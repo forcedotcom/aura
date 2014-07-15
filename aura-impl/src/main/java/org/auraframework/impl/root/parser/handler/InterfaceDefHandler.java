@@ -27,6 +27,7 @@ import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -85,31 +86,36 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     @Override
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
-        Aura.getContextService().getCurrentContext().setCurrentCaller(getDefDescriptor());
-        String extendsNames = getAttributeValue(ATTRIBUTE_EXTENDS);
-        if (extendsNames != null) {
-            for (String extendsName : AuraTextUtil.splitSimple(",", extendsNames)) {
-                builder.extendsDescriptors.add(DefDescriptorImpl.getInstance(extendsName.trim(), InterfaceDef.class));
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.pushCallingDescriptor(getDefDescriptor());
+        try {
+            String extendsNames = getAttributeValue(ATTRIBUTE_EXTENDS);
+            if (extendsNames != null) {
+                for (String extendsName : AuraTextUtil.splitSimple(",", extendsNames)) {
+                    builder.extendsDescriptors.add(DefDescriptorImpl.getInstance(extendsName.trim(), InterfaceDef.class));
+                }
             }
-        }
 
-        String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
-        if (providerName != null) {
-            List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(providerName, ",", 0);
-            for (String provider : providerNames) {
-                builder.addProvider(provider);
+            String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
+            if (providerName != null) {
+                List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(providerName, ",", 0);
+                for (String provider : providerNames) {
+                    builder.addProvider(provider);
+                }
+            } else {
+                String apexProviderName = String.format("apex://%s.%sProvider", defDescriptor.getNamespace(),
+                        AuraTextUtil.initCap(defDescriptor.getName()));
+                DefDescriptor<ProviderDef> apexDescriptor = DefDescriptorImpl.getInstance(apexProviderName,
+                        ProviderDef.class);
+                if (apexDescriptor.exists()) {
+                    builder.addProvider(apexDescriptor.getQualifiedName());
+                }
             }
-        } else {
-            String apexProviderName = String.format("apex://%s.%sProvider", defDescriptor.getNamespace(),
-                    AuraTextUtil.initCap(defDescriptor.getName()));
-            DefDescriptor<ProviderDef> apexDescriptor = DefDescriptorImpl.getInstance(apexProviderName,
-                    ProviderDef.class);
-            if (apexDescriptor.exists()) {
-                builder.addProvider(apexDescriptor.getQualifiedName());
-            }
+
+            builder.setAccess(readAccessAttribute());
+        } finally {
+            context.popCallingDescriptor();
         }
-        
-        builder.setAccess(readAccessAttribute());
     }
 
     @Override

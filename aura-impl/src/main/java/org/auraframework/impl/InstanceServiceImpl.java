@@ -69,10 +69,14 @@ public class InstanceServiceImpl implements InstanceService {
             return (T) new ComponentImpl((DefDescriptor<ComponentDef>) descriptor, attributes);
         case ACTION:
             AuraContext context = Aura.getContextService().getCurrentContext();
-            context.setCurrentCaller(descriptor);
-            ControllerDef controllerDef = ((SubDefDescriptor<ActionDef, ControllerDef>) descriptor)
-                    .getParentDescriptor().getDef();
-            return (T) controllerDef.createAction(descriptor.getName(), attributes);
+            context.pushCallingDescriptor(descriptor);
+            try {
+                ControllerDef controllerDef = ((SubDefDescriptor<ActionDef, ControllerDef>) descriptor)
+                        .getParentDescriptor().getDef();
+                return (T) controllerDef.createAction(descriptor.getName(), attributes);
+            } finally {
+                context.popCallingDescriptor();
+            }
         case EVENT:
             return (T) new EventImpl((DefDescriptor<EventDef>) descriptor, attributes);
         default:

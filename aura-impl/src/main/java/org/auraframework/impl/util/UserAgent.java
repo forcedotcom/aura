@@ -15,62 +15,30 @@
  */
 package org.auraframework.impl.util;
 
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_0;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_1;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_2;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_3;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_1_4;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_2_0;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_AXIS_UNKNOWN;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_BEATBOX;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_BEA_WLW;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_BREW;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_CURL;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_DOTNET_1_0;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_DOTNET_1_1;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_DOTNET_2_0;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_DOTNET_UNKNOWN;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_DOTNET_WSE;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_DREAMFACTORY;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_EASYSOAP;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_HTTP_COMMONS;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_IBM_WEBSERVICES;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_JAVA;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_MEAP;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_MSFT_STK;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_NUSOAP;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_OFFICE_TOOLKIT;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_PEAR_SOAP;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_PHP_SOAP;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_POCKETSOAP;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_PYTHON;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_SOAP_LITE;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_TIBCO_BW;
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_XMLSPY;
-import static org.auraframework.impl.util.BrowserConsts.XBROWSER_IE_7;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.auraframework.impl.util.BrowserConsts.*;
 
 /**
  * User agent variants. These are generally for use by {@link BrowserUserAgent}
  * and {@link BrowserInfo}. Check those classes for your needs first.
- * 
+ *
  * Each implementation should be self-sufficient and not dependent on ordering
  * with other UserAgent instances for validation or parsing where practical.
  * They may be ordered for performance reasons, but do not assume a static order
  * over time.
- * 
+ *
  * If a browser purposely identifies itself wrongly, such as Opera emulating
  * Firefox for compatibility can be identified as the the reported browser
  * rather than the underlying actual browser.
- * 
+ *
  * Very common, very expensive, or very ugly cases can be rerouted to the real
  * browser to avoid problems. For example old Palm devices pretend to be
  * Internet Explorer, often with bad results, and IE in compatibility mode acts
  * like IE7 but we log it in Login History as the true IE version, with a note
  * that it was in compatibility view.
- * 
+ *
  */
 public enum UserAgent {
 
@@ -111,10 +79,10 @@ public enum UserAgent {
 
             // do a couple of faster checks before looking for "MSIE" or Trident
             boolean claimsToBeIE = ua.startsWith(UA.MOZILLA_5_MSIE)
-                    || ua.startsWith(UA.MOZILLA_4_MSIE)
-                    || ua.contains(UA.MSIE)
-                    // as of IE11, IE user agents no longer include "MSIE"
-                    || ua.contains(UA.TRIDENT);
+                || ua.startsWith(UA.MOZILLA_4_MSIE)
+                || ua.contains(UA.MSIE)
+                // as of IE11, IE user agents no longer include "MSIE"
+                || ua.contains(UA.TRIDENT);
 
             if (!claimsToBeIE) {
                 return false;
@@ -122,23 +90,17 @@ public enum UserAgent {
 
             // check for impostors, stop checking after finding one
             if (ua.contains(UA.CHROMEFRAME)
-                    || ua.contains(UA.OPERA)
-                    || ua.contains(UA.MS_WEB_SERVICES)
-                    || ua.contains(UA.SFORCE_HTTP)
-                    || ua.contains(UA.SFORCE_OFFICE_TOOLKIT)
-            // the rest block really IE4-5-6-7 so they show up as 'other mobile'
-            // instead of IE since they can't do many things 'normal' IE can do.
-            // as IE8/9/10 are moved onto devices that might match these, they will
-            // include TRIDENT and generally work as IE, so we allow those
-                    || (!ua.contains(UA.TRIDENT)
-                            && (ua.contains(UA.SYMBIAN)
-                                    || ua.contains(UA.NOKIA)
-                                    || ua.contains(UA.PALMSOURCE)
-                                    || ua.contains(UA.BLAZER)
-                                    || ua.contains(UA.PALM_OS)
-                            )
-                       )
-            ) {
+                || ua.contains(UA.OPERA)
+                || ua.contains(UA.MS_WEB_SERVICES)
+                || ua.contains(UA.SFORCE_HTTP)
+                || ua.contains(UA.SFORCE_OFFICE_TOOLKIT)
+                // the rest block really IE4-5-6-7 so they show up as 'other mobile'
+                // instead of IE since they can't do many things 'normal' IE can do.
+                // as IE8/9/10 are moved onto devices that might match these, they will
+                // include TRIDENT and generally work as IE, so we allow those
+                || (!ua.contains(UA.TRIDENT) && (ua.contains(UA.SYMBIAN) || ua.contains(UA.NOKIA)
+                || ua.contains(UA.PALMSOURCE) || ua.contains(UA.BLAZER) || ua.contains(UA.PALM_OS)))
+                ) {
                 return false;
             }
 
@@ -161,24 +123,27 @@ public enum UserAgent {
         int majorVersion(String ua) {
             if (ua.contains(UA.TRIDENT_4)) {
                 return 8;
-            } else if (ua.contains(UA.TRIDENT_5)) {
+            }
+            if (ua.contains(UA.TRIDENT_5)) {
                 return 9;
-            } else if (ua.contains(UA.TRIDENT_6)) {
+            }
+            if (ua.contains(UA.TRIDENT_6)) {
                 return 10;
-            } else if (ua.contains(UA.TRIDENT_7)) {
+            }
+            if (ua.contains(UA.TRIDENT_7)) {
                 return 11;
-            } else if (ua.contains(UA.TRIDENT_8)) {
+            }
+            if (ua.contains(UA.TRIDENT_8)) {
                 return 12;
-            } else if (ua.contains(UA.TRIDENT_9)) {
+            }
+            if (ua.contains(UA.TRIDENT_9)) {
                 return 13;
-            } else {
-                try {
-                    int verStart = ua.indexOf(UA.MSIE) + 5; // 5 = "msie ".length()
-                    int verEnd = ua.indexOf(UA.DOT, verStart);
-                    return Integer.parseInt(ua.substring(verStart, verEnd));
-                }
-                catch (NumberFormatException e) {}
-                catch (IndexOutOfBoundsException e) {}
+            }
+            try {
+                int verStart = ua.indexOf(UA.MSIE) + 5; // 5 = "msie ".length()
+                int verEnd = ua.indexOf(UA.DOT, verStart);
+                return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
             return UA.UNSPECIFIED;
         }
@@ -223,8 +188,7 @@ public enum UserAgent {
                 if ('1' == String.valueOf(browser).charAt(6)) {
                     // if yes, fake IE7
                     return super.match(XBROWSER_IE_7, version, atLeast);
-                }
-                else {
+                } else {
                     // if no, check normally
                     return super.match(browser, version, atLeast);
                 }
@@ -245,8 +209,7 @@ public enum UserAgent {
                 if ('1' == String.valueOf(browser).charAt(6)) {
                     // if yes, fake IE7
                     return super.match(XBROWSER_IE_7, minVer, maxVer);
-                }
-                else {
+                } else {
                     // if no, check normally
                     return super.match(browser, minVer, maxVer);
                 }
@@ -258,15 +221,14 @@ public enum UserAgent {
     },
 
 
-
     FIREFOX(11) {
         // https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference
 
         @Override
         boolean match(String ua) {
             return (ua.contains(UA.FIREFOX) && ua.contains(UA.GECKO)
-                    && !ua.contains(UA.NAVIGATOR)
-                    && !ua.contains(UA.OPERA));
+                && !ua.contains(UA.NAVIGATOR)
+                && !ua.contains(UA.OPERA));
         }
 
         /**
@@ -281,9 +243,8 @@ public enum UserAgent {
                 int verStart = ua.indexOf(UA.FIREFOX) + 8; // 8 = "firefox/".length()
                 int verEnd = ua.indexOf(UA.DOT, verStart);
                 return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
@@ -297,9 +258,11 @@ public enum UserAgent {
         int flags(String ua) {
             if (ua.contains(UA.PHONE)) {
                 return UA.PHONE_FLAG;
-            } else if (ua.contains(UA.TABLET)) {
+            }
+            if (ua.contains(UA.TABLET)) {
                 return UA.TABLET_FLAG;
-            } else if (ua.contains(UA.FENNEC) || ua.contains(UA.MOBILE)) {
+            }
+            if (ua.contains(UA.FENNEC) || ua.contains(UA.MOBILE)) {
                 return UA.MOBILE_FLAG;
             }
             return UA.UNSPECIFIED;
@@ -322,9 +285,8 @@ public enum UserAgent {
                 int verStart = ua.indexOf(UA.CHROMEFRAME) + 12; // 12 = "chromeframe/".length()
                 int verEnd = ua.indexOf(UA.DOT, verStart);
                 return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
@@ -339,9 +301,8 @@ public enum UserAgent {
                 int verStart = ua.indexOf(UA.MSIE) + 5; // 5 = "msie ".length()
                 int verEnd = ua.indexOf(UA.DOT, verStart);
                 return 10 * Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
     },
@@ -363,25 +324,22 @@ public enum UserAgent {
         int majorVersion(String ua) {
             try {
                 int verStart = ua.indexOf(UA.CHROMEFRAME);
-                if (verStart != -1){
+                if (verStart != -1) {
                     verStart += 12; // 12 = "chromeframe/".length()
-                }
-                else if (ua.contains(UA.CHROME_IOS)) {
+                } else if (ua.contains(UA.CHROME_IOS)) {
                     verStart = ua.indexOf(UA.CHROME_IOS) + 6; // 6 = "crios/".length
-                }
-                else {
+                } else {
                     verStart = ua.indexOf(UA.CHROME_SLASH) + 7; // 7 = "chrome/".length()
                 }
                 int verEnd = ua.indexOf(UA.DOT, verStart);
                 return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
         /**
-         * 001 if mobile, 006 if on IOS (a hybrid of Chrome and Safari),
+         * 001/003 if mobile/tablet, 006 if on IOS (a hybrid of Chrome and Safari),
          * otherwise 000
          */
         @Override
@@ -389,14 +347,21 @@ public enum UserAgent {
             if (ua.contains(UA.CHROME_IOS)) {
                 return 6;
             }
-            else if (ua.contains(UA.MOBILE)) {
+
+            if (ua.contains(UA.MOBILE)) {
                 return UA.MOBILE_FLAG;
             }
+
+            if (ua.contains(UA.ANDROID)) {
+                // Android tablets don't have the string "Mobile" as part of the user agent,
+                // see the somewhat outdated article:
+                // http://googlewebmastercentral.blogspot.com/2011/03/mo-better-to-also-detect-mobile-user.html
+                return UA.TABLET_FLAG;
+            }
+
             return UA.UNSPECIFIED;
         }
     },
-
-
 
 
     SAFARI(14) {
@@ -406,13 +371,13 @@ public enum UserAgent {
         @Override
         boolean match(String ua) {
             return (ua.contains(UA.SAFARI) && ua.contains(UA.APPLE_WEBKIT)
-                    && !ua.contains(UA.CHROME)
-                    && !ua.contains(UA.ANDROID)
-                    && !ua.contains(UA.SYMBIAN)
-                    && !ua.contains(UA.PLAYBOOK)
-                    && !ua.contains(UA.BLACKBERRY)
-                    && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
-                    && !ua.contains(UA.SILK));
+                && !ua.contains(UA.CHROME)
+                && !ua.contains(UA.ANDROID)
+                && !ua.contains(UA.SYMBIAN)
+                && !ua.contains(UA.PLAYBOOK)
+                && !ua.contains(UA.BLACKBERRY)
+                && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
+                && !ua.contains(UA.SILK));
         }
 
         @Override
@@ -428,9 +393,8 @@ public enum UserAgent {
                 } else if (ua.contains(UA.SAFARI_1_KEY1) || ua.contains(UA.SAFARI_1_KEY2) || ua.contains(UA.SAFARI_1_KEY3)) {
                     return 1;
                 }
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
@@ -445,18 +409,20 @@ public enum UserAgent {
         int flags(String ua) {
             if (ua.contains(UA.IPHONE)) {
                 return UA.PHONE_FLAG;
-            } else if (ua.contains(UA.IPAD)) {
+            }
+            if (ua.contains(UA.IPAD)) {
                 return UA.TABLET_FLAG;
-            } else if (ua.contains(UA.IPOD)) {
+            }
+            if (ua.contains(UA.IPOD)) {
                 return UA.MPLAYER_FLAG;
-            } else if (ua.contains(UA.MOBILE)) {
+            }
+            if (ua.contains(UA.MOBILE)) {
                 return UA.MOBILE_FLAG;
             }
             return UA.UNSPECIFIED;
         }
 
     },
-
 
 
     OPERA(15) {
@@ -476,16 +442,15 @@ public enum UserAgent {
                     verStart = ua.indexOf(UA.VERSION) + 8; // 8 = "version/".length()
                 } else if (ua.contains(UA.OPERA_MINI)) {
                     verStart = ua.indexOf(UA.OPERA_MINI) + 11; // 11 = "opera mini/".length()
-                } else if (ua.contains(UA.OPERA_SLASH)){
+                } else if (ua.contains(UA.OPERA_SLASH)) {
                     verStart = ua.indexOf(UA.OPERA_SLASH) + 6; // 6 = "opera/".length()
                 } else {
                     verStart = ua.indexOf(UA.OPERA_SPACE) + 6; // 6 = "opera ".length()
                 }
                 int verEnd = ua.indexOf(UA.DOT, verStart);
                 return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
@@ -496,13 +461,13 @@ public enum UserAgent {
         int flags(String ua) {
             if (ua.contains(UA.OPERA_MINI)) {
                 return 6;
-            } else if (ua.contains(UA.OPERA_MOBILE) || ua.contains(UA.HTC)) {
+            }
+            if (ua.contains(UA.OPERA_MOBILE) || ua.contains(UA.HTC)) {
                 return UA.MOBILE_FLAG;
             }
             return UA.UNSPECIFIED;
         }
     },
-
 
 
     ANDROID_WEBKIT(16) {
@@ -520,9 +485,8 @@ public enum UserAgent {
                 int verStart = ua.indexOf(UA.VERSION) + 8; // 8 = "version/".length()
                 int verEnd = ua.indexOf(UA.DOT, verStart);
                 return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
@@ -535,15 +499,14 @@ public enum UserAgent {
         int flags(String ua) {
             // if mobile SDK then either tablet or phone
             if (ua.contains(UA.MOBILE)
-                    || ua.contains(UA.PHONE)
-                    || ua.contains(UA.HTC)
-                    || ua.contains(UA.SAMSUNG)) {
+                || ua.contains(UA.PHONE)
+                || ua.contains(UA.HTC)
+                || ua.contains(UA.SAMSUNG)) {
                 return UA.MOBILE_FLAG;
             }
             return UA.UNSPECIFIED;
         }
     },
-
 
 
     NETSCAPE(17) {
@@ -552,13 +515,13 @@ public enum UserAgent {
         @Override
         boolean match(String ua) {
             return ((ua.contains(UA.GECKO) && (ua.contains(UA.NAVIGATOR) || ua.contains(UA.NETSCAPE_NOSLASH)))
-                    || (ua.contains(UA.MOZILLA_4)
-                            && (!ua.contains(UA.GECKO)
-                            && !ua.contains(UA.MSIE)
-                            && !ua.contains(UA.PALM_OS)
-                            && !ua.contains(UA.SYMBIAN)
-                            && !ua.contains(UA.OMNIWEB)
-                            && !ua.contains(UA.ICAB))));
+                || (ua.contains(UA.MOZILLA_4)
+                && (!ua.contains(UA.GECKO)
+                && !ua.contains(UA.MSIE)
+                && !ua.contains(UA.PALM_OS)
+                && !ua.contains(UA.SYMBIAN)
+                && !ua.contains(UA.OMNIWEB)
+                && !ua.contains(UA.ICAB))));
         }
 
         @Override
@@ -568,11 +531,11 @@ public enum UserAgent {
                     int verStart = -1;
                     if (ua.contains(UA.NAVIGATOR)) {
                         verStart = ua.indexOf(UA.NAVIGATOR) + 10; // 10 = "navigator/".length()
-                    } else if (ua.contains(UA.NETSCAPE)){
+                    } else if (ua.contains(UA.NETSCAPE)) {
                         verStart = ua.indexOf(UA.NETSCAPE) + 9; // 9 = "netscape/".length()
                     } else if (ua.contains(UA.NETSCAPE_6)) {
                         verStart = ua.indexOf(UA.NETSCAPE_6) + 10; // 10 = "netscape6/".length()
-                    } else if (ua.contains(UA.NETSCAPE_NOSLASH)){
+                    } else if (ua.contains(UA.NETSCAPE_NOSLASH)) {
                         verStart = ua.indexOf(UA.NETSCAPE_NOSLASH) + 8; // 8 = "netscape".length()
                     }
                     if (verStart != -1) {
@@ -584,9 +547,8 @@ public enum UserAgent {
                     // Netscape 4.x is the rest of what passes match()
                     return 4;
                 }
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
     },
@@ -597,25 +559,25 @@ public enum UserAgent {
      * This includes some newer Nokia and Blackberry systems.
      */
     OTHER_WEBKIT(18) {
-
         @Override
         boolean match(String ua) {
             // is webkit, but doesn't match other specific webkit UserAgent instances
-            if (!ua.contains(UA.APPLE_WEBKIT)){
+            if (!ua.contains(UA.APPLE_WEBKIT)) {
                 // not other webkit
                 return false;
-            } else if (ua.contains(UA.IPAD) || ua.contains(UA.IPHONE)) {
+            }
+            if (ua.contains(UA.IPAD) || ua.contains(UA.IPHONE)) {
                 //ios UIWebView
                 return true;
             }
             // else, webkit but not the more specific: safari, chrome, stock android, BB10+, or S1 Desktop
             return (!ua.contains(UA.CHROME)
-                    && !ua.contains(UA.IPHONE)
-                    && !ua.contains(UA.IPAD)
-                    && !ua.contains(UA.IPOD)
-                    && !ua.contains(UA.ANDROID)
-                    && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
-                    && !ua.contains(UA.PLAYBOOK));
+                && !ua.contains(UA.IPHONE)
+                && !ua.contains(UA.IPAD)
+                && !ua.contains(UA.IPOD)
+                && !ua.contains(UA.ANDROID)
+                && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
+                && !ua.contains(UA.PLAYBOOK));
         }
 
         /**
@@ -624,17 +586,18 @@ public enum UserAgent {
         @Override
         int flags(String ua) {
             if (ua.contains(UA.IPAD)
-                    || ua.contains(UA.TABLET)
-                    || ua.contains(UA.SILK)) {
+                || ua.contains(UA.TABLET)
+                || ua.contains(UA.SILK)) {
                 return UA.TABLET_FLAG;
-            } else if (ua.contains(UA.MOBILE)
-                    || ua.contains(UA.PHONE)
-                    || ua.contains(UA.IPOD)
-                    || ua.contains(UA.SYMBIAN)
-                    || ua.contains(UA.BLACKBERRY)
-                    || ua.contains(UA.BLACKBERRY10_AND_ABOVE)
-                    || ua.contains(UA.HTC)
-                    || ua.contains(UA.SAMSUNG)) {
+            }
+            if (ua.contains(UA.MOBILE)
+                || ua.contains(UA.PHONE)
+                || ua.contains(UA.IPOD)
+                || ua.contains(UA.SYMBIAN)
+                || ua.contains(UA.BLACKBERRY)
+                || ua.contains(UA.BLACKBERRY10_AND_ABOVE)
+                || ua.contains(UA.HTC)
+                || ua.contains(UA.SAMSUNG)) {
                 return UA.MOBILE_FLAG;
             }
             return UA.UNSPECIFIED;
@@ -646,15 +609,14 @@ public enum UserAgent {
      * This includes some releases of Camino, Konquerer, Chimera, etc.
      */
     OTHER_GECKO(19) {
-
         @Override
         boolean match(String ua) {
             // is gecko, but doesn't match other specific gecko UserAgent instances
             return (ua.contains(UA.GECKO)
-                    && !ua.contains(UA.FIREFOX)
-                    && !ua.contains(UA.NAVIGATOR)
-                    && !ua.contains(UA.NETSCAPE)
-                    && !ua.contains(UA.PLAYBOOK));
+                && !ua.contains(UA.FIREFOX)
+                && !ua.contains(UA.NAVIGATOR)
+                && !ua.contains(UA.NETSCAPE)
+                && !ua.contains(UA.PLAYBOOK));
         }
 
         /**
@@ -678,8 +640,8 @@ public enum UserAgent {
         boolean match(String ua) {
             // is KHTML, but doesn't match other specific UserAgent instances
             return (ua.contains(UA.KHTML) && !ua.contains(UA.GECKO)
-                    && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
-                    && !ua.contains(UA.PLAYBOOK));
+                && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
+                && !ua.contains(UA.PLAYBOOK));
         }
 
     },
@@ -689,7 +651,7 @@ public enum UserAgent {
      * This includes legacy (old) Blackberry, Nokia, Palm, and other browsers that are not
      * based on modern engines (Gecko, Chromium, and Webkit).
      */
-    OTHER_MOBILE (21) {
+    OTHER_MOBILE(21) {
 
         // http://www.developer.nokia.com/Community/Wiki/User-Agent_headers_for_Nokia_devices
         // http://www.zytrax.com/tech/web/mobile_ids.html
@@ -700,18 +662,18 @@ public enum UserAgent {
             // is a mobile we know about but don't want to handle specially
             // APPLE_WEBKIT should have been found as OTHER_WEBKIT
             // TRIDENT should have matched for modern IEMobile
-            if (ua.contains(UA.APPLE_WEBKIT)  || ua.contains(UA.TRIDENT)) {
+            if (ua.contains(UA.APPLE_WEBKIT) || ua.contains(UA.TRIDENT)) {
                 return false;
             }
             // TODO: should we also look for 'phone' and 'mobile' here?
             return (ua.contains(UA.BLACKBERRY)
-                    || ua.contains(UA.HTC)
-                    || ua.contains(UA.SAMSUNG)
-                    || ua.contains(UA.SYMBIAN)
-                    || ua.contains(UA.NOKIA)
-                    || ua.contains(UA.PALMSOURCE)
-                    || ua.contains(UA.BLAZER)
-                    || ua.contains(UA.PALM_OS)
+                || ua.contains(UA.HTC)
+                || ua.contains(UA.SAMSUNG)
+                || ua.contains(UA.SYMBIAN)
+                || ua.contains(UA.NOKIA)
+                || ua.contains(UA.PALMSOURCE)
+                || ua.contains(UA.BLAZER)
+                || ua.contains(UA.PALM_OS)
             );
         }
 
@@ -729,13 +691,13 @@ public enum UserAgent {
     /**
      * Modern Blackberry
      */
-    BLACKBERRY (23) {
+    BLACKBERRY(23) {
 
         // http://supportforums.blackberry.com/t5/Web-and-WebWorks-Development/How-to-detect-the-BlackBerry-Browser/ta-p/559862
 
         @Override
         boolean match(String ua) {
-             return ua.contains(UA.BLACKBERRY10_AND_ABOVE) || ua.contains(UA.PLAYBOOK);
+            return ua.contains(UA.BLACKBERRY10_AND_ABOVE) || ua.contains(UA.PLAYBOOK);
         }
 
         @Override
@@ -746,9 +708,8 @@ public enum UserAgent {
                     int verEnd = ua.indexOf(UA.DOT, verStart);
                     return Integer.parseInt(ua.substring(verStart, verEnd));
                 }
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-            catch (NumberFormatException ex) {}
-            catch (IndexOutOfBoundsException e) {}
             return UA.UNSPECIFIED;
         }
 
@@ -783,8 +744,7 @@ public enum UserAgent {
         // [<key to match ua.startsWith> , <label key>]
         // order is important in some cases - a string might contain matches to 2+ keys
         @SuppressWarnings("serial")
-        private final Map<String, Integer> STARTS_WITH = new LinkedHashMap<String, Integer>()
-        {
+        private final Map<String, Integer> STARTS_WITH = new LinkedHashMap<String, Integer>() {
             {
                 put(UA.SFORCE_HTTP, BROWSER_OFFICE_TOOLKIT);
                 put(UA.SFORCE_OFFICE_TOOLKIT, BROWSER_OFFICE_TOOLKIT);
@@ -813,8 +773,7 @@ public enum UserAgent {
 
         // [<key to match ua.contains> , <label key>]
         @SuppressWarnings("serial")
-        private final Map<String, Integer> CONTAINS = new LinkedHashMap<String, Integer>()
-        {
+        private final Map<String, Integer> CONTAINS = new LinkedHashMap<String, Integer>() {
             {
                 put(UA.MS_WEB_SERVICES_2_0, BROWSER_DOTNET_2_0);
                 put(UA.MS_WEB_SERVICES_1_1, BROWSER_DOTNET_1_1);
@@ -832,7 +791,6 @@ public enum UserAgent {
                 put("jakarta commons-httpclient", BROWSER_HTTP_COMMONS);
             }
         };
-
 
 
         @Override
@@ -859,23 +817,18 @@ public enum UserAgent {
         int flags(String ua) {
             for (String s : STARTS_WITH.keySet()) {
                 if (ua.startsWith(s)) {
-                    return (STARTS_WITH.get(s).intValue());
+                    return (STARTS_WITH.get(s));
                 }
             }
             for (String s : CONTAINS.keySet()) {
                 if (ua.contains(s)) {
-                    return (CONTAINS.get(s).intValue());
+                    return (CONTAINS.get(s));
                 }
             }
             // this should never happen
             return UA.UNSPECIFIED;
         }
     };
-
-
-
-
-
 
 
     // higher than this means 182+ dynamic versions
@@ -885,8 +838,7 @@ public enum UserAgent {
     static final int VERSIONED_CUTOFF = 99000000;
 
     // 2 digits for browser family/type
-    private int prefix;
-
+    private final int prefix;
 
 
     /**
@@ -903,7 +855,7 @@ public enum UserAgent {
      * Examines the user agent String and returns the appropriate matching
      * UserAgent enum instance.
      *
-     * @param userAgent
+     * @param userAgent Browser user agent
      *
      * @return the corresponding UserAgent, or null if unknown
      */
@@ -926,7 +878,7 @@ public enum UserAgent {
      * @return the prefix int
      */
     int prefix() {
-        return this.prefix;
+        return prefix;
     }
 
     /**
@@ -963,13 +915,8 @@ public enum UserAgent {
      * @return true if a match, false otherwise
      */
     public boolean match(int browser) {
-        if (browser > LEGACY_CUTOFF) {
-            return this.prefix == Integer.parseInt(String.valueOf(browser).substring(0,2));
-        }
-        return false;
+        return browser > LEGACY_CUTOFF && prefix == Integer.parseInt(String.valueOf(browser).substring(0, 2));
     }
-
-
 
 
     /**
@@ -1003,8 +950,8 @@ public enum UserAgent {
     public boolean match(int browser, int version, boolean atLeast) {
         if (browser > LEGACY_CUTOFF) {
             String b = String.valueOf(browser);
-            if (this.prefix == Integer.parseInt(b.substring(0,2))) {
-                int browserVer = Integer.parseInt(b.substring(2,5));
+            if (prefix == Integer.parseInt(b.substring(0, 2))) {
+                int browserVer = Integer.parseInt(b.substring(2, 5));
                 if (atLeast) {
                     return browserVer >= version;
                 } else {
@@ -1021,16 +968,16 @@ public enum UserAgent {
      * and if the browser int refers to a version in the given range.
      *
      * @param browser the browser int to check
-     * @param int minVer the minimum version to compare against
-     * @param int maxVer the maximum version to compare against
+     * @param minVer the minimum version to compare against
+     * @param maxVer the maximum version to compare against
      *
      * @return true if a match for browser and version, false otherwise
      */
     public boolean match(int browser, int minVer, int maxVer) {
         if (browser > LEGACY_CUTOFF) {
             String b = String.valueOf(browser);
-            if (this.prefix == Integer.parseInt(b.substring(0,2))) {
-                int browserVer = Integer.parseInt(b.substring(2,5));
+            if (prefix == Integer.parseInt(b.substring(0, 2))) {
+                int browserVer = Integer.parseInt(b.substring(2, 5));
                 return (browserVer >= minVer) && (browserVer <= maxVer);
             }
         }
@@ -1066,7 +1013,6 @@ public enum UserAgent {
         static final int PHONE_FLAG = 2;
         static final int TABLET_FLAG = 3;
         static final int MPLAYER_FLAG = 4;
-        static final String BLANK = "";
 
 
         // MS
@@ -1082,7 +1028,6 @@ public enum UserAgent {
         static final String TRIDENT_7 = "trident/7.0"; // IE11
         static final String TRIDENT_8 = "trident/8.0"; // IE12?
         static final String TRIDENT_9 = "trident/9.0"; // IE13?
-        static final String IEMOBILE = "iemobile/";
         static final String WINCE = "wince";
         static final String WINDOWS_CE = "windows ce";
         static final String MS_WEB_SERVICES = "ms web services client protocol ";
@@ -1112,7 +1057,6 @@ public enum UserAgent {
         static final String WINDOWS_PHONE_OS_7_5 = "windows phone os 7.5";
         static final String WINDOWS_PHONE_8 = "windows phone 8.0";
         static final String WINDOWS_PHONE_8_1 = "windows phone 8.1";
-        static final String WINDOWS = "Windows ";
 
 
         // Apple

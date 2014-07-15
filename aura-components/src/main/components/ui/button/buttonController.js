@@ -22,8 +22,15 @@
     },
 
     press : function(cmp, event){
-        if ($A.util.getBooleanValue(cmp.get("v.stopClickPropagation"))) {
-            $A.util.squash(event, true);
+        if ($A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
+            //IE9 & Other Browsers
+            if (event.stopPropagation) {
+              event.stopPropagation();
+            }
+            //IE8 and Lower
+            else {
+              event.cancelBubble = true;
+            }
         }
 
         if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {

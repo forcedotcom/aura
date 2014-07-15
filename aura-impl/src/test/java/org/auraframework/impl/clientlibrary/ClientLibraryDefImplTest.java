@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -31,6 +30,7 @@ import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.ClientLibraryDefHandler;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.source.StringSource;
@@ -239,11 +239,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
 
     private XMLStreamReader getXmlReader(StringSource<ClientLibraryDef> clSource) throws FactoryConfigurationError,
             XMLStreamException {
-        XMLStreamReader xmlReader = null;
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(clSource.getSystemId(),
-                clSource.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(clSource.getHashingReader());
         xmlReader.next();
         return xmlReader;
     }

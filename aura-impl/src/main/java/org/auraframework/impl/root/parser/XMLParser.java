@@ -45,23 +45,35 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public class XMLParser implements Parser {
 
-    private final XMLInputFactory xmlInputFactory;
-    private static final XMLParser instance = new XMLParser();
+    private static final XMLInputFactory xmlInputFactory;
 
-    private XMLParser() {
+    static {
         xmlInputFactory = XMLInputFactory.newInstance();
+
+        // Setting IS_NAMESPACE_AWARE to true will require all xml to be valid xml and
+        // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
+
         try {
+            // sjsxp does not currently have a thread-safe XMLInputFactory, as that implementation
+            // tries to cache and reuse theXMLStreamReader. Setting the parser-specific "reuse-instance"
+            // property to false prevents this.
+            // All other known open-source stax parsers (and the bea ref impl) have thread-safe factories.
+            // W-2316503: remove compatibility code for both SJSXP and Woodstox
             xmlInputFactory.setProperty("reuse-instance", false);
-        } catch (IllegalArgumentException e) {
-            //See W-1737863.  This property is specific to SJSXP and not supported or needed by Woodstox
-            //The exception here is a no-op.
+        } catch (IllegalArgumentException ex) {
+            // Other implementations will likely throw this exception since "reuse-instance"
+            // is implementation specific. NO-OP
         }
     }
+
+    private static final XMLParser instance = new XMLParser();
+
+    private XMLParser() {}
 
     public static XMLParser getInstance() {
         return instance;
@@ -79,7 +91,7 @@ public class XMLParser implements Parser {
             if (source.exists()) {
                 reader = new HTMLReader(source.getHashingReader());
 
-                xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), reader);
+                xmlReader = xmlInputFactory.createXMLStreamReader(reader);
             }
             handler = RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>) descriptor,
                     (Source<RootDefinition>) source, xmlReader);
@@ -208,6 +220,17 @@ public class XMLParser implements Parser {
             return new Location(source.getSystemId(), source.getLastModified());
         }
         return null;
+    }
+
+    /**
+     * Convenience method to use input factory to create steam reader
+     *
+     * @param reader reader
+     * @return xml stream reader implementation
+     * @throws XMLStreamException
+     */
+    public XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
+        return xmlInputFactory.createXMLStreamReader(reader);
     }
 
 }

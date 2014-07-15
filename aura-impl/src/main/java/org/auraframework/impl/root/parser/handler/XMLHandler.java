@@ -105,22 +105,34 @@ public abstract class XMLHandler<T extends Definition> {
     }
 
     /**
-     * Since we do not have namespace support enabled on the xmlreader, there doesn't seem to be a good api to get
-     * namespaced attributes. Unlike tags, the simple get does actually strip off the namespace. So, we see if the
-     * simple name matches at all, and if it does, we iterate through all attributes to do the exact match, including
-     * namespace.
+     * Gets system attribute by prepending system prefix.
+     *
+     * @param name attribute name
+     * @return attribute value
      */
     protected String getSystemAttributeValue(String name) {
-        String ret = getAttributeValue(name);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(ret)) {
-            for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
-                if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)
-                        && SYSTEM_TAG_PREFIX.equalsIgnoreCase(xmlReader.getAttributePrefix(i))) {
-                    return xmlReader.getAttributeValue(i);
+        // W-2316503: remove compatibility code for both SJSXP and Woodstox
+        String value = getAttributeValue(SYSTEM_TAG_PREFIX + ":" + name);
+        if (value != null) {
+            // woodstox
+            // With IS_NAMESPACE_AWARE disabled, woodstox will not set attribute prefix
+            // so we can get the value from entire attribute name
+            return value;
+        } else {
+            // sjsxp
+            // defaults to setting attribute prefix regardless of IS_NAMESPACE_AWARE setting
+            value = getAttributeValue(name);
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(value)) {
+                // ensure system prefixed value of attribute ie "id" vs "aura:id"
+                for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
+                    if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)
+                            && SYSTEM_TAG_PREFIX.equalsIgnoreCase(xmlReader.getAttributePrefix(i))) {
+                        return xmlReader.getAttributeValue(i);
+                    }
                 }
             }
+            return null;
         }
-        return null;
     }
 
     protected boolean getBooleanAttributeValue(String name) {
@@ -174,5 +186,15 @@ public abstract class XMLHandler<T extends Definition> {
             fullName = name.getLocalPart();
         }
         return SYSTEM_TAGS.contains(fullName.toLowerCase());
+    }
+
+    /**
+     * Whether name is system "aura" prefixed
+     *
+     * @param name tag or attribute name
+     * @return whether name is system "aura" prefixed
+     */
+    public static boolean isSystemPrefixed(String name, String prefix) {
+        return SYSTEM_TAG_PREFIX.equalsIgnoreCase(prefix) || name.regionMatches(true, 0, SYSTEM_TAG_PREFIX + ":", 0, 5);
     }
 }

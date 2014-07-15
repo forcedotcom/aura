@@ -289,9 +289,10 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 ApplicationDef.class,
                 "<aura:application '></aura:application>");
         openRaw(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
-        assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException: "
-                + String.format("markup://%s:%s:1,19: ParseError at [row,col]:[2,19]", add.getNamespace(),
-                        add.getName()));
+        // Verifying common bits of parser (sjsxp vs woodstox) error
+        assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException:");
+        assertQuickFixStacktrace(String.format("markup://%s:%s:", add.getNamespace(), add.getName()));
+        assertQuickFixStacktrace("[2,19]");
     }
 
     /**

@@ -15,118 +15,143 @@
  */
 package org.auraframework.impl.util;
 
+import junit.framework.TestSuite;
+import org.auraframework.test.UnitTestCase;
+import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.test.annotation.UnitTest;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-import junit.framework.TestSuite;
-
-import org.auraframework.test.UnitTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.test.annotation.UnitTest;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 @UnAdaptableTest
 @UnitTest
-public class BrowserAgentTest extends TestSuite{
+public class BrowserAgentTest extends TestSuite {
 
     public static TestSuite suite() throws Throwable {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        InputStream is = cl.getResourceAsStream("/results/BrowserAgentTest/BrowserAgentTest.csv");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         TestSuite suite = new TestSuite("BrowserAgentTestSuite");
-        try {
+        InputStreamReader fixtureStream = new InputStreamReader(getFixture("results/BrowserAgentTest/BrowserAgentTest.csv"));
+        try (BufferedReader reader = new BufferedReader(fixtureStream)) {
+
             String line;
             boolean firstLine = true;
+
             while ((line = reader.readLine()) != null) {
                 if (firstLine) {
+                    // Ignore first line as it contains the CSV header and not actual browser information
                     firstLine = false;
                     continue;
                 }
-                StringTokenizer tok = new StringTokenizer(line,",", false);
-                BrowserTestInfo info = new BrowserTestInfo();
-                info.client = tok.nextToken();
-                if (info.client.startsWith("#")) {
+                if (ignore(line)) {
                     continue;
                 }
-                info.formFactor = tok.nextToken();
-                info.tablet = Boolean.valueOf(tok.nextToken());
-                info.phone = Boolean.valueOf(tok.nextToken());
-                info.iPad = Boolean.valueOf(tok.nextToken());
-                info.iPhone = Boolean.valueOf(tok.nextToken());
-                info.iOS = Boolean.valueOf(tok.nextToken());
-                info.android = Boolean.valueOf(tok.nextToken());
-                info.windowsPhone = Boolean.valueOf(tok.nextToken());
-                info.firefox = Boolean.valueOf(tok.nextToken());
-                info.webkit = Boolean.valueOf(tok.nextToken());
-                info.ie6 = Boolean.valueOf(tok.nextToken());
-                info.ie7 = Boolean.valueOf(tok.nextToken());
-                info.ie8 = Boolean.valueOf(tok.nextToken());
-                info.ie9 = Boolean.valueOf(tok.nextToken());
-                info.ie10 = Boolean.valueOf(tok.nextToken());
-                info.ie11 = Boolean.valueOf(tok.nextToken());
-                info.userAgent = tok.nextToken("*");
-                suite.addTest(new BrowserAgentTestCase(info, "testBrowserAgent"));
+
+                BrowserTestInfo expectedBrowserInfo = readExpectedBrowserInfo(line);
+
+                suite.addTest(new BrowserAgentTestCase(expectedBrowserInfo));
             }
-        }
-        finally {
-            reader.close();
         }
         return suite;
     }
-    
-    public static class BrowserAgentTestCase extends UnitTestCase{
-        private final BrowserTestInfo browserInfo;
+
+    private static BrowserTestInfo readExpectedBrowserInfo(String line) {
+        StringTokenizer tokenizer = new StringTokenizer(line, ",", false);
+        BrowserTestInfo info = new BrowserTestInfo();
+
+        info.client = tokenizer.nextToken();
+        info.formFactor = tokenizer.nextToken();
+        info.tablet = Boolean.valueOf(tokenizer.nextToken());
+        info.phone = Boolean.valueOf(tokenizer.nextToken());
+        info.iPad = Boolean.valueOf(tokenizer.nextToken());
+        info.iPhone = Boolean.valueOf(tokenizer.nextToken());
+        info.iOS = Boolean.valueOf(tokenizer.nextToken());
+        info.android = Boolean.valueOf(tokenizer.nextToken());
+        info.windowsPhone = Boolean.valueOf(tokenizer.nextToken());
+        info.firefox = Boolean.valueOf(tokenizer.nextToken());
+        info.webkit = Boolean.valueOf(tokenizer.nextToken());
+        info.ie6 = Boolean.valueOf(tokenizer.nextToken());
+        info.ie7 = Boolean.valueOf(tokenizer.nextToken());
+        info.ie8 = Boolean.valueOf(tokenizer.nextToken());
+        info.ie9 = Boolean.valueOf(tokenizer.nextToken());
+        info.ie10 = Boolean.valueOf(tokenizer.nextToken());
+        info.ie11 = Boolean.valueOf(tokenizer.nextToken());
+        info.userAgent = tokenizer.nextToken("*");
+
+        return info;
+    }
+
+    private static InputStream getFixture(String fixtureName) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        return classLoader.getResourceAsStream(fixtureName);
+    }
+
+    private static boolean ignore(String line) {
+        return line.trim().startsWith("#");
+    }
+
+    public static class BrowserAgentTestCase extends UnitTestCase {
+
+        private final BrowserTestInfo expected;
         private final String name;
-        public BrowserAgentTestCase(BrowserTestInfo info, String name) {
+
+        public BrowserAgentTestCase(BrowserTestInfo expectedBrowserInfo) {
             super("testBrowserAgent");
-            this.browserInfo = info;
-            this.name = name + "_" + info.client;
+            expected = expectedBrowserInfo;
+            name = "testBrowserAgent" + "_" + expectedBrowserInfo.client;
         }
+
         @Override
         public String getName() {
             return name;
         }
+
         public void testBrowserAgent() throws Exception {
-            BrowserInfo info = new BrowserInfo(browserInfo.userAgent);
-            assertEquals(browserInfo.client + " tablet incorrect", browserInfo.tablet, info.isTablet());
-            assertEquals(browserInfo.client + " phone incorrect", browserInfo.phone, info.isPhone());
-            assertEquals(browserInfo.client + " iPad incorrect", browserInfo.iPad, info.isIPad());
-            assertEquals(browserInfo.client + " iPhone incorrect", browserInfo.iPhone, info.isIPhone());
-            assertEquals(browserInfo.client + " iOS incorrect", browserInfo.iOS, info.isIOS());
-            assertEquals(browserInfo.client + " android incorrect", browserInfo.android, info.isAndroid());
-            assertEquals(browserInfo.client + " windowsPhone incorrect", browserInfo.windowsPhone, info.isWindowsPhone());
-            assertEquals(browserInfo.client + " firefox incorrect", browserInfo.firefox, info.isFirefox());
-            assertEquals(browserInfo.client + " webkit incorrect", browserInfo.webkit, info.isWebkit());
-            assertEquals(browserInfo.client + " ie6 incorrect", browserInfo.ie6, info.isIE6());
-            assertEquals(browserInfo.client + " ie7 incorrect", browserInfo.ie7, info.isIE7());
-            assertEquals(browserInfo.client + " ie8 incorrect", browserInfo.ie8, info.isIE8());
-            assertEquals(browserInfo.client + " ie9 incorrect", browserInfo.ie9, info.isIE9());
-            assertEquals(browserInfo.client + " ie10 incorrect", browserInfo.ie10, info.isIE10());
-            assertEquals(browserInfo.client + " ie11 incorrect", browserInfo.ie11, info.isIE11());
-            assertEquals(browserInfo.client + " form factor incorrect", browserInfo.formFactor, info.getFormFactor());
+            BrowserInfo computed = new BrowserInfo(expected.userAgent);
+
+            assertThat("Is a Tablet", computed.isTablet(), is(expected.tablet));
+            assertThat("Is a Phone", computed.isPhone(), is(expected.phone));
+            assertThat("Is an iPad", computed.isIPad(), is(expected.iPad));
+            assertThat("Is an iPhone", computed.isIPhone(), is(expected.iPhone));
+            assertThat("Is iOS", computed.isIOS(), is(expected.iOS));
+            assertThat("Is Android", computed.isAndroid(), is(expected.android));
+            assertThat("Is Windows Phone", computed.isWindowsPhone(), is(expected.windowsPhone));
+            assertThat("Is Firefox", computed.isFirefox(), is(expected.firefox));
+            assertThat("Is WebKit", computed.isWebkit(), is(expected.webkit));
+            assertThat("Is IE6", computed.isIE6(), is(expected.ie6));
+            assertThat("Is IE7", computed.isIE7(), is(expected.ie7));
+            assertThat("Is IE8", computed.isIE8(), is(expected.ie8));
+            assertThat("Is IE9", computed.isIE9(), is(expected.ie9));
+            assertThat("Is IE10", computed.isIE10(), is(expected.ie10));
+            assertThat("Is IE11", computed.isIE11(), is(expected.ie11));
+            assertThat("Form factor", computed.getFormFactor(), is(expected.formFactor));
         }
+
     }
 
     private static class BrowserTestInfo {
-        public String client;
-        public String formFactor;
-        public boolean tablet;
-        public boolean phone;
-        public boolean iPad;
-        public boolean iPhone;
-        public boolean iOS;
-        public boolean android;
-        public boolean windowsPhone;
-        public boolean firefox;
-        public boolean webkit;
-        public boolean ie6;
-        public boolean ie7;
-        public boolean ie8;
-        public boolean ie9;
-        public boolean ie10;
-        public boolean ie11;
-        public String userAgent;
-        
+
+        String client;
+        String userAgent;
+        String formFactor;
+
+        boolean tablet;
+        boolean phone;
+        boolean iPad;
+        boolean iPhone;
+        boolean iOS;
+        boolean android;
+        boolean windowsPhone;
+        boolean firefox;
+        boolean webkit;
+        boolean ie6;
+        boolean ie7;
+        boolean ie8;
+        boolean ie9;
+        boolean ie10;
+        boolean ie11;
     }
 }

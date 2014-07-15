@@ -16,106 +16,15 @@
 package org.auraframework.impl.util;
 
 // import constants
-import static org.auraframework.impl.util.BrowserConsts.BROWSER_UNKNOWN;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_ANDROID;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_ANDROID_VERSION_BASE;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_DARWIN_CFNETWORK;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_IPAD;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_IPHONE;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_LINUX;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_68K;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_OSX;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_MAC_PPC;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_PALM;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_RIM;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN_4;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN_5;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SUN_I86;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_SYMBIAN;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_UNKNOWN;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7_5;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8_1;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_2K;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_2K3;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_3_1;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_7;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_8;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_8_1;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_95;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_98;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_CE;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_ME;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_NT;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_RT;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_RT_8_1;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_VISTA;
-import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_XP;
-import static org.auraframework.impl.util.UserAgent.VERSIONED_CUTOFF;
-import static org.auraframework.impl.util.UserAgent.UA.ANDROID;
-import static org.auraframework.impl.util.UserAgent.UA.ANDROID_MOBILE;
-import static org.auraframework.impl.util.UserAgent.UA.ARM;
-import static org.auraframework.impl.util.UserAgent.UA.BLACKBERRY;
-import static org.auraframework.impl.util.UserAgent.UA.BLACKBERRY10_AND_ABOVE;
-import static org.auraframework.impl.util.UserAgent.UA.BLAZER;
-import static org.auraframework.impl.util.UserAgent.UA.DARWIN;
-import static org.auraframework.impl.util.UserAgent.UA.EPOC;
-import static org.auraframework.impl.util.UserAgent.UA.I86;
-import static org.auraframework.impl.util.UserAgent.UA.INUX;
-import static org.auraframework.impl.util.UserAgent.UA.IPAD;
-import static org.auraframework.impl.util.UserAgent.UA.IPHONE;
-import static org.auraframework.impl.util.UserAgent.UA.IPOD;
-import static org.auraframework.impl.util.UserAgent.UA.MAC;
-import static org.auraframework.impl.util.UserAgent.UA.MAC68000;
-import static org.auraframework.impl.util.UserAgent.UA.MAC68K;
-import static org.auraframework.impl.util.UserAgent.UA.NOKIA;
-import static org.auraframework.impl.util.UserAgent.UA.OSX;
-import static org.auraframework.impl.util.UserAgent.UA.OS_X;
-import static org.auraframework.impl.util.UserAgent.UA.PALM;
-import static org.auraframework.impl.util.UserAgent.UA.PHONE;
-import static org.auraframework.impl.util.UserAgent.UA.POWERPC;
-import static org.auraframework.impl.util.UserAgent.UA.PPC;
-import static org.auraframework.impl.util.UserAgent.UA.SUNOS;
-import static org.auraframework.impl.util.UserAgent.UA.SUNOS_4;
-import static org.auraframework.impl.util.UserAgent.UA.SUNOS_5;
-import static org.auraframework.impl.util.UserAgent.UA.SYMBIAN;
-import static org.auraframework.impl.util.UserAgent.UA.SYMBOS;
-import static org.auraframework.impl.util.UserAgent.UA.TRIDENT;
-import static org.auraframework.impl.util.UserAgent.UA.TRIDENT_3_1;
-import static org.auraframework.impl.util.UserAgent.UA.TRIDENT_4;
-import static org.auraframework.impl.util.UserAgent.UA.WIN;
-import static org.auraframework.impl.util.UserAgent.UA.WINCE;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_16_BIT;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_3_1;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_95;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_98;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_CE;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_NT;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_8;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_8_1;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_OS_7;
-import static org.auraframework.impl.util.UserAgent.UA.WINDOWS_PHONE_OS_7_5;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_16_BIT;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_2K;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_2K3;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_7;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_8;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_8_1;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_95;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_98;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_ME;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_NT;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_VISTA;
-import static org.auraframework.impl.util.UserAgent.UA.WIN_XP;
+
+import org.auraframework.impl.util.UserAgent.UA;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.auraframework.impl.util.UserAgent.UA;
+import static org.auraframework.impl.util.BrowserConsts.*;
+import static org.auraframework.impl.util.UserAgent.UA.*;
+import static org.auraframework.impl.util.UserAgent.VERSIONED_CUTOFF;
 
 /**
  * Utility to parse and handle browser user-agent Strings.
@@ -123,17 +32,10 @@ import org.auraframework.impl.util.UserAgent.UA;
 public class BrowserUserAgent {
 
     /**
-     * The http header identifier for user agents.
-     *
-     * Use should not be case sensitive.
-     */
-    public static final String HEADER = "user-agent";
-
-    /** 
      * User agent strings have way too many possible characters. This is a white list of all desired characters -
      * basically everything printable except for the backslash.
      */
-    public static final Pattern USER_AGENT_WHITELIST = Pattern.compile("[\\x20-\\x7E&&[^\\x5C]]*");
+    private static final Pattern USER_AGENT_WHITELIST = Pattern.compile("[\\x20-\\x7E&&[^\\x5C]]*");
 
     /* 
      * These regular expressions to detect Mobile Browsers based on the User-Agent header were found at
@@ -165,11 +67,11 @@ public class BrowserUserAgent {
     private static final Pattern mobilePat1 = Pattern.compile(mobileRegexp1);
     private static final Pattern mobilePat2 = Pattern.compile(mobileRegexp2);
 
-    static final Pattern getCommonMobileUserAgentPattern() {
+    static Pattern getCommonMobileUserAgentPattern() {
         return mobilePat1;
     }
 
-    static final Pattern getUncommonMobileUserAgentPattern() {
+    static Pattern getUncommonMobileUserAgentPattern() {
         return mobilePat2;
     }
 
@@ -183,7 +85,7 @@ public class BrowserUserAgent {
      *
      * @return a browser int
      */
-    public static final int parseBrowser(String userAgent) {
+    public static int parseBrowser(String userAgent) {
         // clean the input
         if (userAgent == null) {
             return BROWSER_UNKNOWN;
@@ -227,7 +129,7 @@ public class BrowserUserAgent {
      *
      * @return a platform int
      */
-    public static final int parsePlatform(String userAgent) {
+    public static int parsePlatform(String userAgent) {
         if (userAgent == null) {
             return PLATFORM_UNKNOWN;
         }
@@ -235,16 +137,20 @@ public class BrowserUserAgent {
 
         if (ua.contains(BLACKBERRY) || ua.contains(BLACKBERRY10_AND_ABOVE) || ua.contains(UA.PLAYBOOK)) {
             return PLATFORM_RIM;
-        } else if (ua.contains(PALM) || ua.contains(BLAZER)) {
+        }
+        if (ua.contains(PALM) || ua.contains(BLAZER)) {
             return PLATFORM_PALM;
-        } else if (ua.contains(SYMBIAN) || ua.contains(EPOC) || ua.contains(SYMBOS)) {
+        }
+        if (ua.contains(SYMBIAN) || ua.contains(EPOC) || ua.contains(SYMBOS)) {
             // epoc is old name for symbian
             return PLATFORM_SYMBIAN;
-        } else if (ua.contains(NOKIA) && (!ua.contains(TRIDENT) || ua.contains(TRIDENT_4) || ua.contains(TRIDENT_3_1)) ) {
+        }
+        if (ua.contains(NOKIA) && (!ua.contains(TRIDENT) || ua.contains(TRIDENT_4) || ua.contains(TRIDENT_3_1))) {
             // older nokia devices ran symbian, impersonating IE 5/6/7/8 (Trident/4 and older)
             // new nokia phones run win phone with real IE 9+ (Trident/5.0+) - make sure we don't return symbian for these
             return PLATFORM_SYMBIAN;
-        } else if (ua.contains(ANDROID)) {
+        }
+        if (ua.contains(ANDROID)) {
             try {
                 // sometimes the first occurrence is "android mobile/1.234"
                 int idx = ua.indexOf(ANDROID_MOBILE);
@@ -259,10 +165,11 @@ public class BrowserUserAgent {
                 return PLATFORM_ANDROID_VERSION_BASE + (majorVer * 10) + minorVer;
             }
             // fall through to generic Android on version parse failure
-            catch (IndexOutOfBoundsException e) {}
-            catch (NumberFormatException e) {}
+            catch (IndexOutOfBoundsException | NumberFormatException ignored) {
+            }
             return PLATFORM_ANDROID;
-        } else if (ua.contains(WIN)&&!ua.contains(DARWIN)) {
+        }
+        if (ua.contains(WIN) && !ua.contains(DARWIN)) {
             if (ua.contains(PHONE)) {
                 if (ua.contains(WINDOWS_PHONE_8_1)) {
                     return PLATFORM_WINPH_8_1;
@@ -291,8 +198,7 @@ public class BrowserUserAgent {
                 } else {
                     return PLATFORM_WIN_8_1;
                 }
-            }
-            else if (ua.contains(WIN_VISTA)) {
+            } else if (ua.contains(WIN_VISTA)) {
                 return PLATFORM_WIN_VISTA;
             } else if (ua.contains(WIN_2K3)) {
                 return PLATFORM_WIN_2K3;
@@ -314,18 +220,21 @@ public class BrowserUserAgent {
             } else {
                 return PLATFORM_WIN;
             }
-        } else if (ua.contains(IPAD)) {
+        }
+        if (ua.contains(IPAD)) {
             // also includes S1/SDK apps on iPads
             // http://developer.apple.com/safari/library/technotes/tn2010/tn2262/index.html
             return PLATFORM_IPAD;  // Ipad != iPhone
-        } else if (ua.contains(IPHONE) || ua.contains(IPOD)) {
+        }
+        if (ua.contains(IPHONE) || ua.contains(IPOD)) {
             // also includes S1/SDK apps on iPhones
             // treat ipod and iphone the same for now - they have the same OS, screen, and browser
             return PLATFORM_IPHONE;
-        } else if (ua.contains(DARWIN)) {
+        }
+        if (ua.contains(DARWIN)) {
             return PLATFORM_DARWIN_CFNETWORK;
         }
-        else if (ua.contains(MAC)) {
+        if (ua.contains(MAC)) {
             if (ua.contains(OS_X) || ua.contains(OSX)) {
                 return PLATFORM_MAC_OSX;
             } else if (ua.contains(MAC68K) || ua.contains(MAC68000)) {
@@ -335,7 +244,8 @@ public class BrowserUserAgent {
             } else {
                 return PLATFORM_MAC;
             }
-        } else if (ua.contains(SUNOS)) {
+        }
+        if (ua.contains(SUNOS)) {
             if (ua.contains(SUNOS_4)) {
                 return PLATFORM_SUN_4;
             } else if (ua.contains(SUNOS_5)) {
@@ -345,7 +255,8 @@ public class BrowserUserAgent {
             } else {
                 return PLATFORM_SUN;
             }
-        } else if (ua.contains(INUX)) {
+        }
+        if (ua.contains(INUX)) {
             return PLATFORM_LINUX;
         }
 
@@ -356,18 +267,18 @@ public class BrowserUserAgent {
      * Sanitize a given user agent String, removing potentially dangerous
      * or unusable characters.
      *
-     * @param userAgent
+     * @param userAgent Browser user agent
      *
      * @return a sanitized user agent String
      */
     public static String sanitizeString(String userAgent) {
-        if(userAgent == null) {
+        if (userAgent == null) {
             return null;
         }
         userAgent = userAgent.trim();
         StringBuilder resUa = new StringBuilder(userAgent.length());
         Matcher m = USER_AGENT_WHITELIST.matcher(userAgent);
-        while(m.find()) {
+        while (m.find()) {
             resUa.append(m.group());
         }
         return resUa.toString();

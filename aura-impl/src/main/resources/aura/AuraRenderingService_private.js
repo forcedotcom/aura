@@ -78,7 +78,6 @@ var priv = {
     push : function (cmp) {
         var inContainer = false;
         var i;
-        var container;
 
         // Some rerenderers begin by unrendering themselves, which results in two
         // pushes for the same component (from rerender(), then unrender(), and
@@ -111,7 +110,7 @@ var priv = {
             }
         }
 
-        container = cmp.getRenderContainer();
+        var container = cmp.getRenderContainer();
         if (doublePush) {
             // We do want the double stack frame so it will pop cleanly.  We don't
             // want its return value; we got the "right" container already above.  Nor
@@ -141,17 +140,13 @@ var priv = {
                 }
             }
             // Even if we didn't previously have a container, figure it out now as the
-            // containing context (assuming there is one).  If this is the first frame,
-            // we still need to push, but we cannot use the result.
-            var newContainer = $A.componentStack.push(cmp);
-            if (newContainer) {
-                container = newContainer;
-            }
+            // containing context (assuming there is one).
+            container = $A.componentStack.push(cmp);
             cmp.setRenderContainer(container, priorSibling);
         }
-        
+
         if (inContainer) {
-            cmp.setRenderContained(inContainer);
+            $A.componentStack.addNote('renderContained', inContainer);
         }
         return container;
     },
@@ -163,8 +158,7 @@ var priv = {
      */ 
     pop : function(cmp, oldElems) {
         var i;
-        var elemsInContainer = oldElems && cmp.getRenderContained();
-
+        var elemsInContainer = $A.componentStack.getNote('renderContained');
         var top = $A.componentStack.pop(cmp);
         $A.assert(top, "empty component context stack");
         if ($A.componentStack.currentContext()) {
@@ -172,61 +166,59 @@ var priv = {
             // for the LAST stack frame, to patch dangling references above.
             return;
         }
+        var container = top.getRenderContainer();
 
-        if (!oldElems) {
-            oldElems = {};
-        } else if (!oldElems[0]) {
-            oldElems[0] = oldElems['element'];
-        }
-        if (elemsInContainer) {
-            var container = top.getRenderContainer();
-            if (container) {
-                // if we have old elements and also a higher containers that might
-                // reference them, we need to check if the elements changed and
-                // seek-and-destroy the dead refs to them if so.
-                var newElems = top.getElements();
-                if (!newElems[0]) {
-                    newElems[0] = newElems['element'];
+        if (oldElems && container) {
+            // if we have old elements and also a higher containers that might
+            // reference them, we need to check if the elements changed and
+            // seek-and-destroy the dead refs to them if so.
+            var newElems = top.getElements();
+            var changed = false;
+            for (i in oldElems) {
+                if (oldElems[i] !== newElems[i]) {
+                    changed = true;
+                    break;
                 }
-                var changed = false;
-                for (i in oldElems) {
+            }
+            if (!changed) {
+                for (i in newElems) {
                     if (oldElems[i] !== newElems[i]) {
                         changed = true;
                         break;
                     }
                 }
-                if (!changed) {
-                	for (i = 0; newElems[i]; i++) {
-                		if (oldElems[i] !== newElems[i]) {
-                			changed = true;
-                			break;
-                		}
-                	}
-                }
+            }
 
-                if (changed) {
+            if (changed && elemsInContainer) {
+                // Because e.g. lazy provider actions must first destory the old body, then create with
+                // a new value, even with elemsInContainer==true, we might not have oldElems in the
+                // container now.  But we can figure out where it was, because it was after the last
+                // element of the prior sibling (if it was in the container at all, that is).  This
+                // depends on the fact that either the prior sib is stable, or it has already been done.
+                var prevElem = undefined;
+                var priorSib = top.getRenderPriorSibling();
+                if (priorSib) {
+                    var priorElems = priorSib.getElements();
+                    if (priorElems[0]) {
+                        prevElem = priorElems['element'];
+                    } else {
+                        for (i = 0; priorElems[i + 1]; ++i) {
+                            // count to last elem
+                        }
+                        prevElem = priorElems[i];
+                    }
+                }
+                for (container; container; container = container.getRenderContainer()) {
+                    if (!container.updateElements(prevElem, oldElems, newElems)) {
+                        break;   // If we don't adjust it, we're good above here too
+                    }
                     // We also need to apply the containers' classes, if the contained components
-                    // are also part of the containers elements.  So we need the new elems as an
-                    // array:
+                    // are also part of the containers elements.
                     var asArray = [];
                     for (i = 0; newElems[i]; ++i) {
                         asArray.push(newElems[i]);
                     }
-                    
-                    // Because e.g. lazy provider actions must first destory the old body, then create with
-                    // a new value, even with elemsInContainer==true, we might not have oldElems in the
-                    // container now.  But we can figure out where it was, because it was after the last
-                    // element of the prior sibling (if it was in the container at all, that is).  This
-                    // depends on the fact that either the prior sib is stable, or it has already been done.
-                    // However, we need to repeat for each container, because for the grand-container,
-                    // it's the container's priorSibling that matters, and so on.
-                    for (container; container && elemsInContainer; container = container.getRenderContainer()) {
-                        if (!container.updateElements(oldElems, newElems)) {
-                            break;   // If we don't adjust it, we're good above here too
-                        }
-                        this.applyClasses(container, asArray);
-                        elemsInContainer = container.getRenderContained();
-                    }
+                    this.applyClasses(container, asArray);
                 }
             }
         }
@@ -503,14 +495,17 @@ var priv = {
 
         var len = elements.length;
         var single = (len === 1);
-        var element;
-        cmp.resetElements();
         for (var i = 0; i < len; i++) {
-            element = elements[i];
+            var element = elements[i];
             $A.assert(element !== undefined);
             if (element["name"] !== undefined && element["element"]) {
                 cmp.associateElement(element);
                 element = element["element"];
+            } else if (single) {
+                cmp.associateElement({
+                    "name" : "element",
+                    "element" : element
+                });
             }
 
             cmp.associateElement({
@@ -520,12 +515,7 @@ var priv = {
 
             bareElements.push(element);
         }
-        if (single) {
-            cmp.associateElement({
-                "name" : "element",
-                "element" : element
-            });
-        }
+
         return bareElements;
     }
 };

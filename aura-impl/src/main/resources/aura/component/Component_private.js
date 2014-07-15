@@ -842,27 +842,6 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     /** @private@
-     * Used to notate that this component is contained in its render-container's
-     * elements.  We need this noted here because, for components like expressions,
-     * the "old" elements will be unrendered and removed from the container; we need
-     * to know whether to propagate the "new" ones up or not.
-     *
-     * @param {Boolean} contained
-     */
-    Component.prototype.setRenderContained = function(contained) {
-        this.priv.renderContained = contained;
-    };
-
-    /** @private@
-     * Used to decide whether to propagate the "new" elements up or not.
-     *
-     * @param {Boolean} contained
-     */
-    Component.prototype.getRenderContained = function(contained) {
-        return this.priv.renderContained;
-    };
-
-    /** @private@
      * Updates the elements for a contained component's re-render.
      * Replaces in this components' elements, the "oldElems" list with "newElems,"
      * assuming oldElems is found.  Sometimes oldElems has already been unrendered
@@ -870,100 +849,109 @@ var ComponentPriv = (function() { // Scoping priv
      * replacement rather than a simple single-step one, but with the same net
      * effect.
      *
-     * @param {Object} oldElems our funky almost-an-array cmp.priv.elements list
+     * @param prevElem {Element} undefined if there are no prior siblings, else
+     *                  the last DOM element *before* oldElems
+     * @param oldElems {Object} our funky almost-an-array cmp.priv.elements list
      *                  of what should be (or perhaps has been) removed
-     * @param {Object} newElems a replacement for oldElems
+     * @param newElems {Object} a replacement for oldElems
      *
      * @returns true if a change was made, false if not found (which implies the
      *    contained child's elements are not part of this component or its ancestors'
      *    elements).
      */
-    Component.prototype.updateElements = function(oldElems, newElems) {
-        var oldElemCount;
-        for (oldElemCount = 0; oldElems[oldElemCount]; oldElemCount++) {
-            // count old elements
-        }
-        var newLen;
-        for (newLen = 0; newElems[newLen]; ++newLen) {
-              // count items in newElems
-        }
-        if (oldElemCount === 0 && newLen === 0) {
-            return false;  // Replace nothing with nothing is easy
-        }
-
+    Component.prototype.updateElements = function(prevElem, oldElems, newElems) {
+        var start = 0;
         var elems = this.getElements();
-        if (!elems[0]) {
-            elems[0] = elems['element'];
-        }
+        var i;
 
-        var start;
-        if (oldElems[0]) {
-            // We had old stuff, and references may be in elems to be replaced.
-            // But we MIGHT not find them (rerender implemented as unrender/render
-            // will update three times total, first to remove, then to replace, and
-            // last to do nothiong).
-            for (start = 0; elems[start] && elems[start] !== oldElems[0]; start++) {
-                // Just scan elems looking for the start of old stuff
-            }
-            if (!elems[start]) {
-                return false;  // We're done early, there WAS old but it's already gone
-            }
-        } else {
-            // We don't have any old elements, but existing elements may be, or point to,
-            // new elements, which tells us the insertion point.
-            for (start = 0; elems[start]; start++) {
-                if (elems[start].nextSibling && elems[start].nextSibling === newElems[0]) {
-                    start++;  // The NEXT item is the first to replace/reinsert
+        if (prevElem) {
+            // I really wish we used an Array for elements, not the Object-almost-an-array
+            // that we do use.  Anyway, this code is really just looking for prevElem in
+            // this.getElements(), returning false if not found, and otherwise splicing to
+            // replace oldElems with newElems and returning true.
+            for (start = 0; elems[start]; ++start) {
+                if (elems[start] === prevElem) {
                     break;
                 }
             }
-        }
-        // Now, we know our insertion start, and sizes.  Deal with trailing elements:
-    	var offset = newLen - oldElemCount;
-    	var copy = start + oldElemCount;  // first trailing-of-oldElems index
-    	if (offset < 0) {
-        	// We're shrinking the list, copy trailing things down and delete excess
-            for (copy; elems[copy]; copy++) {
-                elems[copy + offset] = elems[copy];
+            if (!elems[start]) {  // Didn't find it
+                $A.error("Rerender couldn't find prior element to use when updating container");
             }
-            for (copy = copy + offset; elems[copy]; copy++) {
-                delete elems[copy];  // Remove excess elements
-            }
-        } else {
-        	// We're growing the list (perhaps by zero, if the sizes are equal), so
-        	// copy trailing elements up... last first, to preserve them.
-        	for (var last = copy; elems[last]; last++) {
-        		// count to past last item
-        	}
-        	for (last--; last > copy; last--) {
-        		elems[last + offset] = elems[last];
-        	}
-        }
-        // And insert the new elements into the newLen gap at start
-        for (var index = 0; index < newLen; index++) {
-            elems[start + index] = newElems[index];
+            start++;  // Move start to be an insertion point, after priorElem
         }
 
-        // Splicing done.  elems[0] to elems[index-1] are unchanged, elems[index] to elems[start+newLen] are now a match
-        // to newElems, and trailing items follow unchanged except for the shift.
-        for (var q = 0; elems[q]; q++) {
-            for (var r = q + 1; elems[r]; r++) {
-                $A.assert(elems[q] !== elems[r], "oops, update created a duplicate");
+        // Check that, if any, ALL of oldElems are found.  It'd be weird to have a
+        // partial subset rather than all-of-nothing.
+        if (elems[start] === oldElems[0]) {
+            for (i = 1; oldElems[i]; ++i) {
+                $A.assert(oldElems[i] === elems[start + i],
+                        "Found too few stale elements (only " + i + ")");
+            }
+        } else {
+            // just pretend we're splicing from an empty oldElems
+            oldElems = {};
+        }
+        // And our splice... we need to know the new and old lengths, first
+        var newLen;
+        for (newLen = 0; newElems[newLen]; ++newLen) {
+            // count items in newElems
+        }
+        var oldLen;
+        for (oldLen = 0; oldElems[oldLen]; ++oldLen) {
+            // count items in oldElems
+        }
+        // Now, splice.
+        if (newLen <= oldLen) {
+            // Copy new onto old (it fits), then any extras fold down
+            for (i = 0; i < newLen; ++i) {
+                elems[start + i] = newElems[i];
+            }
+            for (elems; elems[i]; ++i) {
+                if (elems[start + oldLen + i]) {
+                    elems[start + i] = elems[start + oldLen + i];
+                } else {
+                    delete elems[start + i];
+                }
+            }
+        } else {
+            // New doesn't fit into old.  We need to move extra stuff up, top first, then copy.
+            for (i = 0; elems[i + 1]; ++i) {
+                // count i up to index of last *present* value
+            }
+            var delta = newLen - oldLen;
+            for (i; i >= start + oldLen; --i) {
+                // from end backwards, copy post-oldElems items up by delta, stopping at end of oldElems sequence
+                elems[i + delta] = elems[i];
+            }
+            // Now we've made room, copy new into elems
+            for (i = 0; i < newLen; ++i) {
+                elems[start + i] = newElems[i];
             }
         }
+        // Splicing done.  elems[start] to elems[newLen] are now a match to newElems, replacing
+        // elems[start] to elems[oldLen] which WAS a match to oldElems.
 
-        if (!elems[1]) {
-            elems['element'] = elems[0];
-        } else {
-            delete elems['element'];
+        // If elems.element happens to be one end or the other of the oldElems, replace it from
+        // the newElems, or if that's empty, from other bits of elems (or delete it).
+        if (elems.element === oldElems[0]) {
+            if (newLen > 0) {
+                elems.element = newElems[0];
+            } else if (start > 0) {
+                elems.element = elems[start - 1];
+            } else {
+                delete elems.element;
+            }
+        } else if (elems.element === oldElems[oldLen - 1]) {
+            if (newLen > 0) {
+                elems.element = newElems[newLen - 1];
+            } else if (elems[start]) {
+                elems.element = elems[start];
+            } else {
+                delete elems.element;
+            }
         }
 
         return true;
-    };
-
-    /** Resets associated elements. */
-    Component.prototype.resetElements = function() {
-    	this.priv.elements = undefined;
     };
 
     ComponentPriv.prototype.outputArrayValue = function(value, avp, serialized, depth) {

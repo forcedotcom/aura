@@ -906,15 +906,14 @@ _initScroller: function () {
             var scrollerDOM = this.scroller,
                 // We need to take into account if the `PullToLoadMore` plugin is active
                 // and in that case substract the height from the scrollable area size
-                ptl         = this.opts.pullToLoadMore,
-                ptl_offset  = this._ptlThreshold || 0;
+                ptl         = this.opts.pullToLoadMore;
 
             this._setWrapperSize();
             this._sizePullToShowMore();
 
             // Once all the sizes are accurate, performn the scroll size calculations
             this.scrollerWidth  = scrollerDOM.offsetWidth;
-            this.scrollerHeight = ptl ? scrollerDOM.offsetHeight - ptl_offset : scrollerDOM.offsetHeight;
+            this.scrollerHeight = ptl ? scrollerDOM.offsetHeight - this.getPTLSize() : scrollerDOM.offsetHeight;
 
             this.maxScrollX     = this.wrapperWidth  - this.scrollerWidth;
             this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
@@ -937,6 +936,18 @@ _initScroller: function () {
         _sizePullToShowMore: function () {
             //To be overriden
         },
+        /**
+        * To be overriden by the `PullToShowMore` plugin.
+        * Gets the height of `PullToShowMore` so
+        * it can be taken into account when calculating the total scrollable size.
+        *
+        * @method getPTLSize
+        * @private
+        */
+        getPTLSize: function () {
+            return 0;
+        },
+
         /**
         * Private destroy function that is responsible for the destruction of the
         * instance itself. 
@@ -3654,6 +3665,10 @@ _initPullToLoadMorePlugin: function () {
         * ==================================
         */
         getPTLSize: function () {
+            if (!this._ptlThreshold) {
+                this._ptlThreshold = this.ptlDOM.offsetHeight;
+            }
+
             return this._ptlThreshold;
         },
         getPTLSnapTime: function () {

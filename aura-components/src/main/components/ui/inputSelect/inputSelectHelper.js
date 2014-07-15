@@ -216,8 +216,12 @@
         					}
         				}, this);
         			}
-        		} else if (cmpName = "ui:inputSelectOption") {
+        		} else if (cmpName === "ui:inputSelectOption") {
     				op(cmp, result, newValues);
+    			} else {
+    				$A.warning("<" + cmpName + "> is currently not supported inside <ui:inputSelect> since it does not properly " +
+    						   "attach the options to the component. This will lead to undefined behavior. Please " +
+    						   "use 'v.options' to insert your option objects instead.");
     			}
         	}, this);
         },

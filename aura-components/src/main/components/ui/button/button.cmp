@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" access="GLOBAL" 
+<aura:component extensible="true" support="GA" access="GLOBAL"
     description="Represents a button element.">
 
     <aura:attribute name="theme" type="String" default="default" description="The default CSS style used to display the button."/>
@@ -30,7 +30,7 @@
     <aura:attribute name="disabled" type="Boolean" default="false" access="GLOBAL" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>
     <aura:attribute name="accesskey" type="String" default="" access="GLOBAL" description="The keyboard access key that puts the button in focus. When the button is in focus, pressing Enter clicks the button."/>
     <aura:attribute name="labelDir" type="String" default="ltr" description="The direction in which the label should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
-    <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
+    <aura:attribute name="stopClickPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
 
     <aura:registerevent name="keydown" type="ui:keydown" description="The controller method that runs when a key is pressed down on the button."/>
     <aura:registerevent name="press" type="ui:press" access="GLOBAL" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>

@@ -252,7 +252,7 @@ var AuraRenderingService = function AuraRenderingService(){
                             for (var j = 0; j in elems; ++j) {
                                 allElems.push(elems[j]);
                             }
-                            if (allElems.length === startLen && elems['element']) {
+                            if (allElems.length === startLen && element in elems) {
                                 allElems.push(elems['element']);
                             }
                             continue;  // next item

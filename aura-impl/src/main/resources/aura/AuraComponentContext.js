@@ -90,7 +90,7 @@ $A.ns.AuraComponentContext.prototype.addNote = function(k, v) {
     if (top.notes === undefined) {
         top.notes = { };
     }
-    top.notes[k] = v;
+    top[k] = v;
 };
 
 /**
@@ -104,7 +104,7 @@ $A.ns.AuraComponentContext.prototype.getNote = function(k) {
     if (!top.notes) {
         return undefined;
     }
-    return top.notes[k];
+    return top[k];
 };
 
 /**
@@ -118,6 +118,6 @@ $A.ns.AuraComponentContext.prototype.clearNote = function(k) {
     if (!top.notes) {
         return;
     }
-    delete top.notes[k];
+    delete top[k];
 };
 

@@ -140,7 +140,7 @@ MapValue.prototype.setValue = function (newMap) {
  * @private
  */
 MapValue.prototype._setValue = function(newMap) {
-    var oldMap = this.value;  // Held to test for dirty replaced subobjects
+    this.oldvalue = this.value;  // Held to test for dirty replaced subobjects & copy handlers
     this.value = {};
     this.keys = {};
     this.makeDirty();
@@ -180,8 +180,9 @@ MapValue.prototype._setValue = function(newMap) {
         } else {
             lowerKey = originalKey.toLowerCase();
         }
-        this.add(originalKey, copyMap, lowerKey in oldMap);
+        this.add(originalKey, copyMap, lowerKey in this.oldvalue);
     }
+    this.oldvalue = undefined;  // We no longer hold this for commit/rollback
 };
 
 /**
@@ -392,6 +393,13 @@ MapValue.prototype.add = function(k, config, subDirty) {
 
     var value = valueFactory.create(v, null, this.owner);
     this.value[key] = value;
+    // Now, we have a new value object, but if we're adding as part of a setvalue,
+    // the old value may have had handlers we want to keep.  This is a patch job
+    // to address that problem; TODO(dchasman, fabbott) Doug promises a better
+    // implementation, including support in ArrayValue, etc.
+    if (this.oldvalue && this.oldvalue[key]) {
+    	this.copyHandlers(this.oldvalue[key], value);
+    }
 
     if (key !== k) {
         this.keys[key] = k;
@@ -410,7 +418,11 @@ MapValue.prototype.add = function(k, config, subDirty) {
                 BaseValue.addValueHandler(k, value, cmpHandlers[i]);
             }
         }
-
+    }
+    if (value.handlers || value.eventDispatcher) {
+    	// Value might be simple, using eventDispatcher; it might be a map,
+    	// using handlers.  Either way, if we have handlers from before or from
+    	// this map, fire the change.
         value.fire("change");
     }
 };
@@ -492,6 +504,45 @@ MapValue.prototype.destroyHandlers = function(globalId){
  */
 MapValue.prototype.contains = function(key){
     return !$A.util.isUndefined(this.value[key.toLowerCase()]);
+};
+
+/**
+ * Patch job for propagating change handlers during setValue.
+ * TODO(fabbott, dchasman): Doug has a better implementation here coming.
+ * @private
+ */
+MapValue.prototype.copyHandlers = function(oldvalue, newvalue) {
+	var k;
+	if (oldvalue.handlers || oldvalue.eventDispatcher) {
+	    // Semi-deep copy the handlers: the actual handler objects can
+	    // be shared, but they're in a map of map of arrays, which needs to copy.
+		// Conveniently, MapValue and SimpleValue call the handler structure
+		// by different names.
+        var newHandlers;
+        if (newvalue instanceof MapValue) {
+        	newvalue.handlers = {};
+        	newHandlers = newvalue.handlers;
+        } else {
+        	newHandlers = newvalue.getEventDispatcher();
+        }
+
+        var oldHandlers = oldvalue.handlers ? oldvalue.handlers : oldvalue.eventDispatcher;
+        for (k in oldHandlers) {
+      	    newHandlers[k] = {};
+      	    for (var c in oldHandlers[k]) {
+      	    	newHandlers[k][c] = oldHandlers[k][c].concat();  // Using concat as "create copy"
+      	    }
+    	}
+	}
+	if (oldvalue instanceof MapValue && newvalue instanceof MapValue) {
+		for (var k in newvalue) {
+			if (k in oldvalue) {
+                this.copyHandlers(oldvalue[k], newvalue[k]);
+			}
+		}
+	}
+	// TODO(fabbott, dchasman): Arrays should be supported too, but aren't yet.
+	// We don't much like expressions like {!v.foo.bar[3].baz} anyway....
 };
 
 //#include aura.value.MapValue_export

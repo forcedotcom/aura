@@ -183,6 +183,39 @@
         }
     },
 
+    /**
+     * This checks that handlers on subvalues are preserved across MapValue.set[Value]
+     */
+    testMapSubkeyHandler: {
+    	test: function(component) {
+            $A.test.assertEquals(0, component.get("v.triggers.triggerCount"), "initial triggerCount attribute bad");
+            $A.test.assertUndefined(component._lastTriggerCount, "initial state bad (has _lastTriggerCount)");
+            component.set("v.triggers.trigger", "one");
+            $A.test.assertEquals(1, component.get("v.triggers.triggerCount"), "first trigger didn't update attribute");
+            $A.test.assertEquals(1, component._lastTriggerCount, "first trigger didn't update _lastTriggerCount");
+
+            // If we replace the whole v.triggers map (which is really our test scenario),
+            // we have a "correct" non-deterministic case: we're going to end up adding both
+            // keys, including their handlers, so we can't know whether trigger gets added
+            // and fired before or after triggerCount.  Fun and useful too, eh?  But that's
+            // the spec-by-implementation, and I'm not changing it now....
+            component.set("v.triggers", { trigger: "dos", triggerCount: 27 });
+            var count = component.get("v.triggers.triggerCount");
+            $A.test.assertTrue(27 == count // trigger count wasn't yet set when triggered, but was later
+            		|| 28 == count, // or trigger count was set to "new" value
+            		"bulk replace triggerCount wasn't either acceptable value (was " + count 
+            		+ "), callback may have been lost");
+            $A.test.assertEquals(2, component._lastTriggerCount,
+            		"bulk replace _lastTriggerCount wasn't right, callback may have been lost");
+            
+            component.set("v.triggers.triggerCount", 2);  // Let's become sane again
+            
+            component.set("v.triggers.trigger", "san");
+            $A.test.assertEquals(3, component.get("v.triggers.triggerCount"), "last trigger didn't update attribute, callback was lost?");
+            $A.test.assertEquals(3, component._lastTriggerCount, "last trigger didn't update _lastTriggerCount, callback was lost?");
+        }
+    },
+
     //Fails in Halo due to W-2256415, Setting new Maps as model values doesn't work. At least not similar to attributes
     testMapSetValueRenders: {
         test: [ function(component) {

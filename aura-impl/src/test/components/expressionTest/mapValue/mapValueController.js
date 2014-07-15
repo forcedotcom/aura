@@ -19,5 +19,17 @@
             cmp._log=[];
         }
         cmp._log.push(evt.getParams());
+    },
+
+    onTriggerChange : function(cmp, evt, helper) {
+    	var old = cmp.get("v.triggers.triggerCount");
+    	if (old !== undefined) {
+    		// Undefined value can, perhaps surprisingly, happen during MapValue.setValue
+        	cmp.set("v.triggers.triggerCount", old + 1);
+    	}
+
+    	cmp._lastTriggerCount = cmp._lastTriggerCount ?
+    			cmp._lastTriggerCount + 1 :
+    				1;
     }
 })

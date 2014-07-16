@@ -103,19 +103,21 @@
         	    //sanity check
         	   this.checkOutput(cmp, "iterationBlock", this.array1to10Even, "unexpected initial display");
                 //toggle boolean in iteration
-               this.clickAndWaitByClass(cmp,"toggleEvenOdd",this.array1to10Odd);   
-           }, function(cmp) {
+               this.clickAndWaitByClass(cmp,"toggleEvenOdd",this.array1to10Odd,"error output toggle even-odd");   
+           },
+           function(cmp) {
                //toggle boolean in iteration
-               this.clickAndWaitByClass(cmp,"toggleEvenOdd",this.array1to10Even);   
+               this.clickAndWaitByClass(cmp,"toggleEvenOdd",this.array1to10Even,"error output toggle even-odd again");   
            },
            function(cmp) {
         	   //toggle boolean in renderIf
-        	   this.clickAndWait(cmp, "toggleBool1",this.array11to21Even);
+        	   this.clickAndWait(cmp, "toggleBool1",this.array11to21Even,"error output toggle new array");
            }, function(cmp) {
         	   //toggle boolean in renderIf
-               this.clickAndWait(cmp, "toggleBool1",this.array1to10Even);
-           }, 
+               this.clickAndWait(cmp, "toggleBool1",this.array1to10Even,"error output toggle new array again");
+           }
       ]
    },
+   
 
 })

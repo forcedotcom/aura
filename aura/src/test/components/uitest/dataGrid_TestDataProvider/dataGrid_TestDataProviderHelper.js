@@ -46,14 +46,16 @@
 
         // Hack to make 'zero based'. 
         --currentPage;
-
+        var tmpId;
+        
         for (var i = 1; i <= pageSize; i++) {
+        	tmpId = ((currentPage * pageSize) + i);
             items.push({
-                id           : ((currentPage * pageSize) + i),
-                subject      : 'Foo ' + ((currentPage * pageSize) + i), 
-                date : '2014-01-01',
-                name : 'John Doe',
-                relatedTo : 'Acme'
+                id           : tmpId,
+                subject      : 'Foo '+tmpId, 
+                date : '2014-01-01 '+tmpId,
+                name : 'John Doe '+tmpId, 
+                relatedTo : 'Acme '+tmpId
             });
         }
 

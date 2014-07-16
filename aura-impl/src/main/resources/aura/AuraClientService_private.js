@@ -138,10 +138,10 @@ var priv = {
             // if the error on the server is meant to trigger a client-side
             // event...
             if ($A.util.isUndefinedOrNull(resp)) {
-                // #if {"excludeModes" : ["PRODUCTION"]}
+                //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
                 $A.error("Communication error, invalid JSON: " + text);
                 // #end
-                // #if {"modes" : ["PRODUCTION"]}
+                // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
                 $A.error("Communication error, please retry or reload the page");
                 // #end
                 return null;
@@ -156,14 +156,14 @@ var priv = {
                 // there the error message will be meaningless. This code thu does much the same
                 // thing, but in a different way so that we get a real error message.
                 // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-                // #if {"excludeModes" : ["PRODUCTION"]}
+                //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
                 if (resp["message"] && resp["stack"]) {
                     $A.error(resp["message"] + "\n" + resp["stack"]);
                 } else {
                     $A.error("Communication error, invalid JSON: " + text);
                 }
                 // #end
-                // #if {"modes" : ["PRODUCTION"]}
+                // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
                 if (resp["message"]) {
                     $A.error(resp["message"]);
                 } else {
@@ -182,10 +182,10 @@ var priv = {
 
         var responseMessage = $A.util.json.decode(text, true);
         if ($A.util.isUndefinedOrNull(responseMessage)) {
-            // #if {"excludeModes" : ["PRODUCTION"]}
+            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             $A.error("Communication error, invalid JSON: " + text);
             // #end
-            // #if {"modes" : ["PRODUCTION"]}
+            // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             $A.error("Communication error, please retry or reload the page");
             // #end
             return null;

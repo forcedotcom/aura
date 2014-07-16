@@ -76,6 +76,7 @@ public final class AuraFileMonitor {
     public static synchronized void start() {
         if (fileMonitorManager != null && fileMonitor != null && !started) {
             fileMonitor.start();
+            fileMonitor.setDelay(50);
             started = true;
             LOG.info("Aura file monitor started");
         }

@@ -50,8 +50,12 @@ public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
         attribs.put("defaultBodyClass", "auraError");
         attribs.put("forceError", "true");
 
-        if (Aura.getContextService().isEstablished()
-                && Aura.getContextService().getCurrentContext().getMode() != Mode.PROD) {
+        boolean writeStack = false;
+        if (Aura.getContextService().isEstablished()) {
+            Mode mode = Aura.getContextService().getCurrentContext().getMode();
+            writeStack = mode != Mode.PROD && mode != Mode.PRODDEBUG;
+        }            
+        if (writeStack) {
             attribs.put("errorMessage", AuraExceptionUtil.getStackTrace(t));
         } else {
             attribs.put("errorMessage", t.getMessage());

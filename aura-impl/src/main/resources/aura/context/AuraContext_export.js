@@ -23,7 +23,7 @@ exp(p,
     "setCurrentAction", p.setCurrentAction,
     "getGlobalValueProviders", p.getGlobalValueProviders,
     "clearComponentConfigs", p.clearComponentConfigs
-    //#if {"excludeModes" : ["PRODUCTION"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,
         "getNum", p.getNum,
         "getLoaded", p.getLoaded,

@@ -1750,7 +1750,7 @@ $A.ns.Util.prototype.estimateSize = function(obj) {
     return this.sizeEstimator.estimateSize(obj);
 };
 
-//#if {"excludeModes" : ["PRODUCTION"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	/**
 	 * Gets the aura debug tool component whether in an iframe or not.
 	 * @returns {Object} The debug tool component.

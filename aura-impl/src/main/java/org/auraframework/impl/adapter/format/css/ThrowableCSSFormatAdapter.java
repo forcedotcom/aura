@@ -35,8 +35,8 @@ public class ThrowableCSSFormatAdapter extends CSSFormatAdapter<Throwable> {
 
         out.append("/** \nAN EXCEPTION OCCURRED WHILE PROCESSING CSS\n");
         // FIXME: this is pretty ugly.
-        if (Aura.getContextService().getCurrentContext().getMode() != Mode.PROD
-                && !Aura.getConfigAdapter().isProduction()) {
+        Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        if (mode != Mode.PROD && mode != Mode.PRODDEBUG && !Aura.getConfigAdapter().isProduction()) {
             out.append(AuraExceptionUtil.getStackTrace(t));
         }
         out.append("\n**/\n");

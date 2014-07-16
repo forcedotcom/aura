@@ -44,7 +44,7 @@ var AuraClientService = function() {
          */
         initHost : function(host) {
             priv.host = host || "";
-            //#if {"modes" : ["PRODUCTION"]}
+            //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             delete this.initHost;
             //#end
         },
@@ -72,7 +72,7 @@ var AuraClientService = function() {
             // I think this should be done in all cases, the $A.error can be more
             // instructive than an uncaught exception.
             //
-            //#if {"modes" : ["PRODUCTION"]}
+            //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             try {
                 //#end
 
@@ -93,7 +93,7 @@ var AuraClientService = function() {
                 callback(component);
 
                 // not on in dev modes to preserve stacktrace in debug tools
-                //#if {"modes" : ["PRODUCTION"]}
+                //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             } catch (e) {
                 $A.error("Error during init", e);
                 throw e;

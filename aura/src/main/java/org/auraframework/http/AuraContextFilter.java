@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -305,11 +306,12 @@ public class AuraContextFilter implements Filter {
 
     protected Mode getMode(HttpServletRequest request, Map<String, Object> configMap) {
         Mode m = getModeParam(request, configMap);
-
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        
         if (m == null) {
-            m = Aura.getConfigAdapter().getDefaultMode();
+            m = configAdapter.getDefaultMode();
         }
-        Set<Mode> allowedModes = Aura.getConfigAdapter().getAvailableModes();
+        Set<Mode> allowedModes = configAdapter.getAvailableModes();
         boolean forceProdMode = !allowedModes.contains(m) && allowedModes.contains(Mode.PROD);
         if (forceProdMode) {
             m = Mode.PROD;

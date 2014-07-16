@@ -20,6 +20,8 @@
 	<aura:attribute name="dataProvider" type="Aura.Component[]" description="A list of data provider components. Use a ui:dataProvider component to provide list data."/>	
 	<aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
 	<aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
+	<aura:attribute name="cancelLabel" type="String" default="Cancel" description="The label for the cancel button." />
+	<aura:attribute name="applyLabel" type="String" default="Apply" description="The label for the apply button." />
 	<aura:attribute name="visible" type="Boolean" default="false" description="Controls the visibility of the component."/>		
 	<aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list." />
 	<aura:attribute name="defaultSelectedItems" type="Object" description="Default selected row item." />
@@ -54,10 +56,12 @@
 				</ui:menu>
 			</div>
 			<div aura:id="headerBar" class="headerBar">
-	            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">Cancel
+	            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">
+	            	{!v.cancelLabel}
 	            </a>
 	            <span aura:id="title" class="title">{!v.title}</span>
-	            <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">Apply
+	            <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">
+	            	{!v.applyLabel}
 	            </a>
 	        </div>
 		</div>

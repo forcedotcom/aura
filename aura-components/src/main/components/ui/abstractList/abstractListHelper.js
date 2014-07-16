@@ -34,7 +34,7 @@
 
 	/** Behavior to prepare the list for new data before a refresh **/
 	beforeRefresh: function(component, event) {
-		component.getConcreteComponent().getValue("v.items").clear();
+		component.getConcreteComponent().set("v.items", []);
 	},
 
 	updateEmptyListContent:function (component) {
@@ -56,12 +56,13 @@
     },
 
     initDataProvider: function(component) {
-        var dataProviders = component.getValue("v.dataProvider").unwrap();
-        
+        var dataProviders = component.get("v.dataProvider");
+
         if (dataProviders && dataProviders.length && dataProviders.length > 0) {
             for (var i = 0; i < dataProviders.length; i++) {
                 dataProviders[i].addHandler("onchange", component, "c.handleDataChange");
             }
+            
             component._dataProviders = dataProviders;
         }
     },
@@ -97,7 +98,7 @@
 //          var k = chainedAttrs.length;
 //          while (k--) {
 //              var exp = "v." + chainedAttrs[k];
-//              pager.getValue(exp).setValue(component.getValue(exp));
+//              pager.set(exp, component.get(exp));
 //          }
         }
 

@@ -155,8 +155,8 @@
 		var dataTemplates = templates.dataTemplates || [];
 		var dataTemplateCount = dataTemplates.length;
 		var index = 0;
-		var items = component.getValue("v.items");
-		var itemCount = items.getLength();
+		var items = component.get("v.items");
+		var itemCount = items.length;
 		var listId = component.get("v.id");
 		var rows = [];
 		var rowTooltip = component.get("v.rowTooltip");
@@ -204,7 +204,7 @@
 				containerSet = true;
 			}
 			for (var i = 0; i < blockSize && index < itemCount; i++, index++) {
-				item = items.getValue(index);
+				item = items[index];
 				if (!item)
 					continue;
 				rowClass = this.getRowClass(component, index);
@@ -417,24 +417,30 @@
 		// Create recursion pointer constructs for first level call
 		if (!columnTemplates)
 			columnTemplates = [];
+		
 		if (!colSpans)
 			colSpans = [];
+		
 		if (!dataTemplates)
 			dataTemplates = [];
+		
 		if (!depth)
 			depth = 0;
+		
 		if (!nextId)
 			nextId = 0;
+		
 		if (!headers)
 			headers = [];
 		else
 			component.set("v.headers", headers.join(' '));
-		if (!listId)
-			listId = component.find("listView:table").getValue("v.HtmlAttributes.id").getValue(component).getValue();
+		
+		if (!listId){
+			listId = component.find("listView:table").getValue("v.HtmlAttributes.id").getValue(component).getValue();;
+		}
 
 		var id = null;
 		var column = null;
-		var colSpan = component.getValue("v.colSpan");
 		var listViewColumns = component.find({
 			instancesOf : "ui:listViewColumn"
 		});
@@ -471,7 +477,8 @@
 				// lowest level columns
 				colSpans.length += childColumns.length;
 			}
-			colSpan.setValue(colSpans.length);
+			
+			component.set("v.colSpan", colSpans.length);
 		} else {
 			// No child columns, so add this column to the list of data columns,
 			// mark it, and count it for parent column spans
@@ -619,9 +626,9 @@
 				var value = attributes[field];
 				var expression = this.getExpression(value);
 				if (expression) {
-					value = $A.expressionService.getValue(component, expression);
+					value = $A.expressionService.get(component, expression);
 					if (value) {
-						component.set("v." + field, value.getValue());
+						component.set("v." + field, value);
 					}
 				}
 			}
@@ -670,6 +677,9 @@
 		var attributes = propertyList.join(',');
 		var attribute = null;
 		for (var i = 0; i < propertyList.length; i++) {
+			
+			// DCHASMAN TODO HALO I have no idea what to do with this
+			
 			attribute = component.getValue("v." + propertyList[i]);
 			attribute.setValue = this.setValueObserver.bind(this, component, attributes, attribute, attribute.setValue.bind(attribute), actionDelegate);
 		}

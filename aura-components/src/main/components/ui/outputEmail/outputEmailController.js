@@ -16,9 +16,10 @@
 ({
     doInit: function(component, helper) {
         // trimming whitespaces
-        var value = component.getValue('v.value');
-        var label = component.getValue('v.label');
-        value.setValue($A.util.trim((value.getValue())));
-        label.setValue($A.util.trim((label.getValue())));
+        var value = component.get('v.value');
+        component.set('v.value', $A.util.trim((value)));
+        
+        var label = component.get('v.label');
+        component.set('v.label', $A.util.trim((label)));
     }
 })

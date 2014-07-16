@@ -34,12 +34,6 @@
     },
 
     handleCanShowMoreChange: function (cmp, evt, hlp) {
-    	var newValue = evt.getParam('value'),
-    		oldValue = cmp.getValue('v.canShowMore').oldValue;
-
-    	// false => true ?
-    	if (!oldValue && newValue) {
-    		hlp.swapShowMore(cmp);
-    	}
+		hlp.swapShowMore(cmp);
     }
 })

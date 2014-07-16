@@ -27,17 +27,12 @@
 	},
 	
 	rerender: function(cmp, helper) {
-		var width = cmp.getValue('v.priv_width'),
-			height = cmp.getValue('v.priv_height'),
-			cssClass = cmp.getValue('v.class'),
-			snap = cmp.getValue('v.priv_snap');
-		
-		//call super rerender only if necessary, to avoid triggering unnecessary rerendering for contained child components
-		if (width.isDirty() || height.isDirty()) {			
+		// call super rerender only if necessary, to avoid triggering unnecessary rerendering for contained child components
+		if (cmp.isDirty("v.priv_width") || cmp.isDirty("v.priv_height")) {			
 			helper.updateSize(cmp);
 		}
 		
-		if (cssClass.isDirty() || snap.isDirty()) {
+		if (cmp.isDirty("v.class") || cmp.isDirty("v.priv_snap")) {
 			this.superRerender();
 		}
 	}

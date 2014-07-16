@@ -24,9 +24,10 @@
 	},
 
     toggleState: function(cmp) {
-    	var ascending = cmp.get("v.isAscending");
+    	var ascending = $A.util.getBooleanValue(cmp.get("v.isAscending"));
     	
-    	cmp.getValue("v.isAscending").setValue(!ascending, true);
+    	cmp.set("v.isAscending", !ascending, true);
+    	
     	this.updateDirection(cmp, !ascending)
     },
     

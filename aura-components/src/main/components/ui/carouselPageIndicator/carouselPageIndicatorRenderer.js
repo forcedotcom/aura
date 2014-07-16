@@ -16,8 +16,7 @@
 
 ({
 	rerender: function(cmp) {
-		var pageCmp = cmp.getValue('v.pageComponents');
-		if (pageCmp.isDirty()) {
+		if (cmp.isDirty("v.pageComponents")) {
 			this.superRerender();
 		}
 	}	

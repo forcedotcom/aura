@@ -68,8 +68,7 @@
 		
 		if (direction === 'descending') {
 			newValue = 'ascending'	
-		}
-		else {
+		} else {
 			newValue = 'descending';	
 			name = '-' + name;
 		}

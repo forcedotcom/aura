@@ -21,7 +21,8 @@
         if (north) {
             ret = ret.concat(north);
         }
-        var center = helper.filterEmptyTextNodes($A.render(component.getValue("v.body")));
+        
+        var center = helper.filterEmptyTextNodes($A.render(component.get("v.body")));
 
         if (center && center.length > 0) {
 

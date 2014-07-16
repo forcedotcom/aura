@@ -134,12 +134,13 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
-        File file = new File(RESULTS_DIR + "/profiles/" + fileName + "_profile.cpuprofile");
+        File file = new File(RESULTS_DIR + "/profiles/" + fileName + ".cpuprofile");
         try {
             file.getParentFile().mkdirs();
             BufferedWriter writer = null;
             try {
-                writer = new BufferedWriter(new FileWriter(file));
+                FileOutputStream out = new FileOutputStream(file);
+                writer = new BufferedWriter(new OutputStreamWriter(out, Charsets.US_ASCII));
                 writer.write(new JSONObject(jsProfilerData).toString());
                 RESULTS_JSON.addResultsFile(file);
                 LOG.info("wrote JavaScript CPU profile: " + file.getAbsolutePath());
@@ -161,7 +162,7 @@ public final class PerfResultsUtil {
      */
     @SuppressWarnings("unchecked")
     public static File writeHeapSnapshot(Map<String, ?> data, String fileName) throws Exception {
-        File file = new File(RESULTS_DIR + "/heaps/" + fileName + "_heap.heapsnapshot");
+        File file = new File(RESULTS_DIR + "/heaps/" + fileName + ".heapsnapshot");
         BufferedWriter writer = null;
         try {
             file.getParentFile().mkdirs();

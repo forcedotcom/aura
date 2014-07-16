@@ -17,6 +17,7 @@ package org.auraframework.util.test;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.AssertionFailedError;
@@ -72,7 +73,12 @@ public final class GoldFileUtils {
             } else {
                 LOG.info("overwriting gold file: " + url);
             }
-            diff.writeGoldFile(testResults);
+            try {
+                diff.writeGoldFile(testResults);
+            } catch (Exception e) {
+                // i.e. in autobuild
+                LOG.log(Level.WARNING, "cannot write goldfile: " + url, e);
+            }
             if (testResults instanceof PerfMetrics) {
                 LOG.info("new gold file contents:\n"
                         + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults, diff.getTest()

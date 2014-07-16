@@ -133,12 +133,12 @@
 		// Handle force:recordLayout
 		// TODO: make adapter? 
 		if (columns && columns.length > 0) {
-			columns.forEach(function (column) {
+			$A.util.forEach(columns, function (column) {
 				var recordLayoutBody; 
 
 				if (column.getDef().getDescriptor().getPrefix() === 'layout') {
 					recordLayoutBody = column.getSuper().get('v.body');
-					recordLayoutBody.forEach(function (col) {
+					$A.util.forEach(recordLayoutBody, function (col) {
 						ret.push(col);
 					});
 				}
@@ -749,7 +749,7 @@
 		doc.appendChild(tr);
 
 		// Build up a mapping of the summary columns and their positions.		
-		summaryRow.forEach(function (cell, i) {
+		$A.util.forEach(summaryRow, function (cell, i) {
 			cell = cell.getValue();
 
 			var column = cell.attributes.values.column.value, 

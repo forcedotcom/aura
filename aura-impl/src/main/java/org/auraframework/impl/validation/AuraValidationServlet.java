@@ -76,6 +76,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
         String charset = Charsets.UTF_8.toString();
         response.setStatus(HttpServletResponse.SC_OK);
         response.setCharacterEncoding(charset);
+        setBasicHeaders(response);
 
         if (report != null) {
             File reportFile = new File(report);

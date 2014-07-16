@@ -54,6 +54,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
+        setBasicHeaders(response);
         InputStream in = null;
         try {
 

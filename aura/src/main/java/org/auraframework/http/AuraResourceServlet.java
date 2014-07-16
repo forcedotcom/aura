@@ -17,7 +17,6 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
 import java.io.Writer;
 import java.net.URI;
 import java.util.Map;
@@ -372,6 +371,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         setLongCache(response);
         AuraContext.Format format = context.getFormat();
         response.setContentType(getContentType(format));
+        setBasicHeaders(response);
         switch (format) {
         case MANIFEST:
             writeManifest(request, response);

@@ -46,6 +46,9 @@ import org.auraframework.util.json.JsonReader;
  * @since 0.0.139
  */
 public class AuraServletHttpTest extends AuraHttpTestCase {
+    private static final String SAMEORIGIN = "SAMEORIGIN";
+    private static final String X_FRAME_OPTIONS = "X-FRAME-OPTIONS";
+
     public AuraServletHttpTest(String name) {
         super(name);
     }
@@ -99,8 +102,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
         }
-        @SuppressWarnings("unchecked")
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
+        new JsonReader().read(response
                 .substring(AuraBaseServlet.CSRF_PROTECT.length()));
     }
 
@@ -164,6 +166,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals(expectedRedirect, response.getFirstHeader(HttpHeaders.LOCATION).getValue());
         assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
         assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
+        assertEquals("Failed to use anti-clickjacking " + X_FRAME_OPTIONS, 
+                SAMEORIGIN, response.getFirstHeader(X_FRAME_OPTIONS).getValue());
     }
 
     /**
@@ -276,7 +280,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("Expected response to be marked for long cache",
                 String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
                 response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
-
+        assertEquals("Failed to use anti-clickjacking " + X_FRAME_OPTIONS, 
+                SAMEORIGIN, response.getFirstHeader(X_FRAME_OPTIONS).getValue());
         String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
         //
@@ -304,7 +309,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("Expected response to be marked for no-cache", "no-cache, no-store",
                 response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
         assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
-
+        assertEquals("Failed to use anti-clickjacking " + X_FRAME_OPTIONS, 
+                SAMEORIGIN, response.getFirstHeader(X_FRAME_OPTIONS).getValue());
+        
         String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
         //

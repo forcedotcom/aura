@@ -177,6 +177,7 @@ public class AuraServlet extends AuraBaseServlet {
         //
         try {
             response.setCharacterEncoding(UTF_ENCODING);
+            setBasicHeaders(response);
             context = Aura.getContextService().getCurrentContext();
             response.setContentType(getContentType(context.getFormat()));
             definitionService = Aura.getDefinitionService();
@@ -324,6 +325,7 @@ public class AuraServlet extends AuraBaseServlet {
         ServerService serverService = Aura.getServerService();
         AuraContext context = contextService.getCurrentContext();
         response.setCharacterEncoding(UTF_ENCODING);
+        setBasicHeaders(response);
         boolean written = false;
         setNoCache(response);
 

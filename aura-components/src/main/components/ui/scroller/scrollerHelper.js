@@ -97,19 +97,35 @@
         return window.__S;
     },
     handleScrollTo : function(component, event) {
-        var scroller = this.getScrollerInstance(component),
-            params   = event.getParams(),
-            dest     = params.destination,
-            time     = params.time,
-            x        = params.xcoord || 0,
-            y        = params.ycoord || 0;
+        var scroller   = this.getScrollerInstance(component),
+            isNative   = component.get('v.useNativeScroller'),
+            wrapper    = scroller.wrapper,
+            scrollBody = scroller.scroller,
+            params     = event.getParams(),
+            dest       = params.destination,
+            time       = params.time,
+            x          = params.xcoord || 0,
+            y          = params.ycoord || 0;
 
         if (dest === 'custom') {
-            scroller.scrollTo(x, y, time);
+            if (isNative) {
+                wrapper.scrollTop  = scroller.scrollVertical ? Math.abs(y) : wrapper.scrollTop;
+                wrapper.scrollLeft = scroller.scrollVertical ? wrapper.scrollLeft : Math.abs(x) ;
+            } else {
+                scroller.scrollTo(x, y, time);
+            }
         } else if (dest === 'top' || dest === 'left') {
-            scroller.scrollToTop(time);
+            if (isNative) {
+                wrapper.scrollTop = 0;
+            } else {
+                scroller.scrollToTop(time);
+            }
         } else if (dest === 'bottom' || dest === 'right') {
-            scroller.scrollToBottom(time);
+            if (isNative) {
+                wrapper.scrollTop = scrollBody.offsetHeight - wrapper.offsetHeight;
+            } else {
+                scroller.scrollToBottom(time);
+            }
         }
     },
     handleScrollBy: function (component, event) {

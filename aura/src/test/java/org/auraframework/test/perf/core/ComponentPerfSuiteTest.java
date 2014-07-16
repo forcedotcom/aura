@@ -56,7 +56,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
             "markup://ui:inputDate" // server side dependency
             , "markup://ui:action" // this should be abstract
             , "markup://perf:dummyPerf"
-    );
+            );
 
     private static final Logger LOG = Logger.getLogger(ComponentPerfSuiteTest.class.getSimpleName());
 
@@ -65,6 +65,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
     }
 
     public ComponentPerfSuiteTest(String name) throws Exception {
+        LOG.info("ComponentPerfSuiteTest: " + name);
         setName(name);
         createTestCases();
     }
@@ -85,6 +86,8 @@ public class ComponentPerfSuiteTest extends TestSuite {
     }
 
     protected void createTestCases() throws Exception {
+        LOG.info("createTestCases: starting");
+
         if (System.getProperty("skipCmpPerfTests") != null) {
             LOG.info("Skipping Components Perf Tests");
             return;

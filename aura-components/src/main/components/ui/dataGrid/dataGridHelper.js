@@ -504,7 +504,8 @@
 	 */
 	// TODO rework
 	handleItemsChange: function (cmp, params) {
-		var self = this;
+		var self = this,
+			newLength;
 		
 		// If adding or removing rows, escape.
 		if (cmp._addRemove) { 
@@ -514,10 +515,11 @@
 		// Loaded once is meant to ensure the first data loaded doesn't break.
 		if (!cmp._hasDataProvider || cmp._loadedOnce) {
 			if (!params.index) {
+				newLength = params.value.length;
 				// Check for a larger or smaller list.
 				// TODO: concrete vs cmp?
-				if (cmp._rowData.length !== length) {
-					this.resize(cmp.getConcreteComponent(), params.value.length);
+				if (cmp._rowData.length !== newLength) {
+					this.resize(cmp.getConcreteComponent(), newLength);
 				}
 				else {
 					this.updateValueProvidersFromItems(cmp);

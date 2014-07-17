@@ -475,7 +475,7 @@ Component.prototype.destroy = function(async,value){
         $A.renderingService.unrender(this);
 
         // Track some useful debugging information for InvalidComponent's use
-        //#if {"excludeModes" : ["PRODUCTION"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         this._globalId = globalId;
         this._componentDef = componentDef;
         //#end

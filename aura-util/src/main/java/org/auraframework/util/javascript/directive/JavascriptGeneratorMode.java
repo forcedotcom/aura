@@ -58,7 +58,7 @@ public enum JavascriptGeneratorMode {
      */
     PTEST("ptest", false, JavascriptWriter.CLOSURE_AURA_PROD, true),
 
-    PRODUCTIONDEBUG("proddebug", false, JavascriptWriter.CLOSURE_AURA_PROD, true),
+    PRODUCTIONDEBUG("proddebug", false, JavascriptWriter.CLOSURE_AURA_DEBUG, true),
 
     /**
      * mode used for documentation (jsdoc), but never served in any context

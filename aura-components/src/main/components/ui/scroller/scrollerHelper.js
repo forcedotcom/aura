@@ -84,7 +84,7 @@
         component._scroller = scrollerInstance;
 
         // For debugging purposes...
-       // #if {"excludeModes" : ["PRODUCTION"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             var scrollerNS = this.getScrollerNamespace(component),
                 instances  = scrollerNS.instances || (scrollerNS.instances = {});
             instances[component.getGlobalId()] = scrollerInstance;
@@ -429,7 +429,7 @@
             wrapper.removeEventListener('touchmove', this._preventDefault, false);
         }
 
-        // #if {"excludeModes" : ["PRODUCTION"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         delete namespace.instances[component.getGlobalId()];
         // #end
 

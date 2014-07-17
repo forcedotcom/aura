@@ -50,7 +50,7 @@ $A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.Perf.removeStats;
 $A.ns.Aura.prototype["isLoadFired"] = $A.ns.Aura.prototype.Perf.isLoadFired;
 // //#end
 
-//#if {"excludeModes" : ["PRODUCTION"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 $A.ns.Aura.prototype["devToolService"] = $A.ns.Aura.prototype.devToolService;
 $A.ns.Aura.prototype["getQueryStatement"] = $A.ns.Aura.prototype.getQueryStatement;
 $A.ns.Aura.prototype["qhelp"] = $A.ns.Aura.prototype.qhelp;

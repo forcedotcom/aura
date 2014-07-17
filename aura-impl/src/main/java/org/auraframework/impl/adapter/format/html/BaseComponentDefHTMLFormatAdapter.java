@@ -101,7 +101,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 writeHtmlScripts(AuraServlet.getNamespacesScripts(context), true, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
-                if(!Aura.getContextService().getCurrentContext().getMode().equals(Mode.PROD) &&
+                if(mode != Mode.PROD && mode != Mode.PRODDEBUG &&
                         Aura.getContextService().getCurrentContext().getIsDebugToolEnabled()) {
                     attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
 

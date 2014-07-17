@@ -80,8 +80,8 @@ exp(p,
     "keys", p.keys,
     "bind", p.bind,
     "includeScript", p.includeScript
-    
-    //#if {"excludeModes" : ["PRODUCTION"]}
+
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	    ,
 	    "getDebugToolComponent", p.getDebugToolComponent,
 	    "setDebugToolWindow", p.setDebugToolWindow,

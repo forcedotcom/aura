@@ -109,7 +109,7 @@ var clientService;
 // #include aura.AuraEventService
 // #include aura.AuraLayoutService
 // #include aura.AuraLocalizationService
-// #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.AuraDevToolService"}
+// #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 // #include aura.value.ValueFactory
 // #include aura.value.ExpressionFunctions
 // #include aura.model.Model
@@ -144,7 +144,7 @@ $A.ns.Aura = function() {
     this.storageService = new AuraStorageService();
     this.componentStack = new $A.ns.AuraComponentContext();
 
-    //#if {"excludeModes" : ["PRODUCTION"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
     //#end
     var aura = this;
@@ -447,7 +447,7 @@ $A.ns.Aura = function() {
         "pushCreationPath", aura.pushCreationPath,
         "popCreationPath", aura.popCreationPath,
         "setCreationPathIndex", aura.setCreationPathIndex,
-        //#if {"excludeModes" : ["PRODUCTION"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             "devToolService", aura.devToolService,
             "getQueryStatement", aura.devToolService.newStatement,
             "qhelp", function() { return aura.devToolService.help() },
@@ -851,7 +851,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
  * @protected Internal assertion, should never happen
  */
 $A.ns.Aura.prototype.assert = function(condition, assertMessage) {
-    //#if {"excludeModes" : ["PRODUCTION"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     if (!condition) {
         var message = "Assertion Failed!: " + assertMessage + " : " + condition;
         var error = new Error(message);

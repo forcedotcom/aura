@@ -58,10 +58,12 @@ public abstract class QuickFixException extends AuraException implements JsonSer
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("message", getMessage());
-        if (Aura.getContextService().isEstablished()
-                && Aura.getContextService().getCurrentContext().getMode() != Mode.PROD) {
-            json.writeMapEntry("stack", AuraExceptionUtil.getStackTrace(this));
-            json.writeMapEntry("location", getLocation());
+        if (Aura.getContextService().isEstablished()) {
+            Mode mode = Aura.getContextService().getCurrentContext().getMode();
+            if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
+                json.writeMapEntry("stack", AuraExceptionUtil.getStackTrace(this));
+                json.writeMapEntry("location", getLocation());
+            }
         }
         json.writeMapEntry("quickFixes", getQuickFixes());
         json.writeMapEnd();

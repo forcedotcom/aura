@@ -168,8 +168,8 @@ Event.prototype.fire = function() {
                 }
             }
         }, stackname);
-    
-    //#if {"excludeModes" : ["PRODUCTION"]}
+
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     // if we have a debug component send event info to the tool
     var auraDebugCmp = $A.util.getDebugToolComponent();
     if(!$A.util.isUndefinedOrNull(auraDebugCmp)) {

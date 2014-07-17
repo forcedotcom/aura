@@ -795,7 +795,7 @@ var ComponentPriv = (function() { // Scoping priv
         $A.assert(parent !== this);
         $A.assert(priorSibling !== this);
 
-//#if {"excludeModes" : ["PRODUCTION"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         // This should be a needless loop cost, so let's leave it out in production.
         // But I've found enough screwiness in nesting combinations of (re/un)render
         // that in debug it might be worthwhile.  If a cycle IS created, you get a

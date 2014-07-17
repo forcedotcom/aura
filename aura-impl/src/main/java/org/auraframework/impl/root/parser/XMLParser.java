@@ -184,9 +184,8 @@ public class XMLParser implements Parser {
      * Returns a location for the reader and source provided. When
      * {@code xmlReader} is provided, its location will be used for the
      * finer-grain information such as line number; otherwise, a new and more
-     * limited location will be constructed based on {@code source} and the
-     * system ID therein.
-     * 
+     * limited location will be constructed based on {@code source}.
+     *
      * @param xmlReader
      * @param source
      * @return An as-specific-as-possible location.
@@ -194,21 +193,12 @@ public class XMLParser implements Parser {
     public static Location getLocation(XMLStreamReader xmlReader, Source<?> source) {
         if (xmlReader != null) {
             assert source != null;
-            // The xmlReader location is "better" for having more information,
-            // but it is sometimes *wrong* for having turned a relative-path
-            // system ID into a false absolute file://$CWD/... URL. So we need
-            // prefer source.getUrl() over
-            // xmlReader.getLocation().getSystemId().
-            // (Also, note that both, in practice, return URLs; XMLStreamReader
-            // will have made a URL out of its system id.)
+            // xmlLocation provides column and line number.
             javax.xml.stream.Location xmlLocation = xmlReader.getLocation();
             String location = source.getUrl();
             if (location == null) {
-                // This will happen for external subclasses of Source, but we
-                // can't
-                // really know what to use as an accurate source URL. So we use
-                // the xmlLocation instead, as it's all we've got.
-                location = xmlLocation.getSystemId();
+                // Not a file (DB) so let's provide the component name
+                location = source.getDescriptor().getQualifiedName();
             }
             if (location.startsWith("file:")) {
                 location = location.substring(5);

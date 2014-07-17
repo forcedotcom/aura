@@ -1,0 +1,17 @@
+{
+	"name": "ckeditor-dev",
+	"version": "4.4.1",
+	"description": "The development version of CKEditor - JavaScript WYSIWYG web text editor.",
+	"devDependencies": {
+		"benderjs-ckeditor": "git://github.com/benderjs/benderjs-ckeditor.git",
+		"benderjs-jquery": "git://github.com/benderjs/benderjs-jquery.git",
+		"benderjs-yui": "git://github.com/benderjs/benderjs-yui.git"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "CKSource (http://cksource.com/)",
+	"license": "For licensing, see LICENSE.md or http://ckeditor.com/license.",
+	"bugs": "http://dev.ckeditor.com",
+	"homepage": "http://ckeditor.com"
+}

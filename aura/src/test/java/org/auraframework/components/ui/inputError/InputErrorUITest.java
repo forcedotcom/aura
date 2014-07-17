@@ -135,7 +135,7 @@ public class InputErrorUITest extends WebDriverTestCase {
         clearBtn.click();
         waitForElementTextPresent(status, STATUS_CLEAR);
         if (verifyErrMsg) {
-            verifyNoErrorMessage(input);
+            verifyNoErrorMessage();
         }
         verifyCss(input, false);
     }
@@ -151,9 +151,8 @@ public class InputErrorUITest extends WebDriverTestCase {
         assertTrue("Incorrect error message: " + errorText, errorText.contains(expectedErrorMsg));
     }
     
-    private void verifyNoErrorMessage(WebElement element) throws Exception {
-        WebElement errorElement = d.findElement(By.className("uiInputDefaultError"));
-        assertEquals("Did not expect an error message","", errorElement.getText());
+    private void verifyNoErrorMessage() throws Exception {
+    	 assertFalse("Did not expect an error message", isElementPresent(By.className("uiInputDefaultError")));
     }
     
     private void verifyCss(WebElement element, boolean isError) throws Exception {

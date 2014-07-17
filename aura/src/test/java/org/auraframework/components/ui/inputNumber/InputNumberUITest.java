@@ -117,7 +117,6 @@ public class InputNumberUITest extends WebDriverTestCase {
         input.sendKeys("1234");
         submit.click();
         waitForElementTextPresent(output, "1234");
-        auraUITestingUtil.waitForElementText(By.className("uiInputDefaultError"), "", true,
-                "Error message never cleared after valid input");
+        assertFalse("Did not expect an error message", isElementPresent(By.className("uiInputDefaultError")));
     }
 }

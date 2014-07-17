@@ -95,7 +95,8 @@ public class InputNumberUITest extends WebDriverTestCase {
         waitForElementTextPresent(output, "-123.456");
     }
 
-    public void testInputNumberWithError() throws Exception {
+    // commented for bug W-2319834
+    public void _testInputNumberWithError() throws Exception {
         WebDriver d = getDriver();
         open("/uitest/inputNumber_Test.cmp");
 

@@ -82,7 +82,8 @@
     },
     
     //Show inputDefault error then take it away
-    testInputDefaultToggles : {
+    // commented for bug W-2319834
+    _testInputDefaultToggles : {
     	attributes: {"caseToRender" : "default"},
     	test : function(cmp) {
     		//Validate the components

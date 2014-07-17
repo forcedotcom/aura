@@ -76,7 +76,8 @@ public class InputErrorUITest extends WebDriverTestCase {
     /**
      * Test error handling from server errors.
      */
-    public void testServerError() throws Exception {
+    // commented for bug W-2319834
+    public void _testServerError() throws Exception {
         d = getDriver();
         open(URL);
         setWebElements("ErrorServer", "ClearNoEvent");
@@ -89,7 +90,8 @@ public class InputErrorUITest extends WebDriverTestCase {
      * setting SimpleValue attributes. Test error handling clearing errors
      * without firing clear events just setting SimpleValue attributes.
      */
-    public void testErrorWithoutEvents() throws Exception {
+    // commented for bug W-2319834
+    public void _testErrorWithoutEvents() throws Exception {
         d = getDriver();
         open(URL);
         setWebElements("ErrorNoEvent", "ClearNoEvent");

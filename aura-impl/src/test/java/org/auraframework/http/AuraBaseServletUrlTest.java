@@ -85,6 +85,10 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
     }
 
     private AuraContext setupContext() {
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
+
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setSerializeLastMod(false);
@@ -101,6 +105,10 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         String markup = "<aura:application access='unauthenticated' theme='%s'/>";
         String src = String.format(markup, Joiner.on(",").join(themes));
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
+
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);

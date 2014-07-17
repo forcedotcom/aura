@@ -45,15 +45,15 @@
     handleDataChange: function(cmp, evt, callback) {
         $A.mark("infiniteList handleDataChange " + cmp.getGlobalId());
         
+        var concrete = cmp.getConcreteComponent();
     	var newData = evt.getParam("data"),
-    		items = cmp.getConcreteComponent().getValue("v.items"),
-    		actualItems = items.unwrap();
+    		actualItems = concrete.get("v.items")||[];
         
         for (var i = 0, len = newData.length; i < len; i++) {
             actualItems.push(newData[i]);
         }
         
-        items.setValue(actualItems);
+        concrete.set("v.items", actualItems);
         
         if (callback) {
         	callback();

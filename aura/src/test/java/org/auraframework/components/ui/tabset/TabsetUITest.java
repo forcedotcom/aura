@@ -21,9 +21,7 @@ import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabset_Test.cmp";
@@ -136,7 +134,7 @@ public class TabsetUITest extends WebDriverTestCase {
      * @param tabBody - Body of the tab
      */
     private void createNewTab(String tabName, String tabBody){
-        WebElement element = findDomElement(By.xpath("//button[contains(.,'add tab')]"));
+        WebElement element = findDomElement(By.xpath("//button[contains(@class,'addTab')]"));
         element.click();
         
         element = findDomElement(ACTIVE_LI_LOCATOR);

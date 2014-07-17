@@ -34,8 +34,8 @@
             }
         }
 
-        var items = component.getValue("v.items");
-        if (!items.isEmpty()) {
+        var items = component.get("v.items");
+        if (items && items.length > 0) {
 	        // Create a <th scope="col" class="header">{!v.headerValue}</th> for each column
 	        var headerEl = component.find("header").getElement();
 	        if (headerEl) {

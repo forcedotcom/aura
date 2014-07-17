@@ -24,10 +24,10 @@
     
     getComponent: function(component,cmpName){
         var concrete = component.getConcreteComponent();
-        var body = concrete.getValue("v.body");
+        var body = concrete.get("v.body");
         if(!$A.util.isUndefinedOrNull(cmpName)){
-	        for (var i = 0; i < body.getLength(); i++) {
-	            var c = body.getValue(i);
+	        for (var i = 0; i < body.length; i++) {
+	            var c = body[i];
 	            if (c.isInstanceOf('ui:scroller')) {
 	            	return this.getComponent(c, cmpName);
 	            } else if (c.isInstanceOf(cmpName)) {

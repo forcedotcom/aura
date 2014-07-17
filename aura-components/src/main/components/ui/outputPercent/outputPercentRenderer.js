@@ -44,34 +44,31 @@
     },
 
     rerender: function outputPercentRerenderer(cmp, helper) {
-        var val = cmp.getValue("v.value");
-        var f = cmp.getValue("v.format");
-        if (val.isDirty() || f.isDirty()) {
-            var formatted = '';
-            f = f.unwrap();
-            val = val.unwrap();
-            if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val)) {
-                var scale = cmp.get("v.valueScale");
-                if (scale) {
-                    val *= Math.pow(10, scale);
-                }
-                if (!$A.util.isEmpty(f)) {
-                    var nf;
-                    try {
-                        nf = $A.localizationService.getNumberFormat(f);
-                    } catch (e) {
-                        formatted = "Invalid format attribute";
-                        $A.log(e);
-                    }
-                    if (nf) {
-                        formatted = nf.format(val);
-                    }
-                } else {
-                    formatted = $A.localizationService.formatPercent(val);
-                }
+        var val = cmp.get("v.value");
+        var f = cmp.get("v.format");
+        var formatted = '';
+
+        if (($A.util.isNumber(val) || $A.util.isString(val)) && !$A.util.isEmpty(val)) {
+            var scale = cmp.get("v.valueScale");
+            if (scale) {
+                val *= Math.pow(10, scale);
             }
-            var span = cmp.find("span");
-            span.getElement().textContent = span.getElement().innerText = formatted;
+            if (!$A.util.isEmpty(f)) {
+                var nf;
+                try {
+                    nf = $A.localizationService.getNumberFormat(f);
+                } catch (e) {
+                    formatted = "Invalid format attribute";
+                    $A.log(e);
+                }
+                if (nf) {
+                    formatted = nf.format(val);
+                }
+            } else {
+                formatted = $A.localizationService.formatPercent(val);
+            }
         }
+        var span = cmp.find("span");
+        span.getElement().textContent = span.getElement().innerText = formatted;
     }
 })

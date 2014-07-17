@@ -15,19 +15,17 @@
  */
 ({
     updateHref: function(cmp){
-        if (cmp.getValue("v.value")) {
-            var value = cmp.get("v.value");
+    	var value = cmp.get("v.value");
 
-            if (value) {
-                var link = cmp.find("link");
-                if (link) {
-                    var element = link.getElement();
-                    if (value.search("#") != -1 || value.search("\\*") != -1) {
-                        element.removeAttribute("href");
-                    } else {
-                        var tel = this.removeSpaces(value);
-                        element.setAttribute("href", "tel:" + tel);
-                    }
+        if (value) {
+            var link = cmp.find("link");
+            if (link) {
+                var element = link.getElement();
+                if (value.search("#") != -1 || value.search("\\*") != -1) {
+                    element.removeAttribute("href");
+                } else {
+                    var tel = this.removeSpaces(value);
+                    element.setAttribute("href", "tel:" + tel);
                 }
             }
         }

@@ -16,7 +16,7 @@
 ({
     // this is a direct copy of componentRenderer, except using realbody
     render: function(component){
-        var body = component.getValue("v.realbody");
+        var body = component.get("v.realbody");
         //$A.mark("render iteration body " + component.getGlobalId());
         var ret = $A.render(body);
         //$A.endMark("render iteration body " + component.getGlobalId());

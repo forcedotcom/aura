@@ -60,10 +60,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     }
 
     public boolean isInPrivilegedNamespace() {
-		return isInPrivilegedNamespace;
-	}
+        return isInPrivilegedNamespace;
+    }
 
-	protected DefDescriptor<T> getDefDescriptor() {
+    protected DefDescriptor<T> getDefDescriptor() {
         return defDescriptor;
     }
 

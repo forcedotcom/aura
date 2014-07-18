@@ -52,47 +52,50 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         super(xmlReader, source);
     }
 
+    protected void readElement() throws XMLStreamException, QuickFixException {
+        validateAttributes();
+        this.startLocation = getLocation();
+        String startTag = getTagName();
+        if (!handlesTag(startTag)) {
+            error("Expected start tag <%s> but found %s", getHandledTag(), getTagName());
+        }
+        readAttributes();
+        readSystemAttributes();
+        loop: while (xmlReader.hasNext()) {
+            int next = xmlReader.next();
+            switch (next) {
+            case XMLStreamConstants.START_ELEMENT:
+                handleChildTag();
+                break;
+            case XMLStreamConstants.CDATA:
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.SPACE:
+                handleChildText();
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                if (!startTag.equalsIgnoreCase(getTagName())) {
+                    error("Expected end tag <%s> but found %s", startTag, getTagName());
+                }
+                // we hit our own end tag, so stop handling
+                break loop;
+            case XMLStreamConstants.ENTITY_REFERENCE:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                error("found something of type: %s", next);
+            }
+        }
+        if (xmlReader.getEventType() != XMLStreamConstants.END_ELEMENT) {
+            // must have hit EOF, barf time!
+            error("Didn't find an end tag");
+        }
+    }
+
     @Override
     public final T getElement() throws XMLStreamException, QuickFixException {
         if (source.exists()) {
-            validateAttributes();
-            this.startLocation = getLocation();
-            String startTag = getTagName();
-            if (!handlesTag(startTag)) {
-                error("Expected start tag <%s> but found %s", getHandledTag(), getTagName());
-            }
-            readAttributes();
-            readSystemAttributes();
-            loop: while (xmlReader.hasNext()) {
-                int next = xmlReader.next();
-                switch (next) {
-                case XMLStreamConstants.START_ELEMENT:
-                    handleChildTag();
-                    break;
-                case XMLStreamConstants.CDATA:
-                case XMLStreamConstants.CHARACTERS:
-                case XMLStreamConstants.SPACE:
-                    handleChildText();
-                    break;
-                case XMLStreamConstants.END_ELEMENT:
-                    if (!startTag.equalsIgnoreCase(getTagName())) {
-                        error("Expected end tag <%s> but found %s", startTag, getTagName());
-                    }
-                    // we hit our own end tag, so stop handling
-                    break loop;
-                case XMLStreamConstants.ENTITY_REFERENCE:
-                case XMLStreamConstants.COMMENT:
-                    break;
-                default:
-                    error("found something of type: %s", next);
-                }
-            }
-            if (xmlReader.getEventType() != XMLStreamConstants.END_ELEMENT) {
-                // must have hit EOF, barf time!
-                error("Didn't find an end tag");
-            }
+            readElement();
         }
-
         return createDefinition();
     }
 

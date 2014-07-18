@@ -17,10 +17,12 @@
 
 package org.auraframework.def;
 
+import java.io.Serializable;
+
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
 // Holds compiled value of ACCESS attribute. 
-public interface DefinitionAccess {
+public interface DefinitionAccess extends Serializable {
 	
     // Authentication
     boolean requiresAuthentication();

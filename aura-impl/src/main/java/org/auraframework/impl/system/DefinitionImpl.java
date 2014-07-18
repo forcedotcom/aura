@@ -53,21 +53,21 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
 
     private final QuickFixException parseError;
     private final String ownHash;
-    private final Hash sourceHash;
     private final DefinitionAccess access;
     private boolean valid;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, Visibility visibility) {
-        this(descriptor, location, null, null, null, visibility, null, null, null, null);
+        this(descriptor, location, null, null, null, visibility, null, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
-        this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.apiVersion, builder.description, builder
-                .visibility, builder.getAccess(), builder.getOwnHash(), builder.getSourceHash(), builder.getParseError());
+        this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.apiVersion, builder.description,
+                builder.visibility, builder.getAccess(), builder.getOwnHash(), builder.getParseError());
     }
 
-    DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs, String apiVersion,
-            String description, Visibility visibility, DefinitionAccess access, String ownHash, Hash sourceHash, QuickFixException parseError) {
+    DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
+            String apiVersion, String description, Visibility visibility, DefinitionAccess access, String ownHash,
+            QuickFixException parseError) {
         this.descriptor = descriptor;
         this.location = location;
         this.subDefs = subDefs;
@@ -75,7 +75,6 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         this.description = description;
         this.visibility = visibility;
         this.ownHash = ownHash;
-        this.sourceHash = sourceHash;
         this.parseError = parseError;
         this.access = access == null ? DefinitionAccessImpl.defaultAccess(descriptor != null ? descriptor.getNamespace() : null) : access;
     }
@@ -116,9 +115,6 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
 
     @Override
     public String getOwnHash() {
-        if (sourceHash != null) {
-            return sourceHash.toString();
-        }
         return ownHash;
     }
 
@@ -226,10 +222,10 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         }
 
         public DefinitionAccess getAccess() {
-        	return access;
-		}
+            return access;
+        }
 
-		@Override
+        @Override
         public RefBuilderImpl<T, A> setLocation(String fileName, int line, int column, long lastModified) {
             location = new Location(fileName, line, column, lastModified);
             return this;
@@ -332,17 +328,6 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
                 ownHash = hash.toString();
             }
             return ownHash;
-        }
-
-        private Hash getSourceHash() {
-            //
-            // Only set the hash value if we don't have one.
-            //
-            if (getOwnHash() == null) {
-                return hash;
-            } else {
-                return null;
-            }
         }
 
         @Override

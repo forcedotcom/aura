@@ -1727,9 +1727,9 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
             (($A.get('$Browser.formFactor') !== 'DESKTOP' || $A.get('$Browser.isIOS') || $A.get('$Browser.isAndroid')) && 'ontouchstart' in window)
 
             // IE  will also give false positives, so we make sure that only enable pointer events when is a windowsPhone
-            || ($A.get('$Browser.isWindowsPhone') && (navigator.pointerEnabled ||  navigator.msPointerEnabled))
-            || navigator.msMaxTouchPoints > 0 
-            || navigator.maxTouchPoints > 0)
+            || ($A.get('$Browser.isWindowsPhone') && (window["navigator"]["pointerEnabled"] ||  window["navigator"]["msPointerEnabled"]))
+            || window["navigator"]["msMaxTouchPoints"] > 0 
+            || window["navigator"]["maxTouchPoints"] > 0)
 
             // Aura internal testing
             && ($A.getContext().getMode() !== 'PTEST')

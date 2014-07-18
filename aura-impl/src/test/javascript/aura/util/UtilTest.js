@@ -454,9 +454,10 @@ Test.Aura.UtilTest=function(){
                         return true;
                     }
                 },
-                window: {},
-                navigator: {
-                    msPointerEnabled: true
+                window: {
+                    navigator: {
+                        msPointerEnabled: true
+                    }
                 }
             });
 
@@ -489,10 +490,11 @@ Test.Aura.UtilTest=function(){
                         return false;
                     }
                 },
-                window: {},
-                navigator: {
-                    msPointerEnabled: false,
-                    msMaxTouchPoints: 10
+                window: {
+                    navigator: {
+                        msPointerEnabled: false,
+                        msMaxTouchPoints: 10
+                    }
                 }
             });
 
@@ -560,12 +562,13 @@ Test.Aura.UtilTest=function(){
                         return false;
                     }
                 },
-                window: {},
-                navigator: {
-                    msPointerEnabled: true,
-                    pointerEnabled: true,
-                    msMaxTouchPoints: 0,
-                    maxTouchPoints: 0
+                window: {
+                    navigator: {
+                        msPointerEnabled: true,
+                        pointerEnabled: true,
+                        msMaxTouchPoints: 0,
+                        maxTouchPoints: 0
+                    }
                 }
             });
 

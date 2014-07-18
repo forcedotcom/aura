@@ -18,8 +18,10 @@
 	 * Test to verify action menu works when interacting with the menu items 
 	 * which has attachToBody attribute set
 	 * using AURA API  
+	 * TODO: Disabling test in IE7&8, bug W-2320774
 	 */
 	testActionMenuWithAttachToBodySet:{
+		browsers: ["-IE7","-IE8"],
 		test: [function(cmp) {
 				actionMenu = cmp.find("actionMenuAttachToBody");
 	        	menuLabel = cmp.find("triggerAttachToBody");
@@ -71,8 +73,10 @@
     
     /**
      * Test first item in menuList is focused.
+     * TODO: Disabling test in IE7&8, bug W-2320774
      */
     testFocusOnFirstMenuItem:{
+    	browsers: ["-IE7","-IE8"],
     	test: function(cmp){
 			trigger = cmp.find("trigger");
 			trigger.get("e.click").fire();

@@ -40,12 +40,12 @@
     },
 
     uncheckSiblings : function(component) {
-        var parent = component.getValue("v.parent");
-        if (parent && !parent.isEmpty()) {
-            p = parent.getValue(0);
-            var body = p.getValue("v.childMenuItems");
-            for (var i = 0; i < body.getLength(); i++) {
-                var c = body.getValue(i);
+    	var parent = component.get("v.parent");
+        if (parent && parent.length > 0) {
+            p = parent[0];
+            var body = p.get("v.childMenuItems");
+            for (var i = 0; i < body.length; i++) {
+                var c = body[i];
                 if (c.isInstanceOf("ui:radioMenuItem") &&
                     $A.util.getBooleanValue(c.get("v.selected")) &&
                     c.getGlobalId() != component.getGlobalId()) {

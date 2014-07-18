@@ -1,4 +1,4 @@
-markup://ui:outputNumber : yoMzBtrhGHFBnZ8Bpu_M5A
+markup://ui:outputNumber : R9nUfoZghj73brtfbuiotA
 aura://Boolean : null
 aura://Integer : null
 aura://String : null
@@ -74,6 +74,6 @@ markup://ui:visible : _6cbltysuoEp_cHYOg3n2g
 markup://ui:interactive : SUDPP3CAlEQR6qwEgCANNA
 aura://Decimal : null
 css://ui.outputNumber : 8bm_8b0q-ftoIJVkYGSIMA
-js://ui.outputNumber : AypChTLjuG2yyhApz7JbWQ
+js://ui.outputNumber : 0uYwClLjY0aBsjMQvV-O0A
 markup://ui:output : osL0BB5egCJG1Q-CyKaQZA
 markup://ui:outputNumber : cqtmcvNViQDtzWJ5vVSOJA

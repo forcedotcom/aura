@@ -18,17 +18,17 @@
         var realbody = [];
         var facet;
         if (isTrue) {
-            facet = cmp.getValue("v.body");
+            facet = cmp.get("v.body");
             //console.log("truth " + cmp.getGlobalId());
         } else {
-            facet = cmp.getValue("v.else");
+            facet = cmp.get("v.else");
             //console.log("fiction " + cmp.getGlobalId());
         }
 
         $A.pushCreationPath("realbody");
-        for (var i = 0, length = facet.getLength(); i < length; i++) {
+        for (var i = 0, length = facet.length; i < length; i++) {
         	$A.setCreationPathIndex(i);
-            var cdr = facet.get(i);
+            var cdr = facet[i];
             var cmps = $A.componentService.newComponentDeprecated(cdr, cdr.valueProvider || cmp.getAttributeValueProvider(), false, doForce);
             if ($A.util.isArray(cmps)) {
                 throw new Error("foreach inside of an if doesn't work yet");

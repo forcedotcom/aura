@@ -238,9 +238,11 @@
                 $A.test.assertEquals(0, children.length);
 
                 // Now, add a couple new items
-                var data = cmp.getValue("m.data");
+                var data = cmp.get("m.data");
                 data.push({stringy: "newaaa"});
                 data.push({stringy: "newbbb"});
+                cmp.set("m.data", data);
+                
              }, function(cmp) {
                 var container = cmp.find("container").getElement();
                 var children = $A.test.getNonCommentNodes(container.childNodes);

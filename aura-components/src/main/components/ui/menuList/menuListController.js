@@ -17,18 +17,18 @@
     doInit: function(component, event, helper) {
         var children = [];
         // Set "parent" for menu items in body
-        var body = component.getValue("v.body");
-        for (var i = 0; i < body.getLength(); i++) {
-            var c = body.getValue(i);
+        var body = component.get("v.body");
+        for (var i = 0; i < body.length; i++) {
+            var c = body[i];
             if (c.isInstanceOf("ui:menuItem")) {
                 children.push(c);
                 if (c.getDef().getAttributeDefs().getDef("parent")) {
                     c.set("v.parent", [component]);
                 }
             } else if (c.isInstanceOf("aura:iteration")) { // support external iteration
-                var iters = c.getValue("v.realbody");
-                for (var k = 0; k < iters.getLength(); k++) {
-                    var iter = iters.getValue(k);
+                var iters = c.get("v.realbody");
+                for (var k = 0; k < iters.length; k++) {
+                    var iter = iters[k];
                     if (iter.isInstanceOf("ui:menuItem")) {
                         children.push(iter);
                         if (iter.getDef().getAttributeDefs().getDef("parent")) {

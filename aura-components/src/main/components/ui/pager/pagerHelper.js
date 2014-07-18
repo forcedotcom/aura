@@ -39,7 +39,7 @@
 			return false;
 		}
 
-		var pageSize = parseInt(component.getValue("v.pageSize"), 10);
+		var pageSize = parseInt(component.get("v.pageSize"), 10);
 		if (pageSize == targetPageSize) {
 			return false;
 		}
@@ -74,10 +74,10 @@
 		var pageSize = component.get("v.pageSize") || 0;
 		var totalItems = parseInt(component.get("v.totalItems"), 10);
 		if (pageSize > 0) {
-			var pageCount = component.getValue("v.pageCount");
+			var pageCount = component.get("v.pageCount");
 			var newPageCount = Math.ceil(totalItems / pageSize);
-			if (!isNaN(newPageCount) && pageCount.getValue() != newPageCount) {
-				pageCount.setValue(newPageCount);
+			if (!isNaN(newPageCount) && pageCount != newPageCount) {
+				component.set("v.pageCount", newPageCount);
 			}
 		} else {
 			component.set("v.pageCount", 1);

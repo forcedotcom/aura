@@ -187,16 +187,6 @@ Test.Ui.OutputNumber.RendererTest = function(){
     	
     	var message = '';
     	    	    	    	    	    	    	
-    	var targetValueObj ={
-			unwrap:function(){return targetValue;},
-			isDirty:function(){return true;}
-    	};
-    	
-    	var targetFormatObj ={
-			unwrap:function(){return targetFormat;},
-			isDirty:function(){return true;}
-    	};    	    	    
-    	
     	var targetElement={
 			innerText:'',
 			textContent:''
@@ -209,44 +199,15 @@ Test.Ui.OutputNumber.RendererTest = function(){
 		};
     	
     	var targetComponent={
-			getValue:function(value){
-				if(value=="v.value")return targetValueObj;
-				if(value=="v.format")return targetFormatObj;
+			get:function(value){
+				if(value=="v.value")return targetValue;
+				if(value=="v.format")return targetFormat;
 			},
 			find:function(cmp){
 				if(cmp == "span") return spanElement; 
 			}
 		};
     	
-    	[Fact]
-        function NotDirty(){
-        	// Arrange
-        	var expected = '';  
-        	        	
-        	var targetValueObj ={    		
-    			isDirty:function(){return false;}
-        	};
-        	
-        	var targetFormatObj ={    			
-    			isDirty:function(){return false;}
-        	};
-        	    	        	        	        	        	
-        	var targetComponent={
-    			getValue:function(value){
-    				if(value=="v.value")return targetValueObj;
-    				if(value=="v.format")return targetFormatObj;
-    			}
-    		};
-																				
-            // Act						
-			targetRenderer.rerender(targetComponent, targetHelper);			
-
-            // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
-            Assert.Equal(expected, targetElement.textContent);
-        }
-    	    	
         [Fact]
         function NotNumberNotString(){
         	// Arrange

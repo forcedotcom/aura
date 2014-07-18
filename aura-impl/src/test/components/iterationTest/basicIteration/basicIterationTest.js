@@ -15,16 +15,14 @@
  */
 ({
     assertBodyComponentDefRef: function(cmp) {
-        var value = cmp.find("iteration").getValue("v.body");
-        $A.test.assertEquals("ArrayValue", value.toString());
-        $A.test.assertEquals(1, value.getLength());
-        value = value.get(0);
-
+    	var value = cmp.find("iteration").get("v.body");
+        $A.test.assertTrue($A.util.isArray(value));
+        $A.test.assertEquals(1, value.length);
+        value = value[0];
         $A.test.assertTrue(typeof value === "object");
         $A.test.assertEquals(undefined, value.auraType);
         $A.test.assertEquals(undefined, value.getDef);
         $A.test.assertEquals("markup://aura:expression", value.componentDef.descriptor);
-
     },
 
     /**
@@ -33,52 +31,49 @@
     testSanity:{
         attributes:{ items:"alpha,omega" },
         test:function(cmp){
-            // Verify renderIf
-            var value = cmp.find("if").getValue("v.body");
-            $A.test.assertEquals("ArrayValue", value.toString());
-            $A.test.assertEquals(1, value.getLength());
-            value = value.get(0);
+        	// Verify renderIf
+            var value = cmp.find("if").get("v.body");
+            $A.test.assertTrue($A.util.isArray(value));
+            $A.test.assertEquals(1, value.length);
             var iteration = cmp.find("iteration");
-            $A.test.assertEquals(iteration, value);
+            $A.test.assertEquals(iteration, value[0]);
 
             this.assertBodyComponentDefRef(cmp);
 
-            var realbody = iteration.getValue("v.realbody");
-            $A.test.assertEquals("ArrayValue", realbody.toString());
-            $A.test.assertEquals(2, realbody.getLength());
-            value = realbody.get(0);
-            $A.test.assertTrue(typeof value === "object");
+            var realbody = iteration.get("v.realbody");
+            $A.test.assertTrue( $A.util.isArray(realbody));
+            $A.test.assertEquals(2, realbody.length);
+            value = realbody[0];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
-            value = realbody.get(1);
-            $A.test.assertTrue(typeof value === "object");
+            value = realbody[1];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("1:omega,", value.get("v.value"));
         }
     },
-    
-    
+
     /**
      * Iteration body is not rendered by renderIf
      */
-    _testNotRendered:{
+    testNotRendered:{
         attributes:{ showIteration:false, items:"alpha,omega" },
         test:function(cmp){
             // Verify renderIf
-            var value = cmp.find("if").getValue("v.body");
-            $A.test.assertEquals("ArrayValue", value.toString());
-            $A.test.assertEquals(1, value.getLength());
-            value = value.get(0);
+            var value = cmp.find("if").get("v.body");
+            $A.test.assertTrue($A.util.isArray(value));
+            $A.test.assertEquals(1, value.length);
             var iteration = cmp.find("iteration");
-            $A.test.assertEquals(iteration, value);
+            $A.test.assertEquals(iteration, value[0]);
 
             this.assertBodyComponentDefRef(cmp);
 
-            var realbody = iteration.getValue("v.realbody");
-            $A.test.assertEquals("ArrayValue", realbody.toString());
-            $A.test.assertEquals(2, realbody.getLength());
+            var realbody = iteration.get("v.realbody");
+            $A.test.assertTrue( $A.util.isArray(realbody));
+            $A.test.assertEquals(2, realbody.length);
             $A.test.assertFalse(iteration.isRendered());
             $A.test.assertTrue(undefined === iteration.getElements());
 
@@ -89,8 +84,8 @@
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
             $A.test.assertFalse(value.isRendered());
             $A.test.assertTrue(undefined === value.getElements());
-            value = realbody.get(1);
-            $A.test.assertTrue(typeof value === "object");
+            value = realbody[1];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("Component", value.auraType);
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("1:omega,", value.get("v.value"));
@@ -98,7 +93,6 @@
             $A.test.assertTrue(undefined === value.getElements());
         }
     },
-
 
     /**
      * Iteration is empty if items is empty
@@ -116,10 +110,10 @@
         attributes:{ items:"a,b,c,d,e", start:2, end:3 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(1, realbody.getLength());
-            value = realbody.get(0);
-            $A.test.assertTrue(typeof value === "object");
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals(1, realbody.length);
+            value = realbody[0];
+            $A.test.assertTrue($A.util.isObject(value));
             $A.test.assertEquals("2:c,", value.get("v.value"));
         }
     },
@@ -157,11 +151,11 @@
         attributes:{ items:"a,b,c,d,e", start:3 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(2, realbody.getLength());
-            value = realbody.get(0);
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals(2, realbody.length);
+            value = realbody[0];
             $A.test.assertEquals("3:d,", value.get("v.value"));
-            value = realbody.get(1);
+            value = realbody[1];
             $A.test.assertEquals("4:e,", value.get("v.value"));
         }
     },
@@ -173,13 +167,13 @@
         attributes:{ items:"a,b,c,d,e", end:3 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(3, realbody.getLength());
-            value = realbody.get(0);
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals(3, realbody.length);
+            value = realbody[0];
             $A.test.assertEquals("0:a,", value.get("v.value"));
-            value = realbody.get(1);
+            value = realbody[1];
             $A.test.assertEquals("1:b,", value.get("v.value"));
-            value = realbody.get(2);
+            value = realbody[2];
             $A.test.assertEquals("2:c,", value.get("v.value"));
         }
     },
@@ -191,11 +185,11 @@
         attributes:{ items:"delta,gamma", start:-3 },
         test:function(cmp){
             this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(2, realbody.getLength());
-            value = realbody.get(0);
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals(2, realbody.length);
+            value = realbody[0];
             $A.test.assertEquals("0:delta,", value.get("v.value"));
-            value = realbody.get(1);
+            value = realbody[1];
             $A.test.assertEquals("1:gamma,", value.get("v.value"));
         }
     },
@@ -206,19 +200,19 @@
     testStartDecimal:{
         attributes:{ items:"alpha,beta", start: 0.000001 },
         test:function(cmp){
-            this.assertBodyComponentDefRef(cmp);
-            var realbody = cmp.find("iteration").getValue("v.realbody");
-            $A.test.assertEquals(2, realbody.getLength());
-            value = realbody.get(0);
+        	this.assertBodyComponentDefRef(cmp);
+            var realbody = cmp.find("iteration").get("v.realbody");
+            $A.test.assertEquals(2, realbody.length);
+            value = realbody[0];
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
-            value = realbody.get(1);
+            value = realbody[1];
             $A.test.assertEquals("1:beta,", value.get("v.value"));
         }
     },
  
     /** Iteration rerender stays stable */
     //TODO: Test fails because iteration's body is not rerendered
-    _testEmptyAndFill:{
+    testEmptyAndFill:{
         attributes:{ items:"alpha,beta" },
         test:[function(cmp) {
             var items = cmp.get("v.items");
@@ -239,8 +233,8 @@
         	var realbody = cmp.find("iteration").get("v.realbody");
             // This assertion isn't the big one; it doesn't show the render state.
             // But we do want to be sure it's right:
-            $A.test.assertEquals(1, realbody.getLength());
-            $A.test.assertEquals("0:xyz,", realbody.get(0).get("v.value"));
+            $A.test.assertEquals(1, realbody.length);
+            $A.test.assertEquals("0:xyz,", realbody[0].get("v.value"));
 
             // Now, this is the more useful part:
             var refNode = realbody[0].getElement();
@@ -255,6 +249,5 @@
             $A.test.assertEquals("BODY", parent.tagName,
                     "Reference parent isn't right component");
         }]
-    }
-
+    },
 })

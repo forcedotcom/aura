@@ -45,9 +45,9 @@
             index = 0;
         }
         var concrete = component.getConcreteComponent();
-        var parent = concrete.getValue("v.parent");
-        if (parent && !parent.isEmpty()) {
-            p = parent.getValue(0);
+        var parent = concrete.get("v.parent");
+        if (parent && parent.length > 0) {
+            p = parent[0];
             var pressEvent = p.get("e.menuTriggerPress");
             pressEvent.setParams({
                 focusItemIndex: index

@@ -15,16 +15,16 @@
  */
 ({
     getMenuItem: function(component, index) {
-        var menuItems = component.getValue("v.childMenuItems");
+        var menuItems = component.get("v.childMenuItems");
         if (menuItems) {
-            return menuItems.getValue(index);
+            return menuItems[index];
         }
     },
 
     handleGlobalClick: function(component, visible) {
-        var parent = component.getValue("v.parent");
-        if (parent && !parent.isEmpty()) {
-            p = parent.getValue(0);
+        var parent = component.get("v.parent");
+        if (parent && !$A.util.isEmpty(parent)) {
+            p = parent[0];
             if (visible === true) {
                 var action = p.get("c.handleMenuExpand");
                 if (action) {
@@ -125,9 +125,9 @@
     setAriaAttributes: function(component) {
         var concrete = component.getConcreteComponent();
         var elem = concrete.getElement();
-        var parent = concrete.getValue("v.parent");
-        if (parent && !parent.isEmpty()) {
-            var p = parent.getValue(0);
+        var parent = concrete.get("v.parent");
+        if (parent && !$A.util.isEmpty(parent)) {
+            var p = parent[0];
             var pHelper = p.getDef().getHelper();
             if (pHelper.getTriggerComponent) {
                 var triggerCmp = pHelper.getTriggerComponent(p);
@@ -158,7 +158,7 @@
             if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
                 var index = concreteCmp.get("v.focusItemIndex");
                 if (index < 0) {
-                    index = component.getValue("v.childMenuItems").getLength() - 1;
+                    index = component.get("v.childMenuItems").length - 1;
                 }
                 this.setMenuItemFocus(component, index);
             }

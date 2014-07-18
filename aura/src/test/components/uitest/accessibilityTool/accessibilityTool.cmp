@@ -17,6 +17,14 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
+    
+    <!--Should have 1 error -->   
+    <aura:if isTrue="{!v.caseToRender == 'testInputDefaultError'}">
+		<uitest:inputDefaultError_Test aura:id="inputErrorTest" caseToRender="all"/>
+		<ui:inputDefaultError value="first error, second error, third error, fourth error"/>
+    </aura:if>
+    
+    
       <!--Should Pass Since there are no headers -->   
     <aura:if isTrue="{!v.caseToRender == 'testWithNoHeader'}">
        <table>

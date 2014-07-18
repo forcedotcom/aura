@@ -34,7 +34,7 @@
      <!-- 
           Test verifying that the inputDefault component can be used by itself
       -->
-    <aura:if isTrue="{!v.caseToRender == 'customUsage' || v.caseToRender == 'all'}">
+    <aura:if isTrue="{!v.caseToRender == 'customUsage'}">
 	    <ui:label for="customUsageInvalid" label="testingInvalidInput"/>
 	    <ui:inputNumber class="formInput" aura:id="customUsageInvalid" value="100000" placeholder="at least 6 chars">
 	      <aura:set attribute="errorComponent">
@@ -79,7 +79,7 @@
      	<br/>
     </aura:if>
     
-       <aura:if isTrue="{!v.caseToRender == 'dateTime' || v.caseToRender == 'all'}">
+       <aura:if isTrue="{!v.caseToRender == 'dateTime'}">
         <ui:label for="dateTimeInvalid" label="testingInvalidInput"/>
         <ui:inputDateTime aura:id="dateTimeInvalid"/>
      	<br/>

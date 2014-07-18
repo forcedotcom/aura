@@ -372,6 +372,57 @@ var AuraDevToolService = function() {
             return cmp.output();
         },
         accessbilityAide:{
+        	/**
+             * Helper functions that returns an error array when ever an inputDefaultError that is not associated with an ID is used
+             * @param   uls          - all of the ULs on the page
+             * @param   inputTags    - all of the input tags that can be associated with the inputDefaultError
+             * @param   selectTags   - all of the select tags that can be associated with the inputDefaultError
+             * @param   textAreaTags - all of the textAreaTags tags that can be associated with the inputDefaultError
+             * @returns array        - error array, 
+             */   
+        	 inputDefaultErrorAide : function(uls, inputTags, selectTags, textAreaTags) {
+      	        var ul  = null;
+      	        var elmntAtrib = "";
+      	        var errorArray = [];
+      	    	
+      	        var accessAideFuncs = aura.devToolService.accessbilityAide;
+      	        for(var i = 0; i< uls.length; i++){
+                      ul = uls[i];
+                      elmntAtrib = $A.util.getElementAttributeValue(ul ,"class");
+      	    		
+                      if(!$A.util.isUndefinedOrNull(elmntAtrib) && elmntAtrib.indexOf("uiInputDefaultError") > -1){
+                          elmntAtrib = $A.util.getElementAttributeValue(ul ,"id");
+      	    			
+                          //As long as a select, inputTag or textArea have the value we are looking for set we pass
+                          if(!(accessAideFuncs.findMatchingId(elmntAtrib, inputTags, "aria-describedby")    ||
+                                  accessAideFuncs.findMatchingId(elmntAtrib, selectTags, "aria-describedby") ||
+                                  accessAideFuncs.findMatchingId(elmntAtrib, textAreaTags, "aria-describedby"))){
+                              errorArray.push(ul);
+                          }
+                      }
+                  }
+      	    	
+                  return errorArray;
+      	        },
+      	      /**
+                 * Helper function that will return true if the two values equal each other
+                 * @param   id             - value that we are expecting
+                 * @param   tags           - tags to iterate through
+                 * @param   attribute2find - attribute that we want to extract from the ID
+                 * @returns boolean    - true signifies that it was found
+                 */   
+         	findMatchingId : function (id, tags, attribute2find){
+         		var tagId = null;
+         		for(var i = 0; i<tags.length; i++){
+         			tagId = $A.util.getElementAttributeValue(tags[i], attribute2find);
+         			
+         			if(tagId === id){
+         				return true;
+         			}
+         		}
+         		
+         		return false;
+         	},
             /**
              * Helper function that will return true if the two values equal each other
              * @param   attribute  - Contents of the attribute that we want to look at
@@ -1143,6 +1194,15 @@ var AuraDevToolService = function() {
                         errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, selectTags));
                                   	        
         	        return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
+        	    },
+        	    /**
+        	     * Test that will verify that if there exists an inputDefaultError on the page, that there is a corresponding input associated with it
+        	     */
+        	    checkForInputDefaultError : function (domElem){
+        	    	var accessAideFuncs = aura.devToolService.accessbilityAide;
+        	    	var inputErrorMsg   = "​Error message for input field should be associated with the input control by using aria-describedby.";        	        
+        	    	var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));       	    	
+        	    	return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
         	    }
         },
         /**

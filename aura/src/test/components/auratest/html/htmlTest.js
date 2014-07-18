@@ -205,40 +205,76 @@
      * Automation for W-1564377
      */
     testTouchEndHandlerUsedWhenPresent:{
-	browsers:["IPAD", "IPAD_IOS_DRIVER"],
-	labels : ["UnAdaptableTest"],
-	test: [
-	  //Both click handler and touch end handler defined
-	  function(component){
-	    component._TouchEndHandler = false;
-	    component._OnClickHandler = false;
-	    var targetElement = component.find("bothTouchEndAndClickHandlers").getElement();
-	    this.fireTouchEndEventOnElement(component, targetElement);
-	    $A.test.addWaitFor(true,
-		    function(){return component._TouchEndHandler},
-		    function(){ $A.test.assertFalse(component._OnClickHandler); });
-	},
-	  //Both touch end handler defined
-	  function(component){
-	    var targetElement = component.find("onlyTouchEndHandler").getElement();
-	    this.fireTouchEndEventOnElement(component, targetElement);
-	    $A.test.addWaitFor(true, function(){return component._TouchEndHandler;},
-		    function(){$A.test.assertFalse(component._OnClickHandler);})
-	}
-	 //Only click handler defined
-//	 function(component){
-//	    var targetElement = component.find("onlyClickHandler").getElement();
-//	    this.fireTouchEndEventOnElement(component, targetElement);
-//	    $A.test.addWaitFor(true, function(){return component._OnClickHandler;},
-//		    function(){$A.test.assertFalse(component._TouchEndHandler);})
-//	}
-	]
+    	browsers:["IPAD", "IPAD_IOS_DRIVER"],
+    	labels : ["UnAdaptableTest"],
+    	test: [
+    	  //Both click handler and touch end handler defined
+    	  function(component){
+    	    component._TouchEndHandler = false;
+    	    component._OnClickHandler = false;
+    	    var targetElement = component.find("bothTouchEndAndClickHandlers").getElement();
+    	    this.fireTouchEndEventOnElement(component, targetElement);
+    	    $A.test.addWaitFor(true,
+    		    function(){return component._TouchEndHandler},
+    		    function(){ $A.test.assertFalse(component._OnClickHandler); });
+    	},
+    	  //Both touch end handler defined
+    	  function(component){
+    	    var targetElement = component.find("onlyTouchEndHandler").getElement();
+    	    this.fireTouchEndEventOnElement(component, targetElement);
+    	    $A.test.addWaitFor(true, function(){return component._TouchEndHandler;},
+    		    function(){$A.test.assertFalse(component._OnClickHandler);})
+    	}
+    	 //Only click handler defined
+    //	 function(component){
+    //	    var targetElement = component.find("onlyClickHandler").getElement();
+    //	    this.fireTouchEndEventOnElement(component, targetElement);
+    //	    $A.test.addWaitFor(true, function(){return component._OnClickHandler;},
+    //		    function(){$A.test.assertFalse(component._TouchEndHandler);})
+    //	}
+        ]
     },
+
+    /**
+     * Verify touch and click handlers are setup when device/browser supports touch events.
+     * This is necessary for devices with a touchscreen and a mouse. 
+     */
+    testClickAndTouchEventsHandled: {
+        browsers: ["IPAD", "IPHONE", "IPAD_IOS_DRIVER", "IPHONE_IOS_DRIVER", "ANDROID_PHONE", "ANDROID_TABLET"],
+        test: [
+            function(cmp) {
+                if (!$A.util.supportsTouchEvents()) {
+                    $A.test.fail("Test setup failure: browser must support touch events");
+                }
+
+                var anchor = cmp.find("anchor").getElement();
+                anchor.click();
+
+                $A.test.addWaitForWithFailureMessage(1, function() {
+                    return cmp.get("v.clickCount");
+                }, "Handler function not called on click event");
+            }, function(cmp) {
+                var anchor = cmp.find("anchor").getElement();
+
+                // Manually fire touch events
+                var ts = document.createEvent('UIEvent');
+                ts.initUIEvent('touchstart', true, true); 
+                var te = document.createEvent('UIEvent');
+                te.initUIEvent('touchend', true, true);
+                anchor.dispatchEvent(ts);
+                anchor.dispatchEvent(te);
+
+                $A.test.addWaitForWithFailureMessage(2, function() {
+                    return cmp.get("v.clickCount");
+                }, "Handler function not called on touch event");
+        }]
+    },
+
     fireTouchEndEventOnElement:function(component, targetElement){
-	component._OnClickHandler = false;
-	component._TouchEndHandler = false;
-	var touchEndEvt =  document.createEvent("UIEvent");
-	touchEndEvt.initUIEvent("touchend", true, true);
-	targetElement.dispatchEvent(touchEndEvt);
+        component._OnClickHandler = false;
+        component._TouchEndHandler = false;
+        var touchEndEvt =  document.createEvent("UIEvent");
+        touchEndEvt.initUIEvent("touchend", true, true);
+        targetElement.dispatchEvent(touchEndEvt);
     }
 })

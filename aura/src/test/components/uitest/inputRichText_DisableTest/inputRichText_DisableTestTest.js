@@ -44,7 +44,7 @@
 	assertRichTextInitalized : function() {
     	$A.test.addWaitFor(true, function(){
     		return !$A.util.isUndefinedOrNull(
-    			$A.test.getElementByClass("cke_editor"));
+    			$A.test.getElementByClass("cke_wysiwyg_frame"));
 		});
     },
     
@@ -66,7 +66,7 @@
 	},
 	
 	assertRichTextState : function(isEnabled) {
-		var elem = $A.test.getElementByClass("cke_editor");
+		var elem = $A.test.getElementByClass("cke_wysiwyg_frame");
 		if (isEnabled) {
     		$A.test.assertNotNull(elem, "ck editor should be present");
 		} else {

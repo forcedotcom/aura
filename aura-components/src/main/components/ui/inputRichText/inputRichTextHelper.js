@@ -79,6 +79,10 @@
 	 */
 	initEditor : function(cmp) {
 		if ($A.util.getBooleanValue(cmp.get('v.isRichText'))) {
+			if (!this.isLibraryLoaded(cmp)) {
+				$A.warn("Richtext editor library is not loaded");
+				return;
+			}
 			var editorInstance = this.getEditorInstance(cmp);
 
 			if (!editorInstance) {
@@ -86,6 +90,10 @@
 				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
 			}
 		}
+	},
+
+	isLibraryLoaded: function(cmp) {
+		return typeof CKEDITOR !== "undefined";
 	},
 
 	toggle : function(cmp, isRichText) {
@@ -122,7 +130,7 @@
 	},
 
 	getEditorInstance : function (cmp) {
-		return CKEDITOR ? CKEDITOR.instances[this.getEditorId(cmp)] : null;
+		return typeof CKEDITOR === "undefined" ? null : CKEDITOR.instances[this.getEditorId(cmp)];
 	},
 
 	/**
@@ -159,7 +167,6 @@
 			toolbarLocation = cmp.get('v.toolbarLocation');
 
 		var config = {
-				skin : 'aura',
 				language : locale,
 				width: width,
 				height: height,
@@ -170,14 +177,13 @@
 				resize_enabled : false,
 				forcePasteAsPlainText : false,
 	    		forceSimpleAmpersand : true,
-	    		extraPlugins : 'onchange',
 	    		/*
 	    	     * Deactivate:
 	    	     * - The Element path component (RTE's "status bar")
 	    	     * - Resizing ability (editing area maximization, resizing)
 	    	     * - Context menus
 	    	     */
-	    		removePlugins : 'elementspath,maximize,resize,about,liststyle,tabletools,scayt,menubutton,contextmenu',
+	    		removePlugins : 'elementspath,maximize,resize,about,liststyle,tabletools,scayt,contextmenu',
 	    		/*
 	    	     * Hide some dialog tabs:
 	    	     * - Link dialog: advanced and target tabs
@@ -245,7 +251,7 @@
 			if (!this.fullToolbarConfig) {
 				this.fullToolbarConfig = [
 			        { name: 'clipboard',   items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-			        { name: 'editing',     items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] },
+			        { name: 'editing',     items : [ 'Find','Replace','-','SelectAll'] },
 			        { name: 'forms',       items : [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
 			        '/',
 			        { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },

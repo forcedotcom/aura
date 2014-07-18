@@ -13,7 +13,7 @@
             "render":
 function(component) {
         var rendering = component.getRendering();
-        return rendering ? rendering : $A.render(component.getValue("v.body"));
+        return rendering ? rendering : $A.render(component.get("v.body"));
     },
             "afterRender":
 function(component) {

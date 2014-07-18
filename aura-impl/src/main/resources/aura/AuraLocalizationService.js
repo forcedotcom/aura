@@ -89,7 +89,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          * //If format is not provided, the default locale is used
          * var formatted = $A.localizationService.formatNumber(num); 
          * </pre>
-         * @param {String} format The number format.
+         * @param {String} format The number format. <code>format=".00"</code> displays the number followed by two decimal places. 
          * @param {String} symbols 
          * @return {Number} The number format
          * @memberOf AuraLocalizationService

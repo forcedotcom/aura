@@ -19,16 +19,19 @@ Function.RegisterNamespace("Test.Aura.Storage.Adapters");
 Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
     var auraMock=function(delegate){
         Mocks.GetMocks(Object.Global(),{
-            exp:function() {},
-            window:Object.Global(),
-            document:{createDocumentFragment:function() {}},
-            Json:function() {},
-            Transport:function() {},
-            Style:function() {},
-            Bitset:{},
-            NumberFormat:{},
-            $A:{util:{isArray:function(value) { return Array.isArray(value); }}},
-            navigator:{userAgent:''}
+            exp: function() {},
+            window: Object.Global(),
+            document: { createDocumentFragment: function() {} },
+            Json: function() {},
+            Transport: function() {},
+            Style: function() {},
+            Bitset: {},
+            NumberFormat: {},
+            $A: {
+                log: function() {},
+                util: { isArray: function(value) { return Array.isArray(value); }} 
+            },
+            navigator: { userAgent:'' }
         })(function(){
             // #import aura.storage.adapters.SizeEstimator
             delegate();
@@ -45,11 +48,6 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
         
         Assert.Equal(expectedSize, result);
     }
-
-    var OBJECT_ENTRY_OVERHEAD = 8;
-    var ARRAY_ENTRY_OVERHEAD = 16;
-    // Object overhead is entry overhead + size('__es_mark__') + size(boolean) 
-    var OBJECT_OVERHEAD = OBJECT_ENTRY_OVERHEAD+11*2;
 
 
     [Fixture]
@@ -106,14 +104,14 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
         [Fact]
         function estimateArray2() {
             var value = [ 1, 3 ];
-            var expected = ARRAY_ENTRY_OVERHEAD*2+8+8;
+            var expected = 5;
             checkEstimateSize(value, expected);
         }
 
         [Fact]
         function estimateArray4() {
             var value = [ 1, "a", "b", 3 ];
-            var expected = ARRAY_ENTRY_OVERHEAD*4+8+2+2+8;
+            var expected = 13;
             checkEstimateSize(value, expected);
         }
 
@@ -121,23 +119,8 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
         function estimateArrayCycle() {
             var value = [ 1, 3 ];
             value.push(value);
-            var expected = ARRAY_ENTRY_OVERHEAD*3+8+8;
+            var expected = 0; // cycle is size 0
             checkEstimateSize(value, expected);
-        }
-
-        [Fact]
-        function estimateArrayCycleBadCheater() {
-            var value = [ 1, 3 ];
-            value.push(value);
-            var expected = ARRAY_ENTRY_OVERHEAD*3+8+8;
-            var result;
-
-            auraMock(function() {
-                var target = new SizeEstimator();
-                result = target.estimateSize(value, "not a list");
-            });
-            
-            Assert.Equal(expected, result);
         }
 
         [Fact]
@@ -151,14 +134,14 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
                 var target = new SizeEstimator();
                 result = target.estimateSize(value, [ value ]);
             });
-            
+
             Assert.Equal(expected, result);
         }
 
         [Fact]
         function estimateSimpleObject() {
             var value = { "a":"a" };
-            var expected = OBJECT_OVERHEAD+OBJECT_ENTRY_OVERHEAD*1+(2+2);
+            var expected = 9;
             checkEstimateSize(value, expected);
         }
 
@@ -166,7 +149,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
         function estimateSimpleCycle() {
             var value = { "a":"a" };
             value["b"] = value;
-            var expected = OBJECT_OVERHEAD+OBJECT_ENTRY_OVERHEAD*2+(2+2)+(2+8);
+            var expected = 0; // cycle is size 0
             checkEstimateSize(value, expected);
         }
 
@@ -177,8 +160,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             var value2 = { "a":"a", "b":array };
             var array2 = [ value2 ];
             value["b"] = array2;
-            // ugh.... 2 objects, each with 2 entries, but one will not be counted. and 2 arrays.
-            var expected = OBJECT_OVERHEAD*2+OBJECT_ENTRY_OVERHEAD*4+(2+2)*2+(2+8)+2+ARRAY_ENTRY_OVERHEAD*2;
+            var expected = 0; // cycle is size 0
             checkEstimateSize(value, expected);
         }
 

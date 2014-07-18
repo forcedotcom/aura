@@ -149,16 +149,8 @@
      * automatically without an error or warning.
      */
     testClearingPartialConfigsOnStorableActions : {
+        failOnWarning: true,
         test : function(cmp) {
-            // All configs in this test should be consumed or automatically cleared so fail on any warnings
-            $A.test.overrideFunction($A, "warning",
-                    function(msg) {
-                        if (msg.substring(0, 14) == "unused configs") {
-                            $A.test.fail("Unused config warning should not be thrown");
-                        }
-                    }
-            );
-
             // Run storable action (no callback) that has unconsumed component configs
             var actionStorable = $A.get("c.aura://ComponentController.getComponent");
             actionStorable.setStorable();

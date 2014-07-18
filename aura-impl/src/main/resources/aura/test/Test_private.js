@@ -58,7 +58,7 @@ $A.ns.Test.prototype.expectMessage = function(pre, expected, msg) {
 $A.ns.Test.prototype.clearExpected = function(pre, expected) {
     for (var i = 0; i < pre.length; i++) {
         for (var j = 0; j < expected.length; j++) {
-            if (pre[i].indexOf(expected[j]) !== -1) {
+            if (expected[j] !== undefined && pre[i].indexOf(expected[j]) !== -1) {
                 pre[i] = undefined;
                 expected[j] = undefined;
                 break;
@@ -229,10 +229,10 @@ $A.ns.Test.prototype.continueWhenReady = function() {
                     setTimeout(internalCWR, 200);
                 }
             } else {
-                this.logErrors(true, "Did not receive expected error:",this.expectedErrors);
+                this.logErrors(true, "Did not receive expected error: ",this.expectedErrors);
                 this.expectedErrors = [];
 
-                this.logErrors(true, "Did not receive expected warning:",this.expectedWarnings);
+                this.logErrors(true, "Did not receive expected warning: ",this.expectedWarnings);
                 this.expectedWarnings = [];
 
                 if (this.stages.length === 0){

@@ -26,7 +26,7 @@
     assertRichTextInitalized : function() {
     	$A.test.addWaitFor(true, function(){
     		return !$A.util.isUndefinedOrNull(
-    			$A.test.getElementByClass("cke_editor"));
+    			$A.test.getElementByClass("cke_wysiwyg_frame"));
 		});
     }
 })

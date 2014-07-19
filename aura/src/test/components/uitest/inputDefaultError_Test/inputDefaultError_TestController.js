@@ -20,7 +20,7 @@
     	 var componentIdArray = [];
     	 
     	 if(baseId === 'all'){
-    		 componentIdArray = ["default", "customUsage", "select", "search", "textArea", "date", "dateTime", "radio", "range", "autoCompleteTextArea", "autoCompleteText", "text"];
+    		 componentIdArray = ["default", "select", "search", "textArea", "date", "radio", "range", "autoCompleteTextArea", "autoCompleteText", "text"];
     	 }
     	 else{
     		 componentIdArray = [baseId];

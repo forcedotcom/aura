@@ -164,10 +164,11 @@
 		CreateOperation.prototype.run = function(cmp) {
 			cmp._pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.push(this) : [this];
 			
+			var that = this;
 			var items = cmp.get("v.items")
 			helper.createComponentForIndex(cmp, items, this.index, function() {
 				// Remove this create op from the set of pending creates
-				var i = $A.util.arrayIndexOf(cmp._pendingCreates, this);
+				var i = $A.util.arrayIndexOf(cmp._pendingCreates, that);
 				if (i >= 0) {
 					cmp._pendingCreates.splice(i, 1);
 				}
@@ -229,6 +230,11 @@
 		var realbody = this.getUpdatedRealBody(cmp);
 
 		cmp.set("v.realbody", realbody);
+		
+
+		// DCHASMAN TODO Rename this horrible misnomer that has nothing to do with rendering and everything to do with updating the contents of the iteration!!!
+		cmp.getEvent("rerenderComplete").fire();
+
 		
 		// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
 		//$A.renderingService.removeDirtyValue(cmp.getValue("v.realbody"));

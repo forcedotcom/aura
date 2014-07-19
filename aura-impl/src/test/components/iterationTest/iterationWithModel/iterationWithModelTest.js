@@ -31,8 +31,6 @@
 
             // Wait for 5 elements- 3 original plus 2 added
             $A.test.addWaitFor(5, function() {
-            	debugger
-            	
                 return cmp.find("innerCmp").length;
             }, function() {
                 cmps = cmp.find("innerCmp");

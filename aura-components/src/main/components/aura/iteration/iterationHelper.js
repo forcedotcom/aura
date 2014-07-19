@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	createComponentForIndex : function(cmp, items, index) {
+	createComponentForIndex : function(cmp, items, index, afterCreationCallback) {
 		var helper = this;
 		
 		function createCallback(collector, index) {
@@ -29,6 +29,10 @@
 					var realbody = helper.createFacetFromTrackingInfo(collector.cmp);
 					
 					collector.cmp.set("v.realbody", realbody);
+					
+					if (afterCreationCallback) {
+						afterCreationCallback();
+					}
 					
 					// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
 					//$A.renderingService.removeDirtyValue(collector.cmp.getValue("v.realbody"));
@@ -158,8 +162,20 @@
 		}
 
 		CreateOperation.prototype.run = function(cmp) {
+			cmp._pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.push(this) : [this];
+			
 			var items = cmp.get("v.items")
-			helper.createComponentForIndex(cmp, items, this.index);
+			helper.createComponentForIndex(cmp, items, this.index, function() {
+				// Remove this create op from the set of pending creates
+				var i = $A.util.arrayIndexOf(cmp._pendingCreates, this);
+				if (i >= 0) {
+					cmp._pendingCreates.splice(i, 1);
+				}
+				
+				if (cmp._pendingCreates.length === 0) {
+					delete cmp._pendingCreates;
+				}
+			});
 		}
 
 		CreateOperation.prototype.toString = function() {
@@ -186,11 +202,25 @@
 				}
 			}
 
+			// Check to see if we already have a pending create and update its target index
+			if (!found && cmp._pendingCreates) {
+				for (var n = 0; n < cmp._pendingCreates.length; n++) {
+					var op = cmp._pendingCreates[n];
+					if (op.item === item) {
+						op.index = i;
+						operations.push(op);
+						found = true;
+					}
+				}
+			}
+			
 			if (!found) {
 				// Add a create to the list operations to be satisfied
 				operations.push(new CreateOperation(i, item));
 			}
 		}
+		
+		$A.log("getTrans()", operations);
 		
 		return operations;
 	},

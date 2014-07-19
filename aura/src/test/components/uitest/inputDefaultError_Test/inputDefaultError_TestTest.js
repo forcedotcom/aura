@@ -97,7 +97,13 @@
     		
     		//Remove errors
     		cmp.find("validate").getEvent("press").fire({});
-    		this.verifyInputDefaultStructure(input, ul, 1, 0);
+    		$A.test.addWaitFor(true, function (){
+    			return $A.util.isUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"));
+    		});
+    		
+    		//UL should no longer exist
+    		ul = $A.test.getElementByClass("uiInputDefaultError");
+    		$A.test.assertUndefinedOrNull(ul, "There should not be an inputDefaultError on the page!");
     		
     	}
     },

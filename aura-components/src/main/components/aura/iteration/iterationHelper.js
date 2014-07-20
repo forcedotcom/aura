@@ -221,8 +221,6 @@
 			}
 		}
 		
-		$A.log("getTrans()", operations);
-		
 		return operations;
 	},
 

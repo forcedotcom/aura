@@ -42,6 +42,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 //#end                     
                 
                 var cmps = [];
+                var cleanUp = [];
                 for (var id in priv.dirtyComponents) {
                     var cmp = $A.componentService.get(id);
                     
@@ -65,8 +66,10 @@ var AuraRenderingService = function AuraRenderingService(){
                             cmpsWithWhy["components"][id] = { "id": id, "descr": cmp.getDef().getDescriptor().toString(), "why": priv.dirtyComponents[id] };  
                             //#end                     
                         }
-                    }else{
-                        priv.cleanComponent(id);
+                    } else {
+                    	// Defer ValueObject.commit()'ing because non-visual components (non-rendered) might still have contributed dirty objects that other
+                    	// rendered components care about!
+                        cleanUp.push(id);
                     }
                 }
                 
@@ -87,6 +90,10 @@ var AuraRenderingService = function AuraRenderingService(){
 
                     $A.renderingService.statsIndex["rerenderDirty"].push(cmpsWithWhy);
 	                //#end
+                }
+                
+                for (var toClean = 0; toClean < cleanUp.length; toClean++) {
+                	priv.cleanComponent(cleanUp[toClean]);
                 }
                 
                 $A.Perf.endMark(initialMarkName);

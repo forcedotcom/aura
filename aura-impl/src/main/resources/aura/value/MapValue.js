@@ -422,23 +422,20 @@ MapValue.prototype.unwrap = function() {
 MapValue.prototype.add = function(k, config, subDirty, skipChange) {
 	var key = k.toLowerCase();
 	var v = config[k];
-
+	
 	var value = valueFactory.create(v, null, this.owner);
 	this.value[key] = value;
-	
-	// Now, we have a new value object, but if we're adding as part of a setvalue,
-	// the old value may have had handlers we want to keep. This is a patch job
-	// to address that problem; TODO(dchasman, fabbott) Doug promises a better
-	// implementation, including support in ArrayValue, etc.
-	if (this.oldvalue && this.oldvalue[key]) {
-		this.copyHandlers(this.oldvalue[key], value);
-	}
 
 	if (key !== k) {
 		this.keys[key] = k;
 	}
+	
+	if (this.oldvalue && this.oldvalue[key]) {
+		this.copyHandlers(this.oldvalue[key], value);
+	}
 
 	this.makeDirty();
+	
 	if (value.makeDirty && subDirty) {
 		value.makeDirty();
 	}

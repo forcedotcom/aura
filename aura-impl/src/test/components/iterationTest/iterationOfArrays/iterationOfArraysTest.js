@@ -135,6 +135,7 @@
             $A.test.assertEquals("11:lll", $A.test.getText(children[2]));
 
             cmp.set("v.toChange", 10);
+            
             cmp.get("c.deleteOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);

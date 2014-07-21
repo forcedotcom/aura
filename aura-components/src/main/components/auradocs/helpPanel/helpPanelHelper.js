@@ -27,7 +27,7 @@
           this,
           function(topicPanel) {  
               try {
-                  cmp.setValue('{!v.topicPanel}', [topicPanel]);
+                  cmp.set('v.topicPanel', [topicPanel]);
                   } catch (e) {
                   // Handle the catch-all scenario.
                       if(topic !== 'welcome') {

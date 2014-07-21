@@ -181,7 +181,7 @@
     		return this._eventNames;
     	}
     	
-		if (navigator.pointerEnabled) {
+		if (window["navigator"]["pointerEnabled"]) {
 		    eventNames = {
 		        start : 'pointerdown',
 		        move  : 'pointermove',
@@ -189,7 +189,7 @@
 		    };
 		
 		} 
-		else if (navigator.msPointerEnabled) {
+		else if (window["navigator"]["msPointerEnabled"]) {
 		    eventNames = {
 		        start : 'MSPointerDown',
 		        move  : 'MSPointerMove',

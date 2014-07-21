@@ -27,8 +27,7 @@
 		    Otherwise, use the <code>width</code> and <code>height</code> attributes.    	
 		</p>
 		<p>
-			<code>ui:outputRichText</code> supports a list of HTML tags that are typically supported by CKEditor.
-    	   You can add more tags by specifying them on the <code>supportedTags</code> attribute. 
+			<code>ui:outputRichText</code> supports a list of HTML tags that are supported by CKEditor.
     	   Tags such as <code>&lt;script&gt;</code> are removed.
     	</p>
 	</aura:description>	

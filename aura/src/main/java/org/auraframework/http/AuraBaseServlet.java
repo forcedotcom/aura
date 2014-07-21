@@ -81,6 +81,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
     public static final String MANIFEST_CONTENT_TYPE = "text/cache-manifest";
     public static final String CSS_CONTENT_TYPE = "text/css";
+    
+    /** Clickjack protection HTTP header */
+    public static final String HDR_FRAME_OPTIONS = "X-FRAME-OPTIONS";
+    /** Baseline clickjack protection level for HDR_FRAME_OPTIONS header */
+    public static final String HDR_FRAME_SAMEORIGIN = "SAMEORIGIN";
+
     protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
@@ -566,6 +572,13 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) {
+    }
+
+    /**
+     * Sets mandatory headers, notably for anti-clickjacking.
+     */
+    protected void setBasicHeaders(HttpServletResponse rsp) {
+        rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);   
     }
 
     /**

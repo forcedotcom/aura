@@ -91,14 +91,14 @@
             return this.cachedGestures;
         } else {
 
-            if (navigator.pointerEnabled) {
+            if (window["navigator"]["pointerEnabled"]) {
                 g = {
                         start : 'pointerdown',
                         move : 'pointermove',
                         end : 'pointerup' 
                     };
 
-            } else if (navigator.msPointerEnabled) {
+            } else if (window["navigator"]["msPointerEnabled"]) {
                 g = {
                         start : 'MSPointerDown',
                         move : 'MSPointerMove',

@@ -219,6 +219,18 @@ InvalidComponent.prototype.getAttributes = function() {
     this.raiseInvalidComponentError();
 };
 
+InvalidComponent.prototype.getAttributeValueProvider = function() {
+    this.raiseInvalidComponentError();
+};
+
+InvalidComponent.prototype.getComponentValueProvider = function() {
+    this.raiseInvalidComponentError();
+};
+
+InvalidComponent.prototype.mergeAttributes = function(yourMap, overwrite) {
+    this.raiseInvalidComponentError();
+};
+
 /**
  * @public
  */

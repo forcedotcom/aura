@@ -462,4 +462,47 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Check Menu list should be expanded even after double click",
                 menu.getAttribute("class").contains("visible"));
     }
+    
+    /**
+     * Test case for W-2315592
+     * Components extends menuItem get's focus
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public void testFocusForExtendedMenuItem() throws MalformedURLException, URISyntaxException{
+    	open("/uitest/menu_extendMenuItem.app");
+    	WebDriver driver = this.getDriver();
+    	String label = "trigger";
+        String menuName = "actionMenu";
+        String menuItem1 = "actionItem1";
+        String menuItem2 = "actionItem2";
+        String menuItem3 = "actionItem3";
+        WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
+        WebElement actionItem1 = driver.findElement(By.className(menuItem1));
+        WebElement actionItem1Element = actionItem1.findElement(By.tagName("a"));
+        WebElement actionItem2 = driver.findElement(By.className(menuItem2));
+        WebElement actionItem2Element = actionItem2.findElement(By.tagName("a"));
+        WebElement actionItem3 = driver.findElement(By.className(menuItem3));
+        WebElement actionItem3Element = actionItem3.findElement(By.tagName("a"));
+        // click on menu list
+        menuLabel.click();
+        // check menu list is visible after the click
+        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+
+        // default focus on action item1
+        assertEquals("Focus should be on actionItem1", actionItem1Element.getText(),
+                auraUITestingUtil.getActiveElementText());
+        
+        // verify focus on action item3
+        auraUITestingUtil.setHoverOverElement(menuItem3);
+        assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
+                auraUITestingUtil.getActiveElementText());
+        // use send key("f") to move to actionItem2
+        actionItem3Element.sendKeys("f");
+
+        // verify focus on actionItem2
+        assertEquals("Focus should be on actionItem 2", actionItem2Element.getText(),
+                auraUITestingUtil.getActiveElementText());
+    }
 }

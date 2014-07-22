@@ -590,7 +590,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         ServerService ss = Aura.getServerService();
         DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
+        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
@@ -614,5 +614,38 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         for (String preload : preloads) {
             assertTrue("Does not have preloaded component: (" + preload + ")" , sourceNoWhitespace.contains(preload));
         }
+    }
+
+    /**
+     * Tests aura definitions has no syntax errors and can be compressed
+     */
+    public void testNoAppJSCompressionErrors() throws Exception {
+
+        // check js compression on main aura namespaces
+        String[] namespaces = new String[] {
+            "aura", "ui", "auraadmin", "auradev", "auradocs", "auraStorage"
+        };
+
+        StringBuilder source = new StringBuilder();
+        source.append("<aura:application>");
+        for (String ns : namespaces) {
+            source.append(String.format("<aura:dependency resource=\"%s:*\" type=\"*\" />", ns));
+        }
+        source.append("</aura:application>");
+
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, source.toString());
+        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.PROD, AuraContext.Format.JS,
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        final String uid = context.getDefRegistry().getUid(null, appDesc);
+        context.addLoaded(appDesc, uid);
+        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+
+        ServerService ss = Aura.getServerService();
+        StringWriter output = new StringWriter();
+        ss.writeDefinitions(dependencies, output);
+
+        String js = output.toString();
+        assertFalse("There are syntax errors preventing compression of application javascript",
+            js.contains("There are errors preventing this file from being minimized!"));
     }
 }

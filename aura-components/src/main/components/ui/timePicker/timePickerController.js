@@ -25,14 +25,14 @@
             if (helper.validateHours(component)) {
                 if (amPmCmp) { // it must be in 12 hour format
                     if (amPmCmp.get("v.value") == "am") {
-                        component.setValue("v.hours", parseInt(currentHourValue));
+                        component.set("v.hours", parseInt(currentHourValue));
                     } else {
-                        component.setValue("v.hours", parseInt(currentHourValue) + 12);
+                        component.set("v.hours", parseInt(currentHourValue) + 12);
                     }
                 }
-                component.setValue("v.isValid", true);
+                component.set("v.isValid", true);
             } else {
-            	component.setValue("v.isValid", false);
+            	component.set("v.isValid", false);
             }
             return;
         }
@@ -41,9 +41,9 @@
             var hours = component.get("v.hours");
             if (amPmCmp) {
                 if (amPmCmp.get("v.value") == "am") {
-                    component.setValue("v.hours", parseInt(hours) - 12);
+                    component.set("v.hours", parseInt(hours) - 12);
                 } else {
-                    component.setValue("v.hours", parseInt(hours) + 12);
+                    component.set("v.hours", parseInt(hours) + 12);
                 }
             }
         }

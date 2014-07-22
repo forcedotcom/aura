@@ -16,6 +16,6 @@
 ({
 	toggleBool1: function(cmp, evt) {
 		var oldv = cmp.get("v.bool1");
-		cmp.setValue("v.bool1", !oldv);
+		cmp.set("v.bool1", !oldv);
 	},
 })

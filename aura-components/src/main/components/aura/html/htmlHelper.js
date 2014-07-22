@@ -193,6 +193,7 @@
                     case 'touchend':
                     case 'pointerup':
                     case 'MSPointerUp':
+                    case 'click':
                         this.onClick(event);
                         break;
                     }
@@ -200,31 +201,34 @@
                 onTouchStart : function(event) {
                     var point = event.touches ? event.touches[0] : event;
                     $A.util.on(this.element, gesture.end, this, false);
-                    //bind touchmove event to element instead of document, for the event could be stop propagated by child elements
+                    // Bind gesture.move event to this.element instead of document.body, for the event could be stop
+                    // propagated by child elements
                     $A.util.on(this.element, gesture.move, this, false);
                     this.startX = point.pageX;
                     this.startY = point.pageY;
                 },
                 onTouchMove : function(event) {
                     var point = event.touches ? event.touches[0] : event;
-                    if (Math.abs(point.pageX - this.startX) > 4 || Math.abs(point.pageY - this.startY) > 4) {
+                    var dragThresholdPixels = 4;
+                    if (Math.abs(point.pageX - this.startX) > dragThresholdPixels
+                        || Math.abs(point.pageY - this.startY) > dragThresholdPixels) {
                         this.reset();
                     }
                 },
                 onClick : function(event) {
                     event.stopPropagation();
-                    event.preventDefault();
-                    this.element.focus();
+                    this.reset();
                     this.handler(event);
 
                     if (event.type == gesture.end) {
                         FastClick.preventGhostClick(this.startX, this.startY);
                     }
-                    this.reset();
                 },
                 reset : function() {
-                   $A.util.removeOn(this.element, gesture.end, this, false);
-                   $A.util.removeOn(this.element, gesture.move, this, false);
+                    $A.util.removeOn(this.element, gesture.end, this, false);
+                    // See comment in #onTouchStart regarding binding gesture.move to this.element instead of
+                    // document.body
+                    $A.util.removeOn(this.element, gesture.move, this, false);
 
                     this.startX = 0;
                     this.startY = 0;

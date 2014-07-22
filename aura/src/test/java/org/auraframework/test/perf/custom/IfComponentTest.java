@@ -23,25 +23,16 @@ public final class IfComponentTest extends CustomPerfAbstractTestCase {
 
     public IfComponentTest(String name) {
         super(name);
-
         setComponentDef(getDefDescriptor("performanceTest:aura_if"));
     }
 
-    public void testChangeCount() throws Throwable {
-        // Change number of first level if's to 200.
-        WebElement inputText = currentDriver.findElement(By.cssSelector(".count"));
-        inputText.clear();
-        inputText.sendKeys("200");
-        WebElement button = currentDriver.findElement(By.cssSelector(".changeCount"));
-        button.click();
+    public void testIf() throws Throwable {
+    	setComponentDef(getDefDescriptor("performanceTest:aura_if"));
+        auraUITestingUtil.getRawEval("var c = $A.PERFCORE.getCreatedComponent(); c.set('v.enabled', true)");
     }
 
-    public void testChangeNestedCount() throws Throwable {
-        // Change number of second level if's to 5.
-        WebElement inputText = currentDriver.findElement(By.cssSelector(".nestedCount"));
-        inputText.clear();
-        inputText.sendKeys("5");
-        WebElement button = currentDriver.findElement(By.cssSelector(".changeNestedCount"));
-        button.click();
+    public void testElse() throws Throwable {
+    	setComponentDef(getDefDescriptor("performanceTest:aura_if"));
+        auraUITestingUtil.getRawEval("var c = $A.PERFCORE.getCreatedComponent(); c.set('v.branch', true); c.set('v.enabled', true)");
     }
 }

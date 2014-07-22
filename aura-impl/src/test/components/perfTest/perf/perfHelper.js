@@ -51,7 +51,12 @@
                 timeEnd: function () {/* TODO */},
                 mark: function (name) {
                     return timestamp && console.timeStamp(name);
-                    // TODO: Aura timestamp as well
+                },
+                setCreatedComponent: function (newCmp) {
+                    this._createdComponent = newCmp;
+                },
+                getCreatedComponent: function () {
+                    return this._createdComponent;
                 },
                 later: function (time, callback) {
                     var RAF = this.raf;
@@ -60,11 +65,11 @@
                     }, time);
                 },
                 profileStart: function(name) {
-                    timestamp && console.timeStamp(name);
+                    this.mark(name);
                     $A.PERFCORE.stats.start(trimPerfMarkerSuffix(name));
                 },
                 profileEnd: function(name) {
-                    timestamp && console.timeStamp(name);
+                    this.mark(name);
                     $A.PERFCORE.stats.end(trimPerfMarkerSuffix(name));
                 },
                 setConfig: function (cfg) {
@@ -209,6 +214,7 @@
         this.createComponent(cmp.def, cmp.attr, function (newCmp) {
             // Hook for executing after creating perf stuff
             self.afterCreateComponent(appCmp);
+            $A.PERFCORE.setCreatedComponent(newCmp);
             callback(newCmp);
         });
     },
@@ -290,6 +296,9 @@
         $A.render(newCmp, container && container.getElement());
         $A.afterRender(newCmp);
         $A.PERFCORE.mark('END:cmpRender');
+    },
+    unrenderCmp: function (cmp) {
+        $A.unrender(cmp);
     },
 
     perfAfterRender: function (appCmp, newCmp, callback) {

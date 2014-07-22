@@ -81,7 +81,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
     protected void injectComponent() throws QuickFixException {
         if (this.intfDescriptor != null) {
             AuraContext context = Aura.getContextService().getCurrentContext();
-            context.setCurrentCaller(descriptor);
+            context.pushCallingDescriptor(descriptor);
             BaseComponent<?, ?> oldComponent = context.setCurrentComponent(new ProtoComponentImpl(descriptor,
                     getGlobalId(), attributeSet));
             try {
@@ -149,6 +149,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                 }
 
             } finally {
+                context.popCallingDescriptor();
                 context.setCurrentComponent(oldComponent);
             }
         }

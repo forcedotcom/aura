@@ -780,12 +780,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             } else {
                 json.writeMapBegin();
                 json.writeMapEntry("descriptor", descriptor);
-                context.setCurrentCaller(descriptor);
-                RendererDef rendererDef = getRendererDef();
-                if (rendererDef != null && !rendererDef.isLocal()) {
-                    json.writeMapEntry("rendererDef", rendererDef);
+                context.pushCallingDescriptor(descriptor);
+                try{
+                    RendererDef rendererDef = getRendererDef();
+                    if (rendererDef != null && !rendererDef.isLocal()) {
+                        json.writeMapEntry("rendererDef", rendererDef);
+                    }
+                } finally {
+                    context.popCallingDescriptor();
                 }
-
                 HelperDef helperDef = getHelperDef();
                 if (helperDef != null && !helperDef.isLocal()) {
                     json.writeMapEntry("helperDef", helperDef);
@@ -946,8 +949,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public ModelDef getModelDef() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setCurrentCaller(descriptor);
-        return modelDefDescriptor == null ? null : modelDefDescriptor.getDef();
+        context.pushCallingDescriptor(descriptor);
+        try {
+            return modelDefDescriptor == null ? null : modelDefDescriptor.getDef();
+        } finally {
+            context.popCallingDescriptor();
+        }
     }
 
     /**

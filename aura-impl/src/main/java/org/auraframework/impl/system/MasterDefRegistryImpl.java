@@ -35,7 +35,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -561,9 +560,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
         compiling.descriptor = canonical;
         currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
-        context.setCurrentCaller(canonical);
-
-        compiling.def.validateDefinition();
+        context.pushCallingDescriptor(canonical);
+        try {
+            compiling.def.validateDefinition();
+        } finally {
+            context.popCallingDescriptor();
+        }
         compiling.built = true;
         return true;
     }
@@ -655,16 +657,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             compiling = Lists.newArrayList(currentCC.compiled.values());
 
             for (CompilingDef<?> cd : compiling) {
-                // FIXME: setting the current namespace on the context seems extremely hackish
-                currentCC.context.setCurrentCaller(cd.descriptor);
-                if (cd.built && !cd.validated) {
-                    if (iteration != 0) {
-                        logger.warn("Nested add of " + cd.descriptor + " during validation of " + currentCC.topLevel);
-                        // throw new
-                        // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                currentCC.context.pushCallingDescriptor(cd.descriptor);
+                try {
+                    if (cd.built && !cd.validated) {
+                        if (iteration != 0) {
+                            logger.warn("Nested add of " + cd.descriptor + " during validation of " + currentCC.topLevel);
+                            // throw new
+                            // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
+                        }
+                        cd.def.validateReferences();
+                        cd.validated = true;
                     }
-                    cd.def.validateReferences();
-                    cd.validated = true;
+                } finally {
+                    currentCC.context.popCallingDescriptor();
                 }
             }
             iteration += 1;

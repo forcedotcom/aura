@@ -112,7 +112,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
         }
         
         AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<?> referencingDesc = context.getCurrentCaller();
+        DefDescriptor<?> referencingDesc = context.getCurrentCallingDescriptor();
     	if (referencingDesc != null) {
 	        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
 	    	registry.assertAccess(referencingDesc, event);

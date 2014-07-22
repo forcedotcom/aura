@@ -389,7 +389,7 @@ MapValue.prototype.destroy = function(async) {
 	var values = this.value;
 	for ( var k in values) {
 		var v = values[k];
-		if (v !== undefined) {
+		if (v !== undefined  && v.destroy) {
 			v.destroy(async);
 		}
 	}

@@ -32,6 +32,7 @@ import org.auraframework.test.ComponentJSTestSuiteTest.ComponentTestCase;
 import org.auraframework.test.IntegrationTestCase;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
+import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.util.ServiceLocator;
 
 import com.google.common.collect.Maps;
@@ -169,6 +170,7 @@ public class TestSetRunnerState {
                 testWithProps.put("exception", "");
                 testWithProps.put("isHidden", "");
                 testWithProps.put("isInteg", t instanceof IntegrationTestCase);
+                testWithProps.put("isPerf", t instanceof AbstractPerfTestCase);
                 
                 String url = "";
                 if (t instanceof ComponentTestCase) {

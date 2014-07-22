@@ -74,17 +74,18 @@
      * when there is an error being added to storage.
      */
     testErrorHandlerHook: {
-        test : function(component) {
-            var errorHandled = false;
+        test : [function(component) {
+            var errorHandled = null;
             var action = component.get("c.getString");
-            
+            this._actionParams = action.getParams();
+            //actionStorage.app set maxSize to 10, that will give us 10240 bytes, tooLarge has size 40414 after this
             var tooLarge = new Array(10000).join("!");
             
             action.setParams({ param: tooLarge });
             
             action.setStorable({
-                errorHandler: function() {
-                    errorHandled = true;
+                errorHandler: function(error) {
+                    errorHandled = error;
                 }
             });
             
@@ -92,10 +93,32 @@
                 $A.enqueueAction(action);
             });
             
-            $A.test.addWaitFor(true, function() {
-                return errorHandled;
-            });
-        }
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() { return errorHandled!=null; },
+                "error handler didn't get called",
+                function() {
+                    $A.test.assertEquals(
+                    "MemoryStorageAdapter.setItem() cannot store an item over the maxSize",
+                    errorHandled);
+                }
+            );
+         },
+        function(component) {
+            var actionIsInStorage = null;//init actionIsInStorage to null, make sure it's not at the end of the test
+            $A.clientService.isActionInStorage(this._actionDescriptor,this._actionParams,
+                    function(isInStorage) {//this call back could be async, depends on the storage
+                    actionIsInStorage = isInStorage;
+                    $A.test.assertFalse(isInStorage, "Action with error should not be found in storage");
+                    }
+            );
+            
+            //because the isActionInStorage's callback could be async, we need to make sure it did get called before test end
+            $A.test.addWaitForWithFailureMessage(true,
+                function() { return actionIsInStorage!=null; },
+                "callback of isActionInStorage did not get run"
+            );
+        }]
     },
     
     /**

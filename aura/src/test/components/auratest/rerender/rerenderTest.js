@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+	//W-2317243: these tests pass when run FF on sauceLab locally, but FF autobuild acts strange
+	//come back and enable them once FF autobuild in back to normal
+	browsers: ["-FIREFOX"],
+	
 	getCounter : function(component) {
 		return $A.test.getText(component.find("counter").find("count").getElement());
 	},

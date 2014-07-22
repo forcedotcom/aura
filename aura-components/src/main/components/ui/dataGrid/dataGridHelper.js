@@ -49,8 +49,7 @@
 			// Copy the references to _row for easier access later. 
 			if (isEditMode && c.get('v.editable') && inputComponent && inputComponent.length > 0) {
 				concrete._row[i] = inputComponent;
-			}
-			else {
+			} else {
 				concrete._row[i] = outputComponent; 
 			}
 
@@ -111,8 +110,7 @@
 						// For objects, place an empty object.
 						if (j === path.length - 1) {
 							sub[path[j]] = '';	
-						}
-						else {
+						} else {
 							sub = sub[path[j]] = {};
 						}
 					}
@@ -141,8 +139,7 @@
 					$A.util.forEach(recordLayoutBody, function (col) {
 						ret.push(col);
 					});
-				}
-				else {
+				} else {
 					ret.push(column);
 				}
 			});
@@ -209,15 +206,13 @@
 
 		if (window['JSON']) {
 			return JSON.parse(JSON.stringify(source));
-		}
-		else {
+		} else {
 			obj = {};
 
 			for (var i in source) {
 				if (typeof source[i] === 'object') {
 					obj[i] = this.clone(source[i]);
-				}
-				else {
+				} else {
 					obj[i] = source[i];
 				}
 			}
@@ -276,8 +271,7 @@
 
 		if (params.last) {
 			params.index = 'last';
-		}
-		else {
+		} else {
 			params.index = parseInt(params.index);
 		}
 
@@ -285,10 +279,9 @@
 
 		if (params.remove) {
 			this.removeRows(concrete, params.index, params.count);
-		}
-		else {
+		} else {
 			// Insert n rows of but no items?
-			this.insertRows(concrete, params.index, params.count, params.items);
+			this.insertRowsAndUpdateData(concrete, params.index, params.count, params.items, true);
 		}
 	},	
 
@@ -317,12 +310,22 @@
 	},
 
 	/**
+	 * Inserts rows at the specified index. Inserts the data from newItems or empty
+	 * objects if insertItems = true
+	 * 
+	 * @param {Component} concrete
+	 * @param {Number} index zero-based index to begin insertion
+	 * @param {Number} count number of rows/items being inserted
+	 * @param {Array} newItems (optional) objects to be inserted 
+	 * @param {Boolean} insertItems (optional) whether data should be inserted (if items already exist in v.items, we don't want to insert)
+	 * @param {Function} callback (optional) callback after all the rows have been inserted
+	 * 
 	 * TODO add index validation
 	 * TODO BUG: Deal with situation where items being inserted already exists in v.items
-	 */
-	insertRows: function (concrete, index, count, newItems, callback) {
+	 */ 
+	insertRowsAndUpdateData: function (concrete, index, count, newItems, insertItems, callback) {
         if (!concrete.isRendered()) {
-            //insertRows might be called before the table is actually rendered to the dom
+            //insertRowsAndUpdateData might be called before the table is actually rendered to the dom
             //If that's the case, this method will fail.  Instead, we just ignore it
             //and we'll end up calling this method when the dataGrid is rendered anyway
             return;
@@ -346,11 +349,9 @@
 
 		if (index === 'first') {
 			realIndex = 0;
-		}
-		else if (index === 'last') {
+		} else if (index === 'last') {
 			realIndex = priv_rowsLength; 
-		}
-		else {
+		} else {
 			realIndex = index;
 		}
 
@@ -367,13 +368,14 @@
 
 			self.createTableRow(concrete, item, realIndex + i, {}, function (tr) {
 				if (index === 'last') {
-					items.push(item);
-					priv_rows.push(item);
+					if (insertItems) {
+						items.push(item);
+					}
 					tbody.appendChild(tr);
-				}
-				else {
-					items.splice(realIndex + i, 0, item);
-					priv_rows.splice(realIndex + i, 0, item);
+				} else {
+					if (insertItems) {
+						items.splice(realIndex + i, 0, item);
+					}
 
 					node = tbody.children[realIndex + i];
 					tbody.insertBefore(tr, node);
@@ -382,6 +384,7 @@
 				if (++resolved === count) {
 					concrete._addRemove = false;
 					concrete.set("v.items", items, true)
+					concrete._rowItems = items;
 
 					if (callback) {
 						callback();
@@ -402,11 +405,10 @@
 
 		if (itemsLength > priv_rowsLength) {
 			diff = itemsLength - priv_rowsLength;
-			this.insertRows(concrete, 'last', diff, null, function () {
+			this.insertRowsAndUpdateData(concrete, 'last', diff, null, false, function () {
 				self.updateValueProvidersFromItems(concrete);
 			});
-		} 
-		else {
+		} else {
 			diff = priv_rowsLength - itemsLength;
 			index = priv_rowsLength - diff;
 			
@@ -485,8 +487,7 @@
 					if (newComponents.length > 0) {
 						$A.render(newComponents, el);
 						$A.afterRender(newComponents); 
-					}
-					else {
+					} else {
 						// Create and render the components (async).
 						self.createAndRenderCell(concrete, targetComponent, vp, el, newComponents);	
 
@@ -520,8 +521,7 @@
 				// TODO: concrete vs cmp?
 				if (cmp._rowData.length !== newLength) {
 					this.resize(cmp.getConcreteComponent(), newLength);
-				}
-				else {
+				} else {
 					this.updateValueProvidersFromItems(cmp);
 				}
 			}
@@ -579,14 +579,12 @@
 			// An empty index implies that this is select all. 
 			if ($A.util.isUndefinedOrNull(index)) {
 				this.selectAll(cmp, value);
-			}
-			else {
+			} else {
 				// Don't worry about calling 'selectOne'.
 				// hlp.selectOne(cmp, index, value);
 				this.changeSelectedItems(cmp, [cmp.get('v.items.' + index)], value);
 			}
-		}
-		else if (name && index && globalId) {
+		} else if (name && index && globalId) {
 
 			// Use value object incase change handlers are important.
 			// For the dataGrid implementation, we provide the internal row object.
@@ -692,8 +690,7 @@
 
 				setKeys();
 				concrete.set('v.selectedItems', items);
-			}
-			else {
+			} else {
 				setKeys();
 				concrete.set('v.selectedItems', replace(value ? items : []));
 			}
@@ -781,8 +778,7 @@
 					concrete._summaryCells[column] = summaryCell;
 					summaries[co] = summaryCell;
 				}, cell, cell.valueProvider || vp);
-			}
-			else {
+			} else {
 				$A.error('Invalid column name: \'' + column + '\'');
 			}
 		});
@@ -798,8 +794,7 @@
 
 				$A.render(summaries[i], tr);
 				$A.afterRender(summaries[i]);
-			}
-			else {
+			} else {
 				++colspan;
 			}
 

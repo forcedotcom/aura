@@ -16,7 +16,7 @@
 function() {
 	var imports = Array.prototype.slice.call(arguments, 0);
     return function() {
-    	var ret = "MIXED:";
+    	var ret = "EXT_MULTIPLE2:";
     	for(var i=0; i<imports.length; i++){
     		ret = ret + (imports[i] && imports[i]()) + "|";
     	}

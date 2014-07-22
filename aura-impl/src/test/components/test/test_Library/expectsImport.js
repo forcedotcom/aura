@@ -15,6 +15,6 @@
  */
 function(importedFunction) {
     return function() {
-    	return "TEST:" + importedFunction();
+    	return "IMPORTS1:" + importedFunction();
     }
 }

@@ -25,5 +25,5 @@ public interface LibraryDef extends RootDefinition {
      * Gets the list of included js files.
      * @return {@link List} of included resources.
      */
-    List<IncludeDef> getIncludes();
+    List<IncludeDefRef> getIncludes();
 }

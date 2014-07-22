@@ -15,6 +15,6 @@
  */
 function() {
 	return function() {
-		return "PRIMARY";
+		return "EXT1";
 	}
 }

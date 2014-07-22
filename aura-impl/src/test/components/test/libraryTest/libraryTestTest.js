@@ -23,7 +23,7 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.imported);
 			$A.test.assertDefined(helper.imported.basicFirst);
-			$A.test.assertEquals("1st", helper.imported.basicFirst());
+			$A.test.assertEquals("BASIC1", helper.imported.basicFirst());
 		}
 	},
 
@@ -35,7 +35,8 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.imported);
 			$A.test.assertDefined(helper.imported.expectsImport);
-			$A.test.assertEquals("TEST:1st", helper.imported.expectsImport());
+			$A.test.assertEquals("IMPORTS1:BASIC1", helper.imported
+					.expectsImport());
 		}
 	},
 
@@ -47,21 +48,21 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.imported);
 			$A.test.assertDefined(helper.imported.reusesImport);
-			$A.test.assertEquals("REUSED:1st", helper.imported.reusesImport());
+			$A.test.assertEquals("REUSED:BASIC1", helper.imported
+					.reusesImport());
 		}
 	},
 
 	/**
 	 * Multiple Includes are properly injected into the defined Include.
 	 */
-	//
+	// W-2328663
 	_testImportsMultiple : {
 		test : function(cmp) {
 			var helper = cmp.getDef().getHelper();
-			$A.test.assertDefined(helper.externallyImported);
-			$A.test
-					.assertDefined(helper.externallyImported.handlesMultipleImports);
-			$A.test.assertEquals("MULTIPLE:1st|2nd|", helper.externallyImported
+			$A.test.assertDefined(helper.imported);
+			$A.test.assertDefined(helper.imported.handlesMultipleImports);
+			$A.test.assertEquals("MULTIPLE:BASIC1|BASIC2|", helper.imported
 					.handlesMultipleImports());
 		}
 	},
@@ -75,7 +76,7 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.imported);
 			$A.test.assertDefined(helper.imported.expectsImportAlso);
-			$A.test.assertEquals("ALSO:TEST:1st", helper.imported
+			$A.test.assertEquals("IMPORTS2:IMPORTS1:BASIC1", helper.imported
 					.expectsImportAlso());
 		}
 	},
@@ -101,7 +102,7 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.imported);
 			$A.test.assertDefined(helper.imported.importsAndExport);
-			$A.test.assertEquals("EXPORTED IMPORT:1st|", helper.imported
+			$A.test.assertEquals("EXPORTED_IMPORT:BASIC1|", helper.imported
 					.importsAndExport());
 		}
 	},
@@ -114,8 +115,8 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.externallyImported);
 			$A.test.assertDefined(helper.externallyImported.expectsImport);
-			$A.test.assertEquals("EXTERNALLY:1st", helper.externallyImported
-					.expectsImport());
+			$A.test.assertEquals("EXT_IMPORT1:BASIC1",
+					helper.externallyImported.expectsImport());
 		}
 	},
 
@@ -128,7 +129,7 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.externallyImported);
 			$A.test.assertDefined(helper.externallyImported.expectsImportAlso);
-			$A.test.assertEquals("EXTERIORALLY:TEST:1st",
+			$A.test.assertEquals("EXT_IMPORT2:IMPORTS1:BASIC1",
 					helper.externallyImported.expectsImportAlso());
 		}
 	},
@@ -141,7 +142,7 @@
 			var helper = cmp.getDef().getHelper();
 			$A.test.assertDefined(helper.externallyImported);
 			$A.test.assertDefined(helper.externallyImported.importsAndExport);
-			$A.test.assertEquals("EXPORTED EXTERNAL IMPORT:1st|2nd|",
+			$A.test.assertEquals("EXT_EXPORTED_IMPORT:BASIC1|BASIC2|",
 					helper.externallyImported.importsAndExport());
 		}
 	},
@@ -155,8 +156,24 @@
 			$A.test.assertDefined(helper.externallyImported);
 			$A.test
 					.assertDefined(helper.externallyImported.handlesMultipleImports);
-			$A.test.assertEquals("EXTERNAL:1st|2nd|TEST:1st|",
+			$A.test.assertEquals(
+					"EXT_MULTIPLE1:BASIC1|BASIC2|IMPORTS1:BASIC1|",
 					helper.externallyImported.handlesMultipleImports());
+		}
+	},
+
+	/**
+	 * Multiple local and external Includes can be imported.
+	 */
+	// W-2328663
+	_testImportsMultipleLocalAndExternal : {
+		test : function(cmp) {
+			var helper = cmp.getDef().getHelper();
+			$A.test.assertDefined(helper.externallyImported);
+			$A.test
+					.assertDefined(helper.externallyImported.handlesMultipleImportsAlso);
+			$A.test.assertEquals("MIXED:PRIMARY|SECONDARY|1st|2nd|",
+					helper.externallyImported.handlesMultipleImportsAlso());
 		}
 	},
 
@@ -189,11 +206,17 @@
 			helper.imported.expectsImportAlso();
 			$A.test.assertEquals(4, helper.imported.basicFirst.getCounter());
 
+			// another property
+			helper.importedAgain.basicFirst();
+			$A.test.assertEquals(5, helper.imported.basicFirst.getCounter());
+			helper.importedAgain.reusesImport();
+			$A.test.assertEquals(6, helper.imported.basicFirst.getCounter());
+
 			// external imports also
 			helper.externallyImported.expectsImport();
-			$A.test.assertEquals(5, helper.imported.basicFirst.getCounter());
+			$A.test.assertEquals(7, helper.imported.basicFirst.getCounter());
 			helper.externallyImported.expectsImportAlso()
-			$A.test.assertEquals(6, helper.imported.basicFirst.getCounter());
+			$A.test.assertEquals(8, helper.imported.basicFirst.getCounter());
 		}
 	}
 })

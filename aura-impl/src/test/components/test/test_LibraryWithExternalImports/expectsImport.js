@@ -15,6 +15,6 @@
  */
 function(importedFunction) {
     return function() {
-    	return "EXTERNALLY:" + importedFunction();
+    	return "EXT_IMPORT1:" + importedFunction();
     }
 }

@@ -15,6 +15,6 @@
  */
 function() {
 	return function() {
-		return "SECONDARY";
+		return "EXT2";
 	}
 }

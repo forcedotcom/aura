@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.system.Source;
@@ -36,12 +36,10 @@ import com.google.common.collect.Lists;
 public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
     public static final String TAG = "aura:library";
-    
-    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(RootTagHandler.ATTRIBUTE_API_VERSION);
-    
+
     private final LibraryDefImpl.Builder builder = new LibraryDefImpl.Builder();
-    
-    private final List<IncludeDef> includes = Lists.newLinkedList();
+
+    private final List<IncludeDefRef> includes = Lists.newLinkedList();
 
     public LibraryDefHandler() {
         super();
@@ -53,7 +51,8 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return new ImmutableSet.Builder<String>().add(RootTagHandler.ATTRIBUTE_API_VERSION)
+                .addAll(super.getAllowedAttributes()).build();
     }
 
     @Override
@@ -68,8 +67,8 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
-        if (IncludeDefHandler.TAG.equals(tag)) {
-            this.includes.add(new IncludeDefHandler(this, xmlReader, source).getElement());
+        if (IncludeDefRefHandler.TAG.equals(tag)) {
+            this.includes.add(new IncludeDefRefHandler(this, xmlReader, source).getElement());
         } else {
             error("Found unexpected tag %s", tag);
         }
@@ -90,7 +89,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
-            error("No literal text allowed in event definition");
+            error("No literal text allowed in " + TAG);
         }
     }
 
@@ -103,9 +102,9 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     protected RootDefinitionBuilder<LibraryDef> getBuilder() {
         return builder;
     }
-    
-	@Override
-	protected boolean allowPrivateAttribute() {
-		return true;
-	}
+
+    @Override
+    protected boolean allowPrivateAttribute() {
+        return true;
+    }
 }

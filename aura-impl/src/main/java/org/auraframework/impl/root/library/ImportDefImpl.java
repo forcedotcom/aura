@@ -22,95 +22,80 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ImportDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.root.parser.handler.ImportDefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportDef {
-   private static final long serialVersionUID = 8916829297107001915L;
-   private final DefDescriptor<? extends RootDefinition> parentDescriptor;
-   private final String library;
-   private final String property;
+    private static final long serialVersionUID = 8916829297107001915L;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+    private final String property;
 
-   protected ImportDefImpl(Builder builder) {
-       super(builder);
-       this.parentDescriptor = builder.parentDescriptor;
-       this.library = builder.library;
-       this.property = builder.property;
-   }
-   
-   @Override
-    public String getLibraryName() {
-        return this.library;
+    protected ImportDefImpl(Builder builder) {
+        super(builder);
+        this.parentDescriptor = builder.parentDescriptor;
+        this.property = builder.property;
     }
 
-   @Override
-   public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-       if (descriptor != null) {
-           dependencies.add(descriptor);
-       }
-   }
+    @Override
+    public DefDescriptor<LibraryDef> getLibraryDescriptor() {
+        return descriptor;
+    }
 
-   @Override
-   public void validateDefinition() throws QuickFixException {
-       if (library == null) {
-           throw new InvalidDefinitionException("aura:import must specify module=\"…\"", getLocation());
-       }
-       
-       if (property == null) {
-           throw new InvalidDefinitionException("aura:import must specify property=\"…\"", getLocation());
-       }
-   }
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        if (descriptor != null) {
+            dependencies.add(descriptor);
+        }
+    }
 
-   @Override
-   public void validateReferences() throws QuickFixException {
-       if (library == null) {
-           throw new InvalidReferenceException("aura:import has invalid module: null", getLocation());
-       } 
-       
-       assert(parentDescriptor != null);
-       // TODO: convert text to module def and validate 
-       // Aura.getDefinitionService().getDefRegistry().assertAccess(parentDescriptor, module);
-   }
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {
+            throw new InvalidDefinitionException(String.format("%s missing property attribute", ImportDefHandler.TAG),
+                    getLocation());
+        }
+        // W-2236794 - validate that property is valid javascript identifier name
+    }
 
-   @Override
-   public void serialize(Json json) throws IOException {
-       json.writeMapBegin();
-       json.writeMapEntry("name", library);
-       json.writeMapEntry("property", property);
-       json.writeMapEnd();
-   }
+    @Override
+    public void validateReferences() throws QuickFixException {
+        assert (parentDescriptor != null);
+    }
 
-   public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefImpl> {
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeMapBegin();
+        json.writeMapEntry("name", descriptor.getDescriptorName());
+        json.writeMapEntry("property", property);
+        json.writeMapEnd();
+    }
 
-       public Builder() {
-           super(LibraryDef.class);
-       }
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefImpl> {
 
-       private DefDescriptor<? extends RootDefinition> parentDescriptor;
-       private String library;
-       private String property;
+        public Builder() {
+            super(LibraryDef.class);
+        }
 
-       @Override
-       public ImportDefImpl build() {
-           return new ImportDefImpl(this);
-       }
+        private DefDescriptor<? extends RootDefinition> parentDescriptor;
+        private String property;
 
-       public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
-           this.parentDescriptor = parentDescriptor;
-           return this;
-       }
+        @Override
+        public ImportDefImpl build() {
+            return new ImportDefImpl(this);
+        }
 
-       public Builder setModule(String module) {
-           this.library = module;
-           return this;
-       }
-       
-       public Builder setProperty(String property) {
-           this.property = property;
-           return this;
-       }
-   }
+        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
+            this.parentDescriptor = parentDescriptor;
+            return this;
+        }
+
+        public Builder setProperty(String property) {
+            this.property = property;
+            return this;
+        }
+    }
 }

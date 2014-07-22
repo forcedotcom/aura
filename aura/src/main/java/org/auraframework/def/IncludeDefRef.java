@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function() {
-	var counter = 0;
+package org.auraframework.def;
 
-	var instance = function() {
-		counter = counter + 1;
-		return "BASIC1";
-	}
-	instance.getCounter = function(){
-		return counter;
-	}
-	return instance;
+import java.util.List;
+
+public interface IncludeDefRef extends Definition {
+    /**
+     * Gets the included library's dependencies.
+     * @return the imported dependency list.
+     */
+    List<DefDescriptor<IncludeDef>> getImports();
+    
+    /**
+     * Gets the variable wrapped and exported by the library.
+     * @return the exported variable name.
+     */
+    String getExport();
+    
+    DefDescriptor<IncludeDef> getIncludeDescriptor();
 }

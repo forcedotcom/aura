@@ -34,6 +34,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
@@ -261,6 +262,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case RESOURCE:
             case PROVIDER:
             case THEME_PROVIDER:
+            case INCLUDE:
             case THEME_MAP_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
@@ -284,7 +286,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case ACTION:
             case DESCRIPTION:
             case EXAMPLE:
-            case INCLUDE:
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
                         .name()));

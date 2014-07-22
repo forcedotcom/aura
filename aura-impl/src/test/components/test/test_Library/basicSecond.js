@@ -15,6 +15,6 @@
  */
 function() {
 	return function() {
-		return "2nd";
+		return "BASIC2";
 	}
 }

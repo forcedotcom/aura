@@ -24,7 +24,7 @@
     <aura:include name="hasVars" export="firstVar" />
     <aura:include name="importsAndExport" imports="basicFirst" export="anExport" />
 
-    <!-- currently unable to handle multiple local imports
+    <!-- currently unable to handle multiple imports
     <aura:include name="handlesMultipleImports" imports="basicFirst,basicSecond" />
     -->
 </aura:library>

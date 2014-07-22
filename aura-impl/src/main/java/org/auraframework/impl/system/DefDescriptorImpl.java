@@ -82,9 +82,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     protected DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
         LoggingService loggingService = Aura.getLoggingService();
 
-        this.bundle = null;
         loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
         try {
+            this.bundle = null;
             this.defType = DefType.getDefType(defClass);
             this.prefix = newPrefix;
             this.name = associate.getName();
@@ -159,6 +159,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TESTCASE:
             case VAR:
             case THEME_DEF_REF:
+            case INCLUDE_REF:
                 name = qualifiedName;
                 break;
             case APPLICATION:

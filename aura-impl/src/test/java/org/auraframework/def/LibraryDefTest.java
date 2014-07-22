@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl.Builder;
@@ -30,19 +30,11 @@ import org.mockito.Mockito;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
 
     public LibraryDefTest(String name) {
         super(name);
-    }
-
-    public void testGetDescription() throws Exception {
-    }
-
-    public void testGetSupport() throws Exception {
-
     }
 
     /**
@@ -69,12 +61,12 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
             fail("Getting library should fail because it is malformed.");
         } catch (Throwable t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    "aura:lbrary: Unable to order include statements by dependency tree.");
+                    "aura:library: Unable to order include statements by dependency tree.");
         }
     }
 
     /**
-     * Tests the {@link LibraryDef} (and {@link IncludeDef}) serialization.
+     * Tests the {@link LibraryDef} (and {@link IncludeDefRef}) serialization.
      */
     public void testSerialization() throws Exception {
         LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_Library", LibraryDef.class);
@@ -106,105 +98,29 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         }
     }
 
-    public void testValidateDefinitionValidatesInclude() throws Exception {
-        List<IncludeDef> includes = ImmutableList.of(Mockito.mock(IncludeDef.class));
-
+    public void testValidateDefinitionWithDuplicateIncludes() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         Builder builder = new LibraryDefImpl.Builder();
         builder.setDescriptor(libDesc);
+
+        IncludeDefRef include = Mockito.mock(IncludeDefRef.class);
+        Mockito.doReturn("included").when(include).getName();
+
+        IncludeDefRef includeDupe = Mockito.mock(IncludeDefRef.class);
+        Mockito.doReturn("included").when(includeDupe).getName();
+
+        List<IncludeDefRef> includes = ImmutableList.of(include, includeDupe);
         builder.setIncludes(includes);
 
         LibraryDefImpl libraryDef = builder.build();
 
-        libraryDef.validateDefinition();
-
-        Mockito.verify(includes.get(0), Mockito.times(1)).validateDefinition();
-    }
-
-    public void testValidateDefinitionValidatesAllIncludes() throws Exception {
-        List<IncludeDef> includes = Lists.newLinkedList();
-        for (int i = 0; i < 3; i++) {
-            includes.add(Mockito.mock(IncludeDef.class));
+        try {
+            libraryDef.validateDefinition();
+            fail("LibraryDef requires an IncludeDef");
+        } catch (InvalidDefinitionException t) {
+            assertExceptionMessage(t, InvalidDefinitionException.class,
+                    "aura:include with duplicate name found in library: included");
         }
-
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
-        Builder builder = new LibraryDefImpl.Builder();
-        builder.setDescriptor(libDesc);
-        builder.setIncludes(includes);
-
-        LibraryDefImpl libraryDef = builder.build();
-
-        libraryDef.validateDefinition();
-
-        for (IncludeDef includeDef : includes) {
-            Mockito.verify(includeDef, Mockito.times(1)).validateDefinition();
-        }
-    }
-
-    public void testValidateDefinitionWithoutExternalDependencies() throws Exception {
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
-        Builder builder = new LibraryDefImpl.Builder();
-        builder.setDescriptor(libDesc);
-
-        // must explicitly list dependency even for local import ?
-        IncludeDef localImportedIncludeDef = Mockito.mock(IncludeDef.class);
-        Mockito.doReturn("localDependency").when(localImportedIncludeDef).getName();
-
-        IncludeDef localIncludeDef = Mockito.mock(IncludeDef.class);
-        Mockito.doReturn("localImport").when(localIncludeDef).getName();
-        Mockito.doReturn(ImmutableList.of("localDependency")).when(localIncludeDef).getImports();
-
-        List<IncludeDef> includes = ImmutableList.of(localIncludeDef, localImportedIncludeDef);
-        builder.setIncludes(includes);
-
-        LibraryDefImpl libraryDef = builder.build();
-
-        libraryDef.validateDefinition();
-    }
-
-    public void testLibraryIncludeImportsExternal() throws Exception {
-        DefDescriptor<LibraryDef> externalLibraryDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "externalLibrary", LibraryDef.class, null);
-        DefDescriptor<IncludeDef> externalIncludeDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "externalInclude", IncludeDef.class, externalLibraryDesc);
-        addSourceAutoCleanup(externalIncludeDesc, "function(){return 'externally'}");
-        addSourceAutoCleanup(externalLibraryDesc,
-                String.format("<aura:library><aura:include name='%s' /></aura:library>", externalIncludeDesc.getName()));
-
-        DefDescriptor<LibraryDef> localLibraryDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "localLibrary", LibraryDef.class, null);
-        DefDescriptor<IncludeDef> importingIncludeDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "importingInclude", IncludeDef.class, localLibraryDesc);
-        addSourceAutoCleanup(importingIncludeDesc, "function(input){return input()}");
-
-        addSourceAutoCleanup(
-                localLibraryDesc,
-                String.format("<aura:library><aura:include name='%s' /></aura:library>", importingIncludeDesc.getName()));
-    }
-
-    public void testLibraryIncludeImportsInternal() throws Exception {
-        DefDescriptor<LibraryDef> externalLibraryDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "externalLibrary", LibraryDef.class, null);
-        DefDescriptor<IncludeDef> externalIncludeDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "externalInclude", IncludeDef.class, externalLibraryDesc);
-        addSourceAutoCleanup(externalIncludeDesc, "function(){return 'externally'}");
-        addSourceAutoCleanup(externalLibraryDesc,
-                String.format("<aura:library><aura:include name='%s' /></aura:library>", externalIncludeDesc.getName()));
-
-        DefDescriptor<LibraryDef> localLibraryDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "localLibrary", LibraryDef.class, null);
-        DefDescriptor<IncludeDef> localIncludeDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "localInclude", IncludeDef.class, localLibraryDesc);
-        addSourceAutoCleanup(localIncludeDesc, "function(){return 'locally'}");
-
-        DefDescriptor<IncludeDef> importingIncludeDesc = getAuraTestingUtil().createStringSourceDescriptor(
-                "importingInclude", IncludeDef.class, localLibraryDesc);
-        addSourceAutoCleanup(importingIncludeDesc, "function(input){return input()}");
-
-        addSourceAutoCleanup(localLibraryDesc,
-                String.format("<aura:library><aura:include name='%s' /></aura:library>", localIncludeDesc.getName()));
     }
 }

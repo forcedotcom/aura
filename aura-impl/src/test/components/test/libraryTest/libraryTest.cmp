@@ -1,4 +1,5 @@
 <aura:component render="client">
     <aura:import library="test:test_Library" property="imported" />
+    <aura:import library="test:test_Library" property="importedAgain" />
     <aura:import library="test:test_LibraryWithExternalImports" property="externallyImported" />
 </aura:component>

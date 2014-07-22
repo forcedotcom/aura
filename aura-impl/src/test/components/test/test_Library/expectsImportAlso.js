@@ -15,6 +15,6 @@
  */
 function(someImport) {
     return function() {
-    	return "ALSO:" + someImport();
+    	return "IMPORTS2:" + someImport();
     }
 }

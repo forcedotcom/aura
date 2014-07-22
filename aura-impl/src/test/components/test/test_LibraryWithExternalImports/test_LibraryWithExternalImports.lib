@@ -23,7 +23,7 @@
     <aura:include name="importsAndExport" imports="test:test_Library:basicFirst,test:test_Library:basicSecond" export="anExport" />
     <aura:include name="handlesMultipleImports" imports="test:test_Library:basicFirst,test:test_Library:basicSecond,test:test_Library:expectsImport" />
     
-    <!-- currently unable to handle multiple imports that contain a local import
+    <!-- currently unable to handle multiple imports that contain mixed local and external imports
     <aura:include name="handlesMultipleImportsAlso" imports="basicFirst,basicSecond,test:test_Library:basicFirst,test:test_Library:basicSecond" />
     -->
 </aura:library>

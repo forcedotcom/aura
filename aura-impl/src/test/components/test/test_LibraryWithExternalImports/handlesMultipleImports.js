@@ -16,7 +16,7 @@
 function() {
 	var imports = Array.prototype.slice.call(arguments, 0);
     return function() {
-    	var ret = "EXTERNAL:";
+    	var ret = "EXT_MULTIPLE1:";
     	for(var i=0; i<imports.length; i++){
     		ret = ret + (imports[i] && imports[i]()) + "|";
     	}

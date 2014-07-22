@@ -15,6 +15,6 @@
  */
 function(someImport) {
     return function() {
-    	return "EXTERIORALLY:" + someImport();
+    	return "EXT_IMPORT2:" + someImport();
     }
 }

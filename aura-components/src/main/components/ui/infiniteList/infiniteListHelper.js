@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 ({
-	SWIPE_THRESHOLD: 30,
+	DIRECTION_THRESHOLD	: 2, 	// the intent of a gesture is captured after moving 2px in a direction
+	OPEN_PERCENTAGE		: 80,	// an 'open' row is translated 80% from its initial position
+	
+	SNAP_TIMEOUT		: 300,	// duration of 'snap' transition
+	CLOSE_TIMEOUT 		: 600,	// duration of the full 'close' transition of an active row 
 	
 	/**
 	 * Creates the handlers needed for listening to touch/pointer events.
 	 */
 	initializeHandlers: function (cmp) {
 		var self = this;
-    	
+
 		cmp._ontouchstart = function (e) {
 			self.ontouchstart(cmp, e);
 		};
@@ -67,7 +71,6 @@
      */
     attachListeners: function (cmp) {
     	var ul = cmp.getElement();
-    
     	ul.addEventListener(this.getEventNames().move, cmp._ontouchmove, false);
         ul.addEventListener(this.getEventNames().end, cmp._ontouchend, false);
     },
@@ -77,7 +80,6 @@
      */
     detachListeners: function (cmp) {
     	var ul = cmp.getElement();
-    	
     	ul.removeEventListener(this.getEventNames().move, cmp._ontouchmove);
     	ul.removeEventListener(this.getEventNames().end, cmp._ontouchend);
     },
@@ -88,22 +90,67 @@
      *  attaches 'move' and 'end' listeners if a valid row was found.
      */
     ontouchstart: function (cmp, e) {  
-    	var touch, rootClassName, ul, row;
-    	
+    	var touch, rootClassName, ul, row, openRowSwipe, 
+    		initialPosition = 0;
+
+        // Cancel when blocking is needed.
+        if (cmp._isClosing || cmp._isSnapping || cmp._isBlockedInteraction) {
+            e.stopPropagation();
+            e.preventDefault();    
+            return;     
+        }
+
     	if ((e.touches && e.touches.length == 1) || (e.pageX !== undefined)) {
     		touch = (e.touches && e.touches[0]) || e;
     		rootClassName = cmp.getElement().className || 'uiInfiniteList';
-    		row = this.getRow(e.target, 'uiInfiniteListRow', rootClassName)
+    		row = this.getRow(e.target, 'uiInfiniteListRow', rootClassName); 
     		
     		// Only proceed if a valid row was found.
-    		if (row) {
+    		if (row) {                
     			this.attachListeners(cmp);
+	    		
+                // If a different row was open, close it.
+                if (cmp._openRow && cmp._previousSwipe && cmp._previousSwipe.row !== row) {
+                	openRowSwipe = cmp._previousSwipe;
+                	
+                    // Perform close operation.
+                	openRowSwipe.body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
+                    this.translateX(cmp, openRowSwipe.body, 0);
+                    
+                    // Null these fields as 'touchend' will not execute.
+                    cmp._openRow = null;
+                    cmp._swipe = null;
+                    
+                    // Cancel all further events - this handler is registered in the 'capture' phase.
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    // Change the state for the duration of the close animation.
+                    // Use two variables to cancel all touch events.
+                    cmp._isClosing = true;
+                    cmp._isBlockedInteraction = true;
+                    
+                    setTimeout(function () {
+                        cmp._isClosing = false;
+                        openRowSwipe.body.style.transition = '';
+                    }, this.CLOSE_TIMEOUT);
+
+                    return;
+                }
+
+	    		// If another swipe is occurring on the same row. Check for openness.	
+	    		if (cmp._previousSwipe && (cmp._previousSwipe.row === row)) {
+	    			if (cmp._openRow === row) {	
+						initialPosition = this.getPixelFromPercentage(cmp, row, this.OPEN_PERCENTAGE);
+	    			}
+	    		}
 	    		
 		    	// Begin tracking the swipe gesture.
 		    	cmp._swipe = {
-					row    : row,
-					startX : touch.pageX,
-					startY : touch.pageY
+					row    			: row,
+					startX       	: touch.pageX,
+					startY 			: touch.pageY,
+					initialPosition : initialPosition 
 		    	};
     		}
     	}
@@ -114,12 +161,21 @@
      * Records the touch/pointer interaction. 
      */
     ontouchmove: function (cmp, e) {   
-    	var point = null;
+    	var point = null, // must be explicitly null
+            swipe, axis, body, percentage;
     	
+    	// If a row is closing or the interaction has been blocked, 
+    	// bounce the event and return.
+        if (cmp._isClosing || cmp._isSnapping || cmp._isBlockedInteraction) {
+            e.stopPropagation();
+            e.preventDefault();    
+            return;  
+        }
+
     	// Continue tracking the swipe if the an associated row was found.
     	if (cmp._swipe && cmp._swipe.row && (point = this.getPoint(e)) !== null) {
-	    	var swipe = cmp._swipe;
-	    	
+	    	swipe = cmp._swipe;
+
 	    	// Records the most recent point in the movement.
 	    	// Calculates the diffs in horizontal (X) and vertical (Y) position.
 	    	swipe.x 	= point.x;
@@ -129,18 +185,39 @@
 	    	swipe.absX 	= Math.abs(swipe.diffX);
 	    	swipe.absY 	= Math.abs(swipe.diffY);
 
-	    	// If a horizontal close swipe and the row is closed, ignore.
+            // Lock the direction for the duration of the iteraction.
+            axis = cmp._direction || this.getScrollAxis(swipe.absX, swipe.absY);
+
+            if (axis === 'x') {
+                // If a greater gesture occurred horizontally than vertically, 
+                // then prevent event bubbling to keep the scroller from moving.
+                e.stopPropagation();
+                e.preventDefault();
+                
+                swipe.body = body = swipe.body || swipe.row.querySelector('.body'); 
+                
+                // Positive displacement is a 'open' gesture.
+            	// Negative displacement is an 'close' gesture.
+                if (swipe.diffX > 0) {
+                	percentage = this.getWidthPercentage(cmp, body, (swipe.absX + swipe.initialPosition));
+                	swipe.percentage = -percentage;
+                	
+                	if (swipe.percentage >= -(this.OPEN_PERCENTAGE)) { 
+                		this.translateX(cmp, body, swipe.percentage);
+                	}
+                }
+                else {
+                	percentage = this.getWidthPercentage(cmp, body, (swipe.absX + (cmp._bodyLength - swipe.initialPosition)));
+                	swipe.percentage = -(100 - percentage);
+                	
+                	if (swipe.percentage <= 0) {
+                		this.translateX(cmp, body, swipe.percentage);
+                	}
+                }
+            }
+
+	    	// TODO: If a horizontal close swipe and the row is closed, ignore.
 	    	// Ignoring allows with event to continue bubbling (stageLeft swipe for example). 
-	    	if (swipe.diffX < 0 && swipe.row.className.indexOf('open') === -1) {
-	    		return; 
-	    	}
-	    	
-	    	// If a greater gesture occurred horizontally than vertically, 
-	    	// then prevent event bubbling to keep the scroller from moving.
-	    	if (swipe.absX > this.SWIPE_THRESHOLD && swipe.absX > swipe.absY) {
-	    		e.stopPropagation();
-	        	e.preventDefault();
-	    	}
     	}
     },
     
@@ -150,25 +227,65 @@
      * Detaches event listeners.
      */
     ontouchend: function (cmp, e) {
-    	var swipe = cmp._swipe;
+    	var swipe = cmp._swipe,
+    		percentage, shouldSnapOpen;
     	
-    	if (swipe.absX > this.SWIPE_THRESHOLD) {
-    		// If the end position was less than the start, open the row.
-    		// Else the end position was greater than the start, so close the row.
-    		if (swipe.diffX > 0) {
-    			if (cmp._openRow) {
-    				$A.util.removeClass(cmp._openRow, 'open');
-    			}
-    			
-    			cmp._openRow = cmp._swipe.row;
-    			$A.util.addClass(cmp._swipe.row, 'open');
-    		}
-    		else {
-    			$A.util.removeClass(cmp._swipe.row, 'open');
-    		}
-    	}
+    	// Use 'percentage' field on 'swipe' to determine the position of the row.
+        if (swipe && swipe.hasOwnProperty('percentage')) {
+        	percentage = Math.abs(swipe.percentage);
+        	
+        	// If the row is not completely open or not completely closed, then apply 'snap' logic.
+        	if (percentage !== -(this.OPEN_PERCENTAGE) && percentage !== 0) {
+	        	
+        		swipe.body.style.transition = 'all ' + this.SNAP_TIMEOUT + 'ms';
+        		
+        		// Block interactions while the transition is happening.
+        		cmp._isSnapping = true;
+      
+	        	// The percentage is inverted. 
+	        	// Greater than 50% implies open intent.
+	        	// Less than 50% implies close intent.
+	    		if (percentage > 50) {	    			
+	    			this.translateX(cmp, swipe.body, -(this.OPEN_PERCENTAGE));
+	    			
+	    			// Create '_openRow' reference after timeout 'snap' has completed.
+	    			// Creating the reference too soon could cause a 'close' animation to also occur. 
+	    			shouldSnapOpen = true; 
+	    		}
+	    		else {
+	    			this.translateX(cmp, swipe.body, 0);
+	    			cmp._openRow = null;
+	    		}
+	    		
+	    		setTimeout(function () {
+        			cmp._isSnapping = false;
+        			swipe.body.style.transition = '';
+        			
+        			if (shouldSnapOpen) {
+        				cmp._openRow = swipe.row;	
+        			}
+        		}, this.SNAP_TIMEOUT);
+        	}
+        	
+        	// Prevent anything else from happening (clicks, etc).
+        	e.stopPropagation();
+            e.preventDefault(); 
+        }
+        
+        // Reset '_isBlockedInteraction' so that future touch events are not cancelled.
+        // This is here because the touch gesture might last longer than the animation.
+        // A 'blocked interaction' means that all pointer events are cancelled as long as 
+        // the pointer is active (down).
+        if (cmp._isBlockedInteraction) {
+            cmp._isBlockedInteraction = false;
+        }
     	
     	this.detachListeners(cmp);
+        
+    	cmp._previousSwipe = cmp._swipe;
+        cmp._swipe = null;
+        cmp._moved = false;
+        cmp._direction = null;
     },
     
     /**
@@ -227,6 +344,17 @@
 
         return point;
     },
+
+    /**
+     * Given the absoluate value of movemnet in x and y, return the scrolling (dominant) axis.
+     */
+    getScrollAxis: function (absX, absY) {
+        var treshold = this.DIRECTION_THRESHOLD;
+
+        return (absX > absY + treshold) ? 'x' :
+               (absY > absX + treshold) ? 'y' :
+                null;
+    },
     
     /**
      * Attempts to find a row given the current touch target.
@@ -242,7 +370,7 @@
     	// Walk the tree until the closest target is found.
     	// Escape if 100 nodes are traversed or the root is hit.
     	while (count < 100 && current.className !== rootClassName) {
-    		if (current.className.indexOf(targetClassName) !== -1) {
+    		if ($A.util.hasClass(current, targetClassName)) {
 	    		row = current;
 	    		break;
 	    	}
@@ -252,5 +380,49 @@
     	}
     	
     	return row;
+    },
+
+    /**
+     * Returns the percentage coverage given the absolute value of x distance.
+     * 
+     * @param cmp {Component} infinteList component instance
+     * @param el {HTMLElement} infiniteListRow's body div
+     * @param x {Number} the number of pixels    
+     */
+    getWidthPercentage: function (cmp, el, x) {
+    	var length = cmp._bodyLength;
+
+	    if (!length) {
+	        length = cmp._bodyLength = el.getBoundingClientRect().right;
+	    }
+	    
+	    return Math.floor((x / length) * 100);
+    },
+    
+    /**
+     * Returns the pixel position given the percent value.
+     * 
+     * @param cmp {Component} infinteList component instance
+     * @param el {HTMLElement} infiniteListRow's body div
+     * @param pecentage {Number} integer value for percentage (eg. 80 for 80%).
+     */
+    getPixelFromPercentage: function (cmp, el, percentage) {
+    	var length = cmp._bodyLength; 
+
+	    if (!length) {
+	        length = cmp._bodyLength = el.getBoundingClientRect().right;
+	    }
+
+    	return Math.floor(length * (percentage / 100)); 
+    },
+    
+    /**
+     * Translates the given element in the x direction by the given percent.
+     * 
+     * @param percent {Number} percentage to apply 
+     */
+    translateX: function (cmp, el, percent) {
+        var style = 'translate3d(' + percent + '%, 0, 0)';
+        el.style.webkitTransform = style;
     }
 })

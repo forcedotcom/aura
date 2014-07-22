@@ -15,5 +15,22 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
-</aura:event>
+<aura:component>
+
+	<uiExamples:mobileViewport>
+		<ui:scroller>
+			<ui:infiniteList itemVar="item" enableRowSwipe="true">
+				
+				<aura:set attribute="itemTemplate">
+					<uiExamples:infiniteListRow item="{!item}"/>
+				</aura:set>	
+
+				<aura:set attribute="dataProvider">
+					<uiExamples:infiniteListDataProvider/>
+				</aura:set>
+
+			</ui:infiniteList>
+		</ui:scroller>
+	</uiExamples:mobileViewport>
+
+</aura:component>

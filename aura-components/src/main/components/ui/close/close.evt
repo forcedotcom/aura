@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
+<aura:event type="COMPONENT" extends="ui:command" description="Command event to instruct a component to close itself.">
 </aura:event>

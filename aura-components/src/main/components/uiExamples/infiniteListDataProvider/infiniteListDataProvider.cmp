@@ -15,5 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
-</aura:event>
+<aura:component extends="ui:dataProvider" model="js://uiExamples.infiniteListDataProvider">
+
+</aura:component>

@@ -21,7 +21,6 @@
 }
 
 .THIS > div.body {
-	transition: all .3s;
 	width: 100%;
 }
 
@@ -33,8 +32,4 @@
 	width: 100%;
 	z-index: -1;
 	overflow: hidden;
-}
-
-.THIS.open > div.body {
-	transform: translate3d(-80%, 0, 0);
 }

@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({	
-	afterRender: function (cmp, hlp) {
-		var list;
-		
-		if (cmp.get('v.enableRowSwipe')) {
-			hlp.initializeHandlers(cmp);
-			list = cmp.getElement();
-		
-			// Just attach the start handler, move and end is conditionally added.
-			// Attached to the capture phase in order to cancel click events if necessary. 
-			// This is necessary because Aura's FastClick implementation is attached directly
-			// to aura:html components instead of at the window level.
-			list.addEventListener(hlp.getEventNames().start, cmp._ontouchstart, true); 
-		}
-		
-        this.superAfterRender();
+({
+	handleClick: function (cmp) {
+		alert("ROW CLICK");
 	}
+
+	/* API not exposed yet.
+	handleOpen: function (cmp, evt, hlp) {
+		evt.getParam('domEvent').preventDefault();
+		cmp.getEvent('open').setParams(evt.getParams()).fire();
+	},
+
+	handleClose: function (cmp, evt, hlp) {
+		evt.getParam('domEvent').preventDefault();
+		cmp.getEvent('close').setParams(evt.getParams()).fire();
+	}
+	*/
 })

@@ -15,5 +15,12 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
-</aura:event>
+<aura:component description="A component to remove the boilerplate neccessary for a mobile demo.">
+
+	<!-- bad hack -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui"/>
+
+	<div>
+		{!v.body}
+	</div>
+</aura:component>

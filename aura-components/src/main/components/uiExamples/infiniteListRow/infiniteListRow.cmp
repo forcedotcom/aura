@@ -15,5 +15,21 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
-</aura:event>
+<aura:component extends="ui:infiniteListRow">
+	<aura:attribute name="item" type="Object"/>
+
+	<a onclick="{!c.handleClick}">
+		<strong>{! v.item.name }</strong>
+		<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+<!--
+			<ui:button label="Open" press="{!c.handleOpen}"/>
+			<ui:button label="Close" press="{!c.handleClose}"/>
+-->
+		</p>
+	</a>
+
+	<aura:set attribute="swipeBody">
+		<ui:button label="Edit"/>
+		<ui:button label="Delete"/>
+	</aura:set>
+</aura:component>		

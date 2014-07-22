@@ -15,5 +15,8 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
+<aura:event type="COMPONENT" 
+            description="A classification of event in which one component is attempting to command another to perform some action. Extend this event to provide concrete commands. Known concretes: ui:open, ui:close, ui:refresh, ui:showMore.">
+    
+    <aura:attribute name="parameters" type="Object" description="Untyped object of any parameters needed by the target component."/>
 </aura:event>

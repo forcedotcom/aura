@@ -548,6 +548,13 @@ MapValue.prototype.copyHandlers = function(oldvalue, newvalue) {
 	var k;
 	var oldHandlers;
 
+    // Make sure we really want to be here at all.  I think it's a buggy path,
+    // but apparently we sometimes have a literal NULL in a mapvalue, and we
+    // don't want to fall down.
+    if (!oldvalue) {
+        return;
+    }
+
 	// Conveniently, MapValue and SimpleValue call the handler structure by
 	// different names, and even have different structures (SimpleValue has a
 	// layer for event type, MapValue doesn't).

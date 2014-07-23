@@ -78,13 +78,16 @@ var RawMapValue = function(source) {
 		that[k] = v.unwrap();
 	});
 
-	// We are specifically using the closure based approach to private variables to avoid issues with code that for/in's on the "raw" object (space for safety
-	// tradeoff)
-	this.getSourceValue = function() {
-		return source;
-	};
+	// We are specifically using the closure based approach to private variables to avoid issues with code that 
+	// for/in's on the "raw" object (space for safety tradeoff)
+	this.getSourceValue = (function(_source) { 
+		return function() {
+			return _source;
+		};
+	})(source);
 };
 
+// Hide from for/in iterations that correctly use thing.hasOwnProperty() to guard against traversal of inherited/private props
 RawMapValue.prototype.hasOwnProperty = function(name) {
 	return Object.prototype.hasOwnProperty.call(this, name) && (this[name] !== this.getSourceValue);
 };

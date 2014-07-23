@@ -53,7 +53,7 @@ SizeEstimator.prototype.estimateSize = function(value) {
         // string length. however, JSON.stringify doesn't handle objects/arrays
         // with cycles. thankfully these are rare so we give up and say 0.
         try {
-            bytes = JSON.stringify(value).length;
+            bytes = $A.util.json.encode(value).length;
         } catch (e) {
             $A.log("Error during size estimate, using 0: " + e);
             bytes = 0;

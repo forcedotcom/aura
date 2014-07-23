@@ -36,7 +36,7 @@
     },
 
     calculateSize: function(map) {
-        return $A.util.keys(map, true).length;
+        return $A.util.keys(map).length;
     },
     /**
      * Verify creating map values.
@@ -163,7 +163,7 @@
             component.set("v.map", sval);
             var map = component.get("v.map")
             $A.test.assertTrue($A.util.isObject(map)); //##$$ Remove this line
-    		$A.test.assertEquals(0, $A.util.keys(map, true).length); //##$$ Remove this line
+    		$A.test.assertEquals(0, $A.util.keys(map).length); //##$$ Remove this line
             //$A.test.assertNull(component.get("v.map")); ##$$ uncomment this line
         }
     },
@@ -178,7 +178,7 @@
             component.set("v.map", sval);
             var map = component.get("v.map")
             $A.test.assertTrue($A.util.isObject(map)); //##$$ Remove this line
-    		$A.test.assertEquals(0, $A.util.keys(map, true).length); //##$$ Remove this line
+    		$A.test.assertEquals(0, $A.util.keys(map).length); //##$$ Remove this line
             //$A.test.assertUndefined(component.get("v.map")) ##$$ uncomment this line
         }
     },

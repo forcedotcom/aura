@@ -123,7 +123,7 @@
 		$A.test.assertEquals(1, mapAttr.a);
 		var a = testCmp.get("v.mapAttributeWithNoDefaultValue");
 		$A.test.assertTrue($A.util.isObject(a));
-		$A.test.assertEquals(0, $A.util.keys(a, true).length, "Expected no-default map to be an empty object");
+		$A.test.assertEquals(0, $A.util.keys(a).length, "Expected no-default map to be an empty object");
 	},
 	
 	verifyChangingAttributeValues : function(testCmp) {

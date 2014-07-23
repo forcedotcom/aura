@@ -22,7 +22,6 @@
  * @protected
  */
 function ArrayValue(config, def, component) {
-	this.array = [];
     this.owner = component;
     this.hasRealValue = true;
     this.setValue(config);
@@ -83,7 +82,7 @@ ArrayValue.prototype._getValue = function(i) {
  */
 ArrayValue.prototype.getArray = function() {
     var array = this.dirty ? this.newArray : this.array;
-    
+
     if (array && !array._arrayValueRef) {
         // establish a back ref from the array to the ArrayValue for those times when someone has stripped off the
         // ArrayValue'ness and we need it
@@ -171,73 +170,24 @@ ArrayValue.prototype._setValue = function(newArray, skipChange, doNotAutoDestroy
 	
     this.fireEvents = false;
     this.hasRealValue = (newArray !== null && newArray !== undefined);
-    this.newArray = [];
     
+    this.newArray = [];
+    this.makeDirty();
+
     if (newArray) {
-        if (newArray.auraType === "Value" && newArray.toString() === "ArrayValue") {
+        if (newArray.auraType === "Value" && newArray.toString() === "ArrayValue"){
             newArray = newArray.getArray();
         }
-        
-        if (aura.util.isArray(newArray)) {
-        	try {
-	        	this["ignoreCommit"] = true; // NOTE: Using this ridiculous workaround for obfuscation collisions from Google Closure (using DOT notation results in $A.util.on() being undefined!
-	        	
-				var candiates = this.array ? this.array.slice() : [];
-		        for (var i = 0; i < newArray.length; i++) {
-		        	var value = newArray[i];
-		        	var found = false;
-		
-		        	if (value && candiates && candiates.length > 0) {
-		            	// See if we can find an existing object to use
-		                for (var j = 0; j < candiates.length; j++) {
-		                	var current = candiates[j];
-		                	if (current && $A.util.equalBySource(current, value)) {
-		                		if (current && current.auraType === "Value") {
-		                			current._setValue(value);
-		                			
-		                			// Preserve prior semantics that if something in the array is dirty then the entire array gets marked dirty
-		                			if (current.isDirty()) {
-		                				this.makeDirty();
-		                			}
-		                		}
-		                		
-		                		this.newArray.push(current);
-		                		
-		                		// Mark dirty if the positions are not equal
-		                		if (i !== j && !this.isDirty()) {
-		                			this.makeDirty();
-		                		}
-		                		
-		                		// Consume the candidate
-		                		candiates[j] = undefined;
-		                		found = true;
-		                		break;
-		                	}
-		                }
-		        	}
-		        	
-		            // Create a new value
-		            if (!found) {
-		            	this.push(value);
-		            }
-		        } 
 
-		        // Catch the case where we have a subset of the original values
-		        if (!this.isDirty() && (this.newArray.length !== candiates.length)) {
-		        	this.makeDirty();
-		        }
-        	} finally {
-	        	delete this["ignoreCommit"];
-	        }
+        if (aura.util.isArray(newArray)) {
+            for (var i = 0; i < newArray.length; i++) {
+                this.push(newArray[i]);
+            }
         } else {
-        	this.push(newArray);
+            this.push(newArray);
         }
-    } else {
-        this.makeDirty();
     }
 
-    // We always fire the change event even if nothing has changed because a number of places expect this 
-    // to trigger initialization of downstream behavior
     this.fireEvents = true;
     if (!skipChange) {
         this.fire("change");
@@ -252,9 +202,8 @@ ArrayValue.prototype._setValue = function(newArray, skipChange, doNotAutoDestroy
  * @param {Object} clean Do not use this internal-only parameter.
  */
 ArrayValue.prototype.commit = function(clean) {
-	// If we're in the middle of _setValue and a call to commit() happens we need to ignore it and not mess with
-	// this.newArray while mid _setValue() (this can happen under tests)
-	if (this.isDirty() && !this["ignoreCommit"]) {
+	if (this.isDirty()) {
+		 
 		if (this.array) {
 			if (!this.doNotAutoDestroy) {
 				// Auto destroy any orphaned items
@@ -288,7 +237,7 @@ ArrayValue.prototype.commit = function(clean) {
 		
         this.array = this.newArray;
         this.rollback(clean);
-	}
+    }
 };
 
 /**
@@ -343,19 +292,15 @@ ArrayValue.prototype.rollback = function(clean){
  * @param {Object} config The value for the new item. This can be either a literal JavaScript value or a value object.
  */
 ArrayValue.prototype.push = function(config) {
-    this.makeDirty();
-
-	var ar = this.getArray();
+    var ar = this.getArray();
 
     var value = valueFactory.create(config, null, this.owner);
     if (value.makeDirty) {
         value.makeDirty();
     }
-    
     ar.push(value);
-    
     this.hasRealValue = true;
-    
+    this.makeDirty();
     this.addValueHandlers(value);
 };
 
@@ -495,18 +440,15 @@ ArrayValue.prototype.isLiteral = function() {
  */
 ArrayValue.prototype.each = function(func, reverse) {
     var a = this.getArray();
-    
-    if (a) {
-	    var i;
-	    if (reverse) {
-	        for(i = a.length - 1; i >= 0; i--){
-	            func(a[i],i);
-	        }
-	    } else {
-	        for(i = 0; i < a.length; i++){
-	            func(a[i],i);
-	        }
-	    }
+    var i;
+    if (reverse) {
+        for(i = a.length - 1; i >= 0; i--){
+            func(a[i],i);
+        }
+    } else {
+        for(i = 0; i < a.length; i++){
+            func(a[i],i);
+        }
     }
 };
 
@@ -559,7 +501,7 @@ ArrayValue.prototype.destroy = function(async) {
     if (a) { // in case destroy is called twice
         var len = a.length;
         if (len > 0) {
-            if (this.referenceNode && this.owner.isValid()) {
+            if (this.referenceNode) {
                 // We need to inject a replacement reference node because our current one is about to be destroyed
                 var referenceNode = this.createLocator(" array locator (from destroy) " + this.owner);
                 $A.util.insertBefore(referenceNode, this.referenceNode);
@@ -612,7 +554,6 @@ ArrayValue.prototype.compare = function(arr) {
     if (arr && arr.auraType === "Value" && arr.toString() === "ArrayValue") {
         arr = arr.getArray();
     }
-    
     if (!aura.util.isArray(arr)) {
         return false;
     }
@@ -664,7 +605,7 @@ ArrayValue.prototype.addHandler = function(config){
         var value = values[i];
         BaseValue.addValueHandler(i, value, config);
     }
-    
+
     var handlers = this.handlers;
     if (!this.handlers){
         handlers = {};
@@ -703,9 +644,6 @@ ArrayValue.prototype.render = function(parent, insertElements){
     var rendered = {};
     this.rendered = rendered;
 
-    var prevReferenceNodes = [];
-    this.prevReferenceNodes = prevReferenceNodes;
-
     var referenceNode;
     var ret = [];
 
@@ -727,12 +665,7 @@ ArrayValue.prototype.render = function(parent, insertElements){
             ret.push(referenceNode);
         }
 
-        rendered[item.getGlobalId()] = { 
-    		refNode: referenceNode,
-    		index: i
-		};
-        
-        prevReferenceNodes[i] = referenceNode;
+        rendered[item.getGlobalId()] = referenceNode;
     }
 
     if (ret.length > 0) {
@@ -777,113 +710,51 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
     }
 
     var prevRendered = this.rendered || {};
-    var prevReferenceNodes = this.prevReferenceNodes || [];
     var rendered = {};
-        
     /** Since ArrayValue has no getElements, we'd better have rerender return them all */
     var elems = [];
 
+    //
     // These three variables are used to ensure that we do not lose our reference node when the
     // contents are removed. Basically, if the array is empty, we declare that we need a reference
     // node, and ensure that one is created if there were previously elements in the array. All
     // very complicated in the case where you do not have a parent node (which is the case here).
+    //
     var startReferenceNode = this.referenceNode;
     var firstReferenceNode = null;
     var needReference = false;
-    var item, info, globalId;
-    
     var referenceNode = (appendChild || !this.referenceNode) ? suppliedReferenceNode : this.referenceNode;
-    
     if (!this.isEmpty()) {
         var array = this.getArray();
         var len = array.length;
-        
-        
-        // DCHASMAN TODO Add surgical DOM repositioning for previously rendered components! Can we swap reference nodes? Reparent??
-        var positionChanges = false;
-        var previousIndex = 0;
         for (var j = 0; j < len; j++) {
-            item = array[j];
-        	
-            info = prevRendered[item.getGlobalId()];
-            if (info) {
-	            // Look for reordering - if the relative ordering of current items has been maintained between renderings we'll use inplace rerender
-	            if (info.index < previousIndex) {
-	            	positionChanges = true;
-	            	break;
-	            }
-	            
-	            previousIndex = info.index;
-            }
-        }
-        
-        if (positionChanges) {
+            var item = array[j];
 
-        	$A.log("Fragment based rerendering ", this);
-        	
-        	// Switch to fragment rerendering
-        	var parent = referenceNode.parentNode;
-        	var fragment = document.createDocumentFragment();
-        	
-            for (var j = 0; j < len; j++) {
-                item = array[j];
-                
-                if (item.isValid()) {
-	                globalId = item.getGlobalId();
-	                
-	                if (!item.isRendered()) {
-	                	prevRendered[globalId] = info = { 
-	                		refNode: null // DCHASMAN TODO Figure out the best way to get the ref node for this!
-	            		};
-	                	
-	                	$A.render(item);
-	                } else {
-		                info = prevRendered[globalId];
-	                }
-	
-	            	info.index = j;
-	
-	        		var elements = item.getElements();
-	        		var element = elements[0]; 
-	                if (element) {
-	                	var elementKey = 1;
-	                	do {
-							fragment.appendChild(element);
-	                		element = elements[elementKey++]; 
-	                	} while (element);
-	                } else {
-	                	element = elements["elements"];
-	                	if (element) {
-	                		fragment.appendChild(element);
-	                	}
-	                }
-	
-	                //$A.rerender(item);
-                }
+            if (!item["getDef"]) {
+                // FIXME: this kind of flexibility is dangerous.
+                // If someone passed a config in, construct it.
+                item = $A.componentService.newComponentDeprecated(item, null, false, true);
+
+                // And put the constructed component back into the array.
+                array[j] = item;
             }
 
-            parent.appendChild(fragment);
-
-        	return;
-        }
-        
-        for (j = 0; j < len; j++) {
-            item = array[j];
-
-            globalId = item.getGlobalId();
+            var globalId = item.getGlobalId();
             var itemReferenceNode;
             var itemElems;
-            
             if (!item.isRendered()) {
+                //
                 // If the item was not previously rendered, we render after the last element.
+                //
                 itemElems = $A.render(item);
-                
                 if (itemElems.length > 0) {
                     // Just use the last element as the reference node
                     itemReferenceNode = itemElems[itemElems.length - 1];
                 } else {
+                    //
                     // If nothing was rendered put in a placeholder so that we
                     // can find the element. (FIXME W-1835211: this needs tests -- is it removed?.)
+                    //
                     itemReferenceNode = this.createLocator(" item {rerendered, index:" + j + "} " + item);
                     itemElems.push(itemReferenceNode);
                 }
@@ -894,9 +765,8 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                 insertElements(itemElems, referenceNode, !appendChild, asFirst);
 
                 $A.afterRender(item);
-            } else {            	
+            } else {
                 itemElems = $A.rerender(item);
-                
                 // Find the item reference node.  We have prevRendered, but can't trust it: the
                 // elem might have rerendered away.  So, go hunting....
                 if (itemElems) {
@@ -914,33 +784,27 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                     }
                 }
             }
-            
-            // We have prevRendered, but can't trust it: the elem might have re/unrendered away.
+            // We have prevRendered, but can't trust it: the elem might have rerendered away.
             itemElems = item.getElements();
             itemReferenceNode = itemElems[0] ? itemElems[0] : itemElems['element'];
-            
             if (firstReferenceNode === null) {
                 firstReferenceNode = itemReferenceNode;
             }
-            
             itemElems = item.getElements();
             for (k = 0; itemElems[k]; ++k) {
                 elems.push(itemElems[k]);
             }
 
+            //
             // Next iteration of the loop will use this component's ref node as its "top"
             // FIXME W-1835211: this may remove elements...
+            //
             referenceNode = itemElems[k - 1];
             this.setReferenceNode(referenceNode);
 
             appendChild = false;
 
-            rendered[globalId] = { 
-        		refNode: itemReferenceNode,
-        		index: j
-    		};
-            
-            prevReferenceNodes[j] = itemReferenceNode;
+            rendered[globalId] = itemReferenceNode;
         }
     } else {
         needReference = true;
@@ -949,16 +813,17 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
     // Unrender components no longer in the array
     for (var key in prevRendered) {
         if (needReference) {
+            //
             // If we need a reference node (this only occurs when we have
             // nothing to render), make sure that we create one and put it
             // in the right spot. If there was nothing previously rendered
             // this isn't needed because we already have a locator.
+            //
             referenceNode = this.createLocator(" array locator " + this.owner);
             insertElements([referenceNode], startReferenceNode, true);
             firstReferenceNode = referenceNode;
             needReference = false;
         }
-
         if (!rendered[key]) {
             var c = $A.getCmp(key);
             if (c && c.isValid()) {
@@ -966,21 +831,20 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             }
         }
     }
-    
     if (elems.length === 0 && firstReferenceNode) {
-        // Symmetrically to render(), if there are no "real" elements, use the reference node.
+        // Symmetrically to render(), if there are no "real" elements, use the
+        // reference node.
         elems.unshift(firstReferenceNode);
     }
-    
     if (firstReferenceNode === null) {
         firstReferenceNode = startReferenceNode;
     }
-    
     this.setReferenceNode(firstReferenceNode);
-        
+    // Symmetrically to render(), if there aren't any "real" elements, use the locator comment
+    if (elems.length === 0 && firstReferenceNode) {
+        elems.unshift(firstReferenceNode);
+    }
     this.rendered = rendered;
-    this.prevReferenceNodes = prevReferenceNodes;
-    
     return elems;
 };
 

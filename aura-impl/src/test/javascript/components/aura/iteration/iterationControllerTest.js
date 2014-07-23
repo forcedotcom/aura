@@ -23,4 +23,257 @@ Test.Aura.Iteration.ControllerTest = function(){
 	ImportJson("aura.iteration.iterationController",function(path,result){
 		targetController=result;
 	});
+
+    [Fixture]
+    function rangeChange(){
+
+        [Fact]
+        function testRerenderCalled(){
+        	// Arrange
+        	var expected = true;
+        	var actual;
+
+        	var targetCmp;
+        	var targetEvent;
+        	var targetHelper={
+    			rerenderEverything:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}
+    		};
+
+        	// Act
+            targetController.rangeChange(targetCmp, targetEvent, targetHelper);
+
+			// Assert
+			Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function itemsChange(){
+    	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+    		getContext: function() {
+    			return {
+    				getMode: function() {
+    					return "";
+    				}
+    			}
+    		},
+    		
+    		mark: function(str){},
+    		
+            endMark: function(str){}    		            				
+        });
+
+    	[Fact, Skip("Need to understand this test relative to ValueWrapper changes")]
+        function testRerenderNotCalled(){
+        	// Arrange
+        	var expected = false;
+        	var actual;
+
+        	var targetCmp={
+    			getValue:function(val){
+    				if(val=='v.items') return false;
+    			}
+        	};
+
+        	var targetEvent={
+    			getParam:function(param){
+    				if(param=='value') return true;
+    			}
+        	};
+
+        	var targetHelper={
+    			rerenderEverything:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}
+    		};
+
+        	// Act
+        	mockContext(function(){	       
+			    targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+        	});
+
+			// Assert
+			Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testRerenderCalled(){
+        	// Arrange
+        	var expected = true;
+        	var actual;
+        	var passedinValue = {
+        	    isDifferentArray:function(){
+        	        return true;
+        	    }
+        	};
+        	var targetCmp={
+    			getValue:function(val){
+    				if(val=='v.items') return passedinValue;
+    			},
+    			getGlobalId:function(){
+    				return "";
+    			}
+        	};
+        	var targetEvent={
+    			getParam:function(param){
+    				if(param=='value') return passedinValue;
+    			}
+        	};
+        	var targetHelper={
+    			rerenderEverything:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}
+    		};
+            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+            	util: {
+            		isArray: function () {
+                        return true;
+                    }
+                },
+                
+                getContext: function() {
+        			return {
+        				getMode: function() {
+        					return "";
+        				}
+        			}
+        		},
+        		
+        		mark: function(str){},
+        		
+                endMark: function(str){}
+            });
+
+            // Act
+            mockAura(function(){
+    			targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+            });
+
+			// Assert
+			Assert.Equal(expected, actual);
+        }
+
+        [Fact, Skip("JBUCH: Need to understand this test in context of HALO")]
+        function testRerenderSelectiveCalled(){
+        	// Arrange
+        	var expected = true;
+        	var actual;
+
+        	var passedinValue = {
+        	    isDifferentArray:function(){
+        	        return false;
+        	    }
+        	};
+        	var targetCmp={
+    			getValue:function(val){
+    				if(val=='v.items') return passedinValue;
+    			}
+        	};
+
+        	var targetEvent={
+    			getParam:function(param){
+    				if(param=='value') return passedinValue;
+    			}
+        	};
+
+        	var targetHelper={
+                rerenderSelective:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}
+    		};
+
+        	// Act
+        	mockContext(function(){
+			    targetController.itemsChange(targetCmp, targetEvent, targetHelper);
+        	});
+
+			// Assert
+			Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function firstRender(){
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+    		getContext: function() {
+    			return {
+    				getMode: function() {
+    					return "";
+    				}
+    			}
+    		},
+    		
+    		mark: function(str){},
+    		
+            endMark: function(str){}       		            				
+        });
+
+    	[Fact]
+        function testRerenderNotCalled(){
+        	// Arrange
+        	var expected = false;
+        	var actual;
+
+        	var targetRealBody=[''];
+
+        	var targetCmp={
+    			get:function(val){
+    				if(val=='v.realbody') return targetRealBody;
+    			}
+        	};
+
+        	var targetEvent;
+
+        	var targetHelper={
+    			rerenderEverything:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}
+    		};
+
+        	// Act
+        	mockContext(function(){
+			    targetController.firstRender(targetCmp, targetEvent, targetHelper);
+        	});
+
+			// Assert
+			Assert.Equal(expected, actual);
+        }
+
+    	[Fact]
+        function testRerenderCalled(){
+        	// Arrange
+        	var expected = true;
+        	var actual;
+
+        	var targetRealBody=[];
+
+        	var targetCmp={
+    			get:function(val){
+    				if(val=='v.realbody') return targetRealBody;
+    			},
+    			getGlobalId:function(){
+    				return "";
+    			}
+        	};
+
+        	var targetEvent;
+
+        	var targetHelper={
+    			rerenderEverything:function(cmp){
+    				if(cmp == targetCmp) actual = true;
+    			}
+    		};
+
+        	// Act
+        	mockContext(function(){
+			    targetController.firstRender(targetCmp, targetEvent, targetHelper);
+        	});
+
+			// Assert
+			Assert.Equal(expected, actual);
+        }
+    }
 }

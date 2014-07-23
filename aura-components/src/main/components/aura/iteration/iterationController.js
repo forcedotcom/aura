@@ -15,21 +15,30 @@
  */
 ({
     rangeChange: function(cmp, evt, helper) {
-        helper.updateRealBody(cmp);
+        helper.rerenderEverything(cmp);
     },
 
     itemsChange: function(cmp, evt, helper) {
-        var v = evt.getParam("value");
+        //$A.mark("itemChange starts but before rerenderEverything " + cmp.getGlobalId());
         
+        var v = evt.getParam("value");
         //JBUCH: FIXME: THIS IS A HUGE WRONG: THIS IS FIRING WHEN ATTRIBUTES OTHER THAN ITEMS ARE CHANGED
         if($A.util.isArray(v)){
-            helper.updateRealBody(cmp);
+            if (v === cmp._items) {
+                //$A.endMark("itemChange starts but before rerenderEverything " + cmp.getGlobalId());
+                $A.mark("iteration rerenderEverything " + cmp.getGlobalId());
+                helper.rerenderSelective(cmp);
+            } else {
+                helper.rerenderEverything(cmp);
+                cmp._items = v;
+            }
         }
     },
 
     firstRender: function(cmp, evt, helper) {
         if (cmp.get("v.realbody").length === 0) {
-            helper.updateRealBody(cmp);
+            $A.mark("rerenderEverything in firstRender " + cmp.getGlobalId());
+            helper.rerenderEverything(cmp);
         }
     }
 })

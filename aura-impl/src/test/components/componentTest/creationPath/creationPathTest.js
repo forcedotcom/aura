@@ -173,10 +173,10 @@
             $A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations not reduced");
         }, function(cmp) {
             // client created
-            this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
+            this.assertCreationPath(cmp.find("iterinst")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "client created");
+            this.assertCreationPath(cmp.find("iterinst")[1], "client created");
+            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "client created");
         }]
     },
 
@@ -207,8 +207,12 @@
             });
             $A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
         }, function(cmp) {
-            this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
+            // DCHASMAN TODO W-2164228 Reintroduce validation of smart rerendering of arrays into tests
+            this.assertCreationPath(cmp.find("iterinst")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "client created");
+            //this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
+            //this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
+            
             
             this.assertCreationPath(cmp.find("iterinst")[1], "client created");
             this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "client created");
@@ -228,10 +232,15 @@
             	});
             $A.test.addWaitForWithFailureMessage(4, function(){return cmp.find("iterinst").length}, "number of iterations didn't increment");
         }, function(cmp) {
-            this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
+            // DCHASMAN TODO W-2164228 Reintroduce validation of smart rerendering of arrays into tests
+            this.assertCreationPath(cmp.find("iterinst")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "client created");
+            this.assertCreationPath(cmp.find("iterinst")[1], "client created");
+            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "client created");
+            //this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
+            //this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
+            //this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
+            //this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
             
             this.assertCreationPath(cmp.find("iterinst")[2], "client created");
             this.assertCreationPath(cmp.find("iterinst")[2].find("output"), "client created");

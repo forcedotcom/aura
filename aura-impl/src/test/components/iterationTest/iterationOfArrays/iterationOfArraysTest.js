@@ -18,20 +18,9 @@
         if (!$A.util.isArray(nodes)){
             nodes = [nodes];
         }
-        
         for(var i = 0; i < nodes.length; i++){
             $A.test.assertTrue($A.test.isNodeDeleted(nodes[i]), "node was not deleted: " + nodes[i]);
             $A.test.assertEquals(undefined, $A.getCmp(nodes[i].getAttribute("data-aura-rendered-by")), "parent component not destroyed");
-        }
-    },
-
-    assertNodesNotDeleted : function(nodes){
-        if (!$A.util.isArray(nodes)){
-            nodes = [nodes];
-        }
-        
-        for(var i = 0; i < nodes.length; i++){
-            $A.test.assertFalse($A.test.isNodeDeleted(nodes[i]), "node was deleted: " + nodes[i]);
         }
     },
 
@@ -51,7 +40,6 @@
             // set to another ArrayValue
             cmp.get("c.setCapitalItems").runDeprecated();
             this.assertNodesDeleted(children);
-            
             children = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(3, children.length);
             $A.test.assertEquals("6:GGGGG", $A.test.getText(children[0]));
@@ -135,7 +123,6 @@
             $A.test.assertEquals("11:lll", $A.test.getText(children[2]));
 
             cmp.set("v.toChange", 10);
-            
             cmp.get("c.deleteOneValue").runDeprecated();
 
             var newchildren = $A.test.getNonCommentNodes(container.childNodes);
@@ -160,11 +147,8 @@
             $A.test.assertEquals("11:lll", $A.test.getText(children[0]));
 
             cmp.set("v.start", 9);
-                        
-            this.assertNodesNotDeleted(children);
-            
+            this.assertNodesDeleted(children);
             children = $A.test.getNonCommentNodes(container.childNodes);
-            
             $A.test.assertEquals(3, children.length);
             $A.test.assertEquals("9:jjj", $A.test.getText(children[0]));
             $A.test.assertEquals("10:kkk", $A.test.getText(children[1]));
@@ -187,10 +171,7 @@
             $A.test.assertEquals("9:jjj", $A.test.getText(children[2]));
 
             cmp.set("v.end", 8);
-            
-            this.assertNodesNotDeleted(children[0]);
-            this.assertNodesDeleted(children.slice(1));
-            
+            this.assertNodesDeleted(children);
             children = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(1, children.length);
             $A.test.assertEquals("7:hhh", $A.test.getText(children[0]));

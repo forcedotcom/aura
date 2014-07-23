@@ -30,10 +30,9 @@
     },
 
     changeOneValue: function(cmp, evt) {
-    	var iter = cmp.find("iteration");
-    	var data = iter.get("v.items");
-        data[cmp.get("v.tochange")] = {stringy: cmp.get("v.newvalue") }
-    	iter.set("v.items", data)
+    	var data = cmp.find("iteration").get("v.items");
+    	data[cmp.get("v.tochange")]["stringy"] = cmp.get("v.newvalue");
+    	cmp.find("iteration").set("v.items", data)
     },
 
     pushOneValue: function(cmp, evt) {

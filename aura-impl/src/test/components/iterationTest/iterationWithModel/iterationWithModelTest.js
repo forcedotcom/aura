@@ -27,10 +27,11 @@
             $A.run(function(){
                 cmp.get("addRow").get("e.press").fire();
                 cmp.get("addRow").get("e.press").fire();
+                cmp.get("addRow").get("e.press").fire();
             });
 
             // Wait for 5 elements- 3 original plus 2 added
-            $A.test.addWaitFor(5, function() {
+            $A.test.addWaitFor(6, function() {
                 return cmp.find("innerCmp").length;
             }, function() {
                 cmps = cmp.find("innerCmp");
@@ -39,6 +40,7 @@
                 $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[2].getElement()));
                 $A.test.assertStartsWith("new! : readonly", $A.util.getText(cmps[3].getElement()));
                 $A.test.assertStartsWith("new! : readonly", $A.util.getText(cmps[4].getElement()));
+                $A.test.assertStartsWith("new! : readonly", $A.util.getText(cmps[5].getElement()));
             });
             
         }

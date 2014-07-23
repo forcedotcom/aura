@@ -156,17 +156,24 @@
 			return "pick(" + this.sourceIndex + ") to " + this.targetIndex;
 		}
 
-		function CreateOperation(index, item) {
+		function CreateOperation(index, item, cmp) {
 			this.index = index;
 			this.item = item;
-		}
-
-		CreateOperation.prototype.run = function(cmp) {
+			
 			if (cmp._pendingCreates) {
 				cmp._pendingCreates.push(this);
 			} else {
 				cmp._pendingCreates = [this];
 			}
+		}
+
+		CreateOperation.prototype.run = function(cmp) {
+			if (this.running) {
+				// Create is mid flight just return and wait for the operation to complete
+				return;
+			} 
+			
+			this.running = true;
 			
 			var that = this;
 			var items = cmp.get("v.items")
@@ -177,9 +184,7 @@
 					cmp._pendingCreates.splice(i, 1);
 				}
 				
-				if (cmp._pendingCreates.length === 0) {
-					delete cmp._pendingCreates;
-				}
+				this.running = false;
 			});
 		}
 
@@ -214,9 +219,9 @@
 					var op = pendingCreates[n];
 					if (op.item === item) {
 						op.index = i;
-
+						
 						operations.push(op);
-
+						
 						// Consume the item
 						pendingCreates.splice(n, 1);
 						found = true;
@@ -226,12 +231,10 @@
 			
 			if (!found) {
 				// Add a create to the list operations to be satisfied
-				operations.push(new CreateOperation(i, item));
+				operations.push(new CreateOperation(i, item, cmp));
 			}
 		}
 		
-		$A.log("operations", operations)
-
 		return operations;
 	},
 
@@ -240,11 +243,9 @@
 
 		cmp.set("v.realbody", realbody);
 		
-
 		// DCHASMAN TODO Rename this horrible misnomer that has nothing to do with rendering and everything to do with updating the contents of the iteration!!!
 		cmp.getEvent("rerenderComplete").fire();
 
-		
 		// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
 		//$A.renderingService.removeDirtyValue(cmp.getValue("v.realbody"));
 	},

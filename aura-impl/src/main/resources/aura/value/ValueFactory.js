@@ -20,7 +20,13 @@
 var valueFactory = { 
     create: function create(valueConfig, def, component) {
         if (aura.util.isObject(valueConfig)) {
-            if (valueConfig.auraType) {
+        	if (valueConfig.getSourceValue) {
+        		// Object is already wrapped by a MapValue
+        		return valueConfig.getSourceValue();
+        	} else if (valueConfig._arrayValueRef) {
+        		// Object is already wrapped by an ArrayValue
+        		return valueConfig._arrayValueRef;
+        	} else if (valueConfig.auraType) {
                 if (valueConfig.auraType === "ActionDef") {
                     return new ActionReferenceValue(valueConfig, def, component);
                 }

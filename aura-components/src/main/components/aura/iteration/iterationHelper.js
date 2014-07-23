@@ -231,7 +231,7 @@
 		}
 		
 		$A.log("operations", operations)
-		
+
 		return operations;
 	},
 

@@ -46,8 +46,8 @@
         $A.mark("infiniteList handleDataChange " + cmp.getGlobalId());
         
         var concrete = cmp.getConcreteComponent();
-    	var newData = evt.getParam("data"),
-    		actualItems = concrete.get("v.items")||[];
+    	var newData = evt.getParam("data") || [],
+    		actualItems = concrete.get("v.items") || [];
         
         for (var i = 0, len = newData.length; i < len; i++) {
             actualItems.push(newData[i]);

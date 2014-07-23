@@ -112,10 +112,8 @@ public class BaseInputSelectUI extends WebDriverTestCase{
     }
 
     private void selectOption(String optionLabel) {
-        //String elm = String.format(OPTION_LOCATOR_STRING, optionLabel);
-        //findDomElement(By.xpath(elm)).click();     
-        
-        getInputSelect().selectByValue(optionLabel);  
+        Select inputSelect = getInputSelect();
+		inputSelect.selectByValue(optionLabel);  
         verifyOptionSelected(optionLabel);
     }
 

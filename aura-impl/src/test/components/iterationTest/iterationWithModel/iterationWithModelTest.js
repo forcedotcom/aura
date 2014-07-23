@@ -28,6 +28,7 @@
                 cmp.get("addRow").get("e.press").fire();
                 cmp.get("addRow").get("e.press").fire();
             });
+
             // Wait for 5 elements- 3 original plus 2 added
             $A.test.addWaitFor(5, function() {
                 return cmp.find("innerCmp").length;
@@ -86,9 +87,7 @@
                 return cmp.find("innerCmp").length;
             }, function() {
                 // 8 total renders, 6 for initial load, 1 additional for each iteration
-                
-               	// DCHASMAN TODO W-2164228 Reintroduce validation of smart rerendering of arrays into tests
-                $A.test.assertEquals(14, window.__testRenderCount, "Unexpected number of total items loaded after adding to list.");
+                $A.test.assertEquals(8, window.__testRenderCount, "Unexpected number of total items loaded after adding to list.");
             });
         }
     },

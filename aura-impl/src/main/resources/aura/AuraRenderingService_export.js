@@ -18,5 +18,7 @@ exp(renderingService,
     "render", renderingService.render,
     "afterRender", renderingService.afterRender,
     "rerender", renderingService.rerender,
-    "unrender", renderingService.unrender
+    "unrender", renderingService.unrender,
+    "requestRerender", renderingService.requestRerender,
+    "removeDirtyValue", renderingService.removeDirtyValue
 );

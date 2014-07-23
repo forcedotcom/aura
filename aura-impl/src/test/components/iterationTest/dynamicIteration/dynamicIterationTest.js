@@ -24,6 +24,15 @@
         }
     },
 
+    assertNodesNotDeleted : function(nodes){
+        if (!$A.util.isArray(nodes)){
+            nodes = [nodes];
+        }
+        for(var i = 0; i < nodes.length; i++){
+            $A.test.assertFalse($A.test.isNodeDeleted(nodes[i]), "node was deleted: " + nodes[i]);
+        }
+    },
+
     /**
      * Setting iteration items value to another ArrayValue will rerender all the content.
      */
@@ -57,8 +66,7 @@
     /**
      * Updating a single item in an iteration's items, does not update the other items
      */
-    //W-2312861
-    _testUpdateOneItem:{
+    testUpdateOneItem:{
         attributes:{ start:9, end:12 },
         test:function(cmp){
             var container = cmp.find("container").getElement();
@@ -152,7 +160,8 @@
             $A.test.assertEquals("11:lll", $A.test.getText(children[0]));
 
             cmp.set("v.start", 9);
-            this.assertNodesDeleted(children);
+            this.assertNodesNotDeleted(children);
+
             children = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(3, children.length);
             $A.test.assertEquals("9:jjj", $A.test.getText(children[0]));
@@ -176,7 +185,10 @@
             $A.test.assertEquals("9:jjj", $A.test.getText(children[2]));
 
             cmp.set("v.end", 8);
-            this.assertNodesDeleted(children);
+            
+            this.assertNodesNotDeleted(children[0]);
+            this.assertNodesDeleted(children.slice(1));
+
             children = $A.test.getNonCommentNodes(container.childNodes);
             $A.test.assertEquals(1, children.length);
             $A.test.assertEquals("7:hhh", $A.test.getText(children[0]));

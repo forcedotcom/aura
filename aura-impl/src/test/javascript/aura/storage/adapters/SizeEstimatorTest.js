@@ -29,7 +29,12 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             NumberFormat: {},
             $A: {
                 log: function() {},
-                util: { isArray: function(value) { return Array.isArray(value); }} 
+                util: {
+                    isArray: function(value) { return Array.isArray(value); },
+                    json: {
+                        encode: function(v) { return JSON.stringify(v); }
+                    }
+                }
             },
             navigator: { userAgent:'' }
         })(function(){
@@ -45,7 +50,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             var target = new SizeEstimator();
             result = target.estimateSize(value);
         });
-        
+
         Assert.Equal(expectedSize, result);
     }
 
@@ -72,7 +77,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             var expected = 8;
             checkEstimateSize(value, expected);
         }
-        
+
         [Fact]
         function estimateNull() {
             var value = null;

@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 ({
-    rerender: function(cmp, helper) {
-    	var ret = this.superRerender();
-        helper.setVisible(cmp);
-        return ret;
-    },
-    
     afterRender: function(cmp, helper) {
         helper.setVisible(cmp);
     }

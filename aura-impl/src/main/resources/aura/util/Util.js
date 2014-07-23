@@ -1207,20 +1207,9 @@ if (!!Function.prototype.bind) {
  * @returns {Array} of key {String}s. 
  */
 if (!!(Object && Object.keys)) {
-    $A.ns.Util.prototype.keys = function(object, excludeFunctions) {
-    	var allKeys = Object.keys(object);
-    	var keys = [];
-    	for (var n = 0; n < allKeys.length; n++) {
-    		var key = allKeys[n];
-    		if (!excludeFunctions || typeof (object[key]) !== "function") {
-    			keys.push(key);
-    		}
-    	}
-    	
-    	return keys;
-    };
+    $A.ns.Util.prototype.keys = Object.keys;
 } else {
-    $A.ns.Util.prototype.keys = function(object, excludeFunctions) {
+    $A.ns.Util.prototype.keys = function(object) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
         
         var isAnyObjectType = !util.isObject(object)
@@ -1233,7 +1222,7 @@ if (!!(Object && Object.keys)) {
         
         var keys = [], key;
         for (key in object) {
-            if (Object.prototype.hasOwnProperty.call(object, key) && (excludeFunctions || typeof (object[key]) !== "function")) {
+            if (Object.prototype.hasOwnProperty.call(object, key)) {
                 keys.push(key);
             }
         }
@@ -1759,31 +1748,6 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
  */
 $A.ns.Util.prototype.estimateSize = function(obj) {
     return this.sizeEstimator.estimateSize(obj);
-};
-
-/**
- * Attempt to track back to the underlying value object 
- *
- * @param {Object} lhs The first object to check.
- * @param {Object} rhs The second object to check.
- */
-$A.ns.Util.prototype.equalBySource = function(lhs, rhs) {
-	if (lhs && rhs) {
-	    // Find the value objects
-	    if (lhs instanceof SimpleValue) {
-	    	lhs = lhs.getValue();
-	    } else {
-	    	lhs = (lhs.getSourceValue && lhs.getSourceValue()) || lhs._arrayValueRef || lhs;
-	    }
-	    
-	    if (rhs instanceof SimpleValue) {
-	    	rhs = rhs.getValue();
-	    } else {
-	    	rhs = (rhs.getSourceValue && rhs.getSourceValue()) || rhs._arrayValueRef || rhs;
-	    }
-	}
-    
-    return lhs === rhs;
 };
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

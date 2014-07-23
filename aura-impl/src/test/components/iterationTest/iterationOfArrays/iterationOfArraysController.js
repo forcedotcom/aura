@@ -26,26 +26,14 @@
 
     setCapitalItems: function(cmp, evt) {
         var other = cmp.get("m.capitaldata");
-        var iter = cmp.find("iteration");
-        iter.set("v.items", other);
-    },
-
-    reverseItems: function(cmp, evt) {
-        var iter = cmp.find("iteration");
-        var items = iter.get("v.items");
-        
-        var reversed = items.reverse();
-
-        iter.set("v.items", reversed);
+        cmp.find("iteration").set("v.items", other);
     },
 
     changeOneValue: function(cmp, evt) {
         var index = cmp.get("v.tochange");
         var iter = cmp.find("iteration");
-        
         var data = iter.get("v.items");
         data[index] = {stringy: cmp.get("v.newvalue") }
-        
         iter.set("v.items", data);
     },
 

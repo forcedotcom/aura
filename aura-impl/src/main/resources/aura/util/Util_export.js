@@ -79,9 +79,8 @@ exp(p,
     "filter", p.filter,
     "keys", p.keys,
     "bind", p.bind,
-    "includeScript", p.includeScript,
-    "equalBySource", p.equalBySource
-    
+    "includeScript", p.includeScript
+
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	    ,
 	    "getDebugToolComponent", p.getDebugToolComponent,

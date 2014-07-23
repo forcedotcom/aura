@@ -162,7 +162,11 @@
 		}
 
 		CreateOperation.prototype.run = function(cmp) {
-			cmp._pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.push(this) : [this];
+			if (cmp._pendingCreates) {
+				cmp._pendingCreates.push(this);
+			} else {
+				cmp._pendingCreates = [this];
+			}
 			
 			var that = this;
 			var items = cmp.get("v.items")
@@ -184,6 +188,7 @@
 		}
 
 		var itemInfos = this.getItemTracking(cmp).slice();
+		var pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.slice() : undefined;
 		var operations = [];
 
 		for (var i = start; i < end; i++) {
@@ -204,12 +209,16 @@
 			}
 
 			// Check to see if we already have a pending create and update its target index
-			if (!found && cmp._pendingCreates) {
-				for (var n = 0; n < cmp._pendingCreates.length; n++) {
-					var op = cmp._pendingCreates[n];
+			if (!found && pendingCreates) {
+				for (var n = 0; n < pendingCreates.length; n++) {
+					var op = pendingCreates[n];
 					if (op.item === item) {
 						op.index = i;
+
 						operations.push(op);
+
+						// Consume the item
+						pendingCreates.splice(n, 1);
 						found = true;
 					}
 				}
@@ -220,6 +229,8 @@
 				operations.push(new CreateOperation(i, item));
 			}
 		}
+		
+		$A.log("operations", operations)
 		
 		return operations;
 	},

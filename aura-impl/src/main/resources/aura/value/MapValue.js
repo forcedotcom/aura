@@ -80,9 +80,11 @@ var RawMapValue = function(source) {
 
 	// We are specifically using the closure based approach to private variables to avoid issues with code that for/in's on the "raw" object (space for safety
 	// tradeoff)
-	this.getSourceValue = function() {
-		return source;
-	};
+	this.getSourceValue = function(_source) { 
+		return function() {
+			return _source;
+		};
+	}(source);
 };
 
 RawMapValue.prototype.hasOwnProperty = function(name) {
@@ -545,6 +547,10 @@ MapValue.prototype.contains = function(key) {
  * @private
  */
 MapValue.prototype.copyHandlers = function(oldvalue, newvalue) {
+	if (!oldvalue) {
+		return;
+	}
+	
 	var k;
 	var oldHandlers;
 

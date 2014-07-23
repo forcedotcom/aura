@@ -1,0 +1,10 @@
+<aura:component>
+	<aura:attribute name="items" type="List"/>
+	<aura:attribute name="cdr" type="Aura.ComponentDefRef[]">
+		<li>{!thing}</li>
+	</aura:attribute>
+
+	<ul>
+		<aura:iteration items="{!v.items}" var="thing" body="{!v.cdr}"/>
+	</ul>
+</aura:component>

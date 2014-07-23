@@ -327,33 +327,57 @@ $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProv
  * @return {Object} {{configuration: {}, definition: ComponentDef, descriptor: String}}
  */
 $A.ns.AuraComponentService.prototype.getComponentConfigs = function(config, attributeValueProvider) {
-    if(config && $A.util.isString(config)){
-        config = {"componentDef": config};
+	var configuration, configAttributes, def, desc, configKey, attributeKey; 
+	
+	// Given a string input, expand the config to be an object.
+	if (config && $A.util.isString(config)) {
+		config = { "componentDef" : config };
     }
+	
+    // When a valueProvider is specified, perform a shallow 
+    // clone of the config to preserve the original attributes. 
+	if (attributeValueProvider) {
+		configuration = {};
 
-    if (attributeValueProvider) {
-        if(!config["attributes"]){
-            config["attributes"] = {};
-        }
+		// Copy top-level keys to new config.
+		for (configKey in config) {
+			if (config.hasOwnProperty(configKey)) {
+				configuration[configKey] = config[configKey];
+			}
+		}
+		
+		// Prepare new 'attributes' object.
+		configAttributes = config['attributes'];
+		configuration['attributes'] = {};
+		
+		// Copy attributes to prevent 'valueProvider' from mutating the original config. 
+		if (configAttributes) {
+			for (attributeKey in configAttributes) {
+				if (configAttributes.hasOwnProperty(attributeKey)) {
+					configuration['attributes'][attributeKey] = configAttributes[attributeKey];
+				}
+			}
+		}
+		
+		// Safe to attach valueProvider reference onto new object.
+		configuration['attributes']['valueProvider'] = attributeValueProvider;
+	} else {
+		configuration = config;
+	}
+	
+    // Resolve the definition and descriptor.
+	def = this.getDef(configuration["componentDef"], true);
 
-        config["attributes"]["valueProvider"] = attributeValueProvider;
-    }
-
-    var def;
-    var desc;
-
-    def = this.getDef(config["componentDef"], true);
-
-    if(def){
+    if (def) {
         desc = def.getDescriptor().toString();
-    }else{
-        desc = config["componentDef"]["descriptor"]? config["componentDef"]["descriptor"] : config["componentDef"];
+    } else {
+        desc = configuration["componentDef"]["descriptor"] ? configuration["componentDef"]["descriptor"] : configuration["componentDef"];
     }
-
+	
     return {
-        "configuration": config,
-        "definition": def,
-        "descriptor": desc
+        "configuration"	: configuration,
+        "definition"	: def,
+        "descriptor"	: desc
     };
 };
 

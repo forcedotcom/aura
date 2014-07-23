@@ -217,7 +217,7 @@
 			if (!found && pendingCreates) {
 				for (var n = 0; n < pendingCreates.length; n++) {
 					var op = pendingCreates[n];
-					if (op.item === item) {
+					if ($A.util.equalBySource(item, op.item)) {
 						op.index = i;
 						
 						operations.push(op);
@@ -256,7 +256,7 @@
 		var indexVar = cmp.get("v.indexVar");
 
 		var operations = this.getTransformation(cmp, items, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
-		
+				
 		this.resetItemTracking(cmp);
 		for (var n = 0; n < operations.length; n++) {
 			operations[n].run(cmp);

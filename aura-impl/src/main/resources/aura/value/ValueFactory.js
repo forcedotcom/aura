@@ -22,10 +22,18 @@ var valueFactory = {
         if (aura.util.isObject(valueConfig)) {
         	if (valueConfig.getSourceValue) {
         		// Object is already wrapped by a MapValue
-        		return valueConfig.getSourceValue();
+        		var sourceMap = valueConfig.getSourceValue();
+        		
+        		sourceMap._setValue(valueConfig);
+        		
+        		return sourceMap;
         	} else if (valueConfig._arrayValueRef) {
         		// Object is already wrapped by an ArrayValue
-        		return valueConfig._arrayValueRef;
+        		var sourceArray = valueConfig._arrayValueRef;
+        		        		
+        		sourceArray._setValue(valueConfig);
+        		
+        		return sourceArray;
         	} else if (valueConfig.auraType) {
                 if (valueConfig.auraType === "ActionDef") {
                     return new ActionReferenceValue(valueConfig, def, component);

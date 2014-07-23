@@ -844,12 +844,7 @@ Component.prototype._setValue = function(key, value){
         $A.error("Invalid key "+key);
         return;
     }
-    
     v._setValue(value);
-    
-    if (v.isDirty()) {
-    	$A.renderingService.requestRerender(this, key);
-    }
 };
 
 
@@ -908,10 +903,6 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     }
 
     v._setValue(value, ignoreChanges);
-    
-    if (v.isDirty()) {
-    	$A.renderingService.requestRerender(this, key);
-    }
 };
 
 /**

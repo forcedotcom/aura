@@ -75,6 +75,7 @@
 
     /**
      * Verify Component.isValid() returns false after a component has been asynchronously destroyed.
+     * note that we force destroy to be sync under test mode : W-1927159. this test is the same as above one now
      */
     testIsValidAsynchronousDestroy: {
         test: function(cmp) {

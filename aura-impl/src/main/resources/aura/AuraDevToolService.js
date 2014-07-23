@@ -1200,7 +1200,7 @@ var AuraDevToolService = function() {
         	     */
         	    checkForInputDefaultError : function (domElem){
         	    	var accessAideFuncs = aura.devToolService.accessbilityAide;
-        	    	var inputErrorMsg   = "​Error message for input field should be associated with the input control by using aria-describedby.";        	        
+        	    	var inputErrorMsg = "Error message for input field should be associated with the input control by using aria-describedby.";        	        
         	    	var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));       	    	
         	    	return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
         	    }

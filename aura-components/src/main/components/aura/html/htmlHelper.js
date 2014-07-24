@@ -193,7 +193,6 @@
                     case 'touchend':
                     case 'pointerup':
                     case 'MSPointerUp':
-                    case 'click':
                         this.onClick(event);
                         break;
                     }
@@ -217,12 +216,15 @@
                 },
                 onClick : function(event) {
                     event.stopPropagation();
-                    this.reset();
+                    event.preventDefault();
+                    this.element.focus();
+
                     this.handler(event);
 
                     if (event.type == gesture.end) {
                         FastClick.preventGhostClick(this.startX, this.startY);
                     }
+                    this.reset();
                 },
                 reset : function() {
                     $A.util.removeOn(this.element, gesture.end, this, false);

@@ -29,7 +29,7 @@
     
     <aura:handler name="showMore" action="{!c.showMore}"/>
 
-	<ul class="{!v.class}">
+	<ul aura:id="ul" class="{!v.class}">
 		<aura:iteration items="{!v.items}" 
 						var="{!v.itemVar}" 
 						body="{!v.itemTemplate}" 

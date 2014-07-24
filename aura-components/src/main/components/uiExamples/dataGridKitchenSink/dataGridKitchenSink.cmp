@@ -18,7 +18,7 @@
 <aura:component>
     <aura:attribute name="mode" type="String" default="VIEW"/>
     <aura:attribute name="sortBy" type="String"/>
-    <aura:attribute name="pageSize" type="Integer" default="200"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
     <aura:attribute name="totalItems" type="Integer"/>
     <aura:attribute name="index" type="Integer"/>

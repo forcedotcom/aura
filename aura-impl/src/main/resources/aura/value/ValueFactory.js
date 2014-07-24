@@ -20,21 +20,24 @@
 var valueFactory = { 
     create: function create(valueConfig, def, component) {
         if (aura.util.isObject(valueConfig)) {
+            var source = undefined;
         	if (valueConfig.getSourceValue) {
         		// Object is already wrapped by a MapValue
-        		var sourceMap = valueConfig.getSourceValue();
-        		
-        		sourceMap._setValue(valueConfig);
-        		
-        		return sourceMap;
-        	} else if (valueConfig._arrayValueRef) {
-        		// Object is already wrapped by an ArrayValue
-        		var sourceArray = valueConfig._arrayValueRef;
-        		        		
-        		sourceArray._setValue(valueConfig);
-        		
-        		return sourceArray;
-        	} else if (valueConfig.auraType) {
+                source = valueConfig.getSourceValue();
+            } else if (valueConfig._arrayValueRef) {
+                // Object is already wrapped by an ArrayValue
+                source = valueConfig._arrayValueRef;
+            }
+            // If we have an existing wrapper OWNED BY THE RIGHT COMPONENT,
+            // then this is really a fancy setValue, not a new creation.
+            // But if it's a different component, we do need a new wrapper.
+            if (source && source.owner === component) {
+                source._setValue(valueConfig);
+                return source;
+            }
+
+            // If we get to here, we need a new wrapper of some sort....
+            if (valueConfig.auraType) {
                 if (valueConfig.auraType === "ActionDef") {
                     return new ActionReferenceValue(valueConfig, def, component);
                 }

@@ -20,12 +20,17 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.def.*;
-import org.auraframework.test.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.adapter.TestLoggingAdapter;
 import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.openqa.selenium.By;
 
@@ -102,6 +107,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertViolatedDirective(cspReport, "style-src 'self'");
     }
 
+    @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
     public void testReportClientRenderedIframe() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -124,6 +130,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertViolatedDirective(cspReport, "default-src 'self'");
     }
 
+    @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
     public void testReportServerRenderedIframe() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -165,7 +172,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
 
         // generate an intentional csp report
         auraUITestingUtil
-        .getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
+                .getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
 
         List<Map<String, Object>> logs = getCspReportLogs(1);
         @SuppressWarnings("unchecked")
@@ -189,7 +196,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
                                 +
                                 "<script src='http://www2.sfdcstatic.com/common/assets/js/min/footer-min.js'></script>"
                                 +
-                        "</aura:set>"));
+                                "</aura:set>"));
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag,
@@ -225,34 +232,34 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         HelperDef.class);
         addSourceAutoCleanup(
-                helperDesc,     
+                helperDesc,
                 "{createHttpRequest: function() {\n" +
-                "    if (window.XMLHttpRequest) {\n" +
-                "        return new XMLHttpRequest();\n" +
-                "    } else if (window.ActiveXObject) {\n" +
-                "        try {\n" +
-                "            return new ActiveXObject(\"Msxml2.XMLHTTP\");\n" +
-                "        } catch (e) {\n" +
-                "            try {\n" +
-                "                return new ActiveXObject(\"Microsoft.XMLHTTP\");\n" +
-                "            } catch (ignore) {\n" +
-                "            }\n" +
-                "        }\n" +
-                "    }\n" +
-                "    return null;\n" +
-                "},\n" +
-                "request: function(url) {\n" +
-                "     var request = this.createHttpRequest();\n" +
-                "     request.open(\"GET\", url, true);\n" +
-                "     request[\"onreadystatechange\"] = function() {\n" +
-                "     if (request[\"readyState\"] == 4 && processed === false) {\n" +
-                "             processed = true;\n" +
-                "         console.log(\"from action callback\");\n" +
-                "         }\n" +
-                "     };\n" +
-                "     request.send();\n" +
-                "}}");
-        
+                        "    if (window.XMLHttpRequest) {\n" +
+                        "        return new XMLHttpRequest();\n" +
+                        "    } else if (window.ActiveXObject) {\n" +
+                        "        try {\n" +
+                        "            return new ActiveXObject(\"Msxml2.XMLHTTP\");\n" +
+                        "        } catch (e) {\n" +
+                        "            try {\n" +
+                        "                return new ActiveXObject(\"Microsoft.XMLHTTP\");\n" +
+                        "            } catch (ignore) {\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    return null;\n" +
+                        "},\n" +
+                        "request: function(url) {\n" +
+                        "     var request = this.createHttpRequest();\n" +
+                        "     request.open(\"GET\", url, true);\n" +
+                        "     request[\"onreadystatechange\"] = function() {\n" +
+                        "     if (request[\"readyState\"] == 4 && processed === false) {\n" +
+                        "             processed = true;\n" +
+                        "         console.log(\"from action callback\");\n" +
+                        "         }\n" +
+                        "     };\n" +
+                        "     request.send();\n" +
+                        "}}");
+
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ControllerDef.class);

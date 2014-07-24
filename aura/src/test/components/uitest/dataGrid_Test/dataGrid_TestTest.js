@@ -1,6 +1,7 @@
 ({
-    /*
+    /**
      * Test verifying that when there is no data present dataGrid does not fail
+     * bug tracking: 2327176
      */
     _testNoDataPresent : {
         attributes : {"pageSize" : 0},
@@ -9,7 +10,7 @@
         }
     },
 
-    /*
+    /**
      * Basic test case where we look at an average number of data and make sure paging accounts for it
      */
     testWithAverageData : {
@@ -19,7 +20,7 @@
         }
     },
     
-    /*
+    /**
      * Making sure that we are able to page to the next page and that we are able to page to previous and next pages
      */
     testStartingOnDifferentPage : {
@@ -29,8 +30,9 @@
         }
     },
     
-    /*
+    /**
      * Start at last possible page, then verify that last paging elements acknowledge the change
+     * bug tracking: 2327176
      */
     _testWithLargeData : {
         attributes : {"pageSize" : 3000, "currentPage" : 5},
@@ -39,7 +41,7 @@
         }
     },
     
-    /*
+    /**
      * Testing pagination with sortby attribute
      */
     testPagination : {
@@ -50,7 +52,7 @@
         }
     },
     
-    /*
+    /**
      * testing sorting by elements (i.e. click on sort button)
      */
     testSorting : {
@@ -61,8 +63,8 @@
         }
     },
     
-  //Currently fails because of known bug: TODO -- ADD BUG NUM
-    /*
+
+    /**
      * Test that all items selected are valid in v.items and v.selectedItems
      * 
      *  CURRENTLY FAILS TRACKED IN BUG: 
@@ -85,7 +87,7 @@
         }
     },
 
-    /*
+    /**
      * Test that selecting and pagination still work correctly
      */
     testSelectingDeselectingItemsWithPaginations : {
@@ -108,7 +110,7 @@
         }
     }, 
 
-    /*
+    /**
      * Add multiple items in Asynchornously and make sure that basic functionality still works (add/remove in v.items)
      */
     testAddingElementsInAsyncly : {
@@ -137,8 +139,7 @@
                                            this.createOutputArray(6000, 6000,  ["Spidey", "Peter Parker", "Media Inc", "2020-10-12"]), 102, 100);
         	}]
     },
-    //Test what is being displayed, and also what is stored in the internal cache
-    /*
+    /**
      * Basic test validating that what is being displayed through the grid is there
      */
     testDisplayedItemsAreCorrect : {
@@ -149,10 +150,12 @@
         }
     },
     
-    /*
+    /**
      * Insert single item into grid
+     * bugTracking why this is not being run in IE7/IE8: W-2327182
      */
     testInsertionOfSingleItem : {
+    	browsers : ["-IE8", "-IE7"],
         test : function(cmp){
 
             //Set Intial values for how many items to create, the insert and remove said elements multiple times to verify v.items keeps track
@@ -167,10 +170,13 @@
         }
     },
     
-    /*
+    /**
      * Insert a large amount of elements, remove only a portion of it and see how v.items reacts
+     * 
+     * bugTracking why this is not being run in IE7/IE8: W-2327182
      */
     testStaggeredInsertionRemove : {
+    	browsers : ["-IE8", "-IE7"],
         test : function(cmp){
             this.setValue(cmp, "index", 50);
             this.setValue(cmp, "count", 20);
@@ -191,16 +197,16 @@
         }
     },
 
-    /**************************************************************************************************
+    /***************************************************************************************************
      * Helper functions              
      **************************************************************************************************/
-    /*
+    /**
      * Basic check used in multiple places
      */ 
     checkBasicElements : function(cmp, firstRow, midRow, lastRow){
         //Get elements to use (trs and elements that are in v.items)
         var elements = this.getRowElements(cmp, 100);
-        var trs = elements[0];
+        var trs = elements[0]
         var itemsInBody = elements[1];
         
         //verify first, middle and last item are correct
@@ -208,8 +214,22 @@
         this.verifyRow(trs[50].children, itemsInBody[50], midRow);
         this.verifyRow(trs[99].children, itemsInBody[99], lastRow);
     },
-
-    /*
+    
+    /**
+     * function that will only get the elements that are not comments
+     */
+    getOnlyTrs : function(elements){
+    	var elementArray = [];
+    	
+	     for(var i = 0; i < elements.length; i++){
+	        if(elements[i].tagName != "!"){
+	        	elementArray.push(elements[i]);
+	        }
+	     }
+    	return elementArray;
+    },
+    
+    /**
      * Items that have the checkbox selected should be in v.selected, verify that these items are correct
      */ 
     verifySelectedElements : function(cmp, expectedItemsSelected, trs){
@@ -228,7 +248,7 @@
         }
     },
 
-    /*
+    /**
      * Select x amount of checkboxes (in this case get the inputs)
      */ 
     selectCheckBox : function(beginElm, endElm, rows){
@@ -239,7 +259,7 @@
         }
     },
 
-    /*
+    /**
      * Function, that given a number (start) and values  will create and return an expected array
      */ 
     createOutputArray : function(start, end, arrayValues){
@@ -256,7 +276,7 @@
         return outputArray;
     },
 
-    /*
+    /**
      * Function that will insert element, then remove them and verify that the rows look the way we feel they should
      */ 
     insertRemoveAndVerify : function(cmp, startRow, newExpectedRows, oldExpectedRows, colCountNew, colCountOrig, changeRemoveValue){
@@ -273,7 +293,7 @@
 
     },
     
-    /*
+    /**
      * Perform an action (insert or remove), verify that everything is as expected
      */
      actAndVerifyRowIsCorrect : function(cmp, actionId, index, expectedRow, expectColCount){
@@ -290,21 +310,21 @@
          
      },
      
-    /*
+    /**
      * Extracing out set value code 
      */ 
     setValue : function(cmp, id, value){
          cmp.find(id).set("v.value", value);
     },
 
-    /*
+    /**
      * extracting out the press function
      */ 
     pressButton : function(cmp, id){
           cmp.find(id).get("e.press").fire({});
     },
 
-    /*
+    /**
      * Verify that each row element is correct and does what we want it to
      */ 
     verifyRow : function(domRow, cmpRow, expectedRow){
@@ -317,19 +337,19 @@
         }
     },
     
-    /*
+    /**
      * Get a grid attribute
      */ 
     getGridAttribute : function( cmp, attributeName){
         return cmp.find("grid").get("v."+attributeName);
     },
 
-    /*
+    /**
      * get specific row elements
      */ 
     getRowElements : function(cmp, colCount){
             var tbody = document.getElementsByTagName("tbody")[0];
-            var trs = tbody.children;
+            var trs = this.getOnlyTrs(tbody.children);
             var itemsInBody = this.getGridAttribute(cmp, "items");
 
             $A.test.assertEquals(colCount, trs.length, "The total amount of items on the page are incorrect");
@@ -338,7 +358,7 @@
             return [trs, itemsInBody];
     },
 
-    /*
+    /**
      * Verify that the elements we sorted are correct sorted
      */
     verifySortedElements : function(cmp, element, firstRowId, lastRowId, message){
@@ -355,7 +375,7 @@
             $A.test.assertTrue(lastTr.indexOf(lastRowId) > -1, message);
     },
     
-    /*
+    /**
      * Extract out function that will go through all of the pager items and make sure they are set correctly
      */ 
     verifyDataGridUsingPager : function(cmp, pagerState, pageSize, pagerMessage){
@@ -369,22 +389,22 @@
                 pagerState);
     },
 
-    /*
+    /**
      * Check to make sure that the pager says the correct page and element we are on
      */ 
     verifyPageInfoSaysCorrectNumber : function (cmp, expectedText){
         $A.test.assertEquals($A.test.getTextByComponent(cmp), expectedText, "There should be not elements through pagerinfo");        
     },
     
-    /*
+    /**
      * check to make sure that we are getting the correct trs and verify it is the correct size
      */ 
     verifyNumberOfTrs : function(number, tbl){
-        var trs = tbl.getElementsByTagName("tbody")[0].children;
+        var trs = this.getOnlyTrs(tbl.getElementsByTagName("tbody")[0].children);
         $A.test.assertEquals(number, trs.length, "The correct number of trs ("+number+") is currently not in the table");
     },
     
-    /*
+    /**
      * Verifying that the pager we expect to be disabled is disabled
      */ 
     verifyElementDisabled : function(cmp, pagerIds, disabled){

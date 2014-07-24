@@ -16,7 +16,7 @@
 ({
 	updateAmpm: function(component, event, helper) {
     	var amPmCmp = component.find("ampm");
-        var isAndroid = $A.getGlobalValueProviders().get("$Browser.isAndroid");
+        var isAndroid = $A.get("$Browser.isAndroid");
         if (isAndroid === true) { // On Android, if hour field is changed and then ampm select is clicked, 
         	                      // the focus is still in hour field. That is, the hour value doesn't get updated.
             var hoursCmp = component.find("hours");

@@ -47,14 +47,16 @@
                                          label="{!v.label}"
                                          labelClass="{!v.labelClass}"
                                          labelPosition="{!v.labelPosition}"
-                                         placeholder="{!v.placeholder}"/>
+                                         placeholder="{!v.placeholder}"
+                                         updateOn="{!v.updateOn}"/>
         <aura:set attribute="else">
             <ui:inputTextForAutocomplete aura:id="input" 
                                          class="{!v.inputClass+' '+v.theme}" 
                                          label="{!v.label}"
                                          labelClass="{!v.labelClass}"
                                          labelPosition="{!v.labelPosition}"
-                                         placeholder="{!v.placeholder}"/>
+                                         placeholder="{!v.placeholder}"
+                                         updateOn="{!v.updateOn}"/>
         </aura:set>
     </aura:if>
     

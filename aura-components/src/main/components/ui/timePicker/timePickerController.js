@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+	init: function(component, event, helper) {
+		var hourError = component.find("hourError");
+		var minError = component.find("minuteError");
+		
+		component.find("hours").set("v.ariaDescribedBy", hourError.getGlobalId());
+		component.find("minutes").set("v.ariaDescribedBy", minError.getGlobalId());
+	},
+	
 	updateAmpm: function(component, event, helper) {
     	var amPmCmp = component.find("ampm");
         var isAndroid = $A.get("$Browser.isAndroid");

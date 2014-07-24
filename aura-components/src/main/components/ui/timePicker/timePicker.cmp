@@ -22,6 +22,8 @@
     <aura:attribute name="minutes" type="Integer" default="0" description="The miniue value."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker is displayed. Defaults to false, which hides this time picker."/>
 
+	<aura:handler name="init" value="{!this}" action="{!c.init}" />	
+
     <div class="{!v.class}">
 		<ui:label label="hours" for="hours" labelDisplay="false"/>
 	    <ui:inputText aura:id="hours" class="input-hours" change="{!c.updateHours}"/>

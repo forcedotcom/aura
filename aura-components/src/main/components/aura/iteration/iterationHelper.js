@@ -297,9 +297,9 @@
 			var indexVar = cmp.get("v.indexVar");
 			var extraProviders = {};
 			
-			extraProviders[varName] = $A.expressionService.create(null, item);
+			extraProviders[varName] = $A.expressionService.create(cmp, item);
 			if (indexVar) {
-				extraProviders[indexVar] = $A.expressionService.create(null, index);
+				extraProviders[indexVar] = $A.expressionService.create(cmp, index);
 			}
 
 			return extraProviders;

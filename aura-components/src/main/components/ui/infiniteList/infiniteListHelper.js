@@ -118,6 +118,7 @@
                     this.translateX(cmp, openRowSwipe.body, 0);
                     
                     // Null these fields as 'touchend' will not execute.
+                    $A.util.removeClass(cmp._openRow, 'open');
                     cmp._openRow = null;
                     cmp._swipe = null;
                     
@@ -254,6 +255,7 @@
 	    		}
 	    		else {
 	    			this.translateX(cmp, swipe.body, 0);
+	    			$A.util.removeClass(cmp._openRow, 'open');
 	    			cmp._openRow = null;
 	    		}
 	    		
@@ -262,7 +264,8 @@
         			swipe.body.style.transition = '';
         			
         			if (shouldSnapOpen) {
-        				cmp._openRow = swipe.row;	
+        				cmp._openRow = swipe.row;
+        				$A.util.addClass(cmp._openRow, 'open');
         			}
         		}, this.SNAP_TIMEOUT);
         	}

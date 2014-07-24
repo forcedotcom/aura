@@ -59,7 +59,8 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
 		WebElement row7 = getListRowElement(7);
 		//Horizontal right swipe should not swipe
-		swipeOnElementAndVerify(row7, swipeDirection.SWIPE_RIGHT);
+		//TODO: uncomment once W-2327441 is fixed
+		//swipeOnElementAndVerify(row7, swipeDirection.SWIPE_RIGHT);
 		//verify there is no uiInfiniteListRow element with class open
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
 		//horizontal left flick
@@ -86,17 +87,29 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 		//horizontal left flick on row7
         swipeOnElementAndVerify(row7, swipeDirection.SWIPE_LEFT);
         verifyOnlyOneSwipeBodyIsOpen(row7, true);
-        //horizontal left flick on row8 should close row7
+        //Click on row8 should close row7
+        clickOnListRowAndWait(row8);
         swipeOnElementAndVerify(row8, swipeDirection.SWIPE_LEFT);
         verifyOnlyOneSwipeBodyIsOpen(row8, true);
-        //horizontal left flick on row12 should close row8
+        //click on row12 should close row8
+        clickOnListRowAndWait(row12);
         swipeOnElementAndVerify(row12, swipeDirection.SWIPE_LEFT);
         verifyOnlyOneSwipeBodyIsOpen(row12, true);
-        //Horizontal right swipe on row7 should not close row12
-      	swipeOnElementAndVerify(row7, swipeDirection.SWIPE_RIGHT);
-      	verifyOnlyOneSwipeBodyIsOpen(row12, true);
+        //Horizontal right swipe on row7 should close row12
+        swipeOnElementAndVerify(row7, swipeDirection.SWIPE_RIGHT);
+      	verifyOnlyOneSwipeBodyIsOpen(row12, false);
     }
 	
+	/**
+	 * Click on any row to close the open Listrow
+	 * @param element
+	 * @throws InterruptedException
+	 */
+	private void clickOnListRowAndWait(WebElement listRow) throws InterruptedException {
+		listRow.click();
+		pause(1000);
+	}
+
 	/**
 	 * Test to verify adding more ListRows using show More button should close the open swipeBody if any
 	 * @throws MalformedURLException
@@ -165,21 +178,23 @@ public class infiniteListRowUITest extends WebDriverTestCase{
     }
 
 	/**
-	 * TODO: not yet implemented by dev
+	 * Automation for vertical swipe support to infiniteList & infiniteListRow
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
+	 * Bug: W-2257072
 	 */
-	public void _testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
 		WebElement row7 = getListRowElement(7);
+		WebElement row1 = getListRowElement(1);
 		//horizontal left flick
         swipeOnElementAndVerify(row7, swipeDirection.SWIPE_LEFT);
         verifyOnlyOneSwipeBodyIsOpen(row7, true);
         //Vertical right swipe should close the swipeBody
-        performFlick(row7, 0, -40);
+        performFlick(row1, 0, -4000);
       	verifyOnlyOneSwipeBodyIsOpen(null, false);
     }
 	
@@ -234,7 +249,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 		WebElement eleBody = getListRowBody(elem);
 		switch (swipeOption) {
         case SWIPE_LEFT:
-        	performFlick(elem, -100, 0);
+        	performFlick(elem, -1000, 0);
         	waitForElementPresent(String.format("Swipe body for %s should be visible on the page after horizontal swipe",swipBody.getText()), swipBody);
         	int swipeBody_xPos_SL = swipBody.getLocation().getX();
     		int eleBody_xPos_SL = eleBody.getLocation().getX();
@@ -244,7 +259,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
             assertTrue(String.format("%s should not be within the view port after horizontal Left swipe",eleBody.getText()), viewPortConditionForListBody_SL);
             break;
         case SWIPE_RIGHT:
-        	performFlick(swipBody, 100, 0);
+        	performFlick(swipBody, 1000, 0);
         	waitForElementPresent(String.format("%s should be visible on the page",eleBody.getText()), elem);
             int swipeBody_xPos_SR = swipBody.getLocation().getX();
     		int eleBody_xPos_SR = eleBody.getLocation().getX();

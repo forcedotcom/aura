@@ -51,11 +51,51 @@ public final class PerfResultsUtil {
         RESULTS_DIR.mkdirs();
     }
 
+    public enum PerformanceMetrics {
+        AURA_STATS("aurastats"),
+        GOLD_FILES("goldfiles"),
+        HEAPS("heaps"),
+        PROFILES("profiles"),
+        TIMESLINES("timelines"),
+        UNKNOWN("");
+
+        private String value;
+        private PerformanceMetrics(String value) {
+            this.value = value;
+        }
+        public static File getFile(PerformanceMetrics performanceMetrics, String fileName) {
+            File dir = new File(RESULTS_DIR, performanceMetrics.value);
+
+            return new File(dir, fileName + getFileExtenstion(performanceMetrics));
+        }
+
+        public static PerformanceMetrics getPerformanceMetricsFromType(String metricsType) {
+            for(PerformanceMetrics result: PerformanceMetrics.values()) {
+                if(result.value.equalsIgnoreCase(metricsType)) {
+                    return result;
+                }
+            }
+            return UNKNOWN;
+        }
+
+        private static String getFileExtenstion(PerformanceMetrics performanceMetrics){
+            switch(performanceMetrics) {
+                case HEAPS:
+                    return ".cpuprofile";
+                case PROFILES:
+                    return ".heapsnapshot";
+                default:
+                    return ".json";
+            }
+        }
+    }
+
+
     /**
      * @return the written file
      */
     public static File writeGoldFile(PerfMetrics metrics, String fileName, boolean storeDetails) {
-        File file = new File(RESULTS_DIR + "/goldfiles/" + fileName + ".json");
+        File file = PerformanceMetrics.getFile(PerformanceMetrics.GOLD_FILES, fileName);
         RESULTS_JSON.addResultsFile(file);
         try {
             ALL_GOLDFILES_JSON.addGoldfile(fileName, metrics);
@@ -69,7 +109,7 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeAuraStats(String auraStatsContents, String fileName) {
-        File file = new File(RESULTS_DIR + "/aurastats/" + fileName + "_aurastats.json");
+        File file = PerformanceMetrics.getFile(PerformanceMetrics.AURA_STATS, fileName);
         RESULTS_JSON.addResultsFile(file);
         return writeFile(file, auraStatsContents, "Aura Stats");
     }
@@ -97,7 +137,7 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeDevToolsLog(List<JSONObject> timeline, String fileName, String userAgent) {
-        File file = new File(RESULTS_DIR + "/timelines/" + fileName + "_timeline.json");
+        File file = PerformanceMetrics.getFile(PerformanceMetrics.TIMESLINES, fileName);
         try {
             writeDevToolsLog(timeline, file, userAgent);
             RESULTS_JSON.addResultsFile(file);
@@ -134,7 +174,7 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
-        File file = new File(RESULTS_DIR + "/profiles/" + fileName + ".cpuprofile");
+        File file = PerformanceMetrics.getFile(PerformanceMetrics.PROFILES, fileName);
         try {
             file.getParentFile().mkdirs();
             BufferedWriter writer = null;
@@ -162,7 +202,7 @@ public final class PerfResultsUtil {
      */
     @SuppressWarnings("unchecked")
     public static File writeHeapSnapshot(Map<String, ?> data, String fileName) throws Exception {
-        File file = new File(RESULTS_DIR + "/heaps/" + fileName + ".heapsnapshot");
+        File file = PerformanceMetrics.getFile(PerformanceMetrics.HEAPS, fileName);
         BufferedWriter writer = null;
         try {
             file.getParentFile().mkdirs();

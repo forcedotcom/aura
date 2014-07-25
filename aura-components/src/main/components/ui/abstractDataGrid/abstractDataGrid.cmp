@@ -37,7 +37,7 @@
 	<aura:attribute name="actionDelegate" type="Aura.Component[]" description="Row action delegate."/>
 
 	<aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
-	<aura:registerEvent name="addRemove" type="ui:dataGridAddRemove" description="Command event for grid to insert or delete items as rows."/>
+	<aura:registerEvent name="addRemove" type="ui:addRemove" description="Command event for grid to insert or delete items as rows."/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="{!v.mode}" action="{!c.handleModeChange}"/>

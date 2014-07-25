@@ -94,7 +94,7 @@
     		initialPosition = 0;
 
         // Cancel when blocking is needed.
-        if (cmp._isClosing || cmp._isSnapping || cmp._isBlockedInteraction) {
+        if (cmp._isClosing || cmp._isSnapping || this.isBlocked(cmp)) {
             e.stopPropagation();
             e.preventDefault();    
             return;     
@@ -110,7 +110,7 @@
     			this.attachListeners(cmp);
 	    		
                 // If a different row was open, close it.
-                if (cmp._openRow && cmp._previousSwipe && cmp._previousSwipe.row !== row) {
+                if (cmp._openRow && cmp._previousSwipe && cmp._previousSwipe.row !== row && cmp._previousSwipe.body) {
                 	openRowSwipe = cmp._previousSwipe;
                 	
                     // Perform close operation.
@@ -129,7 +129,7 @@
                     // Change the state for the duration of the close animation.
                     // Use two variables to cancel all touch events.
                     cmp._isClosing = true;
-                    cmp._isBlockedInteraction = true;
+                    this.block(cmp);
                     
                     setTimeout(function () {
                         cmp._isClosing = false;
@@ -167,7 +167,7 @@
     	
     	// If a row is closing or the interaction has been blocked, 
     	// bounce the event and return.
-        if (cmp._isClosing || cmp._isSnapping || cmp._isBlockedInteraction) {
+        if (cmp._isClosing || cmp._isSnapping || this.isBlocked(cmp)) {
             e.stopPropagation();
             e.preventDefault();    
             return;  
@@ -279,8 +279,8 @@
         // This is here because the touch gesture might last longer than the animation.
         // A 'blocked interaction' means that all pointer events are cancelled as long as 
         // the pointer is active (down).
-        if (cmp._isBlockedInteraction) {
-            cmp._isBlockedInteraction = false;
+        if (this.isBlocked(cmp)) {
+        	this.unblock(cmp);
         }
     	
     	this.detachListeners(cmp);
@@ -289,6 +289,52 @@
         cmp._swipe = null;
         cmp._moved = false;
         cmp._direction = null;
+    },
+    
+    isBlocked: function (cmp) {
+    	return cmp._isBlockedInteraction;
+    },
+    
+    block: function (cmp) {
+    	cmp._isBlockedInteraction = true;
+    },
+    
+    unblock: function (cmp) {
+    	cmp._isBlockedInteraction = false;
+    },
+    
+    /**
+     * Overridden implementation to remove a row with an optional animation timeout.
+     */
+    removeItem: function (component, array, index, timeout, animate, callback) {
+    	var row;
+    	
+    	// Animations require a specified timeout.
+    	if (animate && $A.util.isUndefinedOrNull(timeout)) {
+    		$A.warning("'animation' function specified to ui:infinteList WITHOUT the required timeout. Please specify a timeout in milliseconds.");
+    	}
+    	
+    	if (timeout) {		
+    		if (animate) {
+    			row = this.getNthRow(component, index);
+    			animate(row);
+    		}
+    		
+    		setTimeout(function () {
+    			rm();
+    			
+    			if (callback) {
+    				callback();		
+    			}
+    		}, timeout)
+    	}
+    	else {
+    		rm();
+    	}
+    		
+    	function rm() {
+    		component.set('v.items', array);
+    	}
     },
     
     /**
@@ -385,6 +431,14 @@
     	return row;
     },
 
+    /**
+     * Returns the nth concrete row element.
+     */
+    getNthRow: function (component, index) {
+    	var ul = component.getConcreteComponent().find('ul').getElement();
+    	return ul.children[index];
+    },
+    
     /**
      * Returns the percentage coverage given the absolute value of x distance.
      * 

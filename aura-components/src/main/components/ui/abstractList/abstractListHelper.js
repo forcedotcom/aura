@@ -105,7 +105,43 @@
         // cache the pagers
         component._pagers = pagers;
     },
-
+    
+    /**
+     * @param component {Component} ui:abstractList
+     * @param param {Number/Boolean} number for index or boolean for last item
+     * @param timeout
+     * @param callback
+     */
+    remove: function (component, index, param, timeout, animate, callback) {
+    	var items = component.get('v.items'),
+    		array = this.exclude(items, (typeof param === 'number') ? param : items.length - 1),
+    		helper = component.getConcreteComponent().getDef().getHelper();
+    	
+    	helper.removeItem(component, array, index, timeout, animate, callback);
+    },
+	
+    /**
+     * Provides a default implementation of row removal. Intentionally does not do anything nice.
+     * ui:infiniteList implements removal utilizing 'timeout', 'animate', and 'callback'. 
+     * Do NOT change this function - override with custom logic instead.
+     */
+    removeItem: function (component, array, index, timeout, animate, callback) {
+    	component.set('v.items', array);
+    },
+    
+	exclude: function (items, index) {
+		var array = [],
+			i;
+		
+		for (i = 0; i < items.length; i++) {
+			if (i !== index) {
+				array.push(items[i]);
+			}
+		}
+		
+		return array;
+	},
+    
     showLoading:function (component, visible) {
         $A.util[visible ? "addClass" : "removeClass"](component.getElement(), "loading");
     },

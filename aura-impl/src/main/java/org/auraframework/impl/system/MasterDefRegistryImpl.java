@@ -34,7 +34,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
@@ -286,6 +285,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case ACTION:
             case DESCRIPTION:
             case EXAMPLE:
+            case INCLUDE_REF:
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
                         .name()));
@@ -1430,9 +1430,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param descriptor - the descriptor use for the key
      */
     private String makeNonUidGlobalKey(@NonNull DefDescriptor<?> descriptor) {
-        AuraContext context = this.currentCC == null
-                ? Aura.getContextService().getCurrentContext()
-                : currentCC.context;
         return makeLocalKey(descriptor);
     }
 

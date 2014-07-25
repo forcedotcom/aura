@@ -34,6 +34,8 @@
 	<div id="header" class="common">New Aura Scroller</div>
 		
 		<ui:scroller class="scrollWrapper" 
+			canRefresh = "true"
+			canShowMore = "true"
 			onPullToRefresh="{!c.fetchDataPTR}" 
 			onPullToShowMore="{!c.fetchDataPTL}" 
 			onBeforeScrollStart="{!c.beforeScrollStartHandler}" 
@@ -145,9 +147,10 @@
 		</ui:scroller>
 		
 	<div id="footer" class="common">This is a footer</div>
- <span id="beforeScrollStartHandlerCalled">0</span>
- <span id="scrollStartHandlerCalled">0</span>
- <span id="scrollMoveHandlerCalled">0</span>
- <span id="scrollEndHandlerCalled">0</span>
+	
+	<span id="beforeScrollStartHandlerCalled">0</span>
+	<span id="scrollStartHandlerCalled">0</span>
+	<span id="scrollMoveHandlerCalled">0</span>
+	<span id="scrollEndHandlerCalled">0</span>
 	
 </aura:component>

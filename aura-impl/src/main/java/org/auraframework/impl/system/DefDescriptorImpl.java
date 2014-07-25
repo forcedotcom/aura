@@ -82,9 +82,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     protected DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
         LoggingService loggingService = Aura.getLoggingService();
 
-        this.bundle = null;
         loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
         try {
+            this.bundle = null;
             this.defType = DefType.getDefType(defClass);
             this.prefix = newPrefix;
             this.name = associate.getName();
@@ -159,6 +159,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TESTCASE:
             case VAR:
             case THEME_DEF_REF:
+            case INCLUDE_REF:
                 name = qualifiedName;
                 break;
             case APPLICATION:
@@ -267,7 +268,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public boolean equals(Object o) {
         if (o instanceof DefDescriptor) {
             DefDescriptor<?> e = (DefDescriptor<?>) o;
-            return (bundle == e.getBundle() || (bundle != null && !bundle.equals(e.getBundle())))
+            return (bundle == e.getBundle() || (bundle != null && bundle.equals(e.getBundle())))
                     && getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
                     && (namespace == null ? e.getNamespace() == null:namespace.equalsIgnoreCase(e.getNamespace()))
                     && (prefix == null ? e.getPrefix() == null : prefix.equalsIgnoreCase(e.getPrefix()));
@@ -312,7 +313,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             }
         }
 
-        return new DefDescriptorImpl<E>(qualifiedName, defClass, bundle);
+        return new DefDescriptorImpl<>(qualifiedName, defClass, bundle);
     }
 
     /**
@@ -385,7 +386,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         if (desc == null) {
             throw new AuraRuntimeException("descriptor is null");
         }
-        return new DefDescriptorImpl<E>(desc, defClass, newPrefix);
+        return new DefDescriptorImpl<>(desc, defClass, newPrefix);
     }
 
     /**
@@ -411,12 +412,30 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * abstract class.
      */
     public static int compare(DefDescriptor<?> dd1, DefDescriptor<?> dd2) {
+        if (dd1 == dd2) {
+            return 0;
+        }
+        
+        if (dd1 == null) {
+            return -1;
+        }
+        
+        if (dd2 == null) {
+            return 1;
+        }
+        
         int value;
 
         value = dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
         if (value != 0) {
             return value;
         }
-        return dd1.getDefType().compareTo(dd2.getDefType());
+        
+        value = dd1.getDefType().compareTo(dd2.getDefType());
+        if (value != 0) {
+            return value;
+        }
+        
+        return compare(dd1.getBundle(), dd2.getBundle());
     }
 }

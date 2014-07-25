@@ -247,6 +247,11 @@ public class CachingServiceImpl implements CachingService {
 			if (descriptor.getDefType() == DefType.LAYOUTS) {
 				invalidateScope(descriptor, true, true);
 			}
+			
+			if (descriptor.getDefType() == DefType.INCLUDE) {
+			    defsCache.invalidate(descriptor.getBundle());
+                existsCache.invalidate(descriptor.getBundle());
+			}
 		}
 	}
 

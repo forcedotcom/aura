@@ -16,22 +16,22 @@
 package org.auraframework.impl.root.library;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
-import org.auraframework.impl.root.event.EventDefImpl;
+import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -44,56 +44,30 @@ import com.google.common.collect.Sets;
 public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements LibraryDef {
     private static final long serialVersionUID = 610875326950592992L;
     private final int hashCode;
-    
-    private List<IncludeDef> includes;
-    private List<LibraryDef> externalLibraries;
+
+    private List<IncludeDefRef> includeRefs;
 
     protected LibraryDefImpl(Builder builder) {
         super(builder);
-        this.hashCode = super.hashCode();
-        this.includes = builder.includes; 
-        this.externalLibraries = Lists.newLinkedList();
+        this.includeRefs = builder.includes;
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), includeRefs);
     }
 
     @Override
-    public List<IncludeDef> getIncludes() {
-		return includes;
-	}
-    
-    @Override
-    public List<LibraryDef> getExternalDependencies() {
-    	return externalLibraries;
+    public List<IncludeDefRef> getIncludes() {
+        return includeRefs;
     }
 
-	@Override
+    @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("descriptor", getDescriptor());
-        json.writeMapKey("includes"); 
+        json.writeMapKey("includes");
         json.writeMapBegin();
-        for (IncludeDef include : includes) {
-            include.serialize(json);
+        for (IncludeDefRef include : includeRefs) {
+            json.writeMapEntry(include.getName(), include);
         }
         json.writeMapEnd();
-        
-        if (!externalLibraries.isEmpty()) {
-        	json.writeMapKey("externalDependencies");
-        	json.writeArrayBegin();
-        	Iterator<LibraryDef> iterator = externalLibraries.iterator();
-	        while (iterator.hasNext()) {
-	        	LibraryDef library = iterator.next();
-	        	DefDescriptor<LibraryDef> libraryDescriptor = library.getDescriptor();
-	        	json.writeString(libraryDescriptor.getNamespace() 
-        			+ ":" + libraryDescriptor.getName() 
-        			+ ":" + library.getName()
-    			);
-	        	
-	        	if (iterator.hasNext()) {
-	        		json.writeComma();
-	        	}
-	        }
-	        json.writeArrayEnd();
-        }
         json.writeMapEnd();
     }
 
@@ -101,37 +75,34 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
-        if (includes.isEmpty()) {
-            throw new InvalidDefinitionException("aura:library must contain at least one aura:include attribute", getLocation());
+        if (includeRefs == null || includeRefs.isEmpty()) {
+            throw new InvalidDefinitionException("aura:library must contain at least one aura:include attribute",
+                    getLocation());
         }
-        
-        for (IncludeDef includeDef : includes) {
-        	externalLibraries.addAll(extractExternalDependencies(includeDef));
+
+        Set<String> names = Sets.newHashSet();
+        for (IncludeDefRef include : includeRefs) {
+            if (!names.add(include.getName())) {
+                throw new InvalidDefinitionException(String.format("%s with duplicate name found in library: %s",
+                        IncludeDefRefHandler.TAG, include.getName()), getLocation());
+            }
         }
-        
-        for (LibraryDef externalLibrary : externalLibraries) {
-        	externalLibrary.validateDefinition();
-        }
-        
-        includes = orderByDependencies(includes); // Will throw if impossible to order due to invalid dependency tree.
-        
-        for(IncludeDef includeDef : includes) {
-            includeDef.validateDefinition();
-        }
+        includeRefs = orderByDependencies(includeRefs); // Will throw if impossible to order due to invalid dependency
+                                                        // tree.
     }
-    
+
     @Override
     public void appendDependencies(java.util.Set<org.auraframework.def.DefDescriptor<?>> dependencies) {
-    	super.appendDependencies(dependencies);
-        for (LibraryDef externalLibrary : externalLibraries) {
-        	dependencies.add(externalLibrary.getDescriptor());
+        super.appendDependencies(dependencies);
+        for (IncludeDefRef includeRef : includeRefs) {
+            includeRef.appendDependencies(dependencies);
         }
     };
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof EventDefImpl) {
-            EventDefImpl other = (EventDefImpl) obj;
+        if (obj instanceof LibraryDefImpl) {
+            LibraryDefImpl other = (LibraryDefImpl) obj;
             return getDescriptor().equals(other.getDescriptor());
         }
 
@@ -168,119 +139,96 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
             throws QuickFixException {
         return attributeDefs;
     }
-    
-    /**
-     * @throws QuickFixException 
-     * @throws DefinitionNotFoundException 
-     * Looks at an include an extracts external dependency libraries.
-     * @throws QuickFixException 
-     * @throws  
-     */
-    private List<LibraryDef> extractExternalDependencies(IncludeDef includeDef) throws QuickFixException {
-    	List<LibraryDef> dependencies = Lists.newLinkedList();
-    	if (includeDef.getImports() == null || includeDef.getImports().isEmpty()) {
-    		return dependencies;
-    	}
-    	
-    	for (String importName : includeDef.getImports()) {
-    		String[] tokens = importName.split(":");
-    		if (tokens.length == 3) {
-    			String dependencyName = tokens[0] + ":" + tokens[1];
-				dependencies.add(Aura.getDefinitionService().getDefinition(dependencyName, LibraryDef.class));
-    		} else if (tokens.length != 1) {
-    			throw new InvalidDefinitionException("Invalid import file name: " + importName, getLocation());
-    		}
-    	}
-    	return dependencies;
-    }
-    
+
     /**
      * Orders the includes so that the resources with dependencies are loaded after the files they depend on.
-     * @throws InvalidDefinitionException 
+     * 
+     * @throws InvalidDefinitionException
      */
-    private List<IncludeDef> orderByDependencies(List<IncludeDef> unordered) throws InvalidDefinitionException {
-    	List<IncludeDef> ordered = Lists.newLinkedList();
-    	Set<String> placed = Sets.newHashSet();
-    	ListMultimap<String, IncludeDef> dependantsMap = LinkedListMultimap.create();
-    	
-    	List<IncludeDef> step = Lists.newLinkedList();
-    	
-    	for (IncludeDef include: unordered) {
-    		List<String> imports = Lists.newLinkedList();
-    		
-    		// Filter out NON external imports:
-    		if (include.getImports() != null) {
-    			for (String importName : include.getImports()) {
-    				if (importName.split(":").length == 1) {
-    					imports.add(importName);
-    				}
-    			}
-    		}
-    		
-    		if (imports.isEmpty()) {
-    			ordered.add(include);
-    			placed.add(include.getLibraryName());
-    			step.add(include);
-    		} else {
-    			for (String imported : imports) {
-    				dependantsMap.put(imported, include);
-    			}
-    		}
-    	}
-    	
-    	while (!step.isEmpty()) {
-    		List<IncludeDef> currentStep = step;
-    		step = Lists.newLinkedList();
-    		
-    		for (IncludeDef currentInclude : currentStep) {
-    			for (IncludeDef nextInclude : dependantsMap.get(currentInclude.getLibraryName())) {
-    				boolean isSatisfied = true;
-    				for (String imported : nextInclude.getImports()) {
-    					if (!placed.contains(imported)) {
-    						isSatisfied = false;
-    						break;
-    					}
-    				}
-    				
-    				if (isSatisfied) {
-    					ordered.add(nextInclude);
-    					placed.add(nextInclude.getLibraryName());
-    					step.add(nextInclude);
-    				}
-    			}
-    		}
-    	}
-    	
-    	if (ordered.size() != unordered.size()) {
-    		throw new InvalidDefinitionException("aura:lbrary: Unable to order include statements by dependency tree.", getLocation());
-    	}
-    	
-    	return ordered;
-    	
+    private List<IncludeDefRef> orderByDependencies(List<IncludeDefRef> unordered) throws InvalidDefinitionException {
+        List<IncludeDefRef> ordered = Lists.newLinkedList();
+        Set<DefDescriptor<IncludeDef>> placed = Sets.newHashSet();
+        ListMultimap<DefDescriptor<IncludeDef>, IncludeDefRef> dependantsMap = LinkedListMultimap.create();
+        List<IncludeDefRef> step = Lists.newLinkedList();
+
+        for (IncludeDefRef include : unordered) {
+            List<DefDescriptor<IncludeDef>> imports = Lists.newLinkedList();
+
+            if (include.getImports() != null) {
+                for (DefDescriptor<IncludeDef> imported : include.getImports()) {
+                    // We can only order local includes here, so ignore external imports
+                    if (descriptor.equals(imported.getBundle())) {
+                        imports.add(imported);
+                    }
+                }
+            }
+
+            if (imports.isEmpty()) {
+                ordered.add(include);
+                placed.add(include.getIncludeDescriptor());
+                step.add(include);
+            } else {
+                for (DefDescriptor<IncludeDef> imported : imports) {
+                    dependantsMap.put(imported, include);
+                }
+            }
+        }
+
+        while (!step.isEmpty()) {
+            List<IncludeDefRef> currentStep = step;
+            step = Lists.newLinkedList();
+
+            for (IncludeDefRef currentInclude : currentStep) {
+                for (IncludeDefRef nextInclude : dependantsMap.get(currentInclude.getIncludeDescriptor())) {
+                    boolean isSatisfied = true;
+                    for (DefDescriptor<IncludeDef> imported : nextInclude.getImports()) {
+                        if (!placed.contains(imported)) {
+                            isSatisfied = false;
+                            break;
+                        }
+                    }
+
+                    if (isSatisfied) {
+                        ordered.add(nextInclude);
+                        placed.add(nextInclude.getIncludeDescriptor());
+                        step.add(nextInclude);
+                    }
+                }
+            }
+        }
+
+        if (ordered.size() != unordered.size()) {
+            throw new InvalidDefinitionException(
+                    "aura:library: Unable to order include statements by dependency tree.",
+                    getLocation());
+        }
+
+        return ordered;
+
     }
-    
+
     public static class Builder extends RootDefinitionImpl.Builder<LibraryDef> {
-        
-        private List<IncludeDef> includes;
-        
+
+        private List<IncludeDefRef> includes;
+
         public Builder() {
             super(LibraryDef.class);
         }
-        
-        public void setIncludes(List<IncludeDef> includes) {
+
+        public void setIncludes(List<IncludeDefRef> includes) {
             this.includes = includes;
         }
 
         /**
-         * @throws QuickFixException 
+         * @throws QuickFixException
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
          */
         @Override
         public LibraryDefImpl build() {
             // Lookup associated documentation in present:
-        	DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
-                getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX
-            );
+            DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
+                    getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX
+                    );
 
             if (documentationDescriptor.exists()) {
                 setDocumentation(documentationDescriptor.getQualifiedName());

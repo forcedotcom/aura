@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.Definition;
 import org.auraframework.def.ImportDef;
-import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.BaseComponent;
@@ -66,30 +66,22 @@ public class TopicExampleModel {
                 defs.add(new DefModel(dep));
             }
         }
-        
-		// Add all imported libraries AND their source to the documentation.
+
+        // Add all imported libraries AND their source to the documentation.
         if (def instanceof ComponentDef) {
-        	Collection<ImportDef> importDefs = ((ComponentDef) def).getImportDefs();
-        	
-        	for (ImportDef importDef : importDefs) {
-        		LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getLibraryName(), LibraryDef.class);
-        		if (ReferenceTreeModel.hasAccess(libraryDef)) {
-        			defs.add(new DefModel(libraryDef.getDescriptor()));
-        			
-    				// Treat the included js files specially because they load source differently:
-            		for (IncludeDef includeDef: libraryDef.getIncludes()) {
-            			includeDefs.add(new IncludeDefModel(includeDef.getDescriptor()));
-            		}
-        			
-        			// Add external dependencies as well (just the js files).
-        			for (LibraryDef externalLibrary : libraryDef.getExternalDependencies()) {
-        				// Treat the included js files specially because they load source differently:
-                		for (IncludeDef externalIncludeDef: externalLibrary.getIncludes()) {
-                			includeDefs.add(new IncludeDefModel(externalIncludeDef.getDescriptor()));
-                		}
-        			}
-        		}
-        	}
+            Collection<ImportDef> importDefs = ((ComponentDef) def).getImportDefs();
+
+            for (ImportDef importDef : importDefs) {
+                LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getLibraryDescriptor());
+                if (ReferenceTreeModel.hasAccess(libraryDef)) {
+                    defs.add(new DefModel(libraryDef.getDescriptor()));
+
+                    // Treat the included js files specially because they load source differently:
+                    for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
+                        includeDefs.add(new IncludeDefModel(includeDef.getIncludeDescriptor()));
+                    }
+                }
+            }
         }
     }
 
@@ -97,7 +89,7 @@ public class TopicExampleModel {
     public List<DefModel> getDefs() {
         return defs;
     }
-    
+
     @AuraEnabled
     public List<IncludeDefModel> getIncludeDefs() {
         return includeDefs;

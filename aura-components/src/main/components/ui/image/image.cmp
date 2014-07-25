@@ -24,14 +24,15 @@
     <aura:attribute name="linkClass" type="String" description="The CSS style used to display the URL link."/>
     <aura:attribute name="alt" type="String" default="" description="The alternate text description of the image. If imageType=&quot;informational&quot;, the alt attribute is required. Otherwise, it is not required if imageType=&quot;decorative&quot;."/>
     <aura:attribute name="target" type="String" default="_self" description="The target URL to display when the image is clicked. Default value is &#8220;_self&#8221;. Valid options: _blank, _parent, _top, _self"/>
+    <aura:attribute name="onerror" type="Aura.Action" description="Action invoked when an error occurs while loading the image"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    
+
     <aura:if isTrue="{!v.href != null &amp;&amp; v.href != ''}">
         <a class="{!v.linkClass}" href="{!v.href}" target="{!v.target}" aura:id="link">
-            <img src="{!v.src}" class="{!v.class}" alt="{!v.alt}" title="{!v.title}"/>
+            <img src="{!v.src}" class="{!v.class}" alt="{!v.alt}" title="{!v.title}" onerror="{!v.onerror != undefined ? v.onerror : c.doNothing}"/>
         </a>
         <aura:set attribute="else">
-            <img src="{!v.src}" class="{!v.class}" alt="{!v.alt}" title="{!v.title}"/>
+            <img src="{!v.src}" class="{!v.class}" alt="{!v.alt}" title="{!v.title}" onerror="{!v.onerror != undefined ? v.onerror : c.doNothing}"/>
         </aura:set>
     </aura:if>
 </aura:component>

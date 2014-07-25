@@ -624,13 +624,10 @@ public class AuraUITestingUtil {
      * {@link #waitForDocumentReady()}.
      */
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
-        // Umbrella check for any framework load error.
-        if (!getBooleanEval("return !!window.$A")) {
-            Assert.fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
-        }
-
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        wait.ignoring(StaleElementReferenceException.class).until(
+        wait.ignoring(StaleElementReferenceException.class)
+        .withMessage("Initializati​on error: Perhaps the initial GET failed")
+        .until(
                 new Function<WebDriver, Boolean>() {
                     @Override
                     public Boolean apply(WebDriver input) {

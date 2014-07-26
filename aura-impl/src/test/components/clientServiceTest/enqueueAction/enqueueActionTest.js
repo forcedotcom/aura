@@ -377,6 +377,8 @@
     },
 
     testBackgroundClientActionNotQueued : {
+        // fix flapper in IE
+        browsers: ["-IE8"],
         test : [
                 function(cmp) {
                     var that = this;
@@ -689,6 +691,8 @@
     },
 
     testStorableRefresh : {
+        // fix flapper in IE
+        browsers: ["-IE8"],
         test : [ function(cmp) {
             var that = this;
             $A.run(function() {

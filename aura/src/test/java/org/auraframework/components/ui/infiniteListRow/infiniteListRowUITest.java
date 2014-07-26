@@ -22,10 +22,12 @@ import java.util.List;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-@TargetBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+@UnAdaptableTest
+@TargetBrowsers({ BrowserType.IPHONE })
 public class infiniteListRowUITest extends WebDriverTestCase{
 	private static final String TEST_APP = "/uitest/infiniteListRow_Test.cmp";
 	private final String INFINITE_LISTROW = "li[class*='uiInfiniteListRow']";	
@@ -141,15 +143,9 @@ public class infiniteListRowUITest extends WebDriverTestCase{
         //left swipe on row35
         swipeOnElementAndVerify(row35, swipeDirection.SWIPE_LEFT);
         verifyOnlyOneSwipeBodyIsOpen(row35, true);
-        swipeOnElementAndVerify(row35, swipeDirection.SWIPE_VERTICAL_UP); 
-        //swipe row20 and make sure row35 swipeBody is closed and row20 is opened
-        WebElement row20 = getListRowElement(20);
-        swipeOnElementAndVerify(row20, swipeDirection.SWIPE_LEFT);
-        verifyOnlyOneSwipeBodyIsOpen(row20, true);
-        //close the swipeBody
-        swipeOnElementAndVerify(row20, swipeDirection.SWIPE_RIGHT);
+        swipeOnElementAndVerify(row35, swipeDirection.SWIPE_RIGHT);
         verifyOnlyOneSwipeBodyIsOpen(null, false);
-	}
+    }
 	
 	
 	private void verifyListRowAfterRefreshOrShowMoreAction(String action) throws MalformedURLException, URISyntaxException, InterruptedException {
@@ -197,6 +193,27 @@ public class infiniteListRowUITest extends WebDriverTestCase{
         performFlick(row1, 0, -4000);
       	verifyOnlyOneSwipeBodyIsOpen(null, false);
     }
+	
+	/**
+	 * tap outside of active row should close active row
+	 * Bug: W-2297263
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 * @throws InterruptedException
+	 */
+	public void testTapOnNonActiveRowClosesActiveRow() throws MalformedURLException, URISyntaxException, InterruptedException{
+		open(TEST_APP);
+		setViewPortVariable();
+		verifyOnlyOneSwipeBodyIsOpen(null, false);
+		WebElement row7 = getListRowElement(7);
+		WebElement row1 = getListRowElement(1);
+		//horizontal left flick
+        swipeOnElementAndVerify(row7, swipeDirection.SWIPE_LEFT);
+        verifyOnlyOneSwipeBodyIsOpen(row7, true);
+        //tap on non active list row1 should close swipe body for row7
+        clickOnListRowAndWait(row1);
+        verifyOnlyOneSwipeBodyIsOpen(null, false);
+	}
 	
 	/**
 	 * To verify swipe body for the listRow that is opened after the Horizontal swipe is done
@@ -249,7 +266,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 		WebElement eleBody = getListRowBody(elem);
 		switch (swipeOption) {
         case SWIPE_LEFT:
-        	performFlick(elem, -1000, 0);
+        	performFlick(elem, -10000, 0);
         	waitForElementPresent(String.format("Swipe body for %s should be visible on the page after horizontal swipe",swipBody.getText()), swipBody);
         	int swipeBody_xPos_SL = swipBody.getLocation().getX();
     		int eleBody_xPos_SL = eleBody.getLocation().getX();
@@ -259,7 +276,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
             assertTrue(String.format("%s should not be within the view port after horizontal Left swipe",eleBody.getText()), viewPortConditionForListBody_SL);
             break;
         case SWIPE_RIGHT:
-        	performFlick(swipBody, 1000, 0);
+        	performFlick(swipBody, 10000, 0);
         	waitForElementPresent(String.format("%s should be visible on the page",eleBody.getText()), elem);
             int swipeBody_xPos_SR = swipBody.getLocation().getX();
     		int eleBody_xPos_SR = eleBody.getLocation().getX();

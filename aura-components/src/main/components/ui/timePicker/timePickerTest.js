@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 ({
+	/**
+	 * Test to make sure timepicker is now accessible with inputDefaultError
+	 */
+	testAccessible : {
+        test : [function(cmp){
+        	cmp.get("hours").set("v.value", "100");
+        	cmp.get("c.updateHours").runDeprecated({});
+        },function(cmp){
+        	cmp.get("minutes").set("v.value", "100");
+        	cmp.get("c.updateMinutes").runDeprecated({});   
+        },function(cmp){
+        	$A.test.assertAccessible();    	   
+        }]
+    },
+    
     testHoursAttribute : {
         attributes : {  "hours" : 5 },
         test : function(cmp) {

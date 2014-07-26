@@ -50,6 +50,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         AUTOCOMPLETE_COMPONENT.put("LargeList", 3);
         AUTOCOMPLETE_COMPONENT.put("CustomTemplate", 4);
         AUTOCOMPLETE_COMPONENT.put("OptionExtention", 5);
+        AUTOCOMPLETE_COMPONENT.put("autoCompleteUpdateOn", 6);
     }
 
     private enum OptionType {
@@ -74,6 +75,26 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertEquals("Autocomplete has the incorrect number of options", 10, options.size());
         String matchCount = getAutoCompleteMatchCount(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         assertEquals("Match Done should not be fired yet", "", matchCount);
+    }
+    
+    /**
+     * Test to verify input cmp does get its value updated on clicking ENTER in the field
+     * Bug: W-2293143
+     */
+    public void testAutoCompleteWithUpdateOnAttributeSet() throws Exception {
+        open(URL);
+        String inputAutoComplete = "autoCompleteUpdateOn";
+        String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete) + ".find('input').get('v.value')");
+        String autoCompleteText = (String) auraUITestingUtil.getEval(expr);
+        assertNull("Auto complete Text for input should be undefined", autoCompleteText);
+        WebDriver driver = getDriver();
+        WebElement inputElement = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("autoCompleteUpdateOn"));
+        inputElement.click();
+        String expectedText = "testing";
+        inputElement.sendKeys(expectedText);
+        auraUITestingUtil.pressEnter(inputElement);
+        autoCompleteText = (String) auraUITestingUtil.getEval(expr);
+        assertEquals("Input Value was not change after pressing Enter", expectedText, autoCompleteText);
     }
 
     /**

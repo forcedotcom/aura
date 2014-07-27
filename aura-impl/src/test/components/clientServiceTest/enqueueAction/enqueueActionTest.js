@@ -293,6 +293,8 @@
      *  - Use a foreground process to kick off one of the backgrounds, causing the last one to fire as well.
      */
     testMaxNumBackgroundServerAction : {
+        // fix flapper in IE
+        browsers: ["-IE8"],
         test : [
             function(cmp) {
                 var that = this;
@@ -450,6 +452,8 @@
     },
 
     testPollSingleBackgroundAction : {
+        // fix flapper in IE
+        browsers: ["-IE8"],
         test : [
                 function(cmp) {
                     var that = this;

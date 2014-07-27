@@ -28,8 +28,8 @@ import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
-import org.auraframework.impl.root.library.ImportDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl;
+import org.auraframework.impl.root.library.ImportDefHandlerImpl;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
 import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
 import org.auraframework.impl.root.parser.handler.AttributeDefRefHandler;
@@ -68,7 +68,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
         handlers.put(EventDefImpl.class, new EventDefHandler());
         handlers.put(EventHandlerDefImpl.class, new EventHandlerDefHandler());
         handlers.put(LibraryDefImpl.class, new LibraryDefHandler());
-        handlers.put(ImportDefImpl.class, new ImportDefHandler());
+        handlers.put(ImportDefHandlerImpl.class, new ImportDefHandler());
         handlers.put(InterfaceDefImpl.class, new InterfaceDefHandler());
         handlers.put(RegisterEventDefImpl.class, new RegisterEventHandler());
         handlers.put(ThemeDefImpl.class, new ThemeDefHandler());

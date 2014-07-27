@@ -236,7 +236,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
 
         // Create a descriptor but do not add it.
         DefDescriptor<ComponentDef> nonExisting = getAuraTestingUtil().createStringSourceDescriptor(
-                "nonExisting", ComponentDef.class, null);
+                "nonExisting", ComponentDef.class);
         definitionService.getDefDescriptor(nonExisting.getDescriptorName(), ComponentDef.class);
         assertFalse("How can a non existing def exist?", nonExisting.exists());
         /*

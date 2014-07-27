@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-    <aura:import library="auradev:library" property="libraryDoc" />
+    <aura:import library="aura:library" property="libraryDoc" />
     <aura:handler name="init" value="this" action="{!c.initialize}"/>
     
     <aura:attribute name="message" default="Error" type="String" description="Displays library invocation message." />

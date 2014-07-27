@@ -34,7 +34,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
@@ -249,7 +248,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> Set<DefDescriptor<D>> find(@NonNull DefDescriptor<D> matcher) {
         Set<DefDescriptor<D>> matched;
         if (matcher.getNamespace().equals("*")) {
-            matched = new LinkedHashSet<>();
+            matched = new LinkedHashSet<DefDescriptor<D>>();
             String qualifiedNamePattern = null;
             switch (matcher.getDefType()) {
             case CONTROLLER:
@@ -262,7 +261,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case RESOURCE:
             case PROVIDER:
             case THEME_PROVIDER:
-            case INCLUDE:
             case THEME_MAP_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
@@ -423,6 +421,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         /** Is this def's dependencies cacheable? */
         public boolean shouldCacheDependencies;
 
+        // TODO: remove preloads
+        public boolean addedPreloads = false;
+
         public CompileContext(DefDescriptor<? extends Definition> topLevel, List<ClientLibraryDef> clientLibs) {
             this.clientLibs = clientLibs;
             this.topLevel = topLevel;
@@ -440,7 +441,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             @SuppressWarnings("unchecked")
             CompilingDef<D> cd = (CompilingDef<D>) compiled.get(descriptor);
             if (cd == null) {
-                cd = new CompilingDef<>(descriptor);
+                cd = new CompilingDef<D>(descriptor);
                 compiled.put(descriptor, cd);
             }
             return cd;
@@ -978,7 +979,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @throws QuickFixException if something has gone terribly wrong.
      */
     private <D extends Definition> void validateHelper(@NonNull DefDescriptor<D> descriptor) throws QuickFixException {
-        CompilingDef<D> compiling = new CompilingDef<>(descriptor);
+        CompilingDef<D> compiling = new CompilingDef<D>(descriptor);
         currentCC.compiled.put(descriptor, compiling);
     }
 

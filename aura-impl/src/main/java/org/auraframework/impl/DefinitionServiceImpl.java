@@ -50,20 +50,16 @@ import com.google.common.collect.Sets;
  */
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
-    private static final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<WeakReference<SourceListener>>();
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
-        return getDefDescriptor(qualifiedName, defClass, null);
-    }
-
-    @Override
-    public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName,
-            Class<T> defClass, DefDescriptor<B> bundle) {
         if (defClass == ActionDef.class) {
-            return SubDefDescriptorImpl.getInstance(qualifiedName, defClass, ControllerDef.class);
+            return (DefDescriptor<T>) SubDefDescriptorImpl.getInstance(qualifiedName, ActionDef.class,
+                    ControllerDef.class);
         }
-        return DefDescriptorImpl.getInstance(qualifiedName, defClass, bundle);
+        return DefDescriptorImpl.getInstance(qualifiedName, defClass);
     }
 
     @Override
@@ -307,7 +303,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public void subscribeToChangeNotification(SourceListener listener) {
-        listeners.add(new WeakReference<>(listener));
+        listeners.add(new WeakReference<SourceListener>(listener));
     }
 
     @Override

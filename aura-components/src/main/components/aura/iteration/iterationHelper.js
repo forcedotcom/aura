@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	createComponentForIndex : function(cmp, items, index, afterCreationCallback) {
+	createComponentForIndex : function(cmp, itemsval, index, afterCreationCallback) {
 		var helper = this;
 		
 		function createCallback(collector, index) {
@@ -24,7 +24,7 @@
 				//$A.renderingService.requestRerender(newComponent);
 
 				if (--collector.expectedCount === 0) {
-					helper.trackItem(collector.cmp, collector.item, collector.targetIndex, collector.components);
+					helper.trackItem(collector.cmp, collector.itemval, collector.targetIndex, collector.components);
 
 					var realbody = helper.createFacetFromTrackingInfo(collector.cmp);
 					
@@ -40,7 +40,7 @@
 			};
 		}
 
-		var item = items[index];
+		var itemval = itemsval.getValue(index);
 
 		// Clone the body for this row
 		var body = cmp.get("v.body");
@@ -48,13 +48,13 @@
 		var forceServer = cmp.get("v.forceServer");
 		var collector = {
 			targetIndex: index,
-			item : item,
+			itemval : itemval,
 			components : [],
 			cmp : cmp,
 			expectedCount : body.length
 		};
 		
-		this.createComponents(cmp, items, index, function(cdr, ivp, n) {
+		this.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
 			$A.componentService.newComponentAsync(helper, createCallback(collector, n), cdr, ivp, false, false, forceServer);
 		});
 	},
@@ -62,13 +62,13 @@
 	createRealBodyServer : function(cmp) {
 		var helper = this;
 		
-		function createComponentsForIndexFromServer(cmp, items, index) {
+		function createComponentsForIndexFromServer(cmp, itemsval, index) {
 			var ret = [];
 			
 			$A.setCreationPathIndex(index);
 			$A.pushCreationPath("body");
 			
-			helper.createComponents(cmp, items, index, function(cdr, ivp, n) {
+			helper.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
 				ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, true));
 			});
 
@@ -77,9 +77,14 @@
 			return ret;
 		}
 
-		var items = cmp.get("v.items");
+		// Although this is becoming an anti-pattern, we actually DO want
+		// getValue() here.  With it, we end up sharing model objects (under
+		// a PassthroughValue for sub-component ownership).  Without it,
+		// ValueFactory makes us a NEW object for child components, and we
+		// don't share a data model.
+		var itemsval = cmp.getValue("v.items");
 
-		if (items && items.length > 0) {
+		if (itemsval && itemsval.getLength() > 0) {
 			$A.pushCreationPath("realbody");
 
 			this.resetItemTracking(cmp);
@@ -88,9 +93,9 @@
 			var endIndex = this.getEnd(cmp);
 
 			for (var i = startIndex; i < endIndex; i++) {
-				var components = createComponentsForIndexFromServer(cmp, items, i);
+				var components = createComponentsForIndexFromServer(cmp, itemsval, i);
 
-				this.trackItem(cmp, items[i], i, components);
+				this.trackItem(cmp, itemsval.getValue(i), i, components);
 			}
 
 			$A.popCreationPath("realbody");
@@ -111,18 +116,18 @@
 		return cmp._itemInfos;
 	},
 
-	trackItem : function(cmp, item, index, components) {
+	trackItem : function(cmp, itemval, index, components) {
 		// Track the components associated with this item for future v.items delta calculations
 		cmp._itemInfos[index] = {
 			index : index,
-			item : item,
+			itemval : itemval,
 			components : components
 		};
 	},
 
-	getTransformation : function(cmp, items, indexVar, varName, start, end) {
-		function PickOperation(item, sourceIndex, targetIndex, components, indexVar, varName) {
-			this.item = item;
+	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
+		function PickOperation(itemval, sourceIndex, targetIndex, components, indexVar, varName) {
+			this.itemval = itemval;
 			this.sourceIndex = sourceIndex;
 			this.targetIndex = targetIndex;
 			this.components = components;
@@ -135,7 +140,7 @@
 		PickOperation.prototype.run = function(cmp) {
 			var moved = this.sourceIndex !== this.targetIndex;
 			
-			helper.trackItem(cmp, this.item, this.targetIndex, this.components);
+			helper.trackItem(cmp, this.itemval, this.targetIndex, this.components);
 			
 			for (var n = 0; n < this.components.length; n++) {
 				var component = this.components[n];
@@ -156,9 +161,9 @@
 			return "pick(" + this.sourceIndex + ") to " + this.targetIndex;
 		}
 
-		function CreateOperation(index, item, cmp) {
+		function CreateOperation(index, itemval, cmp) {
 			this.index = index;
-			this.item = item;
+			this.itemval = itemval;
 			
 			if (cmp._pendingCreates) {
 				cmp._pendingCreates.push(this);
@@ -176,8 +181,13 @@
 			this.running = true;
 			
 			var that = this;
-			var items = cmp.get("v.items")
-			helper.createComponentForIndex(cmp, items, this.index, function() {
+			// Although this is becoming an anti-pattern, we actually DO want
+			// getValue() here.  With it, we end up sharing model objects (under
+			// a PassthroughValue for sub-component ownership).  Without it,
+			// ValueFactory makes us a NEW object for child components, and we
+			// don't share a data model.
+			var itemsval = cmp.getValue("v.items");
+			helper.createComponentForIndex(cmp, itemsval, this.index, function() {
 				// Remove this create op from the set of pending creates
 				var i = $A.util.arrayIndexOf(cmp._pendingCreates, that);
 				if (i >= 0) {
@@ -197,14 +207,14 @@
 		var operations = [];
 
 		for (var i = start; i < end; i++) {
-			var item = items[i];
+			var itemval = itemsval.getValue(i);
 
 			// Find existing itemInfo for this item
 			var found = false;
 			for (var j = 0; j < itemInfos.length; j++) {
 				var info = itemInfos[j];
-				if (info && $A.util.equalBySource(item, info.item)) {
-					operations.push(new PickOperation(item, j, i, info.components, indexVar, varName));
+				if (info && itemval === info.itemval) {
+					operations.push(new PickOperation(itemval, j, i, info.components, indexVar, varName));
 
 					// Consume the item
 					itemInfos[j] = undefined;
@@ -217,7 +227,7 @@
 			if (!found && pendingCreates) {
 				for (var n = 0; n < pendingCreates.length; n++) {
 					var op = pendingCreates[n];
-					if ($A.util.equalBySource(item, op.item)) {
+					if (itemval === op.itemval) {
 						op.index = i;
 						
 						operations.push(op);
@@ -231,7 +241,7 @@
 			
 			if (!found) {
 				// Add a create to the list operations to be satisfied
-				operations.push(new CreateOperation(i, item, cmp));
+				operations.push(new CreateOperation(i, itemval, cmp));
 			}
 		}
 		
@@ -251,11 +261,16 @@
 	},
 
 	getUpdatedRealBody : function(cmp) {
-		var items = cmp.get("v.items")
-		var varName = cmp.get("v.var");
+        // Although this is becoming an anti-pattern, we actually DO want
+        // getValue() here.  With it, we end up sharing model objects (under
+        // a PassthroughValue for sub-component ownership).  Without it,
+        // ValueFactory makes us a NEW object for child components, and we
+        // don't share a data model.
+        var itemsval = cmp.getValue("v.items");
+        var varName = cmp.get("v.var");
 		var indexVar = cmp.get("v.indexVar");
 
-		var operations = this.getTransformation(cmp, items, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
+		var operations = this.getTransformation(cmp, itemsval, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
 				
 		this.resetItemTracking(cmp);
 		for (var n = 0; n < operations.length; n++) {
@@ -284,20 +299,25 @@
 	},
 
 	getEnd : function(cmp) {
-		var items = cmp.get("v.items");
-		var length = items ? items.length : 0;
+	    // Although this is becoming an anti-pattern, we actually DO want
+        // getValue() here.  With it, we end up sharing model objects (under
+        // a PassthroughValue for sub-component ownership).  Without it,
+        // ValueFactory makes us a NEW object for child components, and we
+        // don't share a data model.
+        var itemsval = cmp.getValue("v.items");
+		var length = itemsval ? itemsval.getLength() : 0;
 		var end = cmp.get("v.end");
 		
 		return !$A.util.isEmpty(end) ? Math.min(length, this.getNumber(end)) : length;
 	},
 	
-	createComponents : function(cmp, items, index, behavior) {
-		function createExtraProviders(cmp, item, index) {
+	createComponents : function(cmp, itemsval, index, behavior) {
+		function createExtraProviders(cmp, itemval, index) {
 			var varName = cmp.get("v.var");
 			var indexVar = cmp.get("v.indexVar");
 			var extraProviders = {};
 			
-			extraProviders[varName] = $A.expressionService.create(cmp, item);
+			extraProviders[varName] = $A.expressionService.create(cmp, itemval);
 			if (indexVar) {
 				extraProviders[indexVar] = $A.expressionService.create(cmp, index);
 			}
@@ -310,7 +330,7 @@
 		for (var n = 0; n < body.length; n++) {
 			var cdr = body[n];
 			if (!ivp) {
-				var extraProviders = createExtraProviders(cmp, items[index], index);
+				var extraProviders = createExtraProviders(cmp, itemsval.getValue(index), index);
 				ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
 			}
 

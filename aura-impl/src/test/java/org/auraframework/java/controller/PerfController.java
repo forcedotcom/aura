@@ -15,6 +15,10 @@
  */
 package org.auraframework.java.controller;
 
+import java.io.File;
+import java.io.FileReader;
+import java.util.logging.Logger;
+
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
@@ -24,17 +28,13 @@ import org.auraframework.test.testsetrunner.TestSetRunnerState;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.util.json.JsonReader;
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.logging.Logger;
-
-
 @Controller
 public class PerfController {
     private static final Logger logger = Logger.getLogger(PerfController.class.getName());
 
     /**
      * Get Performance metrics for a given test.
+     * 
      * @param metricsType Eg. "goldfiles", "aurastats", "timelines"
      * @param testName Eg. "testChangeCount(org.auraframework.test.perf.custom.RenderIfComponentTest)"
      * @return
@@ -42,15 +42,16 @@ public class PerfController {
      */
     @AuraEnabled
     public static Object getPerformanceMetrics(@Key("metricsType") String metricsType,
-                                               @Key("testName") String testName) throws Exception {
+            @Key("testName") String testName) throws Exception {
 
         logger.info(String.format("Loading '%s' Performance metrics for test: %s", metricsType, testName));
 
         UnitTestCase test = (UnitTestCase) TestSetRunnerState.getInstance().getInventory().get(testName);
         String goldFileName = test.getGoldFileName();
 
-        PerfResultsUtil.PerformanceMetrics type = PerfResultsUtil.PerformanceMetrics.getPerformanceMetricsFromType(metricsType);
-        File file = type.getFile(type, goldFileName);
+        PerfResultsUtil.PerformanceMetrics type = PerfResultsUtil.PerformanceMetrics
+                .getPerformanceMetricsFromType(metricsType);
+        File file = type.getFile(goldFileName);
 
         if (file.exists()) {
             logger.info(String.format("Reading Performance metrics from file: %s", file.getAbsolutePath()));

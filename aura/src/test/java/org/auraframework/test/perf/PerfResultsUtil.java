@@ -46,7 +46,25 @@ public final class PerfResultsUtil {
     public static final File RESULTS_DIR;
 
     static {
-        RESULTS_DIR = new File(System.getProperty("aura.perf.results.dir", "target/perf/results"));
+        // use aura.perf.results.dir if set
+        String resultsPath = System.getProperty("aura.perf.results.dir", null);
+
+        // else use aura-integration-test/target/perf/results if running in aura
+        if (resultsPath == null && new File("../aura-integration-test").exists()) {
+            resultsPath = "../aura-integration-test/target/perf/results";
+            try {
+                resultsPath = new File(resultsPath).getCanonicalPath();
+            } catch (IOException e) {
+                LOG.log(Level.WARNING, "error canonicalizing " + resultsPath, e);
+            }
+        }
+
+        // else target/perf/results
+        if (resultsPath == null) {
+            resultsPath = "target/perf/results";
+        }
+
+        RESULTS_DIR = new File(resultsPath);
         LOG.info("perf results dir: " + RESULTS_DIR.getAbsolutePath());
         RESULTS_DIR.mkdirs();
     }
@@ -54,48 +72,42 @@ public final class PerfResultsUtil {
     public enum PerformanceMetrics {
         AURA_STATS("aurastats"),
         GOLD_FILES("goldfiles"),
-        HEAPS("heaps"),
-        PROFILES("profiles"),
-        TIMESLINES("timelines"),
-        UNKNOWN("");
+        HEAPS("heaps", ".heapsnapshot"),
+        PROFILES("profiles", ".cpuprofile"),
+        TIMELINES("timelines");
 
-        private String value;
+        private final String value;
+        private final String fileExtension;
+
         private PerformanceMetrics(String value) {
-            this.value = value;
+            this(value, ".json");
         }
-        public static File getFile(PerformanceMetrics performanceMetrics, String fileName) {
-            File dir = new File(RESULTS_DIR, performanceMetrics.value);
 
-            return new File(dir, fileName + getFileExtenstion(performanceMetrics));
+        private PerformanceMetrics(String value, String fileExtension) {
+            this.value = value;
+            this.fileExtension = fileExtension;
+        }
+
+        public File getFile(String fileName) {
+            File dir = new File(RESULTS_DIR, value);
+            return new File(dir, fileName + fileExtension);
         }
 
         public static PerformanceMetrics getPerformanceMetricsFromType(String metricsType) {
-            for(PerformanceMetrics result: PerformanceMetrics.values()) {
-                if(result.value.equalsIgnoreCase(metricsType)) {
+            for (PerformanceMetrics result : PerformanceMetrics.values()) {
+                if (result.value.equalsIgnoreCase(metricsType)) {
                     return result;
                 }
             }
-            return UNKNOWN;
-        }
-
-        private static String getFileExtenstion(PerformanceMetrics performanceMetrics){
-            switch(performanceMetrics) {
-                case HEAPS:
-                    return ".cpuprofile";
-                case PROFILES:
-                    return ".heapsnapshot";
-                default:
-                    return ".json";
-            }
+            throw new IllegalArgumentException("unknown metricsType: " + metricsType);
         }
     }
-
 
     /**
      * @return the written file
      */
     public static File writeGoldFile(PerfMetrics metrics, String fileName, boolean storeDetails) {
-        File file = PerformanceMetrics.getFile(PerformanceMetrics.GOLD_FILES, fileName);
+        File file = PerformanceMetrics.GOLD_FILES.getFile(fileName);
         RESULTS_JSON.addResultsFile(file);
         try {
             ALL_GOLDFILES_JSON.addGoldfile(fileName, metrics);
@@ -109,7 +121,7 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeAuraStats(String auraStatsContents, String fileName) {
-        File file = PerformanceMetrics.getFile(PerformanceMetrics.AURA_STATS, fileName);
+        File file = PerformanceMetrics.AURA_STATS.getFile(fileName);
         RESULTS_JSON.addResultsFile(file);
         return writeFile(file, auraStatsContents, "Aura Stats");
     }
@@ -137,7 +149,7 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeDevToolsLog(List<JSONObject> timeline, String fileName, String userAgent) {
-        File file = PerformanceMetrics.getFile(PerformanceMetrics.TIMESLINES, fileName);
+        File file = PerformanceMetrics.TIMELINES.getFile(fileName);
         try {
             writeDevToolsLog(timeline, file, userAgent);
             RESULTS_JSON.addResultsFile(file);
@@ -174,7 +186,7 @@ public final class PerfResultsUtil {
      * @return the written file
      */
     public static File writeJSProfilerData(Map<String, ?> jsProfilerData, String fileName) {
-        File file = PerformanceMetrics.getFile(PerformanceMetrics.PROFILES, fileName);
+        File file = PerformanceMetrics.PROFILES.getFile(fileName);
         try {
             file.getParentFile().mkdirs();
             BufferedWriter writer = null;
@@ -202,7 +214,7 @@ public final class PerfResultsUtil {
      */
     @SuppressWarnings("unchecked")
     public static File writeHeapSnapshot(Map<String, ?> data, String fileName) throws Exception {
-        File file = PerformanceMetrics.getFile(PerformanceMetrics.HEAPS, fileName);
+        File file = PerformanceMetrics.HEAPS.getFile(fileName);
         BufferedWriter writer = null;
         try {
             file.getParentFile().mkdirs();

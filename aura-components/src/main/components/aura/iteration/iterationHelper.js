@@ -227,7 +227,7 @@
 			if (!found && pendingCreates) {
 				for (var n = 0; n < pendingCreates.length; n++) {
 					var op = pendingCreates[n];
-					if (itemval === op.itemval) {
+					if ($A.util.equalBySource(itemval, op.itemval)) {
 						op.index = i;
 						
 						operations.push(op);

@@ -169,14 +169,17 @@
     testChangeIterationSize : {
         attributes : { list : "x,x,x" },
         test : [ function(cmp) {
-            $A.run(function(){cmp.find("iteration").set("v.start", 1)});
+            $A.run(
+            		function(){
+            			cmp.find("iteration").set("v.start", 1)
+            		});
             $A.test.addWaitForWithFailureMessage(2, function(){return cmp.find("iterinst").length}, "number of iterations not reduced");
         }, function(cmp) {
             // client created
-            this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[0]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[0]/*[0]/$/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[1]/*[0]");
-            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
+            this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/+[1]/*[0]");
+            this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/+[1]/*[0]/$/*[0]");
+            this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/+[2]/*[0]");
+            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/+[2]/*[0]/$/*[0]");
         }]
     },
 

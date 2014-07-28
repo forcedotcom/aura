@@ -65,7 +65,7 @@ var clientService;
 // #include aura.value.SimpleValue
 // #include aura.value.MapValue
 // #include aura.value.ArrayValue
-// #include aura.value.PropertyReferenceChain
+// #include aura.value.PropertyChain
 // #include aura.value.FunctionCallValue
 // #include aura.value.ActionReferenceValue
 // #include aura.value.PassthroughValue

@@ -27,7 +27,7 @@ var valueFactory = {
 
                 return valueConfig;
             } else if (valueConfig["exprType"] === "PROPERTY") {
-                return new PropertyReferenceChain(valueConfig["path"]);
+                return new PropertyChain(valueConfig["path"]);
             } else if (valueConfig["exprType"] === "FUNCTION") {
                 return new FunctionCallValue(valueConfig, def, component);
             } else {
@@ -38,7 +38,7 @@ var valueFactory = {
         } else if (valueConfig && valueConfig.indexOf && valueConfig.indexOf("{!") === 0) {
         	// Property expressions
         	valueConfig = valueConfig.substring(2, valueConfig.length - 1);
-            return new PropertyReferenceChain(valueConfig.split("."));
+            return new PropertyChain(valueConfig.split("."));
         } else {
             return new SimpleValue(valueConfig, def, component);
         }
@@ -51,7 +51,7 @@ var valueFactory = {
         }
         
         var path = str.split('.');
-        return new PropertyReferenceChain(path);
+        return new PropertyChain(path);
     }
 
 //#if {"modes" : ["STATS"]}

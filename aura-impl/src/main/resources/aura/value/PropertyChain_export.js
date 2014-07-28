@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = PropertyReferenceChain.prototype;
+var p = PropertyChain.prototype;
 exp(p,
     "getRoot", p.getRoot,
     "getStem", p.getStem,

@@ -148,8 +148,8 @@ var AuraDevToolService = function() {
             "passthroughValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("PassthroughValue"));
             },
-            "PropertyReferenceChain" : function(){
-                return flattenRegistry(valueFactory.getIndex("PropertyReferenceChain"));
+            "PropertyChain" : function(){
+                return flattenRegistry(valueFactory.getIndex("PropertyChain"));
             },
             "simpleValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("SimpleValue"));

@@ -70,9 +70,9 @@
         	var newMap = component.find('htmlDiv').get('v.HTMLAttributes');
             try{
             	$A.test.assertTrue($A.util.isExpression(newMap["disabled"]));
-                $A.test.assertEquals(false, newMap["disabled"].evaluate(), "failed to resolve propertyReferenceChain");
+                $A.test.assertEquals(false, newMap["disabled"].evaluate(), "failed to resolve propertyChain");
             }catch(e){
-                $A.test.fail("Failed to resolve PropertyReferenceChains. Error :" + e);
+                $A.test.fail("Failed to resolve PropertyChains. Error :" + e);
             }
         }
     },

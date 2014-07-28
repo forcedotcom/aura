@@ -84,7 +84,7 @@
     },
 
     /**
-     * Test server dependent client created component with attributes containing PropertyReferenceChain in MapValue
+     * Test server dependent client created component with attributes containing PropertyChain in MapValue
      */
     createCmpWithMapValuePropRefValueFromServer : function(cmp, evt,helper){
         var path = [];

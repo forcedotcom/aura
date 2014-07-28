@@ -19,7 +19,7 @@
  * @constructor
  * @protected
  */
-function PropertyReferenceChain(path){
+function PropertyChain(path){
     this.path = path;
 
 //#if {"modes" : ["STATS"]}
@@ -27,27 +27,27 @@ function PropertyReferenceChain(path){
 //#end
 }
 
-PropertyReferenceChain.prototype.auraType = "Value";
+PropertyChain.prototype.auraType = "Value";
 
 /**
  * Returns the root piece of this property reference.
  */
-PropertyReferenceChain.prototype.getRoot = function() {
+PropertyChain.prototype.getRoot = function() {
     return this.path[0];
 };
 
 /**
- * Returns a new PropertyReferenceChain representing everything after the root, or null if there is no more.
+ * Returns a new PropertyChain representing everything after the root, or null if there is no more.
  */
 
-PropertyReferenceChain.prototype.getStem = function() {
+PropertyChain.prototype.getStem = function() {
     var l = this.path.length;
     if (l == 1) {
         return null;
     }
     
     if (!this.stem) {
-    	this.stem = new PropertyReferenceChain(this.path.slice(1, l));
+    	this.stem = new PropertyChain(this.path.slice(1, l));
     }
    
     return this.stem;
@@ -57,58 +57,58 @@ PropertyReferenceChain.prototype.getStem = function() {
 /**
  * Returns the value in the format "{!path}".
  */
-PropertyReferenceChain.prototype.getValue = function() {
+PropertyChain.prototype.getValue = function() {
     return "{!" + this.path.join(".") + "}";
 };
 
 /**
  * Sets the isDefined flag to true.
  */
-PropertyReferenceChain.prototype.isDefined = function() {
+PropertyChain.prototype.isDefined = function() {
     return true;
 };
 
 /**
  * Sets the isDirty flag to false.
  */
-PropertyReferenceChain.prototype.isDirty = function(){
+PropertyChain.prototype.isDirty = function(){
     return false;
 };
 
 /**
- * Always throws an error because PropertyReferenceChain cannot be unwrapped.
+ * Always throws an error because PropertyChain cannot be unwrapped.
  * Do not call.
  */
-PropertyReferenceChain.prototype.unwrap = function(){
-    throw new Error("Cannot unwrap a PropertyReferenceChain");
+PropertyChain.prototype.unwrap = function(){
+    throw new Error("Cannot unwrap a PropertyChain");
 };
 
 /**
- * Always throws an error because PropertyReferenceChain cannot be merged into.
+ * Always throws an error because PropertyChain cannot be merged into.
  * Do not call.
  */
-PropertyReferenceChain.prototype.merge = function() {
-    throw new Error("Cannot merge into a PropertyReferenceChain");
+PropertyChain.prototype.merge = function() {
+    throw new Error("Cannot merge into a PropertyChain");
 };
 
 /**
  * Sets the isLiteral flag to false to denote that the property reference can be changed.
  */
-PropertyReferenceChain.prototype.isLiteral = function(){
+PropertyChain.prototype.isLiteral = function(){
     return false;
 };
 
 /**
  * Sets the isExpression flag to true to denote an expression.
  */
-PropertyReferenceChain.prototype.isExpression = function(){
+PropertyChain.prototype.isExpression = function(){
     return true;
 };
 
 /**
  * Destroys the path.
  */
-PropertyReferenceChain.prototype.destroy = function(){
+PropertyChain.prototype.destroy = function(){
 
 //#if {"modes" : ["STATS"]}
     valueFactory.deIndex(this);
@@ -117,9 +117,9 @@ PropertyReferenceChain.prototype.destroy = function(){
 };
 
 /**
- * Returns "PropertyReferenceChain" as  String.
+ * Returns "PropertyChain" as  String.
  */
-PropertyReferenceChain.prototype.toString = function(){
-    return "PropertyReferenceChain";
+PropertyChain.prototype.toString = function(){
+    return "PropertyChain";
 };
-//#include aura.value.PropertyReferenceChain_export
+//#include aura.value.PropertyChain_export

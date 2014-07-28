@@ -164,7 +164,7 @@ $A.ns.GlobalValueProviders.prototype.getValueProvider = function(type) {
  * Creates property reference chain from string expression
  *
  * @param expression
- * @return {PropertyReferenceChain}
+ * @return {PropertyChain}
  * @private
  */
 $A.ns.GlobalValueProviders.prototype.createPropertyRef = function(expression) {

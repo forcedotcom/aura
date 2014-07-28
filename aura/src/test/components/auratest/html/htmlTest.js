@@ -273,8 +273,8 @@
     fireTouchEndEventOnElement:function(component, targetElement){
         component._OnClickHandler = false;
         component._TouchEndHandler = false;
-        var touchEndEvt =  document.createEvent("UIEvent");
-        touchEndEvt.initUIEvent("touchend", true, true);
+        var touchEndEvt =  document.createEvent("TouchEvent");
+        touchEndEvt.initTouchEvent("touchend", true, true);
         targetElement.dispatchEvent(touchEndEvt);
     }
 })

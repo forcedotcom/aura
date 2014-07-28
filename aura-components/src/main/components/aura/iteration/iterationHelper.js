@@ -84,7 +84,7 @@
 		// don't share a data model.
 		var itemsval = cmp.getValue("v.items");
 
-		if (itemsval && itemsval.getLength() > 0) {
+		if (itemsval && itemsval.getLength && itemsval.getLength() > 0) {
 			$A.pushCreationPath("realbody");
 
 			this.resetItemTracking(cmp);
@@ -305,7 +305,7 @@
         // ValueFactory makes us a NEW object for child components, and we
         // don't share a data model.
         var itemsval = cmp.getValue("v.items");
-		var length = itemsval ? itemsval.getLength() : 0;
+		var length = itemsval && itemsval.getLength ? itemsval.getLength() : 0;
 		var end = cmp.get("v.end");
 		
 		return !$A.util.isEmpty(end) ? Math.min(length, this.getNumber(end)) : length;

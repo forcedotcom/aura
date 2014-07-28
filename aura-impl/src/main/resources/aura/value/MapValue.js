@@ -201,7 +201,7 @@ MapValue.prototype.get = function(key){
     // if ($A.util.isUndefinedOrNull(value)) {
     //     return value;
     // }
-    // if (value.toString && value.toString() === 'PropertyReferenceValue') {
+    // if (value.toString && value.toString() === 'PropertyChain') {
     //     return $A.expressionService.get(this.owner, key);
     // }
     // return value.unwrap();

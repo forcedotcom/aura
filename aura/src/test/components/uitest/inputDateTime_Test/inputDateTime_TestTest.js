@@ -108,13 +108,13 @@
     },
     
  	/**
- 	 * Firing the openDatePicker component event should open the date picker.
+ 	 * Firing the openPicker component event should open the date picker.
  	 */
  	testOpenDatePickerWithComponentEvent : {
             test : function(cmp) {
             		var dateTimePickerTest = cmp.find("dateTimePickerTest");
-            		var openDatePickerEvt = dateTimePickerTest.getEvent("openDatePicker");
-            		$A.test.assertNotUndefinedOrNull(openDatePickerEvt, "Didn't find an openDatePicker event");
+            		var openDatePickerEvt = dateTimePickerTest.getEvent("openPicker");
+            		$A.test.assertNotUndefinedOrNull(openDatePickerEvt, "Didn't find an openPicker event");
             		openDatePickerEvt.fire();
             		var datePicker = dateTimePickerTest.find("datePicker").getElement();
             		$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});

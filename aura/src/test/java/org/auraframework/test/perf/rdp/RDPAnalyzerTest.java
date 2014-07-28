@@ -34,12 +34,22 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
     }
 
     @Override
+    protected boolean runPerfWarmupRun() {
+        return true;
+    }
+
+    @Override
     protected int numPerfTimelineRuns() {
         return 0; // run only the first warmup run
     }
 
     @Override
     protected int numPerfAuraRuns() {
+        return 0; // run only the first warmup run
+    }
+
+    @Override
+    protected int numPerfProfileRuns() {
         return 0; // run only the first warmup run
     }
 

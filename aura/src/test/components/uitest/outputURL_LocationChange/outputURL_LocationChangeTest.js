@@ -65,13 +65,16 @@
                             function() {
                                 $A.test.addWaitForWithFailureMessage(2, 
                                         function() { return cmp.get("v.locationChangeCount"); }, 
-                                        "locationChangeCount count should increase after clicking on Peach");
+                                        "locationChangeCount should increase after clicking on Peach");
+                                $A.test.addWaitForWithFailureMessage(1, 
+                                        function() { return cmp.get("v.locationChangeCountPeach"); }, 
+                                        "locationChangeCountPeach should increase after clicking on Peach");
                             }
                     );
                     href = urlElPeach.getAttribute('href');
-                    var locationChangeCount = cmp.get("v.locationChangeCount");
+                    var locationChangeCountPeach = cmp.get("v.locationChangeCountPeach");
                     $A.test.assertTrue(
-                       href == "javascript:void(0);" || href == "javascript:void(0/*#" + locationChangeCount +"*/);",
+                       href == "javascript:void(0);" || href == "javascript:void(0/*#" + locationChangeCountPeach +"*/);",
                        "href attribute not correct"
                     );
                 },
@@ -89,20 +92,27 @@
                             function() {
                                 $A.test.addWaitForWithFailureMessage(3, 
                                         function() { return cmp.get("v.locationChangeCount"); }, 
-                                        "locationChangeCount count should increase after clicking on Peach again");
+                                        "locationChangeCount should increase after clicking on Peach again");
+                                $A.test.addWaitForWithFailureMessage(2, 
+                                        function() { return cmp.get("v.locationChangeCountPeach"); }, 
+                                        "locationChangeCountPeach should increase after clicking on Peach again");
                             }
                     );
-                },
+                }
         ]
     },
     
     /*
-     * this is disabled for : W-2317160, update the test then enable it once the bug is resolved.
+     * this is disabled for : W-2317160
+     * I think the value of outputURL cannot be changed BEFORE locationChange event is fired, looks like
+     * our handler is attached to the "exact" outputURL, change in value will loose the handler. 
+     * that's why if we don't change orange link's value, click after first will trigger locationChange
+     * we do create a new HtmlAttribute everytime value changes, not 'reusing' the old one.
      */
     _testHashValueChangeInClickHandler:{
         test : [
                     function(cmp) {
-                        //Click Orange first time,its url has value="{!'#' + v.locationToken}"
+                        //Click Orange first time,its url has value="{!'#' + v.locationTokenOrange}"
                         // we change locationToken in click event handler
                         // locationChange event DOES NOT fire
                         var urlCmpOrange = cmp.find('hashLinkO'),
@@ -113,13 +123,13 @@
                                 function() { return cmp.get("v.clickCount"); }, 
                                 "clickCount should increase after clicking on Orange at the first time",
                                 function() {
-                                    $A.test.assertEquals(1,cmp.get("v.locationChangeCount"),
+                                    $A.test.assertEquals(2,cmp.get("v.locationChangeCount"),
                                             "locationChange event doesn't fire at the first time we click Orange");
                                 }
                         );
                     },
                     function(cmp) {
-                        //Click Orange Again, locationChange event is fired
+                        //Click Orange Again, locationChange event doesn't fire
                         var urlCmpOrange = cmp.find('hashLinkO'),
                         urlElOrange = urlCmpOrange.getElement();
                         $A.test.clickOrTouch(urlElOrange);
@@ -127,7 +137,7 @@
                                 function() { return cmp.get("v.clickCount"); }, 
                                 "clickCount should increase after clicking on Orange Again",
                                 function() {
-                                    $A.test.assertEquals(2,cmp.get("v.locationChangeCount"),
+                                    $A.test.assertEquals(3,cmp.get("v.locationChangeCount"),
                                             "locationChange event should fire after clicking Orange again");
                                 }
                         );
@@ -135,7 +145,11 @@
                ]
     },
     
+    /*
+     * W-2322327: test disable for IE8 
+     */
     testConstHashValue : {
+    	browsers:["-IE8"],
         test : [
                     function(cmp) {
                         //Click Apple,its url has value="#APPLE", locationChange is fired
@@ -167,7 +181,21 @@
                                 }
                         );
                     }, 
-                                    
+                    function(cmp) {
+                        //Click Apple AGAIN, location doesn't really change,but locationChange event is fired anyway. 
+                        var urlCmpApple = cmp.find('hashLinkA'),
+                        urlElApple = urlCmpApple.getElement();
+                        $A.test.clickOrTouch(urlElApple);
+                        $A.test.addWaitForWithFailureMessage(3,
+                                function() { return cmp.get("v.clickCount"); },
+                                "click count should increase after clicking on Apple 3rd time",
+                                function() {
+                                    $A.test.addWaitForWithFailureMessage(4, 
+                                            function() { return cmp.get("v.locationChangeCount"); }, 
+                                            "locationChangeCount should increase after clicking on Apple 3nd time");
+                                }
+                        );
+                    }
                 ]
     },
     

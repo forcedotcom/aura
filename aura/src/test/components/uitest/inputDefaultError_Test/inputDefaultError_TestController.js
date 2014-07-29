@@ -14,7 +14,20 @@
  * limitations under the License.
  */
  ({  
-	 //controller that grabs all the ids and puts invalidates all of them
+	 //If in the correct mode, creating the necessary inputDefaultError
+	 init : function(cmp, evt, hlp) {
+            if(cmp.get("v.caseToRender") == 'dynamic'){
+            	  hlp.createNewCmp(cmp, "1");
+            }           
+    },
+    
+    //Creating a new defaultError component on the fly
+    createNew : function(cmp, evt, hlp) {
+       hlp.createNewCmp(cmp, "2");
+    },
+
+
+     //controller that grabs all the ids and puts invalidates all of them
      validateInput : function(cmp, evt, helper){
     	 var baseId = cmp.get("v.caseToRender");
     	 var componentIdArray = [];

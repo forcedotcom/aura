@@ -19,12 +19,20 @@
 	<aura:attribute name="class" type="String"/>
 	<aura:attribute name="swipeBody" type="Aura.Component[]"/>
 
+<!-- API not currently exposed.
+	<aura:registerEvent name="open" type="ui:open"/>
+	<aura:registerEvent name="close" type="ui:close"/>
+
+	<aura:handler name="open" action="{!c.handleOpen}"/>
+	<aura:handler name="close" action="{!c.handleClose}"/>
+-->
+
 	<!-- 
 	 ~ Each row touch event is resolved by ui:infiniteList via the class "uiInfiniteListRow" (see infiniteListRowHelper). 
 	 ~ Hence, try not to mess around with the class name. Adding an additional class name is acceptable tough.
 	 -->
 	<li class="{!v.class}" style="{! $Browser.isWindowsPhone ? 'touch-action: pan-y' : ''}">
-		<div class="body">{!v.body}</div>
-		<div class="swipeBody">{!v.swipeBody}</div>
+		<div aura:id="body" class="body">{!v.body}</div>
+		<div aura:id="swipeBody" class="swipeBody">{!v.swipeBody}</div>
 	</li>
 </aura:component>

@@ -35,6 +35,9 @@
     <aura:registerEvent name="refresh" type="ui:refresh" description="The event fired when the component is refreshed."/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 
+	<aura:registerEvent name="addRemove" type="ui:addRemove" description="Command event to insert or remove items"/>
+	<aura:handler name="addRemove" action="{!c.addRemove}"/>
+
     <aura:handler name="init" action="{!c.init}" value="{!this}"/>
     
     <div class="{!v.class + (v.visible == false ? ' invisible' : '')}" role="{!v.role}">
@@ -43,7 +46,7 @@
         <div class="listContent">
             {!v.body}
 			<div class="emptyListContent">
-					{!v.emptyListContent}
+				{!v.emptyListContent}
 			</div>
             <div class="loadingIndicator">
                 <div class="background"></div>

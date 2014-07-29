@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 ({
-	clickFruit : function(cmp) {
+	clickFruit : function(cmp, fruit) {
+		//update the common location token
+		cmp.set("v.locationToken",fruit);
+		if(fruit == "Orange") {
+			//update token for Orange
+			cmp.set("v.locationTokenOrange",cmp.get("v.locationTokenOrange")+"Orange");
+		}
     	cmp.set("v.clickCount", cmp.get("v.clickCount") + 1);
     },
     

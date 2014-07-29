@@ -13,5 +13,26 @@
     	 else{
     		 invalidCmp.setValid(value, true);
     	 }
+	},
+	
+	//Extracting out the ability to create this new inputDefaultError
+	createNewCmp : function(cmp, lblAide){
+		 $A.componentService.newComponentAsync(
+	                this,
+	                function(newcmp){
+	                    cmp.find("propsArea").getValue("v.body").push(newcmp);
+	                },
+	                {
+	                    "componentDef": "markup://uitest:inputDefaultErrorDynamic_test",
+	                    "attributes": {
+	                        "values": {
+	                            label: "Label"+lblAide,
+	                            value : "123",
+	                            name: "Label"+lblAide,
+	                            newClass : "class"+lblAide
+	                        }
+	                    }
+	                }
+	        );
 	}
 })

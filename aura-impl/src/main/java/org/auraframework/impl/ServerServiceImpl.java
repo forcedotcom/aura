@@ -180,7 +180,7 @@ public class ServerServiceImpl implements ServerService {
         AuraContext context = Aura.getContextService().getCurrentContext();
 
         Mode mode = context.getMode();
-        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
+        final boolean minify = !mode.prettyPrint();
         final String mKey = minify ? "MIN:" : "DEV:";
         //
         // create a temp buffer in case anything bad happens while we're processing this.
@@ -242,6 +242,13 @@ public class ServerServiceImpl implements ServerService {
                     // For now, just use the non-compressed version if we can't get
                     // the compression to work.
                     cached = sw.toString();
+                } else {
+                    // if unable to compress, add error comments to the end. 
+                    // ONLY if not production instance
+                    if (!Aura.getConfigAdapter().isProduction()) {
+                        sb.append(commentedJavascriptErrors(errors));
+                    }
+                    cached = sb.toString();
                 }
             }
             context.getDefRegistry().putCachedString(uid, applicationDescriptor, key, cached);
@@ -302,5 +309,28 @@ public class ServerServiceImpl implements ServerService {
             throw new IllegalStateException("Illegal state, QFE during write", qfe);
         }
         return out;
+    }
+    
+    /**
+     * Loops through list of javascript errors and return commented text to display
+     * 
+     * @param errors list of javascript syntax errors
+     * @return commented errors
+     */
+    private StringBuilder commentedJavascriptErrors(List<JavascriptProcessingError> errors) {
+        StringBuilder errorMsgs = new StringBuilder();
+        if (errors != null && !errors.isEmpty()) {
+            errorMsgs
+                .append("/**")
+                .append(System.lineSeparator())
+                .append("There are errors preventing this file from being minimized! ")
+                .append("Start from the first error as they cascade and produce additional errors.")
+                .append(System.lineSeparator());
+            for (JavascriptProcessingError err : errors) {
+                errorMsgs.append(err);
+            }
+            errorMsgs.append("**/");
+        }
+        return errorMsgs;
     }
 }

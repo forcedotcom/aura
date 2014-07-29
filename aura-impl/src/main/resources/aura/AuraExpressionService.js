@@ -58,7 +58,7 @@ var AuraExpressionService = function AuraExpressionService(){
                 return expression.getValue(valueProvider);
             }
 
-            if (!$A.util.instanceOf(expression, PropertyReferenceValue)){
+            if (!$A.util.instanceOf(expression, PropertyChain)){
                 return null;
             }
 
@@ -83,8 +83,8 @@ var AuraExpressionService = function AuraExpressionService(){
                 propRef = propRef.getStem();
             }
 
-            // handle PropertyReferenceValue. get its value.
-            if ($A.util.instanceOf(value, PropertyReferenceValue)) {
+            // handle PropertyChain. get its value.
+            if ($A.util.instanceOf(value, PropertyChain)) {
                 value = this.getValue(valueProvider, value);
             }
 

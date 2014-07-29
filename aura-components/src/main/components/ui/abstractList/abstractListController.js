@@ -64,6 +64,45 @@
         	
     	helper.triggerDataProvider(component, index);
     },
+    
+    /**
+     * Handles removal of a row(s) from the list.
+     * 
+     * Structure your "parameters" (inherited from ui:command) like so:
+     * 
+     * parameters : { 
+     *     timeout  : Number 	// number of milliseconds to use as an animation timeout
+     *     animate  : Function  // invoked to apply whatever animation technique is most appropriate
+     *     callback : Function  // invoked after the timeout and hard removal has occurred
+     * }
+     */
+    addRemove: function (component, event, helper) {
+    	var params = event.getParams(),
+    		timeout = params.parameters && params.parameters.timeout, 	// no default timeout
+    		animate = params.parameters && params.parameters.animate, 	
+    		callback = params.parameters && params.parameters.callback,
+    		items;
+    	
+    	if (params.remove) {
+    		
+    		// Default index and count if necessary.
+    		if (params.last) {
+    			items = component.getConcreteComponent().get('v.items');
+    			params.index = items ? items.length - 1 : null; 
+    			params.count = 1;
+    		}
+    		
+    		if (params.count) {
+    			helper.remove(component, params.index, params.count, timeout, animate, callback);	
+    		}
+    		else {
+    			throw new Error("Remove command must be provided with either a 'count' or 'last' parameter.");
+    		}	
+    	}
+    	else {
+    		throw new Error('Add command not implemented on ui:abstractList.');
+    	}
+    },
 
     triggerDataProvider: function(component, event, helper) {
     	var params = event.getParam("parameters");

@@ -15,6 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Used to fetch and display additional list data.">
-    <aura:attribute name="parameters" type="Object" description="The parameters the component can use to refresh."/>
+<aura:event type="COMPONENT" extends="ui:command" description="Used to fetch and display additional list data.">
 </aura:event>

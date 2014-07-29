@@ -16,7 +16,15 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="default" />
-    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <!--
+       Test that will verify that the the inputDefault error shows up when there is an error, and doesn't when there isn't an error  
+    -->
+    <aura:if isTrue="{!v.caseToRender == 'dynamic' }">   	
+	    <div aura:id="propsArea"></div>
+	    <ui:button label="New" aura:id="new_button" press="{!c.createNew}"/>	   
+    	<br/>
+    </aura:if>
     
     <!--
        Test that will verify that the the inputDefault error shows up when there is an error, and doesn't when there isn't an error  

@@ -1,27 +1,28 @@
 ({
 
 	clickPeach : function (cmp, evt, helper) {
-		cmp.set("v.locationToken","Peach");
-		helper.clickFruit(cmp);
+		helper.clickFruit(cmp,"Peach");
     },
     
     clickApple : function(cmp,evt,helper) {
-    	cmp.set("v.locationToken","Apple");
-    	helper.clickFruit(cmp);
+    	helper.clickFruit(cmp,"Apple");
     },
     
     clickBanana : function(cmp,evt,helper) {
-    	cmp.set("v.locationToken","Banana");
-    	helper.clickFruit(cmp);
+    	helper.clickFruit(cmp,"Banana");
     },
     
     clickOrange : function(cmp,evt,helper) {
-    	cmp.set("v.locationToken","Orange");
-    	helper.clickFruit(cmp);
+    	helper.clickFruit(cmp,"Orange");
     },
     
     locationChanged: function(cmp, evt) {
-        cmp.set("v.locationChangeCount", cmp.get("v.locationChangeCount") + 1);
+    	var fruit = cmp.get("v.locationToken");
+    	if(fruit == "Peach") {
+    		cmp.set("v.locationChangeCountPeach", cmp.get("v.locationChangeCountPeach") + 1);
+    	}
+    	//increase common counter
+    	cmp.set("v.locationChangeCount", cmp.get("v.locationChangeCount") + 1);
     },
     
 })

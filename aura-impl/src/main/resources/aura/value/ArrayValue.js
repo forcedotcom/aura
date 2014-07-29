@@ -899,12 +899,15 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                 
                 // Find the item reference node.  We have prevRendered, but can't trust it: the
                 // elem might have rerendered away.  So, go hunting....
-                if (itemElems) {
+
+                if (itemElems.length > 0) {
                     // itemElems is an array, take the last one
                     itemReferenceNode = itemElems[itemElems.length - 1];
                 } else {
                     // Get the funky elements object, find the last
-                    itemElems = item.getElements();
+                    // use previously rendered comments if getElements() returns nothing
+                    itemElems = item.getElements() || prevRenderedIndexed;
+
                     if (itemElems[0]) {
                         for (var k = 0; itemElems[k]; ++k) {
                             itemReferenceNode = itemElems[k];
@@ -916,7 +919,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             }
             
             // We have prevRendered, but can't trust it: the elem might have re/unrendered away.
-            itemElems = item.getElements();
+            itemElems = item.getElements() || prevRenderedIndexed;
             itemReferenceNode = itemElems[0] ? itemElems[0] : itemElems['element'];
             
             if (firstReferenceNode === null) {

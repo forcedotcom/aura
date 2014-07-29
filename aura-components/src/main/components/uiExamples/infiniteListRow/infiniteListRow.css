@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = PropertyReferenceValue.prototype;
-exp(p,
-    "getRoot", p.getRoot,
-    "getStem", p.getStem,
-    "getValue", p.getValue,
-    "isDefined", p.isDefined,
-    "isDirty", p.isDirty,
-    "unwrap", p.unwrap,
-    "merge", p.merge,
-    "isLiteral", p.isLiteral,
-    "isExpression", p.isExpression,
-    "destroy", p.destroy,
-    "toString", p.toString
-);
+.THIS div.body > a {
+	display: block;
+	padding: 14px;
+	height: 100%;
+	overflow: hidden;
+	width: 100%;
+}
+
+.THIS div.body > a > p {
+	color: #000;
+	font-weight: normal;
+}
+
+.THIS div.swipeBody {
+	background-color: #ccc;
+}

@@ -34,6 +34,7 @@ public class ScrollerUITest extends WebDriverTestCase{
 private static final String SCROLLER_CMP1 = "/uitest/scroller_basic.cmp";
 //private static final String SCROLLER_CMP2 = "/uitest/scrollerEndless.cmp";
 //private static final String SCROLLER_CMP3 = "/uitest/scrollerSnap.cmp";
+private static final String SCROLLER_CMP4 = "/uitest/scrollerNative.cmp";
 private WebDriver driver;
 
 public ScrollerUITest(String name) {
@@ -191,7 +192,26 @@ public void testScrollingSnapInfinite() throws Exception {
    
 }
 */
-
+public void testScrollingNativeFiresEvents() throws Exception {
+	 open(SCROLLER_CMP4);
+	    driver = this.getDriver();
+	    augmentDriver();
+	    
+	//test for scrollTo event
+	//scrollTo bottom
+	evaluateEventExpression("scrollTo","{destination:'bottom'}");
+	pause(1000);
+	assertTrue("Seems like vertical scrolling did not work", 
+	verifyIfElementInViewport("r100"));
+	//scrollTo top
+    evaluateEventExpression("scrollTo","{destination:'top'}");
+    pause(1000);
+    assertTrue("Seems like vertical scrolling did not work on firing scrollTo", 
+    		verifyIfElementInViewport("r1"));
+    
+	//assert event onScrollMove fired
+    assertEquals("Seems like onScrollMove did not get fired", "1", getEventHandlerExecutionStatus("scrollMoveHandlerCalled"));
+}
 private void startFlick(int xOffset, int yOffset){
 	//for iPhone
 	int yOffsetByDevice = yOffset;

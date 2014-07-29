@@ -24,5 +24,6 @@
     	} else if (imageType === 'decorative' && altText.length > 0) {
     		$A.error('component: ' + id + ': "alt" attribute should be empty for decorative image');
     	}
-    }
+    },
+    doNothing: function() {}
 })

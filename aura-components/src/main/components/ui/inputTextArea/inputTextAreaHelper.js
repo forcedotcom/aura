@@ -26,6 +26,9 @@
                 elem.value = "";
             } else {
                 elem.value = value;
+                // carriage returns are added for new lines to match form encoded textarea behavior
+                var carriageReturnValue = value.replace(/(\r\n)|\n/g,'\r\n');
+                component.setValue("v.value",carriageReturnValue,true);
             }
         }
     }

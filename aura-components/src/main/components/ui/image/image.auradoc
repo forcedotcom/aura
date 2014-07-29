@@ -15,10 +15,12 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="PROTO">
-    <aura:attribute name="index" type="Integer" description="Zero base index for where to add/remove rows."/>
-    <aura:attribute name="count" type="Integer" description="Row count to add/remove."/>
-    <aura:attribute name="last" type="Boolean" description="Alternative to index for simply pushing an item."/>
-    <aura:attribute name="items" type="Object[]" description="Items to insert. Empty rows are inserted not specified."/>
-    <aura:attribute name="remove" type="Boolean" description="Indicate removal"/>
-</aura:event>
+<aura:documentation>
+	<aura:description>
+	</aura:description>	
+		<aura:example name="buttonExample" ref="uitest:image_ErrorTest" label="Using ui:image">
+    	<p>This example shows how broken and unbroken images are rendered when passing onerror aura action to ui:image</p>
+    	
+	</aura:example>
+	
+</aura:documentation>

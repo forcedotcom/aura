@@ -52,6 +52,7 @@ public abstract class UnitTestCase extends TestCase {
     private static final GoldFileUtils goldFileUtils = new GoldFileUtils();
     Collection<File> tempFiles = null;
     Stack<Runnable> tearDownSteps = null;
+    private PerfMetricsComparator perfMetricsComparator = PerfMetricsComparator.DEFAULT_INSTANCE;
 
     public UnitTestCase() {
         super();
@@ -182,7 +183,11 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     public PerfMetricsComparator getPerfMetricsComparator() {
-        return PerfMetricsComparator.DEFAULT_INSTANCE;
+        return perfMetricsComparator;
+    }
+
+    public void setPerfMetricsComparator(PerfMetricsComparator perfMetricsComparator) {
+        this.perfMetricsComparator = perfMetricsComparator;
     }
 
     protected void serializeAndGoldFile(Object actual) throws Exception {

@@ -80,14 +80,20 @@
     	var params = event.getParams(),
     		timeout = params.parameters && params.parameters.timeout, 	// no default timeout
     		animate = params.parameters && params.parameters.animate, 	
-    		callback = params.parameters && params.parameters.callback,  
-    		removeParam;
+    		callback = params.parameters && params.parameters.callback,
+    		items;
     	
     	if (params.remove) {
-    		removeParam = params.count ? params.count : (params.last ? params.last : false);
     		
-    		if (removeParam) {
-    			helper.remove(component, params.index, removeParam, timeout, animate, callback);	
+    		// Default index and count if necessary.
+    		if (params.last) {
+    			items = component.getConcreteComponent().get('v.items');
+    			params.index = items ? items.length - 1 : null; 
+    			params.count = 1;
+    		}
+    		
+    		if (params.count) {
+    			helper.remove(component, params.index, params.count, timeout, animate, callback);	
     		}
     		else {
     			throw new Error("Remove command must be provided with either a 'count' or 'last' parameter.");

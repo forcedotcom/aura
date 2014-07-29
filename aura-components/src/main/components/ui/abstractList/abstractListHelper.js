@@ -108,13 +108,13 @@
     
     /**
      * @param component {Component} ui:abstractList
-     * @param param {Number/Boolean} number for index or boolean for last item
+     * @param param {Number/Boolean} count or boolean for last item
      * @param timeout
      * @param callback
      */
-    remove: function (component, index, param, timeout, animate, callback) {
+    remove: function (component, index, count, timeout, animate, callback) {
     	var items = component.get('v.items'),
-    		array = this.exclude(items, (typeof param === 'number') ? param : items.length - 1),
+    		array = this.exclude(items, index),
     		helper = component.getConcreteComponent().getDef().getHelper();
     	
     	helper.removeItem(component, array, index, timeout, animate, callback);

@@ -306,9 +306,16 @@ MapValue.prototype.isUnset = function() {
 /**
  * @private
  */
-MapValue.prototype.makeDirty = function() {
-	this.dirty = true;
-	$A.renderingService.addDirtyValue(this);
+MapValue.prototype.makeDirty = function(subDirty) {
+    this.dirty = true;
+    $A.renderingService.addDirtyValue(this);
+    if(subDirty) {
+        for (var key in this.value) {
+            if (this.value[key]&&this.value[key].makeDirty){
+                this.value[key].makeDirty(subDirty);
+            }
+        }
+    }
 };
 
 /**
@@ -437,10 +444,10 @@ MapValue.prototype.add = function(k, config, subDirty, skipChange) {
 		this.copyHandlers(this.oldvalue[key], value);
 	}
 
-	this.makeDirty();
-	
+	this.makeDirty(subDirty);
+
 	if (value.makeDirty && subDirty) {
-		value.makeDirty();
+		value.makeDirty(subDirty);
 	}
 
 	var handlers = this.handlers;

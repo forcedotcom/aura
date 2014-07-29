@@ -714,17 +714,6 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
     /** Since ArrayValue has no getElements, we'd better have rerender return them all */
     var elems = [];
 
-    // in case component.getElements() returns nothing (invalid)
-    // we'll return previously rendered in indexed object form
-    var prevRenderedIndexed = {},
-        count = 0;
-    for(var p in prevRendered) {
-        if(prevRendered.hasOwnProperty(p)) {
-            prevRenderedIndexed[count] = prevRendered[p];
-            count++;
-        }
-    }
-
     //
     // These three variables are used to ensure that we do not lose our reference node when the
     // contents are removed. Basically, if the array is empty, we declare that we need a reference
@@ -786,8 +775,16 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                     itemReferenceNode = itemElems[itemElems.length - 1];
                 } else {
                     // Get the funky elements object, find the last
-                    // use previously rendered comments if getElements() returns nothing
-                    itemElems = item.getElements() || prevRenderedIndexed;
+                    itemElems = item.getElements();
+
+                    if (itemElems === undefined) {
+                        // in case there are no elements, associate a comment
+                        item.associateElement({
+                            "name": 0,
+                            "element": this.createLocator(" item {rerendered, index:" + j + "} " + item)
+                        });
+                        itemElems = item.getElements();
+                    }
 
                     if (itemElems[0]) {
                         for (var k = 0; itemElems[k]; ++k) {
@@ -799,7 +796,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                 }
             }
             // We have prevRendered, but can't trust it: the elem might have rerendered away.
-            itemElems = item.getElements() || prevRenderedIndexed;
+            itemElems = item.getElements();
             itemReferenceNode = itemElems[0] ? itemElems[0] : itemElems['element'];
             if (firstReferenceNode === null) {
                 firstReferenceNode = itemReferenceNode;

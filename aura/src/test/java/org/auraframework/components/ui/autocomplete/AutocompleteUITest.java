@@ -80,7 +80,10 @@ public class AutocompleteUITest extends WebDriverTestCase {
     /**
      * Test to verify input cmp does get its value updated on clicking ENTER in the field
      * Bug: W-2293143
+     * Press Enter is not used for Safari
      */
+    @ExcludeBrowsers({ BrowserType.SAFARI5, BrowserType.SAFARI,
+        BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
     public void testAutoCompleteWithUpdateOnAttributeSet() throws Exception {
         open(URL);
         String inputAutoComplete = "autoCompleteUpdateOn";
@@ -139,7 +142,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         open(URL);
         WebDriver driver = getDriver();
         WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
-        auraUITestingUtil.pressEnter(input);
+        input.click();
+        input.sendKeys("o");
         WebElement output = driver.findElement(By.cssSelector(EVENT_OUTPUT_SELECTOR));
         waitForElementTextPresent(output, "KeyDown Event Fired");
     }

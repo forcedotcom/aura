@@ -19,7 +19,20 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputNumber</code> component represents a number input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.
+			This example shows a number field, which displays a value of <code>10</code>.
+			</p>
+			<pre>&lt;aura:attribute name="num" type="integer" default="10"/>
+&lt;ui:inputNumber aura:id="num" label="Age" value="{!v.num}"/></pre>
+			<p>The previous example results in the following HTML.</p>
+			<pre>&lt;div class="uiInput uiInputText uiInputNumber">
+&lt;label class="uiLabel-left uiLabel">
+    &lt;span>Age&lt;/span>
+&lt;/label>
+&lt;input aria-describedby="" max="99999999999999" step="1" placeholder="" type="text" 
+        min="-99999999999999" class="uiInput uiInputText uiInputNumber">
+&lt;/div></pre>
+			
+			<p>To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.
 <pre>&lt;aura:attribute name="number" type="integer" default="100,000"/>
 &lt;ui:inputNumber label="Number" value="{!v.number}"/></pre>
 		</p>
@@ -28,9 +41,9 @@
 &lt;ui:inputNumber label="Number" value="{!v.number}"/>
 </pre>
 		</p>
-		<p>
-			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.
-    	</p>	
+		<p>Specifying <code>format="#,##0,000.00#"</code> returns a formatted number value like <code>10,000.00</code>.</p>
+		<pre>&lt;ui:label label="Cost"/>
+&lt;ui:inputNumber aura:id="costField" format="#,##0,000.00#" value="10000"/></pre>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:inputNumberExample" label="Using ui:inputNumber">
     		This example shows how you can use <code>ui:inputNumber</code> to validate user input.

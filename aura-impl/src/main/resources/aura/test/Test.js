@@ -1256,13 +1256,17 @@ $A.ns.Test.prototype.fireDomEvent = function (element, eventName) {
  * 
  * @param {HTMLElement} element
  *          The element to click or fire touch event on.
+ * @param {Boolean} canBubble
+ *          true to allow bubbling of the touch event.
+ * @param {Boolean} cancelable
+ *          true to prevent the default action.
  */
-$A.ns.Test.prototype.clickOrTouch = function (element) {
+$A.ns.Test.prototype.clickOrTouch = function (element, canBubble, cancelable) {
     if($A.util.supportsTouchEvents()){
         var ts = document.createEvent('TouchEvent');
-        ts.initTouchEvent('touchstart', true, true); 
+        ts.initTouchEvent('touchstart', canBubble, cancelable); 
         var te = document.createEvent('TouchEvent');
-        te.initTouchEvent('touchend', true, true);
+        te.initTouchEvent('touchend', canBubble, cancelable);
         element.dispatchEvent(ts);
         element.dispatchEvent(te);
     } else {

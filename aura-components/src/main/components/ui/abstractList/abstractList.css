@@ -58,18 +58,18 @@
 
 .THIS .loadingIndicator .label{
     background-image:url('/auraFW/resources/aura/images/spinner.gif');
-    background-position:left center;
+    background-position:left top;
     background-repeat:no-repeat;
     color:#666;
     display: inline-block;
     font-weight:bold;
     line-height:normal;
-    height:16px;
-    padding-left:25px;
+    height:32px;
+    padding-left:32px;
+    padding-top: 9px;
     position:relative;
     text-shadow: 0.1em 0.1em 0.01em #fff, 0.1em -0.1em 0.01em #fff, -0.1em -0.1em 0.01em #fff, -0.1em 0.1em 0.01em #fff;
     top: 65px;
-    vertical-align: middle;
     z-index:1;
     zoom: 1;
 }

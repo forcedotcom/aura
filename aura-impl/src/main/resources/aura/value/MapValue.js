@@ -562,14 +562,7 @@ MapValue.prototype.copyHandlers = function(oldvalue, newvalue) {
 	var k;
 	var oldHandlers;
 
-	// Conveniently, MapValue and SimpleValue call the handler structure by
-	// different names, and even have different structures (SimpleValue has a
-	// layer for event type, MapValue doesn't).
-	if (oldvalue instanceof SimpleValue) {
-		oldHandlers = oldvalue.eventDispatcher ? oldvalue.eventDispatcher["markup://aura:valueChange"] : undefined;
-	} else {
-		oldHandlers = oldvalue.handlers;
-	}
+	oldHandlers = oldvalue.eventDispatcher ? oldvalue.eventDispatcher["markup://aura:valueChange"] : oldvalue.handlers;
 
 	if (oldHandlers) {
 		// Semi-deep copy the handlers: the actual handler objects can

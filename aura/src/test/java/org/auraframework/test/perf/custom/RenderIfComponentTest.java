@@ -29,7 +29,7 @@ public final class RenderIfComponentTest extends CustomPerfAbstractTestCase {
         setComponentDef(getDefDescriptor("performanceTest:aura_renderif"));
     }
 
-    public void testChangeCount() throws Throwable {
+    public void TODO_testChangeCount() throws Throwable {
         // Change number of first level renderIf's to 200.
         final int numberOfRows = 200;
         WebElement inputText = currentDriver.findElement(By.cssSelector(".count"));
@@ -46,7 +46,7 @@ public final class RenderIfComponentTest extends CustomPerfAbstractTestCase {
         });
     }
 
-    public void testChangeNestedCount() throws Throwable {
+    public void TODO_testChangeNestedCount() throws Throwable {
         // Change number of second level renderIf's to 5.
         WebElement inputText = currentDriver.findElement(By.cssSelector(".nestedCount"));
         inputText.clear();

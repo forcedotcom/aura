@@ -29,7 +29,7 @@ public final class InfiniteListComponentTest extends CustomPerfAbstractTestCase 
         setComponentDef(getDefDescriptor("performanceTest:ui_infiniteList"));
     }
 
-    public void testShowMore() throws Throwable {
+    public void TODO_testShowMore() throws Throwable {
         // Load more data.
         WebElement element = currentDriver.findElement(By.cssSelector(".showMore"));
         element.click();
@@ -43,7 +43,7 @@ public final class InfiniteListComponentTest extends CustomPerfAbstractTestCase 
         });
     }
 
-    public void testRefresh() throws Throwable {
+    public void TODO_testRefresh() throws Throwable {
         // Refresh the list
         WebElement element = currentDriver.findElement(By.cssSelector(".refresh"));
         element.click();

@@ -29,7 +29,7 @@ public final class IterationComponentTest extends CustomPerfAbstractTestCase {
         setComponentDef(getDefDescriptor("performanceTest:aura_iteration"));
     }
 
-    public void testChangeItemValue() throws Throwable {
+    public void TODO_testChangeItemValue() throws Throwable {
         // Change value of an item at index 20.
         final int rowIndex = 20;
         final String rowValue = "new test value";
@@ -49,7 +49,7 @@ public final class IterationComponentTest extends CustomPerfAbstractTestCase {
         });
     }
 
-    public void testChangePageSize() throws Throwable {
+    public void TODO_testChangePageSize() throws Throwable {
         // Shrink the list to 20 items.
         WebElement inputText = currentDriver.findElement(By.cssSelector(".pageSize"));
         inputText.sendKeys("20");
@@ -64,7 +64,7 @@ public final class IterationComponentTest extends CustomPerfAbstractTestCase {
         });
     }
 
-    public void testChangePageCount() throws Throwable {
+    public void TODO_testChangePageCount() throws Throwable {
         final int pageSize = 25;
         final int pageCount = 20;
         WebElement inputText = currentDriver.findElement(By.cssSelector(".pageCount"));

@@ -19,11 +19,11 @@
 	<aura:attribute name="selectAll" type="Boolean" description="Allows grid to control 'selectAll' visual state."/>
 
 	<aura:set attribute="header">
-		<ui:actionCheckbox name="dataGrid:select" value="{!v.selectAll}"/>
+		<ui:actionCheckbox name="dataGrid:select" value="{!v.selectAll}" label="Select all rows" labelClass="assistiveText"/>
 	</aura:set>
 
 	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]">
 		<!-- Wire 'selected' and 'index' into action. This is the secret sauce; action won't work without it. -->
-		<ui:actionCheckbox name="dataGrid:select" value="{!selected}" index="{!index}"/>
+		<ui:actionCheckbox name="dataGrid:select" value="{!selected}" index="{!index}" label="Select row" labelClass="assistiveText"/>
 	</aura:attribute>
 </aura:component>

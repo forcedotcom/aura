@@ -573,7 +573,7 @@ Action.prototype.getReturnValue = function() {
  * <pre><code>
  * var errors = a.getError();
  * if (errors)  {
- *     $A.logf("Errors", errors);
+ *     $A.log("Errors", errors);
  *     if (errors[0] && errors[0].message) {
  *         $A.error("Error message: " + errors[0].message);
  *     }

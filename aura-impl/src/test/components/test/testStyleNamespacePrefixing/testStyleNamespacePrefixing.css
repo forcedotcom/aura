@@ -1,6 +1,14 @@
 /*this might start failing when a property is no longer prefixed by default, in which case a different property should be used*/
 
 .THIS {
-  box-sizing: border-box;
-  width: calc(3px - 1px);  
+  transform: rotateY(10deg);
+}
+
+.THIS {
+    background: linear-gradient(red, yellow);   
+}
+
+@keyframes test {
+  from { top: 0% }
+  to   { top: 100% }
 }

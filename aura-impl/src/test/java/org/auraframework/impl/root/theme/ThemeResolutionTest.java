@@ -227,17 +227,19 @@ public class ThemeResolutionTest extends StyleTestCase {
     /** themes with auto-prefixable properties */
     public void testThemeAutoPrefix() throws Exception {
         addNsTheme(theme()
-                .var("sizing", "border-box")
+                .var("userSelect", "none")
                 .var("gradient", "red, yellow"));
 
         String src = ".THIS {\n" +
-                "  box-sizing: t(sizing);\n" +
+                "  user-select: t(userSelect);\n" +
                 "  background: theme('linear-gradient(' + gradient + ')');\n" +
                 "}";
 
         String expected = ".THIS {" +
-                "-moz-box-sizing:border-box; " +
-                "box-sizing:border-box; " +
+                "-webkit-user-select:none; " +
+                "-moz-user-select:none; " +
+                "-ms-user-select:none; " +
+                "user-select:none; " +
                 "background:-webkit-linear-gradient(red, yellow); " +
                 "background:linear-gradient(red, yellow)" +
                 "}";

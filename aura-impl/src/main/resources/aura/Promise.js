@@ -52,11 +52,14 @@ $A.ns.Promise = function (fn) {
  * @param {Object=} result The resulting value from the work executed (optional). 
  */
 $A.ns.Promise.prototype.resolve = function (result) {
-	
+
 	// Do nothing if the promise has already been resolved or rejected.
 	if (!this.isResolved && !this.isRejected) {
 
-		if (typeof this.resolveHandler === 'function') { 
+        this.isResolved = true;
+        this.result = result;
+
+        if (typeof this.resolveHandler === 'function') {
 			this.resolveHandler(result);
 		}	
 	}
@@ -82,6 +85,7 @@ $A.ns.Promise.prototype.reject = function (err) {
 	if (!this.isResolved && !this.isRejected) {
 
 		this.isRejected = true;
+        this.error = err;
 
 		if (typeof this.rejectHandler === 'function') { 
 			this.rejectHandler(err);
@@ -101,31 +105,58 @@ $A.ns.Promise.prototype.reject = function (err) {
 /**
  * Success and error handler entry point for the promise. 
  *
- * @param {function (Object=)} success Resolve handler - function which will be executed in a resolved/successs state.
+ * @param {function (Object=)} successFunction Resolve handler - function which will be executed in a resolved/successs state.
  * @param {function (Object=)} error Error handler - function which will be executed in a rejected/error state.
  * @return {Promise} A chainable promise to use if the previous then handler wishes to process some data.
  */ 
-$A.ns.Promise.prototype.then = function (success, error) {
+$A.ns.Promise.prototype.then = function (successFunction, errorFunction) {
+    if(this.isResolved) {
+        successFunction(this.result);
+        return;
+    }
+
+    if(this.isRejected) {
+        errorFunction(this.error);
+        return;
+    }
+
 	var thenPromise = this.thenPromise = new $A.ns.Promise();
 
 	// When this promise is done. 
 	// Asynchronously execute the next promise.
 	this.resolveHandler = function (previousResult) {
-		if (typeof success === 'function') {
-			$A.ns.Promise.exec(success, [previousResult], function (err, result) {
+		if (typeof successFunction === 'function') {
+			$A.ns.Promise.exec(successFunction, [previousResult], function (err, result) {
 				if (err) {
 					thenPromise.reject(err);
-				}
-				else {
-					thenPromise.resolve(result);
+				} else {
+                    if ($A.ns.Promise.isThenable(result)) {
+                        result["then"](
+                            function(val) { return thenPromise.resolve(val); },
+                            function(err) { return thenPromise.reject(err); });
+                    } else {
+                        thenPromise.resolve(result);
+                    }
 				}
 			});
 		}
 	};
 
-	this.rejectHandler = error;
+	this.rejectHandler = errorFunction;
 
 	return thenPromise; 
+};
+
+/**
+ * An object is a 'thenable' if it contains a property named "then" that is a function.
+ * (A Promise is-a thenable)
+ *
+ * @param object
+ * @returns {*|boolean}
+ */
+$A.ns.Promise.isThenable = function(object) {
+    // Using [] instead of . operator to get around aura's obfuscation of non-exported functions
+    return object && typeof object["then"] === 'function';
 };
 
 /**

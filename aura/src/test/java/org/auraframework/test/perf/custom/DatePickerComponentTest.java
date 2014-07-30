@@ -27,7 +27,7 @@ public final class DatePickerComponentTest extends CustomPerfAbstractTestCase {
         setComponentDef(getDefDescriptor("performanceTest:ui_datePicker"));
     }
 
-    public void testChangeYear() throws Throwable {
+    public void TODO_testChangeYear() throws Throwable {
         // Change calendar year.
         WebElement element = currentDriver.findElement(By.cssSelector(".nextYear"));
         element.click();

@@ -905,8 +905,16 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                     itemReferenceNode = itemElems[itemElems.length - 1];
                 } else {
                     // Get the funky elements object, find the last
-                    // use previously rendered comments if getElements() returns nothing
-                    itemElems = item.getElements() || prevRenderedIndexed;
+                    itemElems = item.getElements();
+
+                    if (itemElems === undefined) {
+                        // in case there are no elements, associate a comment
+                        item.associateElement({
+                            "name": 0,
+                            "element": this.createLocator(" item {rerendered, index:" + j + "} " + item)
+                        });
+                        itemElems = item.getElements();
+                    }
 
                     if (itemElems[0]) {
                         for (var k = 0; itemElems[k]; ++k) {
@@ -917,9 +925,8 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                     }
                 }
             }
-            
-            // We have prevRendered, but can't trust it: the elem might have re/unrendered away.
-            itemElems = item.getElements() || prevRenderedIndexed;
+            // We have prevRendered, but can't trust it: the elem might have rerendered away.
+            itemElems = item.getElements();
             itemReferenceNode = itemElems[0] ? itemElems[0] : itemElems['element'];
             
             if (firstReferenceNode === null) {

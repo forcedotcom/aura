@@ -27,7 +27,7 @@ public final class ActionMenuListComponentTest extends CustomPerfAbstractTestCas
         setComponentDef(getDefDescriptor("performanceTest:ui_menu_actionMenu"));
     }
 
-    public void testChangeMenuItem() throws Throwable {
+    public void TODO_testChangeMenuItem() throws Throwable {
         // Open a menu and select an item.
         WebElement menu = currentDriver.findElement(By.cssSelector(".uiMenu"));
         menu.click();

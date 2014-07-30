@@ -28,7 +28,7 @@ public final class InputSelectComponentTest extends CustomPerfAbstractTestCase {
         setComponentDef(getDefDescriptor("performanceTest:ui_inputSelect"));
     }
 
-    public void testSelectOption() throws Throwable {
+    public void TODO_testSelectOption() throws Throwable {
         // Change selected dropdown option.
         WebElement element = currentDriver.findElement(By.cssSelector(".uiInputSelect"));
         Select dropdown = new Select(element);

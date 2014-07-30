@@ -66,6 +66,9 @@ import com.google.common.collect.Maps;
  * Base class with some helper methods specific to Aura.
  */
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
+	private static final String SAMEORIGIN = "SAMEORIGIN";
+	private static final String X_FRAME_OPTIONS = "X-FRAME-OPTIONS";
+	    
     public AuraHttpTestCase(String name) {
         super(name);
     }
@@ -87,6 +90,12 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         get.releaseConnection();
         int status = getStatusCode(httpResponse);
         assertEquals(msg, statusCode, status);
+    }
+    
+    protected void assertAntiClickjacking(HttpResponse response) {
+    	assertTrue(response.getFirstHeader(X_FRAME_OPTIONS) != null);
+    	assertEquals("Failed to use anti-clickjacking " + X_FRAME_OPTIONS, 
+                SAMEORIGIN, response.getFirstHeader(X_FRAME_OPTIONS).getValue());
     }
 
     protected String getHost() throws Exception {

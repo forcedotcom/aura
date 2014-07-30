@@ -21,14 +21,31 @@
 			A <code>ui:button</code> component represents a button element that executes an action defined by a controller. Clicking the button triggers the client-side controller method set for the <code>press</code> event.
 			The button can be created in several ways.
 		</p>
-		<p>
-			A text-only button has only the required <code>label</code> attribute set on it.
-			To create a button with both image and text, use the <code>label</code> attribute and add styles for the button.
-		</p>
-		<p>
-			The visual appearance of buttons is highly configurable, as are text and accessibility attributes.
-		    
-		</p>
+		<p>A text-only button has only the required <code>label</code> attribute set on it.</p>
+		<pre>&lt;ui:button label="Find"/></pre>
+		<p>An image-only button uses both the <code>label</code> and <code>labelClass</code> attributes with CSS.</p>
+		<pre>&lt;!-- Component markup -->
+&lt;ui:button label="Find" labelClass="assistiveText" class="img" />
+
+/** CSS **/
+THIS.uiButton.img {
+background: url(/path/to/img) no-repeat;
+width:50px;
+height:25px;
+}</pre>
+		<p>The <code>assistiveText</code> class hides the label from view but makes it available to assistive technologies. To create a button with both image and text, use the <code>label</code> attribute and add styles for the button.</p>
+		<pre>&lt;!-- Component markup -->
+&lt;ui:button label="Find" />
+
+/** CSS **/
+THIS.uiButton {
+background: url(/path/to/img) no-repeat;
+}</pre>
+		<p>The previous markup for a button with text and image results in the following HTML.</p>
+		<pre>&lt;button class="default uiBlock uiButton" accesskey type="button">
+&lt;span class="label bBody truncate" dir="ltr">Find&lt;/span>
+&lt;/button></pre>
+		
 	</aura:description>	
 		<aura:example name="buttonExample" ref="uiExamples:buttonExample" label="Using ui:button">
     	<p>This example shows a button that displays the input value you enter.</p>

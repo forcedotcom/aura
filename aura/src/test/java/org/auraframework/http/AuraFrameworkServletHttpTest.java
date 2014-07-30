@@ -156,9 +156,11 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     private void verifyResourceAccess(String resourcePath, int expectedResponseStatus, String failureMsg)
             throws Exception {
         HttpGet get = obtainGetMethod(resourcePath);
-        int statusCode = getStatusCode(perform(get));
+        HttpResponse response = perform(get);
+        int statusCode = getStatusCode(response);
         get.releaseConnection();
         assertEquals(failureMsg, expectedResponseStatus, statusCode);
+        assertAntiClickjacking(response);
     }
 
     /**
@@ -204,6 +206,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         assertEquals("Expected server to return a 200 for unexpired cache without fwUid or nonce.", HttpStatus.SC_OK,
                 statusCode);
         assertNotNull(response);
+        assertAntiClickjacking(httpResponse);
     }
 
     /**
@@ -271,6 +274,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         response = perform(get);
 
         checkExpired(response, "image/png");
+        assertAntiClickjacking(response);
         get.releaseConnection();
     }
 
@@ -294,6 +298,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         long expirationMillis = (df.parse(expires).getTime() - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
+        assertAntiClickjacking(httpResponse);
     }
 
     /**
@@ -316,6 +321,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce, true);
         response = perform(get);
         checkExpired(response, "text/css");
+        assertAntiClickjacking(response);
         get.releaseConnection();
     }
 
@@ -343,6 +349,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
+        assertAntiClickjacking(httpResponse);
     }
 
     /**
@@ -353,6 +360,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
 
         checkExpired(response, "text/javascript");
+        assertAntiClickjacking(response);
         get.releaseConnection();
     }
 
@@ -363,6 +371,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpGet get = obtainNoncedGetMethod(sampleJavascriptResourcePathWithNonce, false);
         HttpResponse response = perform(get);
         checkLongCache(response, "text/javascript");
+        assertAntiClickjacking(response);
         get.releaseConnection();
     }
 
@@ -373,8 +382,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpGet get = obtainGetMethod("/auraFW/resources/moment/moment.js");
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
-
         checkExpired(httpResponse, "text/javascript");
+        assertAntiClickjacking(httpResponse);
         assertTrue(response.contains("(function(e){"));
 
         get.releaseConnection();
@@ -390,6 +399,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         checkExpired(httpResponse, "text/javascript");
         assertTrue(response.contains("function setDefaults("));
+        assertAntiClickjacking(httpResponse);
 
         get.releaseConnection();
     }

@@ -21,11 +21,16 @@
 			A <code>ui:inputText</code> component represents a text input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
 			To render the output from a <code>ui:inputText</code> component, use the <code>ui:outputText</code> component.
 		</p>
-		<p>
-			To provide a field label for accessibility, use the <code>label</code> attribute. You can hide the label from view by setting <code>labelPosition="hidden"</code> and still maintain accessibility.
-			
-    	</p>
-		
+		<p>This is a basic set up of a text field.</p>
+		<pre>&lt;ui:inputText aura:id="expname" label="Expense Name" value="My Expense" required="true"/></pre>
+		<p>This example results in the following HTML.</p>
+		<pre>&lt;div class="uiInput uiInputText">
+  &lt;label class="uiLabel-left uiLabel">
+    &lt;span>Expense Name&lt;/span>
+    &lt;span class="required">*&lt;/span>
+  &lt;/label>
+  &lt;input required="required" class="uiInput uiInputText" aria-describedby placeholder type="text">
+&lt;/div></pre>
 	</aura:description>	
 		<aura:example name="innputTextExample" ref="uiExamples:inputTextExample" label="Using ui:inputText">
     	<p>This example shows a <code>ui:inputText</code> component with the default error handling, and a corresponding <code>ui:outputText</code> component for text rendering.</p>

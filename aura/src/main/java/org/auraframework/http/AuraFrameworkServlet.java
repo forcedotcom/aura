@@ -169,9 +169,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-
             response.reset();
-
+            setBasicHeaders(response);
+            
             // handle any MIME content type, using only file name (not contents)
             String mimeType = mimeTypesMap.getContentType(path);
 

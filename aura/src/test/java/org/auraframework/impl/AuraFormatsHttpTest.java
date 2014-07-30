@@ -57,6 +57,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     private void requestAndAssertContentType(HttpRequestBase method, String url, Format format) throws Exception {
 
         HttpResponse response = perform(method);
+        assertAntiClickjacking(response);
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
         // Eliminate the spaces separating the content Type specification
         contentType = AuraTextUtil.arrayToString(contentType.split(";\\s+"), ";", -1, false);

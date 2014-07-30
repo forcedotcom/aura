@@ -1003,9 +1003,11 @@ $A.ns.Aura.prototype.log = function(value, error) {
  * Logs using <code>console.log()</code> if defined on the console implementation.
  */
 $A.ns.Aura.prototype.logf = function() {
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     if (window["console"]) {
         window["console"]["log"].apply(window["console"], arguments);
     }
+    //#end
 };
 
 /**

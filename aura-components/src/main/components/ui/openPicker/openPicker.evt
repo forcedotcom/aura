@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="Event fired to ask inputDate to display its date picker.">
+<aura:event type="COMPONENT" support="GA" description="Event fired to ask components to display its their picker.">
 </aura:event>

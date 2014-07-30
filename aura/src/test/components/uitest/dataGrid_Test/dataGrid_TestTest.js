@@ -1,5 +1,9 @@
 ({
-    /**
+    ADD_ROW_ARRAY    : ["Spidey", "Peter Parker", "Media Inc", "2020-10-12"],
+    BASIC_ROW_ARRAY  : ["Foo", "John Doe", "Acme", "2014-01-01"],
+    INSERT_ROW_ARRAY : ["Bar", "New John", "SFDC", "2014-11-11"],
+	
+	/**
      * Test verifying that when there is no data present dataGrid does not fail
      * bug tracking: 2327176
      */
@@ -11,12 +15,65 @@
     },
 
     /**
+     * Start at last possible page, then verify that last paging elements acknowledge the change
+     * bug tracking: 2327175
+     */
+    _testWithLargeData : {
+    	browsers : ["-IE8", "-IE7"],
+        attributes : {"pageSize" : 3000, "currentPage" : 1},
+        test : function(cmp){
+            this.verifyDataGridUsingPager(cmp,[true, true, false, false], 3000, "1 - 3000 of 15000");
+        }
+    },
+    
+    /**
+     * Verifying that dataGrid is accessible
+     */
+    testAccessible : {
+        attributes : {"pageSize" : 10},
+        test : function(cmp){
+            $A.test.assertAccessible();
+        }
+    },
+    /**
+     * Test that all items selected are valid in v.items and v.selectedItems
+     * 
+     *  CURRENTLY FAILS TRACKED IN BUG: W-2308639
+     */
+    _testItemsSelectAttribute : {
+        test : function(cmp){
+            var elements = this.getRowElements(cmp, 100);
+            var trs = elements[0];
+
+            //Select the first 2 elements (excluding select all)
+            this.selectCheckBox(0, 1, trs);
+            this.verifySelectedElements(cmp, this.createOutputArray(1, 2,  this.BASIC_ROW_ARRAY), trs);
+
+            //Select the head checkbox to select all
+            var thead = document.getElementsByTagName("thead")[0];
+            this.selectCheckBox(0, 0, thead.children);
+
+            //Verify that everything is correctly selected
+            this.verifySelectedElements(cmp, this.createOutputArray(1, 100,  this.BASIC_ROW_ARRAY), trs);
+        }
+    },
+    /**
      * Basic test case where we look at an average number of data and make sure paging accounts for it
      */
     testWithAverageData : {
         attributes : {"pageSize" : 10},
         test : function(cmp){
             this.verifyDataGridUsingPager(cmp, [true, true, false, false], 10, "1 - 10 of 50");
+        }
+    },
+    
+    /**
+     * Basic test case verifying that pager and dataGrid work well together
+     */
+    testWithPagerEnd : {
+        attributes : {"pageSize" : 10,"currentPage" : 5},
+        test : function(cmp){
+            this.verifyDataGridUsingPager(cmp, [false, false, true, true], 10, "41 - 50 of 50");
         }
     },
     
@@ -30,16 +87,7 @@
         }
     },
     
-    /**
-     * Start at last possible page, then verify that last paging elements acknowledge the change
-     * bug tracking: 2327176
-     */
-    _testWithLargeData : {
-        attributes : {"pageSize" : 3000, "currentPage" : 5},
-        test : function(cmp){
-            this.verifyDataGridUsingPager(cmp,[false, false, true, true], 3000, "12001 - 15000 of 15000");
-        }
-    },
+    
     
     /**
      * Testing pagination with sortby attribute
@@ -62,31 +110,7 @@
                 this.verifySortedElements(cmp, anchor, "10", "1", "We are on the wrong page, we should be on row 10-1", 10);               
         }
     },
-    
-
-    /**
-     * Test that all items selected are valid in v.items and v.selectedItems
-     * 
-     *  CURRENTLY FAILS TRACKED IN BUG: W-2308639
-     */
-    _testItemsSelectAttribute : {
-        test : function(cmp){
-            var elements = this.getRowElements(cmp, 100);
-            var trs = elements[0];
-
-            //Select the first 2 elements (excluding select all)
-            this.selectCheckBox(0, 1, trs);
-            this.verifySelectedElements(cmp, this.createOutputArray(1, 2,  ["Foo", "John Doe", "Acme", "2014-01-01"]), trs);
-
-            //Select the head checkbox to select all
-            var thead = document.getElementsByTagName("thead")[0];
-            this.selectCheckBox(0, 0, thead.children);
-
-            //Verify that everything is correctly selected
-            this.verifySelectedElements(cmp, this.createOutputArray(1, 100,  ["Foo", "John Doe", "Acme", "2014-01-01"]), trs);
-        }
-    },
-
+  
     /**
      * Test that selecting and pagination still work correctly
      */
@@ -136,8 +160,8 @@
         		//Add an element to the row and verify insert and removing still work
                 this.setValue(cmp, "index", 0);
                 this.setValue(cmp, "count", 2);
-                this.insertRemoveAndVerify(cmp, 0, this.createOutputArray(6020, 6021, ["Bar", "New John", "SFDC", "2014-11-11"]),
-                                           this.createOutputArray(6000, 6000,  ["Spidey", "Peter Parker", "Media Inc", "2020-10-12"]), 22, 20);
+                this.insertRemoveAndVerify(cmp, 0, this.createOutputArray(6020, 6021, this.INSERT_ROW_ARRAY),
+                                           this.createOutputArray(6000, 6000,  this.ADD_ROW_ARRAY), 22, 20);
         	}]
     },
     /**
@@ -162,11 +186,11 @@
             //Set Intial values for how many items to create, the insert and remove said elements multiple times to verify v.items keeps track
             this.setValue(cmp, "index", 1);
             this.setValue(cmp, "count", 2);
-            this.insertRemoveAndVerify(cmp, 1, this.createOutputArray(6000, 6001, ["Bar", "New John", "SFDC", "2014-11-11"]),
-                                       this.createOutputArray(2, 3,  ["Foo", "John Doe", "Acme", "2014-01-01"]), 102, 100);
+            this.insertRemoveAndVerify(cmp, 1, this.createOutputArray(6000, 6001, this.INSERT_ROW_ARRAY),
+                                       this.createOutputArray(2, 3,  this.BASIC_ROW_ARRAY), 102, 100);
             
-            this.insertRemoveAndVerify(cmp, 1, this.createOutputArray(6002, 6003, ["Bar", "New John", "SFDC", "2014-11-11"]),
-                                       this.createOutputArray(2, 3,  ["Foo", "John Doe", "Acme", "2014-01-01"]), 102, 100);
+            this.insertRemoveAndVerify(cmp, 1, this.createOutputArray(6002, 6003, this.INSERT_ROW_ARRAY),
+                                       this.createOutputArray(2, 3,  this.BASIC_ROW_ARRAY), 102, 100);
 
         }
     },
@@ -183,18 +207,33 @@
             this.setValue(cmp, "count", 20);
 
             //Set up for insert remove
-            var valuesAfterInsert = this.createOutputArray(6000, 6019, ["Bar", "New John", "SFDC", "2014-11-11"]);
-            var valuesAfterRemove = this.createOutputArray(51, 69,  ["Foo", "John Doe", "Acme", "2014-01-01"]);
+            var valuesAfterInsert = this.createOutputArray(6000, 6019, this.INSERT_ROW_ARRAY);
+            var valuesAfterRemove = this.createOutputArray(51, 69,  this.BASIC_ROW_ARRAY);
             this.insertRemoveAndVerify(cmp, 50, valuesAfterInsert, valuesAfterRemove, 120, 100);
             
-            valuesAfterInsert = this.createOutputArray(6020, 6039, ["Bar", "New John", "SFDC", "2014-11-11"]);
+            valuesAfterInsert = this.createOutputArray(6020, 6039, this.INSERT_ROW_ARRAY);
             //Since the array is not correct now, concat new items with old to make sure the correct element was not destroyed
-            valuesAfterRemove = this.createOutputArray(6030, 6039, ["Bar", "New John", "SFDC", "2014-11-11"])
-            valuesAfterRemove = valuesAfterRemove.concat(this.createOutputArray(51, 69,  ["Foo", "John Doe", "Acme", "2014-01-01"]));
+            valuesAfterRemove = this.createOutputArray(6030, 6039, this.INSERT_ROW_ARRAY)
+            valuesAfterRemove = valuesAfterRemove.concat(this.createOutputArray(51, 69,  this.BASIC_ROW_ARRAY));
 
             //Insert and remove elements
             this.insertRemoveAndVerify(cmp, 50, valuesAfterInsert, valuesAfterRemove, 120, 110, 10);
             
+        }
+    },
+    
+    /**
+     * Remove elements then refire the DataGrid provider to verify that v.items is overwritten
+     */
+    testDataGridProviderRefire : {
+    	attributes : {"pageSize" : 20},
+        test : function(cmp){
+            this.setValue(cmp, "index", 0);
+            this.setValue(cmp, "count", 5);
+            this.actAndVerifyRowIsCorrect(cmp, "remove", 0, 
+                this.createOutputArray(6, 10, this.BASIC_ROW_ARRAY), 15);
+            this.actAndVerifyRowIsCorrect(cmp, "refireDP", 0, 
+                this.createOutputArray(1, 7, this.BASIC_ROW_ARRAY), 20);
         }
     },
 
@@ -380,8 +419,7 @@
     verifyDataGridUsingPager : function(cmp, pagerState, pageSize, pagerMessage){
             //Getting pager and making sure that the nummbe of trs are correct
     	    var pager = cmp.find("pagerNextPrev");
-           
-            //
+
             this.verifyPageInfoSaysCorrectNumber(cmp.find("pageInfo"), pagerMessage);
             this.verifyElementDisabled(pager, 
                 ["pager:first","pager:previous", "pager:next","pager:last"], 

@@ -18,7 +18,7 @@
 <aura:component>
 
 <!-- 
-     These three items should be modified to get the desired result. I.e. 0 items per page, 100 items per page, 
+     These items should be modified to get the desired result. I.e. 0 items per page, 100 items per page, 
      3000 items per page, or 6000 items per page
 -->
 
@@ -40,12 +40,12 @@
     <aura:attribute name="index" type="Integer"/>
     <aura:attribute name="count" type="Integer"/>
     <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
-
+    <ui:button aura:id="refireDP" label="Re-fire datagrid's provide" press="{!c.replaceData}"/><br/> 
     <ui:button aura:id="addRow" label="Add row" press="{!c.handleAddRow}"/>
     <ui:button aura:id="insert" label="Insert" press="{!c.handleInsert}"/>
     <ui:button aura:id="remove" label="Remove" press="{!c.handleRemove}"/>
-    <ui:inputText placeholder="index" aura:id="index" value="{!v.index}"/>
-    <ui:inputText placeholder="count" aura:id="count" value="{!v.count}"/>
+    <ui:inputText placeholder="index" label="index" labelPosition="hidden" aura:id="index" value="{!v.index}"/>
+    <ui:inputText placeholder="count" label="count" labelPosition="hidden" aura:id="count" value="{!v.count}"/>
 
 
 

@@ -327,11 +327,12 @@
      */ 
     verifyRow : function(domRow, cmpRow, expectedRow){
         var keys = ["id", "subject", "name", "relatedTo", "date"];
-        $A.test.assertEquals($A.test.getElementAttributeValue(domRow[0].children[0], "type"), "checkbox", "Row element data does not match what it show be");
+        // TODO: Clean up this assertion to check for selection checkbox inside wrapper div (due to accessibility changes from W-2330954)
+        $A.test.assertEquals($A.test.getElementAttributeValue(domRow[0].children[0].children[1], "type"), "checkbox", "Row element data does not match what it should be");
         
         for(var i = 1; i < domRow.length; i++){
-            $A.test.assertEquals($A.util.getText(domRow[i]), ""+expectedRow[i-1], "Row element data does not match what it show be");
-            $A.test.assertEquals(""+cmpRow[keys[i-1]], expectedRow[i-1], "Row data stored in cmp data does not match what it show be");
+            $A.test.assertEquals($A.util.getText(domRow[i]), ""+expectedRow[i-1], "Row element data does not match what it should be");
+            $A.test.assertEquals(""+cmpRow[keys[i-1]], expectedRow[i-1], "Row data stored in cmp data does not match what it should be");
         }
     },
     

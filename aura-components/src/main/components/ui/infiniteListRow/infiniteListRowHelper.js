@@ -22,8 +22,7 @@
 	 */
 	open: function (cmp, params) {
 		var el = cmp.getElement();
-
-		// TODO: create custom event to bubble 'open' operation to infiniteList.
+		this.createAndDispatch(el, 'InfiniteListRowOpen', params);
 	},
 
 	/**
@@ -33,8 +32,21 @@
 	 * @param params {Object} Whichever values passed from ui:open / ui:command.
 	 */
 	close: function (cmp, params) {
-		var el = cmp.getElement();
-		
-		// TODO: create custom event to bubble 'close' operation to infiniteList.
+		var el = cmp.getElement();		
+		this.createAndDispatch(el, 'InfiniteListRowClose', params);
+	},
+	
+	/**
+	 * Creates the event object and dispatches it. 
+	 */
+	createAndDispatch: function (el, name, detail) {
+		var cfg = {
+				detail 		: detail,
+				bubbles 	: true,
+				cancelable 	: true
+			},
+			evt = new CustomEvent(name, cfg);
+
+		el.dispatchEvent(evt);
 	}
 })

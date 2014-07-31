@@ -227,6 +227,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(httpResponse);
         assertEquals("Expected server to return a 304 for unexpired cache.", HttpStatus.SC_NOT_MODIFIED, statusCode);
         assertNull(getResponseBody(httpResponse));
+        assertAntiClickjacking(httpResponse);
     }
 
     /**
@@ -241,6 +242,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         Header varyHeader = response.getFirstHeader(HttpHeaders.VARY);
         assertNotNull("Vary header is not set.", varyHeader);
         assertEquals("Vary header set to wrong value.", "Accept-Encoding", varyHeader.getValue());
+        assertAntiClickjacking(response);
     }
 
     /**

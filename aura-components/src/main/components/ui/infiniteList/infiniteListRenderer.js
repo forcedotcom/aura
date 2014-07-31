@@ -26,6 +26,9 @@
 			// This is necessary because Aura's FastClick implementation is attached directly
 			// to aura:html components instead of at the window level.
 			list.addEventListener(hlp.getEventNames().start, cmp._ontouchstart, true); 
+			
+			list.addEventListener('InfiniteListRowOpen', cmp._onInfiniteListRowOpen, false);
+			list.addEventListener('InfiniteListRowClose', cmp._onInfiniteListRowClose, false);
 		}
 		
         this.superAfterRender();

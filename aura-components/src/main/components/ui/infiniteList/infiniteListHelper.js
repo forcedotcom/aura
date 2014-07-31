@@ -16,6 +16,7 @@
 ({
 	DIRECTION_THRESHOLD	: 2, 	// the intent of a gesture is captured after moving 2px in a direction
 	OPEN_PERCENTAGE		: 80,	// an 'open' row is translated 80% from its initial position
+	COMMIT_PERCENTAGE 	: 20, 	// the minimum absolute distance necessary to force commitment of either opening or closing
 	
 	SNAP_TIMEOUT		: 300,	// duration of 'snap' transition
 	CLOSE_TIMEOUT 		: 600,	// duration of the full 'close' transition of an active row 
@@ -37,6 +38,17 @@
     	cmp._ontouchend = function (e) {
     		self.ontouchend(cmp, e);
     	};
+    	
+    	cmp._onInfiniteListRowOpen = function (e) {
+    		// 1. close the open row if it exists 
+    		// 2. make the target row the open row
+    		// 3. open the row with a transition (if desired, check for e.details.useTransition
+    		$A.warning('List row open is unimplemented.');
+    	};
+    	
+    	cmp._onInfiniteListRowClose = function (e) {
+    		self.onInfiniteListRowClose(cmp, e);
+    	} 
 	},
 	
 	/**
@@ -99,44 +111,29 @@
             e.preventDefault();    
             return;     
         }
-
+        
     	if ((e.touches && e.touches.length == 1) || (e.pageX !== undefined)) {
     		touch = (e.touches && e.touches[0]) || e;
     		rootClassName = cmp.getElement().className || 'uiInfiniteList';
     		row = this.getRow(e.target, 'uiInfiniteListRow', rootClassName); 
-    		
+    		    		
     		// Only proceed if a valid row was found.
     		if (row) {                
     			this.attachListeners(cmp);
 	    		
-                // If a different row was open, close it.
-                if (cmp._openRow && cmp._previousSwipe && cmp._previousSwipe.row !== row && cmp._previousSwipe.body) {
-                	openRowSwipe = cmp._previousSwipe;
-                	
-                    // Perform close operation.
-                	openRowSwipe.body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
-                    this.translateX(cmp, openRowSwipe.body, 0);
-                    
-                    // Null these fields as 'touchend' will not execute.
-                    $A.util.removeClass(cmp._openRow, 'open');
-                    cmp._openRow = null;
-                    cmp._swipe = null;
-                    
+    			// Detect whether this interaction is on the open row.
+    			cmp._isInteractionOnOpenRow = cmp._openRow && cmp._previousSwipe && (cmp._previousSwipe.row === row);
+    			
+                // If a different row was open, close it. Slightly different logic than above.
+                if (cmp._openRow && cmp._previousSwipe && (cmp._previousSwipe.row !== row)) {
                     // Cancel all further events - this handler is registered in the 'capture' phase.
                     e.stopPropagation();
                     e.preventDefault();
                     
-                    // Change the state for the duration of the close animation.
-                    // Use two variables to cancel all touch events.
-                    cmp._isClosing = true;
-                    this.block(cmp);
+                    // Close the row,
+                	this.closeRowBlockAndReset(cmp, cmp._previousSwipe);
                     
-                    setTimeout(function () {
-                        cmp._isClosing = false;
-                        openRowSwipe.body.style.transition = '';
-                    }, this.CLOSE_TIMEOUT);
-
-                    return;
+                	return;
                 }
 
 	    		// If another swipe is occurring on the same row. Check for openness.	
@@ -163,7 +160,7 @@
      */
     ontouchmove: function (cmp, e) {   
     	var point = null, // must be explicitly null
-            swipe, axis, body, percentage;
+            swipe, axis, percentage;
     	
     	// If a row is closing or the interaction has been blocked, 
     	// bounce the event and return.
@@ -185,40 +182,45 @@
 	    	swipe.diffY = (swipe.startY - point.y),
 	    	swipe.absX 	= Math.abs(swipe.diffX);
 	    	swipe.absY 	= Math.abs(swipe.diffY);
-
+	    	swipe.body  = swipe.body || swipe.row.querySelector('.body'); 
+	    	
             // Lock the direction for the duration of the iteraction.
             axis = cmp._direction || this.getScrollAxis(swipe.absX, swipe.absY);
-
+            
             if (axis === 'x') {
                 // If a greater gesture occurred horizontally than vertically, 
                 // then prevent event bubbling to keep the scroller from moving.
                 e.stopPropagation();
                 e.preventDefault();
                 
-                swipe.body = body = swipe.body || swipe.row.querySelector('.body'); 
-                
                 // Positive displacement is a 'open' gesture.
             	// Negative displacement is an 'close' gesture.
                 if (swipe.diffX > 0) {
-                	percentage = this.getWidthPercentage(cmp, body, (swipe.absX + swipe.initialPosition));
+                	percentage = this.getWidthPercentage(cmp, swipe.body, (swipe.absX + swipe.initialPosition));
                 	swipe.percentage = -percentage;
                 	
                 	if (swipe.percentage >= -(this.OPEN_PERCENTAGE)) { 
-                		this.translateX(cmp, body, swipe.percentage);
+                		this.translateX(cmp, swipe.body, swipe.percentage);
                 	}
                 }
                 else {
-                	percentage = this.getWidthPercentage(cmp, body, (swipe.absX + (cmp._bodyLength - swipe.initialPosition)));
+                	percentage = this.getWidthPercentage(cmp, swipe.body, (swipe.absX + (cmp._bodyLength - swipe.initialPosition)));
                 	swipe.percentage = -(100 - percentage);
                 	
                 	if (swipe.percentage <= 0) {
-                		this.translateX(cmp, body, swipe.percentage);
+                		this.translateX(cmp, swipe.body, swipe.percentage);
                 	}
                 }
             }
-
-	    	// TODO: If a horizontal close swipe and the row is closed, ignore.
-	    	// Ignoring allows with event to continue bubbling (stageLeft swipe for example). 
+            else if (cmp._isInteractionOnOpenRow) {
+  
+                // Movement along the y direction on the current row will force the row closed. 
+            	// Cancel all further events.
+                e.stopPropagation();
+                e.preventDefault();
+                
+            	this.closeRowBlockAndReset(cmp, swipe);
+            }
     	}
     },
     
@@ -243,22 +245,22 @@
         		// Block interactions while the transition is happening.
         		cmp._isSnapping = true;
       
-	        	// The percentage is inverted. 
-	        	// Greater than 50% implies open intent.
-	        	// Less than 50% implies close intent.
-	    		if (percentage > 50) {	    			
-	    			this.translateX(cmp, swipe.body, -(this.OPEN_PERCENTAGE));
-	    			
-	    			// Create '_openRow' reference after timeout 'snap' has completed.
-	    			// Creating the reference too soon could cause a 'close' animation to also occur. 
-	    			shouldSnapOpen = true; 
-	    		}
-	    		else {
-	    			this.translateX(cmp, swipe.body, 0);
-	    			$A.util.removeClass(cmp._openRow, 'open');
-	    			cmp._openRow = null;
-	    		}
-	    		
+        		// If the absolute percentage moved meets the threshold, then commit to either openning or closing. 
+        		if (percentage >= this.COMMIT_PERCENTAGE) {
+        			if (swipe.diffX > 0) {
+		    			this.translateX(cmp, swipe.body, -(this.OPEN_PERCENTAGE));
+		    			
+		    			// Create '_openRow' reference after timeout 'snap' has completed.
+		    			// Creating the reference too soon could cause a 'close' animation to also occur. 
+		    			shouldSnapOpen = true; 
+		    		}
+		    		else {
+		    			this.translateX(cmp, swipe.body, 0);
+		    			$A.util.removeClass(cmp._openRow, 'open');
+		    			cmp._openRow = null;
+		    		}
+        		}
+        		
 	    		setTimeout(function () {
         			cmp._isSnapping = false;
         			swipe.body.style.transition = '';
@@ -289,6 +291,59 @@
         cmp._swipe = null;
         cmp._moved = false;
         cmp._direction = null;
+        cmp._isInteractionOnOpenRow = null;
+    },
+    
+    /**
+     * Closes the current row.
+     */
+    onInfiniteListRowClose: function (cmp, e) {
+    	e.preventDefault();
+    	e.stopPropagation();
+    	
+    	var target 		  = e.target,
+    		body 		  = target.querySelector('div.body'),
+    		useTransition = e.detail && e.detail.useTransition;
+    	
+    	if (body && $A.util.hasClass(target, 'open')) {
+    		if (useTransition) {
+    			body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
+    		}
+    		
+    		this.translateX(cmp, body, 0);
+    		
+    		setTimeout(function () {
+    			if (useTransition) {
+    				body.style.transition = '';
+    			}
+    			
+    			$A.util.removeClass(body, 'open');
+    		}, this.CLOSE_TIMEOUT);
+    	}
+    },
+    
+    /**
+     * Given an active swipe, close the row and reset.
+     */
+    closeRowBlockAndReset: function (cmp, swipe) {
+        // Perform close operation.
+    	swipe.body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
+        this.translateX(cmp, swipe.body, 0);
+        
+        // Null these fields as 'touchend' will not execute.
+        $A.util.removeClass(cmp._openRow, 'open');
+        cmp._openRow = null;
+        cmp._swipe = null;
+                
+        // Change the state for the duration of the close animation.
+        // Use two variables to cancel all touch events.
+        cmp._isClosing = true;
+        this.block(cmp);
+        
+        setTimeout(function () {
+            cmp._isClosing = false;
+            swipe.body.style.transition = '';
+        }, this.CLOSE_TIMEOUT);
     },
     
     isBlocked: function (cmp) {

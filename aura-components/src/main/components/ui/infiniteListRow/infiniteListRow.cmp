@@ -19,13 +19,11 @@
 	<aura:attribute name="class" type="String"/>
 	<aura:attribute name="swipeBody" type="Aura.Component[]"/>
 
-<!-- API not currently exposed.
 	<aura:registerEvent name="open" type="ui:open"/>
 	<aura:registerEvent name="close" type="ui:close"/>
 
 	<aura:handler name="open" action="{!c.handleOpen}"/>
 	<aura:handler name="close" action="{!c.handleClose}"/>
--->
 
 	<!-- 
 	 ~ Each row touch event is resolved by ui:infiniteList via the class "uiInfiniteListRow" (see infiniteListRowHelper). 

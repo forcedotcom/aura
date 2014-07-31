@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 ({
-	/* API not currently exposed.
 	handleOpen: function (cmp, evt, hlp) {
 		var parameters = evt.getParam('parameters');
 		hlp.open(cmp, parameters); 
@@ -24,5 +23,4 @@
 		var parameters = evt.getParam('parameters');
 		hlp.close(cmp, parameters); 
 	}
-	*/	
 })

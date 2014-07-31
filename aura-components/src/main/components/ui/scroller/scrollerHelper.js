@@ -91,8 +91,9 @@
         // #end
     },
     getScrollerNamespace: function () {
-        if (typeof window.__S === "undefined") {
+        if (typeof window.__S === "undefined" || !window.__S.initialized) {
             this._bootstrapScroller();
+            window.__S.initialized = true;
         }
         return window.__S;
     },
@@ -526,6 +527,7 @@ _initScroller: function () {
         ACTION_GESTURE_START = 'gestureStart',
         ACTION_GESTURE_MOVE  = 'gestureMove',
         ACTION_GESTURE_END   = 'gestureEnd',
+        ACTION_ANIM_START    = 'animationStart',
         ACTION_ANIM_MOVING   = 'animationMove',
         ACTION_ANIM_END      = 'animationEnd',
         HOOK_BEFORE          = 'before',
@@ -1943,6 +1945,8 @@ _initScroller: function () {
                 if (!time) {
                     this._isScrolling = false;
                     this._fire(ACTION_GESTURE_END);
+                } else {
+                    this._fire(ACTION_ANIM_START, ACTION_ANIM_START);
                 }
             } else {
                 this._animate(x, y, time, easing.fn);

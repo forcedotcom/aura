@@ -22,10 +22,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.test.ServiceLocatorMocker;
 import org.auraframework.test.UnitTestCase;
+
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.json.Json;
 import org.mockito.Mockito;
 
@@ -40,21 +44,64 @@ public class InstanceStackTest extends UnitTestCase {
         super(name);
     }
 
+    /**
+     * setUp mocks Aura.getConfigAdapter().isPrivilegedNamespace().
+     */
+    @Override
+    public void setUp() throws Exception {
+    	 super.setUp();
+    	 mci = Mockito.mock(ConfigAdapter.class);
+    	 Mockito.when(mci.isPrivilegedNamespace((String)Mockito.any())).thenReturn(true);
+    	 ServiceLoader msl = ServiceLocatorMocker.mockServiceLocator();
+    	 Mockito.when(msl.get(ConfigAdapter.class)).thenReturn(mci);    	 
+    }
+
+    /**
+     * tearDown un-mocks Aura.getConfigAdapter().isPrivilegedNamespace().
+     */
+    @Override
+    public void tearDown() throws Exception {
+        ServiceLocatorMocker.unmockServiceLocator();
+        super.tearDown();
+    }
+
+    //
     // Simplified implementation of Instance for testing. We really only care about the path string.
+    // FIXME: This shoule be a mock.
+    //
     private class TestInstance implements Instance<Definition> {
         private final String path;
-
+        private final String name;
+        protected final DefDescriptor<Definition> descriptor;
+        
+        private DefDescriptor<Definition> createMockDescriptor(String namespace) {
+        	@SuppressWarnings("unchecked")
+			DefDescriptor<Definition> desc = Mockito.mock(DefDescriptor.class);
+        	Mockito.when(desc.getNamespace()).thenReturn(namespace);
+        	return desc;
+        }
+        
         public TestInstance() {
             this.path = "testInstance";
+            this.name = "";
+            this.descriptor = createMockDescriptor("aura");
         }
 
         public TestInstance(String path) {
-            this.path = path;
+        	this.path = path;
+        	this.name = "";
+        	this.descriptor = createMockDescriptor("aura");
         }
-
+        
+        public TestInstance(String namespace, String name) {
+        	this.path = namespace;
+        	this.name = name;
+        	this.descriptor = createMockDescriptor(namespace);
+        }
+        
         @Override
         public DefDescriptor<Definition> getDescriptor() {
-            return null;
+            return this.descriptor;
         }
 
         @Override
@@ -71,7 +118,8 @@ public class InstanceStackTest extends UnitTestCase {
         InstanceStack iStack = new InstanceStack();
         assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
 
-        iStack.pushInstance(new TestInstance());
+        Instance<?> ti = new TestInstance();
+        iStack.pushInstance(ti, ti.getDescriptor());
 
         // Set and clear attributes
         iStack.setAttributeName("attr1");
@@ -99,10 +147,10 @@ public class InstanceStackTest extends UnitTestCase {
         InstanceStack iStack = new InstanceStack();
         assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance ti = new TestInstance();
-        iStack.pushInstance(ti);
+        iStack.pushInstance(ti, ti.getDescriptor());
         iStack.popInstance(ti);
         assertEquals("Popping to top of stack should increment index", "/*[1]", iStack.getPath());
-        iStack.pushInstance(ti);
+        iStack.pushInstance(ti, ti.getDescriptor());
         iStack.popInstance(ti);
         assertEquals("Popping to top of stack should increment index", "/*[2]", iStack.getPath());
     }
@@ -155,7 +203,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorPushPopDifferentInstances() {
         InstanceStack iStack = new InstanceStack();
-        iStack.pushInstance(new TestInstance("instance1"));
+        TestInstance ti = new TestInstance("instance1");
+        iStack.pushInstance(ti, ti.getDescriptor());
         try {
             iStack.popInstance(new TestInstance("instance2"));
             fail("Expected error when trying to pop different instance than previously pushed");
@@ -166,7 +215,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorSetAttributeNameWithoutClearing() {
         InstanceStack iStack = new InstanceStack();
-        iStack.pushInstance(new TestInstance("instance"));
+        TestInstance ti = new TestInstance("instance");
+        iStack.pushInstance(ti, ti.getDescriptor());
         iStack.setAttributeName("first");
         try {
             iStack.setAttributeName("second");
@@ -178,7 +228,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorSetIndexWithoutAttributeSet() {
         InstanceStack iStack = new InstanceStack();
-        iStack.pushInstance(new TestInstance("instance"));
+        TestInstance ti = new TestInstance("instance");
+        iStack.pushInstance(ti, ti.getDescriptor());
         try {
             iStack.setAttributeIndex(1);
             fail("Expected error when setting attribute index without setting attribute name first");
@@ -189,7 +240,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorClearIndexWithoutSettingIndex() {
         InstanceStack iStack = new InstanceStack();
-        iStack.pushInstance(new TestInstance());
+        TestInstance ti = new TestInstance();
+        iStack.pushInstance(ti, ti.getDescriptor());
         iStack.setAttributeName("attribute");
         try {
             iStack.clearAttributeIndex(1);
@@ -201,7 +253,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorClearIndexWhileDifferentIndexSet() {
         InstanceStack iStack = new InstanceStack();
-        iStack.pushInstance(new TestInstance());
+        TestInstance ti = new TestInstance();
+        iStack.pushInstance(ti, ti.getDescriptor());
         iStack.setAttributeName("attribute");
         iStack.setAttributeIndex(11);
         try {
@@ -214,7 +267,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     public void testErrorSetIndexWithoutClearingPreviousIndex() {
         InstanceStack iStack = new InstanceStack();
-        iStack.pushInstance(new TestInstance());
+        TestInstance ti = new TestInstance();
+        iStack.pushInstance(ti, ti.getDescriptor());
         iStack.setAttributeName("attribute");
         iStack.setAttributeIndex(42);
         try {
@@ -295,4 +349,43 @@ public class InstanceStackTest extends UnitTestCase {
         assertEquals("Components should empty when no registered components", 0, iStack.getComponents().size());
         verifyZeroInteractions(jsonMock);
     }
+
+    public void testPrivileged() throws Exception {
+    	//setting up 
+    	String namespace_Priv = "previlege";
+    	String namespace_UnPriv = "unprevilege";
+    	String name1 = "one";
+    	String name2 = "two";
+    	String name3 = "three";
+    	String name4 = "four";
+    	Mockito.when(mci.isPrivilegedNamespace(namespace_Priv)).thenReturn(true);
+    	Mockito.when(mci.isPrivilegedNamespace(namespace_UnPriv)).thenReturn(false);
+    	//create empty stack, sanity check
+        InstanceStack iStack = new InstanceStack();
+        assertFalse("stack should has topUnprivileged=null at the beginning", iStack.isUnprivileged());
+        //start pushing
+        TestInstance one = new TestInstance(namespace_Priv,name1);
+        iStack.pushInstance(one, one.getDescriptor());
+        assertFalse("topUnprivileged is still null after pushing in one previleged instance:instance1", iStack.isUnprivileged());
+        TestInstance two = new TestInstance(namespace_UnPriv,name2);
+        iStack.pushInstance(two, two.getDescriptor());
+        assertTrue("topUnprivileged should become first unprivilege instance:instance2", iStack.isUnprivileged());
+        TestInstance three = new TestInstance(namespace_Priv,name3);
+        iStack.pushInstance(three, three.getDescriptor());
+        assertTrue("topUnprivileged should remain unchanged after pushing in a new privilege instance:instance3", iStack.isUnprivileged());
+        TestInstance four = new TestInstance(namespace_UnPriv,name4);
+        iStack.pushInstance(four, four.getDescriptor());
+        assertTrue("topUnprivileged should be unchanged after pushing in a new unprivilege instance:instance4", iStack.isUnprivileged());
+        //start poping
+        iStack.popInstance(four);
+        assertTrue("topUnprivileged should be unchanged after poping out unprivilege instance:instance4", iStack.isUnprivileged());
+        iStack.popInstance(three);
+        assertTrue("topUnprivileged should be unchanged after poping out privilege instance:instance3", iStack.isUnprivileged());
+        iStack.popInstance(two);
+        assertFalse("topUnprivileged should become null after poping out first unprivilege instance:instance2", iStack.isUnprivileged());
+        iStack.popInstance(one);
+        assertFalse("topUnprivileged should be unchanged(null) after poping out instance1", iStack.isUnprivileged());
+    }
+
+    private ConfigAdapter mci;
 }

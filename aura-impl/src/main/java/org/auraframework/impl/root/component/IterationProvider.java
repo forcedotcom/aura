@@ -81,7 +81,7 @@ public class IterationProvider implements ComponentConfigProvider {
                 iStack.setAttributeName("realbody");
                 for (int i = realstart; i < realend; i++) {
                     iStack.setAttributeIndex(i);
-                    iStack.pushInstance(component);
+                    iStack.pushInstance(component, component.getDescriptor());
                     iStack.setAttributeName("body");
                     Map<String, Object> providers = new HashMap<String, Object>();
                     providers.put(var, items.get(i));

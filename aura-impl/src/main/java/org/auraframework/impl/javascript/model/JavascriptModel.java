@@ -46,7 +46,7 @@ public class JavascriptModel implements Model {
     public JavascriptModel(JavascriptModelDef modelDef) {
         this.modelDef = modelDef;
         InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
-        iStack.pushInstance(this);
+        iStack.pushInstance(this, modelDef.getDescriptor());
         iStack.setAttributeName("m");
         this.path = iStack.getPath();
         for (JavascriptValueDef member : this.modelDef.getAllMembers()) {

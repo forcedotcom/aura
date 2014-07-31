@@ -172,12 +172,12 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
         InstanceStack instanceStack = context.getInstanceStack();
         Instance<?> parent = instanceStack.peek();
-		instanceStack.pushInstance(this);
 		
         this.descriptor = descriptor;
         this.originalDescriptor = descriptor;
         this.path = instanceStack.getPath();
-
+        instanceStack.pushInstance(this, descriptor);
+        
         if (def == null) {
             try {
                 def = descriptor.getDef();

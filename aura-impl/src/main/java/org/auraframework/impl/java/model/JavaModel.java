@@ -60,7 +60,7 @@ public class JavaModel implements Model {
     public JavaModel(JavaModelDefImpl modelDef) {
         this.modelDef = modelDef;
         InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
-        iStack.pushInstance(this);
+        iStack.pushInstance(this, modelDef.getDescriptor());
         iStack.setAttributeName("m");
         this.path = iStack.getPath();
         try {

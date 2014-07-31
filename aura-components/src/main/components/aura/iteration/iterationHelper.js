@@ -14,365 +14,334 @@
  * limitations under the License.
  */
 ({
-    /**
-     * Create a callback with a closure for the collector and index.
-     *
-     * If you put a function closure in a loop, it takes the _last_
-     * value for the variable. Passing by value protects us.
-     */
-    createAddComponentCallback: function(indexCollector, index) {
-        // fixme: error handling here?
-        return function(cmp) {
-            indexCollector.body[index] = cmp;
-            var bc = indexCollector.bodyCollector
-            bc.count -= 1;
-            if (bc.count === 0) {
-                $A.endMark("iteration create real body " + bc.cmp.getGlobalId());
-                var accum = [];
-                var rbl = bc.realBodyList;
-                var i;
+	createComponentForIndex : function(cmp, itemsval, index, afterCreationCallback) {
+		var helper = this;
+		
+		function createCallback(collector, index) {
+			return function(newComponent) {
+				collector.components[index] = newComponent;
 
-                for (i = bc.offset; i < rbl.length; i++) {
-                    var j;
-                    for (j = 0; j < rbl[i].length; j++) {
-                        accum.push(rbl[i][j]);
-                    }
-                }
-                if (bc.cmp._currentBodyCollector != bc) {
-                    for (i = 0; i < accum.length; i++) {
-                        accum[i].destroy(true);
-                    }
-                    return;
-                }
-                bc.cmp._currentBodyCollector = null;
-                bc.callback(accum);
-            }
-        };
-    },
+				//$A.renderingService.requestRerender(newComponent);
 
-    createComponentsForIndex: function(bodyCollector, cmp, items, index, doForce) {
-        var ret = [];
+				if (--collector.expectedCount === 0) {
+					helper.trackItem(collector.cmp, collector.itemval, collector.targetIndex, collector.components);
+
+					var realbody = helper.createFacetFromTrackingInfo(collector.cmp);
+					
+					collector.cmp.set("v.realbody", realbody);
+					
+					if (afterCreationCallback) {
+						afterCreationCallback();
+					}
+					
+					// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
+					//$A.renderingService.removeDirtyValue(collector.cmp.getValue("v.realbody"));
+				}
+			};
+		}
+
+		var itemval = itemsval.getValue(index);
+
+		// Clone the body for this row
+		var body = cmp.get("v.body");
+		
+		var forceServer = cmp.get("v.forceServer");
+		var collector = {
+			targetIndex: index,
+			itemval : itemval,
+			components : [],
+			cmp : cmp,
+			expectedCount : body.length
+		};
+		
+		this.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
+			$A.componentService.newComponentAsync(helper, createCallback(collector, n), cdr, ivp, false, false, forceServer);
+		});
+	},
+	
+	createRealBodyServer : function(cmp) {
+		var helper = this;
+		
+		function createComponentsForIndexFromServer(cmp, itemsval, index) {
+			var ret = [];
+			
+			$A.setCreationPathIndex(index);
+			$A.pushCreationPath("body");
+			
+			helper.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
+				ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, true));
+			});
+
+			$A.popCreationPath("body");
+
+			return ret;
+		}
+
+		// Although this is becoming an anti-pattern, we actually DO want
+		// getValue() here.  With it, we end up sharing model objects (under
+		// a PassthroughValue for sub-component ownership).  Without it,
+		// ValueFactory makes us a NEW object for child components, and we
+		// don't share a data model.
+		var itemsval = cmp.getValue("v.items");
+
+		if (itemsval && itemsval.getLength && itemsval.getLength() > 0) {
+			$A.pushCreationPath("realbody");
+
+			this.resetItemTracking(cmp);
+
+			var startIndex = this.getStart(cmp);
+			var endIndex = this.getEnd(cmp);
+
+			for (var i = startIndex; i < endIndex; i++) {
+				var components = createComponentsForIndexFromServer(cmp, itemsval, i);
+
+				this.trackItem(cmp, itemsval.getValue(i), i, components);
+			}
+
+			$A.popCreationPath("realbody");
+		}
+
+		return this.getUpdatedRealBody(cmp);
+	},
+	
+	resetItemTracking : function(cmp) {
+		cmp._itemInfos = [];
+	},
+
+	getItemTracking : function(cmp) {
+		if (!cmp._itemInfos) {
+			this.resetItemTracking(cmp);
+		}
+		
+		return cmp._itemInfos;
+	},
+
+	trackItem : function(cmp, itemval, index, components) {
+		// Track the components associated with this item for future v.items delta calculations
+		cmp._itemInfos[index] = {
+			index : index,
+			itemval : itemval,
+			components : components
+		};
+	},
+
+	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
+		function PickOperation(itemval, sourceIndex, targetIndex, components, indexVar, varName) {
+			this.itemval = itemval;
+			this.sourceIndex = sourceIndex;
+			this.targetIndex = targetIndex;
+			this.components = components;
+			this.indexVar = indexVar;
+			this.varName = varName;
+		}
+
+		var helper = this;
+		
+		PickOperation.prototype.run = function(cmp) {
+			var moved = this.sourceIndex !== this.targetIndex;
+			
+			helper.trackItem(cmp, this.itemval, this.targetIndex, this.components);
+			
+			for (var n = 0; n < this.components.length; n++) {
+				var component = this.components[n];
+
+				if (moved) {
+					// Update the index to match the new position in the facet
+					var vp = component.getAttributeValueProvider();
+					if (vp) {
+						vp.set(indexVar, this.targetIndex);
+					}
+					
+					$A.renderingService.requestRerender(component);
+				}
+			}
+		}
+
+		PickOperation.prototype.toString = function() {
+			return "pick(" + this.sourceIndex + ") to " + this.targetIndex;
+		}
+
+		function CreateOperation(index, itemval, cmp) {
+			this.index = index;
+			this.itemval = itemval;
+			
+			if (cmp._pendingCreates) {
+				cmp._pendingCreates.push(this);
+			} else {
+				cmp._pendingCreates = [this];
+			}
+		}
+
+		CreateOperation.prototype.run = function(cmp) {
+			if (this.running) {
+				// Create is mid flight just return and wait for the operation to complete
+				return;
+			} 
+			
+			this.running = true;
+			
+			var that = this;
+			// Although this is becoming an anti-pattern, we actually DO want
+			// getValue() here.  With it, we end up sharing model objects (under
+			// a PassthroughValue for sub-component ownership).  Without it,
+			// ValueFactory makes us a NEW object for child components, and we
+			// don't share a data model.
+			var itemsval = cmp.getValue("v.items");
+			helper.createComponentForIndex(cmp, itemsval, this.index, function() {
+				// Remove this create op from the set of pending creates
+				var i = $A.util.arrayIndexOf(cmp._pendingCreates, that);
+				if (i >= 0) {
+					cmp._pendingCreates.splice(i, 1);
+				}
+				
+				this.running = false;
+			});
+		}
+
+		CreateOperation.prototype.toString = function() {
+			return "create(" + this.index + ")";
+		}
+
+		var itemInfos = this.getItemTracking(cmp).slice();
+		var pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.slice() : undefined;
+		var operations = [];
+
+		for (var i = start; i < end; i++) {
+			var itemval = itemsval.getValue(i);
+
+			// Find existing itemInfo for this item
+			var found = false;
+			for (var j = 0; j < itemInfos.length; j++) {
+				var info = itemInfos[j];
+				if (info && itemval === info.itemval) {
+					operations.push(new PickOperation(itemval, j, i, info.components, indexVar, varName));
+
+					// Consume the item
+					itemInfos[j] = undefined;
+					found = true;
+					break;
+				}
+			}
+
+			// Check to see if we already have a pending create and update its target index
+			if (!found && pendingCreates) {
+				for (var n = 0; n < pendingCreates.length; n++) {
+					var op = pendingCreates[n];
+					if ($A.util.equalBySource(itemval, op.itemval)) {
+						op.index = i;
+						
+						operations.push(op);
+						
+						// Consume the item
+						pendingCreates.splice(n, 1);
+						found = true;
+					}
+				}
+			}
+			
+			if (!found) {
+				// Add a create to the list operations to be satisfied
+				operations.push(new CreateOperation(i, itemval, cmp));
+			}
+		}
+		
+		return operations;
+	},
+
+	updateRealBody : function(cmp) {
+		var realbody = this.getUpdatedRealBody(cmp);
+
+		cmp.set("v.realbody", realbody);
+		
+		// DCHASMAN TODO Rename this horrible misnomer that has nothing to do with rendering and everything to do with updating the contents of the iteration!!!
+		cmp.getEvent("rerenderComplete").fire();
+
+		// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
+		//$A.renderingService.removeDirtyValue(cmp.getValue("v.realbody"));
+	},
+
+	getUpdatedRealBody : function(cmp) {
+        // Although this is becoming an anti-pattern, we actually DO want
+        // getValue() here.  With it, we end up sharing model objects (under
+        // a PassthroughValue for sub-component ownership).  Without it,
+        // ValueFactory makes us a NEW object for child components, and we
+        // don't share a data model.
+        var itemsval = cmp.getValue("v.items");
         var varName = cmp.get("v.var");
-        var indexVar = cmp.get("v.indexVar");
-        var body = cmp.get("v.body");
-        var extraProviders = {};
-        var indexCollector = {
-            body:ret,
-            bodyCollector:bodyCollector
-        };
-        bodyCollector.realBodyList[index] = ret;
-        extraProviders[varName] = items.getValue(index);
-        if (indexVar) {
-            extraProviders[indexVar] = $A.expressionService.create(null, index);
-        }
-        var ivp;
-        var len = body.length;
-        var forceServer = cmp.get("v.forceServer");
-        //
-        // Take off our index, but add the number of components that we will create.
-        //
-        bodyCollector.count += len - 1;
-        for (var j = 0; j < len; j++) {
-            var cdr = body[j];
-            if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
-            }
-            ret[j] = null;
-            $A.componentService.newComponentAsync(this, this.createAddComponentCallback(indexCollector, j), cdr, ivp, false, false, forceServer);
-        }
-        return len;
-    },
+		var indexVar = cmp.get("v.indexVar");
 
-    createComponentsForIndexFromServer: function(cmp, items, index, doForce) {
-        var ret = [];
-        var varName = cmp.get("v.var");
-        var indexVar = cmp.get("v.indexVar");
-        var body = cmp.get("v.body");
-        var extraProviders = {};
-        extraProviders[varName] = items.getValue(index);
-        if (indexVar) {
-            extraProviders[indexVar] = $A.expressionService.create(null, index);
-        }
-        var ivp;
+		var operations = this.getTransformation(cmp, itemsval, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
+				
+		this.resetItemTracking(cmp);
+		for (var n = 0; n < operations.length; n++) {
+			operations[n].run(cmp);
+		}
+		
+		return this.createFacetFromTrackingInfo(cmp);
+	},
 
-        $A.setCreationPathIndex(index);
-        $A.pushCreationPath("body");
-        //
-        // Take off our index, but add the number of components that we will create.
-        //
-        for (var j = 0; j < body.length; j++) {
-            $A.setCreationPathIndex(j);
-            var cdr = body[j];
-            if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
-            }
-            ret.push( $A.componentService.newComponentDeprecated(cdr, ivp, false, doForce) );
-        }
+	createFacetFromTrackingInfo : function(cmp) {
+		var realbody = [];
+		var trackingInfo = this.getItemTracking(cmp);
+		for (var n = 0; n < trackingInfo.length; n++) {
+			var info = trackingInfo[n];
+			if (info) {
+				realbody = realbody.concat(info.components);
+			}
+		}
+		
+		return realbody;
+	},
 
-        $A.popCreationPath("body");
-        return ret;
-    },
+	getStart : function(cmp) {
+		var start = cmp.get("v.start");
+		return !$A.util.isEmpty(start) ? Math.max(0, this.getNumber(start)) : 0;
+	},
 
-    createNewComponents: function(cmp, callback) {
-        var start = this.getStart(cmp);
-        var end = this.getEnd(cmp);
-        var realbody = cmp.getValue("v.realbody");
-        var body = cmp.getValue("v.body");
-        var bodyLen = body.getLength();
-        if ((end - start) > (realbody.getLength()/bodyLen)) {
-            // now we don't have enough, create a new cmp at the end
-            var items = cmp.getValue("v.items");
-            this.createSelectiveComponentsForIndex(cmp, items, end - 1, false, callback);
-        }
-    },
+	getEnd : function(cmp) {
+	    // Although this is becoming an anti-pattern, we actually DO want
+        // getValue() here.  With it, we end up sharing model objects (under
+        // a PassthroughValue for sub-component ownership).  Without it,
+        // ValueFactory makes us a NEW object for child components, and we
+        // don't share a data model.
+        var itemsval = cmp.getValue("v.items");
+		var length = itemsval && itemsval.getLength ? itemsval.getLength() : 0;
+		var end = cmp.get("v.end");
+		
+		return !$A.util.isEmpty(end) ? Math.min(length, this.getNumber(end)) : length;
+	},
+	
+	createComponents : function(cmp, itemsval, index, behavior) {
+		function createExtraProviders(cmp, itemval, index) {
+			var varName = cmp.get("v.var");
+			var indexVar = cmp.get("v.indexVar");
+			var extraProviders = {};
+			
+			extraProviders[varName] = $A.expressionService.create(cmp, itemval);
+			if (indexVar) {
+				extraProviders[indexVar] = $A.expressionService.create(cmp, index);
+			}
 
-    createRealBody: function(cmp, doForce, callback) {
-        var items = cmp.getValue("v.items");
-        
-        // The collector for the components.
-        // Note that we put the count of items in our count, and
-        // decrement for each one when we add the subitems on. This protects
-        // us from 'instant' callbacks which occur inline (and would cause us
-        // to think we had finished after the first item was processed).
-        var bodyCollector = {
-            realBodyList:[],
-            count: (items && items.getLength) ? items.getLength() : 0, // items length if exists else zero
-            callback: callback,
-            cmp: cmp,
-            offset:0
-        };
+			return extraProviders;
+		}
 
-        cmp._currentBodyCollector = bodyCollector;
-        if (items && items.getLength && !items.isLiteral() && !items.isEmpty()) {
-            var realstart = 0;
-            var realend = items.getLength();
-            var start = cmp.getValue("v.start");
-            if (start.isDefined()) {
-                start = this.getNumber(start);
-                if (start > realstart) {
-                    realstart = start;
-                    bodyCollector.offset = realstart;
-                }
-            }
-            var end = cmp.getValue("v.end");
-            if (end.isDefined()) {
-                end = this.getNumber(end);
-                if (end < realend) {
-                    realend = end;
-                }
-            }
-            bodyCollector.count = realend-realstart;
-            var count = 0;
-            $A.mark("iteration create real body " + cmp.getGlobalId());
-            for (var i = realstart; i < realend; i++) {
-                count += this.createComponentsForIndex(bodyCollector, cmp, items, i, doForce);
-            }
-            //
-            // Catch the boundary condition where we end up creating nothing at all because
-            // we never have a callback.
-            //
-            if (count === 0) {
-                callback([]);
-            }
-        }
-        else {
-           callback([]);
-        }
-    },
+		var ivp;
+		var body = cmp.get("v.body");
+		for (var n = 0; n < body.length; n++) {
+			var cdr = body[n];
+			if (!ivp) {
+				var extraProviders = createExtraProviders(cmp, itemsval.getValue(index), index);
+				ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
+			}
 
-    createRealBodyServer: function(cmp, doForce) {
-        var realbody = [];
-        var items = cmp.getValue("v.items");
+			$A.setCreationPathIndex(n);
+			
+			behavior(cdr, ivp, n);
+		}
+	},
 
-        if (items && !items.isLiteral() && !items.isEmpty()) {
-            $A.pushCreationPath("realbody");
-
-            var realstart = 0;
-            var realend = items.getLength();
-            var start = cmp.getValue("v.start");
-            if (start.isDefined()) {
-                start = this.getNumber(start);
-                if (start > realstart) {
-                    realstart = start;
-                }
-            }
-            var end = cmp.getValue("v.end");
-            if (end.isDefined()) {
-                end = this.getNumber(end);
-                if (end < realend) {
-                    realend = end;
-                }
-            }
-
-            for (var i = realstart; i < realend; i++) {
-                realbody = realbody.concat(this.createComponentsForIndexFromServer(cmp, items, i, doForce));
-            }
-            $A.popCreationPath("realbody");
-        }
-
-        return realbody;
-    },
-
-    createSelectiveComponentsForIndex: function(cmp, items, index, doForce, callback) {
-        var varName = cmp.get("v.var");
-        var indexVar = cmp.get("v.indexVar");
-        var body = cmp.get("v.body");
-        var extraProviders = {};
-        extraProviders[varName] = items.getValue(index);
-        if (indexVar) {
-            extraProviders[indexVar] = $A.expressionService.create(null, index);
-        }
-        var ivp;
-        var forceServer = cmp.get("v.forceServer");
-        var selectiveBodyCollector = {
-            realBodyList: [],
-            count: body.length,
-            cmp: cmp,
-            callback: callback
-        };
-        for (var j = 0; j < body.length; j++) {
-            var cdr = body[j];
-            if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
-            }
-            $A.setCreationPathIndex(j);
-            $A.componentService.newComponentAsync(this, this.createSelectiveComponentsCallback(selectiveBodyCollector, j), cdr, ivp, false, false, forceServer);
-        }
-    },
-
-    createSelectiveComponentsCallback: function(selectiveBodyCollector, index) {
-        return function(newcmp) {
-            selectiveBodyCollector.realBodyList[index] = newcmp;
-            selectiveBodyCollector.count -= 1;
-            if (selectiveBodyCollector.count === 0) {
-                var accum = [];
-                var rbl = selectiveBodyCollector.realBodyList;
-                for (var i = 0; i < rbl.length; i++) {
-                    accum.push(rbl[i]);
-                }
-                selectiveBodyCollector.callback(accum);
-            }
-        };
-    },
-
-    rerenderEverything: function(cmp) {
-        this.createRealBody(cmp, false, function(newBody) {
-            if (cmp.isValid()) {
-                var realbody = cmp.getValue("v.realbody");
-                realbody.destroy();
-                realbody.setValue(newBody);
-                cmp.getEvent("rerenderComplete").fire();
-                $A.endMark("iteration rerenderEverything " + cmp.getGlobalId());
-                $A.endMark("rerenderEverything in firstRender " + cmp.getGlobalId());
-            }
-        });
-    },
-
-    rerenderSelective: function(cmp) {
-        // optimized for insert/remove/push. if this is called as a result of a setValue then anything could change
-        var start = this.getStart(cmp);
-        var end = this.getEnd(cmp);
-        var items = cmp.getValue("v.items")
-        var realbody = cmp.getValue("v.realbody");
-        var body = cmp.getValue("v.body");
-        var bodyLen = body.getLength();
-        if (!realbody.isEmpty()) {
-            var varName = cmp.get("v.var");
-            var indexVar = cmp.get("v.indexVar");
-            var diffIndex = -1;
-            var data;
-            // look for a diff between the components we already created and the data
-            for (var i = 0; i < realbody.getLength(); i++) {
-                var bodycmp = realbody.getValue(i);
-                var vp = bodycmp.getAttributeValueProvider();
-                var index = vp.getValue(indexVar).unwrap();
-                data = vp.getValue(varName);
-                if (items.getValue(index) !== data) {
-                    // we have a diff
-                    diffIndex = index;
-                    break;
-                }
-            }
-            if (diffIndex !== -1) {
-                // something was added or removed at or before diffIndex
-                var cmparray;
-                var nextItem = items.getValue(diffIndex + 1);
-                if (nextItem !== data) {
-                    // this item was removed, delete this item, re-number rest
-                    var removed = realbody.remove(i, bodyLen);
-                    cmparray = realbody.unwrap();
-                    this.incrementIndices(cmparray, i, indexVar, -1, bodyLen);
-                    for (var k = 0; k < body.getLength(); k++) {
-                        removed[k].destroy();
-                    }
-                    this.createNewComponents(cmp, function(newcmps) {
-                        for (var j = 0; j < newcmps.length; j++) {
-                            realbody.push(newcmps[j]);
-                        }
-                    });
-                } else {
-                    // item was added, instantiate new cmp, re-number rest
-                    cmparray = realbody.unwrap();
-                    this.incrementIndices(cmparray, i, indexVar, 1, bodyLen);
-                    this.createSelectiveComponentsForIndex(cmp, items, diffIndex, false, function(newcmps) {
-                        cmparray.splice.apply(cmparray, [i, 0].concat(newcmps));
-                        if (end - start < cmparray.length/bodyLen) {
-                            // now there is 1 too many, need to remove from the end
-                            for (var j = 0; j < bodyLen; j++) {
-                                var endcmp = cmparray.pop();
-                                endcmp.destroy();
-                            }
-                        }
-                        realbody.setValue(cmparray);
-                    });
-                }
-            } else {
-                this.createNewComponents(cmp, function(newcmps) {
-                    for (var j = 0; j < newcmps.length; j++) {
-                        realbody.push(newcmps[j]);
-                    }
-                });
-            }
-        } else {
-            this.rerenderEverything(cmp);
-        }
-    },
-
-    incrementIndices: function(cmpArray, start, indexVar, change, bodyLen) {
-        for (var i = start; i < cmpArray.length; (bodyLen ? i+=bodyLen : i++)) {
-            var vp = cmpArray[i].getAttributeValueProvider();
-            var index = vp.getValue(indexVar);
-            index.setValue(index.unwrap() + change);
-        }
-    },
-
-    getStart: function(cmp) {
-        var start = cmp.get("v.start");
-        if (!$A.util.isEmpty(start)) {
-            return Math.max(0, this.getNumber(start));
-        } else {
-            return 0;
-        }
-    },
-
-    getEnd: function(cmp) {
-        var length = cmp.get("v.items.length");
-        var end = cmp.get("v.end");
-        if (!$A.util.isEmpty(end)) {
-            return Math.min(length, this.getNumber(end));
-        } else {
-            return length;
-        }
-    },
-
-    // temp workaround when strings get passed in until typedef takes care of this for us
-    getNumber: function(value) {
-        if (value && value.auraType === "Value"){
-            value = value.unwrap();
-        }
-        if (aura.util.isString(value)) {
-            value = parseInt(value, 10);
-        }
-        return value;
-    }
+	// temp workaround when strings get passed in until typedef takes care of this for us
+	getNumber : function(value) {
+		return aura.util.isString(value) ? parseInt(value, 10) : value;
+	}
 })

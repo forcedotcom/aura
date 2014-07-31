@@ -16,23 +16,19 @@
 package org.auraframework.test.perf.custom;
 
 import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 public final class IfComponentTest extends CustomPerfAbstractTestCase {
 
     public IfComponentTest(String name) {
-        super(name);
-        setComponentDef(getDefDescriptor("performanceTest:aura_if"));
+        super(name, getDefDescriptor("performanceTest:aura_if"));
     }
 
     public void testIf() throws Throwable {
-    	setComponentDef(getDefDescriptor("performanceTest:aura_if"));
         auraUITestingUtil.getRawEval("var c = $A.PERFCORE.getCreatedComponent(); c.set('v.enabled', true)");
     }
 
     public void testElse() throws Throwable {
-    	setComponentDef(getDefDescriptor("performanceTest:aura_if"));
-        auraUITestingUtil.getRawEval("var c = $A.PERFCORE.getCreatedComponent(); c.set('v.branch', true); c.set('v.enabled', true)");
+        auraUITestingUtil
+                .getRawEval("var c = $A.PERFCORE.getCreatedComponent(); c.set('v.branch', false); c.set('v.enabled', true)");
     }
 }

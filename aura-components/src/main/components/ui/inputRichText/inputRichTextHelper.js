@@ -23,7 +23,16 @@
 		var	editorInstance = this.getEditorInstance(cmp);
 
 		if (editorInstance) {
-			editorInstance.on(event, this.editorEventHandler, cmp);
+            editorInstance.on(event, this.editorEventHandler, cmp);
+            // defer binding editor events until the dom is created so that
+            // we can bind directly and receive faster events effectively
+            // bypassing the 200ms delay on blur events
+            editorInstance.on('contentDom', function() {
+                var concreteCmp = this.getConcreteComponent();
+                var helper = concreteCmp.getDef().getHelper();
+                var editable = editorInstance.editable();
+                editable.attachListener(editable, event, helper.editorEventHandler, concreteCmp);
+            }, cmp);
 		} else {
 			var el = this.getInputElement(cmp);
 	        $A.util.on(el, event, this.domEventHandler);
@@ -90,7 +99,7 @@
 				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
 			}
 		}
-	},
+    },
 
 	isLibraryLoaded: function(cmp) {
 		return typeof CKEDITOR !== "undefined";

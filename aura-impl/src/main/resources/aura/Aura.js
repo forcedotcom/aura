@@ -125,7 +125,9 @@ var clientService;
  * @constructor
  */
 $A.ns.Aura = function() {
-    this.util = new $A.ns.Util();
+    this.util = new $A.ns.Util(); 
+    //TODO W-2334986: HACK to get past closure, $A.util.on is getting stomped over by closure property rename
+    this.util["on"] = this.util.on;
     this["util"] = this.util;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this.test = new $A.ns.Test();
@@ -651,9 +653,9 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
 $A.ns.Aura.prototype.error = function(msg, e){
     var logMsg = msg || "";
     var dispMsg;
-
+ 
     if (!$A.util.isString(msg)) {
-        e = msg;
+        e = msg; 
         logMsg = "";
         msg = "Unknown Error";
     }
@@ -666,7 +668,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
             var stk = e.stack;
             e = new Error("caught " + e.message);
             if (stk) {
-                e.stack = stk;
+                e.stack = stk;      
             }
         } else {
             e = new Error("caught " + $A.util.json.encode(e));

@@ -49,6 +49,8 @@
     }
 })		
 		</pre>
+		<p><code>class</code> is a reserved keyword that might not work with older versions of Internet Explorer. We recommend using <code>"class"</code> with double quotes.</p>
+		
 		<h4>Generating Options using a Model</h4>
 		<p>
 			Display a list of options from a model by using the format <code>&lt;ui:inputSelect options="{!m.selectOptions}" /></code> and creating the list of options in the model using <code>ArrayList&lt;InputOption></code>.

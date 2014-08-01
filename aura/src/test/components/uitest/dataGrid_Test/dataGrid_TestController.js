@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({  
+    replaceData : function(cmp, evt, hlp) {
+        cmp.find("provider").getEvent("provide").fire();
+    },
+
     handleCurrentPageChange: function (cmp) {
         // Tell the grid to fetch new items from the dataProvider.
         cmp.find('grid').getEvent('refresh').fire();

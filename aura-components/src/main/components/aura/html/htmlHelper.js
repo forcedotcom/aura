@@ -80,7 +80,9 @@
 
     // string constants used to save fast click event and handler
     NAMES: {
-        "touch": "fcTouchEvent",
+        "touchStart": "fcTouchStart",
+        "touchEnd": "fcTouchEnd",
+        "touchMove": "fcTouchMove",
         "domHandler": "fcDomHandler",
         "hashHandler": "fcHashHandler"
     },
@@ -129,19 +131,26 @@
      * @returns {Function} previous handler if any
      */
     createFastClickHandler : function(element, handler, name) {
-        // remove existing fast click event handler if component is rerendered
+        // remove existing click event listeners if component is rerendered
         // there are potentially two handlers: one for domEvent and another for hashEvent
         // so we need to save reference and remove the right one
         var previousHandler = element[name];
         if($A.util.isFunction(previousHandler)) {
-            $A.util.removeOn(element, element[this.NAMES.touch], previousHandler);
             $A.util.removeOn(element, "click", previousHandler);
         }
 
-        var FastClick = this.initFastClick();
         if (this.supportsTouchEvents()) {
             // typically mobile and touch screens
-            new FastClick(element, handler);
+            var FastClick = this.initFastClick();
+            // remove the touch event listeners for the same two handlers
+            var touchHandler = name + "Touch";
+            var previousTouchHandler = element[touchHandler];
+            if (!$A.util.isUndefinedOrNull(previousTouchHandler)) {
+                $A.util.removeOn(element, element[this.NAMES.touchStart], previousTouchHandler);
+                $A.util.removeOn(element, element[this.NAMES.touchMove], previousTouchHandler);
+                $A.util.removeOn(element, element[this.NAMES.touchEnd], previousTouchHandler);
+            }
+            element[touchHandler] = new FastClick(element, handler);
         }
 
         // mouse click by default for devices with both touch and click capabilities
@@ -158,7 +167,9 @@
 
     initFastClick : function() {
         var gesture = this.GESTURE(),
-            fastClickEvent = this.NAMES.touch,
+            touchStart = this.NAMES.touchStart,
+            touchMove = this.NAMES.touchMove,
+            touchEnd = this.NAMES.touchEnd,
             FastClick;
 
         if (!this.FastClick) {
@@ -171,7 +182,9 @@
              **/
             FastClick = function(element, handler) {
                 // save fast click event type in order to remove listener
-                element[fastClickEvent] = gesture.start;
+                element[touchStart] = gesture.start;
+                element[touchMove] = gesture.move;
+                element[touchEnd] = gesture.end;
                 this.element = element;
                 this.handler = handler;
                 element.addEventListener(gesture.start, this, false);

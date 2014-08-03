@@ -256,6 +256,41 @@
             $A.test.assertEquals(7, component._noopCount, "last trigger didn't update _noopCount per leaf");
         }
     },
+
+    //
+    // Check the map from the model, being absolutely sure to use Object.hasOwnProperty so that
+    // we duplicate the JSON serializer behaviour.
+    //
+    checkMap : function(map, rawCount) {
+        var count = 0;
+        var k;
+        $A.test.assertEquals("apple", map["fruit"], "result[fruit] should be apple");
+        $A.test.assertEquals("bear", map["animal"], "result[animal] should be bear");
+        for (k in map) {
+            if (Object.prototype.hasOwnProperty.call(map, k)) {
+                count += 1;
+            }
+        }
+        $A.test.assertEquals(rawCount, count, "must have exactly four properties");
+        $A.test.assertEquals('{"fruit":"apple","animal":"bear"}', $A.util.json.encode(map));
+    },
+
+    testMapGet : {
+        test: function(component) {
+            var map = component.get("m.map");
+            var a = component.get("c.echoMap");
+            var done = false;
+            // this includes the getSource functions.
+            this.checkMap(map, 3);
+            a.setParams({ "map": map });
+            a.setCallback(this, function(a) {
+            	// when we check here, the map is a simple map.
+                this.checkMap(a.getReturnValue(), 2); done = true;
+            });
+            $A.run(function() { $A.enqueueAction(a); });
+            $A.test.addWaitFor(true, function() { return done; });
+        }
+    },
     
     //Fails in Halo due to W-2256415, Setting new Maps as model values doesn't work. At least not similar to attributes
     testMapSetValueRenders: {

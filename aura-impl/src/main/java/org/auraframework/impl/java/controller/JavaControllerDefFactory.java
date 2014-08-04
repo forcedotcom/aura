@@ -90,7 +90,14 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
     }
 
     private static String formatType(Type t) {
-        String result = JavaTypeDef.getClass(t).getName();
+        Class<?> clazz = JavaTypeDef.getClass(t);
+        String result;
+       
+        if (clazz != null) {
+            result = clazz.getName();
+        } else {
+            result = "Object";
+        }
 
         if (t instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) t;
@@ -102,7 +109,11 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                         result += ",";
                     }
                     first = false;
-                    result += formatType(tp); // recurse if nested parameterized
+                    if (tp == null) {
+                        result += "Object";
+                    } else {
+                        result += formatType(tp); // recurse if nested parameterized
+                    }
                 }
                 result += ">";
             }

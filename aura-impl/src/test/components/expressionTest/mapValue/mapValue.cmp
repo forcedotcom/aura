@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel" controller="java://org.auraframework.impl.java.controller.JavaTestController" >
     <aura:attribute name="map" type="Map" />
     <aura:attribute name="triggers" type="Map" default = "{ trigger: 'zero', triggerCount: 0 }"/>
     <aura:attribute name="triggers2" type="Map" default = "{ trigger: 'zero', triggerCount: 0 }"/>

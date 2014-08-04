@@ -34,3 +34,7 @@ exp(p,
     "put", p.put,
     "addHandler", p.addHandler
 );
+var pr = RawMapValue.prototype;
+exp(pr,
+    "toJSON", pr.toJSON
+);

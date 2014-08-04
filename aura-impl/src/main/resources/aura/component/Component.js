@@ -786,12 +786,13 @@ Component.prototype.getValue = function (key) {
  * If you do not need the wrapper, use <code>get()</code> instead.
  * Temporarily internalized to gate access.
  * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
+ * @param {Boolean} docreate set {@code true} to create missing MapValue entries
  *
  * @private
  *
  * @deprecated use Component.get(key,value) instead
  */
-Component.prototype._getValue = function(key){
+Component.prototype._getValue = function(key, docreate){
     // Should we deliberately break here?
     if (!this.isValid() || $A.util.isUndefinedOrNull(key)) {
         return undefined;
@@ -800,7 +801,7 @@ Component.prototype._getValue = function(key){
     // this getValue is special, the only one that accepts an expression or just a key
     if (key.toString() === "PropertyChain" || key.indexOf(".") !== -1) {
         // then we got an expression, lets deal with it
-        return expressionService.getValue(this, key);
+        return expressionService.getValue(this, key, undefined, docreate);
     }
 
     var priv = this.priv;
@@ -889,7 +890,7 @@ Component.prototype.mergeAttributes = function(yourMap, overwrite) {
  * @param {String} key The data key to look up on the Component.
  * @public
  */
-Component.prototype.get = function(key){
+Component.prototype.get = function(key, docreate){
     return $A.expressionService.get(this, key);
 };
 
@@ -901,7 +902,7 @@ Component.prototype.get = function(key){
  * @public
  */
 Component.prototype.set = function(key, value, ignoreChanges) {
-    var v = this._getValue(key);
+    var v = this._getValue(key, true);
     if ($A.util.isUndefinedOrNull(v)) {
         $A.error("Invalid key " + key);
         return;

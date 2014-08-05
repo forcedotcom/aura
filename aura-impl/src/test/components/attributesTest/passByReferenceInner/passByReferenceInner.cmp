@@ -47,11 +47,7 @@
         {!v.mapAttribute.oneDeeper.newEntry.newLayer}
     </div>
 
-    <!-- W-2338914: Everything on the attribute we try to iterate over prints out, but not within iteration! -->
-    Facet Iteration output:
-    {!v.objectAttribute.listEntry[0]}
-    {!v.objectAttribute.listEntry[1]}
-    {!v.objectAttribute.listEntry[2]}
+    Facet iteration output:
     <div aura:id="iterOutput">
         <aura:iteration items="{!v.objectAttribute.listEntry}" var="item">
             {!item}

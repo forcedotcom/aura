@@ -447,14 +447,17 @@ MapValue.prototype.unwrap = function() {
 MapValue.prototype.add = function(k, config, subDirty, skipChange) {
     var key = k.toLowerCase();
     var v = config[k];
-    
-    var value = valueFactory.create(v, null, this.owner);
+    var expected = this.value[key];
+    if (!expected && this.oldvalue) {
+        expected = this.oldvalue[key];
+    }	
+    var value = valueFactory.create(v, null, this.owner, expected);
     this.value[key] = value;
 
     if (key !== k) {
         this.keys[key] = k;
     }
-    
+	
     if (this.oldvalue && this.oldvalue[key]) {
         this.copyHandlers(this.oldvalue[key], value);
     }
@@ -474,7 +477,7 @@ MapValue.prototype.add = function(k, config, subDirty, skipChange) {
             }
         }
     }
-    
+	
     if (!skipChange && (value.handlers || value.eventDispatcher)) {
         // Value might be simple, using eventDispatcher; it might be a map,
         // using handlers. Either way, if we have handlers from before or from

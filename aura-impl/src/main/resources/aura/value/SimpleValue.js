@@ -62,7 +62,13 @@ function SimpleValue(config, def, component) {
 // Copy the AttributeValue.prototype, so its methods are available:
 $A.ns.Util.derivePrototype(SimpleValue, $A.ns.AttributeValue);
 
-SimpleValue.prototype.auraType = "Value";
+SimpleValue.prototype.auraType  = "Value";
+SimpleValue.prototype._getValueType = function () {
+    return "SimpleValue";
+};
+SimpleValue.prototype._hasChanged = function (rawMapValue) {
+    return this.unwrap() !== rawMapValue;
+};
 
 /**
  * DO NOT USE THIS METHOD.

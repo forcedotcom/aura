@@ -1707,6 +1707,29 @@ $A.ns.Util.prototype.isComponent = function(obj) {
 };
 
 /**
+ * TODO
+ */
+
+$A.ns.Util.prototype.getNormalizedValueType = function(value) {
+    var valueType;
+
+    if (value === null) {
+        return 'SimpleValue';
+    }
+
+    if (value._getValueType) {
+        valueType = value._getValueType();
+        return valueType === 'RawMapValue' ? 'MapValue' : valueType;
+    } else if ($A.util.isArray(value)) {
+        return 'ArrayValue';
+    } else if ($A.util.isObject(value)) {
+        return 'MapValue';
+    }
+
+    return 'SimpleValue';
+
+};
+/**
  * Checks if the object is an aura value object via auraType property.
  *
  * @param {Object} obj The object to check for.

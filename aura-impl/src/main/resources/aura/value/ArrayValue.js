@@ -22,7 +22,7 @@
  * @protected
  */
 function ArrayValue(config, def, component) {
-	this.array = [];
+    this.array = [];
     this.owner = component;
     this.hasRealValue = true;
     this.setValue(config);
@@ -41,6 +41,33 @@ function ArrayValue(config, def, component) {
 }
 
 ArrayValue.prototype.auraType = "Value";
+ArrayValue.prototype._getValueType = function () {
+    return 'ArrayValue';
+};
+
+ArrayValue.prototype._hasChanged = function (rawValue) {
+    //#debugger
+    var oldValueType = this._getValueType(),
+        newValueType = $A.util.getNormalizedValueType(rawValue),
+        oldLength    = this.getLength(),i;
+
+    if (oldValueType !== newValueType || oldLength !== rawValue.length) {
+        return true;
+    }
+
+    for (i = 0; i < oldLength; i++) {
+        oldValue = this.array[i];
+        newValue = rawValue[i];
+        oldCast  = $A.util.getNormalizedValueType(oldValue);
+        newCast  = $A.util.getNormalizedValueType(newValue);
+
+        if (oldCast !== newCast || oldValue._hasChanged(newValue)) {
+            return true;
+        }
+    }
+
+    return false;
+};
 
 /**
  * DO NOT USE THIS METHOD.
@@ -165,10 +192,10 @@ ArrayValue.prototype.setValue = function (newArray, skipChange) {
  * @param {Boolean} doNotAutoDestroy Set to true if you want to skip auto destroy in commit().
  */
 ArrayValue.prototype._setValue = function(newArray, skipChange, doNotAutoDestroy) {
-	if (doNotAutoDestroy) {
-		this.doNotAutoDestroy = true;
-	}
-	
+    if (doNotAutoDestroy) {
+        this.doNotAutoDestroy = true;
+    }
+    
     this.fireEvents = false;
     this.hasRealValue = (newArray !== null && newArray !== undefined);
     this.newArray = [];
@@ -179,58 +206,58 @@ ArrayValue.prototype._setValue = function(newArray, skipChange, doNotAutoDestroy
         }
         
         if (aura.util.isArray(newArray)) {
-        	try {
-	        	this["ignoreCommit"] = true; // NOTE: Using this ridiculous workaround for obfuscation collisions from Google Closure (using DOT notation results in $A.util.on() being undefined!
-	        	
-				var candiates = this.array ? this.array.slice() : [];
-		        for (var i = 0; i < newArray.length; i++) {
-		        	var value = newArray[i];
-		        	var found = false;
-		
-		        	if (value && candiates && candiates.length > 0) {
-		            	// See if we can find an existing object to use
-		                for (var j = 0; j < candiates.length; j++) {
-		                	var current = candiates[j];
-		                	if (current && $A.util.equalBySource(current, value)) {
-		                		if (current && current.auraType === "Value") {
-		                			current._setValue(value);
-		                			
-		                			// Preserve prior semantics that if something in the array is dirty then the entire array gets marked dirty
-		                			if (current.isDirty()) {
-		                				this.makeDirty();
-		                			}
-		                		}
-		                		
-		                		this.newArray.push(current);
-		                		
-		                		// Mark dirty if the positions are not equal
-		                		if (i !== j && !this.isDirty()) {
-		                			this.makeDirty();
-		                		}
-		                		
-		                		// Consume the candidate
-		                		candiates[j] = undefined;
-		                		found = true;
-		                		break;
-		                	}
-		                }
-		        	}
-		        	
-		            // Create a new value
-		            if (!found) {
-		            	this.push(value);
-		            }
-		        } 
+            try {
+                this["ignoreCommit"] = true; // NOTE: Using this ridiculous workaround for obfuscation collisions from Google Closure (using DOT notation results in $A.util.on() being undefined!
+                
+                var candiates = this.array ? this.array.slice() : [];
+                for (var i = 0; i < newArray.length; i++) {
+                    var value = newArray[i];
+                    var found = false;
+        
+                    if (value && candiates && candiates.length > 0) {
+                        // See if we can find an existing object to use
+                        for (var j = 0; j < candiates.length; j++) {
+                            var current = candiates[j];
+                            if (current && $A.util.equalBySource(current, value)) {
+                                if (current && current.auraType === "Value" && current._hasChanged(value)) {
+                                    current._setValue(value);
+                                    
+                                    // Preserve prior semantics that if something in the array is dirty then the entire array gets marked dirty
+                                    if (current.isDirty()) {
+                                        this.makeDirty();
+                                    }
+                                }
+                                
+                                this.newArray.push(current);
+                                
+                                // Mark dirty if the positions are not equal
+                                if (i !== j && !this.isDirty()) {
+                                    this.makeDirty();
+                                }
+                                
+                                // Consume the candidate
+                                candiates[j] = undefined;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Create a new value
+                    if (!found) {
+                        this.push(value);
+                    }
+                } 
 
-		        // Catch the case where we have a subset of the original values
-		        if (!this.isDirty() && (this.newArray.length !== candiates.length)) {
-		        	this.makeDirty();
-		        }
-        	} finally {
-	        	delete this["ignoreCommit"];
-	        }
+                // Catch the case where we have a subset of the original values
+                if (!this.isDirty() && (this.newArray.length !== candiates.length)) {
+                    this.makeDirty();
+                }
+            } finally {
+                delete this["ignoreCommit"];
+            }
         } else {
-        	this.push(newArray);
+            this.push(newArray);
         }
     } else {
         this.makeDirty();
@@ -252,43 +279,43 @@ ArrayValue.prototype._setValue = function(newArray, skipChange, doNotAutoDestroy
  * @param {Object} clean Do not use this internal-only parameter.
  */
 ArrayValue.prototype.commit = function(clean) {
-	// If we're in the middle of _setValue and a call to commit() happens we need to ignore it and not mess with
-	// this.newArray while mid _setValue() (this can happen under tests)
-	if (this.isDirty() && !this["ignoreCommit"]) {
-		if (this.array) {
-			if (!this.doNotAutoDestroy) {
-				// Auto destroy any orphaned items
-				var orphans = [];
-				for (var i = 0; i < this.array.length; i++) {
-					var toFind = this.array[i];
-					if (toFind && toFind.auraType === "Component" && toFind.isValid()) {
-						var found = false;
-						for (var j = 0; j < this.newArray.length; j++) {
-							if (this.newArray[j] === toFind) {
-								found = true;
-								break;
-							}
-						}
-						
-						if (!found) {
-							orphans.push(toFind);
-						}
-					}
-				}
-				
-				for (var n = 0; n < orphans.length; n++) {
-					var orphan = orphans[n];
-					orphan.getConcreteComponent().destroy();
-				}
-			} else {
-				// Reset for the next time around since this is the result of _setValue() with doNotAutoDestroy === true
-				this.doNotAutoDestroy = false;
-			}
-		}
-		
+    // If we're in the middle of _setValue and a call to commit() happens we need to ignore it and not mess with
+    // this.newArray while mid _setValue() (this can happen under tests)
+    if (this.isDirty() && !this["ignoreCommit"]) {
+        if (this.array) {
+            if (!this.doNotAutoDestroy) {
+                // Auto destroy any orphaned items
+                var orphans = [];
+                for (var i = 0; i < this.array.length; i++) {
+                    var toFind = this.array[i];
+                    if (toFind && toFind.auraType === "Component" && toFind.isValid()) {
+                        var found = false;
+                        for (var j = 0; j < this.newArray.length; j++) {
+                            if (this.newArray[j] === toFind) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!found) {
+                            orphans.push(toFind);
+                        }
+                    }
+                }
+                
+                for (var n = 0; n < orphans.length; n++) {
+                    var orphan = orphans[n];
+                    orphan.getConcreteComponent().destroy();
+                }
+            } else {
+                // Reset for the next time around since this is the result of _setValue() with doNotAutoDestroy === true
+                this.doNotAutoDestroy = false;
+            }
+        }
+        
         this.array = this.newArray;
         this.rollback(clean);
-	}
+    }
 };
 
 /**
@@ -345,7 +372,7 @@ ArrayValue.prototype.rollback = function(clean){
 ArrayValue.prototype.push = function(config) {
     this.makeDirty();
 
-	var ar = this.getArray();
+    var ar = this.getArray();
 
     var value = valueFactory.create(config, null, this.owner);
     if (value.makeDirty) {
@@ -497,16 +524,16 @@ ArrayValue.prototype.each = function(func, reverse) {
     var a = this.getArray();
     
     if (a) {
-	    var i;
-	    if (reverse) {
-	        for(i = a.length - 1; i >= 0; i--){
-	            func(a[i],i);
-	        }
-	    } else {
-	        for(i = 0; i < a.length; i++){
-	            func(a[i],i);
-	        }
-	    }
+        var i;
+        if (reverse) {
+            for(i = a.length - 1; i >= 0; i--){
+                func(a[i],i);
+            }
+        } else {
+            for(i = 0; i < a.length; i++){
+                func(a[i],i);
+            }
+        }
     }
 };
 
@@ -728,9 +755,9 @@ ArrayValue.prototype.render = function(parent, insertElements){
         }
 
         rendered[item.getGlobalId()] = { 
-    		refNode: referenceNode,
-    		index: i
-		};
+            refNode: referenceNode,
+            index: i
+        };
         
         prevReferenceNodes[i] = referenceNode;
     }
@@ -804,67 +831,67 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
         var previousIndex = 0;
         for (var j = 0; j < len; j++) {
             item = array[j];
-        	
+            
             info = prevRendered[item.getGlobalId()];
             if (info) {
-	            // Look for reordering - if the relative ordering of current items has been maintained between renderings we'll use inplace rerender
-	            if (info.index < previousIndex) {
-	            	positionChanges = true;
-	            	break;
-	            }
-	            
-	            previousIndex = info.index;
+                // Look for reordering - if the relative ordering of current items has been maintained between renderings we'll use inplace rerender
+                if (info.index < previousIndex) {
+                    positionChanges = true;
+                    break;
+                }
+                
+                previousIndex = info.index;
             }
         }
         
         if (positionChanges) {
 
-        	$A.log("Fragment based rerendering ", this);
-        	
-        	// Switch to fragment rerendering
-        	var parent = referenceNode.parentNode;
-        	var fragment = document.createDocumentFragment();
-        	
+            $A.log("Fragment based rerendering ", this);
+            
+            // Switch to fragment rerendering
+            var parent = referenceNode.parentNode;
+            var fragment = document.createDocumentFragment();
+            
             for (var j = 0; j < len; j++) {
                 item = array[j];
                 
                 if (item.isValid()) {
-	                globalId = item.getGlobalId();
-	                
-	                if (!item.isRendered()) {
-	                	prevRendered[globalId] = info = { 
-	                		refNode: null // DCHASMAN TODO Figure out the best way to get the ref node for this!
-	            		};
-	                	
-	                	$A.render(item);
-	                } else {
-		                info = prevRendered[globalId];
-	                }
-	
-	            	info.index = j;
-	
-	        		var elements = item.getElements();
-	        		var element = elements[0]; 
-	                if (element) {
-	                	var elementKey = 1;
-	                	do {
-							fragment.appendChild(element);
-	                		element = elements[elementKey++]; 
-	                	} while (element);
-	                } else {
-	                	element = elements["elements"];
-	                	if (element) {
-	                		fragment.appendChild(element);
-	                	}
-	                }
-	
-	                //$A.rerender(item);
+                    globalId = item.getGlobalId();
+                    
+                    if (!item.isRendered()) {
+                        prevRendered[globalId] = info = { 
+                            refNode: null // DCHASMAN TODO Figure out the best way to get the ref node for this!
+                        };
+                        
+                        $A.render(item);
+                    } else {
+                        info = prevRendered[globalId];
+                    }
+    
+                    info.index = j;
+    
+                    var elements = item.getElements();
+                    var element = elements[0]; 
+                    if (element) {
+                        var elementKey = 1;
+                        do {
+                            fragment.appendChild(element);
+                            element = elements[elementKey++]; 
+                        } while (element);
+                    } else {
+                        element = elements["elements"];
+                        if (element) {
+                            fragment.appendChild(element);
+                        }
+                    }
+    
+                    //$A.rerender(item);
                 }
             }
 
             parent.appendChild(fragment);
 
-        	return;
+            return;
         }
         
         for (j = 0; j < len; j++) {
@@ -894,7 +921,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
                 insertElements(itemElems, referenceNode, !appendChild, asFirst);
 
                 $A.afterRender(item);
-            } else {            	
+            } else {                
                 itemElems = $A.rerender(item);
                 
                 // Find the item reference node.  We have prevRendered, but can't trust it: the
@@ -946,9 +973,9 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             appendChild = false;
 
             rendered[globalId] = { 
-        		refNode: itemReferenceNode,
-        		index: j
-    		};
+                refNode: itemReferenceNode,
+                index: j
+            };
             
             prevReferenceNodes[j] = itemReferenceNode;
         }

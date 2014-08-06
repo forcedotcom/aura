@@ -184,6 +184,21 @@
     },
 
     /**
+     * Tests what happens when one attribut is assigned to another.
+     */
+    testMapAssignment: {
+        test: function(cmp) {
+            cmp.set("v.triggers2", cmp.get("v.triggers"));
+            cmp.set("v.triggers.triggerCount", 12);
+            cmp.set("v.triggers2.nested.count", 7);
+            $A.test.assertEquals(12, cmp.get("v.triggers.triggerCount"));
+            $A.test.assertEquals(0, cmp.get("v.triggers.nested.count"));
+            $A.test.assertEquals(0, cmp.get("v.triggers2.triggerCount"));
+            $A.test.assertEquals(7, cmp.get("v.triggers2.nested.count"));
+        }
+    },
+
+    /**
      * This checks that handlers on subvalues are preserved across MapValue.set[Value]
      */
     testMapSubkeyHandler: {

@@ -17,8 +17,8 @@
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel" controller="java://org.auraframework.impl.java.controller.JavaTestController" >
     <aura:attribute name="map" type="Map" />
-    <aura:attribute name="triggers" type="Map" default = "{ trigger: 'zero', triggerCount: 0 }"/>
-    <aura:attribute name="triggers2" type="Map" default = "{ trigger: 'zero', triggerCount: 0 }"/>
+    <aura:attribute name="triggers" type="Map" default = "{ trigger: 'zero', triggerCount: 0, nested: { count: 0 } }"/>
+    <aura:attribute name="triggers2" type="Map" default = "{ trigger: 'zero', triggerCount: 0, nested: { count: 1 } }"/>
     <aura:attribute name="observer" type="Integer"/>
 
     <aura:handler name="change" value="{!v.map}" action="{!c.onValueChange}"/>

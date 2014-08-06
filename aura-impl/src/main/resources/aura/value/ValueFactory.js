@@ -18,20 +18,21 @@
  * creates the right value object based on whats passed in
  */
 var valueFactory = { 
-    create: function create(valueConfig, def, component) {
+    create: function create(valueConfig, def, component, expected) {
         if (aura.util.isObject(valueConfig)) {
             var source = undefined;
-        	if (valueConfig.getSourceValue) {
-        		// Object is already wrapped by a MapValue
+            if (valueConfig.getSourceValue) {
+                // Object is already wrapped by a MapValue
                 source = valueConfig.getSourceValue();
             } else if (valueConfig._arrayValueRef) {
                 // Object is already wrapped by an ArrayValue
                 source = valueConfig._arrayValueRef;
             }
-            // If we have an existing wrapper OWNED BY THE RIGHT COMPONENT,
-            // then this is really a fancy setValue, not a new creation.
-            // But if it's a different component, we do need a new wrapper.
-            if (source && source.owner === component) {
+            // If we have an existing wrapper and it's the source of this value,
+            // then this is really a fancy setValue, not a new creation.  But
+            // if it's a different wrapper, or we don't have one, we do need a
+            // new wrapper.
+            if (source && source === expected) {
                 source._setValue(valueConfig);
                 return source;
             }

@@ -22,6 +22,61 @@
             var actual = output.split("\n")[0];
             $A.test.assertEquals(expected, actual, errorMessage + output);
         },
+        
+        testTopPanelHidden : {
+        	attributes: {
+                caseToRender: 'testTopPanelHidden'
+            },
+            test: function (cmp) {
+                this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        },
+
+        testActiveTopPanelAriaHiddenIsTrue : {
+        	attributes: {
+                caseToRender: 'testActiveTopPanelAriaHiddenIsTrue'
+            },
+            test: function (cmp) {
+                this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        },
+        
+        testBasePanelAriaHiddenIsFalse : {
+        	attributes: {
+                caseToRender: 'testBasePanelAriaHiddenIsFalse'
+            },
+            test: function (cmp) {
+                this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        }, 
+        
+        testNoActiveTopPanelAriaHiddenOk : {
+        	attributes: {
+                caseToRender: 'testNoActiveTopPanelAriaHiddenOk'
+            },
+            test: function (cmp) {
+                this.runTest("", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        }, 
+        
+        testNoActiveTopPanelBasePanelAriaHiddenIsTrue : {
+        	attributes: {
+                caseToRender: 'testNoActiveTopPanelBasePanelAriaHiddenIsTrue'
+            },
+            test: function (cmp) {
+                this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        }, 
+        
+        testNoActiveTopPanelAriaHiddenNotExists: {
+        	attributes: {
+                caseToRender: 'testNoActiveTopPanelAriaHiddenNotExists'
+            },
+            test: function (cmp) {
+                this.runTest("Total Number of Errors found: 1", "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        },
+        
         testInputDefaultError : {
         	attributes: {
                 caseToRender: 'testInputDefaultError'

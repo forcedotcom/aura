@@ -218,10 +218,11 @@
             value: "blah {0} meh",
             string: "-"
         },
-        test: function(component){
+        test: [function(component){
             aura.test.assertEquals("blah - meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
-            $A.run(function(){ component.set("v.string", "60"); });
+        	component.set("v.string", "60");
+        },	function(component){
             aura.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
-        }
+        }]
     }
 })

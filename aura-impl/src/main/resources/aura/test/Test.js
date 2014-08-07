@@ -1492,6 +1492,7 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
     if(this.inProgress >= 0){
         return;
     }
+    var that = this;
     this.inProgress = 2;
     if(!timeoutOverride) {
         timeoutOverride = 10;
@@ -1501,9 +1502,14 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
     this.cmp = $A.getRoot();
     this.suite = aura.util.json.decode(code);
 
-    var suiteFailOnWarning = this.suite["failOnWarning"] || false;
-    var failOnWarning = this.suite[name]["failOnWarning"];
-    this.failOnWarning = (failOnWarning === undefined) ? suiteFailOnWarning : failOnWarning;
+    var useLabel = function(labelName){
+   	    var suiteLevel = that.suite[labelName] || false;
+   	    var testLevel = that.suite[name][labelName];
+   	    return (testLevel === undefined) ? suiteLevel : testLevel;
+    };
+   
+    this.failOnWarning = useLabel("failOnWarning");
+    this.doNotWrapInAuraRun = useLabel("doNotWrapInAuraRun");
 
     this.stages = this.suite[name]["test"];
     this.stages = $A.util.isArray(this.stages) ? this.stages : [this.stages];
@@ -1513,7 +1519,13 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
 
     try {
         if(this.suite["setUp"]){
-            this.suite["setUp"].call(this.suite, this.cmp);
+            if (this.doNotWrapInAuraRun) {
+                this.suite["setUp"].call(this.suite, this.cmp);
+            } else {
+                $A.run(function() {
+                    that.suite["setUp"].call(that.suite, that.cmp);
+                });
+            }
         }
     }catch(e){
         this.logError("Error during setUp", e);

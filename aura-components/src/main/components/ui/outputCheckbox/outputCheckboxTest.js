@@ -37,34 +37,32 @@
     /* unchecked -> checked checkbox */
     testRerenderChecked: {
         attributes : {value : false},
-        test: function(component){
+        test: [function(component){
         	var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
             
             component.set("v.value",true);
-            $A.renderingService.rerender(component);
-
-            expectedElem = component.find("img1").getElement();
+        }, function(component){
+            var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-        }
+        }]
     },
 
     /* checked -> unchecked checkbox */
     testRerenderUnchecked: {
         attributes : {value : true},
-        test: function(component){
+        test: [function(component){
             var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
             
             component.set("v.value",false);
-            $A.renderingService.rerender(component);
-
-            expectedElem = component.find("img1").getElement();
+        }, function(component){
+            var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-      }
+      }]
     }
 })

@@ -45,14 +45,15 @@
      *  test click on add before
      */
     testABWithDefaultList: {
-        test: function(cmp) {
+        test: [function(cmp) {
         	$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
+        }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore("purple blue green yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to front of default list not showing up in DOM.");
-        }
+        }]
     },
     
     //W-2407542
@@ -60,28 +61,30 @@
     	attributes: {
     		colors : ""
     	},
-    	test: function(cmp) {
+    	test: [function(cmp) {
         	$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
+    	 }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore("",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to front of empty list not showing up in DOM.");
-        }
+        }]
     },
     
     /**
      *  test click on add inside
      */
     testAIWithDefaultList: {
-    	test: function(cmp) {
+    	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
+    	 }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddInside("purple blue green","yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to middle of default list not showing up in DOM.");
-    	}
+    	}]
     },
     
     
@@ -89,14 +92,15 @@
      *  test click on add after
      */
     testAAWithDefaultList: {
-    	test: function(cmp) {
+    	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
+    	 }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to end of default list not showing up in DOM.");
-    	}
+    	}]
     },
     
     //W-2407542
@@ -104,15 +108,15 @@
     	attributes: {
     		colors : ""
     	},
-    	test: function(cmp) {
+    	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
-    		debugger;
+    	 }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to end of default list not showing up in DOM.");
-    	}
+    	}]
     },
     
     /**
@@ -122,30 +126,31 @@
     testMixAndMatch : {
     	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
+    	 }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to end of list #1 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
+    	 }, function(cmp) {
         	var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to end of list #2 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
+    	 }, function(cmp) {
     		var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to beginning of list #1 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	}, function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
+    	 }, function(cmp) {
     		var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
     		var oldText = this.shareTextBetweenTests;
@@ -158,8 +163,8 @@
             "list with new items added to middle of list #1 not showing up in DOM.");
             //shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue green g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2 
             this.shareTextBetweenTests = newText;
-    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
+    	 }, function(cmp) {
     		var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
       		var oldText = this.shareTextBetweenTests;
@@ -172,16 +177,16 @@
             "list with new items added to middle of list #2 not showing up in DOM.");
             //shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue green g-y 2 g-y 1 g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2 
             this.shareTextBetweenTests = newText;
-    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
+    	 }, function(cmp) {
     		var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
             "list with new items added to end of list #3 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	}, function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
+    	 }, function(cmp) {
     		var ele_outputDiv = document.getElementsByClassName("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore(this.shareTextBetweenTests,1);

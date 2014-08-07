@@ -112,16 +112,16 @@
      */
     testUpdateValue: {
         attributes : {value : .227},
-        test: function(component){
+        test: [function(component){
         	var value = component.getElement().value;
         	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
             $A.test.assertEquals('23%', value, "Element: Value not formatted correctly");
             component.set("v.value", 965.21);
-            $A.rerender(component);
+        }, function(component){
             value = component.getElement().value;
         	$A.test.assertEquals(965.21, component.get("v.value"), "Cmp: Value not formatted correctly");
             $A.test.assertEquals('965.21', value, "Element: Value not formatted correctly");
-        }
+        }]
     },
 
     /**

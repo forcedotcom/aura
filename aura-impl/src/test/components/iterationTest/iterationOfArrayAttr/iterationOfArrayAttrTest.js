@@ -30,37 +30,42 @@
 	 * Verify that clearing attribute of type List clears up iteration body.
 	 */
 	testClearListItems:{
-		test:function(cmp){
+		test:[function(cmp){
 			this.verifyExpectedItems(cmp, [1, 2, 3, 4], ["Tony", "Romo"]);
 			$A.test.clickOrTouch(cmp.find("clear").getElement());
+		}, function(cmp){
 			$A.test.assertEquals(0, cmp.get("v.simpleListAttr").length);
 			$A.test.assertEquals(0, cmp.get("v.listOfMapAttr").length);
 			this.verifyExpectedItems(cmp, [], []);
-		}
+		}]
 	},
 	
 	/**
 	 * Verify that setting attribute of List type to new arrays will cause iteration to change page content. 
 	 */
 	testSetListItemsToNewArray:{
-		test: function(cmp){
+		test: [function(cmp){
 			this.verifyExpectedItems(cmp, [1, 2, 3, 4], ["Tony", "Romo"]);
 			$A.test.clickOrTouch(cmp.find("change").getElement());
+		}, function(cmp){
 			this.verifyExpectedItems(cmp, [99,100,101,102,103], ["Tom", "Brady"]);
-		}
+		}]
 	},
 	
 	/**
 	 * Verify that clearing and setting an attribute of List type to new arrays will cause iteration to change page content. 
 	 */
 	testClearAndSetItemsToNewArray:{
-		test:function(cmp){
+		test:[function(cmp){
 			this.verifyExpectedItems(cmp, [1, 2, 3, 4], ["Tony", "Romo"]);
 			$A.test.clickOrTouch(cmp.find("clear").getElement());
+			
+		}, function(cmp){
 			this.verifyExpectedItems(cmp, [], []);
 			$A.test.clickOrTouch(cmp.find("change").getElement());
+		}, function(cmp){
 			this.verifyExpectedItems(cmp, [99,100,101,102,103], ["Tom", "Brady"]);
-		}
+		}]
 	},
 	
 	verifyExpectedItems: function(cmp, expectedSimpleItems, expectedMapItems){

@@ -1,4 +1,8 @@
 ({
+	tearDown : function(component){
+		component._gotResponse = null;
+        delete component._gotResponse;
+	},
 	/**
 	 * Test the client side action is a background action
 	 */
@@ -21,40 +25,43 @@
 	 * Test the client side foreground action is executed once enqueued
 	 */
 	testClientActionInForeground : {
-		test : function(component) {
+		test : [function(component) {
 			var action = component.get("c.cExecuteInForeground");
-			var gotResponse = false;
+			component._gotResponse = false;
 			action.setCallback(this, function() {
-				gotResponse = true;
+				component._gotResponse = true;
 			});
-
-			$A.test.enqueueAction(action);
+			$A.test.enqueueAction(action, true);
+		}, function(component) {
+			
 
 			$A.test.addWaitFor(true, function() {
-				return gotResponse;
+				return component._gotResponse;
 			});
-			$A.test.assertTrue(gotResponse, "Client Side Action was not called after enqueue.")
-		}
+		}, function(component) {
+			$A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
+		}]
 	},
 
 	/**
 	 * Test the client side foreground action is executed once enqueued
 	 */
 	testClientActionInBackground : {
-		test : function(component) {
+		test : [function(component) {
 			var action = component.get("c.cExecuteInBackground");
-			var gotResponse = false;
+			component._gotResponse = false;
 			action.setCallback(this, function() {
-				gotResponse = true;
+				component._gotResponse = true;
 			});
-
 			$A.test.enqueueAction(action, true);
-
+		}, function(component) {
+		
 			$A.test.addWaitFor(true, function() {
-				return gotResponse;
+				return component._gotResponse;
 			});
-			$A.test.assertTrue(gotResponse, "Background Client Side Action was not called after enqueue.")
-		}
+		}, function(component) {
+			$A.test.assertTrue(component._gotResponse, "Background Client Side Action was not called after enqueue.");
+		}]
 	}
 
 	/**

@@ -75,7 +75,7 @@
     testFetchNewDefFromServer:{
         test: [
         function(cmp) {
-            $A.run(function() {
+
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
@@ -85,15 +85,16 @@
                         },
                         {
                             componentDef: "markup://loadLevelTest:displayNumber",
-                            attributes: {
-                                values: {
-                                    number: 99
-                                }
+						                            attributes : {
+							values : {
+								number : 99
+							}
                             }
                         }
                 );
-            });
 
+        },
+        function(cmp) {
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var textCmp = cmp.get('v.body')[0];
                 //Since this is created under root component and this is the first component from the server
@@ -106,7 +107,6 @@
             // After retrieving the cmp from the server, it should be saved on the client in the def registry
             try {
                 $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
-                $A.run(function(){
                     $A.newCmpAsync(
                         this,
                         function(newCmp) {
@@ -123,14 +123,15 @@
                             }
                         }
                     );
-                });
 
-                var textCmp = cmp.get('v.body')[1];
-                $A.test.assertEquals(100,textCmp.get('v.number'), "Failed to pass attribute values to created component");
-                $A.test.assertEquals("100",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
             } finally {
                 $A.test.releaseRequests();
             }
+        },
+        function(cmp){
+        	 var textCmp = cmp.get('v.body')[1];
+             $A.test.assertEquals(100,textCmp.get('v.number'), "Failed to pass attribute values to created component");
+             $A.test.assertEquals("100",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
         }]
     },
 
@@ -356,8 +357,7 @@
      * This componentDef is available at the client registry.
      */
     testCreateComponentWithSimpleAttributes:{
-        test: function(cmp){
-            $A.run(function(){
+        test: [function(cmp){
                 $A.newCmpAsync(
                         this,
                         function(newCmp) {
@@ -375,7 +375,7 @@
                             }
                         }
                 );
-            });
+        }, function(cmp){
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
@@ -383,7 +383,7 @@
             $A.test.assertEquals("TextComponent",body[0].get('v.value'));
             $A.test.assertEquals(6,body[0].get('v.truncate'));
             $A.test.assertEquals("Tex...",$A.test.getText(body[0].getElement()));
-        }
+        }]
     },
 
     /**
@@ -582,8 +582,7 @@
     },
 
     testSetLocalId:{
-        test: function(cmp){
-            $A.run(function(){
+        test: [function(cmp){
                 $A.newCmpAsync(
                         this,
                         function(newCmp){
@@ -602,7 +601,7 @@
                             }
                         }
                 );
-            });
+        }, function(cmp){
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
@@ -611,7 +610,7 @@
             $A.test.assertEquals("TextComponent",newCmp.get('v.value'));
             $A.test.assertEquals(6,newCmp.get('v.truncate'));
             $A.test.assertEquals("Tex...",$A.test.getText(newCmp.getElement()));
-        }
+        }]
     },
 
     testSetLocalIdServerDependencies:{

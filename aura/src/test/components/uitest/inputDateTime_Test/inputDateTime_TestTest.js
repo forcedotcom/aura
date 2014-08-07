@@ -45,7 +45,6 @@
     testSetLink : {
     	attributes : {format: "MM/dd/yyyy hh:mm"},
     	test : [function(cmp) {
-    	   
     		var input = cmp.find("dateTimePickerTest").find("inputText").getElement();
     		$A.test.assertNotNull(input, "input not visible");
     		
@@ -54,11 +53,11 @@
     		
     		this.openDatePicker(cmp);
     	}, function(cmp) {
-    	 
-    		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
+    	    var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var setLink = datePicker.find("set").getElement();
-    		
     		$A.test.clickOrTouch(setLink);
+    	}, function(cmp) {  		
+    		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
     		
     		var expectedDate = this.getCleanDate(null, true);
@@ -87,8 +86,9 @@
       */
     testCalendarWithTimeValuePreSet : {
     	attributes : {value: '09-10-2012T11:23Z', format: 'MM/dd/yyyy HH:mm', timezone: 'GMT'},
-    	test : function(cmp) {
-		this.openDatePicker(cmp);
+    	test : [function(cmp) {
+    		 this.openDatePicker(cmp);
+    	}, function(cmp) {		   
     		var expected = "September 2012";
     		var datepicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var actual = this.getTextFromElm(datepicker);
@@ -104,7 +104,7 @@
     		
     		actual = hours +":"+minutes;
     		$A.test.assertEquals("11:23", actual, "The default value put in the inputText box, is not the value in the timePicker");
-    	}
+    	}]
     },
     
  	/**

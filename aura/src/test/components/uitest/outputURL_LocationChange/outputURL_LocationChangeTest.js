@@ -57,8 +57,11 @@
                     // location change count would increase exponentially instead of + 1
                     var urlCmpPeach = cmp.find('hashLinkP'),
                     urlElPeach = urlCmpPeach.getElement();
-                    
                     $A.test.clickOrTouch(urlElPeach);
+                },
+                function(cmp) {
+                	var urlCmpPeach = cmp.find('hashLinkP'),
+                    urlElPeach = urlCmpPeach.getElement();
                     $A.test.addWaitForWithFailureMessage(1,
                         function() { return cmp.get("v.clickCount");},
                             "clickCount should in crease after clicking on Peach",

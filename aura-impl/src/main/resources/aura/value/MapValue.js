@@ -194,7 +194,6 @@ MapValue.prototype.setValue = function(newMap) {
 // Examining the direct children and if everything matches
 // delegates recursively
 MapValue.prototype._hasChanged = function (rawMapValue) {
-    //#debugger
     var oldValueType = this._getValueType(),
         newValueType = $A.util.getNormalizedValueType(rawMapValue),
         oldValues    = this.value,

@@ -46,7 +46,6 @@ ArrayValue.prototype._getValueType = function () {
 };
 
 ArrayValue.prototype._hasChanged = function (rawValue) {
-    //#debugger
     var oldValueType = this._getValueType(),
         newValueType = $A.util.getNormalizedValueType(rawValue),
         oldLength    = this.getLength(),i;

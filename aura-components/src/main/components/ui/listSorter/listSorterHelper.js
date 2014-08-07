@@ -31,7 +31,7 @@
 				trigger[0].set("v.label", triggerLabel);
 			}
 			trigger[0].addHandler('click', cmp, 'c.onOpen');
-		} else {
+		} else if (triggerLabel) {
 			var menuTrigger = $A.componentService.newComponentDeprecated({
 	            "componentDef" : {
 	            	"descriptor" : "markup://ui:menuTriggerLink"

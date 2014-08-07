@@ -1293,9 +1293,7 @@ var AuraDevToolService = function() {
                         var topPanelsCount = domElem.querySelectorAll("div.forcePanelOverlay.active").length + domElem.querySelectorAll("div.forcePanelModal.active").length;
                         var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
                         return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
-                }
-               
-                
+                }  
         },
         
         /**
@@ -1308,7 +1306,7 @@ var AuraDevToolService = function() {
             aura.devToolService.accessbilityAide.errorCount = 0;
             
             if($A.util.isUndefinedOrNull(domElem)){
-            domElem = document;
+                domElem = document;
             }
             
             for(var funcNames in functions){           
@@ -1316,7 +1314,7 @@ var AuraDevToolService = function() {
             }
             
             if(aura.devToolService.accessbilityAide.errorCount === 0){
-            return "";
+                return "";
             }
             
             return "Total Number of Errors found: "+aura.devToolService.accessbilityAide.errorCount+result;

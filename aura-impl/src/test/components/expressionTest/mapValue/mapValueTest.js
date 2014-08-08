@@ -337,7 +337,7 @@
                    $A.test.assertEquals("missing", key);
                }
            }
-           for (var key in submap.was) {
+           for (var key in submap.missing) {
                if (!(submap[key] instanceof Function)) {
                    $A.test.assertEquals("foo", key);
                }

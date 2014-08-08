@@ -36,7 +36,6 @@ var AuraStorageService = function(){
         
         /**
          * Initializes and returns new storage.
-         * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
          * @param {String} name Required. The unique name of the storage to be initialized.
          * @param {Boolean} persistent Set to true if the requested storage is persistent.
          * @param {Boolean} secure Set to true if the requested storage is secure.
@@ -121,7 +120,6 @@ var AuraStorageService = function(){
         
         /**
          * Selects an adapter based on the given configuration. Used mostly in non-production modes.
-         * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
          * @param {Boolean} persistent Set to true if the adapter should be persistent, or false otherwise.
          * @param {Boolean} secure Set to true if the adapter should be secure, or false otherwise.
          * @memberOf AuraStorageService

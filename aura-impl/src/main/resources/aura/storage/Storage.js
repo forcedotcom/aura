@@ -93,7 +93,6 @@ AuraStorage.prototype.clear = function() {
 
 /**
  * Gets an item from storage corresponding to the specified key.
- * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
  * @param {String} key The item key. This is the key used when the item was added to storage using put().
  * @param {Function} resultCallback The function that will be called asynchronously with the item that was fetched from the storage as its parameter.
  * @returns {Object} An item from storage.

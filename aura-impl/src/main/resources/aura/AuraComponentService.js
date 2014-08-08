@@ -109,7 +109,6 @@ $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeVa
  *
  * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
  * creates a <code>ui:inputText</code> component.
- * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
  * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
  * @param {Object} attributeValueProvider The value provider for the attributes
  *

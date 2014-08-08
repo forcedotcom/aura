@@ -31,8 +31,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public interface Integration {
     /**
      * Generates a &lt;script&gt; tag that will correctly embed an instance of an
-     * Aura
-     * component bound to the DOM element identified by localDomId.
+     * Aura component bound to the DOM element identified by localDomId.
      *
      * @param tag
      *            Fully qualified (namespace:name) name of the Aura component.
@@ -46,11 +45,22 @@ public interface Integration {
      *            parent of the component's elements.
      * @param out
      *            Destination for injection script content.
+     * @param useAsync use asynchonous component call instead of HTML config
+     * @throws UnsupportedUserAgentException
      * @throws AuraRuntimeException
      * @throws IOException
      * @throws QuickFixException
      */
-    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out)
-            throws UnsupportedUserAgentException, AuraRuntimeException,
-            IOException, QuickFixException;
+    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                         Appendable out, boolean useAsync)
+            throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
+
+    /**
+     * Print config to HTML page
+     *
+     * @see #injectComponent(String, java.util.Map, String, String, Appendable)
+     */
+    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                         Appendable out)
+            throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
 }

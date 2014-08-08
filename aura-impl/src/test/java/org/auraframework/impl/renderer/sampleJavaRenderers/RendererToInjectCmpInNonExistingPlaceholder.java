@@ -30,8 +30,9 @@ public class RendererToInjectCmpInNonExistingPlaceholder extends AbstractRendere
         String desc = (String) component.getAttributes().getValue("desc");
         String placeholder = (String) component.getAttributes().getValue("placeholder");
         String localId = (String) component.getAttributes().getValue("localId");
+        Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
 
-        injectComponent(desc, Collections.<String, Object> emptyMap(), localId, placeholder, out);
+        injectComponent(desc, Collections.<String, Object> emptyMap(), localId, placeholder, out, useAsync);
     }
 
 }

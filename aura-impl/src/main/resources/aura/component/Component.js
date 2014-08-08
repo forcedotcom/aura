@@ -296,7 +296,7 @@ Component.prototype.implementsDirectly = function(type){
  * @param {String} eventName The event name
  * @param {Object} valueProvider The value provider to use for resolving the actionExpression.
  * @param {Object} actionExpression The expression to use for resolving the handler Action against the given valueProvider.
- * @param {boolean} insert The flag to indicate if we should put the handler at the beginning instead of the end of handlers array.
+ * @param {boolean} [insert] The flag to indicate if we should put the handler at the beginning instead of the end of handlers array.
  * @public
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert){

@@ -789,7 +789,6 @@ $A.ns.Aura.prototype.setRoot = function(root) {
 
 /**
  * Gets the current <code>AuraContext</code>. The context consists of the mode, descriptor, and namespaces to be loaded.
- * <p>See Also: <a href="#help?topic=modesReference">Modes Reference</a></p>
  *
  * @public
  * @function

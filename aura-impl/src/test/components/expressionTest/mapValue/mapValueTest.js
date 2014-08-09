@@ -197,18 +197,65 @@
     },
 
     /**
-     * Tests what happens when one attribut is assigned to another.
+     * test for W-2336292.
+     * Tests what happens when one attribute(a nested MapValue) is assigned to another(a nested MapValue as well).
+     * we create a new MapValue in this case
      */
-    testMapAssignment: {
+    testMapAssignmentCreateNewWrapper: {
         test: function(cmp) {
+    		var mv2nested = cmp.getValue("v.triggers2.nested");
+
+    		//sanity check
+    		 $A.test.assertEquals(1,cmp.get("v.triggers2.nested.count"),
+    		"v.triggers2.nested.count should be 1 to begin with");
+
             cmp.set("v.triggers2", cmp.get("v.triggers"));
+            
+            //triggers2 will have same value as triggers after above, but they are not the same object
+            $A.test.assertEquals(0,cmp.get("v.triggers2.nested.count"),
+            "v.triggers2.nested.count should has the same value as v.triggers.nested.count");
+            
+            //make sure we did create a new MapValue for triggers2.nested
+            $A.test.assertTrue(mv2nested !== cmp.getValue("v.triggers2.nested"),
+            "we should create a new MapValue for v.trigger2.nested");
+            
+            //now change value in triggers and triggers2.nested
             cmp.set("v.triggers.triggerCount", 12);
             cmp.set("v.triggers2.nested.count", 7);
-            $A.test.assertEquals(12, cmp.get("v.triggers.triggerCount"));
-            $A.test.assertEquals(0, cmp.get("v.triggers.nested.count"));
-            $A.test.assertEquals(0, cmp.get("v.triggers2.triggerCount"));
-            $A.test.assertEquals(7, cmp.get("v.triggers2.nested.count"));
+            
+            //make sure they do not interference with each other 
+            $A.test.assertEquals(12, cmp.get("v.triggers.triggerCount"),"triggers' count should become 12");
+            $A.test.assertEquals(0, cmp.get("v.triggers.nested.count"),"triggers.nested.count should remain 0");
+            $A.test.assertEquals(0, cmp.get("v.triggers2.triggerCount"),"triggers2' count should remain 0");
+            $A.test.assertEquals(7, cmp.get("v.triggers2.nested.count"),"triggers2.nested.count should become 7");
+            
         }
+    },
+    
+    /**
+     * test for W-2336292.
+     * Tests what happens when one attribute(a nested MapValue)'s RawMapValue is changed then assign back to itself.
+     * we reuse the MapValue in this case
+     */
+    testMapAssignmentReuseWrapper : {
+    	test: function(cmp) {
+    		var mv1nested = cmp.getValue("v.triggers.nested");
+    		
+    		//get the raw map value, change its nested.count
+    		var rmv1 = cmp.get("v.triggers");
+    		rmv1.nested.count = 99;
+    		
+    		//it shouldn't change v.triggers.nested.count
+    		$A.test.assertEquals(0,cmp.get("v.triggers.nested.count"),"triggers.nested.count should remain 0");
+    		
+    		//now change the count for triggers.nested
+    		cmp.set("v.triggers",rmv1);
+    		$A.test.assertEquals(99,cmp.get("v.triggers.nested.count"),"triggers.nested.count should become 99");
+    		
+    		//make sure we didn't create a new MapValue for v.triggers.nested 
+    		$A.test.assertTrue(mv1nested === cmp.getValue("v.triggers.nested"),
+    		"we shouldn't create a new MapValue for v.triggers.nested");
+    	}
     },
 
     /**

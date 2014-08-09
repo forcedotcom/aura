@@ -13,32 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.impl.java.controller.JavaControllerTest.JavaValueDefExt;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
 @Controller
-public class TestControllerWithParameters {
-
-    @AuraEnabled
-    public static String appendStrings(@Key("a") String a, @Key("b") String b) {
-        return a + b;
+public class TestControllerOnlyForJavaControllerTest {
+	
+	@AuraEnabled
+ 	public static String customErrorParam(@Key("keya") JavaValueDefExt keya) {
+ 	     return "something";
     }
 
-    @AuraEnabled
-    public static Integer sumValues(@Key("a") Integer a, @Key("b") Integer b) {
-        return Integer.valueOf(a.intValue() + b.intValue());
-    }
-    
-    
-    @AuraEnabled
- 	public static String customParam(@Key("a") CustomParam a) {
- 	     return "Anything";
-    }
- 	 
- 	public static class CustomParam {
- 	}
- 	
 }

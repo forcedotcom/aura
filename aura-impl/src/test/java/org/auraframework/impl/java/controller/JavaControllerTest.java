@@ -22,17 +22,23 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.cache.Cache;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
+import org.auraframework.system.Location;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
 import org.auraframework.test.annotation.ThreadHostileTest;
@@ -41,6 +47,8 @@ import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -194,7 +202,56 @@ public class JavaControllerTest extends AuraImplTestCase {
         args.put("a", "1");
         args.put("b", "2");
         checkPassAction(controller, "sumValues", args, State.SUCCESS, new Integer(3));
+        
     }
+    
+    /** 
+     * This is testing JavaAction with parameter that throws QFE when accessing. 
+     * verify AuraUnhandledException is added when this happen in JavaAction
+     */
+    public void testActionWithBadParameterThrowsQFE() throws Exception {
+    	//create DefDescriptor for JavaValueDefExt, type doesn't matter as we plan to spy on it.
+    	String instanceName = "java://java.lang.String";
+    	DefDescriptor<TypeDef> JavaValueDefDesc = DefDescriptorImpl.getInstance(instanceName, TypeDef.class);
+    	//spy on DefDescriptor, ask it to throw QFE when calling getDef()
+    	DefDescriptor<TypeDef> JavaValueDefDescMocked = Mockito.spy(JavaValueDefDesc);
+    	Mockito.when(JavaValueDefDescMocked.getDef()).thenThrow(new TestQuickFixException("new quick fix exception"));
+    	//time to ask MDR give us what we want
+    	String name = "java://org.auraframework.impl.java.controller.JavaControllerTest$JavaValueDefExt";
+    	Class<TypeDef> defClass = TypeDef.class;
+    	DescriptorKey dk = new DescriptorKey(name, defClass);
+        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
+        		Aura.getCachingService().getDefDescriptorByNameCache();
+        cache.put(dk, JavaValueDefDescMocked);
+        
+    	//jvd doesn't matter that much for triggering QFE, as we only used it as the Object param
+        JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null);
+        Map<String, Object> args = new HashMap<String, Object>();
+        args.put("keya", jvd);
+    	ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerOnlyForJavaControllerTest");
+     	
+    	//we actually catch the QFE in JavaAction.getArgs(), then wrap it up with AuraUnhandledException 
+    	String errorMsg = "org.auraframework.impl.java.controller.JavaControllerTest$TestQuickFixException: new quick fix exception";
+    	checkFailAction(controller, "customErrorParam", args, State.ERROR, AuraUnhandledException.class,
+    			errorMsg);
+    	
+    }
+    
+    @SuppressWarnings("serial")
+	public class JavaValueDefExt extends JavaValueDef {
+		public JavaValueDefExt(String name,
+				DefDescriptor<TypeDef> typeDescriptor, Location location) {
+			super(name, typeDescriptor, location);
+		}
+    }
+    
+    
+    private static class TestQuickFixException extends QuickFixException {
+	        private static final long serialVersionUID = 7887234381181710432L;
+	        public TestQuickFixException(String name) {
+	            super(name, null);
+	        }
+	 }
 
     /**
      * Verify that nice exception is thrown if controller def doesn't exist

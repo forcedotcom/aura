@@ -17,18 +17,18 @@
 -->
 <aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
 
-<table class="testRoot">
-<aura:iteration items="{!m.data}" var="outer" indexVar="index" start="13" end="19">
-    <tr>
-    <th scope="row">indexVar is <span style="color: firebrick">{!index}</span> out here.</th>
-    <aura:iteration items="{!m.innerData}" var="inner" indexVar="index">
-       <td>
-           <div style="background-color: olivedrab"><span style="color: papayawhip">{!outer.stringy}</span> works just as good as inner <span style="color: blanchedalmond">{!inner}</span></div>
-            but indexVar is <span style="color: darkorchid">{!index}</span> in here
-        </td>
-    </aura:iteration>
-    </tr>
-</aura:iteration>
-</table>
+	<table class="testRoot">
+		<aura:iteration items="{!m.data}" var="outer" indexVar="index" start="13" end="19">
+		    <tr>
+		    <th scope="row">indexVar is <span style="color: firebrick">{!index}</span> out here.</th>
+		    <aura:iteration items="{!m.innerData}" var="inner" indexVar="index">
+		       <td>
+		           <div style="background-color: olivedrab"><span style="color: papayawhip">{!outer.stringy}</span> works just as good as inner <span style="color: blanchedalmond">{!inner}</span></div>
+		            but indexVar is <span style="color: darkorchid">{!index}</span> in here
+		        </td>
+		    </aura:iteration>
+		    </tr>
+		</aura:iteration>
+	</table>
 
 </aura:component>

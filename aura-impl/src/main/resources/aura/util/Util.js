@@ -1233,7 +1233,7 @@ if (!!(Object && Object.keys)) {
         
         var keys = [], key;
         for (key in object) {
-            if (Object.prototype.hasOwnProperty.call(object, key) && (excludeFunctions || typeof (object[key]) !== "function")) {
+            if (Object.prototype.hasOwnProperty.call(object, key) && (!excludeFunctions || typeof (object[key]) !== "function")) {
                 keys.push(key);
             }
         }

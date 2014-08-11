@@ -60,8 +60,7 @@
         				this.verifyChangingAttributeValues(newComp);
                         this.verifyDefaultValuesOfMapDataType(newComp);
 					},
-					"markup://attributesTest:defaultValue",
-					null, null, null
+					"markup://attributesTest:defaultValue"
 			);
 
 		}

@@ -20,6 +20,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -274,6 +276,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     protected HttpPost obtainPostMethod(String path, Map<String, String> params)
             throws MalformedURLException, URISyntaxException,
             UnsupportedEncodingException {
+    	
         HttpPost post = new HttpPost(getTestServletConfig().getBaseUrl()
                 .toURI().resolve(path).toString());
 
@@ -392,8 +395,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     public class ServerAction implements Action {
 
-        private final String qualifiedName;
-        private Map<String, Object> actionParams;
+        private final ArrayList<String> qualifiedName;
+        private ArrayList<Map<String, Object>> actionParams;
         private State state = State.NEW;
         private Object returnValue;
         private List<Object> errors;
@@ -402,15 +405,23 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private String contextValue;
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
-            this.qualifiedName = qualifiedName;
-            this.actionParams = actionParams;
+            this.qualifiedName = new ArrayList<String>();
+        	this.qualifiedName.add(qualifiedName);
+            this.actionParams.add(actionParams);
+        }
+        
+        public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
+        	
+        	this.qualifiedName = qualifiedName;
+        	this.actionParams = actionParams;
+        	
         }
 
         public ServerAction putParam(String name, Object value) {
-            if (actionParams == null) {
-                actionParams = Maps.newHashMap();
+            if (actionParams.isEmpty()) {
+                actionParams.add(Maps.newHashMap(new HashMap<String,Object>()));
             }
-            actionParams.put(name, value);
+            actionParams.get(0).put(name, value);
             return this;
         }
 
@@ -423,9 +434,24 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             if (post == null) {
                 Map<String, Object> message = Maps.newHashMap();
                 Map<String, Object> actionInstance = Maps.newHashMap();
-                actionInstance.put("descriptor", qualifiedName);
-                if (actionParams != null) {
-                    actionInstance.put("params", actionParams);
+                if(qualifiedName.size() > 1) {
+	                int i = 0;
+	                for(String name: qualifiedName) {
+	                	actionInstance.put("descriptor" + i,name);
+	                	i++;
+	                }
+	                i = 0;
+	                if (actionParams != null) {
+	                	for(Map<String,Object> params: actionParams) {
+	                		actionInstance.put("params" + i, params);
+	                		i++;
+	                	}                    
+	                }
+                } else {
+                	actionInstance.put("descriptor", qualifiedName.get(0));
+                    if (actionParams != null) {
+                        actionInstance.put("params", actionParams.get(0));
+                    }
                 }
                 message.put("actions", new Map[] { actionInstance });
                 String jsonMessage = Json.serialize(message);
@@ -454,8 +480,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
-            return Aura.getDefinitionService().getDefDescriptor(qualifiedName,
+            return Aura.getDefinitionService().getDefDescriptor(qualifiedName.get(0),
                     ActionDef.class);
+        }
+        
+        public ArrayList<String> getQualifiedName() {
+        	return qualifiedName;
+        }
+        
+        public DefDescriptor<ActionDef> getDescriptor(String qualifiedName) {
+        	return Aura.getDefinitionService().getDefDescriptor(qualifiedName,ActionDef.class);
         }
 
         @Override

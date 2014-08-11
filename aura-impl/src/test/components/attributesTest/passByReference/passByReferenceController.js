@@ -17,7 +17,7 @@
         var objectWithList = {
                 intEntry: 777,
                 stringEntry: "A Large Barge",
-                listEntry: ['first','second','third']
+                listEntry: ['First','Second','Third']
         };
         cmp.set("v.objectWithList", objectWithList);
     },
@@ -32,6 +32,12 @@
         var temp = cmp.find("innerCmp").get("v.intAttribute");
         temp = 5565;
         cmp.find("innerCmp").set("v.intAttribute", temp);
+    },
+
+    changeIntCreatedCmp: function(cmp) {
+        var temp = cmp.find("createdCmp").get("v.body")[0].get("v.intAttribute");
+        temp = 12345;
+        cmp.find("createdCmp").get("v.body")[0].set("v.intAttribute", temp);
     },
 
     changeListOuter: function(cmp) {
@@ -60,13 +66,13 @@
 
     removeItemListOuter: function(cmp) {
         var list = cmp.get("v.listByReference");
-        list.splice(list.length - 1, 1);
+        list[list.length - 1] = undefined;
         cmp.set("v.listByReference", list);
     },
 
     removeItemListFacet: function(cmp) {
         var list = cmp.find("innerCmp").get("v.listAttribute");
-        list.splice(list.length - 1, 1);
+        list[list.length - 1] = undefined;
         cmp.find("innerCmp").set("v.listAttribute", list);
     },
     
@@ -98,15 +104,32 @@
     
     removeMapOuter: function(cmp) {
         var map = cmp.get("v.mapByReference");
-        delete map.oneDeeper.evenOneDeeper['layer3'];
+        map.oneDeeper.evenOneDeeper['layer3'] = undefined;
         cmp.set("v.mapByReference", map);
     },
     
     removeMapFacet: function(cmp) {
         var map = cmp.find("innerCmp").get("v.mapAttribute");
-        delete map.oneDeeper.evenOneDeeper['layer3b'];
-        delete map.oneDeeper['newEntry'];
+        map.oneDeeper.evenOneDeeper['layer3'] = undefined;
         cmp.find("innerCmp").set("v.mapAttribute", map);
+    },
+    
+    createCmp: function(cmp) {
+        var intValue = cmp.get("v.intByReference");
+        $A.newCmpAsync(
+                this,
+                function(newCmp) {
+                    cmp.find("createdCmp").set("v.body", newCmp);
+                },
+                {
+                    componentDef: "markup://attributesTest:simpleValue",
+                    attributes: {
+                        values: {
+                            intAttribute: intValue
+                        }
+                    }
+                }
+        );
     }
 })
 

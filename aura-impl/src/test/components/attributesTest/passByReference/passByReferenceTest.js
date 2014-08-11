@@ -108,14 +108,13 @@
                     $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
         }
     },
-    
-    // TODO(W-2338909): removing an item does not mark dirty/rerender properly
-    _testPassingListToFacet_DeleteItemOuter: {
+
+    testPassingListToFacet_DeleteItemOuter: {
         test: function(cmp) {
             this.verifyInitialList(cmp);
 
             // Modify list on outer component, verify facet list has also changed
-            var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b']];
+            var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], undefined];
             $A.test.clickOrTouch(cmp.find("removeListOuterButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
@@ -125,14 +124,13 @@
                     $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
         }
     },
-    
-    // TODO(W-2338909): removing an item does not mark dirty/rerender properly
-    _testPassingListToFacet_DeleteItemFacet: {
+
+    testPassingListToFacet_DeleteItemFacet: {
         test: function(cmp) {
             this.verifyInitialList(cmp);
 
             // Modify list on outer component, verify facet list has also changed
-            expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b']];
+            expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], undefined];
             $A.test.clickOrTouch(cmp.find("removeListFacetButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
@@ -261,8 +259,7 @@
         }
     },
 
-    // TODO(W-2338909): removing an item does not mark dirty/rerender properly
-    _testPassingMapToFacet_DeleteItemOuter: {
+    testPassingMapToFacet_DeleteItemOuter: {
         test: function(cmp) {
             this.verifyInitialMap(cmp);
 
@@ -271,6 +268,7 @@
                     oneDeeper: {
                         layer2: "initial2",
                         evenOneDeeper: {
+                            layer3: undefined
                         }
                     }
                 };
@@ -285,9 +283,8 @@
                     $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
         }
     },
-    
-    // TODO(W-2338909): removing an item does not mark dirty/rerender properly
-    _testPassingMapToFacet_DeleteItemFacet: {
+
+    testPassingMapToFacet_DeleteItemFacet: {
         test: function(cmp) {
             this.verifyInitialMap(cmp);
 
@@ -296,19 +293,18 @@
                     oneDeeper: {
                         layer2: "initial2",
                         evenOneDeeper: {
-                            layer3: "initial3"
+                            layer3: undefined
                         }
                     }
                 };
-            $A.test.clickOrTouch(cmp.find("appendMapFacetButton").getElement());
             $A.test.clickOrTouch(cmp.find("removeMapFacetButton").getElement());
             
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             
-            $A.test.assertEquals("initial1\ninitial2\ninitial3",
+            $A.test.assertEquals("initial1\ninitial2",
                     $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2\ninitial3",
+            $A.test.assertEquals("initial1\ninitial2",
                     $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
         }
     },
@@ -375,12 +371,59 @@
             $A.test.assertFalse(cmp.isDirty("v.listAttribute"), "Facet's List should not be dirty after rerender");
         }
     },
-    
-    // TODO(W-2338914): Cannot iterate over a list within a map attribute
-//    _testIterationListInsideMapOnFacet: {
-//        test: function(cmp) {
-//        }
-//    },
+
+    testIterationListInsideMap: {
+        test: function(cmp) {
+            $A.test.assertEquals("FirstSecondThird", $A.test.getText(cmp.find("iterOutput").getElement()));
+            $A.test.assertEquals("FirstSecondThird", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+
+            var list = cmp.get("v.objectWithList.listEntry");
+            list[1] = "New!";
+            cmp.set("v.objectWithList.listEntry", list);
+
+            $A.test.assertEquals("FirstNew!Third", $A.test.getText(cmp.find("iterOutput").getElement()));
+            $A.test.assertEquals("FirstNew!Third", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+
+            var facetList = cmp.find("innerCmp").get("v.objectAttribute.listEntry");
+            facetList[1] = "Again!";
+            cmp.find("innerCmp").set("v.objectAttribute.listEntry", facetList);
+
+            $A.test.assertEquals("FirstAgain!Third", $A.test.getText(cmp.find("iterOutput").getElement()));
+            $A.test.assertEquals("FirstAgain!Third", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+
+            // Shift elements to right, adding new element to 0 index and removing last element
+            var list = cmp.get("v.objectWithList.listEntry");
+            list.unshift("Zero");
+            list.splice(list.length - 1, 1);
+            cmp.set("v.objectWithList.listEntry", list);
+            $A.test.assertEquals("ZeroFirstAgain!", $A.test.getText(cmp.find("iterOutput").getElement()));
+            $A.test.assertEquals("ZeroFirstAgain!", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+
+            // Remove last element in list, verify output updated
+            var list = cmp.get("v.objectWithList.listEntry");
+            list.splice(list.length - 1, 1);
+            cmp.set("v.objectWithList.listEntry", list);
+            $A.test.assertEquals("ZeroFirst", $A.test.getText(cmp.find("iterOutput").getElement()));
+            $A.test.assertEquals("ZeroFirst", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+        }
+    },
+
+    testClientSideComponentCreation: {
+        test: function(cmp) {
+            $A.test.clickOrTouch(cmp.find("createCmpButton").getElement());
+            $A.test.assertEquals("2007", $A.test.getText(cmp.find("createdCmp").getElement()));
+
+            // Change outer component attribute, verify does not change client-created cmp
+            $A.test.clickOrTouch(cmp.find("changeIntOuterButton").getElement());
+            $A.test.assertEquals("2007", $A.test.getText(cmp.find("createdCmp").getElement()));
+            $A.test.assertEquals(9999, cmp.get("v.intByReference"));
+
+            // Change attribute on created component, verify does not change outer component
+            $A.test.clickOrTouch(cmp.find("changeIntCsccButton").getElement());
+            $A.test.assertEquals("12345", $A.test.getText(cmp.find("createdCmp").getElement()));
+            $A.test.assertEquals(9999, cmp.get("v.intByReference"));
+        }
+    },
 
     assertMapItems: function(expected, actual) {
         if (this.keyCount(expected) !== this.keyCount(actual)) {
@@ -417,9 +460,9 @@
         }
 
         for (var i = 0; i < expected.length; i++) {
-            if (expected[i] instanceof Array) {
+            if (expected[i] && expected[i] instanceof Array) {
                 this.assertListItems(expected[i], actual[i]);
-            } else if ($A.util.isUndefinedOrNull(actual[i]) || expected[i] !== actual[i]) {
+            } else if (expected[i] !== actual[i]) {
                 $A.test.fail("Did not receive expected list. Expected '" + expected[i] + "', but received '" + actual[i] + "'");
             }
         }

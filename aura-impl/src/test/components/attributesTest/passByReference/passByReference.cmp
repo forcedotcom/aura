@@ -19,16 +19,21 @@
     <aura:attribute name="intByReference" default="2007" type="Integer"/>
     <aura:attribute name="listByReference" default="[]" type="List" />
     <aura:attribute name="mapByReference" default="{}" type="Map" />
-    <aura:attribute name="objectWithList" default="{}" type="Map" />
+    <!-- TODO(W-2338914): Must define a default value for list otherwise setting it later (in init) will not be picked up -->
+    <aura:attribute name="objectWithList" default="{listEntry:[]}" type="Map" />
     
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 
+    <!-- Include facet as dependency so client-side component creation does not have to go to server for def -->
+    <aura:dependency resource="markup://attributesTest:simpleValue" />
+
     <ui:button label="Change outer int" press="{!c.changeIntOuter}" aura:id="changeIntOuterButton" />
-    <ui:button label="Create facet int" press="{!c.changeIntFacet}" aura:id="changeIntFacetButton" />
+    <ui:button label="Change facet int" press="{!c.changeIntFacet}" aura:id="changeIntFacetButton" />
+    <ui:button label="Change created cmp int" press="{!c.changeIntCreatedCmp}" aura:id="changeIntCsccButton" />
     <br/><br/>
 
     <ui:button label="Change outer list" press="{!c.changeListOuter}" aura:id="changeListOuterButton" />
-    <ui:button label="Create facet list" press="{!c.changeListFacet}" aura:id="changeListFacetButton" />
+    <ui:button label="Change facet list" press="{!c.changeListFacet}" aura:id="changeListFacetButton" />
     <ui:button label="Append to outer list" press="{!c.appendListOuter}" aura:id="appendListOuterButton" />
     <ui:button label="Append to facet list" press="{!c.appendListFacet}" aura:id="appendListFacetButton" />
     <ui:button label="Remove item from outer list" press="{!c.removeItemListOuter}" aura:id="removeListOuterButton" />
@@ -36,20 +41,19 @@
     <br/><br/>
 
     <ui:button label="Change outer map" press="{!c.changeMapOuter}" aura:id="changeMapOuterButton" />
-    <ui:button label="Create facet map" press="{!c.changeMapFacet}" aura:id="changeMapFacetButton" />
+    <ui:button label="Change facet map" press="{!c.changeMapFacet}" aura:id="changeMapFacetButton" />
     <ui:button label="Append to outer map" press="{!c.appendMapOuter}" aura:id="appendMapOuterButton" />
     <ui:button label="Append to facet map" press="{!c.appendMapFacet}" aura:id="appendMapFacetButton" />
     <ui:button label="Remove item from outer map" press="{!c.removeMapOuter}" aura:id="removeMapOuterButton" />
     <ui:button label="Remove item from facet map" press="{!c.removeMapFacet}" aura:id="removeMapFacetButton" />
     <br/><br/>
 
-    <ui:button label="Create cmp with List" press="{!c.createCmpWithList}" aura:id="createCmpListButton" />
-    <ui:button label="Create cmp with Map" press="{!c.createCmpWithMap}" aura:id="createCmpMapButton" />
+    <ui:button label="Create new component" press="{!c.createCmp}" aura:id="createCmpButton" />
     <br/>
  
     <attributesTest:passByReferenceInner aura:id="innerCmp" intAttribute="{!v.intByReference}" listAttribute="{!v.listByReference}" mapAttribute="{!v.mapByReference}" objectAttribute="{!v.objectWithList}"/>
 
-    <div aura:id="createdCmp" />
+    <div aura:id="createdCmp" /><br/>
     
     Outer component Integer attribute output:
     <div aura:id="intOutput">
@@ -77,15 +81,11 @@
         {!v.mapByReference.oneDeeper.newEntry.newLayer}
     </div>
 
-    <!-- W-2338914: Everything on the attribute we try to iterate over prints out, but not within iteration! -->
     Outer iteration output:
-    {!v.objectWithList.listEntry[0]}
-    {!v.objectWithList.listEntry[1]}
-    {!v.objectWithList.listEntry[2]}
     <div aura:id="iterOutput">
         <aura:iteration items="{!v.objectWithList.listEntry}" var="item">
             {!item}
         </aura:iteration>
     </div><br/>
-    
+
 </aura:component>

@@ -22,6 +22,7 @@
 		cmp._dataProvided = true;
 		var data = evt.getParam('data');
 		if (data) {
+			helper.refreshMenu(cmp);
         	helper.initItems(cmp, data.columns, data.orderBy);
         	if (cmp._openAfterDataProvided) {
         		cmp._openAfterDataProvided = false;

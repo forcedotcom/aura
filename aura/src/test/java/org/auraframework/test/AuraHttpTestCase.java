@@ -407,10 +407,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
             this.qualifiedName = new ArrayList<String>();
         	this.qualifiedName.add(qualifiedName);
-        	this.actionParams = new ArrayList<Map<String,Object>>();
-        	if(actionParams != null) {
-        		this.actionParams.add(actionParams);
-        	}
+            this.actionParams.add(actionParams);
         }
         
         public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
@@ -438,8 +435,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 Map<String, Object> message = Maps.newHashMap();
                 Map<String, Object> actionInstance = Maps.newHashMap();
                 if(qualifiedName.size() > 1) {
-	                
-                	int i = 0;
+	                int i = 0;
 	                for(String name: qualifiedName) {
 	                	actionInstance.put("descriptor" + i,name);
 	                	i++;
@@ -452,9 +448,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 	                	}                    
 	                }
                 } else {
-                	
                 	actionInstance.put("descriptor", qualifiedName.get(0));
-                    if (actionParams != null && !actionParams.isEmpty()) {
+                    if (actionParams != null) {
                         actionInstance.put("params", actionParams.get(0));
                     }
                 }
@@ -463,6 +458,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 Map<String, String> params = Maps.newHashMap();
                 params.put("message", jsonMessage);
                 params.put("aura.token", getTestServletConfig().getCsrfToken());
+
                 if (contextValue != null) {
                     params.put("aura.context", contextValue);
                 } else {
@@ -474,7 +470,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                         Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
                         params.put("aura.context", sb.toString());
                     } else {
-                    	params.put("aura.context", getSimpleContext(Format.JSON, false));
+                        params.put("aura.context", getSimpleContext(Format.JSON, false));
                     }
                 }
                 post = obtainPostMethod("/aura", params);
@@ -516,6 +512,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             try {
                 HttpPost post = getPostMethod();
                 HttpResponse response = getHttpClient().execute(post);
+
                 assertEquals(HttpStatus.SC_OK, getStatusCode(response));
                 rawResponse = getResponseBody(response);
                 assertEquals(

@@ -16,6 +16,7 @@
 package org.auraframework.components.ui.inputError;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,15 +34,14 @@ public class InputErrorUITest extends WebDriverTestCase {
     final String STATUS_CLEAR = "Cleared error";
     final String URL = "/uitest/inputError_Test.cmp";
     final String URL_CST = "/uitest/inputError_CustomTest.cmp";
-    
+
     public InputErrorUITest(String name) {
         super(name);
     }
 
     /**
-     * Test error handling setting errors when firing onError event. Test error
-     * handling clearing errors when firing onClearErrors event. Test error
-     * handling setting a custom error component.
+     * Test error handling setting errors when firing onError event. Test error handling clearing errors when firing
+     * onClearErrors event. Test error handling setting a custom error component.
      */
     public void testServerErrorUsingOnError() throws Exception {
         String expectedErrorMsg = "Custom Error Msg: Error Happens!";
@@ -86,9 +86,8 @@ public class InputErrorUITest extends WebDriverTestCase {
     }
 
     /**
-     * Test error handling setting errors without firing error events just
-     * setting SimpleValue attributes. Test error handling clearing errors
-     * without firing clear events just setting SimpleValue attributes.
+     * Test error handling setting errors without firing error events just setting SimpleValue attributes. Test error
+     * handling clearing errors without firing clear events just setting SimpleValue attributes.
      */
     // commented for bug W-2319834
     public void _testErrorWithoutEvents() throws Exception {
@@ -100,9 +99,8 @@ public class InputErrorUITest extends WebDriverTestCase {
     }
 
     /**
-     * Test error handling without setting error message on SimpleValue. Test
-     * error handling clearing errors setting error message to null on
-     * SimpleValue.
+     * Test error handling without setting error message on SimpleValue. Test error handling clearing errors setting
+     * error message to null on SimpleValue.
      */
     public void testErrorWithoutSettingErrorMessage() throws Exception {
         d = getDriver();
@@ -132,6 +130,13 @@ public class InputErrorUITest extends WebDriverTestCase {
     }
 
     private void clearError(boolean verifyErrMsg) throws Exception {
+        // Sometimes running ios tests through SauceLabs can be very slow. Watching the video recording, it appears to
+        // not be done processing the previous click when we try to send this click causing the click to be ignored and
+        // the test to timeout on the following wait.
+        if (getBrowserType() == BrowserType.IPAD || getBrowserType() == BrowserType.IPHONE) {
+            waitFor(3);
+        }
+
         clearBtn.click();
         waitForElementTextPresent(status, STATUS_CLEAR);
         if (verifyErrMsg) {
@@ -150,11 +155,11 @@ public class InputErrorUITest extends WebDriverTestCase {
         String errorText = errorElement.getText();
         assertTrue("Incorrect error message: " + errorText, errorText.contains(expectedErrorMsg));
     }
-    
+
     private void verifyNoErrorMessage() throws Exception {
-    	 assertFalse("Did not expect an error message", isElementPresent(By.className("uiInputDefaultError")));
+        assertFalse("Did not expect an error message", isElementPresent(By.className("uiInputDefaultError")));
     }
-    
+
     private void verifyCss(WebElement element, boolean isError) throws Exception {
         String inputClassValue = element.getAttribute("class");
         if (isError) {

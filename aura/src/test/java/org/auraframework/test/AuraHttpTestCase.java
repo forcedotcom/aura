@@ -407,7 +407,10 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
             this.qualifiedName = new ArrayList<String>();
         	this.qualifiedName.add(qualifiedName);
-            this.actionParams.add(actionParams);
+        	this.actionParams = new ArrayList<Map<String,Object>>();
+            if(actionParams != null) {
+            	this.actionParams.add(actionParams);
+            }
         }
         
         public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
@@ -449,7 +452,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 	                }
                 } else {
                 	actionInstance.put("descriptor", qualifiedName.get(0));
-                    if (actionParams != null) {
+                    if (actionParams != null && !actionParams.isEmpty()) {
                         actionInstance.put("params", actionParams.get(0));
                     }
                 }

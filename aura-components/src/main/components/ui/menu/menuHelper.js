@@ -184,6 +184,34 @@
         c.set("v.focusItemIndex", index);
         c.set("v.referenceElement", event.getSource().getElement());
         var menuVisible = c.get("v.visible");
-        c.set("v.visible", !menuVisible);
-    }
+        if (menuVisible === true) {
+        	c.set("v.visible", false);
+        	this.handleMenuCollapse(component);
+        } else {
+        	c.set("v.visible", true);
+        	this.handleMenuExpand(component);
+        }
+    },
+    
+    handleMenuExpand: function(component) {
+        $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
+        $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));        
+    },
+    
+    handleMenuCollapse: function(component) {
+    	$A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
+        $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+    },
+    
+    setAriaAttributes: function(component) {        
+        var menuListCmp = this.getMenuComponent(component);
+        var triggerCmp = this.getTriggerComponent(component);
+
+        if (triggerCmp && menuListCmp) {
+        	var triggerElem = triggerCmp.getElement(), menuListEl = menuListCmp.getElement();
+            if (triggerElem && menuListEl) {
+            	menuListEl.setAttribute("aria-labelledby", triggerElem.getAttribute("id"));
+            }
+        }
+    },
 })

@@ -14,49 +14,19 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
-        var children = [];
-        // Set "parent" for menu items in body
-        var body = component.get("v.body");
-        for (var i = 0; i < body.length; i++) {
-            var c = body[i];
-            if (c.isInstanceOf("ui:menuItem")) {
-                children.push(c);
-                if (c.getDef().getAttributeDefs().getDef("parent")) {
-                    c.set("v.parent", [component]);
-                }
-            } else if (c.isInstanceOf("aura:iteration")) { // support external iteration
-                var iters = c.get("v.realbody");
-                for (var k = 0; k < iters.length; k++) {
-                    var iter = iters[k];
-                    if (iter.isInstanceOf("ui:menuItem")) {
-                        children.push(iter);
-                        if (iter.getDef().getAttributeDefs().getDef("parent")) {
-                            iter.set("v.parent", [component]);
-                        }
-                    }
-                }
-            }
-        }
-        // Set "parent" for menu items in iteration
-        var items = component.find("item");
-        if (items && $A.util.isArray(items)) {
-            for (var j = 0; j < items.length; j++) {
-                var item = items[j];
-                if (item.isInstanceOf("ui:menuItem")) {
-                    children.push(item);
-                }
-                if (item.getDef().getAttributeDefs().getDef("parent")) {
-                    item.set("v.parent", [component]);
-                }
-            }
-        }
-        component.set("v.childMenuItems", children);
-    },
-    
+	doInit: function(component, event, helper) {
+		helper.doInit(component);
+	},
+	
     visibleChange: function(component, event, helper) {
         var concrete = component.getConcreteComponent();
         var _helper = concrete.getDef().getHelper();
         _helper.visibleChange(concrete);
+    },
+    onMenuItemSelected: function(component, event, helper) {
+    	helper.onMenuItemSelected(component, event);
+    },
+    update: function(component, event, helper) {
+    	helper.doInit(component);
     }
 })

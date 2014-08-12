@@ -34,6 +34,7 @@ public class MenuItem implements HasClassName, HasDisabled, HasLabel, HasSelecte
     private final boolean selected;
     private final String type;
     private final String value;
+    private final boolean hideMenuAfterSelected;
     
     public MenuItem(String label, String type) {
         this(label, false, type);
@@ -52,12 +53,17 @@ public class MenuItem implements HasClassName, HasDisabled, HasLabel, HasSelecte
     }
     
     public MenuItem(String className, boolean disabled, String label, boolean selected, String type, String value) {
+        this(className, disabled, label, selected, type, value, false);
+    }
+    
+    public MenuItem(String className, boolean disabled, String label, boolean selected, String type, String value, boolean hideMenuAfterSelected) {
         this.className = className;
         this.disabled = disabled;
         this.label = label;
         this.selected = selected;
         this.type = type;
         this.value = value;
+        this.hideMenuAfterSelected = hideMenuAfterSelected;
     }
 
     /**
@@ -113,6 +119,10 @@ public class MenuItem implements HasClassName, HasDisabled, HasLabel, HasSelecte
     public String getValue() {
         return this.value;
     }
+    
+    public boolean isHideMenuAfterSelected() {
+    	return this.hideMenuAfterSelected;
+    }
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -123,13 +133,14 @@ public class MenuItem implements HasClassName, HasDisabled, HasLabel, HasSelecte
         json.writeMapEntry("selected", this.selected);
         json.writeMapEntry("type", this.type);
         json.writeMapEntry("value", this.value);
+        json.writeMapEntry("hideMenuAfterSelected", this.hideMenuAfterSelected);
         json.writeMapEnd();
     }
 
     @Override
     public String toString() {
-        return String.format("MenuItem(className[%s] disabled[%s] label[%s] selected[%s] type[%s] value[%s])", 
-                this.className, this.disabled, this.label, this.selected, this.type, this.value);
+        return String.format("MenuItem(className[%s] disabled[%s] label[%s] selected[%s] type[%s] value[%s] hideMenuAfterSelected[%s])", 
+                this.className, this.disabled, this.label, this.selected, this.type, this.value, this.hideMenuAfterSelected);
     }
 
 }

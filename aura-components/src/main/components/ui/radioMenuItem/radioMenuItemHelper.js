@@ -18,7 +18,7 @@
 		var current = component.get("v.selected");
         if (current === false) {
         	component.set("v.selected", !current);
-        }
+        }        
 	},
 
     setSelected : function(component) {
@@ -30,28 +30,9 @@
             if (selected === true) {
                 $A.util.addClass(elem, "selected");
                 elem.setAttribute("aria-checked", "true");
-                // make sure the sibling radioMenuItems are not checked.
-                this.uncheckSiblings(concreteCmp);
             } else {
                 $A.util.removeClass(elem, "selected");
                 elem.setAttribute("aria-checked", "false");
-            }
-        }
-    },
-
-    uncheckSiblings : function(component) {
-    	var parent = component.get("v.parent");
-        if (parent && parent.length > 0) {
-            p = parent[0];
-            var body = p.get("v.childMenuItems");
-            for (var i = 0; i < body.length; i++) {
-                var c = body[i];
-                if (c.isInstanceOf("ui:radioMenuItem") &&
-                    $A.util.getBooleanValue(c.get("v.selected")) &&
-                    c.getGlobalId() != component.getGlobalId()) {
-                    c.set("v.selected", false);
-                    break;
-                }
             }
         }
     }

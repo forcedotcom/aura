@@ -44,15 +44,10 @@
         if ($A.util.isUndefinedOrNull(index)) {
             index = 0;
         }
-        var concrete = component.getConcreteComponent();
-        var parent = concrete.get("v.parent");
-        if (parent && parent.length > 0) {
-            p = parent[0];
-            var pressEvent = p.get("e.menuTriggerPress");
-            pressEvent.setParams({
-                focusItemIndex: index
-            }); 
-            pressEvent.fire();
-        }
+        var pressEvent = component.get("e.menuTriggerPress");
+        pressEvent.setParams({
+            focusItemIndex: index
+        }); 
+        pressEvent.fire();
     }
 })

@@ -22,7 +22,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
-    <aura:handler name="refresh" action="{!c.doInit}"/>
+    <aura:handler name="refresh" action="{!c.refresh}"/>
     
     <div aura:id="app" class="{!v.class}" role="application">
         {!v.body}

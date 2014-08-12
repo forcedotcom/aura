@@ -405,19 +405,25 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private String contextValue;
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
-            this.qualifiedName = new ArrayList<String>();
+        	this.qualifiedName = new ArrayList<String>();
         	this.qualifiedName.add(qualifiedName);
         	this.actionParams = new ArrayList<Map<String,Object>>();
             if(actionParams != null) {
             	this.actionParams.add(actionParams);
             }
+            
         }
+        //Indexes in list correspond with each other.  IE index 1 of qualifiedName matches index2 of actionParams.  
+        //Can have null for individual actionParams but must at least pass an array list
         
         public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
         	
         	this.qualifiedName = qualifiedName;
         	this.actionParams = actionParams;
-        	
+        	//Now will verify that we have actions and params
+        	if(this.qualifiedName.toArray().length != this.actionParams.toArray().length) {
+        		throw new IllegalArgumentException("Number of action names does not match number of action parameters");
+        	}
         }
 
         public ServerAction putParam(String name, Object value) {
@@ -427,6 +433,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             actionParams.get(0).put(name, value);
             return this;
         }
+        
+        public ServerAction putParamUsingQName(String qualifiedName, String name, Object value) {
+        	int index = this.qualifiedName.indexOf(qualifiedName);
+        	if(actionParams.get(index)==null) {
+        		actionParams.add(index,Maps.newHashMap(new HashMap<String,Object>()));
+        	}
+        	actionParams.get(index).put(name, value);
+        	return this;
+        }
 
         public ServerAction setContext(String value) {
             contextValue = value;
@@ -435,28 +450,18 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
         public HttpPost getPostMethod() throws Exception {
             if (post == null) {
+            	
                 Map<String, Object> message = Maps.newHashMap();
-                Map<String, Object> actionInstance = Maps.newHashMap();
-                if(qualifiedName.size() > 1) {
-	                int i = 0;
-	                for(String name: qualifiedName) {
-	                	actionInstance.put("descriptor" + i,name);
-	                	i++;
-	                }
-	                i = 0;
-	                if (actionParams != null) {
-	                	for(Map<String,Object> params: actionParams) {
-	                		actionInstance.put("params" + i, params);
-	                		i++;
-	                	}                    
-	                }
-                } else {
-                	actionInstance.put("descriptor", qualifiedName.get(0));
-                    if (actionParams != null && !actionParams.isEmpty()) {
-                        actionInstance.put("params", actionParams.get(0));
-                    }
+                ArrayList<Map<String,Object>> actionInstanceArray = new ArrayList<Map<String,Object>>();
+                for(int i = 0;i<qualifiedName.size();i++){
+                	Map<String, Object> actionInstance = Maps.newHashMap();
+                	actionInstance.put("descriptor", qualifiedName.get(i));
+                	if(actionParams.get(i) != null) {
+                		actionInstance.put("params", actionParams.get(i));
+                	}
+                	actionInstanceArray.add(actionInstance);
                 }
-                message.put("actions", new Map[] { actionInstance });
+                message.put("actions", actionInstanceArray.toArray());
                 String jsonMessage = Json.serialize(message);
                 Map<String, String> params = Maps.newHashMap();
                 params.put("message", jsonMessage);

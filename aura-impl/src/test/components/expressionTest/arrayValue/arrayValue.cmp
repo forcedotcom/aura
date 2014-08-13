@@ -17,5 +17,13 @@
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
     <aura:attribute name="array" type="Object[]"/>
+    <aura:attribute name="second" type="Object[]"/>
+    <aura:attribute name="arrayLen" type="Integer" default="0"/>
+
     <aura:handler name="change" value="{!v.array}" action="{!c.onValueChange}"/>
+    <aura:handler name="change" value="{!v.array.length}" action="{!c.onLengthChange}"/>
+
+    <div>
+      array.length={!v.array.length}, second.length={!v.second.length}.
+    </div>
 </aura:component>

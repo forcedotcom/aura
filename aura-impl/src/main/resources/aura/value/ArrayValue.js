@@ -92,7 +92,12 @@ ArrayValue.prototype._getValue = function(i) {
     if (aura.util.isString(i)) {
         if ("length" === i) {
             // special case for length
-            return valueFactory.create(this.getLength());
+            if (!this.lengthValue) {
+               this.lengthValue = valueFactory.create(this.getLength(), undefined, this.owner); 
+            } else {
+                this.lengthValue.setValue(this.getArray().length);
+            }
+            return this.lengthValue;
         } else {
             i = parseInt(i, 10);
         }
@@ -314,6 +319,10 @@ ArrayValue.prototype.commit = function(clean) {
         
         this.array = this.newArray;
         this.rollback(clean);
+        // If anyone cares about our length, make the change.
+        if (this.lengthValue) {
+            this.lengthValue.setValue(this.getArray().length);
+        }
     }
 };
 

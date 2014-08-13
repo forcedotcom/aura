@@ -19,5 +19,9 @@
             cmp._log=[];
         }
         cmp._log.push(evt.getParams());
+    },
+
+    onLengthChange : function(cmp, evt, helper) {
+        cmp.set("v.arrayLen", evt.getParams().value);
     }
 })

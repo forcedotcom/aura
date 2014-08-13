@@ -19,7 +19,7 @@
  */
 var valueFactory = { 
     create: function create(valueConfig, def, component, expected) {
-        if (aura.util.isObject(valueConfig)) {
+        if (valueConfig) {
             var source = undefined;
             if (valueConfig.getSourceValue) {
                 // Object is already wrapped by a MapValue
@@ -36,13 +36,14 @@ var valueFactory = {
                 source._setValue(valueConfig);
                 return source;
             }
+        }
 
-            // If we get to here, we need a new wrapper of some sort....
+        // If we get to here, we need a new wrapper of some sort....
+        if (aura.util.isObject(valueConfig)) {
             if (valueConfig.auraType) {
                 if (valueConfig.auraType === "ActionDef") {
                     return new ActionReferenceValue(valueConfig, def, component);
                 }
-
                 return valueConfig;
             } else if (valueConfig["exprType"] === "PROPERTY") {
                 return new PropertyChain(valueConfig["path"]);

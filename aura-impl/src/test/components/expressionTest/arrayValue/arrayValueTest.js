@@ -257,7 +257,7 @@
     testRemove: {
         attributes : { array : "q,w,e,r" },
         test: function(component){
-        	var array = component.get("v.array");
+            var array = component.get("v.array");
             $A.test.assertEquals(4, array.length);
 
             array.splice(2, 1);
@@ -268,4 +268,47 @@
             $A.test.assertEquals("r", array[2]);
         }
     },
+
+    testLength: {
+        attributes: { array : "q, w",
+                      second: "q2, w2" },
+        test: [ function(cmp) {
+                cmp.set("v.array", ["q", "w", {"list": [1, 2, 3] }] );
+
+                var array = cmp.get("v.array");
+                array[2].list[3] = 4;
+
+                var wrapper = cmp.getValue("v.array");
+                // This should use the same wrapper object
+                cmp.set("v.array", array);
+                $A.test.assertEquals(wrapper, cmp.getValue("v.array"));
+
+                // This should NOT use the same wrapper, so later mutations
+                // don't propagate here.
+                cmp.set("v.second", array);
+
+                // Mutate the first copy
+                cmp.getValue("v.array").push("tail");
+                // Be nice if we parsed "v.array[2].list", but we don't, so:
+                cmp.getValue("v.array").getValue(2).getValue("list").push("last");
+
+                // Test those happened one place, but not the other
+                $A.test.assertEquals("tail", cmp.get("v.array")[3]);
+                $A.test.assertEquals(3, cmp.get("v.second.length"));
+                $A.test.assertEquals("last", cmp.get("v.array")[2].list[4]);
+                $A.test.assertEquals(5, cmp.get("v.array")[2].list.length);
+                $A.test.assertEquals(4, cmp.get("v.second")[2].list.length);
+            },
+            function(cmp) {
+                // Length handler fired (after commit)
+                $A.test.assertEquals(4, cmp.get("v.arrayLen"));
+
+                // Length expressions rerendered
+                var div = cmp.getElement();
+                $A.test.assertEquals("array.length=4, second.length=3.",
+                    div.innerText);
+            }
+        ]
+    }
+
 })

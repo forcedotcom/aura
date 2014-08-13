@@ -145,20 +145,22 @@ var ComponentPriv = (function() { // Scoping priv
                 } else {
                     configAttributes = {};
                     var atCfg = config["attributes"];
-                    for ( var key in atCfg) {
-                        configAttributes[key] = atCfg[key];
+                    for (var key in atCfg) {
+                    	if (atCfg.hasOwnProperty(key)) {
+                    		configAttributes[key] = atCfg[key];
+                    	}
                     }
 
                     atCfg = partialConfig["attributes"];
                     for (key in atCfg) {
-                        if (key !== "valueProvider") {
+                        if (atCfg.hasOwnProperty(key) && key !== "valueProvider") {
                             configAttributes[key] = atCfg[key];
                         }
                     }
 
                     atCfg = config["attributes"]["values"];
                     for (key in atCfg) {
-                        if (!configAttributes["values"][key]) {
+                        if (atCfg.hasOwnProperty(key) && !configAttributes["values"][key]) {
                             configAttributes["values"][key] = atCfg[key];
                         }
                     }

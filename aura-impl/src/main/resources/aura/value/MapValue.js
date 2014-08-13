@@ -46,7 +46,7 @@ function MapValue(config, def, component) {
         this.hasRealValue = (config !== null && config !== undefined);
         if (config) {
             for (k in config) {
-                this.add(k, config);
+        		this.add(k, config);
             }
         }
     }
@@ -75,7 +75,7 @@ MapValue.prototype._getValueType = function () {
  * @constructor
  * @private
  */
-var RawMapValue = function(source) {
+function RawMapValue(source) {
     var that = this;
     source.each(function(k, v) {
         that[k] = v.unwrap();
@@ -88,12 +88,11 @@ var RawMapValue = function(source) {
             return _source;
         };
     })(source);
-};
+}
 
 // Hide from for/in iterations that correctly use thing.hasOwnProperty() to guard against traversal of inherited/private props
 RawMapValue.prototype.hasOwnProperty = function(name) {
-    return Object.prototype.hasOwnProperty.call(this, name) 
-        && (this[name] !== this.getSourceValue);
+    return Object.prototype.hasOwnProperty.call(this, name) && !$A.util.isFunction(this[name]);
 };
 
 // toJSON is expected to return an object that can be converted by JSON.stringify, this means
@@ -102,11 +101,13 @@ RawMapValue.prototype.hasOwnProperty = function(name) {
 // a RawMapValue. Since this is only used for serialization it should be fine.
 RawMapValue.prototype.toJSON = function() {
     var copy = {};
+    
     for (var k in this) {
         if (this.hasOwnProperty(k)) {
             copy[k] = this[k];
         }
     }
+    
     return copy;
 };
 
@@ -513,12 +514,18 @@ MapValue.prototype.unwrap = function() {
  * @private
  */
 MapValue.prototype.add = function(k, config, subDirty, skipChange) {
-    var key = k.toLowerCase();
     var v = config[k];
+	if (v && !config.hasOwnProperty(k)) {
+		// Filter out any unwanted inherited stuff including functions (e.g. from RawMapValue) - config should be just a plain old DTO
+		return;
+	}
+
+    var key = k.toLowerCase();
     var expected = this.value[key];
     if (!expected && this.oldvalue) {
         expected = this.oldvalue[key];
     }	
+    
     var value = valueFactory.create(v, null, this.owner, expected);
     this.value[key] = value;
 

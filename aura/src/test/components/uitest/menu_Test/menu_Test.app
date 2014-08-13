@@ -18,6 +18,7 @@
 <aura:application model="java://org.auraframework.component.ui.MenuTestModel">
 <aura:attribute name="expandEventFired" type="boolean" default="false"/>
 <aura:attribute name="collapseEventFired" type="boolean" default="false"/>
+<aura:attribute name="hideMenuAfterSelected" type="Boolean" default="true"/>
 <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Check Menu Position Test</h2>
         <ui:menu aura:id="uiMenu" class="checkPositionMenu">
@@ -38,9 +39,9 @@
         <ui:menu aura:id="uiMenu" class="clubMenu">
             <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
             <ui:menuList class="actionMenu" aura:id="actionMenu">
-                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
                 <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
                 <ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
             </ui:menuList>
         </ui:menu> 

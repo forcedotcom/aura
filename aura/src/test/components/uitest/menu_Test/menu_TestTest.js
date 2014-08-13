@@ -265,5 +265,53 @@
 				trigger.get("e.click").fire();
 				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible when you extend from menuList");
 			}
+   },
+   
+   /**
+	 * Test to verify action menu list does not collapse if HideMenuAfterSelected is set to false
+	 * Test case: W-2328775
+	 */
+	testHideMenuAfterSelected:{
+		attributes: { hideMenuAfterSelected : "false" },
+		test: [function(cmp) {
+				actionMenu = cmp.find("actionMenu");
+	        	menuLabel = cmp.find("trigger");
+	        	
+	        	//check menu is default to hidden by using AURA API
+	        	$A.test.assertFalse(actionMenu.get('v.visible'),"Action Menu should not be visible");
+	            
+	        	//check menu is default to hidden by using DOM API
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
+	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
+	        	menuLabel.get("e.click").fire();
+	            
+	            //Check if secondItem in the menu is disabled
+	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find("actionItem2").get("v.disabled");}, "Check if Item2 in the menu is disabled");
+			}, function(cmp) {
+				//make sure menuItem is not attached to body directly and its attached to uiMenu instead
+				//Test case for W-2181713
+				var actionMenuParentClassName = actionMenu.getElement().parentNode.className;
+				$A.test.assertTrue($A.test.contains(actionMenuParentClassName,"uiMenu"), "Menu Item List not attached to correct uiMenu");
+	    		
+				//click actionItem3 and check if label is updated
+	            cmp.find("actionItem3").get("e.click").fire();
+	            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3").get('v.label'), function(){return menuLabel.get('v.label')}, "Label should be updated to "+ cmp.find("actionItem3").get('v.label'));
+	        }, function(cmp) {
+	        	//check menu is still visible after selecting actionItem3
+	        	$A.test.assertTrue(actionMenu.get('v.visible'),"Menu should be visible after selecting actionItem3");
+	        	//click actionItem1 and check if label is updated
+	            cmp.find("actionItem1").get("e.click").fire();
+	            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem1").get('v.label'), function(){return menuLabel.get('v.label')}, "Label should be updated to "+ cmp.find("actionItem1").get('v.label'));
+	        }, function(cmp) {
+	        	//check menu is still visible after selecting actionItem1
+	        	$A.test.assertTrue(actionMenu.get('v.visible'),"Menu should be visible after selecting actionItem1");
+	        	//click actionItem4 and check if label is updated
+	            cmp.find("actionItem4").get("e.click").fire();
+	            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem4").get('v.label'), function(){return menuLabel.get('v.label')}, "Label should be updated to "+ cmp.find("actionItem4").get('v.label'));
+	        }, function(cmp) {
+	        	//check menu is still visible after selecting actionItem1
+	        	$A.test.assertFalse(actionMenu.get('v.visible'),"Menu should not be visible after selecting actionItem4");
+	        }
+	   ]
    }
 })

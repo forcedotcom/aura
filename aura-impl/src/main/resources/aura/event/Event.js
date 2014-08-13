@@ -70,9 +70,13 @@ Event.prototype.setParams = function(config) {
         var attributeDefs = this.eventDef.getAttributeDefs();
 
         for (var key in config){
-            if (attributeDefs[key]) {
-                var value = config[key];
-                this.params[key] = value;
+            if (config.hasOwnProperty(key)) {
+                if (attributeDefs[key]) {
+                    var value = config[key];
+                    this.params[key] = value;
+                } else {
+                    $A.warning("Attempt to set invalid property '" + key + "' on event");
+                }
             }
         }
     }

@@ -405,12 +405,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private String contextValue;
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
+        	System.out.println("qualified name is " + qualifiedName);
         	this.qualifiedName = new ArrayList<String>();
         	this.qualifiedName.add(qualifiedName);
         	this.actionParams = new ArrayList<Map<String,Object>>();
             if(actionParams != null) {
             	this.actionParams.add(actionParams);
+            } else {
+            	this.actionParams.add(null);
             }
+            
             
         }
         //Indexes in list correspond with each other.  IE index 1 of qualifiedName matches index2 of actionParams.  
@@ -427,8 +431,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
 
         public ServerAction putParam(String name, Object value) {
-            if (actionParams.isEmpty()) {
-                actionParams.add(Maps.newHashMap(new HashMap<String,Object>()));
+            if (actionParams.get(0) == null) {
+                actionParams.add(0,Maps.newHashMap(new HashMap<String,Object>()));
             }
             actionParams.get(0).put(name, value);
             return this;
@@ -454,12 +458,17 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 Map<String, Object> message = Maps.newHashMap();
                 ArrayList<Map<String,Object>> actionInstanceArray = new ArrayList<Map<String,Object>>();
                 for(int i = 0;i<qualifiedName.size();i++){
+                	System.out.println("Creating an actionInstance");
                 	Map<String, Object> actionInstance = Maps.newHashMap();
                 	actionInstance.put("descriptor", qualifiedName.get(i));
+                	System.out.println("added the qualified name");
                 	if(actionParams.get(i) != null) {
+                		System.out.println("made it through the conditional");
                 		actionInstance.put("params", actionParams.get(i));
+                		System.out.println("added the actionParams");
                 	}
                 	actionInstanceArray.add(actionInstance);
+                	System.out.println("hey we made it through the action Instance add!!");
                 }
                 message.put("actions", actionInstanceArray.toArray());
                 String jsonMessage = Json.serialize(message);

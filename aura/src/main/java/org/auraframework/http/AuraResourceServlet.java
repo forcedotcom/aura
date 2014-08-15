@@ -200,19 +200,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return;
             }
 
-            //
-            // TODO: why do we want this restriction? Does it actually help us in
-            // any way?
-            //
-            String originalPath = (String) request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
-            if (originalPath != null) {
-                String currentManifestUrl = ManifestUtil.getManifestUrl();
-                if (!originalPath.equals(currentManifestUrl)) {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-            }
-
             boolean appOk = false;
 
             DefDescriptor<? extends BaseComponentDef> descr = null;
@@ -257,9 +244,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // need to make sure that they are in at least one place.
             //
             Map<String, Object> attribs = Maps.newHashMap();
+            String appUid = getContextAppUid();
             attribs.put(LAST_MOD,
-                    String.format("app=%s, FW=%s", getContextAppUid(), Aura.getConfigAdapter().getAuraFrameworkNonce()));
-            attribs.put(UID, getContextAppUid());
+                    String.format("app=%s, FW=%s", appUid, Aura.getConfigAdapter().getAuraFrameworkNonce()));
+            attribs.put(UID, appUid);
             StringWriter sw = new StringWriter();
 
             for (String s : getStyles()) {

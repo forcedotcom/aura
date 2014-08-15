@@ -300,23 +300,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET app cache manifest with unknown format URL.
-     */
-    public void testGetManifestWithUnknownFormat() throws Exception {
-        setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
-
-        HttpGet get = obtainGetMethod(manifest.url + "?param=unknown");
-        HttpResponse httpResponse = perform(get);
-
-        assertEquals(HttpStatus.SC_NOT_FOUND, getStatusCode(httpResponse));
-        assertManifestHeaders(httpResponse);
-        assertEquals("", getResponseBody(httpResponse));
-
-        get.releaseConnection();
-    }
-
-    /**
      * GET app cache manifest for app with additional URLs specified using a controller action returns a full manifest
      * containing the additional URLs returned by controller.
      */

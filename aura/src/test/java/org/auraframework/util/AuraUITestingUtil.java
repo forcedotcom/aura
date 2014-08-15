@@ -465,7 +465,7 @@ public class AuraUITestingUtil {
      */
     public List<WebElement> findDomElements(final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<List<WebElement>>() {
+        return wait.withMessage("fail to find element in dom:"+locator.toString()).ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<List<WebElement>>() {
 
             @Override
             public List<WebElement> apply(WebDriver d) {
@@ -610,12 +610,14 @@ public class AuraUITestingUtil {
      * Wait for the document to enter the complete readyState.
      */
     public void waitForDocumentReady() {
-        waitUntil(new ExpectedCondition<Boolean>() {
+        waitUntil(
+        new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return getBooleanEval("return document.readyState === 'complete'");
             }
-        });
+        },
+        "Document is not Ready! state:"+getEval("return document.readyState;"));
     }
 
     /**
@@ -645,7 +647,7 @@ public class AuraUITestingUtil {
                         + "return $A.util.isUndefinedOrNull(cache) || "
                         + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
             }
-        });
+        },"AppCache is not Ready! state:"+getEval("return window.applicationCache;"));
     }
 
     /**

@@ -34,21 +34,9 @@
     assertNoChangeEvent: function(component){
         $A.test.assertEquals(undefined, component._log);
     },
-
-    /**
-     * Checking to see what version of the browser we are looking at and returning whether we are looking at IE7/8.
-     * This is used mainly for $A.util.keys(...). The logic in it is different for IE7/8 vs all other browsers. A
-     * fix for $A.util.keys was the best approach but was too risky, since people on SFDC were already using it incorrectly.
-     * This approach will fix the test failures without causing additional test failures for everyone else that is using 
-     * $A.util.keys(...)
-     */
-    isIE7_8 : function(){
-    	var browser = $A.get("$Browser");
-	    return browser.isIE7 || browser.isIE8;
-    },
     
     calculateSize: function(map) {  	
-        return $A.util.keys(map, !this.isIE7_8()).length;
+        return $A.util.keys(map, true).length;
     },
     
     /**
@@ -176,7 +164,7 @@
             component.set("v.map", sval);
             var map = component.get("v.map")
             $A.test.assertTrue($A.util.isObject(map)); //##$$ Remove this line
-    		$A.test.assertEquals(0, $A.util.keys(map,  !this.isIE7_8()).length); //##$$ Remove this line
+    		$A.test.assertEquals(0, $A.util.keys(map,  true).length); //##$$ Remove this line
             //$A.test.assertNull(component.get("v.map")); ##$$ uncomment this line
         }
     },
@@ -191,7 +179,7 @@
             component.set("v.map", sval);
             var map = component.get("v.map")
             $A.test.assertTrue($A.util.isObject(map)); //##$$ Remove this line
-    		$A.test.assertEquals(0, $A.util.keys(map, !this.isIE7_8()).length); //##$$ Remove this line
+    		$A.test.assertEquals(0, $A.util.keys(map, true).length); //##$$ Remove this line
             //$A.test.assertUndefined(component.get("v.map")) ##$$ uncomment this line
         }
     },

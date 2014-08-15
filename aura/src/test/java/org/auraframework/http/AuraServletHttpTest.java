@@ -15,6 +15,7 @@
  */
 package org.auraframework.http;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -86,8 +87,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     	ServerAction a = new ServerAction(qNameList,actionParamsArrayList);
     	a.run();
+    	assertTrue("The response does not have the expected number of actions", a.getReturnValueList().size() == 2);
+    	assertTrue(a.getReturnValueList().get(0).equals("some string") && a.getReturnValueList().get(1).equals(new BigDecimal(6)));
     	
-    	assertTrue(a.getReturnValueList().get(0) == "some string" && (Integer) a.getReturnValueList().get(1) == 6);
     }
 
     /**

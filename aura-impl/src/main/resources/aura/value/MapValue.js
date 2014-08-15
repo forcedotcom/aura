@@ -26,45 +26,48 @@ var mapValueNextId = 0;
  * @protected
  */
 function MapValue(config, def, component) {
-	this.value = {};
-	this.keys = {};
-	this.owner = component;
+    this.value = {};
+    this.keys = {};
+    this.owner = component;
 
-	/** One of "true" if set to any {...} object, or "null" or "undefined" if not */
-	this.hasRealValue = true;
+    /** One of "true" if set to any {...} object, or "null" or "undefined" if not */
+    this.hasRealValue = true;
 
-	var k;
-	// attributes can come through here but have no way of knowing the member keys
-	// models have getMembers
-	if (def && def.getMembers) {
-		var allMembers = def.getMembers();
-		for (var i = 0; i < allMembers.length; i++) {
-			k = allMembers[i].getName();
-			this.add(k, config);
-		}
-	} else {
-		this.hasRealValue = (config !== null && config !== undefined);
-		if (config) {
-			for (k in config) {
-				this.add(k, config);
-			}
-		}
-	}
+    var k;
+    // attributes can come through here but have no way of knowing the member keys
+    // models have getMembers
+    if (def && def.getMembers) {
+        var allMembers = def.getMembers();
+        for (var i = 0; i < allMembers.length; i++) {
+            k = allMembers[i].getName();
+            this.add(k, config);
+        }
+    } else {
+        this.hasRealValue = (config !== null && config !== undefined);
+        if (config) {
+            for (k in config) {
+        		this.add(k, config);
+            }
+        }
+    }
 
-	this.dirty = false;
-	// #if {"modes" : ["DEVELOPMENT", "STATS"]}
-	this._mapValueId = mapValueNextId++;
+    this.dirty = false;
+    // #if {"modes" : ["DEVELOPMENT", "STATS"]}
+    this._mapValueId = mapValueNextId++;
 
-	if (def) {
-		this.name = def.getDescriptor().getQualifiedName();
-	}
-	// #end
-	// #if {"modes" : ["STATS"]}
-	valueFactory.index(this);
-	// #end
+    if (def) {
+        this.name = def.getDescriptor().getQualifiedName();
+    }
+    // #end
+    // #if {"modes" : ["STATS"]}
+    valueFactory.index(this);
+    // #end
 }
 
 MapValue.prototype.auraType = "Value";
+MapValue.prototype._getValueType = function () {
+    return "MapValue";
+};
 
 /**
  * @class A simple object for a map that responds correctly to hasOwnProperty() to hide back ref to MapValue that created it.
@@ -72,24 +75,44 @@ MapValue.prototype.auraType = "Value";
  * @constructor
  * @private
  */
-var RawMapValue = function(source) {
-	var that = this;
-	source.each(function(k, v) {
-		that[k] = v.unwrap();
-	});
+function RawMapValue(source) {
+    var that = this;
+    source.each(function(k, v) {
+        that[k] = v.unwrap();
+    });
 
-	// We are specifically using the closure based approach to private variables to avoid issues with code that 
-	// for/in's on the "raw" object (space for safety tradeoff)
-	this.getSourceValue = (function(_source) { 
-		return function() {
-			return _source;
-		};
-	})(source);
-};
+    // We are specifically using the closure based approach to private variables to avoid issues with code that 
+    // for/in's on the "raw" object (space for safety tradeoff)
+    this.getSourceValue = (function(_source) { 
+        return function() {
+            return _source;
+        };
+    })(source);
+}
 
 // Hide from for/in iterations that correctly use thing.hasOwnProperty() to guard against traversal of inherited/private props
 RawMapValue.prototype.hasOwnProperty = function(name) {
-	return Object.prototype.hasOwnProperty.call(this, name) && (this[name] !== this.getSourceValue);
+    return Object.prototype.hasOwnProperty.call(this, name) && !$A.util.isFunction(this[name]);
+};
+
+// toJSON is expected to return an object that can be converted by JSON.stringify, this means
+// we can't actually convert the string here, but must have a copy of the map to convert.
+// We do the lazy creation here to avoid having the memory hit of storing it every time we create
+// a RawMapValue. Since this is only used for serialization it should be fine.
+RawMapValue.prototype.toJSON = function() {
+    var copy = {};
+    
+    for (var k in this) {
+        if (this.hasOwnProperty(k)) {
+            copy[k] = this[k];
+        }
+    }
+    
+    return copy;
+};
+
+RawMapValue.prototype._getValueType = function () {
+    return "RawMapValue";
 };
 
 /**
@@ -98,9 +121,9 @@ RawMapValue.prototype.hasOwnProperty = function(name) {
  * @private
  */
 MapValue.prototype.fire = function(name) {
-	for ( var k in this.value) {
-		this.value[k].fire(name);
-	}
+    for ( var k in this.value) {
+        this.value[k].fire(name);
+    }
 };
 
 /**
@@ -111,8 +134,8 @@ MapValue.prototype.fire = function(name) {
  * @deprecated use Component.get(key) instead
  */
 MapValue.prototype.getValue = function(key) {
-	// $A.warning("DEPRECATED USE OF mapValue.getValue(key). USE component.get(key) INSTEAD.",{key:key});
-	return this._getValue(key);
+    // $A.warning("DEPRECATED USE OF mapValue.getValue(key). USE component.get(key) INSTEAD.",{key:key});
+    return this._getValue(key);
 };
 
 /**
@@ -126,18 +149,18 @@ MapValue.prototype.getValue = function(key) {
  * @private
  */
 MapValue.prototype.getValue = function(k, returnUndefined) {
-	if ($A.util.isUndefined(this.value)) {
-		return valueFactory.create(undefined, null, this.owner);
-	}
+    if ($A.util.isUndefined(this.value)) {
+        return valueFactory.create(undefined, null, this.owner);
+    }
 
-	aura.assert(k, "Key is required for getValue on MapValue");
+    aura.assert(k, "Key is required for getValue on MapValue");
 
-	var ret = this.value[k.toLowerCase()];
-	if ($A.util.isUndefined(ret) && !returnUndefined) {
-		ret = valueFactory.create(undefined, null, this.owner);
-	}
+    var ret = this.value[k.toLowerCase()];
+    if ($A.util.isUndefined(ret) && !returnUndefined) {
+        ret = valueFactory.create(undefined, null, this.owner);
+    }
 
-	return ret;
+    return ret;
 };
 
 /**
@@ -148,8 +171,8 @@ MapValue.prototype.getValue = function(k, returnUndefined) {
  * @deprecated use Component.set(key,newMap) instead
  */
 MapValue.prototype.setValue = function(newMap) {
-	// $A.warning("DEPRECATED USE OF mapValue.setValue(newMap). USE component.set(key,newMap) INSTEAD.", {key: key,value:newMap});
-	this._setValue(newMap);
+    // $A.warning("DEPRECATED USE OF mapValue.setValue(newMap). USE component.set(key,newMap) INSTEAD.", {key: key,value:newMap});
+    this._setValue(newMap);
 };
 
 /**
@@ -167,60 +190,121 @@ MapValue.prototype.setValue = function(newMap) {
  * TEMPORARILY INTERNALIZED TO GATE ACCESS
  * @private
  */
-MapValue.prototype._setValue = function(newMap, skipChange) {
-	this.oldvalue = this.value; // Held to test for dirty replaced subobjects & copy handlers
-	this.value = {};
-	this.keys = {};
-	this.makeDirty();
-	
-	if ($A.util.isUndefinedOrNull(newMap) || (newMap.isDefined && !newMap.isDefined())) {
-		this.hasRealValue = false;
-		return;
-	}
-	
-	this.hasRealValue = true;
-	if (!$A.util.isObject(newMap)) {
-		$A.assert(false, "newMap must be an object");
-	}
-	
-	var copyMap = newMap;
-	var copyKeys = null;
-	
-	if (newMap.auraType === "Value") {
-		var type = (newMap.toString ? newMap.toString() : '');
-		if (type === 'MapValue') {
-			copyMap = newMap.value;
-			copyKeys = newMap.keys;
-		} else if (type === 'SimpleValue') {
-			if (newMap.unwrap() === null) {
-				return;
-			}
-		
-			// bad.
-			$A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
-			return;
-		} else if (type === 'ArrayValue') {
-			// bad.
-			$A.assert(false, "Defined ArrayValue cannot be passed to MapValue.setValue");
-			return;
-		}
-	}
-	
-	for (var originalKey in copyMap) {
-		var lowerKey;
-		if (copyKeys && copyKeys[originalKey]) {
-			lowerKey = originalKey;
-			originalKey = copyKeys[originalKey];
-		} else {
-			lowerKey = originalKey.toLowerCase();
-		}
-		
-		if (copyMap.hasOwnProperty(originalKey)) {
-			this.add(originalKey, copyMap, lowerKey in this.oldvalue, skipChange);
-		}
-	}
 
-	this.oldvalue = undefined; // We no longer hold this for commit/rollback
+// This hasChanged algorithm optimized for breath first:
+// Examining the direct children and if everything matches
+// delegates recursively
+MapValue.prototype._hasChanged = function (rawMapValue) {
+    var oldValueType = this._getValueType(),
+        newValueType = $A.util.getNormalizedValueType(rawMapValue),
+        oldValues    = this.value,
+        oldKeys      = this.keys,
+        oldValue, newValue,
+        oldCast, newCast,
+        key, tmpKey;
+
+
+    if (oldValueType !== newValueType) {
+        return true;
+    }
+
+    // Check if any property has been added in the rawMap
+    for (key in rawMapValue) {
+        if (rawMapValue.hasOwnProperty(key)) {
+            if (!oldValues.hasOwnProperty(key.toLowerCase())) {
+                return true;
+            }
+        }
+    }
+
+    // Check any property has been deleted in the rawMap
+    for (key in oldValues) {
+        if (oldValues.hasOwnProperty(key)) {
+            tmpKey = oldKeys[key] || key;
+            if (!rawMapValue.hasOwnProperty(tmpKey)) {
+                return true;
+            }
+            
+        }
+    }
+
+    // Check for the type-matching of the direct children
+    // And if is a single value check for that as well
+    for (key in oldValues) {
+        tmpKey   = oldKeys[key] || key;
+        oldValue = oldValues[key];
+        newValue = rawMapValue[tmpKey];
+        oldCast  = $A.util.getNormalizedValueType(oldValue);
+        newCast  = $A.util.getNormalizedValueType(newValue);
+
+        // if cast does not match, or a simple value is different
+        if (oldCast !== newCast || oldValue._hasChanged(newValue)) {
+            return true;
+        }
+    }
+
+    return false;
+
+};
+
+MapValue.prototype._setValue = function(newMap, skipChange) {
+    this.oldvalue = this.value; // Held to test for dirty replaced subobjects & copy handlers
+    this.value = {};
+    this.keys = {};
+    this.makeDirty();
+    
+    if ($A.util.isUndefinedOrNull(newMap) || (newMap.isDefined && !newMap.isDefined())) {
+        this.hasRealValue = false;
+        return;
+    }
+    
+    this.hasRealValue = true;
+    if (!$A.util.isObject(newMap)) {
+        $A.assert(false, "newMap must be an object");
+    }
+    
+    var copyMap = newMap;
+    var copyKeys = null;
+    
+    if (newMap.auraType === "Value") {
+        var type = (newMap.toString ? newMap.toString() : '');
+        if (type === 'MapValue') {
+            copyMap = newMap.value;
+            copyKeys = newMap.keys;
+        } else if (type === 'SimpleValue') {
+            if (newMap.unwrap() === null) {
+                return;
+            }
+        
+            // bad.
+            $A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
+            return;
+        } else if (type === 'ArrayValue') {
+            // bad.
+            $A.assert(false, "Defined ArrayValue cannot be passed to MapValue.setValue");
+            return;
+        }
+    }
+    
+    if (!this._hasChanged(newMap)) {
+        return;
+    }
+
+    for (var originalKey in copyMap) {
+        var lowerKey;
+        if (copyKeys && copyKeys[originalKey]) {
+            lowerKey = originalKey;
+            originalKey = copyKeys[originalKey];
+        } else {
+            lowerKey = originalKey.toLowerCase();
+        }
+        
+        if (copyMap.hasOwnProperty(originalKey)) {
+            this.add(originalKey, copyMap, lowerKey in this.oldvalue, skipChange);
+        }
+    }
+
+    this.oldvalue = undefined; // We no longer hold this for commit/rollback
 };
 
 /**
@@ -230,20 +314,20 @@ MapValue.prototype._setValue = function(newMap, skipChange) {
  *            key The key for the value to return.
  */
 MapValue.prototype.get = function(key) {
-	// FIXME: W-1563175
-	return $A.expressionService.get(this, key);
-	//
-	// The code below does not work either, but it doesn't throw an error, it gives the wrong value..
-	// Not clear which is worse.
-	//
-	// var value = $A.expressionService.getValue(this, key);
-	// if ($A.util.isUndefinedOrNull(value)) {
-	// return value;
-	// }
-	// if (value.toString && value.toString() === 'PropertyReferenceValue') {
-	// return $A.expressionService.get(this.owner, key);
-	// }
-	// return value.unwrap();
+    // FIXME: W-1563175
+    return $A.expressionService.get(this, key);
+    //
+    // The code below does not work either, but it doesn't throw an error, it gives the wrong value..
+    // Not clear which is worse.
+    //
+    // var value = $A.expressionService.getValue(this, key);
+    // if ($A.util.isUndefinedOrNull(value)) {
+    // return value;
+    // }
+    // if (value.toString && value.toString() === 'PropertyReferenceValue') {
+    // return $A.expressionService.get(this.owner, key);
+    // }
+    // return value.unwrap();
 };
 
 /**
@@ -253,12 +337,12 @@ MapValue.prototype.get = function(key) {
  *            key The key for the value to return.
  */
 MapValue.prototype.set = function(key, value) {
-	var v = this._getValue(key);
-	if ($A.util.isUndefinedOrNull(v)) {
-		$A.error("Invalid key " + key);
-		return;
-	}
-	v._setValue(value);
+    var v = this._getValue(key);
+    if ($A.util.isUndefinedOrNull(v)) {
+        $A.error("Invalid key " + key);
+        return;
+    }
+    v._setValue(value);
 };
 
 /**
@@ -270,37 +354,37 @@ MapValue.prototype.set = function(key, value) {
  *            overwrite If set to true, entries from yourMap overwrite entries in the current map.
  */
 MapValue.prototype.merge = function(yourMap, overwrite) {
-	var my = this.value;
-	var keys = yourMap.value;
-	for ( var key in keys) {
-		var yourvalue = yourMap.getValue(key);
-		var myvalue = this.getValue(key);
-		if (myvalue && (myvalue.isDefined ? myvalue.isDefined() : true) && myvalue.merge) {
-			myvalue.merge(yourvalue, overwrite);
-		} else {
-			my[key] = yourvalue;
-		}
-	}
-	this.hasRealValue = true;
+    var my = this.value;
+    var keys = yourMap.value;
+    for ( var key in keys) {
+        var yourvalue = yourMap.getValue(key);
+        var myvalue = this.getValue(key);
+        if (myvalue && (myvalue.isDefined ? myvalue.isDefined() : true) && myvalue.merge) {
+            myvalue.merge(yourvalue, overwrite);
+        } else {
+            my[key] = yourvalue;
+        }
+    }
+    this.hasRealValue = true;
 };
 
 /**
  * Returns false as this is not an expression.
  */
 MapValue.prototype.isExpression = function() {
-	return false;
+    return false;
 };
 
 /**
  * Returns false as this is not a literal.
  */
 MapValue.prototype.isLiteral = function() {
-	return false;
+    return false;
 };
 
 /** Returns true if this was set to null or undefined */
 MapValue.prototype.isUnset = function() {
-	return !this.hasRealValue;
+    return !this.hasRealValue;
 };
 
 /**
@@ -323,14 +407,14 @@ MapValue.prototype.makeDirty = function(subDirty) {
  * owns the data, and calls commit() to remove the dirty flag.
  */
 MapValue.prototype.isDirty = function() {
-	return this.dirty;
+    return this.dirty;
 };
 
 /**
  * @private
  */
 MapValue.prototype.commit = function(clean) {
-	this.dirty = false;
+    this.dirty = false;
 };
 
 /**
@@ -340,8 +424,8 @@ MapValue.prototype.commit = function(clean) {
  *            clean Do not use this internal-only parameter.
  */
 MapValue.prototype.rollback = function(clean) {
-	$A.renderingService.removeDirtyValue(this);
-	this.dirty = false;
+    $A.renderingService.removeDirtyValue(this);
+    this.dirty = false;
 };
 
 /**
@@ -350,7 +434,7 @@ MapValue.prototype.rollback = function(clean) {
  * 
  * <pre>
  * mapValue.each(function(key, val) {
- * 	alert(&quot;Value &quot; + val + &quot; stored at key &quot; + key);
+ *  alert(&quot;Value &quot; + val + &quot; stored at key &quot; + key);
  * });
  * </pre>
  * 
@@ -362,15 +446,15 @@ MapValue.prototype.rollback = function(clean) {
  *            config.scope A context value for 'this' when func is invoked.
  */
 MapValue.prototype.each = function(func, config) {
-	// Defaults to global scope
-	var scope = config && config.scope ? config.scope : window;
+    // Defaults to global scope
+    var scope = config && config.scope ? config.scope : window;
 
-	var values = this.value;
-	var keys = this.keys;
-	for ( var k in values) {
-		var v = values[k];
-		func.call(scope, keys[k] || k, v, config);
-	}
+    var values = this.value;
+    var keys = this.keys;
+    for ( var k in values) {
+        var v = values[k];
+        func.call(scope, keys[k] || k, v, config);
+    }
 };
 
 /**
@@ -381,36 +465,36 @@ MapValue.prototype.each = function(func, config) {
  *            k The key for the value to return.
  */
 MapValue.prototype.getRawValue = function(k) {
-	var ret = this.getValue(k);
-	if (!ret) {
-		return ret;
-	}
+    var ret = this.getValue(k);
+    if (!ret) {
+        return ret;
+    }
 
-	return ret.unwrap();
+    return ret.unwrap();
 };
 
 /**
  * Recursively destroys all entries in the map and deletes the map. Also, removes any onchange handlers listening to this value object.
  */
 MapValue.prototype.destroy = function(async) {
-	// #if {"modes" : ["STATS"]}
-	valueFactory.deIndex(this);
-	// #end
-	var values = this.value;
-	for ( var k in values) {
-		var v = values[k];
-		if (v !== undefined  && v.destroy) {
-			v.destroy(async);
-		}
-	}
+    // #if {"modes" : ["STATS"]}
+    valueFactory.deIndex(this);
+    // #end
+    var values = this.value;
+    for ( var k in values) {
+        var v = values[k];
+        if (v !== undefined  && v.destroy) {
+            v.destroy(async);
+        }
+    }
 
-	delete this.handlers;
-	delete this.value;
-	delete this.keys;
+    delete this.handlers;
+    delete this.value;
+    delete this.keys;
 };
 
 MapValue.prototype.toString = function() {
-	return "MapValue";
+    return "MapValue";
 };
 
 /**
@@ -418,7 +502,7 @@ MapValue.prototype.toString = function() {
  * method if you have no other alternatives.
  */
 MapValue.prototype.unwrap = function() {
-	return new RawMapValue(this);
+    return new RawMapValue(this);
 };
 
 /**
@@ -430,42 +514,51 @@ MapValue.prototype.unwrap = function() {
  * @private
  */
 MapValue.prototype.add = function(k, config, subDirty, skipChange) {
-	var key = k.toLowerCase();
-	var v = config[k];
+    var v = config[k];
+	if (v && !config.hasOwnProperty(k)) {
+		// Filter out any unwanted inherited stuff including functions (e.g. from RawMapValue) - config should be just a plain old DTO
+		return;
+	}
+
+    var key = k.toLowerCase();
+    var expected = this.value[key];
+    if (!expected && this.oldvalue) {
+        expected = this.oldvalue[key];
+    }	
+    
+    var value = valueFactory.create(v, null, this.owner, expected);
+    this.value[key] = value;
+
+    if (key !== k) {
+        this.keys[key] = k;
+    }
 	
-	var value = valueFactory.create(v, null, this.owner);
-	this.value[key] = value;
+    if (this.oldvalue && this.oldvalue[key]) {
+        this.copyHandlers(this.oldvalue[key], value);
+    }
 
-	if (key !== k) {
-		this.keys[key] = k;
-	}
+    this.makeDirty(subDirty);
+
+    if (value.makeDirty && subDirty) {
+        value.makeDirty(subDirty);
+    }
+
+    var handlers = this.handlers;
+    if (handlers) {
+        for ( var globalId in handlers) {
+            var cmpHandlers = handlers[globalId];
+            for (var i = 0; i < cmpHandlers.length; i++) {
+                BaseValue.addValueHandler(k, value, cmpHandlers[i]);
+            }
+        }
+    }
 	
-	if (this.oldvalue && this.oldvalue[key]) {
-		this.copyHandlers(this.oldvalue[key], value);
-	}
-
-	this.makeDirty(subDirty);
-
-	if (value.makeDirty && subDirty) {
-		value.makeDirty(subDirty);
-	}
-
-	var handlers = this.handlers;
-	if (handlers) {
-		for ( var globalId in handlers) {
-			var cmpHandlers = handlers[globalId];
-			for (var i = 0; i < cmpHandlers.length; i++) {
-				BaseValue.addValueHandler(k, value, cmpHandlers[i]);
-			}
-		}
-	}
-	
-	if (!skipChange && (value.handlers || value.eventDispatcher)) {
-		// Value might be simple, using eventDispatcher; it might be a map,
-		// using handlers. Either way, if we have handlers from before or from
-		// this map, fire the change.
-		value.fire("change");
-	}
+    if (!skipChange && (value.handlers || value.eventDispatcher)) {
+        // Value might be simple, using eventDispatcher; it might be a map,
+        // using handlers. Either way, if we have handlers from before or from
+        // this map, fire the change.
+        value.fire("change");
+    }
 };
 
 /**
@@ -478,17 +571,17 @@ MapValue.prototype.add = function(k, config, subDirty, skipChange) {
  *            v The value.
  */
 MapValue.prototype.put = function(k, v) {
-	var key = k.toLowerCase();
-	var value = this.value[key];
+    var key = k.toLowerCase();
+    var value = this.value[key];
 
-	if (value) {
-		value.setValue(v);
-	} else {
-		var config = {};
-		config[k] = v;
-		this.add(k, config);
-	}
-	this.makeDirty();
+    if (value) {
+        value.setValue(v);
+    } else {
+        var config = {};
+        config[k] = v;
+        this.add(k, config);
+    }
+    this.makeDirty();
 };
 
 /**
@@ -497,27 +590,27 @@ MapValue.prototype.put = function(k, v) {
  * @public
  */
 MapValue.prototype.addHandler = function(config) {
-	var values = this.value;
-	var keys = this.keys;
-	for ( var k in values) {
-		var v = values[k];
-		var key = keys[k] !== undefined ? keys[k] : k;
-		BaseValue.addValueHandler(key, v, config);
-	}
+    var values = this.value;
+    var keys = this.keys;
+    for ( var k in values) {
+        var v = values[k];
+        var key = keys[k] !== undefined ? keys[k] : k;
+        BaseValue.addValueHandler(key, v, config);
+    }
 
-	var handlers = this.handlers;
-	if (!this.handlers) {
-		handlers = {};
-		this.handlers = handlers;
-	}
+    var handlers = this.handlers;
+    if (!this.handlers) {
+        handlers = {};
+        this.handlers = handlers;
+    }
 
-	var cmpHandlers = handlers[config["globalId"]];
-	if (!cmpHandlers) {
-		cmpHandlers = [];
-		handlers[config["globalId"]] = cmpHandlers;
-	}
+    var cmpHandlers = handlers[config["globalId"]];
+    if (!cmpHandlers) {
+        cmpHandlers = [];
+        handlers[config["globalId"]] = cmpHandlers;
+    }
 
-	cmpHandlers.push(config);
+    cmpHandlers.push(config);
 };
 
 /**
@@ -526,18 +619,18 @@ MapValue.prototype.addHandler = function(config) {
  * @protected
  */
 MapValue.prototype.destroyHandlers = function(globalId) {
-	var handlers = this.handlers;
-	if (handlers) {
-		delete handlers[globalId];
-	}
+    var handlers = this.handlers;
+    if (handlers) {
+        delete handlers[globalId];
+    }
 
-	var values = this.value;
-	for ( var k in values) {
-		var v = values[k];
-		if (v.destroyHandlers) {
-			v.destroyHandlers(globalId);
-		}
-	}
+    var values = this.value;
+    for ( var k in values) {
+        var v = values[k];
+        if (v.destroyHandlers) {
+            v.destroyHandlers(globalId);
+        }
+    }
 };
 
 /**
@@ -546,7 +639,7 @@ MapValue.prototype.destroyHandlers = function(globalId) {
  * @private
  */
 MapValue.prototype.contains = function(key) {
-	return !$A.util.isUndefined(this.value[key.toLowerCase()]);
+    return !$A.util.isUndefined(this.value[key.toLowerCase()]);
 };
 
 /**
@@ -555,59 +648,59 @@ MapValue.prototype.contains = function(key) {
  * @private
  */
 MapValue.prototype.copyHandlers = function(oldvalue, newvalue) {
-	if (!oldvalue) {
-		return;
-	}
-	
-	var k;
-	var oldHandlers;
+    if (!oldvalue) {
+        return;
+    }
+    
+    var k;
+    var oldHandlers;
 
-	oldHandlers = oldvalue.eventDispatcher ? oldvalue.eventDispatcher["markup://aura:valueChange"] : oldvalue.handlers;
+    oldHandlers = oldvalue.eventDispatcher ? oldvalue.eventDispatcher["markup://aura:valueChange"] : oldvalue.handlers;
 
-	if (oldHandlers) {
-		// Semi-deep copy the handlers: the actual handler objects can
-		// be shared, but they're in a map of map of arrays, which needs to copy.
-		// We can (and should) skip any handlers from "this" map's handlers,
-		// because they'll be restored later, separately.
-		var newHandlers;
-		if (newvalue instanceof MapValue) {
-			newvalue.handlers = {};
-			newHandlers = newvalue.handlers;
-		} else {
-			newHandlers = newvalue.getEventDispatcher();
-			if (!newHandlers["markup://aura:valueChange"]) {
-				newHandlers["markup://aura:valueChange"] = {};
-			}
-			newHandlers = newHandlers["markup://aura:valueChange"];
-		}
+    if (oldHandlers) {
+        // Semi-deep copy the handlers: the actual handler objects can
+        // be shared, but they're in a map of map of arrays, which needs to copy.
+        // We can (and should) skip any handlers from "this" map's handlers,
+        // because they'll be restored later, separately.
+        var newHandlers;
+        if (newvalue instanceof MapValue) {
+            newvalue.handlers = {};
+            newHandlers = newvalue.handlers;
+        } else {
+            newHandlers = newvalue.getEventDispatcher();
+            if (!newHandlers["markup://aura:valueChange"]) {
+                newHandlers["markup://aura:valueChange"] = {};
+            }
+            newHandlers = newHandlers["markup://aura:valueChange"];
+        }
 
-		for (k in oldHandlers) {
-			newHandlers[k] = oldHandlers[k].concat(); // Using concat as "create copy"
-			// TODO(fabbott): I wish we could trim out the map-level handlers; they
-			// create duplicate calls. But there's no identity relation to figure
-			// which are the dups, and in theory I've got the new event handling on
-			// deck anyway, which won't push them down. So don't chase it.
-		}
-	}
+        for (k in oldHandlers) {
+            newHandlers[k] = oldHandlers[k].concat(); // Using concat as "create copy"
+            // TODO(fabbott): I wish we could trim out the map-level handlers; they
+            // create duplicate calls. But there's no identity relation to figure
+            // which are the dups, and in theory I've got the new event handling on
+            // deck anyway, which won't push them down. So don't chase it.
+        }
+    }
 
-	// Only SimpleValue supports obeservers today, but it's harmless to act as
-	// though MapValues might:
-	if (oldvalue.observers) {
-		for (k = 0; k < oldvalue.observers.length; k++) {
-			oldvalue.observers[k].observe(newvalue);
-		}
-	}
+    // Only SimpleValue supports obeservers today, but it's harmless to act as
+    // though MapValues might:
+    if (oldvalue.observers) {
+        for (k = 0; k < oldvalue.observers.length; k++) {
+            oldvalue.observers[k].observe(newvalue);
+        }
+    }
 
-	// But only MapValue needs to recurse down:
-	if (oldvalue instanceof MapValue && newvalue instanceof MapValue) {
-		for ( var k in newvalue) {
-			if (k in oldvalue) {
-				this.copyHandlers(oldvalue[k], newvalue[k]);
-			}
-		}
-	}
-	// TODO(fabbott, dchasman): Arrays should be supported too, but aren't yet.
-	// We don't much like expressions like {!v.foo.bar[3].baz} anyway....
+    // But only MapValue needs to recurse down:
+    if (oldvalue instanceof MapValue && newvalue instanceof MapValue) {
+        for ( var k in newvalue) {
+            if (k in oldvalue) {
+                this.copyHandlers(oldvalue[k], newvalue[k]);
+            }
+        }
+    }
+    // TODO(fabbott, dchasman): Arrays should be supported too, but aren't yet.
+    // We don't much like expressions like {!v.foo.bar[3].baz} anyway....
 };
 
 // #include aura.value.MapValue_export

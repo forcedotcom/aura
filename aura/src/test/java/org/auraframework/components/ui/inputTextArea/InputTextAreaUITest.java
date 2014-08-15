@@ -16,12 +16,15 @@
 package org.auraframework.components.ui.inputTextArea;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
  * UI tests for inputTextArea Component
  */
+//Exluding the test as sendKeys and click not working with ios
+@UnAdaptableTest
 public class InputTextAreaUITest extends WebDriverTestCase {
 
     public static final String TEST_CMP = "/uitest/inputTextArea_UpdateOnTest.cmp";

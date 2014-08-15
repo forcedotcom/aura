@@ -20,6 +20,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Automation for COQL (Component Query Language). COQL is available in all modes except PRODUCTION
@@ -57,15 +59,21 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      * only available in STATS mode.
      */
     public void testRerenderingsQuery() throws Exception {
-        String rowQuery = "return $A.getQueryStatement().from('rerenderings').query().rowCount;";
+        final String rowQuery = "return $A.getQueryStatement().from('rerenderings').query().rowCount;";
         open("/attributesTest/simpleValue.cmp", Mode.STATS);
 
         Long rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
         assertEquals("Rerenders query should be empty on load.", 0, rowCount.intValue());
 
         findDomElement(By.cssSelector(".uiButton")).click();
-        rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
-        assertEquals("Expecting one rerender query entry after attribute value change.", 1, rowCount.intValue());
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                Long rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
+                return rowCount.intValue() == 1;
+            }
+        }, "Expecting one rerender query entry after attribute value change.");
+
         String descr = (String) auraUITestingUtil
                 .getEval("return $A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2.a'].descr;");
         assertEquals("Unexpected component was rerendered.", "markup://attributesTest:simpleValue", descr);
@@ -74,7 +82,12 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
         assertEquals("Unexpected cause for rerender.", "intAttribute", whyName);
 
         findDomElement(By.cssSelector(".uiButton")).click();
-        rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
-        assertEquals("Expecting two rerender query entries after second value change.", 2, rowCount.intValue());
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                Long rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
+                return rowCount.intValue() == 2;
+            }
+        }, "Expecting two rerender query entry after attribute value change.");
     }
 }

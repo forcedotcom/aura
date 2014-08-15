@@ -40,10 +40,12 @@ var AuraExpressionService = function AuraExpressionService(){
          * <code>$A.expressionService.get(cmp, "v.attribute")</code> is equivalent to <code>cmp.getValue("v.attribute")</code>.
          * @param {Object} valueProvider The value provider
          * @param {String} expression The expression to be evaluated
+         * @param {Function} callback used to provide a way to e.g. populate dynamic labels
+         * @param {Boolean} docreate used to create missing items
          * @public
          * @memberOf AuraExpressionService
          */
-        getValue: function(valueProvider, expression, callback){
+        getValue: function(valueProvider, expression, callback, docreate){
             if (aura.util.isString(expression)) {
             	var cached = propertyRefCache[expression];
             	if (!cached) {
@@ -72,15 +74,26 @@ var AuraExpressionService = function AuraExpressionService(){
             var value = valueProvider;
             while (propRef) {
                 var root = propRef.getRoot();
-
+                var lastvalue = value;
                 value = value.getValue(root);
+                propRef = propRef.getStem();
 
-                if (!value) {
-                    // still nothing, time to die
-                    break;
+                if (!value || (value.isDefined && !value.isDefined())) {
+                    if (!value || !docreate ||
+                        !(lastvalue instanceof MapValue)) {
+                        // still nothing, time to die
+                        break;
+                    }
+                    // we're not done, and we want to create, so make a new map
+                    var config = {};
+                    if (propRef) {
+                        // if we have more properties, we want a map
+                        config[root] = {};
+                    }
+                    lastvalue.add(root, config);
+                    value = lastvalue.getValue(root);
                 }
 
-                propRef = propRef.getStem();
             }
 
             // handle PropertyChain. get its value.

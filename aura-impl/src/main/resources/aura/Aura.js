@@ -789,7 +789,6 @@ $A.ns.Aura.prototype.setRoot = function(root) {
 
 /**
  * Gets the current <code>AuraContext</code>. The context consists of the mode, descriptor, and namespaces to be loaded.
- * <p>See Also: <a href="#help?topic=modesReference">Modes Reference</a></p>
  *
  * @public
  * @function
@@ -979,7 +978,8 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
 };
 
 /**
- *  Log something.  Currently, this logs to the JavaScript console if it is available, and does not throw errors otherwise.
+ *  Logs to the browser's JavaScript console if it is available.
+ *  This method doesn't log in PROD or PRODDEBUG modes.
  *  If both value and error are passed in, value shows up in the console as a group with value logged within the group.
  *  If only value is passed in, value is logged without grouping.
  *  <p>For example, <code>$A.log(action.getError());</code> logs the error from an action.</p>
@@ -1002,7 +1002,8 @@ $A.ns.Aura.prototype.log = function(value, error) {
 };
 
 /**
- * Logs using <code>console.log()</code> if defined on the console implementation.
+ *  Logs to the browser's JavaScript console if it is available.
+ *  This method doesn't log in PROD or PRODDEBUG modes.
  */
 $A.ns.Aura.prototype.logf = function() {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

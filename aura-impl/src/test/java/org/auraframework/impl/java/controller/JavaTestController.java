@@ -318,16 +318,22 @@ public class JavaTestController {
     }
     
     @SuppressWarnings("rawtypes")
-	@AuraEnabled
+    @AuraEnabled
     public static List<Map> getList(@Key("start") int start, @Key("limit") int limit) throws Exception {
     	List<Map> myList = new ArrayList<Map>();
     	for (int i=start; i < limit; i++) {
-    		char alphabet = (char) (65 + (i%26));
-    		Map<String, String> row = new HashMap<String, String>();
-    		row.put("index", (i+1) + "");
-    		row.put("char", "server " + alphabet);
-    		myList.add(row);          
-        	}
+            char alphabet = (char) (65 + (i%26));
+            Map<String, String> row = new HashMap<String, String>();
+            row.put("index", (i+1) + "");
+            row.put("char", "server " + alphabet);
+            myList.add(row);          
+        }
     	return myList;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @AuraEnabled
+    public static Map echoMap(@Key("map") Map map) {
+        return map;
     }
 }

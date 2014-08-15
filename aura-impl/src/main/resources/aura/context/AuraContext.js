@@ -74,7 +74,7 @@ function AuraContext(config, initCallback) {
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
  * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.
- * <p>See Also: <a href="#help?topic=modesReference">AuraContext</a></p>
+ * 
  *
  * @return {string} the mode from the server.
  */
@@ -85,7 +85,6 @@ AuraContext.prototype.getMode = function() {
 /**
  * Provides access to global value providers.
  * For example, <code>$A.get("$Label.Related_Lists.task_mode_today");</code> gets the label value.
- * <p>See Also: <a href="#help?topic=dynamicLabel">Dynamically Constructing Labels</a></p>
  *
  * @private
  * @return {GlobalValueProviders}

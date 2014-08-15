@@ -1233,7 +1233,7 @@ if (!!(Object && Object.keys)) {
         
         var keys = [], key;
         for (key in object) {
-            if (Object.prototype.hasOwnProperty.call(object, key) && (excludeFunctions || typeof (object[key]) !== "function")) {
+            if (Object.prototype.hasOwnProperty.call(object, key) && (!excludeFunctions || typeof (object[key]) !== "function")) {
                 keys.push(key);
             }
         }
@@ -1706,6 +1706,29 @@ $A.ns.Util.prototype.isComponent = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Component');
 };
 
+/**
+ * TODO
+ */
+
+$A.ns.Util.prototype.getNormalizedValueType = function(value) {
+    var valueType;
+
+    if (this.isUndefinedOrNull(value)) {
+        return 'SimpleValue';
+    }
+
+    if (value._getValueType) {
+        valueType = value._getValueType();
+        return valueType === 'RawMapValue' ? 'MapValue' : valueType;
+    } else if ($A.util.isArray(value)) {
+        return 'ArrayValue';
+    } else if ($A.util.isObject(value)) {
+        return 'MapValue';
+    }
+
+    return 'SimpleValue';
+
+};
 /**
  * Checks if the object is an aura value object via auraType property.
  *

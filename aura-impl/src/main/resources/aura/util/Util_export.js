@@ -15,81 +15,78 @@
  */
 /*jslint sub: true */
 var p = $A.ns.Util.prototype;
-exp(p,
-    "isIE", p.isIE,
-    "isIOSWebView", p.isIOSWebView,
-    "isArray", p.isArray,
-    "isBoolean", p.isBoolean,
-    "isObject", p.isObject,
-    "isError", p.isError,
-    "isFunction", p.isFunction,
-    "isNumber", p.isNumber,
-    "isFiniteNumber", p.isFiniteNumber,
-    "isString", p.isString,
-    "isUndefined", p.isUndefined,
-    "isUndefinedOrNull", p.isUndefinedOrNull,
-    "isEmpty", p.isEmpty,
-    "getElement", p.getElement,
-    "getBooleanValue", p.getBooleanValue,
-    "hasClass", p.hasClass,
-    "addClass", p.addClass,
-    "removeClass", p.removeClass,
-    "toggleClass", p.toggleClass,
-    "swapClass", p.swapClass,
-    "insertFirst", p.insertFirst,
-    "insertBefore", p.insertBefore,
-    "insertAfter", p.insertAfter,
-    "removeElement", p.removeElement,
-    "attachToDocumentBody", p.attachToDocumentBody,
-    "stringEndsWith",p.stringEndsWith,
-    "urlDecode", p.urlDecode,
-    "trim", p.trim,
-    "truncate", p.truncate,
-    "on", p.on,
-    "removeOn", p.removeOn,
-    "formToMap", p.formToMap,
-    "getSelectValue", p.getSelectValue,
-    "addValueToMap", p.addValueToMap,
-    "addMapValueToMap", p.addMapValueToMap,
-    "isSubDef", p.isSubDef,
-    "getElementAttributeValue", p.getElementAttributeValue,
-    "getDataAttribute", p.getDataAttribute,
-    "setDataAttribute", p.setDataAttribute,
-    "hasDataAttribute", p.hasDataAttribute,
-    "createTimeoutCallback", p.createTimeoutCallback,
-    "arrayIndexOf", p.arrayIndexOf,
-    "contains", p.contains,
-    "squash", p.squash,
-    "stripTags", p.stripTags,
-    "getWindowSize", p.getWindowSize,
-    "isComponent", p.isComponent,
-    "isValue", p.isValue,
-    "instanceOf", p.instanceOf,
-    "supportsTouchEvents", p.supportsTouchEvents,
-    "estimateSize", p.estimateSize,
-    "createPromise", p.createPromise,
-    "when", p.when,
-    "lookup", p.lookup,
-    "map", p.map,
-    "reduce", p.reduce,
-    "forEach", p.forEach,
-    "merge", p.merge,
-    "every", p.every,
-    "some", p.some,
-    "filter", p.filter,
-    "keys", p.keys,
-    "bind", p.bind,
-    "includeScript", p.includeScript,
-    "equalBySource", p.equalBySource
-    
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-	    ,
-	    "getDebugToolComponent", p.getDebugToolComponent,
-	    "setDebugToolWindow", p.setDebugToolWindow,
-	    "getDebugToolsAuraInstance",  p.getDebugToolsAuraInstance,
-	    "getUrl", p.getUrl,
-	    "getText", p.getText,
-	    "errorBasedOnMode", p.errorBasedOnMode
-    //#end
-);
+p["isIE"] = p.isIE;
+p["isIOSWebView"] = p.isIOSWebView;
+p["isArray"] = p.isArray;
+p["isBoolean"] = p.isBoolean;
+p["isObject"] = p.isObject;
+p["isError"] = p.isError;
+p["isFunction"] = p.isFunction;
+p["isNumber"] = p.isNumber;
+p["isFiniteNumber"] = p.isFiniteNumber;
+p["isString"] = p.isString;
+p["isUndefined"] = p.isUndefined;
+p["isUndefinedOrNull"] = p.isUndefinedOrNull;
+p["isEmpty"] = p.isEmpty;
+p["getElement"] = p.getElement;
+p["getBooleanValue"] = p.getBooleanValue;
+p["hasClass"] = p.hasClass;
+p["addClass"] = p.addClass;
+p["removeClass"] = p.removeClass;
+p["toggleClass"] = p.toggleClass;
+p["swapClass"] = p.swapClass;
+p["insertFirst"] = p.insertFirst;
+p["insertBefore"] = p.insertBefore;
+p["insertAfter"] = p.insertAfter;
+p["removeElement"] = p.removeElement;
+p["attachToDocumentBody"] = p.attachToDocumentBody;
+p["stringEndsWith"] = p.stringEndsWith;
+p["urlDecode"] = p.urlDecode;
+p["trim"] = p.trim;
+p["truncate"] = p.truncate;
+p["on"] = p.on;
+p["removeOn"] = p.removeOn;
+p["formToMap"] = p.formToMap;
+p["getSelectValue"] = p.getSelectValue;
+p["addValueToMap"] = p.addValueToMap;
+p["addMapValueToMap"] = p.addMapValueToMap;
+p["isSubDef"] = p.isSubDef;
+p["getElementAttributeValue"] = p.getElementAttributeValue;
+p["getDataAttribute"] = p.getDataAttribute;
+p["setDataAttribute"] = p.setDataAttribute;
+p["hasDataAttribute"] = p.hasDataAttribute;
+p["createTimeoutCallback"] = p.createTimeoutCallback;
+p["arrayIndexOf"] = p.arrayIndexOf;
+p["contains"] = p.contains;
+p["squash"] = p.squash;
+p["stripTags"] = p.stripTags;
+p["getWindowSize"] = p.getWindowSize;
+p["isComponent"] = p.isComponent;
+p["isValue"] = p.isValue;
+p["instanceOf"] = p.instanceOf;
+p["supportsTouchEvents"] = p.supportsTouchEvents;
+p["estimateSize"] = p.estimateSize;
+p["createPromise"] = p.createPromise;
+p["when"] = p.when;
+p["lookup"] = p.lookup;
+p["map"] = p.map;
+p["reduce"] = p.reduce;
+p["forEach"] = p.forEach;
+p["merge"] = p.merge;
+p["every"] = p.every;
+p["some"] = p.some;
+p["filter"] = p.filter;
+p["keys"] = p.keys;
+p["bind"] = p.bind;
+p["includeScript"] = p.includeScript;
+p["equalBySource"] = p.equalBySource;
+
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+p["getDebugToolComponent"] = p.getDebugToolComponent;
+p["setDebugToolWindow"] = p.setDebugToolWindow;
+p["getDebugToolsAuraInstance"] = p.getDebugToolsAuraInstance;
+p["getUrl"] = p.getUrl;
+p["getText"] = p.getText;
+p["errorBasedOnMode"] = p.errorBasedOnMode;
+//#end
 

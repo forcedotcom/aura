@@ -21,6 +21,7 @@
     <aura:attribute name="readonly" type="Boolean" default="false" description="Specifies whether the text area should be rendered as read-only. Default value is &#8220;false&#8221;." />
     <aura:attribute name="placeholder" type="String" default="" description="The text that is displayed by default."/>
     <aura:attribute name="resizable" type="Boolean" default="true" description="Specifies whether or not the textarea should be resizable.  Defaults to true."/>
+    <aura:attribute name="maxlength" type="Integer" description="The maximum number of characters that can be typed into the input field. Corresponds to the maxlength attribute of the rendered HTML textarea element."/>
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
     
     <aura:renderif isTrue="{!v.body.length == 0}">
@@ -31,6 +32,7 @@
             rows="{!v.rows}"
             disabled="{!v.disabled}"
             readonly="{!v.readonly}"
+            maxlength="{!v.maxlength}"
             placeholder="{!v.placeholder}"
             aria-describedby="{!v.ariaDescribedby}"/>
         <aura:set attribute="else">

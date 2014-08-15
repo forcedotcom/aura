@@ -42,13 +42,13 @@
 
             $A.test.assertEquals(0, cmp.get("v.clickCount"), "Test setup failure: click count should be 0");
 
-            $A.test.clickOrTouch(a);
+            $A.test.clickOrTouch(a, true, true);
             $A.test.assertEquals(1, cmp.get("v.clickCount"), "Click count should increment after clicking anchor");
 
-            $A.test.clickOrTouch(div);
+            $A.test.clickOrTouch(div, true, true);
             $A.test.assertEquals(2, cmp.get("v.clickCount"), "Click count should increment after clicking div");
 
-            $A.test.clickOrTouch(span);
+            $A.test.clickOrTouch(span, true, true);
             $A.test.assertEquals(3, cmp.get("v.clickCount"), "Click count should increment after clicking span");
         }
     }

@@ -18,12 +18,71 @@
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
     
+    <!--Top panel is hidden, no errors-->
+    <aura:if isTrue="{!v.caseToRender == 'testTopPanelHidden'}"> 
+	    <section class="stage panelSlide forceAccess" aria-hidden="true">
+	        <span>test</span>
+	    </section>
+        <div class="forcePanelModal active" aria-hidden="false">
+            <div class="panelModal">test</div>
+        </div>
+    </aura:if>
+
+     <!--Test active top panel Aria hidden is set to true one error-->
+     <aura:if isTrue="{!v.caseToRender == 'testActiveTopPanelAriaHiddenIsTrue'}">
+         <section class="stage panelSlide forceAccess" aria-hidden="false">
+                <span>test</span>
+         </section>
+         <div class="forcePanelModal active">
+             <div class="panelModal">test</div>
+         </div>
+     </aura:if>
+
+     <!--test base panel aria hidden is false, one error-->
+      <aura:if isTrue="{!v.caseToRender == 'testBasePanelAriaHiddenIsFalse'}">
+          <section class="stage panelSlide forceAccess" aria-hidden="false">
+                <span>test</span>
+          </section>
+          <div class="forcePanelModal active">
+                <div class="panelModal">test</div>
+          </div>
+     </aura:if>
+     
+     <!--Test no active top panel no errors-->
+     <aura:if isTrue="{!v.caseToRender == 'testNoActiveTopPanelAriaHiddenOk'}">
+           <section class="stage panelSlide forceAccess">
+                <span>test</span>
+           </section>
+           <div class="forcePanelModal" aria-hidden="true">
+                <div class="panelModal">test</div>
+           </div>
+     </aura:if>
+     
+     <!--test no active top panel and base panel is set to true, 1 error-->
+     <aura:if isTrue="{!v.caseToRender == 'testNoActiveTopPanelBasePanelAriaHiddenIsTrue'}">
+            <section class="stage panelSlide forceAccess" aria-hidden="true">
+                <span>test</span>
+            </section>
+            <div class="forcePanelOverlay" aria-hidden="true">
+                <div class="panelModal">test</div>
+            </div>
+     </aura:if>
+     
+     <!--Test no active top panel with aria hidden, error 1-->
+     <aura:if isTrue="{!v.caseToRender == 'testNoActiveTopPanelAriaHiddenNotExists'}">
+             <section class="stage panelSlide forceAccess" aria-hidden="false">
+                <span>test</span>
+             </section>
+             <div class="forcePanelModal">
+                <div class="panelModal">test</div>
+             </div>
+     </aura:if>
+    
     <!--Should have 1 error -->   
     <aura:if isTrue="{!v.caseToRender == 'testInputDefaultError'}">
 		<uitest:inputDefaultError_Test aura:id="inputErrorTest" caseToRender="all"/>
 		<ui:inputDefaultError value="first error, second error, third error, fourth error"/>
     </aura:if>
-    
     
       <!--Should Pass Since there are no headers -->   
     <aura:if isTrue="{!v.caseToRender == 'testWithNoHeader'}">

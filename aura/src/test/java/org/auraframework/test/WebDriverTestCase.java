@@ -971,7 +971,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 }
                 return false;
             }
-        }, timeoutInSecs);
+        }, timeoutInSecs,"fail on loading url:"+url);
 
         if (waitForInit) {
             auraUITestingUtil.waitForAuraInit(getAuraErrorsExpectedDuringInit());
@@ -997,7 +997,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             public Boolean apply(WebDriver d) {
                 return auraUITestingUtil.getBooleanEval(javascript);
             }
-        }, timeoutInSecs);
+        }, timeoutInSecs,"fail on waiting for condition:"+javascript);
     }
 
     /**
@@ -1047,7 +1047,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             public Boolean apply(WebDriver d) {
                 return isPresent == text.equals(e.getText());
             }
-        }, timeout);
+        }, timeout,"fail on waiting for element text:"+text);
     }
 
     protected void waitForElementAbsent(String msg, final WebElement e) {
@@ -1161,7 +1161,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                             .contains(itemAttrShouldContain);
                 }
             }
-        }, timeoutInSecs);
+        }, timeoutInSecs,"fail on waiting for component to change status");
     }
 
     /**
@@ -1177,7 +1177,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 String pageContent = page.getAttribute("innerHTML");
                 return pageContent.contains(expectedText);
             }
-        }, timeoutInSecs);
+        }, timeoutInSecs, "fail on waiting for Carousel Page to Change");
     }
 
     public void waitForAutoCompleteListVisible(final WebElement list, final boolean isVisible) {
@@ -1187,7 +1187,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 boolean isInvisible = hasCssClass(list, "invisible");
                 return isVisible != isInvisible;
             }
-        }, timeoutInSecs);
+        }, timeoutInSecs,"fail on waiting AutoCompleteList to be visible");
     }
 
     /**

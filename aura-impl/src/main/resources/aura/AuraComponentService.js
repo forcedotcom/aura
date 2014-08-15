@@ -15,8 +15,6 @@
  */
 /*jslint sub: true */
 
-//#include aura.component.ComponentCreationContext
-
 /**
  * @namespace The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
  * @constructor
@@ -109,7 +107,6 @@ $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeVa
  *
  * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
  * creates a <code>ui:inputText</code> component.
- * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
  * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
  * @param {Object} attributeValueProvider The value provider for the attributes
  *
@@ -186,9 +183,38 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
     $A.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
 
-    // compiler error if not assigned to variable
-    /*jslint unused: true */
-    var ccc = new $A.ns.ComponentCreationContext(config, callbackScope, callback, attributeValueProvider, localCreation, forceServer, doForce);
+    //TODO - arrays are incorrectly created synchronously in all cases.
+    if ($A.util.isArray(config)){
+        return this.newComponentArray(config, attributeValueProvider, localCreation, doForce);
+    }
+
+    var configObj = this.getComponentConfigs(config, attributeValueProvider);
+
+    var def = configObj["definition"],
+        desc = configObj["descriptor"];
+    var forceClient = false;
+
+    config = configObj["configuration"];
+
+    //
+    // Short circuit our check for remote dependencies, since we've
+    // been handed a partial config. This feels distinctly like a hack
+    // and will hopefully disappear with ComponentCreationContexts.
+    //
+    if (config["creationPath"] && !forceServer) {
+        forceClient = true;
+    }
+
+    config["componentDef"] = {
+        "descriptor": desc
+    };
+
+    if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
+        this.requestComponent(callbackScope, callback, config, attributeValueProvider);
+    } else {
+        var newComp = this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+        callback.call(callbackScope, newComp);
+    }
 };
 
 /**

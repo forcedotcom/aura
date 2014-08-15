@@ -436,7 +436,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         getDriver().get(getAbsoluteURI(url).toString());
 
         WebElement elem = auraUITestingUtil
-                .waitUntil(new Function<WebDriver, WebElement>() {
+                .waitUntil(
+                new Function<WebDriver, WebElement>() {
                     @Override
                     public WebElement apply(WebDriver input) {
                         WebElement find = findDomElement(By
@@ -446,7 +447,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         }
                         return null;
                     }
-                });
+                },
+                "fail to load clickableme"
+                );
         List<Request> logs = endMonitoring();
 
         elem.click();

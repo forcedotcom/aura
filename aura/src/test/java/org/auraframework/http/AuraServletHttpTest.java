@@ -17,6 +17,7 @@ package org.auraframework.http;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -67,6 +68,26 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Integer posActions = rawRes.indexOf("actions");
         Integer posContex = rawRes.indexOf("context");
         assertTrue(posActions < posContex);
+    }
+    
+    public void testMulitpleActionsInOnePost() {
+    	ArrayList<String> qNameList = new ArrayList<String>();
+    	ArrayList<Map<String,Object>> actionParamsArrayList = new ArrayList<Map<String,Object>>();
+
+		Map<String, Object> actionParams = new HashMap<String, Object>();
+        actionParams.put("param", "some string");
+        qNameList.add("java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+        actionParamsArrayList.add(actionParams);
+        
+        Map<String, Object> actionParams1 = new HashMap<String, Object>();
+        actionParams1.put("param", 6);
+        qNameList.add("java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getInt");
+        actionParamsArrayList.add(actionParams1);
+
+    	ServerAction a = new ServerAction(qNameList,actionParamsArrayList);
+    	a.run();
+    	
+    	assertTrue(a.getReturnValueList().get(0) == "some string" && (Integer) a.getReturnValueList().get(1) == 6);
     }
 
     /**

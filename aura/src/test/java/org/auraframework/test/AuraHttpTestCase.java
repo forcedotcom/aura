@@ -403,6 +403,10 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private HttpPost post;
         private String rawResponse;
         private String contextValue;
+        private ArrayList<State> stateList = new ArrayList<State>();
+        private ArrayList<List<Object>> errorsList = new ArrayList<List<Object>>();
+        private ArrayList<Object> returnValueList = new ArrayList<Object>();
+        
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
         	this.qualifiedName = new ArrayList<String>();
@@ -416,18 +420,32 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             
             
         }
-        //Indexes in list correspond with each other.  IE index 1 of qualifiedName matches index2 of actionParams.  
-        //Can have null for individual actionParams but must at least pass an array list
+        /**
+         * Constructor for Server action using two array lists
+         * Note that each list must be of equal length or will throw an IllegalArgumentException
+         * @param qualifiedName
+         * @param actionParams
+         */
         
         public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
         	
         	this.qualifiedName = qualifiedName;
         	this.actionParams = actionParams;
+        	if(qualifiedName == null || actionParams == null) {
+        		throw new IllegalArgumentException("Cannot pass in a null list. You can pass in a list of null parameters if parameters are not yet known");
+        	}
         	//Now will verify that we have actions and params
         	if(this.qualifiedName.toArray().length != this.actionParams.toArray().length) {
         		throw new IllegalArgumentException("Number of action names does not match number of action parameters");
         	}
         }
+        /**
+         * Will insert the given key-value pair as a parameter in the first entry of the action parameters list.
+         * Corresponds with the first entry in the qualified names list.
+         * @param name Description of parameter
+         * @param value Object of action parameter
+         * @return Returns instance of Server Action
+         */
 
         public ServerAction putParam(String name, Object value) {
             if (actionParams.get(0) == null) {
@@ -436,9 +454,21 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             actionParams.get(0).put(name, value);
             return this;
         }
+        /**
+         * Will insert the given key-value pair as a parameter for the given qualified name.
+         * Throws IllegalArguementException if qualified name is not found.
+         * Cannot distinguish between multiple qualified names with the same name.
+         * @param qualifiedName The name of the qualified Name you are adding a parameter for.
+         * @param name Description of the parameter
+         * @param value Object of the action parameter
+         * @return Returns instance of Server Action
+         */
         
         public ServerAction putParamUsingQName(String qualifiedName, String name, Object value) {
         	int index = this.qualifiedName.indexOf(qualifiedName);
+        	if(index<0){
+        		throw new IllegalArgumentException("Qualified name does not exist.");
+        	}
         	if(actionParams.get(index)==null) {
         		actionParams.add(index,Maps.newHashMap(new HashMap<String,Object>()));
         	}
@@ -523,7 +553,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             try {
                 HttpPost post = getPostMethod();
                 HttpResponse response = getHttpClient().execute(post);
-
                 assertEquals(HttpStatus.SC_OK, getStatusCode(response));
                 rawResponse = getResponseBody(response);
                 assertEquals(
@@ -534,11 +563,20 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                         .read(rawResponse
                                 .substring(AuraBaseServlet.CSRF_PROTECT
                                         .length()));
+                ArrayList<Map<String,Object>> actions = (ArrayList<Map<String, Object>>) json.get("actions");
+                for(Map<String,Object> action: actions) {
+                
+                	this.stateList.add(State.valueOf(action.get("state").toString()));
+                	this.returnValueList.add(action.get("returnValue"));
+                	this.errorsList.add((List<Object>) action.get("error"));
+                }
+                //for legacy uses
                 Map<String, Object> action = (Map<String, Object>) ((List<Object>) json
                         .get("actions")).get(0);
                 this.state = State.valueOf(action.get("state").toString());
                 this.returnValue = action.get("returnValue");
                 this.errors = (List<Object>) action.get("error");
+                
             } catch (Exception e) {
                 throw new AuraExecutionException(e, null);
             }
@@ -562,15 +600,27 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         public Object getReturnValue() {
             return returnValue;
         }
+        
+        public ArrayList<Object> getReturnValueList() {
+        	return returnValueList;
+        }
 
         @Override
         public State getState() {
             return state;
         }
+        
+        public ArrayList<State> getStateList() {
+        	return stateList;
+        }
 
         @Override
         public List<Object> getErrors() {
             return errors;
+        }
+        
+        public ArrayList<List<Object>> getErrorsList() {
+        	return errorsList;
         }
 
         @Override

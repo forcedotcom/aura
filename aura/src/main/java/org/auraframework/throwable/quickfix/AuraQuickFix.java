@@ -140,6 +140,6 @@ public abstract class AuraQuickFix implements JsonSerializable {
 
     protected void resetCache(DefDescriptor<?> descriptor) {
         Aura.getContextService().getCurrentContext().getDefRegistry().invalidate(descriptor);
-        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.created, null);
+        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.CREATED, null);
     }
 }

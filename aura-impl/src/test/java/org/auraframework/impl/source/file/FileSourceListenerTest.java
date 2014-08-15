@@ -15,12 +15,12 @@
  */
 package org.auraframework.impl.source.file;
 
-import org.apache.commons.vfs2.FileChangeEvent;
-import org.apache.commons.vfs2.FileName;
-import org.apache.commons.vfs2.FileObject;
+import java.nio.file.FileSystems;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.FileChangeEvent;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -45,10 +45,7 @@ public class FileSourceListenerTest extends UnitTestCase {
 
     @Mock
     private FileChangeEvent fileChangeEvent;
-    @Mock
-    private FileObject fileObject;
-    @Mock
-    private FileName fileName;
+
 
 
     @Override
@@ -56,37 +53,34 @@ public class FileSourceListenerTest extends UnitTestCase {
         super.setUp();
         MockitoAnnotations.initMocks(this);
         listener = spy(listener);
-
-        when(fileChangeEvent.getFile()).thenReturn(fileObject);
-        when(fileObject.getName()).thenReturn(fileName);
     }
 
     public void testCreateEvent() throws Exception {
-        when(fileName.getPath()).thenReturn("/some/awesome/ui/inputSearch/inputSearch.cmp");
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
 
         listener.fileCreated(fileChangeEvent);
         verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.created), anyString());
+                eq(SourceListener.SourceMonitorEvent.CREATED), anyString());
 
         assertFileChangeEvent();
     }
 
     public void testDeleteEvent() throws Exception {
-        when(fileName.getPath()).thenReturn("/some/awesome/ui/inputSearch/inputSearch.cmp");
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
 
         listener.fileDeleted(fileChangeEvent);
         verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.deleted), anyString());
+                eq(SourceListener.SourceMonitorEvent.DELETED), anyString());
 
         assertFileChangeEvent();
     }
 
     public void testChangeEvent() throws Exception {
-        when(fileName.getPath()).thenReturn("/some/awesome/ui/inputSearch/inputSearch.cmp");
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
 
         listener.fileChanged(fileChangeEvent);
         verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.changed), anyString());
+                eq(SourceListener.SourceMonitorEvent.CHANGED), anyString());
 
         assertFileChangeEvent();
     }
@@ -105,11 +99,11 @@ public class FileSourceListenerTest extends UnitTestCase {
      * whole cache.
      */
     public void testNullDefDescriptor() throws Exception {
-        when(fileName.getPath()).thenReturn("/some/awesome/ui/inputSearch/inputSearchModel.java");
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearchModel.java"));
 
         listener.fileChanged(fileChangeEvent);
         verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.changed), anyString());
+                eq(SourceListener.SourceMonitorEvent.CHANGED), anyString());
 
         assertNull(defDescriptorCaptor.getValue());
     }
@@ -181,11 +175,12 @@ public class FileSourceListenerTest extends UnitTestCase {
 
     private void assertSourceChangedCalled(String prefix, String namespace, String name, DefDescriptor.DefType defType,
             String filePath) throws Exception {
-        when(fileName.getPath()).thenReturn(filePath);
+        
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath(filePath));
 
         listener.fileChanged(fileChangeEvent);
         verify(listener, times(1)).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.changed), anyString());
+                eq(SourceListener.SourceMonitorEvent.CHANGED), anyString());
 
         DefDescriptor<?> dd = defDescriptorCaptor.getValue();
 

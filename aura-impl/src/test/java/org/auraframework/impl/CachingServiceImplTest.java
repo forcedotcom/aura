@@ -122,7 +122,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		DefDescriptor<?> source = DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				ComponentDef.class);
-		SourceMonitorEvent event = SourceMonitorEvent.changed;
+		SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
 		String filePath = "someFilePath";
 		Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
 		for (int i = 0; i < 3; i++) {
@@ -142,7 +142,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		DefDescriptor<?> source = DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				ComponentDef.class);
-		SourceMonitorEvent event = SourceMonitorEvent.changed;
+		SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
 		String filePath = "someFilePath";
 		Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
 

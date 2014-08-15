@@ -216,7 +216,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to CSS cache", cssCache);
 
         // Now force a source change event and verify cache is emptied
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.changed, null);
+        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNull("CSS cache not cleared after source change event", cssCache);
@@ -256,7 +256,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to JS cache", jsCache);
 
         // Now force a source change event and verify cache is emptied
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.changed, null);
+        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNull("JS cache not cleared after source change event", jsCache);

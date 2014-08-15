@@ -16,7 +16,7 @@
 package org.auraframework.impl.root.theme;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.test.WebDriverTestCase.CheckAccessibility;
 import org.openqa.selenium.By;
 
 /**
@@ -25,6 +25,7 @@ import org.openqa.selenium.By;
  * 
  * @author ljagasia
  */
+@CheckAccessibility(false)
 public class ThemingSanityUITest extends WebDriverTestCase {
     public ThemingSanityUITest(String name) {
         super(name);
@@ -57,7 +58,6 @@ public class ThemingSanityUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
-    @UnAdaptableTest("we need a annotation for accessibility test : W-2312560")
     public void testThemeOverride() throws Exception {
         // base theme
         final String expectedHeight1 = "300px";

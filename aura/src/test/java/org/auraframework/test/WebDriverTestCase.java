@@ -15,26 +15,11 @@
  */
 package org.auraframework.test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.*;
+import java.lang.annotation.*;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.net.*;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,41 +32,24 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.def.*;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
-import org.auraframework.test.perf.PerfResultsUtil;
-import org.auraframework.test.perf.PerfUtil;
-import org.auraframework.test.perf.PerfWebDriverUtil;
-import org.auraframework.test.perf.metrics.PerfMetrics;
-import org.auraframework.test.perf.metrics.PerfMetricsCollector;
-import org.auraframework.test.perf.metrics.PerfRunsCollector;
+import org.auraframework.test.perf.*;
+import org.auraframework.test.perf.metrics.*;
 import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.eclipse.jetty.util.log.Log;
 import org.json.JSONObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Keys;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.HasTouchScreen;
+import org.openqa.selenium.interactions.*;
 import org.openqa.selenium.interactions.touch.FlickAction;
 import org.openqa.selenium.interactions.touch.TouchActions;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.ScreenshotException;
+import org.openqa.selenium.remote.*;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -124,6 +92,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         BrowserType[] value();
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.TYPE, ElementType.METHOD })
+    @Inherited
+    public @interface CheckAccessibility {
+        boolean value() default true;
+        BrowserType browserType() default BrowserType.GOOGLECHROME; // default browser to run accessibility test is Google Chrome
+    }
+
     public WebDriverTestCase(String name) {
         super(name);
     }
@@ -134,6 +110,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        
     }
 
     public String getBrowserTypeString() {
@@ -763,6 +740,21 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             return EnumSet.noneOf(BrowserType.class);
         }
         return Sets.newEnumSet(Arrays.asList(excludeBrowsers.value()), BrowserType.class);
+    }
+    
+    public boolean isAccessibilityTestDisabled() {
+        CheckAccessibility checkAccessibility = null;
+        try {
+            Method method = getClass().getMethod(getName());
+            checkAccessibility = method.getAnnotation(CheckAccessibility.class);
+            if (checkAccessibility == null) {
+                // Inherit defaults from the test class
+                checkAccessibility = getClass().getAnnotation(CheckAccessibility.class);
+            }
+        } catch (NoSuchMethodException e) {
+            // Do nothing
+        }
+        return checkAccessibility != null ? !checkAccessibility.value() : false;
     }
 
     public WebDriver getDriver() {

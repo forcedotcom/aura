@@ -221,7 +221,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 
     private final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
             StringSource<D> source, boolean overwrite, boolean isPrivilegedNamespace) {
-        SourceMonitorEvent event = SourceMonitorEvent.created;
+        SourceMonitorEvent event = SourceMonitorEvent.CREATED;
 
         nsLock.lock();
         try {
@@ -247,7 +247,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
                 boolean containsKey = sourceMap.containsKey(descriptor);
                 Preconditions.checkState(overwrite || !containsKey);
                 if (containsKey) {
-                    event = SourceMonitorEvent.changed;
+                    event = SourceMonitorEvent.CHANGED;
                 }
 
             }
@@ -292,7 +292,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             nsLock.unlock();
         }
         // notify source listeners of change
-        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.deleted, null);
+        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.DELETED, null);
     }
 
     /**

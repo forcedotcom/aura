@@ -42,7 +42,7 @@ public interface SourceListener {
      * what happened to the source?
      */
     enum SourceMonitorEvent {
-        created, deleted, changed
+        CREATED, DELETED, CHANGED
     };
 
     /**

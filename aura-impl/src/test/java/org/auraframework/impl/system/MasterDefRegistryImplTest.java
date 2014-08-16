@@ -856,7 +856,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
         Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
-                cmpDef, SourceListener.SourceMonitorEvent.changed, null);
+                cmpDef, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         assertFalse("ComponentDef not cleared from cache", isInDefsCache(defs.get(DefType.COMPONENT), mdr));
         assertTrue("ControllerDef in same bundle as cmp should not be cleared from cache",
@@ -875,7 +875,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> namespaceDef = defs.get(DefType.NAMESPACE);
         Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
-                namespaceDef, SourceListener.SourceMonitorEvent.changed, null);
+                namespaceDef, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         assertFalse("NamespaceDef not cleared from cache", isInDefsCache(defs.get(DefType.NAMESPACE), mdr));
         assertFalse("ComponentDef in same namespace as changed namespaceDef not cleared from cache",
@@ -897,7 +897,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> layoutsDef = defs.get(DefType.LAYOUTS);
         Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
-                layoutsDef, SourceListener.SourceMonitorEvent.changed, null);
+                layoutsDef, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         assertFalse("LayoutsDef not cleared from cache", isInDefsCache(defs.get(DefType.LAYOUTS), mdr));
         assertFalse("ApplicationDef in same bundle as LayoutsDef not cleared from cache",

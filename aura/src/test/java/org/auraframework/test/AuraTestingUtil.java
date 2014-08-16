@@ -234,7 +234,7 @@ public class AuraTestingUtil {
         };
         definitionService.subscribeToChangeNotification(listener);
         for (DefDescriptor<?> desc : cached) {
-            definitionService.onSourceChanged(desc, SourceMonitorEvent.changed, null);
+            definitionService.onSourceChanged(desc, SourceMonitorEvent.CHANGED, null);
         }
         if (!latch.await(CACHE_CLEARING_TIMEOUT_SECS, TimeUnit.SECONDS)) {
             throw new AuraRuntimeException(String.format(

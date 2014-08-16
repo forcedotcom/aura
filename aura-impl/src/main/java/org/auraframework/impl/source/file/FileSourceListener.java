@@ -15,26 +15,27 @@
  */
 package org.auraframework.impl.source.file;
 
+import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.Map;
 
-import org.apache.commons.vfs2.FileChangeEvent;
-import org.apache.commons.vfs2.FileListener;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.auraframework.util.FileChangeEvent;
+import org.auraframework.util.FileListener;
 
 /**
  * Used by {@link FileSourceLoader} to monitor and notify when file has changed. When a file does change, it notifies
  * its listener to clear cache of specific descriptor.
  */
-public class FileSourceListener implements FileListener {
+public class FileSourceListener implements FileListener{
 
     private static final Logger LOG = Logger.getLogger(FileSourceListener.class);
-    private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<DefDescriptor.DefType, String>(
+    private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<>(
             DefDescriptor.DefType.class);
 
     static {
@@ -59,17 +60,17 @@ public class FileSourceListener implements FileListener {
 
     @Override
     public void fileCreated(FileChangeEvent event) throws Exception {
-        notifySourceChanges(event, SourceMonitorEvent.created);
+        notifySourceChanges(event, SourceMonitorEvent.CREATED);
     }
 
     @Override
     public void fileDeleted(FileChangeEvent event) throws Exception {
-        notifySourceChanges(event, SourceMonitorEvent.deleted);
+        notifySourceChanges(event, SourceMonitorEvent.DELETED);
     }
 
     @Override
     public void fileChanged(FileChangeEvent event) throws Exception {
-        notifySourceChanges(event, SourceMonitorEvent.changed);
+        notifySourceChanges(event, SourceMonitorEvent.CHANGED);
     }
 
     public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent,
@@ -78,9 +79,9 @@ public class FileSourceListener implements FileListener {
     }
 
     private void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {
-
-        String filePath = event.getFile().getName().getPath();
-        LOG.info("File changed: " + filePath);
+        Path path = event.getPath();
+        String filePath = path.toString();
+        LOG.info("File " + filePath + " changed due to: " + smEvent);
 
         DefDescriptor<?> defDescriptor = getDefDescriptor(filePath);
         onSourceChanged(defDescriptor, smEvent, filePath);

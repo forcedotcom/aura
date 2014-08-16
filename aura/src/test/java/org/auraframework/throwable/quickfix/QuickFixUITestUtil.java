@@ -122,6 +122,6 @@ public class QuickFixUITestUtil {
         // invalidate all cache so that next tests can use fresh defs.
         // due to inherit delays in file listeners, there are timing issues with
         // file listener clearing the same DD while the next tests run.
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.deleted, null);
+        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.DELETED, null);
     }
 }

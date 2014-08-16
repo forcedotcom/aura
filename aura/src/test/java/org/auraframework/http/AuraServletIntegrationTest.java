@@ -123,7 +123,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                         .getSource(toUpdate);
                 final String originalContent = source.getContents();
                 source.addOrUpdate(originalContent + " ");
-                Aura.getDefinitionService().onSourceChanged(source.getDescriptor(), SourceMonitorEvent.changed, null);
+                Aura.getDefinitionService().onSourceChanged(source.getDescriptor(), SourceMonitorEvent.CHANGED, null);
                 addTearDownStep(new Runnable() {
                     @Override
                     public void run() {

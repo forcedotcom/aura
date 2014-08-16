@@ -32,6 +32,9 @@ import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.net.HttpHeaders;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -81,6 +84,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
+        Aura.getContextService().endContext();
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
     }
 
@@ -117,6 +121,9 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertTrue("Cookie should contain : but was:" + cookie.getValue(), cookie.getValue().contains(":"));
         String countStr = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
         String startTimeStr = cookie.getValue().substring(countStr.length() + 1);
+
+        Aura.getContextService().endContext();
+
         try {
             int count = Integer.parseInt(countStr);
             assertTrue("count should be between 1 & 8 was " + count, (count >= 0 && count < 9));
@@ -137,7 +144,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * so when different browser request on the same page, they don't get each other's cache one
      * server cache CSS for cmp too.
      */
-    private void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String browserType, String cssMsgToVerify) throws Exception {
+    private void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String cssMsgToVerify) throws Exception {
     	String cmpname = "appCache:withpreload";
     	String cmporapp = "app";
     	DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(cmpname,
@@ -176,9 +183,9 @@ public class AuraResourceServletTest extends AuraTestCase {
     }
     
     public void testRequestFromDifferentBrowserOnSamePage() throws Exception {
-    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(),Type.IE9,"IE9","");
+    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(),Type.IE9,"");
     	//ui:button has special session for IE7 in button.css under @if (IE7){...}
-    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE7.getUserAgentString(),Type.IE7,"IE7","display:inline; zoom:1; overflow:visible!important");
+    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE7.getUserAgentString(),Type.IE7,"display:inline; zoom:1; overflow:visible!important");
     }
     
     
@@ -219,6 +226,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        Aura.getContextService().endContext();
+
         assertNull("CSS cache not cleared after source change event", cssCache);
     }
 
@@ -259,6 +268,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        Aura.getContextService().endContext();
         assertNull("JS cache not cleared after source change event", jsCache);
     }
 

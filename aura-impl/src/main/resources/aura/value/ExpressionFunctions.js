@@ -152,6 +152,6 @@ var expressionFunctions = {
     "not": function not(args) {                             
     	var a = args[0];
         a = a ? a.unwrap() : a;
-        return a !== true;
+        return !a;
     }
 };

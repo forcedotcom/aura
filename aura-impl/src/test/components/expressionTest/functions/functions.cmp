@@ -92,12 +92,13 @@
     <expressionTest:test expression="{!!true}" exprText="!true" expected="false"/>
     <expressionTest:test expression="{!not(false)}" exprText="not(false)" expected="true"/>
     <expressionTest:test expression="{!!0}" exprText="!0" expected="true"/>
-    <expressionTest:test expression="{!!7}" exprText="!7" expected="true"/>
-    <expressionTest:test expression="{!!'0'}" exprText="!'0'" expected="true"/>
-    <expressionTest:test expression="{!!'false'}" exprText="!'false'" expected="true"/>
+    <expressionTest:test expression="{!!7}" exprText="!7" expected="false"/>
+    <expressionTest:test expression="{!!'0'}" exprText="!'0'" expected="false"/>
+    <expressionTest:test expression="{!!'false'}" exprText="!'false'" expected="false"/>
     <expressionTest:test expression="{!!''}" exprText="!''" expected="true"/>
     <expressionTest:test expression="{!!v.NaN}" exprText="!v.NaN" expected="true"/>
-    <expressionTest:test expression="{!!v.string}" exprText="!v.string" expected="true"/>
+    <expressionTest:test expression="{!!v.string}" exprText="!v.string" expected="false"/>
+    <expressionTest:test expression="{!!v.emptyString}" exprText="!v.emptyString" expected="true"/>
 
     <!-- ternary -->
     <expressionTest:test expression="{!true ? 'yes' : 'no'}" exprText="true ? 'yes' : 'no'" expected="'yes'"/>

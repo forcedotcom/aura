@@ -18,20 +18,20 @@
         test: function(cmp) {
             $A.test.assertEquals(2007, cmp.get("v.intByReference"));
             $A.test.assertEquals(2007, cmp.find("innerCmp").get("v.intAttribute"));
-            $A.test.assertEquals("2007", $A.test.getText(cmp.find("intOutput").getElement()));
-            $A.test.assertEquals("2007", $A.test.getText(cmp.find("innerCmp").find("intOutput").getElement()));
+            $A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("intOutput")));
+            $A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("innerCmp").find("intOutput")));
 
             $A.test.clickOrTouch(cmp.find("changeIntOuterButton").getElement());
             $A.test.assertEquals(9999, cmp.get("v.intByReference"));
             $A.test.assertEquals(9999, cmp.find("innerCmp").get("v.intAttribute"));
-            $A.test.assertEquals("9999", $A.test.getText(cmp.find("intOutput").getElement()));
-            $A.test.assertEquals("9999", $A.test.getText(cmp.find("innerCmp").find("intOutput").getElement()));
+            $A.test.assertEquals("9999", this.getTextNoWhitespaces(cmp.find("intOutput")));
+            $A.test.assertEquals("9999", this.getTextNoWhitespaces(cmp.find("innerCmp").find("intOutput")));
 
             $A.test.clickOrTouch(cmp.find("changeIntFacetButton").getElement());
             $A.test.assertEquals(5565, cmp.get("v.intByReference"));
             $A.test.assertEquals(5565, cmp.find("innerCmp").get("v.intAttribute"));
-            $A.test.assertEquals("5565", $A.test.getText(cmp.find("intOutput").getElement()));
-            $A.test.assertEquals("5565", $A.test.getText(cmp.find("innerCmp").find("intOutput").getElement()));
+            $A.test.assertEquals("5565", this.getTextNoWhitespaces(cmp.find("intOutput")));
+            $A.test.assertEquals("5565", this.getTextNoWhitespaces(cmp.find("innerCmp").find("intOutput")));
         }
     },
 
@@ -39,12 +39,12 @@
         var expected = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c'];
         this.assertListItems(expected, cmp.get("v.listByReference"));
         this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-        $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c",
-                $A.test.getText(cmp.find("listOutput").getElement()));
-        $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c",
-                $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+        $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1c", 
+                this.getTextNoWhitespaces(cmp.find("listOutput")));
+        $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1c",
+                this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
     },
-    
+
     testPassingListToFacet_ModifyOuter: {
         test: function(cmp) {
             this.verifyInitialList(cmp);
@@ -54,10 +54,10 @@
             $A.test.clickOrTouch(cmp.find("changeListOuterButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nchangedOuter2b\nlevel1c",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nchangedOuter2b\nlevel1c",
-                    $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3achangedOuter2blevel1c",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("level1alevel1blevel2alevel3achangedOuter2blevel1c",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
         }
     },
 
@@ -70,10 +70,10 @@
             $A.test.clickOrTouch(cmp.find("changeListFacetButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference")); 
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nchangedFacet2b\nlevel1c",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nchangedFacet2b\nlevel1c",
-                    $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3achangedFacet2blevel1c",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("level1alevel1blevel2alevel3achangedFacet2blevel1c",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
         }
     },
 
@@ -86,10 +86,10 @@
             $A.test.clickOrTouch(cmp.find("appendListOuterButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c\naddedOuter1d",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c\naddedOuter1d",
-                    $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1caddedOuter1d",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1caddedOuter1d",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
         }
     },
 
@@ -102,10 +102,10 @@
             $A.test.clickOrTouch(cmp.find("appendListFacetButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c\naddedFacet1d",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c\naddedFacet1d",
-                    $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1caddedFacet1d",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1caddedFacet1d",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
         }
     },
 
@@ -118,10 +118,10 @@
             $A.test.clickOrTouch(cmp.find("removeListOuterButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b",
-                    $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2b",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2b",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
         }
     },
 
@@ -134,10 +134,10 @@
             $A.test.clickOrTouch(cmp.find("removeListFacetButton").getElement());
             this.assertListItems(expected, cmp.get("v.listByReference"));
             this.assertListItems(expected, cmp.find("innerCmp").get("v.listAttribute"));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b",
-                    $A.test.getText(cmp.find("innerCmp").find("listOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2b",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2b",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("listOutput")));
         }
     },
     
@@ -153,10 +153,10 @@
             };
         this.assertMapItems(expected, cmp.get("v.mapByReference"));
         this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-        $A.test.assertEquals("initial1\ninitial2\n\initial3",
-                $A.test.getText(cmp.find("mapOutput").getElement()));
-        $A.test.assertEquals("initial1\ninitial2\n\initial3",
-                $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+        $A.test.assertEquals("initial1initial2\initial3",
+                this.getTextNoWhitespaces(cmp.find("mapOutput")));
+        $A.test.assertEquals("initial1initial2\initial3",
+                this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
     },
 
     testPassingMapToFacet_ModifyOuter: {
@@ -175,10 +175,10 @@
             $A.test.clickOrTouch(cmp.find("changeMapOuterButton").getElement());
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-            $A.test.assertEquals("initial1\ninitial2\nchangedOuter3",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2\nchangedOuter3",
-                    $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+            $A.test.assertEquals("initial1initial2changedOuter3",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
+            $A.test.assertEquals("initial1initial2changedOuter3",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
         }
     },
 
@@ -198,10 +198,10 @@
             $A.test.clickOrTouch(cmp.find("changeMapFacetButton").getElement());
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-            $A.test.assertEquals("initial1\ninitial2\nchangedFacet3",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2\nchangedFacet3",
-                    $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+            $A.test.assertEquals("initial1initial2changedFacet3",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
+            $A.test.assertEquals("initial1initial2changedFacet3",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
         }
     },
     
@@ -225,10 +225,10 @@
             $A.test.clickOrTouch(cmp.find("appendMapOuterButton").getElement());
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-            $A.test.assertEquals("initial1\ninitial2\n\initial3\naddedOuter3\naddedOuter4",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2\n\initial3\naddedOuter3\naddedOuter4",
-                    $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+            $A.test.assertEquals("initial1initial2\initial3addedOuter3addedOuter4",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
+            $A.test.assertEquals("initial1initial2\initial3addedOuter3addedOuter4",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
         }
     },
     
@@ -252,10 +252,10 @@
             $A.test.clickOrTouch(cmp.find("appendMapFacetButton").getElement());
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
-            $A.test.assertEquals("initial1\ninitial2\n\initial3\naddedFacet3\naddedFacet4",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2\n\initial3\naddedFacet3\naddedFacet4",
-                    $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+            $A.test.assertEquals("initial1initial2\initial3addedFacet3addedFacet4",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
+            $A.test.assertEquals("initial1initial2\initial3addedFacet3addedFacet4",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
         }
     },
 
@@ -277,10 +277,10 @@
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             
-            $A.test.assertEquals("initial1\ninitial2",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2",
-                    $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+            $A.test.assertEquals("initial1initial2",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
+            $A.test.assertEquals("initial1initial2",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
         }
     },
 
@@ -302,10 +302,10 @@
             this.assertMapItems(expected, cmp.get("v.mapByReference"));
             this.assertMapItems(expected, cmp.find("innerCmp").get("v.mapAttribute"));
             
-            $A.test.assertEquals("initial1\ninitial2",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2",
-                    $A.test.getText(cmp.find("innerCmp").find("mapOutput").getElement()));
+            $A.test.assertEquals("initial1initial2",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
+            $A.test.assertEquals("initial1initial2",
+                    this.getTextNoWhitespaces(cmp.find("innerCmp").find("mapOutput")));
         }
     },
     
@@ -331,10 +331,10 @@
             this.assertListItems(expectedList, cmp.get("v.listByReference"));
             this.assertMapItems(expectedMap, cmp.get("v.mapByReference"));
 
-            $A.test.assertEquals("level1a\nlevel1b\nlevel2a\nlevel3a\nlevel2b\nlevel1c",
-                    $A.test.getText(cmp.find("listOutput").getElement()));
-            $A.test.assertEquals("initial1\ninitial2\ninitial3",
-                    $A.test.getText(cmp.find("mapOutput").getElement()));
+            $A.test.assertEquals("level1alevel1blevel2alevel3alevel2blevel1c",
+                    this.getTextNoWhitespaces(cmp.find("listOutput")));
+            $A.test.assertEquals("initial1initial2initial3",
+                    this.getTextNoWhitespaces(cmp.find("mapOutput")));
         }
     },
 
@@ -374,53 +374,53 @@
 
     testIterationListInsideMap: {
         test: function(cmp) {
-            $A.test.assertEquals("FirstSecondThird", $A.test.getText(cmp.find("iterOutput").getElement()));
-            $A.test.assertEquals("FirstSecondThird", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+            $A.test.assertEquals("FirstSecondThird", this.getTextNoWhitespaces(cmp.find("iterOutput")));
+            $A.test.assertEquals("FirstSecondThird", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
 
             var list = cmp.get("v.objectWithList.listEntry");
             list[1] = "New!";
             cmp.set("v.objectWithList.listEntry", list);
 
-            $A.test.assertEquals("FirstNew!Third", $A.test.getText(cmp.find("iterOutput").getElement()));
-            $A.test.assertEquals("FirstNew!Third", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+            $A.test.assertEquals("FirstNew!Third", this.getTextNoWhitespaces(cmp.find("iterOutput")));
+            $A.test.assertEquals("FirstNew!Third", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
 
             var facetList = cmp.find("innerCmp").get("v.objectAttribute.listEntry");
             facetList[1] = "Again!";
             cmp.find("innerCmp").set("v.objectAttribute.listEntry", facetList);
 
-            $A.test.assertEquals("FirstAgain!Third", $A.test.getText(cmp.find("iterOutput").getElement()));
-            $A.test.assertEquals("FirstAgain!Third", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+            $A.test.assertEquals("FirstAgain!Third", this.getTextNoWhitespaces(cmp.find("iterOutput")));
+            $A.test.assertEquals("FirstAgain!Third", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
 
             // Shift elements to right, adding new element to 0 index and removing last element
             var list = cmp.get("v.objectWithList.listEntry");
             list.unshift("Zero");
             list.splice(list.length - 1, 1);
             cmp.set("v.objectWithList.listEntry", list);
-            $A.test.assertEquals("ZeroFirstAgain!", $A.test.getText(cmp.find("iterOutput").getElement()));
-            $A.test.assertEquals("ZeroFirstAgain!", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+            $A.test.assertEquals("ZeroFirstAgain!", this.getTextNoWhitespaces(cmp.find("iterOutput")));
+            $A.test.assertEquals("ZeroFirstAgain!", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
 
             // Remove last element in list, verify output updated
             var list = cmp.get("v.objectWithList.listEntry");
             list.splice(list.length - 1, 1);
             cmp.set("v.objectWithList.listEntry", list);
-            $A.test.assertEquals("ZeroFirst", $A.test.getText(cmp.find("iterOutput").getElement()));
-            $A.test.assertEquals("ZeroFirst", $A.test.getText(cmp.find("innerCmp").find("iterOutput").getElement()));
+            $A.test.assertEquals("ZeroFirst", this.getTextNoWhitespaces(cmp.find("iterOutput")));
+            $A.test.assertEquals("ZeroFirst", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
         }
     },
 
     testClientSideComponentCreation: {
         test: function(cmp) {
             $A.test.clickOrTouch(cmp.find("createCmpButton").getElement());
-            $A.test.assertEquals("2007", $A.test.getText(cmp.find("createdCmp").getElement()));
+            $A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("createdCmp")));
 
             // Change outer component attribute, verify does not change client-created cmp
             $A.test.clickOrTouch(cmp.find("changeIntOuterButton").getElement());
-            $A.test.assertEquals("2007", $A.test.getText(cmp.find("createdCmp").getElement()));
+            $A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("createdCmp")));
             $A.test.assertEquals(9999, cmp.get("v.intByReference"));
 
             // Change attribute on created component, verify does not change outer component
             $A.test.clickOrTouch(cmp.find("changeIntCsccButton").getElement());
-            $A.test.assertEquals("12345", $A.test.getText(cmp.find("createdCmp").getElement()));
+            $A.test.assertEquals("12345", this.getTextNoWhitespaces(cmp.find("createdCmp")));
             $A.test.assertEquals(9999, cmp.get("v.intByReference"));
         }
     },
@@ -466,5 +466,12 @@
                 $A.test.fail("Did not receive expected list. Expected '" + expected[i] + "', but received '" + actual[i] + "'");
             }
         }
-    }
+    },
+
+    /**
+     * Convenience method to get text of a component. Strip out all whitespce for browser compatability.
+     */
+    getTextNoWhitespaces: function(cmp) {
+        return $A.test.getText(cmp.getElement()).replace(/\s/g, "");
+    },
 })

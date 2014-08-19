@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+		<ui:button label="Clear Body of Root Cmp" press="{!c.clearRootBody}" aura:id="clearRootBody"/>
+		<ui:button label="Set Body of Root Cmp" press="{!c.setRootBody}" aura:id="setRootBody"/>
+		<ui:button label="Set Body of Root Cmp to new cmp array which reuses some existing cmps" press="{!c.setRootBody_ReUse}" aura:id="setRootBody_ReUse"/>
+		<div aura:id="rootDiv">
+			<p aura:id="rootDivsBody">Top level html component </p>
+		</div>
+		<ui:button label="Root level uiButton Component" aura:id="rootButton"></ui:button>
+		<br/>
+		
+		<br/>
+		<ui:button label="Facet uiButtonComponent" aura:id="facetButton"/>
+		<ui:button label="Clear Body of facet button Cmp" aura:id="clearFacetButtonBody" press="{!c.clearFacetButtonBody}"></ui:button>
+		<br/>
+		
+		<br/>		
+		<expressionTest:bodyAttributeOfFacet aura:id="facetCmp">
+			<ui:button label="Clear Body of Facet test Cmp" press="{!c.clearFacetCmpBody}" aura:id="clearFacetCmpBody"/>
+			<div aura:id="div">Inside the markup body of a facet</div>
+		</expressionTest:bodyAttributeOfFacet>
+</aura:component>

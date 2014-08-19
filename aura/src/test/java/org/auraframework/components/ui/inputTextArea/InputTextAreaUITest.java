@@ -16,6 +16,8 @@
 package org.auraframework.components.ui.inputTextArea;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -80,5 +82,25 @@ public class InputTextAreaUITest extends WebDriverTestCase {
 	    String actualText = (String) auraUITestingUtil.getEval(valueExpression);
 	    assertEquals("Total number of bytes with \r\n does not match", inputText.getBytes().length + 3, actualText.getBytes().length);
 	    assertEquals("Value of Input text Area shoud be updated after removing carriage return", inputText, actualText.replaceAll("(\\r)", ""));
+    }
+    
+    // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute (iOS/Safari)
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.SAFARI5, BrowserType.SAFARI })
+    public void testMaxLengthInTextArea() throws Exception {
+        open("/uitest/inputTextArea_MaxLength.cmp?maxlength=5");
+        WebElement input = findDomElement(By.className("textArea"));
+        input.click();
+        input.sendKeys("1234567890");
+        assertEquals("Text not truncated to 5 chars correctly", "12345", input.getAttribute("value"));
+    }
+
+    public void testNoMaxLengthInTextArea() throws Exception {
+        open("/uitest/inputTextArea_MaxLength.cmp");
+        WebElement input = findDomElement(By.className("textArea"));
+        input.click();
+        String inputText = "1234567890";
+        input.sendKeys(inputText);
+        assertEquals("Expected untruncated text", inputText, input.getAttribute("value"));
     }
 }

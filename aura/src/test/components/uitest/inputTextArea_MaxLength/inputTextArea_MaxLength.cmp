@@ -16,5 +16,6 @@
 
 -->
 <aura:component>
-  <ui:inputTextArea maxlength="5"/>
+<aura:attribute name="maxlength" type="Integer"/>
+  <ui:inputTextArea class="textArea" aura:id="textArea" maxlength="{!v.maxlength}"/>
 </aura:component>

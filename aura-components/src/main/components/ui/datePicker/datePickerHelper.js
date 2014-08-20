@@ -123,10 +123,18 @@
         }
 
         // fill the cache
-        this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
+        this.getOnClickEventProp.cache["isTouchDevice"] = $A.util.supportsTouchEvents();
         if (this.getOnClickEventProp.cache["isTouchDevice"]) {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
+        	if (window["navigator"]["pointerEnabled"]) {
+        		this.getOnClickEventProp.cache["onClickStartEvent"] = "pointerdown";
+                this.getOnClickEventProp.cache["onClickEndEvent"] = "pointerup";
+            } else if (window["navigator"]["msPointerEnabled"]) {
+                this.getOnClickEventProp.cache["onClickStartEvent"] = "MSPointerDown";
+                this.getOnClickEventProp.cache["onClickEndEvent"] = "MSPointerUp";
+            } else {
+                this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
+                this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
+            }
         } else {
             this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
             this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";

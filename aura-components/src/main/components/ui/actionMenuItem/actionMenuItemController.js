@@ -15,7 +15,7 @@
  */
 ({
     handleClick : function(component, event, helper) {
-    	var hideMenu = component.get("v.hideMenuAfterSelected");
+    	var hideMenu = component.getConcreteComponent().get("v.hideMenuAfterSelected");
     	//set focus to menuTrigger is hideMenu is true
     	helper.fireSelectEvent(component, event, {"hideMenu": hideMenu, "focusTrigger": hideMenu});         
     }

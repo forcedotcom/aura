@@ -15,6 +15,7 @@
     limitations under the License.
 
 -->
+<!-- NOTE: text context shows up in this component's body will be throw as ERROR on suite.cmp's helper -->
 <aura:component extends="expressionTest:suite" render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
     <aura:attribute name="isNotSet" type="String[]"/>
     <aura:attribute name="stringArray" type="String[]" default="one,two,three"/>
@@ -22,6 +23,12 @@
 	<aura:attribute name="componentArray" type="Aura.Component[]">
 		<div/><span/>text<p/>
 	</aura:attribute>
+	
+	<!-- below is used by expressionTest:arrayValue -->
+	<aura:attribute name="passedInArray" type="Object[]" default="['a','b','c']"/>
+	<aura:attribute name="passedInArrayLength" type="Integer" default="0"/>
+	<aura:handler name="change" value="{!v.passedInArray.length}" action="{!c.onPassedInArrayLengthChange}"/>
+	<!-- above is used by expressionTest:arrayValue -->
 	
     <!-- "undefined" in following expressions is not the literal, but from a reference to nothing -->
 

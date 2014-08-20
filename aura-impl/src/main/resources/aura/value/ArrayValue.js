@@ -84,7 +84,7 @@ ArrayValue.prototype.getValue = function (index) {
  * Returns the value object at the specified index.
  * <code>getValue('length')</code> returns a value object representing the length of this array value.
  * Any other argument for getValue() will flag an error.
- * @param {Number} i The length of the array.
+ * @param {Number} i The index of the object in the array.
  *
  * @private
  */

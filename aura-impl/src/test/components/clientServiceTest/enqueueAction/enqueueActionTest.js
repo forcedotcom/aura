@@ -37,12 +37,16 @@
 
     waitForLog : function(cmp, index, content) {
         var actual;
-        $A.test.addWaitFor(false, function() {
-            actual = cmp.get("v.log")?cmp.get("v.log")[index]:undefined;
-            return actual === undefined;
-        }, function() {
-            $A.test.assertEquals(content, actual, "mismatch on log entry "+index);
-        });
+        $A.test.addWaitForWithFailureMessage(false,
+                function() {
+                    actual = cmp.get("v.log")?cmp.get("v.log")[index]:undefined;
+                    return actual === undefined;
+                },
+                "Never received log message '" + content + "' at index " + index,
+                function() {
+                    $A.test.assertEquals(content, actual, "mismatch on log entry "+index);
+                }
+        );
     },
 
     /**
@@ -50,23 +54,27 @@
      */
     waitForLogRace : function(cmp, index1, index2, content) {
         var actual;
-        $A.test.addWaitFor(false, function() {
-            actual = cmp.get("v.log")?cmp.get("v.log")[index2]:undefined;
-            return actual === undefined;
-        }, function() {
-            var i;
-            var logs = cmp.get("v.log");
-            var acc = '';
+        $A.test.addWaitForWithFailureMessage(false, 
+                function() {
+                    actual = cmp.get("v.log")?cmp.get("v.log")[index2]:undefined;
+                    return actual === undefined;
+                }, 
+                "Never received log message '" + content + "' between index " + index1 + " and " + index2,
+                function() {
+                    var i;
+                    var logs = cmp.get("v.log");
+                    var acc = '';
 
-            for (i = index1; i <= index2; i++) {
-                if (logs[i] === content) {
-                    return;
+                    for (i = index1; i <= index2; i++) {
+                        if (logs[i] === content) {
+                            return;
+                        }
+                        acc = acc + '\n' + logs[i];
+                    }
+                    $A.test.fail("mismatch in log range "+index1+','+index2+
+                        'did not find '+content+' in:'+acc);
                 }
-                acc = acc + '\n' + logs[i];
-            }
-            $A.test.fail("mismatch in log range "+index1+','+index2+
-                'did not find '+content+' in:'+acc);
-        });
+        );
     },
 
     getAction : function(cmp, actionName, commands, callback, background, abortable, allAboardCallback) {
@@ -197,7 +205,8 @@
                         that.log(cmp, "back1:" + a.getReturnValue());
                     }));
                 // verify background action ran, even though it is marked as caboose
-                this.waitForLog(cmp, 0, "cabooseAndBack1:cabooseAndBack1");
+                this.waitForLogRace(cmp, 0, 1, "cabooseAndBack1:cabooseAndBack1");
+                this.waitForLogRace(cmp, 0, 1, "back1:back1");
             }
         ]
     },
@@ -293,8 +302,6 @@
      *  - Use a foreground process to kick off one of the backgrounds, causing the last one to fire as well.
      */
     testMaxNumBackgroundServerAction : {
-        // fix flapper in IE
-        browsers: ["-IE8"],
         test : [
             function(cmp) {
                 var that = this;
@@ -379,23 +386,25 @@
     },
 
     testBackgroundClientActionNotQueued : {
-        // fix flapper in IE
-        browsers: ["-IE8"],
         test : [
                 function(cmp) {
                     var that = this;
                     $A.run(function() {
-                        // fire first background server action that waits for trigger
+                        // fill up background action queue
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
-                                "APPEND back1;RESUME fore1;WAIT back1;READ;SLEEP 1000;", function(a) {
+                                "WAIT back1", function(a) {
                                     that.log(cmp, "back1:" + a.getReturnValue());
+                                }));
+                        $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
+                                "WAIT back2", function(a) {
+                                    that.log(cmp, "back2:" + a.getReturnValue());
+                                }));
+                        $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
+                                "WAIT back3;READ", function(a) {
+                                    that.log(cmp, "back3:" + a.getReturnValue());
                                 }));
                     });
                     $A.run(function() {
-                        // queue up another background server action
-                        $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND back2;READ;", function(a) {
-                            that.log(cmp, "back2:" + a.getReturnValue());
-                        }));
                         // queue up a background client action
                         var a = cmp.get("c.client");
                         a.setBackground();
@@ -403,17 +412,19 @@
                     });
                     // client action executed immediately even if "background"
                     this.waitForLog(cmp, 0, "client");
-                    // Now that more than one background action can occur, this completes now.
-                    this.waitForLog(cmp, 1, "back2:back1,back2");
                 }, function(cmp) {
                     var that = this;
                     $A.run(function() {
-                        $A.enqueueAction(that.getAction(cmp, "c.execute", "WAIT fore1;RESUME back1", function(a) {
+                        // flush out background actions
+                        $A.enqueueAction(that.getAction(cmp, "c.execute", "RESUME back1;RESUME back2;RESUME back3", function(a) {
                             that.log(cmp, "fore1:" + a.getReturnValue());
                         }));
                     });
-                    this.waitForLog(cmp, 2, "fore1:");
-                    this.waitForLog(cmp, 3, "back1:");
+                    // The foreground and all 3 background actions are in a race to finish
+                    this.waitForLogRace(cmp, 1, 4, "fore1:");
+                    this.waitForLogRace(cmp, 1, 4, "back1:");
+                    this.waitForLogRace(cmp, 1, 4, "back2:");
+                    this.waitForLogRace(cmp, 1, 4, "back3:");
                 } ]
     },
 
@@ -452,8 +463,6 @@
     },
 
     testPollSingleBackgroundAction : {
-        // fix flapper in IE
-        browsers: ["-IE8"],
         test : [
                 function(cmp) {
                     var that = this;
@@ -695,8 +704,6 @@
     },
 
     testStorableRefresh : {
-        // fix flapper in IE
-        browsers: ["-IE8"],
         test : [ function(cmp) {
             var that = this;
             $A.run(function() {
@@ -706,9 +713,13 @@
                 });
                 a.setStorable();
                 $A.enqueueAction(a);
-                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;"));
+                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;", "bgAction1"));
             });
             this.waitForLog(cmp, 0, "prime:false:initial");
+            // This test assumes actions from each test stage are complete before moving on to the next stage. So we
+            // need to wait on actions that don't log to the screen. On slower browsers without the wait the actions
+            // get backed up and begin aborting themselves, causing the test to fail.
+            $A.test.addWaitForAction(true, "bgAction1");
         }, function(cmp) {
             var that = this;
             $A.run(function() {
@@ -718,9 +729,10 @@
                 });
                 a.setStorable();
                 $A.enqueueAction(a);
-                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;"));
+                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;", "bgAction2"));
             });
             this.waitForLog(cmp, 1, "foreground match:true:initial");
+            $A.test.addWaitForAction(true, "bgAction2");
         }, function(cmp) {
             var that = this;
             $A.run(function() {
@@ -731,9 +743,10 @@
                 a.setStorable();
                 a.setBackground();
                 $A.enqueueAction(a);
-                $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND initial;RESUME;"));
+                $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND initial;RESUME;", "foreAction1"));
             });
             this.waitForLog(cmp, 2, "background match:true:initial");
+            $A.test.addWaitForAction(true, "foreAction1");
         }, function(cmp) {
             var that = this;
             $A.run(function() {
@@ -743,10 +756,11 @@
                 });
                 a.setStorable();
                 $A.enqueueAction(a);
-                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND updated;RESUME;"));
+                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND updated;RESUME;", "bgAction3"));
             });
             this.waitForLog(cmp, 3, "foreground differs:true:initial");
             this.waitForLog(cmp, 4, "foreground differs:false:updated"); // from differing refresh
+            $A.test.addWaitForAction(true, "bgAction3");
         }, function(cmp) {
             var that = this;
             $A.run(function() {

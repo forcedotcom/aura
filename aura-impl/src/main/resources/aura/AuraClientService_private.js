@@ -232,7 +232,7 @@ var priv = {
      * Process a single action/response.
      * 
      * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
-     * erroroccurs.
+     * error occurs.
      * 
      * @private
      * @param {Action}

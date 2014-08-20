@@ -15,11 +15,8 @@
  */
 ({
     handleClick : function(component, event, helper) {
-        var parent = component.get("v.parent");
-        if (parent && parent.length > 0) {
-            var p = parent[0];
-            p.getConcreteComponent().set("v.visible", false);
-            helper.fireSelectEvent(component, event);
-        } 
+    	var hideMenu = component.getConcreteComponent().get("v.hideMenuAfterSelected");
+    	//set focus to menuTrigger is hideMenu is true
+    	helper.fireSelectEvent(component, event, {"hideMenu": hideMenu, "focusTrigger": hideMenu});         
     }
 })

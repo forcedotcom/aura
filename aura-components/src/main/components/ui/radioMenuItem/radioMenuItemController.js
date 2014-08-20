@@ -21,7 +21,6 @@
         concreteHelper.handleClick(concrete);
 
         // Un-select the previously selected item
-        helper.uncheckSiblings(concrete);
-        helper.fireSelectEvent(component, event);
+        helper.fireSelectEvent(component, event, {deselectSiblings: true, hideMenu: concrete.get("v.hideMenuAfterSelected")});
     }
 })

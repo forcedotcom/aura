@@ -17,4 +17,7 @@
 -->
 <aura:event type="COMPONENT" support="GA" description="Indicates that the user selects a menu item inside a menu component.">
     <aura:attribute name="selectedItem" type="Aura.Component[]" description="The menu item which is selected."/>
+    <aura:attribute name="hideMenu" type="Boolean" description="Hide menu if set to true."/>
+    <aura:attribute name="deselectSiblings" type="Boolean" description="Deselect the siblings of the currently selected menu item."/>
+    <aura:attribute name="focusTrigger" type="Boolean" description="Set focus to menuTrigger."/>    
 </aura:event>

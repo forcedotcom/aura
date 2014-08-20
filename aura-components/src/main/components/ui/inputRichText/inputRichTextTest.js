@@ -229,7 +229,9 @@
     
     /**
      * Test invalid dimensions.
+     * Exclude IE 7, 8 since they don't support negative dimensions
      */
+    browsers: ["-IE7", "-IE8"],
     testRichTextInvalidDimensions:{
     	attributes : {width: -100, height:-10},
     	test : function(component) {

@@ -20,7 +20,13 @@
     	if (m && t) {
             m.set("v.referenceElement", t.getElement());
     	}
+    	helper.setAriaAttributes(component);
     	return this.superAfterRender();
+	},
+	
+	rerender: function(component, helper) {		
+		this.superRerender();
+		helper.setAriaAttributes(component);
 	},
  
     unrender: function(component, helper) {

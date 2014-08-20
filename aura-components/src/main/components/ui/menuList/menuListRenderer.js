@@ -15,8 +15,8 @@
  */
 ({
     afterRender: function(component, helper) {
+    	helper.addEventHandlers(component);
         helper.handleVisible(component);
-        helper.setAriaAttributes(component);
         var ret = this.superAfterRender();
         helper.position(component);
         helper.setFocus(component, false);
@@ -35,9 +35,12 @@
         }
         var ret = this.superRerender();
         helper.handleVisible(component, currentlyVisible);
-        helper.setAriaAttributes(component);
         helper.position(component);
         helper.setFocus(component, currentlyVisible);
         return ret;
+    },
+    
+    unrender: function(component, helper) {
+    	helper.removeEventHandlers(component);
     }
 })

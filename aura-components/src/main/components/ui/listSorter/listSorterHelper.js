@@ -31,7 +31,7 @@
 				trigger[0].set("v.label", triggerLabel);
 			}
 			trigger[0].addHandler('click', cmp, 'c.onOpen');
-		} else {
+		} else if (triggerLabel) {
 			var menuTrigger = $A.componentService.newComponentDeprecated({
 	            "componentDef" : {
 	            	"descriptor" : "markup://ui:menuTriggerLink"
@@ -93,14 +93,14 @@
 			cmp._selectedItems = sList;
 			cmp.set('v.defaultSelectedItems', selectedItems);
 			cmp.set('v.items', filteredItems);
-			this.updateMenuList(cmp);
+			this.refreshMenu(cmp);
 		}
 	},
 
 	
 	handleOnOpen : function(cmp) {
 		var items = cmp.get('v.items');		
-		if (cmp.get('v.visible')) {
+		if (cmp.get('v.visible') || !cmp.isRendered()) {
 			return;
 		}		
 		this.attachEventHandler(cmp);		
@@ -509,64 +509,5 @@
     	if (sorterMenu) {
     		sorterMenu.get('e.refresh').fire();
     	}
-	},
-	
-	updateMenuList: function(cmp) {
-		//this is a workaround for the aura:iteration rerendering issue
-		var items = cmp.get('v.items');
-		var menuList = cmp.find('sorterMenuList');
-		var onFinish = function(newItems) {
-			var menuListBody = menuList.get('v.body');
-			for (var n = 0; n < menuListBody.length; n++) {
-				//until we get rid of the parent attribute in the menuItem, which is anti-pattern
-				//need to reset v.parent attribute to empty array, otherwise, the parent component will be destroyed also
-				var item = menuListBody[n];
-				item.set('v.parent', [], true);
-			}
-			
-			menuList.set('v.body', newItems);
-		};
-		
-		this._createMenuItems(cmp, items, onFinish);
-	},
-
-	_createMenuItems: function(cmp, items, onFinish) {
-		var rowFacet = cmp.get('v.rowDef');
-		var rowVar = cmp.get('rowVar') || 'item';
-		
-		if (!$A.util.isArray(items) || !rowFacet) {
-			return;
-		}
-		var total = items.length;
-		var helper = this;
-		var doFinish = function(newCmps){
-			if (typeof onFinish === 'function') {
-				onFinish(newCmps);
-				helper.refreshMenu(cmp);
-			}
-		};
-		var retVal = []
-		var doInsert = function(index) {
-			total--;
-			return function(newCmp) {
-				retVal.push(newCmp);
-				if (total == 0) {
-					doFinish(retVal);
-				}
-			}
-		}
-		for (var i=0, len=items.length; i < len; i++) {
-			var rowContext = {};
-			var itemVal = $A.expressionService.create(null, {'label': items[i].label, 'fieldName': items[i].fieldName});
-			rowContext[rowVar] = itemVal;			
-			var vp = $A.expressionService.createPassthroughValue(rowContext, cmp);
-			
-			$A.componentService.newComponentAsync(
-	            this,
-	            doInsert(i),
-	            rowFacet[0],
-	            vp
-	        )
-        }
-    }  
+	}
 })

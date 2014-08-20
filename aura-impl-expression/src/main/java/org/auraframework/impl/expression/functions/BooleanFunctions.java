@@ -67,16 +67,29 @@ public class BooleanFunctions {
         }
     }
 
+    /**
+     * Not is meant to match JS not.
+     */
     public static class Not implements Function {
         private static final long serialVersionUID = 2749177700513718436L;
 
         @Override
         public Object evaluate(List<Object> args) {
             Object a1 = args.get(0);
+            
             if (a1 instanceof Boolean) {
-                return !(Boolean) a1;
+                return Boolean.valueOf(!((Boolean)a1).booleanValue());
             }
-            return null;
+            if (a1 instanceof String) {
+                return Boolean.valueOf("".equals(a1));
+            }
+            if (a1 instanceof Number) {
+                return Boolean.valueOf(a1.equals(0.0) || a1.equals(Float.NaN));
+            }
+            if (a1 == null) {
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
         }
 
         @Override

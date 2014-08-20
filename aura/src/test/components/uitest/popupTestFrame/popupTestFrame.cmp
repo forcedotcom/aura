@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:attribute name="frameId" type="String"/>
+    <ui:button press="{!c.handlePress}" label="{!v.frameId + ': press me'}"/>
+</aura:component>

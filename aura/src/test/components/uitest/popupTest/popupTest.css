@@ -1,0 +1,15 @@
+.THIS.popups {
+	list-style-type: none;
+}
+
+.THIS .popup {
+    display: inline-block;
+    min-width: 200px;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+iframe.THIS {
+    border: 1px solid black;
+    padding: 10px;
+}

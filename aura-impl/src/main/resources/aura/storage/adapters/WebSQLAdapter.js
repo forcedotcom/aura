@@ -20,11 +20,15 @@
  */
 var WebSQLStorageAdapter = function WebSQLStorageAdapter(config) {
     this.size = 0;
-	
+
+    this.createSchemaInProgress = false;
+    this.createSchemaSuccessCallbacks = [];
+    this.createSchemaErrorCallbacks = [];
+
     var instanceName = "AIS:" + config["name"];
 	this.db = openDatabase(instanceName, "1.0", instanceName + " database", 50 * 1024 * 1024);
 
-	this.createSchema(false);
+	this.createSchema();
 };
 
 WebSQLStorageAdapter.NAME = "websql";
@@ -34,119 +38,228 @@ WebSQLStorageAdapter.prototype.getName = function() {
 };
 
 WebSQLStorageAdapter.prototype.getSize = function() {
-	return this.size;
+    var that = this;
+    return $A.util.createPromise(function(success, error) {
+        success(that.size);
+    });
 };
 
-WebSQLStorageAdapter.prototype.getItem = function(key, resultCallback) {
-	this.db.readTransaction(function(tx) {
-		tx.executeSql("SELECT value, created, expires FROM cache WHERE key = ?;", [key],
-			function(tx, results) {
-				var rows = results.rows;
+WebSQLStorageAdapter.prototype.getItem = function(key) {
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        that.db.readTransaction(
+            function(tx) {
+                tx.executeSql(
+                    "SELECT value, created, expires FROM cache WHERE key = ?;",
+                    [key],
+                    function(tx, results) {
+                        var rows = results.rows;
 
-				var item;
-				if (rows.length > 0) {
-					var row = rows.item(0);
-					
-					item = {
-						"value": $A.util["json"].decode(row["value"]),
-						"created": row["created"],
-						"expires": row["expires"]
-					};
-				}
-				
-				resultCallback(item);
-			}
-		);
-	});
+                        var item;
+                        if (rows.length > 0) {
+                            var row = rows.item(0);
+
+                            item = {
+                                "value": $A.util["json"].decode(row["value"]),
+                                "created": row["created"],
+                                "expires": row["expires"]
+                            };
+                        }
+
+                        success(item);
+                    },
+                    function(transaction, errorMsg) { error(errorMsg); });
+            },
+            error
+        );
+    });
+
+    return promise;
 };
 
 WebSQLStorageAdapter.prototype.setItem = function(key, item) {
 	var that = this;
-	this.db.transaction(function(tx) {
-		tx.executeSql("DELETE FROM cache WHERE key = ?;", [key]);
-		
-		var value = $A.util["json"].encode(item["value"]);
-		tx.executeSql("INSERT INTO cache (key, value, created, expires, size) VALUES (?, ?, ?, ?, ?);", 
-				[key, value, item["created"], item["expires"], value.length], function() {
-			that.updateSize();
-		}, function(tx, error) {
-			throw new Error("WebSQLStorageAdapter.setItem() failed: " + error.message);
-		});
-	});
+    var promise = $A.util.createPromise(function(success, error) {
+        that.db.transaction(
+            function(tx) {
+                tx.executeSql(
+                    "DELETE FROM cache WHERE key = ?;",
+                    [key],
+                    function() {
+                        var value = $A.util["json"].encode(item["value"]);
+                        tx.executeSql(
+                            "INSERT INTO cache (key, value, created, expires, size) VALUES (?, ?, ?, ?, ?);",
+                            [key, value, item["created"], item["expires"], value.length],
+                            function() { that.updateSize(success); },
+                            function(transaction, errorMsg) { error(errorMsg); });
+                    },
+                    error
+                );
+            },
+            error
+        );
+    });
+
+    return promise;
 };
 
 WebSQLStorageAdapter.prototype.removeItem = function(key) {
 	var that = this;
-	this.db.transaction(function(tx) {
-		tx.executeSql("DELETE FROM cache WHERE key = ?;", [key], function() {
-			that.updateSize();
-		});
-	});
+    var promise = $A.util.createPromise(function(success, error) {
+        that.db.transaction(
+            function(tx) {
+                tx.executeSql(
+                    "DELETE FROM cache WHERE key = ?;",
+                    [key],
+                    function() { that.updateSize(success); },
+                    function(transaction, errorMsg) { error(errorMsg); });
+            },
+            error
+        );
+    });
+    return promise;
 };
 
 WebSQLStorageAdapter.prototype.clear = function() {
-	this.createSchema(true);
+    var that = this;
+    return $A.util.createPromise(function(success, error) {
+        that.createSchema(success, error);
+    });
 };
 
-WebSQLStorageAdapter.prototype.getExpired = function(resultCallback) {
-	this.db.readTransaction(function(tx) {
-		var now = new Date().getTime();
-		tx.executeSql("SELECT key FROM cache WHERE expires < ?;", [now],
-			function(tx, results) {
-				var rows = results.rows;
+WebSQLStorageAdapter.prototype.getExpired = function() {
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        that.db.readTransaction(
+            function(tx) {
+                var now = new Date().getTime();
+                tx.executeSql(
+                    "SELECT key FROM cache WHERE expires < ?;",
+                    [now],
+                    function(tx, results) {
+                        var rows = results.rows;
 
-				var expired = [];
-				for (var n = 0; n < rows.length; n++) {
-					var row = rows.item(n);
-					expired.push(row["key"]);
-				}
-				
-				resultCallback(expired);
-			}
-		);
-	});
+                        var expired = [];
+                        for (var n = 0; n < rows.length; n++) {
+                            var row = rows.item(n);
+                            expired.push(row["key"]);
+                        }
+
+                        success(expired);
+                    },
+                    function(transaction, errorMsg) {
+                        if (errorMsg.message.indexOf("no such table: cache") > -1) {
+                            success([]);
+                        } else {
+                            error(errorMsg);
+                        }
+                    }
+                );
+            },
+            error
+        );
+    });
+
+    return promise;
 };
 
 // Internals
 
 
-WebSQLStorageAdapter.prototype.updateSize = function() {
+WebSQLStorageAdapter.prototype.updateSize = function(sizeUpdatedCallback) {
 	// Prime the this.size pump with a SELECT SUM() query
 	var that = this;
-	this.db.transaction(function(tx) {
-		tx.executeSql("SELECT SUM(size) AS totalSize FROM cache;", [],
-			function(tx, results) {
-				var rows = results.rows;
-				that.size = rows.item(0)["totalSize"];
-				
-				$A.storageService.fireModified();
-			},
-			function(tx, error) {
-				throw new Error("WebSQLStorageAdapter.updateSize() failed: " + error.message);
-			}
-		);
-	});
+	this.db.transaction(
+        function(tx) {
+            tx.executeSql(
+                "SELECT SUM(size) AS totalSize FROM cache;",
+                [],
+                function(tx, results) {
+                    var rows = results.rows;
+                    that.size = rows.item(0)["totalSize"];
+
+                    if (sizeUpdatedCallback) {
+                        sizeUpdatedCallback();
+                    }
+                    $A.storageService.fireModified();
+                },
+                function(tx, error) {
+                    throw new Error("WebSQLStorageAdapter.updateSize() failed: " + error.message);
+                }
+            );
+        }
+    );
 };
 
-WebSQLStorageAdapter.prototype.createSchema = function(dropFirst) {
-	if (dropFirst) {
-		this.db.transaction(function(tx) {
-			tx.executeSql("DROP TABLE cache;");
-		});
-	}
-	
-	// Create the schema if it does not already exist
-	this.db.transaction(function(tx) {
-		tx.executeSql("CREATE TABLE IF NOT EXISTS cache (key unique, value, created, expires, size);");
-	});
-	
-	this.updateSize();
+WebSQLStorageAdapter.prototype.createSchema = function(successCallback, errorCallback) {
+    var that = this;
+
+    // Schema creation is asynchronous and multiple calls to it can occur before the first call completes.
+    // Use the success/failure of any active call to satisfy any other calls.
+    if (successCallback) {
+        that.createSchemaSuccessCallbacks.push(successCallback);
+    }
+    if (errorCallback) {
+        that.createSchemaErrorCallbacks.push(errorCallback);
+    }
+
+    if (that.createSchemaInProgress) {
+        return;
+    } else {
+        that.createSchemaInProgress = true;
+    }
+
+    function processSuccess() {
+        that.updateSize(function() {
+            var successCallbacks = that.createSchemaSuccessCallbacks;
+            that.createSchemaSuccessCallbacks = [];
+            that.createSchemaErrorCallbacks = [];
+            $A.util.forEach(successCallbacks, function(callback) { callback(); });
+            that.createSchemaInProgress = false;
+        });
+    }
+
+    function processError(transaction, error) {
+        var errorCallbacks = that.createSchemaErrorCallbacks;
+        that.createSchemaSuccessCallbacks = [];
+        that.createSchemaErrorCallbacks = [];
+        $A.util.forEach(errorCallbacks, function(callback) { callback(error); });
+        that.createSchemaInProgress = false;
+    }
+
+    function createCacheTable() {
+        that.db.transaction(
+            function (tx) {
+                tx.executeSql(
+                    "CREATE TABLE IF NOT EXISTS cache (key unique, value, created, expires, size);",
+                    [],
+                    processSuccess,
+                    processError
+                );
+            }
+        );
+    }
+
+    function deleteCacheTable(success) {
+        that.db.transaction(
+            function (tx) {
+                tx.executeSql(
+                    "DROP TABLE IF EXISTS cache;",
+                    [],
+                    success,
+                    processError
+                );
+            }
+        );
+    }
+
+    deleteCacheTable(createCacheTable);
 };
 
 // Only register this adapter if the WebSQL API is present
 if (window.openDatabase) {
-	$A.storageService.registerAdapter({ 
-		"name": WebSQLStorageAdapter.NAME, 
+	$A.storageService.registerAdapter({
+		"name": WebSQLStorageAdapter.NAME,
 		"adapterClass": WebSQLStorageAdapter,
 		"persistent": true
 	});

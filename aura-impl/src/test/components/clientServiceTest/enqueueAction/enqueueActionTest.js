@@ -665,7 +665,7 @@
     },
 
     testAbortInFlightAbortable : {
-        test : [ function(cmp) {
+        test : function(cmp) {
             var that = this;
             // hold abortable at server
             $A.run(function() {
@@ -700,7 +700,7 @@
             this.waitForLog(cmp, 0, "back1:fore1,back1");
             this.waitForLog(cmp, 1, "back2:back2");
             this.waitForLog(cmp, 2, "fore2:fore2");
-        } ]
+        }
     },
 
     testStorableRefresh : {
@@ -900,58 +900,110 @@
         } ]
     },
 
+
+    /**
+     * This test checks four things, all around abortion of an in-flight storable:
+     * 1. The first time you get a storable, it does not come from storage
+     * 2. The next time you get a storable, it comes from storage
+     * 3. Writing while a storable is being processed aborts that storable. The aborted storable still returns and
+     *    the returned value is stored, but callbacks are not called.
+     * 4. Getting a storable after the write has completed returns a new value and that value does not come from
+     *    storage.
+     *
+     *
+     * Factors that made this test hard for me to understand:
+     *
+     *   The action returned by getAction is not the same as the actions passed to getAction's callback. This
+     *   means, for example, that the action returned by getAction and the action passed to getAction's callback
+     *   may have different returnValues.
+     *
+     *   When looking at what happens to an aborted action... Breaking in Action.prototype.updateFromResponse shows that
+     *   one action does have its returnValue set to the value of the aborted actions response. However, this action is
+     *   not the action returned by getAction nor is it one of the actions passed to getAction's callback.
+     *
+     *   Storing the returnValue of a completed action is asynchronous; therefore, getAction's callback cannot
+     *   be used to make assertions about values in storage.
+     */
     testAbortInFlightStorable : {
         test : [ function(cmp) {
             var that = this;
+            var a;
             $A.run(function() {
                 // prime storage
-                var a = that.getAction(cmp, "c.execute", "WAIT fore;READ;", function(a) {
-                    that.log(cmp, "prime:" + a.isFromStorage() + ":" + a.getReturnValue());
-                });
+                a = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
                 a.setStorable({'refresh':0});
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME fore;"));
             });
-            this.waitForLog(cmp, 0, "prime:false:initial");
+
+            // First read comes from the server
+            $A.test.addWaitFor(
+                "false:initial",
+                function() { return a.isFromStorage() + ":" + a.getReturnValue(); },
+                function () { that.log(cmp, "SUCCESS - initial value read from server"); }
+            );
         }, function(cmp) {
             var that = this;
+            var a;
+            var storage;
+            var key;
             // max out in-flight, to start queueing, and hold storable at server
-            $A.run(function() {
-                var a = that.getAction(cmp, "c.execute", "WAIT fore;READ;", function(a) {
-                    that.log(cmp, "store1:" + a.isFromStorage() + ":" + a.getReturnValue());
-                });
-                a.setStorable({'refresh':0});
+            $A.run(function () {
+                a = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
+                a.setStorable({'refresh': 0});
                 $A.enqueueAction(a);
-            });
-            // queue up second storable
-            $A.run(function() {
-                var a = that.getAction(cmp, "c.execute", "READ; RESUME back2;", function(a) {
-                    that.log(cmp, "release:" + a.getReturnValue());
-                });
-                $A.enqueueAction(a);
-                a = that.getAction(cmp, "c.execute", "WAIT fore;READ;", function(a) {
-                    that.log(cmp, "store2:" + a.isFromStorage() + ":" + a.getReturnValue());
-                });
-                a.setStorable({'refresh':0});
-                $A.enqueueAction(a);
-            });
-            // release
-            $A.run(function() {
-                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND release1;RESUME fore;"));
-                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "WAIT back2;APPEND release2;RESUME fore;"));
+                storage = a.getStorage();
+                key = a.getStorageKey();
             });
 
-            this.waitForLog(cmp, 1, "store1:true:initial");
-            // since the first action is already in flight when it is aborted, the return value is still stored in
-            // storage (release1), we just don't call the callback
-            this.waitForLog(cmp, 2, "store2:true:release1");
-            //
-            // FIXME: if we remove the log 'release:' above, and make this a single
-            // wait, it becomes flappy with the second 'store2' never appearing.
-            //
-            this.waitForLogRace(cmp, 3, 4, "release:");
-            this.waitForLogRace(cmp, 3, 4, "store2:false:release2");
-            //this.waitForLog(cmp, 3, "store2:false:release2");
+            // Queue up second read
+            // Make this action non-storable so that we can later check storage to see if the aborted action's value
+            // was stored.
+            var b;
+            $A.run(function () {
+                $A.enqueueAction(that.getAction(cmp, "c.execute", "READ; RESUME back2;"));
+                b = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
+                $A.enqueueAction(b);
+            });
+
+            // Release
+            $A.run(function() {
+                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND abortedValue;RESUME fore;"));
+                $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "WAIT back2;APPEND overwriteValue;RESUME fore;"));
+            });
+
+            // A value that has already been fetched is read from storage
+            $A.test.addWaitFor(
+                "true:initial",
+                function () { return a.isFromStorage() + ":" + a.getReturnValue(); },
+                function () { that.log(cmp, "SUCCESS - initial value read from storage"); }
+            );
+            
+            // The new action shows a new value has been retrieved from the server.
+            $A.test.addWaitFor(
+                "false:overwriteValue",
+                function() { return b.isFromStorage() + ":" + b.getReturnValue(); },
+                function () { that.log(cmp, "SUCCESS - new value read from server"); }
+            );
+
+            // The aborted action's response was stored
+            var readAbortedValue = false;
+            $A.test.addWaitFor(
+                true,
+                function () {
+                    if (!storage) {
+                        return false;
+                    }
+
+                    storage.get(key)
+                        .then(function(item) {
+                            readAbortedValue = item.value.returnValue[0] === "abortedValue";
+                        });
+
+                    return readAbortedValue;
+                },
+                function () { that.log(cmp, "SUCCESS - aborted value read from storage"); }
+            );
         } ]
     },
 

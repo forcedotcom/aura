@@ -61,11 +61,12 @@ AuraStorage.prototype.getName = function() {
 };
 
 /**
- * Returns the current storage size in KB. 
- * @returns {number} The current storage size in KB.
+ * Asynchronously gets the current storage size in KB.
+ * @returns {Promise} A Promise that will get the current storage size in KB.
  */
 AuraStorage.prototype.getSize = function() {
-	return this.adapter.getSize() / 1024.0;
+	return this.adapter.getSize()
+        .then(function(size) { return size / 1024.0; } );
 };
 
 /**
@@ -85,99 +86,134 @@ AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
 };
 
 /**
- * Clears the storage. 
+ * Returns a promise that clears the storage.
+ * @return {Promise} A Promise that will clear storage.
  */
 AuraStorage.prototype.clear = function() {
-	this.adapter.clear();
+	return this.adapter.clear();
 };
 
 /**
- * Gets an item from storage corresponding to the specified key.
+ * Asynchronously gets an item from storage corresponding to the specified key.
  * @param {String} key The item key. This is the key used when the item was added to storage using put().
- * @param {Function} resultCallback The function that will be called asynchronously with the item that was fetched from the storage as its parameter.
- * @returns {Object} An item from storage.
+ * @returns {Promise} A Promise that will fetch an item from storage.
  */
-AuraStorage.prototype.get = function(key, resultCallback) {
-    this.sweep();
-
-    // This needs to also be asynchronous (callback) based to map to IndexedDB, WebSQL, SmartStore that are all async worlds
+AuraStorage.prototype.get = function(key) {
+    // This needs to also be asynchronous to map to IndexedDB, WebSQL, SmartStore that are all async worlds
     var that = this;
-    this.adapter.getItem(key, function(item) {
-        var value, isExpired;
-        if (item && item.value) {
-            value = item.value;
-            isExpired = (new Date().getTime() > item.expires);
-            
+    var promise = this.sweep().then(function() {
+        return that.adapter.getItem(key).then(function(item) {
+
             that.log("AuraStorage.get(): using action found in " + that.getName() + " storage", [key, item]);
-        }
-    
-        resultCallback(value, isExpired);
+
+            if (!item) {
+                return undefined;
+            }
+
+            return { value : item.value, isExpired : (new Date().getTime() > item.expires) };
+        });
     });
+
+    return promise;
 };
 
 /**
- * Stores the value in storage using the specified key.
+ * Asynchronously stores the value in storage using the specified key.
  * @param {String} key The key of the item to store. 
  * @param {Object} value The value of the item to store.
+ * @return {Promise} A Promise that will put the value in storage.
  */
 AuraStorage.prototype.put = function(key, value) {
-	this.sweep();
+    var now = new Date().getTime();
 
-	var now = new Date().getTime();
-	
-	var item = {
-		"value": value,	
-		"created": now,
-		"expires": now + this.defaultExpiration
-	};
-	
-	this.adapter.setItem(key, item);
+    var item = {
+        "value": value,
+        "created": now,
+        "expires": now + this.defaultExpiration
+    };
 
-	this.log("AuraStorage.put(): persisting action to " + this.getName() + " storage", [key, item]);
-	
-	$A.storageService.fireModified();
+    var that = this;
+    var promise = this.sweep().then(function() {
+
+        return that.adapter.setItem(key, item)
+            .then(function () {
+                that.log("AuraStorage.put(): persisting action to " + that.getName() + " storage", [key, item]);
+                $A.storageService.fireModified();
+            });
+    });
+
+    return promise;
 };
 
 /**
  * @private
+ * Asynchronously removes the item indicated by key.
+ * @param {String} key The key of the item to remove.
+ * @param {Boolean} doNotFireModified A bool indicating whether or not to fire the modified event on item removal.
+ * @return {Promise} A Promise that will remove the item from storage.
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
-	this.adapter.removeItem(key);
-	
-	if (!doNotFireModified) {
-		$A.storageService.fireModified();
-	}
+    var promise = this.adapter.removeItem(key)
+        .then(function(){
+            if (!doNotFireModified) {
+                $A.storageService.fireModified();
+            }
+        });
+    return promise;
 };
 
 /**
  * @private
+ * Asynchronously removes all expired items.
+ * @return{Promise} A Promise that will execute sweep.
  */
 AuraStorage.prototype.sweep = function() {
-	// Do not sweep if we have lost our connection - we'll
-	// ignore expiration until sweeping resumes
-	if (!this._sweepingSuspended) {
-		// Check simple expirations
-		var removedSomething;
-		// var now = new Date().getTime();
-		var that = this;
-		this.adapter.getExpired(function(expired) {
-			for (var n = 0; n < expired.length; n++) {
-				var key = expired[n];
-	
-				that.log("AuraStorage.sweep(): expiring action from " + that.getName() + " storage adapter", key);
-				that.remove(key, true);
-				removedSomething = true;
-			}
-			
-			if (removedSomething) {
-				$A.storageService.fireModified();
-			}
-		});
-	}
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+
+        // Do not sweep if we have lost our connection - we'll
+        // ignore expiration until sweeping resumes
+        if (that._sweepingSuspended) {
+            success();
+            return;
+        }
+
+        // Check simple expirations
+        return that.adapter.getExpired().then(function (expired) {
+
+            if (expired.length === 0) {
+                success();
+                return;
+            }
+
+            var promiseSet = [];
+            var key;
+            for (var n = 0; n < expired.length; n++) {
+                key = expired[n];
+                that.log("AuraStorage.sweep(): expiring action from " + that.getName() + " storage adapter", key);
+                promiseSet.push(that.remove(key, true));
+            }
+
+            // When all of the remove promises have completed...
+            $A.util.when.apply(that, promiseSet).then(
+                function () {
+                    $A.storageService.fireModified();
+                    success();
+                },
+                function (err) {
+                    that.log("Error while AuraStorage.sweep was removing items: " + err);
+                    error(err);
+                }
+            );
+        });
+    });
+
+    return promise;
 };
 
 /**
- * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the connection goes offline.
+ * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the
+ * connection goes offline.
  */
 AuraStorage.prototype.suspendSweeping = function() {
 	this.log("AuraStorage.suspendSweeping()");
@@ -187,12 +223,13 @@ AuraStorage.prototype.suspendSweeping = function() {
 
 /**
  * Resumes sweeping to remove expired storage adapters.
+ * @return{Promise} A Promise that will execute sweep.
  */
 AuraStorage.prototype.resumeSweeping = function() {
 	this.log("AuraStorage.resumeSweeping()");
 
 	this._sweepingSuspended = false;
-	this.sweep();
+	return this.sweep();
 };
 
 /**

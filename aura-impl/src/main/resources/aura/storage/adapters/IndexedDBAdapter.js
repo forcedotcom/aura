@@ -31,10 +31,8 @@ IndexedDBStorageAdapter.prototype.getSize = function() {
 	return 0;
 };
 
-IndexedDBStorageAdapter.prototype.getItem = function(key, resultCallback) {
+IndexedDBStorageAdapter.prototype.getItem = function(key) {
 	// DCHASMAN TODO
-	
-	resultCallback(undefined);
 };
 
 IndexedDBStorageAdapter.prototype.setItem = function(key, item) {
@@ -49,13 +47,8 @@ IndexedDBStorageAdapter.prototype.clear = function(key) {
 	// DCHASMAN TODO
 };
 
-IndexedDBStorageAdapter.prototype.getExpired = function(resultCallback) {
-	// var now = new Date().getTime();
-	var expired = [];
-
+IndexedDBStorageAdapter.prototype.getExpired = function() {
 	// DCHASMAN TODO
-	
-	resultCallback(expired);
 };
 
 

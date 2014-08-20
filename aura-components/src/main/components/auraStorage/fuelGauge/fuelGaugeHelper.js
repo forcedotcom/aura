@@ -26,22 +26,25 @@
 	update: function(cmp){
     	if (this.isEnabled(cmp)) {
     		var storage = this.getStorage(cmp);
-	    	var size = storage.getSize();
 	    	var maxSize = storage.getMaxSize();
 
-	    	var severity;
-	    	if (size < maxSize / 2) {
-	    		severity = "success";
-	    	} else if (size < maxSize) {
-	    		severity = "warning";
-	    	} else {
-	    		severity = "important";
-	    	}
+            storage.getSize().then(function(size) {
+                $A.run(function() {
+                    var severity;
+                    if (size < maxSize / 2) {
+                        severity = "success";
+                    } else if (size < maxSize) {
+                        severity = "warning";
+                    } else {
+                        severity = "important";
+                    }
 
-	    	var stamp = cmp.find("stamp");
-	    	stamp.set("v.severity", severity);
+                    var stamp = cmp.find("stamp");
+                    stamp.set("v.severity", severity);
 
-	    	cmp.set("v.value", Math.round(size * 100) / 100);
+                    cmp.set("v.value", Math.round(size * 100) / 100);
+                });
+            });
     	}
     }
 })

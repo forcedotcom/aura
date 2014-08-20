@@ -12,7 +12,20 @@
 
     testAuraInitWaitsForGetItem : {
         test : function(cmp) {
-            $A.test.assertTrue(window.mockStorageAdapter.getItem['globalValueProviders'], "Aura initialization completed before mockStorageAdapter.getItem('globalValueProviders')'s callback was invoked");
+
+            var completed = false;
+            var result;
+            window.mockStorageAdapter.getItem('globalValueProviders')
+                .then(function(item) {
+                    result = item;
+                    completed = true;
+                });
+
+            $A.test.addWaitFor(
+                true,
+                function() { return completed; },
+                function() { $A.test.assertNotUndefinedOrNull(result, "Aura initialization completed before mockStorageAdapter.getItem('globalValueProviders')'s callback was invoked"); }
+            );
         }
     }
 })

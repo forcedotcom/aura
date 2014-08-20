@@ -28,7 +28,11 @@
 
     testSizeInitial : {
         test : function(cmp) {
-            $A.test.assertEquals(0, this.adapter.getSize());
+            var completed = false;
+            this.adapter.getSize().then(function(size) {$A.test.assertEquals(0, size)})
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
@@ -36,55 +40,67 @@
         test : function(cmp) {
             // key: 4 chars = 8 bytes
             // value: ~32 bytes
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            $A.test.assertEquals(40, this.adapter.getSize());
+            var that = this;
+            var completed = false;
+            that.adapter.setItem("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(40, size); })
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
     testSizeSameKeySameObject : {
         test : function(cmp) {
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            var originalSize = this.adapter.getSize();
+            var adapter = this.adapter;
+            var size1 = NaN;
+            var size2 = NaN;
+            var size3 = NaN;
+            var completed = false;
+            adapter.setItem("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" }})
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { size1 = size; })
+                .then(function() { return adapter.getSize();})
+                .then(function(size) { size2 = size; })
+                .then(function() {return adapter.setItem("key2", {});})
+                .then(function() {return adapter.getSize();})
+                .then(function(size) { size3 = size; })
+                .then(
+                    function(args) {
+                        // do nothing and the size should not have changed
+                        $A.test.assertEquals(size1, size2);
 
-            // do nothing and the size should not have changed
-            $A.test.assertEquals(originalSize, this.adapter.getSize());
+                        // add another object to trigger a recalculation of size
+                        // size should be the original + the 8 for the new key
+                        $A.test.assertEquals(size1 + (8), size3);
 
-            // add another object to trigger a recalculation of size
-            this.adapter.setItem("key2", {});
-            // size should be the original + the 8 for the new key
-            $A.test.assertEquals(originalSize + (8), this.adapter.getSize());
+                        completed = true;
+                    },
+                    function(err) {
+                        $A.test.fail("Failed testSizeSameKeySameObject." + err);
+                    }
+            )
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
     testSizeSameKeyEqualObject : {
         test : function(cmp) {
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            var originalSize = this.adapter.getSize();
+            var that = this;
+            var originalSize = NaN;
+            var completed = false;
+            this.adapter.setItem("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { originalSize = size; })
+                .then(function() { return that.adapter.setItem("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } }); })
+                // the size should not have changed
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(originalSize, size) })
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); })
 
-            // set the key with an equal (===) object.
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            // the size should not have changed
-            $A.test.assertEquals(originalSize, this.adapter.getSize());
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
@@ -92,197 +108,160 @@
         test : function(cmp) {
             // key: 4 chars = 8 bytes
             // value: ~32 bytes
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            $A.test.assertEquals(40, this.adapter.getSize());
+            var that = this;
+            var completed = false;
+            this.adapter.setItem("key1", {"value" : {"alpha" : "beta","gamma" : "delta" } })
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(40, size); })
+                .then(function() { return that.adapter.setItem("key1", {"value" : {"alpha" : "epsilon","gamma" : "zeta","now" : true }}) })
+                // key: 4 chars = 8 bytes
+                // value: ~45 bytes
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(53, size); })
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
 
-            // key: 4 chars = 8 bytes
-            // value: ~45 bytes
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "epsilon",
-                    "gamma" : "zeta",
-                    "now" : true
-                }
-            });
-
-            $A.test.assertEquals(53, this.adapter.getSize());
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
     testSizeMultipleObjects : {
         test : function(cmp) {
-            // key: 4 chars = 8 bytes
-            // value: ~32 bytes
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            // key: 4 chars = 8 bytes
-            // value: ~34 bytes
-            this.adapter.setItem("key2", {
-                "value" : {
-                    "alpha" : "epsilon",
-                    "gamma" : "zeta"
-                }
-            });
-            // key: 4 chars = 8 bytes
-            // value: ~31 bytes
-            this.adapter.setItem("key3", {
-                "value" : {
-                    "alpha" : "eta",
-                    "gamma" : "theta"
-                }
-            });
-            // key: 4 chars = 8 bytes
-            // value: ~32 bytes
-            this.adapter.setItem("key4", {
-                "value" : {
-                    "alpha" : "iota",
-                    "gamma" : "kappa"
-                }
-            });
+            var adapter = this.adapter;
+            var completed = false;
+            $A.util.when(
+                // key: 4 chars = 8 bytes
+                // value: ~32 bytes
+                adapter.setItem("key1", {
+                    "value" : {
+                        "alpha" : "beta",
+                        "gamma" : "delta"
+                    }
+                }),
+                // key: 4 chars = 8 bytes
+                // value: ~34 bytes
+                adapter.setItem("key2", {
+                    "value" : {
+                        "alpha" : "epsilon",
+                        "gamma" : "zeta"
+                    }
+                }),
+                // key: 4 chars = 8 bytes
+                // value: ~31 bytes
+                adapter.setItem("key3", {
+                    "value" : {
+                        "alpha" : "eta",
+                        "gamma" : "theta"
+                    }
+                }),
+                // key: 4 chars = 8 bytes
+                // value: ~32 bytes
+                adapter.setItem("key4", {
+                    "value" : {
+                        "alpha" : "iota",
+                        "gamma" : "kappa"
+                    }
+                })
+            )
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(40+42+39+40, size); })
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
 
-            $A.test.assertEquals(40+42+39+40, this.adapter.getSize());
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
     testSizeAfterRemoveKey : {
         test : function(cmp) {
+            var that = this;
+            var completed = false;
             // key: 4 chars = 8 bytes
             // value: ~32 bytes
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "beta",
-                    "gamma" : "delta"
-                }
-            });
-            // key: 4 chars = 8 bytes
-            // value: ~32 bytes
-            this.adapter.setItem("key2", {
-                "value" : {
-                    "alpha" : "iota",
-                    "gamma" : "kappa"
-                }
-            });
-            $A.test.assertEquals(40+40, this.adapter.getSize());
+            $A.util.when(
+                that.adapter.setItem("key1", {"value" : {"alpha" : "beta","gamma" : "delta"}}),
+                that.adapter.setItem("key2", {"value" : {"alpha" : "iota","gamma" : "kappa"}})
+            )
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(40+40, size); })
+                // removing the key, removes it from this.storage
+                .then(function() { return that.adapter.removeItem("key1"); } )
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(40, size); })
+                // adding a new key
+                // key: 4 chars = 8 bytes
+                // value: ~34 bytes
+                .then(function() { return that.adapter.setItem("key1", {"value" : {"alpha" : "epsilon", "gamma" : "zeta"}}) })
+                .then(function() { return that.adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(40+42, size); })
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
 
-            this.adapter.removeItem("key1");
-            // removing the key, removes it from this.storage
-            $A.test.assertEquals(40, this.adapter.getSize());
-
-            // adding a new key
-            // key: 4 chars = 8 bytes
-            // value: ~34 bytes
-            this.adapter.setItem("key1", {
-                "value" : {
-                    "alpha" : "epsilon",
-                    "gamma" : "zeta"
-                }
-            });
-            $A.test.assertEquals(40+42, this.adapter.getSize());
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
     testLeastRecentlyUsedEviction : {
-        test : [ function(cmp) {
+        test : function(cmp) {
             var adapter = this.adapter;
-
-            // key: 4 chars = 8 bytes
-            // value: ~265 bytes
-            adapter.setItem("key1", {
-                "value" : {
-                    "foo" : new Array(256).join("x")
-                }
-            });
-            var size1 = adapter.getSize();
-            $A.test.assertEquals(273, size1);
-            $A.test.assertEquals("key1", adapter.getMRU().toString());
-
-            // key: 4 chars = 8 bytes
-            // value: ~521 bytes
-            adapter.setItem("key2", {
-                "value" : {
-                    "bar" : new Array(512).join("y")
-                }
-            });
-            var size2 = adapter.getSize();
-            $A.test.assertEquals(273+529, size2);
-            $A.test.assertEquals("key1,key2", adapter.getMRU().toString());
-        }, function(cmp) {
-            var adapter = this.adapter;
-            // Touch key1 to move it up to the top of the MRU
-            // Oldest (key2) item should have been evicted
-            var item1WasTouched;
-            $A.test.addWaitFor(true, function() {
-                adapter.getItem("key1", function(item) {
-                    item1WasTouched = !$A.util.isUndefined(item);
-                });
-
-                return item1WasTouched;
-            }, function(cmp) {
-                $A.test.assertEquals("key2,key1", adapter.getMRU().toString());
+            var completed = false;
+            adapter.setItem("key1", {"value" : {"foo" : new Array(256).join("x")}})
+                // key: 4 chars = 8 bytes
+                // value: ~265 bytes
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(273, size); })
+                .then(function() { return adapter.getMRU(); })
+                .then(function(mru) { $A.test.assertEquals("key1", mru.toString()); })
 
                 // key: 4 chars = 8 bytes
-                // value: ~3309 bytes
-                adapter.setItem("key3", {
-                    "value" : {
-                        "baz" : new Array(3300).join("z")
-                    }
-                });
+                // value: ~521 bytes
+                .then(function() { return adapter.setItem("key2", { "value" : { "bar" : new Array(512).join("y")}})})
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(273+529, size); })
+                .then(function() { return adapter.getMRU(); })
+                .then(function(mru) { $A.test.assertEquals("key1,key2", mru.toString()); })
 
+                // Touch key1 to move it up to the top of the MRU
+                .then(function() {return adapter.getItem("key1"); })
+                .then(function(item) { return adapter.getMRU(); })
+                .then(function(mru) { $A.test.assertEquals("key2,key1", mru.toString()); })
+
+                // Add another item to push out the oldest item
                 // Oldest (key2) item should have been evicted
-                var itemWasEvicted;
-                $A.test.addWaitFor(true, function() {
-                    adapter.getItem("key2", function(item) {
-                        itemWasEvicted = $A.util.isUndefined(item);
-                    });
+                // key: 4 chars = 8 bytes
+                // value: ~3309 bytes
+                .then(function() { return adapter.setItem("key3", {"value" : {"baz" : new Array(3300).join("z")}}); })
+                .then(function() { return adapter.getItem("key2"); })
+                .then(function(item) { $A.util.isUndefined(item); })
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(273+3317, size); })
+                .then(function() { return adapter.getMRU(); })
+                .then(function(mru) { $A.test.assertEquals("key1,key3", mru.toString()); })
 
-                    return itemWasEvicted;
-                }, function(cmp) {
-                    $A.test.assertEquals(273+3317, adapter.getSize());
-                    $A.test.assertEquals("key1,key3", adapter.getMRU().toString());
-                });
-            });
-        },
-        // Complete eviction
-        function(cmp) {
-            var adapter = this.adapter;
-            // Add a new key which would require all the current entries to be
-            // evicted
-            // key: 4 chars = 8 bytes
-            // value: ~4009 bytes
-            adapter.setItem("key4", {
-                "value" : {
-                    "buz" : new Array(4000).join("w")
-                }
-            });
-            var size1 = adapter.getSize();
-            $A.test.assertEquals(4017, size1);
-            $A.test.assertEquals("key4", adapter.getMRU().toString());
-        } ]
+                // Complete eviction
+                // Add a new key which would require all the current entries to be evicted
+                // key: 4 chars = 8 bytes
+                // value: ~4009 bytes
+                .then(function() { return adapter.setItem("key4", { "value" : { "buz" : new Array(4000).join("w") }}); })
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(4017, size); })
+                .then(function() { return adapter.getMRU(); })
+                .then(function(mru) { $A.test.assertEquals("key4", mru.toString()); } )
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        }
     },
 
     testSetItemOverMaxSize : {
-            test : function(cmp) {
-                var adapter = this.adapter;
-                try {
-                    adapter.setItem("overSize", {
-                        "value" : {
-                            "BigMac" : new Array(5000).join("x")
-                        }
-                    });
+        test : function(cmp) {
+            var that = this;
+            var result = "";
+            that.adapter.setItem("overSize", { "value" : { "BigMac" : new Array(5000).join("x") } })
+                .then(
+                    function() { throw "Should not be called"; },
+                    function(error) { result = error;}
+                );
 
-                    $A.test.fail("Test should not reach here an error should be thrown");
-                } catch (error) {
-                    $A.test.assertEquals("MemoryStorageAdapter.setItem() cannot store an item over the maxSize", error);
-                }
-            }
+            $A.test.addWaitFor('MemoryStorageAdapter.setItem() cannot store an item over the maxSize',
+                function() { return result; })
+        }
     }
 })

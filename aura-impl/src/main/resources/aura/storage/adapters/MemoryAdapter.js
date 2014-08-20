@@ -52,109 +52,170 @@ MemoryStorageAdapter.prototype.getName = function() {
 };
 
 MemoryStorageAdapter.prototype.getSize = function() {
-	if (this.isDirtyForCachedSize === true) {
-		var newSize = 0;
-		for (var key in this.backingStore) {
-			var backingStoreValue = this.backingStore[key];
-			newSize += backingStoreValue.getSize();
-		}
-		
-		this.cachedSize = newSize;
-		this.isDirtyForCachedSize = false;
-	}
-	
-	return this.cachedSize;
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+
+        if (that.isDirtyForCachedSize === true) {
+            var newSize = 0;
+            for (var key in that.backingStore) {
+                newSize += that.backingStore[key].getSize();
+            }
+
+            that.cachedSize = newSize;
+            that.isDirtyForCachedSize = false;
+        }
+
+        success(that.cachedSize);
+    });
+
+    return promise;
 };
 
-MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
-	var value = this.backingStore[key];
-	if (!$A.util.isUndefinedOrNull(value)) {
-		// Update the MRU
-		var index = $A.util.arrayIndexOf(this.mru, key);
-		this.mru.splice(index, 1);
-		this.mru.push(key);
+MemoryStorageAdapter.prototype.getItem = function(key) {
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        var value = that.backingStore[key];
+        if (!$A.util.isUndefinedOrNull(value)) {
+            // Update the MRU
+            var index = $A.util.arrayIndexOf(that.mru, key);
+            that.mru.splice(index, 1);
+            that.mru.push(key);
 
-		resultCallback(value.getItem());
-	} else {
-		resultCallback();
-	}
+            success(value.getItem());
+        } else {
+            success();
+        }
+    });
+
+    return promise;
 };
 
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
-	// For the size calculation, consider only the inputs to the storage layer: key and value
-	// Ignore all the extras added by the Storage layer.
-	var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
-	
-	if (size > this.maxSize) {
-            throw "MemoryStorageAdapter.setItem() cannot store an item over the maxSize";
-	}
-	
-	var spaceNeeded = (size + this.getSize()) - this.maxSize;
-	if (spaceNeeded > 0) {
-            this.evict(spaceNeeded);
-	}
-	
-	var value = new MemoryStorageValue(item, size);
-	this.backingStore[key] = value;
-	
-	// Update the MRU
-	this.mru.push(key);
-	
-	this.isDirtyForCachedSize = true;
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        // For the size calculation, consider only the inputs to the storage layer: key and value
+        // Ignore all the extras added by the Storage layer.
+        var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
+
+        if (size > that.maxSize) {
+            error("MemoryStorageAdapter.setItem() cannot store an item over the maxSize");
+        }
+
+        that.getSize()
+            .then(function (adapterSize) { return (size + adapterSize) - that.maxSize; })
+            .then(function(spaceNeeded) { that.evict(spaceNeeded); })
+            .then(function() {
+                that.backingStore[key] = new MemoryStorageValue(item, size);
+                // Update the MRU
+                that.mru.push(key);
+                that.isDirtyForCachedSize = true;
+                success();
+            });
+    });
+
+    return promise;
 };
 
 MemoryStorageAdapter.prototype.removeItem = function(key) {
-	// Update the MRU
-	var value = this.backingStore[key];
-	
-	var index = $A.util.arrayIndexOf(this.mru, key);
-	if (index >= 0) {
-		this.mru.splice(index, 1);
-	}
-	
-	delete this.backingStore[key];
-	
-	this.isDirtyForCachedSize = true;
-	
-	return value;
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        // Update the MRU
+        var value = that.backingStore[key];
+
+        var index = $A.util.arrayIndexOf(that.mru, key);
+        if (index >= 0) {
+            that.mru.splice(index, 1);
+        }
+
+        delete that.backingStore[key];
+        that.isDirtyForCachedSize = true;
+
+        success(value);
+    });
+
+    return promise;
 };
 
-MemoryStorageAdapter.prototype.clear = function(key) {
-	this.backingStore = {};
-	this.cachedSize = 0;
-	this.isDirtyForCachedSize = false;
+MemoryStorageAdapter.prototype.clear = function() {
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        that.backingStore = {};
+        that.cachedSize = 0;
+        that.isDirtyForCachedSize = false;
+
+        success();
+    });
+
+    return promise;
 };
 
-MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
-	var now = new Date().getTime();
-	var expired = [];
-	
-	for (var key in this.backingStore) {
-		var expires = this.backingStore[key].getItem()["expires"];
-		if (now > expires) {
-			expired.push(key);
-		}
-	}
-	
-	resultCallback(expired);
+MemoryStorageAdapter.prototype.getExpired = function() {
+    var that = this;
+    var promise = $A.util.createPromise(function(success, error) {
+        var now = new Date().getTime();
+        var expired = [];
+
+        for (var key in that.backingStore) {
+            var expires = that.backingStore[key].getItem()["expires"];
+            if (now > expires) {
+                expired.push(key);
+            }
+        }
+
+        success(expired);
+    });
+
+    return promise;
 };
 
+/**
+ * Asynchronously removes items, starting with the least-recently-used, until spaceNeeded has been made available.
+ * @param {Number} spaceNeeded The amount of space to free.
+ * @returns {Promise} Returns a promise that will evict items.
+ */
 MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
-	var spaceReclaimed = 0;
-	while (spaceReclaimed < spaceNeeded && this.mru.length > 0) {
-		var key = this.mru[0];
-		var value = this.removeItem(key);
-		spaceReclaimed += value.getSize();
-		
-		if (this.debugLoggingEnabled) {
-			$A.logInternal("MemoryStorageAdapter.evict(): evicted", [key, value, spaceReclaimed]);
-		}
-	}
+    var that = this;
+    var spaceReclaimed = 0;
+
+    var promise = $A.util.createPromise(function(success, failure) {
+        if (spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
+            success();
+            return;
+        }
+
+        var pop = function() {
+            var key = that.mru[0];
+            that.removeItem(key)
+                .then(function(itemRemoved) {
+                    spaceReclaimed += itemRemoved.getSize();
+
+                    if (that.debugLoggingEnabled) {
+                        $A.logInternal("MemoryStorageAdapter.evict(): evicted", [key, itemRemoved, spaceReclaimed]);
+                    }
+
+                    if(spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
+                        success();
+                    } else {
+                        pop();
+                    }
+                });
+        };
+        pop();
+    });
+
+    return promise;
 };
 
+/**
+ * Asynchronously gets the most-recently-used list.
+ * @returns {Promise} Returns a Promise that will retrieve the mru.
+ */
 // #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 MemoryStorageAdapter.prototype.getMRU = function() {
-	return this.mru;
+    var that = this;
+    return $A.util.createPromise(function(success, error) {
+        success(that.mru);
+    });
 };
 // #end
 

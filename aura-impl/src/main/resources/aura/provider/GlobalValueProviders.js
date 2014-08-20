@@ -116,15 +116,19 @@ $A.ns.GlobalValueProviders.prototype.loadFromStorage = function(callback) {
     var storage = this.getStorage();
     var that = this;
     if (storage) {
-        storage.get("globalValueProviders", function(item) {
-            if (item) {
-                that.join(item, true);
-            }
-            callback(!!item);
+        storage.get("globalValueProviders").then(function (item) {
+            $A.run(function() {
+                if (item) {
+                    that.join(item, true);
+                }
+                callback(!!item);
+            });
         });
     } else {
         // nothing loaded from persistent storage
-        callback(false);
+        $A.run(function() {
+            callback(false);
+        });
     }
 };
 

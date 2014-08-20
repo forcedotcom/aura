@@ -44,7 +44,7 @@
             this.prepareAction();
         }, function(component) {
             var cacheChecked = false;
-            
+
             // this._action has been sent and received and should be in storage:
             $A.clientService.isActionInStorage(this._actionDescriptor, this._actionParams, function(isInStorage) {
                 $A.test.assertTrue(isInStorage, "Action should be found in storage.");
@@ -167,30 +167,36 @@
             
             // The action is in cache assert that the difference between the time it expires and the time it was added
             // is the expiry time:
-            this._action.getStorage().adapter.getItem(this._action.getStorageKey(), function(item) {
-                $A.test.assertEquals(expiryTime, item.expires - item.created, "Expiry time not set properly.");
-                expiryChecked = true;
-            });
+            var adapter = this._action.getStorage().adapter;
+
+            adapter.getItem(this._action.getStorageKey())
+                .then(function(item) {
+                    $A.test.assertEquals(expiryTime, item.expires - item.created, "Expiry time not set properly.");
+                    expiryChecked = true;
+                });
             
-            $A.test.addWaitFor(true, function() {
-                return expiryChecked;
-            });
+            $A.test.addWaitFor(true, function() { return expiryChecked; });
         }, function(component) {
             var expiryTime = this._expiryTime,
                 action = this._action,
                 expiryChecked = false;
-            
-            // Revalidate the action and when complete, get the time it expires and ensure that it is expiryTime 
+
+            // Revalidate the action and when complete, get the time it expires and ensure that it is expiryTime
             // millis after the revalidation time.
             $A.clientService.revalidateAction(this._actionDescriptor, this._actionParams, function() {
                 var revalidateTime = new Date().getTime();
-                action.getStorage().adapter.getItem(action.getStorageKey(), function(item) {
-                            $A.test.assertTrue(
-                        item.expires - revalidateTime - expiryTime <= 1, 
-                        "Revalidate time mismatch. Expected: ~" + expiryTime + ", received: " + 
-                            (item.expires - revalidateTime));
-                    expiryChecked = true;
-                });
+
+                var adapter = action.getStorage().adapter;
+                adapter.getItem(action.getStorageKey())
+                    .then(function(item) {
+
+                        $A.test.assertTrue(
+                            item.expires - revalidateTime - expiryTime <= 1,
+                            "Revalidate time mismatch. Expected: ~" + expiryTime + ", received: " + (item.expires - revalidateTime)
+                        );
+
+                        expiryChecked = true;
+                    });
             });
             
             $A.test.addWaitFor(true, function() {

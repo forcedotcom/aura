@@ -12,7 +12,7 @@
         if(actionParam) a.setParams(actionParam);
         a.setCallback(cmp, function(a){
             var returnValue = a.getReturnValue();
-            cmp.getDef().getHelper().findAndSetText(cmp, "staticCounter", returnValue.Counter); 
+            cmp.getDef().getHelper().findAndSetText(cmp, "staticCounter", returnValue.Counter);
             cmp.getDef().getHelper().findAndSetText(cmp, "responseData", returnValue.Data);
             cmp.getDef().getHelper().findAndSetText(cmp, "isFromStorage", a.isFromStorage());
             cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
@@ -43,7 +43,7 @@
         a.setStorable();
         $A.test.markForCompletion(a, "testSetStorableAPIStage2");
         $A.test.enqueueAction(a);
-        $A.test.addWaitForAction(true, 
+        $A.test.addWaitForAction(true,
             "testSetStorableAPIStage2",
             function(){
                 $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
@@ -58,7 +58,7 @@
         aSecond.setParams({testName : "testSetStorableAPI"});
         aSecond.setStorable();
         $A.test.enqueueAction(aSecond);
-        $A.test.addWaitFor("SUCCESS", 
+        $A.test.addWaitFor("SUCCESS",
             function(){return aSecond.getState()},
             function(){
                 var refreshBeginCmp = mycmp.find("refreshBegin");
@@ -89,17 +89,17 @@
                 //Keeping the auto refresh time to 0, helps testing the override
                 aThird.setStorable({"refresh": 0});
                 requestTime = new Date().getTime();
-                //Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
+                //Make sure we haven't reached the auto-refresh timeout already. Default is set to 60, so 30 is quite conservative
                 $A.test.assertTrue( ((requestTime-cmp._requestStoredTime)/1000<30), "Test setup failure, increase defaultAutoRefreshInterval time.");
                 $A.test.enqueueAction(aThird);
-                $A.test.addWaitFor("SUCCESS", 
+                $A.test.addWaitFor("SUCCESS",
                     function(){return aThird.getState()},
                     function(){
                         $A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
                     });
             });
         //Verify that refreshBegin was fired
-        $A.test.addWaitFor("refreshBegin", 
+        $A.test.addWaitFor("refreshBegin",
             function(){
                 var refreshBeginCmp = cmp.find("refreshBegin");
                 if($A.util.isUndefinedOrNull (refreshBeginCmp)) {
@@ -117,7 +117,7 @@
                 $A.test.callServerAction(resume, true);
             });
         //Verify that refreshEnd was fired
-        $A.test.addWaitFor("refreshEnd", 
+        $A.test.addWaitFor("refreshEnd",
             function(){
                     var refreshEndCmp = cmp.find("refreshEnd");
                     if($A.util.isUndefinedOrNull (refreshEndCmp)) {
@@ -130,14 +130,17 @@
                 aFourth.setParams({testName : "testSetStorableAPI"});
                 aFourth.setStorable();
                 $A.test.enqueueAction(aFourth);
-                $A.test.addWaitFor("SUCCESS", 
+                $A.test.addWaitForWithFailureMessage(
+                    "SUCCESS",
                     function(){return aFourth.getState()},
-                    function(){
-                        $A.test.assertTrue(aFourth.isFromStorage(), 
-                            "aFourth should have been from storage");
-                        $A.test.assertEquals(1, aFourth.getReturnValue().Counter, 
-                            "aFourth should have fetched refreshed response");
-                        });
+                    "Expected action to become SUCCESSful.",
+                    function(){ $A.test.assertTrue(aFourth.isFromStorage(), "aFourth should have been from storage"); }
+                );
+                // Storage is asynchronous; therefore, the Action may be SUCCESS before the value is stored.
+                $A.test.addWaitForWithFailureMessage(
+                    1,
+                    function() { return aFourth.getReturnValue().Counter; },
+                    "aFourth should have fetched a refreshed response.");
             });
     },
     
@@ -152,25 +155,26 @@
         a.setParams({testName : "testCacheExpiration"});
         a.setStorable();
         $A.test.enqueueAction(a);
-        $A.test.addWaitFor(false, 
+        $A.test.addWaitFor(
+            false,
             $A.test.isActionPending,
             function(){
-                $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
+                $A.test.assertFalse(a.isFromStorage(), "Failed to execute action at server");
                 $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
-            });
+            }
+        );
     },
     testCacheExpirationStage3:function(cmp){
-        //Wait for atleast 5 seconds after the response has been stored
-        $A.test.addWaitFor(true, 
-            function(){ 
-                var now = new Date().getTime();
-                var storageModifiedCmp = cmp.find("storageModified");
-                if($A.util.isUndefinedOrNull(storageModifiedCmp)) {
-                    storageModifiedCmp = cmp.getSuper().find("storageModified");
-                }                    
-                var storageModified = $A.test.getText(storageModifiedCmp.getElement());
-                return ((now - parseInt(storageModified))/1000) > 5;
-            });
+        //Wait for at least 5 seconds after the response has been stored
+        $A.test.addWaitFor(true, function(){
+            var now = new Date().getTime();
+            var storageModifiedCmp = cmp.find("storageModified");
+            if($A.util.isUndefinedOrNull(storageModifiedCmp)) {
+                storageModifiedCmp = cmp.getSuper().find("storageModified");
+            }
+            var storageModified = $A.test.getText(storageModifiedCmp.getElement());
+            return ((now - parseInt(storageModified))/1000) > 5;
+        });
     },
     testCacheExpirationStage4:function(cmp){
         //Run the action and verify that new response was fetched from server
@@ -178,12 +182,14 @@
         aSecond.setParams({testName : "testCacheExpiration"});
         aSecond.setStorable();
         $A.test.enqueueAction(aSecond);
-        $A.test.addWaitFor("SUCCESS", 
+        $A.test.addWaitFor(
+            "SUCCESS",
             function(){return aSecond.getState()},
             function(){
                 $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
                 $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
-            });
+            }
+        );
     },
     
     // The sequential stages of testActionKeyOverloading
@@ -228,7 +234,7 @@
                 $A.test.assertEquals(2, a.getReturnValue()[0], "Wrong counter value seen in response");
                 $A.test.assertEquals(9999, a.getReturnValue()[1]);
             });
-    },    
+    },
     
     // The sequential stages of testActionGrouping
     testActionGroupingStage1:function(cmp){
@@ -288,7 +294,7 @@
         $A.test.addWaitFor(false, $A.test.isActionPending,
             function(){
                 $A.test.assertFalse(notStoredAgain.isFromStorage(), "Failed to group stored actions and unstored actions.");
-                $A.test.assertEquals(1, notStoredAgain.getReturnValue().Counter, 
+                $A.test.assertEquals(1, notStoredAgain.getReturnValue().Counter,
                     "Counter value should have been incremented for unstored action");
                 });
     }

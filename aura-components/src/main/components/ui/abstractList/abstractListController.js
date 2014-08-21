@@ -30,16 +30,14 @@
 
     handleDataChange: function(component, event, helper) {
     	var concrete = component.getConcreteComponent(),
-    		concreteHelper = concrete.getDef().getHelper(),
-    		callback;
+    		concreteHelper = concrete.getDef().getHelper();
     	    	
     	if (concrete._refreshing) {
     		helper.beforeRefresh(concrete, event);
     		concrete._refreshing = false;
-    		callback = concrete._callback;
     	}
 
-    	concreteHelper.handleDataChange(component, event, callback);
+    	concreteHelper.handleDataChange(component, event, concrete._callback);
     	concrete._callback = null; // remove reference to avoid a leak
     },
 

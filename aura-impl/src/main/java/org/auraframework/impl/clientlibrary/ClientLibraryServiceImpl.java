@@ -159,12 +159,19 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
 
         AuraContext.Mode mode = context.getMode();
         String uid = context.getUid(context.getApplicationDescriptor());
+        String contextPath = context.getContextPath();
+        String nonce = context.getFrameworkUID();
 
         if (uid == null) {
             return Collections.emptySet();
         }
 
-        String key = new StringBuilder(uid).append(":").append(type).append(":").append(mode).toString();
+        //
+        // TODO: rethink this caching. It has an awful lot in the keys. Maybe we can prepend the
+        // 'prefix' string on output if it is a relative URL.
+        //
+        String key = new StringBuilder(uid).append(":").append(type).append(":").append(mode)
+            .append(":").append(nonce).append(":").append(contextPath).toString();
         Set<String> urls = urlsCache.getIfPresent(key);
 
         if (urls == null) {

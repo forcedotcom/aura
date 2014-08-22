@@ -443,7 +443,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
 
-        final WebElement elem = auraUITestingUtil
+        auraUITestingUtil
                 .waitUntil(
                 new Function<WebDriver, WebElement>() {
                     @Override

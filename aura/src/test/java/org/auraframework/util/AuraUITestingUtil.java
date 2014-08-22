@@ -617,7 +617,7 @@ public class AuraUITestingUtil {
                 return getBooleanEval("return document.readyState === 'complete'");
             }
         },
-        "Document is not Ready! state:"+getEval("return document.readyState;"));
+        "Document is not Ready!");
     }
 
     /**
@@ -643,11 +643,12 @@ public class AuraUITestingUtil {
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return getBooleanEval("var cache=window.applicationCache;"
+                return
+                		getBooleanEval("var cache=window.applicationCache;"
                         + "return $A.util.isUndefinedOrNull(cache) || "
                         + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
             }
-        },"AppCache is not Ready! state:"+getEval("return window.applicationCache;"));
+        },"AppCache is not Ready!");
     }
 
     /**

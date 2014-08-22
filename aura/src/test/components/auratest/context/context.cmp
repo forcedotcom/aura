@@ -1,2 +1,3 @@
 <aura:component render="client">
+    <aura:dependency resource="markup://auratest:test_button" />
 </aura:component>

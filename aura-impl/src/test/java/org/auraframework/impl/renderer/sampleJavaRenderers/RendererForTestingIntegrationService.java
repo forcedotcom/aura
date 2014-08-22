@@ -32,10 +32,11 @@ public class RendererForTestingIntegrationService extends AbstractRendererForTes
         Map<String, Object> attr = (Map<String, Object>) component.getAttributes().getValue("attrMap");
         String placeholder = (String) component.getAttributes().getValue("placeholder");
         String localId = (String) component.getAttributes().getValue("localId");
+        Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
 
         out.append(String.format("<div id='%s' style='border: 1px solid black'/>", placeholder));
 
-        injectComponent(desc, attr, localId, placeholder, out);
+        injectComponent(desc, attr, localId, placeholder, out, useAsync);
     }
 
 }

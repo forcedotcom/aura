@@ -18,5 +18,5 @@ package org.auraframework.integration;
 import org.auraframework.system.AuraContext;
 
 public interface IntegrationServiceObserver {
-	void contextEstablished(Integration integration, AuraContext context);
+    void contextEstablished(Integration integration, AuraContext context);
 }

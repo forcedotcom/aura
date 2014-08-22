@@ -372,6 +372,24 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         injectSimpleComponent(integration);
         Mockito.verify(mockObserver, Mockito.times(2)).contextEstablished(integration, cntx);
     }
+
+    /**
+     * Test app used for integration should extend aura:integrationServiceApp
+     */
+    public void testAppDoesntExtendIntegrationApp() throws Exception {
+        String appMarkup = "<aura:application></aura:application>";
+        DefDescriptor<ApplicationDef> appDesc = getAuraTestingUtil().addSourceAutoCleanup(
+                ApplicationDef.class, appMarkup);
+        Map<String, Object> attributes = Maps.newHashMap();
+        Appendable out = new StringBuffer();
+        Integration integration = service.createIntegration("", Mode.UTEST, true, null, appDesc.getQualifiedName(), null);
+        try {
+            integration.injectComponent(simpleComponentTag, attributes, "", "", out);
+            fail("App used for integration should extend aura:integrationServiceApp");
+        } catch (AuraRuntimeException expected) {
+            assertEquals("Application must extend aura:integrationServiceApp.", expected.getMessage());
+        }
+    }
     
     private void assertException(Integration obj, String tag, Map<String, Object> attributes, String localId,
             String locatorDomId, Appendable out) throws Exception {

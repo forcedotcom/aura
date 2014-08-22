@@ -421,9 +421,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         /** Is this def's dependencies cacheable? */
         public boolean shouldCacheDependencies;
 
-        // TODO: remove preloads
-        public boolean addedPreloads = false;
-
         public CompileContext(DefDescriptor<? extends Definition> topLevel, List<ClientLibraryDef> clientLibs) {
             this.clientLibs = clientLibs;
             this.topLevel = topLevel;
@@ -1431,9 +1428,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param descriptor - the descriptor use for the key
      */
     private String makeNonUidGlobalKey(@NonNull DefDescriptor<?> descriptor) {
-        AuraContext context = this.currentCC == null
-                ? Aura.getContextService().getCurrentContext()
-                : currentCC.context;
         return makeLocalKey(descriptor);
     }
 

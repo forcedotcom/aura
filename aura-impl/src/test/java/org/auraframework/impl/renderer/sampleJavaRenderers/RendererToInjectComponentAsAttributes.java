@@ -34,6 +34,7 @@ public class RendererToInjectComponentAsAttributes extends AbstractRendererForTe
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
         String desc = (String) component.getAttributes().getValue("desc");
+        Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
         Map<String, Object> auratextAttr = Maps.newHashMap();
         auratextAttr.put("value", "Grape Fruit");
         ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
@@ -51,7 +52,7 @@ public class RendererToInjectComponentAsAttributes extends AbstractRendererForTe
 
         Map<String, Object> attr = Maps.newHashMap();
         attr.put("cmps", cmps);
-        injectComponent(desc, attr, "localId", "placeholder", out);
+        injectComponent(desc, attr, "localId", "placeholder", out, useAsync);
     }
 
 }

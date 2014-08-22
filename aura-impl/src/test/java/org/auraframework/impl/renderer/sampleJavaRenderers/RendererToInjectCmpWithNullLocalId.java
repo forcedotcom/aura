@@ -31,10 +31,11 @@ public class RendererToInjectCmpWithNullLocalId extends AbstractRendererForTesti
         @SuppressWarnings("unchecked")
         Map<String, Object> attr = (Map<String, Object>) component.getAttributes().getValue("attrMap");
         String placeholder = (String) component.getAttributes().getValue("placeholder");
+        Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
 
         out.append(String.format("<div id='%s' style='border: 1px solid black'/>", placeholder));
 
-        injectComponent(desc, attr, null, "placeholder", out);
+        injectComponent(desc, attr, null, "placeholder", out, useAsync);
     }
 
 }

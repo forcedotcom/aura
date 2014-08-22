@@ -26,9 +26,9 @@ var AuraClientService = function() {
     // #include aura.controller.ActionCollector
     // #include aura.model.ValueDef
     // #include aura.AuraClientService_private
-	
+
     var NOOP = function() {};
-	
+
     var clientService = {
 
         /**
@@ -65,7 +65,7 @@ var AuraClientService = function() {
             $A.Perf.mark("Initial Component Created");
             $A.Perf.mark("Initial Component Rendered");
             var body = document.body;
-            
+
             //
             // not on in dev modes to preserve stacktrace in debug tools
             // Why? - goliver
@@ -134,7 +134,7 @@ var AuraClientService = function() {
                 componentService.getLibraryDef(libraryConfigs[j]);
             }
             $A.Perf.endMark("Registered Libraries [" + libraryConfigs.length + "]");
-            
+
             var controllerConfigs = aura.util.json.resolveRefs(config["controllerDefs"]);
             $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
             for (j = 0; j < controllerConfigs.length; j++) {
@@ -308,7 +308,7 @@ var AuraClientService = function() {
          * Check to see if a public pop should be allowed.
          *
          * We allow a public pop if the name was pushed, or if there is nothing
-         * on the stack. 
+         * on the stack.
          *
          * @param {string} name the name of the public 'pop' that will happen.
          * @return {Boolean} true if the pop should be allowed.
@@ -332,7 +332,7 @@ var AuraClientService = function() {
         pushStack : function(name) {
             priv.auraStack.push(name);
         },
-        
+
         /**
          * Pop an item off the stack.
          *
@@ -356,7 +356,7 @@ var AuraClientService = function() {
             } else {
                 $A.warning("Pop from empty stack");
             }
-            
+
             if (priv.auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
                 priv.auraStack.push(tmppush);
@@ -364,21 +364,21 @@ var AuraClientService = function() {
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
                     $A.renderingService.rerenderDirty(name);
-                    
+
                     done = !clientService.processActions();
-                    
+
                     count += 1;
                     if (count > 14) {
                         $A.error("finishFiring has not completed after 15 loops");
                     }
                 }
-                
+
                 // Force our stack to nothing.
                 lastName = priv.auraStack.pop();
                 if (lastName !== tmppush) {
                     $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
                 }
-                
+
                 priv.auraStack = [];
                 priv.actionQueue.incrementNextTransactionId();
             }
@@ -519,6 +519,7 @@ var AuraClientService = function() {
 
             var actionResult = config["actions"][0];
             var action = $A.get("c.aura://ComponentController.getComponent");
+            var self = this;
 
             action.setCallback(action, function(a) {
                 var element = $A.util.getElement(locatorDomId);
@@ -545,34 +546,10 @@ var AuraClientService = function() {
                     // Make sure we clear any configs associated with the action.
                     //
                     $A.getContext().clearComponentConfigs(a.getId());
-                    // 
+                    //
                     // Display the errors in a ui:message instead
                     //
-                    componentConfig = {
-                        "componentDef" : {
-                            "descriptor" : "markup://ui:message"
-                        },
-
-                        "attributes" : {
-                            "values" : {
-                                "title" : "Aura Integration Service Error",
-                                "severity" : "error",
-                                "body" : [
-                                    {
-                                        "componentDef" : {
-                                            "descriptor" : "markup://ui:outputText"
-                                        },
-
-                                        "attributes" : {
-                                            "values" : {
-                                                "value" : $A.util.json.encode(errors)
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    };
+                    componentConfig = self.createIntegrationErrorConfig(errors);
                 }
 
                 componentConfig["localId"] = localId;
@@ -582,32 +559,14 @@ var AuraClientService = function() {
 
                 if (!errors) {
                     // Wire up event handlers
-                    var actionEventHandlers = config["actionEventHandlers"];
-                    if (actionEventHandlers) {
-                        var containerValueProvider = {
-                            getValue : function(functionName) {
-                                return {
-                                    run : function(event) {
-                                        window[functionName](event);
-                                    },
-                                    runDeprecated : function(event) {
-                                        window[functionName](event);
-                                    }
-                                };
-                            }
-                        };
-
-                        for ( var event in actionEventHandlers) {
-                            c.addHandler(event, containerValueProvider, actionEventHandlers[event]);
-                        }
-                    }
+                    self.addComponentHandlers(c, config["actionEventHandlers"]);
                 }
 
                 var body = root.getValue("v.body");
                 body.push(c);
-                
+
                 // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
-                body.commit();          
+                body.commit();
 
                 $A.render(c, element);
 
@@ -619,7 +578,114 @@ var AuraClientService = function() {
         },
 
         /**
-         * Return whether Aura believes it is online. 
+         * Create error component config to display integration service errors
+         *
+         * @param {(String|String[])} errorText
+         * @returns {Object} error config for ui:message
+         */
+        createIntegrationErrorConfig: function(errorText) {
+            return {
+                "componentDef" : {
+                    "descriptor" : "markup://ui:message"
+                },
+
+                "attributes" : {
+                    "values" : {
+                        "title" : "Aura Integration Service Error",
+                        "severity" : "error",
+                        "body" : [
+                            {
+                                "componentDef" : {
+                                    "descriptor" : "markup://ui:outputText"
+                                },
+
+                                "attributes" : {
+                                    "values" : {
+                                        "value" : $A.util.json.encode(errorText)
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+        },
+
+        /**
+         * Used within async callback for AIS.
+         *
+         * @param {Component} component - component
+         * @param {String} locatorDomId - element id
+         * @param {Object} [actionEventHandlers] - event handlers
+         */
+        renderInjection: function(component, locatorDomId, actionEventHandlers) {
+            var error = null,
+                hostEl = document.getElementById(locatorDomId);
+
+            if (!hostEl) {
+                error = "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId;
+                hostEl = document.body;
+            }
+
+            if (component.isInstanceOf("aura:text")) {
+                // check for component creation error
+                error = component.get("v.value");
+            }
+
+            if (error) {
+                // create same messaging as injectComponent
+                var errorConfig = this.createIntegrationErrorConfig(error);
+                errorConfig["localId"] = component.getLocalId();
+                component = $A.componentService.newComponentDeprecated(errorConfig, $A.getRoot());
+            }
+
+            this.addComponentHandlers(component, actionEventHandlers);
+            $A.render(component, hostEl);
+            $A.afterRender(component);
+        },
+
+        /**
+         * Use async created component for integration service
+         *
+         * @param {Object} config - component def config
+         * @param {String} locatorDomId - id of element to inject component
+         * @param {Object} [eventHandlers] - handlers of registered event
+         */
+        injectComponentAsync: function(config, locatorDomId, eventHandlers) {
+            $A.componentService.newComponentAsync(undefined, function(component) {
+                $A.clientService.renderInjection(component, locatorDomId, eventHandlers);
+            }, config, $A.getRoot(), false, false, true);
+        },
+
+        /**
+         * Add handlers of registered events for AIS
+         *
+         * @param {Component} component - component
+         * @param {Object} [actionEventHandlers] - handlers of registered events
+         */
+        addComponentHandlers: function(component, actionEventHandlers) {
+            if (actionEventHandlers) {
+                var containerValueProvider = {
+                    getValue : function(functionName) {
+                        return {
+                            run : function(evt) {
+                                window[functionName](evt);
+                            },
+                            runDeprecated : function(evt) {
+                                window[functionName](evt);
+                            }
+                        };
+                    }
+                };
+
+                for (var evt in actionEventHandlers) {
+                    component.addHandler(evt, containerValueProvider, actionEventHandlers[evt]);
+                }
+            }
+        },
+
+        /**
+         * Return whether Aura believes it is online.
          * Immediate and future communication with the server may fail.
          * @memberOf AuraClientService
          * @return {Boolean} Returns true if Aura believes it is online; false otherwise.
@@ -628,11 +694,11 @@ var AuraClientService = function() {
         isConnected : function() {
             return !priv.isDisconnected;
         },
-        
+
         /**
-         * Inform Aura that the environment is either online or offline. 
-         * 
-         * @param {Boolean} isConnected Set to true to run Aura in online mode,  
+         * Inform Aura that the environment is either online or offline.
+         *
+         * @param {Boolean} isConnected Set to true to run Aura in online mode,
          * or false to run Aura in offline mode.
          * @memberOf AuraClientService
          * @public
@@ -651,7 +717,7 @@ var AuraClientService = function() {
          * @memberOf AuraClientService
          * @public
          */
-        // TODO: remove boolean trap http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html 
+        // TODO: remove boolean trap http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html
         enqueueAction : function(action, background) {
             $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
             $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
@@ -659,39 +725,39 @@ var AuraClientService = function() {
             if (background) {
                 action.setBackground();
             }
-            
+
             priv.actionQueue.enqueue(action);
         },
 
         /**
-         * Defer the action by returning a Promise object. 
-         * Configure your action excluding the callback prior to deferring. 
+         * Defer the action by returning a Promise object.
+         * Configure your action excluding the callback prior to deferring.
          * The Promise is a thenable, meaning it exposes a 'then' function for consumers to chain updates.
          * Do NOT use the promise constructor to initiate the action - it will subvert the actionQueue.
          *
          * @public
-         * @param {Action} the target action
+         * @param {Action} action - target action
          * @return {Promise} a promise which is resolved or rejected depending on the state of the action
          */
         deferAction : function (action) {
             var promise = new $A.util.createPromise();
-        
+
             action.wrapCallback(this, function (a) {
                 if (a.getState() === 'SUCCESS') {
                     promise.resolve(a.getReturnValue());
                 }
                 else {
                     // Reject the promise as it was not successful.
-                    // Give the user a somewhat useful object to use on reject. 
+                    // Give the user a somewhat useful object to use on reject.
                     promise.reject({ state: a.getState(), action: a });
                 }
             });
 
             this.enqueueAction(action);
-            
-            return promise; 
+
+            return promise;
         },
-    
+
         /**
          * Gets whether or not the Aura "actions" cache exists.
          * @returns {Boolean} true if the Aura "actions" cache exists.
@@ -699,47 +765,47 @@ var AuraClientService = function() {
         hasActionStorage: function() {
             return !!Action.getStorage();
         },
-        
+
         /**
          * Checks to see if an action is currently being stored (by action descriptor and parameters).
-         * 
-         * @param descriptor {String} action descriptor.
-         * @param params {Object} map of keys to parameter values.
-         * @param callback {Function} called asynchronously after the action was looked up in the cache. Fired with a 
+         *
+         * @param {String} descriptor - action descriptor.
+         * @param {Object} params - map of keys to parameter values.
+         * @param {Function} callback - called asynchronously after the action was looked up in the cache. Fired with a
          * single parameter, isInStorge {Boolean} - representing whether the action was found in the cache.
          */
         isActionInStorage : function(descriptor, params, callback) {
             var storage = Action.getStorage();
             callback = callback || NOOP;
-            
+
             if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
                 callback(false);
                 return;
             }
-            
+
             storage.get(Action.getStorageKey(descriptor, params), function(value, isExpired) {
                 callback(!!value && !isExpired);
             });
         },
-        
+
         /**
-         * Resets the cache cleanup timer for an action. 
-         * 
-         * @param descriptor {String} action descriptor.
-         * @param params {Object} map of keys to parameter values.
-         * @param callback {Function} called asynchronously after the action was revalidated. Called with a single
-         * parameter, wasRevalidated {Boolean} - representing whether the action was found in the cache and 
-         * successfully revalidated.  
+         * Resets the cache cleanup timer for an action.
+         *
+         * @param {String} descriptor - action descriptor.
+         * @param {Object} params - map of keys to parameter values.
+         * @param {Function} callback - called asynchronously after the action was revalidated. Called with a single
+         * parameter, wasRevalidated {Boolean} - representing whether the action was found in the cache and
+         * successfully revalidated.
          */
         revalidateAction : function(descriptor, params, callback) {
             var storage = Action.getStorage();
             callback = callback || NOOP;
-            
+
             if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
                 callback(false);
                 return;
             }
-            
+
             var actionKey = Action.getStorageKey(descriptor, params);
             storage.get(actionKey, function(value) {
                 if (!!value) {
@@ -748,28 +814,28 @@ var AuraClientService = function() {
                 callback(!!value);
             });
         },
-        
+
         /**
-         * Clears an action out of the action cache. 
-         * 
-         * @param descriptor {String} action descriptor.
-         * @param params {Object} map of keys to parameter values.
-         * @param callback {Function} called after the action was invalidated. Called with true if the action was 
+         * Clears an action out of the action cache.
+         *
+         * @param {String} descriptor - action descriptor.
+         * @param {Object} params - map of keys to parameter values.
+         * @param {Function} params - called after the action was invalidated. Called with true if the action was
          * successfully invalidated and false if the action was invalid or was not found in the cache.
          */
         invalidateAction : function(descriptor, params, callback) {
             var storage = Action.getStorage();
             callback = callback || NOOP;
-            
+
             if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
                 callback(false);
                 return;
             }
-            
+
             storage.remove(Action.getStorageKey(descriptor, params));
             callback(true);
         },
-        
+
         /**
          * process the current set of actions, looping if needed.
          *
@@ -787,7 +853,7 @@ var AuraClientService = function() {
                 priv.runClientActions(actions);
                 processedActions = true;
             }
-            
+
             //
             // Only send forground actions if we have something that
             // needs to be sent (force boxcar will delay this)
@@ -802,7 +868,7 @@ var AuraClientService = function() {
                     priv.foreground.cancel();
                 }
             }
-            
+
             if (priv.background.start()) {
                 action = priv.actionQueue.getNextBackgroundAction();
                 if (action !== null) {

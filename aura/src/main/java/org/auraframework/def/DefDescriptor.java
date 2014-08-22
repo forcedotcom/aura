@@ -101,6 +101,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         MODEL(ModelDef.class), //
         LIBRARY(LibraryDef.class, true), //
         INCLUDE(IncludeDef.class), //
+        INCLUDE_REF(IncludeDefRef.class), //
         RENDERER(RendererDef.class), //
         ACTION(ActionDef.class), //
         TYPE(TypeDef.class), //
@@ -143,7 +144,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
         private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
             if (defTypeMap == null) {
-                defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
+                defTypeMap = new HashMap<>();
             }
 
             defTypeMap.put(clz, defType);

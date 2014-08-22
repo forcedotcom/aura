@@ -163,7 +163,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors,
-                cmpThemeDescriptor);
+                cmpThemeDescriptor, imports);
     }
 
     /**

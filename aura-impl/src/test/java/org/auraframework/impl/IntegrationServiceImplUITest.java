@@ -153,7 +153,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     private DefDescriptor<ComponentDef> setupSimpleComponentWithModelControllerHelperAndProvider() {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
         DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
         DefDescriptor<ProviderDef> jsProviderdesc = Aura.getDefinitionService()
@@ -268,7 +268,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     private DefDescriptor<ComponentDef> setupSimpleComponentWithExtension() {
     	DefDescriptor<ComponentDef> baseCmpDesc =  setupSimpleComponentToExtend();
     	DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
     	String systemAttributes=String.format("extends='%s:%s' ", baseCmpDesc.getNamespace(),baseCmpDesc.getName());
     	String bodyMarkup = "<aura:set attribute='SimpleAttribute'> We just Set it </aura:set> "
     			+ "<div class='attrFromBaseCmp'>In BaseCmp : SimpleAttribute={!v.SimpleAttribute}  </div>";
@@ -279,7 +279,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
     private DefDescriptor<ComponentDef> setupSimpleComponentToExtend() {
     	DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
     	String systemAttributes="extensible='true' ";
     	String bodyMarkup =
     	"<aura:attribute name='SimpleAttribute' type='String' default='DefaultStringFromBaseCmp'/>"

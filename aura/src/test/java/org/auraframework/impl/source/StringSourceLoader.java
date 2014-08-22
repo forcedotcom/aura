@@ -37,6 +37,7 @@ import org.auraframework.def.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.LibraryDef;
@@ -131,8 +132,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      * @param defClass the interface of the type definition
      * @return a {@link DefDescriptor} with name that is guaranteed to be unique in the string: namespace.
      */
-    public final <D extends Definition> DefDescriptor<D> createStringSourceDescriptor(@Nullable String namePrefix,
-            Class<D> defClass) {
+    public final <D extends Definition, B extends Definition> DefDescriptor<D> createStringSourceDescriptor(
+            @Nullable String namePrefix, Class<D> defClass, @Nullable DefDescriptor<B> bundle) {
 
         DescriptorInfo descriptorInfo = DescriptorInfo.get(defClass);
 
@@ -155,7 +156,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             }
         }
 
-        return descriptorInfo.getDescriptor(namespace, name + counter.incrementAndGet());
+        return descriptorInfo.getDescriptor(namespace, name + counter.incrementAndGet(), bundle);
     }
 
     /**
@@ -185,7 +186,22 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      */
     public final <D extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
             @Nullable String namePrefix, boolean overwrite, boolean isPrivilegedNamespace) {
-        DefDescriptor<D> descriptor = createStringSourceDescriptor(namePrefix, defClass);
+        return putSource(defClass, contents, namePrefix, overwrite, isPrivilegedNamespace, null);
+    }
+
+    /**
+     * Load a definition.
+     * 
+     * @param defClass the definition class that this source will represent
+     * @param contents the source contents
+     * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
+     * @param overwrite if true, overwrite any previously loaded definition
+     * @param isPrivilegedNamespace if true, namespace is privileged
+     * @return the created {@link StringSource}
+     */
+    public final <D extends Definition, B extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
+            @Nullable String namePrefix, boolean overwrite, boolean isPrivilegedNamespace, @Nullable DefDescriptor<B> bundle) {
+        DefDescriptor<D> descriptor = createStringSourceDescriptor(namePrefix, defClass, bundle);
         return putSource(descriptor, contents, overwrite, isPrivilegedNamespace);
     }
 
@@ -415,7 +431,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        DESIGN(DesignDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+        DESIGN(DesignDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        INCLUDE(IncludeDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, ".");
 
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
 
@@ -444,12 +461,13 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         }
 
         @SuppressWarnings("unchecked")
-        private <D extends Definition> DefDescriptor<D> getDescriptor(String namespace, String name) {
+        private <D extends Definition, B extends Definition> DefDescriptor<D> getDescriptor(String namespace,
+                String name, DefDescriptor<B> bundle) {
             return (DefDescriptor<D>) Aura.getDefinitionService()
                     .getDefDescriptor(
                             String.format("%s://%s%s%s", prefix, namespace,
                                     delimiter, name == null ? "" : name),
-                            defClass);
+                            defClass, bundle);
         }
 
         private Format getFormat() {

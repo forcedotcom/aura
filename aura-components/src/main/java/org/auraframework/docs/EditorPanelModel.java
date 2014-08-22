@@ -19,7 +19,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -57,8 +57,8 @@ public class EditorPanelModel {
                 desc, LibraryDef.class
             );
             
-            for (IncludeDef includeDef : library.getDef().getIncludes()) {
-               if (includeDef.getLibraryName().equals(name)) {
+            for (IncludeDefRef includeDef : library.getDef().getIncludes()) {
+               if (includeDef.getName().equals(name)) {
                    descriptor = includeDef.getDescriptor();
                }
             }

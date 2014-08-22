@@ -30,8 +30,9 @@ import org.auraframework.cache.Cache;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
@@ -54,7 +55,7 @@ public class CachingServiceImpl implements CachingService {
 
     @Override
     public <K, T> CacheBuilder<K, T> getCacheBuilder() {
-        return new CacheImpl.Builder<K, T>();
+        return new CacheImpl.Builder<>();
     }
 
     private final Cache<DefDescriptor<?>, Boolean> existsCache;
@@ -65,7 +66,7 @@ public class CachingServiceImpl implements CachingService {
     private final Cache<String, String> clientLibraryOutputCache;
     private final Cache<String, Set<String>> clientLibraryUrlsCache;
     private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
-    
+
     private static final Logger logger = Logger.getLogger(CachingServiceImpl.class);
 
     public CachingServiceImpl() {
@@ -113,13 +114,13 @@ public class CachingServiceImpl implements CachingService {
                 .setName("clientLibraryUrlsCache")
                 .setRecordStats(true).build();
 
-        defDescriptorByNameCache = 
-                this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>>getCacheBuilder()
-                .setInitialSize(512)
-                .setMaximumSize(1024 * 10)
-                .setConcurrencyLevel(20)
-                .setName("defDescByNameCache")
-                .build();
+        defDescriptorByNameCache =
+                this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getCacheBuilder()
+                        .setInitialSize(512)
+                        .setMaximumSize(1024 * 10)
+                        .setConcurrencyLevel(20)
+                        .setName("defDescByNameCache")
+                        .build();
     }
 
     @Override
@@ -157,11 +158,11 @@ public class CachingServiceImpl implements CachingService {
         return clientLibraryUrlsCache;
     }
 
-   @Override
+    @Override
     public final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache() {
         return defDescriptorByNameCache;
     }
-    
+
     @Override
     public Lock getReadLock() {
         return rwLock.readLock();
@@ -173,20 +174,14 @@ public class CachingServiceImpl implements CachingService {
     }
 
     /**
-     * The driver for cache-consistency management in response to source
-     * changes. MDR drives the process, will notify all registered listeners
-     * while write blocking, then invalidate it's own caches. If this routine
-     * can't acquire the lock , it will log it as an non-fatal error, as it only
-     * results in staleness.
+     * The driver for cache-consistency management in response to source changes. MDR drives the process, will notify
+     * all registered listeners while write blocking, then invalidate it's own caches. If this routine can't acquire the
+     * lock , it will log it as an non-fatal error, as it only results in staleness.
      * 
-     * @param listeners
-     *            - collections of listeners to notify of source changes
-     * @param source
-     *            - DefDescriptor that changed - for granular cache clear
-     *            (currently not considered here, but other listeners may make
-     *            use of it)
-     * @param event
-     *            - what type of event triggered the change
+     * @param listeners - collections of listeners to notify of source changes
+     * @param source - DefDescriptor that changed - for granular cache clear (currently not considered here, but other
+     *            listeners may make use of it)
+     * @param event - what type of event triggered the change
      */
     @Override
     public void notifyDependentSourceChange(
@@ -250,13 +245,18 @@ public class CachingServiceImpl implements CachingService {
             defsCache.invalidate(adesc);
             existsCache.invalidate(adesc);
 
-            // invalidate all DDs with the same namespace if its a namespace DD
-            if (descriptor.getDefType() == DefType.NAMESPACE) {
+            switch (descriptor.getDefType()) {
+            case NAMESPACE:
+                // invalidate all DDs with the same namespace if its a namespace DD
                 invalidateScope(descriptor, true, false);
-            }
-
-            if (descriptor.getDefType() == DefType.LAYOUTS) {
+                break;
+            case LAYOUTS:
                 invalidateScope(descriptor, true, true);
+                break;
+            case INCLUDE:
+                invalidateSourceRelatedCaches(descriptor.getBundle());
+                break;
+            default:
             }
         }
     }

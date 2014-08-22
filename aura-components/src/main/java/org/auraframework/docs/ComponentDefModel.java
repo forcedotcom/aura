@@ -30,7 +30,7 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.ImportDef;
-import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RegisterEventDef;
@@ -61,7 +61,7 @@ public class ComponentDefModel {
         DefinitionService definitionService = Aura.getDefinitionService();
         descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
-        
+
         ReferenceTreeModel.assertAccess(definition);
 
         String type = null;
@@ -72,10 +72,10 @@ public class ComponentDefModel {
                     attributes.add(new AttributeModel(attribute));
                 }
             }
-            
+
             DocumentationDef docDef = rootDef.getDocumentationDef();
             doc = docDef != null ? new DocumentationDefModel(docDef) : null;
-            
+
             if (definition instanceof BaseComponentDef) {
                 BaseComponentDef cmpDef = (BaseComponentDef) definition;
                 for (RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()) {
@@ -83,24 +83,24 @@ public class ComponentDefModel {
                         events.add(new AttributeModel(reg));
                     }
                 }
-                
+
                 for (EventHandlerDef handler : cmpDef.getHandlerDefs()) {
                     handledEvents.add(new AttributeModel(handler));
                 }
-                
+
                 for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {
                     if (ReferenceTreeModel.hasAccess(intf.getDef())) {
                         interfaces.add(intf.getNamespace() + ":" + intf.getName());
                     }
                 }
-                
+
                 DefDescriptor<?> superDesc = cmpDef.getExtendsDescriptor();
                 if (superDesc != null) {
                     theSuper = superDesc.getNamespace() + ":" + superDesc.getName();
                 } else {
                     theSuper = null;
                 }
-                
+
                 isAbstract = cmpDef.isAbstract();
                 isExtensible = cmpDef.isExtensible();
 
@@ -116,7 +116,7 @@ public class ComponentDefModel {
                 type = eventDef.getEventType().name();
                 isExtensible = true;
                 isAbstract = false;
-            }  else if (definition instanceof LibraryDef){
+            } else if (definition instanceof LibraryDef) {
                 theSuper = null;
                 isExtensible = false;
                 isAbstract = false;
@@ -125,7 +125,7 @@ public class ComponentDefModel {
                 isExtensible = true;
                 isAbstract = false;
             }
-            
+
             support = rootDef.getSupport().name();
 
             if (definition instanceof RootDefinition) {
@@ -141,27 +141,19 @@ public class ComponentDefModel {
                     }
                 }
             }
-            
+
             // Add all imported libraries AND their source to the documentation.
             if (definition instanceof ComponentDef) {
                 Collection<ImportDef> importDefs = ((ComponentDef) definition).getImportDefs();
-                
+
                 for (ImportDef importDef : importDefs) {
-                    LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getLibraryName(), LibraryDef.class);
+                    LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getLibraryDescriptor());
                     if (ReferenceTreeModel.hasAccess(libraryDef)) {
                         defs.add(new DefModel(libraryDef.getDescriptor()));
-                        
+
                         // Treat the included js files specially because they load source differently:
-                        for (IncludeDef includeDef: libraryDef.getIncludes()) {
-                            includeDefs.add(new IncludeDefModel(includeDef.getDescriptor()));
-                        }
-                        
-                        // Add external dependencies as well (just the js files).
-                        for (LibraryDef externalLibrary : libraryDef.getExternalDependencies()) {
-                            // Treat the included js files specially because they load source differently:
-                            for (IncludeDef externalIncludeDef: externalLibrary.getIncludes()) {
-                                includeDefs.add(new IncludeDefModel(externalIncludeDef.getDescriptor()));
-                            }
+                        for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
+                            includeDefs.add(new IncludeDefModel(includeDef.getIncludeDescriptor()));
                         }
                     }
                 }
@@ -250,12 +242,12 @@ public class ComponentDefModel {
     public List<DefModel> getDefs() {
         return defs;
     }
-    
+
     @AuraEnabled
     public List<IncludeDefModel> getIncludeDefs() {
         return includeDefs;
     }
-    
+
     @AuraEnabled
     public DocumentationDefModel getDocumentation() {
         return doc;
@@ -364,7 +356,7 @@ public class ComponentDefModel {
         }
 
     }
-    
+
     private final DefDescriptor<?> descriptor;
     private final Definition definition;
     private final List<AttributeModel> attributes = Lists.newArrayList();

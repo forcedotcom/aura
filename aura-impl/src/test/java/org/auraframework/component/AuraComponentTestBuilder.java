@@ -177,6 +177,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         // subtypes
         case ACTION:
         case DESCRIPTION:
+        case INCLUDE_REF:
             return null;
         case ATTRIBUTE:
         case LAYOUT:

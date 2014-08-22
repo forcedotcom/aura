@@ -74,7 +74,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
 
     private DesignTemplateRegionDef setupDesignTemplateRegionDef(String name, String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
         String cmpBody = "<aura:attribute name='mystring' type='String' />";
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpBody));
 

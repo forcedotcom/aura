@@ -14,42 +14,22 @@
  * limitations under the License.
  */
 ({
-    updateTriggerLabel: function(cmp, event) {
-        var triggerCmp = cmp.find("trigger");
-        if (triggerCmp) {
-            var source = event.getSource();
-            var label = source.get("v.label");
-            triggerCmp.set("v.label", label);
-        }
+    updateTriggerLabel: function(cmp, event, helper) {
+        helper.handleUpdateTriggerLabel(cmp, event, "trigger");
     },
-    updateLabel: function(cmp, event) {
-        var triggerCmp = cmp.find("mytrigger");
-        if (triggerCmp) {
-            var source = event.getSource();
-            var label = source.get("v.label");
-            triggerCmp.set("v.label", label);
-        }
+    updateLabel: function(cmp, event, helper) {
+        helper.handleUpdateTriggerLabel(cmp, event, "mytrigger");
     },
     clickMenu: function(cmp, event) {
         var source = event.getSource();
         var label = source.get("v.label");
         console.log("click menu item " + label);
     },
-    pickPlace: function(cmp, event) {
-        var triggerCmp = cmp.find("trigger");
-        if (triggerCmp) {
-            var source = event.getParam("selectedItem");
-            var label = source.get("v.label");
-            triggerCmp.set("v.label", label);
-        }
+    pickPlace: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "trigger");
     },
-    pickTiger: function(cmp, event) {
-        var triggerCmp = cmp.find("imageTrigger");
-        if (triggerCmp) {
-            var source = event.getParam("selectedItem");
-            var className = source.get("v.class");
-            triggerCmp.set("v.class", className);
-        }
+    pickTiger: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "imageTrigger");
     },
     getMenuSelected: function(cmp, event) {
         var menuCmp = cmp.find("checkboxMenu");

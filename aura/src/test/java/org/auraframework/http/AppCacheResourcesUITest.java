@@ -44,6 +44,7 @@ import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.util.AuraTextUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -328,10 +329,17 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         return String.format(COOKIE_NAME, getAuraModeForCurrentBrowser().toString(), namespace, appName);
     }
 
-    private void assertAppCacheStatus(Status status) {
-        Status actual = Status.values()[Integer.parseInt(auraUITestingUtil.getEval(
-                "return window.applicationCache.status;").toString())];
-        assertEquals("Unexpected status", status.name(), actual.name());
+    private void assertAppCacheStatus(final Status status) {
+        auraUITestingUtil.waitUntil(
+                new Function<WebDriver, Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver input) {
+                        return status.name().equals(Status.values()[Integer.parseInt(auraUITestingUtil.getEval(
+                                "return window.applicationCache.status;").toString())].name());
+                    }
+                },
+                "applicationCache.status was not " + status.name()
+                );
     }
 
     // provide a test component with TOKENs for replacement to trigger lastMod updates
@@ -435,28 +443,49 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
 
-        WebElement elem = auraUITestingUtil
+        auraUITestingUtil
                 .waitUntil(
                 new Function<WebDriver, WebElement>() {
                     @Override
                     public WebElement apply(WebDriver input) {
                         WebElement find = findDomElement(By
                                 .cssSelector(".clickableme"));
-                        if (markupToken.equals(find.getText())) {
-                            return find;
+                        try {
+                            if (markupToken.equals(find.getText())) {
+                                return find;
+                            }
+                        } catch (StaleElementReferenceException e) {
+                            // slight chance of happening between the findDomElement and getText
                         }
                         return null;
                     }
                 },
                 "fail to load clickableme"
                 );
+        Thread.sleep(200);
         List<Request> logs = endMonitoring();
 
-        elem.click();
-        WebElement output = findDomElement(By.cssSelector("div.attroutput"));
+        String output = auraUITestingUtil.waitUntil(
+                new Function<WebDriver, String>() {
+                    @Override
+                    public String apply(WebDriver input) {
+                        WebElement find = findDomElement(By
+                                .cssSelector(".clickableme"));
+                        try {
+                            find.click();
+                            WebElement output = findDomElement(By
+                                    .cssSelector("div.attroutput"));
+                            return output.getText();
+                        } catch (StaleElementReferenceException e) {
+                            // could happen before the click or if output is
+                            // rerendering
+                        }
+                        return null;
+                    }
+                }, "couldn't locate output value");
+
         assertEquals("Unexpected alert text",
-                String.format("%s%s%s", jsToken, cssToken, fwToken),
-                output.getText());
+                String.format("%s%s%s", jsToken, cssToken, fwToken), output);
 
         return logs;
     }

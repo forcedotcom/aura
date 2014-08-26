@@ -56,12 +56,6 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         super(descriptor, attributeDefRefs, attributeValueProvider, localId);
     }
 
-    public ComponentImpl(DefDescriptor<ComponentDef> descriptor, Collection<AttributeDefRef> attributeDefRefs,
-            BaseComponent<?, ?> attributeValueProvider, Map<String, Object> valueProviders,
-            ValueProvider delegateValueProvider) throws QuickFixException {
-        super(descriptor, attributeDefRefs, attributeValueProvider, valueProviders, delegateValueProvider);
-    }
-
     @Override
     protected void createSuper() throws QuickFixException {
         ComponentDef def = getComponentDef();

@@ -22,22 +22,30 @@
     </filter-mapping>
     <!-- End Aura Content Security Policy -->
 
-    <!-- Begin rewrite for docs.app mountpoint.  Force loading to prod mode. -->
-
-    <filter>
-        <filter-name>AuraDocsRewriteFilter</filter-name>
-        <filter-class>org.auraframework.http.AuraDocsRewriteFilter</filter-class>
-    </filter>
+    <!-- Begin Aura Servlet -->
 
     <filter-mapping>
-    	<filter-name>AuraDocsRewriteFilter</filter-name>
-        <url-pattern>/auradocs</url-pattern>
+        <filter-name>AuraContextFilter</filter-name>
+        <url-pattern>/aura</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
 
-    <!-- End rewrite for docs.app -->
+    <filter-mapping>
+        <filter-name>AuraContextFilter</filter-name>
+        <url-pattern>*.cmp</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
 
-
-    <!-- Begin Aura Servlet -->
+    <filter-mapping>
+        <filter-name>AuraContextFilter</filter-name>
+        <url-pattern>*.app</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
 
     <filter>
         <filter-name>AuraRewriteFilter</filter-name>
@@ -60,18 +68,33 @@
         <load-on-startup>0</load-on-startup>
     </servlet>
 
+    <servlet-mapping>
+        <servlet-name>AuraServlet</servlet-name>
+        <url-pattern>/aura</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Begin rewrite for docs.app mountpoint.  Force loading to prod mode.  After context -->
+
+    <filter>
+        <filter-name>AuraDocsRewriteFilter</filter-name>
+        <filter-class>org.auraframework.http.AuraDocsRewriteFilter</filter-class>
+    </filter>
+
     <filter-mapping>
         <filter-name>AuraContextFilter</filter-name>
-        <url-pattern>/aura</url-pattern>
+        <url-pattern>/auradocs</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
 
-    <servlet-mapping>
-        <servlet-name>AuraServlet</servlet-name>
-        <url-pattern>/aura</url-pattern>
-    </servlet-mapping>
+    <filter-mapping>
+    	<filter-name>AuraDocsRewriteFilter</filter-name>
+        <url-pattern>/auradocs</url-pattern>
+    </filter-mapping>
+
+    <!-- End rewrite for docs.app -->
 
 
     <!-- Begin Aura ResourceServlet -->

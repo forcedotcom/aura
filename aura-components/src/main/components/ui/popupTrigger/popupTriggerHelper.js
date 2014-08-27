@@ -72,15 +72,10 @@
     },
     
     firePopupEvent: function(component, eventName, params) {
-    	var popup = component.getValue("v.parent"),
-    		_event;
-    	
-    	if (popup && !popup.isEmpty()) {
-    		_event = popup.getValue(0).get(eventName);
-    		if (params) {
-    			_event.setParams(params);
-    		}
-    		_event.fire();
-    	}
+    	var event = component.get(eventName);
+    	if (params) {
+            event.setParams(params);
+        }
+        event.fire();
     }
 })

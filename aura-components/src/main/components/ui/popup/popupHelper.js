@@ -79,15 +79,20 @@
         targetEvent.fire();
     },
 
-    setParentOnChildren : function(component) {
+    setEventHandlersOnChildren : function(component) {
         var body = component.getConcreteComponent().getValue("v.body"),
             child;
 
         for (var i = 0, l = body.getLength(); i < l; i++) {
             child = body.getValue(i);
-
-            if (child.getDef().getAttributeDefs().getDef("parent")) {
-                child.set("v.parent", [component]);
+            if (child.isInstanceOf("ui:popupTrigger")) {
+            	child.addHandler("popupTriggerPress", component, "c.onTriggerPress");
+            	child.addHandler("popupTargetShow", component, "c.onTargetShow");
+            	child.addHandler("popupTargetHide", component, "c.onTargetHide");
+            }
+            
+            if (child.isInstanceOf("ui:popupTarget")) {
+            	child.addHandler("doClose", component, "c.onTargetHide");
             }
         }
     }

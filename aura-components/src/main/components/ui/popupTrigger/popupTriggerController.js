@@ -17,12 +17,11 @@
     focus: function(component, event, helper) {
     	component.getConcreteComponent().getDef().getHelper().focus(concreteCmp);
     },
-
-    onTriggerPress : function(component, event, helper) {
-        if ($A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
+    
+    onClick : function(component, event, helper) {
+    	if ($A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
             $A.util.squash(event, true);
         }
-
         helper.handleTriggerPress(component);
     },
 

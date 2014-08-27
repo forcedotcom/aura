@@ -106,32 +106,17 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Collection<AttributeDefRef> attributeDefRefs,
             BaseComponent<?, ?> attributeValueProvider, String localId) throws QuickFixException {
-        //
-        // DANGER WILL ROBINSON!!!! DANGER WILL ROBINSON!!!
-        // Thit does not call finishComponent because it actually uses the version
-        // of the constructor immediately below, which has already called finishComponent.
-        //
-        this(descriptor, attributeDefRefs, attributeValueProvider, null, null);
-        this.localId = localId;
-    }
-
-    public BaseComponentImpl(DefDescriptor<D> descriptor, Collection<AttributeDefRef> attributeDefRefs,
-            BaseComponent<?, ?> attributeValueProvider, Map<String, Object> valueProviders,
-            ValueProvider delegateValueProvider) throws QuickFixException {
-        this(descriptor, attributeValueProvider, valueProviders, null, null);
+        this(descriptor, attributeValueProvider, null, null, null);
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.attributeSet.set(attributeDefRefs);
-            this.delegateValueProvider = delegateValueProvider;
-            if (delegateValueProvider != null) {
-                this.valueProviders.remove(ValueProviderType.VIEW.getPrefix());
-            }
             finishInit();
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_COMPONENT_CREATION);
         }
         Aura.getContextService().getCurrentContext().getInstanceStack().popInstance(this);
+        this.localId = localId;
     }
 
     /**
@@ -470,10 +455,6 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                     return root;
                 }
             }
-            // try the delegate
-            if (delegateValueProvider != null) {
-                return delegateValueProvider.getValue(expr);
-            }
             return null;
         } finally {
             context.setCurrentComponent(oldComponent);
@@ -560,7 +541,6 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected String localId;
     protected final AttributeSet attributeSet;
     private Model model;
-    private ValueProvider delegateValueProvider;
     protected I superComponent;
     protected I concreteComponent;
     protected boolean remoteProvider = false;

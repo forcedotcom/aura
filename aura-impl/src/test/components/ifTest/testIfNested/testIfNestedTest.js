@@ -16,23 +16,21 @@
 ({
 	testOuterTrue: {
         attributes : {outer : "true", inner: "false"},
-        
         test: function(component){
             this.whatItIs(component, "Outer is True, inner false:", true, false);
         }
     },
-    
+
     testOuterFalse: {
         attributes : {outer : "false", inner : "true"},
-        
         test: function(component){
             this.whatItIs(component, "Outer is false, inner true:", false, true);
         }
     },
-    
+
+    // TODO(W-1419175): onchange events don't fire across function expressions
     _testRerender: {
-    	attributes : {outer : "true", inner : "false"},
-        
+        attributes : {outer : "true", inner : "false"},
         test: function(component){
             this.whatItIs(component, "Testing rerender, outer is true, inner false:", true, false);
             component.set("v.outer", false);
@@ -41,25 +39,25 @@
             this.whatItIs(component, "Testing rerender, outer is false, inner true:", false, true);
         }
     },
-    
+
     whatItIs : function(component, name, outervalue, innervalue){
-    	if(outervalue){
-    		aura.test.assertNotNull($A.test.getElementByClass("outerIsTrue"), name+"Outer If was not displayed.");
-    		aura.test.assertNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was displayed");
-    	}else{
-    		aura.test.assertNull($A.test.getElementByClass("outerIsTrue"), name+"Outer rIf was displayed.");
-    		aura.test.assertNotNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was not displayed");
-    	}
+        if (outervalue) {
+            $A.test.assertNotNull($A.test.getElementByClass("outerIsTrue"), name+"Outer If was not displayed.");
+            $A.test.assertNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was displayed");
+        } else {
+            $A.test.assertNull($A.test.getElementByClass("outerIsTrue"), name+"Outer rIf was displayed.");
+            $A.test.assertNotNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was not displayed");
+        }
     	if (innervalue) {
-            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} didn't evaluate as true");
-            aura.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} evaluated as false");
-            aura.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} evaluated as true");
-            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} didn't evaluate as false");
-        }else{
-            aura.test.assertNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} evaluated as true");
-            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} didn't evaluate as false");
-            aura.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} didn't evaluate as true");
-            aura.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} evaluated as false");
+            $A.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} didn't evaluate as true");
+            $A.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} evaluated as false");
+            $A.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} evaluated as true");
+            $A.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} didn't evaluate as false");
+        } else {
+            $A.test.assertNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} evaluated as true");
+            $A.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} didn't evaluate as false");
+            $A.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} didn't evaluate as true");
+            $A.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} evaluated as false");
         }
     }
 })

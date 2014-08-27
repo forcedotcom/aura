@@ -44,13 +44,6 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
     private static final PropertyReference i235325 = new PropertyReferenceImpl("i235325", l);
     private static final PropertyReference bTrue = new PropertyReferenceImpl("bTrue", l);
     private static final PropertyReference bFalse = new PropertyReferenceImpl("bFalse", l);
-    private static final PropertyReference sRandom = new PropertyReferenceImpl("sRandom", l);
-    private static final PropertyReference sEmpty = new PropertyReferenceImpl("sEmpty", l);
-    private static final PropertyReference sFalse = new PropertyReferenceImpl("sFalse", l);
-    private static final PropertyReference oNull = new PropertyReferenceImpl("oNull", l);
-    private static final PropertyReference oObj = new PropertyReferenceImpl("oObj", l);
-    private static final PropertyReference d0 = new PropertyReferenceImpl("d0", l);
-    private static final PropertyReference d1 = new PropertyReferenceImpl("d1", l);
 
     private static ValueProvider values = new ValueProvider() {
         @Override
@@ -59,28 +52,13 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
                 return Integer.valueOf(314);
             } else if (key == i235325) {
                 return Integer.valueOf(235325);
-            } else if (key == d0) {
-                return Double.valueOf(0);
-            } else if (key == d1) {
-                return Double.valueOf(1);
             } else if (key == bTrue) {
                 return Boolean.TRUE;
             } else if (key == bFalse) {
                 return Boolean.FALSE;
-            } else if (key == sRandom) {
-                return "Random";
-            } else if (key == sEmpty) {
-                return "";
-            } else if (key == sFalse) {
-                return "false";
-            } else if (key == oNull) {
-                return null;
-            } else if (key == oObj) {
-                return new Object();
             }
             return null;
         }
-
     };
 
     public ExpressionTest(String name) {
@@ -103,81 +81,10 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
         assertEquals(((314 + 235325.0) - (314 + 314)) - 17, o);
     }
 
-    public void testBooleanAnd() throws Exception {
-        Expression e;
-        Object o;
-        
-        e = new FunctionCallImpl(AND, ImmutableList.<Expression> of(bTrue, bFalse), l);
-        o = e.evaluate(values);
-        assertFalse("and(true, false) should be false", o);
-
-        e = new FunctionCallImpl(AND, ImmutableList.<Expression> of(bTrue, bTrue), l);
-        o = e.evaluate(values);
-        assertTrue("and(true, true) should be true", o);
-    }
-
-    public void testBooleanOr() throws Exception {
-        Expression e;
-        Object o;
-        
-        e = new FunctionCallImpl(OR, ImmutableList.<Expression> of(bTrue, bFalse), l);
-        o = e.evaluate(values);
-        assertTrue("Expected or(true,false) to be true", o);
-
-        e = new FunctionCallImpl(OR, ImmutableList.<Expression> of(bFalse, bFalse), l);
-        o = e.evaluate(values);
-        assertFalse("Expected or(false,false) to be false", o);
-
-        e = new FunctionCallImpl(OR, ImmutableList.<Expression> of(bFalse, bTrue), l);
-        o = e.evaluate(values);
-        assertTrue("Expected or(false,true) to be true", o);
-    }
-
-    public void testBooleanNot() throws Exception {
-        Expression e;
-        Object o;
-        
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(bTrue), l);
-        o = e.evaluate(values);
-        assertFalse("Expected !true to be false", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(bFalse), l);
-        o = e.evaluate(values);
-        assertTrue("Expected !false to be true", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(sEmpty), l);
-        o = e.evaluate(values);
-        assertTrue("Expected !'' to be true", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(sRandom), l);
-        o = e.evaluate(values);
-        assertFalse("Expected !'Random' to be false", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(sFalse), l);
-        o = e.evaluate(values);
-        assertFalse("Expected !'false' to be false", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(oNull), l);
-        o = e.evaluate(values);
-        assertTrue("Expected !null to be true", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(oObj), l);
-        o = e.evaluate(values);
-        assertFalse("Expected !obj to be false", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(d0), l);
-        o = e.evaluate(values);
-        assertTrue("Expected !0.0 to be true", o);
-
-        e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(d1), l);
-        o = e.evaluate(values);
-        assertFalse("Expected !1.0 to be false", o);
-    }
-
     public void testBooleanComplex() throws Exception {
         Expression e;
         Object o;
-        
+
         // true && (false || !true)
         e = new FunctionCallImpl(AND, ImmutableList.<Expression> of(
                 bTrue,

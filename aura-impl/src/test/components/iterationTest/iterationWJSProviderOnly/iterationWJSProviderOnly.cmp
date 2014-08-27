@@ -16,5 +16,5 @@
 -->
 <aura:component abstract="true" provider="js://iterationTest.iterationWJSProviderOnly">
     <aura:dependency resource="ifTest:*" type="COMPONENT" />
-    <aura:attribute name="type" type="String" description="type of component we load, see helper for the list"/>
+    <aura:attribute name="cmpDescriptorName" type="String" description="What component to provide"/>
 </aura:component>

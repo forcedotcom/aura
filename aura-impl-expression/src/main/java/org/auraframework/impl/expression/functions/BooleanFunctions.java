@@ -76,15 +76,15 @@ public class BooleanFunctions {
         @Override
         public Object evaluate(List<Object> args) {
             Object a1 = args.get(0);
-            
+
             if (a1 instanceof Boolean) {
-                return Boolean.valueOf(!((Boolean)a1).booleanValue());
+                return Boolean.valueOf(!((Boolean) a1).booleanValue());
             }
             if (a1 instanceof String) {
                 return Boolean.valueOf("".equals(a1));
             }
             if (a1 instanceof Number) {
-                return Boolean.valueOf(a1.equals(0.0) || a1.equals(Float.NaN));
+                return Boolean.valueOf(a1.equals(0.0) || Double.isNaN(((Number) a1).doubleValue()));
             }
             if (a1 == null) {
                 return Boolean.TRUE;

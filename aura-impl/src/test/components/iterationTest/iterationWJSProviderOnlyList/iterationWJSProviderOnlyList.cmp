@@ -14,10 +14,11 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestIterationModel" description="a list for cmp with JS provider only">
-   <div>
-     <aura:iteration items="{!m.data2}" var="item">
-           <iterationTest:iterationWJSProviderOnly type="{!item.type}"/>
-     </aura:iteration>
-  </div>
+<aura:component>
+    <aura:attribute name="items" type="String[]" default="ifTest:testIf,ifTest:testIfElse,ifTest:testIfNested,ifTest:testIfServer"/>
+
+    <aura:iteration items="{!v.items}" var="item">
+        <iterationTest:iterationWJSProviderOnly aura:id="iterCmp" cmpDescriptorName="{!item}"/>
+    </aura:iteration>
+
 </aura:component>

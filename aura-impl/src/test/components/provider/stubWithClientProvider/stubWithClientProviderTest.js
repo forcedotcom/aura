@@ -40,29 +40,6 @@
             $A.test.assertEquals(providedCmp, cmp.find("provider1"), "Provided component no accessible using aura:id of provider");
         }
     },
-    /**
-     * Verify that a client side provider can replace itself with a component which also has serverside dependencies.
-
-     * TODO: W-1961207 &  W-1787477 server dependent client provided will need completion of component creation context
-     * */
-    _testComponentWithModelProvided: {
-        attributes: {config: "{componentDef:'markup://provider:cmpWithModel',attributes:{value:'secondThing'}}"},
-        test: function (cmp) {
-            var providedCmp = cmp.find("cmpWSrvrDpndncyProvided").get("v.body")[0];
-            $A.test.assertNotNull(providedCmp);
-
-            $A.test.assertEquals("markup://provider:cmpWithModel", providedCmp.getDef().getDescriptor().getQualifiedName(),
-                "Found unexpected component by client side provider");
-            $A.test.assertEquals("secondThing", providedCmp.get("v.value"),
-                "Attribute values were not set on provided component");
-            $A.test.assertEquals("firstThingDefault", providedCmp.get("m.firstThing"),
-                "Model values were not available on provided component");
-            $A.test.assertEquals("firstThingDefaultsecondThing", $A.test.getTextByComponent(providedCmp));
-
-            //Verify that find using aura:id of provider component will return the expected provided component
-            $A.test.assertEquals(providedCmp, cmp.find("provider2"), "Provided component no accessible using aura:id of provider");
-        }
-    },
 
     testExtendedComponentHasItsOwnAttributes: {
         test: function(cmp) {

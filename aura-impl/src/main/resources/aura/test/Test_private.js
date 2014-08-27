@@ -20,7 +20,7 @@ $A.ns.Test.prototype.putMessage = function(pre, expected, msg) {
         if (expected[i] === undefined) {
             continue;
         }
-        if (msg.indexOf(expected[i]) === 0) {
+        if (msg.indexOf(expected[i]) != -1) {
             expected[i] = undefined;
             return true;
         }

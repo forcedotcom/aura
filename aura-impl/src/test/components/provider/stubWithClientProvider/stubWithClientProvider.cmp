@@ -24,10 +24,6 @@
     <div aura:id="simpleComponentProvided">
         <provider:clientProvider value="{componentDef:'markup://aura:text',attributes:{value:'resolver'}}" aura:id="provider1"/>
     </div>
-    
-    <div aura:id="cmpWSrvrDpndncyProvided">
-        <provider:clientProvider value="{componentDef:'markup://provider:cmpWithModel',attributes:{value:'secondThing'}}" aura:id="provider2"/>
-    </div>
 
     <provider:clientProvider value="{componentDef:'markup://provider:providerA'}" aura:id="provider3" />
     <provider:clientProvider value="{componentDef:'markup://provider:providerB'}" aura:id="provider4" />

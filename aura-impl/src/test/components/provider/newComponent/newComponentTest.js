@@ -176,5 +176,20 @@
                 config, null, true, false
             );
         }
+    },
+
+    /**
+     * Verify client provided component cannot be server dependent
+     */
+    testClientProvidedServerDependent: {
+        attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'markup://provider:cmpWithModel',attributes:{value:'secondThing'}}\"}"},
+        test:function(cmp){
+            $A.run(function(){
+                cmp.get('c.createComponent').runDeprecated();
+            });
+            var error = $A.test.getAuraErrorMessage();
+            $A.test.assertTrue(error.indexOf("Client provided component cannot have server dependencies") != -1,
+                "Incorrect error message when creating client provided server dependent component");
+        }
     }
 })

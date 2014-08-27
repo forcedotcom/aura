@@ -35,6 +35,7 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -249,7 +250,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
         
         if (modelDefDescriptor != null) {
-            localDeps = true;
+            localDeps = Boolean.TRUE;
             return;
         }
 
@@ -264,7 +265,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
             
             if (!hasRemote) {
-                localDeps = true;
+                localDeps = Boolean.TRUE;
                 return;
             }
         }
@@ -280,23 +281,71 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
             
             if (!hasRemote) {
-                localDeps = true;
+                localDeps = Boolean.TRUE;
                 return;
             }
         }
-            	
-		 // Walk the super component tree applying slightly different dependency rules.
-        T superDef = getSuperDef(); 
-        
-		if (superDef != null && superDef.hasLocalDependencies()) {
-			// Only local/server models and renderers on the super/parent are considered local dependences for the child.
-			localDeps = superDef.getModelDef() != null || 
-					(superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()); 
-		
-		}
-		else {
-			localDeps = false;
-		}
+
+        // Walk the super component tree applying slightly different dependency rules.
+        T superDef = getSuperDef();
+
+        if (superDef != null && superDef.hasLocalDependencies() &&
+            // super has model
+            (superDef.getModelDef() != null ||
+            // or has renderer that's local
+            (superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()))) {
+            // Only local/server models and renderers on the super/parent are considered local dependencies for the child.
+            localDeps = Boolean.TRUE;
+            return;
+        }
+
+        // nested components with server dependencies makes me server dependent
+        for (AttributeDefRef adr : this.facets) {
+            if (areChildenServerDependent(adr)) {
+                localDeps = Boolean.TRUE;
+                return;
+            }
+        }
+
+        if (localDeps == null) {
+            localDeps = Boolean.FALSE;
+        }
+    }
+
+    /**
+     * Loop through facets for components. If any has server dependencies then this component should as well
+     *
+     * @param adr attribute definition reference
+     * @return true if nested components has server dependencies
+     */
+    private boolean areChildenServerDependent(AttributeDefRef adr) throws QuickFixException {
+        Object facet = adr.getValue();
+        if (facet instanceof List && !((List) facet).isEmpty() && ((List) facet).get(0) instanceof ComponentDefRef) {
+            List<ComponentDefRef> body = (List<ComponentDefRef>) facet;
+            for (ComponentDefRef componentRef : body) {
+                if (this.getDescriptor().getQualifiedName().equals(componentRef.getDescriptor().getQualifiedName())) {
+                    // get out of recursive components
+                    // can safely return false at this point if the other criteria hasn't been met (model, renderers, etc)
+                    return false;
+                }
+                if (componentRef.getDescriptor().getDef().hasLocalDependencies()) {
+                    return true;
+                }
+                Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = componentRef.getAttributeValues();
+                if (attributes != null && !attributes.isEmpty()) {
+                    for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributes.entrySet()) {
+                        String attributeDescriptor = entry.getKey().getDescriptorName();
+                        if (attributeDescriptor.equals("body") || attributeDescriptor.equals("else")) {
+                            // body of nested components
+                            if (areChildenServerDependent(entry.getValue())) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     @SuppressWarnings("unchecked")

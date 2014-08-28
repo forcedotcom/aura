@@ -688,16 +688,14 @@ var AuraDevToolService = function() {
             /**
              * Method that looks at the given tag and will look print out the next two parents components names
              * @param   tag     - The initial tag to find the parents of
-             * @param   spacing - The amount of spacing that we want per item
              * @returns String  - The string representation of the the cmp stack trace 
              */
-            getStackTrace : function(tag, spacing){
-                var cmp = null;
+            getStackTrace : function(tag){
+            	var cmp = null;
                 var cmpInfo = {};
-                var cmpNameArray = [];
+                var cmpNameList = "";
                 var cmpName = "";
-                var spaces = "";
-                    
+                
                 //Keep going up until we hit the either the BODY or HTML tag
                 while(!$A.util.isUndefinedOrNull(tag) && tag.tagName.toLowerCase() !== "body" && tag.tagName.toLowerCase() !== "html"){
                     data_aura_rendered_by = $A.util.getElementAttributeValue(tag, "data-aura-rendered-by");
@@ -714,7 +712,7 @@ var AuraDevToolService = function() {
                                  //Making sure that we have unique components
                                  if(!(cmpName in cmpInfo)){
                                      cmpInfo[cmpName] = "";
-                                     cmpNameArray.push(cmpName);
+                                     cmpNameList = cmpNameList +"    by "+ cmpName +"\n";
                                  }
                              }
                          }
@@ -722,28 +720,9 @@ var AuraDevToolService = function() {
                      tag = tag.parentNode;
                  }
                     
-                 spaces = spacing;
-                 cmpName = "";
-                 for(var index=cmpNameArray.length-1; index>=0; index--){
-                     cmpName = cmpName + spaces+ cmpNameArray[index]+"\n";
-                     spaces = spaces+"   ";
-                 }
-                     
-                 return cmpName;
+                 return cmpNameList;
             },
-         /**
-          * Method that checks to that an element has the necessary functions to be able to grab data from it and format correct.
-          * The only thing that this will stop is the ability to say which component rendered it.
-          * @param elm        - component that we are making sure contains all of the necessary informaiton.
-          * @return boolean   - True if all functions exist. False otherwise
-          */
-         containsNecessaryFunctions : function(elm){
-             var checkExists = $A.util.isUndefinedOrNull;
-             return  (!checkExists(elm)) && 
-                 ("getAttributes" in elm) && !checkExists(elm.getAttributes()) &&
-                 ("getValueProvider" in elm.getAttributes() && !checkExists(elm.getAttributes().getValueProvider())) && 
-                 ("getDef" in elm.getAttributes().getValueProvider() && !checkExists(elm.getAttributes().getValueProvider().getDef()));
-         },   
+
             /**
              * Method grabs everything from the given array and prints out the error and the tag(s) that are the issue
              * @param   tagError - The error message for the given tag
@@ -751,69 +730,26 @@ var AuraDevToolService = function() {
              * @returns String - Either the empty string or a string representation of the error
              */
             formatOutput : function(tagError, errArray){
-                if(errArray.length === 0){
-                    return "";
-                }
-                
-                var len = errArray.length;
-                var data_aura_rendered_by = "";
-                var compThatRenderedCmp = "";
-                var cmpInfo = "";
-                var cmpDesc = "";
-                var nodeName = "";
-                var cmp = "";
-                var errStr = "\nIssue: "+tagError+"\n";
-                var accessAideFuncs = aura.devToolService.accessbilityAide;
-                accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
-                    
-                for(var i = 0; i<len; i++){
-                    nodeName = errArray[i].nodeName.toLowerCase();
-                    data_aura_rendered_by = $A.util.getElementAttributeValue(errArray[i], "data-aura-rendered-by");
-                    cmpInfo = "";
-                    cmpDesc = "";
-                    
-                    //Make sure it has a rendered by value
-                    if($A.util.isEmpty(data_aura_rendered_by)){
-                        nodeName = errArray[i].nodeName.toLowerCase();
-                        cmpInfo = "No Aura information available";
-                        compThatRenderedCmp = cmpInfo;
-                    }
-                    else{
-                        //Making sure that the cmp is rendered by Aura and a normal HTML tag
-                        //Making sure to grab the correct $A. Depending if you are using the debuggertool or not, $A will be different
-                        cmp = $A.getCmp(data_aura_rendered_by);
-                        
-                        if(accessAideFuncs.containsNecessaryFunctions(cmp)){
-                           //If he component exists grab it descriptor
-                           cmpDesc = cmp.getAttributes().getValueProvider().getDef().getDescriptor();
-                        
-                           //Grab the namespace and name so that it is not viewed as a hyperlink
-                           cmpInfo = cmpDesc.getNamespace()+":"+cmpDesc.getName();
-                        
-                           //Grabbing the erroneous components value provider
-                           cmpDesc = cmp.getAttributes().getValueProvider();
-                        
-                           //Making sure we are not at the app level and that we are not looking at a pass through value
-                           if(accessAideFuncs.containsNecessaryFunctions(cmpDesc)){                    
-                               cmpDesc = cmpDesc.getAttributes().getValueProvider();
-                               cmpDesc = cmpDesc.getDef().getDescriptor();
-                               compThatRenderedCmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
-                           }
-                           else{
-                               //If the component does not have a valueprovider than we are at the app level, or the necessary information can't be found
-                               compThatRenderedCmp = cmpInfo;
-                           }
-                        }
-                        else{
-                            cmpInfo = "No Aura information available";
-                            compThatRenderedCmp = cmpInfo;
-                        }
-                    }
-                
-                    errStr = errStr+"Component markup: //"+cmpInfo+"\nFound in: //"+compThatRenderedCmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";             
-                    errStr = errStr+"StackTrace:\n" + accessAideFuncs.getStackTrace(errArray[i], "           ");
-                }
-                return errStr;
+            	 if(errArray.length === 0){
+                     return "";
+                 }
+                 
+                 var len = errArray.length;
+                 var nodeName = "";
+                 var elm = null;
+                 var errStr = tagError+"\n";
+                 var accessAideFuncs = aura.devToolService.accessbilityAide;
+                 accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
+                     
+                 for(var i = 0; i<len; i++){
+                 	elm = errArray[i];
+                     nodeName = elm.nodeName.toLowerCase();
+            
+                     errStr = errStr+"  Error Tag: <"+nodeName+""+accessAideFuncs.attribStringVal(elm.attributes)+">...</"+nodeName+">\n";             
+                     errStr = errStr+"  Stack Trace: error tag is rendered\n" + accessAideFuncs.getStackTrace(elm)+"\n";
+                 }
+                 
+                 return errStr;
             },
             /**
              * Method looks at the given tags title, and makes sure that it is not the empty string
@@ -1078,12 +1014,12 @@ var AuraDevToolService = function() {
                  }
         },
         verifyAccessibility : {
-            /**
-             * Function that will find all nested Headers and make sure that they have in 1 lvl difference
+        	/**
+             * Checking to make sure that all nested Headers have a single level of difference
              * @returns String - Returns a string representation of the errors
              */
-            checkNestedHeaders : function(domElem){
-                   var headerErrMsg = "Headings are properly nested and increased by 1 level at a time. e.g., h1 followed by h2, h2 followed by h2 or h3. Refer to http://www.w3.org/TR/WCAG20-TECHS/G141.html.";
+        	A11Y_DOM_11 : function(domElem){
+                   var headerErrMsg = "[A11Y_DOM_11] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_11";
                    var errArray = [];
                    var accessAideFuncs = $A.devToolService.accessbilityAide;
                    var hdrs1 = domElem.getElementsByTagName("h1");
@@ -1102,23 +1038,22 @@ var AuraDevToolService = function() {
                
              },
                /**
-                * Function that will find all anchors and make sure that they have text in them
+                * Check making sure that all anchors have text associated with them
                 * @returns String - Returns a string representation of the errors
                 */
-               checkAnchorHasText : function(domElem){
-                      var anchorErrMsg = "Anchor tag should contain proper link text and tell what the link is about. For a graphical link, uses ui:image instead,"+
-                                 " or uses a span tag with assistiveText class to include the link text; uses ui:button if it's a button.";
+               A11Y_DOM_04 : function(domElem){
+                      var anchorErrMsg = "[A11Y_DOM_04] Links must have non-empty text content.\n  More info http://sfdc.co/a11y_dom_04";
                       var accessAideFuncs = $A.devToolService.accessbilityAide;
                       var anchors = domElem.getElementsByTagName("a");
                       return accessAideFuncs.formatOutput(anchorErrMsg, accessAideFuncs.checkAnchorHasInnerText(anchors));
                   
                 },
                 /**
-                 * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
+                 * Check making sure the head element is set correctly
                  * @returns String - Returns a string representation of the errors
                  */
-                  checkHeadTitle : function(domElem){
-                      var hdErrMsg = "Head element must include non-empty title element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/navigation-mechanisms.html.";
+                A11Y_DOM_07 : function(domElem){
+                      var hdErrMsg = "[A11Y_DOM_07] The head section must have a non-empty title element.\n  More info http://sfdc.co/a11y_dom_07";
                       var accessAideFuncs = $A.devToolService.accessbilityAide;
                       var hd = domElem.getElementsByTagName("head")[0];
                 
@@ -1128,21 +1063,21 @@ var AuraDevToolService = function() {
                       return accessAideFuncs.formatOutput(hdErrMsg, accessAideFuncs.checkHeadHasCorrectTitle(hdErrMsg, hd));
                  },
                  /**
-                  * Function that will find all ths and make sure that they have scope in them, and that they are equal to row, col, rowgroup, colgroup
+                  * Check making sure that table cells have scope in them, and that they are equal to row, col, rowgroup, colgroup
                   * @returns String - Returns a string representation of the errors
                   */
-                  checkTableIsAccessible : function(domElem){
-                      var tableErrorMsg = "Table header must properly associate with table cell by, either using 'scope' attribute with one of the values 'row', 'col', 'rowgroup' and 'colgroup', or using id and headers attributes.";
+                 A11Y_DOM_08 : function(domElem){
+                      var tableErrorMsg = "[A11Y_DOM_08] Data table cells must be associated with data table headers.\n  More info http://sfdc.co/a11y_dom_08";
                       var accessAideFuncs = aura.devToolService.accessbilityAide;
                       var tables = domElem.getElementsByTagName("table");
                       return accessAideFuncs.formatOutput(tableErrorMsg, accessAideFuncs.checkTables(tables, tableErrorMsg));
                    },
                   /**
-                   * Function that will find all IFrames and make sure that they have titles in them
+                   * Check making sure that all iframes have a non empty title associated with them
                    * @returns String - Returns a string representation of the errors
                    */
-                   checkIFrameHasTitle : function(domElem){
-                       var iFrameTitleMsg = "Each frame and iframe element must have non-empty title attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/ensure-compat.html.";
+                   A11Y_DOM_06 : function(domElem){
+                       var iFrameTitleMsg = "[A11Y_DOM_06] Each frame and iframe element must have a non-empty title attribute.\n  More info http://sfdc.co/a11y_dom_06";
                        var accessAideFuncs = aura.devToolService.accessbilityAide;
                        var iframes = domElem.getElementsByTagName("iframe");
                 
@@ -1167,26 +1102,23 @@ var AuraDevToolService = function() {
                       return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframeArray, "title", "", accessAideFuncs.doesContain));
                     },
                    
-                    /**
-                    * Grabs all images tags and makes sure they have titles
-                    * @returns String - Returns a string representation of the errors
-                    */
-                    checkImageTagForAlt : function(domElem){
-                		var imgError = "All image tags require the presence of the alt attribute. If the image is decorative, set alt=\"\". " +
-                				"If the image is informational, set alt to equal a descriptive alternative for the image. Stings such as null, " +
-                				"empty, and undefined are not appropriate alt attribute values. Speak to your doc writer for assistance.";
+                    /** 
+                     * Check making sure that all images have an alt attribute present
+                     * @returns String - Returns a string representation of the errors
+                     */
+                    A11Y_DOM_01 : function(domElem){
+                		var imgError = "[A11Y_DOM_01] All image tags require the presence of the alt attribute.\n  More info http://sfdc.co/a11y_dom_01";
          
-                		  
                 		var allImgTags = domElem.getElementsByTagName("img");
                		    return aura.devToolService.accessbilityAide.findAllImgTags(allImgTags, imgError);
                 	},
                 	
                    /**
-                    * Goes through all of the fieldsets tags that do not have the display:none field set and makes sure that each one has a legend
+                    * Check making sure that all fieldset tags do not have the display:none field set and makes sure that each one has a legend
                     * @returns String - Returns a string representation of the errors
                     */
-                    checkFieldSetForLegend : function(domElem){
-                        var fieldsetLegnedMsg = "Fieldset element must include legend element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
+                	A11Y_DOM_09 : function(domElem){
+                        var fieldsetLegnedMsg = "[A11Y_DOM_09] Fieldset must have a legend element.\n  More info http://sfdc.co/a11y_dom_09";
                         var accessAideFuncs = aura.devToolService.accessbilityAide;
                         var fieldSets = domElem.getElementsByTagName('fieldset');
                         var legends = "";
@@ -1209,33 +1141,33 @@ var AuraDevToolService = function() {
                         return accessAideFuncs.formatOutput(fieldsetLegnedMsg, errorArray);
                     }, 
                     /**
-                     * gets all buttons then makes sure that they are a label associated with it
+                     * Check making sure all buttons have non empty label
                      * @returns String - Returns a string representation of the errors
                      */
-                    checkButtonsHaveNonEmptyLabel : function(domElem){
-                        var buttonLabelErrorMsg = "Button should have non-empty label. When using ui:button, assign a non-empty string to label attribute.";
+                    A11Y_DOM_03 : function(domElem){
+                        var buttonLabelErrorMsg = "[A11Y_DOM_03] Buttons must have non-empty text labels.\n  More info http://sfdc.co/a11y_dom_03";
                         var accessAideFuncs = aura.devToolService.accessbilityAide;
                         var buttonTags = domElem.getElementsByTagName('button');
                     
                         return accessAideFuncs.formatOutput(buttonLabelErrorMsg, accessAideFuncs.buttonLabelAide(buttonTags));
                    },
                    /**
-                    * Gets all radio buttons, then traverses up the tree to find if they are in a fieldset
+                    * Check making sure that all radio and checkboxes are grouped within a fieldset
                     * @returns String - Returns a string representation of the errors
                     */
-                    checkRadioButtonsInFieldSet : function(domElem){
-                        var radioButtonFieldSetMsg = "Radio button and checkbox should group by fieldset and legend elements. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
+                   A11Y_DOM_10 : function(domElem){
+                        var radioButtonFieldSetMsg = "[A11Y_DOM_10] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_10";
                         var accessAideFuncs = aura.devToolService.accessbilityAide;
                         var inputTags = domElem.getElementsByTagName('input');
                         
                         return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, accessAideFuncs.radioButtonAide(inputTags));
                      },
                     /**
-                     * Verifys that all inputs have a label
+                     * Check making sure all inputs have an associated label
                      * @returns String - Returns a string representation of the errors
                      */
-                     checkInputHasLabel : function(domElem) {
-                         var inputLabelMsg   = "A label element must be directly before/after the input controls, and the for attribute of label must match the id attribute of the input controls, OR the label should be wrapped around an input. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
+                     A11Y_DOM_02 : function(domElem) {
+                         var inputLabelMsg   = "[A11Y_DOM_02] Labels are required for all input controls.\n  More info http://sfdc.co/a11y_dom_02";
                          var accessAideFuncs = aura.devToolService.accessbilityAide;
                          var inputTextTags   = domElem.getElementsByTagName('input');
                          var textAreaTags    = domElem.getElementsByTagName('textarea');
@@ -1250,12 +1182,12 @@ var AuraDevToolService = function() {
                          return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
                      },
                    /**
-                    * Test that will verify that if there exists an inputDefaultError on the page, that there is a corresponding input associated with it
+                    * Check making sure that if an inputDefaultError exists on the page, that there is a corresponding input associated with it
                     * @returns String - Returns a string representation of the errors
                     */
-                    checkForInputDefaultError : function (domElem){
+                     A11Y_DOM_13 : function (domElem){
                         var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var inputErrorMsg = "Error message for input field should be associated with the input control by using aria-describedby.";                    
+                        var inputErrorMsg = "[A11Y_DOM_13] Aria-describedby must be used to associate error message with input control.\n  More info http://sfdc.co/a11y_dom_13";                    
                         var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));                   
                         return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
                     }, 
@@ -1263,9 +1195,9 @@ var AuraDevToolService = function() {
                      * Test that will verifyt that all top level panels have the correct aria associated with them
                      * @returns String - Returns a string representation of the errors
                      */
-                    checkForTopLevelAriaAttribute : function (domElem){
+                    A11Y_DOM_12 : function (domElem){
                         var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var errorMsg = "Top panels (panelModal, panelOverlay) and base panel (panelSlide) should have proper aria-hidden value.";
+                        var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
                     
                         //Get all panels
                         var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll("div.forcePanelModal"), domElem.querySelectorAll("div.forcePanelOverlay"), domElem.querySelectorAll("section.stage.panelSlide")]);
@@ -1282,8 +1214,7 @@ var AuraDevToolService = function() {
         checkAccessibility : function(domElem){
             var functions = aura.devToolService.verifyAccessibility;
             var result = "";
-            aura.devToolService.accessbilityAide.errorCount = 0;
-            
+
             if($A.util.isUndefinedOrNull(domElem)){
                 domElem = document;
             }
@@ -1292,11 +1223,7 @@ var AuraDevToolService = function() {
                result = result + functions[funcNames](domElem);
             }
             
-            if(aura.devToolService.accessbilityAide.errorCount === 0){
-                return "";
-            }
-            
-            return "Total Number of Errors found: "+aura.devToolService.accessbilityAide.errorCount+result;
+            return result;
         },
         help : function(){
             var ret = [];

@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
-        helper.setEventHandlersOnChildren(component, event);
-    },
-
-    onTriggerPress: function(component, event, helper) {
-        helper.handleTriggerPress(component);
-    },
-
-    onTargetShow: function(component, event, helper) {
-        helper.handleTargetShow(component);
-    },
-
-    onTargetHide: function(component, event, helper) {
-        helper.handleTargetHide(component);
-    },
-
-    onKeyboardEvent: function(component, event, helper) {
-        helper.handleKeyboardEvent(component, event);
+    afterRender: function(component, helper) {
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        var target = _helper.getTargetComponent(component);
+    	var trigger = _helper.getTriggerComponent(component);
+    	if (target && trigger) {
+            target.set("v.referenceElement", trigger.find("popupTriggerElement").getElement());
+    	}
+    	this.superAfterRender();
     }
 })

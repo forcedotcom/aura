@@ -31,13 +31,10 @@
         		o.targetDiv = component.find("popupTarget").getElement(); // the actual menu looking container that gets positioned relative to the trigger
         	}
         	
-        	o.popup = o.target.get("v.parent")[0]; // the actual popup that contains both the trigger and target (aura attributes that store components are arrays)
-        	o.trigger = o.popup.find({instancesOf : "ui:popupTrigger"})[0]; 	// the trigger that controls the target
-        	
-        	if (o.trigger.find("popupTriggerElement")) { // this prevents extended components from throwing an error because they don't contain this element
-        		o.triggerElement = o.trigger.find("popupTriggerElement").getElement();
+        	o.triggerElement = component.getConcreteComponent().get("v.referenceElement");
+        	if (o.triggerElement) {
+        	    o.trigger = this.getTriggerComponent(o.triggerElement);
         	}
-        	
         	component._localElementCache = o;
     	}
 
@@ -58,7 +55,7 @@
 	        };
         	
 	        for (var i in names) {
-	            if (names.hasOwnProperty(i) && typeof el.style[i] !== 'undefined') {
+	        	if (names.hasOwnProperty(i) && typeof el.style[i] !== 'undefined') {
 	            	component._transitionEndEventName = names[i];
 	            }
 	        }
@@ -67,9 +64,18 @@
     	return component._transitionEndEventName;
     },
     
+    getTriggerComponent: function(element) {
+    	var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
+        var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
+        while (component && !component.isInstanceOf("ui:popupTrigger")) {
+        	component = component.getComponentValueProvider().getConcreteComponent();
+        }
+        return component;
+    },
+    
     position: function(component) {
     	var elements = this.getElementCache(component),
-    		attachToBody = elements.target.get("v.attachToBody"),
+            attachToBody = elements.target.get("v.attachToBody"),
     		manualPosition = elements.target.get("v.manualPosition"),
     		visible,
 	        autoPosition, 
@@ -160,8 +166,8 @@
     
     setAriaAttributes: function(component) {
     	var elements = this.getElementCache(component);
-
-    	if (elements.popup && elements.triggerElement && elements.target) {
+    	
+    	if (elements.triggerElement && elements.target) {
     		elements.targetElement.setAttribute("aria-labelledby", elements.trigger.getGlobalId());
         }
     },
@@ -317,7 +323,7 @@
                 	|| (!doIf.clickIsInsideTarget && doIf.closeOnClickOutside && !doIf.clickIsInsideTrigger) // if click is out of target and out of trigger and v.closeOnClickOutside is true
                 	|| doIf.clickIsInCurtain // or if the user is clicking the curtain
                 ) {       
-                	elements.popup.get("e.popupTargetHide").fire();
+                	component.getConcreteComponent().get("e.doClose").fire();
                 }
             };
             
@@ -332,7 +338,7 @@
         	var elements = this.getElementCache(component);
         	
         	component._windowBlurHandlerFunc = function (event) {
-        		elements.popup.get("e.popupTriggerPress").fire();
+        		elements.target.set("v.visible", !elements.target.get("v.visible"));
         	}
         }
         

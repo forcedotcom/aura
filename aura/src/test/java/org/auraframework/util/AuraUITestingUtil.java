@@ -54,7 +54,7 @@ public class AuraUITestingUtil {
         this.driver = driver;
         if (SauceUtil.areTestsRunningOnSauce()) {
             // things are slower in SauceLabs
-            timeoutInSecs = 120;
+            timeoutInSecs = 240;
         }
     }
 

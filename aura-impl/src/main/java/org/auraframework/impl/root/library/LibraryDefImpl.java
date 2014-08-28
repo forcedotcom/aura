@@ -200,10 +200,11 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
      */
     private List<IncludeDef> orderByDependencies(List<IncludeDef> unordered) throws InvalidDefinitionException {
     	List<IncludeDef> ordered = Lists.newLinkedList();
-    	Set<String> placed = Sets.newHashSet();
+    	Set<String> resolved = Sets.newHashSet();
     	ListMultimap<String, IncludeDef> dependantsMap = LinkedListMultimap.create();
     	
-    	List<IncludeDef> step = Lists.newLinkedList();
+    	// List of dependencies resolved in a resolution pass:
+    	List<IncludeDef> pass = Lists.newLinkedList();
     	
     	for (IncludeDef include: unordered) {
     		List<String> imports = Lists.newLinkedList();
@@ -219,8 +220,8 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     		
     		if (imports.isEmpty()) {
     			ordered.add(include);
-    			placed.add(include.getLibraryName());
-    			step.add(include);
+    			resolved.add(include.getLibraryName());
+    			pass.add(include);
     		} else {
     			for (String imported : imports) {
     				dependantsMap.put(imported, include);
@@ -228,24 +229,36 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     		}
     	}
     	
-    	while (!step.isEmpty()) {
-    		List<IncludeDef> currentStep = step;
-    		step = Lists.newLinkedList();
+    	// Until there are no dependencies resolved in a pass:
+    	while (!pass.isEmpty()) {
+    		List<IncludeDef> previousPass = pass;
+    		pass = Lists.newLinkedList();
     		
-    		for (IncludeDef currentInclude : currentStep) {
-    			for (IncludeDef nextInclude : dependantsMap.get(currentInclude.getLibraryName())) {
+    		// For each include that was resolved in the previous pass:
+    		for (IncludeDef previousPassInclude : previousPass) {
+    			
+    			// Find all things that depend on this include:
+    			for (IncludeDef requiredCurrent : dependantsMap.get(previousPassInclude.getLibraryName())) {
+    				// Skip includes that depend on this include from the previous pass that are already resolved:
+    				if (resolved.contains(requiredCurrent.getLibraryName())) {
+    					break;
+    				}
+    				
+    				// Check to see if in this pass, the include's dependencies can be resolved:
     				boolean isSatisfied = true;
-    				for (String imported : nextInclude.getImports()) {
-    					if (!placed.contains(imported)) {
+    				for (String imported : requiredCurrent.getImports()) {
+    					if (imported.indexOf(":") == -1 && !resolved.contains(imported)) {
     						isSatisfied = false;
     						break;
     					}
     				}
     				
+    				// If resolved, add this dependency to the next pass as something that depends on this now
+    				// might become resolvable:
     				if (isSatisfied) {
-    					ordered.add(nextInclude);
-    					placed.add(nextInclude.getLibraryName());
-    					step.add(nextInclude);
+    					ordered.add(requiredCurrent);
+    					resolved.add(requiredCurrent.getLibraryName());
+    					pass.add(requiredCurrent);
     				}
     			}
     		}

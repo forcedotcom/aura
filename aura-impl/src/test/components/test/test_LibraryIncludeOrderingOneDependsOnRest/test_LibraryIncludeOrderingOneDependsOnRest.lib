@@ -1,0 +1,6 @@
+<aura:library>
+    <aura:include name="a"/>
+    <aura:include name="b"/>
+    <aura:include name="c"/>
+    <aura:include name="d" imports="a,b,c" />
+</aura:library>

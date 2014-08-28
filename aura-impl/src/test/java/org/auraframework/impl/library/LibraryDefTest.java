@@ -80,6 +80,52 @@ public class LibraryDefTest extends AuraImplTestCase {
     }
     
     /**
+     * Tests the ordering logic of the {@link LibraryDef} to ensure that imports will be serialized in order.
+     * This issue tests and error that occurred in main.
+     * @throws Exception
+     */
+    public void testIncludeOrderingOneDependsOnRest() throws Exception {
+        LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_LibraryIncludeOrderingOneDependsOnRest", LibraryDef.class);
+        assertNotNull(libDef);
+        
+        String libraryName1 = libDef.getIncludes().get(0).getLibraryName();
+        String libraryName2 = libDef.getIncludes().get(1).getLibraryName();
+        String libraryName3 = libDef.getIncludes().get(2).getLibraryName();
+        
+        assertEquals(4, libDef.getIncludes().size());
+        
+        // Ensure no dependency-included-twice malarkey:
+        assertFalse(libraryName1.equals(libraryName2));
+        assertFalse(libraryName2.equals(libraryName3));
+        assertFalse(libraryName1.equals(libraryName3));
+        
+        // a, b, c are not required to be in any particular order since they have no dependencies:
+        assertTrue(libraryName1.equals("a") ||libraryName1.equals("b") || libraryName1.equals("c"));
+        assertTrue(libraryName2.equals("a") ||libraryName2.equals("b") || libraryName2.equals("c"));
+        assertTrue(libraryName3.equals("a") ||libraryName3.equals("b") || libraryName3.equals("c"));
+        
+        // d needs to be the last included dependency:
+        assertEquals("d", libDef.getIncludes().get(3).getLibraryName());
+    }
+    
+    /**
+     * Tests the ordering logic of the {@link LibraryDef} to ensure a mix of external and internal dependencies
+     * work.
+     * @throws Exception
+     */
+    public void testLibraryOrderingInternalExternalMix() throws Exception {
+        LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_LibraryOrderingInternalExternalMix", LibraryDef.class);
+        assertNotNull(libDef);
+        
+        // c only depends on something external, it has no library level dependencies and hence is first:
+        assertEquals("c", libDef.getIncludes().get(0).getLibraryName());
+        // b depends on c so it will be chosen second:
+        assertEquals("b", libDef.getIncludes().get(1).getLibraryName());
+        // a has both external and library dependencies, it depends on c and b and is therefore last:
+        assertEquals("a", libDef.getIncludes().get(2).getLibraryName());
+    }
+    
+    /**
      * Tests the exception thrown when a cycle exists in the lib's dependency tree.
      * @throws Exception
      */

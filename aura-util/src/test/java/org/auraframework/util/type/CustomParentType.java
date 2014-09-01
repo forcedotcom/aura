@@ -16,5 +16,14 @@
 package org.auraframework.util.type;
 
 public class CustomParentType {
+	private String str = null;
+
+    public CustomParentType(String s) {
+        str = s;
+    }
+
+	public CustomParentType() {
+		// TODO Auto-generated constructor stub
+	}
 
 }

@@ -46,15 +46,16 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         clearUIPerfStats();
         WebElement button = getDriver().findElement(By.cssSelector("button[class~='uiButton']"));
         button.click();
-        waitForElementTextPresent(getDriver().findElement(By.cssSelector("button[class~='uiButton']")), "clicked");
+        waitForElementTextPresent(getDriver().findElement(By.cssSelector("div[class~='changeCount']")), "1");
 
-        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-2: ['markup://ui:button']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-2: ['markup://performanceTest:ui_button']")));
         assertFalse("Did not find UIPerf marks with component information for Rerender cycle.",
                 logStats.isEmpty());
         logStats.clear();
 
         button.click();
-        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://ui:button']")));
+        waitForElementTextPresent(getDriver().findElement(By.cssSelector("div[class~='changeCount']")), "2");
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://performanceTest:ui_button']")));
         assertFalse("Did not mark multiple Rerender of same component.",
                 logStats.isEmpty());
     }
@@ -66,7 +67,8 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      * @throws Exception
      */
     @UnAdaptableTest("we need a annotation for accessibility test : W-2312560")
-    public void testRerenderMarksHaveAllComponentNames() throws Exception {
+    // W-2364120
+    public void _testRerenderMarksHaveAllComponentNames() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/perfApp.app", Mode.CADENCE);
         clearUIPerfStats();

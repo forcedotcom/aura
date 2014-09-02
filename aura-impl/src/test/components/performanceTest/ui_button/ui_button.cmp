@@ -1,3 +1,5 @@
 <aura:component>
-  	<ui:button aura:id="button1" label="per component test for ui:button" press="{!c.changeLabel}"></ui:button>
+        <aura:attribute name="changeCount" type="String" default="0" />
+        <div class="changeCount" aura:id="changeCount">{!v.changeCount}</div>
+  	<ui:button aura:id="button1" label="per component test for ui:button" press="{!c.changeCount}"></ui:button>
 </aura:component> 

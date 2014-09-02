@@ -41,6 +41,11 @@ Test.Aura.AuraClientServiceTest = function() {
 				isUndefined : function() {
 				},
 				isArray : function() {
+				},
+				json : {
+					encode :function(errorText) {
+						return "mockedJson:"+errorText;
+					}
 				}
 			},
 			mark : function() {
@@ -50,6 +55,53 @@ Test.Aura.AuraClientServiceTest = function() {
 		"exp" : function() {
 		}
 	});
+	
+	[Fixture]
+    function testCreateIntegrationErrorConfig() {
+        [Fact]
+        function ReturnsErrorConfig() {
+        	// Arrange
+            var target;
+            mockGlobal(function() {
+                target = new AuraClientService();
+            });
+            var errorMsg = "Test Error Message";
+            // Act
+            var actual;
+            mockGlobal(function() {
+            	actual = target.createIntegrationErrorConfig(errorMsg);
+			});
+            // Assert
+            var expected;
+            expected = {
+            		"componentDef" : {
+                        "descriptor" : "markup://ui:message"
+                    },
+
+                    "attributes" : {
+                        "values" : {
+                            "title" : "Aura Integration Service Error",
+                            "severity" : "error",
+                            "body" : [
+                                {
+                                    "componentDef" : {
+                                        "descriptor" : "markup://ui:outputText"
+                                    },
+
+                                    "attributes" : {
+                                        "values" : {
+                                            "value" : "mockedJson:"+errorMsg
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+            };
+            Assert.Equal(expected, actual);
+        }
+
+    }
 
 	var MockAction = function(type) {
         this.auraType = "Action";
@@ -906,4 +958,7 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(false, actual);
         }
     }
+    
+    
+    
 }

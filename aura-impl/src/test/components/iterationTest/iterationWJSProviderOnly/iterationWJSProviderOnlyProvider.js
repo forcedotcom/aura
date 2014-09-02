@@ -15,17 +15,6 @@
  */
 ({
     provide : function(component) {
-        var helper = component.getDef().getHelper();
-        var type = component.get("v.type")||'';
-        if ($A.util.isEmpty(type)) {
-            return helper.typeMap["typeif"];
-        } else {
-            var menuItemDef = helper.typeMap[type];
-            if ($A.util.isUndefinedOrNull(menuItemDef)) {
-                return type;
-            } else {
-                return menuItemDef;
-            }
-        }
+        return component.get("v.cmpDescriptorName");
     }
 })

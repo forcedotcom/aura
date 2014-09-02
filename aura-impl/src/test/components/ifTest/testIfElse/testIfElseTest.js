@@ -16,38 +16,36 @@
 ({  
     testTrue: {
         attributes : {thang : "true"},
-        
         test: function(component){
             this.whatItIs(component, "true", true);
         }
     },
-    
+
     testFalse: {
         attributes : {thang : "false"},
-        
         test: function(component){
             this.whatItIs(component, "false", false);
         }
     },
-    
+
     testUndefined: {
         test: function(component){
             this.whatItIs(component, "undefined", false);
         }
-    	
+
     },
-    
+
     testEmptyString: {
-    	attributes: {thang : ''},
-    		
-    	test:function(component){
-    		this.whatItIs(component, "Empty string", false);
-    	}
+        attributes: {thang : ''},
+
+        test:function(component){
+            this.whatItIs(component, "Empty string", false);
+        }
     },
-    
+
+    // TODO(W-1419175): onchange events don't fire across function expressions
     _testRerender: {
-    	attributes : {thang : "true"},
-        
+        attributes : {thang : "true"},
         test: function(component){
             this.whatItIs(component, "Testing rerender: true", true);
             component.set("v.thang", false);
@@ -55,18 +53,18 @@
             this.whatItIs(component, "Testing rerender: false", false);
         }
     },
-    
+
     whatItIs : function(component, name, value){
         if (value) {
-            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+" didn't evaluate as true");
-            aura.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+" evaluated as true");
-            aura.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+" evaluated as not true");
-            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+" didn't evaluate as not true");
+            $A.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+" didn't evaluate as true");
+            $A.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+" evaluated as true");
+            $A.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+" evaluated as not true");
+            $A.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+" didn't evaluate as not true");
         }else{
-            aura.test.assertNull($A.test.getElementByClass("itIsTrue"), name+" evaluated as true");
-            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+" didn't evaluate as true");
-            aura.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+" didn't evaluate as not true");
-            aura.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+" evaluated as not true");
+            $A.test.assertNull($A.test.getElementByClass("itIsTrue"), name+" evaluated as true");
+            $A.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+" didn't evaluate as true");
+            $A.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+" didn't evaluate as not true");
+            $A.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+" evaluated as not true");
         }
     }
 })

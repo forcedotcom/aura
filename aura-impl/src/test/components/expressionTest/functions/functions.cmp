@@ -318,6 +318,7 @@
     <expressionTest:test expression="{!-1}" exprText="-1" expected="-1"/>
     <expressionTest:test expression="{!neg(2)}" exprText="neg(2)" expected="-2"/>
     <expressionTest:test expression="{!negate(3)}" exprText="negate(3)" expected="-3"/>
+    <expressionTest:test expression="{!negate(-3)}" exprText="negate(-3)" expected="3"/>
     <expressionTest:test expression="{!-v.NaN}" exprText="-v.NaN" expected="NaN"/>
     <expressionTest:test expression="{!-v.Infinity}" exprText="-v.Infinity" expected="-Infinity"/>
     <expressionTest:test expression="{!-'5o'}" exprText="-'5o'" expected="NaN"/>

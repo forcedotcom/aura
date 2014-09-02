@@ -227,6 +227,7 @@ public final class AuraFileMonitor implements Runnable{
         if (singletonMonitor != null && !singletonMonitor.isStarted()) {
             singletonMonitor.setTerminateThread(false);
             singletonMonitor.watchServiceThread = new Thread(singletonMonitor);
+            singletonMonitor.watchServiceThread.setDaemon(true);
             singletonMonitor.watchServiceThread.start();
             LOG.info("Aura file monitor started");
         }

@@ -47,6 +47,15 @@ public class AuraTestingUtil {
     private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
     private Set<DefDescriptor<?>> cleanUpDds;
+    
+    private AuraTestingMarkupUtil auraTesingMarkupUtil;
+    
+    public AuraTestingMarkupUtil getAuraTestingMarkupUtil() {
+        if (auraTesingMarkupUtil == null) {
+        	auraTesingMarkupUtil = new AuraTestingMarkupUtil();
+        }
+        return auraTesingMarkupUtil;
+    }
 
     public void tearDown() {
         if (cleanUpDds != null) {

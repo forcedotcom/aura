@@ -13,8 +13,18 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-possible duplicate: we already have another one under handleEventTest
+
 -->
-<aura:event type="APPLICATION">
-    <aura:attribute name="strParam" type="String"/>
-</aura:event>
+<aura:application extends='aura:integrationServiceApp'>
+    <!-- for app evt, handler in controller works -->
+    <aura:handler event="handleEventTest:applicationEvent" action="{!c.handlerPressFromInject}"/>
+    <aura:attribute name='msgFromEvent' type='String' default='empty'/>
+    <!-- for cmp evt we can put controller into markup directly -->
+    <script>
+          function click2Handler__t(event) {
+            document._click2HandlerCalled = true; 
+            document.__click2Event=event;
+          }
+    </script>
+    
+</aura:application>

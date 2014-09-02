@@ -22,6 +22,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface TestLabels {
+public @interface AuraTestLabels {
     String value();
 }

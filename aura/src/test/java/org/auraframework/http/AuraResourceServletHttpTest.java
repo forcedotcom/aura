@@ -29,7 +29,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.AuraTestLabels;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraTextUtil;
 
@@ -51,7 +51,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * Create a chain of components as facet and verify the order of css(Style Defs)
      * @throws Exception
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testCSSOrdering_AcrossFacets() throws Exception {
         String modeAndContext = getAuraTestingUtil().getContext(Mode.DEV, Format.CSS,
                 "auratest:test_css_a", ComponentDef.class, false);
@@ -75,7 +75,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertTrue("_b must come before _a in: "+response, idx_b < idx_a);
     }
 
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testCSSOrdering_AcrossInheritance() throws Exception {
         String modeAndContext = getAuraTestingUtil().getContext(Mode.DEV, Format.CSS, "auratest:test_css_child", ComponentDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
@@ -152,7 +152,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     /**
      * GET with If-Modified-Since header from an hour ago, will return 304 if the UID is correct.
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testGetWithIfModifiedSinceOld() throws Exception {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
@@ -176,7 +176,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     /**
      * GET with If-Modified-Since header from an hour ago, will return 304 if the UID is correct.
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testGetWithIfModifiedSinceOldModified() throws Exception {
         String requestContext = getSimpleContext(Format.JS, true);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
@@ -200,7 +200,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     /**
      * GET with If-Modified-Since header 45 days from now, will return 304 with empty body.
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testGetWithIfModifiedSinceNew() throws Exception {
         String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/app.js";
         Calendar stamp = Calendar.getInstance();
@@ -222,7 +222,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     /**
      * GET without If-Modified-Since header from an hour ago, will return the expected resource.
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testGetWithoutIfModifiedSince() throws Exception {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";

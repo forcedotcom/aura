@@ -25,7 +25,7 @@ import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.AuraTestLabels;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -69,7 +69,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
      * def.
      */
     @SuppressWarnings("unchecked")
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testVerifyPostWithoutToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
@@ -124,7 +124,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
      * Test to post a request to aura servlet with a valid CSRF token. This test
      * tries to request an action defined on a controller.
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testVerifyPostWithValidToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
         // Valid token

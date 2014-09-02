@@ -16,7 +16,7 @@
 package org.auraframework.impl.root.component.rendering;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.AuraTestLabels;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -39,7 +39,7 @@ import com.google.common.base.Function;
  * @priority high
  * @userStory a07B0000000EWWg
  */
-@TestLabels("auraSanity")
+@AuraTestLabels("auraSanity")
 public class ComponentRenderingUITest extends WebDriverTestCase {
     public ComponentRenderingUITest(String name) {
         super(name);

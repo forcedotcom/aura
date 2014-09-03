@@ -203,9 +203,9 @@ public final class PerfWebDriverUtil {
         return stats;
     }
 
-    private static boolean isSimilar(String str1, String str2) {
+    protected static boolean isSimilar(String str1, String str2) {
         char[] str1Arr = str1.toCharArray();
-        char[] str2Arr = str1.toCharArray();
+        char[] str2Arr = str2.toCharArray();
         Arrays.sort(str1Arr);
         Arrays.sort(str2Arr);
         str1 = new String(str1Arr);

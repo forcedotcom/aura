@@ -29,7 +29,7 @@
 	 ~ Each row touch event is resolved by ui:infiniteList via the class "uiInfiniteListRow" (see infiniteListRowHelper). 
 	 ~ Hence, try not to mess around with the class name. Adding an additional class name is acceptable tough.
 	 -->
-	<li class="{!v.class}" style="{! $Browser.isWindowsPhone ? 'touch-action: pan-y' : ''}">
+	<li aura:id="containerLI" class="{!v.class}" style="{! $Browser.isWindowsPhone ? 'touch-action: pan-y' : ''}">
 		<div aura:id="body" class="body">{!v.body}</div>
 		<div aura:id="swipeBody" class="swipeBody">{!v.swipeBody}</div>
 	</li>

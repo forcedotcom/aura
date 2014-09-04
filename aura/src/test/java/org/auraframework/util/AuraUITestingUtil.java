@@ -51,7 +51,6 @@ public class AuraUITestingUtil {
     private long timeoutInSecs = 30;
     private int rerunCount = 0;
     protected static final Random RAND = new Random(System.currentTimeMillis());
-    
 
     public AuraUITestingUtil(WebDriver driver) {
         this.driver = driver;
@@ -468,18 +467,19 @@ public class AuraUITestingUtil {
      */
     public List<WebElement> findDomElements(final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.withMessage("fail to find element in dom:"+locator.toString()).ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<List<WebElement>>() {
+        return wait.withMessage("fail to find element in dom:" + locator.toString())
+                .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<List<WebElement>>() {
 
-            @Override
-            public List<WebElement> apply(WebDriver d) {
-                List<WebElement> elements = driver.findElements(locator);
-                if (elements.size() > 0 &&
-                        getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
-                    return elements;
-                }
-                return null;
-            }
-        });
+                    @Override
+                    public List<WebElement> apply(WebDriver d) {
+                        List<WebElement> elements = driver.findElements(locator);
+                        if (elements.size() > 0 &&
+                                getBooleanEval("return arguments[0].ownerDocument === document", elements.get(0))) {
+                            return elements;
+                        }
+                        return null;
+                    }
+                });
     }
 
     /**
@@ -614,13 +614,13 @@ public class AuraUITestingUtil {
      */
     public void waitForDocumentReady() {
         waitUntil(
-        new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return getBooleanEval("return document.readyState === 'complete'");
-            }
-        },
-        "Document is not Ready!");
+                new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver d) {
+                        return getBooleanEval("return document.readyState === 'complete'");
+                    }
+                },
+                "Document is not Ready!");
     }
 
     /**
@@ -629,17 +629,27 @@ public class AuraUITestingUtil {
      * {@link #waitForDocumentReady()}.
      */
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        wait.ignoring(StaleElementReferenceException.class)
-        .withMessage("Initializati​on error: Perhaps the initial GET failed")
-        .until(
-                new Function<WebDriver, Boolean>() {
-                    @Override
-                    public Boolean apply(WebDriver input) {
-                        assertNoAuraErrorMessage(expectedErrors);
-                        return isAuraFrameworkReady();
-                    }
-                });
+        WebDriverWait waitAuraPresent = new WebDriverWait(driver, timeoutInSecs);
+        waitAuraPresent.withMessage("Initialization error: Perhaps the initial GET failed")
+                .until(
+                        new Function<WebDriver, Boolean>() {
+                            @Override
+                            public Boolean apply(WebDriver input) {
+                                return (Boolean) getRawEval("return !!window.$A");
+                            }
+                        });
+
+        WebDriverWait waitFinishedInit = new WebDriverWait(driver, timeoutInSecs);
+        waitFinishedInit.ignoring(StaleElementReferenceException.class)
+                .withMessage("Initialization error: $A present but failed to initialize")
+                .until(
+                        new Function<WebDriver, Boolean>() {
+                            @Override
+                            public Boolean apply(WebDriver input) {
+                                assertNoAuraErrorMessage(expectedErrors);
+                                return isAuraFrameworkReady();
+                            }
+                        });
     }
 
     public void waitForAppCacheReady() {
@@ -647,11 +657,11 @@ public class AuraUITestingUtil {
             @Override
             public Boolean apply(WebDriver d) {
                 return
-                		getBooleanEval("var cache=window.applicationCache;"
+                getBooleanEval("var cache=window.applicationCache;"
                         + "return $A.util.isUndefinedOrNull(cache) || "
                         + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
             }
-        },"AppCache is not Ready!");
+        }, "AppCache is not Ready!");
     }
 
     /**
@@ -761,10 +771,9 @@ public class AuraUITestingUtil {
         Assert.assertTrue(message + ": Mismatched classes extra = " + extra + ", missing=" + expected,
                 extra.size() == 0 && expected.size() == 0);
     }
-    
+
     /**
-     * Creates a random lower case string.
-     * NOTE: this is BAD WAY to produce Strings, as the results are
+     * Creates a random lower case string. NOTE: this is BAD WAY to produce Strings, as the results are
      * non-reproducible. Do not use it: call {@link #randString(int,long)} instead.
      */
     public String randString(int len) {
@@ -772,13 +781,12 @@ public class AuraUITestingUtil {
     }
 
     /**
-     * Creates a random lower case string of specified length,
-     * using given pseudo-Random number generator.
+     * Creates a random lower case string of specified length, using given pseudo-Random number generator.
      */
     public String randString(int len, Random rnd) {
-        byte [] buff = new byte[len];
+        byte[] buff = new byte[len];
         for (int i = 0; i < len; i++) {
-            buff[i] = (byte)(rnd.nextInt(26) + 'a');
+            buff[i] = (byte) (rnd.nextInt(26) + 'a');
         }
         try {
             return new String(buff, "US-ASCII");

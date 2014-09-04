@@ -190,7 +190,7 @@ public final class PerfWebDriverUtil {
                         // as expected in transactionsToGather so need to
                         // make sure measure and transactionsToGather are
                         // similar
-                        !isSimilar(
+                        !stringsHaveSameContent(
                                 (String) marks.get("measure"),
                                 transactionsToGather.get(0))) {
                     continue;
@@ -203,7 +203,12 @@ public final class PerfWebDriverUtil {
         return stats;
     }
 
-    protected static boolean isSimilar(String str1, String str2) {
+    /**
+     * Check for two strings having the same content.
+     *
+     * Note that this function has no tests, as it is not in an appropriate place.
+     */
+    public static boolean stringsHaveSameContent(String str1, String str2) {
         char[] str1Arr = str1.toCharArray();
         char[] str2Arr = str2.toCharArray();
         Arrays.sort(str1Arr);

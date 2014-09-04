@@ -159,15 +159,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
+        expectedChange.add(new Request(getUrl(), null, null, null, 302)); // hard refresh
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200));
+            expectedChange.add(new Request(2, getUrl(), null, null, null, 200));
             break;
         default:
             expectedChange.add(new Request("/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
+            expectedChange.add(new Request(getUrl(), null, null, null, 200));
             expectedChange.add(new Request("/auraResource", null, null, "css", 200));
             expectedChange.add(new Request("/auraResource", null, null, "js", 200));
         }
@@ -193,7 +193,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
+        expectedChange.add(new Request(getUrl(), null, null, null, 200));
         expectedChange.add(new Request("/auraResource", null, null, "css", 200));
         expectedChange.add(new Request("/auraResource", null, null, "js", 200));
         assertRequests(expectedChange, logs);
@@ -222,15 +222,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         List<Request> expectedChange = Lists.newArrayList();
 
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
+        expectedChange.add(new Request(getUrl(), null, null, null, 302)); // hard refresh
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200));
+            expectedChange.add(new Request(2, getUrl(), null, null, null, 200));
             break;
         default:
             expectedChange.add(new Request("/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
+            expectedChange.add(new Request(getUrl(), null, null, null, 200));
             expectedChange.add(new Request("/auraResource", null, null, "css", 200));
             expectedChange.add(new Request("/auraResource", null, null, "js", 200));
         }
@@ -440,7 +440,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see
         // what's cached, so build our URL and call WebDriver.get() directly.
-        String url = String.format("/%s/%s.app", namespace, appName);
+        String url = getUrl();
         Map<String, String> params = new HashMap<String, String>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
         url = addUrlParams(url, params);
@@ -492,6 +492,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         return logs;
     }
+
+	private String getUrl() {
+		return String.format("/%s/%s.app", namespace, appName);
+	}
 
     // replaces TOKEN found in the source file with the provided replacement
     private void replaceToken(DefDescriptor<?> descriptor, String replacement) throws Exception {
@@ -558,10 +562,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * css only once, but it's not stable, do see some test get them twice sometimes.
              */
             return ImmutableList.of(
-                    new Request("/aura", namespace + ":" + appName, null, "HTML", 302), // hard refresh
+                    new Request(getUrl(), null, null, null, 302), // hard refresh
                     new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
                     new Request(3, "/auraResource", null, null, "manifest", 200),
-                    new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
+                    new Request(2, getUrl(), null, null, null, 200), // rest are cache updates
                     new Request(2, "/auraResource", null, null, "css", 200),
                     new Request(2, "/auraResource", null, null, "js", 200));
         default:
@@ -573,10 +577,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * initial page twice
              */
             return ImmutableList.of(
-                    new Request("/aura", namespace + ":" + appName, null, "HTML", 302), // hard refresh
+                    new Request(getUrl(), null, null, null, 302), // hard refresh
                     new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
                     new Request("/auraResource", null, null, "manifest", 200),
-                    new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
+                    new Request(2, getUrl(), null, null, null, 200), // rest are cache updates
                     new Request(2, "/auraResource", null, null, "css", 200),
                     new Request(2, "/auraResource", null, null, "js", 200));
         }
@@ -598,7 +602,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * are two requests for the initial page, one as the first request, and one to fill the app cache (odd, but
              * true). There are also two manifest requests.
              */
-            return ImmutableList.of(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(
+            return ImmutableList.of(new Request(2, getUrl(), null, null, null, 200), new Request(
                     2, "/auraResource", null, null, "manifest", 200), new Request("/auraResource", null, null, "css",
                     200), new Request(2, "/auraResource", null, null, "js", 200));
         default:
@@ -608,7 +612,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * all three components, initial, css, and js</li> <li>Finally, the browser re-fetches the manifest to check
              * contents</li> <ul> Note that there are also two css and js request.
              */
-            return ImmutableList.of(new Request(1, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(
+            return ImmutableList.of(new Request(1, getUrl(), null, null, null, 200), new Request(
                     1, "/auraResource", null, null, "manifest", 200), new Request(2, "/auraResource", null, null,
                     "css", 200), new Request(2, "/auraResource", null, null, "js", 200));
         }

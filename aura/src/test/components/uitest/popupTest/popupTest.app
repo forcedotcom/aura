@@ -40,12 +40,12 @@
         </li>
         <li class="popup">
 		    <ui:popup>
-		        <ui:popupTrigger>
+		        <ui:popupTrigger class="customTrigger">
 		        	<aura:set attribute="trigger">
 		        		<uiTest:popupTestTriggerElement aura:id="triggerTriggerElement" />
 		        	</aura:set>
 		        </ui:popupTrigger>
-		        <ui:popupTarget aura:id="targetTriggerElement" attachToBody="true">
+		        <ui:popupTarget class="customTriggerTargetContainer" aura:id="targetTriggerElement" attachToBody="true">
 		            <div style="width:150px;height:200px;">
     	              label target
 		            </div>
@@ -85,6 +85,14 @@
 		            </div>
 	            </ui:popupTarget>
 		    </ui:popup>
+        </li>
+        <li class="popup">
+        <ui:popup>
+        <ui:popupTrigger class='triggerExtendedTarget' aura:id='triggerExtendedTarget' label='Triggerglsc'/>
+        <ui:popupTarget aura:id='targetExtendedTarget' attachToBody='true' manualPosition='true' autoPosition='false'>
+        	<div style='position: absolute;left: 5px;width: 100px;height: 220px'>Targetbdir</div>
+        </ui:popupTarget>
+        </ui:popup>
         </li>
     </ol>
     <iframe src="/uitest/popupTestFrame.cmp?frameId=Frame1"/>

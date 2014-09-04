@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -49,6 +50,8 @@ public class AuraUITestingUtil {
     private final WebDriver driver;
     private long timeoutInSecs = 30;
     private int rerunCount = 0;
+    protected static final Random RAND = new Random(System.currentTimeMillis());
+    
 
     public AuraUITestingUtil(WebDriver driver) {
         this.driver = driver;
@@ -757,5 +760,30 @@ public class AuraUITestingUtil {
         }
         Assert.assertTrue(message + ": Mismatched classes extra = " + extra + ", missing=" + expected,
                 extra.size() == 0 && expected.size() == 0);
+    }
+    
+    /**
+     * Creates a random lower case string.
+     * NOTE: this is BAD WAY to produce Strings, as the results are
+     * non-reproducible. Do not use it: call {@link #randString(int,long)} instead.
+     */
+    public String randString(int len) {
+        return randString(len, RAND);
+    }
+
+    /**
+     * Creates a random lower case string of specified length,
+     * using given pseudo-Random number generator.
+     */
+    public String randString(int len, Random rnd) {
+        byte [] buff = new byte[len];
+        for (int i = 0; i < len; i++) {
+            buff[i] = (byte)(rnd.nextInt(26) + 'a');
+        }
+        try {
+            return new String(buff, "US-ASCII");
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

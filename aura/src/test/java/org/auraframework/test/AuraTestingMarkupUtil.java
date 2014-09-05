@@ -61,6 +61,10 @@ public class AuraTestingMarkupUtil {
 		return attributeMarkup;
 	}
 	
+	public String getAllCommonAttributeMarkup() {
+		return getCommonAttributeMarkup(true,true,true,true);
+	}
+	
 	public String getCommonAttributeWithDefaultMarkup(boolean getString, boolean getBoolean, boolean getObject, 
 			boolean getComponent, String defaultString, String defaultBoolean, String defaultObject, String defaultComponent) 
 	{
@@ -99,6 +103,10 @@ public class AuraTestingMarkupUtil {
 			attributeMarkup = attributeMarkup+String.format(attributeCmpListMarkup,"'cmps'");
 		}
 		return attributeMarkup;
+	}
+	
+	public String getAllCommonAttributeListMarkup() {
+		return getCommonAttributeListMarkup(true,true,true,true,true);
 	}
 	
 	public String getCommonAttributeListWithDefaultMarkup(boolean getList, boolean getString, boolean getBoolean, boolean getObject, 

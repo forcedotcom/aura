@@ -44,6 +44,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
 
     private AuraTestingUtil auraTestingUtil;
+    private AuraTestingMarkupUtil auraTesingMarkupUtil;
 
     public AuraTestCase(String name) {
         super(name);
@@ -279,6 +280,13 @@ public abstract class AuraTestCase extends UnitTestCase {
             auraTestingUtil = new AuraTestingUtil();
         }
         return auraTestingUtil;
+    }
+    
+    protected AuraTestingMarkupUtil getAuraTestingMarkupUtil() {
+        if (auraTesingMarkupUtil == null) {
+        	auraTesingMarkupUtil = new AuraTestingMarkupUtil();
+        }
+        return auraTesingMarkupUtil;
     }
 
     protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception {

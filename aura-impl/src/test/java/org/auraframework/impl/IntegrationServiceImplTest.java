@@ -66,7 +66,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     public void setUp() throws Exception {
         super.setUp();
         service = Aura.getIntegrationService();
-        tmu = getAuraTestingUtil().getAuraTestingMarkupUtil();
+        tmu = getAuraTestingMarkupUtil();
     }
 
     /**

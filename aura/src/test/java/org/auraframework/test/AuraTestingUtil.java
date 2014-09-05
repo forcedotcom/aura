@@ -48,15 +48,6 @@ public class AuraTestingUtil {
 
     private Set<DefDescriptor<?>> cleanUpDds;
     
-    private AuraTestingMarkupUtil auraTesingMarkupUtil;
-    
-    public AuraTestingMarkupUtil getAuraTestingMarkupUtil() {
-        if (auraTesingMarkupUtil == null) {
-        	auraTesingMarkupUtil = new AuraTestingMarkupUtil();
-        }
-        return auraTesingMarkupUtil;
-    }
-
     public void tearDown() {
         if (cleanUpDds != null) {
             StringSourceLoader loader = StringSourceLoader.getInstance();

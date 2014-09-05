@@ -24,6 +24,12 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.Provider;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.impl.source.StringSource;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.test.AuraTestingMarkupUtil;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
@@ -65,7 +71,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
                         true, true, true));
-        tmu = getAuraTestingUtil().getAuraTestingMarkupUtil();
+        tmu = getAuraTestingMarkupUtil();
     }
 
     /**
@@ -75,7 +81,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     // Click is unsupported in these touch based platforms
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
     public void testSimpleComponentWithModelAndController() throws Exception {
-        verifySimpleComponentWithModelAndController(defaultStubCmp);
+    	verifySimpleComponentWithModelControllerHelperandProvider(defaultStubCmp);
     }
 
     /**
@@ -90,11 +96,32 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 true, true, true, true)
         );
 
-        verifySimpleComponentWithModelAndController(stub);
+        verifySimpleComponentWithModelControllerHelperandProvider(stub);
+    }
+    
+    private String getMarkupOfExistingComponnet(DefDescriptor<? extends Definition> defDescriptor) {
+    	String markup="";
+		StringSource<?> source = (StringSource<?>) getSource(defDescriptor);
+		if(source!=null)
+		{
+			markup = source.getContents();
+		}
+		return markup;
+    }
+    
+    /*
+     * this test is under construction .....
+     */
+    public void _testExistingComponent() {
+    	DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService()
+                .getDefDescriptor("markup://ifTest:testIf", ComponentDef.class);
+    	DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("markup://ifTest:testIf", ComponentDef.class);
+    	String cmpMarkup = getMarkupOfExistingComponnet(descriptor);
+    	System.out.println("cmpMarkup:"+cmpMarkup);
     }
 
-    private void verifySimpleComponentWithModelAndController(DefDescriptor<ComponentDef> stub) throws Exception {
-        DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelAndController();
+    private void verifySimpleComponentWithModelControllerHelperandProvider(DefDescriptor<ComponentDef> stub) throws Exception {
+        DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelControllerHelperAndProvider();
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttribute", "Oranges");
         String selectorForPlaceholder = String.format("div#%s", defaultPlaceholderID);
@@ -108,7 +135,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         WebElement modelValue = findDomElement(By.cssSelector("div.dataFromModel"));
         assertEquals("Failed to initilize attribute value of injected component", "firstThingDefault",
                 modelValue.getText());
-
+       
         WebElement button = findDomElement(By.cssSelector("button.uiButton"));
         button.click();
         auraUITestingUtil.waitForElementText(By.cssSelector("div.dataFromController"), "TestController", true);
@@ -120,31 +147,80 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 (String) auraUITestingUtil.getEval(String.format(
                         "return window.$A.getRoot().find('%s').getDef().getDescriptor().toString()", defaultLocalId))
         );
+        
+        WebElement valueFromJsProvider = findDomElement(By.cssSelector("div.dataFromJSProvider"));
+        assertEquals("Failed to see data from model of injected component", 
+        		"ValueFromJsProvider[ValueFromHelper]", valueFromJsProvider.getText());
+        
+        WebElement valueFromJavaProvider = findDomElement(By.cssSelector("div.dataFromJavaProvider"));
+        assertEquals("Failed to see data from model of injected component", 
+        		"valueFromJavaProvider", valueFromJavaProvider.getText());
+
     }
 
-    private DefDescriptor<ComponentDef> setupSimpleComponentWithModelAndController() {
+    /*
+     * this creates simple component with helper, JS controller, JS provider , Java provider and Java model
+     * in the helper we have function return a string (returnAString)
+     * in the JS provider, we set attribute(valueFromJSProvider) with the string we get from helper
+     * in the Java provider, we set attribute(valueFromJavaProvider)
+     * in the JS controller, we handler click event , push text component to the body each it clicks
+     */
+    private DefDescriptor<ComponentDef> setupSimpleComponentWithModelControllerHelperAndProvider() {
+    	DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                ComponentDef.class);
+    	DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
+    	DefDescriptor<ProviderDef> jsProviderdesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
+    	DefDescriptor<HelperDef> jsHelperdesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc,  DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class);
+    	//fill in component to be injected 
+        String jsProviderName = jsProviderdesc.getQualifiedName();
         String systemAttributes = "model='java://org.auraframework.impl.java.model.TestModel' "
-                + "controller='java://org.auraframework.impl.java.controller.TestController'";
+                + "controller='java://org.auraframework.impl.java.controller.TestController' "
+        		+ "provider='"+jsProviderName+",java://org.auraframework.impl.java.provider.TestComponnetConfigProviderAIS' ";
         String bodyMarkup = "<aura:attribute name='strAttribute' type='String' default='Apple'/> "
+        		+ "<aura:attribute name='valueFromJSProvider' type='String' default='Empty'/> "
+        		+ "<aura:attribute name='valueFromJavaProvider' type='String' default='Empty'/> "
                 + "<ui:button label='clickMe' press='{!c.handleClick}'/>"
                 + "<div class='wrapper'>"
                 + "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.strAttribute}</div> "
                 + "<div class='dataFromModel' aura:id='dataFromModel'>{!m.firstThing}</div> "
                 + "<div class='dataFromController' aura:id='dataFromController'></div>" 
+                + "<div class='dataFromJSProvider' aura:id='dataFromJSProvider'>{!v.valueFromJSProvider}</div>"
+                + "<div class='dataFromJavaProvider' aura:id='dataFromJavaProvider'>{!v.valueFromJavaProvider}</div>"
                 + "</div>";
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, systemAttributes, bodyMarkup));
-        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
-                .getDefDescriptor(
-                        String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpDesc.getNamespace(),
-                                cmpDesc.getName()), ControllerDef.class);
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, systemAttributes,bodyMarkup));
+    	//fill in js controller
         addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){"
+                + "var valueFromHelper = cmp.getDef().getHelper().returnAString();"
                 + "var a = cmp.get('c.getString');"
                 + "a.setCallback(cmp,function(a){ "
                 + "$A.componentService.newComponentAsync("
                 + "this, function(newCmp){cmp.find('dataFromController').getValue('v.body').push(newCmp);},"
                 + "{componentDef: 'markup://aura:text', attributes:{ values:{ value: a.getReturnValue() }}}"
                 + ")}); $A.enqueueAction(a);}}");
+        //fill in js provider
+        addSourceAutoCleanup(jsProviderdesc, 
+          "{"+"provide : function AisToInjectProvider(component) {"+
+		        "var valueFromHelper = component.getDef().getHelper().returnAString();" +
+		        "var returnvalue = 'ValueFromJsProvider['+valueFromHelper+']';" +
+		        "return {" +
+		            "attributes: {" +
+		                "'valueFromJSProvider': returnvalue" +
+		            "}" +
+		        "};" +
+		    "}" 
+		  +"}"
+        );
+        //fill in helper
+        addSourceAutoCleanup(jsHelperdesc,
+	        "{" + "returnAString: function() {" +
+	        			"return 'ValueFromHelper';" +
+	                "}"
+	        +"}"
+        );
+        
         return cmpDesc;
     }
 
@@ -527,7 +603,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     @Ignore("W-1498404")
     public void testMultipleIntegrationObjectsOnSamePage() throws Exception {
-        DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelAndController();
+        DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelControllerHelperAndProvider();
         Map<String, Object> attributes = Maps.newHashMap();
         String facets[] = new String[] { "Panda", "Tiger" };
         String facetMarkup = "";

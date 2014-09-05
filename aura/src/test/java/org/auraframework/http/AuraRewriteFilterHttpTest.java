@@ -17,7 +17,7 @@ package org.auraframework.http;
 
 import org.apache.http.HttpStatus;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.AuraTestLabels;
 
 /**
  * Automation to verify the handling of urls by AuraRewriteFilter.
@@ -31,7 +31,7 @@ public class AuraRewriteFilterHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testDoFilterOfValidURLs() throws Exception {
         assertUrlResponse("Didn't forward url with namespace and component name.", "/aura/text.cmp", HttpStatus.SC_OK);
         assertUrlResponse("Didn't forward url with namespace and application name.", "/test/fakeApplication.app",

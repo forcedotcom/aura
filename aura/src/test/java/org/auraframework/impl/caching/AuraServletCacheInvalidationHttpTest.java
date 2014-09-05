@@ -30,7 +30,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.AuraTestLabels;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -73,7 +73,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * 
      * @throws Exception
      */
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testPostRequestWithValidUID() throws Exception {
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
         HttpPost post = getPostMethod(ctx, false);

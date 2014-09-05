@@ -29,7 +29,7 @@ import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.AuraTestLabels;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Maps;
@@ -51,7 +51,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
      * </ol>
      */
     @SuppressWarnings("unchecked")
-    @TestLabels("auraSanity")
+    @AuraTestLabels("auraSanity")
     public void testComponentDef() throws Exception {
         String response = obtainResponseCheckStatus();
 

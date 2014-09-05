@@ -27,7 +27,7 @@ import org.openqa.selenium.By;
  * 
  * ThreadHostile because simultaneous loads of the testApp will interfere with progress bar loading.
  * 
- * AppCache tests are only for webkit browsers. Excluded from Safari5, iOS for not supporting ProgressEvent.
+ * AppCache tests are only for webkit browsers. Excluded iOS for not supporting ProgressEvent.
  * 
  * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
  */

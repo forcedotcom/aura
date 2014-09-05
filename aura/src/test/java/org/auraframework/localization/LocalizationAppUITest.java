@@ -31,9 +31,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Excluded on mobile browsers for lack of tab support
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputDate/outputDate components
     public void testDateComponents() throws Exception {
         open(URL);
@@ -68,9 +67,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Excluded on mobile browsers for lack of tab support
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputDateTime/outputDateTime components
     public void testDateTimeComponents() throws Exception {
         open(URL);
@@ -108,7 +106,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Excluded on mobile browsers for lack of tab support
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputNumber/outputNumber components
     public void _testNumberComponents() throws Exception {
@@ -141,9 +139,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Excluded on mobile browsers for lack of tab support
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputPercent/outputPercent components
     public void testPercentComponents() throws Exception {
         open(URL);
@@ -175,9 +172,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     }
 
     // Excluded on mobile browsers for lack of tab support
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputCurrency/outputCurrency components
     public void testCurrencyComponents() throws Exception {
         open(URL);

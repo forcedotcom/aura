@@ -196,7 +196,7 @@
      * For iphone/ipad, when the date picker is up, it suppose to take the whole screen. there is no 'other place' you can 'touch'
      */
     testDocumentLevelHandler:{
-        browsers: ["-IPHONE","-IPAD", "-IPHONE_IOS_DRIVER", "-IPAD_IOS_DRIVER"],
+        browsers: ["-IPHONE","-IPAD"],
         test : function(component){
                     var input_date = component.find("datePickerTestCmp");
                     var date_picker = input_date.find("datePicker");

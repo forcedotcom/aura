@@ -205,7 +205,7 @@
      * Automation for W-1564377
      */
     testTouchEndHandlerUsedWhenPresent:{
-    	browsers:["IPAD", "IPAD_IOS_DRIVER"],
+    	browsers:["IPAD"],
     	labels : ["UnAdaptableTest"],
     	test: [
     	  //Both click handler and touch end handler defined
@@ -240,7 +240,7 @@
      * This is necessary for devices with a touchscreen and a mouse. 
      */
     testClickAndTouchEventsHandled: {
-        browsers: ["IPAD", "IPHONE", "IPAD_IOS_DRIVER", "IPHONE_IOS_DRIVER", "ANDROID_PHONE", "ANDROID_TABLET"],
+        browsers: ["IPAD", "IPHONE", "ANDROID_PHONE", "ANDROID_TABLET"],
         test: [
             function(cmp) {
                 if (!$A.util.supportsTouchEvents()) {

@@ -23,7 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 // ios-driver gets a NoSuchElementException trying to type after a input.clear()
-@ExcludeBrowsers({ BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
 public class InputNumberUITest extends WebDriverTestCase {
 
     public InputNumberUITest(String name) {

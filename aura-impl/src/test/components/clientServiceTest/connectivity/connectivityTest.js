@@ -17,7 +17,7 @@
 	/** IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com,
 	 * IE and Firefox block it by default
 	 */
-    browsers:["GOOGLECHROME","SAFARI5", "SAFARI"],
+    browsers:["GOOGLECHROME", "SAFARI"],
 
     setUp: function(component) {
     	// Store a reference to the component to facilitate the use of the test's helpers.

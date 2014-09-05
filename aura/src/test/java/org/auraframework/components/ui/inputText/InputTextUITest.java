@@ -41,8 +41,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     // Exclude on ios-driver because the driver hides the keyboard after send keys which triggers a blur event
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD_IOS_DRIVER,
-            BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
@@ -62,16 +61,16 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     @UnAdaptableTest
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI5,
-            BrowserType.SAFARI, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
+            BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
         doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
     }
 
     @UnAdaptableTest
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI5,
-            BrowserType.SAFARI, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
+            BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
         doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP_WITH_LABELS);
@@ -105,8 +104,8 @@ public class InputTextUITest extends WebDriverTestCase {
 
         // ios-driver sends a blur event during sendKeys so skip blur check. It also seems to send a delayed click event
         // when doing a WebElement.clear() and WebElement.sendKeys() in sequence so skip click check.
-        if (!BrowserType.IPAD_IOS_DRIVER.equals(getBrowserType())
-                && !BrowserType.IPHONE_IOS_DRIVER.equals(getBrowserType())) {
+        if (!BrowserType.IPAD.equals(getBrowserType())
+                && !BrowserType.IPHONE.equals(getBrowserType())) {
             String eventName = "blur";
             WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
             assertModelValue(value, "Value shouldn't be updated yet.");
@@ -251,7 +250,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute (iOS/Safari)
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.SAFARI5, BrowserType.SAFARI })
+            BrowserType.SAFARI })
     public void testMaxLength() throws Exception {
         open("/uitest/inputText_MaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
@@ -334,9 +333,8 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     // W-1625895: Safari WebDriver bug- cannot right click because interactions API not implemented
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD_IOS_DRIVER,
-            BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testBaseMouseClickEventValue() throws Exception {
         open(TEST_CMP);
         WebElement input = findDomElement(By.cssSelector(".keyup2"));
@@ -379,8 +377,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     // Exclude on ios-driver because the driver hides the keyboard after send keys which triggers a blur event
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD_IOS_DRIVER,
-            BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testInputTextWithEmptyLabel() throws Exception {
         open(TEST_CMP_WITH_LABELS);
         String value = getCurrentModelValue();

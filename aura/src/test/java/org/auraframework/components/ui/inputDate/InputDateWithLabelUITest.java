@@ -145,7 +145,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
      ***********************************************************************************************/
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testHomeEnd() throws Exception {
         open(URL);
 
@@ -180,8 +180,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.ANDROID_PHONE,
-            BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testPageUpDownYear() throws Exception {
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_STR);
         open(URL);
@@ -216,8 +215,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testPageUpDownMonth() throws Exception {
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_STR);
         open(URL);
@@ -251,8 +249,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing functionallity of tab, starting from the InputBox to the today button
     // Do Not run with Safari. Safari does not handle tabs normally
-    @ExcludeBrowsers({ BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testTab() throws Exception {
         open(URL);
 
@@ -286,8 +284,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Test case for W-2031902
-    @ExcludeBrowsers({ BrowserType.SAFARI5, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testValueChangeEvent() throws Exception {
         open(URL);
         // Tab test Begins
@@ -322,9 +320,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
      */
     @UnAdaptableTest
     // Checking functionality of the shift tab button
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI5, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
+            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testShiftTab() throws Exception {
         open(URL);
 
@@ -379,8 +376,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing functionality of the ESC key
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testEscape() throws Exception {
         open(URL);
 
@@ -406,8 +402,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing Functionality of calendar in traversing through 1 year by the keys
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testDateWithOneArrow() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -435,8 +430,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing functionality of arrows being used one after the other
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1
         open(URL);
@@ -469,8 +463,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing functionality of arrows being used one after the other, while going through months
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
-            BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testUpAndDownArrows() throws Exception {
 
         open(URL);

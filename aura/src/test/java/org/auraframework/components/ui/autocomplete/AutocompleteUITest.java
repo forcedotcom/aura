@@ -76,18 +76,17 @@ public class AutocompleteUITest extends WebDriverTestCase {
         String matchCount = getAutoCompleteMatchCount(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         assertEquals("Match Done should not be fired yet", "", matchCount);
     }
-    
+
     /**
-     * Test to verify input cmp does get its value updated on clicking ENTER in the field
-     * Bug: W-2293143
-     * Press Enter is not used for Safari
+     * Test to verify input cmp does get its value updated on clicking ENTER in the field Bug: W-2293143 Press Enter is
+     * not used for Safari
      */
-    @ExcludeBrowsers({ BrowserType.SAFARI5, BrowserType.SAFARI,
-        BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testAutoCompleteWithUpdateOnAttributeSet() throws Exception {
         open(URL);
         String inputAutoComplete = "autoCompleteUpdateOn";
-        String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete) + ".find('input').get('v.value')");
+        String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete)
+                + ".find('input').get('v.value')");
         String autoCompleteText = (String) auraUITestingUtil.getEval(expr);
         assertNull("Auto complete Text for input should be undefined", autoCompleteText);
         WebDriver driver = getDriver();
@@ -133,10 +132,9 @@ public class AutocompleteUITest extends WebDriverTestCase {
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Autocomplete with no data should not have any options", 0, options.size());
     }
-    
+
     /**
-     * Test to check support for keydown event.
-     * Test case for W-2227931
+     * Test to check support for keydown event. Test case for W-2227931
      */
     public void testAutoCompleteKeyDownEventSupport() throws Exception {
         open(URL);
@@ -156,7 +154,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     // TODO : Bug W-1780786
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testAutoCompleteTabing() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -178,9 +176,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
      * Using arrow keys to cycle through list items functions properly.
      */
     // Excluding mobile devices since they dont have arrow key functionality
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
     public void testAutoCompleteArrowKeys() throws Exception {
         open(URL);
         WebDriver driver = getDriver();

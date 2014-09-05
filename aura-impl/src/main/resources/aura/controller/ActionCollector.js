@@ -59,24 +59,31 @@ $A.ns.ActionCollector.prototype.counter = 0;
  */
 $A.ns.ActionCollector.prototype.process = function() {
     var i, key;
-    var action, storage;
+    var action;
+    var that = this;
 
-    for ( i = 0; i < this.actionsRequested.length; i++) {
-        action = this.actionsRequested[i];
-        $A.assert(action.getDef().isServerAction(), "Client side action leaked through to server call.");
+    var checkForCachedResponse = function(action) {
         //
         // For cacheable actions check the storage service to see if we already have a viable cached action
         // response we can complete immediately. In this case, we get a callback, so we create a callback
         // for each one (ugh, this could have been handled via passing an additional param to the action,
         // bue we don't have that luxury now.)
         //
-        storage = action.getStorage();
+        var storage = action.getStorage();
         if (action.isStorable() && storage) {
             key = action.getStorageKey();
-            storage.get(key, this.createResultCallback(action));
+            storage.get(key).then(
+                that.createResultCallback(action)
+            );
         } else {
-            this.collectAction(action);
+            that.collectAction(action);
         }
+    };
+
+    for (i = 0; i < this.actionsRequested.length; i++) {
+        action = this.actionsRequested[i];
+        $A.assert(action.getDef().isServerAction(), "Client side action leaked through to server call.");
+        checkForCachedResponse(action);
     }
 };
 
@@ -140,7 +147,7 @@ $A.ns.ActionCollector.prototype.getNum = function() {
 $A.ns.ActionCollector.prototype.createResultCallback = function(action) {
     var that = this;
     return function(response) {
-        that.collectAction(action, response);
+        that.collectAction(action, response ? response.value : response);
     };
 };
 

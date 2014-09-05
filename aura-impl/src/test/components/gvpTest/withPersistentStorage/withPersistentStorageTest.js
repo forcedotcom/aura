@@ -16,10 +16,10 @@
      * Verify that GVPs are stored in aura storage named "actions" when available and persist across apps.
      */
     testGvpsPersistInStorage:{
-        test: [
-        function(cmp){
+        test: function(cmp) {
             //Fetch the label using gvp, which causes a server action
             $A.test.setTestTimeout(15000);
+
             $A.get("$Label" + ".Related_Lists" + ".task_mode_today");
             $A.test.assertTrue($A.test.isActionPending(),
                 "Test Setup Failure: test expects the label to be fetched from server");
@@ -33,11 +33,12 @@
                     //Check for GVPs in Storage
                     var storage = $A.storageService.getStorage("actions");
                     $A.test.assertDefined(storage, "Test setup failure: storage name actions required");
-                    storage.get("globalValueProviders", function(item) {
+                    storage.get("globalValueProviders")
+                        .then(function(item) {
                         cmp._foundGvps = true;
                         //Setup for step 2, change one of the labels
-                        item[0].values["Related_Lists"]["task_mode_today"] = "Yesterday";
-                        storage.put("globalValueProviders", item);
+                        item.value[0].values["Related_Lists"]["task_mode_today"] = "Yesterday";
+                        storage.put("globalValueProviders", item.value);
                     });
                 }
             );
@@ -47,5 +48,5 @@
                 "Failed to store global value providers in storage"
             );
         }
-    ]}
+    }
 })

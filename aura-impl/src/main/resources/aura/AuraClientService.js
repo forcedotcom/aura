@@ -783,9 +783,12 @@ var AuraClientService = function() {
                 return;
             }
 
-            storage.get(Action.getStorageKey(descriptor, params), function(value, isExpired) {
-                callback(!!value && !isExpired);
-            });
+            storage.get(Action.getStorageKey(descriptor, params))
+                .then(function(response) {
+                    $A.run(function() {
+                        callback(!!response && !!response.value && !response.isExpired);
+                    });
+                });
         },
 
         /**
@@ -807,33 +810,37 @@ var AuraClientService = function() {
             }
 
             var actionKey = Action.getStorageKey(descriptor, params);
-            storage.get(actionKey, function(value) {
-                if (!!value) {
-                    storage.put(actionKey, value);
+            storage.get(actionKey).then(function(response) {
+                if (!!response && !!response.value) {
+                    storage.put(actionKey, response.value)
+                        .then(function() { callback(true); });
+                } else {
+                    callback(false);
                 }
-                callback(!!value);
             });
         },
 
         /**
-         * Clears an action out of the action cache.
-         *
-         * @param {String} descriptor - action descriptor.
-         * @param {Object} params - map of keys to parameter values.
-         * @param {Function} params - called after the action was invalidated. Called with true if the action was
+         * Clears an action out of the action cache. 
+         * 
+         * @param descriptor {String} action descriptor.
+         * @param params {Object} map of keys to parameter values.
+         * @param successCallback {Function} called after the action was invalidated. Called with true if the action was
          * successfully invalidated and false if the action was invalid or was not found in the cache.
+         * @param errorCallback {Function} called if an error occured during execution
          */
-        invalidateAction : function(descriptor, params, callback) {
+        invalidateAction : function(descriptor, params, successCallback, errorCallback) {
             var storage = Action.getStorage();
-            callback = callback || NOOP;
+            successCallback = successCallback || NOOP;
+            errorCallback = errorCallback || NOOP;
 
             if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
-                callback(false);
+                successCallback(false);
                 return;
             }
 
-            storage.remove(Action.getStorageKey(descriptor, params));
-            callback(true);
+            storage.remove(Action.getStorageKey(descriptor, params))
+                .then(function() { successCallback(true); }, errorCallback );
         },
 
         /**

@@ -1,6 +1,13 @@
 ({
     setUp : function(component) {
-        $A.storageService.getStorage("actions").clear();
+        var completed = false;
+        $A.storageService.getStorage("actions").clear()
+            .then(
+                function() { completed = true; },
+                function(err) { $A.test.fail("Test setUp() failed to clear storage: " + err);
+            });
+
+        $A.test.addWaitFor(true, function() { return completed; });
     },
     /**
      * Verify the default adapter selected when auraStorage:init is used without
@@ -181,7 +188,7 @@
             function(cmp) {
                 var a = cmp.get("c.fetchDataRecord");
                 a.setParams({
-                        testName : "testSetStorableAPI_Empty"
+                    testName : "testSetStorableAPI_Empty"
                 });
                 // Empty settings
                 a.setStorable({});
@@ -206,7 +213,8 @@
                         return $A.test.getText(cmp.find("refreshEnd").getElement())
                     });
                 });
-            } ]
+            }
+        ]
     },
     testSetStorableAPI_Undefined : {
         attributes : {
@@ -360,16 +368,24 @@
                 // Run the action and mark it as storable.
                 var btn = cmp.find("RunActionAndStore");
                 var evt = btn.get("e.press");
+                var storage = $A.storageService.getStorage("actions");
+                var completed = false;
+
                 evt.fire();
+
                 $A.test.addWaitFor(false, $A.test.isActionPending, function() {
-                    $A.test.assertTrue($A.storageService.getStorage("actions").getSize() > 0,
-                                    "Expected first action to be stored in storage service.");
-                    $A.test.assertEquals("StorageController", $A.test
-                                    .getText(cmp.find("responseData").getElement()));
+                    $A.test.assertEquals("StorageController", $A.test.getText(cmp.find("responseData").getElement()));
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
                     $A.test.assertEquals("1", $A.test.getText(cmp.find("callbackCounter").getElement()));
+
+                    storage.getSize()
+                        .then(function(size) { $A.test.assertTrue(size > 0,
+                            "Expected first action to be stored in storage service."); })
+                        .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
                 });
+
+                $A.test.addWaitFor(true, function() { return completed; });
             },
             function(cmp) {
                 // Re-Run the action without marking it as storable, this
@@ -397,35 +413,55 @@
                         $A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
                         $A.test.assertEquals("3", $A.test.getText(cmp.find("callbackCounter").getElement()));
                     });
-            } ]
+            }
+        ]
     },
     testUnmarkedActionAreNotStored : {
         test : [
             function(cmp) {
-                    cmp._testName = "testUnmarkedActionAreNotStored";
-                    this.resetCounter(cmp, "testUnmarkedActionAreNotStored");
-                    $A.test.assertEquals(0, $A.storageService.getStorage("actions").getSize());
+                var completed = false;
+                cmp._testName = "testUnmarkedActionAreNotStored";
+                this.resetCounter(cmp, "testUnmarkedActionAreNotStored");
+                var storage = $A.storageService.getStorage("actions");
+                storage.getSize()
+                    .then(function(size) { $A.test.assertEquals(0, size); })
+                    .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+
+                $A.test.addWaitFor(true, function() { return completed; });
             },
             function(cmp) {
-                    // Run the action without marking it as storable.
-                    var btn = cmp.find("ForceActionAtServer");
-                    var evt = btn.get("e.press");
-                    evt.fire();
-                    $A.test.addWaitFor(false, $A.test.isActionPending, function() {
-                            $A.test.assertEquals("StorageController", $A.test
-                                            .getText(cmp.find("responseData").getElement()));
-                            $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()),
-                                            "Failed to inoke server action.");
-                            $A.test.assertEquals(0, $A.storageService.getStorage("actions").getSize(),
-                                            "Storage service saw an increase in size.");
-                    });
+                // Run the action without marking it as storable.
+                var btn = cmp.find("ForceActionAtServer");
+                var evt = btn.get("e.press");
+                var storage = $A.storageService.getStorage("actions");
+                var completed = false;
+
+                evt.fire();
+
+                $A.test.addWaitFor(false, $A.test.isActionPending, function() {
+                    $A.test.assertEquals(
+                        "StorageController",
+                        $A.test.getText(cmp.find("responseData").getElement())
+                    );
+                    $A.test.assertEquals(
+                        "0",
+                        $A.test.getText(cmp.find("staticCounter").getElement()),
+                        "Failed to inoke server action."
+                    );
+
+                    storage.getSize()
+                        .then(function(size) { $A.test.assertEquals(0, size, "Storage service saw an increase in size."); })
+                        .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+                });
+
+                $A.test.addWaitFor(true, function() { return completed; });
             }, function(cmp) {
-                    var btn = cmp.find("ForceActionAtServer");
-                    var evt = btn.get("e.press");
-                    evt.fire();
-                    $A.test.addWaitFor("1", function() {
-                            return $A.test.getText(cmp.find("staticCounter").getElement())
-                    });
+                var btn = cmp.find("ForceActionAtServer");
+                var evt = btn.get("e.press");
+                evt.fire();
+                $A.test.addWaitFor("1", function() {
+                    return $A.test.getText(cmp.find("staticCounter").getElement())
+                });
             } ]
     },
     /**
@@ -435,8 +471,7 @@
     testCacheExpiration : {
         attributes : {
             defaultExpiration : 5, // I am king
-            defaultAutoRefreshInterval : 60
-            // Very high but doesn't matter
+            defaultAutoRefreshInterval : 60 // Very high but doesn't matter
         },
         test : [ function(cmp) {
             cmp.getDef().getHelper().testCacheExpirationStage1.call(this, cmp);
@@ -455,8 +490,7 @@
     testCacheDataNotPurgedWhenOffline : {
         attributes : {
             defaultExpiration : 5, // I am king
-            defaultAutoRefreshInterval : 60
-            // Very high but doesn't matter
+            defaultAutoRefreshInterval : 60 // Very high but doesn't matter
         },
         test : [
             function(cmp) {
@@ -879,20 +913,32 @@
         }, function(cmp) {
             // this response will be different(has extra component but same return value) so callback count should be +2 (for get(), then refresh())
             var a = $A.run(function(){
-                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents",
-                        {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();},
-                        function(a){$A.test.clearAndAssertComponentConfigs(a);});
+                    return cmp.getDef().getHelper().executeAction(
+                        cmp,
+                        "c.fetchDataRecordWithComponents",
+                        {testName:cmp._testName, extraComponentsCreated:true},
+                        function(a){ a.setStorable(); },
+                        function(a){ $A.test.clearAndAssertComponentConfigs(a); });
                 });
-            $A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+
+            var completed = false;
+            $A.test.addWaitFor(
+                "3",
+                function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
-                        function(item){
-                            if(item.expires <= cmp._originalExpiration){
-                                $A.test.fail("storage expiration was not updated after refresh");
-                            }
-                        });
-                });
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey())
+                            .then(function(item) {
+                                if (item.expires <= cmp._originalExpiration) {
+                                    $A.test.fail("storage expiration was not updated after refresh");
+                                }
+
+                                completed = true;
+                            });
+                }
+            );
+
+            $A.test.addWaitFor(true, function() { return completed; });
         } ]
     },
     /**

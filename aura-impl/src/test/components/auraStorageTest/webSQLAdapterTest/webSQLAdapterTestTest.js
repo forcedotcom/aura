@@ -8,37 +8,40 @@
 			return "websql";});
 		$A.storageService.initStorage("browserdb", false, true, 1024, 200, 300, true, true);
     },
-    
+
     resetCounters:function(cmp){
 		cmp._storageModified = false;
-		cmp._storageModifiedCounter = 0;    
+		cmp._storageModifiedCounter = 0;
     },
-    
+
     assertAfterStorageChange:function(cmp, callback){
 		$A.test.addWaitFor(2, function() {
 		    return cmp._storageModified?cmp._storageModifiedCounter:0;
 		}, callback);
     },
-    
+
     testGetName : {
-		test : function(cmp) {  
+		test : function(cmp) {
 		    var storage = $A.storageService.getStorage("browserdb");
 		    $A.test.assertEquals("websql", storage.getName());
 		}
     },
-    
+
     testClear:{
 		test:[function(cmp){
 		    $A.test.setTestTimeout(5000);
 		    var storage = $A.storageService.getStorage("browserdb");
+            var completed = false;
 		    this.resetCounters(cmp);
-		    storage.clear();
-		    /*TODO: W-1620503 - auraStorage:modified is fired twice, once by AuraStorage and once by the Adapter
-		     * this.assertAfterStorageChange(cmp, function(){
-			    			$A.test.assertEquals(0, storage.getSize(), 
-			    				"Storage size not 0 after clear()");
-						});*/
-		    $A.test.addWaitFor(0, function(){return storage.getSize()});
+
+            storage.clear()
+                .then(function() { return storage.getSize(); })
+                .then(function(size) {
+                    $A.test.assertTrue(size >= 0 && size <= 0.1, "testClear: Expected size of 0, but got " + size);
+                    completed = true;
+                });
+
+            $A.test.addWaitFor(true, function() { return completed; });
 		},
 		/**
 		 * Call clear() after the cache has some values
@@ -46,270 +49,217 @@
 		function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
 		    this.resetCounters(cmp);
-		    storage.put("key1" , new Array(1024).join("x"));
-		    /*W-1620503
-		     * this.assertAfterStorageChange(cmp, function(){
-						    debugger;
-		    				    $A.test.assertEquals(1.00, storage.getSize().toFixed(2), "Storage size doesn't reflect size of items stored");
-		    				} );*/
-		    $A.test.addWaitFor(true, function(){
-				return storage.getSize()>=1 && storage.getSize()<1.001
-				}, function(){
-				    storage.clear();
-				    $A.test.addWaitFor(0, function(){return storage.getSize()});
-				});
-		}
-		]
+
+            storage.put("key1" , new Array(1024).join("x"))
+                .then(function() { return storage.getSize(); })
+                .then(function(size) {
+                    $A.test.assertTrue(size >= 1 && size <= 1.1, "testClear: Expected size of 1, but got " + size);
+                })
+                .then(function() { return storage.clear(); })
+                .then(function() { return storage.getSize(); })
+                .then(function(size) {
+                    $A.test.assertTrue(size >= 0 && size <= 0.1, "testClear: Expected size of 0, but got " + size);
+                });
+		}]
     },
-    
+
     testGetSize:{
 		test:[function(cmp){
 		    $A.test.setTestTimeout(15000);
+            var completed = false;
 		    var storage = $A.storageService.getStorage("browserdb");
-		    //One value
-		    storage.put("key1" , new Array(1024).join("x")); //1kb
-		    this.assertAfterGet(cmp, storage, "key1", function(){
-			var item = cmp["key1"];
-			$A.test.assertDefined(item);
-			$A.test.assertTrue(storage.getSize()>=1 && storage.getSize()<1.001);		
-		    });
-		},function(cmp){    
+            storage.put("key1", new Array(1024).join("x"))  // 1kb
+                .then(function() { return storage.get("key1"); })
+                .then(function(item) { $A.test.assertDefined(item.value, "Fail item."); })
+                .then(function() { return storage.getSize(); })
+                .then(function(size) {
+                    $A.test.assertTrue(size >= 1 && size < 1.001, "testGetSize: Expected size of 1, but got " + size);
+                    completed = true;
+                });
+
+            // Allow this promise chain to complete before starting the next test.
+            // If we don't wait, the chains are interleaved.
+            $A.test.addWaitFor(true, function() { return completed; });
+
+		}, function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
+            var completed = false;
+
 		    //Two value to see that size is recalculated
-		    storage.put("key2" , new Array(1024*5).join("y")); //5kb
-		    this.assertAfterGet(cmp, storage, "key2", function(){
-			var item = cmp["key2"];
-			$A.test.assertDefined(item);
-			$A.test.assertTrue(storage.getSize()>=6 && storage.getSize()<6.002);		
-		    });
-		},function(cmp){
+		    storage.put("key2" , new Array(5120).join("y")) //5kb
+                .then(function() { return storage.get("key2"); })
+                .then(function(item) { $A.test.assertDefined(item.value, "testGetSize: Fail - item undefined."); })
+                .then(function() { return storage.getSize(); })
+                .then(function(size) {
+                    $A.test.assertTrue(size >= 6 && size < 6.002, "testGetSize: Expected size of 6, but got " + size);
+                    completed = true;
+                });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+
+        }, function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
-		    //Reset flags
-		    cmp["key2"] = undefined;
-		    cmp["key2flag"] = undefined;
-		    //Dup value to see that only incremental value
-		    storage.put("key2" , new Array(1024).join("z")); //1kb
-		    this.assertAfterGet(cmp, storage, "key2", function(){
-			var item = cmp["key2"];
-			$A.test.assertDefined(item);
-                        //waitFor size to change as an attempt to fix flappiness on autobuilds
-                        $A.test.addWaitForWithFailureMessage(true, function(){
-                                return storage.getSize()>=2 && storage.getSize()<2.002;
-                            }, "Expected value of approx. 2, got: "+storage.getSize());
-                    });
-		}
-		]
+            var completed = false;
+
+            // Overwrite previous key2
+            storage.put("key2" , new Array(1024).join("z")) //1kb
+                .then(function() { return storage.get("key2"); })
+                .then(function(item) { $A.test.assertDefined(item.value); })
+                .then(function() { return storage.getSize(); })
+                .then(function(size) {
+                    $A.test.assertTrue(size >= 2 && size < 2.002, "testGetSize: Expected size of 2, but got " + size);
+                    completed = true;
+                });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        } ]
     },
-    
+
     testGetMaxSize:{
 		test:function(cmp){
-		    //Max Size doesn't seem to mean anything incase of WebSQLAdapter. It just a transient variable.
-		    $A.test.assertEquals(1, $A.storageService.getStorage("browserdb").getMaxSize(), 
-			    "Failed to configure max size of storage");
+		    //Max Size doesn't seem to mean anything in the case of WebSQLAdapter. It just a transient variable.
+            var storage = $A.storageService.getStorage("browserdb");
+            $A.test.assertEquals(1, storage.getMaxSize(), "testGetMaxSize: Failed to configure max size of storage");
 		}
-	
     },
-    
+
     testGet:{
-		test:[
-		 /**
-		  * Bad key values
-		  */     
-		 function(cmp){
-		    $A.test.setTestTimeout(15000);
-		    var storage = $A.storageService.getStorage("browserdb");
-		    storage.get("key1", function(item) {$A.test.assertUndefinedOrNull(item);});
-		    storage.get(undefined, function(item) { $A.test.assertUndefinedOrNull(item);});
-		    storage.get(null, function(item) { $A.test.assertUndefinedOrNull(item);});
-		    storage.get("", function(item) { $A.test.assertUndefinedOrNull(item);});
-		},
+        test:[
+        /**
+         * Bad key values
+         */
+        function(cmp){
+            $A.test.setTestTimeout(15000);
+            var completed = false;
+            var storage = $A.storageService.getStorage("browserdb");
+            storage.get("key1")
+                .then(function(item) { $A.test.assertUndefinedOrNull(item); } )
+                .then(function() { return storage.get(undefined); })
+                .then(function(item) { $A.test.assertUndefinedOrNull(item); } )
+                .then(function() { return storage.get(null); })
+                .then(function(item) { $A.test.assertUndefinedOrNull(item); } )
+                .then(function() { return storage.get(""); })
+                .then(function(item) {
+                    $A.test.assertUndefinedOrNull(item);
+                    completed = true;
+                } );
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        },
 		/**
 		 * Insert a map as value.
 		 */
 		function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
-		    var map = {"NBA": "Basketball"};
-		    storage.put("sport", map);
-		    //Assert that item was retrieved from storage
-		    this.assertAfterGet(cmp, storage, "sport", 
-                            function(){
-                                var item = cmp["sport"];
-                                $A.test.assertEquals("Basketball", item["NBA"], "Failed to retrieve map value");
-                            });
-		},
+            var map = { "NBA": "Basketball" };
+            var completed = false;
+
+            //Assert that item was retrieved from storage
+            storage.put("sport", map)
+                .then(function() { return storage.get("sport"); })
+                .then(function(item) {
+                    $A.test.assertDefined(item);
+                    $A.test.assertEquals("Basketball", item.value["NBA"], "testGet: Failed to retrieve map value");
+                    completed = true;
+                });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        },
 		/**
 		 * Insert a literal value
 		 */
 		function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
-		    storage.put("sounds", "Boogaboo");
-		    //Assert that item was retrieved from storage
-		    this.assertAfterGet(cmp, storage, "sounds", 
-			    		function(){
-						$A.test.assertEquals("Boogaboo", cmp["sounds"], "Failed to retrieve string value");
-					});
+            var completed = false;
+            storage.put("sounds", "Boogaboo")
+                .then(function() { return storage.get("sounds")})
+                .then(function(item) {
+                    $A.test.assertEquals("Boogaboo", item.value, "testGet: Failed to retrieve string value");
+                })
+                .then(function() { return storage.put("array", ["foo","bar"]); })
+                .then(function() { return storage.get("array")})
+                .then(function(item) {
+                    $A.test.assertEquals("foo", item.value[0], "testGet: Failed to retrieve array value");
+                    $A.test.assertEquals("bar", item.value[1], "testGet: Failed to retrieve all array values");
+                })
+                .then(function() { return storage.put("score", 999); })
+                .then(function() { return storage.get("score")})
+                .then(function(item) {
+                    $A.test.assertEquals(999, item.value, "testGet: Failed to retrieve numeric value");
+                    completed = true;
+                });
 		    /*TODO: W-1620507 cannot put boolean values
 		     * storage.put("flag", false);
-		    this.assertAfterGet(cmp, storage, "flag", 
+		    this.assertAfterGet(cmp, storage, "flag",
 		    		function(){
 					$A.test.assertFalse(cmp["flag"], "Failed to retrieve string value")
 				});*/
-		    storage.put("array", ["foo","bar"]);
-		    this.assertAfterGet(cmp, storage, "array", 
-			    		function(){
-						$A.test.assertEquals("foo", cmp["array"][0], "Failed to retrieve array value");
-						$A.test.assertEquals("bar", cmp["array"][1], "Failed to retrieve all array values");
-					});
-		    storage.put("score", 999);
-		    this.assertAfterGet(cmp, storage, "score", 
-			    		function(){
-						$A.test.assertEquals(999, cmp["score"], "Failed to retrieve numeric value");
-					});
-		}, 
-		/**
-		 * Insert a action return value
-		 */
-		function(cmp){
-		    var storage = $A.storageService.getStorage("browserdb");
-		    var a = $A.get("c.aura://ComponentController.getComponent");
-		    a.setParams({
-                        "name" : 'auraStorageTest:teamFacet'
-		    });
-		    a.setCallback(cmp,function(a){
-	    		//Verify that original action is usable
-	    		$A.test.assertEquals("SUCCESS", a.getState())
-	    		$A.test.assertDefined(a.getReturnValue);
-                        $A.test.clearAndAssertComponentConfigs(a);
-                        $A.newCmpAsync(
-	                    this,
-	                    function(newCmp){
-	                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
-	                        storage.put("actionResponse", a);
-	                    },
-	                    a.getReturnValue()
-                        );
-		    });
-		    $A.enqueueAction(a);
-		    $A.eventService.finishFiring();
-		    this.assertAfterGet(cmp, storage, "actionResponse", 
-                            function(){
-                                /*TODO: W-1620511 - actions are not flattened correctly, most properties are ommited
-                                 * //Verify that action is usable after it was retrieved from cache
-                                var item = cmp["actionResponse"];
-                                $A.test.assertEquals("SUCCESS", item.getState());
-                                $A.test.assertDefined(item.getReturnValue);
-                                $A.newCmpAsync(
-                                    this,
-                                    function(newCmp){
-                                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
-                                    },
-                                    a.getReturnValue()
-                                );*/
-                            });
-                }
-		]
-	
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        }
+        ]
     },
-    
-    /**
-     * Utillity method to verify cached value. Very helpful when insertion happens in an asynchronous fashion. 
-     */
-    assertAfterGet:function(cmp, storage, key, callback){
-		$A.test.addWaitFor(true, function(){
-			storage.get(key, function(item) {
-			    //Value 
-			    cmp[key] = item;
-			    //Flag to signal item retrieval, cannot use the item itself as flag because item can be null  
-			    cmp[key+"flag"] = true;
-			});
-			return !$A.util.isUndefinedOrNull(cmp[key+"flag"]);
-	     }, callback);
+
+    testPutGoodValue: {
+        /**
+         * Insert a value
+         */
+         test: function(cmp){
+                $A.test.setTestTimeout(15000);
+                var storage = $A.storageService.getStorage("browserdb");
+                storage.put("key1", new Array(1024).join("x"))  // 1kb
+                    .then(function() {return storage.get("key1"); })
+                    .then(function(item) {
+                        $A.test.assertDefined(item.value, "testPutGoodValue: Failed to put an item.");
+                    });
+         }
     },
-    
-    testPut:{
-		test:[
-		/**
+
+    testPutBadValues:{ test:[
+        /**
 		 * Insert bad values
-		 */      
+		 */
 		function(cmp){
 		    $A.test.setTestTimeout(15000);
 		    var storage = $A.storageService.getStorage("browserdb");
-		    /*TODO: W-1620514 - TypeError: Cannot read property 'length' of undefined WebSQLAdapter.setItem()
-		     * storage.put("unDefined", undefined);
-		    this.assertAfterGet(cmp, storage, "unDefined", 
-			    		function(){$A.test.assertUndefinedOrNull(cmp["unDefined"], "Failed to put undefined value")});*/
-		    storage.put("NULL", null);
-		    this.assertAfterGet(cmp, storage, "NULL", 
-			    		function(){$A.test.assertUndefinedOrNull(cmp["NULL"], "Failed to put null value")});
-		    /* TODO - W-1620514 Can't seem to insert an empty string as value
-		     * storage.put("EMPTY", "");
-		    this.assertAfterGet(cmp, storage, "EMPTY", 
-			    		function(){debugger; $A.test.assertEquals("", cmp["EMPTY"], "Failed to put an empty string")});*/
+		    storage.put("NULL", null)
+                .then(function() { return storage.get("NULL"); })
+                .then(function(item) {
+                    $A.test.assertUndefinedOrNull(item.value, "testPutBadValues: Failed to put null value")
+                });
 		},
 		/**
 		 * Insert bad keys
 		 */
 		function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
-		    storage.put(null, "NULL");
-		    storage.get(null, function(item) { $A.test.assertUndefinedOrNull(item);});
-		    storage.put(undefined, "UNDEFINED");
-		    storage.get(undefined, 
-		    		function(item) {
-		    			//iOS implementation of WebSql doesn't store an entry if key is undefined but google chrome's implementation does
-		    			// Test makes sure, if a browser does store, it stores the right value
-		    			if(item){
-		    				$A.test.assertEquals("UNDEFINED", item);
-		    			}
-		    		});
-		    storage.put("", "EMPTY");
-		    storage.get("", function(item) { $A.test.assertEquals("EMPTY", item);});
+            storage.put(null, "NULL")
+                .then(function() { return storage.get(null); })
+                .then(function(item) { $A.test.assertUndefinedOrNull(item); })
+                .then(function() { storage.put(undefined, "UNDEFINED"); })
+                .then(function() { return storage.get(undefined); })
+                .then(function(item) {
+                    // iOS implementation of WebSql doesn't store an entry if key is undefined
+                    // but google chrome's implementation does. Test makes sure, if a browser
+                    // does store, it stores the right value
+                    if (item)
+                        $A.test.assertEquals("UNDEFINED", item.value);
+                })
+                .then(function() { storage.put("", "EMPTY"); })
+                .then(function() { return storage.get(""); })
+                .then(function(item) { $A.test.assertEquals("EMPTY", item.value); });
 		},
 		/**
 		 * Inset duplicate keys
 		 */
 		function(cmp){
 		    var storage = $A.storageService.getStorage("browserdb");
-		    storage.put("dup", "ORIGINAL");
-		    storage.get("dup", function(item) { 
-					    $A.test.assertEquals("ORIGINAL", item);
-					    storage.put("dup", "DUPLICATE");
-					    storage.get("dup", function(item) { $A.test.assertEquals("DUPLICATE", item);});
-					});
-		}
-		]
-    },
-    
-    testExpiry:{
-    	// TODO(W-1766465): iOS/Safari has a size limit of how much a WebSql Db can take up. We have a fixed size
-        //                  implementation in WebSqlAdapter: W-1766465
-    	browsers:["GOOGLECHROME", "ANDROID_PHONE", "ANDROID_TABLET"],
-		test:[function(cmp){
-		    $A.test.setTestTimeout(30000);
-		    //defaultExpiration of 5 seconds
-		    $A.storageService.initStorage("testExpiry", false, true, 1024, 5, 300, true, true);
-		    var storage = $A.storageService.getStorage("testExpiry");
-		    storage.put("key", "Value");
-		    this.assertAfterGet(cmp, storage, "key", function(){
-			var item = cmp["key"];
-			$A.test.assertDefined(item);
-			cmp._time = new Date().getTime();
-			$A.log(cmp._time);
-			//Assert after 5 seconds
-			$A.test.addWaitFor(true, function(){
-			    			     return (new Date().getTime() - cmp._time)/1000 > 5;
-			    			 },function(){
-						     $A.log((new Date().getTime() - cmp._time)/1000);
-			    			     storage.get("key",function(item){
-			    				 $A.log("Even after expiry:" + item)
-			    				 //TODO-W-1620521 Expiry is not synchronous, get() still fetches expired items 
-			    				 //$A.test.assertUndefinedOrNull(item, "Failed to expire items in cache");
-			    			     });
-			    			 })
-		    });
-		},function(cmp){
-		    var storage = $A.storageService.getStorage("testExpiry");
-		    $A.test.addWaitFor(0, function(){return storage.getSize()});
+		    storage.put("dup", "ORIGINAL")
+                .then(function() { return storage.get("dup"); })
+                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
+                .then(function() { return storage.put("dup", "DUPLICATE"); })
+                .then(function() { return storage.get("dup"); })
+                .then(function(item) { $A.test.assertEquals("DUPLICATE", item.value); });
 		}]
     }
 })

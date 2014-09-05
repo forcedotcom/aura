@@ -43,22 +43,24 @@
 		var storageName = cmp.get("v.storageName");
 		var storage = opener.$A.storageService.getStorage(storageName);
 		var name = storage.getName();
-    	var size = storage.getSize();
-    	var value = Math.round(size * 100) / 100;
-    	var maxSize = storage.getMaxSize();
-    	var status;
+        var maxSize = storage.getMaxSize();
 
-    	var elem = cmp.find("storageInfo").getElement();
-    	if (size < maxSize / 2) {
-    		status = "Ok";
-    	} else if (size < maxSize) {
-    		status = "Warning";
-    	} else {
-    		status = "Critical";
-    	}
+        var status;
+        storage.getSize().then(function(size) {
+            $A.run(function() {
+                if (size < maxSize / 2) {
+                    status = "Ok";
+                } else if (size < maxSize) {
+                    status = "Warning";
+                } else {
+                    status = "Critical";
+                }
 
-    	var output = "Storage["+ storageName +"] "+ value + " K (" + name + ") Status: " + status;
-    	helper.output(cmp, "storageData", output);
+                var value = Math.round(size * 100) / 100;
+                var output = "Storage[" + storageName + "] " + value + " K (" + name + ") Status: " + status;
+                helper.output(cmp, "storageData", output);
+            });
+        });
 	},
 
 	cmpStats : function(cmp, event, helper) {

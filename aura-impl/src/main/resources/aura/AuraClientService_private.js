@@ -266,15 +266,18 @@ var priv = {
                 errorHandler = action.getStorageErrorHandler();
                 
                 if (toStore) {
-                    try {
-                        storage.put(key, toStore);
-                    } catch (error) {
-                        if (errorHandler && $A.util.isFunction(errorHandler)) {
-                            errorHandler(error);
-                        } else {
-                            $A.error(error);
+                    storage.put(key, toStore).then(
+                        function() {},
+                        function(error){
+                            $A.run(function() {
+                                if (errorHandler && $A.util.isFunction(errorHandler)) {
+                                    errorHandler(error);
+                                } else {
+                                    $A.error(error);
+                                }
+                            });
                         }
-                    }
+                    );
                 }
             }
         }, key);

@@ -82,7 +82,8 @@
 		whitespacesGuard = CKEDITOR.dom.walker.whitespaces( true ),
 		skipGuard = function( node ) {
 			return bookmarkGuard( node ) && whitespacesGuard( node );
-		};
+		},
+		listItemNames = { dd: 1, dt: 1, li: 1 };
 
 	// Get a reference for the next element, bookmark nodes are skipped.
 	function getNextSourceNode( node, startFromSibling, lastNode ) {
@@ -282,7 +283,7 @@
 
 				if ( !block && startBlockLimit && !this.enforceRealBlocks && checkLimits[ startBlockLimit.getName() ] && range.checkStartOfBlock() && range.checkEndOfBlock() && !startBlockLimit.equals( range.root ) )
 					block = startBlockLimit;
-				else if ( !block || ( this.enforceRealBlocks && block.getName() == 'li' ) ) {
+				else if ( !block || ( this.enforceRealBlocks && block.is( listItemNames ) ) ) {
 					// Create the fixed block.
 					block = this.range.document.createElement( blockTag );
 
@@ -360,10 +361,29 @@
 	function startIterator() {
 		var range = this.range.clone(),
 			// Indicate at least one of the range boundaries is inside a preformat block.
-			touchPre;
+			touchPre,
+
+			// (#12178)
+			// Remember if following situation takes place:
+			// * startAtInnerBoundary: <p>foo[</p>...
+			// * endAtInnerBoundary: ...<p>]bar</p>
+			// Because information about line break will be lost when shrinking range.
+			// Note that we test only if path block exist, because we must properly shrink
+			// range containing table and/or table cells.
+			// Note: When range is collapsed there's no way it can be shrinked.
+			// By checking if range is collapsed we also prevent #12308.
+			startPath = range.startPath(),
+			endPath = range.endPath(),
+			startAtInnerBoundary = !range.collapsed && rangeAtInnerBlockBoundary( range, startPath.block ),
+			endAtInnerBoundary = !range.collapsed && rangeAtInnerBlockBoundary( range, endPath.block, 1 );
 
 		// Shrink the range to exclude harmful "noises" (#4087, #4450, #5435).
 		range.shrink( CKEDITOR.SHRINK_ELEMENT, true );
+
+		if ( startAtInnerBoundary )
+			range.setStartAt( startPath.block, CKEDITOR.POSITION_BEFORE_END );
+		if ( endAtInnerBoundary )
+			range.setEndAt( endPath.block, CKEDITOR.POSITION_AFTER_START );
 
 		touchPre = range.endContainer.hasAscendant( 'pre', true ) || range.startContainer.hasAscendant( 'pre', true );
 
@@ -486,6 +506,17 @@
 		};
 
 		return 1;
+	}
+
+	// Checks whether range starts or ends at inner block boundary.
+	// See usage comments to learn more.
+	function rangeAtInnerBlockBoundary( range, block, checkEnd ) {
+		if ( !block )
+			return false;
+
+		var testRange = range.clone();
+		testRange.collapse( !checkEnd );
+		return testRange.checkBoundaryOfElement( block, checkEnd ? CKEDITOR.START : CKEDITOR.END );
 	}
 
 	/**

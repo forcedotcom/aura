@@ -634,7 +634,7 @@
 									// Read the current cursor.
 									var rngEnd = body.$.createTextRange();
 
-									moveRangeToPoint( rngEnd, evt.x, evt.y );
+									moveRangeToPoint( rngEnd, evt.clientX, evt.clientY );
 
 									// Handle drag directions.
 									textRng.setEndPoint(
@@ -668,7 +668,7 @@
 									 evt.$.x < html.$.clientWidth ) {
 								// Start to build the text range.
 								var textRng = body.$.createTextRange();
-								moveRangeToPoint( textRng, evt.$.x, evt.$.y );
+								moveRangeToPoint( textRng, evt.$.clientX, evt.$.clientY );
 
 								// Records the dragging start of the above text range.
 								var startRng = textRng.duplicate();
@@ -1133,12 +1133,7 @@
 				fixInitialSelection( root, sel, true );
 		}
 		else if ( CKEDITOR.env.ie ) {
-			var active;
-
-			// IE8,9 throw unspecified error when trying to access document.$.activeElement.
-			try {
-				active = this.document.getActive();
-			} catch ( e ) {}
+			var active = this.document.getActive();
 
 			// IEs 9+.
 			if ( !isMSSelection ) {
@@ -1771,7 +1766,7 @@
 				this.selectRanges( ranges );
 				this.lock();
 				// Return to the previously focused element.
-				!focused.equals( this.root ) && focused.focus();
+				focused && !focused.equals( this.root ) && focused.focus();
 				return;
 			}
 

@@ -11,12 +11,12 @@ var config = {
 		}
 	},
 
-	assertion: 'yui',
+	framework: 'yui',
 
 	plugins: [
 		'benderjs-yui',
 		'benderjs-jquery',
-		'benderjs-ckeditor'
+		'tests/_benderjs/ckeditor'
 	],
 
 	tests: {

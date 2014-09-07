@@ -15,12 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:import library="uiExamples:libraryExternal" property="libraryDoc" />
-    <aura:handler name="init" value="this" action="{!c.initialize}"/>
-    
-    <aura:attribute name="message" default="Error" type="String" description="Displays library invocation message." />
-    <span aura:id="output">
-        {!v.message}
-    </span>
+<aura:component extends="ui:dataProvider">
+    <aura:attribute name="listType" type="String"/>
+    <aura:handler name="provide" action="{!c.provide}"/>
 </aura:component>

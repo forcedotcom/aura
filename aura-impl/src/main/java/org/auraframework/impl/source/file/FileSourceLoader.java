@@ -21,8 +21,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+
+import org.auraframework.Aura;
 
 import org.auraframework.def.DefDescriptor;
 
@@ -32,20 +33,17 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
-import com.google.common.collect.Maps;
-
 /**
  */
-public class FileSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader {
+public class FileSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader, SourceListener {
 
     protected final File base;
     protected final int baseLen;
-    // Tests create loaders like crazy, which takes time to scan for namespaces,
-    // so this caches that mapping.
-    private static final Map<File, Set<String>> baseToNamepsaceCache = Maps.newHashMap();
+    private Set<String> namespaces;
 
     private static final FileFilter directoryFilter = new FileFilter() {
         @Override
@@ -69,6 +67,7 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
         this.baseLen = base.getPath().length();
 
         // add the namespace root to the file monitor
+        Aura.getDefinitionService().subscribeToChangeNotification(this);
         AuraFileMonitor.addDirectory(base.getPath());
     }
 
@@ -104,7 +103,7 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
 
         String id = (file.exists()) ? FileSource.getFilePath(file) : filename;
 
-        return new FileSource<D>(descriptor, id, file, getFormat(descriptor));
+        return new FileSource<>(descriptor, id, file, getFormat(descriptor));
     }
 
     /**
@@ -115,30 +114,35 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
      */
     @Override
     public Set<String> getNamespaces() {
-        Set<String> namespaces = baseToNamepsaceCache.get(base);
-
-        if (namespaces == null) {
-            namespaces = new HashSet<String>();
-            for (File dir : base.listFiles(directoryFilter)) {
-                File[] files = IOUtil.listFiles(dir, true, true);
-                if (files != null && files.length > 0) {
-                    namespaces.add(dir.getName());
+        synchronized(this) {
+            if (namespaces == null) {
+                namespaces = new HashSet<>();
+                for (File dir : base.listFiles(directoryFilter)) {
+                    File[] files = IOUtil.listFiles(dir, true, true);
+                    if (files != null && files.length > 0) {
+                        namespaces.add(dir.getName());
+                    }
                 }
             }
-            baseToNamepsaceCache.put(base, namespaces);
+            return namespaces;
         }
-        return namespaces;
     }
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> ret = new HashSet<>();
         AnyTypeFilter af = new AnyTypeFilter(ret, matcher);
-
-        for (String ns : getNamespaces()) {
-            if (matcher.matchNamespace(ns)) {
-                af.setNamespace(ns);
-                findFiles(new File(base, ns), null, af);
+        if (matcher.getNamespaceMatch().isConstant() && matcher.getNameMatch().isConstant()) {
+            String ns = matcher.getNamespaceMatch().toString();
+            String name = matcher.getNameMatch().toString();
+            af.setNamespace(ns);
+            findFiles(new File(new File(base, ns), name), null, af);
+        } else {
+            for (String ns : getNamespaces()) {
+                if (matcher.matchNamespace(ns)) {
+                    af.setNamespace(ns);
+                    findFiles(new File(base, ns), null, af);
+                }
             }
         }
         return ret;
@@ -146,9 +150,9 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
 
     @Override
     public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
-        Set<DefDescriptor<T>> ret = new HashSet<DefDescriptor<T>>();
+        Set<DefDescriptor<T>> ret = new HashSet<>();
         DefType defType = DefType.getDefType(primaryInterface);
-        OneTypeFilter<T> otf = new OneTypeFilter<T>(ret, defType);
+        OneTypeFilter<T> otf = new OneTypeFilter<>(ret, defType);
         findFiles(new File(base, namespace), null, otf);
         //System.out.println("PI="+primaryInterface.getName()+", prefix="+prefix+", ns = "+namespace+", RET="+ret);
         return ret;
@@ -316,5 +320,18 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
     @Override
     public String toString() {
         return super.toString() + '[' + base.getAbsolutePath() + ']';
+    }
+
+    @Override
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+        // rip out namespace cache if need be.
+        // Note that this is a little more aggressive than it has to be, but, well, it does only do it
+        // for creation/deletion. There is a race condition whereby this will cause odd failures if files
+        // are added/removed while something is running. caveat emptor
+        if (filePath != null && filePath.startsWith(base.getPath()) && event != SourceMonitorEvent.CHANGED) {
+            synchronized (this) {
+                namespaces = null;
+            }
+        }
     }
 }

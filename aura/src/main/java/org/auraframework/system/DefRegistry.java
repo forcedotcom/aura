@@ -24,10 +24,16 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
- * Public interface for retrieving aura definitions to be implemented by the
- * cache. This is exposed through aura context, all loading and caching is
- * hidden in the implementations.
+ * Public interface for retrieving aura definitions.
+ *
+ * This interface has several implementations with highly variable performance parameters.
+ * There should be no assumption that exists/getDef/find are efficient.
+ *
+ * Note: The typing here is as bogus as it gets. T is not valid.
  */
 public interface DefRegistry<T extends Definition> extends Serializable {
 
@@ -38,6 +44,7 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * 
      * @throws QuickFixException
      */
+    @CheckForNull
     T getDef(DefDescriptor<T> descriptor) throws QuickFixException;
 
     /**
@@ -53,7 +60,8 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * exists. Does not compile the definitions if they were not already
      * compiled, and does not guarantee that they can compile.
      */
-    Set<DefDescriptor<T>> find(DefDescriptor<T> matcher);
+    @NonNull
+    Set<DefDescriptor<T>> find(@NonNull DefDescriptor<T> matcher);
 
     /**
      * Given a string that contains search patterns or wildcards, return a set
@@ -61,7 +69,8 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * Does not compile the definitions if they were not already compiled, and
      * does not guarantee that they can compile.
      */
-    Set<DefDescriptor<?>> find(DescriptorFilter matcher);
+    @NonNull
+    Set<DefDescriptor<?>> find(@NonNull DescriptorFilter matcher);
 
     /**
      * Save the given definition back to appropriate source location.
@@ -78,11 +87,13 @@ public interface DefRegistry<T extends Definition> extends Serializable {
     /**
      * The DefTypes that this registry handles (returns)
      */
+    @NonNull
     Set<DefType> getDefTypes();
 
     /**
      * The Prefixes that this registry handles
      */
+    @NonNull
     Set<String> getPrefixes();
 
     /**
@@ -90,8 +101,15 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * indicates that the registry should be used when no other registry has
      * registered for a namespace.
      */
+    @NonNull
     Set<String> getNamespaces();
 
+    /**
+     * Get the source file for a descriptor.
+     *
+     * This is not always available, and so may return null even if the descriptor has a definition.
+     */
+    @CheckForNull
     Source<T> getSource(DefDescriptor<T> descriptor);
 
     /**
@@ -101,11 +119,17 @@ public interface DefRegistry<T extends Definition> extends Serializable {
 
     /**
      * return true if the caller can cache the value.
+     *
+     * This means that the def for a descriptor should not be mutable. The only exception here is that
+     * change notifications will flush the cache.
      */
     boolean isCacheable();
 
     /**
-     * return true if registry cannot change after creation.
+     * Return true if registry cannot change after creation.
+     *
+     * There is an implicit assumption that static registries are fast, and thus need not be cached
+     * by the implementation.
      */
     boolean isStatic();
 }

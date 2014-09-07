@@ -49,8 +49,8 @@ public final class SourceFactory {
     private final Set<String> namespaces;
 
     public SourceFactory(Collection<SourceLoader> loaders) {
-        Map<LoaderKey, SourceLoader> mutableLoaderMap = new HashMap<LoaderKey, SourceLoader>();
-        Set<String> mutableNamespaces = new HashSet<String>();
+        Map<LoaderKey, SourceLoader> mutableLoaderMap = new HashMap<>();
+        Set<String> mutableNamespaces = new HashSet<>();
 
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         for (SourceLoader loader : loaders) {
@@ -58,6 +58,11 @@ public final class SourceFactory {
                 mutableNamespaces.add(namespace);
                 
                 // Track and system/privileged namespaces
+                //
+                // This code is rather broken, as this now assumes that we build source factories for every
+                // loader. It is not fully compatible with having compiled registries, and we now have a hack
+                // to make it work.
+                //
                 if (loader instanceof PrivilegedNamespaceSourceLoader) {
                 	PrivilegedNamespaceSourceLoader privilegedLoader = (PrivilegedNamespaceSourceLoader)loader;
 	                if (privilegedLoader.isPrivilegedNamespace(namespace)) {

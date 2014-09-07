@@ -40,6 +40,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- This should be enabled, and the corresponding aura-resources stanza deleted when W-2342861 is complete
+            <plugin>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-tools</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>aura:compile-components</id>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <outputDirectory>target/classes/components_aura_components</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
         </plugins>
     </build>
 </project>

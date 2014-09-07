@@ -45,7 +45,7 @@ public class RegistryAndSystemTagsJsonSerializer {
 
     private static void serializeToFile() throws QuickFixException, IOException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String, Map<String, Map<String, String>>>>();
+        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<>();
         try {
             loadMetadataForSystemComponents(components);
             RegistryJsonSerializer.writeMetadataToFile(components, DEFAULT_FILE_SYSTEM_TAGS);
@@ -66,10 +66,10 @@ public class RegistryAndSystemTagsJsonSerializer {
             String compName = specialComp.getHandledTag();
             // some handlers don't really have a TAG..
             if (XMLHandler.SYSTEM_TAGS.contains(compName)) {
-                component = new TreeMap<String, Map<String, Map<String, String>>>();
-                componentDetails = new TreeMap<String, Map<String, String>>();
+                component = new TreeMap<>();
+                componentDetails = new TreeMap<>();
                 for (String attribute : specialComp.getAllowedAttributes()) {
-                    Map<String, String> attributeProps = new TreeMap<String, String>();
+                    Map<String, String> attributeProps = new TreeMap<>();
                     attributeProps.put(RegistryJsonSerializer.TYPE_KEY, "Object");
                     componentDetails.put(attribute, attributeProps);
                 }

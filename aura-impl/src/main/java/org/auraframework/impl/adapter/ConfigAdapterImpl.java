@@ -67,9 +67,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
 
-    private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
+    private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
     
-    private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
+    private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
     
     private static final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
     
@@ -173,26 +173,26 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return "aura";
     }
 
-	@Override
-	public boolean isPrivilegedNamespace(String namespace) {
-		return namespace != null && SYSTEM_NAMESPACES.contains(namespace.toLowerCase());
-	}
+    @Override
+    public boolean isPrivilegedNamespace(String namespace) {
+        return namespace != null && SYSTEM_NAMESPACES.contains(namespace.toLowerCase());
+    }
 
-	@Override
-	public String getDefaultNamespace() {
-		return null;
-	}
-	
-	@Override
-	public boolean isUnsecuredPrefix(String prefix) {
-		return UNSECURED_PREFIXES.contains(prefix);
-	}
+    @Override
+    public String getDefaultNamespace() {
+        return null;
+    }
+    
+    @Override
+    public boolean isUnsecuredPrefix(String prefix) {
+        return UNSECURED_PREFIXES.contains(prefix);
+    }
 
-	@Override
-	public boolean isUnsecuredNamespace(String namespace) {
-		// Deprecated stub will be removed once we remove the sfdc core usage
-		return false;
-	}
+    @Override
+    public boolean isUnsecuredNamespace(String namespace) {
+        // Deprecated stub will be removed once we remove the sfdc core usage
+        return false;
+    }
 
     @Override
     public synchronized void regenerateAuraJS() {
@@ -233,7 +233,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getMomentJSURL() {
-    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
         return String.format("%s/auraFW/resources/%s/moment/moment.js", contextPath, nonce);
     }
@@ -245,7 +245,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
 
         List<String> urls = Lists.newLinkedList();
-    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         if (!"GMT".equals(locale)) {
             urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js", contextPath,
                     nonce, locale));
@@ -257,9 +257,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getHTML5ShivURL() {
-    	String ret = null;
-    	AuraContext context = Aura.getContextService().getCurrentContext();
-    	String ua = context != null ? context.getClient().getUserAgent() : null;
+        String ret = null;
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String ua = context != null ? context.getClient().getUserAgent() : null;
         BrowserInfo b = new BrowserInfo(ua);
         if (b.isIE7() || b.isIE8()) {
             String nonce = context.getFrameworkUID();
@@ -274,7 +274,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public String getAuraJSURL() {
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
         String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
-    	String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         return String.format("%s/auraFW/javascript/%s/aura_%s.js", contextPath, nonce, suffix);
     }
 
@@ -449,22 +449,22 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
     }
 
-	@Override
-	public void addPrivilegedNamespace(String namespace) {
-	    if(namespace != null && !namespace.isEmpty()){
-	        SYSTEM_NAMESPACES.add(namespace.toLowerCase());
-	    }
-	}
+    @Override
+    public void addPrivilegedNamespace(String namespace) {
+        if(namespace != null && !namespace.isEmpty()){
+            SYSTEM_NAMESPACES.add(namespace.toLowerCase());
+        }
+    }
 
-	@Override
-	public void removePrivilegedNamespace(String namespace) {
+    @Override
+    public void removePrivilegedNamespace(String namespace) {
         SYSTEM_NAMESPACES.remove(namespace.toLowerCase());
-	}
+    }
 
-	@Override
-	public boolean isDocumentedNamespace(String namespace) {
+    @Override
+    public boolean isDocumentedNamespace(String namespace) {
         return !UNDOCUMENTED_NAMESPACES.contains(namespace) && !namespace.toLowerCase().endsWith("test");
-	}
+    }
 
     @Override
     public boolean isCacheablePrefix(String prefix) {

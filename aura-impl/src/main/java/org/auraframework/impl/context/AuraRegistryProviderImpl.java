@@ -17,7 +17,6 @@ package org.auraframework.impl.context;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -79,7 +78,10 @@ import com.google.common.collect.Sets;
 public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener {
     private static final Logger _log = Logger.getLogger(RegistryAdapter.class);
 
-    private DefRegistry<?>[] registries;
+    /**
+     * FIXME: (goliver) I am not convinced that this caching is correct in any way shape or form.
+     */
+    private volatile DefRegistry<?>[] registries;
 
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
     private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
@@ -90,8 +92,8 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
         public final List<DefRegistry<?>> staticLocationRegistries;
         public final List<SourceLoader> markupSourceLoaders;
         public final List<SourceLoader> javaSourceLoaders;
-        public String baseDir;
-        public boolean changed;
+        public final String baseDir;
+        private boolean changed;
 
         public SourceLocationInfo(DefRegistry<?>[] staticLocationRegistries, String baseDir,
                 List<SourceLoader> markupSourceLoaders,
@@ -105,6 +107,14 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
             this.javaSourceLoaders = javaSourceLoaders;
             this.baseDir = baseDir;
             this.changed = false;
+        }
+
+        public synchronized boolean isChanged() {
+            return changed;
+        }
+
+        public synchronized void setChanged(boolean changed) {
+            this.changed = changed;
         }
     };
 
@@ -121,14 +131,14 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
         File file = new File(path);
         FileInputStream fis = null;
 
-        if (file.canRead()) {
-            try {
-                fis = new FileInputStream(file);
-            } catch (FileNotFoundException fnfe) {
-                // don't die.
-                // I believe that the only way to trigger this is to remove the file
-                // in between the canRead check and here.
-                _log.error("Unable to open registries file", fnfe);
+        try {
+            fis = new FileInputStream(file);
+        } catch (Throwable t) {
+            // don't die.
+            // This can occur because the file is unreadable, or doesn't exist. We only
+            // log an error if the file exists.
+            if (file.exists()) {
+                _log.error("Unable to open registries file", t);
             }
         }
         return fis;
@@ -158,14 +168,10 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                     return l.toArray(new DefRegistry<?> [l.size()]);
                 }
                 return (DefRegistry[]) ois.readObject();
-            } catch (ClassNotFoundException cnfe) {
+            } catch (Exception e) {
                 // Do not fail here, just act as if we don't have a registries file.
                 // You'd have to create a bad registries file...
-                _log.error("Unable to read registries file", cnfe);
-            } catch (IOException ioe) {
-                // Do not fail here, just act as if we don't have a registries file.
-                // You'd have to create a bad registries file...
-                _log.error("Unable to read registries file", ioe);
+                _log.error("Unable to read registries file", e);
             } finally {
                 try {
                     ris.close();
@@ -256,7 +262,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
     public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
         DefRegistry<?>[] ret = registries;
 
-        if (mode.isTestMode() || registries == null || (extraLoaders != null && !extraLoaders.isEmpty())) {
+        if (mode.isTestMode() || ret == null || (extraLoaders != null && !extraLoaders.isEmpty())) {
             Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
@@ -264,16 +270,14 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
 
             regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
             regBuild.add(AuraStaticControllerDefRegistry.INSTANCE);
-            synchronized (this) {
-                for (ComponentLocationAdapter location : markupLocations) {
-                    if (location != null) {
-                        SourceLocationInfo sli = getSourceLocationInfo(location);
-                        if (!sli.changed && sli.staticLocationRegistries != null) {
-                            regBuild.addAll(sli.staticLocationRegistries);
-                        } else {
-                            markupLoaders.addAll(sli.markupSourceLoaders);
-                            javaLoaders.addAll(sli.javaSourceLoaders);
-                        }
+            for (ComponentLocationAdapter location : markupLocations) {
+                if (location != null) {
+                    SourceLocationInfo sli = getSourceLocationInfo(location);
+                    if (!sli.isChanged() && sli.staticLocationRegistries != null) {
+                        regBuild.addAll(sli.staticLocationRegistries);
+                    } else {
+                        markupLoaders.addAll(sli.markupSourceLoaders);
+                        javaLoaders.addAll(sli.javaSourceLoaders);
                     }
                 }
             }
@@ -371,20 +375,20 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
 
     @Override
     public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-        if (filePath != null) {
-            File file = new File(filePath);
-            try {
-                String canonical = file.getCanonicalPath();
-                synchronized (this) {
+        synchronized (this) {
+            if (filePath != null) {
+                File file = new File(filePath);
+                try {
+                    String canonical = file.getCanonicalPath();
                     for (SourceLocationInfo sli : locationMap.values()) {
-                        if (sli.baseDir != null && canonical.startsWith(sli.baseDir) && !sli.changed) {
-                            sli.changed = true;
-                            registries = null;
+                        if (sli.baseDir != null && canonical.startsWith(sli.baseDir)) {
+                            sli.setChanged(true);
                         }
                     }
+                } catch (IOException ioe) {
                 }
-            } catch (IOException ioe) {
             }
+            registries = null;
         }
     }
 }

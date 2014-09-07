@@ -246,7 +246,7 @@ public class RegistrySerializer {
         // Fetch all matching descriptors for our 'root' definitions.
         //
         descriptors = mdr.find(root_nsf);
-        // HACK! this should go away with: W-xxxxxx
+        // HACK! this should go away with: W-2368045
         descriptors.add(Aura.getDefinitionService().getDefDescriptor("markup://"+namespace, NamespaceDef.class));
         for (DefDescriptor<?> desc : descriptors) {
             Definition def = null;
@@ -319,7 +319,12 @@ public class RegistrySerializer {
             throw new RegistrySerializerException("Output directory is not writable: "+outputDirectory);
         }
         File outputFile = new File(outputDirectory, ".registries");
-        outputFile.delete();
+        if (outputFile.exists()) {
+            boolean deleted = outputFile.delete();
+            if (!deleted && outputFile.exists()) {
+                throw new RegistrySerializerException("Unable to delete and create a new file: "+outputFile);
+            }
+        }
         try {
             outputFile.createNewFile();
         } catch (IOException ioe) {
@@ -332,7 +337,7 @@ public class RegistrySerializer {
         } catch (FileNotFoundException fnfe) {
             throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
         }
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
         try {
             write(namespaces, out);
         } finally {

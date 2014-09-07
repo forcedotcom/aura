@@ -90,5 +90,32 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             return loaders;
         }
 
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("ComponentLocationAdapter(CSD=");
+            if (componentSourceDir != null) {
+                sb.append(componentSourceDir.getPath());
+            } else {
+                sb.append("null");
+            }
+            sb.append(", JGSD=");
+            if (javaGeneratedSourceDir != null) {
+                sb.append(javaGeneratedSourceDir.getPath());
+            } else {
+                sb.append("null");
+            }
+            sb.append(", CSP=");
+            if (componentSourcePackage != null) {
+                sb.append(componentSourcePackage);
+            } else {
+                sb.append("null");
+            }
+            sb.append(", Loaders=");
+            sb.append(loaders.toString());
+            sb.append(")");
+            return sb.toString();
+        }
+
     }
 }

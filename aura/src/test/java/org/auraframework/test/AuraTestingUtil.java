@@ -359,4 +359,5 @@ public class AuraTestingUtil {
         sb.setCharAt(3, flip);
         return sb.toString();
     }
+
 }

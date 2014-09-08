@@ -416,7 +416,7 @@
                     var that = this;
                     $A.run(function() {
                         // flush out background actions
-                        $A.enqueueAction(that.getAction(cmp, "c.execute", "RESUME back1;RESUME back2;RESUME back3", function(a) {
+                        $A.enqueueAction(that.getAction(cmp, "c.execute", "RESUME back1;SLEEP 200;RESUME back2;SLEEP 200;RESUME back3;", function(a) {
                             that.log(cmp, "fore1:" + a.getReturnValue());
                         }));
                     });

@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -31,6 +32,7 @@ import org.auraframework.impl.root.library.IncludeDefImpl;
 
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -43,6 +45,9 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_IMPORTS = "imports";
     private static final String ATTRIBUTE_EXPORTS = "exports";
+
+    private static final String JS_IDENTIFIER_REGEX = "^[_$a-zA-Z][_$a-zA-Z0-9]*$";
+    private static final Pattern JS_IDENTIFIER_PATTERN = Pattern.compile(JS_IDENTIFIER_REGEX);
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
         ATTRIBUTE_NAME, ATTRIBUTE_IMPORTS, ATTRIBUTE_EXPORTS, RootTagHandler.ATTRIBUTE_DESCRIPTION
@@ -90,6 +95,11 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
         
         String exports = getAttributeValue(ATTRIBUTE_EXPORTS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(exports)) {
+            if (!matchesJsIdentifier(exports)) {
+                // should only be javascript identifier and not any javascript
+                // currently doesn't include javascript reserved words
+                throw new InvalidDefinitionException("Exports attribute must be valid javascript identifier", getLocation());
+            }
             builder.setExports(exports);
         }
         
@@ -118,5 +128,18 @@ public class IncludeDefHandler extends XMLHandler<IncludeDefImpl> {
     @Override
     public String getHandledTag() {
         return TAG;
+    }
+
+    /**
+     * Checks whether input is valid js identifier. Currently ASCII only and doesn't include javascript reserved words.
+     *
+     * @param input String to match
+     * @return true is matches
+     */
+    static boolean matchesJsIdentifier(String input) {
+        if (input != null) {
+            return JS_IDENTIFIER_PATTERN.matcher(input).matches();
+        }
+        return false;
     }
 }

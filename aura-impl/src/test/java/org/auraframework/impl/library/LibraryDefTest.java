@@ -22,6 +22,7 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.AuraImplTestCase;
 
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -195,5 +196,17 @@ public class LibraryDefTest extends AuraImplTestCase {
 	    } catch (QuickFixException quickFixException) {
 	    	assertEquals("Library: Malformed does not represent a function, use \"exports\" to wrap third party libraries.", quickFixException.getMessage());
 	    }
+    }
+
+    /**
+     * Test exports is not javascript
+     */
+    public void testInvalidExportAttribute() throws Exception {
+        try {
+            Aura.getDefinitionService().getDefinition("test:test_LibraryBadExports", LibraryDef.class);
+            fail("Should accept only valid javascript identifier instead of javascript code");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Exports attribute must be valid javascript identifier");
+        }
     }
 }

@@ -43,6 +43,7 @@ import junit.framework.AssertionFailedError;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
@@ -223,13 +224,18 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         // this may be due to the extra steps that happen when everything is initialized
         // here we force the first test to execute single threaded and also initialize
         // aura before invoking that first test
+        HttpGet get = null;
         try {
             LOCK_FIRST_TEST_SEMAPHORE.acquire();
             if (numWebDriverTestsExecuted == 0) {
-                perform(obtainGetMethod("/uitest/testApp.app", true, null));
+                get = obtainGetMethod("/uitest/testApp.app", true, null);
+                getResponseBody(perform(get)); // need to drain response for HttpClient
             }
             runTestImpl();
         } finally {
+            if (get != null) {
+                get.releaseConnection();
+            }
             numWebDriverTestsExecuted++;
             // release enough permits to run in parallel after first
             LOCK_FIRST_TEST_SEMAPHORE.release(TestExecutor.NUM_THREADS);

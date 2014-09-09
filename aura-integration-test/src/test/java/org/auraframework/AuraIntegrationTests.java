@@ -40,6 +40,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.ServiceLocator;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /**
@@ -57,6 +58,8 @@ public class AuraIntegrationTests extends TestSuite {
 
     private final String nameFragment;
     private static final boolean RUN_PERF_TESTS = System.getProperty("runPerfTests") != null;
+
+    private final List<String> skipTests;
 
     static {
         int numIterations = 0;
@@ -78,6 +81,9 @@ public class AuraIntegrationTests extends TestSuite {
         } else {
             nameFragment = null;
         }
+
+        // comma-delimited list of fully qualified test classes (case-insensitive), e.g. my.test.TestClass
+        skipTests = ImmutableList.copyOf(System.getProperty("skipIntTests", "").toLowerCase().trim().split("\\s,\\s"));
     }
 
     /**
@@ -146,12 +152,13 @@ public class AuraIntegrationTests extends TestSuite {
                 queueTest(suite.testAt(i), result, queue, hostileQueue);
             }
         } else if (test instanceof TestCase) {
+            String testName = test.getClass().getName().toLowerCase() + "." + ((TestCase) test).getName().toLowerCase();
             if (nameFragment != null) {
-                String testName = test.getClass().getName().toLowerCase() + "."
-                        + ((TestCase) test).getName().toLowerCase();
                 if (!testName.contains(nameFragment)) {
                     return;
                 }
+            } else if (!skipTests.isEmpty() && skipTests.contains(testName)) {
+                return;
             }
             if (RUN_PERF_TESTS) {
                 if (!PerfUtil.hasPerfTestAnnotation((TestCase) test)) {

@@ -15,6 +15,8 @@
  */
 package org.auraframework.throwable;
 
+import java.util.List;
+
 import org.auraframework.system.Location;
 
 public interface AuraExceptionInfo {
@@ -35,4 +37,11 @@ public interface AuraExceptionInfo {
      * database IDs and other highly variable information.
      */
     String getExtraMessage();
+
+    /**
+     * Get the location for this exception.
+     * 
+     * @return the location stack.
+     */
+    List<String> getComponentStack();
 }

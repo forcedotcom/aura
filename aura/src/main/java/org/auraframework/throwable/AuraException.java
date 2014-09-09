@@ -15,6 +15,8 @@
  */
 package org.auraframework.throwable;
 
+import java.util.List;
+
 import org.auraframework.system.Location;
 
 /**
@@ -36,9 +38,30 @@ public abstract class AuraException extends Exception implements AuraExceptionIn
     private static final long serialVersionUID = 8678776658910679296L;
     private final Location location;
     private final String extraMessage;
+    private final List<String> componentStack;
 
     protected AuraException(String msg, Location l, Throwable t, String extraMessage) {
         super(msg, t);
+
+        List<String> componentStack;
+
+        if (t != null && t instanceof AuraExceptionInfo) {
+            AuraExceptionInfo info = (AuraExceptionInfo) t;
+
+            if (l == null) {
+                l = info.getLocation();
+            }
+            if (extraMessage == null) {
+                extraMessage = info.getExtraMessage();
+            }
+            componentStack = info.getComponentStack();
+        } else {
+            componentStack = AuraExceptionUtil.getComponentStack();
+        }
+        if (l != null) {
+            AuraExceptionUtil.addLocation(l, this);
+        }
+        this.componentStack = AuraExceptionUtil.addComponentStack(this, componentStack);
         if (l != null) {
             AuraExceptionUtil.addLocation(l, this);
         }
@@ -54,5 +77,10 @@ public abstract class AuraException extends Exception implements AuraExceptionIn
     @Override
     public String getExtraMessage() {
         return this.extraMessage;
+    }
+
+    @Override
+    public List<String> getComponentStack() {
+        return this.componentStack;
     }
 }

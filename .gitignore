@@ -13,3 +13,4 @@ pom.xml.releaseBackup
 *.iml
 version.properties
 *~
+tags

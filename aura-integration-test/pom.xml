@@ -111,6 +111,7 @@
         <xdisplay.exec>Xvfb</xdisplay.exec>
         <xdisplay.size>960x640x16</xdisplay.size>
         <xdisplay.options>-ac -screen 0 ${xdisplay.size}</xdisplay.options>
+        <skipIntTests>org.auraframework.system.AuraSystemUITest.testSystemChecks</skipIntTests>
     </properties>
     <build>
         <pluginManagement>
@@ -208,6 +209,7 @@
                                     <webdriver.remote.server>${webdriver.remote.server}</webdriver.remote.server>
                                     <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                     <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
+                                    <skipIntTests>${skipIntTests}</skipIntTests>
                                 </systemPropertyVariables>
                             </configuration>
                         </execution>
@@ -595,6 +597,7 @@
                                 <webdriver.remote.server>${webdriver.remote.server}</webdriver.remote.server>
                                 <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                 <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
+                                <skipIntTests>${skipIntTests}</skipIntTests>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <DISPLAY>:${jetty.port}</DISPLAY>

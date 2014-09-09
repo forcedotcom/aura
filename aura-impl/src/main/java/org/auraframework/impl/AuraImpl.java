@@ -35,6 +35,8 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -45,16 +47,26 @@ import com.google.common.collect.Maps;
  */
 public class AuraImpl {
 
+    private static final Logger _log;
     private static final Map<IndexKey, FormatAdapter<?>> formatAdapters;
-
-    private static final LoadingCache<IndexKey, FormatAdapter<?>> formatAdapterCache = CacheBuilder.newBuilder().build(
-            new Loader());
+    private static final LoadingCache<IndexKey, FormatAdapter<?>> formatAdapterCache;
 
     static {
-        formatAdapters = Maps.newHashMap();
-        for (FormatAdapter<?> adapter : getFormatAdapters()) {
-            formatAdapters.put(new IndexKey(adapter.getFormatName(), adapter.getType()), adapter);
+        Map<IndexKey, FormatAdapter<?>> t_formatAdapters = null;
+        LoadingCache<IndexKey, FormatAdapter<?>> t_formatAdapterCache = null;
+
+        _log = LoggerFactory.getLogger(AuraImpl.class);
+        try {
+            t_formatAdapterCache = CacheBuilder.newBuilder().build(new Loader());
+            t_formatAdapters = Maps.newHashMap();
+            for (FormatAdapter<?> adapter : getFormatAdapters()) {
+                t_formatAdapters.put(new IndexKey(adapter.getFormatName(), adapter.getType()), adapter);
+            }
+        } catch (Throwable t) {
+            _log.error("Unable to initialize AuraImpl", t);
         }
+        formatAdapterCache = t_formatAdapterCache;
+        formatAdapters = t_formatAdapters;
     }
 
     public static Collection<ComponentLocationAdapter> getComponentLocationAdapters() {

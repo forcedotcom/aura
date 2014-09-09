@@ -16,7 +16,6 @@
 package org.auraframework.impl.context;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +30,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.css.MutableThemeList;
@@ -53,7 +53,6 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
-
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
@@ -757,5 +756,18 @@ public class AuraContextImpl implements AuraContext {
         }
         
         return caller;
+    }
+
+    @Override
+    public List<String> createComponentStack() {
+        InstanceStack istack = getInstanceStack();
+        List<String> info = null;
+        if (istack != null) {
+            info = istack.getStackInfo();
+            if (info.size() == 0) {
+                info = null;
+            }
+        }
+        return info;
     }
 }

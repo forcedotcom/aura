@@ -15,6 +15,8 @@
  */
 package org.auraframework.throwable;
 
+import java.util.List;
+
 import org.auraframework.system.Location;
 
 /**
@@ -29,6 +31,7 @@ import org.auraframework.system.Location;
 public class AuraRuntimeException extends RuntimeException implements AuraExceptionInfo {
     private static final long serialVersionUID = -1196068206703611084L;
     private final Location location;
+    private final List<String> componentStack;
     private final String extraMessage;
 
     public AuraRuntimeException(String message) {
@@ -57,6 +60,9 @@ public class AuraRuntimeException extends RuntimeException implements AuraExcept
 
     public AuraRuntimeException(String message, Location location, Throwable cause, String extraMessage) {
         super(message, cause);
+
+        List<String> componentStack;
+
         if (cause != null && cause instanceof AuraExceptionInfo) {
             AuraExceptionInfo info = (AuraExceptionInfo) cause;
 
@@ -66,10 +72,14 @@ public class AuraRuntimeException extends RuntimeException implements AuraExcept
             if (extraMessage == null) {
                 extraMessage = info.getExtraMessage();
             }
+            componentStack = info.getComponentStack();
+        } else {
+            componentStack = AuraExceptionUtil.getComponentStack();
         }
         if (location != null) {
             AuraExceptionUtil.addLocation(location, this);
         }
+        this.componentStack = AuraExceptionUtil.addComponentStack(this, componentStack);
         this.location = location;
         this.extraMessage = extraMessage;
     }
@@ -97,5 +107,10 @@ public class AuraRuntimeException extends RuntimeException implements AuraExcept
             return this.location + ": " + super.getMessage();
         }
         return super.getMessage();
+    }
+
+    @Override
+    public List<String> getComponentStack() {
+        return componentStack;
     }
 }

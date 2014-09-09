@@ -17,17 +17,13 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
-import org.auraframework.instance.AttributeSet;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.ComponentConfig;
-import org.auraframework.instance.InstanceStack;
+import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.Provider;
+
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -48,24 +44,24 @@ public class IterationProvider implements ComponentConfigProvider {
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
         ComponentConfig cc = new ComponentConfig();
-        List<Component> components = Lists.newArrayList();
+        List<Component> components = new ArrayList<Component>();
         InstanceStack iStack = context.getInstanceStack();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
         m.put("realbody", components);
         cc.setAttributes(m);
 
         AttributeSet atts = component.getAttributes();
-        Iterable<?> value = atts.getValue("items", Iterable.class);
+        Iterable<?> value = (Iterable<?>)atts.getValue("items");
         if (value != null) {
             List<?> items = Lists.newArrayList(value);
             if (!items.isEmpty()) {
-                String var = atts.getValue("var", String.class);
-                String indexVar = atts.getValue("indexVar", String.class);
+                String var = (String) atts.getValue("var");
+                String indexVar = (String) atts.getValue("indexVar");
 
                 int realstart = 0;
                 int realend = items.size();
                 
-                ComponentDefRefArray body = atts.getValue("body", ComponentDefRefArray.class);
+                ComponentDefRefArray body = (ComponentDefRefArray) atts.getValue("body");
                 Integer start = getIntValue(atts.getValue("start"));
                 Integer end = getIntValue(atts.getValue("end"));
                 if (start == null && end == null) {
@@ -87,7 +83,7 @@ public class IterationProvider implements ComponentConfigProvider {
                     iStack.setAttributeIndex(i);
                     iStack.pushInstance(component, component.getDescriptor());
                     iStack.setAttributeName("body");
-                    Map<String, Object> providers = Maps.newHashMap();
+                    Map<String, Object> providers = new HashMap<String, Object>();
                     providers.put(var, items.get(i));
                     if (indexVar != null) {
                         providers.put(indexVar, i);

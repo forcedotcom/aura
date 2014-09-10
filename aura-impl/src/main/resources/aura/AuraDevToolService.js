@@ -1014,213 +1014,270 @@ var AuraDevToolService = function() {
                  }
         },
         verifyAccessibility : {
+        	/** 
+             * Check making sure that all images have an alt attribute present
+             * @returns String - Returns a string representation of the errors
+             */
+            checkImagesHaveAlts : {
+         	    "tag"  : "A11Y_DOM_01", 
+         	    "func" : function(domElem){
+            	    var imgError = "[A11Y_DOM_01] All image tags require the presence of the alt attribute.\n  More info http://sfdc.co/a11y_dom_01";
+                    
+            	    var allImgTags = domElem.getElementsByTagName("img");
+           		    return aura.devToolService.accessbilityAide.findAllImgTags(allImgTags, imgError);
+            	} 
+            },
+            
         	/**
+             * Check making sure all inputs have an associated label
+             * @returns String - Returns a string representation of the errors
+             */
+            checkInputsHaveLabel : {
+                "tag"  : "A11Y_DOM_02", 
+                "func" : function(domElem) {
+                     var inputLabelMsg   = "[A11Y_DOM_02] Labels are required for all input controls.\n  More info http://sfdc.co/a11y_dom_02";
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var inputTextTags   = domElem.getElementsByTagName('input');
+                     var textAreaTags    = domElem.getElementsByTagName('textarea');
+                     var selectTags      = domElem.getElementsByTagName('select');
+                     var lbls = domElem.getElementsByTagName("LABEL");  
+                     var errorArray = [];
+                
+                     errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, inputTextTags));
+                     errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, textAreaTags));
+                     errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, selectTags));
+                                      
+                     return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
+                 }
+            },
+              
+            /**
+             * Check making sure all buttons have non empty label
+             * @returns String - Returns a string representation of the errors
+             */
+            checkButtonHaveLabel : {
+                "tag"  : "A11Y_DOM_03", 
+                "func" : function(domElem){
+                    var buttonLabelErrorMsg = "[A11Y_DOM_03] Buttons must have non-empty text labels.\n  More info http://sfdc.co/a11y_dom_03";
+                    var accessAideFuncs = aura.devToolService.accessbilityAide;
+                    var buttonTags = domElem.getElementsByTagName('button');
+                
+                    return accessAideFuncs.formatOutput(buttonLabelErrorMsg, accessAideFuncs.buttonLabelAide(buttonTags));
+               }
+            },
+            
+            /**
+             * Check making sure that all anchors have text associated with them
+             * @returns String - Returns a string representation of the errors
+             */
+            checkAnchorHasText : {
+        	    "tag"  : "A11Y_DOM_04", 
+        	    "func" :  function(domElem){
+                    var anchorErrMsg = "[A11Y_DOM_04] Links must have non-empty text content.\n  More info http://sfdc.co/a11y_dom_04";
+                    var accessAideFuncs = $A.devToolService.accessbilityAide;
+                    var anchors = domElem.getElementsByTagName("a");
+                    return accessAideFuncs.formatOutput(anchorErrMsg, accessAideFuncs.checkAnchorHasInnerText(anchors));
+                }
+            }, 
+        	
+            /**
+             * Check making sure that all iframes have a non empty title associated with them
+             * @returns String - Returns a string representation of the errors
+             */
+            checkIframeHasTitle : {
+          	    "tag" : "A11Y_DOM_06", 
+          	    "func" : function(domElem){
+                     var iFrameTitleMsg = "[A11Y_DOM_06] Each frame and iframe element must have a non-empty title attribute.\n  More info http://sfdc.co/a11y_dom_06";
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var iframes = domElem.getElementsByTagName("iframe");
+          
+                     /**THIS CODE BLOCK SHOULD BE REMOVED AFTER PARTIAL CODE RUNNING**/
+                     var id = null;
+                     var src = null;
+                     var frame = null;
+                     var iframeArray = [];
+                     for(var i = 0; i<iframes.length; i++){
+                         frame = iframes[i];
+                         id  = $A.util.getElementAttributeValue(frame, "id");
+                         src = $A.util.getElementAttributeValue(frame, "src"); 
+                     
+                         if((!$A.util.isUndefinedOrNull(src) && src.indexOf("/apex/") !== -1) ||
+                            (!$A.util.isUndefinedOrNull(id) && id.toLowerCase().indexOf("vfframeid") !== -1)){
+                            continue;
+                         }
+              
+                         iframeArray.push(frame);
+                     }
+                    /*************************************************************************/
+                    return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframeArray, "title", "", accessAideFuncs.doesContain));
+                 }
+            },
+            
+            /**
+             * Check making sure the head element is set correctly
+             * @returns String - Returns a string representation of the errors
+             */
+            checkCorrectHeaderOrder : {
+        	    "tag"  : "A11Y_DOM_07", 
+        	    "func" : function(domElem){
+                     var hdErrMsg = "[A11Y_DOM_07] The head section must have a non-empty title element.\n  More info http://sfdc.co/a11y_dom_07";
+                     var accessAideFuncs = $A.devToolService.accessbilityAide;
+                     var hd = domElem.getElementsByTagName("head")[0];
+               
+                     if($A.util.isEmpty(hd)){
+                         return "";
+                     } 
+                     return accessAideFuncs.formatOutput(hdErrMsg, accessAideFuncs.checkHeadHasCorrectTitle(hdErrMsg, hd));
+                } 
+            },
+        	
+            /**
+             * Check making sure that table cells have scope in them, and that they are equal to row, col, rowgroup, colgroup
+             * @returns String - Returns a string representation of the errors
+             */
+            checkTableCellsHaveScope : {
+                "tag"  : "A11Y_DOM_08", 
+                "func" : function(domElem){
+                     var tableErrorMsg = "[A11Y_DOM_08] Data table cells must be associated with data table headers.\n  More info http://sfdc.co/a11y_dom_08";
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var tables = domElem.getElementsByTagName("table");
+                     return accessAideFuncs.formatOutput(tableErrorMsg, accessAideFuncs.checkTables(tables, tableErrorMsg));
+                 }
+            },
+                  
+            /**
+             * Check making sure that all fieldset tags do not have the display:none field set and makes sure that each one has a legend
+             * @returns String - Returns a string representation of the errors
+             */
+            checkFieldsetsAreCorrect : {
+                "tag"  : "A11Y_DOM_09",
+                "func" : function(domElem){
+                     var fieldsetLegnedMsg = "[A11Y_DOM_09] Fieldset must have a legend element.\n  More info http://sfdc.co/a11y_dom_09";
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var fieldSets = domElem.getElementsByTagName('fieldset');
+                     var legends = "";
+                     var errorArray = [];
+                     var fieldSetSytle  = "";
+                
+                     for(var i=0; i<fieldSets.length; i++){
+                         legends = fieldSets[i].getElementsByTagName('legend');
+                         fieldSetSytle = fieldSets[i].style.display;
+                    
+                         if(!$A.util.isUndefinedOrNull(fieldSetSytle) && fieldSetSytle == "none"){
+                             continue;
+                         }
+
+                         if(legends.length === 0){
+                             errorArray.push(fieldSets[i]);
+                         }
+                      }
+              
+                     return accessAideFuncs.formatOutput(fieldsetLegnedMsg, errorArray);
+                  } 
+            }, 
+                   
+            /**
+             * Check making sure that all radio and checkboxes are grouped within a fieldset
+             * @returns String - Returns a string representation of the errors
+             */
+            checkRadioGrouping : {
+                "tag"  : "A11Y_DOM_10",
+                "func" : function(domElem){
+                     var radioButtonFieldSetMsg = "[A11Y_DOM_10] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_10";
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var inputTags = domElem.getElementsByTagName('input');
+                       
+                     return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, accessAideFuncs.radioButtonAide(inputTags));
+                }
+            },
+            
+            /**
              * Checking to make sure that all nested Headers have a single level of difference
              * @returns String - Returns a string representation of the errors
              */
-        	A11Y_DOM_11 : function(domElem){
-                   var headerErrMsg = "[A11Y_DOM_11] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_11";
-                   var errArray = [];
-                   var accessAideFuncs = $A.devToolService.accessbilityAide;
-                   var hdrs1 = domElem.getElementsByTagName("h1");
-                   var hdrs2 = domElem.getElementsByTagName("h2");
-                   var hdrs3 = domElem.getElementsByTagName("h3");
-                   var hdrs4 = domElem.getElementsByTagName("h4");
-                   var hdrs5 = domElem.getElementsByTagName("h5");
+            checkNestedHeader : {
+                "tag"  : "A11Y_DOM_11",  
+                "func" : function(domElem){
+                     var headerErrMsg = "[A11Y_DOM_11] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_11";
+                     var errArray = [];
+                     var accessAideFuncs = $A.devToolService.accessbilityAide;
+                     var hdrs1 = domElem.getElementsByTagName("h1");
+                     var hdrs2 = domElem.getElementsByTagName("h2");
+                     var hdrs3 = domElem.getElementsByTagName("h3");
+                     var hdrs4 = domElem.getElementsByTagName("h4");
+                     var hdrs5 = domElem.getElementsByTagName("h5");
 
-                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs1, "h2", {"h2":"", "h3":"", "h4":"", "h5":"", "h6":""}));
-                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs2, "h3", {"h3":"", "h4":"", "h5":"", "h6":""}));
-                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs3, "h4", {"h4":"", "h5":"", "h6":""}));
-                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs4, "h5", {"h5":"", "h6":""}));
-                   errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs5, "h6", {"h6":""}));
+                     errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs1, "h2", {"h2":"", "h3":"", "h4":"", "h5":"", "h6":""}));
+                     errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs2, "h3", {"h3":"", "h4":"", "h5":"", "h6":""}));
+                     errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs3, "h4", {"h4":"", "h5":"", "h6":""}));
+                     errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs4, "h5", {"h5":"", "h6":""}));
+                     errArray = errArray.concat(accessAideFuncs.findNextHeader(hdrs5, "h6", {"h6":""}));
 
-                   return accessAideFuncs.formatOutput(headerErrMsg, errArray);
-               
-             },
-               /**
-                * Check making sure that all anchors have text associated with them
-                * @returns String - Returns a string representation of the errors
-                */
-               A11Y_DOM_04 : function(domElem){
-                      var anchorErrMsg = "[A11Y_DOM_04] Links must have non-empty text content.\n  More info http://sfdc.co/a11y_dom_04";
-                      var accessAideFuncs = $A.devToolService.accessbilityAide;
-                      var anchors = domElem.getElementsByTagName("a");
-                      return accessAideFuncs.formatOutput(anchorErrMsg, accessAideFuncs.checkAnchorHasInnerText(anchors));
-                  
-                },
-                /**
-                 * Check making sure the head element is set correctly
-                 * @returns String - Returns a string representation of the errors
-                 */
-                A11Y_DOM_07 : function(domElem){
-                      var hdErrMsg = "[A11Y_DOM_07] The head section must have a non-empty title element.\n  More info http://sfdc.co/a11y_dom_07";
-                      var accessAideFuncs = $A.devToolService.accessbilityAide;
-                      var hd = domElem.getElementsByTagName("head")[0];
-                
-                      if($A.util.isEmpty(hd)){
-                          return "";
-                      } 
-                      return accessAideFuncs.formatOutput(hdErrMsg, accessAideFuncs.checkHeadHasCorrectTitle(hdErrMsg, hd));
-                 },
-                 /**
-                  * Check making sure that table cells have scope in them, and that they are equal to row, col, rowgroup, colgroup
-                  * @returns String - Returns a string representation of the errors
-                  */
-                 A11Y_DOM_08 : function(domElem){
-                      var tableErrorMsg = "[A11Y_DOM_08] Data table cells must be associated with data table headers.\n  More info http://sfdc.co/a11y_dom_08";
-                      var accessAideFuncs = aura.devToolService.accessbilityAide;
-                      var tables = domElem.getElementsByTagName("table");
-                      return accessAideFuncs.formatOutput(tableErrorMsg, accessAideFuncs.checkTables(tables, tableErrorMsg));
-                   },
-                  /**
-                   * Check making sure that all iframes have a non empty title associated with them
-                   * @returns String - Returns a string representation of the errors
-                   */
-                   A11Y_DOM_06 : function(domElem){
-                       var iFrameTitleMsg = "[A11Y_DOM_06] Each frame and iframe element must have a non-empty title attribute.\n  More info http://sfdc.co/a11y_dom_06";
-                       var accessAideFuncs = aura.devToolService.accessbilityAide;
-                       var iframes = domElem.getElementsByTagName("iframe");
-                
-                       /**THIS CODE BLOCK SHOULD BE REMOVED AFTER PARTIAL CODE RUNNING**/
-                       var id = null;
-                       var src = null;
-                       var frame = null;
-                       var iframeArray = [];
-                       for(var i = 0; i<iframes.length; i++){
-                           frame = iframes[i];
-                           id  = $A.util.getElementAttributeValue(frame, "id");
-                           src = $A.util.getElementAttributeValue(frame, "src"); 
-                           
-                           if((!$A.util.isUndefinedOrNull(src) && src.indexOf("/apex/") !== -1) ||
-                               (!$A.util.isUndefinedOrNull(id) && id.toLowerCase().indexOf("vfframeid") !== -1)){
-                              continue;
-                           }
-                    
-                           iframeArray.push(frame);
-                      }
-                      /*************************************************************************/
-                      return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib(iframeArray, "title", "", accessAideFuncs.doesContain));
-                    },
-                   
-                    /** 
-                     * Check making sure that all images have an alt attribute present
-                     * @returns String - Returns a string representation of the errors
-                     */
-                    A11Y_DOM_01 : function(domElem){
-                		var imgError = "[A11Y_DOM_01] All image tags require the presence of the alt attribute.\n  More info http://sfdc.co/a11y_dom_01";
-         
-                		var allImgTags = domElem.getElementsByTagName("img");
-               		    return aura.devToolService.accessbilityAide.findAllImgTags(allImgTags, imgError);
-                	},
-                	
-                   /**
-                    * Check making sure that all fieldset tags do not have the display:none field set and makes sure that each one has a legend
-                    * @returns String - Returns a string representation of the errors
-                    */
-                	A11Y_DOM_09 : function(domElem){
-                        var fieldsetLegnedMsg = "[A11Y_DOM_09] Fieldset must have a legend element.\n  More info http://sfdc.co/a11y_dom_09";
-                        var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var fieldSets = domElem.getElementsByTagName('fieldset');
-                        var legends = "";
-                        var errorArray = [];
-                        var fieldSetSytle  = "";
-                  
-                        for(var i=0; i<fieldSets.length; i++){
-                            legends = fieldSets[i].getElementsByTagName('legend');
-                            fieldSetSytle = fieldSets[i].style.display;
-                      
-                            if(!$A.util.isUndefinedOrNull(fieldSetSytle) && fieldSetSytle == "none"){
-                                continue;
-                            }
-
-                            if(legends.length === 0){
-                                errorArray.push(fieldSets[i]);
-                            }
-                         }
-                
-                        return accessAideFuncs.formatOutput(fieldsetLegnedMsg, errorArray);
-                    }, 
-                    /**
-                     * Check making sure all buttons have non empty label
-                     * @returns String - Returns a string representation of the errors
-                     */
-                    A11Y_DOM_03 : function(domElem){
-                        var buttonLabelErrorMsg = "[A11Y_DOM_03] Buttons must have non-empty text labels.\n  More info http://sfdc.co/a11y_dom_03";
-                        var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var buttonTags = domElem.getElementsByTagName('button');
-                    
-                        return accessAideFuncs.formatOutput(buttonLabelErrorMsg, accessAideFuncs.buttonLabelAide(buttonTags));
-                   },
-                   /**
-                    * Check making sure that all radio and checkboxes are grouped within a fieldset
-                    * @returns String - Returns a string representation of the errors
-                    */
-                   A11Y_DOM_10 : function(domElem){
-                        var radioButtonFieldSetMsg = "[A11Y_DOM_10] Headings should be properly nested.\n  More info http://sfdc.co/a11y_dom_10";
-                        var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var inputTags = domElem.getElementsByTagName('input');
+                     return accessAideFuncs.formatOutput(headerErrMsg, errArray);              
+                }	
+            },
+                 	 
+            /**
+             * Test that will verify that all top level panels have the correct aria associated with them
+             * @returns String - Returns a string representation of the errors
+             */
+            checkTopLevelPanels : {
+                "tag"  : "A11Y_DOM_12", 
+                "func" : function (domElem){
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
                         
-                        return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, accessAideFuncs.radioButtonAide(inputTags));
-                     },
-                    /**
-                     * Check making sure all inputs have an associated label
-                     * @returns String - Returns a string representation of the errors
-                     */
-                     A11Y_DOM_02 : function(domElem) {
-                         var inputLabelMsg   = "[A11Y_DOM_02] Labels are required for all input controls.\n  More info http://sfdc.co/a11y_dom_02";
-                         var accessAideFuncs = aura.devToolService.accessbilityAide;
-                         var inputTextTags   = domElem.getElementsByTagName('input');
-                         var textAreaTags    = domElem.getElementsByTagName('textarea');
-                         var selectTags      = domElem.getElementsByTagName('select');
-                         var lbls = domElem.getElementsByTagName("LABEL");  
-                         var errorArray = [];
-                        
-                         errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, inputTextTags));
-                         errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, textAreaTags));
-                         errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, selectTags));
-                                              
-                         return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
-                     },
-                   /**
-                    * Check making sure that if an inputDefaultError exists on the page, that there is a corresponding input associated with it
-                    * @returns String - Returns a string representation of the errors
-                    */
-                     A11Y_DOM_13 : function (domElem){
-                        var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var inputErrorMsg = "[A11Y_DOM_13] Aria-describedby must be used to associate error message with input control.\n  More info http://sfdc.co/a11y_dom_13";                    
-                        var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));                   
-                        return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
-                    }, 
-                    /**
-                     * Test that will verifyt that all top level panels have the correct aria associated with them
-                     * @returns String - Returns a string representation of the errors
-                     */
-                    A11Y_DOM_12 : function (domElem){
-                        var accessAideFuncs = aura.devToolService.accessbilityAide;
-                        var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
-                    
-                        //Get all panels
-                        var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll("div.forcePanelModal"), domElem.querySelectorAll("div.forcePanelOverlay"), domElem.querySelectorAll("section.stage.panelSlide")]);
-                        var topPanelsCount = domElem.querySelectorAll("div.forcePanelOverlay.active").length + domElem.querySelectorAll("div.forcePanelModal.active").length;
-                        var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
-                        return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
-                }  
+                     //Get all panels
+                     var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll("div.forcePanelModal"), domElem.querySelectorAll("div.forcePanelOverlay"), domElem.querySelectorAll("section.stage.panelSlide")]);
+                     var topPanelsCount = domElem.querySelectorAll("div.forcePanelOverlay.active").length + domElem.querySelectorAll("div.forcePanelModal.active").length;
+                     var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
+                     return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
+                }
+            },
+            
+            /**
+             * Check making sure that if an inputDefaultError exists on the page, that there is a corresponding input associated with it
+             * @returns String - Returns a string representation of the errors
+             */
+            checkInputdefaultErrorLinkage : { 
+                "tag"  : "A11Y_DOM_13", 
+                "func" : function (domElem){
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var inputErrorMsg = "[A11Y_DOM_13] Aria-describedby must be used to associate error message with input control.\n  More info http://sfdc.co/a11y_dom_13";                    
+                     var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));                   
+                     return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
+                } 
+            }
         },
         
         /**
          * Calls all functions in VerifyAccessibility and stores the result in a string
-         * @returns String - Returns a a concatenated string representation of all errors or the empty string
+         * @param domElem     - element to start at. Can be null or a dom element
+         * @param checksToSkip - Array of function names to run. Defaults to run all.
+         * @returns String    - Returns a a concatenated string representation of all errors or the empty string
          */
-        checkAccessibility : function(domElem){
+        checkAccessibility : function(domElem, checksToRun){
             var functions = aura.devToolService.verifyAccessibility;
             var result = "";
-
+            var funcObject = "";
+            //Checking if user of the tool wants to start at a specific element or not
             if($A.util.isUndefinedOrNull(domElem)){
                 domElem = document;
             }
             
-            for(var funcNames in functions){           
-               result = result + functions[funcNames](domElem);
+            //Checking if there are a set of tests that we want to be run or not
+            if($A.util.isEmpty(checksToRun)){
+            	checksToRun = ["A11Y_DOM_01", "A11Y_DOM_02", "A11Y_DOM_03", "A11Y_DOM_04",
+            	               "A11Y_DOM_06", "A11Y_DOM_07", "A11Y_DOM_08", "A11Y_DOM_09",
+            	               "A11Y_DOM_10", "A11Y_DOM_11", "A11Y_DOM_12", "A11Y_DOM_13"];
+            }
+            //Run all tests that are applicable
+            for(var funcLabel in functions){
+               funcObject = functions[funcLabel];
+               if(checksToRun.indexOf(funcObject["tag"]) !== -1){
+            	    result = result + funcObject["func"](domElem);
+               }
+               
             }
             
             return result;

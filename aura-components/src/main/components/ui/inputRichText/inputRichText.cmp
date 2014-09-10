@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputTextArea"  extensible="true" description="An input field for entering rich text.">
+<aura:component extends="ui:inputTextArea"  extensible="true" support="GA" description="An input field for entering rich text.">
     <aura:clientLibrary name="CkEditor" type="JS" />
 	<aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Possible values: standard, full, email. Default value is &quot;basic&quot;. Custom config can be added in inputRichTextHelper."/>
 	<aura:attribute name="toolbarLocation" type="String" default="top" description="Location of the toolbar. Possible options are &quot;top&quot; and &quot;bottom&quot;." /> 

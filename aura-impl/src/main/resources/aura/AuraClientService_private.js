@@ -278,7 +278,8 @@ var priv = {
                                 if (errorHandler && $A.util.isFunction(errorHandler)) {
                                     errorHandler(error);
                                 } else {
-                                    $A.error(error);
+                                    // storage problems should warn rather than the agressive error.
+                                    $A.warning(error);
                                 }
                             });
                         }
@@ -339,7 +340,6 @@ var priv = {
             //
             // pre-decrement so that we correctly send the next response right after this.
             //
-            flightCounter.finish();
             if (responseMessage) {
                 var token = responseMessage["token"];
                 if (token) {
@@ -441,16 +441,39 @@ var priv = {
         $A.Perf.mark("AuraClientService.request");
         $A.Perf.mark("Action Request Prepared");
         var that = this;
+        var flightHandled = { value: false };
         //
         // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
         // an abortable action while we are off waiting for storage.
         //
-        var abortableId = this.actionQueue.getLastAbortableTransactionId();
-        var collector = new $A.ns.ActionCollector(actions, function() {
-            that.finishRequest(collector, flightCounter, abortableId);
-        });
-        collector.process();
-        $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
+        this.flightCounterTimeoutId = window.setTimeout(function() {
+           if(!flightHandled.value) {
+               $A.warning("Timed out waiting for ActionController to reset flight counter! Resetting the flight counter and clearing component configs of processed actions");
+               flightCounter.cancel();
+           }
+        }, 30000);
+        try {
+            var abortableId = this.actionQueue.getLastAbortableTransactionId();
+            var collector = new $A.ns.ActionCollector(actions, function() {
+                try {
+                    that.finishRequest(collector, flightCounter, abortableId, flightHandled);
+                } catch (e) {
+                    if (!flightHandled.value) {
+                        flightCounter.cancel();
+                        flightHandled.value = true;
+                    }
+                    throw e;
+                }
+            });
+            collector.process();
+            $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
+        } catch (e) {
+            if (!flightHandled.value) {
+                flightCounter.cancel();
+                flightHandled.value = true;
+            }
+            throw e;
+        }
     },
 
     /**
@@ -461,7 +484,7 @@ var priv = {
      * 
      * @private
      */
-    finishRequest : function(collector, flightCounter, abortableId) {
+    finishRequest : function(collector, flightCounter, abortableId, flightHandled) {
         var actionsToSend = collector.getActionsToSend();
         var actionsToComplete = collector.getActionsToComplete();
 
@@ -469,7 +492,23 @@ var priv = {
             for ( var n = 0; n < actionsToComplete.length; n++) {
                 var info = actionsToComplete[n];
                 info.action.updateFromResponse(info.response);
-                info.action.finishAction($A.getContext());
+                try {
+                    info.action.finishAction($A.getContext());
+                } catch(e) {
+                    var retryAction = info.action.getRetryFromStorageAction();
+                    if (retryAction) {
+                        $A.log("Finishing cached action failed. Trying to refetch from server.");
+                        
+                        // Clear potential leftover configs
+                        $A.getContext().clearComponentConfigs(info.action.getId());
+                        
+                        // Enqueue the retry action
+                        $A.enqueueAction(retryAction);
+                    } else {
+                        // If it was not from storage, just rethrow the error and carry on as normal.
+                        throw e;
+                    }
+                }
             }
             this.fireDoneWaiting();
         }
@@ -499,12 +538,13 @@ var priv = {
             // #end
 
             // clientService.requestQueue reference is mutable
-            flightCounter.send();
             var requestConfig = {
                 "url" : priv.host + "/aura",
                 "method" : "POST",
                 "scope" : this,
                 "callback" : function(response) {
+                    // always finish our in-flight counter here.
+                    flightCounter.finish();
                     this.actionCallback(response, collector, flightCounter, abortableId);
                 },
                 "params" : {
@@ -530,6 +570,8 @@ var priv = {
 
             $A.Perf.endMark("Action Request Prepared");
             $A.util.transport.request(requestConfig);
+            flightCounter.send();
+            flightHandled.value = true;
 
             setTimeout(function() {
                 $A.get("e.aura:waiting").fire();
@@ -537,6 +579,7 @@ var priv = {
         } else {
             // We didn't send a request, so clean up the in-flight counter.
             flightCounter.cancel();
+            flightHandled.value = true;
         }
     },
 
@@ -663,9 +706,9 @@ var priv = {
             e.stopImmediatePropagation();
         }
 
-    	if (window.applicationCache
+        if (window.applicationCache
                 && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
-        	return;
+            return;
         }
 
         priv.hardRefresh();

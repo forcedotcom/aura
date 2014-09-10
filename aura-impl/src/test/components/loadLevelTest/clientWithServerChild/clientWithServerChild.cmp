@@ -16,5 +16,6 @@
 
 -->
 <aura:component>
-    <loadLevelTest:NonPreloadedServerComponent stringAttribute="from model - clientWithServerChild"/>
+    <aura:attribute name="stringAttribute" type="String" default="clientWithServerChild"/>
+    <loadLevelTest:NonPreloadedServerComponent stringAttribute="set by clientWithServerChild"/>
 </aura:component>

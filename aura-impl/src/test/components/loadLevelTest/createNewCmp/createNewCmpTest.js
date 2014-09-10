@@ -203,8 +203,7 @@
      * Verify creating a component that's available on the client, but has an inner comopnent with server-side
      * dependencies (in this case, a model).
      */
-    // TODO(W-1961207): enable test when component attributes are created async
-    _testPreloadedDefWithNonPreloadedInnerCmp : {
+    testPreloadedDefWithNonPreloadedInnerCmp : {
         test : function(cmp) {
             $A.run(function() {
                 $A.newCmpAsync(
@@ -224,7 +223,7 @@
                 $A.test.assertEquals("markup://loadLevelTest:clientWithServerChild",
                         body[0].getDef().getDescriptor().getQualifiedName());
                 var cmpText = $A.test.getTextByComponent(body[0]);
-                $A.test.assertTrue($A.test.contains(cmpText, "from model - clientWithServerChild"),
+                $A.test.assertTrue($A.test.contains(cmpText, "set by clientWithServerChild"),
                         "Model data not present on inner component.");
             });
         }
@@ -649,31 +648,46 @@
 
     /**
      * Create a component with a provider which provides a component that contains an inner component with server
-     * dependencies. Verfiy component is successfully created and contains data from it's model.
+     * dependencies. Verify error message stating that it cannot provide a component with server deps
      */
-
-    // TODO(W-1961207): enable this test when component attributes are converted to async
-    _testCreateComponentNotOnClientWithClientProvider: {
+    testCreateComponentNotOnClientWithClientProvider: {
         test: function(cmp) {
-            $A.run(function() {
+            try {
                 $A.newCmpAsync(
                     this,
-                    function(newCmp) {
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
+                    function () {
                     },
                     "markup://loadLevelTest:clientProvidesServerCmp"
                 );
+                $A.test.fail('Should have failed to create component with client provided server dependent component.');
+            } catch(e) {
+                $A.test.assertTrue(e.message.indexOf("Client provided component cannot have server dependencies") != -1,
+                    "Incorrect error message when creating client provided server dependent component");
+            }
+        }
+    },
+
+    /**
+     * test creating a component having model, client and server provider
+     */
+    testCreationOfKitchenSink:{
+        test: function(cmp){
+            $A.run(function(){
+                $A.newCmpAsync(
+                    this,
+                    function(newCmp){
+                        var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
+                    },
+                    "markup://test:kitchenSink"
+                );
             });
 
-            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                var body = cmp.get('v.body');
-                $A.test.assertEquals(1,body.length);
-                $A.test.assertEquals("markup://loadLevelTest:clientWithServerChild",body[0].getDef().getDescriptor().getQualifiedName());
-                var cmpText = $A.test.getTextByComponent(body[0]);
-                $A.test.assertTrue($A.test.contains(cmpText, "from model - clientWithServerChild"),
-                        "Model data not present on inner component.");
+            $A.test.addWaitFor(false, $A.test.isActionPending, function() {
+                var newCmp = cmp.get('v.body')[0];
+                var cmpName = newCmp.getDef().getDescriptor().getQualifiedName();
+                $A.test.assertEquals("markup://test:kitchenSink", cmpName, "Component couldn't be created");
             });
         }
     },

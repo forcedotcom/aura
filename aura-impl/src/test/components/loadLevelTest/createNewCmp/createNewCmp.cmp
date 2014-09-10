@@ -25,6 +25,7 @@
     <aura:dependency resource="loadLevelTest:serverComponent" />
 
     <aura:dependency resource="loadLevelTest:clientWithServerChild" />
+    <aura:dependency resource="loadLevelTest:clientProvidesServerCmp" />
 
     {!v.body}
 </aura:component>

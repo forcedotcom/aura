@@ -635,10 +635,13 @@ var ComponentPriv = (function() { // Scoping priv
 
         var self = this,
             setProvided = function(realComponentDef, attributes) {
-                $A.assert(realComponentDef
-                    && realComponentDef.auraType === "ComponentDef"
-                    && !realComponentDef.isAbstract(),
-                    "No concrete implementation provided");
+                // Provide better error messaging with each assertion
+                $A.assert(realComponentDef && realComponentDef.auraType === "ComponentDef",
+                    "No definition for provided component");
+                $A.assert(!realComponentDef.isAbstract(), "No concrete implementation provided");
+                // client provider and current config wasn't from the server
+                $A.assert(!realComponentDef.hasRemoteDependencies() || (realComponentDef.hasRemoteDependencies() && self.partialConfig),
+                    "Client provided component cannot have server dependencies.");
 
                 self.componentDef = realComponentDef;
                 self.attributes.recreate(realComponentDef.getAttributeDefs(), attributes);

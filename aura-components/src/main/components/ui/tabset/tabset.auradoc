@@ -42,12 +42,19 @@
 &lt;/ui:tabset>        
         </pre>
         </p>
-        <p>To retrieve an active tab, use <code>event.getParam("tab")</code>. To update a tab's parameters, retrieve the tabset and fire the <code>getActiveTab</code> event.
-        See the <code>ui:tabsetEvent</code> component reference for a list of parameters.
+        <p>To retrieve an active tab, use <code>event.getParam("tab")</code>. This example retrieves a tab and its title. See the <code>ui:tabsetEvent</code> component reference for a list of parameters.
+        <pre>
+var tab = evt.getParam("tab");
+alert(tab.get("v.title") + " activated");
+        </pre>
+        </p>
+        
+        <p>This example retrieves a tabset and identifies the active tab by firing the <code>getActiveTab</code> event.
+        
         <pre>
 var tabset = cmp.find("myTabset");
 var e = tabset.get("e.getActiveTab");
-//Set tab parameters using e.setParams() and fire the event       
+//Set tab parameters using e.setParams()
         </pre>
         </p>
          <h4>Rendering a Tab Selectively</h4>

@@ -126,8 +126,6 @@ var clientService;
  */
 $A.ns.Aura = function() {
     this.util = new $A.ns.Util(); 
-    //TODO W-2334986: HACK to get past closure, $A.util.on is getting stomped over by closure property rename
-    this.util["on"] = this.util.on;
     this["util"] = this.util;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this.test = new $A.ns.Test();

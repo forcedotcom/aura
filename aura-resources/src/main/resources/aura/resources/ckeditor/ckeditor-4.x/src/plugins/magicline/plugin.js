@@ -428,7 +428,12 @@
 
 	var elementFromMouse = ( function() {
 		function elementFromPoint( doc, mouse ) {
-			return new CKEDITOR.dom.element( doc.$.elementFromPoint( mouse.x, mouse.y ) );
+			var pointedElement = doc.$.elementFromPoint( mouse.x, mouse.y );
+
+			// IE9QM: from times to times it will return an empty object on scroll bar hover. (#12185)
+			return pointedElement && pointedElement.nodeType ?
+				new CKEDITOR.dom.element( pointedElement ) :
+				null;
 		}
 
 		return function( that, ignoreBox, forceMouse ) {
@@ -438,6 +443,7 @@
 			var doc = that.doc,
 				lineWrap = that.line.wrap,
 				mouse = forceMouse || that.mouse,
+				// Note: element might be null.
 				element = elementFromPoint( doc, mouse );
 
 			// If ignoreBox is set and element is the box, it means that we
@@ -568,7 +574,7 @@
 		var doc = that.doc,
 			// This the main box element that holds triangles and the insertion button
 			line = newElementFromHtml( '<span contenteditable="false" style="' + CSS_COMMON + 'position:absolute;border-top:1px dashed ' + that.boxColor + '"></span>', doc ),
-			iconPath = this.path + 'images/' + ( env.hidpi ? 'hidpi/' : '' ) + 'icon.png';
+			iconPath = this.path + 'images/' + ( env.hidpi ? 'hidpi/' : '' ) + 'icon' + ( that.rtl ? '-rtl' : '' ) + '.png';
 
 		extend( line, {
 

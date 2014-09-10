@@ -19,7 +19,7 @@
 	 * Blocked from IOS and IPAD because clicking on an input does not seem to work when using clickOrTouch, works fine manually
 	 */
     testClickVsChanged : {
-    	browsers : ["-IE7", "-IE8", "-IPHONE", "-IPAD"],
+    	browsers : ["-IPHONE", "-IPAD"],
     	test : [function (cmp){   	
     		//Verify that the outputTexts are set to their default value of the inputCheckbox
     		$A.test.assertEquals("false", cmp.find("changedEvt_ot").get("v.value"), "Value of the checkbox should be 'false', since no events have been fired");

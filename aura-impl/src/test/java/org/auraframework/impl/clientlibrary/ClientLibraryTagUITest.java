@@ -17,12 +17,13 @@ package org.auraframework.impl.clientlibrary;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.test.WebDriverTestCase.CheckAccessibility;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.ibm.icu.util.Calendar;
 
+@CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
     public ClientLibraryTagUITest(String name) {
         super(name);
@@ -69,7 +70,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     /**
      * Verify that resource change depending on Mode. Mixture of combinable and uncombinable resources
      */
-    @UnAdaptableTest("we need a annotation for accessibility test : W-2312560")
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 

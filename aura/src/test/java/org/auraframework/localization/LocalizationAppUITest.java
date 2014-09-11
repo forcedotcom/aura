@@ -15,11 +15,13 @@
  */
 package org.auraframework.localization;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.*;
+import org.auraframework.test.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+@CheckAccessibility(false)
 public class LocalizationAppUITest extends WebDriverTestCase {
 
     public String URL = "/uitest/localization_Test.app";

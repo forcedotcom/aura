@@ -324,7 +324,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         }
     }
 
-    private void endContextIfEstablished() {
+    protected void endContextIfEstablished() {
         ContextService contextService = Aura.getContextService();
         if (contextService != null && contextService.isEstablished()) {
             contextService.endContext();

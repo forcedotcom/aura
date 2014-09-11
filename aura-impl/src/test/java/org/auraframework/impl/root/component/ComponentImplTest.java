@@ -86,7 +86,7 @@ public class ComponentImplTest extends AuraImplTestCase {
 	}
 
     public void testServerDependenceComponentSuperWithProviderOnly() throws Exception {
-        Aura.getContextService().startContext(AuraContext.Mode.PROD, AuraContext.Format.HTML, AuraContext.Authentication.AUTHENTICATED);
+        // AuraContext already started
         DefDescriptor<ComponentDef> cmp = definitionService.getDefDescriptor(
                 "ui:pagerNextPrevious", ComponentDef.class);
         assertFalse("Component with super that has provider only should not have server dependencies",
@@ -144,7 +144,7 @@ public class ComponentImplTest extends AuraImplTestCase {
     }
 
     public void testServerDependenceRecursiveComponent() throws Exception {
-        Aura.getContextService().startContext(AuraContext.Mode.PROD, AuraContext.Format.HTML, AuraContext.Authentication.AUTHENTICATED);
+        // AuraContext already started
         DefDescriptor<ComponentDef> cmp = definitionService.getDefDescriptor(
                 "ui:treeNode", ComponentDef.class);
         assertFalse("Recursive components ie ui:treeNode should not cause stack overflow.",

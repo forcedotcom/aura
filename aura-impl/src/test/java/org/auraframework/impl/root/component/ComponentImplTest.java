@@ -88,9 +88,9 @@ public class ComponentImplTest extends AuraImplTestCase {
     public void testServerDependenceComponentSuperWithProviderOnly() throws Exception {
         Aura.getContextService().startContext(AuraContext.Mode.PROD, AuraContext.Format.HTML, AuraContext.Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> cmp = definitionService.getDefDescriptor(
-            "ui:pagerNextPrevious", ComponentDef.class);
+                "ui:pagerNextPrevious", ComponentDef.class);
         assertFalse("Component with super that has provider only should not have server dependencies",
-            cmp.getDef().hasLocalDependencies());
+                cmp.getDef().hasLocalDependencies());
     }
 
     public void testServerDependenceWithNestedServerDependentChild() throws Exception {

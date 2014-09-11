@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 ({
-	refresh: function(component, event, helper) {
-        var list = component.find("list");
-        list.get("e.refresh").fire();
-	},
+    refresh: function(component, event, helper) {
+    	var list = component.find("list");
+    	component.set("v.refreshCallBack", false);
+        list.getEvent('refresh').setParams({
+            parameters: {
+                callback: function() {
+                	component.set("v.refreshCallBack", true);
+                }
+            }
+        }).fire();
+    },
 
-	showMore: function(component, event, helper) {
-        var list = component.find("list");
-        list.get("e.showMore").fire();
-	}
+    showMore: function(component, event, helper) {
+    	var list = component.find("list");
+    	component.set("v.showMoreCallback", false);
+        list.getEvent('showMore').setParams({
+            parameters: {
+                callback: function() {
+                	component.set("v.showMoreCallback", true);
+                }
+            }
+        }).fire();
+    }
 })

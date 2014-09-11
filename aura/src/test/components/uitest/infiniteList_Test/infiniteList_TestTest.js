@@ -28,6 +28,22 @@
 	},
 	
 	/**
+	 * Test showMore invokes callBack
+	 * Test case:W-2294810
+	 */
+	testShowMoreInvokesCallback : {
+		test: [function(cmp) {
+			// waiting for intial items of list to load.
+			this.waitForItems(cmp, 25);
+		}, function(cmp) {
+			// more items should be fetched and displayed.
+			$A.test.assertFalse(cmp.get("v.showMoreCallback"),"callback for showMore should not be invoked");
+			this.pushButton(cmp, "btnShowMore", 50);
+	        $A.test.addWaitForWithFailureMessage(true, function(){return cmp.get("v.showMoreCallback");}, "callback should be invoked after pressing showMore");
+		}]
+	},
+	
+	/**
 	 * Test refresh list.
 	 */
 	testRefreshList : {
@@ -40,6 +56,25 @@
 		}, function(cmp) {
 			// clicking refresh bring list back to initial items.
 			this.pushButton(cmp, "btnRefresh", 25);
+		}]
+	},
+	
+	/**
+	 * Test refresh invokes callback.
+	 * Test case:W-2294810
+	 */
+	testRefreshListInvokesCallback : {
+		test: [function(cmp) {
+			// waiting for intial items of list to load.
+			this.waitForItems(cmp, 25);
+		}, function(cmp) {
+			// more items should be fetched and displayed.
+			this.pushButton(cmp, "btnShowMore", 50);
+		}, function(cmp) {
+			// clicking refresh bring list back to initial items.
+			$A.test.assertFalse(cmp.get("v.refreshCallBack"),"Callback for Refresh should not be invoked");
+	        this.pushButton(cmp, "btnRefresh", 25);
+	        $A.test.addWaitForWithFailureMessage(true, function(){return cmp.get("v.refreshCallBack");}, "callback should be invoked after pressing refresh");
 		}]
 	},
 	

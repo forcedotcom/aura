@@ -16,10 +16,11 @@
 
 -->
 <aura:component>
-
+		
 	<uiExamples:mobileViewport>
-		<ui:scroller>
-			<ui:infiniteList itemVar="item" enableRowSwipe="true">
+		<ui:scroller onPullToRefresh="{!c.handleRefresh}" onPullToShowMore="{!c.handleShowMore}">
+		
+			<ui:infiniteList aura:id="list" itemVar="item" enableRowSwipe="true">
 				
 				<aura:set attribute="itemTemplate">
 					<uiExamples:infiniteListRow item="{!item}"/>
@@ -30,6 +31,7 @@
 				</aura:set>
 
 			</ui:infiniteList>
+			
 		</ui:scroller>
 	</uiExamples:mobileViewport>
 

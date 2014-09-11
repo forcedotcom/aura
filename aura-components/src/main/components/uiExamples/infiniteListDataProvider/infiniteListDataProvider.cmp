@@ -16,5 +16,5 @@
 
 -->
 <aura:component extends="ui:dataProvider" model="js://uiExamples.infiniteListDataProvider">
-
+	<aura:handler name="provide" action="{!c.handleProvide}"/>
 </aura:component>

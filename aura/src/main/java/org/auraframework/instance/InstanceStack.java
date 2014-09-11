@@ -292,6 +292,44 @@ public class InstanceStack {
         }
     }
 
+    /**
+     * Internal routine to get a stack info frame.
+     */
+    private void addStackInfo(Entry e, List<String> info) {
+        StringBuffer sb = new StringBuffer();
+        if (e.instance != null) {
+            sb.append(e.instance.getDescriptor());
+            if (e.name != null) {
+                sb.append(".");
+                sb.append(e.name);
+                if (e.index != -1) {
+                    sb.append("[");
+                    sb.append(e.index);
+                    sb.append("]");
+                }
+            }
+        }
+        if (sb.length() > 0) {
+            info.add(sb.toString());
+        }
+    }
+
+    /**
+     * Get the current instance stack.
+     */
+    public List<String> getStackInfo() {
+        List<String> info = Lists.newArrayList();
+
+        if (current != null) {
+            addStackInfo(current, info);
+        }
+        if (stack != null) {
+            for (Entry e : stack) {
+                addStackInfo(e, info);
+            }
+        }
+        return info;
+    }
 
     private static class Entry {
         public final Instance<?> instance;

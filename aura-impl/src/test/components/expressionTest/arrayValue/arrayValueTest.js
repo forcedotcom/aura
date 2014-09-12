@@ -313,8 +313,9 @@
 
                 // Length expressions rerendered
                 var div = cmp.getElement();
+                var actualText = $A.util.getText(div);
                 $A.test.assertEquals("array.length=4, second.length=3.",
-                    div.innerText,"unexpected innerText");
+                    $A.util.trim(actualText), "unexpected text");
             }
         ]
     },

@@ -34,6 +34,7 @@ import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
+import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
@@ -43,8 +44,10 @@ import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.instance.Action.State;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.json.Json;
@@ -170,19 +173,18 @@ public class JavascriptParserTest extends AuraImplTestCase {
 
         serializeAndGoldFile(controller, "_JSControllerDef");
 
-        // 2.2: Should not be able to create an instance of the client action on
-        // the server side
+        // 2.2: Should be able to create an instance of the client action on
+        // the server side, but it's a pseudo action
         try {
             obj.createAction("newAction", new HashMap<String, Object>());
             fail("Should not be able to create an instance of the client action on the server side");
-        } catch (Exception e) {// Expect a file not found Exception
-            checkExceptionFull(e, UnsupportedOperationException.class,
-                    "cannot create an instance of a client action");
-
+        } catch (Exception e) {// Expect a definition not found Exception
+            checkExceptionFull(e, DefinitionNotFoundException.class,
+                    "No ACTION named js://test.testJSController/ACTION$newAction found");
         }
-        // catch (UnsupportedOperationException expected) {
-        // "cannot create an instance of a client action".equals(expected.getMessage());
-        // }
+        JavascriptPseudoAction action = (JavascriptPseudoAction) obj.createAction("functionName1", null);
+        assertEquals(State.ERROR, action.getState());
+
         // 2.3 Extract the action defs and verify each of them in Step 3
         // Get all the actions defined in the Javascript
         Map<String, JavascriptActionDef> controllerActions = obj

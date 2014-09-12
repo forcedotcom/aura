@@ -19,12 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
+import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
-
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
@@ -35,6 +37,43 @@ import com.google.common.collect.Lists;
 
 @Controller
 public class ComponentController {
+
+    /**
+     * A Java exception representing a <em>Javascript</em> error condition, as
+     * reported from client to server for forensic logging.
+     * 
+     * @since 194
+     */
+    public static class AuraClientException extends Exception {
+
+        private final Action action;
+        private final String jsStack;
+
+        public AuraClientException(String desc, String id, String message, String jsStack) {
+            super(message);
+            JavascriptPseudoAction action = null;
+            try {
+                action = (JavascriptPseudoAction) Aura.getInstanceService().getInstance(desc,
+                        ActionDef.class);
+                action.setId(id);
+                action.addError(this);
+            } catch (QuickFixException e) {
+                // Uh... okay, we fell over running an action we now can't even define.
+                action = null;
+            }
+            this.action = action;
+            this.jsStack = jsStack;
+        }
+
+        public Action getOriginalAction() {
+            return action;
+        }
+
+        public String getClientStack() {
+            return jsStack;
+        }
+
+    }
 
     @AuraEnabled
     public static Component getComponent(@Key(value = "name", loggable = true) String name, @Key("attributes") Map<String, Object> attributes)
@@ -52,6 +91,25 @@ public class ComponentController {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
         definitionService.updateLoaded(desc);
         return Aura.getInstanceService().getInstance(desc, attributes);
+    }
+
+    /**
+     * Called when the client-side code encounters a failed client-side action, to allow server-side
+     * record of the code error.
+     * 
+     * @param desc The name of the client action failing
+     * @param id The id of the client action failing
+     * @param error The javascript error message of the failure
+     * @param stack Not always available (it's browser dependent), but if present, a browser-dependent
+     *      string describing the Javascript stack for the error.  Some frames may be obfuscated,
+     *      anonymous, omitted after inlining, etc., but it may help diagnosis. 
+     */
+    @AuraEnabled
+    public static void reportFailedAction(@Key(value = "failedAction") String desc, @Key("failedId") String id,
+            @Key("clientError") String error, @Key("clientStack") String stack) {
+        // Error reporting (of errors in prior client-side actions) are handled specially
+        AuraClientException ace = new AuraClientException(desc, id, error, stack);
+        Aura.getExceptionAdapter().handleException(ace, ace.getOriginalAction());
     }
 
     @AuraEnabled

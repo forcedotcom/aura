@@ -56,7 +56,6 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
             Action instance = (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"),
                     ActionDef.class, params);
             instance.setId((String) map.get("id"));
-
             ret.add(instance);
         }
         return ret;

@@ -578,11 +578,24 @@ Test.Aura.Controller.ActionTest = function() {
             var expectedName = "expectedName";
             var expectedQualifiedName = "expectedQN";
             var expected = "Action failed: " + expectedQualifiedName + " -> " + expectedName;
+            var sentToServer = false;
+
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function(param) {
                 },
                 warning : function(msg) {
                     actual = msg;
+                },
+                get : function(actDesc) {
+                	return {
+                        setStorable: function() { },
+                        setAbortable: function() { },
+                        setParams: function() { },
+                        setCallback: function() { }
+                	};
+                },
+                clientService: {
+                	enqueueAction: function() { sentToServer = true; }
                 }
             });
             var cmp = {
@@ -601,18 +614,25 @@ Test.Aura.Controller.ActionTest = function() {
             var target = new Action();
             target.cmp = cmp;
             target.def = {
-                                getName : function() {
-                                        return expectedName;
-                                },
-                isClientAction : function() {
-                }
-                        };
+                    getDescriptor: function() {
+                        return { 
+                            getQualifiedName : function() {
+                                return expectedQualifiedName;
+                            }
+                        }
+                    },
+                    getName : function() {
+                        return expectedName;
+                    },
+                    isClientAction : function() { }
+                };
             var actual = null;
 
             // Act
             mockAssert(function() {
                 target.runDeprecated();
             })
+            Assert.Equal(true, sentToServer);
 
             // Assert
                         // FIXME: re-enable after client side creation fixed.
@@ -661,10 +681,24 @@ Test.Aura.Controller.ActionTest = function() {
         function SetsStateToFailureOnException() {
             // Arrange
             var expectedState = "FAILURE";
+            // We also use this test to check that reportFailure failures are NOT re-sent
+            var sentToServer = 0;
+
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function(param) {
                 },
                 warning : function() {
+                },
+                get : function(actDesc) {
+                	return {
+                        setStorable: function() { },
+                        setAbortable: function() { },
+                        setParams: function() { },
+                        setCallback: function() { }
+                	};
+                },
+                clientService: {
+                	enqueueAction: function() { sentToServer++; }
                 }
             });
             var cmp = {
@@ -682,11 +716,16 @@ Test.Aura.Controller.ActionTest = function() {
             var target = new Action();
             target.cmp = cmp;
             target.def = {
-                                getName : function() {
-                                },
-                isClientAction : function() {
-                }
-                        };
+                    getDescriptor: function() {
+                        return { 
+                            getQualifiedName : function() {
+                                return "aura://ComponentController.reportFailedAction";
+                            }
+                        }
+                    },
+                    getName : function() { },
+                    isClientAction : function() { }
+               };
 
             // Act
             mockAssert(function() {
@@ -695,6 +734,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.Equal(expectedState, target.state);
+            Assert.Equal(1, sentToServer);
         }
     }
 

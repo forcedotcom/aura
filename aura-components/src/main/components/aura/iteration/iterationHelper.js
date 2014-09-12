@@ -274,7 +274,6 @@
 				
 		this.resetItemTracking(cmp);
 		// Clean previous components before replacing the body
-		cmp.getValue('v.realBody').commit();
 		for (var n = 0; n < operations.length; n++) {
 			operations[n].run(cmp);
 		}

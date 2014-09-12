@@ -1,0 +1,81 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="A panel for modals">
+
+    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Add listener to close on click outside"/>
+    <aura:attribute name="closeAction" type="Aura.Action" default="{!c.hide}" description="Close Aura Action function"/>
+    <aura:attribute name="class" type="String" default="" description="Additional css classes"/>
+    <aura:attribute name="animation" type="String" default="bottom" description="Animation to apply"/>
+	<aura:attribute name="title" type="String" description="the title of the window"/>
+    <aura:attribute name="detail" type="String" description="the description of the window"/>
+    <aura:attribute name="icon" type="Aura.Component[]" description="the icon for the panel"/>
+    <aura:attribute name="isVisible" type="Boolean" default="false" description="Should show on render?"/>
+    <aura:attribute name="autoFocus" type="Boolean" default="true" description="Automatically focus on the first focusable element"/>
+    <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility"/>
+    <aura:attribute name="isScrollable" type="Boolean" default="true" description="Flag to create a scroller inside"/>
+    <aura:attribute name="isTransient" type="Boolean" default="true" description="Flag to indicate if modal is one-time use and should be destroyed when hidden"/>
+    
+    <!-- supported callbacks: onClose -->
+    <aura:attribute name="callbacks" type="Object" description="Option callbacks that can be set when creating a new panel through the panelManager." />
+    <aura:registerEvent name="panelDoneRendering" type="ui:panelDoneRendering"/>
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:dependency resource="markup://ui:panelTransitionBegin" type="EVENT" />
+    <aura:dependency resource="markup://ui:panelTransitionEnd" type="EVENT" />
+    <aura:dependency resource="markup://ui:updateSize" type="EVENT" />
+    
+	<div>
+		<!-- Full screen grey glass behind the modal -->
+	    <div aura:id='modal-glass' class="modal-glass" style="display:none"></div>
+	    
+	    <div aura:id='panel'
+             tabindex="-1"
+	     	 class="{! 'panel panelModal ' + $Browser.formFactor + ' ' + v.class}"
+         	 role="dialog" 
+             aria-labeled-by="{!'title_' + globalId}"
+	         style="display:none">
+	        <div role="document" class="{! v.body.length || v.detail ? 'headerAndBody' : 'headerOnly' }"> 
+                <span class="assistiveText">{!$Label.Global.startOfDialog}</span>
+
+    	       	<ui:header class="titleBar modalWindow">
+    	       	    {!v.icon}
+    	        	<aura:renderIf isTrue="{! v.title != '' &amp;&amp; v.title != null}">
+    	            	<div class="titles">
+    	            		<h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
+    	            	</div>
+    	            </aura:renderIf>
+    	        </ui:header>
+    	            
+    	        <div class="{! 'body actions scrollbox ' + ((v.body.length || v.detail) ? '' : 'hidden') }">
+    	    		<ui:scroller aura:id='scroller' scrollContentClass="panelScrollContent" bindEventsToScroller="true">
+	    	        	<aura:renderIf isTrue="{! v.detail != '' &amp;&amp; v.detail != null}">
+	    					<div class="detail">{!v.detail}</div>
+	    				</aura:renderIf>
+    	    			{!v.body}
+    	    		</ui:scroller>
+    	        </div>
+
+                <ui:button class="closeBtn" press="{!c.close}"
+                	label="{!$Label.Buttons.closeWindow}"
+                	buttonTitle="{!$Label.Buttons.closeWindow}"
+                	labelDisplay="false"
+                	>&times;</ui:button>
+            </div>
+	    </div>
+    </div>
+</aura:component>

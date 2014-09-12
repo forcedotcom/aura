@@ -299,53 +299,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return;
         }
 
-        // nested components with server dependencies makes me server dependent
-        for (AttributeDefRef adr : this.facets) {
-            if (areChildenServerDependent(adr)) {
-                localDeps = Boolean.TRUE;
-                return;
-            }
-        }
-
         if (localDeps == null) {
             localDeps = Boolean.FALSE;
         }
-    }
-
-    /**
-     * Loop through facets for components. If any has server dependencies then this component should as well
-     *
-     * @param adr attribute definition reference
-     * @return true if nested components has server dependencies
-     */
-    private boolean areChildenServerDependent(AttributeDefRef adr) throws QuickFixException {
-        Object facet = adr.getValue();
-        if (facet instanceof List && !((List) facet).isEmpty() && ((List) facet).get(0) instanceof ComponentDefRef) {
-            List<ComponentDefRef> body = (List<ComponentDefRef>) facet;
-            for (ComponentDefRef componentRef : body) {
-                if (this.getDescriptor().getQualifiedName().equals(componentRef.getDescriptor().getQualifiedName())) {
-                    // get out of recursive components
-                    // can safely return false at this point if the other criteria hasn't been met (model, renderers, etc)
-                    return false;
-                }
-                if (componentRef.getDescriptor().getDef().hasLocalDependencies()) {
-                    return true;
-                }
-                Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = componentRef.getAttributeValues();
-                if (attributes != null && !attributes.isEmpty()) {
-                    for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributes.entrySet()) {
-                        String attributeDescriptor = entry.getKey().getDescriptorName();
-                        if (attributeDescriptor.equals("body") || attributeDescriptor.equals("else")) {
-                            // body of nested components
-                            if (areChildenServerDependent(entry.getValue())) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
     }
     
     @SuppressWarnings("unchecked")

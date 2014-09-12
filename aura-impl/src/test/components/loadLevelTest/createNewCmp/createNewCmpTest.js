@@ -202,8 +202,9 @@
     /**
      * Verify creating a component that's available on the client, but has an inner comopnent with server-side
      * dependencies (in this case, a model).
+     * TODO: W-2365060
      */
-    testPreloadedDefWithNonPreloadedInnerCmp : {
+    _testPreloadedDefWithNonPreloadedInnerCmp : {
         test : function(cmp) {
             $A.run(function() {
                 $A.newCmpAsync(
@@ -296,7 +297,7 @@
             });
         }
     },
-    
+
     /**
      * Test to verify creating an invalid component returns proper error.
      * test:test_Preload_BadCmp has two attributes with the same name.
@@ -314,7 +315,7 @@
                         "test:test_Preload_BadCmp"
                 );
             });
- 
+
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
                 var errorMsg = errorCmp.get("v.value");
@@ -410,7 +411,7 @@
                         }
                 );
             });
-            
+
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var textCmp = cmp.get('v.body')[0];
                 $A.test.assertEquals("one,two", textCmp.get('v.StringArray').toString(), "Failed to pass array attribute values to placeholder");
@@ -418,7 +419,7 @@
             });
         }
     },
-    
+
     /**
      * Create a component that is abstract, which end up being replaced by an actual implementation.
      */
@@ -439,12 +440,12 @@
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var newCmp = cmp.get('v.body')[0];
                 var cmpImplName = newCmp.getDef().getDescriptor().getQualifiedName();
-                $A.test.assertEquals("markup://test:test_Provider_AbstractBasicExtends", cmpImplName, 
+                $A.test.assertEquals("markup://test:test_Provider_AbstractBasicExtends", cmpImplName,
                         "Abstract component replaced with incorrect implementation on creation");
             });
         }
     },
-    
+
     testCreateCmpNoDescriptor: {
         test:function(cmp){
             aura.test.setTestTimeout(15000);
@@ -459,7 +460,7 @@
             }
         }
     },
-    
+
     testNotFullyQualifiedNameInConfig: {
         test: function(cmp){
             aura.test.setTestTimeout(15000);
@@ -513,7 +514,7 @@
             }
         }
     },
-    
+
     testAlternateConfigFormat: {
         test: function(cmp){
             aura.test.setTestTimeout(15000);
@@ -593,7 +594,7 @@
                             componentDef: "markup://aura:text",
                             localId: "userLocalId",
                             attributes: {
-                                values: { 
+                                values: {
                                     truncate: 6,
                                     value:"TextComponent"
                                 }
@@ -649,8 +650,9 @@
     /**
      * Create a component with a provider which provides a component that contains an inner component with server
      * dependencies. Verify error message stating that it cannot provide a component with server deps
+     * TODO: W-2365060
      */
-    testCreateComponentNotOnClientWithClientProvider: {
+    _testCreateComponentNotOnClientWithClientProvider: {
         test: function(cmp) {
             try {
                 $A.newCmpAsync(

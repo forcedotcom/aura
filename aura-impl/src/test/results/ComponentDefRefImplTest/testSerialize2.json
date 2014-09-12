@@ -407,8 +407,7 @@ function(value) {
                         }
                       ]
                     }
-                  ],
-                  "hasServerDeps":true
+                  ]
                 }
               }
             },
@@ -467,8 +466,7 @@ function(value) {
             }
           ]
         }
-      ],
-      "hasServerDeps":true
+      ]
     }
   }
 }

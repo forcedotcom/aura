@@ -70,23 +70,18 @@ public final class WebDriverUtil {
     }
 
     public enum BrowserType {
-        FIREFOX(DesiredCapabilities.firefox(), null, Platform.ANY, ExtraCapability.DISABLE_NATIVE_EVENTS),
+        FIREFOX(DesiredCapabilities.firefox(), "29", ExtraCapability.DISABLE_NATIVE_EVENTS),
         IE11(DesiredCapabilities.internetExplorer(), "11", "Windows 8.1"),
-        IE10(DesiredCapabilities.internetExplorer(), "10", Platform.WIN8),
-        IE9(DesiredCapabilities.internetExplorer(), "9", Platform.VISTA),
+        IE10(DesiredCapabilities.internetExplorer(), "10", "Windows 2012"),
+        IE9(DesiredCapabilities.internetExplorer(), "9", "Windows 7"),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
         IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
-        GOOGLECHROME(DesiredCapabilities.chrome(), null, Platform.ANY),
-        SAFARI(DesiredCapabilities.safari(), "6", "OS X 10.8"),
-        SAFARI5(DesiredCapabilities.safari(), "5", "Mac"), // Not run in autobuilds
+        GOOGLECHROME(DesiredCapabilities.chrome(), "34", Platform.ANY),
+        SAFARI(DesiredCapabilities.safari(), "7", "OS X 10.9"),
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
-        IPHONE(DesiredCapabilities.iphone(), "6", "Mac 10.8"),
-        IPAD(DesiredCapabilities.ipad(), "6", "Mac 10.8"),
-        IPAD7(DesiredCapabilities.ipad(), "7.1", "OS X 10.9", ExtraCapability.PORTRAIT), // Not run in autobuilds
-        IPHONE7(DesiredCapabilities.iphone(), "7.1", "OS X 10.9", ExtraCapability.PORTRAIT), // Not run in autobuilds
-        IPAD_IOS_DRIVER(IOSCapabilities.ipad("Safari"), "7.1", "Mac 10.9", ExtraCapability.SIMULATOR_SCALE_IPAD),
-        IPHONE_IOS_DRIVER(IOSCapabilities.iphone("Safari"), "7.1", "Mac 10.9", ExtraCapability.SIMULATOR_SCALE_IPHONE); // Not run in autobuilds (yet)
+        IPAD(IOSCapabilities.ipad("Safari"), "7.1", "Mac 10.9", ExtraCapability.SIMULATOR_SCALE_IPAD),
+        IPHONE(IOSCapabilities.iphone("Safari"), "7.1", "Mac 10.9", ExtraCapability.SIMULATOR_SCALE_IPHONE);
 
         private final DesiredCapabilities capability;
         private final String version;

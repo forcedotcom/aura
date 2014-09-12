@@ -35,8 +35,7 @@ import org.openqa.selenium.WebElement;
  * UnAdaptable because issue with sfdc environments with sendkeys in iframes see W-1985839 and W-2009411
  */
 @UnAdaptableTest
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI5,
-        BrowserType.SAFARI })
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE7, BrowserType.SAFARI })
 public class ListSorterUITest extends WebDriverTestCase {
 
     public static final String APP = "/uitest/listSorter_Test.cmp";

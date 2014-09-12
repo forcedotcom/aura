@@ -26,7 +26,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.Provider;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -50,15 +49,15 @@ import com.google.common.collect.Maps;
 
 public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
-	//defaultStubCmp : act as a container inject other components into, async is FALSE
+    // defaultStubCmp : act as a container inject other components into, async is FALSE
     DefDescriptor<ComponentDef> defaultStubCmp;
-    //use as id for cssSelector, where we put the injected component
+    // use as id for cssSelector, where we put the injected component
     String defaultPlaceholderID = "placeholder";
-    //aura id of injected component
+    // aura id of injected component
     String defaultLocalId = "injectedComponent";
 
     AuraTestingMarkupUtil tmu;
-    
+
     public IntegrationServiceImplUITest(String name) {
         super(name);
     }
@@ -79,48 +78,51 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Controller.
      */
     // Click is unsupported in these touch based platforms
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testSimpleComponentWithModelAndController() throws Exception {
-    	verifySimpleComponentWithModelControllerHelperandProvider(defaultStubCmp);
+        verifySimpleComponentWithModelControllerHelperandProvider(defaultStubCmp);
     }
 
     /**
      * Verify using IntegrationService to inject a simple component with a Java model, Javascript Controller and Java
      * Controller. (ASYNC)
      */
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, })
     public void testSimpleComponentWithModelAndControllerAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
-            ComponentDef.class,
-            getIntegrationStubMarkup("java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
-                true, true, true, true)
-        );
+                ComponentDef.class,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
+                        true, true, true, true)
+                );
 
         verifySimpleComponentWithModelControllerHelperandProvider(stub);
     }
-    
+
     private String getMarkupOfExistingComponnet(DefDescriptor<? extends Definition> defDescriptor) {
-    	String markup="";
-		StringSource<?> source = (StringSource<?>) getSource(defDescriptor);
-		if(source!=null)
-		{
-			markup = source.getContents();
-		}
-		return markup;
+        String markup = "";
+        StringSource<?> source = (StringSource<?>) getSource(defDescriptor);
+        if (source != null)
+        {
+            markup = source.getContents();
+        }
+        return markup;
     }
-    
+
     /*
      * this test is under construction .....
      */
     public void _testExistingComponent() {
-    	DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService()
+        Aura.getDefinitionService()
                 .getDefDescriptor("markup://ifTest:testIf", ComponentDef.class);
-    	DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("markup://ifTest:testIf", ComponentDef.class);
-    	String cmpMarkup = getMarkupOfExistingComponnet(descriptor);
-    	System.out.println("cmpMarkup:"+cmpMarkup);
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("markup://ifTest:testIf",
+                ComponentDef.class);
+        String cmpMarkup = getMarkupOfExistingComponnet(descriptor);
+        System.out.println("cmpMarkup:" + cmpMarkup);
     }
 
-    private void verifySimpleComponentWithModelControllerHelperandProvider(DefDescriptor<ComponentDef> stub) throws Exception {
+    private void verifySimpleComponentWithModelControllerHelperandProvider(DefDescriptor<ComponentDef> stub)
+            throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelControllerHelperAndProvider();
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttribute", "Oranges");
@@ -135,7 +137,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         WebElement modelValue = findDomElement(By.cssSelector("div.dataFromModel"));
         assertEquals("Failed to initilize attribute value of injected component", "firstThingDefault",
                 modelValue.getText());
-       
+
         WebElement button = findDomElement(By.cssSelector("button.uiButton"));
         button.click();
         auraUITestingUtil.waitForElementText(By.cssSelector("div.dataFromController"), "TestController", true);
@@ -145,53 +147,51 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 "return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
         assertEquals(cmpToInject.toString(),
                 (String) auraUITestingUtil.getEval(String.format(
-                        "return window.$A.getRoot().find('%s').getDef().getDescriptor().toString()", defaultLocalId))
-        );
-        
-        WebElement valueFromJsProvider = findDomElement(By.cssSelector("div.dataFromJSProvider"));
-        assertEquals("Failed to see data from model of injected component", 
-        		"ValueFromJsProvider[ValueFromHelper]", valueFromJsProvider.getText());
-        
-        WebElement valueFromJavaProvider = findDomElement(By.cssSelector("div.dataFromJavaProvider"));
-        assertEquals("Failed to see data from model of injected component", 
-        		"valueFromJavaProvider", valueFromJavaProvider.getText());
+                        "return window.$A.getRoot().find('%s').getDef().getDescriptor().toString()", defaultLocalId)));
 
+        WebElement valueFromJsProvider = findDomElement(By.cssSelector("div.dataFromJSProvider"));
+        assertEquals("Failed to see data from model of injected component",
+                "ValueFromJsProvider[ValueFromHelper]", valueFromJsProvider.getText());
+
+        WebElement valueFromJavaProvider = findDomElement(By.cssSelector("div.dataFromJavaProvider"));
+        assertEquals("Failed to see data from model of injected component",
+                "valueFromJavaProvider", valueFromJavaProvider.getText());
     }
 
     /*
-     * this creates simple component with helper, JS controller, JS provider , Java provider and Java model
-     * in the helper we have function return a string (returnAString)
-     * in the JS provider, we set attribute(valueFromJSProvider) with the string we get from helper
-     * in the Java provider, we set attribute(valueFromJavaProvider)
-     * in the JS controller, we handler click event , push text component to the body each it clicks
+     * this creates simple component with helper, JS controller, JS provider , Java provider and Java model in the
+     * helper we have function return a string (returnAString) in the JS provider, we set attribute(valueFromJSProvider)
+     * with the string we get from helper in the Java provider, we set attribute(valueFromJavaProvider) in the JS
+     * controller, we handler click event , push text component to the body each it clicks
      */
     private DefDescriptor<ComponentDef> setupSimpleComponentWithModelControllerHelperAndProvider() {
-    	DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class);
-    	DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
+        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
-    	DefDescriptor<ProviderDef> jsProviderdesc = Aura.getDefinitionService()
+        DefDescriptor<ProviderDef> jsProviderdesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
-    	DefDescriptor<HelperDef> jsHelperdesc = Aura.getDefinitionService()
-                .getDefDescriptor(cmpDesc,  DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class);
-    	//fill in component to be injected 
+        DefDescriptor<HelperDef> jsHelperdesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class);
+        // fill in component to be injected
         String jsProviderName = jsProviderdesc.getQualifiedName();
         String systemAttributes = "model='java://org.auraframework.impl.java.model.TestModel' "
                 + "controller='java://org.auraframework.impl.java.controller.TestController' "
-        		+ "provider='"+jsProviderName+",java://org.auraframework.impl.java.provider.TestComponnetConfigProviderAIS' ";
+                + "provider='" + jsProviderName
+                + ",java://org.auraframework.impl.java.provider.TestComponnetConfigProviderAIS' ";
         String bodyMarkup = "<aura:attribute name='strAttribute' type='String' default='Apple'/> "
-        		+ "<aura:attribute name='valueFromJSProvider' type='String' default='Empty'/> "
-        		+ "<aura:attribute name='valueFromJavaProvider' type='String' default='Empty'/> "
+                + "<aura:attribute name='valueFromJSProvider' type='String' default='Empty'/> "
+                + "<aura:attribute name='valueFromJavaProvider' type='String' default='Empty'/> "
                 + "<ui:button label='clickMe' press='{!c.handleClick}'/>"
                 + "<div class='wrapper'>"
                 + "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.strAttribute}</div> "
                 + "<div class='dataFromModel' aura:id='dataFromModel'>{!m.firstThing}</div> "
-                + "<div class='dataFromController' aura:id='dataFromController'></div>" 
+                + "<div class='dataFromController' aura:id='dataFromController'></div>"
                 + "<div class='dataFromJSProvider' aura:id='dataFromJSProvider'>{!v.valueFromJSProvider}</div>"
                 + "<div class='dataFromJavaProvider' aura:id='dataFromJavaProvider'>{!v.valueFromJavaProvider}</div>"
                 + "</div>";
-        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, systemAttributes,bodyMarkup));
-    	//fill in js controller
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, systemAttributes, bodyMarkup));
+        // fill in js controller
         addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){"
                 + "var valueFromHelper = cmp.getDef().getHelper().returnAString();"
                 + "var a = cmp.get('c.getString');"
@@ -200,33 +200,31 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 + "this, function(newCmp){cmp.find('dataFromController').getValue('v.body').push(newCmp);},"
                 + "{componentDef: 'markup://aura:text', attributes:{ values:{ value: a.getReturnValue() }}}"
                 + ")}); $A.enqueueAction(a);}}");
-        //fill in js provider
-        addSourceAutoCleanup(jsProviderdesc, 
-          "{"+"provide : function AisToInjectProvider(component) {"+
-		        "var valueFromHelper = component.getDef().getHelper().returnAString();" +
-		        "var returnvalue = 'ValueFromJsProvider['+valueFromHelper+']';" +
-		        "return {" +
-		            "attributes: {" +
-		                "'valueFromJSProvider': returnvalue" +
-		            "}" +
-		        "};" +
-		    "}" 
-		  +"}"
-        );
-        //fill in helper
+        // fill in js provider
+        addSourceAutoCleanup(jsProviderdesc,
+                "{" + "provide : function AisToInjectProvider(component) {" +
+                        "var valueFromHelper = component.getDef().getHelper().returnAString();" +
+                        "var returnvalue = 'ValueFromJsProvider['+valueFromHelper+']';" +
+                        "return {" +
+                        "attributes: {" +
+                        "'valueFromJSProvider': returnvalue" +
+                        "}" +
+                        "};" +
+                        "}"
+                        + "}");
+        // fill in helper
         addSourceAutoCleanup(jsHelperdesc,
-	        "{" + "returnAString: function() {" +
-	        			"return 'ValueFromHelper';" +
-	                "}"
-	        +"}"
-        );
-        
+                "{" + "returnAString: function() {" +
+                        "return 'ValueFromHelper';" +
+                        "}"
+                        + "}");
+
         return cmpDesc;
     }
 
     /**
-     * Verify use of integration service to inject a component and initialize various types of attributes.
-     * Disabled in chrome because only this test fails with chromedriver 2.9 with a
+     * Verify use of integration service to inject a component and initialize various types of attributes. Disabled in
+     * chrome because only this test fails with chromedriver 2.9 with a
      * "unknown error: Maximum call stack size exceeded" exception. It works fine in firefox, IE9.
      * https://code.google.com/p/chromedriver/issues/detail?id=887
      */
@@ -248,20 +246,20 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
                         true, true, true, true)
-        );
+                );
 
         verifyAttributesInitialization(stub);
     }
 
     private void verifyAttributesInitialization(DefDescriptor<ComponentDef> stub) throws Exception {
         String attributeMarkup = tmu.getCommonAttributeMarkup(true, true, true, false)
-        		+tmu.getCommonAttributeListMarkup(true, true, false, false, false);
-        String attributeWithDefaultsMarkup = 
-        		tmu.getCommonAttributeWithDefaultMarkup(true, true, true, false, 
-        				"'Apple'", "'true'", "'Banana'", "") +
-        		tmu.getCommonAttributeListWithDefaultMarkup(true, true, false, false, false,
-        				"'Apple,Orange'", "'Melon,Berry,Grapes'", "","","");
-        
+                + tmu.getCommonAttributeListMarkup(true, true, false, false, false);
+        String attributeWithDefaultsMarkup =
+                tmu.getCommonAttributeWithDefaultMarkup(true, true, true, false,
+                        "'Apple'", "'true'", "'Banana'", "") +
+                        tmu.getCommonAttributeListWithDefaultMarkup(true, true, false, false, false,
+                                "'Apple,Orange'", "'Melon,Berry,Grapes'", "", "", "");
+
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
@@ -304,22 +302,20 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "stringListDefault")));
 
     }
-    
-    
+
     /**
-     * Verify we can fire custom event from injected component, then handle it in top application level
-     * Note in RendererWithExtendedApp, we are not using the aura:integrationServiceApp, instead we are using its extension
-     * (ASYNC)
-     * Click is unsupported in these touch based platforms
+     * Verify we can fire custom event from injected component, then handle it in top application level Note in
+     * RendererWithExtendedApp, we are not using the aura:integrationServiceApp, instead we are using its extension
+     * (ASYNC) Click is unsupported in these touch based platforms
      */
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testExtendedAppWithRegisteredEventsAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererWithExtendedApp",
                         true, true, true, true)
-        );
+                );
         verifyComponentWithRegisteredEvents(stub, true);
     }
 
@@ -327,14 +323,14 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify use of integration service to inject a component and initialize events with javascript function handlers.
      */
     // Click is unsupported in these touch based platforms
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentWithRegisteredEvents() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
                         true, true, true)
-        );
+                );
         verifyComponentWithRegisteredEvents(stub, false);
     }
 
@@ -342,32 +338,33 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify use of integration service to inject a component and initialize events with javascript function handlers.
      * (ASYNC)
      */
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentWithRegisteredEventsAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
                         true, true, true, true)
-        );
+                );
         verifyComponentWithRegisteredEvents(stub, false);
     }
 
     /*
-     * this function create component to inject, it registers three custom events(two component one application), 
-     * fire them in its controller.
-     * for container component to catch these events, one needs to add key->value pair(eventName-->handlerFunctionName),
-     * then in container's markup, find a way to inject the hander functions within <script>...</script>
+     * this function create component to inject, it registers three custom events(two component one application), fire
+     * them in its controller. for container component to catch these events, one needs to add key->value
+     * pair(eventName-->handlerFunctionName), then in container's markup, find a way to inject the hander functions
+     * within <script>...</script>
      */
-    private void verifyComponentWithRegisteredEvents(DefDescriptor<ComponentDef> stub, boolean checkAppEvt) throws Exception {
-    	//create injected component with custom events.
+    private void verifyComponentWithRegisteredEvents(DefDescriptor<ComponentDef> stub, boolean checkAppEvt)
+            throws Exception {
+        // create injected component with custom events.
         String bodyMarkup = "<aura:attribute name='attr' type='String' default='Oranges'/> "
                 + "<aura:registerevent name='press' type='ui:press'/>" +
                 "<aura:registerevent name='change' type='ui:change'/>" +
-                "<aura:registerevent name='appEvtFromInjectedCmp' type='handleEventTest:applicationEvent'/>"+
+                "<aura:registerevent name='appEvtFromInjectedCmp' type='handleEventTest:applicationEvent'/>" +
                 "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.attr}</div>" +
                 "<div class='click_t' onclick='{!c.clickHndlr}'>Click Me</div>" +
-                "<input class='change_t' onchange='{!c.changeHndlr}' type='text'/>"+
+                "<input class='change_t' onchange='{!c.changeHndlr}' type='text'/>" +
                 "<div class='click2_t' onclick='{!c.click2Hndlr}'>Click Me2</div>" +
                 "<div class='click3_t' onclick='{!c.click3Hndlr}'>Click Me3</div>";
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
@@ -377,17 +374,20 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                         String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpToInject.getNamespace(),
                                 cmpToInject.getName()), ControllerDef.class
                 );
-        //create controller to fire events
+        // create controller to fire events
         addSourceAutoCleanup(
                 jsControllerdesc,
-                "{" +
-                "   clickHndlr: function(cmp, evt){var e = cmp.getEvent('press');e.setParams({'domEvent': evt});e.fire();}," +
-                "   changeHndlr: function(cmp, evt){var e = cmp.getEvent('change');e.fire();}," +
-                "   click2Hndlr: function(cmp, evt){var e = cmp.getEvent('appEvtFromInjectedCmp'); e.fire();}," +
-                "   click3Hndlr: function(cmp, evt){var e = $A.getEvt('handleEventTest:applicationEvent'); e.setParams({'strAttr': 'event fired from click3Hndlr'}); e.fire();}" 
-                + "}"
-        );
-        //associate custom event name to handler function name using attribute map
+                "{"
+                        +
+                        "   clickHndlr: function(cmp, evt){var e = cmp.getEvent('press');e.setParams({'domEvent': evt});e.fire();},"
+                        +
+                        "   changeHndlr: function(cmp, evt){var e = cmp.getEvent('change');e.fire();},"
+                        +
+                        "   click2Hndlr: function(cmp, evt){var e = cmp.getEvent('appEvtFromInjectedCmp'); e.fire();},"
+                        +
+                        "   click3Hndlr: function(cmp, evt){var e = $A.getEvt('handleEventTest:applicationEvent'); e.setParams({'strAttr': 'event fired from click3Hndlr'}); e.fire();}"
+                        + "}");
+        // associate custom event name to handler function name using attribute map
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("attr", "Apples");
         attributes.put("press", "clickHandler__t");
@@ -399,11 +399,11 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         WebElement attrValue = findDomElement(By.cssSelector("div.dataFromAttribute"));
         assertEquals("Failed to see data from model of injected component", "Apples", attrValue.getText());
 
-        //component event 1
+        // component event 1
         WebElement clickNode = findDomElement(By.cssSelector("div.click_t"));
         clickNode.click();
-        assertTrue("expect _clickHandlerCalled to be true", 
-        		auraUITestingUtil.getBooleanEval("return document._clickHandlerCalled"));
+        assertTrue("expect _clickHandlerCalled to be true",
+                auraUITestingUtil.getBooleanEval("return document._clickHandlerCalled"));
         assertEquals("press", auraUITestingUtil.getEval("return document.__clickEvent.getName()"));
 
         WebElement textNode = findDomElement(By.cssSelector("input.change_t"));
@@ -412,25 +412,25 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         waitForCondition("return !!document._changeHandlerCalled");
         assertEquals("Custom JS Code", auraUITestingUtil.getEval("return document._changeHandlerCalled"));
         assertEquals("change", auraUITestingUtil.getEval("return document.__changeEvent.getName()"));
-        
-        //component event 2
+
+        // component event 2
         WebElement clickNode2 = findDomElement(By.cssSelector("div.click2_t"));
         clickNode2.click();
-        assertTrue("clickHandler2Called should be true after container cmp handle the evt from injected cmp", 
-        		auraUITestingUtil.getBooleanEval("return document._click2HandlerCalled"));
+        assertTrue("clickHandler2Called should be true after container cmp handle the evt from injected cmp",
+                auraUITestingUtil.getBooleanEval("return document._click2HandlerCalled"));
         assertEquals("didn't get expect event name from Click Me2",
-        		"appEvtFromInjectedCmp", 
-        		auraUITestingUtil.getEval("return document.__click2Event.getName()"));
-        
-        //application event
-        if(checkAppEvt) {
-	        WebElement clickNode3 = findDomElement(By.cssSelector("div.click3_t"));
-	        clickNode3.click();
-	        assertTrue("clickHandler3Called should be true after container cmp handle the evt from injected cmp", 
-	        		auraUITestingUtil.getBooleanEval("return document._click3HandlerCalled"));
-	        assertEquals("didn't get expect event param from Click Me3",
-	        		"event fired from click3Hndlr", 
-	        		auraUITestingUtil.getEval("return document.__click3EventParam"));
+                "appEvtFromInjectedCmp",
+                auraUITestingUtil.getEval("return document.__click2Event.getName()"));
+
+        // application event
+        if (checkAppEvt) {
+            WebElement clickNode3 = findDomElement(By.cssSelector("div.click3_t"));
+            clickNode3.click();
+            assertTrue("clickHandler3Called should be true after container cmp handle the evt from injected cmp",
+                    auraUITestingUtil.getBooleanEval("return document._click3HandlerCalled"));
+            assertEquals("didn't get expect event param from Click Me3",
+                    "event fired from click3Hndlr",
+                    auraUITestingUtil.getEval("return document.__click3EventParam"));
         }
 
     }
@@ -486,7 +486,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder",
                         true, true, true)
-        );
+                );
         verifyMissingPlaceholder(stub);
     }
 
@@ -499,7 +499,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder",
                         true, true, true, true)
-        );
+                );
         verifyMissingPlaceholder(stub);
     }
 
@@ -508,7 +508,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 String.format(AuraImplTestCase.baseComponentTag, "", ""));
 
         String badPlaceholder = "fooBared";
-        String expectedErrorMessage = String.format("Invalid locatorDomId specified - no element found in the DOM with id=%s", badPlaceholder);
+        String expectedErrorMessage = String.format(
+                "Invalid locatorDomId specified - no element found in the DOM with id=%s", badPlaceholder);
 
         openIntegrationStub(stub, cmpToInject, null, badPlaceholder);
 
@@ -527,7 +528,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpWithNullLocalId",
                         true, true, false)
-        );
+                );
 
         verifyMissingLocalId(stub);
     }
@@ -541,7 +542,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpWithNullLocalId",
                         true, true, false, true)
-        );
+                );
 
         verifyMissingLocalId(stub);
     }
@@ -567,7 +568,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
                         true, true, true)
-        );
+                );
         verifyExceptionDuringComponentInitialization(stub);
     }
 
@@ -580,7 +581,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getIntegrationStubMarkup(
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
                         true, true, true, true)
-        );
+                );
         verifyExceptionDuringComponentInitialization(stub);
     }
 
@@ -713,7 +714,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     private String getIntegrationStubMarkup(String javaRenderer, Boolean attributeMap, Boolean placeHolder,
-                                            Boolean localId) {
+            Boolean localId) {
         return this.getIntegrationStubMarkup(javaRenderer, attributeMap, placeHolder, localId, false);
     }
 
@@ -741,7 +742,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * component using webdriver.
      */
     private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,
-                                     Map<String, Object> attributeMap, String placeholder)
+            Map<String, Object> attributeMap, String placeholder)
             throws MalformedURLException, URISyntaxException {
         String url = String.format("/%s/%s.cmp", stub.getNamespace(), stub.getName());
         url = url + "?desc=" + String.format("%s:%s", toInject.getNamespace(), toInject.getName());

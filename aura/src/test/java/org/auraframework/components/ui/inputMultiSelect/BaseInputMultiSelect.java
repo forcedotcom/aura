@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 // TODO(W-2233222): ios-driver cannot select or deselect options from ui:inputSelect options
-@ExcludeBrowsers({ BrowserType.IPAD_IOS_DRIVER, BrowserType.IPHONE_IOS_DRIVER, BrowserType.IPHONE, BrowserType.IPAD })
+@ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD })
 public class BaseInputMultiSelect extends WebDriverTestCase {
     private final String URL;
     private final By outputLocator = By.xpath("//span[@class='uiOutputText']");

@@ -22,12 +22,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
- * Excluding mobile browsers because they have readOnly text fields. 
- * Excluding Safari because it does not acknowledge that a value was placed in the inputText box. It works manually though.
+ * Excluding mobile browsers because they have readOnly text fields. Excluding Safari because it does not acknowledge
+ * that a value was placed in the inputText box. It works manually though.
+ * 
  * @author mkohanfars
- *
+ * 
  */
-@ExcludeBrowsers({BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI,BrowserType.SAFARI5})
+@ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
+        BrowserType.SAFARI })
 public class DatePickerManagerUITest extends WebDriverTestCase {
 
     // URL string to go to
@@ -41,36 +43,40 @@ public class DatePickerManagerUITest extends WebDriverTestCase {
         super(name);
 
     }
+
     /**
-     * This test is checking for instances where an inputDateTrigger does not have a value attribute set, 
-     * and that it still opens to the correct value 
+     * This test is checking for instances where an inputDateTrigger does not have a value attribute set, and that it
+     * still opens to the correct value
+     * 
      * @throws Exception
      */
-   
-    public void testDatepickerOpensToCorrectValue () throws Exception {
+
+    public void testDatepickerOpensToCorrectValue() throws Exception {
         open(URL);
         // Test Begins
         // Making sure the textBox is empty so we always start at the same date
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.clear();
         element.sendKeys(TEST_DATE_TO_USE);
-        
-        //Reopening the calendar and Grabbing date directly above it, clicking on it, then verifying that it is the correct date.
+
+        // Reopening the calendar and Grabbing date directly above it, clicking on it, then verifying that it is the
+        // correct date.
         openAndCheckDate(By.linkText("8"), "04/08/2013");
-              
+
     }
-    
-    private void openAndCheckDate(By loc, String date){
-     // Grabbing the Date Icon and click on it to open the calendar
+
+    private void openAndCheckDate(By loc, String date) {
+        // Grabbing the Date Icon and click on it to open the calendar
         WebElement element = findDomElement(By.xpath(DATE_ICON_SEL));
         element.click();
-        
-        //Grabbing the date that the datePicker opened to. Then verifying that it is correct
+
+        // Grabbing the date that the datePicker opened to. Then verifying that it is correct
         element = findDomElement(loc);
         element.click();
-        
+
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        assertEquals("The date selected and the date in the inputText box do not match", date, element.getAttribute("value"));
-        
+        assertEquals("The date selected and the date in the inputText box do not match", date,
+                element.getAttribute("value"));
+
     }
 }

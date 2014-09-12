@@ -67,8 +67,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      * 
      * @throws Exception
      */
-    // W-2364120
-    public void _testRerenderMarksHaveAllComponentNames() throws Exception {
+    public void testRerenderMarksHaveAllComponentNames() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
         open("/performanceTest/perfApp.app", Mode.CADENCE);
         clearUIPerfStats();
@@ -87,8 +86,11 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         // components
         WebElement innerButton = getDriver().findElement(By.cssSelector("button[class~='changeIteratonIndex']"));
         innerButton.click();
+        waitForElementDisappear("Iteration never rerendered after end index changed.",
+                By.xpath("//div[@class='performanceTestIterateBasicData']/table/tr[11]"));
+        // Changing iteration end index only rerenders iterations with number of items greater than new end index
         logStats.putAll(getUIPerfStats(Lists
-                .newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration','markup://aura:iteration']")));
+                .newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration']")));
         assertFalse("Multiple component Rerender should be marked with all componentNames.",
                 logStats.isEmpty());
         logStats.clear();

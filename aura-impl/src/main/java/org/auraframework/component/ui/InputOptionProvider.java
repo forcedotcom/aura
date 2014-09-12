@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -36,8 +37,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * @since Touch.174.3
  */
 @Provider
-public class InputOptionProvider {
-    public static ComponentConfig provide() throws QuickFixException {
+public class InputOptionProvider implements ComponentConfigProvider {
+    @Override
+    public ComponentConfig provide() throws QuickFixException {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         AttributeSet attributes = component.getAttributes();
         ComponentConfig componentConfig = new ComponentConfig();

@@ -17,14 +17,16 @@ package org.auraframework.docs;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @Provider
-public class DemoPanelProvider {
-    public static DefDescriptor<ComponentDef> provide() throws QuickFixException {
+public class DemoPanelProvider implements ComponentDescriptorProvider {
+    @Override
+    public DefDescriptor<ComponentDef> provide() throws QuickFixException {
         BaseComponent<?, ?> c = Aura.getContextService().getCurrentContext().getCurrentComponent();
         String demo = (String)c.getAttributes().getValue("demo");
         if (demo != null) {

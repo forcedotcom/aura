@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
 
 @Provider
 public class TestComponnetConfigProviderAIS implements ComponentConfigProvider {
-	@Override
+    @Override
     public ComponentConfig provide() {
         ComponentConfig config = new ComponentConfig();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);

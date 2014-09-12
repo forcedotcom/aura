@@ -17,14 +17,16 @@ package org.auraframework.impl.java.provider;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.Provider;
 
 @Provider
-public class TestProvideInterfaceCyclic {
-    public static DefDescriptor<ComponentDef> provide() {
+public class TestProvideInterfaceCyclic implements ComponentDescriptorProvider {
+    @Override
+    public DefDescriptor<ComponentDef> provide() {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         String cycle = (String) component.getAttributes().getExpression("cycle");
 

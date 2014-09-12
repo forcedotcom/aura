@@ -97,23 +97,25 @@ public class IntegrationImpl implements Integration {
             Map<String, String> actionEventHandlers = Maps.newHashMap();
 
             ComponentDef componentDef = descriptor.getDef();
-            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-                String key = entry.getKey();
-
-                AttributeDef attributeDef = componentDef.getAttributeDef(key);
-                if (attributeDef != null) {
-                    String name = attributeDef.getName();
-                    actionAttributes.put(name, entry.getValue());
-                } else {
-                    RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
-                    if (eventDef != null) {
-                        // Emit component.addHandler() wired to special global scope value provider
-                        String name = eventDef.getAttributeName();
-                        actionEventHandlers.put(name, (String) entry.getValue());
-                    } else {
-                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
-                    }
-                }
+            if(attributes!=null) {
+	            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+	                String key = entry.getKey();
+	
+	                AttributeDef attributeDef = componentDef.getAttributeDef(key);
+	                if (attributeDef != null) {
+	                    String name = attributeDef.getName();
+	                    actionAttributes.put(name, entry.getValue());
+	                } else {
+	                    RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
+	                    if (eventDef != null) {
+	                        // Emit component.addHandler() wired to special global scope value provider
+	                        String name = eventDef.getAttributeName();
+	                        actionEventHandlers.put(name, (String) entry.getValue());
+	                    } else {
+	                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
+	                    }
+	                }
+	            }
             }
 
             try {

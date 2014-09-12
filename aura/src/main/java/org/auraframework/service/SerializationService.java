@@ -21,6 +21,9 @@ import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
 
+import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**

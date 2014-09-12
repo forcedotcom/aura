@@ -52,10 +52,7 @@ public class SerializationServiceImpl implements SerializationService {
 
     @Override
     public <T> Collection<T> readCollection(Reader in, Class<T> type) throws IOException, QuickFixException {
-
-        Aura.getContextService().assertEstablished();
-
-        return getFormatAdapter(type).readCollection(in);
+        return readCollection(in, type, null);
     }
 
     @Override
@@ -130,11 +127,14 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     private <T> FormatAdapter<T> getFormatAdapter(Class<T> type) throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        return getFormatAdapter(context.getFormat().name(), type);
+        return getFormatAdapter(null, type);
     }
 
     private <T> FormatAdapter<T> getFormatAdapter(String format, Class<T> type) throws QuickFixException {
+        if (format == null) {
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            format = context.getFormat().name();    
+        }
         FormatAdapter<T> ret = AuraImpl.getFormatAdapter(format, type);
         if (ret == null) {
             throw new AuraRuntimeException(String.format("No FormatAdapter found for '%s' in '%s' Format",

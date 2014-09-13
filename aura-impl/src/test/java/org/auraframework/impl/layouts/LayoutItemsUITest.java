@@ -16,6 +16,7 @@
 package org.auraframework.impl.layouts;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 
 /**
@@ -33,6 +34,8 @@ public class LayoutItemsUITest extends WebDriverTestCase {
      * Verify that navigating forward and backward works when underlying LayoutsDef has multiple layoutitems per layout.
      * Automation for W-954182
      */
+    // TODO(W-2375142): Default layouts not properly loaded when navigating for page to first time in IE10 and 11.
+    @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
         By forwardButton = By.cssSelector(".Forward_Button");
         By backButton = By.cssSelector(".Back_Button");

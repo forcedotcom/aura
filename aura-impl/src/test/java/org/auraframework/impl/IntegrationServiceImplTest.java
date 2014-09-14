@@ -240,6 +240,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * Verify initializing attributes and event handlers during component
      * injection.
      * @throws QuickFixException 
+     * W-2370679: this test pass, but adding handler function like this doesn't work.
      */
     public void testAttributesAndEvents() throws QuickFixException {
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
@@ -252,7 +253,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttr", "");
         attributes.put("booleanAttr", false);
-        //this test pass, but this handler doesn't work.
+        
         attributes.put("press", "function(e){alert('press')}");
         attributes.put("mouseout", "function(e){alert('mouseout')}");
 

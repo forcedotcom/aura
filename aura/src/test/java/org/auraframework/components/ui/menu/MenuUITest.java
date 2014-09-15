@@ -41,6 +41,7 @@ public class MenuUITest extends WebDriverTestCase {
     public static final String MENUTEST_APP = "/uitest/menu_Test.app";
     public static final String MENUTEST_ATTACHTOBODY_APP = "/uitest/menu_AttachToBodyTest.app";
     public static final String MENUTEST_METADATA_APP = "/uitest/menu_MetadataTest.app";
+    public static final String MENUTEST_EVENTBUBBLING_APP = "/uitest/menu_EventBubbling.app";
 
     public MenuUITest(String name) {
         super(name);
@@ -504,5 +505,50 @@ public class MenuUITest extends WebDriverTestCase {
         // verify focus on actionItem2
         assertEquals("Focus should be on actionItem 2", actionItem2Element.getText(),
                 auraUITestingUtil.getActiveElementText());
+    }
+    
+    /**
+     * Test case to allow bubbling of event with menu
+     * Bug: W-2368359
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public void testStopClickPropogoationByDefault() throws MalformedURLException, URISyntaxException{
+    	open(MENUTEST_EVENTBUBBLING_APP);
+    	WebDriver driver = this.getDriver();
+    	String label = "trigger";
+        String menuName = "actionMenu";
+        WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
+        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.eventBubbled");
+        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
+        assertNull("Event should not bubble up to parent div", auraUITestingUtil.getEval(valueExpression));
+        // click on menu list
+        menuLabel.click();
+        // check menu list is visible after the click
+        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        assertTrue("Event should get bubble up to parent div", auraUITestingUtil.getBooleanEval(valueExpression));
+    }
+    
+    /*
+     * Test case to Stop bubbling of event when StopClickPropogoation attribute is set
+     * Bug: W-2368359
+     */
+    public void testStopClickPropogoationIsSet() throws MalformedURLException, URISyntaxException{
+    	open(MENUTEST_EVENTBUBBLING_APP + "?stopClickPropagation=true");
+    	WebDriver driver = this.getDriver();
+    	String label = "trigger";
+        String menuName = "actionMenu";
+        WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
+        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.eventBubbled");
+        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
+        assertNull("Event should not bubble up to parent div", auraUITestingUtil.getEval(valueExpression));
+        
+        // click on menu list
+        menuLabel.click();
+        // check menu list is visible after the click
+        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        assertNull("Event should not bubble up to parent div when StopPropogoation is set on menu", auraUITestingUtil.getEval(valueExpression));
     }
 }

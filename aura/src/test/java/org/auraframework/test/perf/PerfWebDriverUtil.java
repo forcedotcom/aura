@@ -17,7 +17,6 @@ package org.auraframework.test.perf;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.auraframework.test.SauceUtil;
 import org.auraframework.test.WebDriverTestCase.UnexpectedError;
 import org.auraframework.test.perf.rdp.CPUProfilerAnalyzer;
 import org.auraframework.test.perf.rdp.RDPNotification;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
 import org.json.JSONException;
@@ -190,7 +190,7 @@ public final class PerfWebDriverUtil {
                         // as expected in transactionsToGather so need to
                         // make sure measure and transactionsToGather are
                         // similar
-                        !stringsHaveSameContent(
+                        !AuraTextUtil.stringsHaveSameContent(
                                 (String) marks.get("measure"),
                                 transactionsToGather.get(0))) {
                     continue;
@@ -201,21 +201,6 @@ public final class PerfWebDriverUtil {
             stats.put(measureName, marks.get("et").toString());
         }
         return stats;
-    }
-
-    /**
-     * Check for two strings having the same content.
-     *
-     * Note that this function has no tests, as it is not in an appropriate place.
-     */
-    public static boolean stringsHaveSameContent(String str1, String str2) {
-        char[] str1Arr = str1.toCharArray();
-        char[] str2Arr = str2.toCharArray();
-        Arrays.sort(str1Arr);
-        Arrays.sort(str2Arr);
-        str1 = new String(str1Arr);
-        str2 = new String(str2Arr);
-        return str1.equals(str2);
     }
 
     // JS heap snapshot

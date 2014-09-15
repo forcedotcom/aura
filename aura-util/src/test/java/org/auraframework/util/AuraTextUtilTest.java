@@ -339,13 +339,12 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertFalse("Attribute name <nam'a'e> should be invalid", AuraTextUtil.validateAttributeName("nam'a'e"));
     }
 
-
     private final static StringPair[] JSON_FUNCTION_ENCODE_PAIRS = new StringPair[] {
-        new StringPair("", ""),
-        new StringPair("\u2029", "\\u2029"),
-        new StringPair("\u2028", "\n"),
-        new StringPair("\u0000", ""),
-        new StringPair("*/", "\\u002A/"),
+            new StringPair("", ""),
+            new StringPair("\u2029", "\\u2029"),
+            new StringPair("\u2028", "\n"),
+            new StringPair("\u0000", ""),
+            new StringPair("*/", "\\u002A/"),
     };
 
     public void testJSONFunction() {
@@ -354,4 +353,9 @@ public class AuraTextUtilTest extends UnitTestCase {
         }
     }
 
+    public void testStringsHaveSameContent() {
+        assertTrue(AuraTextUtil.stringsHaveSameContent("abc", "abc"));
+        assertTrue(AuraTextUtil.stringsHaveSameContent("abc", "cba"));
+        assertFalse(AuraTextUtil.stringsHaveSameContent("abc", "def"));
+    }
 }

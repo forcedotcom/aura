@@ -150,7 +150,8 @@ public class BrowserUserAgent {
             // new nokia phones run win phone with real IE 9+ (Trident/5.0+) - make sure we don't return symbian for these
             return PLATFORM_SYMBIAN;
         }
-        if (ua.contains(ANDROID)) {
+        if (ua.contains(ANDROID) && !ua.contains(TRIDENT)) {
+            // not "trident" because Windows Phone 8.1 impersonates Android and iPhone)
             try {
                 // sometimes the first occurrence is "android mobile/1.234"
                 int idx = ua.indexOf(ANDROID_MOBILE);
@@ -227,6 +228,7 @@ public class BrowserUserAgent {
             return PLATFORM_IPAD;  // Ipad != iPhone
         }
         if (ua.contains(IPHONE) || ua.contains(IPOD)) {
+            // if this conditional moves ahead of the WINx section, exclude "TRIDENT" - IE11 on WinPhone 8.1 impersonates iPhone/iOS
             // also includes S1/SDK apps on iPhones
             // treat ipod and iphone the same for now - they have the same OS, screen, and browser
             return PLATFORM_IPHONE;

@@ -59,7 +59,7 @@ public class BrowserAgentTest extends TestSuite {
     }
 
     private static BrowserTestInfo readExpectedBrowserInfo(String line) {
-        StringTokenizer tokenizer = new StringTokenizer(line, ",", false);
+        StringTokenizer tokenizer = new StringTokenizer(line, "|", false);
         BrowserTestInfo info = new BrowserTestInfo();
 
         info.client = tokenizer.nextToken();

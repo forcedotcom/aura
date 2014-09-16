@@ -69,6 +69,8 @@ public enum UserAgent {
 
         // about IE 11 user agents (notable for the removal of "msie" from the user agent)
         // http://msdn.microsoft.com/en-us/library/ie/bg182625(v=vs.85).aspx
+        // IE11 on WinPhone 8.1 now mimics Webkit, iPhone, and Gecko
+        // http://msdn.microsoft.com/en-us/library/ie/hh869301(v=vs.85).aspx
 
         // some impostor info
         // http://www.developer.nokia.com/Community/Wiki/User-Agent_headers_for_Nokia_devices
@@ -98,8 +100,12 @@ public enum UserAgent {
                 // instead of IE since they can't do many things 'normal' IE can do.
                 // as IE8/9/10 are moved onto devices that might match these, they will
                 // include TRIDENT and generally work as IE, so we allow those
-                || (!ua.contains(UA.TRIDENT) && (ua.contains(UA.SYMBIAN) || ua.contains(UA.NOKIA)
-                || ua.contains(UA.PALMSOURCE) || ua.contains(UA.BLAZER) || ua.contains(UA.PALM_OS)))
+                || (!ua.contains(UA.TRIDENT)
+                    && (ua.contains(UA.SYMBIAN)
+                        || ua.contains(UA.NOKIA)
+                        || ua.contains(UA.PALMSOURCE)
+                        || ua.contains(UA.BLAZER)
+                        || ua.contains(UA.PALM_OS)))
                 ) {
                 return false;
             }
@@ -317,7 +323,10 @@ public enum UserAgent {
             // We would normally exclude matches to UA.CHROMEFRAME since we log
             // it separately, but if somebody asks "is this browser Chrome?"
             // they mean "can it be treated like Chrome" and Chromeframe can be.
-            return (ua.contains(UA.CHROME) || ua.contains(UA.CHROME_IOS));
+            return (ua.contains(UA.CHROME) || ua.contains(UA.CHROME_IOS))
+                    && !ua.contains(UA.TRIDENT)
+                    && !ua.contains(UA.GOODACCESS)
+                    && !ua.contains(UA.GOOD_ACCESS);
         }
 
         @Override
@@ -339,7 +348,8 @@ public enum UserAgent {
         }
 
         /**
-         * 001/003 if mobile/tablet, 006 if on IOS (a hybrid of Chrome and Safari),
+         * 003 if known tablet, 001 if other mobile,
+         * 006 if on IOS (a hybrid of Chrome and Safari),
          * otherwise 000
          */
         @Override
@@ -348,15 +358,18 @@ public enum UserAgent {
                 return 6;
             }
 
-            if (ua.contains(UA.MOBILE)) {
-                return UA.MOBILE_FLAG;
-            }
-
-            if (ua.contains(UA.ANDROID)) {
+            if (ua.contains(UA.NEXUS_7)
+                    || ua.contains(UA.NEXUS_10)) {
                 // Android tablets don't have the string "Mobile" as part of the user agent,
                 // see the somewhat outdated article:
                 // http://googlewebmastercentral.blogspot.com/2011/03/mo-better-to-also-detect-mobile-user.html
                 return UA.TABLET_FLAG;
+            }
+
+            if (ua.contains(UA.MOBILE)
+                    || ua.contains(UA.NEXUS)
+                    || ua.contains(UA.PHONE)) {
+                return UA.MOBILE_FLAG;
             }
 
             return UA.UNSPECIFIED;
@@ -372,6 +385,8 @@ public enum UserAgent {
         boolean match(String ua) {
             return (ua.contains(UA.SAFARI) && ua.contains(UA.APPLE_WEBKIT)
                 && !ua.contains(UA.CHROME)
+                && !ua.contains(UA.GOODACCESS)
+                && !ua.contains(UA.GOOD_ACCESS)
                 && !ua.contains(UA.ANDROID)
                 && !ua.contains(UA.SYMBIAN)
                 && !ua.contains(UA.PLAYBOOK)
@@ -476,7 +491,11 @@ public enum UserAgent {
 
         @Override
         boolean match(String ua) {
-            return (ua.contains(UA.ANDROID) && ua.contains(UA.APPLE_WEBKIT));
+            return ua.contains(UA.ANDROID)
+                    && ua.contains(UA.APPLE_WEBKIT)
+                    && !ua.contains(UA.TRIDENT) // ie impersonates
+                    && !ua.contains(UA.GOODACCESS)
+                    && !ua.contains(UA.GOOD_ACCESS);
         }
 
         @Override
@@ -501,7 +520,8 @@ public enum UserAgent {
             if (ua.contains(UA.MOBILE)
                 || ua.contains(UA.PHONE)
                 || ua.contains(UA.HTC)
-                || ua.contains(UA.SAMSUNG)) {
+                || ua.contains(UA.SAMSUNG)
+                || ua.contains(UA.NEXUS)) {
                 return UA.MOBILE_FLAG;
             }
             return UA.UNSPECIFIED;
@@ -572,10 +592,13 @@ public enum UserAgent {
             }
             // else, webkit but not the more specific: safari, chrome, stock android, BB10+, or S1 Desktop
             return (!ua.contains(UA.CHROME)
+                && !ua.contains(UA.TRIDENT) // ie impersonates
                 && !ua.contains(UA.IPHONE)
                 && !ua.contains(UA.IPAD)
                 && !ua.contains(UA.IPOD)
                 && !ua.contains(UA.ANDROID)
+                && !ua.contains(UA.GOODACCESS)
+                && !ua.contains(UA.GOOD_ACCESS)
                 && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
                 && !ua.contains(UA.PLAYBOOK));
         }
@@ -613,9 +636,12 @@ public enum UserAgent {
         boolean match(String ua) {
             // is gecko, but doesn't match other specific gecko UserAgent instances
             return (ua.contains(UA.GECKO)
+                && !ua.contains(UA.TRIDENT) // ie impersonates
                 && !ua.contains(UA.FIREFOX)
                 && !ua.contains(UA.NAVIGATOR)
                 && !ua.contains(UA.NETSCAPE)
+                && !ua.contains(UA.GOODACCESS)
+                && !ua.contains(UA.GOOD_ACCESS)
                 && !ua.contains(UA.PLAYBOOK));
         }
 
@@ -640,6 +666,8 @@ public enum UserAgent {
         boolean match(String ua) {
             // is KHTML, but doesn't match other specific UserAgent instances
             return (ua.contains(UA.KHTML) && !ua.contains(UA.GECKO)
+                && !ua.contains(UA.GOODACCESS)
+                && !ua.contains(UA.GOOD_ACCESS)
                 && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
                 && !ua.contains(UA.PLAYBOOK));
         }
@@ -725,6 +753,52 @@ public enum UserAgent {
                 return UA.MOBILE_FLAG;
             }
         }
+
+    },
+
+
+    /**
+     * Good Access Browser
+     *
+     * This is based on a security layer on top of a webkit build,
+     * and may behave differently on different platforms.
+     */
+    GOOD_ACCESS (24) {
+
+        // UA will have "GoodAccess" or "Good Access"
+
+        @Override
+        boolean match(String ua) {
+            return ua.contains(UA.APPLE_WEBKIT)
+                    && (ua.contains(UA.GOODACCESS) || ua.contains(UA.GOOD_ACCESS));
+        }
+
+        @Override
+        int majorVersion(String ua) {
+            try {
+
+                int verStart = ua.indexOf(UA.ACCESS) + 7; // 7 = "access/".length()
+                int verEnd = ua.indexOf(".", verStart);
+                return Integer.parseInt(ua.substring(verStart, verEnd));
+            }
+            catch (NumberFormatException | IndexOutOfBoundsException ignored) {}
+            return UA.UNSPECIFIED;
+        }
+
+        /**
+         * 001 if mobile, otherwise 000
+         */
+        @Override
+        int flags(String ua) {
+            // Good still releases point releases -
+            // if we find 1.0 and 1.1 behave differently we need to added it to a flag here
+            // for now just mobile or not
+            if (ua.contains(UA.MOBILE) || ua.contains(UA.PHONE)) {
+                return UA.MOBILE_FLAG;
+            }
+            return UA.UNSPECIFIED;
+        }
+
 
     },
 
@@ -1013,6 +1087,7 @@ public enum UserAgent {
         static final int PHONE_FLAG = 2;
         static final int TABLET_FLAG = 3;
         static final int MPLAYER_FLAG = 4;
+        static final String BLANK = "";
 
 
         // MS
@@ -1028,6 +1103,7 @@ public enum UserAgent {
         static final String TRIDENT_7 = "trident/7.0"; // IE11
         static final String TRIDENT_8 = "trident/8.0"; // IE12?
         static final String TRIDENT_9 = "trident/9.0"; // IE13?
+        static final String IEMOBILE = "iemobile/";
         static final String WINCE = "wince";
         static final String WINDOWS_CE = "windows ce";
         static final String MS_WEB_SERVICES = "ms web services client protocol ";
@@ -1057,6 +1133,7 @@ public enum UserAgent {
         static final String WINDOWS_PHONE_OS_7_5 = "windows phone os 7.5";
         static final String WINDOWS_PHONE_8 = "windows phone 8.0";
         static final String WINDOWS_PHONE_8_1 = "windows phone 8.1";
+        static final String WINDOWS = "Windows ";
 
 
         // Apple
@@ -1109,6 +1186,11 @@ public enum UserAgent {
         // BlackBerry 10 and above
         static final String BLACKBERRY10_AND_ABOVE = "(bb";
 
+        // Good Access Browser
+        static final String GOODACCESS = "goodaccess/";
+        static final String GOOD_ACCESS = "good access/";
+        static final String ACCESS = "access/";
+
         // Linux / Unix
         static final String SUNOS = "sunos";
         static final String SUNOS_4 = "sunos 4";
@@ -1135,6 +1217,9 @@ public enum UserAgent {
         static final String SFORCE_HTTP = "sforce http";
         static final String SFORCE_OFFICE_TOOLKIT = "sforceofficetoolkit";
         static final String SILK = "silk";
+        static final String NEXUS = "nexus";
+        static final String NEXUS_7 = "nexus 7";
+        static final String NEXUS_10 = "nexus 10";
         static final String AXIS = "axis";
         static final String AXIS_1_0 = "axis/1.0";
         static final String AXIS_1_1 = "axis/1.1";

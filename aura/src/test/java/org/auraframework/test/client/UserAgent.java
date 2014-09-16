@@ -31,6 +31,7 @@ public enum UserAgent {
     IE10_WINDOWS_PHONE_8("Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 928)"),
     IE10_WINDOWS_RT_8("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; ARM; Trident/6.0 Touch)"),
     IE11_WINDOWS_PHONE_8_1("Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0;Touch; rv:11.0; IEMobile/11.0; Microsoft; Virtual) like Gecko"),
+    IE11_WINDOWS_PHONE_8_1_SDK("Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11; IEMobile/11.0) like Android 4.1.2; compatible) like iPhone OS 7_0_3 Mac OS X WebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari /537.36"),
     IE11_WINDOWS_RT_8_1("Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.3; ARM; Trident/7.0)"),
     FIREFOX("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"),
     SAFARI6("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.73.11 (KHTML, like Gecko) Version/6.1.1 Safari/537.73.11"),
@@ -45,7 +46,7 @@ public enum UserAgent {
     BLACKBERRY_10("Mozilla/5.0 (BB10; Touch) AppleWebKit/537.10+ (KHTML, like Gecko) Version/10.0.9.2372 Mobile Safari/537.10+"),
     GOOD_IPHONE("Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/.537.51.2 (KHTML, like Gecko) Mobile/11D167 Safari/8536.25 GoodAccess/1.1.333.302"),
     GOOD_ANDROID("Mozilla/5.0 (Linux; Android 4.1.1; SAMSUNG-SGH-1747 Build/JRO03L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.45 Mobile Safari/537.36 Good Access/1.0.21.304"),
-
+    NEXUS_10("Mozilla/5.0 (Linux; Android 4.4.2; Nexus 10 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.136 Safari/537.36"),
     IPOD("Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; ja-jp) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"),
     SAFARI5_MAC("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2"),
     SAFARI5_WINDOWS("Mozilla/5.0 (Windows; U; Windows NT 6.1; tr-TR) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27"),
@@ -58,6 +59,7 @@ public enum UserAgent {
     PLAYBOOK("Mozilla/5.0 (PlayBook; U; RIM Tablet OS 2.0.0; en-US) AppleWebKit/535.8+ (KHTML, like Gecko) Version/7.2.0.0 Safari/535.8+"),
     NOKIA_N95("Mozilla/5.0 (SymbianOS/9.2; U; Series60/3.1 NokiaN95/10.0.018; Profile/MIDP-2.0 Configuration/CLDC-1.1 ) AppleWebKit/413 (KHTML, like Gecko) Safari/413"),
     NOKIA_920("Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 920)"),
+    LUMIA_928("Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11; IEMobile/11.0; NOKIA; Lumia 928) like Gecko"),
     BLACKBERRY_7("Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.1.0.346 Mobile Safari/534.11+"),
     NETSCAPE("Mozilla/5.0 (Windows; U; Win 9x 4.90; SG; rv:1.9.2.4) Gecko/20101104 Netscape/9.1.0285"),
     EMPTY("");

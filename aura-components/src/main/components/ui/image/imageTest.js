@@ -15,7 +15,8 @@
  */
 ({
     testDefaultAttributes:{
-        auraErrorsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"], 	
+    	failOnWarning: true,
+        auraWarningsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"], 	
         test:function(cmp){
             var imgElement = cmp.getElement();
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.");
@@ -87,24 +88,19 @@
         }
     },
     testInformationImageTypeWithoutAltText:{
-        auraErrorsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
+        failOnWarning: true,
+    	auraWarningsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
     	attributes : {imageType:'informational'},
         test: function(cmp){
-            // Note the missing colon here compared to below.
-            var errorMessage = "component: 1:2;a \"alt\" attribute should not be empty for informational image";
-            var screenError = $A.test.getAuraErrorMessage();
-            $A.test.assertTrue($A.test.contains(screenError, errorMessage),
-                               "Expected '" + errorMessage+"', Got:'"+screenError+"'");
-        }
+        	// This is testing component "init" which is already tested above (auraWarningsExpectedDuringInit).
+       }
     },
     testDecorativeImageTypeWithAltText:{
-        auraErrorsExpectedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
+    	failOnWarning: true,
+    	auraWarningsExpectedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
     	attributes : {imageType:'decorative', alt:'Company'},
         test: function(cmp){
-            var errorMessage = "component: 1:2;a: \"alt\" attribute should be empty for decorative image";
-            var screenError = $A.test.getAuraErrorMessage();
-            $A.test.assertTrue($A.test.contains(screenError, errorMessage),
-                               "Expected '" + errorMessage+"', Got:'"+screenError+"'");
+            // This is testing component "init" which is already tested above (auraWarningsExpectedDuringInit).
         }
     },
     

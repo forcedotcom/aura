@@ -72,4 +72,7 @@ public interface CacheBuilder<K, T> {
 	CacheBuilder<K, T> setConcurrencyLevel(int concurrencyLevel);
 
 	Cache<K, T> build();
+
+	/** Associates a human-readable name with the cache */
+    CacheBuilder<K, T> setName(String string);
 }

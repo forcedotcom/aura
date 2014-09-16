@@ -18,9 +18,82 @@ package org.auraframework.impl.cache;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.auraframework.cache.Cache;
+import org.auraframework.impl.adapter.ConfigAdapterImpl;
+
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 public class CacheImpl<K, T> implements Cache<K, T> {
+
+    private static class EvictionListener<K, T> implements RemovalListener<K, T> {
+
+        /** A default name string */
+        private static final String UNNAMED = "(unnamed)";
+
+        /** Interval at which to log cache stats in "normal" operation */
+        private static final long ONE_DAY = 1000 * 60 * 60 * 24;
+
+        /** A name for the cache being listened to, to clarifiy in logs which one evicted */
+        private final String name;
+
+        /** The cache for this listener, to fetch statistics. */
+        private com.google.common.cache.Cache<K, T> cache;
+
+        /** Count of log-worth evictions, to avoid spamming the log*/
+        private int evictions = 0;
+
+        /** Log threshold for next actual emission to logs */
+        private int nextLogThreshold = 1;
+
+        /** Log the entire stats once a day, regardless of evictions. */
+        private long lastFull = System.currentTimeMillis();
+ 
+        EvictionListener(String name) {
+            this.name = name == null ? UNNAMED : name;
+        }
+
+        void setCache(com.google.common.cache.Cache<K, T> cache) {
+            this.cache = cache;
+        }
+
+        @Override
+        public void onRemoval(RemovalNotification<K, T> notification) {
+            // We don't much care about removal for reasons other than space constraint;
+            // those happen for lots of reasons.  But size eviction means size pressure,
+            // which we do care about.
+            if (notification.getCause() == RemovalCause.SIZE) {
+                evictions++;
+                if (evictions >= nextLogThreshold) {
+                    Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
+                    CacheStats stats = cache.stats();
+                    logger.info(String.format(
+                        "Cache %s evicted %d entries for size pressure, hit rate=%.3f, evictions=%d, loads=%d %s",
+                        name, evictions, stats.hitRate(), stats.evictionCount(),
+                        stats.loadCount(), stats.toString()));
+                    // We want to log every 10 until 100, every 100 until 1000, every 1000 thereafter
+                    if (nextLogThreshold == 1) {
+                        nextLogThreshold = 10;
+                    } else if (nextLogThreshold < 100) {
+                        nextLogThreshold += 10;
+                    } else if (nextLogThreshold < 1000) {
+                        nextLogThreshold += 100;
+                    } else {
+                        nextLogThreshold += 1000;
+                    }
+                }
+            }
+            if (System.currentTimeMillis() >= lastFull + ONE_DAY) {
+                Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
+                CacheStats stats = cache.stats();
+                logger.info(String.format("Cache %s has hit rate=%.3f, stats %s\n",
+                        name, stats.hitRate(), stats.toString()));
+            }
+        }
+    };
 
 	private com.google.common.cache.Cache<K, T> cache;
 
@@ -44,7 +117,11 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 		if (builder.softValues) {
 			cb = cb.softValues();
 		}
+
+        EvictionListener<K, T> listener = new EvictionListener<K, T>(builder.name);
+		cb.removalListener(listener);
 		cache = cb.build();
+		listener.setCache(cache);
 	}
 
 	@Override
@@ -110,12 +187,13 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 	public static class Builder<K, T> implements
 			org.auraframework.builder.CacheBuilder<K, T> {
 		// builder defaults
-		public int initialCapacity = 128;
-		public int concurrencyLevel = 4;
-		public long maximumSize = 1024;
-		public boolean recordStats = false;
-		public boolean softValues = true;
-		public boolean useSecondaryStorage = false;
+        int initialCapacity = 128;
+        int concurrencyLevel = 4;
+        long maximumSize = 1024;
+        boolean recordStats = false;
+        boolean softValues = true;
+        boolean useSecondaryStorage = false;
+        String name;
 
 		public Builder() {
 
@@ -156,6 +234,12 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 			this.concurrencyLevel = concurrencyLevel;
 			return this;
 		}
+
+        @Override
+        public Builder<K, T> setName(String name) {
+            this.name = name;
+            return this;
+        }
 
 		@Override
 		public CacheImpl<K, T> build() {

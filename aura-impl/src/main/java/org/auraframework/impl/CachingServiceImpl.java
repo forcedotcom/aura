@@ -40,7 +40,7 @@ public class CachingServiceImpl implements CachingService {
 
 	private static final long serialVersionUID = -3311707270226573084L;
 	private final static int DEFINITION_CACHE_SIZE = 4096;
-	private final static int DEPENDENCY_CACHE_SIZE = 100;
+	private final static int DEPENDENCY_CACHE_SIZE = 300;
 	private final static int STRING_CACHE_SIZE = 100;
 	private final static int CLIENT_LIB_CACHE_SIZE = 30;
 

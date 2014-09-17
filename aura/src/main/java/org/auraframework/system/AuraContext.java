@@ -507,4 +507,9 @@ public interface AuraContext {
      * the actual CSS request itself. See {@link #addAppThemeDescriptors()}.
      */
     ThemeList getThemeList();
+
+    /**
+     * Get a location stack for the current context at the current moment.
+     */
+    List<String> createComponentStack();
 }

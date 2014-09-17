@@ -41,13 +41,13 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Attribute;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
-
 import org.auraframework.instance.EventHandler;
 import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.instance.Wrapper;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -213,6 +213,25 @@ public class AttributeSetImpl implements AttributeSet {
             throw new InvalidDefinitionException("No dots allowed", expr.getLocation());
         }
         return getValue(expr);
+    }
+
+    @Override
+    public <T> T getValue(String name, Class<T> clazz) throws QuickFixException {
+        PropertyReference expr = new PropertyReferenceImpl(name,
+                AuraUtil.getExternalLocation("direct attributeset access"));
+        if (expr.size() != 1) {
+            throw new InvalidDefinitionException("No dots allowed", expr.getLocation());
+        }
+        Object val = getValue(expr);
+        if (val == null) {
+            return null;
+        }
+        try {
+            return clazz.cast(val);
+        } catch (ClassCastException cce) {
+            throw new AuraRuntimeException("attribute "+name+" is of the wrong type: expected "
+                    +clazz.getName()+" but got "+val.getClass().getName());
+        }
     }
 
     @Override

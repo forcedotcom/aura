@@ -193,7 +193,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide'></aura:interface>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertStacktrace("java.lang.RuntimeException: out of stock at .(org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide)");
+        assertStacktrace("java.lang.RuntimeException: out of stock at .", cdd.toString());
     }
 
     /**

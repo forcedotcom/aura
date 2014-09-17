@@ -17,14 +17,20 @@ package org.auraframework.throwable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
+import org.auraframework.Aura;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for Exceptiony things.
  */
 public final class AuraExceptionUtil {
+    //private static final Logger _log = LoggerFactory.getLogger(AuraExceptionUtil.class);
+
     public static String getStackTrace(Throwable th) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -33,7 +39,7 @@ public final class AuraExceptionUtil {
     }
 
     /**
-     * jambs a aura location into the stacktrace of a throwable
+     * jams a aura location into the stacktrace of a throwable
      */
     public static void addLocation(Location location, Throwable t) {
         if (location != null) {
@@ -46,6 +52,51 @@ public final class AuraExceptionUtil {
             }
             t.setStackTrace(trace);
         }
+    }
+
+    /**
+     * Get a component stack from the context service.
+     *
+     * This will return a component stack, or null if there is none.
+     *
+     * @return a list of component descriptor + attributes.
+     */
+    public static List<String> getComponentStack() {
+        try {
+            if (Aura.getContextService() != null && Aura.getContextService().getCurrentContext() != null) {
+                return Aura.getContextService().getCurrentContext().createComponentStack();
+            }
+        } catch (Throwable t) {
+            //_log.error("Unable to get component stack", t);
+        }
+        return null;
+    }
+
+    /**
+     * Add a component stack to an exception.
+     *
+     * This should arguably be a nesting exception, but that will require a larger refactor.
+     * see: W-2372563
+     *
+     * @param t the throwable where we will insert the stack.
+     * @param componentStack the stack of components in the error.
+     */
+    public static List<String> addComponentStack(Throwable t, List<String> componentStack) {
+        if (componentStack == null) {
+            return componentStack;
+        }
+        StackTraceElement[] oldTrace = t.getStackTrace();
+        StackTraceElement[] trace = new StackTraceElement[oldTrace.length + componentStack.size()];
+        int i = 0;
+
+        for (String comp : componentStack) {
+            trace[i++] = new StackTraceElement("", "", comp, 1);
+        }
+        for (int j = 0; j < oldTrace.length; j++) {
+            trace[i + j] = oldTrace[j];
+        }
+        t.setStackTrace(trace);
+        return componentStack;
     }
 
     /**

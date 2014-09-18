@@ -1,32 +1,97 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.ImmutableSet;
 
 public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesignDef, DesignDef> {
     public static final String TAG = "aura:designattribute";
     
+    private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_TYPE = "type";
+    private static final String ATTRIBUTE_REQUIRED = "required";
+    private static final String ATTRIBUTE_READONLY = "readonly";
+    private static final String ATTRIBUTE_DEPENDENCY = "dependsOn";
+    private static final String ATTRIBUTE_DATASOURCE = "dataSource";
+    private static final String ATTRIBUTE_MIN = "min";
+    private static final String ATTRIBUTE_MAX = "max";
+    
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, 
+            ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE, ATTRIBUTE_MIN, ATTRIBUTE_MAX);
+    
+    //TODO implement tool specific properties
+    
+    @Override
+    protected void readAttributes() throws QuickFixException {
+        super.readAttributes();
+        
+        String name = getAttributeValue(ATTRIBUTE_NAME);
+        String type = getAttributeValue(ATTRIBUTE_TYPE);
+        String required = getAttributeValue(ATTRIBUTE_REQUIRED);
+        String readonly = getAttributeValue(ATTRIBUTE_READONLY);
+        String dependency = getAttributeValue(ATTRIBUTE_DEPENDENCY);
+        String datasource = getAttributeValue(ATTRIBUTE_DATASOURCE);
+        String min = getAttributeValue(ATTRIBUTE_MIN);
+        String max = getAttributeValue(ATTRIBUTE_MAX);
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(type)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(required)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(readonly)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(dependency)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(datasource)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(min)) {
+            
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(max)) {
+            
+        }
+    }
+    
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        // TODO Auto-generated method stub
-        
+        error("Found unexpected tag %s", getTagName());
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        // TODO Auto-generated method stub
-        
+        error("No literal text allowed in attribute design definition");
     }
 
     @Override
+    public Set<String> getAllowedAttributes() {
+        return ALLOWED_ATTRIBUTES;
+    }
+    @Override
     public String getHandledTag() {
-        // TODO Auto-generated method stub
-        return null;
+        return TAG;
     }
 
     @Override

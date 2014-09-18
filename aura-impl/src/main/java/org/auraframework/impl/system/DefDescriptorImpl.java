@@ -21,9 +21,7 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.CachingService;
@@ -159,6 +157,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TESTCASE:
             case VAR:
             case THEME_DEF_REF:
+            case ATTRIBUTE_DESIGN:
                 name = qualifiedName;
                 break;
             case APPLICATION:
@@ -171,6 +170,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LAYOUTS:
             case NAMESPACE:
             case THEME:
+            case DESIGN:
                 Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
                 if (tagMatcher.matches()) {
                     prefix = tagMatcher.group(1);

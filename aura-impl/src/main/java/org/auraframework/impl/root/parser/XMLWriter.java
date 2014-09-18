@@ -19,30 +19,17 @@ import java.io.Writer;
 import java.util.Map;
 
 import org.auraframework.def.Definition;
+import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.root.event.EventDefImpl;
-import org.auraframework.impl.root.event.EventHandlerDefImpl;
-import org.auraframework.impl.root.event.RegisterEventDefImpl;
+import org.auraframework.impl.root.event.*;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
-import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.ImportDefHandlerImpl;
-import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
-import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
-import org.auraframework.impl.root.parser.handler.AttributeDefRefHandler;
-import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
-import org.auraframework.impl.root.parser.handler.ComponentDefRefHandler;
-import org.auraframework.impl.root.parser.handler.EventDefHandler;
-import org.auraframework.impl.root.parser.handler.EventHandlerDefHandler;
-import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
-import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
-import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
-import org.auraframework.impl.root.parser.handler.ImportDefHandler;
-import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
-import org.auraframework.impl.root.parser.handler.XMLHandler;
+import org.auraframework.impl.root.library.LibraryDefImpl;
+import org.auraframework.impl.root.parser.handler.*;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -72,6 +59,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
         handlers.put(InterfaceDefImpl.class, new InterfaceDefHandler());
         handlers.put(RegisterEventDefImpl.class, new RegisterEventHandler());
         handlers.put(ThemeDefImpl.class, new ThemeDefHandler());
+        handlers.put(DesignDefImpl.class, new DesignDefHandler());
     }
 
     /**

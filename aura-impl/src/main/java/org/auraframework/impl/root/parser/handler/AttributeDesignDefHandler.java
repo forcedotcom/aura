@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DesignDef;
+import org.auraframework.impl.design.AttributeDesignDefImpl;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -27,7 +30,13 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, 
             ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE, ATTRIBUTE_MIN, ATTRIBUTE_MAX);
     
+    private final AttributeDesignDefImpl.Builder builder = new AttributeDesignDefImpl.Builder();
+    
     //TODO implement tool specific properties
+    
+    public AttributeDesignDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+        super(parentHandler, xmlReader, source);
+    }
     
     @Override
     protected void readAttributes() throws QuickFixException {
@@ -96,8 +105,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
 
     @Override
     protected AttributeDesignDef createDefinition() throws QuickFixException {
-        // TODO Auto-generated method stub
-        return null;
+        return builder.build();
     }
 
     @Override

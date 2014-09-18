@@ -87,7 +87,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
          */
-        protected Builder() {
+        public Builder() {
             super(AttributeDesignDef.class);
         }
 

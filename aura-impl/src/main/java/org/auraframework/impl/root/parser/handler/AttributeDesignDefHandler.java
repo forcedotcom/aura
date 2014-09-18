@@ -9,6 +9,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.impl.design.AttributeDesignDefImpl;
+import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -50,38 +51,28 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         String datasource = getAttributeValue(ATTRIBUTE_DATASOURCE);
         String min = getAttributeValue(ATTRIBUTE_MIN);
         String max = getAttributeValue(ATTRIBUTE_MAX);
-        
+
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            
+            builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, AttributeDesignDef.class));
+            builder.setName(name);
+        } else {
+            error("Name attribute is required for attribute design definitions");
         }
         
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(type)) {
-            
+        if(!AuraTextUtil.isNullEmptyOrWhitespace(required)) {
+            builder.setRequired(Boolean.parseBoolean(required));
         }
         
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(required)) {
-            
+        if(!AuraTextUtil.isNullEmptyOrWhitespace(readonly)) {
+            builder.setReadOnly(Boolean.parseBoolean(readonly));
         }
         
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(readonly)) {
-            
-        }
-        
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(dependency)) {
-            
-        }
-        
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(datasource)) {
-            
-        }
-        
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(min)) {
-            
-        }
-        
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(max)) {
-            
-        }
+        builder.setType(type);
+        builder.setDependency(dependency);
+        builder.setDataSource(datasource);
+        builder.setMin(min);
+        builder.setMax(max);
+        builder.setLocation(getLocation());
     }
     
     @Override
@@ -110,8 +101,6 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
 
     @Override
     public void writeElement(AttributeDesignDef def, Appendable out) throws IOException {
-        // TODO Auto-generated method stub
-        
     }
 
 }

@@ -35,7 +35,7 @@
     <aura:handler name="matchText" action="{!c.matchText}"/>
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
 
-    <ul aura:id="list" class="{!v.class+' '+v.theme+(v.visible == true ? ' visible':'')}" role="presentation" 
+    <ul aura:id="list" class="{!v.class+' '+v.theme}" role="presentation" 
         onclick="{!c.handleClick}" oncustomClick="{!c.handleClick}">
         <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>

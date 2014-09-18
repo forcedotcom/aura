@@ -278,6 +278,18 @@
     handleTabkeydown: function(component, event) {
         component.set("v.visible", false);
     },
+    
+    hasVisibleOption : function(items) {
+        var hasVisibleOption = false;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].visible === true) {
+                hasVisibleOption = true;
+                break;
+            }
+        }
+        
+        return hasVisibleOption;
+    },
 
     /**
      * Checks if the object is an HTML element.
@@ -322,14 +334,12 @@
     },
 
     toggleListVisibility: function(component, items) {
-        var hasVisibleOption = false;
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].visible === true) {
-                hasVisibleOption = true;
-                break;
-            }
-        }
-        component.set("v.visible", hasVisibleOption);
+        var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) &&
+                !$A.util.isEmpty(component.get("v.keyword")); 
+        var hasVisibleOption = this.hasVisibleOption(items);
+        var list = component.find("list");
+        $A.util[hasVisibleOption ?  "addClass" :"removeClass"](list.getElement(), "visible");
+        component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },
 
     updateAriaAttributes: function(component, highlightedCmp) {
@@ -345,5 +355,12 @@
             })
             updateAriaEvt.fire();
         }
+    },
+    
+    updateEmptyListContent: function (component) {
+        var visible = component.getConcreteComponent().get("v.visible");
+        var items = component.getConcreteComponent().get("v.items");
+        var hasVisibleOption = this.hasVisibleOption(items);
+        $A.util[!visible || hasVisibleOption ? "removeClass" : "addClass"](component.getElement(), "showEmptyContent");
     }
 })

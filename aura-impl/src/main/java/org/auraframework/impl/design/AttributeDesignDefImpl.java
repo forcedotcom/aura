@@ -45,10 +45,12 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         this.max = builder.max;
     }
     
+    @Override
     public Boolean getRequired() {
         return required;
     }
     
+    @Override
     public Boolean getReadOnly() {
         return readonly;
     }
@@ -58,22 +60,27 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         return name;
     }
     
+    @Override
     public String getType() {
         return type;
     }
     
+    @Override
     public String getDependency() {
         return dependency;
     }
     
+    @Override
     public String getDataSource() {
         return datasource;
     }
     
+    @Override
     public String getMin() {
         return min;
     }
     
+    @Override
     public String getMax() {
         return max;
     }

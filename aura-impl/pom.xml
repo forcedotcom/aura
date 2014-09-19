@@ -99,7 +99,7 @@
         <aura.home>${basedir}/..</aura.home>
         <xunit.js.engine>rhino</xunit.js.engine>
         <xunit.js.format>xml</xunit.js.format>
-        <xunit.js.console>${basedir}/src/test/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
+        <xunit.js.console>${basedir}/target/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
         <xunit.js.gen-test-files>${project.build.directory}/xunitjs/xunitTests</xunit.js.gen-test-files>
         <xunit.js.testPath />
@@ -114,6 +114,25 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-test-resources</phase>
+                        <id>unpack-xunit</id>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -240,7 +259,7 @@
                                                     <arg value="${xunit.js.console}" />
                                                     <arg value="/output:${xunit.js.format}" />
                                                     <arg value="/strict:false" />
-                                                    <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/" />
+                                                    <arg value="/dependency:${basedir}/target/tools/xUnit/dependencies/" />
                                                     <arg value="${xunit.js.gen-test-files}/${xunit.js.testPath}" />
                                                </java>
                                            </case>
@@ -251,7 +270,7 @@
                                        <switch value="${xunit.js.format}">
                                            <case value="xml">
                                                <echo>Generating test report</echo>
-                                               <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/src/test/tools/xUnit/junit.xsl" />
+                                               <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/target/tools/xUnit/junit.xsl" />
                                                <echo>Test report completed: ${xunit.js.report}</echo>
                                            </case>
                                            <default>

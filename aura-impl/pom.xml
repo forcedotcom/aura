@@ -101,7 +101,7 @@
         <xunit.js.format>xml</xunit.js.format>
         <xunit.js.console>${basedir}/target/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
-        <xunit.js.gen-test-files>${project.build.directory}/xunitjs/xunitTests</xunit.js.gen-test-files>
+        <xunit.js.gen-test-files>${project.build.directory}/xunitjs</xunit.js.gen-test-files>
         <xunit.js.testPath />
     </properties>
     <build>
@@ -239,6 +239,17 @@
                        </dependencies>
                        <executions>
                            <execution>
+                               <id>gen-xunit.js</id>
+                               <phase>generate-test-resources</phase>
+                               <goals>
+                                    <goal>run</goal>
+                               </goals>
+                               <configuration>
+                                   <target>
+                                   </target>
+                               </configuration>
+                           </execution>
+                           <execution>
                                <id>xunit.js</id>
                                <phase>test</phase>
                                <goals>
@@ -250,6 +261,10 @@
                                        <echo>Generating Aura framework resources for xUnit.js</echo>
                                        <java classname="org.auraframework.test.javascript.GenerateXUnitJS" classpathref="maven.test.classpath" fork="true" failonerror="true">
                                            <jvmarg value="-Daura.home=${basedir}/.." />
+                                            <arg value="${basedir}/src/test/javascript" />
+                                            <arg value="${basedir}/src/main/resources" />
+                                            <arg value="${xunit.js.gen-test-files}" />
+                                            <arg value="xunitTests" />
                                        </java>
                                        <echo>Executing tests</echo>
                                        <switch value="${xunit.js.engine}">
@@ -260,7 +275,7 @@
                                                     <arg value="/output:${xunit.js.format}" />
                                                     <arg value="/strict:false" />
                                                     <arg value="/dependency:${basedir}/target/tools/xUnit/dependencies/" />
-                                                    <arg value="${xunit.js.gen-test-files}/${xunit.js.testPath}" />
+                                                    <arg value="${xunit.js.gen-test-files}/xunitTests/${xunit.js.testPath}" />
                                                </java>
                                            </case>
                                            <default>

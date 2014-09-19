@@ -15,12 +15,13 @@
  */
 package org.auraframework.test.javascript;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.impl.javascript.AuraJavascriptGroup;
-import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
@@ -28,58 +29,66 @@ import org.auraframework.util.javascript.directive.*;
 import org.auraframework.util.javascript.directive.impl.DirectiveImpl;
 
 /**
+ * An import for xunit tests.
+ *
  * includes another file, expecting just the filename relative to the root in
- * java format (. instead of / as dir separator)
+ * java format (. instead of / as dir separator), but writes it out as a new file, changinng the
+ * import into an include of that path.
  */
 public class ImportDirective extends DirectiveImpl {
-        private File include;
-        private DirectiveParser includedParser;
-        private final String path;
-        private String relativePath;
-        private static final File destinationRoot = AuraImplFiles.AuraResourceJavascriptTestDirectory.asFile();
-    
-        public ImportDirective(int offset, String line) {
-            super(offset, line);
-            Map<String, Object> config = getConfig();
-            if (config != null) {
-                path = (String) config.get("path");
-                assert path != null : "Path is required in import directive config";
-            } else {
-                path = getLine();
-            }
+    private File include;
+    private DirectiveParser includedParser;
+    private final String path;
+    private String relativePath;
+    private final File destinationRoot;
+    private final File auraRoot;
+
+    public ImportDirective(int offset, String line, File destinationRoot, File auraRoot) {
+        super(offset, line);
+        Map<String, Object> config = getConfig();
+        if (config != null) {
+            path = (String) config.get("path");
+            assert path != null : "Path is required in import directive config";
+        } else {
+            path = getLine();
         }
-    
-        @Override
-        public void processDirective(DirectiveBasedJavascriptGroup group) throws IOException {
-            AuraJavascriptGroup auraGroup = new AuraJavascriptGroup();
-            // get the file, group will do validation
-            relativePath = path.replace('.', File.separatorChar) + ".js";
-            this.include = group.addFile(relativePath);
-            includedParser = new DirectiveParser(auraGroup, include);
-            includedParser.parseFile();
-        }
-    
-        @Override
-        public String generateOutput(JavascriptGeneratorMode mode) {
+        this.destinationRoot = destinationRoot;
+        this.auraRoot = auraRoot;
+    }
+
+    @Override
+    public void processDirective(DirectiveBasedJavascriptGroup group) throws IOException {
+        DirectiveBasedJavascriptGroup auraGroup = new DirectiveBasedJavascriptGroup("auraTest",
+                    auraRoot, "aura/Aura.js", DirectiveTypes.DEFAULT_TYPES,
+                    EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT));
+        // get the file, group will do validation
+        relativePath = path.replace('.', File.separatorChar) + ".js";
+        this.include = group.addFile(relativePath);
+        includedParser = new DirectiveParser(auraGroup, include);
+        includedParser.parseFile();
+    }
+
+    @Override
+    public String generateOutput(JavascriptGeneratorMode mode) {
+        try{
+            String code = includedParser.generate(mode);
+            File output = new File(destinationRoot, relativePath);
+            output.getParentFile().mkdirs();
+            FileWriter writer = new FileWriter(output);
             try{
-                String code = includedParser.generate(mode);
-                File output = new File(destinationRoot, relativePath);
-                output.getParentFile().mkdirs();
-                FileWriter writer = new FileWriter(output);
-                try{
-                    writer.write(code);
-                }finally{
-                    writer.close();
-                }
-            }catch(IOException e){
-                throw new AuraRuntimeException(e);
+                writer.write(code);
+            }finally{
+                writer.close();
             }
-            return "[Import(\""+path+"\")]";
+        }catch(IOException e){
+            throw new AuraRuntimeException(e);
         }
-    
-        @Override
-        public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-            return includedParser.validate(validator);
-        }
+        return "[Import(\""+path+"\")]";
+    }
+
+    @Override
+    public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
+        return includedParser.validate(validator);
+    }
 
 }

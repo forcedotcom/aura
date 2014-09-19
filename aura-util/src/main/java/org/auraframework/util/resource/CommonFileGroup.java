@@ -297,7 +297,7 @@ public abstract class CommonFileGroup implements FileGroup {
 
     @Override
     public File addFile(String s) throws IOException {
-        File f = new File(root, s);
+        File f = root.toPath().resolve(s).toFile();
         addFile(f);
         return f;
     }
@@ -308,7 +308,7 @@ public abstract class CommonFileGroup implements FileGroup {
      */
     @Override
     public File addDirectory(String s) throws FileNotFoundException {
-        File dir = new File(root, s);
+        File dir = root.toPath().resolve(s).toFile();
         addDirectory(dir);
         return dir;
     }

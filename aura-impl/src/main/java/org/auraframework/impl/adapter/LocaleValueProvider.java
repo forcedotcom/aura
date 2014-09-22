@@ -15,8 +15,10 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.text.*;
-import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -111,7 +113,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         // DecimalFormat is expected
         DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(al.getNumberLocale());
 
-        builder.put(NUMBER_FORMAT, df.toPattern());
+        builder.put(NUMBER_FORMAT, df.toLocalizedPattern());
         DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
         builder.put(DECIMAL, dfs.getDecimalSeparator());
         builder.put(GROUPING, dfs.getGroupingSeparator());
@@ -119,11 +121,11 @@ public class LocaleValueProvider implements GlobalValueProvider {
         
         df = (DecimalFormat) DecimalFormat.getPercentInstance(al.getNumberLocale());
 
-        builder.put(PERCENT_FORMAT, df.toPattern());
+        builder.put(PERCENT_FORMAT, df.toLocalizedPattern());
         
         df = (DecimalFormat) DecimalFormat.getCurrencyInstance(al.getCurrencyLocale());
 
-        builder.put(CURRENCY_FORMAT, df.toPattern());
+        builder.put(CURRENCY_FORMAT, df.toLocalizedPattern());
         DecimalFormatSymbols cdfs = df.getDecimalFormatSymbols();
         Currency cur = cdfs.getCurrency();
         builder.put(CURRENCY_CODE, cur != null ? cur.getCurrencyCode() : "");

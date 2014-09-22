@@ -54,7 +54,7 @@ public interface AuraContext {
         JSTESTDEBUG(true, false, true, JavascriptGeneratorMode.TESTINGDEBUG, false),
         AUTOJSTESTDEBUG(true, false, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, false),
         PTEST(false, false, false, JavascriptGeneratorMode.PTEST, true),
-        CADENCE(false, false, false, JavascriptGeneratorMode.PTEST, true),
+        CADENCE(true, false, false, JavascriptGeneratorMode.PTEST, true),
         PRODDEBUG(false, false, false, JavascriptGeneratorMode.PRODUCTIONDEBUG, true),
         PROD(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
         SELENIUM(true, false, true, JavascriptGeneratorMode.AUTOTESTING, true),

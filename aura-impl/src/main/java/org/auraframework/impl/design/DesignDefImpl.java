@@ -71,8 +71,6 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
 
     @Override
     public void serialize(Json json) throws IOException {
-        // TODO Auto-generated method stub
-
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<DesignDef> implements DesignDefBuilder {

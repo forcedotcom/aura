@@ -88,12 +88,10 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        // TODO validation
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-        // TODO Auto-generated method stub
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDesignDef> implements

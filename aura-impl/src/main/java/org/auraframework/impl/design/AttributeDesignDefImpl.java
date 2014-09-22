@@ -24,15 +24,15 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> implements AttributeDesignDef {
-    private Boolean required;
-    private Boolean readonly;
-    private String name;
-    private String type;
-    private String dependency;
-    private String datasource;
-    private String min;
-    private String max;
-    
+    private final Boolean required;
+    private final Boolean readonly;
+    private final String name;
+    private final String type;
+    private final String dependency;
+    private final String datasource;
+    private final String min;
+    private final String max;
+
     protected AttributeDesignDefImpl(Builder builder) {
         super(builder);
         this.required = builder.required;
@@ -44,59 +44,60 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         this.min = builder.min;
         this.max = builder.max;
     }
-    
+
     @Override
     public Boolean getRequired() {
         return required;
     }
-    
+
     @Override
     public Boolean getReadOnly() {
         return readonly;
     }
-    
+
     @Override
     public String getName() {
         return name;
     }
-    
+
     @Override
     public String getType() {
         return type;
     }
-    
+
     @Override
     public String getDependency() {
         return dependency;
     }
-    
+
     @Override
     public String getDataSource() {
         return datasource;
     }
-    
+
     @Override
     public String getMin() {
         return min;
     }
-    
+
     @Override
     public String getMax() {
         return max;
     }
-    
+
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
         // TODO validation
     }
-    
+
     @Override
     public void serialize(Json json) throws IOException {
         // TODO Auto-generated method stub
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDesignDef> implements AttributeDesignDefBuilder {
+    public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDesignDef> implements
+            AttributeDesignDefBuilder {
         private Boolean required;
         private Boolean readonly;
         private String name;
@@ -105,7 +106,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         private String datasource;
         private String min;
         private String max;
-        
+
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
          */
@@ -165,6 +166,6 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
             this.max = max;
             return this;
         }
-        
+
     }
 }

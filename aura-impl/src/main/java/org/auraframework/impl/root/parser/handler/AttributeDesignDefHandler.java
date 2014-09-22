@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableSet;
 
 public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesignDef, DesignDef> {
     public static final String TAG = "aura:attributeDesign";
-    
+
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_REQUIRED = "required";
@@ -42,22 +42,24 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_DATASOURCE = "dataSource";
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
-    
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, 
-            ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE, ATTRIBUTE_MIN, ATTRIBUTE_MAX);
-    
+
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE,
+            ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE, ATTRIBUTE_MIN,
+            ATTRIBUTE_MAX);
+
     private final AttributeDesignDefImpl.Builder builder = new AttributeDesignDefImpl.Builder();
-    
-    //TODO implement tool specific properties
-    
-    public AttributeDesignDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+
+    // TODO implement tool specific properties
+
+    public AttributeDesignDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
+            Source<?> source) {
         super(parentHandler, xmlReader, source);
     }
-    
+
     @Override
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
-        
+
         String name = getAttributeValue(ATTRIBUTE_NAME);
         String type = getAttributeValue(ATTRIBUTE_TYPE);
         String required = getAttributeValue(ATTRIBUTE_REQUIRED);
@@ -68,20 +70,21 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         String max = getAttributeValue(ATTRIBUTE_MAX);
 
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor, AttributeDesignDef.class));
+            builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor,
+                    AttributeDesignDef.class));
             builder.setName(name);
         } else {
             error("Name attribute is required for attribute design definitions");
         }
-        
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(required)) {
+
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(required)) {
             builder.setRequired(Boolean.parseBoolean(required));
         }
-        
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(readonly)) {
+
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(readonly)) {
             builder.setReadOnly(Boolean.parseBoolean(readonly));
         }
-        
+
         builder.setType(type);
         builder.setDependency(dependency);
         builder.setDataSource(datasource);
@@ -89,7 +92,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         builder.setMax(max);
         builder.setLocation(getLocation());
     }
-    
+
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         error("Found unexpected tag %s", getTagName());
@@ -104,6 +107,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }
+
     @Override
     public String getHandledTag() {
         return TAG;

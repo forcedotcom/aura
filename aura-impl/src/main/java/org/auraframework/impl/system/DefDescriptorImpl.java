@@ -21,7 +21,9 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.CachingService;

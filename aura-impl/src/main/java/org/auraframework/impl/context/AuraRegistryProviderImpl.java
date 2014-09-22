@@ -15,37 +15,65 @@
  */
 package org.auraframework.impl.context;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.IncludeDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.ResourceDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.css.style.StyleDefFactory;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
-import org.auraframework.impl.java.provider.*;
+import org.auraframework.impl.java.provider.JavaProviderDefFactory;
+import org.auraframework.impl.java.provider.JavaThemeDescriptorProviderDefFactory;
+import org.auraframework.impl.java.provider.JavaThemeMapProviderDefFactory;
 import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
 import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
-import org.auraframework.impl.system.*;
+import org.auraframework.impl.system.CacheableDefFactoryImpl;
+import org.auraframework.impl.system.CachingDefRegistryImpl;
+import org.auraframework.impl.system.NonCachingDefRegistryImpl;
+import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.*;
+import org.auraframework.system.CacheableDefFactory;
+import org.auraframework.system.DefFactory;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.SourceListener;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLocator;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener {
     private static final Logger _log = Logger.getLogger(RegistryAdapter.class);

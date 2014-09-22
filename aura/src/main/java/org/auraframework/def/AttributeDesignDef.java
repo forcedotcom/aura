@@ -17,11 +17,17 @@ package org.auraframework.def;
 
 public interface AttributeDesignDef extends Definition {
     public Boolean getRequired();
+
     public Boolean getReadOnly();
+
     public String getType();
+
     public String getDependency();
+
     public String getDataSource();
+
     public String getMin();
+
     public String getMax();
     
 }

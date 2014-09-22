@@ -51,6 +51,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
     public static final String IS_IE8 = "isIE8";
     public static final String IS_IE9 = "isIE9";
     public static final String IS_IE10 = "isIE10";
+    public static final String IS_IE11 = "isIE11";
 
     private Map<String, Object> browserDetails;
 
@@ -71,6 +72,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
         m.put(IS_IE8, b.isIE8());
         m.put(IS_IE9, b.isIE9());
         m.put(IS_IE10, b.isIE10());
+        m.put(IS_IE11, b.isIE11());
         m.put(IS_WEBKIT, b.isWebkit());
         m.put(IS_FIREFOX, b.isFirefox());
         m.put(IS_WINDOWS_PHONE, b.isWindowsPhone());
@@ -103,8 +105,6 @@ public class BrowserValueProvider implements GlobalValueProvider {
             throw new InvalidExpressionException("No property on $Browser for key: " + expr, expr.getLocation());
         }
     }
-
-
 
     @Override
     public boolean isEmpty() {

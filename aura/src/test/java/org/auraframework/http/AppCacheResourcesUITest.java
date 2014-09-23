@@ -126,8 +126,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening cached app will only query server for the manifest and the component load.
+     * TODO: put BrowserType.SAFARI back , W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -143,8 +144,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening cached app that had a prior cache error will reload the app.
+     * TODO: put BrowserType.SAFARI back, W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -178,8 +180,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening uncached app that had a prior cache error will have limited caching.
+     * TODO: put BrowserType.SAFARI back , W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
 
@@ -190,9 +193,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(), null, null, null, 200));
         expectedChange.add(new Request("/auraResource", null, null, "css", 200));
         expectedChange.add(new Request("/auraResource", null, null, "js", 200));
+        switch (getBrowserType()) {
+        case GOOGLECHROME:
+        	expectedChange.add(new Request(1, getUrl(), null, null, null, 200));
+        	break;
+        default:
+        	expectedChange.add(new Request(getUrl(), null, null, null, 200));
+        }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
         // There may be a varying number of requests, depending on when the initial manifest response is received.
@@ -444,9 +453,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         new Function<WebDriver, WebElement>() {
                             @Override
                             public WebElement apply(WebDriver input) {
-                                WebElement find = findDomElement(By
+                            	try {
+                            		WebElement find = findDomElement(By
                                         .cssSelector(".clickableme"));
-                                try {
                                     if (markupToken.equals(find.getText())) {
                                         return find;
                                     }
@@ -465,9 +474,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 new Function<WebDriver, String>() {
                     @Override
                     public String apply(WebDriver input) {
-                        WebElement find = findDomElement(By
-                                .cssSelector(".clickableme"));
                         try {
+                        	WebElement find = findDomElement(By
+                                .cssSelector(".clickableme"));
                             find.click();
                             WebElement output = findDomElement(By
                                     .cssSelector("div.attroutput"));

@@ -19,7 +19,7 @@ import org.auraframework.def.AttributeDesignDef;
 
 public interface AttributeDesignDefBuilder extends DefBuilder<AttributeDesignDef, AttributeDesignDef> {
     public AttributeDesignDefBuilder setName(String name);
-    
+
     public AttributeDesignDefBuilder setLabel(String label);
 
     public AttributeDesignDefBuilder setType(String type);

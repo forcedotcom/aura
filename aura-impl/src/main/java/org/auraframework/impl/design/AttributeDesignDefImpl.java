@@ -129,7 +129,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
             this.label = label;
             return this;
         }
-        
+
         @Override
         public AttributeDesignDefBuilder setType(String type) {
             this.type = type;

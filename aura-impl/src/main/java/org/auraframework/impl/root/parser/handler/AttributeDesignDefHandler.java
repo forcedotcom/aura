@@ -44,9 +44,9 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL, ATTRIBUTE_TYPE,
-            ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE, ATTRIBUTE_MIN,
-            ATTRIBUTE_MAX);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
+            ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
+            ATTRIBUTE_MIN, ATTRIBUTE_MAX);
 
     private final AttributeDesignDefImpl.Builder builder = new AttributeDesignDefImpl.Builder();
 

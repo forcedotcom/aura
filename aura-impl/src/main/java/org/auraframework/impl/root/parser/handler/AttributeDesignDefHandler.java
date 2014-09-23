@@ -35,6 +35,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     public static final String TAG = "aura:attributeDesign";
 
     private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_LABEL = "label";
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_REQUIRED = "required";
     private static final String ATTRIBUTE_READONLY = "readonly";
@@ -43,7 +44,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE,
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL, ATTRIBUTE_TYPE,
             ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE, ATTRIBUTE_MIN,
             ATTRIBUTE_MAX);
 
@@ -61,6 +62,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         super.readAttributes();
 
         String name = getAttributeValue(ATTRIBUTE_NAME);
+        String label = getAttributeValue(ATTRIBUTE_LABEL);
         String type = getAttributeValue(ATTRIBUTE_TYPE);
         String required = getAttributeValue(ATTRIBUTE_REQUIRED);
         String readonly = getAttributeValue(ATTRIBUTE_READONLY);
@@ -85,6 +87,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
             builder.setReadOnly(Boolean.parseBoolean(readonly));
         }
 
+        builder.setLabel(label);
         builder.setType(type);
         builder.setDependency(dependency);
         builder.setDataSource(datasource);

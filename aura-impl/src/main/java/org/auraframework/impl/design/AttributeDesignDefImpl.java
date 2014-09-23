@@ -99,6 +99,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         private Boolean required;
         private Boolean readonly;
         private String name;
+        private String label;
         private String type;
         private String dependency;
         private String datasource;
@@ -123,6 +124,12 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
             return this;
         }
 
+        @Override
+        public AttributeDesignDefBuilder setLabel(String label) {
+            this.label = label;
+            return this;
+        }
+        
         @Override
         public AttributeDesignDefBuilder setType(String type) {
             this.type = type;

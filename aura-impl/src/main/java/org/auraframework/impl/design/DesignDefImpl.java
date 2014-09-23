@@ -16,17 +16,10 @@
 package org.auraframework.impl.design;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.builder.DesignDefBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDesignDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -50,7 +43,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
 
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        throw new UnsupportedOperationException("DocumentationDef cannot contain AttributeDefs.");
+        throw new UnsupportedOperationException("DesignDef cannot contain AttributeDefs.");
     }
 
     @Override

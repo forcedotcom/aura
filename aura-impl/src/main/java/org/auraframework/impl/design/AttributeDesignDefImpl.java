@@ -32,6 +32,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     private final String datasource;
     private final String min;
     private final String max;
+    private final String label;
 
     protected AttributeDesignDefImpl(Builder builder) {
         super(builder);
@@ -43,6 +44,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         this.datasource = builder.datasource;
         this.min = builder.min;
         this.max = builder.max;
+        this.label = builder.label;
     }
 
     @Override
@@ -83,6 +85,11 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     @Override
     public String getMax() {
         return max;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 
     @Override

@@ -29,5 +29,7 @@ public interface AttributeDesignDef extends Definition {
     public String getMin();
 
     public String getMax();
-    
+
+    public String getLabel();
+
 }

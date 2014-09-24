@@ -292,21 +292,11 @@
         };
     },
     _bridgeScrollerCallback: function (component, auraAction, callback) {
-        var timeout   = 5000,
-            triggered = false;
-
-        // If the callback was not triggered after a big timeout, call it manually with an error
-        window.setTimeout(function () {
-            if (!triggered) {
-                callback({
-                    /*labelError: 'Callback never called...'*/
-                });
-            }
-        }, timeout);
-
+        // Users of this component need to call the event/callback that gets passed
+        // on to onPullToRefresh and onPullToRefresh with error or success arguments
+        // for the scroller to update its 'loading' state.
         $A.run(function () {
             auraAction.run(function () {
-                triggered = true;
                 callback.apply(this, arguments);
             });    
         });

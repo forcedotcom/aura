@@ -39,7 +39,7 @@ var AuraStorageService = function(){
          * @param {String} name Required. The unique name of the storage to be initialized.
          * @param {Boolean} persistent Set to true if the requested storage is persistent.
          * @param {Boolean} secure Set to true if the requested storage is secure.
-         * @param {number} maxSize Specifies the maximum storage size in KB.
+         * @param {number} maxSize Specifies the maximum storage size in bytes.
          * @param {number} defaultExpiration Specifies the default time in seconds after which the cache expires. When an item is requested that has gone past the default cache expiration time, it will not be used.
          * @param {number} defaultAutoRefreshInterval Specifies the default interval in seconds after which cached data is to be refreshed.
          * @param {Boolean} debugLoggingEnabled Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
@@ -88,9 +88,9 @@ var AuraStorageService = function(){
          * Creates a storage adapter. Used mostly in non-production modes.
          * <p>Example:</p>
          * <code>$A.storageService.createAdapter("memory", "test", 4096, true);</code>
-         * @param {String} adapter The new adapter to create 
-         * @param {String} name The name of the adapter
-         * @param {Integer} maxSize The maximum size to allocate to the storage adapter
+         * @param {String} adapter The new adapter to create.
+         * @param {String} name The name of the adapter.
+         * @param {Integer} maxSize The maximum size in bytes to allocate to the storage adapter.
          * @param {Boolean} debugLoggingEnabled Set to true to enable logging, or false otherwise.
          * @memberOf AuraStorageService
          */

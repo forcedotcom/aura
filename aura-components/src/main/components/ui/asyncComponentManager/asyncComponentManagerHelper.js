@@ -23,6 +23,7 @@
         var numOfLoadingComponents = cmp._numOfLoadingComponents || 0;
         var registeredComponents = cmp._registeredComponents || [];
         var maxConcurrency = cmp.get("v.maxConcurrency");
+        var asyncCmp = "";
 
         while(numOfLoadingComponents < maxConcurrency && registeredComponents.length > 0) {
             // get the next registered component to load

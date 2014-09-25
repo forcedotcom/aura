@@ -81,6 +81,8 @@ public final class PerfMetricsCollector {
                 startBrowserJSHeapSizeBytes = getBrowserJSHeapSize(test.takeHeapSnapshot());
             }
             break;
+        default:
+            break;
         }
 
         startMillis = System.currentTimeMillis();
@@ -108,6 +110,8 @@ public final class PerfMetricsCollector {
                 // TODO: happens for framework tests
                 LOG.log(Level.WARNING, "not running in STATS mode", e);
             }
+            break;
+        default:
             break;
         }
 
@@ -188,6 +192,8 @@ public final class PerfMetricsCollector {
                         }
                     }
                 }
+            default:
+                break;
             }
         } catch (Exception e) {
             LOG.log(Level.WARNING, test.getName(), e);

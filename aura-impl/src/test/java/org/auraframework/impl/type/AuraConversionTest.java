@@ -124,8 +124,8 @@ public class AuraConversionTest extends AuraImplTestCase {
         runPassPairs(
                 ArrayList.class,
                 new Object[] { "a,,b, c,d , e ",
-                        new ArrayList<String>(Arrays.asList(new String[] { "a", "", "b", " c", "d ", " e " })), "",
-                        new ArrayList<String>(Arrays.asList(new String[] {})), }, true);
+                        new ArrayList<>(Arrays.asList(new String[] { "a", "", "b", " c", "d ", " e " })), "",
+                        new ArrayList<>(Arrays.asList(new String[] {})), }, true);
     }
 
     /**
@@ -139,8 +139,8 @@ public class AuraConversionTest extends AuraImplTestCase {
     public void testStringToList() throws Exception {
         runPassPairs(List.class,
                 new Object[] { "a,,b, c,d , e ",
-                        new ArrayList<String>(Arrays.asList(new String[] { "a,,b, c,d , e " })), "",
-                        new ArrayList<String>(Arrays.asList(new String[] { "" })), }, false);
+                        new ArrayList<>(Arrays.asList(new String[] { "a,,b, c,d , e " })), "",
+                        new ArrayList<>(Arrays.asList(new String[] { "" })), }, false);
     }
 
     /**
@@ -155,7 +155,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      */
     public void testStringToDateArray() throws Exception {
         runPassPairs(Date.class, Date[].class,
-                new Object[] { new ArrayList<String>(Arrays.asList(new String[] { "1234", "2345", "-3456" })),
+                new Object[] { new ArrayList<>(Arrays.asList(new String[] { "1234", "2345", "-3456" })),
                         new Date[] { new Date(1234L), new Date(2345L), new Date(-3456) } });
     }
 
@@ -233,7 +233,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      */
     public void testArrayListToIntegerArray() throws Exception {
         runPassPairs(Integer.class, Integer[].class,
-                new Object[] { new ArrayList<String>(Arrays.asList(new String[] { "0", "-1234", "1234567890" })),
+                new Object[] { new ArrayList<>(Arrays.asList(new String[] { "0", "-1234", "1234567890" })),
                         new Integer[] { new Integer(0), new Integer(-1234), new Integer(1234567890), }, });
     }
 
@@ -289,7 +289,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      */
     public void testArrayListToStringArray() throws Exception {
         runPassPairs(String.class, String[].class,
-                new Object[] { new ArrayList<String>(Arrays.asList(new String[] { " a ", "b", " ", "c" })),
+                new Object[] { new ArrayList<>(Arrays.asList(new String[] { " a ", "b", " ", "c" })),
                         new String[] { "a", "b", "", "c" }, });
     }
 
@@ -301,10 +301,10 @@ public class AuraConversionTest extends AuraImplTestCase {
      */
     public void testArrayListToBooleanArray() throws Exception {
         runPassPairs(Boolean.class, Boolean[].class,
-                new Object[] { new ArrayList<Boolean>(Arrays.asList(new Boolean[] { Boolean.TRUE, Boolean.FALSE })),
+                new Object[] { new ArrayList<>(Arrays.asList(new Boolean[] { Boolean.TRUE, Boolean.FALSE })),
                         new Boolean[] { Boolean.TRUE, Boolean.FALSE }, });
         try {
-            TypeUtil.convertNoTrim(new ArrayList<Integer>(Arrays.asList(new Integer[] { Integer.valueOf(1) })),
+            TypeUtil.convertNoTrim(new ArrayList<>(Arrays.asList(new Integer[] { Integer.valueOf(1) })),
                     Boolean[].class);
             fail("Should fail to convert a list of integers");
         } catch (Exception expected) {
@@ -321,7 +321,7 @@ public class AuraConversionTest extends AuraImplTestCase {
     public void testStringToHashSet() throws Exception {
         runPassPairs(HashSet.class,
                 new Object[] { "a,b, c, d ",
-                        new HashSet<String>(Arrays.asList(new String[] { "a", "b", " c", " d " })), }, true);
+                        new HashSet<>(Arrays.asList(new String[] { "a", "b", " c", " d " })), }, true);
     }
 
     /**
@@ -378,7 +378,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToHashMapConverter.java
      */
     public void testStringToHashMap() throws Exception {
-        HashMap<String, String> out = new HashMap<String, String>();
+        HashMap<String, String> out = new HashMap<>();
 
         out.put("a", "b");
         out.put("c", "d");

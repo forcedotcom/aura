@@ -23,7 +23,7 @@ public class CustomAbstractTypeConverter implements MultiConverter<CustomAbstrac
 	private static Set<Class<?>> toSet;
 	
 	static {
-		toSet = new HashSet<Class<?>>();
+		toSet = new HashSet<>();
 		toSet.add(CustomConcreteType1.class);
 		toSet.add(CustomConcreteType2.class);
 	}

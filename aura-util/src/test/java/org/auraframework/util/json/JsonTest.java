@@ -106,7 +106,7 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testSerializeMap() throws IOException {
-        Map<Object, Object> m = new LinkedHashMap<Object, Object>(2);
+        Map<Object, Object> m = new LinkedHashMap<>(2);
         assertEquals("{}", Json.serialize(m));
         m.put("key1", "val1");
         assertEquals("{\"key1\":\"val1\"}", Json.serialize(m));
@@ -114,13 +114,13 @@ public class JsonTest extends UnitTestCase {
         assertEquals("{\"key1\":\"val1\",\"key2\":\"val2\"}", Json.serialize(m));
         assertEquals("{\n  \"key1\":\"val1\",\n  \"key2\":\"val2\"\n}", Json.serialize(m, true, false));
 
-        Map<String, Object> stringMap = new LinkedHashMap<String, Object>(2);
+        Map<String, Object> stringMap = new LinkedHashMap<>(2);
         stringMap.put("stringKey", "stringValue");
         assertEquals("{\"stringKey\":\"stringValue\"}", Json.serialize(stringMap));
     }
 
     public void testSerializeCollection() throws IOException {
-        Collection<Object> c = new ArrayList<Object>();
+        Collection<Object> c = new ArrayList<>();
         assertEquals("[]", Json.serialize(c));
         c.add("val1");
         assertEquals("[\"val1\"]", Json.serialize(c));
@@ -130,12 +130,12 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testSerializeComplexObject() throws IOException {
-        Map<Object, Object> m = new LinkedHashMap<Object, Object>(1);
-        Map<Object, Object> m2 = new LinkedHashMap<Object, Object>(1);
+        Map<Object, Object> m = new LinkedHashMap<>(1);
+        Map<Object, Object> m2 = new LinkedHashMap<>(1);
         String[] s = { "string1", "string2" };
         m2.put("key2", s);
-        Collection<Object> c = new ArrayList<Object>();
-        Collection<Object> c2 = new ArrayList<Object>();
+        Collection<Object> c = new ArrayList<>();
+        Collection<Object> c2 = new ArrayList<>();
         c.add(s);
         c.add(true);
         c.add(10);
@@ -419,7 +419,7 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteMapEntryTyped() throws IOException {
-        List<String> list = new ArrayList<String>(2);
+        List<String> list = new ArrayList<>(2);
         list.add("item1");
         list.add("item2");
         Json json = new Json(new StringBuilder(), false, false);
@@ -434,7 +434,7 @@ public class JsonTest extends UnitTestCase {
         json.writeMapEnd();
         assertEquals("{\"key\":[]}", json.getAppendable().toString());
 
-        Map<String,Integer> map = new TreeMap<String,Integer>();
+        Map<String,Integer> map = new TreeMap<>();
         map.put("item1", 1);
         map.put("item2", 2);
         json = new Json(new StringBuilder(), false, false);
@@ -644,7 +644,7 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testNullValuesInMaps() throws Exception {
-        final Map<String, Object> map = new LinkedHashMap<String, Object>(8);
+        final Map<String, Object> map = new LinkedHashMap<>(8);
         map.put("cats", null);
         map.put("dogs", "bark");
         map.put("birds", "chirp");

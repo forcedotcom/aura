@@ -754,7 +754,7 @@ public class AuraUITestingUtil {
 
         String result = (String) getEval(jsString);
 
-        ArrayList<String> resultList = new ArrayList<String>();
+        ArrayList<String> resultList = new ArrayList<>();
         String output = "";
 
         // No errors

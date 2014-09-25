@@ -20,7 +20,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.util.text.Hash;
@@ -47,7 +46,7 @@ public class SourceTest extends AuraTestCase {
     public void testHashingReaderProgress() throws Exception {
         int expectedHashCode = getHashCode("hi");
 
-        Source<?> src = new StringSource<Definition>(null, "hi", null, null);
+        Source<?> src = new StringSource<>(null, "hi", null, null);
         Hash hash = src.getHash();
 
         // hash not set initially
@@ -80,7 +79,7 @@ public class SourceTest extends AuraTestCase {
     public void testHashingReaderLargerBuffer() throws Exception {
         int expectedHashCode = getHashCode("hi");
 
-        Source<?> src = new StringSource<Definition>(null, "hi", null, null);
+        Source<?> src = new StringSource<>(null, "hi", null, null);
         Hash hash = src.getHash();
         Reader reader = src.getHashingReader();
         char[] buffer = new char[50];
@@ -98,7 +97,7 @@ public class SourceTest extends AuraTestCase {
     public void testHashingReaderNull() throws Exception {
         int expectedHashCode = getHashCode("");
 
-        Source<?> src = new StringSource<Definition>(null, null, null, null);
+        Source<?> src = new StringSource<>(null, null, null, null);
         Hash hash = src.getHash();
         Reader reader = src.getHashingReader();
         char[] buffer = new char[50];
@@ -115,7 +114,7 @@ public class SourceTest extends AuraTestCase {
     public void testHashingReaderEmpty() throws Exception {
         int expectedHashCode = getHashCode("");
 
-        Source<?> src = new StringSource<Definition>(null, "", null, null);
+        Source<?> src = new StringSource<>(null, "", null, null);
         Hash hash = src.getHash();
         Reader reader = src.getHashingReader();
         char[] buffer = new char[50];

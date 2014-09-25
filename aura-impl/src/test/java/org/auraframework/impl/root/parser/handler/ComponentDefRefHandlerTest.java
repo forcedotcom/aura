@@ -46,14 +46,14 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         super.setUp();
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
                 ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 desc,
                 "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>",
                 "myID", Format.XML);
         xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
-        cdrHandler = new ComponentDefRefHandler<ComponentDef>(cdh, xmlReader, source);
+        cdrHandler = new ComponentDefRefHandler<>(cdh, xmlReader, source);
         cdrHandler.readAttributes();
     }
 
@@ -141,11 +141,11 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     private ComponentDefRefHandler<?> createComponentDefHandler(String markup) throws Exception {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
                 ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup, "myID", Format.XML);
+        StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
         xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
-        return new ComponentDefRefHandler<ComponentDef>(cdh, xmlReader, source);
+        return new ComponentDefRefHandler<>(cdh, xmlReader, source);
 
     }
 }

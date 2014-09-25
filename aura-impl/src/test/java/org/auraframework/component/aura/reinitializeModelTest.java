@@ -412,7 +412,7 @@ public class reinitializeModelTest extends AuraImplTestCase {
         if (testModelWithCount) {
             TestReinitializeModelWithCount.clearCount();
         }
-        ArrayList<Component> newCmpList = new ArrayList<Component>();
+        ArrayList<Component> newCmpList = new ArrayList<>();
         newCmpList.add(newAttrCMP);
         attributesMain.clear();
         attributesMain.put("componentArray", newCmpList);

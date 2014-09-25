@@ -146,7 +146,7 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
             Class retType = invocation.getReturnType();
             @SuppressWarnings("unchecked")
             List<Answer<Object>> answers = getAnswers(((Map<?, ?>) object).get("answers"), retType);
-            return new Stub<Object>(invocation, answers);
+            return new Stub<>(invocation, answers);
         }
         return null;
     }
@@ -227,11 +227,11 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
             String error = (String) map.get("error");
             if (value != null) {
                 if (error == null) {
-                    return new Returns<T>(value);
+                    return new Returns<>(value);
                 }
             } else {
                 if (error != null) {
-                    return new ThrowsExceptionClass<T>(error);
+                    return new ThrowsExceptionClass<>(error);
                 }
             }
         }

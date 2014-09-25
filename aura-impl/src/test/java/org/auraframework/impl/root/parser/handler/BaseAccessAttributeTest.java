@@ -65,7 +65,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
     }
 	
 	public void testInvalidValidAccess() throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();		
+		ArrayList<String> failures = new ArrayList<>();		
 		for (Access access : Access.values()) {
 			testCase = getTestCase(access, "INVALID");	
 			testNamespace = TestNamespace.System;
@@ -95,7 +95,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
     }
 	
 	public void testInvalidValidAuthentication() throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();		
+		ArrayList<String> failures = new ArrayList<>();		
 		for (Authentication authentication : Authentication.values()) {
 			testCase = getTestCase(authentication, "INVALID");	
 			testNamespace = TestNamespace.System;
@@ -193,7 +193,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 	}
 	
 	private void verifySimpleAccess(TestNamespace namespace, boolean isDynamic) throws Exception {		
-		ArrayList<String> failures = new ArrayList<String>();		
+		ArrayList<String> failures = new ArrayList<>();		
 		for (Access access : Access.values()) {
 			if(!(isDynamic && access == Access.PRIVATE)){ // TODO W-2085835
 				testCase = getTestCase(access, isDynamic);	
@@ -225,7 +225,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
     }		
 	
 	private void verifyCombinationAccess(TestNamespace namespace) throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 		Access[] accessValues = Access.values();
 		for (int i = 0; i < accessValues.length-1; i++) {	
 			for (int j = i+1; j < accessValues.length; j++) {
@@ -258,7 +258,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
     }
 	
 	private void verifySimpleAuthentication(TestNamespace namespace, boolean isDynamic) throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 		for (Authentication authentication : Authentication.values()) {
 			testCase = getTestCase(authentication, isDynamic);	
 			testNamespace = namespace;
@@ -293,7 +293,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
     }
 	
 	private void verifyAccessAuthentication(TestNamespace namespace) throws Exception {		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 		Access[] accessValues = Access.values();
 		Authentication[] authenticationValues = Authentication.values();
 		

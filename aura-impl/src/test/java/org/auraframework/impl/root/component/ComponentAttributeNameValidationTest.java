@@ -113,7 +113,6 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      *
      * @expectedResults attribute value is retrieved
      */
-    @SuppressWarnings("unchecked")
     public void testInvalidAttributePrefix() throws Exception {
         try {
             getComponentInstance("<aura:component><aura:attribute name='aura:special1' type='String' default='hi'/></aura:component>");

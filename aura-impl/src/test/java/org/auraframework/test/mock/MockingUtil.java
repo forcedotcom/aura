@@ -50,7 +50,7 @@ public class MockingUtil {
      * @param mockDefs the Definitions to be mocked
      * @throws Exception
      */
-    public <D extends Definition> void mockDef(D... mockDefs) throws Exception {
+    public <D extends Definition> void mockDef(@SuppressWarnings("unchecked") D... mockDefs) throws Exception {
         if (mockDefs != null && mockDefs.length > 0) {
             TestContextAdapter testContextAdapter = Aura
                     .get(TestContextAdapter.class);
@@ -94,7 +94,7 @@ public class MockingUtil {
     public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws Exception {
         D def = XMLParser.getInstance().parse(
                 descriptor,
-                new StringSource<D>(descriptor, markup, descriptor.getQualifiedName(),
+                new StringSource<>(descriptor, markup, descriptor.getQualifiedName(),
                         org.auraframework.system.Parser.Format.XML));
         mockDef(def);
         return def;

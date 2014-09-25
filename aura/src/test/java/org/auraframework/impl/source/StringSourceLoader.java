@@ -106,9 +106,9 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     /**
      * This map stores all of the sources owned by this loader, split into namespaces.
      */
-    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = new ConcurrentHashMap<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>>();
+    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = new ConcurrentHashMap<>();
 
-    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> customNamespaces = new ConcurrentHashMap<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>>();
+    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> customNamespaces = new ConcurrentHashMap<>();
 
     
     private StringSourceLoader() {
@@ -215,7 +215,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
             boolean overwrite, boolean isPrivilegedNamespace) {
         Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
-        StringSource<D> source = new StringSource<D>(descriptor, contents, descriptor.getQualifiedName(), format);
+        StringSource<D> source = new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), format);
         return putSource(descriptor, source, overwrite, isPrivilegedNamespace);
     }
 
@@ -360,8 +360,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 
     @Override
     public Set<String> getNamespaces() {
-    	Set<String> allNamespaces = new HashSet<String>(namespaces.keySet());
-    	Set<String> cNamespaces = new HashSet<String>(customNamespaces.keySet());
+    	Set<String> allNamespaces = new HashSet<>(namespaces.keySet());
+    	Set<String> cNamespaces = new HashSet<>(customNamespaces.keySet());
     	allNamespaces.addAll(cNamespaces);
     	return ImmutableSet.copyOf(allNamespaces);
     }
@@ -387,11 +387,11 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             StringSource<D> ret = (StringSource<D>) sourceMap.get(descriptor);
             if (ret != null) {
                 // return a copy of the StringSource to emulate other Sources (hash is reset)
-                return new StringSource<D>(ret);
+                return new StringSource<>(ret);
             }
             if (descriptor.getDefType().equals(DefType.NAMESPACE)) {
                 Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
-                return new StringSource<D>(descriptor, "", descriptor.getQualifiedName(),
+                return new StringSource<>(descriptor, "", descriptor.getQualifiedName(),
                         format);
             }
         }

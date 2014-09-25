@@ -41,7 +41,7 @@ public class AuraRegistryProviderImplTest extends AuraImplTestCase {
     @AuraTestLabels("auraSanity")
     public void testAllRegistries() throws Exception {
         Collection<ComponentLocationAdapter> markupLocations;
-        List<File> broken = new ArrayList<File>();
+        List<File> broken = new ArrayList<>();
 
         markupLocations = new AuraRegistryProviderImplOverride().testGetAllComponentLocationAdapters();
         for (ComponentLocationAdapter location : markupLocations) {

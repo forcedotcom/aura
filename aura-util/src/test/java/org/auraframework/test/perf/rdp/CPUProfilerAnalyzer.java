@@ -15,15 +15,12 @@
  */
 package org.auraframework.test.perf.rdp;
 
-import java.io.PrintStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -180,14 +177,6 @@ public final class CPUProfilerAnalyzer {
 
         depth--;
         return totalHitCount;
-    }
-
-    private void printInfo(PrintStream out) {
-        List<CPUProfileInfo> nodes = Lists.newArrayList(functionToInfo.values());
-        Collections.sort(nodes);
-        for (CPUProfileInfo node : nodes) {
-            out.println(node);
-        }
     }
 
     /**

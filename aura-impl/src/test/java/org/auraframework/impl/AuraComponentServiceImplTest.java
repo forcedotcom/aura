@@ -34,7 +34,7 @@ public class AuraComponentServiceImplTest extends AuraImplTestCase {
     }
 
     public void testGetComponent() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr", "yo");
         assertNotNull(Aura.getInstanceService().getInstance("test:child1", ComponentDef.class, attributes));
     }

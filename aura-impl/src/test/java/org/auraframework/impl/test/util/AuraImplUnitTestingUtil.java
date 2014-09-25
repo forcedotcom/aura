@@ -458,19 +458,19 @@ public class AuraImplUnitTestingUtil {
                     DefDescriptor<ComponentDef> extendsDescriptor) {
 
             if (attributeDefs == null) {
-                    attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+                    attributeDefs = new HashMap<>();
                     attributeDefs.put(getAttributeDescriptor(),
                                                     makeAttributeDef(null, null, null, false, null,
                                                                     null, null));
             }
 
             if (eventDefs == null) {
-                    eventDefs = new HashMap<String, RegisterEventDef>();
+                    eventDefs = new HashMap<>();
                     eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
             }
 
             if (children == null) {
-                    children = new ArrayList<ComponentDefRef>();
+                    children = new ArrayList<>();
                     children.add(makeComponentDefRef(getChildComponentDefDescriptor(),
                                     null, null));
             }
@@ -529,7 +529,7 @@ public class AuraImplUnitTestingUtil {
             ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
 
             if (attributeDefs == null) {
-                    attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+                    attributeDefs = new HashMap<>();
                     attributeDefs
                                     .put(getAttributeDescriptor(),
                                                     makeAttributeDef(null, null, null, false, null,
@@ -538,18 +538,18 @@ public class AuraImplUnitTestingUtil {
             addAttributes(builder, attributeDefs);
 
             if (eventDefs == null) {
-                    eventDefs = new HashMap<String, RegisterEventDef>();
+                    eventDefs = new HashMap<>();
                     eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
             }
             builder.events = eventDefs;
 
             if (interfaces == null) {
-                    interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
+                    interfaces = new HashSet<>();
                     interfaces.add(getInterfaceDefDescriptor());
             }
             builder.interfaces = interfaces;
 
-            List<DefDescriptor<ControllerDef>> cd = new ArrayList<DefDescriptor<ControllerDef>>();
+            List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
             cd.add(controllerDescriptor == null ? getControllerDescriptor()
                             : controllerDescriptor);
             builder.controllerDescriptors = cd;
@@ -633,7 +633,7 @@ public class AuraImplUnitTestingUtil {
             ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
 
             if (attributeDefs == null) {
-                    attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+                    attributeDefs = new HashMap<>();
                     attributeDefs
                                     .put(getAttributeDescriptor(),
                                                     makeAttributeDef(null, null, null, false, null,
@@ -641,24 +641,24 @@ public class AuraImplUnitTestingUtil {
             }
 
             if (eventDefs == null) {
-                    eventDefs = new HashMap<String, RegisterEventDef>();
+                    eventDefs = new HashMap<>();
                     eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
             }
 
             if (children == null) {
-                    children = new ArrayList<ComponentDefRef>();
+                    children = new ArrayList<>();
                     children.add(makeComponentDefRef(getChildComponentDefDescriptor(),
                                     null, null));
             }
 
             if (interfaces == null) {
-                    interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
+                    interfaces = new HashSet<>();
                     interfaces.add(getInterfaceDefDescriptor());
             }
             /*
              * }
              */
-            List<DefDescriptor<ControllerDef>> cd = new ArrayList<DefDescriptor<ControllerDef>>();
+            List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
             cd.add(controllerDescriptor == null ? getControllerDescriptor()
                             : controllerDescriptor);
 
@@ -698,7 +698,7 @@ public class AuraImplUnitTestingUtil {
                     Set<DefDescriptor<InterfaceDef>> interfaces,
                     List<EventHandlerDef> eventHandlers, boolean isAbstract,
                     boolean isExtensible) {
-            List<DefDescriptor<ControllerDef>> cd = new ArrayList<DefDescriptor<ControllerDef>>();
+            List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
             if (controllerDescriptor != null) {
                     cd.add(controllerDescriptor);
             }
@@ -731,7 +731,7 @@ public class AuraImplUnitTestingUtil {
                     Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues,
                     Location location) {
             if (attributeValues == null) {
-                    attributeValues = new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
+                    attributeValues = new HashMap<>();
                     attributeValues.put(getAttributeDescriptor(),
                                     makeAttributeDefRef(null, null, null));
             }
@@ -775,7 +775,7 @@ public class AuraImplUnitTestingUtil {
                     Location location, DefDescriptor<EventDef> extendsDescriptor) {
 
             if (attributeDefs == null) {
-                    attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+                    attributeDefs = new HashMap<>();
                     attributeDefs
                                     .put(getAttributeDescriptor(),
                                                     makeAttributeDef(null, null, null, false, null,
@@ -872,7 +872,7 @@ public class AuraImplUnitTestingUtil {
             InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
             if (attributeDefs == null) {
-                    attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+                    attributeDefs = new HashMap<>();
                     attributeDefs
                                     .put(getAttributeDescriptor(),
                                                     makeAttributeDef(null, null, null, false, null,
@@ -882,14 +882,14 @@ public class AuraImplUnitTestingUtil {
 
             builder.events = eventDefs;
             if (builder.events == null) {
-                    builder.events = new HashMap<String, RegisterEventDef>();
+                    builder.events = new HashMap<>();
                     builder.events
                                     .put("fakey", makeRegisterEventDef(null, false, null));
             }
 
             builder.extendsDescriptors = extendsDescriptors;
             if (builder.extendsDescriptors == null) {
-                    builder.extendsDescriptors = new HashSet<DefDescriptor<InterfaceDef>>();
+                    builder.extendsDescriptors = new HashSet<>();
                     builder.extendsDescriptors.add(getParentInterfaceDefDescriptor());
             }
 

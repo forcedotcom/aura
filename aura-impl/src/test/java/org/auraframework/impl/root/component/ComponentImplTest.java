@@ -17,15 +17,11 @@ package org.auraframework.impl.root.component;
 
 import java.util.Collections;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.Component;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;

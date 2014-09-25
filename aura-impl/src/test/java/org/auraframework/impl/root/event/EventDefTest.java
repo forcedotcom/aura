@@ -45,7 +45,7 @@ public class EventDefTest extends AuraImplTestCase {
 
     public void testEventDef() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
@@ -99,7 +99,7 @@ public class EventDefTest extends AuraImplTestCase {
 
     public void testValidateDefinitionPrivateAttribute() throws Exception {
         // checks if error is thrown when an attribute is set as private
-        Map<DefDescriptor<AttributeDef>, AttributeDef> att = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> att = new HashMap<>();
         att.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
                 new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, null, null,
                         false, null, null, Visibility.PRIVATE));
@@ -131,14 +131,14 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, null, ext);
-        Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
         def.appendDependencies(dependencies);
         assertTrue("dependencies don't contain the superclass: "+dependencies, dependencies.contains(ext));
     }
 
     public void testSerialize() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
@@ -153,7 +153,7 @@ public class EventDefTest extends AuraImplTestCase {
 
     public void testGetAttributeDefs() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         AttributeDefImpl att1 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testString", AttributeDef.class),
@@ -165,7 +165,7 @@ public class EventDefTest extends AuraImplTestCase {
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);
 
         Map<DefDescriptor<AttributeDef>, AttributeDef> returnedAttributes = def.getAttributeDefs();
-        Map<DefDescriptor<AttributeDef>, AttributeDef> expectedAttributes = new Hashtable<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> expectedAttributes = new Hashtable<>();
         expectedAttributes.put(att1.getDescriptor(), att1);
         expectedAttributes.put(att2.getDescriptor(), att2);
         assertEquals(expectedAttributes, returnedAttributes);
@@ -252,7 +252,7 @@ public class EventDefTest extends AuraImplTestCase {
 
     public void testHashCodeWithDifferentAttributeDefs() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<>();
         attDefs.put(DefDescriptorImpl.getInstance(vendor.getAttributeName(), AttributeDef.class),
                 vendor.makeAttributeDef());
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, attDefs, null, null);

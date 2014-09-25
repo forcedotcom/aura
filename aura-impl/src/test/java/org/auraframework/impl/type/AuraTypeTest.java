@@ -47,7 +47,7 @@ public class AuraTypeTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testAuraConverter() throws Exception {
-        ArrayList<String> typeNames = new ArrayList<String>();
+        ArrayList<String> typeNames = new ArrayList<>();
         String[] types = { "Integer", "Long", "Double", "Decimal", "Boolean", "String", "Object", "Map", "List", "Set",
                 "Aura.Component[]", "Aura.Component", "Aura.ComponentDefRef[]", "Aura.Action" };
 
@@ -57,7 +57,7 @@ public class AuraTypeTest extends AuraImplTestCase {
         List<String> baseTypes = Arrays.asList(types);
 
         BaseComponent<ComponentDef, ?> cmp = null;
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("intName", "3");
         attributes.put("longName", "1525125125");
         attributes.put("doubleName", "14.34");

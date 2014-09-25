@@ -403,15 +403,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         private HttpPost post;
         private String rawResponse;
         private String contextValue;
-        private ArrayList<State> stateList = new ArrayList<State>();
-        private ArrayList<List<Object>> errorsList = new ArrayList<List<Object>>();
-        private ArrayList<Object> returnValueList = new ArrayList<Object>();
+        private ArrayList<State> stateList = new ArrayList<>();
+        private ArrayList<List<Object>> errorsList = new ArrayList<>();
+        private ArrayList<Object> returnValueList = new ArrayList<>();
         
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
-        	this.qualifiedName = new ArrayList<String>();
+        	this.qualifiedName = new ArrayList<>();
         	this.qualifiedName.add(qualifiedName);
-        	this.actionParams = new ArrayList<Map<String,Object>>();
+        	this.actionParams = new ArrayList<>();
             if(actionParams != null) {
             	this.actionParams.add(actionParams);
             } else {
@@ -485,7 +485,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             if (post == null) {
             	
                 Map<String, Object> message = Maps.newHashMap();
-                ArrayList<Map<String,Object>> actionInstanceArray = new ArrayList<Map<String,Object>>();
+                ArrayList<Map<String,Object>> actionInstanceArray = new ArrayList<>();
                 for(int i = 0;i<qualifiedName.size();i++){
                 	Map<String, Object> actionInstance = Maps.newHashMap();
                 	actionInstance.put("descriptor", qualifiedName.get(i));

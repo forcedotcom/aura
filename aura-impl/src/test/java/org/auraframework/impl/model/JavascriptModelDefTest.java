@@ -52,7 +52,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
         validateProperty(modelDef, "bool", true);
         validateProperty(modelDef, "num", BigDecimal.valueOf(5));
         validateProperty(modelDef, "str", "yes");
-        validateProperty(modelDef, "list", new ArrayList<Object>());
+        validateProperty(modelDef, "list", new ArrayList<>());
     }
 
     /**

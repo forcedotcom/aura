@@ -35,7 +35,6 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -564,7 +563,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      */
     @Override
     public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
-        Map<String, RegisterEventDef> ret = new LinkedHashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> ret = new LinkedHashMap<>();
         if (extendsDescriptor != null) {
             ret.putAll(getSuperDef().getRegisterEventDefs());
         }
@@ -607,7 +606,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      */
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> map = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> map = new LinkedHashMap<>();
         if (extendsDescriptor != null) {
             map.putAll(getSuperDef().getAttributeDefs());
         }
@@ -636,7 +635,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
         List<DefDescriptor<ControllerDef>> ret;
         if (extendsDescriptor != null) {
-            ret = new ArrayList<DefDescriptor<ControllerDef>>();
+            ret = new ArrayList<>();
             ret.addAll(this.controllerDescriptors);
             ret.addAll(getSuperDef().getControllerDefDescriptors());
         } else {
@@ -967,7 +966,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      */
     @Override
     public List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException {
-        List<DefDescriptor<ModelDef>> ret = new ArrayList<DefDescriptor<ModelDef>>();
+        List<DefDescriptor<ModelDef>> ret = new ArrayList<>();
 
         if (modelDefDescriptor != null) {
             ret.add(modelDefDescriptor);

@@ -55,21 +55,21 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testAppendDependencies() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<>();
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
-        Map<String, RegisterEventDef> eventDefs = new HashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> eventDefs = new HashMap<>();
         DefDescriptor<EventDef> eventDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         RegisterEventDef red = vendor.makeRegisterEventDefWithNulls(eventDescriptor, true, null);
         eventDefs.put("buckfutter", red);
         InterfaceDefImpl def = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, eventDefs, null, extensions,
                 "java://org.auraframework.impl.java.provider.TestComponentDescriptorProvider");
-        Set<DefDescriptor<?>> expected = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> expected = new HashSet<>();
         expected.add(DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.provider.TestComponentDescriptorProvider", ProviderDef.class));
         expected.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         expected.add(eventDescriptor);
-        Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
         def.appendDependencies(dependencies);
         assertEquals("dependencies are incorrect", expected, dependencies);
     }
@@ -84,7 +84,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testValidateDefinitionPrivateAttribute() throws Exception {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
         atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
                 new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null,
                         DefDescriptorImpl.getInstance("Integer", TypeDef.class), null,
@@ -111,12 +111,12 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testValidateValidDefinition() throws Exception {
         DefDescriptor<EventDef> eventDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         RegisterEventDefImpl red = vendor.makeRegisterEventDefWithNulls(eventDescriptor, true, null);
-        Map<String, RegisterEventDef> eventDefs = new HashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> eventDefs = new HashMap<>();
         eventDefs.put("buckfutter", red);
         AttributeDefImpl testAttributeDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("testattribute",
                 AttributeDef.class), null, vendor.getTypeDef().getDescriptor(), null, false,
                 AttributeDef.SerializeToType.BOTH, null, Visibility.PUBLIC);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<>();
         attDefs.put(DefDescriptorImpl.getInstance("nullAttribute", AttributeDef.class), testAttributeDef);
         InterfaceDefImpl def = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), attDefs, eventDefs, null, null, null);
@@ -124,7 +124,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testGetRegisterEventDefs() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> extendsIntf = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extendsIntf = new HashSet<>();
         extendsIntf.add(vendor.makeInterfaceDefDescriptor("test:testinterfaceparent"));
         InterfaceDefImpl id = vendor.makeInterfaceDef(extendsIntf);
         Map<String, RegisterEventDef> registeredED = id.getRegisterEventDefs();
@@ -133,7 +133,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testGetAttributeDefs() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> extendsIntf = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extendsIntf = new HashSet<>();
         extendsIntf.add(vendor.makeInterfaceDefDescriptor("test:testinterfaceparent"));
         InterfaceDef id = vendor.makeInterfaceDef(extendsIntf);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = id.getAttributeDefs();
@@ -147,7 +147,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testGetEventDefsWithoutExtensions() throws Exception {
         DefDescriptor<EventDef> eventTestDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         RegisterEventDef regEventDef = vendor.makeRegisterEventDefWithNulls(eventTestDescriptor, true, null);
-        Map<String, RegisterEventDef> eventDefs = new HashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> eventDefs = new HashMap<>();
         eventDefs.put("cans", regEventDef);
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, eventDefs, null, null, null);
@@ -155,7 +155,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testGetAttributeDefsWithoutExtensions() throws Exception {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<>();
         AttributeDef attDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("Fake Attribute", AttributeDef.class),
                 null, null, null, false, AttributeDef.SerializeToType.BOTH, null, Visibility.PUBLIC);
         attributes.put(attDef.getDescriptor(), attDef);
@@ -168,7 +168,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testGetExtendsDescriptor() {
-        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<>();
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"));
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"), null, null, null, extensions, null);
@@ -176,7 +176,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testEqualsObject() {
-        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<>();
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null,
@@ -197,7 +197,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testEqualsWithDifferentExtensions() {
-        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<>();
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null,
@@ -219,15 +219,15 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testSerialize() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> extensions = new HashSet<>();
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<>();
         AttributeDef attDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("Fake Attribute", AttributeDef.class),
                 null, null, null, false, AttributeDef.SerializeToType.BOTH, null, null);
         attributes.put(attDef.getDescriptor(), attDef);
         DefDescriptor<EventDef> eventTestDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         RegisterEventDef regEventDef = vendor.makeRegisterEventDefWithNulls(eventTestDescriptor, true, null);
-        Map<String, RegisterEventDef> eventDefs = new HashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> eventDefs = new HashMap<>();
         eventDefs.put("ass", regEventDef);
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), attributes, eventDefs,

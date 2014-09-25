@@ -44,10 +44,10 @@ import com.google.common.collect.Maps;
 
 @Controller
 public class AuraStorageTestController {
-    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
-    private static Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<String, Map<String, Semaphore>>();
+    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<>();
+    private static Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<>();
     private static Map<String, List<Object>> buffer = Maps.newHashMap();
-    private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<String, Semaphore>();
+    private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<>();
 
     private enum Command {
         RESET, WAIT, RESUME, APPEND, READ, STAMP, SLEEP;
@@ -392,7 +392,7 @@ public class AuraStorageTestController {
                 if (!create) {
                     return null;
                 }
-                subSet = new ConcurrentHashMap<String, Semaphore>();
+                subSet = new ConcurrentHashMap<>();
                 pending.put(key, subSet);
             }
 

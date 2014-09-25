@@ -126,7 +126,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		String filePath = "someFilePath";
 		Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
 		for (int i = 0; i < 3; i++) {
-			listeners.add(new WeakReference<SourceListener>(Mockito
+			listeners.add(new WeakReference<>(Mockito
 					.mock(SourceListener.class)));
 		}
 

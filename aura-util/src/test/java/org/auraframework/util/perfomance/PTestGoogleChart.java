@@ -100,7 +100,7 @@ public class PTestGoogleChart {
     public long getMaxYDataPointForChart() {
 
         if (maxYDataPointForChart == 0) {
-            List<Long> dataPoints = new ArrayList<Long>();
+            List<Long> dataPoints = new ArrayList<>();
             for (ChartAxisPoints dataPoint : axisPoints) {
                 for (ChartPoint point : dataPoint.seriesDataPoints) {
                     dataPoints.add(point.yValue);
@@ -117,7 +117,7 @@ public class PTestGoogleChart {
     public long getMaxXDataPointForChart() {
 
         if (maxXDataPointForChart == 0) {
-            List<Long> dataPoints = new ArrayList<Long>();
+            List<Long> dataPoints = new ArrayList<>();
             for (ChartAxisPoints dataPoint : axisPoints) {
                 for (ChartPoint point : dataPoint.seriesDataPoints) {
                     dataPoints.add(Long.valueOf(point.xValue));
@@ -136,7 +136,7 @@ public class PTestGoogleChart {
      * @returns A Map of request parameters and their values.
      */
     public Map<String, String> buildRequestParams() {
-        Map<String, String> data = new HashMap<String, String>(22);
+        Map<String, String> data = new HashMap<>(22);
 
         data.put("cht", "lxy"); // chart type (lc = line chart)
         data.put("chtt", title); // chart title
@@ -179,7 +179,7 @@ public class PTestGoogleChart {
      * Get a string representing the label for each series in this chart.
      */
     public String buildSeriesLegend() {
-        List<String> seriesNames = new ArrayList<String>();
+        List<String> seriesNames = new ArrayList<>();
         for (ChartAxisPoints axisPoint : axisPoints) {
             seriesNames.add(axisPoint.axisPointLabel);
         }
@@ -199,8 +199,8 @@ public class PTestGoogleChart {
         data.append("t:");
         int i = 0;
         for (ChartAxisPoints axisPoint : axisPoints) {
-            List<String> xValues = new ArrayList<String>();
-            List<String> yValues = new ArrayList<String>();
+            List<String> xValues = new ArrayList<>();
+            List<String> yValues = new ArrayList<>();
             for (ChartPoint point : axisPoint.seriesDataPoints) {
                 xValues.add("" + scaleXValue(Long.valueOf(point.xValue)));
                 yValues.add("" + scaleYValue(point.yValue));
@@ -245,7 +245,7 @@ public class PTestGoogleChart {
 
         HttpPost post = new HttpPost(BASE_URL);
 
-        List <NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List <NameValuePair> nvps = new ArrayList<>();
 
         Map<String, String> params = buildRequestParams();
         for (Map.Entry<String, String> entry : params.entrySet()) {

@@ -275,7 +275,7 @@ public class ListViewUITest extends WebDriverTestCase {
      * @return list containing text from each element
      */
     private List<String> getTextFromElements(List<WebElement> elements) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (WebElement element : elements) {
             result.add(element.getText());
         }

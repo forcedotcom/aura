@@ -125,7 +125,7 @@ public class PerfMockAttributeValueProvider {
             // This mock ComponentDefRef is geared toward for list/autocomplete mock components.
             // see comment in Aura.Component mock value above
             return ImmutableMap.<String, Object>of("componentDef", "ui:menuItem",
-                    "attributes", ImmutableMap.<String, ImmutableMap>of("values", ImmutableMap.of("label", "Mock ui:menuItem label")));
+                    "attributes", ImmutableMap.<String, ImmutableMap<?, ?>>of("values", ImmutableMap.of("label", "Mock ui:menuItem label")));
         }
 
         throw new InvalidDefinitionException(String.format("Value for '%s' is not defined", attributeDef.getName()), attributeDef.getTypeDef().getLocation());

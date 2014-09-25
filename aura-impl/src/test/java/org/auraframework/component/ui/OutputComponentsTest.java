@@ -90,7 +90,7 @@ public class OutputComponentsTest extends AuraTestCase {
      * @throws Exception
      */
     public void testDomEventsAreOutputComponentEvents() throws Exception {
-        HashMap<String, String> events = new HashMap<String, String>();
+        HashMap<String, String> events = new HashMap<>();
         events.put("blur", "markup://ui:blur");
         events.put("click", "markup://ui:click");
         events.put("dblclick", "markup://ui:dblclick");
@@ -130,7 +130,7 @@ public class OutputComponentsTest extends AuraTestCase {
 
         // Events which are not registered as ui:output components
         // But are part of Dom Events
-        List<String> events = new ArrayList<String>();
+        List<String> events = new ArrayList<>();
         events.add("change");
 
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);

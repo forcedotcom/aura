@@ -22,7 +22,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ImportDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.test.annotation.UnAdaptableTest;
 
 import com.google.common.collect.Lists;
 

@@ -32,9 +32,6 @@ import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.net.HttpHeaders;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error

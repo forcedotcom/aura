@@ -41,7 +41,7 @@ public class AuraSerializationServiceImplTest extends AuraImplTestCase {
         SerializationService serializationService = Aura.getSerializationService();
 
         StringWriter out = new StringWriter();
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr", "yo");
         Component c = instanceService.getInstance("test:child1", ComponentDef.class, attributes);
         serializationService.write(c, null, Component.class, out);

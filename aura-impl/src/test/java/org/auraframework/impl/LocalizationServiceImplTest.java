@@ -475,7 +475,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
 
     public void testStrictNumberParsing() throws ParseException {
         NumberFormat nf = null;
-        Map<Locale, String[]> strictParserTestNumberStrings = new HashMap<Locale, String[]>();
+        Map<Locale, String[]> strictParserTestNumberStrings = new HashMap<>();
         strictParserTestNumberStrings.put(Locale.ENGLISH, new String[] { "100.200,300", "1 1", "1.1.1.1" });
         strictParserTestNumberStrings.put(Locale.FRANCE, new String[] { "1 1 1 1", "1.1.1", "00. 000 000",
                 "100,200.300" });

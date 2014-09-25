@@ -31,7 +31,7 @@ import com.google.common.collect.Maps;
 
 @Controller
 public class ServerStorableActionController {
-    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
+    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<>();
     @AuraEnabled
     public static void resetCounter(@Key("testName") String testName) {
         if (testName != null) {

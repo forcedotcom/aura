@@ -28,7 +28,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.parser.handler.mock.JavascriptMockActionHandler;
@@ -96,7 +95,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
     protected JavascriptTestSuiteDef createDefinition(Map<String, Object> map) throws QuickFixException {
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
-        builder.caseDefs = new ArrayList<TestCaseDef>();
+        builder.caseDefs = new ArrayList<>();
 
         DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
                 .getAssociateDescriptor(descriptor, ComponentDef.class,

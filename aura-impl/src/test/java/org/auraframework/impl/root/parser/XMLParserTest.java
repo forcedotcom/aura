@@ -124,7 +124,7 @@ public class XMLParserTest extends AuraImplTestCase {
             private static final long serialVersionUID = 1L;
         };
         
-        Source<?> source = new FileSource<ComponentDef>(descriptor, tmpFile, Format.XML);
+        Source<?> source = new FileSource<>(descriptor, tmpFile, Format.XML);
         try {
             parser.parse(null, source);
             fail("Parsing nonexistent source should throw exception");

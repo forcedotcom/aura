@@ -50,15 +50,15 @@ import com.google.common.collect.Maps;
  */
 @Model
 public class TestJavaModel {
-    static ArrayList<InputOption> inputOptions = new ArrayList<InputOption>();
-    static ArrayList<InputOption> moreInputOptions = new ArrayList<InputOption>();
-    static ArrayList<InputOption> perfInputOptions = new ArrayList<InputOption>();
-    static ArrayList<InputOption> morePerfInputOptions = new ArrayList<InputOption>();
-    static ArrayList<InputOption> evenMorePerfInputOptions = new ArrayList<InputOption>();
+    static ArrayList<InputOption> inputOptions = new ArrayList<>();
+    static ArrayList<InputOption> moreInputOptions = new ArrayList<>();
+    static ArrayList<InputOption> perfInputOptions = new ArrayList<>();
+    static ArrayList<InputOption> morePerfInputOptions = new ArrayList<>();
+    static ArrayList<InputOption> evenMorePerfInputOptions = new ArrayList<>();
     static List<Object> iterationData;
-    static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
+    static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<>();
     static List<Item> items;
-    static List<Item> itemsEmpty = new ArrayList<Item>();
+    static List<Item> itemsEmpty = new ArrayList<>();
     static List<Item> itemsLarge; 
     static List<LoadColumn> columns;
     static List<LoadColumn> noColumns = Collections.emptyList();
@@ -115,7 +115,7 @@ public class TestJavaModel {
     }
 
     private static ArrayList<InputOption> getSubCategory(String option) {
-        ArrayList<InputOption> categoryOption = new ArrayList<InputOption>();
+        ArrayList<InputOption> categoryOption = new ArrayList<>();
         if (option.equals("option1")) {
             categoryOption.add(new InputOption("", "", false, "opt1-sub1"));
             categoryOption.add(new InputOption("", "", false, "opt1-sub2"));
@@ -130,38 +130,38 @@ public class TestJavaModel {
     }
     
     static {
-    	columns = new ArrayList<LoadColumn>(5);
+    	columns = new ArrayList<>(5);
     	columns.add(new LoadColumn("Hidden Column", "HiddenColumn", false));
     	for (int i = 1; i <= 4; i++) {
     		columns.add(new LoadColumn("Column " + i, "Column" + i));
         }
-    	maxColumns = new ArrayList<LoadColumn>(20);
+    	maxColumns = new ArrayList<>(20);
     	for (int i = 1; i <= 20; i++) {
     		maxColumns.add(new LoadColumn("Column " + i, "Column" + i));
         }
     }
     
     static {
-    	columnsSelected = new ArrayList<ColumnsSelected>(1);
+    	columnsSelected = new ArrayList<>(1);
     	//column2 order should be Z-A
     	columnsSelected.add(new ColumnsSelected("Column2", false));
     }
     
     static {
-    	items = new ArrayList<Item>(10);
+    	items = new ArrayList<>(10);
     	for (int i = 1; i <= 10; i++) {
             items.add(new Item("hello world" + i, "id" + i));
         }
-    	itemsLarge = new ArrayList<Item>(50);
+    	itemsLarge = new ArrayList<>(50);
     	for (int i = 1; i <= 50; i++) {
     		itemsLarge.add(new Item("some one " + i, "id" + i));
         }
     }
     
     static {
-        iterationData = new LinkedList<Object>();
+        iterationData = new LinkedList<>();
         for (int i = 0; i < 26; i++) {
-            Map<String, Object> theMap = new HashMap<String, Object>();
+            Map<String, Object> theMap = new HashMap<>();
             char c = (char) ('a' + i);
             theMap.put("letters", "" + c + c + c);
             iterationData.add(theMap);
@@ -355,7 +355,7 @@ public class TestJavaModel {
 
     @AuraEnabled
     public List<String> getStringList() {
-        ArrayList<String> sl = new ArrayList<String>();
+        ArrayList<String> sl = new ArrayList<>();
         sl.add("one");
         sl.add("two");
         sl.add("three");
@@ -411,16 +411,16 @@ public class TestJavaModel {
     }
     @AuraEnabled
     public List<List<String>> getListOfList() {
-        List<List<String>> listofList = new ArrayList<List<String>>();
-        ArrayList<String> l1 = new ArrayList<String>();
+        List<List<String>> listofList = new ArrayList<>();
+        ArrayList<String> l1 = new ArrayList<>();
         l1.add("one");
         l1.add("two");
         l1.add("three");
-        ArrayList<String> l2 = new ArrayList<String>();
+        ArrayList<String> l2 = new ArrayList<>();
         l2.add("un");
         l2.add("do");
         l2.add("tres");
-        ArrayList<String> l3 = new ArrayList<String>();
+        ArrayList<String> l3 = new ArrayList<>();
         l3.add("ek");
         l3.add("do");
         l3.add("theen");
@@ -448,7 +448,7 @@ public class TestJavaModel {
 
     @AuraEnabled
     public Object getIntegerList() {
-        ArrayList<Integer> il = new ArrayList<Integer>();
+        ArrayList<Integer> il = new ArrayList<>();
         il.add(123);
         il.add(999);
         il.add(666);
@@ -482,7 +482,7 @@ public class TestJavaModel {
 
     @AuraEnabled
     public ArrayList<Boolean> getBooleanList() {
-        ArrayList<Boolean> bl = new ArrayList<Boolean>();
+        ArrayList<Boolean> bl = new ArrayList<>();
         bl.add(true);
         bl.add(false);
         bl.add(true);

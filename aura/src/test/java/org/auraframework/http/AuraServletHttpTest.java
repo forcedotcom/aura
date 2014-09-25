@@ -59,7 +59,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * context before actions, now it's the opposite
      */
     public void testPostRawResponseSimpleAction() throws Exception {
-        Map<String, Object> actionParams = new HashMap<String, Object>();
+        Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         ServerAction a = new ServerAction(
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString",
@@ -72,15 +72,15 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
     
     public void testMulitpleActionsInOnePost() {
-    	ArrayList<String> qNameList = new ArrayList<String>();
-    	ArrayList<Map<String,Object>> actionParamsArrayList = new ArrayList<Map<String,Object>>();
+    	ArrayList<String> qNameList = new ArrayList<>();
+    	ArrayList<Map<String,Object>> actionParamsArrayList = new ArrayList<>();
 
-		Map<String, Object> actionParams = new HashMap<String, Object>();
+		Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         qNameList.add("java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
         actionParamsArrayList.add(actionParams);
         
-        Map<String, Object> actionParams1 = new HashMap<String, Object>();
+        Map<String, Object> actionParams1 = new HashMap<>();
         actionParams1.put("param", 6);
         qNameList.add("java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getInt");
         actionParamsArrayList.add(actionParams1);
@@ -96,11 +96,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Check a post context.
      */
     public void testPostContext() throws Exception {
-        Map<String, Object> message = new HashMap<String, Object>();
-        Map<String, Object> actionInstance = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
+        Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
-        Map<String, Object> actionParams = new HashMap<String, Object>();
+        Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
         @SuppressWarnings("rawtypes")
@@ -109,7 +109,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         String jsonMessage = Json.serialize(message);
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", getSimpleContext(Format.JSON, false));
@@ -133,11 +133,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * 
      */
     public void testPostWithOldLastMod() throws Exception {
-        Map<String, Object> message = new HashMap<String, Object>();
-        Map<String, Object> actionInstance = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
+        Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
-        Map<String, Object> actionParams = new HashMap<String, Object>();
+        Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
         @SuppressWarnings("rawtypes")
@@ -146,7 +146,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         String jsonMessage = Json.serialize(message);
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", getSimpleContext(Format.JSON, true));

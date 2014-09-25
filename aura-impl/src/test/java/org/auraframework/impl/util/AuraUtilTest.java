@@ -36,7 +36,7 @@ public class AuraUtilTest extends AuraImplTestCase {
     }
 
     public void testImmutableSet() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add("fee");
         set.add("fi");
         Set<String> immutableSet = AuraUtil.immutableSet(set);
@@ -52,7 +52,7 @@ public class AuraUtilTest extends AuraImplTestCase {
     }
 
     public void testImmutableList() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("fee");
         list.add("fi");
         List<String> immutableList = AuraUtil.immutableList(list);

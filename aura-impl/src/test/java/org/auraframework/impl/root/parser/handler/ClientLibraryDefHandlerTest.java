@@ -45,14 +45,14 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testNoTypeInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv'/></aura:component>", "myID",
                 Format.XML);
         assertDefaultType(source, "When no type specified, JS should be the default");
     }
 
     public void testEmptyTypeInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='' /></aura:component>", "myID",
                 Format.XML);
         assertDefaultType(source, "When empty type specified, JS should be the default");
@@ -66,7 +66,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testInvalidTypeInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='fooBar' /></aura:component>", "myID",
                 Format.XML);
 
@@ -80,7 +80,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testCommaSeparatedTypesInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS, CSS' /></aura:component>", "myID",
                 Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
@@ -93,7 +93,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testNoModeSpecifiedInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' />" +
                         "<aura:clientLibrary name='UIPerf' type='JS' modes=''/>" +
@@ -110,7 +110,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testModesSpecifiedInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
                         "<aura:clientLibrary name='UIPerf' type='JS' modes='DEV,FTEST'/>" +
@@ -131,7 +131,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testInvalidModeSpecificationInLibraryTag() throws Exception {
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='fooBar'/>" +
                         "</aura:component>", "myID",
@@ -146,7 +146,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
     
     public void testDefaultValueForCombine() throws Exception{
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
                 "</aura:component>", "myID",
@@ -160,7 +160,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testCombinesReadableResources()throws Exception{
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' combine='true'/>" + //0
                         "<aura:clientLibrary url='js://clientLibraryTest.clientLibraryTest' type='JS' combine='true'/>" + //1
@@ -188,7 +188,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
     
     public void testDoNotCombineLibrariesIfMarkedSo() throws Exception{
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' combine='false'/>" + //1
                         "<aura:clientLibrary url='/jslibrary/baselogin.js' combine='false'/>" + //2
@@ -209,7 +209,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
     
     public void testComponentResourcesAreAlwaysCombined() throws Exception{
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary url='js://clientLibraryTest.clientLibraryTest' type='JS' combine='false'/>" + //2
                         "<aura:clientLibrary url='css://clientLibraryTest.clientLibraryTest' type='CSS' combine='false' />"+ //3
@@ -226,7 +226,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
     
     public void testDefaultValueForUrl() throws Exception{
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
                         "</aura:component>", "myID",

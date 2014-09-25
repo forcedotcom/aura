@@ -47,7 +47,7 @@ public class TestExecutor {
     private final AtomicLong taskCount = new AtomicLong(0);
 
     private TestExecutor(int coreSize, int maxSize) {
-        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
         executor = new ThreadPoolExecutor(coreSize, maxSize, 3, TimeUnit.SECONDS, queue);
     }
 

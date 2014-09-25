@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
  */
 public class TestLoggingAdapterImpl extends LoggingAdapterImpl implements TestLoggingAdapter 
 {
-    private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<LoggingContext>();
+    private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<>();
     private final List<Map<String, Object>> logs = Lists.newLinkedList();
     private boolean isCapturing=false;
     

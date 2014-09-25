@@ -836,7 +836,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     private String addBrowserNonce(String url) {
         if (!url.startsWith("about:blank")) {
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             params.put("browser.nonce", String.valueOf(System.currentTimeMillis()));
             url = addUrlParams(url, params);
         }
@@ -908,7 +908,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("aura.mode", mode.name());
         params.put("aura.test", getQualifiedName());
         url = addUrlParams(url, params);

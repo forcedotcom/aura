@@ -108,7 +108,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         Queue<PooledRemoteWebDriver> pool = pools.get(toKeyWorkaround(capabilities));
 
         if (pool == null) {
-            pool = new LinkedList<PooledRemoteWebDriver>();
+            pool = new LinkedList<>();
             pools.put(toKeyWorkaround(capabilities), pool);
         }
 

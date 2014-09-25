@@ -43,7 +43,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "div[class*='customOption']";
     private final String MATCHED_SELECTOR = "mark[class*='data-match']";
 
-    private final Map<String, Integer> AUTOCOMPLETE_COMPONENT = new HashMap<String, Integer>();
+    private final Map<String, Integer> AUTOCOMPLETE_COMPONENT = new HashMap<>();
     {
         AUTOCOMPLETE_COMPONENT.put("Generic", 1);
         AUTOCOMPLETE_COMPONENT.put("Empty", 2);
@@ -311,7 +311,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         case AUTOCOMPLETE_CUSTOM_OPTION:
             return l.findElements(By.cssSelector(AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR));
         default:
-            return new ArrayList<WebElement>();
+            return new ArrayList<>();
         }
     }
 
@@ -321,7 +321,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 
     private List<WebElement> getMatchedOptionsInListThatUsesCustomOptions(WebElement l, OptionType optionType) {
         List<WebElement> options = getAutoCompleteListOptions(l, optionType);
-        List<WebElement> matched = new ArrayList<WebElement>();
+        List<WebElement> matched = new ArrayList<>();
         for (int i = 0; i < options.size(); i++) {
             WebElement option = options.get(i);
             if (optionType.equals(OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION)) {

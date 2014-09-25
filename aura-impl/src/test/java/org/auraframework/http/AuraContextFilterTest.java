@@ -43,7 +43,7 @@ public class AuraContextFilterTest extends AuraTestCase {
     public void testStartContextContextPath() throws Exception {
         AuraContextFilter filter = new AuraContextFilter();
         HttpServletRequest mock = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(mock.getLocales()).thenReturn(new Vector<Locale>(ImmutableList.of(Locale.ENGLISH)).elements());
+        Mockito.when(mock.getLocales()).thenReturn(new Vector<>(ImmutableList.of(Locale.ENGLISH)).elements());
 
         assertContextPath(filter, mock, "/something", "/something");
         assertContextPath(filter, mock, "/", "");

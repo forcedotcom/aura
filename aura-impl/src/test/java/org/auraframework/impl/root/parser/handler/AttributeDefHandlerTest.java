@@ -54,7 +54,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     public void setUp() throws Exception {
         super.setUp();
         desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
-        componentSource = new StringSource<AttributeDef>(desc, "<aura:component/>", "myID", Format.XML);
+        componentSource = new StringSource<>(desc, "<aura:component/>", "myID", Format.XML);
         componentXmlReader = getXmlReader(componentSource);
         cdh = new ComponentDefHandler(null, componentSource, componentXmlReader);
     }
@@ -234,10 +234,10 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     private AttributeDefHandler<ComponentDef> getHandler(String attrMarkup) throws Exception {
-        StringSource<AttributeDef> attributeSource = new StringSource<AttributeDef>(desc, attrMarkup, "myID",
+        StringSource<AttributeDef> attributeSource = new StringSource<>(desc, attrMarkup, "myID",
                 Format.XML);
         XMLStreamReader attributeXmlReader = getXmlReader(attributeSource);
-        return new AttributeDefHandler<ComponentDef>(cdh, attributeXmlReader,
+        return new AttributeDefHandler<>(cdh, attributeXmlReader,
                 attributeSource);
     }
 

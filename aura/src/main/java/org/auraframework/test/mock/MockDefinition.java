@@ -18,12 +18,14 @@ package org.auraframework.test.mock;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.def.*;
-import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
@@ -110,9 +112,43 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         return Visibility.PUBLIC;
     }
     
+    public class MockDefinitionAccess implements DefinitionAccess {
+        private static final long serialVersionUID = 5004058964564727486L;
+
+        @Override
+        public boolean requiresAuthentication() {
+            return false;
+        }
+
+        @Override
+        public boolean isGlobal() {
+            return false;
+        }
+
+        @Override
+        public boolean isPublic() {
+            return false;
+        }
+
+        @Override
+        public boolean isPrivate() {
+            return false;
+        }
+
+        @Override
+        public boolean isInternal() {
+            return false;
+        }
+
+        @Override
+        public void validate(String namespace, boolean allowAuth,
+                boolean allowPrivate) throws InvalidAccessValueException {
+        }
+    }
+
     @Override
     public DefinitionAccess getAccess() {
-    	return DefinitionAccessImpl.defaultAccess(descriptor.getNamespace());
+        return new MockDefinitionAccess();
     }
 
     @Override

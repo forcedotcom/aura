@@ -97,12 +97,7 @@
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>
-        <xunit.js.engine>rhino</xunit.js.engine>
-        <xunit.js.format>xml</xunit.js.format>
-        <xunit.js.console>${basedir}/target/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
-        <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
-        <xunit.js.gen-test-files>${project.build.directory}/xunitjs</xunit.js.gen-test-files>
-        <xunit.js.testPath />
+        <xunit.js.auraImpl>${basedir}/src/main/resources/</xunit.js.auraImpl>
     </properties>
     <build>
         <resources>
@@ -224,81 +219,10 @@
                <plugins>
                    <plugin>
                        <artifactId>maven-antrun-plugin</artifactId>
-                       <dependencies>
-                           <dependency>
-                               <groupId>ant-contrib</groupId>
-                               <artifactId>ant-contrib</artifactId>
-                               <version>1.0b3</version>
-                               <exclusions>
-                                   <exclusion>
-                                       <groupId>ant</groupId>
-                                       <artifactId>ant</artifactId>
-                                   </exclusion>
-                               </exclusions>
-                           </dependency>
-                       </dependencies>
                        <executions>
-                           <execution>
-                               <id>gen-xunit.js</id>
-                               <phase>generate-test-resources</phase>
-                               <goals>
-                                    <goal>run</goal>
-                               </goals>
-                               <configuration>
-                                   <target>
-                                   </target>
-                               </configuration>
-                           </execution>
                            <execution>
                                <id>xunit.js</id>
                                <phase>test</phase>
-                               <goals>
-                                    <goal>run</goal>
-                               </goals>
-                               <configuration>
-                                   <target>
-                                       <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
-                                       <echo>Generating Aura framework resources for xUnit.js</echo>
-                                       <java classname="org.auraframework.test.javascript.GenerateXUnitJS" classpathref="maven.test.classpath" fork="true" failonerror="true">
-                                           <jvmarg value="-Daura.home=${basedir}/.." />
-                                            <arg value="${basedir}/src/test/javascript" />
-                                            <arg value="${basedir}/src/main/resources" />
-                                            <arg value="${xunit.js.gen-test-files}" />
-                                            <arg value="xunitTests" />
-                                       </java>
-                                       <echo>Executing tests</echo>
-                                       <switch value="${xunit.js.engine}">
-                                           <case value="rhino">
-                                               <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="false" resultproperty="xunit.returnvalue" output="${project.build.directory}/xunitjs/rawresults.xml">
-                                                   <jvmarg value="-Daura.home=${basedir}/.." />
-                                                    <arg value="${xunit.js.console}" />
-                                                    <arg value="/output:${xunit.js.format}" />
-                                                    <arg value="/strict:false" />
-                                                    <arg value="/dependency:${basedir}/target/tools/xUnit/dependencies/" />
-                                                    <arg value="${xunit.js.gen-test-files}/xunitTests/${xunit.js.testPath}" />
-                                               </java>
-                                           </case>
-                                           <default>
-                                               <fail>Unknown XUnit.js engine : ${xunit.js.engine}</fail>
-                                           </default>
-                                       </switch>
-                                       <switch value="${xunit.js.format}">
-                                           <case value="xml">
-                                               <echo>Generating test report</echo>
-                                               <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/target/tools/xUnit/junit.xsl" />
-                                               <echo>Test report completed: ${xunit.js.report}</echo>
-                                           </case>
-                                           <default>
-                                               <echo>output in: "${project.build.directory}/xunitjs/rawresults.xml"</echo>
-                                           </default>
-                                       </switch>
-                                       <fail message="There were xUnit.js test failures. Check ${xunit.js.report}">
-                                           <condition>
-                                               <not><equals arg1="0" arg2="${xunit.returnvalue}" /></not>
-                                           </condition>
-                                       </fail>
-                                   </target>
-                               </configuration>
                            </execution>
                        </executions>
                    </plugin>

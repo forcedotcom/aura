@@ -22,12 +22,19 @@ import org.openqa.grid.selenium.GridLauncher;
 
 /**
  * Get WebDriver instances for Aura tests.
- * 
- * 
- * @since 0.0.94
  */
 public class SeleniumServerLauncher {
+    /**
+     * Browser settings for each node. See https://code.google.com/p/selenium/wiki/Grid2 for more information.
+     */
     private static String browsers = "-browser browserName=chrome,maxInstances=%1$s -browser browserName=firefox,maxInstances=%1$s";
+
+    /**
+     * How long, in seconds, the browser is allowed to hang before timing out. The Selenium default is 3 hours, which is
+     * excessive and may timeout autobuilds with an absolute timeout. The issue has been logged to Selenium and tracked
+     * here: https://code.google.com/p/selenium/issues/detail?id=5414
+     */
+    private static String browserTimeout = "600";
 
     public static void main(String args[]) throws Exception {
         final String host = "localhost";
@@ -39,7 +46,8 @@ public class SeleniumServerLauncher {
         Logger logger = Logger.getLogger(SeleniumServerLauncher.class.getName());
 
         logger.info("Launching Selenium server on port " + serverPort);
-        GridLauncher.main(String.format("-port %s %s", serverPort, String.format(browsers, TestExecutor.NUM_THREADS + 2))
+        GridLauncher.main(String.format("-port %s -browserTimeout %s %s", serverPort, browserTimeout,
+                String.format(browsers, TestExecutor.NUM_THREADS + 2))
                 .split(" "));
         logger.info("Waiting for server to open port");
         waitForServer(host, serverPort);

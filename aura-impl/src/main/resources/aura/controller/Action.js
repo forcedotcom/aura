@@ -56,6 +56,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.storable = false;
     this.caboose = caboose;
     this.allAboardCallback = undefined;
+    this.abortable = undefined;
 
     this.pathStack = [];
     this.canCreate = true;
@@ -791,12 +792,32 @@ Action.prototype.abort = function() {
 };
 
 /**
- * Marks the Action as abortable. For server-side Actions only.
+ * Marks the Action as abortable. For server-side Actions only. Optionally set its abortable key. The key is used
+ * to determine which abortable actions to clear when enqueued. Passing undefined or null will enable abortable and
+ * set to default "".
  *
  * @public
+ *
+ * @param {String|Boolean} [key] abortable key or boolean to disable or enable default key of ""
  */
-Action.prototype.setAbortable = function() {
-    this.abortable = true;
+Action.prototype.setAbortable = function(key) {
+    if (key !== false) {
+        // set key to default "" otherwise, string value of key
+        this.abortable = ($A.util.isUndefinedOrNull(key) || key === true) ? "" : key + "";
+    } else {
+        this.abortable = undefined;
+    }
+};
+
+/**
+ * Returns abortable key
+ *
+ * @public
+ *
+ * @returns {String} abortable key
+ */
+Action.prototype.getAbortableKey = function() {
+    return this.abortable;
 };
 
 /**
@@ -815,7 +836,7 @@ Action.prototype.isRefreshAction = function() {
  * @returns {Boolean} The function is abortable (true), or false otherwise.
  */
 Action.prototype.isAbortable = function() {
-    return this.abortable || false;
+    return !$A.util.isUndefinedOrNull(this.abortable);
 };
 
 /**

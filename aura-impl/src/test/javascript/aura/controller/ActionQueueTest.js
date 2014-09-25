@@ -29,6 +29,16 @@ Test.Aura.Controller.ActionQueueTest = function() {
 	
     });
 
+    var mockGlobal = Mocks.GetMocks(Object.Global(), {
+        "$A" : {
+            util : {
+                isUndefinedOrNull: function (obj) {
+                    return obj === undefined || obj === null;
+                }
+            }
+        }
+    });
+
     var serverDef = {
         isServerAction : function() {
             return true;
@@ -116,7 +126,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
             var target = new ActionQueue();
 
             // Act
-            target.enqueue(expected);
+            mockGlobal(function() {
+                target.enqueue(expected);
+            });
             var actual = target.actions;
 
             // Assert
@@ -130,7 +142,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
             var serverAction = new Action(serverDef);
 
             // Act
-            target.enqueue(serverAction);
+            mockGlobal(function() {
+                target.enqueue(serverAction);
+            });
             var actual = target.xhr;
 
             // Assert
@@ -144,7 +158,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
             serverCabooseAction.caboose = true;
 
             // Act
-            target.enqueue(serverCabooseAction);
+            mockGlobal(function() {
+                target.enqueue(serverCabooseAction);
+            });
             var actual = target.xhr;
 
             // Assert
@@ -158,8 +174,10 @@ Test.Aura.Controller.ActionQueueTest = function() {
             var serverCabooseAction = new Action(serverCabooseDef);
 
             // Act
-            target.enqueue(serverAction);
-            target.enqueue(serverCabooseAction);
+            mockGlobal(function() {
+                target.enqueue(serverAction);
+                target.enqueue(serverCabooseAction);
+            });
             var actual = target.xhr;
 
             // Assert
@@ -170,34 +188,40 @@ Test.Aura.Controller.ActionQueueTest = function() {
         function EnqueuesAbortableAction() {
             // Arrange
             var expected = new Action(serverDef);
-            expected.setAbortable(true);
             var target = new ActionQueue();
-
+            var abortable, actual;
             // Act
-            target.enqueue(expected);
-            target.enqueue(expected);
-            var actual = target.actions;
+            mockGlobal(function() {
+                expected.setAbortable(true);
+                target.enqueue(expected);
+                target.enqueue(expected);
+                actual = target.actions;
+                abortable = actual[0].isAbortable();
+            });
 
             // Assert
             Assert.Equal([ expected, expected ], actual);
-            Assert.True(actual[0].isAbortable());
+            Assert.True(abortable);
         }
 
         [ Fact ]
         function CallsClearPreviousAbortableActionsWhenAbortableActionIsEnqueuedOnNewTransaction() {
             var expected = [ "lastTransaction" ];
             var abortable = new Action(serverDef);
-            abortable.setAbortable(true);
             var target = new ActionQueue();
             target.incrementNextTransactionId();
-            target.clearPreviousAbortableActions = Stubs.GetMethod("queue", []);
+            target.clearPreviousAbortableActions = Stubs.GetMethod("queue", "key", []);
             target.actions = expected;
 
-            target.enqueue(abortable);
+            mockGlobal(function() {
+                abortable.setAbortable(true);
+                target.enqueue(abortable);
+            });
 
             Assert.Equal([ {
                 Arguments : {
-                    queue : expected
+                    queue : expected,
+                    key: ""
                 },
                 // abortable not returned but pushed onto returned list
                 ReturnValue : [ abortable ]
@@ -207,11 +231,13 @@ Test.Aura.Controller.ActionQueueTest = function() {
         [ Fact ]
         function DoesNotCallClearPreviousAbortableActionsWhenAbortableActionIsEnqueuedOnCurrentTransaction() {
             var abortable = new Action(serverDef);
-            abortable.setAbortable(true);
             var target = new ActionQueue();
             target.clearPreviousAbortableActions = Stubs.GetMethod();
 
-            target.enqueue(abortable);
+            mockGlobal(function() {
+                abortable.setAbortable(true);
+                target.enqueue(abortable);
+            });
 
             Assert.Equal(0, target.clearPreviousAbortableActions.Calls.length);
         }
@@ -223,7 +249,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
             target.incrementNextTransactionId();
             target.clearPreviousAbortableActions = Stubs.GetMethod();
 
-            target.enqueue(action);
+            mockGlobal(function() {
+                target.enqueue(action);
+            });
 
             Assert.Equal(0, target.clearPreviousAbortableActions.Calls.length);
         }
@@ -234,14 +262,17 @@ Test.Aura.Controller.ActionQueueTest = function() {
         [ Fact ]
         function PrunesOldAbortableAction() {
             var old = new Action(serverDef);
-            old.setAbortable(true);
             var expected = new Action(serverDef);
-            expected.setAbortable(true);
             var target = new ActionQueue();
             target.actions = [ old ];
             target.incrementNextTransactionId();
 
-            target.enqueue(expected);
+            mockGlobal(function() {
+                old.setAbortable(true);
+                expected.setAbortable(true);
+                target.enqueue(expected);
+            });
+
             var actual = target.actions;
 
             Assert.Equal([ expected ], actual);
@@ -249,44 +280,78 @@ Test.Aura.Controller.ActionQueueTest = function() {
 
         [ Fact ]
         function PrunesOldAbortableActionsFromSet() {
+
             var oldest = new Action(serverDef);
-            oldest.setAbortable(true);
             var nonAbortable1 = new Action(serverDef);
             var older = new Action(serverDef);
-            older.setAbortable(true);
             var nonAbortable2 = new Action(serverDef);
             var old = new Action(serverDef);
-            old.setAbortable(true);
             var expected = new Action(serverDef);
-            expected.setAbortable(true);
+
             var target = new ActionQueue();
             target.actions = [ oldest, nonAbortable1, older, nonAbortable2, old ];
             target.incrementNextTransactionId();
 
-            target.enqueue(expected);
+            mockGlobal(function() {
+                oldest.setAbortable(true);
+                older.setAbortable(true);
+                old.setAbortable(true);
+                expected.setAbortable(true);
+                target.enqueue(expected);
+            });
+
             var actual = target.actions;
 
             Assert.Equal([ nonAbortable1, nonAbortable2, expected ], actual);
         }
 
         [ Fact ]
+        function PrunesOnlyAbortableActionsWithSameKey() {
+            var oldest = new Action(serverDef);
+            var older = new Action(serverDef);
+            var old = new Action(serverDef);
+            var expected = new Action(serverDef);
+            var nonAbortable1 = new Action(serverDef);
+            var nonAbortable2 = new Action(serverDef);
+
+            var target = new ActionQueue();
+            target.actions = [ oldest, nonAbortable1, older, nonAbortable2, old ];
+            target.incrementNextTransactionId();
+
+            mockGlobal(function() {
+                oldest.setAbortable("c");
+                older.setAbortable("a");
+                old.setAbortable("a");
+                expected.setAbortable("a");
+
+                target.enqueue(expected);
+            });
+
+            var actual = target.actions;
+
+            Assert.Equal([ oldest, nonAbortable1, nonAbortable2, expected ], actual);
+        }
+
+        [ Fact ]
         function CallsAbortOnPrunedActions() {
             var older = new Action(serverDef);
-            older.setAbortable(true);
             older.abort = Stubs.GetMethod();
             var nonAbortable = new Action(serverDef);
             nonAbortable.abort = Stubs.GetMethod();
             var old = new Action(serverDef);
-            old.setAbortable(true);
             old.abort = Stubs.GetMethod();
             var expected = new Action(serverDef);
-            expected.setAbortable(true);
             expected.abort = Stubs.GetMethod();
             var target = new ActionQueue();
             target.actions = [ older, nonAbortable, old ];
             target.incrementNextTransactionId();
 
-            target.enqueue(expected);
+            mockGlobal(function() {
+                older.setAbortable(true);
+                old.setAbortable(true);
+                expected.setAbortable(true);
+                target.enqueue(expected);
+            });
 
             Assert.Equal(1, older.abort.Calls.length);
             Assert.Equal(1, old.abort.Calls.length);

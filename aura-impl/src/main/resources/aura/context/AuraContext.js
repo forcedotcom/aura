@@ -25,8 +25,6 @@
  *  asynchronous initialization.
  */
 function AuraContext(config, initCallback) {
-    var i, defs, length;
-
     this.mode = config["mode"];
     this.loaded = config["loaded"];
     if (this.loaded === undefined) {
@@ -47,19 +45,27 @@ function AuraContext(config, initCallback) {
 
     var that = this;
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"], function() {
+        var i, defs;
+        
         // Careful now, the def is null, this fake action sets up our paths.
         that.currentAction = new Action(null, ""+that.num, null, null, false, null, false);
+        
+        if(config["libraryDefs"]) {
+            defs = config["libraryDefs"];
+            for (i = 0; i < defs.length; i++) {
+                $A.services.component.getLibraryDef(defs[i]);
+            }
+        }
+        
         if (config["componentDefs"]) {
             defs = config["componentDefs"];
-            length = defs.length;
-            for (i = 0; i < length; i++) {
+            for (i = 0; i < defs.length; i++) {
                 $A.services.component.getDef(defs[i]);
             }
         }
         if (config["eventDefs"]) {
             defs = config["eventDefs"];
-            length = defs.length;
-            for (i = 0; i < length; i++) {
+            for (i = 0; i < defs.length; i++) {
                 $A.services.event.getEventDef(defs[i]);
             }
         }
@@ -74,7 +80,6 @@ function AuraContext(config, initCallback) {
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
  * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.
- * 
  *
  * @return {string} the mode from the server.
  */
@@ -117,7 +122,7 @@ AuraContext.prototype.encodeForServer = function() {
  *      otherContext the context from the server to join in to this one.
  */
 AuraContext.prototype.join = function(otherContext) {
-    var i, defs, length;
+    var i, defs;
 
     if (otherContext["mode"] !== this.getMode()) {
         throw new Error("Mode mismatch");
@@ -130,17 +135,23 @@ AuraContext.prototype.join = function(otherContext) {
     }
     this.globalValueProviders.join(otherContext["globalValueProviders"]);
     $A.localizationService.init();
+    
+    if(otherContext["libraryDefs"]) {
+        defs = otherContext["libraryDefs"];
+        for (i = 0; i < defs.length; i++) {
+            $A.services.component.getLibraryDef(defs[i]);
+        }
+    }
+    
     if (otherContext["componentDefs"]) {
         defs = otherContext["componentDefs"];
-        length = defs.length;
-        for (i = 0; i < length; i++) {
+        for (i = 0; i < defs.length; i++) {
             $A.services.component.getDef(defs[i]);
         }
     }
     if (otherContext["eventDefs"]) {
         defs = otherContext["eventDefs"];
-        length = defs.length;
-        for (i = 0; i < length; i++) {
+        for (i = 0; i < defs.length; i++) {
             $A.services.event.getEventDef(defs[i]);
         }
     }

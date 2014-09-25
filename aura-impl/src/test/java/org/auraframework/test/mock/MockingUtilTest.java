@@ -17,8 +17,6 @@ package org.auraframework.test.mock;
 
 import java.util.Map;
 
-import junit.framework.AssertionFailedError;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -145,7 +143,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         try {
             open(appDescriptor);
             fail("didn't get the error I expected");
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             assertTrue(e.getMessage().contains("the afterlife"));
         }
     }

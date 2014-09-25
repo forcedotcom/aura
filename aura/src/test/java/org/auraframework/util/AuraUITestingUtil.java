@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import junit.framework.Assert;
+import org.junit.Assert; 
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.test.SauceUtil;
@@ -595,7 +594,44 @@ public class AuraUITestingUtil {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(message).until(addErrorCheck(function));
     }
-
+    
+    public void waitForAppCacheReadyCallback() {
+    	waitUntilWithCallback(
+    			new ExpectedCondition<Boolean>() {
+		            @Override
+		            public Boolean apply(WebDriver d) {
+		                return
+		                getBooleanEval("var cache=window.applicationCache;"
+		                        + "return $A.util.isUndefinedOrNull(cache) || "
+		                        + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
+		            }
+    			}, 
+    			new ExpectedCondition<String>() {
+		            @Override
+		            public String apply(WebDriver d) {
+		                return
+		                (String) getRawEval("return window.applicationCache.status");
+		            }
+    			}, 
+    			timeoutInSecs,
+    			"AppCache is not Ready!"
+    			);
+    }
+    
+    /**
+     * @param function  function we will apply again and again until timeout
+     * @param callbackWhenTimeout  function we will run when timeout happens, 
+     * the return will be append to other output message, start with "Extra message from callback".
+     * we can pass in function to evaluate the client side status, like applicationCache status
+     * @param timeoutInSecs
+     * @param message  error message when timeout. notice this will get evaluated BEFORE the wait, so just use a string
+     */
+    public <V2, V1> void waitUntilWithCallback(Function<? super WebDriver, V1> function, 
+    		Function<? super WebDriver, V2> callbackWhenTimeout, long timeoutInSecs, String message) {
+    	WebDriverWaitWithCallback wait = new WebDriverWaitWithCallback(driver, timeoutInSecs, message);
+    	wait.until(function, callbackWhenTimeout);
+    }
+    
     public void waitForAuraInit() {
         waitForAuraInit(null);
     }
@@ -606,7 +642,7 @@ public class AuraUITestingUtil {
     public void waitForAuraInit(final Set<String> expectedErrors) {
         waitForDocumentReady();
         waitForAuraFrameworkReady(expectedErrors);
-        waitForAppCacheReady();
+        waitForAppCacheReadyCallback();
     }
 
     /**
@@ -650,18 +686,6 @@ public class AuraUITestingUtil {
                                 return isAuraFrameworkReady();
                             }
                         });
-    }
-
-    public void waitForAppCacheReady() {
-        waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return
-                getBooleanEval("var cache=window.applicationCache;"
-                        + "return $A.util.isUndefinedOrNull(cache) || "
-                        + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
-            }
-        }, "AppCache is not Ready!");
     }
 
     /**

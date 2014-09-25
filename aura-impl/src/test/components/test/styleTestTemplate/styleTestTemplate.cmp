@@ -17,4 +17,146 @@
 -->
 <aura:component isTemplate="true" extends="aura:template" style="templateCss://test.styleTestTemplate">
     <ui:message> Loaded styleTestTemplate cmp. </ui:message>
+    <aura:set attribute="auraInitBlock">
+    <script>
+
+        window.BRIDGE = (function (Aura) {
+
+            var DISPLAY_ID = 'auraBridgeLog';
+
+            function getTimestamp() {
+                return new Date().toJSON();
+            };
+
+            function setupDisplay() {
+                var display = getDisplay();
+                if (!display) {
+                    display = document.createElement('div');
+                    display.id = DISPLAY_ID;
+                    display.style.cssText =
+                        'z-index:1000000;font-size:11px;padding:2px;position:fixed;bottom:0;height:250px;width:100%;background:black;color:yellow;opacity:.75;overflow:auto;border-radius:0';
+                    document.body.appendChild(display);
+
+                    var height = 50;
+                    display.addEventListener('click', function(e) {
+                        if ( height === 50 )
+                            height = 100
+                        else
+                            height = 50;
+                        display.style.height = height + '%';
+                    }, false);
+                }
+                return display;
+            };
+
+            function getDisplay() {
+                return document.getElementById(DISPLAY_ID);
+            };
+
+            function destroyDisplay() {
+                var display = getDisplay();
+                if (display) {
+                    display.parentNode.removeChild(display);
+                }
+            };
+
+            function displayLog(msg) {
+                var display = getDisplay();
+                if (!display) {
+                    display = setupDisplay();
+                }
+                var entry = document.createElement('div');
+                entry.innerHTML = msg;
+                display.appendChild(entry);
+                console.log(msg);
+            };
+
+            function log(level, message, error) {
+                if (loggingEnabled) {
+                    var msg = getTimestamp() + ' ' + Array.prototype.join.call(arguments, ' ') + '\n';
+                    if (window.cordova &amp;&amp; window.cordova.logging &amp;&amp; window.cordova.logging.log) {
+                        window.cordova.logging.log(msg);
+                    }
+                    if (displayEnabled) {
+                        displayLog(msg);
+                    }
+                }
+            }
+
+            function logAppCache(e) {
+                var progress = "",
+                    message = "";
+                if(e.type === "progress") {
+                    progress = " (" + e.loaded + " of " + e.total + ")";
+                }
+                if(e.message) {
+                    message = ", message: " + e.message
+                }
+                log("Application Cache '" + e.type + "' event " + process + message);
+            }
+
+            function addAppCacheListeners() {
+                if(window.applicationCache &amp;&amp; window.applicationCache.addEventListener) {
+                    window.applicationCache.addEventListener("checking", logAppCache, false);
+                    window.applicationCache.addEventListener("downloading", logAppCache, false);
+                    window.applicationCache.addEventListener("updateready", logAppCache, false);
+                    window.applicationCache.addEventListener("error", logAppCache, false);
+                    window.applicationCache.addEventListener("progress", logAppCache, false);
+                    window.applicationCache.addEventListener("noupdate", logAppCache, false);
+                    window.applicationCache.addEventListener("cached", logAppCache, false);
+                    window.applicationCache.addEventListener("obsolete", logAppCache, false);
+                }
+            };
+
+            function removeAppCacheListeners() {
+                if(window.applicationCache &amp;&amp; window.applicationCache.removeEventListener) {
+                    window.applicationCache.removeEventListener("checking", logAppCache, false);
+                    window.applicationCache.removeEventListener("downloading", logAppCache, false);
+                    window.applicationCache.removeEventListener("updateready", logAppCache, false);
+                    window.applicationCache.removeEventListener("error", logAppCache, false);
+                    window.applicationCache.removeEventListener("progress", logAppCache, false);
+                    window.applicationCache.removeEventListener("noupdate", logAppCache, false);
+                    window.applicationCache.removeEventListener("cached", logAppCache, false);
+                    window.applicationCache.removeEventListener("obsolete", logAppCache, false);
+                }
+            };
+
+            var loggingEnabled = false,
+                displayEnabled = false;
+
+            var bridgeLogger = {
+                enableLogging: function() {
+                    loggingEnabled = true;
+                    addAppCacheListeners();
+                    return this;
+                },
+                disableLogging: function() {
+                    loggingEnabled = false;
+                    destroyDisplay();
+                    removeAppCacheListeners();
+                    return this;
+                },
+                enableLogDisplay: function() {
+                    displayEnabled = true;
+                    return this;
+                },
+                disableLogDisplay: function() {
+                    displayEnabled = false;
+                    destroyDisplay();
+                    return this;
+                },
+                log: log
+            };
+
+            // subscribe to all
+            Aura.logger.subscribe("INFO", log);
+            Aura.logger.subscribe("WARNING", log);
+            Aura.logger.subscribe("ASSERT", log);
+            Aura.logger.subscribe("ERROR", log);
+
+            return bridgeLogger;
+        })($A);
+
+    </script>
+    </aura:set>
 </aura:component>

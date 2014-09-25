@@ -237,7 +237,8 @@ AuraStorage.prototype.resumeSweeping = function() {
  */
 AuraStorage.prototype.log = function() {
 	if (this.debugLoggingEnabled) {
-		$A.logInternal(arguments[0], arguments.length > 1 ? arguments[1] : undefined);
+        var msg = Array.prototype.join.call(arguments, " ");
+        $A.log(msg);
 	}
 };
 

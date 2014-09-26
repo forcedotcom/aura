@@ -39,10 +39,10 @@ public class ThemeDefRefImplTest extends StyleTestCase {
 
     private ThemeDefRef source(String src) throws Exception {
         DefDescriptor<ThemeDefRef> desc = Aura.getDefinitionService().getDefDescriptor("test", ThemeDefRef.class);
-        StringSource<ThemeDefRef> ss = new StringSource<ThemeDefRef>(desc, src, "myID", Format.XML);
+        StringSource<ThemeDefRef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(ss.getHashingReader());
         xmlReader.next();
-        ThemeDefRefHandler<ThemeDef> handler = new ThemeDefRefHandler<ThemeDef>(null, xmlReader, ss);
+        ThemeDefRefHandler<ThemeDef> handler = new ThemeDefRefHandler<>(null, xmlReader, ss);
         return handler.getElement();
     }
 

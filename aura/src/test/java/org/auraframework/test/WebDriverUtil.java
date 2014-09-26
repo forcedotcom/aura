@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;

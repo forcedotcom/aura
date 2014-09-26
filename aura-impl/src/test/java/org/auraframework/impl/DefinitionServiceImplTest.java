@@ -695,7 +695,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
             @Override
             public Set<DefDescriptor<TypeDef>> find(DefDescriptor<TypeDef> matcher) {
-                Set<DefDescriptor<TypeDef>> ret = new HashSet<DefDescriptor<TypeDef>>();
+                Set<DefDescriptor<TypeDef>> ret = new HashSet<>();
                 ret.add(Aura.getDefinitionService().getDefDescriptor("test://foo.bar1", TypeDef.class));
                 ret.add(Aura.getDefinitionService().getDefDescriptor("test://foo.bar2", TypeDef.class));
                 ret.add(Aura.getDefinitionService().getDefDescriptor("test://foo.bar3", TypeDef.class));

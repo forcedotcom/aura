@@ -61,6 +61,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         cla = new ComponentLocationAdapter.Impl(componentsPath.toFile());
     }
 
+    @Override
     public void close() {
         if (componentsPath != null) {
             try {

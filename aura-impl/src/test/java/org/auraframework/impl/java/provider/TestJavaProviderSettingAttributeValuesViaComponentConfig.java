@@ -44,7 +44,7 @@ public class TestJavaProviderSettingAttributeValuesViaComponentConfig {
     }
 
     private static Map<String, Object> provideAttributes() throws QuickFixException {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("a1", "a1Provider");
         attributes.put("a2", null);
         attributes.put("b1", "b1Provider");

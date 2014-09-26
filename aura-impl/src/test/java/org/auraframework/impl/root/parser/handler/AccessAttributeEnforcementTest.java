@@ -37,7 +37,7 @@ public class AccessAttributeEnforcementTest extends
 	public void testComponentWithText() throws Exception {
 		String resourceSource = "<aura:component><aura:text value='Hello World!' /></aura:component>";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;
@@ -70,7 +70,7 @@ public class AccessAttributeEnforcementTest extends
 	public void testComponentWithHTML() throws Exception {
 		String resourceSource = "<aura:component><aura:html tag='b' body='Hello World!' /></aura:component>";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;
@@ -103,7 +103,7 @@ public class AccessAttributeEnforcementTest extends
 	public void testComponentWithUnescapedHTML() throws Exception {
 		String resourceSource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;
@@ -136,7 +136,7 @@ public class AccessAttributeEnforcementTest extends
 	public void testComponentWithExpression() throws Exception {
 		String resourceSource = "<aura:component><aura:expression value='Hello + World!' /></aura:component>";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;
@@ -169,7 +169,7 @@ public class AccessAttributeEnforcementTest extends
 	public void testComponentWithIf() throws Exception {
 		String resourceSource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;
@@ -202,7 +202,7 @@ public class AccessAttributeEnforcementTest extends
 	public void testComponentWithRenderIf() throws Exception {
 		String resourceSource = "<aura:component><aura:renderIf isTrue='True' else='' /></aura:component>";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;

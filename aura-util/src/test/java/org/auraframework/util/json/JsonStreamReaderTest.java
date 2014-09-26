@@ -549,7 +549,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals("qux", outerMap.get("baz"));
             assertEquals("corge grault\n\"\\\tga\u030A\u031Frply", outerMap.get("quux"));
 
-            List<String> waldo = new ArrayList<String>();
+            List<String> waldo = new ArrayList<>();
             waldo.add("fred");
             waldo.add("plu'gh");
             waldo.add("xyzzy");

@@ -158,7 +158,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
-            return new AttributeDefHandler<ApplicationDef>(
+            return new AttributeDefHandler<>(
                     (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
                     null,
                     null);
@@ -181,7 +181,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         }
         @Override
         XMLHandler<?> getHandler(boolean b) throws DefinitionNotFoundException {
-            return new RegisterEventHandler<RootDefinition>();
+            return new RegisterEventHandler<>();
         }
     }
     public static class AttributeDefRefAttributesVisibilityTest extends DefAttributesVisibilityTest{
@@ -198,7 +198,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         @SuppressWarnings("unchecked")
         XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
-            return new AttributeDefRefHandler<ApplicationDef>(
+            return new AttributeDefRefHandler<>(
                     (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
                     null,
                     null);

@@ -34,12 +34,12 @@ public class GlobMatcherTest extends UnitTestCase {
             if (matches != null) {
                 this.matches = Arrays.asList(matches);
             } else {
-                this.matches = new ArrayList<String>();
+                this.matches = new ArrayList<>();
             }
             if (fails != null) {
                 this.fails = Arrays.asList(fails);
             } else {
-                this.fails = new ArrayList<String>();
+                this.fails = new ArrayList<>();
             }
         }
     }

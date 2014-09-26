@@ -140,8 +140,8 @@ public class JavaControllerTest extends AuraImplTestCase {
 
     public void testActionNoParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
-        Map<String, Object> empty = new HashMap<String, Object>();
-        Map<String, Object> hasOne = new HashMap<String, Object>();
+        Map<String, Object> empty = new HashMap<>();
+        Map<String, Object> hasOne = new HashMap<>();
         hasOne.put("a", "don't care");
         assertNotNull("unable to load test controller", controller);
 
@@ -159,7 +159,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testActionWithParametersError() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
 
         // A custom type parameter without a converter for what's passed to it (String)
         args.put("a", "x");
@@ -185,7 +185,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testActionWithParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
 
         args.put("a", "x");
         args.put("b", "y");
@@ -226,7 +226,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         
     	//jvd doesn't matter that much for triggering QFE, as we only used it as the Object param
         JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null);
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
         args.put("keya", jvd);
     	ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerOnlyForJavaControllerTest");
      	
@@ -267,7 +267,7 @@ public class JavaControllerTest extends AuraImplTestCase {
                     e.getMessage());
         }
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
-        Map<String, Object> empty = new HashMap<String, Object>();
+        Map<String, Object> empty = new HashMap<>();
         try {
             controller.createAction("imNotHere", empty);
             fail("Should not be able to create JavaAction when method does not exist in Controller class");

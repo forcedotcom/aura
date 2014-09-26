@@ -20,14 +20,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.StyleDef;
 import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 
 import com.google.common.collect.Maps;

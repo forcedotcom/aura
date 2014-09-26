@@ -52,7 +52,7 @@ public class TestControllerLocalization {
     @AuraEnabled
     public static Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
         int count = Integer.parseInt(input);
-        List<Component> cmps = new LinkedList<Component>();
+        List<Component> cmps = new LinkedList<>();
         while (count-- > 0) {
             Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class);
             Object val = token + ":java:" + count;

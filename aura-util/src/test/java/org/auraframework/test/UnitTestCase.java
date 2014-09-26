@@ -109,7 +109,7 @@ public abstract class UnitTestCase extends TestCase {
             return;
         }
         if (tearDownSteps == null) {
-            tearDownSteps = new Stack<Runnable>();
+            tearDownSteps = new Stack<>();
         }
         tearDownSteps.push(toRun);
     }
@@ -206,7 +206,7 @@ public abstract class UnitTestCase extends TestCase {
 
     protected void deleteFileOnTeardown(File file) {
         if (tempFiles == null) {
-            tempFiles = new LinkedList<File>();
+            tempFiles = new LinkedList<>();
         }
         tempFiles.add(file);
     }

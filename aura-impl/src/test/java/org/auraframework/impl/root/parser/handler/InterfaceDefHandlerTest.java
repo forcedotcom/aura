@@ -35,7 +35,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     public void testInterfaceDefHandler() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(
+        StringSource<InterfaceDef> source = new StringSource<>(
                 descriptor,
                 "<aura:interface><aura:attribute name='mystring' type='String'/><aura:registerevent name='click' type='aura:click' description='The Description'/></aura:interface>",
                 "myID", Format.XML);
@@ -49,7 +49,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     public void testInterfaceDefHandlerWithExtension() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,
+        StringSource<InterfaceDef> source = new StringSource<>(descriptor,
                 "<aura:interface extends='aura:testinterfaceparent'></aura:interface>", "myID", Format.XML);
         InterfaceDef def = parser.parse(descriptor, source);
         assertEquals(1, def.getExtendsDescriptors().size());
@@ -59,7 +59,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     public void testInterfaceDefHandlerWithInvalidChildTag() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,
+        StringSource<InterfaceDef> source = new StringSource<>(descriptor,
                 "<aura:interface><aura:foo/></aura:interface>", "myID", Format.XML);
         InterfaceDef id = parser.parse(descriptor, source);
         try {
@@ -73,7 +73,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     public void testInterfaceDefHandlerWithTextBetweenTag() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,
+        StringSource<InterfaceDef> source = new StringSource<>(descriptor,
                 "<aura:interface>Invalid text</aura:interface>", "myID", Format.XML);
         InterfaceDef id = parser.parse(descriptor, source);
         try {

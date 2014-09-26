@@ -47,7 +47,7 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
     }
 
     private final String ATTR_COMPONENT_ARRAY = "<aura:attribute name='componentArray' type='Aura.Component[]'><div>am a div</div>just text<span>am a span</span></aura:attribute>";
-    private final String ATTR_STRING_ARRAY = "<aura:attribute name='stringArray' type='String[]' default='first,second,third'/>";
+    //private final String ATTR_STRING_ARRAY = "<aura:attribute name='stringArray' type='String[]' default='first,second,third'/>";
     private final String ATTR_STRING_ARRAY_WITHOUTDEFAULT = "<aura:attribute name='isNotSet' type='String[]'/>";
 
     private String getRenderedHTML(String markup, Class<? extends BaseComponentDef> defType,

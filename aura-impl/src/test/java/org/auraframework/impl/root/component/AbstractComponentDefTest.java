@@ -83,7 +83,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testImplementsIntf() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
         interfaces.add(DefDescriptorImpl.getInstance("test:fakeInterface", InterfaceDef.class));
 
         ComponentDefImpl.Builder builder = createAbstractBuilder();
@@ -104,7 +104,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testEvents() throws Exception {
-        Map<String, RegisterEventDef> eventDefs = new HashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> eventDefs = new HashMap<>();
 
         RegisterEventDefImpl.Builder regBuilder = new RegisterEventDefImpl.Builder();
         regBuilder.setDescriptor(DefDescriptorImpl.getInstance("test:anevent", EventDef.class));

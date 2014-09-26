@@ -52,7 +52,7 @@ public class TestSetRunnerModel {
      */
     @AuraEnabled
     public Object getTests() {
-        List<String> testNames = new LinkedList<String>();
+        List<String> testNames = new LinkedList<>();
         Map<String, Test> inventory = getTestSetRunnerState().getInventory();
         for (Test t : inventory.values()) {
             testNames.add(t.toString());

@@ -36,7 +36,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
     public void testSanity() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='click' type='aura:click' description='The Description' access='global'/></aura:component>",
                 "myID", Format.XML);
@@ -50,7 +50,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
     public void testInvalidAccess() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='aura:click' description='The Description' access='fakeAccessLevel'/></aura:component>",
                 "myID", Format.XML);
@@ -66,7 +66,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
     public void testTextContent() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='aura:click' description='The Description' access='global'>invalidtext</aura:registerevent></aura:component>",
                 "myID", Format.XML);
@@ -82,7 +82,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
     public void testMissingType() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,"<aura:component><aura:registerevent name='wheresthetype'/></aura:component>",
                 "myID", Format.XML);
     	ComponentDef def = parser.parse(descriptor, source);
@@ -98,7 +98,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class, "<aura:event type='COMPONENT'/>");
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 String.format("<aura:component><aura:registerevent type='%s'/></aura:component>",eventDesc.getDescriptorName()),
                 "myID", Format.XML);
@@ -115,7 +115,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class, "<aura:event type='APPLICATION'/>");
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+        StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 String.format("<aura:component><aura:registerevent type='%s'/></aura:component>",eventDesc.getDescriptorName()),
                 "myID", Format.XML);

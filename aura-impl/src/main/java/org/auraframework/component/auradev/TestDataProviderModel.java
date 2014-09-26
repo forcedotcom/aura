@@ -28,7 +28,7 @@ public class TestDataProviderModel {
     private final List<Item> items;
     
     public TestDataProviderModel() throws Exception {
-        this.items = new ArrayList<Item>(10);
+        this.items = new ArrayList<>(10);
         for (int i = 0; i < 10; i++) {
             items.add(new Item("label" + i, "value" + i));
         } 

@@ -55,14 +55,14 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testHashCode() throws Exception {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new HashMap<>();
         attributeDefs.put(DefDescriptorImpl.getInstance(vendor.getAttributeName(), AttributeDef.class),
                 vendor.makeAttributeDef());
 
-        Map<String, RegisterEventDef> eventDefs = new HashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> eventDefs = new HashMap<>();
         eventDefs.put("fakey", vendor.makeRegisterEventDef());
 
-        List<ComponentDefRef> children = new ArrayList<ComponentDefRef>();
+        List<ComponentDefRef> children = new ArrayList<>();
         children.add(vendor.makeComponentDefRef());
 
         Location location = vendor.makeLocation();
@@ -74,16 +74,16 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 "aura:parent", null, null, null, null, null, null, null, null, null, null, null, false, true)
                 .getDescriptor();
 
-        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
         interfaces.add(vendor.getInterfaceDefDescriptor());
 
-        List<DefDescriptor<RendererDef>> renderers = new ArrayList<DefDescriptor<RendererDef>>();
+        List<DefDescriptor<RendererDef>> renderers = new ArrayList<>();
         renderers.add(vendor.getRendererDescriptor());
 
-        List<EventHandlerDef> eventHandlers = new ArrayList<EventHandlerDef>();
+        List<EventHandlerDef> eventHandlers = new ArrayList<>();
         eventHandlers.add(vendor.makeEventHandlerDef());
 
-        List<DefDescriptor<HelperDef>> helpers = new ArrayList<DefDescriptor<HelperDef>>();
+        List<DefDescriptor<HelperDef>> helpers = new ArrayList<>();
         helpers.add(vendor.getHelperDescriptor());
 
         BaseComponentDef bcdAll = vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
@@ -225,7 +225,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testGetAttributeDefsSpidered() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
         interfaces.add(vendor.makeInterfaceDefDescriptor("test:testinterfaceparent"));
         DefDescriptor<T> extendsDescriptor = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:attribute name='parentAttribute' type='String'/>"));
@@ -243,7 +243,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testGetRegisteredEventDefs() throws Exception {
-        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
+        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
         interfaces.add(vendor.makeInterfaceDefDescriptor("test:testinterfaceparent"));
         DefDescriptor<T> extendsDescriptor = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:registerevent name='anotherParentEvent' type='test:parentEvent'/>"));
@@ -257,7 +257,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testAppendDependenciesWithNone() throws Exception {
-        Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", null, null, null, null,
                 null, null, null, null, null, null, null, false, false);
         bcd.appendDependencies(dependencies);
@@ -313,7 +313,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
         addSourceAutoCleanup(namespaceDesc, "<aura:namespace/>");
 
-        Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
         cmpDesc.getDef().appendDependencies(dependencies);
 
         @SuppressWarnings("unchecked")
@@ -1702,7 +1702,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testValidateReferencesWithNonExistentInterface() throws Exception {
         Set<DefDescriptor<InterfaceDef>> interfaces = new
-                HashSet<DefDescriptor<InterfaceDef>>();
+                HashSet<>();
         interfaces.add(vendor.makeInterfaceDefDescriptor("say:what"));
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,

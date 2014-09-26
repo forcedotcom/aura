@@ -27,7 +27,7 @@ public class ListViewTestModel {
 
     @AuraEnabled
     public List<Object> getEmptyList() {
-        return new ArrayList<Object>();
+        return new ArrayList<>();
     }
 
     @AuraEnabled

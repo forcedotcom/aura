@@ -71,7 +71,6 @@ public class InstanceStackTest extends UnitTestCase {
     //
     private class TestInstance implements Instance<Definition> {
         private final String path;
-        private final String name;
         protected final DefDescriptor<Definition> descriptor;
         
         private DefDescriptor<Definition> createMockDescriptor(String namespace) {
@@ -83,19 +82,16 @@ public class InstanceStackTest extends UnitTestCase {
         
         public TestInstance() {
             this.path = "testInstance";
-            this.name = "";
             this.descriptor = createMockDescriptor("aura");
         }
 
         public TestInstance(String path) {
         	this.path = path;
-        	this.name = "";
         	this.descriptor = createMockDescriptor("aura");
         }
         
         public TestInstance(String namespace, String name) {
         	this.path = namespace;
-        	this.name = name;
         	this.descriptor = createMockDescriptor(namespace);
         }
         

@@ -41,7 +41,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(vendor.getComponentDefDescriptor(),
+        StringSource<ComponentDef> source = new StringSource<>(vendor.getComponentDefDescriptor(),
                 "<aura:component controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
                         + vendor.getParentComponentDefDescriptor() + "' implements='"
                         + vendor.getInterfaceDefDescriptor()
@@ -67,7 +67,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
 
     public void testDuplicateAttributeNames() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:attribute name=\"implNumber\" type=\"String\"/>"
                         + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:component>", "myID", Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
@@ -85,7 +85,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
      */
     public void testDuplicateAttributeOnSystemTag() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component extends='test:fakeAbstract' extends='test:fakeAbstractParent'></aura:component>",
                 "myID", Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
@@ -101,7 +101,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
      */
     public void testBlankValueForSystemTag() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component extends=''></aura:component>", "myID", Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
         try {

@@ -30,7 +30,7 @@ public class SluggishServerModel {
 
     @AuraEnabled
     public List<String> getStringList() {
-        ArrayList<String> sl = new ArrayList<String>();
+        ArrayList<String> sl = new ArrayList<>();
         sl.add("foo");
         sl.add("bar");
         sl.add("beer");

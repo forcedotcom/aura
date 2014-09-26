@@ -41,7 +41,7 @@ import org.auraframework.util.json.Json;
 public class AuraFormatsHttpTest extends AuraHttpTestCase {
     private final String componentTag = "&aura.tag=auratest:test_TokenValidation";
     private final String quickFixComponentTag = "&aura.tag=foo:bar";
-    private static Map<Format, String> FORMAT_CONTENTTYPE = new HashMap<Format, String>();
+    private static Map<Format, String> FORMAT_CONTENTTYPE = new HashMap<>();
     static {
         FORMAT_CONTENTTYPE.put(Format.JSON, Json.MIME_TYPE + ";charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.JS, "text/javascript;charset=" + AuraBaseServlet.UTF_ENCODING);
@@ -73,14 +73,14 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     }
 
     private void postOnAuraServlet(Format f, Boolean causeException) throws Exception {
-        Map<String, Object> message = new HashMap<String, Object>();
-        Map<String, Object> actionInstance = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
+        Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
         Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
         String jsonMessage = Json.serialize(message);
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         if (!causeException) {
             params.put("aura.token", getCsrfToken());

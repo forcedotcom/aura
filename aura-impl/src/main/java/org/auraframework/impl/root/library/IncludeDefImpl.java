@@ -24,7 +24,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.impl.root.event.EventDefImpl;
 
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.MasterDefRegistry;

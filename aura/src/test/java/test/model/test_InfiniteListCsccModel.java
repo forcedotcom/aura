@@ -42,7 +42,7 @@ public class test_InfiniteListCsccModel {
     
     // create a set of X items that adds a sequentially numbered id in the form: Server N
     public test_InfiniteListCsccModel() {
-        items = new ArrayList<Map<String, Object>>();
+        items = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
             items.add(newRow(i));

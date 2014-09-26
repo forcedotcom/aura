@@ -42,16 +42,16 @@ public class TestIterationModel {
     private final List<Integer> dataIntList;
 
     public TestIterationModel() {
-        data = new LinkedList<Object>();
-        capitaldata = new LinkedList<Object>();
-        dataIntList = new LinkedList<Integer>();
+        data = new LinkedList<>();
+        capitaldata = new LinkedList<>();
+        dataIntList = new LinkedList<>();
         for (int i = 0; i < 26; i++) {
-            Map<String, Object> dora = new HashMap<String, Object>();
+            Map<String, Object> dora = new HashMap<>();
             char c = (char) ('a' + i);
             dora.put("stringy", "" + c + c + c);
             dora.put("whatever", "hooray for everybody");
             data.add(dora);
-            dora = new HashMap<String, Object>();
+            dora = new HashMap<>();
             c = (char) ('A' + i);
             dora.put("stringy", "" + c + c + c + c + c);
             dora.put("whatever", "boo for nobody");
@@ -89,7 +89,7 @@ public class TestIterationModel {
 
     @AuraEnabled
     public List<List<String>> getPlayerData() {
-        List<List<String>> team = new ArrayList<List<String>>();
+        List<List<String>> team = new ArrayList<>();
         String[][] s = { { "Héctor Sánchez", "23", "Catcher", "2012" },
                 { "Buster Posey", "25", "Catcher/First Baseman", "2012,2010" },
                 { "Brandon Belt", " 24", "First baseman", "2012" },
@@ -108,7 +108,7 @@ public class TestIterationModel {
                 { "Brandon Crawford", "25", "Short Stop", "2012" }, { "Melky Cabrera", "28", "OutFielder", "2009" },
                 { "Ryan Theriot", "32", "Short Stop", "2011, 2012" }, };
         for (String[] list : s) {
-            ArrayList<String> player = new ArrayList<String>();
+            ArrayList<String> player = new ArrayList<>();
             for (String field : list) {
                 player.add(field);
             }

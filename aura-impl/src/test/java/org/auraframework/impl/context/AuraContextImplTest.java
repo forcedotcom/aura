@@ -281,7 +281,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         context.addLoaded(added, "somegenerateduid");
 
         DefDescriptor<EventDef> eventDesc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,

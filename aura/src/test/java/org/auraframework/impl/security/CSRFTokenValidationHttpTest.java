@@ -47,17 +47,17 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     }
 
     private Map<String, String> makeBasePostParams() {
-        Map<String, Object> message = new HashMap<String, Object>();
-        Map<String, Object> actionInstance = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
+        Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
-        Map<String, Object> actionParams = new HashMap<String, Object>();
+        Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
         Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
         String jsonMessage = Json.serialize(message);
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         return params;
     }

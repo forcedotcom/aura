@@ -216,7 +216,7 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 	}
 
 	private DocumentationDef parse(String markup) throws QuickFixException{
-		StringSource<DocumentationDef> source = new StringSource<DocumentationDef>(vendor.getDocumentationDefDescriptor(), markup, "myID", Format.XML);
+		StringSource<DocumentationDef> source = new StringSource<>(vendor.getDocumentationDefDescriptor(), markup, "myID", Format.XML);
 
 		return parser.parse(vendor.getDocumentationDefDescriptor(), source);
 	}

@@ -29,7 +29,7 @@ public class TestDataProviderController {
 
     @AuraEnabled
     public static List<Item> getItems(@Key("keyword") String keyword) throws Exception {
-        List<Item> l = new ArrayList<Item>(10);
+        List<Item> l = new ArrayList<>(10);
         for (int i = 0; i < 10; i++) {
             l.add(new Item("label" + i + Calendar.getInstance().get(Calendar.SECOND), "value" + i));
         }

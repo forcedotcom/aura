@@ -68,7 +68,7 @@ public class TestSetRunnerController {
      */
     @AuraEnabled
     public static Map<String, Object> pollForTestRunStatus() throws Exception {
-        Map<String, Object> r = new HashMap<String, Object>();
+        Map<String, Object> r = new HashMap<>();
         Map<String, Map<String, Object>> m = TestSetRunnerState.getInstance().getTestsWithPropertiesMap();
         r.put("testsRunning", TestExecutor.getInstance().isActive());
         r.put("testsWithPropsMap", m);

@@ -81,7 +81,7 @@ public class DependencyDefImplTest extends AuraImplTestCase {
      */
     public void testAppendDependencies() throws Exception {
         DependencyDef testDependencyDef;
-        Set<DefDescriptor<?>> deps = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> deps = new HashSet<>();
 
         // Check for a couple dependencies present in a namespace
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), "aura", "INTERFACE",

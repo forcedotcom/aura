@@ -443,7 +443,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see
         // what's cached, so build our URL and call WebDriver.get() directly.
         String url = getUrl();
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
         url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
@@ -666,7 +666,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 return super.put(k, v);
             } else {
                 if (extras == null) {
-                    extras = new HashMap<String, String>();
+                    extras = new HashMap<>();
                 }
                 extras.put(k, v);
             }

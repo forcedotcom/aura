@@ -112,33 +112,33 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
 
     private void assertCollectionAndMapDataTypes(Model model) throws Exception {
         // List of Maps.
-        Map<String, String> m1 = new HashMap<String, String>();
-        List<Map<String, String>> l1 = new ArrayList<Map<String, String>>();
+        Map<String, String> m1 = new HashMap<>();
+        List<Map<String, String>> l1 = new ArrayList<>();
         l1.add(m1);
         assertEachModelMember(model, "listOfMaps", l1);
         // Set of maps.
-        Map<String, String> m2 = new HashMap<String, String>();
-        Set<Map<String, String>> s2 = new HashSet<Map<String, String>>();
+        Map<String, String> m2 = new HashMap<>();
+        Set<Map<String, String>> s2 = new HashSet<>();
         s2.add(m2);
         assertEachModelMember(model, "setOfMaps", s2);
         // List of List
-        List<String> l3 = new ArrayList<String>();
-        List<List<String>> ll3 = new ArrayList<List<String>>();
+        List<String> l3 = new ArrayList<>();
+        List<List<String>> ll3 = new ArrayList<>();
         ll3.add(l3);
         assertEachModelMember(model, "listOfList", ll3);
         // Set of List
-        List<String> l4 = new ArrayList<String>();
-        Set<List<String>> s4 = new HashSet<List<String>>();
+        List<String> l4 = new ArrayList<>();
+        Set<List<String>> s4 = new HashSet<>();
         s4.add(l4);
         assertEachModelMember(model, "setOfList", s4);
         // List of Set
-        Set<String> s5 = new HashSet<String>();
-        List<Set<String>> l5 = new ArrayList<Set<String>>();
+        Set<String> s5 = new HashSet<>();
+        List<Set<String>> l5 = new ArrayList<>();
         l5.add(s5);
         assertEachModelMember(model, "listOfSet", l5);
         // Set of Set
-        Set<String> s6 = new HashSet<String>();
-        Set<Set<String>> ss6 = new HashSet<Set<String>>();
+        Set<String> s6 = new HashSet<>();
+        Set<Set<String>> ss6 = new HashSet<>();
         ss6.add(s6);
         assertEachModelMember(model, "setOfSet", ss6);
     }

@@ -27,7 +27,7 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class TestModelToAttachEvents {
     public TestModelToAttachEvents() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("strParam", "Go 49ers!");
         // Adding an event whose definition is in the client because of the
         // handler.

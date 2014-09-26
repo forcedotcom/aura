@@ -25,73 +25,69 @@ import com.google.common.base.Function;
  * A specialization of {@link WebDriverWait} that run passed in callback function when wait time out.
  */
 public class WebDriverWaitWithCallback extends WebDriverWait {
-    private WebDriver driver;
+    private final WebDriver driver;
 
     public WebDriverWaitWithCallback(WebDriver driver, long timeOutInSeconds) {
         super(driver, timeOutInSeconds);
         this.driver = driver;
     }
-    
+
     public WebDriverWaitWithCallback(WebDriver driver, long timeOutInSeconds, String message) {
         super(driver, timeOutInSeconds);
         super.withMessage(message);
         this.driver = driver;
     }
 
-    public <V2, V1> V1 until(Function<? super WebDriver, V1> function, 
+    public <V2, V1> V1 until(Function<? super WebDriver, V1> function,
             Function<? super WebDriver, V2> callbackWhenTimeout) {
-        V2 res2;
         try {
             return super.until(function);
-        }
-        //catch timeout exception and throw exception with extra message from callback function
-        catch (TimeoutException et)
-        {
-            res2 = callbackWhenTimeout.apply(driver);
-            TimeoutExceptionWithExtraMessage tecm = 
-                new TimeoutExceptionWithExtraMessage(et.getMessage(), et.getCause(), res2.toString());
+        } catch (TimeoutException et) {
+            // catch timeout exception and throw exception with extra message from callback function
+            V2 ret = callbackWhenTimeout.apply(driver);
+            TimeoutExceptionWithExtraMessage tecm = new TimeoutExceptionWithExtraMessage(et.getMessage(),
+                    et.getCause(), ret.toString());
             throw tecm;
         }
-        //let other exception (like WebDriverException) bubble up
+        // let other exception (like WebDriverException) bubble up
     }
-    
+
     /**
-     * customized timeoutException class, with extra message append to the end of original one
+     * Customized TimeoutException class, with extra message prepended to the original one
      */
     public class TimeoutExceptionWithExtraMessage extends TimeoutException {
         private static final long serialVersionUID = 1L;
-        private String extraMessage;
-        
-        public TimeoutExceptionWithExtraMessage(String message, Throwable lastException, String extraMessage) 
-        { 
+        private final String extraMessage;
+
+        public TimeoutExceptionWithExtraMessage(String message, Throwable lastException, String extraMessage) {
             super(message, lastException);
             this.extraMessage = extraMessage;
         }
-        
-        public TimeoutExceptionWithExtraMessage(String message, String extraMessage) 
-        { 
+
+        public TimeoutExceptionWithExtraMessage(String message, String extraMessage) {
             super(message);
             this.extraMessage = extraMessage;
         }
-        
-        public TimeoutExceptionWithExtraMessage(Throwable lastException, String extraMessage) 
-        { 
+
+        public TimeoutExceptionWithExtraMessage(Throwable lastException, String extraMessage) {
             super(lastException);
             this.extraMessage = extraMessage;
         }
-        
+
         /**
          * getExtraMessage return the result of callback function
          */
-        public String getExtraMessage() { return extraMessage; }
-        
+        public String getExtraMessage() {
+            return extraMessage;
+        }
+
         /**
          * return message with extra message append to the beginning (from callback function)
          */
         @Override
-        public String getMessage() 
-        { 
-            return "\nExtra message from callback function when time out: "+this.extraMessage+".\n "+super.getMessage(); 
+        public String getMessage() {
+            return "\nExtra message from callback function when time out: " + this.extraMessage + ".\n"
+                    + super.getMessage();
         }
     }
 }

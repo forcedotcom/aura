@@ -279,6 +279,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case THEME:
             case THEME_DEF_REF:
             case VAR:
+            case DESIGN:
+            case ATTRIBUTE_DESIGN:
                 qualifiedNamePattern = "%s://%s:%s";
                 break;
             case ACTION:

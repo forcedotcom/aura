@@ -159,6 +159,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TESTCASE:
             case VAR:
             case THEME_DEF_REF:
+            case ATTRIBUTE_DESIGN:
                 name = qualifiedName;
                 break;
             case APPLICATION:
@@ -171,6 +172,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LAYOUTS:
             case NAMESPACE:
             case THEME:
+            case DESIGN:
                 Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
                 if (tagMatcher.matches()) {
                     prefix = tagMatcher.group(1);

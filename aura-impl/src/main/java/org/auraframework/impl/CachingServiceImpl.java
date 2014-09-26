@@ -19,15 +19,19 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
@@ -68,38 +72,45 @@ public class CachingServiceImpl implements CachingService {
 		existsCache = this.<DefDescriptor<?>, Boolean> getCacheBuilder()
 				.setInitialSize(DEFINITION_CACHE_SIZE)
 				.setMaximumSize(DEFINITION_CACHE_SIZE).setRecordStats(true)
+                .setName("existsCache")
 				.setSoftValues(true).build();
 
 		defsCache = this
 				.<DefDescriptor<?>, Optional<? extends Definition>> getCacheBuilder()
 				.setInitialSize(DEFINITION_CACHE_SIZE)
 				.setMaximumSize(DEFINITION_CACHE_SIZE).setRecordStats(true)
+                .setName("defsCache")
 				.setSoftValues(true).build();
 
 		stringsCache = this.<String, String> getCacheBuilder()
 				.setInitialSize(STRING_CACHE_SIZE)
 				.setMaximumSize(STRING_CACHE_SIZE).setRecordStats(true)
+                .setName("stringsCache")
 				.setSoftValues(true).build();
 
 		descriptorFilterCache = this
 				.<String, Set<DefDescriptor<?>>> getCacheBuilder()
 				.setInitialSize(DEPENDENCY_CACHE_SIZE)
 				.setMaximumSize(DEPENDENCY_CACHE_SIZE).setRecordStats(true)
+                .setName("descriptorFilterCache")
 				.setSoftValues(true).build();
 
 		depsCache = this.<String, DependencyEntry> getCacheBuilder()
 				.setInitialSize(DEPENDENCY_CACHE_SIZE)
 				.setMaximumSize(DEPENDENCY_CACHE_SIZE).setRecordStats(true)
+                .setName("depsCache")
 				.setSoftValues(true).build();
 
 		clientLibraryOutputCache = this.<String, String> getCacheBuilder()
 				.setInitialSize(CLIENT_LIB_CACHE_SIZE)
 				.setMaximumSize(CLIENT_LIB_CACHE_SIZE).setSoftValues(true)
+                .setName("clientLibraryOutputCache")
 				.setRecordStats(true).build();
 
 		clientLibraryUrlsCache = this.<String, Set<String>> getCacheBuilder()
 				.setInitialSize(CLIENT_LIB_CACHE_SIZE)
 				.setMaximumSize(CLIENT_LIB_CACHE_SIZE).setSoftValues(true)
+                .setName("clientLibraryUrlsCache")
 				.setRecordStats(true).build();
 
 		defDescriptorByNameCache = 
@@ -107,6 +118,7 @@ public class CachingServiceImpl implements CachingService {
 	            .setInitialSize(512)
 	            .setMaximumSize(1024 * 10)
 	            .setConcurrencyLevel(20)
+                .setName("defDescByNameCache")
 	            .build();
 	}
 

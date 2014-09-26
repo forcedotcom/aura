@@ -43,6 +43,14 @@ public interface FileGroup {
      */
     Hash getGroupHash() throws IOException;
 
+    /**
+     * Add a file to the group.
+     * 
+     * If the string is an absolute path, it will be added as that absolute file, otherwise, it is
+     * resolved from an implementation dependent root directory.
+     *
+     * @param s the path.
+     */
     File addFile(String s) throws IOException;
 
     File addDirectory(String s) throws IOException;

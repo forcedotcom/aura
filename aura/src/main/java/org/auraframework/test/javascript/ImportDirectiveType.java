@@ -15,18 +15,24 @@
  */
 package org.auraframework.test.javascript;
 
+import java.io.File;
+
 import org.auraframework.util.javascript.directive.DirectiveType;
 /**
  * Import another file
  */
 public class ImportDirectiveType implements DirectiveType<ImportDirective> {
+    private File destinationRoot;
+    private File auraRoot;
 
-    public ImportDirectiveType() {
+    public ImportDirectiveType(File destinationRoot, File auraRoot) {
+        this.destinationRoot = destinationRoot;
+        this.auraRoot = auraRoot;
     }
 
     @Override
     public ImportDirective constructDirective(int offset, String line) {
-        return new ImportDirective(offset, line);
+        return new ImportDirective(offset, line, destinationRoot, auraRoot);
     }
 
     @Override

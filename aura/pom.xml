@@ -91,6 +91,15 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
@@ -173,8 +182,7 @@
                         </pluginExecutions>
                     </lifecycleMappingMetadata>
                 </configuration>
-                </plugin>
-            </plugins>
-
+            </plugin>
+        </plugins>
     </build>
 </project>

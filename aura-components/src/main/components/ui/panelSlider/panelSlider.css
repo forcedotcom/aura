@@ -1,0 +1,150 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	visibility: hidden;
+	overflow: hidden;
+}
+
+.THIS .tablet.sliderWrapper {
+	width: 460px;
+}
+
+.THIS .tablet.sliderWrapper.rightPosition {
+	left:auto;
+    right: 0;
+}
+
+.THIS .sliderWrapper {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	transform: translate3d(0,0,0);
+	z-index: 999;
+}
+
+.THIS .body {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	
+}
+
+.THIS .sliderWrapper.rightPosition .body {
+	margin-left: 50px;
+}
+
+.THIS .sliderWrapper.leftPosition .body {
+	margin-right: 50px;
+}
+
+.THIS .tablet.sliderWrapper > .button {
+	top:25%;
+	right:50px;
+}
+
+.THIS .sliderWrapper > .button {
+	position:absolute;
+	display: block;
+	top:40%;
+	width: 100%;
+   	-moz-box-sizing: border-box;
+    box-sizing: border-box;
+	height:50px;
+	background: #31AF5C;
+	transform: translate3d(0,0,0);
+}
+
+.THIS .sliderWrapper.rightPosition > .button {
+	right: 50px;
+	border-radius: 5px 0px 0px 5px;
+}
+
+.THIS .sliderWrapper.leftPosition > .button {
+	left: 50px;
+	text-align: right;
+	border-radius: 0px 5px 5px 0px;
+}
+
+
+.THIS .sliderWrapper > .button > .icon { 
+	padding: 13px;
+	font-size: 20px;
+	color: white;
+}
+
+
+.THIS .modal-glass {
+	background-color: #2A4158;
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	transition: opacity 300ms;
+	visibility:hidden;
+	z-index: 999;
+}
+
+.THIS.visible, .THIS .visible {
+	visibility: visible;
+}
+
+/* ===== ANIMATION AND TRANSFORMS ======= */
+.THIS .sliding {
+	transition: transform .3s linear, opacity .2s linear;
+}
+
+.THIS.slideIn .modal-glass {
+	opacity: 0.8;
+}
+
+.THIS.slideIn .sliderWrapper {
+	transform: translate3d(0,0,0);
+}
+
+.THIS.slideIn .sliderWrapper.rightPosition > .button {
+	transform: translate3d(60px,0,0);
+}
+
+.THIS.slideIn .sliderWrapper.leftPosition > .button {
+	transform: translate3d(-60px,0,0);
+}
+
+.THIS .rightPosition {
+	transform: translate3d(100%, 0, 0);
+}
+
+.THIS .leftPosition {
+	transform: translate3d(-100%, 0, 0);
+}
+
+.THIS .flip{
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}

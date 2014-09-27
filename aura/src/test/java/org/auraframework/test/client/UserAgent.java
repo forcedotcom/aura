@@ -24,7 +24,7 @@ public enum UserAgent {
     IE7("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)"),
     IE8("Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; Media Center PC 4.0; SLCC1; .NET CLR 3.0.04320)"),
     IE9("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)"),
-    IE10("Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)"),
+    IE10("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)"),
     IE11("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"),
     IE11_NET_FRAMEWORK("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko"),
     // Nokia Lumia 928

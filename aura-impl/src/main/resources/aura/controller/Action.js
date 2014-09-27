@@ -485,7 +485,7 @@ Action.prototype.wrapCallback = function(scope, callback) {
     this.setCallback(this, function(action, cmp) {
         var cb = nestedCallbacks[this.getState()];
         if (cb && cb.fn) {
-            cb.fn.call(cb.s, this, cmp);
+            cb.fn.call(cb.s, action, cmp);
         }
         outerCallback.call(outerScope, this, cmp);
         this.callbacks = nestedCallbacks;

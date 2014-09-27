@@ -203,7 +203,7 @@
                 // Positive displacement is a 'open' gesture.
             	// Negative displacement is an 'close' gesture.
                 if (swipe.diffX > 0) {
-                	percentage = this.getWidthPercentage(cmp, swipe.body, (swipe.absX + swipe.initialPosition));
+                	percentage = this.getWidthPercentage(cmp, swipe.body, swipe.absX + swipe.initialPosition);
                 	swipe.percentage = -percentage;
                 	
                 	if (swipe.percentage >= -(this.OPEN_PERCENTAGE)) { 
@@ -212,10 +212,10 @@
                 }
                 else {
                 	percentage = this.getWidthPercentage(cmp, swipe.body, (swipe.absX + (cmp._bodyLength - swipe.initialPosition)));
-                	swipe.percentage = -(100 - percentage);
+                	swipe.percentage = -this.getWidthPercentage(cmp, swipe.body, swipe.absX);
                 	
-                	if (swipe.percentage <= 0) {
-                		this.translateX(cmp, swipe.body, swipe.percentage);
+                	if (cmp._isInteractionOnOpenRow && swipe.percentage <= 0 && percentage <= 100) {
+                		this.translateX(cmp, swipe.body, -(100 - percentage));
                 	}
                 }
             }
@@ -265,6 +265,18 @@
 		    			this.translateX(cmp, swipe.body, 0);
 		    			$A.util.removeClass(cmp._openRow, 'open');
 		    			cmp._openRow = null;
+		    		}
+        		} else {
+        			if (swipe.diffX > 0) {
+        				this.translateX(cmp, swipe.body, 0);
+		    			$A.util.removeClass(cmp._openRow, 'open');
+		    			cmp._openRow = null;
+		    		} else {
+                        this.translateX(cmp, swipe.body, -(this.OPEN_PERCENTAGE));
+		    			
+		    			// Create '_openRow' reference after timeout 'snap' has completed.
+		    			// Creating the reference too soon could cause a 'close' animation to also occur. 
+		    			shouldSnapOpen = true; 
 		    		}
         		}
 

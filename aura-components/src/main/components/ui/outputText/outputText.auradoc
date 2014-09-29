@@ -19,13 +19,19 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputText</code> component represents text output that is wrapped in an HTML <code>span</code> tag.
-			This component is typically used with <code>ui:inputText</code>, which takes in a text input.
-			
+			This component can be used with <code>ui:inputText</code>, which takes in a text input. 
+			To display text, you can use an attribute value and bind it to the <code>ui:outputText</code> component.
 		</p>
+		<pre>&lt;aura:attribute name="myText" type="String" default="some string"/>
+&lt;ui:outputText value="{!v.myText}" label="my output"/></pre>
+		<p>The previous example renders the following HTML.</p>
+		<pre>&lt;span dir="ltr" class="uiOutputText">
+    some string
+&lt;/span></pre>
 		
 	</aura:description>	
-		<aura:example name="inputTextExample" ref="uiExamples:inputTextExample" label="Using ui:inputText">
-    	<p>This example shows a <code>ui:inputText</code> component with the default error handling, and a corresponding <code>ui:outputText</code> component for text rendering.</p>
+		<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
+    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
 	</aura:example>
 	
 </aura:documentation>

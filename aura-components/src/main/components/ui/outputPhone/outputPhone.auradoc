@@ -19,7 +19,11 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputPhone</code> component represents a phone number output that is wrapped in an HTML <code>span</code> tag.
-			This component is typically used with <code>ui:inputPhone</code>, which takes in a phone number input. 
+			This component can be used with <code>ui:inputPhone</code>, which takes in a phone number input. The following example is
+			a simple set up of a <code>ui:outputPhone</code> component.
 		</p>
+		<pre>&lt;ui:outputPhone value="415-123-4567" label="outputPhone"/></pre>
+		<p>The previous example renders the following HTML.</p>
+		<pre>&lt;a href="tel:415-123-4567" class="uiOutputPhone">415-123-4567&lt;/a></pre>
 	</aura:description>	
 </aura:documentation>

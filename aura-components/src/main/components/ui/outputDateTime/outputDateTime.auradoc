@@ -19,8 +19,16 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputDateTime</code> component represents a date and time output that is wrapped in an HTML <code>span</code> tag.
-			This component is typically used with <code>ui:inputDateTime</code>, which takes in a date input. <code>ui:outputDateTime</code> retrieves the browser's locale information and displays 
+			This component can be used with <code>ui:inputDateTime</code>, which takes in a date input. <code>ui:outputDateTime</code> retrieves the browser's locale information and displays 
 			the date accordingly.
+			To display a date and time, you can use an attribute value and bind it to the <code>ui:outputDateTime</code> component.
 		</p>
+		<pre>&lt;aura:attribute name="myDateTime" type="Date" default="2014-09-29T00:17:08z"/>
+&lt;ui:outputDateTime value="{!v.myDateTime}" label="outputDateTime"/></pre>
+		<p>The previous example renders the following HTML.</p>
+		<pre>&lt;span class="uiOutputDateTime">Sep 29, 2014 12:17:08 AM&lt;/span></pre>
 	</aura:description>	
+	<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
+    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	</aura:example>
 </aura:documentation>

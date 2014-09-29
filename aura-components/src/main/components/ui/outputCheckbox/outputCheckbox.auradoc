@@ -19,8 +19,17 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputCheckbox</code> component represents a checkbox that is rendered as an HTML <code>img</code> tag.
-			This component is typically used with <code>ui:inputCheckbox</code>, which enables users to select or deselect the checkbox. 
+			This component can be used with <code>ui:inputCheckbox</code>, which enables users to select or deselect the checkbox. 
 			To select or deselect the checkbox, set the <code>value</code> attribute to <code>true</code> or <code>false</code>.
+			To display a checkbox, you can use an attribute value and bind it to the <code>ui:outputCheckbox</code> component.
 		</p>
+		<pre>&lt;aura:attribute name="myBool" type="Boolean" default="true"/>
+&lt;ui:outputCheckbox value="{!v.myBool}" label="outputCheckbox"/></pre>
+	<p>The previous example renders the following HTML.</p>
+	<pre>&lt;img class="checked uiImage uiOutputCheckbox" alt="checkbox checked" src="path/to/checkbox"></pre>
 	</aura:description>	
+	
+	<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
+    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	</aura:example>
 </aura:documentation>

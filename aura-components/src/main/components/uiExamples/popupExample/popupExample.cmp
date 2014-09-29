@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <ui:popup label="trigger">
+    	<ui:popupTrigger>Click this trigger to open popup with default settings</ui:popupTrigger>
+    	<ui:popupTarget>
+    		This displays in a popup, which closes when you click outside it.
+    	</ui:popupTarget>
+    </ui:popup>
+    <br/>
+     <ui:popup label="trigger">
+    	<ui:popupTrigger>Click this trigger to open popup with custom settings</ui:popupTrigger>
+    	<ui:popupTarget attachToBody="true" closeOnClickInside="true">
+    		This popup closes when you click inside it.<br/>
+    		Setting <code>attachToBody</code> to <code>true</code> attaches this popup to the HTML body tag level.
+    	</ui:popupTarget>
+    </ui:popup>
+    <br/>
+     <ui:popup label="trigger">
+        <ui:popupTrigger>Click this trigger to open popup as an overlay</ui:popupTrigger>
+        <ui:popupTarget attachToBody="true" curtain="true">
+            <div style="width:150px;height:200px;">
+              Setting <code>curtain</code> to <code>true</code> creates an overlay under the popup.
+            </div>
+        </ui:popupTarget>
+    </ui:popup>
+    
+</aura:component>

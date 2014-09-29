@@ -1,0 +1,53 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:popup</code> component represents a popup with a nested trigger, <code>ui:popupTrigger</code>, and a popup target, <code>ui:popupTarget</code>.
+		</p>
+		<p>This is a basic setup of a <code>ui:popup</code> component, which displays a trigger that when clicked displays the content in <code>ui:popupTarget</code>. </p>
+		<pre>&lt;ui:popup label="trigger">
+    &lt;ui:popupTrigger>Click this trigger to open popup&lt;/ui:popupTrigger>
+    &lt;ui:popupTarget>
+        This displays in a popup.
+    &lt;/ui:popupTarget>
+&lt;/ui:popup></pre>
+		<p>To toggle the popup using a custom trigger, fire the <code>ui:popupTargetToggle</code> event and set <code>show</code> to <code>true</code> or <code>false</code>.</p>
+		<pre>({
+    hideTarget : function(component) {
+        var evt = $A.get('e.ui:popupTargetToggle');
+        evt.setParams({
+            component : component,
+            show : false
+        });
+        evt.fire();
+    }
+})</pre>
+		<p>When using <code>ui:popupTargetToggle</code>, register this event in your component.</p>
+		<pre>&lt;aura:registerevent name="popupTargetToggle" type="ui:popupTargetToggle" /></pre>
+        <p>To prevent popup from closing when a user clicks outside of the popup, set <code>closeOnClickOutside</code> on <code>ui:popupTarget</code> to <code>false</code>.
+           This ensures that the popup can be closed only by clicking the trigger. To enable closing of popup when a user clicks inside the popup, set <code>closeOnClickInside</code> on <code>ui:popupTarget</code> to <code>true</code>.
+        </p>
+        
+
+	</aura:description>	
+		<aura:example name="popupExample" ref="uiExamples:popupExample" label="Using ui:popup">
+    	<p>This example shows various ways to implement the <code>ui:popup</code> component.</p>
+	</aura:example>
+	
+</aura:documentation>

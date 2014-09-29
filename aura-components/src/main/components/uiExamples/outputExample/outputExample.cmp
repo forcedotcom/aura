@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<aura:attribute name="myText" type="String" default="A string waiting to change."/>
+	<aura:attribute name="myNum" type="Decimal" default="10.10"/>
+	<aura:attribute name="myBool" type="Boolean" default="true"/>
+	<aura:attribute name="myDate" type="Date" default="2014-09-29"/>
+	<aura:attribute name="myDateTime" type="Date" default="2014-09-29T00:17:08z"/>
+
+	<div class="row"><ui:outputText value="{!v.myText}" label="outputText"/> <ui:button label="Change" press="{!c.change}" /></div>  
+	<div class="row"><ui:outputNumber value="{!v.myNum}" label="outputNumer" format=".00"/></div>
+	<div class="row"><ui:outputCheckbox value="{!v.myBool}" label="outputCheckbox"/></div>
+	<div class="row"><ui:outputDate value="{!v.myDate}" label="outputDate"/></div>
+	<div class="row"><ui:outputDateTime value="{!v.myDateTime}" label="outputDateTime"/></div>
+	<div class="row"><ui:outputEmail value="abc@email.com" label="abc@email.com"/></div>
+	<div class="row"><ui:outputPhone value="415-123-4567" label="outputPhone"/></div>
+</aura:component>

@@ -32,7 +32,7 @@
   &lt;input required="required" class="uiInput uiInputText" aria-describedby placeholder type="text">
 &lt;/div></pre>
 	</aura:description>	
-		<aura:example name="innputTextExample" ref="uiExamples:inputTextExample" label="Using ui:inputText">
+		<aura:example name="inputTextExample" ref="uiExamples:inputTextExample" label="Using ui:inputText">
     	<p>This example shows a <code>ui:inputText</code> component with the default error handling, and a corresponding <code>ui:outputText</code> component for text rendering.</p>
 	</aura:example>
 	

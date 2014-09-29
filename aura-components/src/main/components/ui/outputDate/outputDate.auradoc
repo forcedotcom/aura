@@ -19,8 +19,15 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputDate</code> component represents a date output in the YYYY-MM-DD format and is wrapped in an HTML <code>span</code> tag.
-			This component is typically used with <code>ui:inputDate</code>, which takes in a date input. <code>ui:outputDate</code> retrieves the browser's locale information and displays 
-			the date accordingly.
+			This component can be used with <code>ui:inputDate</code>, which takes in a date input. <code>ui:outputDate</code> retrieves the browser's locale information and displays 
+			the date accordingly. To display a date, you can use an attribute value and bind it to the <code>ui:outputDate</code> component.
 		</p>
+		<pre>&lt;aura:attribute name="myDate" type="Date" default="2014-09-29"/>
+&lt;ui:outputDate value="{!v.myDate}" label="outputDate"/></pre>
+	<p>The previous example renders the following HTML.</p>
+	<pre>&lt;span class="uiOutputDate">Sep 29, 2014&lt;/span></pre>
 	</aura:description>	
+	<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
+    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	</aura:example>
 </aura:documentation>

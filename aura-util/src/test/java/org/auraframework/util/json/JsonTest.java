@@ -148,6 +148,51 @@ public class JsonTest extends UnitTestCase {
                 Json.serialize(m));
     }
 
+    private class SendNullObject implements JsonSerializable {
+        public SendNullObject(String v1, String v3) {
+            this.v1 = v1;
+            this.v3 = v3;
+        }
+
+        public void serialize(Json json) throws IOException {
+            boolean oldV = json.getSerializationContext().setNullValueEnabled(true);
+            try {
+                json.writeMapBegin();
+                json.writeMapEntry("v1", v1);
+                json.writeMapEntry("v2", v2);
+                json.writeMapEntry("v3", v3);
+                json.writeMapEnd();
+            } finally {
+                json.getSerializationContext().setNullValueEnabled(oldV);
+            }
+        }
+
+        private String v1;
+        private String v2 = null;
+        private String v3;
+    }
+
+    /**
+     * Ensure that encoding is is correct while encoding the nullable object.
+     */
+    public void testSerializeSimpleWithNulls() throws IOException {
+        SendNullObject sno = new SendNullObject("a", "b");
+        assertEquals("{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"}", Json.serialize(sno));
+    }
+
+    /**
+     * Ensure that encoding is restored to normal after encoding the nullable object.
+     */
+    public void testSerializeComplexWithNulls() throws IOException {
+        Map<Object, Object> m = new LinkedHashMap<>(1);
+        m.put("v", "c");
+        m.put("w", null);
+        m.put("x", new SendNullObject("a", "b"));
+        m.put("y", null);
+        m.put("z", "d");
+        assertEquals("{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}", Json.serialize(m));
+    }
+
     public void testSerializeIdentityReferenceType() throws IOException {
         JsonIdentitySerializableTest obj1 = new JsonIdentitySerializableTest(1);
         JsonIdentitySerializableTest obj2 = new JsonIdentitySerializableTest(1);

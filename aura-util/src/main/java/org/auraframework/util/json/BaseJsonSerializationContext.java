@@ -23,7 +23,7 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     private final boolean refSupport;
     private final int dataSizeLimit;
     private final int collectionSizeLimit;
-    private final boolean nullValues;
+    private boolean nullValues;
 
     public BaseJsonSerializationContext(boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit,
             boolean nullValues) {
@@ -60,5 +60,13 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     @Override
     public boolean isNullValueEnabled() {
         return nullValues;
+    }
+
+    @Override
+    public boolean setNullValueEnabled(boolean nullValueEnabled) {
+        boolean old = nullValues;
+
+        nullValues = nullValueEnabled;
+        return old;
     }
 }

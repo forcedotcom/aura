@@ -77,5 +77,4 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
         }
         return null;
     }
-
 }

@@ -44,9 +44,9 @@ exp(p,
     "isCaboose", p.isCaboose,
     "setAllAboardCallback", p.setAllAboardCallback,
     "isFromStorage", p.isFromStorage,
-    "toJSON", p.toJSON,
-    "getStorageKey", p.getStorageKey 
+    "toJSON", p.toJSON
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
      ,"getId", p.getId
+     ,"getStorageKey", p.getStorageKey 
 	//#end
 );

@@ -1,0 +1,52 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:event type="APPLICATION" description="Event used by panelManager to instanciate and show panel/modals">
+    <aura:attribute name="title" type="String" description="the title of the window"/>
+    <aura:attribute name="titleDisplay" type="Boolean" description="Flag to hide title for accessibility"/>
+    <aura:attribute name="detail" type="String" description="the description of the window"/>
+    <aura:attribute name="icon" type="String" description="the icon for the panel The values need to match the iconFont glyphs(keys)"/>
+    <aura:attribute name="body" type="Object" description="The main content of the panel/modal (normally an Array of ActionButtons or a component"/>
+    <aura:attribute name="headerActions" type="Aura.Component[]" description="buttons to add to the header of the panel(only when modal is enabled)"/>
+    <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons to add to the bottom of the window (only when panel is enabled"/>    
+    <!-- options -->
+    <aura:attribute name="class" type="String" description="Additional css classes"/>
+    <aura:attribute name="animation" type="String" description="Animation to apply (default: from bottom)"/>
+	<aura:attribute name="isModal" type="Boolean" description="Instanciate a modal type, otherwise will be a fullscreen panel"/>
+    <aura:attribute name="isSlider" type="Boolean" description="True if panel is a panelSlider"/>
+    <aura:attribute name="closeOnClickOut" type="Boolean" description="Add listener to close on click outside"/>
+    <aura:attribute name="isScrollable" type="Boolean" description="Flag to create a scroller inside (default true)"/>
+    <aura:attribute name="isTransient" type="Boolean" description="Flag to indicate if panel is one-time use and should be destroyed when hidden"/>
+    <aura:attribute name="removeHeader" type="Boolean" description="Flag to remove the header of the panel (non-modal)"/>
+    <aura:attribute name="callbacks" type="Object" description="Panel callbacks fired during different phases of its lifecycle"/>
+    <aura:attribute name="show" type="Boolean" description="True if panel should be made visible after creation (default is false)."/>
+    <aura:attribute name="instance" type="Aura.Component[]" description="Existing panel instance to be displayed."/>
+
+    <!-- slider options -->
+	<aura:attribute name="isVisible" type="Boolean" description="panel is visible or not"/>
+	<aura:attribute name="closeOnModalClick" type="Boolean" description="Whether a click button in the modal area will close the panel"/>
+  	<aura:attribute name="body" type="Aura.Component[]" description="buttons to add to the header of the panel(only when modal is enabled)"/>
+    <aura:attribute name="button" type="Aura.Component[]" description="Buttons to add to the bottom of the window (only when panel is enabled"/>
+    <aura:attribute name="buttonColor" type="String" description="CSS Background string for the button"/>
+    <aura:attribute name="buttonClass" type="String" description="CSS class string"/>
+    <aura:attribute name="slideFrom" type="String" description="String that identifies the animation values (defaults to right): left|right|top|bottom"/>
+    <aura:attribute name="iconKey" type="String" description="Default icon from the current font to put into the button"/>
+    <aura:attribute name="panelOutAltText" type="String" description="Alt text for icon when panel is open/slide out for accessibility"/>
+    <aura:attribute name="panelInAltText" type="String" description="Alt text for icon when panel is closed for accessibility"/>
+    <aura:attribute name="iconAltText" type="String" description="Icon alt text in panel"/>
+    <aura:attribute name="iconTransformation" type="String" description="Css transformation on icon e.g flip,rotate or any other custom"/>
+</aura:event>

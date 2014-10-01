@@ -30,16 +30,16 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @Provider
 public class ExampleComponentProvider implements ComponentDescriptorProvider {
 
-	@Override
-	public DefDescriptor<ComponentDef> provide() throws QuickFixException {
+    @Override
+    public DefDescriptor<ComponentDef> provide() throws QuickFixException {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         String realComponent = (String)component.getAttributes().getValue("def");
         if (realComponent != null) {
-        	DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(realComponent,
+            DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(realComponent,
                   ComponentDef.class);
-        	return desc;
+            return desc;
         }
         throw new AuraRuntimeException("Component " + realComponent + " not found");
-	}
+    }
 
 }

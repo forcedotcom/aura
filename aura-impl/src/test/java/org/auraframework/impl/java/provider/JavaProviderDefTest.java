@@ -150,15 +150,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
                 "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\"",
                 // Provider returns null
                 "provider=\"java://org.auraframework.impl.java.provider.TestProvideReturnNull\"",
-               // Bad return type, basically forcing a class cast exception
-                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\""
         };
         String[] markupTestCases = {  "provider=\"\"", // Blank provider
                 "", // No Provider
                 // No provide method in the Java Provider
                 "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNoProvideMethod\"",
                 // Non static provide method in the Java Provider
-                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNonStaticMethod\"",
+                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithStaticMethod\"",
         };
         String[] definitionNotFoundCases = {
                 // Javascript provider
@@ -232,20 +230,6 @@ public class JavaProviderDefTest extends AuraImplTestCase {
                 component.getAttributes().getExpression("implNumber"), "OverrideAttr");
         assertEquals("Failed to initialize attributes on the component",
                 component.getAttributes().getExpression("defaultAttr"), "meh");
-    }
-
-    /*
-     * An interface provider should not return the same interface.
-     * @throws Exception
-     */
-    public void testInterfaceProviderProvidesItself() throws Exception {
-        try {
-            Aura.getInstanceService().getInstance("test:test_Provider_InterfaceSelf", ComponentDef.class);
-        } catch (AuraRuntimeException e) {
-            // Expected
-        } catch (Throwable e) {
-            fail("Provider should not be providing the same interface: " + e.toString());
-        }
     }
 
     /**

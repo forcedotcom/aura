@@ -217,7 +217,7 @@
         if (!todayCmp) {
             return;
         }
-        var todayLabel = component.get("m.labelForToday");
+        var todayLabel = $A.get("$Locale.labelForToday");
         if (!todayLabel) {
             todayLabel = "Today";
         }
@@ -228,7 +228,8 @@
         var ret = 'en';
         var lang = [];
         var token = "";
-        var langLocale = component.get("m.langLocale");
+        var langLocale = $A.get("$Locale.langLocale");
+        //var langLocale = component.get("m.langLocale");
         if (langLocale) {
             var index = langLocale.indexOf("_");
             while (index > 0) {
@@ -377,9 +378,8 @@
                 if (elem) {
                     var m = grid.get("v.month");
                     var y = grid.get("v.year");
-                    //var title = this.MonthLabels[m].fullName + " " + y;
-                    var monthLabels = component.get("m.monthLabels");
-                    var title = monthLabels[m].fullName + " " + y;
+                    var monthLabels = $A.get("$Locale.nameOfMonths");
+                    var title = monthLabels ? monthLabels[m].fullName + " " + y : this.MonthLabels[m].fullName + " " + y;
                     elem.textContent = elem.innerText = title;
                 }
             }
@@ -393,8 +393,8 @@
             var y = grid.get("v.year");
             var monthTitleCmp = component.find("monthTitle");
             if (monthTitleCmp) {
-                var monthLabels = component.get("m.monthLabels");
-                monthTitleCmp.set("v.value", monthLabels[m].fullName);
+                var monthLabels = $A.get("$Locale.nameOfMonths");
+                monthTitleCmp.set("v.value", monthLabels ? monthLabels[m].fullName : this.MonthLabels[m].fullName);
             }
             var yearTitleCmp = component.find("yearTitle");
             var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;

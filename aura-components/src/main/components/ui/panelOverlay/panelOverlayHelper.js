@@ -23,7 +23,6 @@
     	if (header) {
     		header.style.position = inputIsFocused ? 'absolute' : 'fixed';
     	}
-    	$A.get("e.force:updateToastLocation").setParams({inFocus: inputIsFocused,inContextOfComponent:"force:panelOverlay"}).fire()
     },
     
     _getHeaderElement: function(cmp, panelElement) {

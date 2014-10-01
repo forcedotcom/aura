@@ -35,8 +35,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
- * 
- * @since 0.0.262
  */
 @UnAdaptableTest
 public class ExceptionHandlingUITest extends WebDriverTestCase {

@@ -48,7 +48,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
-    public Boolean getRequired() {
+    public boolean isRequired() {
         if (required == null) {
             return Boolean.FALSE;
         }
@@ -56,7 +56,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
-    public Boolean getReadOnly() {
+    public boolean isReadOnly() {
         if (readonly == null) {
             return Boolean.FALSE;
         }
@@ -109,8 +109,8 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
 
     public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDesignDef> implements
             AttributeDesignDefBuilder {
-        private Boolean required;
-        private Boolean readonly;
+        private boolean required;
+        private boolean readonly;
         private String name;
         private String label;
         private String type;
@@ -150,13 +150,13 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         }
 
         @Override
-        public AttributeDesignDefBuilder setRequired(Boolean required) {
+        public AttributeDesignDefBuilder setRequired(boolean required) {
             this.required = required;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setReadOnly(Boolean readonly) {
+        public AttributeDesignDefBuilder setReadOnly(boolean readonly) {
             this.readonly = readonly;
             return this;
         }

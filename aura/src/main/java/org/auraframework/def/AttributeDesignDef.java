@@ -16,9 +16,9 @@
 package org.auraframework.def;
 
 public interface AttributeDesignDef extends Definition {
-    public Boolean getRequired();
+    public boolean isRequired();
 
-    public Boolean getReadOnly();
+    public boolean isReadOnly();
 
     public String getType();
 

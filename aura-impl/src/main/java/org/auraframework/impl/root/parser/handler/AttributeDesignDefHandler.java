@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.impl.design.AttributeDesignDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -64,8 +65,8 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         String name = getAttributeValue(ATTRIBUTE_NAME);
         String label = getAttributeValue(ATTRIBUTE_LABEL);
         String type = getAttributeValue(ATTRIBUTE_TYPE);
-        String required = getAttributeValue(ATTRIBUTE_REQUIRED);
-        String readonly = getAttributeValue(ATTRIBUTE_READONLY);
+        Boolean required = getBooleanAttributeValue(ATTRIBUTE_REQUIRED);
+        Boolean readonly = getBooleanAttributeValue(ATTRIBUTE_READONLY);
         String dependency = getAttributeValue(ATTRIBUTE_DEPENDENCY);
         String datasource = getAttributeValue(ATTRIBUTE_DATASOURCE);
         String min = getAttributeValue(ATTRIBUTE_MIN);
@@ -79,20 +80,15 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
             error("Name attribute is required for attribute design definitions");
         }
 
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(required)) {
-            builder.setRequired(Boolean.parseBoolean(required));
-        }
-
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(readonly)) {
-            builder.setReadOnly(Boolean.parseBoolean(readonly));
-        }
-
+        builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
         builder.setLabel(label);
         builder.setType(type);
         builder.setDependency(dependency);
         builder.setDataSource(datasource);
         builder.setMin(min);
         builder.setMax(max);
+        builder.setRequired(required);
+        builder.setReadOnly(readonly);
         builder.setLocation(getLocation());
     }
 

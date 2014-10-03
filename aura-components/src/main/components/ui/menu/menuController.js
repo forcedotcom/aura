@@ -28,16 +28,6 @@
         }
     },
     
-    click : function(cmp, event){
-        if ($A.util.getBooleanValue(cmp.get("v.stopClickPropagation"))) {
-            if (event.stopPropagation) { // IE9 & Other Browsers
-              event.stopPropagation();
-            } else { // IE8 and Lower
-              event.cancelBubble = true;
-            }
-        }
-    },
-    
     focusTrigger: function(component, event, helper) {
     	var trigger = helper.getTriggerComponent(component);
     	if (trigger) {

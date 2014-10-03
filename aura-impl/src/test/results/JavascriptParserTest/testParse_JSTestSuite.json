@@ -20,7 +20,9 @@
           ],
           "auraErrorsExpectedDuringInit":[
 
-          ]
+          ],
+          "scrumTeam":"",
+          "owner":""
         }
       },
       {
@@ -40,7 +42,9 @@
           ],
           "auraErrorsExpectedDuringInit":[
 
-          ]
+          ],
+          "scrumTeam":"",
+          "owner":""
         }
       },
       {
@@ -61,7 +65,9 @@
           ],
           "auraErrorsExpectedDuringInit":[
 
-          ]
+          ],
+          "scrumTeam":"",
+          "owner":""
         }
       }
     ],

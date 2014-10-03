@@ -26,6 +26,11 @@ public interface AttributeDesignDef extends Definition {
      */
     public boolean isReadOnly();
 
+    /**
+     * Special type for design attributes
+     * 
+     * Optional. Will be null unless specified.
+     */
     public String getType();
 
     /**
@@ -35,6 +40,11 @@ public interface AttributeDesignDef extends Definition {
      */
     public String getDependsOnAttribute();
 
+    /**
+     * Comma separated list of values or class describing the data source.
+     * 
+     * Optional. Will be null unless specified.
+     */
     public String getDataSource();
 
     /**

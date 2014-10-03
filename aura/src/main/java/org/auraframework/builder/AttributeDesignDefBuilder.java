@@ -28,11 +28,13 @@ public interface AttributeDesignDefBuilder extends DefBuilder<AttributeDesignDef
 
     public AttributeDesignDefBuilder setReadOnly(boolean readonly);
 
-    public AttributeDesignDefBuilder setDependency(String dependency);
+    public AttributeDesignDefBuilder setDependsOnAttribute(String dependency);
 
     public AttributeDesignDefBuilder setDataSource(String datasource);
 
     public AttributeDesignDefBuilder setMin(String min);
 
     public AttributeDesignDefBuilder setMax(String max);
+
+    public AttributeDesignDefBuilder setPlaceholderText(String placeholder);
 }

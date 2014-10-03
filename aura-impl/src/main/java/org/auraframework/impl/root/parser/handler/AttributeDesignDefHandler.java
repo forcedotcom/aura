@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -40,14 +42,15 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_REQUIRED = "required";
     private static final String ATTRIBUTE_READONLY = "readonly";
-    private static final String ATTRIBUTE_DEPENDENCY = "dependsOn";
+    private static final String ATTRIBUTE_DEPENDENCY = "dependsOnAttribute";
     private static final String ATTRIBUTE_DATASOURCE = "dataSource";
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
+    private static final String ATTRIBUTE_PLACEHOLDER = "placeholderText";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
-            ATTRIBUTE_MIN, ATTRIBUTE_MAX);
+            ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION);
 
     private final AttributeDesignDefImpl.Builder builder = new AttributeDesignDefImpl.Builder();
 
@@ -71,6 +74,8 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         String datasource = getAttributeValue(ATTRIBUTE_DATASOURCE);
         String min = getAttributeValue(ATTRIBUTE_MIN);
         String max = getAttributeValue(ATTRIBUTE_MAX);
+        String placeholder = getAttributeValue(ATTRIBUTE_PLACEHOLDER);
+        String description = getAttributeValue(ATTRIBUTE_DESCRIPTION);
 
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor,
@@ -83,12 +88,14 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
         builder.setLabel(label);
         builder.setType(type);
-        builder.setDependency(dependency);
+        builder.setDependsOnAttribute(dependency);
         builder.setDataSource(datasource);
         builder.setMin(min);
         builder.setMax(max);
         builder.setRequired(required);
         builder.setReadOnly(readonly);
+        builder.setPlaceholderText(placeholder);
+        builder.setDescription(description);
         builder.setLocation(getLocation());
     }
 

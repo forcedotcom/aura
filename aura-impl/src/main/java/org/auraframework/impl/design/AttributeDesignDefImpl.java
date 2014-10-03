@@ -34,6 +34,8 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     private final String min;
     private final String max;
     private final String label;
+    private final String placeholder;
+    private final String description;
 
     protected AttributeDesignDefImpl(Builder builder) {
         super(builder);
@@ -46,6 +48,8 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         this.min = builder.min;
         this.max = builder.max;
         this.label = builder.label;
+        this.placeholder = builder.placeholder;
+        this.description = builder.description;
     }
 
     @Override
@@ -69,7 +73,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
-    public String getDependency() {
+    public String getDependsOnAttribute() {
         return dependency;
     }
 
@@ -94,6 +98,16 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
+    public String getPlaceholderText() {
+        return placeholder;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
     }
@@ -113,6 +127,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         private String datasource;
         private String min;
         private String max;
+        private String placeholder;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -157,7 +172,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         }
 
         @Override
-        public AttributeDesignDefBuilder setDependency(String dependency) {
+        public AttributeDesignDefBuilder setDependsOnAttribute(String dependency) {
             this.dependency = dependency;
             return this;
         }
@@ -177,6 +192,12 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         @Override
         public AttributeDesignDefBuilder setMax(String max) {
             this.max = max;
+            return this;
+        }
+
+        @Override
+        public AttributeDesignDefBuilder setPlaceholderText(String placeholder) {
+            this.placeholder = placeholder;
             return this;
         }
 

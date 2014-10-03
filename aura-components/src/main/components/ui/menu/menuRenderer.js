@@ -20,12 +20,14 @@
     	if (m && t) {
             m.set("v.referenceElement", t.getElement());
     	}
+    	helper.addEventHandler(component);
     	helper.setAriaAttributes(component);
     	return this.superAfterRender();
 	},
 	
 	rerender: function(component, helper) {		
 		this.superRerender();
+		helper.addEventHandler(component);
 		helper.setAriaAttributes(component);
 	},
  
@@ -52,6 +54,7 @@
                                           component._onClickEndFunc, false);
             }
         }
+        helper.removeEventHandler(component);
         this.superUnrender();
     }
 })

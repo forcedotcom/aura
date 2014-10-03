@@ -46,6 +46,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         AUTOCOMPLETE_COMPONENT.put("OptionExtention", 5);
         AUTOCOMPLETE_COMPONENT.put("autoCompleteUpdateOn", 6);
         AUTOCOMPLETE_COMPONENT.put("emptyListContent", 7);
+        AUTOCOMPLETE_COMPONENT.put("matchFunc", 8);
     }
 
     private enum OptionType {
@@ -263,6 +264,25 @@ public class AutocompleteUITest extends WebDriverTestCase {
         WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
         waitForAutoCompleteListVisible(list, false);
         assertFalse("Expected emptyListContent to be invisible", hasCssClass(list, "showEmptyContent"));
+    }
+
+    /**
+     * Test for autocomplete with a matchFunc override. The behavior is overridden to show all items no matter what gets
+     * typed in the input field. Verifies that all elements are found.
+     */
+    public void testAutoCompleteMatchFunc() throws Exception {
+        Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("matchFunc");
+
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
+
+        input.sendKeys("hello worldx");
+        WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        waitForAutoCompleteListVisible(list, true);
+
+        List<WebElement> options = getAutoCompleteListOptions(list);
+        assertEquals("Incorrect number of visible options", 10, options.size());
     }
 
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,

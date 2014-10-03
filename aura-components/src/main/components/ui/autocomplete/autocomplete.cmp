@@ -25,6 +25,7 @@
     <aura:attribute name="placeholder" type="String" default="" description="Text that is displayed when the input field is empty, to prompt the user for a valid entry."/>
     <aura:attribute name="propertyToMatch" type="String" default="label" description="The property name in the data object which is used to match typing in the input field."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
+    <aura:attribute name="matchFunc" type="Aura.Action" description="Overrides default list item update behavior to allow custom text matching."/>
     
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
@@ -74,5 +75,6 @@
         propertyToMatch="{!v.propertyToMatch}"
         matchDone="{!c.handleMatchDone}"
         selectListOption="{!c.handleSelectOption}"
-        updateAriaAttributes="{!c.updateAriaAttributes}"/>
+        updateAriaAttributes="{!c.updateAriaAttributes}"
+        matchFunc="{!v.matchFunc}"/>
 </aura:component>

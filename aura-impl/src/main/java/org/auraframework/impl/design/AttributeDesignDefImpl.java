@@ -49,11 +49,17 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
 
     @Override
     public Boolean getRequired() {
+        if (required == null) {
+            return Boolean.FALSE;
+        }
         return required;
     }
 
     @Override
     public Boolean getReadOnly() {
+        if (readonly == null) {
+            return Boolean.FALSE;
+        }
         return readonly;
     }
 

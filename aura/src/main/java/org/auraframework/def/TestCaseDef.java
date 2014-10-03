@@ -84,4 +84,18 @@ public interface TestCaseDef extends Definition {
      * @param b name of the browser, like googlechrome
      */
     public void setCurrentBrowser(String b);
+
+    /**
+     * scrumTeam intended for a particular test cases, 
+     * 
+     * @return the scrumTeam for this test is tagged with
+     */
+	String getScrumTeam();
+
+	/**
+     * Owner intended for a particular test cases, 
+     * 
+     * @return the owner for this test is tagged with
+     */
+	String getOwner();
 }

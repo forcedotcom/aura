@@ -24,6 +24,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> implements AttributeDesignDef {
+    private static final long serialVersionUID = 3290806856269872853L;
     private final Boolean required;
     private final Boolean readonly;
     private final String name;
@@ -49,17 +50,11 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
 
     @Override
     public boolean isRequired() {
-        if (required == null) {
-            return Boolean.FALSE;
-        }
         return required;
     }
 
     @Override
     public boolean isReadOnly() {
-        if (readonly == null) {
-            return Boolean.FALSE;
-        }
         return readonly;
     }
 

@@ -35,7 +35,7 @@ import org.auraframework.util.json.Json;
 import com.google.common.collect.Lists;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
-
+    private static final long serialVersionUID = -8621907027705407577L;
     private final LinkedHashMap<String, AttributeDesignDef> attributeDesignDefs;
 
     protected DesignDefImpl(Builder builder) {

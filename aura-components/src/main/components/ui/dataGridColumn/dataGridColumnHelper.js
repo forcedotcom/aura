@@ -36,6 +36,12 @@
 			this.wireComponentDefRef(cmp, inputComponent);
 		}
 	},
+	
+	updateNameRef: function(cmp) {
+		var outputComponent = cmp.get('v.outputComponent')[0];
+		
+		this.wireComponentDefRef(cmp, outputComponent);
+	},
 
 	wireComponentDefRef: function (cmp, defRef) {
 		var name = cmp.get('v.name'),

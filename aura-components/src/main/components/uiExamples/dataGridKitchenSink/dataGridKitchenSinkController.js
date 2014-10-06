@@ -97,5 +97,18 @@
 	
 	replaceData : function(cmp, evt, hlp) {
 		cmp.find("data").getEvent("provide").fire();
+	},
+	
+	switchColumn : function(cmp, evt, hlp) {
+		var columns = cmp.find("grid").get("v.columns");
+		
+		var column = columns[5];
+		if (column.get("v.name") === "activityDate") {
+			column.set("v.name", "who.name");
+		} else {
+			column.set("v.name", "activityDate");
+		}
+		
+		cmp.find("grid").set("v.columns", columns);
 	}
 })

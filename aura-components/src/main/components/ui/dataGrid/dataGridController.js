@@ -32,14 +32,18 @@
 
 		// Set the initial items and then fire provide against 
 		// the dataProvider to configure paging.
+		// TODO: move into if statement above
 		if (items) {
 			cmp.set('v.items', items);	
 		}
 		
-		hlp.initializeColumns(cmp);
 		hlp.initializeCaches(cmp);
 		hlp.initializeActionDelegate(cmp);
-		hlp.deriveItemShape(cmp);
+		//if (cmp.get("v.columns")) {
+			hlp.initializeColumns(cmp);
+			hlp.deriveItemShape(cmp);
+		//}
+		hlp.initializeRowData(cmp);
 	},
 
 	handleItemsChange: function (cmp, evt, hlp) {
@@ -53,6 +57,12 @@
 		if (concrete._sorting) {
 			concrete._sorting = false;
 		}
+	},
+	
+	handleColumnsChange: function(cmp, evt, helper) {
+		var concrete = cmp.getConcreteComponent();
+		helper.initializeColumns(concrete);
+		helper.rerenderTableRows(concrete, concrete._rowData, false);
 	},
 
 	handleColumnSortChange: function (cmp, evt, hlp) {

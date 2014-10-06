@@ -34,7 +34,7 @@
 
             helper.appendTextElements(value, span);
         }
-        
+        console.log("outputTextRerender");
         this.superRerender();
     }
 })

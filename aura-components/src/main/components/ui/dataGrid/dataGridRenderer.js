@@ -22,9 +22,6 @@
 			items 		= cmp.get('v.items'),
 			summaryRow;
 
-		// Keep a private copy of items.
-		concrete._rowItems = items;
-
 		// TODO: this seems stupid d[-_-]b
 		cmp._loadedOnce = items.length > 0;
 
@@ -40,6 +37,10 @@
 		}
 		cmp._rendered = true;
 		return table;
+	},
+	
+	rerender: function (cmp) {
+		console.log("Rerendering Function");
 	},
 
 	unrender: function (cmp) {

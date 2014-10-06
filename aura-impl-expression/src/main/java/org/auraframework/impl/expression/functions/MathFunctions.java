@@ -28,41 +28,48 @@ public class MathFunctions {
     public static final Function MODULUS = new Modulus();
     public static final Function NEGATE = new Negate();
     public static final Function ABSOLUTE = new Absolute();
-    public static final Function GREATER_THAN = new GreaterThan();
-    public static final Function GREATER_THAN_OR_EQUAL = new GreaterThanOrEqual();
-    public static final Function LESS_THAN = new LessThan();
-    public static final Function LESS_THAN_OR_EQUAL = new LessThanOrEqual();
 
     private static abstract class BinaryNumberFunction implements Function {
-
-        /**
-         */
         private static final long serialVersionUID = -1225813696832918245L;
+
+        private final boolean allowString;
+
+        protected BinaryNumberFunction(boolean allowString) {
+            this.allowString = allowString;
+        }
 
         @Override
         public Object evaluate(List<Object> args) {
-            // TODO: validation would happen early so just cast here
-            Object a1 = args.get(0);
-            Object a2 = args.get(1);
-            if (a1 instanceof Number && a2 instanceof Number) {
-                return evaluate((Number) a1, (Number) a2);
+            Object o1 = args.get(0);
+            Object o2 = args.get(1);
+            Number a1, a2;
+
+            if (allowString && (o1 instanceof String || o2 instanceof String)
+                    && !(o1 instanceof Number || o2 instanceof Number)) {
+                String s1 = JavascriptHelpers.stringify(o1);
+                String s2 = JavascriptHelpers.stringify(o2);
+                a1 = s1.compareTo(s2);
+                a2 = Double.valueOf(0);
+            } else {
+                a1 = JavascriptHelpers.convertToNumber(o1);
+                a2 = JavascriptHelpers.convertToNumber(o2);
             }
-            return null;
+            return evaluate(a1, a2);
         }
 
         public abstract Object evaluate(Number n1, Number n2);
-
     }
 
     public static class Subtract extends BinaryNumberFunction {
-
-        /**
-         */
         private static final long serialVersionUID = -4919030498212099039L;
+
+        public Subtract() {
+            super(false);
+        }
 
         @Override
         public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() - n2.doubleValue();
+            return Double.valueOf(n1.doubleValue() - n2.doubleValue());
         }
 
         @Override
@@ -72,13 +79,15 @@ public class MathFunctions {
     }
 
     public static class Multiply extends BinaryNumberFunction {
-        /**
-         */
         private static final long serialVersionUID = 4968808865180541660L;
+
+        public Multiply() {
+            super(false);
+        }
 
         @Override
         public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() * n2.doubleValue();
+            return Double.valueOf(n1.doubleValue() * n2.doubleValue());
         }
 
         @Override
@@ -88,13 +97,15 @@ public class MathFunctions {
     }
 
     public static class Divide extends BinaryNumberFunction {
-        /**
-         */
         private static final long serialVersionUID = 5462087077577056734L;
+
+        public Divide() {
+            super(false);
+        }
 
         @Override
         public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() / n2.doubleValue();
+            return Double.valueOf(n1.doubleValue() / n2.doubleValue());
         }
 
         @Override
@@ -104,13 +115,15 @@ public class MathFunctions {
     }
 
     public static class Modulus extends BinaryNumberFunction {
-        /**
-         */
         private static final long serialVersionUID = 3014329349472542278L;
+
+        public Modulus() {
+            super(false);
+        }
 
         @Override
         public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() % n2.doubleValue();
+            return Double.valueOf(n1.doubleValue() % n2.doubleValue());
         }
 
         @Override
@@ -119,82 +132,14 @@ public class MathFunctions {
         }
     }
 
-    public static class GreaterThan extends BinaryNumberFunction {
-        /**
-         */
-        private static final long serialVersionUID = 3074104624547345817L;
-
-        @Override
-        public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() > n2.doubleValue();
-        }
-
-        @Override
-        public String[] getKeys() {
-            return new String[] { "gt", "greaterthan" };
-        }
-    }
-
-    public static class GreaterThanOrEqual extends BinaryNumberFunction {
-        /**
-         */
-        private static final long serialVersionUID = 3829111446062691280L;
-
-        @Override
-        public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() >= n2.doubleValue();
-        }
-
-        @Override
-        public String[] getKeys() {
-            return new String[] { "ge", "greaterthanorequal" };
-        }
-    }
-
-    public static class LessThan extends BinaryNumberFunction {
-        /**
-         */
-        private static final long serialVersionUID = 6388516633368411081L;
-
-        @Override
-        public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() < n2.doubleValue();
-        }
-
-        @Override
-        public String[] getKeys() {
-            return new String[] { "lt", "lessthan" };
-        }
-    }
-
-    public static class LessThanOrEqual extends BinaryNumberFunction {
-        /**
-         */
-        private static final long serialVersionUID = 5236251545372152801L;
-
-        @Override
-        public Object evaluate(Number n1, Number n2) {
-            return n1.doubleValue() <= n2.doubleValue();
-        }
-
-        @Override
-        public String[] getKeys() {
-            return new String[] { "le", "lessthanorequal" };
-        }
-    }
-
     public static class Negate implements Function {
-        /**
-         */
         private static final long serialVersionUID = -8356257901220555636L;
 
         @Override
         public Object evaluate(List<Object> args) {
-            Object a1 = args.get(0);
-            if (a1 instanceof Number) {
-                return -((Number) a1).doubleValue();
-            }
-            return null;
+            Number a1 = JavascriptHelpers.convertToNumber(args.get(0));
+
+            return Double.valueOf(-a1.doubleValue());
         }
 
         @Override
@@ -204,17 +149,13 @@ public class MathFunctions {
     }
 
     public static class Absolute implements Function {
-        /**
-         */
         private static final long serialVersionUID = 3242148581747160277L;
 
         @Override
         public Object evaluate(List<Object> args) {
-            Object a1 = args.get(0);
-            if (a1 instanceof Number) {
-                return Math.abs(((Number) a1).doubleValue());
-            }
-            return null;
+            Number a1 = JavascriptHelpers.convertToNumber(args.get(0));
+
+            return Double.valueOf(Math.abs(a1.doubleValue()));
         }
 
         @Override

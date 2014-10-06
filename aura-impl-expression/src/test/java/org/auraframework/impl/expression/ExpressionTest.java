@@ -68,17 +68,17 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
     public void testNumberExpression() throws Exception {
         Expression e = new FunctionCallImpl(ADD, ImmutableList.<Expression> of(i314, i235325), l);
         Object o = e.evaluate(values);
-        assertEquals(314 + 235325.0, o);
+        assertEquals(314 + 235325, o);
 
         // (i314 + i235325) - (i314 + i314)
         e = new FunctionCallImpl(SUBTRACT, ImmutableList.<Expression> of(e,
                 new FunctionCallImpl(ADD, ImmutableList.<Expression> of(i314, i314), l)), l);
         o = e.evaluate(values);
-        assertEquals((314 + 235325.0) - (314 + 314), o);
+        assertEquals((314.0 + 235325) - (314 + 314), o);
 
         e = new FunctionCallImpl(SUBTRACT, ImmutableList.<Expression> of(e, new LiteralImpl(new BigDecimal(17), l)), l);
         o = e.evaluate(values);
-        assertEquals(((314 + 235325.0) - (314 + 314)) - 17, o);
+        assertEquals(((314.0 + 235325) - (314 + 314)) - 17, o);
     }
 
     public void testBooleanComplex() throws Exception {
@@ -125,7 +125,7 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
 
     public void testFunctionWithNullOperands() throws Exception {
         verifyEvaluateResult("true && null", ExpressionType.FUNCTION, null, null);
-        verifyEvaluateResult("null + 1", ExpressionType.FUNCTION, null, null);
+        verifyEvaluateResult("null + 1", ExpressionType.FUNCTION, null, 1);
         verifyEvaluateResult("'null' == null", ExpressionType.FUNCTION, null, false);
     }
 
@@ -142,8 +142,10 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
     // }
 
     public void testFunctionMismatchedOperands() throws Exception {
-        verifyEvaluateResult("3 + ' little piggies'", ExpressionType.FUNCTION, null, null);
-        verifyEvaluateResult("'5' + 5", ExpressionType.FUNCTION, null, null);
+        // Note the 3.0 on this
+        verifyEvaluateResult("3 + ' little piggies'", ExpressionType.FUNCTION, null, "3 little piggies");
+
+        verifyEvaluateResult("'5' + 6", ExpressionType.FUNCTION, null, "56");
         verifyEvaluateResult("'2' == 2", ExpressionType.FUNCTION, null, false);
     }
 

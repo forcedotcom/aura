@@ -23,10 +23,10 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.auraframework.test.UnitTestCase;
@@ -148,50 +148,7 @@ public class JsonTest extends UnitTestCase {
                 Json.serialize(m));
     }
 
-    private class SendNullObject implements JsonSerializable {
-        public SendNullObject(String v1, String v3) {
-            this.v1 = v1;
-            this.v3 = v3;
-        }
 
-        public void serialize(Json json) throws IOException {
-            boolean oldV = json.getSerializationContext().setNullValueEnabled(true);
-            try {
-                json.writeMapBegin();
-                json.writeMapEntry("v1", v1);
-                json.writeMapEntry("v2", v2);
-                json.writeMapEntry("v3", v3);
-                json.writeMapEnd();
-            } finally {
-                json.getSerializationContext().setNullValueEnabled(oldV);
-            }
-        }
-
-        private String v1;
-        private String v2 = null;
-        private String v3;
-    }
-
-    /**
-     * Ensure that encoding is is correct while encoding the nullable object.
-     */
-    public void testSerializeSimpleWithNulls() throws IOException {
-        SendNullObject sno = new SendNullObject("a", "b");
-        assertEquals("{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"}", Json.serialize(sno));
-    }
-
-    /**
-     * Ensure that encoding is restored to normal after encoding the nullable object.
-     */
-    public void testSerializeComplexWithNulls() throws IOException {
-        Map<Object, Object> m = new LinkedHashMap<>(1);
-        m.put("v", "c");
-        m.put("w", null);
-        m.put("x", new SendNullObject("a", "b"));
-        m.put("y", null);
-        m.put("z", "d");
-        assertEquals("{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}", Json.serialize(m));
-    }
 
     public void testSerializeIdentityReferenceType() throws IOException {
         JsonIdentitySerializableTest obj1 = new JsonIdentitySerializableTest(1);
@@ -527,7 +484,7 @@ public class JsonTest extends UnitTestCase {
         json.writeMapKey("rows");
         json.writeArrayBegin();
         json.writeComma(); // needs to be called before each array entry.
-                           // writeArrayEntry does this for us later
+        // writeArrayEntry does this for us later
         json.writeArrayBegin();
         final String testChars = "𥝱𥞩𥞴𥞴𥝱𥝱𠵅🁛🀦𐌸𐍄７辶헪ȦE§קஇ𥞴";
         json.writeArrayEntry(testChars);
@@ -688,7 +645,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
-    public void testNullValuesInMaps() throws Exception {
+    public void testNullValuesInMapsWithJsonStream() throws Exception {
         final Map<String, Object> map = new LinkedHashMap<>(8);
         map.put("cats", null);
         map.put("dogs", "bark");
@@ -711,7 +668,7 @@ public class JsonTest extends UnitTestCase {
                 new String(baos.toByteArray(), Charsets.UTF_8));
     }
 
-    public void testNullValuesInArrays() throws Exception {
+    public void testNullValuesInArraysWithJsonStream() throws Exception {
         final List<String> list = Lists.newArrayList(null, "cats", "dogs", null, "bacteria");
 
         // Try it with null values disabled
@@ -727,5 +684,81 @@ public class JsonTest extends UnitTestCase {
         json.writeArray(list);
         json.close();
         assertEquals("[null,\"cats\",\"dogs\",null,\"bacteria\"]", new String(baos.toByteArray(), Charsets.UTF_8));
+    }
+
+    private class SendNullObject implements JsonSerializable {
+        public SendNullObject(String v1, String v3) {
+            this.v1 = v1;
+            this.v3 = v3;
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+            boolean oldV = json.getSerializationContext().setNullValueEnabled(true);
+            try {
+                json.writeMapBegin();
+                json.writeMapEntry("v1", v1);
+                json.writeMapEntry("v2", v2);
+                json.writeMapEntry("v3", v3);
+                json.writeMapEnd();
+            } finally {
+                json.getSerializationContext().setNullValueEnabled(oldV);
+            }
+        }
+
+        private final String v1;
+        private final String v2 = null;
+        private final String v3;
+    }
+
+    /**
+     * Ensure that encoding is is correct while encoding the nullable object.
+     */
+    public void testSerializeSimpleWithNulls() throws IOException {
+        SendNullObject sno = new SendNullObject("a", "b");
+        assertEquals("{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"}", Json.serialize(sno));
+
+
+    }
+
+    /**
+     * Ensure that encoding is restored to normal after encoding the nullable object.
+     */
+    public void testSerializeComplexWithNulls() throws IOException {
+        Map<Object, Object> m = new LinkedHashMap<>(1);
+        m.put("v", "c");
+        m.put("w", null);
+        m.put("x", new SendNullObject("a", "b"));
+        m.put("y", null);
+        m.put("z", "d");
+        assertEquals("{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}", Json.serialize(m));
+    }
+
+    // we have two ways to output null in serialization, one is
+    // setNullValueEnabled with SerializationContext, another
+    //one is set it when createJsonStream. This test mix them together, and verify it works.
+    public void testSerializeComplexWithNullsWithJsonStreamAndSetNullValueEnabled() throws IOException {
+        Map<Object, Object> m = new LinkedHashMap<>(1);
+        m.put("v", "c");
+        m.put("w", null);
+        m.put("x", new SendNullObject("a", "b"));
+        m.put("y", null);
+        m.put("z", "d");
+        String expect = "{\"v\":\"c\",\"w\":null,\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"y\":null,\"z\":\"d\"}";
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
+
+        //test with Json Stream that output null
+        Json json = Json.createJsonStream(baos, false, false, true);
+        json.writeMap(m);
+        json.close();
+        assertEquals("fail with Json Stream output null", expect, new String(baos.toByteArray(), Charsets.UTF_8));
+
+        //test with Json Stream that skip null
+        String expect2 = "{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}";
+        baos.reset();
+        Json jsonSkipNull = Json.createJsonStream(baos, false, false, false);
+        jsonSkipNull.writeMap(m);
+        jsonSkipNull.close();
+        assertEquals("fail with Json Stream Skip null", expect2, new String(baos.toByteArray(), Charsets.UTF_8) );
     }
 }

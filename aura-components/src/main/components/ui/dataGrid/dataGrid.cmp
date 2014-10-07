@@ -30,7 +30,7 @@
 	 -->
 	<table id="{!globalId}" class="{! v.class + ' ' + v.state + ' ' + v.mode }" onclick="{!c.handleClick}" summary="{!v.summary}">
 		<thead>
-			<tr>
+			<tr aura:id="headerRow">
 				{!v.columns}
 			</tr>
 		</thead>

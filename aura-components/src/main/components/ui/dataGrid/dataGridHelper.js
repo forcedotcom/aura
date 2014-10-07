@@ -87,6 +87,10 @@
 			if (c.isInstanceOf('ui:dataGridSelectionColumn')) {
 				concrete._selectionColumns.push(c);
 			}
+			
+			if (!c.isRendered()) {
+				$A.render(c, concrete.find("headerRow").getElement());
+			}
 		});
 	},
 
@@ -669,6 +673,18 @@
 		// TODO: is this necessary? Not used anywhere else
 		//concrete.set('v.state', 'idle');
 	},
+	
+	createColumnData: function(isEditMode) {
+		var cellCmps = {},
+			ioKey = isEditMode ? 'input' : 'output';
+		
+		cellCmps[ioKey] = [];
+		return {
+				elementRef : null,
+				components : cellCmps,
+				cellKey	   : ioKey
+		}
+	},
     
     /*
      * ================
@@ -779,25 +795,38 @@
 		}
 	},
 	
-	rerenderTableRows: function (concrete, rowDataArray, isEditMode) {
+	updateRowsWithNewColumns: function (concrete, rowDataArray, isEditMode) {
 		var self = this,
 			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
+			rows = concrete.find("tbody").getElement().rows,
 			tr, td, colData, components, cdrs, rowData;
 		
 		for (var rowIndex = 0; rowIndex < rowDataArray.length; rowIndex++) {
 			rowData = rowDataArray[rowIndex];
-			
-			for (var colIndex = 0; colIndex < rowData.columnData.length; colIndex++) {
+			for (var colIndex = 0; colIndex < targetComponents.length; colIndex++) {
 				colData = rowData.columnData[colIndex];
+				
+				if (!colData) {
+					colData = self.createColumnData(isEditMode);
+					colData.elementRef = document.createElement('td');
+					
+					rows[rowIndex].appendChild(colData.elementRef);
+					rowData.columnData[colIndex] = colData;
+				}
+				
 				td = colData.elementRef;
 				key = colData.cellKey;
 				
 				// TODO: Clean up components
+				$A.util.forEach(colData.components[key], function(cmp) {
+					cmp.destroy();
+				});
 				colData.components[key] = [];
 				components = colData.components[key];
 				
 				cdrs = targetComponents[colIndex];
 				
+				// Can we either create a new component and render it, or just rerender the old component?
 				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
 			}
 		}
@@ -997,6 +1026,7 @@
 		}	
 	},
 	
+	// Components cannot be generated with an empty item shape 
 	deriveItemShape: function (concrete) {
     	var itemShape = concrete.get('v.itemShape'),
 			item, sub, path;

@@ -16,7 +16,6 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -31,10 +30,14 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.ImmutableSet;
+
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
     public static final String TAG = "aura:design";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = Collections.emptySet();
+    private static final String ATTRIBUTE_LABEL = "label";
+
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
 
     private final DesignDefImpl.Builder builder = new DesignDefImpl.Builder();
 
@@ -49,6 +52,14 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
+    }
+
+    @Override
+    protected void readAttributes() throws QuickFixException {
+        super.readAttributes();
+
+        String label = getAttributeValue(ATTRIBUTE_LABEL);
+        builder.setLabel(label);
     }
 
     @Override

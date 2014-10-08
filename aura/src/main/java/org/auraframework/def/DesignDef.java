@@ -27,4 +27,6 @@ public interface DesignDef extends RootDefinition {
     DefDescriptor<DesignDef> getDescriptor();
 
     public Map<String, AttributeDesignDef> getAttributeDesignDefs();
+
+    public String getLabel();
 }

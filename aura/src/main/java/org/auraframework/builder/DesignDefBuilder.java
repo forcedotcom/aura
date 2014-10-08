@@ -20,4 +20,6 @@ import org.auraframework.def.DesignDef;
 
 public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
     public DesignDefBuilder addAttributeDesign(String name, AttributeDesignDef attributeDesign);
+
+    public DesignDefBuilder setLabel(String label);
 }

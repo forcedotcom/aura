@@ -17,54 +17,60 @@ package org.auraframework.def;
 
 public interface AttributeDesignDef extends Definition {
     /**
-     * True if the attribute requires a value at design time.
+     * Get the attribute design time requiredness
+     * 
+     * @return whether the attribute requires a value at design time.
      */
     public boolean isRequired();
 
     /**
-     * True is the attribute is read only
+     * Get the attribute design time read only flag
+     * 
+     * @return whether the attribute is read only at design time
      */
     public boolean isReadOnly();
 
     /**
-     * Special type for design attributes
+     * Get the special type for this design attribute.
      * 
-     * Optional. Will be null unless specified.
+     * @return the special type, may be null
      */
     public String getType();
 
     /**
-     * Name of the attribute this attribute has a dependency on.
+     * Get the name of the attribute this attribute has a dependency on. This is necessary for tracking relationships
+     * between attributes.
      * 
-     * Null if none.
+     * @return the name of the dependency, may be null
      */
     public String getDependsOnAttribute();
 
     /**
-     * Comma separated list of values or class describing the data source.
+     * Get the attribute's datasource. This can include a comma separated list of values or class describing the data
+     * source.
      * 
-     * Optional. Will be null unless specified.
+     * @return the attribute's datasource, may be null
      */
     public String getDataSource();
 
     /**
-     * Minimum value allowed for attributes.
+     * Get the minimum value allowed for attributes.
      * 
-     * Optional. Will be null unless specified.
+     * @return the minimum value, may be null
      */
     public String getMin();
 
     /**
-     * Maximum value allowed for attributes.
+     * Get the maximum value allowed for attributes.
      * 
-     * Optional. Will be null unless specified.
+     * @return the maximum value, may be null
      */
     public String getMax();
 
     /**
-     * Localized title of the attribute.
+     * Get the localized title of the attribute.
      * 
-     * Null if the localization isn't found. Does not throw an exception.
+     * @return the localized title, may be null
      */
     public String getLabel();
 
@@ -72,7 +78,7 @@ public interface AttributeDesignDef extends Definition {
      * Localized placeholder text for the attribute. This is the ghosted text in textfields and textareas before you
      * start typing into it. Doesn't apply to all attribute types.
      * 
-     * Null if the localization isn't found.
+     * @return the localized placeholder text, may be null
      */
     public String getPlaceholderText();
 

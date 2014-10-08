@@ -58,6 +58,19 @@ public class JsonReaderTest extends UnitTestCase {
     }
 
     /**
+     * Make sure our escape sequence is yelled about correctly.
+     */
+    public void testReadBadEscape() throws IOException {
+        try {
+            new JsonReader().read("{\"\\~\":\"b\"}");
+            fail("should have caught a bad escape exception");
+        } catch (Exception e) {
+            assertTrue("Message did not have escape sequence: "+e.getMessage(),
+                e.getMessage().contains("Unknown escape sequence : \\~"));
+        }
+    }
+
+    /**
      * Test case to verify the handling of IOExceptions
      * 
      * @throws Exception

@@ -90,7 +90,7 @@ public interface BaseComponentDef extends RootDefinition {
 
     ComponentDef getTemplateDef() throws QuickFixException;
 
-    DefDescriptor<DesignDef> getDesignDefDescriptor() throws QuickFixException;
+    DefDescriptor<DesignDef> getDesignDefDescriptor();
 
     DefDescriptor<ComponentDef> getTemplateDefDescriptor();
 

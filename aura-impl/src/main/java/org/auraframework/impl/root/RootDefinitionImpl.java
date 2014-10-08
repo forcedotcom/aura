@@ -24,7 +24,6 @@ import java.util.Set;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
@@ -46,7 +45,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
     protected final DefDescriptor<DocumentationDef> documentationDescriptor;
-    protected final DefDescriptor<DesignDef> designDescriptor;
     private final int hashCode;
     private final SupportLevel support;
 
@@ -67,8 +65,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
 
         this.documentationDescriptor = builder.documentationDescriptor;
-
-        this.designDescriptor = builder.designDescriptor;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs);
     }
@@ -109,7 +105,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         private List<DefDescriptor<ProviderDef>> providerDescriptors;
         private SupportLevel support;
         private DefDescriptor<DocumentationDef> documentationDescriptor;
-        private DefDescriptor<DesignDef> designDescriptor;
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -125,11 +120,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
         public Builder<T> setDocumentation(String name) {
             documentationDescriptor = DefDescriptorImpl.getInstance(name, DocumentationDef.class);
-            return this;
-        }
-
-        public Builder<T> setDesign(String name) {
-            designDescriptor = DefDescriptorImpl.getInstance(name, DesignDef.class);
             return this;
         }
 
@@ -217,15 +207,6 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         DocumentationDef def = null;
         if (documentationDescriptor != null) {
             def = documentationDescriptor.getDef();
-        }
-        return def;
-    }
-
-    @Override
-    public DesignDef getDesignDef() throws QuickFixException {
-        DesignDef def = null;
-        if (designDescriptor != null) {
-            def = designDescriptor.getDef();
         }
         return def;
     }

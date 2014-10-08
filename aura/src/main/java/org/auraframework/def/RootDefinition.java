@@ -71,6 +71,4 @@ public interface RootDefinition extends Definition {
     SupportLevel getSupport();
 
     DocumentationDef getDocumentationDef() throws QuickFixException;
-
-    DesignDef getDesignDef() throws QuickFixException;
 }

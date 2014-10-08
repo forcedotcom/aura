@@ -398,7 +398,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                     builder.getDescriptor(), DesignDef.class, DefDescriptor.MARKUP_PREFIX);
 
             if (mdr.exists(designDescriptor)) {
-                builder.setDesign(designDescriptor.getQualifiedName());
+                builder.designDefDescriptor = designDescriptor;
             }
 
             builder.render = getAttributeValue(ATTRIBUTE_RENDER);

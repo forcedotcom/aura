@@ -52,27 +52,17 @@ public class IterationUITest extends WebDriverTestCase {
 
         clientHtml = clientHtml.replaceAll("<!---->", ""); // remove comments
         clientHtml = clientHtml.replaceAll("</br>", ""); // remove expanded br
-        clientHtml = clientHtml.replaceAll("\"\\s*\"", ""); // join separated
-                                                            // text
-        clientHtml = clientHtml.replaceAll("\\s+", " "); // replace whitespace
-                                                         // with a single space
-        clientHtml = clientHtml.replaceAll(" data-aura-rendered-by=\"[^\"]+\"", ""); // remove
-                                                                                     // client
-                                                                                     // data
-                                                                                     // tags
-        clientHtml = clientHtml.replaceAll(" class=\"[^\"]+\"", ""); // server
-                                                                     // doesn't
-                                                                     // render
-                                                                     // class?
-        // For ie8 className does not have quotes
-        clientHtml = clientHtml.replaceAll(" class=[^>]+", "");
+        clientHtml = clientHtml.replaceAll("\"\\s*\"", ""); // join separated text
+        clientHtml = clientHtml.replaceAll("\\s+", " "); // replace whitespace with a single space
+        clientHtml = clientHtml.replaceAll(" data-aura-rendered-by=\"[^\"]+\"", ""); // remove client data tags
 
-        serverHtml = serverHtml.replaceAll("\\s+", " "); // replace whitespace
-                                                         // with a single space
-        serverHtml = serverHtml.replaceAll(" id=\"[^\"]+\"", ""); // server
-                                                                  // renders
-                                                                  // aura:id as
-                                                                  // id
+        // Should we maybe just disable this test for ie8?
+        // For ie8 className does not have quotes so get rid of them everywhere.
+        clientHtml = clientHtml.replaceAll(" class=\"([^>\"]+)\"", " class=$1");
+        serverHtml = serverHtml.replaceAll(" class=\"([^>\"]+)\"", " class=$1");
+
+        serverHtml = serverHtml.replaceAll("\\s+", " "); // replace whitespace with a single space
+        serverHtml = serverHtml.replaceAll(" id=\"[^\"]+\"", ""); // server renders aura:id as id
         // fix for ie7 and ie8,
         // as id of div does not have quotes
         serverHtml = serverHtml.replaceAll(" id=[^>]+", "");
@@ -92,6 +82,8 @@ public class IterationUITest extends WebDriverTestCase {
         serverHtml = serverHtml.replaceAll("BUTTON", "button");
         serverHtml = serverHtml.replaceAll("BR", "br");
 
+        System.out.println("CLIENT:"+clientHtml);
+        System.out.println("SERVER:"+serverHtml);
         assertEquals(clientHtml, serverHtml);
         goldFileText(clientHtml);
     }

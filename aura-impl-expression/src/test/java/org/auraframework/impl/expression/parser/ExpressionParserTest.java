@@ -46,9 +46,9 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         e = buildExpression("(536 + .346) * 1.56 / 634 + 11 % 5");
         assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
 
-        result = 1 - -5;
         e = buildExpression("1 - -5");
-        assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
+        // this is an integer
+        assertEquals("Unexpected expression evaluation", 6.0, e.evaluate(null));
 
         e = buildExpression("true ? true : false ? 16 : 21");
         assertEquals("Unexpected expression evaluation", true, e.evaluate(null));
@@ -383,10 +383,10 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         e = buildExpression("and(false, true)");
         assertFalse("Operator could not be accessed as function call", e.evaluate(null));
         e = buildExpression("add(24, 23525)");
-        assertEquals("Operator could not be accessed as function call", 24 + 23525.0, e.evaluate(null));
+        assertEquals("Operator could not be accessed as function call", 24 + 23525, e.evaluate(null));
 
         e = buildExpression("sub(24, add(63, 23525))");
-        assertEquals("Error evaluating nested operators as function calls", 24 - (63 + 23525.0), e.evaluate(null));
+        assertEquals("Error evaluating nested operators as function calls", 24.0 - (63 + 23525), e.evaluate(null));
 
         e = buildExpression("add('The child', ' picked up the teddy bear in one hand')");
         assertEquals("Error adding strings with add operator as function call",

@@ -18,12 +18,9 @@ package org.auraframework.impl.expression;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.TERNARY;
 import static org.auraframework.impl.expression.functions.MathFunctions.ABSOLUTE;
 import static org.auraframework.impl.expression.functions.MathFunctions.DIVIDE;
-import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN;
-import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN_OR_EQUAL;
-import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN;
-import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MathFunctions.MODULUS;
 import static org.auraframework.impl.expression.functions.MathFunctions.MULTIPLY;
 import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
@@ -31,7 +28,10 @@ import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT
 import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
 import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
 import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
-import static org.auraframework.impl.expression.functions.MultiFunctions.TERNARY;
+import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN;
+import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
+import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -105,7 +105,8 @@
      * after the action is complete" "refresh": "Time in seconds to override
      * action's current storage expiration"}
      */
-    testSetStorableAPI : {
+    /* W-2398464 */
+    _testSetStorableAPI : {
         attributes : {
             defaultExpiration : "60",
             defaultAutoRefreshInterval : "60"

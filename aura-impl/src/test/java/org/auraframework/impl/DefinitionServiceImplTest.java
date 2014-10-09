@@ -674,9 +674,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 definitionService.find(new DescriptorFilter("aura://*:doesntexist")).size());
 
         // Find css
-        // This always returns 0 results - W-1426841
-        // assertEquals("find() fails with wildcard as prefix", 1,
-        // definitionService.find("css://test.styleTest").size());
+        assertEquals("find() fails with wildcard as prefix", 1,
+                definitionService.find(new DescriptorFilter("css://test:styleTest")).size());
     }
 
     public static class AuraTestRegistryProviderWithNulls extends AuraRegistryProviderImpl {

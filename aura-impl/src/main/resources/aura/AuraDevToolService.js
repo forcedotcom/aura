@@ -1226,10 +1226,14 @@ var AuraDevToolService = function() {
                 "func" : function (domElem){
                      var accessAideFuncs = aura.devToolService.accessbilityAide;
                      var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
-                        
+                     
+                     var modalOverlay = "div.uiModalOverlay";
+                     var panelOverlay = "div.uiPanelOverlay";
+                     var panelSlide   = "section.stage.panelSlide";
+                     
                      //Get all panels
-                     var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll("div.forcePanelModal"), domElem.querySelectorAll("div.forcePanelOverlay"), domElem.querySelectorAll("section.stage.panelSlide")]);
-                     var topPanelsCount = domElem.querySelectorAll("div.forcePanelOverlay.active").length + domElem.querySelectorAll("div.forcePanelModal.active").length;
+                     var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll(modalOverlay), domElem.querySelectorAll(panelOverlay), domElem.querySelectorAll(panelSlide)]);
+                     var topPanelsCount = domElem.querySelectorAll(modalOverlay+".active").length + domElem.querySelectorAll(panelOverlay+".active").length;
                      var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
                      return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
                 }

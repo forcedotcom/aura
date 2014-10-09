@@ -41,7 +41,8 @@
 		hlp.initializeActionDelegate(cmp);
 		//if (cmp.get("v.columns")) {
 			hlp.initializeColumns(cmp);
-			hlp.deriveItemShape(cmp);
+			hlp.generateNewItemShape(cmp);
+			//hlp.deriveItemShape(cmp);
 		//}
 		hlp.initializeRowData(cmp);
 	},
@@ -50,6 +51,7 @@
 		if (!cmp._rendered) {
 			return;
 		}
+		hlp.generateNewItemShape(cmp);
 		hlp.handleItemsChange(cmp, evt.getParams());
 
 		var concrete = cmp.getConcreteComponent();

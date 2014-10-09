@@ -1027,33 +1027,37 @@
 	},
 	
 	// Components cannot be generated with an empty item shape 
-	deriveItemShape: function (concrete) {
+	generateNewItemShape: function (concrete) {
     	var itemShape = concrete.get('v.itemShape'),
-			item, sub, path;
+			item = concrete.get("v.items")[0],
+			template,
+			sub, path;
 
-    	if (!itemShape) {
-			item = {};
+		if (item) {
+			template = this.clone(item); // TODO: make empty clone rather than full clone?
+			concrete.set("v.itemShape", template);
+		}
 
-			for (var i = 0; i < concrete._columnNames.length; i++) {
-				path = concrete._columnNames[i];
-				sub = item;
+		/*for (var i = 0; i < concrete._columnNames.length; i++) {
+			path = concrete._columnNames[i];
+			sub = item;
 
-				if (path && path.length > 0) {
-					for (var j = 0; j < path.length; j++) {
-						
-						// For leaves, place empty string.
-						// For objects, place an empty object.
-						if (j === path.length - 1) {
-							sub[path[j]] = '';	
-						} else {
-							sub = sub[path[j]] = {};
-						}
+			if (path && path.length > 0) {
+				for (var j = 0; j < path.length; j++) {
+					
+					// For leaves, place empty string.
+					// For objects, place an empty object.
+					if (j === path.length - 1) {
+						sub[path[j]] = '';	
+					} else {
+						sub = sub[path[j]] = {};
 					}
 				}
 			}
+		}*/
+		
 
-			concrete.set("v.itemShape", item);
-    	}
+		concrete.set("v.itemShape", item);
     },
     
     /*

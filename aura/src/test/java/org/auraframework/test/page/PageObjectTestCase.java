@@ -13,7 +13,7 @@ public abstract class PageObjectTestCase<T extends PageObject> extends WebDriver
 	}
 	
 	@Override
-	public void setCurrentDriver(WebDriver currentDriver) {
+	protected void setCurrentDriver(WebDriver currentDriver) {
 		super.setCurrentDriver(currentDriver);
 		page.setDriver(currentDriver);
 	}

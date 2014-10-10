@@ -23,5 +23,10 @@ import java.util.Map;
  * 
  */
 public interface DesignDef extends RootDefinition {
+    @Override
+    DefDescriptor<DesignDef> getDescriptor();
+
     public Map<String, AttributeDesignDef> getAttributeDesignDefs();
+
+    public String getLabel();
 }

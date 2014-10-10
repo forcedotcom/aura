@@ -40,6 +40,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DesignDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.ImportDef;
@@ -61,7 +62,6 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
-
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -96,6 +96,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
     private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
     private final DefDescriptor<ThemeDef> cmpThemeDescriptor;
+    private final DefDescriptor<DesignDef> designDefDescriptor;
 
     private final Set<DefDescriptor<InterfaceDef>> interfaces;
     private final List<DefDescriptor<ControllerDef>> controllerDescriptors;
@@ -115,7 +116,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final int hashCode;
 
     private transient Boolean localDeps = null;
-    
+
     protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
         this.modelDefDescriptor = builder.modelDefDescriptor;
@@ -150,6 +151,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.render = builder.renderType;
         this.whitespaceBehavior = builder.whitespaceBehavior;
         this.cmpThemeDescriptor = builder.cmpThemeDescriptor;
+        this.designDefDescriptor = builder.designDefDescriptor;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         if (getDescriptor() != null) {
@@ -217,7 +219,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         String.format(
                                 "Component %s cannot be a rootComponent and extend %s", getDescriptor(),
                                 this.extendsDescriptor),
-                                getLocation());
+                        getLocation());
             }
         }
 
@@ -232,22 +234,21 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (localDeps == null) {
             computeLocalDependencies();
         }
-        
+
         return localDeps == Boolean.TRUE;
     }
 
     /**
-     * Computes the local (server) dependencies. 
+     * Computes the local (server) dependencies.
      * 
-     * Terminology:
-     *  "remote" - a JavaScript provider or renderer
-     *  "local"  - a Java/Apex/server provider, renderer, or model 
+     * Terminology: "remote" - a JavaScript provider or renderer "local" - a Java/Apex/server provider, renderer, or
+     * model
      */
     private synchronized void computeLocalDependencies() throws QuickFixException {
         if (localDeps != null) {
             return;
         }
-        
+
         if (modelDefDescriptor != null) {
             localDeps = Boolean.TRUE;
             return;
@@ -255,30 +256,30 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         if (rendererDescriptors != null && !rendererDescriptors.isEmpty()) {
             boolean hasRemote = false;
-            
+
             for (DefDescriptor<RendererDef> rendererDescriptor : rendererDescriptors) {
                 if (!rendererDescriptor.getDef().isLocal()) {
                     hasRemote = true;
                     break;
                 }
             }
-            
+
             if (!hasRemote) {
                 localDeps = Boolean.TRUE;
                 return;
             }
         }
-        
+
         if (providerDescriptors != null) {
             boolean hasRemote = providerDescriptors.isEmpty();
-            
+
             for (DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors) {
                 if (!providerDescriptor.getDef().isLocal()) {
                     hasRemote = true;
                     break;
                 }
             }
-            
+
             if (!hasRemote) {
                 localDeps = Boolean.TRUE;
                 return;
@@ -289,11 +290,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         T superDef = getSuperDef();
 
         if (superDef != null && superDef.hasLocalDependencies() &&
-            // super has model
-            (superDef.getModelDef() != null ||
-            // or has renderer that's local
-            (superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()))) {
-            // Only local/server models and renderers on the super/parent are considered local dependencies for the child.
+                // super has model
+                (superDef.getModelDef() != null ||
+                // or has renderer that's local
+                (superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()))) {
+            // Only local/server models and renderers on the super/parent are considered local dependencies for the
+            // child.
             localDeps = Boolean.TRUE;
             return;
         }
@@ -302,7 +304,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             localDeps = Boolean.FALSE;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
@@ -310,7 +312,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (DependencyDef def : dependencies) {
             def.validateReferences();
         }
-        
+
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences();
         }
@@ -338,7 +340,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         "%s cannot extend non-extensible component %s", getDescriptor(), extendsDescriptor),
                         getLocation());
             }
-            
+
             registry.assertAccess(descriptor, parentDef);
 
             SupportLevel support = getSupport();
@@ -351,7 +353,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                                     getDescriptor(),
                                     support, extDesc, extDef.getSupport()), getLocation());
                 }
-                
+
                 extDesc = (DefDescriptor<T>) extDef.getExtendsDescriptor();
             }
         }
@@ -361,18 +363,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             if (interfaze == null) {
                 throw new DefinitionNotFoundException(intf, getLocation());
             }
-            
+
             registry.assertAccess(descriptor, interfaze);
         }
-        
+
         for (RegisterEventDef def : events.values()) {
             def.validateReferences();
         }
-        
+
         for (EventHandlerDef def : eventHandlers) {
             def.validateReferences();
         }
-        
+
         for (ImportDef def : imports) {
             def.validateReferences();
         }
@@ -515,11 +517,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (cmpThemeDescriptor != null) {
             dependencies.add(cmpThemeDescriptor);
         }
-        
+
         if (imports != null) {
-        	for (ImportDef imported : imports) {
-        		dependencies.add(imported.getDescriptor());
-        	}
+            for (ImportDef imported : imports) {
+                dependencies.add(imported.getDescriptor());
+            }
         }
 
         for (DependencyDef dep : this.dependencies) {
@@ -589,7 +591,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public Collection<EventHandlerDef> getHandlerDefs() throws QuickFixException {
         return eventHandlers;
     }
-    
 
     /**
      * @return all the library imports from this component, including those inherited
@@ -665,6 +666,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public DefDescriptor<T> getExtendsDescriptor() {
         return extendsDescriptor;
+    }
+
+    @Override
+    public DefDescriptor<DesignDef> getDesignDefDescriptor() {
+        return designDefDescriptor;
     }
 
     @Override
@@ -747,11 +753,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors.equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                    : modelDefDescriptor.equals(other.modelDefDescriptor))
+                            : modelDefDescriptor.equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
-                    : extendsDescriptor.equals(other.extendsDescriptor))
+                            : extendsDescriptor.equals(other.extendsDescriptor))
                     && (cmpThemeDescriptor == null ? other.cmpThemeDescriptor == null
-                    : cmpThemeDescriptor.equals(other.cmpThemeDescriptor))
+                            : cmpThemeDescriptor.equals(other.cmpThemeDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -785,7 +791,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeMapBegin();
                 json.writeMapEntry("descriptor", descriptor);
                 context.pushCallingDescriptor(descriptor);
-                try{
+                try {
                     RendererDef rendererDef = getRendererDef();
                     if (rendererDef != null && !rendererDef.isLocal()) {
                         json.writeMapEntry("rendererDef", rendererDef);
@@ -810,17 +816,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (!attrDefs.isEmpty()) {
                     json.writeMapEntry("attributeDefs", attrDefs);
                 }
-                
+
                 Set<DefDescriptor<InterfaceDef>> allInterfaces = getAllInterfaces();
                 if (allInterfaces != null && !allInterfaces.isEmpty()) {
                     json.writeMapEntry("interfaces", allInterfaces);
                 }
-                
+
                 Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
                 if (!regevents.isEmpty()) {
                     json.writeMapEntry("registerEventDefs", regevents);
                 }
-                
+
                 Collection<EventHandlerDef> handlers = getHandlerDefs();
                 if (!handlers.isEmpty()) {
                     json.writeMapEntry("handlerDefs", handlers);
@@ -829,17 +835,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (!imports.isEmpty()) {
                     json.writeMapEntry("imports", imports);
                 }
-                
+
                 if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
                 }
-                
+
                 boolean local = hasLocalDependencies();
-                
+
                 if (local) {
                     json.writeMapEntry("hasServerDeps", true);
                 }
-                
+
                 if (isAbstract) {
                     json.writeMapEntry("isAbstract", isAbstract);
                 }
@@ -856,7 +862,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (mode.equals(Mode.AUTOJSTEST)) {
                     json.writeMapEntry("testSuiteDef", getTestSuiteDef());
                 }
-                
+
                 serializeFields(json);
                 json.writeMapEnd();
             }
@@ -866,7 +872,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     protected abstract void serializeFields(Json json) throws IOException,
-    QuickFixException;
+            QuickFixException;
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -1000,6 +1006,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
         public DefDescriptor<ThemeDef> cmpThemeDescriptor;
+        public DefDescriptor<DesignDef> designDefDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
         public List<DefDescriptor<ResourceDef>> resourceDescriptors;
@@ -1112,6 +1119,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> setTemplateDef(ComponentDef templateDef) {
             this.templateDefDescriptor = templateDef.getDescriptor();
+            return this;
+        }
+
+        @Override
+        public Builder<T> setDesignDef(DesignDef designDef) {
+            this.designDefDescriptor = designDef.getDescriptor();
             return this;
         }
 

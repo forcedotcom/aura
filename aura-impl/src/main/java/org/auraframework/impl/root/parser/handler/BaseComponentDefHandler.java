@@ -31,6 +31,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
@@ -82,15 +83,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER, RootTagHandler.ATTRIBUTE_API_VERSION)
+            .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
+                    RootTagHandler.ATTRIBUTE_API_VERSION)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
-    
-	protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
+
+    protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+            ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_EXTENSIBLE, ATTRIBUTE_ABSTRACT, ATTRIBUTE_ISTEMPLATE,
             ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
-            ATTRIBUTE_WHITESPACE).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES).build();
-    
+            ATTRIBUTE_WHITESPACE).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .build();
 
     private int innerCount = 0;
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -313,7 +315,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                 builder.styleDescriptor = cssDescriptor;
             }
 
-            DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName, ResourceDef.class);
+            DefDescriptor<ResourceDef> cssResourceDescriptor = DefDescriptorImpl.getInstance(styleName,
+                    ResourceDef.class);
             if (mdr.exists(cssResourceDescriptor)) {
                 builder.addResource(cssResourceDescriptor.getQualifiedName());
             }
@@ -391,6 +394,13 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                 builder.setDocumentation(documentationDescriptor.getQualifiedName());
             }
 
+            DefDescriptor<DesignDef> designDescriptor = DefDescriptorImpl.getAssociateDescriptor(
+                    builder.getDescriptor(), DesignDef.class, DefDescriptor.MARKUP_PREFIX);
+
+            if (mdr.exists(designDescriptor)) {
+                builder.designDefDescriptor = designDescriptor;
+            }
+
             builder.render = getAttributeValue(ATTRIBUTE_RENDER);
 
             String whitespaceVal = getAttributeValue(ATTRIBUTE_WHITESPACE);
@@ -405,7 +415,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         }
     }
 
-	public void setRender(String val) {
+    public void setRender(String val) {
         builder.render = val;
     }
 

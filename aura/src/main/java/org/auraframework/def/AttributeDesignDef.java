@@ -16,20 +16,70 @@
 package org.auraframework.def;
 
 public interface AttributeDesignDef extends Definition {
-    public Boolean getRequired();
+    /**
+     * Get the attribute design time requiredness
+     * 
+     * @return whether the attribute requires a value at design time.
+     */
+    public boolean isRequired();
 
-    public Boolean getReadOnly();
+    /**
+     * Get the attribute design time read only flag
+     * 
+     * @return whether the attribute is read only at design time
+     */
+    public boolean isReadOnly();
 
+    /**
+     * Get the special type for this design attribute.
+     * 
+     * @return the special type, may be null
+     */
     public String getType();
 
-    public String getDependency();
+    /**
+     * Get the name of the attribute this attribute has a dependency on. This is necessary for tracking relationships
+     * between attributes.
+     * 
+     * @return the name of the dependency, may be null
+     */
+    public String getDependsOnAttribute();
 
+    /**
+     * Get the attribute's datasource. This can include a comma separated list of values or class describing the data
+     * source.
+     * 
+     * @return the attribute's datasource, may be null
+     */
     public String getDataSource();
 
+    /**
+     * Get the minimum value allowed for attributes.
+     * 
+     * @return the minimum value, may be null
+     */
     public String getMin();
 
+    /**
+     * Get the maximum value allowed for attributes.
+     * 
+     * @return the maximum value, may be null
+     */
     public String getMax();
 
+    /**
+     * Get the localized title of the attribute.
+     * 
+     * @return the localized title, may be null
+     */
     public String getLabel();
+
+    /**
+     * Localized placeholder text for the attribute. This is the ghosted text in textfields and textareas before you
+     * start typing into it. Doesn't apply to all attribute types.
+     * 
+     * @return the localized placeholder text, may be null
+     */
+    public String getPlaceholderText();
 
 }

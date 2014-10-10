@@ -24,6 +24,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> implements AttributeDesignDef {
+    private static final long serialVersionUID = 3290806856269872853L;
     private final Boolean required;
     private final Boolean readonly;
     private final String name;
@@ -33,6 +34,8 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     private final String min;
     private final String max;
     private final String label;
+    private final String placeholder;
+    private final String description;
 
     protected AttributeDesignDefImpl(Builder builder) {
         super(builder);
@@ -45,15 +48,17 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         this.min = builder.min;
         this.max = builder.max;
         this.label = builder.label;
+        this.placeholder = builder.placeholder;
+        this.description = builder.description;
     }
 
     @Override
-    public Boolean getRequired() {
+    public boolean isRequired() {
         return required;
     }
 
     @Override
-    public Boolean getReadOnly() {
+    public boolean isReadOnly() {
         return readonly;
     }
 
@@ -68,7 +73,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
-    public String getDependency() {
+    public String getDependsOnAttribute() {
         return dependency;
     }
 
@@ -93,6 +98,16 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
+    public String getPlaceholderText() {
+        return placeholder;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
     }
@@ -103,8 +118,8 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
 
     public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDesignDef> implements
             AttributeDesignDefBuilder {
-        private Boolean required;
-        private Boolean readonly;
+        private boolean required;
+        private boolean readonly;
         private String name;
         private String label;
         private String type;
@@ -112,6 +127,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         private String datasource;
         private String min;
         private String max;
+        private String placeholder;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -144,19 +160,19 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         }
 
         @Override
-        public AttributeDesignDefBuilder setRequired(Boolean required) {
+        public AttributeDesignDefBuilder setRequired(boolean required) {
             this.required = required;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setReadOnly(Boolean readonly) {
+        public AttributeDesignDefBuilder setReadOnly(boolean readonly) {
             this.readonly = readonly;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setDependency(String dependency) {
+        public AttributeDesignDefBuilder setDependsOnAttribute(String dependency) {
             this.dependency = dependency;
             return this;
         }
@@ -176,6 +192,12 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         @Override
         public AttributeDesignDefBuilder setMax(String max) {
             this.max = max;
+            return this;
+        }
+
+        @Override
+        public AttributeDesignDefBuilder setPlaceholderText(String placeholder) {
+            this.placeholder = placeholder;
             return this;
         }
 

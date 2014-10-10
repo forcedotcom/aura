@@ -841,7 +841,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return currentDriver;
     }
     
-    public void setCurrentDriver(WebDriver currentDriver) {
+    protected void setCurrentDriver(WebDriver currentDriver) {
 		this.currentDriver = currentDriver;
     }
 

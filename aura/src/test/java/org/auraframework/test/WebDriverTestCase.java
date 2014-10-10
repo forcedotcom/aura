@@ -37,6 +37,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
+import org.auraframework.test.page.PageObject;
 import org.auraframework.test.perf.*;
 import org.auraframework.test.perf.metrics.*;
 import org.auraframework.test.perf.rdp.RDPNotification;
@@ -79,6 +80,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;
     protected PerfWebDriverUtil perfWebDriverUtil;
+    private PageObject page;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -103,6 +105,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public WebDriverTestCase(String name) {
         super(name);
     }
+    
+    public WebDriverTestCase(PageObject page) {
+    	super(page.getName());
+    	this.page = page;
+    }
 
     /**
      * Setup specific to a test case but common for all browsers. Run only once per test case.
@@ -110,7 +117,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        
     }
 
     public String getBrowserTypeString() {
@@ -788,7 +794,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
 
             logger.info(String.format("Requesting: %s", capabilities));
-            currentDriver = provider.get(capabilities);
+            setCurrentDriver(provider.get(capabilities));
             if (currentDriver == null) {
                 fail("Failed to get webdriver for " + currentBrowserType);
             }
@@ -808,6 +814,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
         return currentDriver;
     }
+    
+    public void setCurrentDriver(WebDriver currentDriver) {
+		this.currentDriver = currentDriver;
+		if (page != null) {
+			page.setDriver(currentDriver);
+		}
+    }
 
     /**
      * @return non-null to specify a desired window size to be set when a new driver is created
@@ -823,7 +836,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             } catch (Exception e) {
                 Log.warn(currentDriver.toString(), e);
             }
-            currentDriver = null;
+            setCurrentDriver(null);
         }
     }
 

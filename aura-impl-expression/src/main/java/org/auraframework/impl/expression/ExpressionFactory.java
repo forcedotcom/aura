@@ -42,7 +42,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.functions.Function;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -108,9 +107,7 @@ public class ExpressionFactory {
     }
 
     public Expression createString(String s) {
-        String result = s.substring(1, s.length() - 1);
-        result = AuraTextUtil.replaceSimple(result, "\\\'", "'");
-        return new LiteralImpl(result, l);
+        return new LiteralImpl(s.substring(1, s.length()-1), l);
     }
 
     public PropertyReference createPropertyReference(List<String> path) {

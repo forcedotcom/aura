@@ -39,12 +39,24 @@ grammar Expression;
 package org.auraframework.impl.expression.parser;
 
 import org.auraframework.impl.expression.AuraLexerException;
+import org.antlr.runtime.UnwantedTokenException;
 }
 
 @lexer::members {
     @Override
     public void reportError(RecognitionException e) {
         throw new AuraLexerException(e);
+    }
+
+    private String hexToString(String c1, String c2, String c3, String c4) {
+        String concat = c1+c2+c3+c4;
+        int c;
+        try {
+            c = Integer.parseInt(concat, 16);
+        } catch (NumberFormatException nfe) {
+            return "?";
+        }
+        return new StringBuilder().appendCodePoint(c).toString();
     }
 }
 
@@ -137,7 +149,6 @@ import java.util.LinkedList;
         FRIENDLY_NAMES[WS] = "whitespace";
         FRIENDLY_NAMES[ESC_SEQ] = "an escape sequence";
         FRIENDLY_NAMES[HEX_DIGIT] = "a hexadecimal number";
-        FRIENDLY_NAMES[UNICODE_ESC] = "a unicode character";
     }
 }
 
@@ -253,7 +264,13 @@ WS  :   ( ' '
         ) { skip(); }
     ;
 
-STRING :  '\'' ( ESC_SEQ | ~('\\'|'\'') )* '\'';
+STRING @init { StringBuilder buf = new StringBuilder(); } :
+    '\'' { buf.append("'"); }
+    ( ESC_SEQ[buf] | n=NORMAL_STRING { buf.append(n.getText()); } )*
+    '\'' { buf.append("'"); setText(buf.toString()); };
+
+fragment
+NORMAL_STRING : ~( '\\' | '\'' ) ;
 
 LPAREN : '(' ;
 
@@ -308,10 +325,16 @@ fragment
 HEX_DIGIT : ('0'..'9'|'a'..'f') ;
 
 fragment
-ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
-    |   UNICODE_ESC
+ESC_SEQ[StringBuilder buf] :
+    '\\'
+    ( 'b' { buf.append("\b"); }
+    | 't' { buf.append("\t"); }
+    | 'n' { buf.append("\n"); }
+    | 'f' { buf.append("\f"); }
+    | 'r' { buf.append("\r"); }
+    | '\"' { buf.append("\""); }
+    | '\'' { buf.append("\'"); }
+    | '\\' { buf.append("\\"); }
+    | 'u' c1=HEX_DIGIT c2=HEX_DIGIT c3=HEX_DIGIT c4=HEX_DIGIT
+        { String s = hexToString(c1.getText(), c2.getText(), c3.getText(), c4.getText()); buf.append(s); } )
     ;
-
-fragment
-UNICODE_ESC : '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;

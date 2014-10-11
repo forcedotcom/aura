@@ -15,16 +15,26 @@
  */
 package org.auraframework.impl.root;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Shared definition code between component and event definition.
@@ -53,7 +63,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         } else {
             support = builder.support;
         }
-        
+
         this.documentationDescriptor = builder.documentationDescriptor;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs);
@@ -64,7 +74,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         super.appendDependencies(dependencies);
         if (providerDescriptors != null) {
             dependencies.addAll(providerDescriptors);
-        } 
+        }
         for (AttributeDef attr : attributeDefs.values()) {
             attr.appendDependencies(dependencies);
         }
@@ -107,7 +117,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             }
             this.providerDescriptors.add(DefDescriptorImpl.getInstance(name, ProviderDef.class));
         }
-        
+
         public Builder<T> setDocumentation(String name) {
             documentationDescriptor = DefDescriptorImpl.getInstance(name, DocumentationDef.class);
             return this;
@@ -171,8 +181,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     /**
-     * @return The primary provider def. If multiple exist, this will be the
-     *         remote one.
+     * @return The primary provider def. If multiple exist, this will be the remote one.
      * @throws QuickFixException
      */
     @Override
@@ -188,7 +197,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
         return def;
     }
-    
+
     /**
      * @return The documentation def, which explains the spirit and usage of this application or component.
      * @throws QuickFixException
@@ -197,17 +206,16 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     public DocumentationDef getDocumentationDef() throws QuickFixException {
         DocumentationDef def = null;
         if (documentationDescriptor != null) {
-        	def = documentationDescriptor.getDef();
+            def = documentationDescriptor.getDef();
         }
         return def;
     }
 
     /**
-     * Method to check if this is a Definition of an Interface/Abstract
-     * Component and if it has a local provider.
+     * Method to check if this is a Definition of an Interface/Abstract Component and if it has a local provider.
      * 
-     * @return True if there are no providers or there is a local provider False
-     *         if there is only a remtre provider and no local provider
+     * @return True if there are no providers or there is a local provider False if there is only a remtre provider and
+     *         no local provider
      * @throws QuickFixException
      */
     public boolean isInConcreteAndHasLocalProvider() throws QuickFixException {

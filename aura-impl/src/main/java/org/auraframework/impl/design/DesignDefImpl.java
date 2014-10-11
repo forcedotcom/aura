@@ -35,12 +35,14 @@ import org.auraframework.util.json.Json;
 import com.google.common.collect.Lists;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
-
+    private static final long serialVersionUID = -8621907027705407577L;
     private final LinkedHashMap<String, AttributeDesignDef> attributeDesignDefs;
+    private final String label;
 
     protected DesignDefImpl(Builder builder) {
         super(builder);
         this.attributeDesignDefs = builder.attributeDesignMap;
+        this.label = builder.label;
     }
 
     @Override
@@ -56,6 +58,11 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     @Override
     public Map<String, AttributeDesignDef> getAttributeDesignDefs() {
         return attributeDesignDefs;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 
     @Override
@@ -75,6 +82,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
 
     public static class Builder extends RootDefinitionImpl.Builder<DesignDef> implements DesignDefBuilder {
         private final LinkedHashMap<String, AttributeDesignDef> attributeDesignMap = new LinkedHashMap<String, AttributeDesignDef>();
+        private String label;
 
         public Builder() {
             super(DesignDef.class);
@@ -91,6 +99,12 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         @Override
         public DesignDefBuilder addAttributeDesign(String name, AttributeDesignDef attributeDesign) {
             this.attributeDesignMap.put(name, attributeDesign);
+            return this;
+        }
+
+        @Override
+        public DesignDefBuilder setLabel(String label) {
+            this.label = label;
             return this;
         }
     }

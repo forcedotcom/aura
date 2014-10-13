@@ -182,6 +182,52 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 
 			Assert.True(appendNotCalled && !PTLplugin._ptlLoading);
 		}
+
+		[Fact]
+		function ExecutesErrorCallbackOnError(){
+			var PTLplugin,
+				stub,
+				neededMocks,
+				errorReceived,
+				callback,
+				appendNotCalled=true;
+
+			windowMock(function(){
+				PTLplugin = new plugins.PullToLoadMore();
+				stub = Stubs.GetObject({
+						appendItems: function(items){
+							appendNotCalled = false;
+						},
+						_resetPosition: function(ptlSnapTime){},
+						_setPTLErrorState: function(err){}
+					},{
+					ptlDOM: {classList: {
+						add: function(_class){},
+						remove: function(_class){}
+					}},
+					_ptlTriggered: null,
+					_ptlLoading: true,
+					_ptlSnapTime: null,
+					ptlLabel:{textContent:''},
+					opts: {
+						onPullToLoadMore: function(){
+							callback = arguments[0];
+						},
+						pullToLoadMoreConfig:{
+							labelUpdate:''
+						}
+					}
+				});
+				neededMocks = Mocks.GetMocks(PTLplugin, stub);
+
+				neededMocks(function(){
+					PTLplugin.triggerPTL();
+					callback({labelError:'Error'});
+					//once when err='Error' and once when setTimeout runs with err=false
+					Assert.True(stub._setPTLErrorState.Calls.length===2);
+				});
+			});
+		}
 	}
 
 	[Fixture]

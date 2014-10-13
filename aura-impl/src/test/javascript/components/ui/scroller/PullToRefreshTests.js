@@ -96,14 +96,16 @@ Test.Components.Ui.Scroller.PullToRefreshTests=function(){
 	[Fixture]
 	function TriggerPTR(){
 
+		var stub = Stubs.GetObject({
+			_resetPosition: function(snapTime){}
+		},{
+			ptrDOM: {classList:{add:function(_class){},remove:function(_class){}}},
+			ptrLabel: {textContent:''},
+			_ptrTriggered: null,
+			_ptrLoading: null
+		});
 		function mock(plugin){
-			return Mocks.GetMocks(plugin,{
-				ptrDOM: {classList:{add:function(_class){},remove:function(_class){}}},
-				_resetPosition: function(snapTime){},
-				ptrLabel: {textContent:''},
-				_ptrTriggered: null,
-				_ptrLoading: null
-			});
+			return Mocks.GetMocks(plugin,stub);
 		}
 
 		[Fact]
@@ -194,6 +196,44 @@ Test.Components.Ui.Scroller.PullToRefreshTests=function(){
 			});
 
 			Assert.True(prependNotCalled && !PTRplugin._ptrLoading);
+		}
+
+		[Fact]
+		function ExecutesErrorCallbackOnError(){
+			var PTRplugin,
+				neededMocks,
+				callback,
+				prependMock,
+				itemsLength=0;
+
+			windowMock(function(){
+				PTRplugin = new plugins.PullToRefresh();
+				PTRplugin.opts = {
+					pullToRefreshConfig:{labelUpdate:''},
+					onPullToRefresh: function(){
+						callback = arguments[0];
+					}
+				};
+
+				neededMocks=mock(PTRplugin);
+
+				neededMocks(function(){
+					PTRplugin._ptrExecTrigger();
+					prependMock=Mocks.GetMock(PTRplugin,"prependItems",function(items){
+						itemsLength=items.length;
+					});
+					prependMock(function(){
+						var mockFn = Stubs.GetMethod(["err"]);
+						var setErrorStateMockFn = Mocks.GetMock(PTRplugin, "_setPTRErrorState", mockFn);
+						setErrorStateMockFn(function(){
+							callback({labelError:'Error'});
+							
+							//once when err='Error' and once when setTimeout runs with err=false
+							Assert.True(mockFn.Calls.length===2);
+						});
+					});
+				});
+			});
 		}
 	}
 }

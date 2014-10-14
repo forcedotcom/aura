@@ -674,6 +674,44 @@
                                 </resources>
                             </configuration>
                         </execution>
+                        <execution>
+                            <!-- m2e replacement for unpacking dependencies -->
+                            <id>copy-xunit</id>
+                            <phase>disabled</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${aura.home}/aura-util/src/test</directory>
+                                        <includes>
+                                            <include>tools/*</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <!-- m2e replacement for unpacking dependencies -->
+                            <id>copy-auraImpl</id>
+                            <phase>disabled</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${xunit.js.auraImpl}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${basedir}</directory>
+                                        <includes>
+                                            <include>src/main/resources/**</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
@@ -916,6 +954,19 @@
                                         <versionRange>[1.0.0,)</versionRange>
                                         <goals>
                                             <goal>enforce</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[1.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

@@ -1,0 +1,3 @@
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel" description="Used by auraStorageTest:initTest.">
+   <div aura:id="output"></div>
+</aura:component>

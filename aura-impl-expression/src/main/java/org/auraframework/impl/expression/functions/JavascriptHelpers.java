@@ -32,7 +32,7 @@ public class JavascriptHelpers {
     public static Number getNumber(double value) {
         if (value == (int)Math.round(value)) {
             return Integer.valueOf((int)value);
-        } else if (value == (long)Math.round(value)) {
+        } else if (value == Math.round(value)) {
             return Long.valueOf((long)value);
         } else {
             return Double.valueOf(value);

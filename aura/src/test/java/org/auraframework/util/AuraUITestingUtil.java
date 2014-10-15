@@ -594,8 +594,33 @@ public class AuraUITestingUtil {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(message).until(addErrorCheck(function));
     }
+    
+    public String appCacheStatusIntToString(Integer ret) {
+    	String status = "Unknown cache state";
+    	switch (ret) {
+        case 0:
+            status = "UNCACHED";
+            break;
+        case 1:
+            status = "IDLE";
+            break;
+        case 2:
+            status = "CHECKING";
+            break;
+        case 3:
+            status = "DOWNLOADING";
+            break;
+        case 4:
+            status = "UPDATEREADY";
+            break;
+        case 5:
+            status = "OBSOLETE";
+            break;
+        }
+    	return status;
+    }
 
-    public void waitForAppCacheReadyCallback() {
+    public void waitForAppCacheReady() {
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
@@ -609,28 +634,7 @@ public class AuraUITestingUtil {
                     @Override
                     public String apply(WebDriver d) {
                         Object ret = getRawEval("return window.applicationCache.status");
-                        String status = "Unknown cache state";
-                        switch (((Long) ret).intValue()) {
-                        case 0:
-                            status = "UNCACHED";
-                            break;
-                        case 1:
-                            status = "IDLE";
-                            break;
-                        case 2:
-                            status = "CHECKING";
-                            break;
-                        case 3:
-                            status = "DOWNLOADING";
-                            break;
-                        case 4:
-                            status = "UPDATEREADY";
-                            break;
-                        case 5:
-                            status = "OBSOLETE";
-                            break;
-                        }
-                        return "Current AppCache status is " + status;
+                        return "Current AppCache status is " + appCacheStatusIntToString(((Long) ret).intValue());
                     }
                 },
                 timeoutInSecs,
@@ -661,7 +665,7 @@ public class AuraUITestingUtil {
     public void waitForAuraInit(final Set<String> expectedErrors) {
         waitForDocumentReady();
         waitForAuraFrameworkReady(expectedErrors);
-        waitForAppCacheReadyCallback();
+        waitForAppCacheReady();
     }
 
     /**

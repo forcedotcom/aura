@@ -18,6 +18,9 @@
 <aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
     <aura:attribute name="testAttr" type="String" default="testValue" />
     <aura:attribute name="testAttr2" type="Integer" default="22" />
+    <aura:attribute name='arrayOfMaps' type="Object[]"/>
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
 
     <!-- Components declared as dependency should create on client if no server dependencies -->
     <aura:dependency resource="aura:renderIf" />

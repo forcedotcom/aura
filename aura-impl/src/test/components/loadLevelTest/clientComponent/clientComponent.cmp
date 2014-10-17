@@ -16,5 +16,9 @@
 
 -->
 <aura:component>
+    <aura:attribute name="first" type="String"/>
+    <aura:attribute name="last" type="String" />
+    <aura:attribute name="arrayOfMaps" type="List" />
+
     Client Component {!globalId}<br/>
 </aura:component>

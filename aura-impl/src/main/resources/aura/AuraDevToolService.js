@@ -476,15 +476,20 @@ var AuraDevToolService = function() {
                  * @returns boolean    - true signifies that it was found
                  */   
              findMatchingId : function (id, tags, attribute2find){
-                 var tagId = null;
+                 var tagIds = null;
                  for(var i = 0; i<tags.length; i++){
-                     tagId = $A.util.getElementAttributeValue(tags[i], attribute2find);
+                     tagIds = $A.util.getElementAttributeValue(tags[i], attribute2find);
                      
-                     if(tagId === id){
-                         return true;
+                     if(!$A.util.isUndefinedOrNull(tagIds)){
+                    	 tagIds = tagIds.trim().split(/\s+/);
+                    	 for(var j = 0; j < tagIds.length; j++){                   	
+	                    	 if(tagIds[j].indexOf(id) == 0){
+	                             return true;
+	                         } 
+                    	 }
                      }
-                 }
-                 
+                     
+                 }                 
                  return false;
              },
             /**

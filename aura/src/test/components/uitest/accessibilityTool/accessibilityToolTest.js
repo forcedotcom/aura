@@ -16,7 +16,6 @@
 ({
     //Excluding IE7/8 because this test will only work with modern browsers
     browsers: ["-IE7", "-IE8"],
-
     
         runTest: function (expected, errorMessage, element, testsToSkip) {
             var output = $A.devToolService.checkAccessibility(element, testsToSkip);
@@ -28,7 +27,7 @@
             $A.test.assertEquals(expected, actual, errorMessage + output);
            
         },
-        //This test is used for checking that we can conditionally skipp checks
+        //This test is used for checking that we can conditionally skip checks
         testRunSpecificChecks: {
             attributes: {
                 caseToRender: 'full'
@@ -40,6 +39,16 @@
                     this.runTest(9, "Unexpected return from CheckAccessibility, should return 3 errors. output: \n", null, ["A11Y_DOM_06", "A11Y_DOM_02", "A11Y_DOM_08"]);
                 }]
         },
+        
+        testMultiInputDefaultULToSingleInput :  {
+        	attributes: {
+                caseToRender: 'testMultiULToOne'
+            },
+            test: function (cmp) {
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+            }
+        },
+        
         testInputDefaultError : {
         	attributes: {
                 caseToRender: 'testInputDefaultError'

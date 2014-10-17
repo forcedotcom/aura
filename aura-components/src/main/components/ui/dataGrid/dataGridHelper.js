@@ -48,7 +48,7 @@
 	 * Initializes columns. 
 	 * Action instances are not ready at provide invocation.
 	 */
-	initializeColumns: function (concrete) {
+	initializeNewColumns: function (concrete) {
 		var columns 				= this.getColumns(concrete),
 			handleColumnSortChange 	= concrete.get('c.handleColumnSortChange'),
 			mode 					= concrete.get('v.mode'),
@@ -126,7 +126,7 @@
     
 	/*
 	 * ================
-	 * Handler Helpers
+	 * Event Handlers
 	 * ================
 	 */
 	
@@ -741,25 +741,7 @@
 			tr = document.createElement('tr');
 			rowData = rowDataArray[rowIndex];
 			
-			for (var colIndex = 0; colIndex < rowData.columnData.length; colIndex++) {
-				colData = rowData.columnData[colIndex];
-				
-				td = document.createElement('td');
-				colData.elementRef = td;
-				key = colData.cellKey;
-				components = colData.components[key];
-				
-				// TODO: This logic doesn't make sense anymore....
-				cdrs = targetComponents[key];
-				if (!cdrs) {
-					cdrs = concrete._row[colIndex];
-				}
-				
-				tr.appendChild(td);
-				
-				// TODO: components might not be empty here if we're using already-created data
-				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
-			}
+			self.renderTableRow(concrete, rowData, tr, isEditMode, false);
 			
 			rowElements.appendChild(tr);
 		}
@@ -798,75 +780,47 @@
 	updateRowsWithNewColumns: function (concrete, rowDataArray, isEditMode) {
 		var self = this,
 			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			rows = concrete.find("tbody").getElement().rows,
+			rowElements = concrete.find("tbody").getElement().rows,
 			tr, td, colData, components, cdrs, rowData;
 		
 		for (var rowIndex = 0; rowIndex < rowDataArray.length; rowIndex++) {
+			tr = rowElements[rowIndex];	
 			rowData = rowDataArray[rowIndex];
-			for (var colIndex = 0; colIndex < targetComponents.length; colIndex++) {
-				colData = rowData.columnData[colIndex];
-				
-				if (!colData) {
-					colData = self.createColumnData(isEditMode);
-					colData.elementRef = document.createElement('td');
-					
-					rows[rowIndex].appendChild(colData.elementRef);
-					rowData.columnData[colIndex] = colData;
-				}
-				
-				td = colData.elementRef;
-				key = colData.cellKey;
-				
-				// TODO: Clean up components
+			
+			self.renderTableRow(concrete, rowData, tr, isEditMode, true);
+		}
+	},
+	
+	renderTableRow: function(concrete, rowData, tr, isEditMode, cleanOldComponents) {
+		var self = this,
+			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
+			colData, td, key, components, cdrs;
+		
+		for (var colIndex = 0; colIndex < targetComponents.length; colIndex++) {
+			colData = rowData.columnData[colIndex];
+			
+			if (!colData) {
+				colData = self.createColumnData(isEditMode);
+				rowData.columnData[colIndex] = colData;
+			}
+			
+			td = colData.elementRef || document.createElement('td');
+			colData.elementRef = td;
+			key = colData.cellKey;
+			
+			if (cleanOldComponents) {
 				$A.util.forEach(colData.components[key], function(cmp) {
 					cmp.destroy();
 				});
 				colData.components[key] = [];
-				components = colData.components[key];
-				
-				cdrs = targetComponents[colIndex];
-				
-				// Can we either create a new component and render it, or just rerender the old component?
-				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
 			}
-		}
-	},
-	
-	renderTableRowsAsync : function(concrete, rowIndex, rowCount, callback) {
-		var self = this;
-		window.setTimeout(function() {
-			for (var i = rowCount-1; i >= 0; i--) {
-				self.renderTableRow(concrete, rowIndex - i, callback);
-			}
-		});
-	},
-	
-	renderTableRow : function(concrete, rowIndex, callback) {
-		var self = this,
-			rowData = concrete._rowData[rowIndex],
-			isEditMode = false,
-			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			resolved = 0,
-			colData, td, components, key, cdrs;
-		
-		for (var colIndex = 0; colIndex < concrete._columnCount; colIndex++) {
-			colData = rowData.columnData[colIndex];
 			
-			td = colData.elementRef;
-			key = colData.cellKey;
 			components = colData.components[key];
+			cdrs = targetComponents[colIndex];
 			
-			cdrs = targetComponents[key];
+			tr.appendChild(td);
 			
-			if (!cdrs) {
-				cdrs = concrete._row[colIndex];
-			}
-			
-			self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components, function () {
-				if (callback && (++resolved === concrete._columnCount)) {
-					callback(tr);
-				}
-			});
+			self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
 		}
 	},
 	
@@ -1214,61 +1168,5 @@
 				}
 			}
 		}
-	},
-	
-	/**
-	 * Creates a table row and returns the element.
-	 *
-	 * @param {Component} concrete 
-	 * @param {Object} item 
-	 * @param {Integer} index Where the item should exist. If an item already exists, perform insert and shift logic.
-	 */
-	/*
-	createTableRow: function (concrete, item, rowIndex, asyncParams, callback) {
-		var self 			 = this, 
-			rowData			 = concrete._rowData[rowIndex],
-			//mode 			 = concrete.get('v.mode'),
-			isEditMode 		 = false, //mode.indexOf('EDIT') === 0,
-			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			resolved = 0,
-			asyncParamsExist = !$A.util.isUndefinedOrNull(asyncParams),
-			key, cdrs, tr, td, components, colData;
-		
-		tr = document.createElement('tr');
-
-		// Generate row's cells
-		for (var colIndex = 0; colIndex < rowData.columnData.length; colIndex++) {
-			colData = rowData.columnData[colIndex];
-			
-			td = document.createElement('td');
-			colData.elementRef = td;
-			key = colData.cellKey;
-			components = colData.components[key];
-			
-			cdrs = targetComponents[key];
-			if (!cdrs) {
-				cdrs = concrete._row[colIndex];
-			}
-			
-			tr.appendChild(td);
-			
-			// Create and render the components synchronously
-			if (asyncParamsExist && !asyncParams.renderAsync) {
-				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components, function () {
-					if (callback && (++resolved === concrete._columnCount)) {
-						callback(tr);
-					}
-				});
-			}
-		}
-		
-		if (asyncParamsExist && asyncParams.renderAsync) {
-			// Only render the rows async if we're at the end of a batch
-			if (self.shouldBatchRender(asyncParams.batchCount, rowIndex)) {
-				self.renderTableRowsAsync(concrete, rowIndex, asyncParams.batchCount, callback);
-			}
-		}
-		
-		return tr;
-	},*/
+	}
 });

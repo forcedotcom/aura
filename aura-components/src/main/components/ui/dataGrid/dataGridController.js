@@ -40,7 +40,7 @@
 		hlp.initializeCaches(cmp);
 		hlp.initializeActionDelegate(cmp);
 		//if (cmp.get("v.columns")) {
-			hlp.initializeColumns(cmp);
+			hlp.initializeNewColumns(cmp);
 			hlp.generateNewItemShape(cmp);
 			//hlp.deriveItemShape(cmp);
 		//}
@@ -63,7 +63,7 @@
 	
 	handleColumnsChange: function(cmp, evt, helper) {
 		var concrete = cmp.getConcreteComponent();
-		helper.initializeColumns(concrete);
+		helper.initializeNewColumns(concrete);
 		helper.updateRowsWithNewColumns(concrete, concrete._rowData, false);
 	},
 

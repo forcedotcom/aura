@@ -115,24 +115,6 @@ public interface DefinitionService extends AuraService, SourceListener {
     MasterDefRegistry getDefRegistry();
 
     /**
-     * [Temporary] Get the latest timestamp for a given descriptor.
-     * 
-     * This will check all dependencies of the definition.
-     * 
-     * @param descriptor the descriptor to check.
-     */
-    <T extends Definition> long getLastMod(DefDescriptor<T> desc) throws QuickFixException;
-
-    /**
-     * Get the latest timestamp for a given uid.
-     * 
-     * This will check all dependencies of the definition.
-     * 
-     * @param descriptor the descriptor to check.
-     */
-    long getLastMod(String uid) throws QuickFixException;
-    
-    /**
      * Given a {@link DefDescriptor} that contains search patterns or wildcards,
      * return a set of Descriptors for all existing Definitions who have source
      * that exists. Does not compile the definitions if they were not already

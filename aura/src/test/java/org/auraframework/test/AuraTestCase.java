@@ -132,9 +132,8 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (current != null) {
             service.endContext();
         }
-        AuraContext newContext = service.startContext(context.getMode(), context.getFormat(), context.getAccess(),
+        service.startContext(context.getMode(), context.getFormat(), context.getAccess(),
                 context.getApplicationDescriptor());
-        newContext.setLastMod(context.getLastMod());
     }
 
     /**

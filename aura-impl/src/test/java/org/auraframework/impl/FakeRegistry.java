@@ -106,11 +106,6 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public long getLastMod(String uid) {
-        return 0;
-    }
-
-    @Override
     public Set<DefDescriptor<?>> getDependencies(String uid) {
         return null;
     }

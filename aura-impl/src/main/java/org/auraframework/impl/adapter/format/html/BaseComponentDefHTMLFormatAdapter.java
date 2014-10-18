@@ -27,7 +27,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.BaseComponent;
@@ -63,8 +62,6 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             writeHtmlStyles(AuraServlet.getStyles(), sb);
             attributes.put("auraStyleTags", sb.toString());
             AuraContext context = Aura.getContextService().getCurrentContext();
-
-            attributes.put("lastMod", Long.toString(AuraBaseServlet.getLastMod()));
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {

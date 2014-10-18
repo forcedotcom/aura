@@ -179,10 +179,6 @@ public class AuraArchetypeSimpleTestMANUAL extends AuraHttpTestCase {
         String body = getResponseBody(httpResponse);
         get.releaseConnection();
 
-        // strip lastmod values
-        body = body.replaceFirst(" data-lm=\"[^\"]+\"", "");
-        body = body.replaceFirst("lastmod%22%3A%22\\d+", "");
-
         goldFileText(body, "-sample.html");
     }
 

@@ -506,7 +506,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     AuraContext context = Aura.getContextService().getCurrentContext();
                     if (context != null) {
                         StringBuilder sb = new StringBuilder();
-                        context.setSerializeLastMod(false);
                         context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
                         Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
                         params.put("aura.context", sb.toString());

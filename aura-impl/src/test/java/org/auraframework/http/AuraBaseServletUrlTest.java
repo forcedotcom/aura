@@ -91,7 +91,6 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setSerializeLastMod(false);
         return ctx;
     }
 
@@ -112,7 +111,6 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
-        ctx.setSerializeLastMod(false);
         return ctx;
     }
 

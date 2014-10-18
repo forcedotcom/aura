@@ -28,25 +28,23 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * A dependency entry for a uid+descriptor.
- * 
+ *
  * This entry is created for each descriptor that a context uses at the top level. It is cached globally and
  * locally. The second version of the entry (with a quick fix) is only ever cached locally.
- * 
+ *
  * all values are final, and unmodifiable.
  */
 public class DependencyEntry {
     public final String uid;
-    public final long lastModTime;
     public final Set<DefDescriptor<?>> dependencies;
     public final List<ClientLibraryDef> clientLibraries;
     public final QuickFixException qfe;
 
-    public DependencyEntry(String uid, Set<DefDescriptor<? extends Definition>> dependencies, long lastModTime,
+    public DependencyEntry(String uid, Set<DefDescriptor<? extends Definition>> dependencies,
                            List<ClientLibraryDef> clientLibraries) {
         this.uid = uid;
         this.dependencies = dependencies;
         this.clientLibraries = Collections.unmodifiableList(clientLibraries);
-        this.lastModTime = lastModTime;
         this.qfe = null;
     }
 
@@ -54,7 +52,6 @@ public class DependencyEntry {
         this.uid = null;
         this.dependencies = null;
         this.clientLibraries = null;
-        this.lastModTime = 0;
         this.qfe = qfe;
     }
 
@@ -67,9 +64,6 @@ public class DependencyEntry {
         if (qfe != null) {
             sb.append(qfe);
         } else {
-            sb.append("[");
-            sb.append(lastModTime);
-            sb.append("] :");
             sb.append(dependencies);
         }
         return sb.toString();

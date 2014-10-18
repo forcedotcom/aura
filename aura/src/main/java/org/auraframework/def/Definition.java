@@ -104,14 +104,9 @@ public interface Definition extends JsonSerializable, Serializable {
      */
     Location getLocation();
 
-    // Visibility is deprecated: replaced by ACCESS=global/public/private
-    @Deprecated
-    public enum Visibility{
-        PRIVATE,PUBLIC,INVALID
-    };
-
-    Visibility getVisibility();
-    
+    /**
+     * @return the access permisions for this definition.
+     */
     DefinitionAccess getAccess(); 
 
     /**

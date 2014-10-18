@@ -28,7 +28,6 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -207,31 +206,6 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         } catch (Throwable t) {
             assertExceptionMessage(t, AuraRuntimeException.class, "QualifiedName is required for descriptors");
         }
-    }
-
-    public void testVisibility() throws Exception {
-        AttributeDefImpl ad = getElement("<aura:attribute name='vis' type='String'/>");
-        assertEquals(Visibility.PUBLIC, ad.getVisibility());
-    }
-
-    public void testVisibilityMixedCase() throws Exception {
-        AttributeDefImpl ad = getElement("<aura:attribute name='vis' type='String' visibility='PrivatE'/>");
-        assertEquals(Visibility.PRIVATE, ad.getVisibility());
-    }
-
-    public void testVisibilityPadded() throws Exception {
-        AttributeDefImpl ad = getElement("<aura:attribute name='vis' type='String' visibility=' private '/>");
-        assertEquals(Visibility.PRIVATE, ad.getVisibility());
-    }
-
-    public void testVisibilityInvalid() throws Exception {
-        AttributeDefImpl ad = getElement("<aura:attribute name='vis' type='String' visibility='invisible'/>");
-        assertEquals(Visibility.INVALID, ad.getVisibility());
-    }
-
-    public void testVisibilityEmptyString() throws Exception {
-        AttributeDefImpl ad = getElement("<aura:attribute name='vis' type='String' visibility=''/>");
-        assertEquals(Visibility.INVALID, ad.getVisibility());
     }
 
     private XMLStreamReader getXmlReader(StringSource<AttributeDef> attributeSource) throws FactoryConfigurationError,

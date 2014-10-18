@@ -89,7 +89,7 @@ public class ConcreteProvider implements ComponentConfigProvider {
             DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
             attributeDefs.put(DefDescriptorImpl.getInstance("whatToDo", AttributeDef.class), new AttributeDefImpl(
                     DefDescriptorImpl.getInstance("whatToDo", AttributeDef.class), null, type, null, true,
-                    AttributeDef.SerializeToType.BOTH, null, null));
+                    AttributeDef.SerializeToType.BOTH, null));
 			builder.attributeDefs = attributeDefs;
             ComponentDef cmpDef = builder.build();
             AuraContext context = Aura.getContextService().getCurrentContext();

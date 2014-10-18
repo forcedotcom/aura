@@ -155,7 +155,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public void setUp() throws Exception {
             super.setUp();
             expectedAttrsInCustomNS = Sets.newHashSet("access", "default", "description", "name", "required", "type");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("serializeTo", "visibility");//TODO support?
+            expectedAttrsInPrivilegedNS = Sets.newHashSet("serializeTo");//TODO support?
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
         }
         @Override

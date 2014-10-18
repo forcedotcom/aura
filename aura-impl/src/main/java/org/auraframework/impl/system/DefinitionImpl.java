@@ -50,38 +50,36 @@ import com.google.common.collect.Maps;
 public abstract class DefinitionImpl<T extends Definition> implements Definition, Serializable {
 
     private static final long serialVersionUID = 5836732915093913670L;
-
+    
     protected final DefDescriptor<T> descriptor;
     protected final Location location;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
     protected final String apiVersion;
     protected final String description;
 
-    protected final Visibility visibility;
 
     private final QuickFixException parseError;
     private final String ownHash;
     private final DefinitionAccess access;
     private boolean valid;
 
-    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, Visibility visibility) {
-        this(descriptor, location, null, null, null, visibility, null, null, null);
+    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location) {
+        this(descriptor, location, null, null, null, null, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
         this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.apiVersion, builder.description,
-                builder.visibility, builder.getAccess(), builder.getOwnHash(), builder.getParseError());
+                builder.getAccess(), builder.getOwnHash(), builder.getParseError());
     }
 
     DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
-            String apiVersion, String description, Visibility visibility, DefinitionAccess access, String ownHash,
+            String apiVersion, String description, DefinitionAccess access, String ownHash,
             QuickFixException parseError) {
         this.descriptor = descriptor;
         this.location = location;
         this.subDefs = subDefs;
         this.apiVersion = apiVersion;
         this.description = description;
-        this.visibility = visibility;
         this.ownHash = ownHash;
         this.parseError = parseError;
         this.access = access == null ? DefinitionAccessImpl.defaultAccess(descriptor != null ? descriptor.getNamespace() : null) : access;
@@ -104,13 +102,8 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     }
 
     @Override
-    public Visibility getVisibility(){
-        return visibility == null ? Visibility.PUBLIC : visibility;
-    }
-
-    @Override
     public DefinitionAccess getAccess() {
-        return access;
+    	return access;
     }
 
     /**
@@ -153,10 +146,6 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         }
         if (descriptor == null) {
             throw new InvalidDefinitionException("No descriptor", location);
-        }
-
-        if (this.visibility == Visibility.INVALID) {
-            throw new InvalidDefinitionException("Invalid visibility value", getLocation());
         }
     }
 
@@ -206,7 +195,6 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     };
 
     public abstract static class RefBuilderImpl<T extends Definition, A extends Definition> implements DefBuilder<T, A> {
-        public Visibility visibility;
         private boolean descriptorLocked;
         public DefDescriptor<T> descriptor;
         public Location location;
@@ -253,15 +241,6 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
 
         public Location getLocation() {
             return this.location;
-        }
-
-        public RefBuilderImpl<T, A> setVisibility(Visibility visibility) {
-            this.visibility = visibility;
-            return this;
-        }
-
-        public Visibility getVisibility(){
-            return this.visibility;
         }
 
         public RefBuilderImpl<T, A> addSubDef(SubDefDescriptor<?, T> sddesc, Definition inner) {
@@ -377,7 +356,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
      */
     protected void retrieveLabels(Collection<PropertyReference> props) throws QuickFixException {
         GlobalValueProvider labelProvider;
-
+        
         labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL.getPrefix());
         for (PropertyReference e : props) {
             if (e.getRoot().equals(LABEL.getPrefix())) {

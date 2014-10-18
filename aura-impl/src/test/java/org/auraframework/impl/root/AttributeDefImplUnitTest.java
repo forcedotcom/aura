@@ -22,7 +22,6 @@ import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl.Builder;
@@ -37,9 +36,7 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;
 
-@SuppressWarnings("deprecation")
-public class AttributeDefImplUnitTest extends
-DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
+public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
 
     @Mock
     protected DefDescriptor<? extends RootDefinition> parentDescriptor;
@@ -108,10 +105,10 @@ DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
     }
 
     public void testSerializeDefaultValue() throws Exception {
-        this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
+    	this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
         Json json = Mockito.mock(Json.class);
         AttributeDef def = buildDefinition();
-        def.serialize(json);
+		def.serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
         inOrder.verify(json).writeMapBegin();
         inOrder.verify(json).writeMapEntry("default", "Hello");
@@ -157,35 +154,6 @@ DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
             fail("Expected an exception for SerializeToType.INVALID");
         } catch (Exception e) {
             assertExceptionMessage(e, InvalidDefinitionException.class, "Invalid serializeTo value");
-        }
-    }
-
-    @Override
-    public void testValidateDefinitionInvalidVisibility() throws Exception {
-        super.testValidateDefinitionInvalidVisibility();
-    }
-
-    public void testValidateDefinitionRequiredAndPublicVisibility() throws Exception {
-        this.required = true;
-        this.visibility = Visibility.PUBLIC;
-        buildDefinition().validateDefinition();
-    }
-
-    public void testValidateDefinitionNotRequiredAndPrivateVisibility() throws Exception {
-        this.required = false;
-        this.visibility = Visibility.PRIVATE;
-        buildDefinition().validateDefinition();
-    }
-
-    public void testValidateDefinitionRequiredAndPrivateVisibility() throws Exception {
-        this.required = true;
-        this.visibility = Visibility.PRIVATE;
-        try {
-            buildDefinition().validateDefinition();
-            fail("Expected an exception for a required and private attribute");
-        } catch (Exception e) {
-            assertExceptionMessage(e, InvalidDefinitionException.class,
-                    "Cannot set an attribute as required and private");
         }
     }
 

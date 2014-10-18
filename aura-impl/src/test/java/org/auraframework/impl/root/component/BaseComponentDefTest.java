@@ -232,7 +232,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef("testAttributeDescriptorName", "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0), null));
+                        vendor.makeLocation("filename1", 5, 5, 0)));
         List<ComponentDefRef> testChildren = ImmutableList.of(vendor.makeComponentDefRefWithNulls(
                 vendor.makeComponentDefDescriptor("test:text"), null, vendor.makeLocation("filename2", 10, 10, 0)));
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),

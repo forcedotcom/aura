@@ -40,6 +40,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
@@ -501,13 +502,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 // validate that its a foreachs
             } else if (vpt == AuraValueProviderType.VIEW) {
                 if (e.getStem() != null) { // checks for private attributes used in expressions ..
-                    String stem = e.getStem().toString();
-                    AttributeDef attr = getAttributeDef(stem);
-                    if ((attr != null) && (attr.getVisibility() == Visibility.PRIVATE)
-                            && (!this.attributeDefs.values().contains(attr))) {
-                        throw new InvalidDefinitionException(String.format(
-                                "Expression %s refers to a private attribute '%s' ", e, attr), e.getLocation());
-                    }
+                    //String stem = e.getStem().toString();
+                    //AttributeDef attr = getAttributeDef(stem);
+                    // FIXME?(GPO) can we check access for attributes here?
                 }
             } else {
                 AuraContext lc = Aura.getContextService().getCurrentContext();

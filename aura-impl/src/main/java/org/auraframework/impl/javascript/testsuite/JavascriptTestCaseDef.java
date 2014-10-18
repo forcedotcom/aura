@@ -42,7 +42,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
             Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
             List<Object> mocks, Set<String> auraErrorsExpectedDuringInit, String scrumTeam, String owner) {
         super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
-                TestCaseDef.class), location, null);
+                TestCaseDef.class), location);
         this.suiteDescriptor = suiteDescriptor;
         this.attributes = attributes == null ? null : AuraUtil.immutableMap(attributes);
         this.defType = defType;

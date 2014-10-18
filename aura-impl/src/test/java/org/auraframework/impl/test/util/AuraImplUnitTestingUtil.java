@@ -36,7 +36,6 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DocumentationDef;
@@ -99,60 +98,60 @@ public class AuraImplUnitTestingUtil {
     private static final EventType defaultEventType = EventType.COMPONENT;
 
     public String getAttributeName() {
-        return defaultAttributeName;
+            return defaultAttributeName;
     }
 
     public DefDescriptor<AttributeDef> getAttributeDescriptor() {
-        return DefDescriptorImpl.getInstance(defaultAttributeName,
-                AttributeDef.class);
+            return DefDescriptorImpl.getInstance(defaultAttributeName,
+                            AttributeDef.class);
     }
 
     public String getAttributeValue() {
-        return defaultAttributeValue;
+            return defaultAttributeValue;
     }
 
     public DefDescriptor<ControllerDef> getClientControllerDescriptor() {
-        return DefDescriptorImpl.getInstance("javascript://client.controller",
-                ControllerDef.class);
+            return DefDescriptorImpl.getInstance("javascript://client.controller",
+                            ControllerDef.class);
     }
 
     public DefDescriptor<RendererDef> getRendererDescriptor() {
-        return DefDescriptorImpl.getInstance("js://test.renderer",
-                RendererDef.class);
+            return DefDescriptorImpl.getInstance("js://test.renderer",
+                            RendererDef.class);
     }
 
     public DefDescriptor<StyleDef> getStyleDescriptor() {
-        return DefDescriptorImpl.getInstance("css://test.fakeComponent",
-                StyleDef.class);
+            return DefDescriptorImpl.getInstance("css://test.fakeComponent",
+                            StyleDef.class);
     }
 
     public DefDescriptor<ApplicationDef> getApplicationDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeApplication",
-                ApplicationDef.class);
+            return DefDescriptorImpl.getInstance("test:fakeApplication",
+                            ApplicationDef.class);
     }
 
     public DefDescriptor<ComponentDef> getComponentDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeComponent",
-                ComponentDef.class);
+            return DefDescriptorImpl.getInstance("test:fakeComponent",
+                            ComponentDef.class);
     }
-
+    
     public DefDescriptor<DocumentationDef> getDocumentationDefDescriptor() {
         return DefDescriptorImpl.getInstance("test:fakeDoc",
-                DocumentationDef.class);
+                        DocumentationDef.class);
     }
 
     public DefDescriptor<ComponentDef> getParentComponentDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeComponentParent",
-                ComponentDef.class);
+            return DefDescriptorImpl.getInstance("test:fakeComponentParent",
+                            ComponentDef.class);
     }
 
     public DefDescriptor<ComponentDef> getChildComponentDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakecomponentChild",
-                ComponentDef.class);
+            return DefDescriptorImpl.getInstance("test:fakecomponentChild",
+                            ComponentDef.class);
     }
 
     public DefDescriptor<ThemeDef> getThemeDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class);
+            return DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class);
     }
 
     public DefDescriptor<ComponentDef> getFlavorableComponentDescriptor() {
@@ -164,17 +163,17 @@ public class AuraImplUnitTestingUtil {
     }
 
     public String getComponentName() {
-        return defaultComponentName;
+            return defaultComponentName;
     }
 
     public DefDescriptor<InterfaceDef> getInterfaceDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeInterface",
-                InterfaceDef.class);
+            return DefDescriptorImpl.getInstance("test:fakeInterface",
+                            InterfaceDef.class);
     }
 
     public DefDescriptor<InterfaceDef> getParentInterfaceDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeParentInterface",
-                InterfaceDef.class);
+            return DefDescriptorImpl.getInstance("test:fakeParentInterface",
+                            InterfaceDef.class);
     }
 
     public Location getLocation() {
@@ -296,13 +295,8 @@ public class AuraImplUnitTestingUtil {
             }
 
             @Override
-            public Visibility getVisibility() {
-                return Visibility.PUBLIC;
-            }
-
-            @Override
             public DefinitionAccess getAccess() {
-                return null;
+            	return null;
             }
 
             @Override
@@ -312,55 +306,55 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<EventDef> getEventDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
+            return DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
     }
     public DefDescriptor<EventDef> getParentEventDefDescriptor() {
-        return DefDescriptorImpl
-                .getInstance("test:parentEvent", EventDef.class);
+            return DefDescriptorImpl
+                            .getInstance("test:parentEvent", EventDef.class);
     }
 
     public EventType getEventType() {
-        return defaultEventType;
+            return defaultEventType;
     }
 
     public DefDescriptor<ControllerDef> getControllerDescriptor() {
-        return DefDescriptorImpl.getInstance(
+            return DefDescriptorImpl.getInstance(
                 "java://org.auraframework.components.test.java.controller.TestController",
-                ControllerDef.class);
+                            ControllerDef.class);
     }
 
     public DefDescriptor<ModelDef> getModelDescriptor() {
-        return DefDescriptorImpl.getInstance(
-                "java://org.auraframework.impl.model.java.TestModel",
-                ModelDef.class);
+            return DefDescriptorImpl.getInstance(
+                            "java://org.auraframework.impl.model.java.TestModel",
+                            ModelDef.class);
     }
 
     public AttributeImpl makeAttribute(String name) {
-        return new AttributeImpl(DefDescriptorImpl.getInstance(
-                name == null ? defaultAttributeName : name, AttributeDef.class));
+            return new AttributeImpl(DefDescriptorImpl.getInstance(
+                            name == null ? defaultAttributeName : name, AttributeDef.class));
     }
 
     public AttributeDefImpl makeAttributeDef() {
-        return makeAttributeDef(null, null, null, false, null, null, null);
+            return makeAttributeDef(null, null, null, false, null, null);
     }
 
     public ClientLibraryDef makeClientLibraryDef(String name, String url,
-            ClientLibraryDef.Type type,
-            Set<AuraContext.Mode> modes,
-            boolean combine,
-            DefDescriptor<? extends RootDefinition> parentDescriptor,
-            Location location) {
+                                                 ClientLibraryDef.Type type,
+                                                 Set<AuraContext.Mode> modes,
+                                                 boolean combine,
+                                                 DefDescriptor<? extends RootDefinition> parentDescriptor,
+                                                 Location location) {
         ClientLibraryDefImpl.Builder builder = new ClientLibraryDefImpl.Builder();
-
+    
         builder.setName(name);
         builder.setUrl(url);
         builder.setType(type);
         builder.setModes(modes);
         builder.setCombine(combine);
-
+    
         builder.setParentDescriptor(parentDescriptor);
         builder.setLocation(location);
-
+    
         return builder.build();
     }
 
@@ -370,38 +364,35 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public AttributeDefImpl makeAttributeDef(String name,
-            DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRefImpl defaultValue, boolean required,
-            SerializeToType serializeTo, Location location,
-            Visibility visibility) {
+                    DefDescriptor<TypeDef> typeDefDescriptor,
+                    AttributeDefRefImpl defaultValue, boolean required,
+                    SerializeToType serializeTo, Location location) {
         return new AttributeDefImpl(
-                DefDescriptorImpl.getInstance(
-                        name == null ? defaultAttributeName : name,
-                                AttributeDef.class), null,
-                                typeDefDescriptor == null ? getTypeDef().getDescriptor()
-                                        : typeDefDescriptor,
-                                        defaultValue == null ? makeAttributeDefRef(null, null, null)
-                                                : defaultValue, required,
-                                                serializeTo == null ? AttributeDef.SerializeToType.BOTH
-                                                        : serializeTo, location == null ? getLocation()
-                                                                : location, visibility == null ? Visibility.PUBLIC
-                                                                        : visibility);
+                            DefDescriptorImpl.getInstance(
+                                            name == null ? defaultAttributeName : name,
+                                            AttributeDef.class), null,
+                            typeDefDescriptor == null ? getTypeDef().getDescriptor()
+                                            : typeDefDescriptor,
+                            defaultValue == null ? makeAttributeDefRef(null, null, null)
+                                            : defaultValue, required,
+                            serializeTo == null ? AttributeDef.SerializeToType.BOTH
+                                            : serializeTo, location == null ? getLocation()
+                                            : location);
     }
 
     public AttributeDefImpl makeAttributeDefWithNulls(String name,
-            DefDescriptor<? extends RootDefinition> parentDescriptor,
-            DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRefImpl defaultValue, boolean required,
-            SerializeToType serializeTo, Location location,
-            Visibility visibility) {
+                    DefDescriptor<? extends RootDefinition> parentDescriptor,
+                    DefDescriptor<TypeDef> typeDefDescriptor,
+                    AttributeDefRefImpl defaultValue, boolean required,
+                    SerializeToType serializeTo, Location location) {
         return new AttributeDefImpl(DefDescriptorImpl.getInstance(name,
-                AttributeDef.class), parentDescriptor, typeDefDescriptor,
-                defaultValue, required, serializeTo, location, visibility);
+                            AttributeDef.class), parentDescriptor, typeDefDescriptor,
+                            defaultValue, required, serializeTo, location);
     }
 
     public DependencyDef makeDependencyDef(
-            DefDescriptor<? extends RootDefinition> parentDescriptor,
-            String resource, String type, Location location) {
+                    DefDescriptor<? extends RootDefinition> parentDescriptor,
+                    String resource, String type, Location location) {
         DependencyDefImpl.Builder builder;
 
         builder = new DependencyDefImpl.Builder();
@@ -425,7 +416,7 @@ public class AuraImplUnitTestingUtil {
 
         AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
         atBuilder.setDescriptor(DefDescriptorImpl.getInstance(name == null ? defaultAttributeName : name,
-                AttributeDef.class));
+                                        AttributeDef.class));
         atBuilder.setLocation((location == null) ? getLocation() : location);
         atBuilder.setValue((value == null) ? defaultAttributeValue : value);
 
@@ -433,7 +424,7 @@ public class AuraImplUnitTestingUtil {
     }
 
     public AttributeDefRefImpl makeAttributeDefRefWithNulls(String name,
-            Object value, Location location) {
+                    Object value, Location location) {
         AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
         atBuilder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
         atBuilder.setLocation(location);
@@ -442,82 +433,81 @@ public class AuraImplUnitTestingUtil {
     }
 
     public Component makeComponent(String name, String globalId)
-            throws QuickFixException {
+                    throws QuickFixException {
         return Aura.getInstanceService().getInstance(DefDescriptorImpl.getInstance(name == null ? defaultComponentName : name,
-                ComponentDef.class), null);
+                                            ComponentDef.class), null);
     }
 
     public ComponentDef makeComponentDef() {
-        return makeComponentDef(null, null, null, null, null, null, null, null,
-                null, null, null, null, false, false);
+            return makeComponentDef(null, null, null, null, null, null, null, null,
+                            null, null, null, null, false, false);
     }
 
     public ComponentDef makeComponentDef(
-            DefDescriptor<ComponentDef> descriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor) {
+                    DefDescriptor<ComponentDef> descriptor,
+                    DefDescriptor<ComponentDef> extendsDescriptor) {
         return makeComponentDef(descriptor, null, null, null, null, null, null,
-                extendsDescriptor, null, null, false, false);
+                        extendsDescriptor, null, null, false, false);
     }
 
     public ComponentDef makeComponentDef(
-            DefDescriptor<ComponentDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs,
-            List<ComponentDefRef> children, Location location,
-            DefDescriptor<ControllerDef> controllerDescriptor,
-            DefDescriptor<ModelDef> modelDescriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor) {
+                    DefDescriptor<ComponentDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs,
+                    List<ComponentDefRef> children, Location location,
+                    DefDescriptor<ControllerDef> controllerDescriptor,
+                    DefDescriptor<ModelDef> modelDescriptor,
+                    DefDescriptor<ComponentDef> extendsDescriptor) {
 
-        if (attributeDefs == null) {
-            attributeDefs = new HashMap<>();
-            attributeDefs.put(getAttributeDescriptor(),
-                    makeAttributeDef(null, null, null, false, null,
-                            null, null));
-        }
+            if (attributeDefs == null) {
+                    attributeDefs = new HashMap<>();
+                    attributeDefs.put(getAttributeDescriptor(),
+                                                    makeAttributeDef(null, null, null, false, null, null));
+            }
 
-        if (eventDefs == null) {
-            eventDefs = new HashMap<>();
-            eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
-        }
+            if (eventDefs == null) {
+                    eventDefs = new HashMap<>();
+                    eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
+            }
 
-        if (children == null) {
-            children = new ArrayList<>();
-            children.add(makeComponentDefRef(getChildComponentDefDescriptor(),
-                    null, null));
-        }
+            if (children == null) {
+                    children = new ArrayList<>();
+                    children.add(makeComponentDefRef(getChildComponentDefDescriptor(),
+                                    null, null));
+            }
 
-        return makeComponentDef(
-                descriptor == null ? getComponentDefDescriptor() : descriptor,
-                        attributeDefs, eventDefs, children,
-                        location == null ? getLocation() : location,
-                                controllerDescriptor == null ? getControllerDescriptor()
-                                        : controllerDescriptor,
-                                        modelDescriptor == null ? getModelDescriptor()
-                                                : modelDescriptor,
-                                                extendsDescriptor == null ? getParentComponentDefDescriptor()
-                                                        : extendsDescriptor, null, null, false, false);
+            return makeComponentDef(
+                            descriptor == null ? getComponentDefDescriptor() : descriptor,
+                            attributeDefs, eventDefs, children,
+                            location == null ? getLocation() : location,
+                            controllerDescriptor == null ? getControllerDescriptor()
+                                            : controllerDescriptor,
+                            modelDescriptor == null ? getModelDescriptor()
+                                            : modelDescriptor,
+                            extendsDescriptor == null ? getParentComponentDefDescriptor()
+                                            : extendsDescriptor, null, null, false, false);
     }
 
     private void addAttributes(RootDefinitionImpl.Builder<?> builder,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs) {
-        if (attributeDefs == null) {
-            return;
-        }
-        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : attributeDefs
-                .entrySet()) {
-            builder.addAttributeDef(entry.getKey(), entry.getValue());
-        }
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs) {
+            if (attributeDefs == null) {
+                    return;
+            }
+            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : attributeDefs
+                            .entrySet()) {
+                    builder.addAttributeDef(entry.getKey(), entry.getValue());
+            }
     }
 
     private void addAttributes(ComponentDefRefImpl.Builder builder,
-            Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeDefs) {
-        if (attributeDefs == null) {
-            return;
-        }
-        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeDefs
-                .entrySet()) {
-            builder.setAttribute(entry.getKey(), entry.getValue());
-        }
+                    Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeDefs) {
+            if (attributeDefs == null) {
+                    return;
+            }
+            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeDefs
+                            .entrySet()) {
+                    builder.setAttribute(entry.getKey(), entry.getValue());
+            }
     }
 
     /**
@@ -526,100 +516,93 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public ComponentDef makeComponentDef(
-            DefDescriptor<ComponentDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs,
-            List<ComponentDefRef> children, Location location,
-            DefDescriptor<ControllerDef> controllerDescriptor,
-            DefDescriptor<ModelDef> modelDescriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor,
-            Set<DefDescriptor<InterfaceDef>> interfaces,
-            List<EventHandlerDef> eventHandlers, boolean isAbstract,
-            boolean isExtensible) {
+                    DefDescriptor<ComponentDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs,
+                    List<ComponentDefRef> children, Location location,
+                    DefDescriptor<ControllerDef> controllerDescriptor,
+                    DefDescriptor<ModelDef> modelDescriptor,
+                    DefDescriptor<ComponentDef> extendsDescriptor,
+                    Set<DefDescriptor<InterfaceDef>> interfaces,
+                    List<EventHandlerDef> eventHandlers, boolean isAbstract,
+                    boolean isExtensible) {
 
-        ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
+            ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
 
-        if (attributeDefs == null) {
-            attributeDefs = new HashMap<>();
-            attributeDefs
-            .put(getAttributeDescriptor(),
-                    makeAttributeDef(null, null, null, false, null,
-                            null, null));
-        }
-        addAttributes(builder, attributeDefs);
+            if (attributeDefs == null) {
+                    attributeDefs = new HashMap<>();
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            }
+            addAttributes(builder, attributeDefs);
 
-        if (eventDefs == null) {
-            eventDefs = new HashMap<>();
-            eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
-        }
-        builder.events = eventDefs;
+            if (eventDefs == null) {
+                    eventDefs = new HashMap<>();
+                    eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
+            }
+            builder.events = eventDefs;
 
-        if (interfaces == null) {
-            interfaces = new HashSet<>();
-            interfaces.add(getInterfaceDefDescriptor());
-        }
-        builder.interfaces = interfaces;
+            if (interfaces == null) {
+                    interfaces = new HashSet<>();
+                    interfaces.add(getInterfaceDefDescriptor());
+            }
+            builder.interfaces = interfaces;
 
-        List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
-        cd.add(controllerDescriptor == null ? getControllerDescriptor()
-                : controllerDescriptor);
-        builder.controllerDescriptors = cd;
+            List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
+        cd.add(controllerDescriptor == null ? getControllerDescriptor() : controllerDescriptor);
+            builder.controllerDescriptors = cd;
 
-        builder.setDescriptor((descriptor == null) ? getComponentDefDescriptor()
-                : descriptor);
-        builder.setLocation((location == null) ? getLocation() : location);
-        builder.modelDefDescriptor = modelDescriptor == null ? getModelDescriptor()
-                : modelDescriptor;
-        builder.extendsDescriptor = extendsDescriptor == null ? getParentComponentDefDescriptor()
-                : extendsDescriptor;
-        builder.eventHandlers = eventHandlers;
-        builder.isAbstract = isAbstract;
-        builder.isExtensible = isExtensible;
-        return builder.build();
+        builder.setDescriptor((descriptor == null) ? getComponentDefDescriptor() : descriptor);
+            builder.setLocation((location == null) ? getLocation() : location);
+        builder.modelDefDescriptor = modelDescriptor == null ? getModelDescriptor() : modelDescriptor;
+        builder.extendsDescriptor = extendsDescriptor == null ? getParentComponentDefDescriptor() : extendsDescriptor;
+            builder.eventHandlers = eventHandlers;
+            builder.isAbstract = isAbstract;
+            builder.isExtensible = isExtensible;
+            return builder.build();
     }
 
     public <T extends BaseComponentDef> T makeBaseComponentDefWithNulls(
-            Class<T> defClass, String descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs,
-            List<ComponentDefRef> children, Location location,
-            DefDescriptor<ControllerDef> controllerDescriptor,
-            DefDescriptor<ModelDef> modelDescriptor,
-            DefDescriptor<T> extendsDescriptor,
-            Set<DefDescriptor<InterfaceDef>> interfaces,
-            List<DefDescriptor<RendererDef>> renderers,
-            List<DefDescriptor<HelperDef>> helpers,
-            List<EventHandlerDef> eventHandlers, boolean isAbstract,
-            boolean isExtensible) throws QuickFixException {
+                    Class<T> defClass, String descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs,
+                    List<ComponentDefRef> children, Location location,
+                    DefDescriptor<ControllerDef> controllerDescriptor,
+                    DefDescriptor<ModelDef> modelDescriptor,
+                    DefDescriptor<T> extendsDescriptor,
+                    Set<DefDescriptor<InterfaceDef>> interfaces,
+                    List<DefDescriptor<RendererDef>> renderers,
+                    List<DefDescriptor<HelperDef>> helpers,
+                    List<EventHandlerDef> eventHandlers, boolean isAbstract,
+                    boolean isExtensible) throws QuickFixException {
 
-        @SuppressWarnings("unchecked")
-        BaseComponentDefImpl.Builder<T> builder = (Builder<T>) (defClass
-                .equals(ComponentDef.class) ? new ComponentDefImpl.Builder()
-        : new ApplicationDefImpl.Builder());
+            @SuppressWarnings("unchecked")
+            BaseComponentDefImpl.Builder<T> builder = (Builder<T>) (defClass
+                            .equals(ComponentDef.class) ? new ComponentDefImpl.Builder()
+                            : new ApplicationDefImpl.Builder());
 
-        if (descriptor != null) {
-            builder.setDescriptor(descriptor);
-        }
-        if (location != null) {
-            builder.setLocation(location);
-        }
-        if (attributeDefs != null) {
-            addAttributes(builder, attributeDefs);
-        }
-        if (controllerDescriptor != null) {
-            builder.controllerDescriptors = ImmutableList
-                    .of(controllerDescriptor);
-        }
-        builder.isAbstract = isAbstract;
-        builder.isExtensible = isExtensible;
-        builder.extendsDescriptor = extendsDescriptor;
-        builder.modelDefDescriptor = modelDescriptor;
-        builder.eventHandlers = eventHandlers;
-        builder.events = eventDefs;
-        builder.interfaces = interfaces;
-        builder.rendererDescriptors = renderers;
-        builder.helperDescriptors = helpers;
-        return builder.build();
+            if (descriptor != null) {
+                    builder.setDescriptor(descriptor);
+            }
+            if (location != null) {
+                    builder.setLocation(location);
+            }
+            if (attributeDefs != null) {
+                    addAttributes(builder, attributeDefs);
+            }
+            if (controllerDescriptor != null) {
+                    builder.controllerDescriptors = ImmutableList
+                                    .of(controllerDescriptor);
+            }
+            builder.isAbstract = isAbstract;
+            builder.isExtensible = isExtensible;
+            builder.extendsDescriptor = extendsDescriptor;
+            builder.modelDefDescriptor = modelDescriptor;
+            builder.eventHandlers = eventHandlers;
+            builder.events = eventDefs;
+            builder.interfaces = interfaces;
+            builder.rendererDescriptors = renderers;
+            builder.helperDescriptors = helpers;
+            return builder.build();
     }
 
     /**
@@ -628,108 +611,101 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public ComponentDef makeComponentDef(
-            DefDescriptor<ComponentDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs,
-            List<ComponentDefRef> children, Location location,
-            DefDescriptor<ControllerDef> controllerDescriptor,
-            DefDescriptor<ModelDef> modelDescriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor,
-            Set<DefDescriptor<InterfaceDef>> interfaces,
-            List<EventHandlerDef> eventHandlers,
-            DefDescriptor<StyleDef> styleDescriptor,
-            DefDescriptor<RendererDef> rendererDescriptor, boolean isAbstract,
-            boolean isExtensible) {
+                    DefDescriptor<ComponentDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs,
+                    List<ComponentDefRef> children, Location location,
+                    DefDescriptor<ControllerDef> controllerDescriptor,
+                    DefDescriptor<ModelDef> modelDescriptor,
+                    DefDescriptor<ComponentDef> extendsDescriptor,
+                    Set<DefDescriptor<InterfaceDef>> interfaces,
+                    List<EventHandlerDef> eventHandlers,
+                    DefDescriptor<StyleDef> styleDescriptor,
+                    DefDescriptor<RendererDef> rendererDescriptor, boolean isAbstract,
+                    boolean isExtensible) {
+            ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
 
-        ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
+            if (attributeDefs == null) {
+                    attributeDefs = new HashMap<>();
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            }
 
-        if (attributeDefs == null) {
-            attributeDefs = new HashMap<>();
-            attributeDefs
-            .put(getAttributeDescriptor(),
-                    makeAttributeDef(null, null, null, false, null,
-                            null, null));
-        }
+            if (eventDefs == null) {
+                    eventDefs = new HashMap<>();
+                    eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
+            }
 
-        if (eventDefs == null) {
-            eventDefs = new HashMap<>();
-            eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
-        }
+            if (children == null) {
+                    children = new ArrayList<>();
+            children.add(makeComponentDefRef(getChildComponentDefDescriptor(), null, null));
+            }
 
-        if (children == null) {
-            children = new ArrayList<>();
-            children.add(makeComponentDefRef(getChildComponentDefDescriptor(),
-                    null, null));
-        }
+            if (interfaces == null) {
+                    interfaces = new HashSet<>();
+                    interfaces.add(getInterfaceDefDescriptor());
+            }
 
-        if (interfaces == null) {
-            interfaces = new HashSet<>();
-            interfaces.add(getInterfaceDefDescriptor());
-        }
-        /*
-         * }
-         */
-        List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
-        cd.add(controllerDescriptor == null ? getControllerDescriptor()
-                : controllerDescriptor);
+            List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
+            cd.add(controllerDescriptor == null ? getControllerDescriptor()
+                            : controllerDescriptor);
 
-        builder.setDescriptor((descriptor == null) ? getComponentDefDescriptor()
-                : descriptor);
-        addAttributes(builder, attributeDefs);
-        builder.events = eventDefs;
-        builder.setLocation((location == null) ? getLocation() : location);
-        builder.controllerDescriptors = cd;
-        builder.modelDefDescriptor = modelDescriptor == null ? getModelDescriptor()
-                : modelDescriptor;
-        builder.extendsDescriptor = extendsDescriptor == null ? getParentComponentDefDescriptor()
-                : extendsDescriptor;
-        builder.interfaces = interfaces;
-        builder.eventHandlers = eventHandlers;
-        builder.styleDescriptor = styleDescriptor == null ? getStyleDescriptor()
-                : styleDescriptor;
-        builder.addRenderer(rendererDescriptor == null ? getRendererDescriptor()
-                .getQualifiedName() : rendererDescriptor.getQualifiedName());
-        builder.isAbstract = isAbstract;
-        builder.isExtensible = isExtensible;
-        return builder.build();
+            builder.setDescriptor((descriptor == null) ? getComponentDefDescriptor()
+                            : descriptor);
+            addAttributes(builder, attributeDefs);
+            builder.events = eventDefs;
+            builder.setLocation((location == null) ? getLocation() : location);
+            builder.controllerDescriptors = cd;
+            builder.modelDefDescriptor = modelDescriptor == null ? getModelDescriptor()
+                            : modelDescriptor;
+            builder.extendsDescriptor = extendsDescriptor == null ? getParentComponentDefDescriptor()
+                            : extendsDescriptor;
+            builder.interfaces = interfaces;
+            builder.eventHandlers = eventHandlers;
+            builder.styleDescriptor = styleDescriptor == null ? getStyleDescriptor()
+                            : styleDescriptor;
+            builder.addRenderer(rendererDescriptor == null ? getRendererDescriptor()
+                            .getQualifiedName() : rendererDescriptor.getQualifiedName());
+            builder.isAbstract = isAbstract;
+            builder.isExtensible = isExtensible;
+            return builder.build();
     }
 
     public DefDescriptor<ComponentDef> makeComponentDefDescriptor(String tag) {
-        return DefDescriptorImpl.getInstance(tag, ComponentDef.class);
+            return DefDescriptorImpl.getInstance(tag, ComponentDef.class);
     }
 
     public ComponentDef makeComponentDefWithNulls(
-            DefDescriptor<ComponentDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs,
-            List<ComponentDefRef> children, Location location,
-            DefDescriptor<ControllerDef> controllerDescriptor,
-            DefDescriptor<ModelDef> modelDescriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor,
-            Set<DefDescriptor<InterfaceDef>> interfaces,
-            List<EventHandlerDef> eventHandlers, boolean isAbstract,
-            boolean isExtensible) {
-        List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
-        if (controllerDescriptor != null) {
-            cd.add(controllerDescriptor);
-        }
-        ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
-        builder.setDescriptor(descriptor);
-        addAttributes(builder, attributeDefs);
-        builder.events = eventDefs;
-        builder.setLocation(location);
-        builder.controllerDescriptors = cd;
-        builder.modelDefDescriptor = modelDescriptor;
-        builder.extendsDescriptor = extendsDescriptor;
-        builder.interfaces = interfaces;
-        builder.eventHandlers = eventHandlers;
-        builder.isAbstract = isAbstract;
-        builder.isExtensible = isExtensible;
-        return builder.build();
+                    DefDescriptor<ComponentDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs,
+                    List<ComponentDefRef> children, Location location,
+                    DefDescriptor<ControllerDef> controllerDescriptor,
+                    DefDescriptor<ModelDef> modelDescriptor,
+                    DefDescriptor<ComponentDef> extendsDescriptor,
+                    Set<DefDescriptor<InterfaceDef>> interfaces,
+                    List<EventHandlerDef> eventHandlers, boolean isAbstract,
+                    boolean isExtensible) {
+            List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
+            if (controllerDescriptor != null) {
+                    cd.add(controllerDescriptor);
+            }
+            ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
+            builder.setDescriptor(descriptor);
+            addAttributes(builder, attributeDefs);
+            builder.events = eventDefs;
+            builder.setLocation(location);
+            builder.controllerDescriptors = cd;
+            builder.modelDefDescriptor = modelDescriptor;
+            builder.extendsDescriptor = extendsDescriptor;
+            builder.interfaces = interfaces;
+            builder.eventHandlers = eventHandlers;
+            builder.isAbstract = isAbstract;
+            builder.isExtensible = isExtensible;
+            return builder.build();
     }
 
     public ComponentDefRef makeComponentDefRef() {
-        return makeComponentDefRef(null, null, null);
+            return makeComponentDefRef(null, null, null);
     }
 
     /**
@@ -738,41 +714,38 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public ComponentDefRef makeComponentDefRef(
-            DefDescriptor<ComponentDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues,
-            Location location) {
-        if (attributeValues == null) {
-            attributeValues = new HashMap<>();
-            attributeValues.put(getAttributeDescriptor(),
-                    makeAttributeDefRef(null, null, null));
-        }
+                    DefDescriptor<ComponentDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues,
+                    Location location) {
+            if (attributeValues == null) {
+                    attributeValues = new HashMap<>();
+            attributeValues.put(getAttributeDescriptor(), makeAttributeDefRef(null, null, null));
+            }
 
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor((descriptor == null) ? getChildComponentDefDescriptor()
-                : descriptor);
-        addAttributes(builder, attributeValues);
-        builder.setLocation((location == null) ? getLocation() : location);
-        return builder.build();
+            ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+        builder.setDescriptor((descriptor == null) ? getChildComponentDefDescriptor() : descriptor);
+            addAttributes(builder, attributeValues);
+            builder.setLocation((location == null) ? getLocation() : location);
+            return builder.build();
     }
 
     public ComponentDefRef makeComponentDefRefWithNulls(
-            DefDescriptor<ComponentDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues,
-            Location location) {
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor(descriptor);
-        addAttributes(builder, attributeValues);
-        builder.setLocation(location);
-        return builder.build();
+                    DefDescriptor<ComponentDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues,
+                    Location location) {
+            ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+            builder.setDescriptor(descriptor);
+            addAttributes(builder, attributeValues);
+            builder.setLocation(location);
+            return builder.build();
     }
 
     public EventDefImpl makeEventDef() {
-        return makeEventDef(null, null, null, null, null);
+            return makeEventDef(null, null, null, null, null);
     }
 
-    public EventDefImpl makeEventDef(DefDescriptor<EventDef> descriptor,
-            DefDescriptor<EventDef> extendsDescriptor) {
-        return makeEventDef(descriptor, null, null, null, extendsDescriptor);
+    public EventDefImpl makeEventDef(DefDescriptor<EventDef> descriptor, DefDescriptor<EventDef> extendsDescriptor) {
+            return makeEventDef(descriptor, null, null, null, extendsDescriptor);
     }
 
     /**
@@ -781,53 +754,47 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public EventDefImpl makeEventDef(DefDescriptor<EventDef> descriptor,
-            EventType eventType,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Location location, DefDescriptor<EventDef> extendsDescriptor) {
+                    EventType eventType,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Location location, DefDescriptor<EventDef> extendsDescriptor) {
 
-        if (attributeDefs == null) {
-            attributeDefs = new HashMap<>();
-            attributeDefs
-            .put(getAttributeDescriptor(),
-                    makeAttributeDef(null, null, null, false, null,
-                            null, null));
-        }
+            if (attributeDefs == null) {
+                    attributeDefs = new HashMap<>();
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            }
 
-        EventDefImpl.Builder builder = new EventDefImpl.Builder();
-        builder.setDescriptor((descriptor == null) ? getEventDefDescriptor()
-                : descriptor);
-        builder.eventType = eventType == null ? defaultEventType : eventType;
-        addAttributes(builder, attributeDefs);
-        builder.setLocation((location == null) ? getLocation() : location);
-        builder.extendsDescriptor = extendsDescriptor == null ? getParentEventDefDescriptor()
-                : extendsDescriptor;
-        return builder.build();
+            EventDefImpl.Builder builder = new EventDefImpl.Builder();
+        builder.setDescriptor((descriptor == null) ? getEventDefDescriptor() : descriptor);
+            builder.eventType = eventType == null ? defaultEventType : eventType;
+            addAttributes(builder, attributeDefs);
+            builder.setLocation((location == null) ? getLocation() : location);
+        builder.extendsDescriptor = extendsDescriptor == null ? getParentEventDefDescriptor() : extendsDescriptor;
+            return builder.build();
     }
 
     public EventDefImpl makeEventDefWithNulls(
-            DefDescriptor<EventDef> descriptor, EventType eventType,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Location location, DefDescriptor<EventDef> extendsDescriptor) {
-        EventDefImpl.Builder builder = new EventDefImpl.Builder();
-        builder.setDescriptor(descriptor);
-        builder.eventType = eventType;
-        addAttributes(builder, attributeDefs);
-        builder.setLocation(location);
-        builder.extendsDescriptor = extendsDescriptor;
-        return builder.build();
+                    DefDescriptor<EventDef> descriptor, EventType eventType,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Location location, DefDescriptor<EventDef> extendsDescriptor) {
+            EventDefImpl.Builder builder = new EventDefImpl.Builder();
+            builder.setDescriptor(descriptor);
+            builder.eventType = eventType;
+            addAttributes(builder, attributeDefs);
+            builder.setLocation(location);
+            builder.extendsDescriptor = extendsDescriptor;
+            return builder.build();
     }
 
     public DefDescriptor<EventDef> makeEventDefDescriptor(String tag) {
-        return DefDescriptorImpl.getInstance(tag, EventDef.class);
+            return DefDescriptorImpl.getInstance(tag, EventDef.class);
     }
 
     public EventHandlerDef makeEventHandlerDef() {
-        return makeEventHandlerDef(null, null, null);
+            return makeEventHandlerDef(null, null, null);
     }
 
-    public EventHandlerDef makeEventHandlerDef(
-            DefDescriptor<EventDef> handledEvent) {
-        return makeEventHandlerDef(handledEvent, null, null);
+    public EventHandlerDef makeEventHandlerDef(DefDescriptor<EventDef> handledEvent) {
+            return makeEventHandlerDef(handledEvent, null, null);
     }
 
     /**
@@ -836,37 +803,35 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public EventHandlerDef makeEventHandlerDef(
-            DefDescriptor<EventDef> handledEvent, PropertyReference action,
-            Location location) {
-        EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
-        builder.setLocation(location);
-        builder.setDescriptor(handledEvent);
-        builder.setAction(action);
-        return builder.build();
+                    DefDescriptor<EventDef> handledEvent, PropertyReference action,
+                    Location location) {
+            EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
+            builder.setLocation(location);
+            builder.setDescriptor(handledEvent);
+            builder.setAction(action);
+            return builder.build();
     }
 
     public EventHandlerDefImpl makeEventHandlerDefWithNulls(
-            DefDescriptor<EventDef> handledEvent, PropertyReference action,
-            Location location) {
-        EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
-        builder.setLocation(location);
-        builder.setDescriptor(handledEvent);
-        builder.setAction(action);
-        return builder.build();
+                    DefDescriptor<EventDef> handledEvent, PropertyReference action,
+                    Location location) {
+            EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
+            builder.setLocation(location);
+            builder.setDescriptor(handledEvent);
+            builder.setAction(action);
+            return builder.build();
     }
 
     public InterfaceDefImpl makeInterfaceDef() {
-        return makeInterfaceDef(null, null, null, null, null);
+            return makeInterfaceDef(null, null, null, null, null);
     }
 
-    public InterfaceDefImpl makeInterfaceDef(
-            DefDescriptor<InterfaceDef> descriptor) {
-        return makeInterfaceDef(descriptor, null, null, null, null);
+    public InterfaceDefImpl makeInterfaceDef(DefDescriptor<InterfaceDef> descriptor) {
+            return makeInterfaceDef(descriptor, null, null, null, null);
     }
 
-    public InterfaceDefImpl makeInterfaceDef(
-            Set<DefDescriptor<InterfaceDef>> extendsDescriptors) {
-        return makeInterfaceDef(null, null, null, null, extendsDescriptors);
+    public InterfaceDefImpl makeInterfaceDef(Set<DefDescriptor<InterfaceDef>> extendsDescriptors) {
+            return makeInterfaceDef(null, null, null, null, extendsDescriptors);
     }
 
     /**
@@ -875,74 +840,66 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public InterfaceDefImpl makeInterfaceDef(
-            DefDescriptor<InterfaceDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs, Location location,
-            Set<DefDescriptor<InterfaceDef>> extendsDescriptors) {
+                    DefDescriptor<InterfaceDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs, Location location,
+                    Set<DefDescriptor<InterfaceDef>> extendsDescriptors) {
+            InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
-        InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
+            if (attributeDefs == null) {
+                    attributeDefs = new HashMap<>();
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            }
+            addAttributes(builder, attributeDefs);
 
-        if (attributeDefs == null) {
-            attributeDefs = new HashMap<>();
-            attributeDefs
-            .put(getAttributeDescriptor(),
-                    makeAttributeDef(null, null, null, false, null,
-                            null, null));
-        }
-        addAttributes(builder, attributeDefs);
+            builder.events = eventDefs;
+            if (builder.events == null) {
+                    builder.events = new HashMap<>();
+                builder.events.put("fakey", makeRegisterEventDef(null, false, null));
+            }
 
-        builder.events = eventDefs;
-        if (builder.events == null) {
-            builder.events = new HashMap<>();
-            builder.events
-            .put("fakey", makeRegisterEventDef(null, false, null));
-        }
+            builder.extendsDescriptors = extendsDescriptors;
+            if (builder.extendsDescriptors == null) {
+                    builder.extendsDescriptors = new HashSet<>();
+                    builder.extendsDescriptors.add(getParentInterfaceDefDescriptor());
+            }
 
-        builder.extendsDescriptors = extendsDescriptors;
-        if (builder.extendsDescriptors == null) {
-            builder.extendsDescriptors = new HashSet<>();
-            builder.extendsDescriptors.add(getParentInterfaceDefDescriptor());
-        }
-
-        builder.setDescriptor((descriptor == null) ? getInterfaceDefDescriptor()
-                : descriptor);
-        builder.setLocation((location == null) ? getLocation() : location);
-        return builder.build();
+        builder.setDescriptor((descriptor == null) ? getInterfaceDefDescriptor() : descriptor);
+            builder.setLocation((location == null) ? getLocation() : location);
+            return builder.build();
     }
 
     public InterfaceDefImpl makeInterfaceDefWithNulls(
-            DefDescriptor<InterfaceDef> descriptor,
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Map<String, RegisterEventDef> eventDefs, Location location,
-            Set<DefDescriptor<InterfaceDef>> extendsDescriptors, String provider) {
-        InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
-        builder.setDescriptor(descriptor);
-        addAttributes(builder, attributeDefs);
-        builder.events = eventDefs;
-        builder.setLocation(location);
-        builder.extendsDescriptors = extendsDescriptors;
-        if (provider != null) {
-            builder.addProvider(provider);
-        }
-        return builder.build();
+                    DefDescriptor<InterfaceDef> descriptor,
+                    Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
+                    Map<String, RegisterEventDef> eventDefs, Location location,
+                    Set<DefDescriptor<InterfaceDef>> extendsDescriptors, String provider) {
+            InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
+            builder.setDescriptor(descriptor);
+            addAttributes(builder, attributeDefs);
+            builder.events = eventDefs;
+            builder.setLocation(location);
+            builder.extendsDescriptors = extendsDescriptors;
+            if (provider != null) {
+                    builder.addProvider(provider);
+            }
+            return builder.build();
     }
 
     public DefDescriptor<InterfaceDef> makeInterfaceDefDescriptor(String tag) {
-        return DefDescriptorImpl.getInstance(tag, InterfaceDef.class);
+            return DefDescriptorImpl.getInstance(tag, InterfaceDef.class);
     }
 
     public Location makeLocation() {
-        return makeLocation(defaultFileName, 5, 5, defaultLastModified);
+            return makeLocation(defaultFileName, 5, 5, defaultLastModified);
     }
 
-    public Location makeLocation(String fileName, int line, int column,
-            long lastModified) {
-        return new Location(fileName == null ? defaultFileName : fileName,
-                line, column, lastModified);
+    public Location makeLocation(String fileName, int line, int column, long lastModified) {
+        return new Location(fileName == null ? defaultFileName : fileName, line, column, lastModified);
     }
 
     public RegisterEventDefImpl makeRegisterEventDef() {
-        return makeRegisterEventDef(null, false, null);
+            return makeRegisterEventDef(null, false, null);
     }
 
     /**
@@ -951,69 +908,63 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public RegisterEventDefImpl makeRegisterEventDef(
-            DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
-            Location location) {
-        RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
-        builder.setDescriptor(eventDescriptor == null ? getEventDefDescriptor()
-                : eventDescriptor);
-        builder.setAttName("fakey");
-        DefinitionAccessImpl access;
-        try {
-            access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
-        } catch (InvalidAccessValueException e) {
-            access = null;
-        }
-        builder.setAccess(access);
-        builder.setLocation((location == null) ? getLocation() : location);
-        return builder.build();
+                    DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
+                    Location location) {
+            RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
+        builder.setDescriptor(eventDescriptor == null ? getEventDefDescriptor() : eventDescriptor);
+            builder.setAttName("fakey");
+            DefinitionAccessImpl access;
+			try {
+				access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
+			} catch (InvalidAccessValueException e) {
+				access = null;
+			}
+			builder.setAccess(access);
+            builder.setLocation((location == null) ? getLocation() : location);
+            return builder.build();
     }
 
     public RegisterEventDefImpl makeRegisterEventDefWithNulls(
-            DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
-            Location location) {
-
-        RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
-        builder.setDescriptor(eventDescriptor);
-        builder.setAttName("fakey");
-        DefinitionAccessImpl access;
-        try {
-            access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
-        } catch (InvalidAccessValueException e) {
-            access = null;
-        }
-        builder.setAccess(access);
-        builder.setLocation((location == null) ? getLocation() : location);
-        return builder.build();
+                    DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
+                    Location location) {
+            RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
+            builder.setDescriptor(eventDescriptor);
+            builder.setAttName("fakey");
+            DefinitionAccessImpl access;
+			try {
+				access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
+			} catch (InvalidAccessValueException e) {
+				access = null;
+			}
+            builder.setAccess(access);
+            builder.setLocation((location == null) ? getLocation() : location);
+            return builder.build();
     }
 
     public ThemeDef makeThemeDef(Map<String, String> variables) {
-        ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
-        for (Entry<String, String> entry : variables.entrySet()) {
-            AttributeDefRefImpl value = makeAttributeDefRef(entry.getKey(),
-                    entry.getValue(), null);
-            AttributeDefImpl attr = makeAttributeDef(entry.getKey(),
-                    DefDescriptorImpl.getInstance("String", TypeDef.class),
-                    value, false, null, null, null);
-            builder.addAttributeDef(attr.getDescriptor(), attr);
-        }
+            ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
+            for (Entry<String, String> entry : variables.entrySet()) {
+            AttributeDefRefImpl value = makeAttributeDefRef(entry.getKey(), entry.getValue(), null);
+                    AttributeDefImpl attr = makeAttributeDef(entry.getKey(),
+                            DefDescriptorImpl.getInstance("String", TypeDef.class), value, false, null, null);
+                    builder.addAttributeDef(attr.getDescriptor(), attr);
+            }
 
-        return builder.build();
+            return builder.build();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends BaseComponentDef> DefDescriptor<T> getBaseComponentPrototype(
-            Class<T> defClass) {
-        if (ComponentDef.class.equals(defClass)) {
-            return (DefDescriptor<T>) ComponentDefImpl.PROTOTYPE_COMPONENT;
-        } else if (ApplicationDef.class.equals(defClass)) {
-            return (DefDescriptor<T>) ApplicationDefImpl.PROTOTYPE_APPLICATION;
-        } else {
-            return null;
-        }
+    public <T extends BaseComponentDef> DefDescriptor<T> getBaseComponentPrototype( Class<T> defClass) {
+            if (ComponentDef.class.equals(defClass)) {
+                    return (DefDescriptor<T>) ComponentDefImpl.PROTOTYPE_COMPONENT;
+            } else if (ApplicationDef.class.equals(defClass)) {
+                    return (DefDescriptor<T>) ApplicationDefImpl.PROTOTYPE_APPLICATION;
+            } else {
+                    return null;
+            }
     }
 
     public DefDescriptor<HelperDef> getHelperDescriptor() {
-        return DefDescriptorImpl.getInstance("js://aura.html", HelperDef.class);
+            return DefDescriptorImpl.getInstance("js://aura.html", HelperDef.class);
     }
-
 }

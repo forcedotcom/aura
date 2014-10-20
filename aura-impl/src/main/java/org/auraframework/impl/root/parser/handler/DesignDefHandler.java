@@ -22,7 +22,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DesignDef;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;

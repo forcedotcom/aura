@@ -35,7 +35,7 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesignDef, DesignDef> {
-    public static final String TAG = "aura:attributeDesign";
+    public static final String TAG = "design:attribute";
 
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_LABEL = "label";

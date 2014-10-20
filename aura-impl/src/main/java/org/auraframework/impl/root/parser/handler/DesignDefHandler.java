@@ -22,9 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDesignDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -33,7 +31,7 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
-    public static final String TAG = "aura:design";
+    public static final String TAG = "design:component";
 
     private static final String ATTRIBUTE_LABEL = "label";
 

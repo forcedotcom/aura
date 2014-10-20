@@ -34,6 +34,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -1026,6 +1027,16 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Illegal name in *:auratest:*");
+        }
+    }
+
+    public void testLabelUnspecificed()  {
+        // Invalid descriptor pattern
+        try {
+            define(baseTag, "", "{!$Label}");
+            fail("Should not be able to load resource, bad Label referece");
+        } catch (QuickFixException e) {
+            checkExceptionFull(e, InvalidExpressionException.class, "Expression didn't have enough terms: $Label");
         }
     }
 

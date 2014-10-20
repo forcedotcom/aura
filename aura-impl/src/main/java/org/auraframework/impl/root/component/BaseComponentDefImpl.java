@@ -69,6 +69,7 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -403,7 +404,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 AuraContext lc = Aura.getContextService().getCurrentContext();
                 GlobalValueProvider gvp = lc.getGlobalProviders().get(vpt);
                 if (gvp != null) {
-                    gvp.validate(e.getStem());
+                    PropertyReference stem = e.getStem();
+                    if (stem == null) {
+                        throw new InvalidExpressionException("Expression didn't have enough terms: " + e, e.getLocation());
+                    }
+                    gvp.validate(stem);
                 }
             } else if (vpt == ValueProviderType.VIEW) {
                 if (e.getStem() != null) { // checks for private attributes used in expressions ..

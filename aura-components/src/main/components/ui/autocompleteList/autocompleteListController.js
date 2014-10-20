@@ -39,6 +39,8 @@
         var obj = {};  
         var visible = component.get("v.visible");
         if (visible === false) { // auto complete list is hidden.
+            var list = component.find("list");
+            $A.util.removeClass(list.getElement(), "visible");
             // Remove loading indicator
             obj["aria-activedescendant"] = "",
             obj["aria-expanded"] = false;          

@@ -38,6 +38,10 @@
         helper.handleInputChange(cmp, event, "autoCompleteCustomOption");
     },
     
+    handleInputChangeEmptyListContent: function(cmp, event, helper) {
+    	helper.handleInputChange(cmp, event, "autoCompleteEmptyListContent");
+    },
+    
     handleSelectOptionAutoComplete: function(cmp, event, helper) {
     	helper.handleSelectOption(cmp, event, "autoComplete");
     },
@@ -56,6 +60,10 @@
     
     handleSelectOptionCustomOption: function(cmp, event, helper) {
     	helper.handleSelectOption(cmp, event, "autoCompleteCustomOption");
+    },
+    
+    handleSelectOptionEmptyListContent: function(cmp, event, helper) {
+    	helper.handleSelectOption(cmp, event, "autoCompleteEmptyListContent");
     },
 
     handleInputChangeAutoCompleteMatchDone: function(cmp, event, helper) {
@@ -76,5 +84,9 @@
     
     handleInputChangeCustomOptionMatchDone: function(cmp, event, helper) {
     	helper.handleMatchDone(cmp, event, "autoCompleteCustomOption");
+    },
+    
+    handleInputChangeEmptyListContentMatchDone: function(cmp, event, helper) {
+    	helper.handleMatchDone(cmp, event, "autoCompleteEmptyListContent");
     }
 })

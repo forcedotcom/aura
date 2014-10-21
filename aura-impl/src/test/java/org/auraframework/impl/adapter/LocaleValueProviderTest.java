@@ -15,17 +15,14 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.adapter.LocaleValueProvider.LocalizedLabel;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -235,5 +232,100 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     	assertEquals(null,
                 lvp.getValue(new PropertyReferenceImpl("ISO3Language", null))); // undefined
                                                                                 // property
+    }
+	
+	/**
+     * Test name of months is returned correctly
+     */
+    public void testNameOfMonths() throws Exception {
+    HashMap<String, String> expectedMonthNames = new HashMap<>();
+        expectedMonthNames.put("Jan", "January");
+        expectedMonthNames.put("Feb", "February");
+        expectedMonthNames.put("Mar", "March");
+        expectedMonthNames.put("Apr", "April");
+        expectedMonthNames.put("May", "May");
+        expectedMonthNames.put("Jun", "June");
+        expectedMonthNames.put("Jul", "July");
+        expectedMonthNames.put("Aug", "August");
+        expectedMonthNames.put("Sep", "September");
+        expectedMonthNames.put("Oct", "October");
+        expectedMonthNames.put("Nov", "November");
+        expectedMonthNames.put("Dec", "December");
+        assertDateLocaleProperties(null, LocaleValueProvider.MONTH_NAME, expectedMonthNames); //en_US
+        
+        HashMap<String, String> expectedMonthNamesJP = new HashMap<>();
+        expectedMonthNamesJP.put("1", "1月");
+        expectedMonthNamesJP.put("2", "2月");
+        expectedMonthNamesJP.put("3", "3月");
+        expectedMonthNamesJP.put("4", "4月");
+        expectedMonthNamesJP.put("5", "5月");
+        expectedMonthNamesJP.put("6", "6月");
+        expectedMonthNamesJP.put("7", "7月");
+        expectedMonthNamesJP.put("8", "8月");
+        expectedMonthNamesJP.put("9", "9月");
+        expectedMonthNamesJP.put("10", "10月");
+        expectedMonthNamesJP.put("11", "11月");
+        expectedMonthNamesJP.put("12", "12月");
+        assertDateLocaleProperties(Locale.JAPANESE, LocaleValueProvider.MONTH_NAME, expectedMonthNamesJP);
+    }
+    
+    /**
+     * Test name of day is returned correctly
+     */
+    public void testNameOfWeekdays() throws Exception {
+        HashMap<String, String> expectedDayNames = new HashMap<>();
+        expectedDayNames.put("MON", "Monday");
+        expectedDayNames.put("TUE", "Tuesday");
+        expectedDayNames.put("WED", "Wednesday");
+        expectedDayNames.put("THU", "Thursday");
+        expectedDayNames.put("FRI", "Friday");
+        expectedDayNames.put("SAT", "Saturday");
+        expectedDayNames.put("SUN", "Sunday");
+        assertDateLocaleProperties(null, LocaleValueProvider.WEEKDAY_NAME, expectedDayNames); //en_US
+        
+        HashMap<String, String> expectedDayNamesJP = new HashMap<>();
+        expectedDayNamesJP.put("日", "日曜日");
+        expectedDayNamesJP.put("月", "月曜日");
+        expectedDayNamesJP.put("火", "火曜日");
+        expectedDayNamesJP.put("水", "水曜日");
+        expectedDayNamesJP.put("木", "木曜日");
+        expectedDayNamesJP.put("金", "金曜日");
+        expectedDayNamesJP.put("土", "土曜日");
+        assertDateLocaleProperties(Locale.JAPANESE, LocaleValueProvider.WEEKDAY_NAME, expectedDayNamesJP);
+    }
+    
+    /**
+     * Test Today label is returned correctly
+     */
+    public void testToday() throws Exception {
+        assertTodayLocaleProperty(null, "Today");  // enUS
+        assertTodayLocaleProperty(Locale.JAPANESE, "今日");
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void assertDateLocaleProperties(Locale locale, String dateName,
+            HashMap<String, String> expectedData) {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setRequestedLocales(locale == null ? null : Arrays.asList(locale));
+        LocaleValueProvider lvp = new LocaleValueProvider();
+        
+        ArrayList<LocalizedLabel> values = (ArrayList<LocalizedLabel>) lvp.getData().get(dateName);
+        Set<String> expectedShortNames = expectedData.keySet();
+        for (int i=0; i<values.size(); i++) {
+            String shortName = values.get(i).getShortName();
+            String fullName = values.get(i).getFullName();
+            assertTrue("Could not find short name '" + shortName + "' in expected short names for locale " + locale,
+                    expectedShortNames.contains(shortName));
+            assertEquals("Long names for locale " + locale + " do not equal",
+                    expectedData.get(shortName), fullName);
+        }
+    }   
+        
+    private void assertTodayLocaleProperty(Locale locale, String expectedLabel) {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setRequestedLocales(locale == null ? null : Arrays.asList(locale));
+        LocaleValueProvider lvp = new LocaleValueProvider();
+        String actualLabel = (String) lvp.getData().get(LocaleValueProvider.TODAY_LABEL);
+        assertEquals("Today label for locale " + locale + " is incorrect", expectedLabel, actualLabel);
     }
 }

@@ -66,8 +66,9 @@ public class IterationUITest extends WebDriverTestCase {
         // fix for ie7 and ie8,
         // as id of div does not have quotes
         serverHtml = serverHtml.replaceAll(" id=[^>]+", "");
-        // remove type from button
-        serverHtml = serverHtml.replaceAll(" type=[^>]+", "");
+        // remove default button type in ie8
+        clientHtml = clientHtml.replaceAll(" type=submit", "");
+        serverHtml = serverHtml.replaceAll(" type=submit", "");
         // needs an extra space
         serverHtml = serverHtml.replaceAll("(?i)</DIV>from", "</DIV> from");
         serverHtml = serverHtml.replaceAll("(?i)<BR>from", "<BR> from");

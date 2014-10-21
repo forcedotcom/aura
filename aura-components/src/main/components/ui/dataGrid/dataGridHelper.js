@@ -52,10 +52,13 @@
 		var columns 				= this.getColumns(concrete),
 			handleColumnSortChange 	= concrete.get('c.handleColumnSortChange'),
 			mode 					= concrete.get('v.mode'),
-			isEditMode				= mode.indexOf('EDIT') === 0;
+			isEditMode				= mode.indexOf('EDIT') === 0,
+			headerRow				= concrete.find("headerRow").getElement();
 
 		// TODO cleanup
 		concrete._columnCount = columns.length;
+		concrete._outputComponents = concrete._outputComponents.slice(0, columns.length);
+		concrete._inputComponents = concrete._inputComponents.slice(0, columns.length);
 
 		$A.util.forEach(columns, function (c, i) {
 			var name = c.get('v.name'),
@@ -89,7 +92,7 @@
 			}
 			
 			if (!c.isRendered()) {
-				$A.render(c, concrete.find("headerRow").getElement());
+				$A.render(c, headerRow);
 			}
 		});
 	},
@@ -674,16 +677,51 @@
 		//concrete.set('v.state', 'idle');
 	},
 	
-	createColumnData: function(isEditMode) {
+	/**
+	 * Creates column data to manage the components that make up a column
+	 * and attaches them to the rowData object at the specified index
+	 * 
+	 * @param {Object} rowData
+	 * @param {Integer} colIndex
+	 * @param {Boolean} isEditMode
+	 */
+	createColumnData: function(rowData, colIndex, isEditMode) {
 		var cellCmps = {},
 			ioKey = isEditMode ? 'input' : 'output';
 		
 		cellCmps[ioKey] = [];
-		return {
+		rowData.columnData[colIndex] = {
 				elementRef : null,
 				components : cellCmps,
 				cellKey	   : ioKey
 		}
+		return rowData.columnData[colIndex];
+	},
+	
+	/**
+	 * Destroys the column data and components at the specified row and column index
+	 * and removes the <td> element from the specified parent <tr>.
+	 * 
+	 * @param {Object} rowData
+	 * @param {Integer} colIndex
+	 * @param {HTMLTableRowElement} parentTR
+	 */
+	destroyColumnData: function(rowData, colIndex, parentTR) {
+		var colData = rowData.columnData[colIndex],
+			key;
+		
+		if (colData) {
+			key = colData.cellKey;
+			$A.util.forEach(colData.components[key], function(cmp) {
+				cmp.destroy();
+			});
+			
+			colData.components[key] = [];
+			parentTR.removeChild(colData.elementRef);
+			
+			rowData.columnData[colIndex] = {};
+		}
+
 	},
     
     /*
@@ -698,7 +736,6 @@
 	// TODO: optimize column iteration
 	createTableBody: function (concrete) {
 		var self = this,
-			//items = concrete._rowItems,
 			items = concrete.get("v.items"),
 			doc = document.createDocumentFragment(),
 			initialRenderCount = concrete.get("v.initialRenderCount"),
@@ -794,33 +831,57 @@
 	renderTableRow: function(concrete, rowData, tr, isEditMode, cleanOldComponents) {
 		var self = this,
 			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			colData, td, key, components, cdrs;
+			colData, td, key, components, cdrs, colIndex, largerLength, resizeRowData;
 		
-		for (var colIndex = 0; colIndex < targetComponents.length; colIndex++) {
+		largerLength = (targetComponents.length > rowData.columnData.length) ? targetComponents.length : rowData.columnData.length;
+		
+		for (colIndex = 0; colIndex < largerLength; colIndex++) {
 			colData = rowData.columnData[colIndex];
+			cdrs = targetComponents[colIndex];
 			
-			if (!colData) {
-				colData = self.createColumnData(isEditMode);
-				rowData.columnData[colIndex] = colData;
-			}
-			
-			td = colData.elementRef || document.createElement('td');
-			colData.elementRef = td;
-			key = colData.cellKey;
-			
-			if (cleanOldComponents) {
+			// If no cdrs, then these columns should be destroyed
+			// TODO: collapse empty columns
+			if (!cdrs && colData) {
+				self.destroyColumnData(rowData, colIndex, tr);
+				/*key = colData.cellKey;
 				$A.util.forEach(colData.components[key], function(cmp) {
 					cmp.destroy();
 				});
 				colData.components[key] = [];
+				tr.removeChild(colData.elementRef);
+				
+				colData = {};*/
+				resizeRowData = true;
+			} else {			
+				if (!colData) {
+					colData = self.createColumnData(rowData, colIndex, isEditMode);
+				}
+				
+				if (!colData.elementRef) {
+					td = document.createElement('td');
+					tr.appendChild(td);
+				} else {
+					td = colData.elementRef;
+				}
+				
+				colData.elementRef = td;
+				key = colData.cellKey;
+				
+				if (cleanOldComponents) {
+					$A.util.forEach(colData.components[key], function(cmp) {
+						cmp.destroy();
+					});
+					colData.components[key] = [];
+				}
+				
+				components = colData.components[key];
+				
+				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
 			}
-			
-			components = colData.components[key];
-			cdrs = targetComponents[colIndex];
-			
-			tr.appendChild(td);
-			
-			self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
+		}
+		
+		if (resizeRowData) {
+			rowData.columnData = rowData.columnData.slice(0, targetComponents.length);
 		}
 	},
 	

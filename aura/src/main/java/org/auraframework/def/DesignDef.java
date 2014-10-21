@@ -40,4 +40,12 @@ public interface DesignDef extends RootDefinition {
      * @return the label, may be null
      */
     public String getLabel();
+
+    /**
+     * Return the design template definition. The design template definition will describe which interfaces are allowed
+     * in named template regions. May be null.
+     * 
+     * @return the design template definition, may be null
+     */
+    public DesignTemplateDef getDesignTemplateDef();
 }

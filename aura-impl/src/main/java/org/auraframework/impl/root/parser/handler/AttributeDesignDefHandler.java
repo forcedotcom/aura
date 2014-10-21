@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.impl.design.AttributeDesignDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -46,7 +45,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_DATASOURCE = "dataSource";
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
-    private static final String ATTRIBUTE_PLACEHOLDER = "placeholderText";
+    private static final String ATTRIBUTE_PLACEHOLDER = "placeholder";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
@@ -85,7 +84,6 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
             error("Name attribute is required for attribute design definitions");
         }
 
-        builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
         builder.setLabel(label);
         builder.setType(type);
         builder.setDependsOnAttribute(dependency);

@@ -1,5 +1,10 @@
 <design:component label="some label">
-	<design:attribute name="something" label="some label" max="100" min="-100"/>
+	<design:template>
+		<design:region name="regionOne" allowedInterfaces="test:fakeInterface"/>
+		<design:region name="regionTwo" />
+		<design:region name="regionThree" allowedInterfaces="test:fakeInterface,auratest:testInterface"/>
+	</design:template>
+	<design:attribute name="something" label="some label" max="100" min="-100" placeholder="Leave blank for default value"/>
 	<design:attribute name="else" label="something else" datasource="one,two,three"/>
 	<design:attribute name="entities" label="some entities" type="EntityName" datasource="Account,Contact" required="true" readonly="false" />
 </design:component>

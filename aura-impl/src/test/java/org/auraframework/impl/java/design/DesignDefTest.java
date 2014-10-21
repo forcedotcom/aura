@@ -19,8 +19,12 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.DesignTemplateDef;
+import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
@@ -74,6 +78,8 @@ public class DesignDefTest extends AuraImplTestCase {
         assertNotNull("AttributeDesignDef 'something' not found!", attr);
         assertEquals("AttributeDesignDef 'something' name is incorrect.", "something", attr.getName());
         assertEquals("AttributeDesignDef 'something' label is incorrect.", "some label", attr.getLabel());
+        assertEquals("AttributeDesignDef 'something' placeholder is incorrect.", "Leave blank for default value",
+                attr.getPlaceholderText());
         assertEquals("AttributeDesignDef 'something' min is incorrect.", "-100", attr.getMin());
         assertEquals("AttributeDesignDef 'something' max is incorrect.", "100", attr.getMax());
 
@@ -96,5 +102,34 @@ public class DesignDefTest extends AuraImplTestCase {
         assertNotNull("AttributeDesignDef 'else' not found!", attr);
         assertEquals("AttributeDesignDef 'else' datasource is incorrect or has wrong format", "one,two,three",
                 attr.getDataSource());
+    }
+
+    public void testDesignTemplateWithRegions() throws Exception {
+        DesignDef c = Aura.getDefinitionService().getDefinition("test:fakeDesign", DesignDef.class);
+        ComponentDef cmp = Aura.getDefinitionService().getDefinition("test:fakeDesign", ComponentDef.class);
+        assertNotNull("DesignDef not found!", c);
+        DesignTemplateDef template = c.getDesignTemplateDef();
+        assertNotNull("DesignTemplateDef not found!", template);
+
+        DesignTemplateRegionDef regionOne = template.getDesignTemplateRegionDef("regionOne");
+        assertNotNull("DesignTemplateRegionDef regionOne not found!", regionOne);
+        assertTrue("DesignTemplateRegionDef regionOne should have one allowed interface.", regionOne
+                .getAllowedInterfaces().size() == 1);
+        for (DefDescriptor<InterfaceDef> intf : regionOne.getAllowedInterfaces()) {
+            assertTrue("InterfaceDef not found!", intf.exists());
+        }
+
+        DesignTemplateRegionDef regionTwo = template.getDesignTemplateRegionDef("regionTwo");
+        assertNotNull("DesignTemplateRegionDef regionTwo not found!", regionTwo);
+        assertTrue("DesignTemplateREgionDef regionTwo should not have any allowed interfaces.", regionTwo
+                .getAllowedInterfaces().isEmpty());
+
+        DesignTemplateRegionDef regionThree = template.getDesignTemplateRegionDef("regionThree");
+        assertNotNull("DesignTemplateRegionDef regionThree not found!", regionThree);
+        assertTrue("DesignTemplateRegionDef regionThree should have two allowed interfaces.", regionThree
+                .getAllowedInterfaces().size() == 2);
+        for (DefDescriptor<InterfaceDef> intf : regionThree.getAllowedInterfaces()) {
+            assertTrue("InterfaceDef not found!", intf.exists());
+        }
     }
 }

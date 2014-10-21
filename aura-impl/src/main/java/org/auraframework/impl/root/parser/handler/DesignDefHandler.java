@@ -25,6 +25,7 @@ import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -40,6 +41,9 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
 
     private final DesignDefImpl.Builder builder = new DesignDefImpl.Builder();
+
+    // counter used to index child defs without an explicit id
+    private int idCounter = 0;
 
     public DesignDefHandler() {
         super();
@@ -84,6 +88,9 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
             AttributeDesignDef attributeDesign = new AttributeDesignDefHandler(this, xmlReader, source).getElement();
             String name = attributeDesign.getName();
             builder.addAttributeDesign(name, attributeDesign);
+        } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
+            DesignTemplateDef template = new DesignTemplateDefHandler(this, xmlReader, source).getElement();
+            builder.setDesignTemplateDef(template);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }
@@ -94,7 +101,7 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         String text = xmlReader.getText();
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
             throw new XMLStreamException(String.format(
-                    "<%s> can contain only <aura:attributeDesign>  tags.\nFound text: %s",
+                    "<%s> can contain only tags.\nFound text: %s",
                     getHandledTag(), text));
         }
     }
@@ -106,6 +113,12 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
 
     @Override
     public void writeElement(DesignDef def, Appendable out) throws IOException {
+    }
+
+    String getNextId() {
+        String ret = Integer.toString(idCounter);
+        idCounter++;
+        return ret;
     }
 
 }

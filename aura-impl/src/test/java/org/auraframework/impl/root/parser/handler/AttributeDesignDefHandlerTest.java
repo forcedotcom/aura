@@ -51,10 +51,10 @@ public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
     public void testGetElement() throws Exception {
         AttributeDesignDef element = getElement(
                 "mystring",
-                "<design:attribute name=\"mystring\" required=\"false\" readonly=\"false\" type=\"String\" dependsOnAttribute=\"myparent\" datasource=\"one,two,three\" min=\"-100\" max=\"100\" label=\"some label\" placeholderText=\"some placeholder\" />");
+                "<design:attribute name=\"mystring\" required=\"true\" readonly=\"true\" type=\"String\" dependsOnAttribute=\"myparent\" datasource=\"one,two,three\" min=\"-100\" max=\"100\" label=\"some label\" placeholderText=\"some placeholder\" />");
 
-        assertEquals(false, element.isRequired());
-        assertEquals(false, element.isReadOnly());
+        assertTrue(element.isRequired());
+        assertTrue(element.isReadOnly());
         assertEquals("String", element.getType());
         assertEquals("myparent", element.getDependsOnAttribute());
         assertEquals("one,two,three", element.getDataSource());
@@ -66,18 +66,18 @@ public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
 
     public void testRequiredAndReadOnlyAttributeParsingNull() throws Exception {
         AttributeDesignDef element = getElement("mystring", "<design:attribute name=\"mystring\" />");
-        assertEquals(false, element.isRequired());
-        assertEquals(false, element.isReadOnly());
+        assertFalse(element.isRequired());
+        assertFalse(element.isReadOnly());
     }
 
     public void testRequiredAndReadOnlyAttributeParsingNotNull() throws Exception {
         AttributeDesignDef element = getElement("mystring",
                 "<design:attribute name=\"mystring\" required=\"nottrue\" readonly=\"nottrue\" />");
-        assertEquals(false, element.isRequired());
-        assertEquals(false, element.isReadOnly());
+        assertFalse(element.isRequired());
+        assertFalse(element.isReadOnly());
         element = getElement("mystring", "<design:attribute name=\"mystring\" required=\"\" readonly=\"\" />");
-        assertEquals(false, element.isRequired());
-        assertEquals(false, element.isReadOnly());
+        assertFalse(element.isRequired());
+        assertFalse(element.isReadOnly());
     }
 
     public void testInvalidSystemAttributeName() throws Exception {

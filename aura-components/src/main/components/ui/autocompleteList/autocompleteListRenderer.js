@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 ({
+    afterRender : function(component, helper){
+        this.superAfterRender();
+        helper.updateEmptyListContent(component);
+    },
+    rerender : function(component, helper){
+        this.superRerender();
+        if (component.isDirty('v.visible')) {
+            helper.updateEmptyListContent(component);
+        }
+    },
     unrender: function(component, helper) {
         if (helper.getOnClickEventProp.cache && 
             helper.getOnClickEventProp.cache.onClickStartEvent && 

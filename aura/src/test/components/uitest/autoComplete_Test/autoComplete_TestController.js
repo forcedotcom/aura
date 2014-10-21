@@ -39,7 +39,11 @@
     },
     
     handleInputChangeEmptyListContent: function(cmp, event, helper) {
-    	helper.handleInputChange(cmp, event, "autoCompleteEmptyListContent");
+        helper.handleInputChange(cmp, event, "autoCompleteEmptyListContent");
+    },
+    
+    handleInputChangeMatchFunc: function(cmp, event, helper) {
+        helper.handleInputChange(cmp, event, "autoCompleteMatchFunc");
     },
     
     handleSelectOptionAutoComplete: function(cmp, event, helper) {
@@ -63,9 +67,13 @@
     },
     
     handleSelectOptionEmptyListContent: function(cmp, event, helper) {
-    	helper.handleSelectOption(cmp, event, "autoCompleteEmptyListContent");
+        helper.handleSelectOption(cmp, event, "autoCompleteEmptyListContent");
     },
 
+    handleSelectOptionMatchFunc: function(cmp, event, helper) {
+        helper.handleSelectOption(cmp, event, "autoCompleteMatchFunc");
+    },
+    
     handleInputChangeAutoCompleteMatchDone: function(cmp, event, helper) {
     	helper.handleMatchDone(cmp, event, "autoComplete");
     },
@@ -87,6 +95,23 @@
     },
     
     handleInputChangeEmptyListContentMatchDone: function(cmp, event, helper) {
-    	helper.handleMatchDone(cmp, event, "autoCompleteEmptyListContent");
+        helper.handleMatchDone(cmp, event, "autoCompleteEmptyListContent");
+    },
+    
+    handleInputChangeMatchFuncMatchDone: function(cmp, event, helper) {
+        helper.handleMatchDone(cmp, event, "autoCompleteMatchFunc");
+    },
+    
+    matchFuncShowAll: function(cmp, event, helper) {
+        var autocomplete = cmp.find("autoCompleteMatchFunc");
+        var input = autocomplete.find("input");
+        var list = autocomplete.find("list");
+        var keyword = list.get("v.keyword");
+        var items = list.get("v.items");
+        for (var i = 0; i < items.length; i++) {
+            items[i].keyword = keyword;
+            items[i].visible = true;
+        }
+        list.set("v.items", items);
     }
 })

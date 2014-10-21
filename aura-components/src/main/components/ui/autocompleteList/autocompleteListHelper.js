@@ -304,7 +304,7 @@
         }
     },
 
-    matchText: function(component) {
+    matchFunc: function(component) {
         var keyword = component.get("v.keyword");
         var propertyToMatch = component.get("v.propertyToMatch");
         var items = component.get("v.items");
@@ -328,9 +328,26 @@
             }
         }
         component.set("v.items", items);
+    },
+
+    matchFuncDone: function(component) {
+        var items = component.get("v.items");
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
+    },
+
+    matchText: function(component) {
+        var action = component.get("v.matchFunc");
+        if (action) {
+            action.setCallback(this, function(result) {
+                this.matchFuncDone(component);
+            });
+            $A.enqueueAction(action);
+        } else {
+            this.matchFunc(component);
+            this.matchFuncDone(component);
+        }
     },
 
     toggleListVisibility: function(component, items) {

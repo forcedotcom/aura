@@ -16,13 +16,13 @@
 
 -->
 <aura:component>
-	<ul>
-		<li><ui:inputDateTrigger/></li>
-		<li><ui:inputDateTrigger/></li>
-		<li><ui:inputDateTrigger/></li>
-		<li><ui:inputDateTrigger/></li>
-		<li><ui:inputDateTrigger/></li>
-	</ul>	
-	
-	<ui:datePickerManager/>
+    <ul>
+        <li><ui:inputDateTrigger/></li>
+        <li><ui:inputDateTrigger/></li>
+        <li><ui:inputDateTrigger/></li>
+        <li><ui:inputDateTrigger/></li>
+        <li><ui:inputDateTrigger/></li>
+    </ul>
+
+    <ui:datePickerManager/>
 </aura:component>

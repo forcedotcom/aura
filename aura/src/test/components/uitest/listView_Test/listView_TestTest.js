@@ -150,7 +150,7 @@
 
             var component = app.find("test-list-specified-columns");
             var expected = component.get("v.body")[0].get("v.title");
-            var actual = this.getHeaderCellComponentAt(component, 0, 0).get("v.body");
+            var actual = $A.util.getText(this.getHeaderCellComponentAt(component, 0, 0).getElement());
 
             $A.test.assertEquals(expected, actual,
                     "Column title is not set as the value of the column component's body attribute");
@@ -170,7 +170,7 @@
                         title:"Column",
                         fieldName: "column"
                     }
-                    
+
                 $A.componentService.newComponentAsync(
                     this,
                     function(){},
@@ -184,7 +184,7 @@
             }
             catch(e) {
                 $A.test.assertTrue(e.message.indexOf("Unknown type attribute specified") > -1,
-                        "Expected exception was not thrown for an invalid column type: " + 
+                        "Expected exception was not thrown for an invalid column type: " +
                         e.message);
             }
         }
@@ -249,9 +249,9 @@
                         "Expected number of fields in row did not match actual");
 
                 for (var j = 0; j < expectedNumFieldsInRow; ++j) {
-                    var headerCellTitle = this.getHeaderCellComponentAt(component, 0, j).get("v.body");
+                    var headerCellTitle = this.getHeaderCellComponentAt(component, 0, j).get("v.title");
                     var expected = items[i][headerCellTitle];
-                    var actual = this.getTableBodyCellComponentAt(component, i, j).get("v.body");
+                    var actual = $A.util.getText(this.getTableBodyCellComponentAt(component, i, j).getElement());
                     $A.test.assertEquals(expected, actual,
                             "Expected cell value did not match actual cell value");
                 }
@@ -286,9 +286,13 @@
                             expected = false;
                             var actual = this.getTableBodyCellComponentAt(component, i, j).getElement().getElementsByTagName('input')[0].checked;
                             break;
+                        case "Html":
+                            expected=items[i][columns[j].get("v.fieldName")];
+                            actual=this.getTableBodyCellComponentAt(component, i, j).getElement().innerHTML.replace(/ data-aura-rendered-by=[^>]+/,'');
+                            break;
                         default:
                             expected = items[i][columns[j].get("v.fieldName")];
-                            actual = this.getTableBodyCellComponentAt(component, i, j).get("v.body");
+                            actual = $A.util.getText(this.getTableBodyCellComponentAt(component, i, j).getElement());
                     }
                     $A.test.assertEquals(expected, actual,
                             "Expected cell value did not match actual cell value");
@@ -316,7 +320,7 @@
                     var actual;
                     if (items[i][columns[j].get("v.fieldName")]) {
                         expected = items[i][columns[j].get("v.fieldName")];
-                        actual = this.getTableBodyCellComponentAt(component, i, j).get("v.body");
+                        actual = $A.util.getText(this.getTableBodyCellComponentAt(component, i, j).getElement());
                     }
                     else {
                         expected = '';
@@ -385,7 +389,7 @@
                 for (var j = 0; j < leafNodeColumns.length; ++j) {
                     var columnFieldName = leafNodeColumns[j].get("v.fieldName");
                     var expected = items[i][columnFieldName];
-                    var actual = this.getTableBodyCellComponentAt(component,i, j).get("v.body");
+                    var actual = $A.util.getText(this.getTableBodyCellComponentAt(component,i, j).getElement());
                     $A.test.assertEquals(expected, actual,
                             "Expected table cell contents did not match actual.");
                 }

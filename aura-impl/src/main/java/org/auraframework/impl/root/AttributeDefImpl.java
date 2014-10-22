@@ -40,7 +40,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
     /**
      * Construct an AttributeDef
-     * 
+     *
      * @param descriptor the descriptor of this attribute
      * @param parentDescriptor the parent descriptor of this attribute
      * @param typeDefDescriptor The TypeDef Descriptor for the Type of instances of this AttributeDef
@@ -50,8 +50,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      * @param location The location where this AttributeDef was defined in the markup.
      */
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
-            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
+                            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+                            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
         super(descriptor, location, visibility);
         this.parentDescriptor = parentDescriptor;
         this.typeDefDescriptor = typeDefDescriptor;
@@ -89,7 +89,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     public AttributeDefRef getDefaultValue() {
         return defaultValue;
     }
-    
+
     /**
      * @return True if instances must require a value to be explicitly set
      */
@@ -112,15 +112,15 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         json.writeMapBegin();
         json.writeMapEntry("name", descriptor);
         json.writeMapEntry("type", typeDefDescriptor);
-        
+
         if (defaultValue != null) {
-        	json.writeMapEntry("default", defaultValue.getValue());
+            json.writeMapEntry("default", defaultValue.getValue());
         }
-        
+
         if (required) {
-        	json.writeMapEntry("required", true);
+            json.writeMapEntry("required", true);
         }
-        
+
         json.writeMapEnd();
     }
 
@@ -129,7 +129,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         if (defaultValue != null) {
             defaultValue.appendDependencies(dependencies);
         }
-        
+
         dependencies.add(typeDefDescriptor);
     }
 
@@ -140,7 +140,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         if (this.typeDefDescriptor == null) {
             throw new InvalidDefinitionException("Invalid typeDefDescriptor: null", getLocation());
         }
-        
+
         String name = this.descriptor.getName();
         // Calls the validateAttributeName method in AuraTextUtil.java to check if its a valid attribute name
         if ((AuraTextUtil.validateAttributeName(name)) != true) {
@@ -206,7 +206,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets the parentDescriptor for this instance.
-         * 
+         *
          * @param parentDescriptor The parentDescriptor.
          */
         public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
@@ -216,7 +216,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets the typeDefDescriptor for this instance.
-         * 
+         *
          * @param typeDefDescriptor The typeDefDescriptor.
          */
         public Builder setTypeDefDescriptor(DefDescriptor<TypeDef> typeDefDescriptor) {
@@ -226,7 +226,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets the defaultValue for this instance.
-         * 
+         *
          * @param defaultValue The defaultValue.
          */
         public Builder setDefaultValue(AttributeDefRef defaultValue) {
@@ -237,7 +237,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets whether or not this instance is required.
-         * 
+         *
          * @param required The required.
          */
         public Builder setRequired(boolean required) {

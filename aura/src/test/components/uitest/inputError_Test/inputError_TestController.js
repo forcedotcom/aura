@@ -46,7 +46,7 @@
 	
 	clearErrorNoEventFire : function(component) {
 		var inputCmp = component.find("inputCmp");
-		inputCmp.setValid("v.value", true);
+		inputCmp.clearErrors("v.value");
 		component.find("outputStatus").set("v.value", "Cleared error");
 	},
 	
@@ -55,11 +55,11 @@
 		inputCmp.setValid("v.value", false);
 		component.find("outputStatus").set("v.value", "Got Error");
 	},
-	
+
+	// TODO(tbliss): Adding a null error here still adds an entry to the errors object so the error is not cleared.
 	clearErrorNullErrorMsg : function(component) {
 		var inputCmp = component.find("inputCmp");
-		inputCmp.setValid("v.value", true);
-		inputCmp.addErrors("v.value", null);
+		inputCmp.clearErrors("v.value");
 	   	component.find("outputStatus").set("v.value", "Cleared error");
 	}
 })

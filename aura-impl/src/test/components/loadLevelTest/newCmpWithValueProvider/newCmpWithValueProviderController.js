@@ -18,15 +18,12 @@
      * Create a new component whose definition was already preloaded and use the current component as attribute value provider.
      */
     createCmpWithPreloadedDef : function(cmp, evt,helper){
-        var path = [];
-        path.push('v');
-        path.push('stringAttribute');
-        var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
+    	var expression = "{!v.stringAttribute}";
         var config = {componentDef:"markup://aura:text",
                       attributes:{
                     	  values:{
                                     truncate:6,
-                                    value:expr
+                                    value: expression
                                  }
                           },
                       localId:"txt_Id"
@@ -38,15 +35,12 @@
      * W-1308292 - Passing localId in config for newCmp will invoke the fix
      */
     createCmpWithPassthroughValue : function(cmp, evt,helper){
-        var path = [];
-        path.push('v');
-        path.push('nameAttribute');
-        var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
+        var expression = "{!v.nameAttribute}";
         var config = {componentDef:"markup://aura:text",
                       attributes:{
                     	  values:{
 	                            truncate:10,
-	                            value:expr
+	                            value: expression
                           }
                       },
                       localId:"txt_Id"
@@ -61,16 +55,13 @@
      */
     createCmpByFetchingDefFromServer : function(cmp, evt,helper){
         //Use attribute of current component as value for new cmp's attribute
-        var path = [];
-        path.push('v');
-        path.push('numberAttribute');
-        var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
+        var expression = "{!v.numberAttribute}";
 
         //Specify current component's attribute as value for new cmp's attribute
         var config = {componentDef:"markup://loadLevelTest:displayNumber",
                       attributes:{
                           values:{
-                              number:expr
+                              number: cmp.getReference(expression)
                           }
                       }
                       , localId:"num_Id"
@@ -84,23 +75,19 @@
     },
 
     /**
-     * Test server dependent client created component with attributes containing PropertyChain in MapValue
+     * Test server dependent client created component with attributes containing PropertyReferenceValue in MapValue
      */
     createCmpWithMapValuePropRefValueFromServer : function(cmp, evt,helper){
-        var path = [];
-        path.push('v');
-        path.push('stringAttribute');
-        var expr = $A.expressionService.create(null, {"exprType": "PROPERTY", "path": path});
-
-        var config = {
+    	var expression = "{!v.stringAttribute}";
+    	var config = {
             componentDef:"markup://loadLevelTest:displayMap",
             attributes:{
                 values:{
                     map: {
                         map2: {
-                            propRef: expr
+                            propRef: expression
                         },
-                        propRef: expr
+                        propRef: expression
                     }
                 }
             },
@@ -115,15 +102,12 @@
      * use blank object as value provider.
      */
     createCmpWithEmptyValueProvider : function(cmp, evt,helper){
-        var path = [];
-        path.push('v');
-        path.push('stringAttribute');
-        var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
+        var expression = "{!v.stringAttribute}";
         var config = {componentDef:"markup://aura:text",
                       attributes:{
                     	  values:{
                                truncate:6,
-                               value:expr
+                               value:expression
                           }
                       }
                      };
@@ -134,15 +118,12 @@
      * use undefined as value provider.
      */
     createCmpWithUndefinedValueProvider : function(cmp, evt,helper){
-        var path = [];
-        path.push('v');
-        path.push('stringAttribute');
-        var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
+        var expression = "{!v.stringAttribute}";
         var config = {componentDef:"markup://aura:text",
                       attributes:{
                     	  values:{
 	                           truncate:6,
-	                           value:expr
+	                           value:expression
                           }
                       }
                      };

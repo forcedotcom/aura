@@ -27,9 +27,9 @@
                 elem.setAttribute("data-datevalue", date.toLocaleDateString());
             }
             var tabIndex = component.get("v.tabIndex");
-            if (parseInt(tabIndex) > -1) {
+            if (parseInt(tabIndex,10) > -1) {
                 elem.removeAttribute("tabindex");
             }
-        } 
+        }
     }
 })

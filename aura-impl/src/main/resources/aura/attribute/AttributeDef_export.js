@@ -18,6 +18,7 @@ var p = AttributeDef.prototype;
 exp(p,
     "getDescriptor", p.getDescriptor,
     "getDefault", p.getDefault,
+    "getNativeType", p.getNativeType,
     "getTypeDefDescriptor", p.getTypeDefDescriptor,
     "isRequired", p.isRequired
 );

@@ -93,6 +93,12 @@
     <aura:registerEvent name="onrowtouchend" type="ui:listViewEvent"                       description="The event that fires when a row touchend occurs."/>
     <aura:registerEvent name="ontouchend" type="ui:listViewEvent"                          description="The event that fires when a table touchend occurs."/>
 
+    <aura:handler name="change" value="{!v.body}" action="{!c.buildList}"/>
+    <aura:handler name="change" value="{!v.emptyText}" action="{!c.buildList}"/>
+    <aura:handler name="change" value="{!v.id}" action="{!c.buildList}"/>
+    <aura:handler name="change" value="{!v.items}" action="{!c.buildList}"/>
+    <aura:handler name="change" value="{!v.class}" action="{!c.buildList}"/>
+
     <table aura:id="listView:table"
            id="{!'ui:listView:'+(v.id!='default'?v.id:globalId)}"
            class="{!'listView '+v.class}"

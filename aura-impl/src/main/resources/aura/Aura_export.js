@@ -27,13 +27,11 @@ $A.ns.Aura.prototype["get"] = $A.ns.Aura.prototype.get;
 $A.ns.Aura.prototype["getRoot"] = $A.ns.Aura.prototype.getRoot;
 $A.ns.Aura.prototype["getContext"] = $A.ns.Aura.prototype.getContext;
 $A.ns.Aura.prototype["run"] = $A.ns.Aura.prototype.run;
-$A.ns.Aura.prototype["unwrap"] = $A.ns.Aura.prototype.unwrap;
 $A.ns.Aura.prototype["assert"] = $A.ns.Aura.prototype.assert;
 $A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;
 $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
-//$A.ns.Aura.prototype["getGlobalValueProviders"] = $A.ns.Aura.prototype.getGlobalValueProviders;
 $A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
 // Perf
 $A.ns.Aura.prototype["Perf"] = $A.ns.Aura.prototype.Perf;

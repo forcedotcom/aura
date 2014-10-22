@@ -90,7 +90,7 @@
     testAttributeCasing: {
         test: function(component){
             var tag = component.find("case").getElement();
-            $A.test.assertTrue(typeof tag.ReadOnly === "undefined" && tag.readOnly === true, "readOnly was not cased properly");
+            $A.test.assertTrue(typeof tag.ReadOnly === "undefined" && tag.readOnly === false, "readOnly was not cased properly");
             $A.test.assertTrue(typeof tag.maxlength === "undefined" && tag.maxLength == 11, "maxLength was not cased properly");
             $A.test.assertTrue(typeof tag.AccessKey === "undefined" && tag.accessKey === "x", "accessKey was not cased properly");
             $A.test.assertTrue(typeof tag.TABINDEX === "undefined" && tag.tabIndex === 1, "tabIndex was not cased properly");

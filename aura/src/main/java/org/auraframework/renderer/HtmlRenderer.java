@@ -52,9 +52,8 @@ public class HtmlRenderer implements Renderer {
                             for (Object obj : (List<?>) section) {
                                 if (obj instanceof ComponentDefRef) {
                                     ComponentDefRef cdr = (ComponentDefRef) obj;
-                                    for (Component cmp : cdr.newInstance(component.getAttributes().getValueProvider())) {
-                                        Aura.getRenderingService().render(cmp, out);
-                                    }
+                                    Component cmp = cdr.newInstance(component.getAttributes().getValueProvider());
+                                    Aura.getRenderingService().render(cmp, out);
                                 } else if (obj instanceof Component) {
                                     Aura.getRenderingService().render((Component) obj, out);
                                 }

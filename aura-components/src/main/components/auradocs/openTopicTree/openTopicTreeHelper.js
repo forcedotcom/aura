@@ -100,7 +100,7 @@
         
         // Handle layered composition of tree objects.
         var tree = cmp.get('v.tree');
-        if (tree == null) {
+        if (!$A.util.isComponent(tree)) {
             return false;
         }
         $A.assert(tree.isInstanceOf("ui:tree"), "Tree must be a ui:tree");
@@ -138,7 +138,7 @@
      * necessary.
      */
     highlightActive : function(cmp) {
-        cmp._activeCmp.set('v.active', 'true');
+        cmp._activeCmp.set('v.active', true);
     },
 
     /**

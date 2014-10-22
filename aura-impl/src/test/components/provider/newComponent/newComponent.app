@@ -23,8 +23,8 @@
     <aura:attribute name="newDescriptor" type="String" default="markup://provider:clientProvider"/>
     <aura:attribute name="newAttributes" type="String" default="{value:&quot;{componentDef:'markup://aura:text',attributes:{value:'breadwinner'}}&quot;}"/>
 
-    <ui:inputText value="{!v.newDescriptor}" size="128" label="descriptor: "/>
-    <ui:inputText value="{!v.newAttributes}" size="128" label="attributes: "/>
+    <div>descriptor: <ui:inputText value="{!v.newDescriptor}" size="128"/></div>
+    <div>attributes: <ui:inputText value="{!v.newAttributes}" size="128"/></div>
     <ui:button aura:id="create" press="{!c.createComponent}" label="create component"/>
 
     <div aura:id="creations">

@@ -15,7 +15,7 @@
  */
 Function.RegisterNamespace("Test.Aura.Iteration");
 
-[Fixture]
+[Fixture, Skip("Rewrite")]
 Test.Aura.Iteration.ControllerTest = function(){
 	var targetController;
 

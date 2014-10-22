@@ -30,7 +30,7 @@
         var concreteCmp = component.getConcreteComponent();
         var format = concreteCmp.get("v.format");
         if (!format) {
-            format = $A.get("$Locale.dateformat");
+            format = $A.get("$Locale.dateFormat");
         }
         component.set("v.placeholder", format);
     },
@@ -44,7 +44,6 @@
     setValue: function(component, event, helper) {
         var dateValue = event.getParam("value");
         if (dateValue) {
-            var concreteCmp = component.getConcreteComponent();
             component.set("v.value", dateValue);
         }
     }

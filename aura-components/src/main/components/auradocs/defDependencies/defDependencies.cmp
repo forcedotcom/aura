@@ -23,7 +23,7 @@
             <h3>{!config.type}</h3>
             <ul class="nav nav-list">
                 <aura:iteration items="{!config.list}" var="dep">
-                    <li><auradocs:defLink descriptor="{!dep.fullName}" defType="{!dep.defType}"/></li>
+                    <li><auradocs:defLink descriptor="{!dep.fullname}" defType="{!dep.defType}"/></li>
                 </aura:iteration>
             </ul>
         </aura:iteration>

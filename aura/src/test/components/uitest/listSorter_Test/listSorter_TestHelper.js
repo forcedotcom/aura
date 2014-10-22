@@ -15,19 +15,19 @@
  */
 ({
 	handleApplyPressed: function(cmp, list, outCmpName) {
-		//if list contains "-" then its descending order
+		// sort order prefix "-" means descending order
 		var desc = "-";
 		list = list[0].sortBy.toString();
 		var sortOrder;
 		//ascending order
-		if(list.indexOf(desc) > -1){
-			list = list.replace("-","");
+		if(list.indexOf(desc) == 0){
+			list = list.substr(1);
 			sortOrder = list + " : Z-A"
 		}
 		else{
 			sortOrder = list + " : A-Z"
 		}
-		var resultCmp = cmp.find(outCmpName);
-        resultCmp.set("v.value", sortOrder);
+
+		cmp.find(outCmpName).set("v.value", sortOrder);
     }
 })

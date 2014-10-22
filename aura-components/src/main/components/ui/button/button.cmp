@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" access="GLOBAL" 
+<aura:component extensible="true" support="GA" access="GLOBAL"
     description="Represents a button element.">
 
     <aura:attribute name="theme" type="String" default="default" description="The default CSS style used to display the button."/>

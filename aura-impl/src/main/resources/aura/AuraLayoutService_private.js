@@ -54,11 +54,11 @@ var priv = {
             // it was overridden manually, use that
             return historyItem.title;
         } else {
-            var title = historyItem.layout.getTitle();
-            if (title.isExpression()) {
-                title = expressionService.getValue(this.cmp, title);
+            var title = valueFactory.create(historyItem.layout.getTitle(),null,this.cmp);
+            if (aura.util.isExpression(title)) {
+                title = title.evaluate();
             }
-            return title.getValue();
+            return title;
         }
     },
 

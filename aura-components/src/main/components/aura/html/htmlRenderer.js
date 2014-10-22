@@ -14,139 +14,121 @@
  * limitations under the License.
  */
 ({
-    render : function(component, helper) {
-    	var placeholder = "auraplaceholder";
-        var valueProvider = component.getAttributeValueProvider();
-        var replacements = {};
-        var ret;
+	render : function(component, helper) {
+		var tag = component.get("v.tag");
+		if ($A.util.isUndefinedOrNull(tag)) {
+			$A.error("Undefined tag attribute for " + component.getGlobalId());
+		}
 
-        var tag = component.get("v.tag");
-        if ($A.util.isUndefinedOrNull(tag)) {
-            $A.error("Undefined tag attribute for "+component.getGlobalId());
-            tag = "div";
-        }
-        var HTMLAttributes = component.getValue("v.HTMLAttributes");
+        var element;
+		var HTMLAttributes = component.get("v.HTMLAttributes");
 
-        //Fix for name being read only attribute on IE7
-        var isIE7 = $A.get("$Browser.isIE7");
-        if(isIE7 ===  true && tag == "input"){
-        	var value = $A.expressionService.getValue(valueProvider, "v.name");
-        	value = value.getValue();
-        	if($A.util.isEmpty(value)){
-        		ret = document.createElement(tag);
-        	}
-        	else{
-        		ret = document.createElement('<input name="' + value + '">');
-        	}
-        }
-        else{
-        	ret = document.createElement(tag);
-        }
+		// FIXME: LEGACY IE SUPPORT
+		// Fix for name being read only attribute on IE7
+		if ($A.get("$Browser.isIE7") && tag == "input") {
+            var value = HTMLAttributes["name"];
+			if ($A.util.isEmpty(value)) {
+				element = document.createElement(tag);
+			} else {
+				element = document.createElement('<input name="' + value + '">');
+			}
+		} else {
+			element = document.createElement(tag);
+		}
 
-        if (HTMLAttributes && HTMLAttributes.each) {
-            // go through all the HTML tag attributes (except class, which is handled specially below)
-            HTMLAttributes.each(helper.createHtmlAttribute, { scope: helper, ret: ret, component: component });
-        }
+		for ( var attribute in HTMLAttributes) {
+			helper.createHtmlAttribute(component, element, attribute, HTMLAttributes[attribute]);
+		}
 
-        if (ret.tagName.toLowerCase() === "a" && !ret.getAttribute("href")) {
-            ret.setAttribute("href", "javascript:void(0);");
-        }
-
-        if (helper.canHaveBody(component)) {
-            var body = component.getValue("v.body");
-            $A.render(body, ret);
-        }
-
-        return ret;
-    },
-
-    rerender : function(component, helper) {
-        var element = component.getElement();
-        if (!element) {
-            return;
-        }
-
-        var valueProvider = component.getAttributeValueProvider();
-        var expressionService = $A.expressionService;
-        var HTMLAttributes = component.getValue("v.HTMLAttributes");
-        if (HTMLAttributes && HTMLAttributes.each) {
-            HTMLAttributes.each(function(name, ve) {
-                // TODO: what if this isn't an expression and changes? doesn't
-                // look like it would work...
-                if (ve.isExpression()) {
-                    var lowerName = name.toLowerCase();
-                    if (lowerName !== "height" && lowerName !== "width"
-                            && lowerName !== "class"
-                            && lowerName.indexOf("on") !== 0) {
-                        var value = expressionService.getValue(valueProvider, ve);
-
-                        if (value && value.isDirty()) {
-                            var newValue;
-                            var oldValue = element[helper.caseAttribute(lowerName)];
-
-                            if ($A.util.arrayIndexOf(helper.SPECIAL_BOOLEANS, lowerName) > -1) {
-                                // JBUCH: TEMPORARY FIX FOR HALO
-                                newValue = $A.util.getBooleanValue(value.getValue());
-                            } else {
-                                newValue = value.unwrap();
-                            }
-
-                            if (newValue !== oldValue) {
-                            	helper.createHtmlAttribute(lowerName, newValue, { scope: helper, ret: element, component: component });
-                            }
-                        }
-                    }
-                }
-            });
-
-            var clz = HTMLAttributes.getValue("class");
-            if (clz) {
-                if (clz.isExpression()) {
-                    clz = expressionService.getValue(valueProvider, clz);
-                }
-                if (clz.isDirty()) {
-
-                    var c = clz.unwrap();
-                    if (element.auraClass) {
-                        c = c + " " + element.auraClass;
-                    }
-                    if (!$A.util.isUndefinedOrNull(c) && c !== element["className"]) {
-                        element["className"] = c;
-                    }
-                }
-
-            }
-        }
-
-        if (element.tagName.toLowerCase() === "a" && !element.getAttribute("href")) {
+		if (element.tagName === "A" && !element.getAttribute("href")) {
             element.setAttribute("href", "javascript:void(0);");
-        }
+		}
 
-        if (helper.canHaveBody(component)) {
-            var body = component.getValue("v.body");
-            $A.rerender(body, element, true);
-        }
-    },
+		if (helper.canHaveBody(component)) {
+            var body=component.get("v.body");
+            $A.renderingService.renderFacet(component,body,element);
+			//$A.render(component.get("v.body"), element);
+		}
 
-    afterRender : function(component, helper) {
-        if (helper.canHaveBody(component)) {
-            $A.afterRender(component.get("v.body"));
-        }
-    },
+		return element;
+	},
 
-    unrender : function(component, helper) {
-        // recursively unrender body facet
-        // TODO: this should use attribute type checking and iterate through all attributes, not just body
+	rerender : function(component, helper) {
+		var element = component.getElement(),
+			htmlAttr = "v.HTMLAttributes";
 
-        if (helper.canHaveBody(component)) {
-            $A.unrender(component.get("v.body"));
-        }
+		if (!element) {
+			return;
+		}
+		
+		var skipMap = {
+			"height" : true,
+			"width" : true,
+			"class" : true
+		};
 
-        var elements = component.getElements();
-        for (var key in elements) {
-            var element = elements[key];
-            $A.util.removeElement(element);
-            delete elements[key];
+		var HTMLAttributes = component.get(htmlAttr);
+		if (HTMLAttributes) {
+			for (var name in HTMLAttributes) {
+				var lowerName = name.toLowerCase();
+				if (skipMap[lowerName] || lowerName.indexOf("on") == 0) {
+					continue;
+				}
+				
+				var value = HTMLAttributes[name];
+				if ($A.util.isExpression(value)) {
+					value = value.evaluate();
+				}
+				
+				if ($A.util.arrayIndexOf(helper.SPECIAL_BOOLEANS, lowerName) > -1) {
+					value = $A.util.getBooleanValue(value);
+				}
+	
+				var oldValue = element[helper.caseAttribute(lowerName)];
+				if (value !== oldValue) {
+					helper.createHtmlAttribute(component, element, lowerName, value);
+				    if($A.util.isExpression(oldValue)){
+                        oldValue.removeChangeHandler(component,"HTMLAttributes."+name);
+                    }
+                }
+			}
+	
+			var className = HTMLAttributes["class"];
+			if ($A.util.isExpression(className)) {
+                 className = className.evaluate();
+             }
+
+            if($A.util.isUndefinedOrNull(className)){
+ 				className='';
+            }
+			
+			if (!$A.util.isUndefinedOrNull(element.auraClass)) {
+				className += (" " + element.auraClass);
+			}
+			
+			if (element["className"] !== className) {
+				element["className"] = className;
+			}
+		}
+		
+		if (element.tagName ==="A" && !element.getAttribute("href")) {
+			element.setAttribute("href", "javascript:void(0);");
+		}
+
+		if (helper.canHaveBody(component)) {
+            $A.renderingService.rerenderFacet(component,component.get("v.body"),element);
+		}
+	},
+
+	afterRender : function(component, helper) {
+		if (helper.canHaveBody(component)) {
+			$A.afterRender(component.get("v.body"));
+		}
+	},
+
+	unrender : function(component, helper) {
+		if (helper.canHaveBody(component)) {
+            $A.renderingService.unrenderFacet(component, component.get("v.body"));
         }
-    }
+	}
 })

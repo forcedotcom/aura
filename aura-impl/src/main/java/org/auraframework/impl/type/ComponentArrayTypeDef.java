@@ -99,7 +99,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
                     components.add((BaseComponent<?, ?>) defRef);
                 } else if (defRef instanceof ComponentDefRef) {
                     context.getInstanceStack().setAttributeIndex(idx);
-                    components.addAll(((ComponentDefRef) defRef).newInstance(valueProvider));
+                    components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
                     context.getInstanceStack().clearAttributeIndex(idx);
                     idx += 1;
                 } else {

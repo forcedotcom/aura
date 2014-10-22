@@ -77,11 +77,11 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
         }, "Expecting one rerender query entry after attribute value change.");
 
         String descr = (String) auraUITestingUtil
-                .getEval("return $A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2.a'].descr;");
+                .getEval("return $A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2;a'].descr;");
         assertEquals("Unexpected component was rerendered.", "markup://attributesTest:simpleValue", descr);
-        String whyName = (String) auraUITestingUtil
-                .getEval("return $A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2.a'].why[0].name;");
-        assertEquals("Unexpected cause for rerender.", "intAttribute", whyName);
+        String why = (String) auraUITestingUtil
+                .getEval("return JSON.stringify($A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2;a'].why);");
+        assertEquals("Unexpected cause for rerender.", "{\"v.intAttribute\":true}", why);
 
         findDomElement(By.cssSelector(".uiButton")).click();
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {

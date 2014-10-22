@@ -31,7 +31,7 @@
             if (endPos < 0) { // shouldn't happen
                 return elems;
             }
-            elems.push(parseInt(base.substring(1, endPos))); // for dynamically replaced variable, store it as a number which will be used as an array index
+            elems.push(parseInt(base.substring(1, endPos),10)); // for dynamically replaced variable, store it as a number which will be used as an array index
             base = base.substring(endPos + 1);
             matchPos = base.search(vPattern);
         }

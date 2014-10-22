@@ -13,7 +13,7 @@
             "render":
 function(component) {
         var rendering = component.getRendering();
-        return rendering ? rendering : $A.render(component.get("v.body"));
+        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
     },
             "afterRender":
 function(component) {
@@ -23,20 +23,12 @@ function(component) {
             "rerender":
 function(component) {
         var body = component.get("v.body");
-        return $A.rerender(body);
+        return $A.renderingService.rerenderFacet(component,body);
     },
             "unrender":
 function(component) {
         var body = component.get("v.body");
-        
-        $A.unrender(body);
-
-        var elements = component.getElements();
-        for (var key in elements){
-            var element = elements[key];
-            delete elements[key];
-            aura.util.removeElement(element);
-        }
+        $A.renderingService.unrenderFacet(component,body);
     }
           }
         },

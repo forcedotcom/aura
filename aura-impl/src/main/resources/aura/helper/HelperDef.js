@@ -19,17 +19,17 @@
  * @constructor
  * @private
  */
-function HelperDef(config, zuper, libraries){
+function HelperDef(config, superComponent, libraries){
     var functions = config["functions"] || {};
     for(var k in functions){
         functions[k] = aura.util.json.decodeString(functions[k]);
     }
     this.functions = functions;
 
-    if(zuper){
-        for(var key in zuper){
+    if(superComponent){
+        for(var key in superComponent){
             if(!functions[key]){
-                functions[key] = zuper[key];
+                functions[key] = superComponent[key];
             }
         }
     }

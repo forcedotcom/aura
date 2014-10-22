@@ -18,7 +18,8 @@
 <aura:component>
     <!--
         Checking for case when no default value is given in inputSelect, 
-        and inputSelectOption is set to true for Lion. Lion should be chosen
+        and not inputSelectOption is chosen result should Tiger is default
+        element chosen
      -->
     <uitest:inputSelect_Extend aura:id="Value_Undef_With_Default">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
@@ -27,18 +28,16 @@
         <ui:inputSelectOption text="Moose"  label="Moose"/>
     </uitest:inputSelect_Extend>
     <br/>
-    <!--
+      <!--
         Checking for case when no default value is given in inputSelect, 
-        and not inputSelectOption is chosen result should Tiger is default
-        element chosen
+        and inputSelectOption is set to true for Lion. Lion should be chosen
      -->
     <uitest:inputSelect_Extend aura:id="Value_Undef_With_No_Default">
         <ui:inputSelectOption text="Tiger" label="Tiger"/>
-        <ui:inputSelectOption text="Lion"  label="Lion"/>
+        <ui:inputSelectOption text="Lion"  label="Lion" />
         <ui:inputSelectOption text="Bear"  label="Bear"/>
     </uitest:inputSelect_Extend> 
     <br/>
-      
     <!--
         Checking for case when default for input select is Bear, result 
         should be bear is the initial item shown

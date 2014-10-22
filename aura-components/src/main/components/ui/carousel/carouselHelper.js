@@ -74,7 +74,6 @@
 		if (pageCmps && pageCmps.length > 0) {
 			//TODO: need a better solution to handle iteration inside the pageComponents
 			if (pageCmps[0].isInstanceOf('aura:iteration')) {
-				//pageCmps = pageCmps[0].get('v.realBody');
 				pageCmps = this.getPageComponentsFromIteration(pageCmps[0]);
 			}
 
@@ -83,6 +82,7 @@
 				pageSuper = page.getSuper();
 				//append page components to page container body
 				if ($A.util.isComponent(page) && page.isInstanceOf("ui:carouselPage")) {
+                    page.autoDestroy(false);
 					pageTmp = pageSuper.isInstanceOf('ui:carouselPage') ? pageSuper : page;
 					//page index starts with 1
 					pageTmp.set('v.pageIndex', i + 1);
@@ -96,7 +96,7 @@
 				}
 			}
 			
-			cmp.setAndRelease('v.pageComponents', pages, true);
+			cmp.set('v.pageComponents', pages, true);
 		} else if (pageModels.length > 0) {
 			for ( var i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
@@ -114,10 +114,11 @@
 			            	'priv_height' : pageHeight,
 			            	'priv_continuousFlow' : isContinuousFlow}}
 			        },null,true);
-				 pages.push(component);
+                component.autoDestroy(false);
+				pages.push(component);
 			}
 			
-			cmp.setAndRelease('v.pageComponents', pages, true);
+			cmp.set('v.pageComponents', pages, true);
 		}
 
 		this.initPageIndicator(cmp);
@@ -127,7 +128,7 @@
 	initPageIndicator : function(cmp) {
 		var indCmp = this.getPageIndicatorsComponent(cmp);
 		if (indCmp) {
-			indCmp.setAndRelease('v.pageComponents', cmp.get('v.pageComponents'));
+			indCmp.set('v.pageComponents', cmp.get('v.pageComponents'));
 			indCmp.addHandler('pagerClicked', cmp, 'c.pagerClicked');
 			indCmp.addHandler('pagerKeyed', cmp, 'c.pagerKeyed');
 		}
@@ -208,14 +209,14 @@
 	},
 
 	getPageComponentsFromIteration : function(iterCmp) {
-		var realBody = iterCmp.get('v.realBody'),
+		var body = iterCmp.get('v.body'),
 			pageCmps = [];
 
-		for (var i=0; i< realBody.length; i++) {
-			if (realBody[i].isInstanceOf('aura:iteration')) {
-				pageCmps = pageCmps.concat(this.getPageComponentsFromIteration(realBody[i]));
-			} else if (realBody[i].isInstanceOf("ui:carouselPage")) {
-				pageCmps.push(realBody[i]);
+		for (var i=0; i< body.length; i++) {
+			if (body[i].isInstanceOf('aura:iteration')) {
+				pageCmps = pageCmps.concat(this.getPageComponentsFromIteration(body[i]));
+			} else if (body[i].isInstanceOf("ui:carouselPage")) {
+				pageCmps.push(body[i]);
 			}
 		}
 
@@ -647,7 +648,7 @@
 	},
 
 	getSnap : function(cmp) {
-		var id = cmp.getGlobalId().replace('.', '_').replace(':', '-');
+		var id = cmp.getGlobalId().replace(';', '_').replace(':', '-');
 		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
 	},
 

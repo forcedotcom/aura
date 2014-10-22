@@ -38,8 +38,8 @@
 		}
 
 		var name = cmp.get("v.name");
-		var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"));
-		var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"));
+		var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"),10);
+		var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"),10);
 		var maxSize = cmp.get("v.maxSize") * 1024.0;
 		var clearStorageOnInit = $A.util.getBooleanValue(cmp.get("v.clearStorageOnInit"));
 		var persistent = $A.util.getBooleanValue(cmp.get("v.persistent"));

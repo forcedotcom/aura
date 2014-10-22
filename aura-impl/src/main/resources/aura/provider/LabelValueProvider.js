@@ -19,19 +19,8 @@
  * @constructor
  */
 $A.ns.LabelValueProvider = function() {
-    this.values = null;
+    this.values = {};
     this.queue = {};
-};
-
-/**
- * Checks value is not defined or SimpleValue is not defined
- *
- * @param {Object} value - checks whether value is undefined or SimpleValue with undefined value
- * @return {Boolean}
- * @private
- */
-$A.ns.LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
-    return (!value || (value.toString() === "SimpleValue" && !value.isDefined()));
 };
 
 /**
@@ -40,28 +29,18 @@ $A.ns.LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
  *
  * @param {String} section - label section
  * @param {String} name - label section
- * @param {Component} [component] - owner component
  * @param {Function} [callback] - callback
- * @return {SimpleValue}
+ * @return {String}
  * @private
  */
-$A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, component, callback) {
-
+$A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, callback) {
     var lvp = this,
         queue = this.getQueue(section, name),
-        isComponent = $A.util.isComponent(component),
-        placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]",
-        resValue = valueFactory.create(placeholder, null, isComponent ? component : null);
-
-    if (isComponent) {
-        queue.addComponent(component);
-    }
+        placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]";
 
     if ($A.util.isFunction(callback)) {
         queue.addCallback(callback);
     }
-
-    queue.addReturnValue(resValue);
 
     if (!queue.isRequested()) {
 
@@ -73,22 +52,20 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
         });
 
         action.setCallback(this, function(a) {
-
-            var i = 0;
-
+            var returnValue = placeholder;
             if(a.getState() === "SUCCESS") {
-                var returnValues = queue.getReturnValues();
-                for (i = 0; i < returnValues.length; i++) {
-                    returnValues[i].setValue(a.getReturnValue());
+                returnValue = a.getReturnValue();
+                if(!this.values[section]){
+                    this.values[section]={};
                 }
+                this.values[section][name] = returnValue;
             } else {
                 $A.log("Error getting label: " + section + "." +name);
             }
 
             var callbacks = queue.getCallbacks();
-
-            for (i = 0; i < callbacks.length; i++) {
-                callbacks[i].call(null, resValue);
+            for (var i = 0; i < callbacks.length; i++) {
+                callbacks[i].call(null, returnValue);
             }
 
             lvp.removeQueue(section, name);
@@ -96,15 +73,12 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
 
         $A.enqueueAction(action);
 
-        if (!isComponent) {
-            // forces immediate lookup if not data-bound to component
-        	$A.run(function() {}, "LabelValueProvider.requestServerLabel");
-        }
+        $A.run(function() {}, "LabelValueProvider.requestServerLabel");
 
         queue.setRequested();
     }
 
-    return resValue;
+    return placeholder;
 
 };
 
@@ -143,19 +117,17 @@ $A.ns.LabelValueProvider.prototype.getQueueKey = function(section, name) {
 };
 
 /**
- * Set $Label values
- * @param {Object} values - set values of all labels
+ * returns $Label values
  */
-$A.ns.LabelValueProvider.prototype.setValues = function(values) {
-    this.values = values;
+$A.ns.LabelValueProvider.prototype.getValues = function(values) {
+    return this.values;
 };
 
 /**
- * Get $Label values
- * @return {Object} Label values
+ * Merges $Label values
  */
-$A.ns.LabelValueProvider.prototype.getValues = function() {
-    return this.values;
+$A.ns.LabelValueProvider.prototype.merge = function(values) {
+    $A.util.apply(this.values, values, false, true);
 };
 
 /**
@@ -164,43 +136,20 @@ $A.ns.LabelValueProvider.prototype.getValues = function() {
  * @param {String} expression - expression
  * @param {Component} [component] - component
  * @param {Function} [callback] - callback
- * @return {SimpleValue}
+ * @return {String}
  */
-$A.ns.LabelValueProvider.prototype.getValue = function(expression, component, callback) {
-
+$A.ns.LabelValueProvider.prototype.get = function(expression, callback) {
     var value;
+    var path=expression.split('.');
 
-    if(expression.path && expression.path.length == 3) {
-
-        var stem = expression.getStem(),
-            section = stem.path[0],
-            name = stem.path[1];
-
-        if( this.values ) {
-            value = this.values;
-            var propRef = expression.getStem();
-            while (!$A.util.isUndefinedOrNull(propRef)) {
-                var root = propRef.getRoot();
-                value = value.getValue(root);
-                if(!value) {
-                    // the value should be a Value Object. if not, set as undefined and done.
-                    value = undefined;
-                    break;
-                }
-                propRef = propRef.getStem();
-            }
-        }
-
-        if(this.isUndefinedSimpleValue(value)) {
+    if(path.length == 2) {
+        var section=path[0];
+        var name=path[1];
+        value = this.values[section]&&this.values[section][name];
+        if(value === undefined) {
             // request from server if no value found in existing gvps
-            value = this.requestServerLabel(section, name, component, callback);
+            value = this.requestServerLabel(section, name, callback);
         } else {
-
-            if ($A.util.isValue(value) && $A.util.isComponent(component)) {
-                // create new value object with reference to owner component
-                value = valueFactory.create(value.unwrap(), null, component);
-            }
-
             if( $A.util.isFunction(callback) ) {
                 callback.call(null, value);
             }

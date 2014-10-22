@@ -16,4 +16,5 @@
 
 -->
 <aura:component extensible="true" controller="java://org.auraframework.impl.loadLevel.GatedModelController">
+    {!v.body}
 </aura:component>

@@ -17,9 +17,7 @@
 	handleClick: function (cmp, evt) {
 		var el = cmp.getElement(),
 			click;
-		
 
-		evt = evt.getParam("domEvent")
 		// Dispatch clicks within the action as clicks on the action itself.
 		// Ignore clicks coming from its own element, those events will bubble correctly.
 		if (evt.target !== el) {

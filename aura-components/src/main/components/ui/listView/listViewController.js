@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+    buildList:function(component,domEvent,helper){
+      helper.buildList(component);
+    },
     clickHandler:function (component, domEvent, helper) {
         helper.fireEvents(component, "click", domEvent);
     },

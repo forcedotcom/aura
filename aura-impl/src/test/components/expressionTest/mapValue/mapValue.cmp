@@ -19,7 +19,6 @@
     <aura:attribute name="map" type="Map" />
     <aura:attribute name="triggers" type="Map" default = "{ trigger: 'zero', triggerCount: 0, nested: { count: 0 } }"/>
     <aura:attribute name="triggers2" type="Map" default = "{ trigger: 'zero', triggerCount: 0, nested: { count: 1 } }"/>
-    <aura:attribute name="observer" type="Integer"/>
 
     <aura:handler name="change" value="{!v.map}" action="{!c.onValueChange}"/>
     <aura:handler name="change" value="{!m.map}" action="{!c.onValueChange}"/>
@@ -28,7 +27,7 @@
     <!-- triggers2 runs the same tests as triggers, but has additional map-level handlers. -->
     <aura:handler name="change" value="{!v.triggers2.trigger}" action="{!c.onTrigger2Change}"/>
     <aura:handler name="change" value="{!v.triggers2}" action="{!c.noop}"/>
-    
+
     <aura:attribute name="fribble" type="Boolean" default="false"/>
     <div disabled="{!v.fribble}" readonly="true" aura:id="htmlDiv"/>
     <ui:outputText aura:id="outputText" value="{!m.map.subkey}"/>

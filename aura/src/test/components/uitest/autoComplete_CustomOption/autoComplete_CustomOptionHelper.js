@@ -17,9 +17,9 @@
     setVisible: function(cmp) {
     	var elem = cmp.getElement();
     	if (cmp.get("v.visible")) {
-    		$A.util.removeClass(elem, "invisible");
+    		$A.util.removeClass(cmp, "invisible");
     	} else {
-    		$A.util.addClass(elem, "invisible");
+    		$A.util.addClass(cmp, "invisible");
     	}
     }
 })

@@ -112,8 +112,8 @@
         attributes: {value : -123.936, format:"#.0#;(#.0#)"},
         test: function(component){
         	var value = component.getElement().value;
-            aura.test.assertEquals(-123.936, component.get("v.value"), "Cmp value: Negative values not displayed correctly.");
-            aura.test.assertEquals('(123.94)', value, "Element value: Negative values not displayed correctly.");
+            $A.test.assertEquals(-123.936, component.get("v.value"), "Cmp value: Negative values not displayed correctly.");
+            $A.test.assertEquals('(123.94)', value, "Element value: Negative values not displayed correctly.");
         }
     },
 
@@ -212,8 +212,8 @@
        attributes : {value : 123.450},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(123.45, component.get("v.value"), "Cmp value not displayed as expected when format is not specified.");
-           aura.test.assertEquals("123.45", value, " Element value not displayed as expected when format is not specified.");
+           $A.test.assertEquals(123.45, component.get("v.value"), "Cmp value not displayed as expected when format is not specified.");
+           $A.test.assertEquals("123.45", value, " Element value not displayed as expected when format is not specified.");
        }
    },
 
@@ -224,8 +224,8 @@
        attributes : {value : 999999.9, format : '#,##0'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(999999.9, component.get("v.value"), "Cmp value: Nines were not rounded up correctly");
-           aura.test.assertEquals('1,000,000', value, "Element value: Nines were not rounded up correctly");
+           $A.test.assertEquals(999999.9, component.get("v.value"), "Cmp value: Nines were not rounded up correctly");
+           $A.test.assertEquals('1,000,000', value, "Element value: Nines were not rounded up correctly");
        }
    },
    /**
@@ -235,8 +235,8 @@
        attributes : {value : 999999.9, format : '00000000'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(999999.9, component.get("v.value"), "Cmp value: Nines were not round up correctly");
-           aura.test.assertEquals('01000000', value, "Element value: Nines were not round up correctly");
+           $A.test.assertEquals(999999.9, component.get("v.value"), "Cmp value: Nines were not round up correctly");
+           $A.test.assertEquals('01000000', value, "Element value: Nines were not round up correctly");
        }
    },
    /**
@@ -246,8 +246,8 @@
        attributes : {value : 3.1459, format : '.00'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(3.1459, component.get("v.value"), "Cmp value: Decimal part of value was not rounded up based on format.");
-           aura.test.assertEquals('3.15', value, "Element value: Decimal part of value was not rounded up based on format.");
+           $A.test.assertEquals(3.1459, component.get("v.value"), "Cmp value: Decimal part of value was not rounded up based on format.");
+           $A.test.assertEquals('3.15', value, "Element value: Decimal part of value was not rounded up based on format.");
        }
    },
    /**
@@ -257,8 +257,8 @@
        attributes : {value : 3.14159, format : '.00'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(3.14159, component.get("v.value"), "Cmp value: Decimal part of value was not rounded down based on format.");
-           aura.test.assertEquals('3.14', value, "Element value: Decimal part of value was not rounded down based on format.");
+           $A.test.assertEquals(3.14159, component.get("v.value"), "Cmp value: Decimal part of value was not rounded down based on format.");
+           $A.test.assertEquals('3.14', value, "Element value: Decimal part of value was not rounded down based on format.");
        }
    },
    /**
@@ -268,8 +268,8 @@
        attributes : {value : 22.7, format : '0.0'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(22.7, component.get("v.value"), "Cmp value: Should have displayed full value but was probably truncated.");
-           aura.test.assertEquals('22.7', value, "Element value: Should have displayed full value but was probably truncated.");
+           $A.test.assertEquals(22.7, component.get("v.value"), "Cmp value: Should have displayed full value but was probably truncated.");
+           $A.test.assertEquals('22.7', value, "Element value: Should have displayed full value but was probably truncated.");
        }
    },
    /**
@@ -279,8 +279,8 @@
        attributes : {value : 22.7, format : '.000'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals(22.7, component.get("v.value"), "Cmp value: Should have appended two zeros to match format.");
-           aura.test.assertEquals('22.700', value, "Element value: Should have appended two zeros to match format.");
+           $A.test.assertEquals(22.7, component.get("v.value"), "Cmp value: Should have appended two zeros to match format.");
+           $A.test.assertEquals('22.700', value, "Element value: Should have appended two zeros to match format.");
        }
    },
    /**
@@ -290,8 +290,8 @@
        attributes : {value : '1234567890123456789012345678901234567890.12', format : '.00'},
        test: function(component){
     	   var value = component.getElement().value;
-           aura.test.assertEquals('1234567890123456789012345678901234567890.12', component.get("v.value"), "Cmp value: Unexpected value.");
-           aura.test.assertEquals('1234567890123456789012345678901234567890.12', value, "Element value: Unexpected value.");
+           $A.test.assertEquals('1234567890123456789012345678901234567890.12', component.get("v.value"), "Cmp value: Unexpected value.");
+           $A.test.assertEquals('1234567890123456789012345678901234567890.12', value, "Element value: Unexpected value.");
        }
    },
 
@@ -302,13 +302,13 @@
        attributes : {value : 22.7, format : '##,#0,00.00#####'},
        test: function(component){
     	   var value = component.getElement().value;
-    	   aura.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
-           aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
+    	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
+           $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.value", 49322);
            $A.rerender(component);
            value = component.getElement().value;
-    	   aura.test.assertEquals(49322, component.get("v.value"), "Cmp: Value not formatted correctly.");
-           aura.test.assertEquals('49322', value, "Element: Value not formatted correctly.");
+    	   $A.test.assertEquals(49322, component.get("v.value"), "Cmp: Value not formatted correctly.");
+           $A.test.assertEquals('49322', value, "Element: Value not formatted correctly.");
        }
    },
 
@@ -319,13 +319,13 @@
        attributes : {value : 22.7, format : '##,#0,00.00#####'},
        test: function(component){
     	   var value = component.getElement().value;
-    	   aura.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
-           aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
+    	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
+           $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.format", '.000');
            $A.rerender(component);
            value = component.getElement().value;
-    	   aura.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
-           aura.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
+    	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
+           $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
        }
    }
 })

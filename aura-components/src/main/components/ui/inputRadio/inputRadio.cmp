@@ -26,5 +26,5 @@
     	   value="{!v.text}"
     	   checked="{!v.value}"
     	   disabled="{!v.disabled}"
-    	   aria-describedby="{!v.ariaDescribedby}"/>
+    	   aria-describedby="{!v.ariaDescribedBy}"/>
 </aura:component>

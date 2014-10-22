@@ -38,9 +38,9 @@ public class IterationUITest extends WebDriverTestCase {
         assertEquals(4, buttons.size());
         buttons.get(0).click(); // button class=.button6
         WebElement e = findDomElement(By.cssSelector(".outputText"));
-        waitForElementTextPresent(e, "action run by button6");
+        assertEquals("action run by button6", e.getText());
         buttons.get(3).click(); // button class=.button9
-        waitForElementTextPresent(e, "action run by button9");
+        assertEquals("action run by button9", e.getText());
 
         WebElement root = findDomElement(By.cssSelector(".testRoot"));
         String clientHtml = (String) auraUITestingUtil.getEval("return arguments[0].innerHTML;", root);

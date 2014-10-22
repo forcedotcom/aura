@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel" render="client">
     <aura:attribute type="String" name="stringValue" default="London"/>
 
     <aura:registerevent name="A" type="handleEventTest:event"/>

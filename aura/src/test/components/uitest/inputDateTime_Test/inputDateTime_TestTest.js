@@ -128,7 +128,7 @@
      * 
      */ 
     isViewDesktop : function(){
-    	return $A.get('$Browser').formFactor.toLowerCase() === "desktop";
+    	return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
     },
     
     /**

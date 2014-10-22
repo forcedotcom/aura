@@ -16,24 +16,20 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
-    
+
     <aura:attribute name="first" type="Object[]"/>
     <aura:attribute name="second" type="Object[]"/>
-    
+
     <aura:attribute name="firstArrayLen" type="Integer" default="0"/>
     <aura:attribute name="secondArrayLen" type="Integer" default="0"/>
 
-    <aura:handler name="change" value="{!v.first}" action="{!c.onValueChange}"/>
-    <!-- comment out for W-2351693
-    <aura:handler name="change" value="{!v.second}" action="{!c.onValueChange2}"/>
-    -->
-    <aura:handler name="change" value="{!v.first.length}" action="{!c.onLengthChange}"/>
-    <aura:handler name="change" value="{!v.second.length}" action="{!c.onLengthChange2}"/>
+    <aura:handler name="change" value="{!v.first}" action="{!c.onChange1}"/>
+    <aura:handler name="change" value="{!v.second}" action="{!c.onChange2}"/>
 
     <div>
-      array.length={!v.first.length}, second.length={!v.second.length}.
+        array.length={!v.first.length}, second.length={!v.second.length}.
     </div>
-    
+
     <expressionTest:arrays aura:id="innerCmp" passedInArray="{!v.first}" />
-   
+
 </aura:component>

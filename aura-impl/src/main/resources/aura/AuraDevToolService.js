@@ -56,8 +56,8 @@ var AuraDevToolService = function() {
             var cmp = $A.getCmp(event.data);
 
             var elements = cmp.getElements();
-            for(var key in elements){
-                var element = elements[key];
+            for(var i=0;i<elements.length;i++){
+                var element = elements[i];
                 if(element && element["style"]){
                     highlightedElements.push(element);
                     $A.util.addClass(element, "auraDevToolServiceHighlight");
@@ -136,23 +136,14 @@ var AuraDevToolService = function() {
             "actionReferenceValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("ActionReferenceValue"));
             },
-            "arrayValue" : function(){
-                return flattenRegistry(valueFactory.getIndex("ArrayValue"));
-            },
             "functionCallValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("FunctionCallValue"));
-            },
-            "mapValue" : function(){
-                return flattenRegistry(valueFactory.getIndex("MapValue"));
             },
             "passthroughValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("PassthroughValue"));
             },
-            "PropertyChain" : function(){
-                return flattenRegistry(valueFactory.getIndex("PropertyChain"));
-            },
-            "simpleValue" : function(){
-                return flattenRegistry(valueFactory.getIndex("SimpleValue"));
+            "PropertyReferenceValue" : function(){
+                return flattenRegistry(valueFactory.getIndex("PropertyReferenceValue"));
             },
             "value" : function(){
                 var ret = {};
@@ -320,6 +311,7 @@ var AuraDevToolService = function() {
                 if(func !== undefined){
                     val = func.call(root);
                 }else{
+                    //JBUCH: HALO: TODO: INVESTIGATE AND REPLACE
                     if(root.getValue){
                         var f = "";
                         for(var i=place;i<fields.length;i++){
@@ -329,10 +321,8 @@ var AuraDevToolService = function() {
                             f += fields[i];
                         }
                         place = i;
+                        //JBUCH: HALO: TODO: INVESTIGATE AND REPLACE
                         val = root.getValue(f);
-                        if(val && val.unwrap){
-                            val = val.unwrap();
-                        }
                     }
                 }
             }else if($A.util.isFunction(val)){
@@ -571,8 +561,8 @@ var AuraDevToolService = function() {
         	     
         	    // Checking for the data_aura_rendered_by attribute 
          	    if(!$A.util.isEmpty(data_aura_rendered_by)){
-         		  imgType = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.imageType');	
-         		  alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');		 
+         		  imgType = $A.getCmp(data_aura_rendered_by).getAttributeValueProvider().get('v.imageType');	
+         		  alt     = $A.getCmp(data_aura_rendered_by).getAttributeValueProvider().get('v.alt');		 
          	    }
          	    
          	    //Checking for injected image tag
@@ -615,7 +605,7 @@ var AuraDevToolService = function() {
              * 
              * @param   lbls       - All of the labels to
              * @param   inputTags  - The attribute that is being sought (for, id, title, etc)
-             * @returns array     - All errornous tags
+             * @returns array     - All erroneous tags
              */
             inputLabelAide : function(lbls, inputTags){
                 var errorArray = [];
@@ -656,7 +646,7 @@ var AuraDevToolService = function() {
              * @param   attribute - The attribute that is being sought (for, id, title, etc)
              * @param   errorVal  - Value that this attribute should not be set to
              * @param   evalFunc  - Function to evaluate whether or not attribute is valid
-             * @returns array    - All errornous tags
+             * @returns array    - All erroneous tags
              */
             checkForAttrib : function(tags, attribute, errorVal, evalFunc){
                 var errorArray = [];
@@ -709,7 +699,7 @@ var AuraDevToolService = function() {
                     if(!$A.util.isEmpty(data_aura_rendered_by)){
                          cmp = $A.getCmp(data_aura_rendered_by);
                          if(!$A.util.isUndefinedOrNull(cmp)){
-                             cmp = cmp.getAttributes().getValueProvider();
+                        	 cmp = cmp.getAttributeValueProvider();
                              if("getDef" in cmp){
                                  cmp = cmp.getDef().getDescriptor();
                                  cmpName = cmp.getNamespace()+":"+cmp.getName();

@@ -21,13 +21,13 @@
 
             if (document.createEvent) {
                 event = document.createEvent("HTMLEvents");
-                event.initEvent("customClick", true, true);
+                event.initEvent("customclick", true, true);
             } else {
                 event = document.createEventObject();
-                event.eventType = "customClick";
+                event.eventType = "customclick";
             }
 
-            event.eventName = "customClick";
+            event.eventName = "customclick";
 
             if (document.createEvent) {
                 element.dispatchEvent(event);

@@ -27,14 +27,7 @@
 	refreshScroller : function(component) {
 		var width = component.get("v.width");
 		if (width) {
-			var contentelement = component.find("scrollContent").getElement();
-			//
-			// May not be present if we switch screen really quickly.
-			// Resize is done asyncronously, so sometimes it just doesn't exist.
-			//
-			if(contentelement) {
-				contentelement.style.width = width;
-			}
+			component.find("scrollContent").getElement().style.width = width;
 		}
 
 		if (!component._refreshing) {
@@ -127,9 +120,9 @@
 			if (enabled) {
 				if ($A.util.isUndefined(component._scroller)) {
 					var snap = component.get("v.snap");
-					var hScroll = $A.util.getBooleanValue(component.get("v.hscroll"));
-					var vScroll = $A.util.getBooleanValue(component.get("v.vscroll"));
-					var showScrollbars = $A.util.getBooleanValue(component.get("v.showscrollbars"));
+					var hScroll = $A.util.getBooleanValue(component.get("v.hScroll"));
+					var vScroll = $A.util.getBooleanValue(component.get("v.vScroll"));
+					var showScrollbars = $A.util.getBooleanValue(component.get("v.showScrollbars"));
 					var useTransform = $A.util.getBooleanValue(component.get("v.useTransform"));
 					var useTransition = $A.util.getBooleanValue(component.get("v.useTransition"));
                     var checkDOMChanges = $A.util.getBooleanValue(component.get("v.checkDOMChanges"));

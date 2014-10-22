@@ -22,7 +22,7 @@
 		cmp._originalSimpleList = simpleList;
 		cmp.set("v.simpleListAttr", [99,100,101,102,103]);
 		
-		var listOfMap = cmp.get("listOfMapAttr");
+		var listOfMap = cmp.get("v.listOfMapAttr");
 		cmp._listOfMap = listOfMap;
 		cmp.set("v.listOfMapAttr", [{'a':'Tom'},{'a':'Brady'}]);
 	},

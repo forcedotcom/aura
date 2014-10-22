@@ -23,19 +23,6 @@
 		</p>
 		
 	</aura:description>	
-	<aura:example name="renderIfExample" ref="uiExamples:displayRenderIf" label="Using aura:renderIf">
-		Use <code>aura:renderIf</code> if you are passing an expression into another component. When you press the <b>Toggle</b> button in this example, the expression <code>{!v.display || v.display}</code> is reevaluated and passed into another component, which has this markup.
-	<pre>&lt;aura:component>
-    &lt;aura:attribute name="display" type="Boolean" default="true"/>
-
-    &lt;aura:renderif isTrue="{!v.display}">
-        True
-
-        &lt;aura:set attribute="else">
-          False
-        &lt;/aura:set>
-    &lt;/aura:renderif>
-&lt;/aura:component>
-	</pre></aura:example>
+		
 	
 </aura:documentation>

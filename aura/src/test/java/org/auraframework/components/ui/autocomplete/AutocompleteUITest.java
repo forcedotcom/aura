@@ -28,7 +28,7 @@ import org.openqa.selenium.*;
 @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
 public class AutocompleteUITest extends WebDriverTestCase {
     private final String URL = "/uitest/autoComplete_Test.cmp";
-    private final String INPUT_SELECTOR = "input[class*='uiInput']";
+    private final String INPUT_SELECTOR = "input[class*='default']";
     private final String OUTPUT_SELECTOR = "span[class*='uiOutputText']";
     private final String EVENT_OUTPUT_SELECTOR = "span[class*='outputLabel']";
     private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";

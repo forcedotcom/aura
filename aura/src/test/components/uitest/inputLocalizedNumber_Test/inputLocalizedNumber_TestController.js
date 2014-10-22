@@ -16,7 +16,7 @@
 ({
     submit : function(component, event) {
         var cmpType = component.get("v.cmpType");
-        var inputCmpValue = component.get("inputValue").get("v.value");
+        var inputCmpValue = component.find("inputValue").get("v.value");
         var a = component.get("c.echo" + cmpType);
         a.setParams({
             inVar : inputCmpValue

@@ -27,12 +27,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public class ComponentRenderer implements Renderer {
 
+    @SuppressWarnings("unchecked")
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-
-        @SuppressWarnings("unchecked")
-        List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>) component.getAttributes().getValue("body");
-        if (body != null) {
+        Object bodyAttribute = component.getAttributes().getValue("body");
+        if(bodyAttribute !=null && bodyAttribute instanceof List) {
+            List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>) bodyAttribute;
             for (BaseComponent<?, ?> c : body) {
                 Aura.getRenderingService().render(c, out);
             }

@@ -16,23 +16,23 @@
 
 -->
 <aura:component>
-		<ui:button label="Clear Body of Root Cmp" press="{!c.clearRootBody}" aura:id="clearRootBody"/>
-		<ui:button label="Set Body of Root Cmp" press="{!c.setRootBody}" aura:id="setRootBody"/>
-		<ui:button label="Set Body of Root Cmp to new cmp array which reuses some existing cmps" press="{!c.setRootBody_ReUse}" aura:id="setRootBody_ReUse"/>
-		<div aura:id="rootDiv">
-			<p aura:id="rootDivsBody">Top level html component </p>
-		</div>
-		<ui:button label="Root level uiButton Component" aura:id="rootButton"></ui:button>
-		<br/>
-		
-		<br/>
-		<ui:button label="Facet uiButtonComponent" aura:id="facetButton"/>
-		<ui:button label="Clear Body of facet button Cmp" aura:id="clearFacetButtonBody" press="{!c.clearFacetButtonBody}"></ui:button>
-		<br/>
-		
-		<br/>		
-		<expressionTest:bodyAttributeOfFacet aura:id="facetCmp">
-			<ui:button label="Clear Body of Facet test Cmp" press="{!c.clearFacetCmpBody}" aura:id="clearFacetCmpBody"/>
-			<div aura:id="div">Inside the markup body of a facet</div>
-		</expressionTest:bodyAttributeOfFacet>
+    <ui:button label="Clear Body of Simple Cmp" press="{!c.clearSimpleCmpBody}" aura:id="clearSimpleCmpBody"/>
+    <ui:button label="Set Body of Simple Cmp" press="{!c.setSimpleCmpBody}" aura:id="setSimpleCmpBody"/>
+    <ui:button label="Keep one and add to Body of Simple Cmp" press="{!c.addSimpleCmpBody}" aura:id="addSimpleCmpBody"/>
+    <br/>
+    <br/>
+    <div aura:id="simpleCmp" style="border: 1px solid blue">
+        <p aura:id="simpleCmpText">Facet of Simple Cmp</p>
+        <ui:button label="Clear Body of Simple Cmp" press="{!c.clearSimpleCmpBody}" aura:id="clearBodyFromSimpleCmp"/>
+    </div>
+
+    <ui:button label="Clear Body of Custom Cmp" press="{!c.clearCustomCmpBody}" aura:id="clearCustomCmpBody"/>
+    <ui:button label="Set Body of Custom Cmp" press="{!c.setCustomCmpBody}" aura:id="setCustomCmpBody"/>
+    <ui:button label="Keep one and add to Body of Custom Cmp" press="{!c.addCustomCmpBody}" aura:id="addCustomCmpBody"/>
+    <br/>
+    <br/>
+    <expressionTest:bodyAttributeOfFacet aura:id="customCmp">
+        <div aura:id="customCmpText">Facet of Custom Cmp</div>
+        <ui:button label="Clear Body of Custom Cmp" press="{!c.clearCustomCmpBody}" aura:id="clearBodyFromCustomCmp"/>
+    </expressionTest:bodyAttributeOfFacet>
 </aura:component>

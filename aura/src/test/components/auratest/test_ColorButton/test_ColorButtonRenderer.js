@@ -24,7 +24,7 @@
     },
     rerender : function(component){
         if (component.isDirty('v.color')) {
-            var div = component.getElements().element;
+            var div = component.getElement();
             //Have something in the label to indicate the number of times this re-render function is called for the button
             var rerenderCount = 0;
             //Note I could have used an attribute to track this count, but then it would have to be set in the re-render function.

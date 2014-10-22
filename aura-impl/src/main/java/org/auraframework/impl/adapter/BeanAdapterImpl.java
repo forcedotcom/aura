@@ -90,7 +90,6 @@ public class BeanAdapterImpl implements BeanAdapter {
      * Build an object for a class that was previously validated by {@link #validateConstructor()}.
      *
      * If the object would not pass validation, an exception will be generated.
-     * create a new instance of controller/model every time we calls this, even within the same request.
      *
      * @param clazz the class to build
      * @throws AuraRuntimeException if the constructor cannot be invoked.

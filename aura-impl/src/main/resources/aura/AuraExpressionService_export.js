@@ -15,9 +15,8 @@
  */
 /*jslint sub: true */
 exp(expressionService,
-    "setValue", expressionService.setValue,
-    "getValue", expressionService.getValue,
-    "get", expressionService.get,
     "create", expressionService.create,
-    "createPassthroughValue", expressionService.createPassthroughValue
+    "createPassthroughValue", expressionService.createPassthroughValue,
+    "normalize",expressionService.normalize,
+    "resolve", expressionService.resolve
 );

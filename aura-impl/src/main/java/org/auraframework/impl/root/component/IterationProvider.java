@@ -37,8 +37,8 @@ import com.google.common.collect.Maps;
 /**
  * guts of the iteration component. dynamically instantiates the components in
  * its body based on the attributes passed into it
- * 
- * 
+ *
+ *
  * @since 0.0.234
  */
 @Provider
@@ -51,7 +51,7 @@ public class IterationProvider implements ComponentConfigProvider {
         List<Component> components = Lists.newArrayList();
         InstanceStack iStack = context.getInstanceStack();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
-        m.put("realbody", components);
+        m.put("body", components);
         cc.setAttributes(m);
 
         AttributeSet atts = component.getAttributes();
@@ -64,8 +64,9 @@ public class IterationProvider implements ComponentConfigProvider {
 
                 int realstart = 0;
                 int realend = items.size();
-                
-                ComponentDefRefArray body = atts.getValue("body", ComponentDefRefArray.class);
+
+                ComponentDefRefArrayImpl template = atts.getValue("body", ComponentDefRefArrayImpl.class);
+                m.put("template",template);
                 Integer start = getIntValue(atts.getValue("start"));
                 Integer end = getIntValue(atts.getValue("end"));
                 if (start == null && end == null) {
@@ -75,14 +76,14 @@ public class IterationProvider implements ComponentConfigProvider {
                     if (start != null && start > realstart) {
                         realstart = start;
                     }
-                    
+
                     if (end != null && end < realend) {
                         realend = end;
                     }
                 }
-                
+
                 // boolean reverse = (Boolean)atts.getValue("reverse");
-                iStack.setAttributeName("realbody");
+                iStack.setAttributeName("body");
                 for (int i = realstart; i < realend; i++) {
                     iStack.setAttributeIndex(i);
                     iStack.pushInstance(component, component.getDescriptor());
@@ -92,17 +93,15 @@ public class IterationProvider implements ComponentConfigProvider {
                     if (indexVar != null) {
                         providers.put(indexVar, i);
                     }
-                    
-                    // realbody ends up dirty, don't need it to be
-                    components.addAll(body.newInstance(atts.getValueProvider(), providers));
+                    components.addAll(template.newInstance(atts.getValueProvider(), providers));
                     iStack.clearAttributeName("body");
                     iStack.popInstance(component);
                     iStack.clearAttributeIndex(i);
                 }
-                iStack.clearAttributeName("realbody");
+                iStack.clearAttributeName("body");
             }
         }
-        
+
         return cc;
     }
 

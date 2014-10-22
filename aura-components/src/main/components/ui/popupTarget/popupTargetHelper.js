@@ -354,18 +354,9 @@
     		return false;
     	}
     	
-        componentElements = [];
-        elements = component.getElements();
+        componentElements = component.getElements();
         
-        // takes all component elements out of aura object
-        // and puts them into a local array
-        for (var index in elements) {
-            if (elements.hasOwnProperty(index)){
-                componentElements.push(elements[index]);
-            }
-        }
-        
-        // while currentNode is not false, climb the component tree 
+        // while currentNode is not false, climb the component tree
         // to see if we find a component with the same name as the 
         // parent component passed in as a parameter
         do {

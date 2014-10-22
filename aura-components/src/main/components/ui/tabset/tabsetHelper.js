@@ -117,7 +117,7 @@
      */
     setActiveTabBody: function(cmp, option) {
         // set active tab body;
-        var index = option.index, tab = option.tab, evt;
+        var tab = option.tab, evt;
   
         if (!tab.isRendered() && option.active) {
             // manually render tab component instead of setting v.body to avoid rerendering of all the tabs
@@ -157,17 +157,16 @@
      * @private
      */
     initTabs: function(cmp) {
-        var tabComponents = [], tabIds = [], tabItems = [];
         var tabConfigs = cmp.get("v.tabs");
         cmp._tabCollection = this.createTabCollection();
-        if (tabConfigs.length > 0) {
+        if (tabConfigs&&tabConfigs.length > 0) {
             this.createTabsFromAttribute(cmp, tabConfigs);
         } else {
             //iterate v.body to find instances of ui:tab
             var result = this.getTabsFromBody(cmp);
             cmp._activeTabIndex = result.activeIndex;
             cmp._tabCollection.init(result.tabs, result.tabIds, result.tabNames);
-            cmp.set('v.tabItems', result.tabItemConfigs);
+            cmp.set('v.tabItems', result.tabItemConfigs, true);
         }
     },
     
@@ -211,12 +210,12 @@
      * @private
      */
     getTabsFromBody: function(cmp) {
-    	var tabCmps = [], tabs = [], tabIds = [], tabItemConfigs =[], tabNames = [], 
+    	var tabs = [], tabIds = [], tabItemConfigs =[], tabNames = [],
     	    //default active tab to first tab
     	    activeTab = 0;
     	
     	// get all instances of ui:tab in the body
-    	tabCmps = this.getTabComponents(cmp.get('v.body'));
+    	tabCmps = this.getTabComponents(cmp.getConcreteComponent().get('v.body'));
     	for (var i=0, len=tabCmps.length; i<len; i++) {
     		var tab = tabCmps[i],
     		    id = tab.getGlobalId(),
@@ -261,7 +260,7 @@
      * @param {Object} tab ui:tab component
      */
     getTabItemConfig: function(cmp, tab) {
-    	var self = this, config={}, values = {},
+    	var config={}, values = {},
     		compService = $A.componentService,
     		tabItemDef = this.CONSTANTS.TAB_ITEM_DEF;
     	
@@ -271,7 +270,7 @@
     			var name = def.getDescriptor().getName();
     			//don't want to pass the body to tabItems
     			if (name != "body") {
-    			    values[name] = self.findValue(tab, "v." + name);
+                    values[name] = tab.get("v." + name);
     			}
     		});
     		values["ariaControlId"] = tab.getGlobalId();
@@ -280,41 +279,23 @@
     	 
     	return config;
     },
-    /**
-     * Find the attribute value in the given component
-     * @private
-     */
-    findValue: function(cmp, expression) {
-	    var zuper = cmp , value = null;
-	    while(zuper){
-	        value = zuper.get(expression);
-	        if(!$A.util.isEmpty(value)) {
-	            return value;
-	        }
-	        zuper = zuper.getSuper();
-	    }
-	    return value;
-    },
+
     /**
      * @private
      */
     getTabComponents: function(body) {
-        var type = "ui:tab";        
+        var type = "ui:tab";
         var ret = [];
         if (!body) {
             return ret;
         }
         for(var i=0;i<body.length;i++) {
             var c = body[i];
-            if (c.isInstanceOf("aura:iteration") || c.isInstanceOf("aura:if")) {
-                ret = ret.concat(this.getTabComponents(c.get('v.realBody')));
+            var inst = this._getTabComponent(c, type);
+            if (inst) {
+                ret.push(inst);
             } else {
-                var inst = this._getTabComponent(c, type);
-                if (inst) {
-                    ret.push(inst);
-                } else {
-                    ret = ret.concat(this.getTabComponents(this._getSuperest(c).get('v.body')));
-                }
+                ret = ret.concat(this.getTabComponents(this._getSuperest(c).get('v.body')));
             }
         }
         return ret;
@@ -348,6 +329,9 @@
      * @private
      */
     renderTabBody: function(cmp, tabComponent) {
+//JBUCH: HALO: TODO: WHY CAN'T THIS WHOLE METHOD JUST BE:
+//cmp.find("tabContainer").set("v.body",tabComponent);
+//???
     	var container = cmp.find("tabContainer").getElement(),
     		docFrag = document.createDocumentFragment();
 
@@ -439,5 +423,5 @@
      CONSTANTS: {
          TAB_DEF : "markup://ui:tab",
          TAB_ITEM_DEF : "markup://ui:tabItem"
-     },
+     }
 })

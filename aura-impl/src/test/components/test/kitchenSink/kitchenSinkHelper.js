@@ -19,7 +19,10 @@
         a.setCallback(cmp, function (a) {
             $A.componentService.newComponentAsync(
                 this, function (newCmp) {
-                    cmp.find('dataFromController').getValue('v.body').push(newCmp);
+                    var dataFromController=cmp.find('dataFromController');
+                    var body=dataFromController.get('v.body');
+                    body.push(newCmp);
+                    dataFromController.set("v.body",body);
                 },
                 {componentDef: 'markup://aura:text', attributes: { values: { value: a.getReturnValue() }}}
             )

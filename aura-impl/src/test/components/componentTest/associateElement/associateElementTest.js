@@ -22,11 +22,12 @@
             // add a proxy function that logs which component is associating which element
             var log = [];
             var proto = $A.test.getPrototype(component);
+            var br = "<br/>";
+
             var override = $A.test.addFunctionHandler(proto, "associateElement",
-                function(){
-                    var config = arguments[0];
-                    log.push(this.getDef().getDescriptor() + ":" + this.getGlobalId()
-                        + "<-" + config["name"] + ":[" + $A.test.getOuterHtml(config["element"]) + "]");
+                function(element){
+            		log.push(this.getDef().getDescriptor() + ":" + this.getGlobalId() + "<-[" + $A.test.getOuterHtml(element) + "]");
+            		log.push(br);
                 }
             );
 
@@ -53,6 +54,9 @@
                     log.sort();
                     var errors = [];
                     for (var i = 1; i < log.length; i ++) {
+                    	// Ignore checks against the line break which is just there to add 
+                    	// to the asthetics.
+                    	if(log[i - 1] == br) { continue; } 
                         if(log[i - 1] == log[i]){
                             errors.push(log[i]);
                         }

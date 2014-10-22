@@ -16,13 +16,14 @@
 
 -->
 <aura:component support="GA" implements="aura:rootComponent"
+    renderer="js://aura.component, java://org.auraframework.components.aura.ProvidedBodyRenderer"
     provider="java://org.auraframework.impl.root.component.IfProvider, js://aura.if"
-    renderer="java://org.auraframework.components.aura.ProvidedBodyRenderer, js://aura.providedBody"
     access="GLOBAL"
     description="Conditionally instantiates and renders either the body or the components in the else attribute.">
-<aura:attribute name="isTrue" type="Boolean" required="true" access="GLOBAL" description="An expression that must be fulfilled in order to display the body."/>
-<aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" access="GLOBAL" description="The components to render when isTrue evaluates to true."/>
-<aura:attribute name="else" type="Aura.ComponentDefRef[]" access="GLOBAL" description="The alternative to render when isTrue evaluates to false, and the body is not rendered.  Should always be set using the aura:set tag."/>
-<aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
-<aura:handler name="change" value="{!v.isTrue}" action="{!c.handleTheTruth}"/>
+    <aura:attribute name="isTrue" type="Boolean" required="true" access="GLOBAL" description="An expression that must be fulfilled in order to display the body."/>
+    <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" access="GLOBAL" description="The components to render when isTrue evaluates to true."/>
+    <aura:attribute name="else" type="Aura.ComponentDefRef[]" access="GLOBAL" description="The alternative to render when isTrue evaluates to false, and the body is not rendered.  Should always be set using the aura:set tag."/>
+    <aura:attribute name="template" type="Aura.ComponentDefRef[]" description="Internal use only. Any value set will be ignored."/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.isTrue}" action="{!c.handleTheTruth}"/>
 </aura:component>

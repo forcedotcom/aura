@@ -26,7 +26,7 @@
                     component.get("c.clickHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -40,7 +40,7 @@
                     component.get("c.clickHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -54,7 +54,7 @@
                     component.get("c.clickHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -68,7 +68,7 @@
                     component.get("c.clickHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -85,7 +85,7 @@
                     component.get("c.dblclickHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -99,7 +99,7 @@
                     component.get("c.dblclickHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -113,7 +113,7 @@
                     component.get("c.dblclickHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -127,7 +127,7 @@
                     component.get("c.dblclickHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -144,7 +144,7 @@
                     component.get("c.keydownHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -158,7 +158,7 @@
                     component.get("c.keydownHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -172,7 +172,7 @@
                     component.get("c.keydownHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -186,7 +186,7 @@
                     component.get("c.keydownHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -203,7 +203,7 @@
                     component.get("c.keyupHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -217,7 +217,7 @@
                     component.get("c.keyupHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -231,7 +231,7 @@
                     component.get("c.keyupHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -245,7 +245,7 @@
                     component.get("c.keyupHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -262,7 +262,7 @@
                     component.get("c.keypressHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -276,7 +276,7 @@
                     component.get("c.keypressHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -290,7 +290,7 @@
                     component.get("c.keypressHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -304,7 +304,7 @@
                     component.get("c.keypressHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -321,7 +321,7 @@
                     component.get("c.mousedownHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -335,7 +335,7 @@
                     component.get("c.mousedownHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -349,7 +349,7 @@
                     component.get("c.mousedownHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -363,7 +363,7 @@
                     component.get("c.mousedownHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -380,7 +380,7 @@
                     component.get("c.mouseoverHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -394,7 +394,7 @@
                     component.get("c.mouseoverHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -408,7 +408,7 @@
                     component.get("c.mouseoverHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -422,7 +422,7 @@
                     component.get("c.mouseoverHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -439,7 +439,7 @@
                     component.get("c.mouseoutHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -453,7 +453,7 @@
                     component.get("c.mouseoutHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -467,7 +467,7 @@
                     component.get("c.mouseoutHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -481,7 +481,7 @@
                     component.get("c.mouseoutHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -498,7 +498,7 @@
                     component.get("c.mouseupHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -512,7 +512,7 @@
                     component.get("c.mouseupHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -526,7 +526,7 @@
                     component.get("c.mouseupHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -540,7 +540,7 @@
                     component.get("c.mouseupHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -557,7 +557,7 @@
                     component.get("c.touchstartHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -571,7 +571,7 @@
                     component.get("c.touchstartHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -585,7 +585,7 @@
                     component.get("c.touchstartHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -599,7 +599,7 @@
                     component.get("c.touchstartHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -616,7 +616,7 @@
                     component.get("c.touchmoveHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -630,7 +630,7 @@
                     component.get("c.touchmoveHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -644,7 +644,7 @@
                     component.get("c.touchmoveHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -658,7 +658,7 @@
                     component.get("c.touchmoveHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -675,7 +675,7 @@
                     component.get("c.touchendHandler").runDeprecated();
                 })
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToFireEvents(component) {
@@ -689,7 +689,7 @@
                     component.get("c.touchendHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEvents(component) {
@@ -703,7 +703,7 @@
                     component.get("c.touchendHandler").runDeprecated();
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToFireEvents(component) {
@@ -717,7 +717,7 @@
                     component.get("c.touchendHandler").runDeprecated(expected);
                 })
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -734,7 +734,7 @@
                     helper.addEvents(component, null);
                 }));
 
-                aura.test.assertNull(actual);
+                $A.test.assertNull(actual);
             },
 
             function GetsEventDispatcher(component) {
@@ -749,7 +749,7 @@
                     helper.addEvents(component, {});
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function SetsEventFromMapOnDispatcher(component) {
@@ -767,7 +767,7 @@
                 });
                 var actual = target[expected];
 
-                aura.test.assertEquals(actual, expected);
+                $A.test.assertEquals(actual, expected);
             }
         ]
     },
@@ -788,7 +788,7 @@
                     helper.buildColumns(component, {columnTemplates:[templates]}, component.find("listView:header"));
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function CreatesColumnHeaderRow(component) {
@@ -805,7 +805,7 @@
                     helper.buildColumns(component, {columnTemplates:[templates]}, component.find("listView:header"));
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function AddsColumnHeaderToRow(component) {
@@ -824,8 +824,8 @@
                     helper.buildColumns(component, {columnTemplates:[templates]}, component.find("listView:header"));
                 });
 
-                aura.test.assertNotNull(expected);
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertNotNull(expected);
+                $A.test.assertEquals(expected, actual);
             },
 
             function AddsColumnHeaderRowToTarget(component) {
@@ -849,8 +849,8 @@
                     });
                 });
 
-                aura.test.assertNotNull(expected);
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertNotNull(expected);
+                $A.test.assertEquals(expected, actual);
             },
 
             function ColumnsStoresSingleColumnForOneLevel(component) {
@@ -868,8 +868,8 @@
                 });
                 var actual=component.get("v.columns")[0];
 
-                aura.test.assertNotNull(expected);
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertNotNull(expected);
+                $A.test.assertEquals(expected,actual);
             },
 
             function ColumnsStoresSingleDataColumnForOneLevel(component) {
@@ -888,8 +888,8 @@
                 });
                 var actual = component.get("v.dataColumns")[0];
 
-                aura.test.assertNotNull(expected);
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertNotNull(expected);
+                $A.test.assertEquals(expected, actual);
             },
 
             function ColumnsStoresSingleDataTemplateForOneLevel(component) {
@@ -900,7 +900,7 @@
                 helper.buildColumns(component, {columnTemplates:[templates], dataTemplates:templates}, component.find("listView:header"));
                 var actual = component.get("v.dataTemplates")[0];
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function FiresColumnsReadyEvent(component){
@@ -915,7 +915,7 @@
                     helper.buildColumns(component, null, component.find("listView:header"));
                 });
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function PassesComponentToColumnsReadyEvent(component) {
@@ -930,7 +930,7 @@
                     helper.buildColumns(expected, null, component.find("listView:header"));
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesSourceToColumnsReadyEvent(component) {
@@ -945,7 +945,7 @@
                     helper.buildColumns(expected, null, component.find("listView:header"));
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventTypeToColumnsReadyEvent(component) {
@@ -960,7 +960,7 @@
                     helper.buildColumns(component, null, component.find("listView:header"));
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsRowClassOnHeaderRow(component){
@@ -985,7 +985,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
 
             },
 
@@ -1008,15 +1008,17 @@
                     });
                 });
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function PassesAttributesToGenerateComponent(component){
                 var helper = this.getHelper(component);
                 var templates = [helper.generateComponent("ui:listViewColumn", {title:'Title', fieldName:'FieldName'})];
+                templates[0].autoDestroy(false);
                 var expected={};
                 var mockGenerateComponent = this.getHelperMock(component, "generateComponent", function (targetDescriptor, targetAttributes) {
                     var component = arguments.callee.mocked(targetDescriptor, targetAttributes);
+                    component.autoDestroy(false);
                     if (targetDescriptor == "ui:listViewColumnHeader") {
                         actual = targetAttributes;
                     }
@@ -1033,7 +1035,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function DeletesHeadersAttribute(component){
@@ -1058,7 +1060,7 @@
                     });
                 });
 
-                aura.test.assertFalse(actual);
+                $A.test.assertFalse(actual);
             },
 
             function SetsColumnHeaderBodyToTemplateTitle(component){
@@ -1084,7 +1086,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function SetsUnspecifiedColumnHeaderTooltipToTemplateTitle(component) {
@@ -1110,7 +1112,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsDelayedExpressionColumnHeaderTooltipToTemplateTitle(component) {
@@ -1136,7 +1138,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsColumnHeaderTooltipToTemplateTooltip(component) {
@@ -1162,7 +1164,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsTemplateReferenceOnColumnHeader(component) {
@@ -1188,13 +1190,13 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsDereferencedFormattersOnColumnHeader(component) {
-                var expected=aura.test.assertEquals;
+                var expected=$A.test.assertEquals;
                 var helper = this.getHelper(component);
-                var targetAttributes = {title:"Title", fieldName:'FieldName',formatters:"aura.test.assertEquals"};
+                var targetAttributes = {title:"Title", fieldName:'FieldName',formatters:"$A.test.assertEquals"};
                 var templates = [helper.generateComponent("ui:listViewColumn", targetAttributes)];
                 var mockGenerateComponent = this.getHelperMock(component, "generateComponent", function (targetDescriptor, targetAttributes) {
                     var component = arguments.callee.mocked(targetDescriptor, targetAttributes);
@@ -1214,13 +1216,13 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsDereferencedFormatterOnColumnHeader(component) {
-                var expected = aura.test.assertEquals;
+                var expected = $A.test.assertEquals;
                 var helper = this.getHelper(component);
-                var targetAttributes = {title:"Title", fieldName:'FieldName', formatters:"aura.test.assertEquals"};
+                var targetAttributes = {title:"Title", fieldName:'FieldName', formatters:"$A.test.assertEquals"};
                 var templates = [helper.generateComponent("ui:listViewColumn", targetAttributes)];
                 var mockGenerateComponent = this.getHelperMock(component, "generateComponent", function (targetDescriptor, targetAttributes) {
                     var component = arguments.callee.mocked(targetDescriptor, targetAttributes);
@@ -1240,13 +1242,13 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SetsDereferencedFormattersOnColumnHeader(component) {
-                var expected = aura.test.assertEquals;
+                var expected = $A.test.assertEquals;
                 var helper = this.getHelper(component);
-                var targetAttributes = {title:"Title", fieldName:'FieldName', formatters:"aura.test.assertTrue,aura.test.assertEquals"};
+                var targetAttributes = {title:"Title", fieldName:'FieldName', formatters:"$A.test.assertTrue,$A.test.assertEquals"};
                 var templates = [helper.generateComponent("ui:listViewColumn", targetAttributes)];
                 var mockGenerateComponent = this.getHelperMock(component, "generateComponent", function (targetDescriptor, targetAttributes) {
                     var component = arguments.callee.mocked(targetDescriptor, targetAttributes);
@@ -1266,7 +1268,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SavesCopyOfUnwrappedAttributesOnColumnTemplate(component) {
@@ -1283,7 +1285,7 @@
                     actual = templates[0].attributes;
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CallsGetEvents(component) {
@@ -1299,7 +1301,7 @@
                     helper.buildColumns(component, {columnTemplates:[templates]}, component.find("listView:header"));
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesColumnTemplateToGetEvents(component) {
@@ -1316,7 +1318,7 @@
                     helper.buildColumns(component, {columnTemplates:[templates]}, component.find("listView:header"));
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SavesCopyOfEventsOnColumnTemplate(component) {
@@ -1334,7 +1336,7 @@
                     actual = templates[0].events;
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -1352,7 +1354,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToGetColumnTemplates(component) {
@@ -1367,7 +1369,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function CallsGenerateColumns(component) {
@@ -1381,7 +1383,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToGenerateTemplates(component) {
@@ -1396,7 +1398,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CallsBuildColumns(component) {
@@ -1410,7 +1412,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToBuildColumns(component) {
@@ -1425,7 +1427,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesTemplatesToBuildColumns(component) {
@@ -1445,7 +1447,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesListHeaderToBuildColumns(component) {
@@ -1460,7 +1462,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CallsBuildRows(component) {
@@ -1474,7 +1476,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToBuildRows(component) {
@@ -1489,7 +1491,7 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesTemplatesToBuildRows(component) {
@@ -1509,7 +1511,7 @@
                     });
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesListHeaderToBuildRows(component) {
@@ -1524,38 +1526,8 @@
                     helper.buildList(component);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
-        ]
-    },
-
-    testHelperBuildRows:{
-        test:[
-            function BuildsEmptyMessge(component){
-                var helper=this.getHelper(component);
-                var mockGenerateComponent=this.getHelperMock(component,"generateComponent",function(targetDescriptor,targetAttributes){
-                    if(targetDescriptor=="aura:unescapedHtml"){
-                        actual=targetAttributes.value;
-                    }
-                });
-                var mockGetValue=this.getMock(component,"get",function(expression){
-                    if(expression=="v.emptyMessage")return expected;
-                    return arguments.callee.mock(expression);
-                });
-                var expected="expected";
-                mockGenerateComponent(function(){
-                    mockGetValue(function(){
-                        component.getValue();
-                    });
-                });
-
-                helper.buildRows(component,{},component.find("listView:body"));
-
-                aura.test.assertEquals();
-            }
-
-            // TODO: LOADS MORE BUILD ROW TESTS
-
         ]
     },
 
@@ -1568,7 +1540,7 @@
 
                 var actual=helper.decodeHtml(target);
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function DecodesLessThanSign(component) {
@@ -1578,7 +1550,7 @@
 
                 var actual = helper.decodeHtml(target);
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function DecodesGreaterThanSign(component) {
@@ -1588,7 +1560,7 @@
 
                 var actual = helper.decodeHtml(target);
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function DecodesQuoteSign(component) {
@@ -1598,7 +1570,7 @@
 
                 var actual = helper.decodeHtml(target);
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function StripsTags(component) {
@@ -1608,7 +1580,7 @@
 
                 var actual = helper.decodeHtml(target);
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -1630,7 +1602,7 @@
                     helper.fireEvent(component);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesEventTypeToGetEvent(component) {
@@ -1649,7 +1621,7 @@
                     helper.fireEvent(component, null, expected);
                 });
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function CallsSetParamsOnEvent(component){
@@ -1668,7 +1640,7 @@
                     helper.fireEvent(component);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesListViewEventTypeToSetParamsOnEvent(component) {
@@ -1688,7 +1660,7 @@
                     helper.fireEvent(component,null,null,expected);
                 });
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function PassesTargetToSetParamsOnEvent(component) {
@@ -1708,7 +1680,7 @@
                     helper.fireEvent(component, expected);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesRawEventToSetParamsOnEvent(component) {
@@ -1729,7 +1701,7 @@
                     helper.fireEvent(component, null, null, null, expected);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesHelperToSetParamsOnEvent(component) {
@@ -1750,7 +1722,7 @@
                     helper.fireEvent(component);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesDataToSetParamsOnEvent(component) {
@@ -1771,7 +1743,7 @@
                     helper.fireEvent(component,null,null,null,null,expected);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -1793,7 +1765,7 @@
                     })
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToGetEventTargets(component) {
@@ -1813,7 +1785,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesDomEventTargetToGetEventTargets(component) {
@@ -1833,7 +1805,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CallsGetEventType(component) {
@@ -1851,7 +1823,7 @@
                     })
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function PassesComponentToGetEventType(component) {
@@ -1870,7 +1842,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesTargetColumnToGetEventType(component) {
@@ -1894,7 +1866,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CallsFireEventForCell(component){
@@ -1914,7 +1886,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesComponentToFireEventForCell(component) {
@@ -1934,7 +1906,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesTargetColumnToFireEventForCell(component) {
@@ -1959,7 +1931,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEventForCell(component) {
@@ -1979,7 +1951,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesDomEventToFireEventForCell(component) {
@@ -1999,7 +1971,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventParamsToFireEventForCell(component) {
@@ -2019,7 +1991,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function FiresRowEventForCell(component){
@@ -2038,7 +2010,7 @@
                     })
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
 
             function FiresTableEventForCell(component){
@@ -2057,7 +2029,7 @@
                     })
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
            },
 
             function CallsFireEventForHeader(component) {
@@ -2077,7 +2049,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesComponentToFireEventForHeader(component) {
@@ -2097,7 +2069,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesTargetColumnToFireEventForHeader(component) {
@@ -2122,7 +2094,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventNameToFireEventForHeader(component) {
@@ -2142,7 +2114,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesDomEventToFireEventForHeader(component) {
@@ -2162,7 +2134,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function PassesEventParamsToFireEventForHeader(component) {
@@ -2182,7 +2154,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CallsFireEventForRow(component) {
@@ -2202,7 +2174,7 @@
                     })
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -2215,7 +2187,7 @@
 
                 var actual=helper.formatColumnName(null);
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function ReturnsEmptyStringIfColumnNameIsUndefined(component) {
@@ -2224,7 +2196,7 @@
 
                 var actual = helper.formatColumnName();
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function SplitsWordsOnCapitalization(component){
@@ -2233,7 +2205,7 @@
 
                 var actual = helper.formatColumnName("ExpectedName");
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function CapitalizesFirstWord(component) {
@@ -2242,28 +2214,13 @@
 
                 var actual = helper.formatColumnName("expectedName");
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
 
     testHelperFormatContent:{
         test:[
-            function UnwrapsDataItemIfPossible(component){
-                var helper=this.getHelper(component);
-                var targetItem={
-                    unwrap:function(){
-                        actual=true;
-                        return {};
-                    }
-                };
-                var actual=false;
-
-                helper.formatContent(null,targetItem);
-
-                aura.test.assertTrue(actual);
-            },
-
             function ReturnsSimpleField(component) {
                 var helper = this.getHelper(component);
                 var expected="expected";
@@ -2272,7 +2229,7 @@
 
                 var actual = helper.formatContent(null, targetItem, expected);
 
-                aura.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected,actual);
             },
 
             function ReturnsComplexField(component) {
@@ -2284,7 +2241,7 @@
 
                 var actual = helper.formatContent(null, targetItem, expected+'.'+expected);
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function ReturnsObjectAsJson(component) {
@@ -2296,7 +2253,7 @@
 
                 var actual = helper.formatContent(null, targetItem, "expected");
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },

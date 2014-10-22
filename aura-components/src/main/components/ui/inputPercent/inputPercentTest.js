@@ -66,8 +66,8 @@
         attributes : {value : 1.145, format : '0000.0%'},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(1.145, component.get("v.value"), "Cmp: Percentage not correct");
-            aura.test.assertEquals('0114.5%', value, "Element: Percentage not correct");
+        	$A.test.assertEquals(1.145, component.get("v.value"), "Cmp: Percentage not correct");
+            $A.test.assertEquals('0114.5%', value, "Element: Percentage not correct");
         }
     },
 
@@ -75,8 +75,8 @@
         attributes : {value : -0.14, format : '.000%'},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(-0.14, component.get("v.value"), "Cmp: Percentage not correct");
-            aura.test.assertEquals('-14.000%', value, "Element: Percentage not correct");
+        	$A.test.assertEquals(-0.14, component.get("v.value"), "Cmp: Percentage not correct");
+            $A.test.assertEquals('-14.000%', value, "Element: Percentage not correct");
         }
     },
 
@@ -84,8 +84,8 @@
         attributes : {value : 30, format: ',,'},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(30, component.get("v.value"), "Expected error message");
-            aura.test.assertEquals('Invalid format attribute', value, "Expected error message");
+        	$A.test.assertEquals(30, component.get("v.value"), "Expected error message");
+            $A.test.assertEquals('Invalid format attribute', value, "Expected error message");
         }
     },
 
@@ -93,8 +93,8 @@
         attributes : {value : 0.14566, format: '0.00%'},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(0.14566, component.get("v.value"), "Cmp: Rounding not correct");
-            aura.test.assertEquals('14.57%', value, "Element: Rounding not correct");
+        	$A.test.assertEquals(0.14566, component.get("v.value"), "Cmp: Rounding not correct");
+            $A.test.assertEquals('14.57%', value, "Element: Rounding not correct");
         }
     },
 
@@ -102,8 +102,8 @@
         attributes : {value : .05, format : '.0%'},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(.05, component.get("v.value"), "Cmp: Percentage not correct");
-            aura.test.assertEquals('5.0%', value, "Element: Percentage not correct");
+        	$A.test.assertEquals(.05, component.get("v.value"), "Cmp: Percentage not correct");
+            $A.test.assertEquals('5.0%', value, "Element: Percentage not correct");
         }
     },
 
@@ -114,13 +114,13 @@
         attributes : {value : .227},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
-            aura.test.assertEquals('23%', value, "Element: Value not formatted correctly");
+        	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
+            $A.test.assertEquals('23%', value, "Element: Value not formatted correctly");
             component.set("v.value", 965.21);
             $A.rerender(component);
             value = component.getElement().value;
-        	aura.test.assertEquals(965.21, component.get("v.value"), "Cmp: Value not formatted correctly");
-            aura.test.assertEquals('965.21', value, "Element: Value not formatted correctly");
+        	$A.test.assertEquals(965.21, component.get("v.value"), "Cmp: Value not formatted correctly");
+            $A.test.assertEquals('965.21', value, "Element: Value not formatted correctly");
         }
     },
 
@@ -131,13 +131,13 @@
         attributes : {value : .227, format : '#0.#%'},
         test: function(component){
         	var value = component.getElement().value;
-        	aura.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
-            aura.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
+        	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
+            $A.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
             component.set("v.format", "000.00 %");
             $A.rerender(component);
             value = component.getElement().value;
-        	aura.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
-            aura.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
+        	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
+            $A.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
         }
     }
 })

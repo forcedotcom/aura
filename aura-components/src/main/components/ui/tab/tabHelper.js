@@ -15,16 +15,19 @@
  */
 ({
     setActive: function(cmp, active) {
-    	var tabEl = cmp.find('tabBody').getElement();
-    	if (!tabEl) {
-    	    return;
-    	}
-    	if (active) {
-    		$A.util.addClass(tabEl, 'active');
-    		tabEl.setAttribute("aria-expanded", "true");
-    	} else {
-    		$A.util.removeClass(tabEl, 'active');
-    		tabEl.setAttribute("aria-expanded", "false");
-    	}
+        // Used to do the work in here, now does it in the cmp as expressions, so just set the property.
+        cmp.set("v.active", active);
+
+    	// var tabEl = cmp.find('tabBody').getElement();
+    	// if (!tabEl) {
+    	//     return;
+    	// }
+    	// if (active) {
+    	// 	//$A.util.addClass(tabEl, 'active');
+    	// 	tabEl.setAttribute("aria-expanded", "true");
+    	// } else {
+    	// 	//$A.util.removeClass(tabEl, 'active');
+    	// 	tabEl.setAttribute("aria-expanded", "false");
+    	// }
     }
 })

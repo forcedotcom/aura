@@ -16,5 +16,7 @@
 
 -->
 <aura:component>
-	{!v.body}
+    <div style="border: 1px solid red">
+    	{!v.body}
+    </div>
 </aura:component>

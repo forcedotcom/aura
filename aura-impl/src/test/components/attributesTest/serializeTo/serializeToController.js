@@ -18,7 +18,7 @@
         $A.newCmpAsync(
             this,
             function (newcmp) {
-                cmp.find("target").set("v.body", newcmp);
+                cmp.find("target").set("v.body", [newcmp]);
             },
             {
                 "componentDef" : "markup://attributesTest:serializeTo",

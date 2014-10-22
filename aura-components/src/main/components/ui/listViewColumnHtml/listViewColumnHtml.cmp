@@ -16,5 +16,6 @@
 
 -->
 <aura:component extends="ui:listViewColumnCell" extensible="true" support="GA" description="An html column template definition, describes unescaped markup in a table data cell.">
-    <aura:unescapedHtml value="{!v.body}"/>
+    <aura:attribute name="markup" type="Object" description="Sets the markup for this cell."/>
+    <aura:unescapedHtml value="{!v.markup}"/>
 </aura:component>

@@ -29,23 +29,6 @@
         }
     },
 
-    testValidValueObject : {
-        test : function(cmp){
-            var foo;
-            $A.test.assertFalse( $A.util.isValue(foo), "undefined: Should not be a value object");
-
-            foo = null;
-            $A.test.assertFalse( $A.util.isValue(foo), "null: Should not be a component");
-
-            foo = {};
-            $A.test.assertFalse( $A.util.isValue(foo), "empty object: Should not be a component");
-
-            foo = $A.expressionService.create(null, "");
-            $A.test.assertTrue( $A.util.isValue(foo), "Should be a value object");
-            $A.test.assertEquals( "SimpleValue", foo.toString(), "Should be a SimpleValue");
-
-        }
-    },
 
     testGetAndSetDataAttributes: {
         test : function(cmp){

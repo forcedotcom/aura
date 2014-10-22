@@ -20,7 +20,14 @@
 		helper.renderTabItems(cmp);
 		return ret;
 	},
-	
+
+//    // JBUCH: HALO: TODO: REWRITE THIS ENTIRE COMPONENT
+//    rerender:function(cmp,helper){
+//        var ret=this.superRerender();
+//        helper.renderTabItems(cmp);
+//        return ret;
+//    },
+//
 	unrender: function (cmp) {
 		var items = cmp._tabItems;
 		try {

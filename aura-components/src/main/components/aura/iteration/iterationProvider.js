@@ -14,19 +14,7 @@
  * limitations under the License.
  */
 ({
-	provide : function IterationProvider(component, localCreation) {
-		// $A.mark("provide " + component.getGlobalId());
-		var realbody = [];
-		if (!localCreation) {
-			var helper = component.getDef().getHelper();
-			realbody = helper.createRealBodyServer(component);
-		}
-		// $A.endMark("provide " + component.getGlobalId());
-		
-		return {
-			attributes : {
-				"realbody" : realbody
-			}
-		};
-	}
+    provide : function IterationProvider(component) {
+        return component;
+    }
 })

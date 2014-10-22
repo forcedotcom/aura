@@ -25,9 +25,9 @@
             $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[2].getElement()));
 
             $A.run(function(){
-                cmp.get("addRow").get("e.press").fire();
-                cmp.get("addRow").get("e.press").fire();
-                cmp.get("addRow").get("e.press").fire();
+                cmp.find("addRow").get("e.press").fire();
+                cmp.find("addRow").get("e.press").fire();
+                cmp.find("addRow").get("e.press").fire();
             });
 
             // Wait for 5 elements- 3 original plus 2 added
@@ -57,7 +57,7 @@
             $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[2].getElement()));
 
             $A.run(function(){
-                cmp.get("removeRow").get("e.press").fire();
+                cmp.find("removeRow").get("e.press").fire();
             });
             // Wait for 2 elements- 3 original minus 1 deleted
             $A.test.addWaitFor(2, function() {
@@ -82,7 +82,7 @@
             $A.test.assertEquals(6, window.__testRenderCount, "Each inner component should be rendered once on load.");
 
             $A.run(function(){
-                cmp.get("addRow").get("e.press").fire();
+                cmp.find("addRow").get("e.press").fire();
             });
             
             $A.test.addWaitFor(4, function() {
@@ -109,7 +109,7 @@
             $A.test.assertStartsWith("three : readonly", $A.util.getText(cmps[2].getElement()));
 
             $A.run(function(){
-                cmp.get("addRow").get("e.press").fire();
+                cmp.find("addRow").get("e.press").fire();
             });
             
             // Wait for 4 elements- 3 original plus 1 added

@@ -59,18 +59,10 @@
         browsers: ["IE7", "IE8", "IE9", "IE10", "IE11"],
         test: function(component){
             var children = component.find("nbsp");
-            
-            var text = children[0].getElement().innerText;
-            $A.test.assertEquals(32, text.charCodeAt(0), "Entity nbsp not rendered as expected at index 0");
-            
-            text = children[1].getElement().innerText;
-            $A.test.assertEquals(32, text.charCodeAt(0), "Entity nbsp not rendered as expected at index 1");
-            
-            text = $A.util.getText(children[2].getElement());
-            $A.test.assertEquals(160, text.charCodeAt(0), "Entity nbsp not rendered as expected at index 2");
-            
-            text = children[3].getElement().innerText;
-            $A.test.assertEquals(32, text.charCodeAt(0), "Entity nbsp not rendered as expected at index 3");
+            $A.test.assertEquals(32, $A.test.getText(children[0].getElement()).charCodeAt(0), "Entity nbsp not rendered as expected at index 0");
+            $A.test.assertEquals(32, $A.test.getText(children[1].getElement()).charCodeAt(0), "Entity nbsp not rendered as expected at index 1");
+            $A.test.assertEquals(160, $A.test.getText(children[2].getElement()).charCodeAt(0), "Entity nbsp not rendered as expected at index 2");
+            $A.test.assertEquals(32, $A.test.getText(children[3].getElement()).charCodeAt(0), "Entity nbsp not rendered as expected at index 3");
         }
     },
 

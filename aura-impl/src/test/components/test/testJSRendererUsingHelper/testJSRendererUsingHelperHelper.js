@@ -31,7 +31,7 @@
      **/
     //Single line Comments
     rerenderHelper: function(component) {
-        var div = component.getElements().element;
+        var div = component.getElement();
         div.innerHTML = component.get('v.label');
     }
 })

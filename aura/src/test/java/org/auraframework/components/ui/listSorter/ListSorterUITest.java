@@ -72,7 +72,7 @@ public class ListSorterUITest extends WebDriverTestCase {
      * If isOpen: true then listSorter should be open after pressing tab, isopen: false, list sorter should be closed
      * after pressing tab
      * 
-     * @param key
+     * @param keysToSend
      * @param isOpen
      * @throws URISyntaxException
      * @throws MalformedURLException
@@ -85,6 +85,7 @@ public class ListSorterUITest extends WebDriverTestCase {
         // List Sorter dialog should be closed
         assertFalse("list Sorter Dialog should not be visible", listSorter.getAttribute("class").contains("open"));
         openListSorter();
+        focusOnListSorter();//need to focus on the list sorter first, or ESC won't work
         WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(keysToSend);
         if (isOpen) {
@@ -103,5 +104,10 @@ public class ListSorterUITest extends WebDriverTestCase {
         WebElement listSorter = driver.findElement(By.className(SORTER));
         listTrigger.click();
         assertTrue("list Sorter Dialog should be visible", listSorter.getAttribute("class").contains("open"));
+    }
+    
+    private void focusOnListSorter() {
+        WebElement input = findDomElement(By.cssSelector("li[class*='uiMenuItem']"));
+        input.click(); 
     }
 }

@@ -237,7 +237,7 @@
         var activeIndex = -1;
         var iterCmp = component.find("iter");
         if (iterCmp) {
-            var iters = iterCmp.get("v.realbody");
+            var iters = iterCmp.get("v.body");
             var highlightedIndex = this.findHighlightedOptionIndex(iters);
             var index = event.getParam("activeIndex");
             if (index < 0) { // highlight previous visible option
@@ -262,7 +262,7 @@
     handlePressOnHighlighted: function(component, event) {
         var iterCmp = component.find("iter");
         if (iterCmp) {
-            var iters = iterCmp.get("v.realbody");
+            var iters = iterCmp.get("v.body");
             var highlightedIndex = this.findHighlightedOptionIndex(iters);
             if (highlightedIndex >= 0) {
                 var targetCmp = iters[highlightedIndex];

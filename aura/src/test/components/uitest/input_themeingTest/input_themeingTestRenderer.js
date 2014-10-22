@@ -1,7 +1,7 @@
 ({
     afterRender : function(cmp){
-	cmp.get("inputTextBoxFocusable").getElement().focus();
-	cmp.get("inputTextBoxFocusable").getElement().select();
+	cmp.find("inputTextBoxFocusable").getElement().focus();
+	cmp.find("inputTextBoxFocusable").getElement().select();
 	this.superAfterRender();
     }
 })

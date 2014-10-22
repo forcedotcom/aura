@@ -39,23 +39,8 @@ ActionReferenceValue.prototype.auraType = "Value";
 /**
  * Returns the unwrapped value. This is a new ActionDef instance based on the associated component.
  */
-ActionReferenceValue.prototype.getValue = function(){
+ActionReferenceValue.prototype.getAction = function(){
     return this.actionDef.newInstance(this.component);
-};
-
-/**
- * Returns the unwrapped value.
- */
-ActionReferenceValue.prototype.unwrap = function(){
-    return this.getValue();
-};
-
-/**
- *  Do not call this method. Always throws an error because this type cannot be merged into.
- *  @private
- */
-ActionReferenceValue.prototype.merge = function(sv, overwrite) {
-    throw new Error("Cannot merge into an ActionReferenceValue");
 };
 
 /**

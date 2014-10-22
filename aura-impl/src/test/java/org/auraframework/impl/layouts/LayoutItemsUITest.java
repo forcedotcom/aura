@@ -37,7 +37,7 @@ public class LayoutItemsUITest extends WebDriverTestCase {
     // TODO(W-2375142): Default layouts not properly loaded when navigating for page to first time in IE10 and 11.
     @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
-        By forwardButton = By.cssSelector(".Forward_Button");
+    	By forwardButton = By.cssSelector(".Forward_Button");
         By backButton = By.cssSelector(".Back_Button");
         By layoutDone = By.cssSelector(".layoutDone");
         By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
@@ -72,33 +72,31 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         verifyExpectedResultsForLayout1();
 
         findDomElement(removeLayoutDone).click();
-        waitForElementDisappear("'layoutDone' class never removed from div", layoutDone);
         auraUITestingUtil.getEval("window.history.back()");
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         findDomElement(removeLayoutDone).click();
-        waitForElementDisappear("'layoutDone' class never removed from div", layoutDone);
         auraUITestingUtil.getEval("window.history.forward()");
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
     }
 
     private void verifyExpectedResultsForInitialLayout() throws Exception {
-        waitForElementTextPresent(findDomElement(resultBtn1), "Ready to party?");
+    	waitForElementText(findDomElement(resultBtn1), "Ready to party?", true, 3);
         assertEquals("", findDomElement(resultBtn2).getText());
     }
 
     private void verifyExpectedResultsForLayout1() throws Exception {
         assertEquals("Step1", getHashToken());
-        waitForElementTextPresent(findDomElement(resultBtn1), "Step 1a. Wear a Suit");
+        assertEquals("Step 1a. Wear a Suit", findDomElement(resultBtn1).getText());
         assertEquals("Step 1b. Wear a Jacket", findDomElement(resultBtn2).getText());
 
     }
 
     private void verifyExpectedResultForLayout2() throws Exception {
         assertEquals("Step2", getHashToken());
-        waitForElementTextPresent(findDomElement(resultBtn1), "Step 2a. Start your car");
+        assertEquals("Step 2a. Start your car", findDomElement(resultBtn1).getText());
         assertEquals("Step 2b. Go party", findDomElement(resultBtn2).getText());
     }
 

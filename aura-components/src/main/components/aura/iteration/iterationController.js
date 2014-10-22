@@ -15,21 +15,21 @@
  */
 ({
     rangeChange: function(cmp, evt, helper) {
-        helper.updateRealBody(cmp);
+        helper.updateBody(cmp);
     },
 
     itemsChange: function(cmp, evt, helper) {
-        var v = evt.getParam("value");
-        
-        //JBUCH: FIXME: THIS IS A HUGE WRONG: THIS IS FIRING WHEN ATTRIBUTES OTHER THAN ITEMS ARE CHANGED
-        if($A.util.isArray(v)){
-            helper.updateRealBody(cmp);
-        }
+        helper.updateBody(cmp);
     },
 
-    firstRender: function(cmp, evt, helper) {
-        if (cmp.get("v.realbody").length === 0) {
-            helper.updateRealBody(cmp);
+    firstRender: function(component, evt, helper) {
+        var bodyTemplate=component.get("v.body");
+        var template=component.get("v.template");
+        var items = component.get("v.items");
+        if(bodyTemplate.length&&!template.length){
+            component.set("v.template",bodyTemplate,true);
+            var body=helper.createBodyServer(component);
+            component.set("v.body",body,true);
         }
     }
 })

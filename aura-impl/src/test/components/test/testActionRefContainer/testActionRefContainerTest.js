@@ -26,7 +26,7 @@
             $A.test.assertEquals("0", text.nodeValue, "initial value for pants wasn't 0");
 
             var mar = component.get("v.myActionRef");
-            $A.test.assertEquals(undefined, mar, "there should be no action yet");
+            $A.test.assertEquals(null, mar, "there should be no action yet");
 
             //getButton.dispatchEvent(evt);
             getButton.get("e.press").fire();

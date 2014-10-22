@@ -11,7 +11,7 @@
                 },
                 attributes: {
                     values: {
-                        value: 6
+                        value: "6"
                     }
                 }
             },

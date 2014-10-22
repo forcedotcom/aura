@@ -94,8 +94,8 @@ AuraContext.prototype.getMode = function() {
  * @private
  * @return {GlobalValueProviders}
  */
-AuraContext.prototype.getGlobalValueProviders = function() {
-    return this.globalValueProviders;
+AuraContext.prototype.getGlobalValueProvider = function(type) {
+    return this.globalValueProviders.getValueProvider(type);
 };
 
 /**
@@ -121,7 +121,7 @@ AuraContext.prototype.encodeForServer = function() {
  * @param {Object}
  *      otherContext the context from the server to join in to this one.
  */
-AuraContext.prototype.join = function(otherContext) {
+AuraContext.prototype.merge = function(otherContext) {
     var i, defs;
 
     if (otherContext["mode"] !== this.getMode()) {
@@ -133,7 +133,7 @@ AuraContext.prototype.join = function(otherContext) {
     if (otherContext["fwuid"] !== this.fwuid) {
         throw new Error("framework mismatch");
     }
-    this.globalValueProviders.join(otherContext["globalValueProviders"]);
+    this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     $A.localizationService.init();
     
     if(otherContext["libraryDefs"]) {

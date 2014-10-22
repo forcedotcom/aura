@@ -25,13 +25,13 @@
     handleIconOnly : function(cmp, event){
         cmp.set("v.iconOnlyButtonPressedMessage", "Icon only button was pressed!!!");
     },
-
+    
     checkDomEventSet : function(cmp, event){
-        var domEvent = event.getParam("domEvent");
-        if ($A.util.isUndefinedOrNull(domEvent)) {
-            cmp.set("v.isDomEventSet", false);
-        } else {
-            cmp.set("v.isDomEventSet", true);
-        }
+    	var domEvent = event.getParam("domEvent");
+    	if ($A.util.isUndefinedOrNull(domEvent)) {
+    		cmp.set("v.isDomEventSet", false);
+    	} else {
+    		cmp.set("v.isDomEventSet", true);
+    	}
     }
 })

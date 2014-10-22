@@ -1,0 +1,4 @@
+<aura:component extends="ui:interactive">
+	<aura:attribute name="title" type="String"/>
+	[<aura:expression aura:id="title" value="{!v.title}"/>]
+</aura:component>

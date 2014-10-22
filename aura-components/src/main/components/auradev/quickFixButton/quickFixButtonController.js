@@ -15,7 +15,7 @@
  */
 ({
     fix : function(cmp, evt){
-    	var quickFix = cmp.get("v.quickFix");
+        var quickFix = cmp.get("v.quickFix");
         var ui = quickFix["ui"];
         if (ui) {
             $A.newCmpAsync(
@@ -46,7 +46,6 @@
             a.setCallback(cmp, function(action){
                 alert("woohoo");
             });
-
 
             $A.enqueueAction(a);
         }

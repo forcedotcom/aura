@@ -13,17 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({        
-    provide : function IfProvider(component, localCreation) {
-        var isTrue = component.get("v.isTrue");
-        // check for the string "true" cause of our awesome type system
-        isTrue = isTrue === true || isTrue === "true";
-        var realbody = component.getDef().getHelper().createRealBody(component, isTrue, !localCreation);
-
-        return {
-            attributes: {
-                "realbody": realbody
-            }
-        };
+({
+    provide : function IfProvider(component) {
+        return component;
     }
 })

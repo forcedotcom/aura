@@ -213,28 +213,31 @@
             aura.test.assertEquals('check again', component.find("link").getElement().title, "Title attribute not updated");
         }
     },  
+    
     testLabelAndIgnorePassedInAlt: {
         attributes: {label: "link", value : 'www.salesforce.com', alt : "wrongAlt", iconClass : "somethingSomethingDarkSide"},
         test:function(component){
-            var renderedBy = component.getElement().children[0].getAttribute("data-aura-rendered-by");
-            var imageType  = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.imageType');
-            var alt        = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.alt');
+            var icon = component.find("icon");
+            var imageType  = icon.get('v.imageType');
+            var alt        = icon.get('v.alt');
             aura.test.assertEquals(alt, "", "Alt is set incorrectly");
             aura.test.assertEquals(imageType, "decorative", "Image is not set to type decorative");
 
         }
      },
+     
      testNoLabelWithAlt: {
         attributes: {value : 'www.salesforce.com', alt : "Alt Should exist", iconClass : "somethingSomethingComplete"},
         test:function(component){
-            var renderedBy = component.getElement().children[0].getAttribute("data-aura-rendered-by");
-            var imageType  = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.imageType');
-            var alt        = $A.getCmp(renderedBy).getAttributeValueProvider().get('v.alt');
+            var icon = component.find("icon");
+            var imageType  = icon.get('v.imageType');
+            var alt        = icon.get('v.alt');
             aura.test.assertEquals(alt, "Alt Should exist", "Alt is set incorrectly");
             aura.test.assertEquals(imageType, "informational", "Image is not set to type informational");
 
         }
      },
+     
      testNoLabelNoAlt: {
          auraErrorsExpectedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
          attributes: {value : 'www.salesforce.com', iconClass : "somethingSomethingDarkSide"},

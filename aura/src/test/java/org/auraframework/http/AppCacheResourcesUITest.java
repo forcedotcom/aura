@@ -113,8 +113,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         + "return val;"
                         + "};"
                         + "var style = getStyle(c.getElement(),'background-image');"
-                        + "c.getValue('v.output').setValue('@@@TOKEN@@@'"
-                        + "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
+                        + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
                         + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
                         + "}}");
 

@@ -29,7 +29,7 @@
         // Set placeholder
         var format = component.get("v.format");
         if (!format) {
-            format = $A.get("$Locale.datetimeformat");
+            format = $A.get("$Locale.datetimeFormat");
         }
         component.set("v.placeholder", format);
     },
@@ -46,7 +46,7 @@
         var value = elem ? elem.value : null;
         var format = component.get("v.format");
         if (!format) { // use default format
-            format = $A.get("$Locale.datetimeformat");
+            format = $A.get("$Locale.datetimeFormat");
         }
         var langLocale = component.get("v.langLocale");
         var secs = 0;

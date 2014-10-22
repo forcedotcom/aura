@@ -251,25 +251,25 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private static AddableDef<?> addable[] = new AddableDef[] {
-        // Ignoring top level bundle defs.
-        // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
-        new AddableDef<>(ControllerDef.class, "js://%s.%s",
-                "({method: function(cmp) {}})"),
-        new AddableDef<>(HelperDef.class, "js://%s.%s",
-                "({method: function(cmp) {}})"),
+            // Ignoring top level bundle defs.
+            // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
+            new AddableDef<>(ControllerDef.class, "js://%s.%s",
+                    "({method: function(cmp) {}})"),
+            new AddableDef<>(HelperDef.class, "js://%s.%s",
+                    "({method: function(cmp) {}})"),
             // new AddableDef<ProviderDef>(ProviderDef.class, "js://%s.%s",
-        //        "({provide: function(cmp) {}})"),
-        new AddableDef<>(RendererDef.class, "js://%s.%s",
-                "({render: function(cmp) {}})"),
-        new AddableDef<>(StyleDef.class, "css://%s.%s",
-                ".THIS {display:block;}"),
-        // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
-        // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+            //        "({provide: function(cmp) {}})"),
+            new AddableDef<>(RendererDef.class, "js://%s.%s",
+                    "({render: function(cmp) {}})"),
+            new AddableDef<>(StyleDef.class, "css://%s.%s",
+                    ".THIS {display:block;}"),
+            // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+            // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
     };
 
     private MasterDefRegistry resetDefRegistry() {
@@ -282,7 +282,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private <T extends Definition> void checkAddRemove(DefDescriptor<?> tld, String suid,
-            AddableDef<T> toAdd) throws QuickFixException {
+                                                       AddableDef<T> toAdd) throws QuickFixException {
         DefDescriptor<T> dd;
         String uid, ouid;
         Set<DefDescriptor<?>> deps;
@@ -946,7 +946,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private boolean isInDescriptorFilterCache(DescriptorFilter filter, Set<DefDescriptor<?>> results,
-            MasterDefRegistryImpl mdr) throws Exception {
+                                              MasterDefRegistryImpl mdr) throws Exception {
         // taking the long road in determining what is in the cache because the current key implementation for
         // the descriptor cache is difficult to recreate.
         Cache<String, Set<DefDescriptor<?>>> cache = AuraPrivateAccessor.get(mdr, "descriptorFilterCache");
@@ -982,7 +982,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Verify basic functionality of MasterDefRegistryImpl.getClientLibraries. The same methods are test in
      * ClientLibraryServiceImplTest, where we use ClientLibraryService.getUrls()
-     * 
+     *
      * @throws Exception
      */
     public void testGetClientLibraries() throws Exception {
@@ -1026,7 +1026,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify that if access cache has a reason to block access, then MDR throws NoAccessException.
-     * 
+     *
      * @throws Exception
      */
     public void testAssertAccess_UsesCachedValueIfPresent_BlockAccess() throws Exception {
@@ -1045,7 +1045,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify that if access cache doesn't have any message to block access, then access checks passes through.
-     * 
+     *
      * @throws Exception
      */
     public void testAssertAccess_UsesCachedValueIfPresent_AllowAccess() throws Exception {
@@ -1386,22 +1386,22 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> otherNamespaceDef = getAuraTestingUtil()
                 .addSourceAutoCleanup(
                         RendererDef.class,
-                "({render: function(cmp) {"
-                        + "cmp.getValue('v.simplevalue1').setValue($A.get('$Label' + '.Related_Lists' + '.task_mode_today', cmp));"
-                        + "cmp.getValue('v.simplevalue2').setValue($A.get('$Label.DOESNT.EXIST', cmp));"
-                        + "cmp.getValue('v.simplevalue3').setValue($A.get('$Label.Related_Lists.DOESNTEXIST', cmp));"
-                        + "// Both section and name are required. This request will return undefined and no action is requested."
-                        + "cmp.getValue('v.simplevalue4').setValue($A.get('$Label.DOESNTEXIST', cmp));"
-                        + "// These requests are here to test that there are no multiple action requests for the same $Label"
-                        + "// See LabelValueProviderUITest.java"
-                        + "var tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                        + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                        + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                        + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                        + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                        + "return this.superRender();"
-                        + "}})",
-                "cstring1.labelProvider", false);
+                        "({render: function(cmp) {"
+                                + "cmp.getValue('v.simplevalue1').setValue($A.get('$Label' + '.Related_Lists' + '.task_mode_today', cmp));"
+                                + "cmp.getValue('v.simplevalue2').setValue($A.get('$Label.DOESNT.EXIST', cmp));"
+                                + "cmp.getValue('v.simplevalue3').setValue($A.get('$Label.Related_Lists.DOESNTEXIST', cmp));"
+                                + "// Both section and name are required. This request will return undefined and no action is requested."
+                                + "cmp.getValue('v.simplevalue4').setValue($A.get('$Label.DOESNTEXIST', cmp));"
+                                + "// These requests are here to test that there are no multiple action requests for the same $Label"
+                                + "// See LabelValueProviderUITest.java"
+                                + "var tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
+                                + "return this.superRender();"
+                                + "}})",
+                        "cstring1.labelProvider", false);
         DefDescriptor<ApplicationDef> appInLayoutsBundleDef = getAuraTestingUtil().addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application>    before    <div aura:id='content'/>    after</aura:application>",
@@ -1500,7 +1500,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public String getAPIVersion() {
             return null;
         }
-        
+
         @Override
         public String getDescription() {
             return "description";
@@ -1517,7 +1517,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         @Override
         public void serialize(Json json) throws IOException {
-            
+
         }
 
         @Override
@@ -1554,7 +1554,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * A fake registry to check locking as we call.
      */
     @SuppressWarnings("serial")
-	private static class FakeRegistry implements DefRegistry<TypeDef> {
+    private static class FakeRegistry implements DefRegistry<TypeDef> {
         public DefDescriptor<TypeDef> desc;
         public TypeDef def;
         private final Lock rLock;
@@ -1586,7 +1586,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public Set<DefDescriptor<TypeDef>> find(DefDescriptor<TypeDef> matcher) {
             Mockito.verify(rLock, Mockito.times(1)).lock();
             Mockito.verify(rLock, Mockito.never()).unlock();
-			Set<DefDescriptor<TypeDef>> found = Sets.newHashSet();
+            Set<DefDescriptor<TypeDef>> found = Sets.newHashSet();
             found.add(desc);
             return found;
         }
@@ -1595,7 +1595,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
             Mockito.verify(rLock, Mockito.times(1)).lock();
             Mockito.verify(rLock, Mockito.never()).unlock();
-			Set<DefDescriptor<?>> found = Sets.newHashSet();
+            Set<DefDescriptor<?>> found = Sets.newHashSet();
             found.add(desc);
             return found;
         }
@@ -1615,7 +1615,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         @Override
         public Set<DefType> getDefTypes() {
-			Set<DefType> types = Sets.newHashSet();
+            Set<DefType> types = Sets.newHashSet();
             types.add(DefType.TYPE);
             return types;
         }

@@ -52,8 +52,10 @@ public class DebuggerDirectiveTest extends UnitTestCase {
     public void testDefaultJavascriptModeForDebuggerDirectiveType() {
         DebuggerDirective d = new DebuggerDirective(4, null);
         Set<JavascriptGeneratorMode> modes = d.getModes();
-        assertEquals(3, modes.size());
+        assertEquals(4, modes.size());
         assertTrue("Dev mode should be included by default.", modes.contains(JavascriptGeneratorMode.DEVELOPMENT));
+        assertTrue("TestingDebug mode should be included by default.",
+                modes.contains(JavascriptGeneratorMode.TESTINGDEBUG));
         assertTrue("AutoDebug mode should be included by default.",
                 modes.contains(JavascriptGeneratorMode.AUTOTESTINGDEBUG));
 

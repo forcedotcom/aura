@@ -23,21 +23,23 @@
      */
     testActionIds:{
         test:[function(cmp){
+            var startactioncount = 17;
             var a = cmp.get("c.getRoster");
-            $A.test.assertEquals("4.a", a.getId(),
+            $A.test.assertEquals(++startactioncount+";a", a.getId(),
                 "Action numbering gone wild - Client Action(1)");
             var b = cmp.get("c.getRoster");
-            $A.test.assertEquals("5.a", b.getId(),
+            $A.test.assertEquals(++startactioncount+";a", b.getId(),
                 "Action numbering gone wild - Client Action(2)");
         },function(cmp){
+            var startactioncount = 19;
             var a = cmp.get("c.getBaseball");
-            $A.test.assertEquals("6.a", a.getId(),
+            $A.test.assertEquals(++startactioncount+";a", a.getId(),
                 "Action numbering gone wild - Server Action(1)");
             var b = cmp.get("c.getBaseball");
-            $A.test.assertEquals("7.a", b.getId(),
+            $A.test.assertEquals(++startactioncount+";a", b.getId(),
                 "Action Numbering gone wild - Server Action(2)");
             var c = cmp.get("c.resetCounter");
-            $A.test.assertEquals("8.a", c.getId(),
+            $A.test.assertEquals(++startactioncount+";a", c.getId(),
                 "Action Numbering gone wild - Server Action(3)");
             $A.test.enqueueAction(c);
             $A.test.addWaitFor(false, $A.test.isActionPending,
@@ -45,7 +47,7 @@
                     //After a action request was sent to server, context will increment its counter.
                     var d = cmp.get("c.getBaseball");
                     $A.test.assertEquals(2, $A.getContext().getNum(), "Context lost track of request numbers" )
-                    $A.test.assertEquals("9.a", d.getId(),
+                    $A.test.assertEquals(++startactioncount+";a", d.getId(),
                         "Action Numbering gone wild - Server Action(4)");
             });
         } ]

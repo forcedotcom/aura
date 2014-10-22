@@ -209,7 +209,10 @@
         // This option should be only used by the panelManager
         // which knows how to manage the lifecycle of the panels
         if (!options.lazyDestroy) {
-            cmp.destroy(true, "v.body");
+            var body=cmp.get("v.body");
+            for(var i=0;i<body.length;i++){
+                body[i].destroy(true);
+            }
         }
     },
     

@@ -26,9 +26,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 /**
  * Sanity check to verify the behavior of native Json function Json.parse().
  * Aura JS library uses native JSON object in PROD mode.
- * 
+ *
  * @userStory a07B0000000Kx2A
- * 
+ *
  * @since 0.0.160
  */
 public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
@@ -38,7 +38,7 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
 
     /**
      * Sanity check to verify that JavaScript renderer works in PROD mode.
-     * 
+     *
      * @throws Exception
      */
     public void testNativeJsonUsageInJSRendererDef() throws Exception {
@@ -51,7 +51,7 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
 
     /**
      * Sanity check to verify that JavaScript helper works in PROD mode
-     * 
+     *
      * @throws Exception
      */
     public void testNativeJsonUsageInJSHelperDef() throws Exception {
@@ -63,7 +63,7 @@ public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
     }
 
     /**
-     * Sanity check to verify that Javascript Controller & Java Controller work
+     * Sanity check to verify that Javascript Controller and Java Controller work
      * in PROD mode
      */
     public void testNativeJsonUsageInControllerDef() throws Exception {

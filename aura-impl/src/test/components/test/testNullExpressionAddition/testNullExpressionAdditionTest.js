@@ -21,7 +21,7 @@
         test: function(component){
             var elements = component.getElements();
             var divs = [];
-            for (var e in elements) {
+            for (var e=0;e<elements.length;e++) {
                 var div = elements[e];
                 if(div.nodeType !== 8 /*COMMENT_NODE*/){
                     divs.push(div);

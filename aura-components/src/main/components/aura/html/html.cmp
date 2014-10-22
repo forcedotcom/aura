@@ -20,5 +20,4 @@
     <aura:attribute name="body" type="Aura.Component[]" access="GLOBAL" description="The body of the component.  In markup, this is everything in the body of the tag."/>
     <aura:attribute name="tag" type="String" access="GLOBAL" description="The name of the html element that should be rendered."/>
     <aura:attribute name="HTMLAttributes" type="Map" access="GLOBAL" description="A Map of attributes to set on the html element."/>
-    <!--<aura:attribute name="markup" type="Object[]" description="As an alternative to the tag and HTMLAttributes attributes, this allows Strings of raw markup to be rendered."/>-->
 </aura:component>

@@ -20,85 +20,85 @@
 
 <div id="blur">
 blur:
-<ui:inputText aura:id="blur" class="blur" value="{!m.String}" updateOn="blur" blur="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="blur" class="blur" value="{!m.string}" updateOn="blur" blur="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="change">
 change:
-<ui:inputText aura:id="change" class="change" value="{!m.String}" updateOn="change"/>
+<ui:inputText aura:id="change" class="change" value="{!m.string}" updateOn="change"/>
 </div>
 
 <div id="click">
 click:
-<ui:inputText aura:id="click" class="click" value="{!m.String}" updateOn="click" click="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="click" class="click" value="{!m.string}" updateOn="click" click="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="dblclick">
 dblclick:
-<ui:inputText aura:id="dblclick" class="dblclick" value="{!m.String}" updateOn="dblclick" dblclick="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="dblclick" class="dblclick" value="{!m.string}" updateOn="dblclick" dblclick="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="focus">
 focus:
-<ui:inputText aura:id="focus" class="focus" value="{!m.String}" updateOn="focus" focus="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="focus" class="focus" value="{!m.string}" updateOn="focus" focus="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mousedown">
 mousedown:
-<ui:inputText aura:id="mousedown" class="mousedown" value="{!m.String}" updateOn="mousedown" mousedown="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="mousedown" class="mousedown" value="{!m.string}" updateOn="mousedown" mousedown="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mousemove">
 mousemove:
-<ui:inputText aura:id="mousemove" class="mousemove" value="{!m.String}" updateOn="mousemove" mousemove="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="mousemove" class="mousemove" value="{!m.string}" updateOn="mousemove" mousemove="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mouseout">
 mouseout:
-<ui:inputText aura:id="mouseout" class="mouseout" value="{!m.String}" updateOn="mouseout" mouseout="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="mouseout" class="mouseout" value="{!m.string}" updateOn="mouseout" mouseout="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mouseover">
 mouseover:
-<ui:inputText aura:id="mouseover" class="mouseover" value="{!m.String}" updateOn="mouseover" mouseover="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="mouseover" class="mouseover" value="{!m.string}" updateOn="mouseover" mouseover="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mouseup">
 mouseup:
-<ui:inputText aura:id="mouseup" class="mouseup" value="{!m.String}" updateOn="mouseup" mouseup="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="mouseup" class="mouseup" value="{!m.string}" updateOn="mouseup" mouseup="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="keydown">
 keydown:
-<ui:inputText aura:id="keydown" class="keydown" value="{!m.String}" updateOn="keydown" keydown="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="keydown" class="keydown" value="{!m.string}" updateOn="keydown" keydown="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="keypress">
 keypress:
-<ui:inputText aura:id="keypress" class="keypress" value="{!m.String}" updateOn="keypress" keypress="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="keypress" class="keypress" value="{!m.string}" updateOn="keypress" keypress="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="keyup">
 keyup:
-<ui:inputText aura:id="keyup" class="keyup" value="{!m.String}" updateOn="keyup" keyup="{!c.checkDomEventSet}"/>
+<ui:inputText aura:id="keyup" class="keyup" value="{!m.string}" updateOn="keyup" keyup="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="select">
 select:
-<ui:inputText aura:id="select" class="select" value="{!m.String}" updateOn="select"/>
+<ui:inputText aura:id="select" class="select" value="{!m.string}" updateOn="select"/>
 </div>
 
 <div id="invalid">
 invalid:
-<ui:inputText aura:id="invalid" class="invalid" value="{!m.String}" updateOn="invalid"/>
+<ui:inputText aura:id="invalid" class="invalid" value="{!m.string}" updateOn="invalid"/>
 </div>
 
 <div id="output">
-output: <ui:outputText value="{!m.String}"/>
+output: <ui:outputText value="{!m.string}"/>
 </div>
 <div id="inspectBaseEvent"> 
 inspectBaseEvent: 
-<ui:inputText aura:id="keyup2" class="keyup2" value="{!m.String}" updateOn="keyup" keypress="{!c.inspectKeyEvent}" mousedown="{!c.inspectMouseEvent}"/><br/> 
+<ui:inputText aura:id="keyup2" class="keyup2" value="{!m.string}" updateOn="keyup" keypress="{!c.inspectKeyEvent}" mousedown="{!c.inspectMouseEvent}"/><br/> 
 outputValue: <ui:outputText aura:id="outputValue" class="outputValue" value=""/> <br/><br/>
 </div>
 

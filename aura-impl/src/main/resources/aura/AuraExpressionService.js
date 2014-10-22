@@ -14,127 +14,77 @@
  * limitations under the License.
  */
 /**
- * @namespace The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
+ * @namespace The Aura Expression Service, accessible using
+ *            $A.expressionService. Processes Expressions.
  * @constructor
  */
-var AuraExpressionService = function AuraExpressionService(){
-	var propertyRefCache = {};
+var AuraExpressionService = function AuraExpressionService() {
+	var expressionService = {
 
-    var expressionService = {
-        setValue : function(valueProvider, expression, value){
-            if (expression.getValue) {
-                expression = expression.getValue();
+		/**
+		 * Trims markup syntax off a given string expression, removing leading {!
+		 * and trailing } notation.
+		 *
+		 * @param {Object}
+		 *            expression The expression to be normalized.
+		 * @returns {Object} The normalized string, or the input parameter, if
+		 *          it was not a string.
+		 */
+		normalize : function(expression) {
+			if ($A.util.isString(expression)) {
+				expression = expression.
+                // Strip expression wrappers: {!x.x.x} -> x.x.x
+                    replace(/^\s*\{\!|\}\s*$/g, '').
+                // Normalize Array indices: x.x[2] -> x.x.2
+                    replace(/\[(\d+)\]/g,".$1");
+			}
+			return expression;
+		},
+
+		/**
+		 * Resolves a hierarchical dot expression in string form against the
+		 * provided object if possible.
+		 *
+		 * @param {String}
+		 *            expression The string expression to be resolved.
+		 * @param {Object}
+		 *            container The object against which to resolve the
+		 *            expression.
+		 * @returns {Object} The target of the expression, or undefined.
+		 */
+		resolve : function(expression, container) {
+			var target = container;
+			var path = expression;
+            if(!$A.util.isArray(path)) {
+                path = path.split('.');
             }
-            var lastDot = expression.lastIndexOf('.');
-            aura.assert(lastDot>0, "Invalid expression for setValue");
+            while (!$A.util.isUndefinedOrNull(target) && path.length) {
+				target = target[path.shift()];
+				if ($A.util.isExpression(target)) {
+					target = target.evaluate();
+				}
+			}
+			return target;
+		},
 
-            var parentExpression = expression.substring(0, lastDot)+"}";
-            var lastPart = expression.substring(lastDot+1, expression.length-1);
+		/**
+		 * @protected
+		 */
+		create : function(valueProvider, config) {
+			return valueFactory.create(config, null, valueProvider);
+		},
 
-            var parentValue = this.getValue(valueProvider, parentExpression);
-            parentValue.getValue(lastPart).setValue(value);
-        },
+		/**
+		 * @private
+		 */
+		// TODO: unify with above create method
+		createPassthroughValue : function(primaryProviders, cmp) {
+			return new PassthroughValue(primaryProviders, cmp);
+		}
 
-        /**
-         * Get the wrapped value of an expression. Use <code>Component.getValue()</code> if you are retrieving the value of a component.
-         * <code>$A.expressionService.get(cmp, "v.attribute")</code> is equivalent to <code>cmp.getValue("v.attribute")</code>.
-         * @param {Object} valueProvider The value provider
-         * @param {String} expression The expression to be evaluated
-         * @param {Function} callback used to provide a way to e.g. populate dynamic labels
-         * @param {Boolean} docreate used to create missing items
-         * @public
-         * @memberOf AuraExpressionService
-         */
-        getValue: function(valueProvider, expression, callback, docreate){
-            if (aura.util.isString(expression)) {
-            	var cached = propertyRefCache[expression];
-            	if (!cached) {
-	                cached = valueFactory.parsePropertyReference(expression);
-	                propertyRefCache[expression] = cached;
-
-	            	//console.debug("ExpressionService.getValue() cache property ref", [expression, propertyRefCache]);
-            	}
-
-                expression = cached;
-            } else if ($A.util.instanceOf(expression, FunctionCallValue)) {
-                return expression.getValue(valueProvider);
-            }
-
-            if (!$A.util.instanceOf(expression, PropertyChain)){
-                return null;
-            }
-
-            // use gvp; supports existing usage of $A.get and $A.expressionService.get
-            if (expression.getRoot().charAt(0) === '$'){
-                var gvp = $A.getGlobalValueProviders();
-                return gvp.getValue(expression, valueProvider, callback);
-            }
-
-            var propRef = expression;
-            var value = valueProvider;
-            while (propRef) {
-                var root = propRef.getRoot();
-                var lastvalue = value;
-                value = value.getValue(root);
-                propRef = propRef.getStem();
-
-                if (!value || (value.isDefined && !value.isDefined())) {
-                    if (!value || !docreate ||
-                        !(lastvalue instanceof MapValue)) {
-                        // still nothing, time to die
-                        break;
-                    }
-                    // we're not done, and we want to create, so make a new map
-                    var config = {};
-                    if (propRef) {
-                        // if we have more properties, we want a map
-                        config[root] = {};
-                    }
-                    lastvalue.add(root, config);
-                    value = lastvalue.getValue(root);
-                }
-
-            }
-
-            // handle PropertyChain. get its value.
-            if ($A.util.instanceOf(value, PropertyChain)) {
-                value = this.getValue(valueProvider, value);
-            }
-
-            return value;
-        },
-
-        /**
-         * Get the raw value referenced using property syntax. Use <code>Component.get()</code> if you are retrieving the value of a component.
-         * @param {Object} valueProvider The value provider
-         * @param {String} expression The expression to be evaluated
-         * @param {Function} callback The method to call if a server trip is expected
-         * @public
-         * @memberOf AuraExpressionService
-         */
-        get : function(valueProvider, expression, callback){
-            return $A.unwrap(this.getValue(valueProvider, expression, $A.util.isFunction(callback)?function(value){
-                callback($A.unwrap(value));
-            }:null));
-        },
-
-        /**
-         * @deprecated JBUCH
-         * @private
-         */
-        create : function(valueProvider, config){
-            return valueFactory.create(config, null, valueProvider);
-        },
-
-        /**
-         * @private
-         */
-        // TODO: unify with above create method
-        createPassthroughValue : function(primaryProviders, cmp) {
-            return new PassthroughValue(primaryProviders, cmp);
-        }
     };
-    //#include aura.AuraExpressionService_export
 
-    return expressionService;
+	// #include aura.AuraExpressionService_export
+
+	return expressionService;
 };

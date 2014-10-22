@@ -14,124 +14,77 @@
  * limitations under the License.
  */
 ({
-    
-    /**
-     * Checking for case when default for input select is Bear, result 
-     * should be bear is the initial item shown
-     */
     testValueDefSelectionExists: {
 	attributes :{whichToRender:"VDSE"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Def_Selection_Exists");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "Bear", "ValueDefSelectionExists");
+		$A.test.assertEquals("Bear", value,"ValueDefSelectionExists failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when no default value is given in inputSelect, 
-     *  and not inputSelectOption is chosen result should Tiger is default
-     *  element chosen
-     */
     testValueUndefWithNoDefault: {
 	attributes :{whichToRender:"VUWND"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Undef_With_No_Default");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "Tiger", "ValueUndefWithNoDefault");
+		$A.test.assertEquals("Tiger", value,"ValueUndefWithNoDefault failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when no default value is given in inputSelect, 
-     *   and inputSelectOption is set to true for Lion. Lion should be chosen
-     */
     testValueUndefWithDefault: {
 	attributes :{whichToRender:"VUWD"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Undef_With_Default");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "Lion", "ValueUndefWithDefault");
+		$A.test.assertEquals("Lion", value,"ValueUndefWithDefault failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when default for input select is Moose, result 
-     * should be Moose but it doesn't exist as an option so default goes 
-     * to the first element 
-     */
+
     testValueDefSelectionDNE: {
 	attributes :{whichToRender:"VDSDNE"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Def_Selection_DNE");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "Tiger", "ValueDefSelectionDNE");
+		$A.test.assertEquals("Tiger", value,"ValueDefSelectionDNE failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when default for input select is null, and there are no inputSelectOptions
-     * result should be that nothing is selected
-     */
     testValueNullNoOptions: {
 	attributes :{whichToRender:"VNNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_No_Options");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "", "ValueNullNoOptions");
+		$A.test.assertEquals("", value,"ValueNullNoOptions failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when default for input select is Null, result 
-     *  should be the first element is selected
-     */
     testValueNullWithNoNullOption: {
 	attributes :{whichToRender:"VNWNNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_No_Null_Option");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "Tiger", "ValueNullWithNoNullOption");
+		$A.test.assertEquals("Tiger", value,"ValueNullWithNoNullOption failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when default for input select is Null, result 
-     * should be the first element is selected, where first elements text is null
-     */
     testValueNullWithNullOption: {
 	attributes :{whichToRender:"VNWNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_Null_Option");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "", "ValueNullWithNullOption");
+		$A.test.assertEquals("", value,"ValueNullWithNullOption failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when default for input select is Null, and an inputSelectOption
-     * is selected, result should be the first element is selected
-     */
     testValueNullWithDefaultAndNullOption: {
 	attributes :{whichToRender:"VNWDANO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_Default_And_Null_Option");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "", "ValueNullWithDefaultAndNullOption");
+		$A.test.assertEquals("", value, "ValueNullWithDefaultAndNullOption failed to initialize, by using inputSelect options in the body");
 	}
     },
-    /**
-     * Checking for case when default for input select is Null, and an inputSelectOption
-     * is selected, result should be the first element is selected
-     */
     testValueNullWithDefaultAndNoNullOption: {
 	attributes :{whichToRender:"VNWDANNO"},
 	test : function(cmp){
 		var inputSelect = cmp.find("Value_Null_With_Default_And_No_Null_Option");
 		var value = inputSelect.get("v.value");
-		this.checkAuraValueMatchesAttributeValue(inputSelect.getElement().value, value, "Tiger", "ValueNullWithDefaultAndNoNullOption");
+		$A.test.assertEquals("Tiger", value,"ValueNullWithDefaultAndNoNullOption failed to initialize, by using inputSelect options in the body");
 	}
-    },
-    
-    /**
-     * Asserting that the value we expected is in the select and also that the value that 
-     * in the value attribute of the component is the same as what is in the select 
-     */
-    checkAuraValueMatchesAttributeValue : function(selElmVal, value, itemThatShouldBeSelected, testName) {
-	$A.test.assertEquals(selElmVal, value, testName+" Item that is present in select and that is different from what is stored in v.value");
-	$A.test.assertEquals(itemThatShouldBeSelected, value, testName+" failed to initialize, by using inputSelect options in the body");
     }
 })

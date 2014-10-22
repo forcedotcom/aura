@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 ({
+    init: function(cmp, evt, helper) {
+        var bodyTemplate = cmp.get("v.body"),
+            isTrue       = $A.util.getBooleanValue(cmp.get("v.isTrue")),
+            template     = cmp.get("v.template"),
+            localCreation = true;
+
+        if (bodyTemplate.length && !template.length) {
+            cmp.set("v.template", bodyTemplate, true);
+            cmp.set("v.body", [], true);
+            localCreation = false;
+        }
+
+        var body = helper.createBody(cmp, isTrue, localCreation);
+        cmp.set("v.body", body, true);
+        cmp._truth=isTrue;
+    },
     handleTheTruth: function(cmp, evt, helper) {
-        var isReallyTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
-        
-        if (isReallyTrue !== cmp._wasReallyTrue) {
-        	cmp._wasReallyTrue = isReallyTrue;
-        	
-            // so it reallyChanged™, swap out the components and store the old ones in either _true or _false
-            var realbody = cmp.get("v.realbody");
-            
-            var switchTo = "_" + isReallyTrue;
-            var switchFrom = "_" + !isReallyTrue;
-            
-            cmp[switchFrom] = realbody;
-            
-            var newcmps = cmp[switchTo];
-            
-            // undefined means we haven't ever instantiated this facet
-            if ($A.util.isUndefined(newcmps)) {
-                newcmps = cmp[switchTo] = helper.createRealBody(cmp, isReallyTrue, false);
-            }
-            
-            cmp.setAndRelease("v.realbody", newcmps)
+        var isTrue  = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        if(cmp._truth!==isTrue) {
+            cmp.set("v.body", helper.createBody(cmp, isTrue, true));
+            cmp._truth=isTrue;
         }
     }
 })

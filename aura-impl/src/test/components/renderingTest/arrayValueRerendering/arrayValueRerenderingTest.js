@@ -17,6 +17,9 @@
     testRerenderOrdering : {
         test : function(component) {
             var values = component.getElement().childNodes;
+            // Children vs childnodes, as sometimes we want to ignore that there are comment nodes in the collection.
+            var children = component.getElement().children;
+
             for (var n = 0; n < values.length; n++) {
                 $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
             }
@@ -47,6 +50,7 @@
                     }
                 );
             }
+
             function iteration(values, toAdd, insertFunction) {
                 var startIndex = values.length;
                 // Add a few items to the end of the body
@@ -59,6 +63,7 @@
                     $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
                 }
             }
+
             //test adding new component to the array
             iteration(values, 4, function(body, c) {
             	body.push(c);
@@ -66,20 +71,24 @@
             });
             iteration(values, 4, function(body, c) {
             	body.push(c);
-                component.find("me").set("v.body", body);
+                component.find("me").set("v.body", body, true);
             });
+
             // Now lets do some splicing. Insert Value to index first, middle, and last index
             addComponent("Value inserted at index 0", function(body, c) {
             	body.unshift(c);
             	component.find("me").set("v.body", body);
             });
+
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 0", $A.test.getText(values[0]));
             $A.test.assertEquals(13, values.length);
+
             addComponent("Value inserted at index 1", function(body, c) {
-            	body.splice(1, 0, c);
+            	var expected = body.splice(1, 0, c);
             	component.find("me").set("v.body", body);
             });
+
             $A.rerender(component);
             $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[1]), "Value not inserted at proper index");
             $A.test.assertEquals(14, values.length);
@@ -95,27 +104,27 @@
             body.splice(0,1);
             component.find("me").set("v.body", body);
             $A.rerender(component);
-            $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[0]),"error after removing the first cmp of array");
-            $A.test.assertEquals(14, values.length);
+            $A.test.assertEquals("Value inserted at index 1", $A.test.getText(children[0]),"error after removing the first cmp of array");
+            $A.test.assertEquals(14, children.length);
+
             //remove the second
             body.splice(1,1);
             component.find("me").set("v.body", body);
             $A.rerender(component);
-            $A.test.assertEquals("Value 2", $A.test.getText(values[1]),"error after removing the 2nd cmp of array");
-            $A.test.assertEquals(13, values.length);
+            $A.test.assertEquals("Value 2", $A.test.getText(children[1]),"error after removing the 2nd cmp of array");
+            $A.test.assertEquals(13, children.length);
             //remove the last
             body.splice(12,1);
             component.find("me").set("v.body", body);
             $A.rerender(component);
-            $A.test.assertEquals("Value 12", $A.test.getText(values[11]),"error after removing the last cmp of array");
-            $A.test.assertEquals(12, values.length);
+            $A.test.assertEquals("Value 12", $A.test.getText(children[11]),"error after removing the last cmp of array");
+            $A.test.assertEquals(12, children.length);
             //clean the array and test inserting to an empty array
             body = []; 
             component.find("me").set("v.body", body);
             $A.test.assertEquals(0,body.length);
-            //we clear the body, AuraRenderingService.rerender -> ArrayValue.rerender will put a comment as a reference node
             //before rerender, value length is still 12
-            $A.test.assertEquals(12,values.length);
+            $A.test.assertEquals(12,children.length);
             $A.rerender(component);
             //after rerender, value length become 1
             $A.test.assertEquals(1,values.length);
@@ -126,8 +135,8 @@
             	component.find("me").set("v.body", body);
             });
             $A.rerender(component);
-            $A.test.assertEquals("Value inserted at index 0 to an empty array", $A.test.getText(values[0]));
-            $A.test.assertEquals(1, values.length);
+            $A.test.assertEquals("Value inserted at index 0 to an empty array", $A.test.getText(children[0]));
+            $A.test.assertEquals(1, children.length);
         }
     }
 })

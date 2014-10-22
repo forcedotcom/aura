@@ -15,37 +15,47 @@
     limitations under the License.
 
 -->
-<aura:component description="The content container, holding individual components contained in a scroller that can be loaded dynamically">
+<aura:component>
+    <aura:attribute name="outer" type="Boolean"/>
+    <aura:attribute name="inner" type="Boolean"/>
 
-    <!-- Default Hostable interface attributes -->
-    <aura:attribute name="outer" type="Boolean" default="false"/>
-    <aura:attribute name="inner" type="Boolean" default="false"/>
-    
-    <div class="controls">
-        <ui:button aura:id="TT" label="Item TT" press="{!c.click}"/>
-        <ui:button aura:id="TF" label="Item TF" press="{!c.click}"/>
-        <ui:button aura:id="FT" label="Item FT" press="{!c.click}"/>
-        <ui:button aura:id="FF" label="Item FF" press="{!c.click}"/>
-    </div>
-
-    <div class="view">
-        <aura:renderIf isTrue="{!v.outer}">
-            <aura:renderif isTrue="{!v.inner}">
-                <span>TT</span>
-                <aura:set attribute="else">
-                    <span>TF</span>
-                </aura:set>
-            </aura:renderif>
-
-            <aura:set attribute="else">
-
+    <div aura:id="wrapper" class="wrapper">
+        <div aura:id="output" class="output">
+            <aura:renderif isTrue="{!v.outer}">
                 <aura:renderif isTrue="{!v.inner}">
-                    <span>FT</span>
+                    TT
                     <aura:set attribute="else">
-                        <span>FF</span>
+                        TF
                     </aura:set>
                 </aura:renderif>
-            </aura:set>
-        </aura:renderIf>
+                <aura:set attribute="else">
+                    <aura:renderif isTrue="{!v.inner}">
+                        FT
+                        <aura:set attribute="else">
+                            FF
+                        </aura:set>
+                    </aura:renderif>
+                </aura:set>
+            </aura:renderif>
+        </div>
+
+        <div>
+            Set inner then outer:
+            <ui:button aura:id="io TT" label="Set TT" press="{!c.press}"/>
+            <ui:button aura:id="io TF" label="Set TF" press="{!c.press}"/>
+            <ui:button aura:id="io FT" label="Set FT" press="{!c.press}"/>
+            <ui:button aura:id="io FF" label="Set FF" press="{!c.press}"/>
+        </div>
+
+        <div>
+            Set outer then inner:
+            <ui:button aura:id="oi TT" label="Set TT" press="{!c.press}"/>
+            <ui:button aura:id="oi TF" label="Set TF" press="{!c.press}"/>
+            <ui:button aura:id="oi FT" label="Set FT" press="{!c.press}"/>
+            <ui:button aura:id="oi FF" label="Set FF" press="{!c.press}"/>
+        </div>
+
+        <div aura:id="log"/>
     </div>
+
 </aura:component>

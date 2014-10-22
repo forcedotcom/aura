@@ -20,4 +20,5 @@
         <aura:attribute name="a2" type="String"/>
         <aura:attribute name="a3" type="String"/>
         <aura:attribute name="value" type="String" required="true"/>
+        {!v.body}
 </aura:component>

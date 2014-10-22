@@ -14,7 +14,7 @@
               "render":
 function(component) {
         var rendering = component.getRendering();
-        return rendering ? rendering : $A.render(component.get("v.body"));
+        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
     },
               "afterRender":
 function(component) {
@@ -24,20 +24,12 @@ function(component) {
               "rerender":
 function(component) {
         var body = component.get("v.body");
-        return $A.rerender(body);
+        return $A.renderingService.rerenderFacet(component,body);
     },
               "unrender":
 function(component) {
         var body = component.get("v.body");
-        
-        $A.unrender(body);
-
-        var elements = component.getElements();
-        for (var key in elements){
-            var element = elements[key];
-            delete elements[key];
-            aura.util.removeElement(element);
-        }
+        $A.renderingService.unrenderFacet(component,body);
     }
             }
           },
@@ -84,11 +76,6 @@ function(component) {
                       "render":
 function(component) {
         var value = component.get("v.value");
-        if ($A.util.isUndefined(value)) {
-            value = '';
-        } else if (!$A.util.isString(value)) {
-            value = String(value);
-        }
         
         var trunc = component.get("v.truncate");
         var truncateByWord = $A.util.getBooleanValue(component.get("v.truncateByWord"));
@@ -98,8 +85,20 @@ function(component) {
             trunc = 1 * trunc;
             value = aura.util.truncate(value, trunc, ellipsis, truncateByWord);
         }
+        return [document.createTextNode($A.util.isUndefinedOrNull(value)?'':value)];
+    },
+                      "rerender":
+function(component) {
+        var element=component.getElement();
         
-        return document.createTextNode(value);
+        if (element && element.parentNode) {
+        	var textValue = component.get("v.value");
+            textValue = $A.util.isUndefinedOrNull(textValue) ? '' : textValue;
+            
+            if (element.nodeValue !== textValue) {
+                element.nodeValue = textValue;
+            }
+        }
     }
                     }
                   },
@@ -238,104 +237,50 @@ function(component) {
                                               "descriptor":"js://aura.expression",
                                               "render":
 function(component, helper) {
-        if(component.isRendered()){
-            $A.unrender(component);
+		var value = component.get("v.value");
+        if($A.util.isUndefinedOrNull(value)){
+            value=[];
         }
-
-        var ret;
-        var value = component.getValue("v.value");
-        var created = false;
-        if (value) {
-            if (value.auraType === "Component" || !value.isLiteral()) {
-                
-                ret = $A.render(value);
-                created = true;
-                component.lastRenderedValue = value;
-            } else if (value.isDefined()) {
-                
-                ret = [document.createTextNode(helper.getTextValue(value))];
-                created = true;
-            }
-        }
-
-        if (!created){
-            ret = [document.createTextNode("")];
-        }
-
-        return ret;
-    },
-                                              "afterRender":
-function(component) {
-        var value = component.getValue("v.value");
-        if (value && (value.auraType === "Component" || !value.isLiteral())) {
+        if(!($A.util.isComponent(value)||$A.util.isArray(value))){
             
-            $A.afterRender(value);
+            component._lastRenderedValue=value=$A.newCmp({componentDef:'aura:text', attributes:{values:{value:value}}});
         }
-    },
+        return $A.renderingService.renderFacet(component,value);
+	},
+                                              "afterRender":
+function(component, helper) {
+		var value = component.get("v.value");
+		if ($A.util.isComponent(value)||$A.util.isArray(value)) {
+			$A.afterRender(value);
+		}
+	},
                                               "rerender":
 function(component, helper) {
-        if (!component.isRendered()) {
-            return;
-        }
-
-        var value = component.getValue("v.value");
-
-        if (value) {
-            if (value.auraType === "Component" || !value.isLiteral()) {
-                var last = component.lastRenderedValue;
-                if (last !== value) {
-                    var referenceNode = last.getReferenceNode();
-                    $A.assert(referenceNode, "referenceNode is required");
-
-                    
-                    var tempReferenceNode = document.createComment("rerender expression: " + component);
-                    $A.util.insertBefore(tempReferenceNode, referenceNode);
-                    referenceNode = tempReferenceNode;
-
-                    $A.unrender(last);
-
-                    var ret = $A.render(value);
-                    $A.util.insertBefore(ret, referenceNode);
-
-                    
-                    $A.util.removeElement(referenceNode);
-
-                    component.lastRenderedValue = value;
-
-                    $A.afterRender(value);
-                    return ret;
-                } else {
-                    return $A.rerender(value);
+        var ret=[];
+		if (component.isRendered()) {
+            var value = component.get("v.value");
+            if(!($A.util.isComponent(value)||$A.util.isArray(value))){
+                if($A.util.isUndefinedOrNull(value)){
+                    value='';
                 }
-            } else {
-                if (value.isDirty()){
+                if(component._lastRenderedValue){
                     
-                    var element = component.getElement();
-
-                    
-                    if (element.parentNode) {
-                        element.nodeValue = helper.getTextValue(value);
-                    }
+                    component._lastRenderedValue.set("v.value",value,true);
+                    value=component._lastRenderedValue;
+                    return $A.rerender(value);
+                }else {
+                    value = $A.newCmp({componentDef: 'aura:text', attributes: {values: {value: value}}});
                 }
             }
+            ret=$A.renderingService.rerenderFacet(component, value);
         }
+        return ret;
     },
                                               "unrender":
-function(component) {
-        
-        var value = component.getValue("v.value");
-        if (value && (value.auraType === "Component" || !value.isLiteral())) {
-            
-            $A.unrender(value);
-        }
-
-        var elements = component.getElements();
-        for(var key in elements){
-            var element = elements[key];
-            delete elements[key];
-            $A.util.removeElement(element);
-        }
-    }
+function(component, helper) {
+        $A.renderingService.unrenderFacet(component);
+        component._lastRenderedValue=null;
+	}
                                             }
                                           },
                                           "helperDef":{
@@ -343,11 +288,15 @@ function(component) {
                                             "value":{
                                               "descriptor":"js://aura.expression",
                                               "functions":{
-                                                "getTextValue":
-function(value) {
-        var raw = value.unwrap();
-        return $A.util.isUndefinedOrNull(raw) ? '' : raw;
-    }
+                                                "setupReferenceNode":
+function(component, ret) {
+		if (!ret || ret.length === 0) {
+			
+			component._referenceNode = document.createComment("render expression: " + component);
+		} else {
+			component._referenceNode = ret[0];
+		}
+	}
                                               }
                                             }
                                           },

@@ -114,26 +114,26 @@
             var hours = hoursCmp.get("v.value");
             if (is24HourFormat === true) {
                 if (this.validateNumber(hours, 0, 23)) {
-                    hoursCmp.removeClass("error");
+                    $A.util.removeClass(hoursCmp.getElement(), "error");
                     errorCmp.set("v.value", []);
-                    errorCmp.addClass("hide");
+                    $A.util.addClass(errorCmp.getElement(), "hide");
                     return true;
                 } else {
-                    hoursCmp.addClass("error");
+                	$A.util.addClass(hoursCmp.getElement(), "error");
                     errorCmp.set("v.value", ["Please input a valid hour value (0 - 23)."]);
-                    errorCmp.removeClass("hide");
+                    $A.util.removeClass(errorCmp.getElement(), "hide");
                     return false;
                 }
             } else {
                 if (this.validateNumber(hours, 1, 12)) {
-                    hoursCmp.removeClass("error");
+                    $A.util.removeClass(hoursCmp.getElement(), "error");
                     errorCmp.set("v.value", []);
-                    errorCmp.addClass("hide");
+                    $A.util.addClass(errorCmp.getElement(), "hide");
                     return true;
                 } else {
-                    hoursCmp.addClass("error");
+                	$A.util.addClass(hoursCmp.getElement(), "error");
                     errorCmp.set("v.value", ["Please input a valid hour value (1 - 12)."]);
-                    errorCmp.removeClass("hide");
+                    $A.util.removeClass(errorCmp.getElement(), "hide");
                     return false;
                 }
             }
@@ -147,14 +147,14 @@
         if (minutesCmp && errorCmp) {
             var minutes = minutesCmp.get("v.value");
             if (this.validateNumber(minutes, 0, 59)) {
-                minutesCmp.removeClass("error");
+            	$A.util.removeClass(minutesCmp.getElement(), "error");
+                errorCmp.set("v.class", "hide");
                 errorCmp.set("v.value", []);
-                errorCmp.addClass("hide");
                 return true;
             } else {
-                minutesCmp.addClass("error");
+            	$A.util.addClass(minutesCmp.getElement(), "error");
+                errorCmp.set("v.class", "");
                 errorCmp.set("v.value", ["Please input a valid minute value (0 - 59)."]);
-                errorCmp.removeClass("hide");
                 return false;
             }
         }

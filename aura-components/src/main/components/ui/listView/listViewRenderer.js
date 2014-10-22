@@ -15,44 +15,7 @@
  */
 ({
     render : function(component, helper) {
-        // Performance Marker
-        $A.Perf.mark("FullRender" + component);
-        $A.Perf.mark("AfterRender" + component);
-        $A.Perf.mark("SuperRender" + component);
-
-        // Add AOP to common attributes
-        helper.addObservers(component, helper.buildList, ["body", "items", "emptyText", "id", "class"]);
-
-        // Build list columns and data
         helper.buildList(component);
-
-        // Render the chain
-        var bodyElements = this.superRender();
-
-        // Performance Marker
-        $A.Perf.endMark("SuperRender" + component);
-
-        // And away we go!,
-        return bodyElements;
-    },
-
-    rerender : function(component,helper){
-        // Performance Marker
-        $A.Perf.mark("SuperRerender" + component);
-
-        // Rerender the chain
-        this.superRerender();
-
-        // Performance Marker
-        $A.Perf.endMark("SuperRerender" + component);
-    },
-
-    afterRender: function(component) {
-        // Required call to complete render chain
-        this.superAfterRender();
-
-        // DEBUG: Performance Marker
-        $A.Perf.endMark("AfterRender" + component);
+        return this.superRender();
     }
-
 })

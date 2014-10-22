@@ -19,24 +19,28 @@
      * Each level of facet evaluating v.body in its markup.
      */
     testDestroyOnChainedFacet:{
-        test:[ function(cmp){
-            //Before Destroy
-            $A.test.assertDefined(cmp.find("outerFacet"));
-            $A.test.assertDefined(cmp.find("innerFacet1"));
-            $A.test.assertDefined(cmp.find("innerFacet2"));
-            $A.test.assertEquals(5, cmp.find("team").getElement().childNodes.length);
-        },function(cmp){
-            //Destroy
-            var outerFacet = cmp.find("outerFacet");
-            try{
-                outerFacet.destroy(false);
-            }catch(e){
-                $A.test.fail("Component destroy() failed destroying chained facets with body:"+e)
+        test:[ 
+            function(cmp){
+                //Before Destroy
+                $A.test.assertDefined(cmp.find("outerFacet"));
+                $A.test.assertDefined(cmp.find("innerFacet1"));
+                $A.test.assertDefined(cmp.find("innerFacet2"));
+                $A.test.assertEquals(5, cmp.find("team").getElement().childNodes.length);
+            },
+            function(cmp){
+                //Destroy
+                var outerFacet = cmp.find("outerFacet");
+                try{
+                    outerFacet.destroy(false);
+                }catch(e){
+                    $A.test.fail("Component destroy() failed destroying chained facets with body:"+e)
+                }
+            },
+            function(cmp){
+                //After Destroy
+                this.verifyComponentDestroyed(cmp);
             }
-        },function(cmp){
-            //After Destroy
-            this.verifyComponentDestroyed(cmp);
-        }]
+        ]
     },
 
     /**
@@ -45,20 +49,24 @@
      * W-1584816
      */
     testDestroyOnParentAwareFacet:{
-        test:[ function(cmp){
-            $A.test.assertDefined(cmp.find("informFacet"));
-            $A.test.assertDefined(cmp.find("knowParent"));
-        },function(cmp){
-            var facet = cmp.find("informFacet");
-            try{
-                facet.destroy(false);
-            }catch(e){
-                $A.test.fail("Component destroy() failed to handle reference loops in facet:"+e)
-            }
-        },function(cmp){
-            $A.test.assertUndefinedOrNull(cmp.find("informFacet"));
-            $A.test.assertUndefinedOrNull(cmp.find("knowParent"));
-        }]
+        test:[
+            function(cmp){
+	            $A.test.assertDefined(cmp.find("informFacet"));
+	            $A.test.assertDefined(cmp.find("knowParent"));
+	        },
+	        function(cmp){
+	            var facet = cmp.find("informFacet");
+	            try{
+	                facet.destroy(false);
+	            }catch(e){
+	                $A.test.fail("Component destroy() failed to handle reference loops in facet:"+e)
+	            }
+	        },
+	        function(cmp){
+	            $A.test.assertUndefinedOrNull(cmp.find("informFacet"));
+	            $A.test.assertUndefinedOrNull(cmp.find("knowParent"));
+	        }
+	    ]
     },
 
     /**

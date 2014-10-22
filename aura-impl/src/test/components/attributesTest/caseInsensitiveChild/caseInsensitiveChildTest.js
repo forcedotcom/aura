@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 ({
-    testCaseInSensitivityWhenSettingParentAttributes:{
+	//TODO W-2248578
+	_testCaseInSensitivityWhenSettingParentAttributes:{
         test:function(cmp){
             //Child component just seens the values given by parent,
             //even though it overrides the value of the attribute, it is reflected only in the parent

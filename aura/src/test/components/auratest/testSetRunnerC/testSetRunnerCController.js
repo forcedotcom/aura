@@ -14,70 +14,89 @@
  * limitations under the License.
  */
 ({
-    runTests : function(cmp, event, helper) {
-        var testsProps = cmp.get("m.testsWithProps");
-        var tt = [];
-        cmp.getValue("m.testsWithProps").each(function(map){
-            if($A.util.getBooleanValue(map.get("selected")) && map.get("isHidden") === ''){
-                tt.push(map.get("name"));
-                map.getValue("status").setValue("ENQUEUEING");
-                map.getValue("exception").setValue("");
-            }});
+	runTests : function(cmp, event, helper) {
+		var testsWithProps = cmp.get("m.testsWithProps");
+		var tt = [];
+		for (var i = 0; i < testsWithProps.length; i++) {
+			var map = testsWithProps[i];
+			if ($A.util.getBooleanValue(map["selected"]) && map["isHidden"] === '') {
+				tt.push(map["name"]);
+				map["status"] = "ENQUEUEING";
+				map["exception"] = "";
+			}
+		}
+		
+		$A.rerender(cmp);
 
-        var a = cmp.get("c.runTestSet");
+		var a = cmp.get("c.runTestSet");
 
-        a.setParams({ testSet: tt });
-        a.setCallback(cmp, function(action){
-            helper.raisePollEvent(cmp, 5000);
-        });
-        $A.enqueueAction(a);
-    },
+		a.setParams({
+			testSet : tt
+		});
 
-     poll : function (cmp, evt, helper){
-        var a = cmp.get("c.pollForTestRunStatus");
-        a.setAbortable(true);
-        var pollFreq = 60000;
-        a.setCallback(cmp, function(action){
+		a.setCallback(cmp, function(action) {
+			helper.raisePollEvent(cmp, 5000);
+		});
 
-            if (action.getState() === "SUCCESS") {
-                var rValue = action.getReturnValue();
-                cmp.getValue("m.testsWithProps").each(function(map){
-                    map.getValue("status").setValue(rValue['testsWithPropsMap'][map.get("name")].status);
-                    map.getValue("exception").setValue(rValue['testsWithPropsMap'][map.get("name")].exception);
-                });
-                if(rValue['testsRunning']){
-                    pollFreq =  5000;
-                }
-            }
+		$A.enqueueAction(a);
+	},
 
-            helper.raisePollEvent(cmp, pollFreq);
+	poll : function(cmp, evt, helper) {
+		var a = cmp.get("c.pollForTestRunStatus");
+		a.setAbortable(true);
+		var pollFreq = 60000;
+		a.setCallback(cmp, function(action) {
+			if (action.getState() === "SUCCESS") {
+				var rValue = action.getReturnValue();
+				
+				var testsWithProps = cmp.get("m.testsWithProps");
+				for (var i = 0; i < testsWithProps.length; i++) {
+					var map = testsWithProps[i];
+					map["status"] = rValue['testsWithPropsMap'][map["name"]].status;
+					map["exception"] = rValue['testsWithPropsMap'][map["name"]].exception;
+				}
 
-        });
-        $A.enqueueAction(a);
-     },
+				$A.rerender(cmp);
 
-     toggleRunAllTests : function (cmp){
-         var runAllTestsCmp = cmp.find("runAllTests");
-         var shouldRunAllTests = runAllTestsCmp.get("v.value");
-         cmp.getValue("m.testsWithProps").each(function(map){
-             map.getValue("selected").setValue(shouldRunAllTests);
-         });
-     },
+				if (rValue['testsRunning']) {
+					pollFreq = 5000;
+				}
+			}
 
-     filterOnSearchText : function (cmp, event, helper){
-     	helper.updateDisplay(cmp, helper);
-     },
+			helper.raisePollEvent(cmp, pollFreq);
 
-    toggleShowFailedTest : function(cmp, event){
-        //Short circuiting re-render to avoid lag
-        event.getSource().getValue("v.value").commit();
-    },
+		});
+		
+		$A.enqueueAction(a);
+	},
 
-     toggleShowFailedTests : function(cmp, event, helper){
-     	helper.updateDisplay(cmp, helper);
-     },
+	toggleRunAllTests : function(cmp) {
+		var runAllTestsCmp = cmp.find("runAllTests");
+		var shouldRunAllTests = runAllTestsCmp.get("v.value");
+		var testsWithProps = cmp.get("m.testsWithProps");
+		
+		for (var i = 0; i < testsWithProps.length; i++) {
+			var map = testsWithProps[i];
+			map["selected"] = shouldRunAllTests;
+		}
+		
+		cmp.set("m.testsWithProps", testsWithProps);
+	},
 
-     toggleShowOnlyIntegrationTests: function(cmp, event, helper){
-     	helper.updateDisplay(cmp, helper);
-     }
+	filterOnSearchText : function(cmp, event, helper) {
+		helper.updateDisplay(cmp, helper);
+	},
+
+	toggleShowFailedTest : function(cmp, event) {
+		// Short circuiting re-render to avoid lag
+		// event.getSource().getValue("v.value").commit();
+	},
+
+	toggleShowFailedTests : function(cmp, event, helper) {
+		helper.updateDisplay(cmp, helper);
+	},
+
+	toggleShowOnlyIntegrationTests : function(cmp, event, helper) {
+		helper.updateDisplay(cmp, helper);
+	}
 })

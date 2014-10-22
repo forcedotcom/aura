@@ -311,19 +311,6 @@ public class IterationTest extends AuraImplTestCase {
         assertEquals(2, iteration.getAttributes().getValue("end"));
     }
 
-    public void testRealBodyIgnored() throws Exception {
-        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='i'><aura:set attribute='realbody'>casper</aura:set>{!i}{!x+'|'}</aura:iteration>";
-        Map<String, Object> attributes = Maps.newHashMap();
-        attributes.put("items", Lists.newArrayList("q", "r", "s"));
-        Component iteration = getIterationComponent(source, attributes);
-        assertEquals("0q|1r|2s|", getRenderedBaseComponent(iteration));
-        List<?> realBody = (List<?>) iteration.getAttributes().getValue("realbody");
-        assertEquals(6, realBody.size());
-        for (Object bodyPart : realBody) {
-            assertEquals("markup://aura:expression", ((Component) bodyPart).getDescriptor().getQualifiedName());
-        }
-    }
-
     /**
      * Verify that iteams, var and body are required attributes.
      */

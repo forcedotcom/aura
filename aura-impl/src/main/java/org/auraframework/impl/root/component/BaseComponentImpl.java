@@ -27,6 +27,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDefRefArray;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
@@ -490,6 +491,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     }
 
     static private DefDescriptor<TypeDef> componentArrType;
+    static private DefDescriptor<TypeDef> componentDefRefArrayType;
 
     @Override
     public void reinitializeModel() throws QuickFixException {
@@ -499,6 +501,10 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         BaseComponentDef def = descriptor.getDef();
         if (componentArrType == null) {
             componentArrType = Aura.getDefinitionService().getDefDescriptor("aura://Aura.Component[]", TypeDef.class);
+        }
+        
+        if(componentDefRefArrayType == null) {
+        	componentDefRefArrayType = Aura.getDefinitionService().getDefDescriptor("aura://Aura.ComponentDefRef[]", TypeDef.class);
         }
 
         createModel();
@@ -529,7 +535,20 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                         c.reinitializeModel();
                     }
                 }
+            } 
+            else if (componentDefRefArrayType.equals(typeDesc)) {
+            	ComponentDefRefArray val = getAttributes().getValue(foo.getKey().getName(), ComponentDefRefArray.class);
+                if (val != null) {
+                    //@SuppressWarnings("unchecked")
+                    //List<BaseComponent<?, ?>> facet = (List<BaseComponent<?, ?>>) val;
+                    for (Object c : val.getList()) {
+                    	if(c instanceof BaseComponent) {
+                    		((BaseComponent<?, ?>)c).reinitializeModel();                    		
+                    	}
+                    }
+                }
             }
+            
         }
     }
 

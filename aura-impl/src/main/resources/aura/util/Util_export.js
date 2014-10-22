@@ -35,6 +35,7 @@ p["addClass"] = p.addClass;
 p["removeClass"] = p.removeClass;
 p["toggleClass"] = p.toggleClass;
 p["swapClass"] = p.swapClass;
+p["createElementsFromMarkup"]= p.createElementsFromMarkup;
 p["insertFirst"] = p.insertFirst;
 p["insertBefore"] = p.insertBefore;
 p["insertAfter"] = p.insertAfter;
@@ -79,7 +80,7 @@ p["filter"] = p.filter;
 p["keys"] = p.keys;
 p["bind"] = p.bind;
 p["includeScript"] = p.includeScript;
-p["equalBySource"] = p.equalBySource;
+p["isExpression"] = p.isExpression;
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 p["getDebugToolComponent"] = p.getDebugToolComponent;

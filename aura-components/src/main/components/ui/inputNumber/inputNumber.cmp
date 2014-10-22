@@ -35,7 +35,7 @@
        		  placeholder="{!v.placeholder}"
        		  required="{!v.required}"
        		  disabled="{!v.disabled}"
-       		  aria-describedby="{!v.ariaDescribedby}"/>
+       		  aria-describedby="{!v.ariaDescribedBy}"/>
        <aura:set attribute="else">
            {!v.body}
        </aura:set>

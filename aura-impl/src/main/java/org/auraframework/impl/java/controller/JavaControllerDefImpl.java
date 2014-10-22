@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -76,7 +77,6 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
         return this.controllerClass;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> sddesc) {
         if (sddesc.getDefType() == DefType.ACTION) {

@@ -18,9 +18,10 @@
 <aura:component>
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
+    <aura:attribute name="status" type="String"/>
     <ui:button press="{!c.makeClient}" label="Push for client component"/>
     <ui:button press="{!c.makeServer}" label="Push for server component" aura:id="makeServer"/>
     <ui:button press="{!c.makeExclusiveServer}" label="Push for exclusive server component"/><br/>
     {!v.body}
-    <div aura:id="status"/>
+    <div>{!v.status}</div>>
 </aura:component>

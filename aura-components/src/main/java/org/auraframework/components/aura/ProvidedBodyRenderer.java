@@ -16,9 +16,8 @@
 package org.auraframework.components.aura;
 
 import java.io.IOException;
-import java.util.List;
-
 import org.auraframework.Aura;
+import org.auraframework.def.ComponentDefRefArray;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -30,14 +29,20 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * @since 0.0.234
  */
 public class ProvidedBodyRenderer implements Renderer {
-    @SuppressWarnings("unchecked")
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        List<BaseComponent<?, ?>> realbody = (List<BaseComponent<?, ?>>) component.getAttributes().getValue("realbody");
-        if (realbody != null) {
-            for (BaseComponent<?, ?> c : realbody) {
-                Aura.getRenderingService().render(c, out);
-            }
+    	ComponentDefRefArray bodyAttribute = component.getAttributes().getValue("body", ComponentDefRefArray.class);
+        if (bodyAttribute == null) {
+        	return;
         }
+        
+        // Loop over all the items in the body, which is a ComponentDefRefArray
+        // If you find a ComponentInstance, render that instance
+        for (Object bodyComponent : bodyAttribute.getList()) {
+        	if(bodyComponent instanceof BaseComponent) {
+        		Aura.getRenderingService().render((BaseComponent<?, ?>)bodyComponent, out);
+        	}
+        }
+        return;
     }
 }

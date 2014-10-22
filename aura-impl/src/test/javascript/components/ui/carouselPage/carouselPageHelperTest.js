@@ -146,12 +146,8 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     		var targetComponent = {
     			find : function(expression) {
     				return {
-    					getValue : function(value) {
-    						return {
-    							isEmpty : function() {return false;},
-    							destroy : function() {actual = true;},
-    							setValue : function() {}
-    						}
+    					set : function(expression, value) {
+    						actual = true;
     					}
     				}
     			}
@@ -175,12 +171,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     		var targetComponent = {
     			find : function(expression) {
     				return {
-    					getValue : function(value) {
-    						return {
-    							isEmpty : function() {return true;},
-    							destroy : function() {actual = true;},
-    							setValue : function() {}
-    						}
+    					set : function(expression, value) {
     					}
     				}
     			}

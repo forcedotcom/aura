@@ -119,28 +119,28 @@
             var cellCmp = component.find(i);
             if (cellCmp) {
                 var dayOfWeek = d.getDay();
-                var clazz;
+                var className;
                 if (dayOfWeek == 0 || dayOfWeek == 6) {
-                    clazz = "weekend";
+                    className = "weekend";
                 } else {
-                    clazz = "weekday";
+                    className = "weekday";
                 }
                 if (d.getMonth() == month - 1 || d.getFullYear() == year - 1) {
-                    clazz += " prevMonth"
+                    className += " prevMonth"
                 } else if (d.getMonth() == month + 1 || d.getFullYear() == year + 1) {
-                    clazz += " nextMonth"
+                    className += " nextMonth"
                 }
 
                 if (this.dateEquals(d, today)) {
-                    clazz += " todayDate";
+                    className += " todayDate";
                 }
                 if (this.dateEquals(d, selectedDate)) {
-                    clazz += " selectedDate"
+                    className += " selectedDate"
                     cellCmp.set("v.tabIndex", 0);
                 } else {
                     cellCmp.set("v.tabIndex", -1);
                 }
-                cellCmp.set("v.class", clazz);
+                cellCmp.set("v.class", className);
                 cellCmp.set("v.label", d.getDate());
                 cellCmp.set("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
 
@@ -189,7 +189,7 @@
             component.set("v.date", targetDate.getDate());
             this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
         } else {
-            var targetCellCmp = component.find(parseInt(localId) + deltaDays);
+            var targetCellCmp = component.find(parseInt(localId,10) + deltaDays);
             targetCellCmp.getElement().focus();
             component.set("v.date", targetCellCmp.get("v.label"));
         }
@@ -264,13 +264,13 @@
         var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
         if (hasTime === true) {
             var firstDate = new Date(component.get("v.year"), component.get("v.month"), 1);
-            var firstDateId = parseInt(firstDate.getDay());
+            var firstDateId = parseInt(firstDate.getDay(),10);
 
             var lastDate = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
             var lastDateCellCmp = this.findDateComponent(component, lastDate);
-            var lastDateId = parseInt(lastDateCellCmp.getLocalId());
+            var lastDateId = parseInt(lastDateCellCmp.getLocalId(),10);
 
-            var currentId = parseInt(source.getLocalId());
+            var currentId = parseInt(source.getLocalId(),10);
             var currentDate = source.get("v.label");
             if (currentId < firstDateId) { // previous month
                 var targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);

@@ -91,7 +91,7 @@
     	attributes : {imageType:'informational'},
         test: function(cmp){
             // Note the missing colon here compared to below.
-            var errorMessage = "component: 1:2.a \"alt\" attribute should not be empty for informational image";
+            var errorMessage = "component: 1:2;a \"alt\" attribute should not be empty for informational image";
             var screenError = $A.test.getAuraErrorMessage();
             $A.test.assertTrue($A.test.contains(screenError, errorMessage),
                                "Expected '" + errorMessage+"', Got:'"+screenError+"'");
@@ -101,7 +101,7 @@
         auraErrorsExpectedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
     	attributes : {imageType:'decorative', alt:'Company'},
         test: function(cmp){
-            var errorMessage = "component: 1:2.a: \"alt\" attribute should be empty for decorative image";
+            var errorMessage = "component: 1:2;a: \"alt\" attribute should be empty for decorative image";
             var screenError = $A.test.getAuraErrorMessage();
             $A.test.assertTrue($A.test.contains(screenError, errorMessage),
                                "Expected '" + errorMessage+"', Got:'"+screenError+"'");

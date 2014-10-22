@@ -16,8 +16,8 @@
 
 -->
 <aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
-    <ui:outputText value='{!m.ObjectNull}' aura:id='myComp1'/> <br/>
-    <ui:outputText value='{!m.BooleanTrue}' aura:id='myComp2'/> <br/>
-    <ui:outputText value='{!m.Text}' aura:id='myComp3'/> <br/>
-    <ui:outputText value='{!m.Number}' aura:id='myComp4'/>
+    <ui:outputText value='{!m.objectNull}' aura:id='myComp1'/> <br/>
+    <ui:outputText value='{!m.booleanTrue}' aura:id='myComp2'/> <br/>
+    <ui:outputText value='{!m.text}' aura:id='myComp3'/> <br/>
+    <ui:outputText value='{!m.number}' aura:id='myComp4'/>
 </aura:component>

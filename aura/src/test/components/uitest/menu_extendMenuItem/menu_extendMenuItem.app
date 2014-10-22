@@ -16,16 +16,16 @@
 
 -->
 <aura:application model="java://org.auraframework.component.ui.MenuTestModel">
-<div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2>Extends menuItem - Focus Test</h2>
-        <ui:menu aura:id="uiMenu" class="clubMenu">
-            <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
-            <ui:menuList class="actionMenu" aura:id="actionMenu">
-                <uitest:menuItem_extend class="actionItem1" label="Bayern München" aura:id="actionItem1" />
-                <uitest:menuItem_extend class="actionItem2" label="FC Barcelona" aura:id="actionItem2"/>
-            	<uitest:menuItem_extend class="actionItem3" label="Inter Milan" aura:id="actionItem3"/>
-            	<uitest:menuItem_extend class="actionItem4" label="Manchester United" aura:id="actionItem4"/>
-            </ui:menuList>
-        </ui:menu>  
-</div>
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+            <h2>Extends menuItem - Focus Test</h2>
+            <ui:menu aura:id="uiMenu" class="clubMenu">
+                <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
+                <ui:menuList class="actionMenu" aura:id="actionMenu">
+                    <uitest:menuItem_extend zclass="actionItem1" zlabel="Bayern München" aura:id="actionItem1" />
+                    <uitest:menuItem_extend zclass="actionItem2" zlabel="FC Barcelona" aura:id="actionItem2"/>
+                	<uitest:menuItem_extend zclass="actionItem3" zlabel="Inter Milan" aura:id="actionItem3"/>
+                	<uitest:menuItem_extend zclass="actionItem4" zlabel="Manchester United" aura:id="actionItem4"/>
+                </ui:menuList>
+            </ui:menu>
+    </div>
 </aura:application>

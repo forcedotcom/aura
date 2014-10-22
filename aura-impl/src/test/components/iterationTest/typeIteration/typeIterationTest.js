@@ -25,7 +25,7 @@
             container = cmp.find("null");
             containerElement = container.getElement();
             children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            $A.test.assertEquals(0, container.get("v.body")[0].get("v.realbody").length);
+            $A.test.assertEquals(0, container.get("v.body")[0].get("v.body").length);
             $A.test.assertEquals("", $A.test.getText(containerElement));
             $A.test.assertEquals(0, children.length);
 
@@ -33,7 +33,7 @@
             container = cmp.find("empty");
             containerElement = container.getElement();
             children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            $A.test.assertEquals(0, container.get("v.body")[0].get("v.realbody").length);
+            $A.test.assertEquals(0, container.get("v.body")[0].get("v.body").length);
             $A.test.assertEquals("", $A.test.getText(containerElement));
             $A.test.assertEquals(0, children.length);
 
@@ -41,7 +41,7 @@
             container = cmp.find("strings");
             containerElement = container.getElement();
             children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            $A.test.assertEquals(3, container.get("v.body")[0].get("v.realbody").length);
+            $A.test.assertEquals(3, container.get("v.body")[0].get("v.body").length);
             $A.test.assertEquals(3, children.length);
             $A.test.assertEquals("one7", children[0].value);
             $A.test.assertEquals("two7", children[1].value);
@@ -51,7 +51,7 @@
             container = cmp.find("numbers");
             containerElement = container.getElement();
             children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            $A.test.assertEquals(3, container.get("v.body")[0].get("v.realbody").length);
+            $A.test.assertEquals(3, container.get("v.body")[0].get("v.body").length);
             $A.test.assertEquals(3, children.length);
             $A.test.assertEquals("3", children[0].value);
             $A.test.assertEquals(3, children[0].size);
@@ -67,7 +67,7 @@
             container = cmp.find("booleans");
             containerElement = container.getElement();
             children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            $A.test.assertEquals(3, container.get("v.body")[0].get("v.realbody").length);
+            $A.test.assertEquals(3, container.get("v.body")[0].get("v.body").length);
             $A.test.assertEquals(3, children.length);
             $A.test.assertEquals("0", children[0].value);
             $A.test.assertEquals(true, children[0].disabled);
@@ -80,7 +80,7 @@
             container = cmp.find("lists");
             containerElement = container.getElement();
             children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            $A.test.assertEquals(3, container.get("v.body")[0].get("v.realbody").length);
+            $A.test.assertEquals(3, container.get("v.body")[0].get("v.body").length);
             $A.test.assertEquals(9, children.length);
             $A.test.assertEquals("one is from [0,0]", children[0].value);
             $A.test.assertEquals("two is from [0,1]", children[1].value);
@@ -91,17 +91,6 @@
             $A.test.assertEquals("ek is from [2,0]", children[6].value);
             $A.test.assertEquals("do is from [2,1]", children[7].value);
             $A.test.assertEquals("theen is from [2,2]", children[8].value);
-
-            // barecomponents
-            // container = cmp.find("barecomponents");
-            // containerElement = container.getElement();
-            // children = $A.test.getNonCommentNodes(containerElement.childNodes);
-            // $A.test.assertEquals(3,
-            // container.get("v.body")[0].get("v.realbody").length);
-            // $A.test.assertEquals("text0text1text2",
-            // $A.test.getText(containerElement));
-            // $A.test.assertEquals(3, children.length);
-
         }
     },
     //Aura.Component[] as items
@@ -111,7 +100,7 @@
             var elements = $A.test.getNonCommentNodes(container.getElements());
             $A.test.assertEquals(2, elements.length);
             //Verify that iteration component's body has only two components.
-            $A.test.assertEquals(2, container.find("iteration").get("v.realbody").length);
+            $A.test.assertEquals(2, container.find("iteration").get("v.body").length);
 
             $A.test.assertTrue($A.test.isInstanceOfText(elements[0]));
             $A.test.assertEquals("textOnBody" , $A.test.getText(elements[0]));
@@ -127,7 +116,7 @@
             var container = cmp.find("emptyComponentArray");
             var elements = $A.test.getNonCommentNodes(container.getElements());
             $A.test.assertEquals(0, elements.length);
-            $A.test.assertEquals(0, container.find("iteration").get("v.realbody").length);
+            $A.test.assertEquals(0, container.find("iteration").get("v.body").length);
         }
     }
 })

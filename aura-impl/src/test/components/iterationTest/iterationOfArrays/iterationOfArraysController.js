@@ -25,7 +25,7 @@
     },
 
     setCapitalItems: function(cmp, evt) {
-        var other = cmp.get("m.capitaldata");
+        var other = cmp.get("m.capitalData");
         var iter = cmp.find("iteration");
         iter.set("v.items", other);
     },
@@ -33,36 +33,36 @@
     reverseItems: function(cmp, evt) {
         var iter = cmp.find("iteration");
         var items = iter.get("v.items");
-        
+
         var reversed = items.reverse();
 
         iter.set("v.items", reversed);
     },
 
     changeOneValue: function(cmp, evt) {
-        var index = cmp.get("v.tochange");
+        var index = parseInt(cmp.get("v.toChange"), 10);
         var iter = cmp.find("iteration");
-        
+
         var data = iter.get("v.items");
-        data[index] = {stringy: cmp.get("v.newvalue") }
-        
+        data[index] = {stringy: cmp.get("v.newValue") }
+
         iter.set("v.items", data);
     },
 
     pushOneValue: function(cmp, evt) {
         var iter = cmp.find("iteration");
         var old = iter.get("v.items");
-        old.push({stringy:cmp.get("v.newvalue")});
+        old.push({stringy:cmp.get("v.newValue")});
         iter.set("v.items",old);
     },
 
     insertOneValue: function(cmp, evt) {
-        var index = parseInt(cmp.get("v.tochange"), 10);
+        var index = parseInt(cmp.get("v.toChange"), 10);
         var iter = cmp.find("iteration");
         var newdata = iter.get("v.items");
 
         // Create the new data item.
-        newdata.splice(index, 0, {stringy:cmp.get("v.newvalue")});
+        newdata.splice(index, 0, {stringy:cmp.get("v.newValue")});
 
         // To avoid over-rerendering, we SHOULD do a for loop over changed indeces:
         //     for (var i = index; i < newdata.length; i++) {
@@ -72,10 +72,10 @@
     },
 
     deleteOneValue: function(cmp, evt) {
-        var index = parseInt(cmp.get("v.tochange"), 10);
+        var index = parseInt(cmp.get("v.toChange"), 10);
         var iter = cmp.find("iteration");
         var newdata = iter.get("v.items");
-        
+
         // Remove the one data item.
         newdata.splice(index, 1);
 

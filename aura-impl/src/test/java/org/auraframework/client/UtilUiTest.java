@@ -19,54 +19,49 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public class UtilUiTest extends WebDriverTestCase {
 
-    public UtilUiTest(String name) {
-        super(name);
-    }
+	public UtilUiTest(String name) {
+		super(name);
+	}
 
-    public void testRemoveOn() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class, String.format(baseComponentTag,
-                        "render='client'",
-                        "<div aura:id='div' class='target'>handled</div>"));
-        By target = By.cssSelector(".target");
-        open(cmpDesc);
+	public void testRemoveOn() throws Exception {
+		DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+				ComponentDef.class, String.format(baseComponentTag,
+						"render='client'",
+						"<div aura:id='div' class='target'>handled</div>"));
+		By target = By.cssSelector(".target");
+		open(cmpDesc);
 
-        // check that test properties are unset, then add two handlers to the same event
-        getDriver().findElement(target).click();
-        assertTrue(
-                "Test setup failure, properties already defined on window",
-                auraUITestingUtil
-                        .getBooleanEval("return window['handledByTest'] === undefined && window['2ndHandledByTest'] === undefined"));
-        auraUITestingUtil
-                .getEval("var handler=function(){window['handledByTest']=true;};var handler2=function(){window['2ndHandledByTest']=true};window['testHandler']=handler;var elem=$A.getRoot().find('div').getElement();$A.util.on(elem, 'click', handler, false);$A.util.on(elem, 'click', handler2, false);");
+		// check that test property is unset, then add a handler
+		getDriver().findElement(target).click();
+		assertEquals(
+				true,
+				auraUITestingUtil
+						.getBooleanEval("return window['handledByTest'] === undefined"));
+		auraUITestingUtil
+				.getEval("var handler=function(){window['handledByTest']=true;};window['testHandler']=handler;var elem=$A.getRoot().find('div').getElement();$A.util.on(elem, 'click', handler, false);");
 
-        // trigger handlers, then check that test properties are now set, reset the test properties after checking
-        getDriver().findElement(target).click();
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return auraUITestingUtil
-                        .getBooleanEval("var res = window['handledByTest'] && window['2ndHandledByTest'];window['handledByTest']=undefined;window['2ndhandledByTest']=undefined;return res===true;");
-            }
-        });
+		// trigger handler, then check that test property is now set
+		// reset the test property after checking
+		getDriver().findElement(target).click();
+		assertEquals(
+				true,
+				auraUITestingUtil
+						.getBooleanEval("var res = window['handledByTest'];window['handledByTest'] = undefined;return res===true;"));
+		assertEquals(
+				true,
+				auraUITestingUtil
+						.getBooleanEval("return window['handledByTest'] === undefined"));
 
-        // remove one one of the handlers, trigger event and verify only the non-removed handler is called
-        auraUITestingUtil
-                .getEval("$A.util.removeOn($A.getRoot().find('div').getElement(), 'click', window['testHandler'], false);");
-        getDriver().findElement(target).click();
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return auraUITestingUtil
-                        .getBooleanEval("return window['2ndHandledByTest'] === true");
-            }
-        });
-        assertTrue("Handler was not removed",
-                auraUITestingUtil.getBooleanEval("return window['handledByTest'] ===  undefined"));
-    }
+		// remove the handler, then check that test property is not set on next event
+		auraUITestingUtil
+				.getEval("$A.util.removeOn($A.getRoot().find('div').getElement(), 'click', window['testHandler'], false);");
+		getDriver().findElement(target).click();
+		assertEquals(
+				true,
+				auraUITestingUtil
+						.getBooleanEval("return window['handledByTest'] === undefined"));
+	}
 }

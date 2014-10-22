@@ -21,7 +21,7 @@
             return;
         var div = document.createElement("div");
         div.innerText = evtToken;
-        $A.util.insertFirst(log, div);
+        $A.util.insertFirst(div, log);
     },
 
     destroy : function(cmp, event) {

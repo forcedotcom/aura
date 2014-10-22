@@ -101,7 +101,7 @@
      * Verify updating attributes on rerender.
      */
     testRerender:{
-        attributes : {disabled: false, text: "my value", value: false},
+        attributes : {disabled: false, text: "my value", value: false, label: "I'm broken, fix me"},
         test:function(component){
             aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
             aura.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");

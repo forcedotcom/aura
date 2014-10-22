@@ -42,16 +42,7 @@
     		return false;
     	}
     	
-        var componentElements = [];
-
-        //grab all the siblings
-        var elements = component.getElements();
-        for(var index in elements) {
-            if (elements.hasOwnProperty(index)){
-                componentElements.push(elements[index]);
-            }
-        }
-
+        var componentElements = component.getElements();
         //go up the chain until it hits either a sibling or the root
         var currentNode = targetElem;
 
@@ -179,10 +170,9 @@
         return this.getOnClickEventProp.cache[prop];
     },
     
-    toggleMenuVisible : function(component, index, event) {
+    toggleMenuVisible : function(component, index) {
     	var c = this.getMenuComponent(component);
         c.set("v.focusItemIndex", index);
-        c.set("v.referenceElement", event.getSource().getElement());
         var menuVisible = c.get("v.visible");
         if (menuVisible === true) {
         	c.set("v.visible", false);

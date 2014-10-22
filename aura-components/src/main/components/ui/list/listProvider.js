@@ -15,7 +15,11 @@
  */
 ({        
     provide : function AbstractListProvider(component) {
-        var items = component.get("v.dataProvider.0.m.items");
+        var dataProvider = component.get("v.dataProvider[0]");
+        var items = [];
+        if(dataProvider && dataProvider.getModel()) {
+        	items = dataProvider.get("m.items");
+        }
         
         return {
             attributes: {

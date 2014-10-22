@@ -15,9 +15,9 @@
  */
 ({
 	initialize: function (cmp) {
-		var value = cmp.getValue('v.value'),
+		var value = cmp.get('v.value'),
 			outputComponentDefRef = cmp.get('v.outputComponent')[0],
-			priv_outputComponent = cmp.getValue('v.priv_outputComponent'),
+			priv_outputComponent = cmp.get('v.priv_outputComponent'),
 			valueProvider = {};
 
 		if (outputComponentDefRef) {
@@ -44,7 +44,7 @@
 	 * this function. 
 	 */
 	calculate: function (cmp) {
-		var items		= cmp.getValue('v.items'),
+		var items		= cmp.get('v.items'),
 			column		= cmp.get('v.column'),
 			type 		= cmp.get('v.type'), 
 			aggregate	= 0,
@@ -92,25 +92,24 @@
 	},
 
 	/**
-	 * @param {ArrayValue} items
+	 * @param {Array} items
 	 * @param {String} column 
 	 */
 	aggregate_sum: function (items, column) {
 		var sum = 0
 
-		items.each(function (item) {
-			var num = parseFloat(item.get(column));
-			
-			if (num) {
-				sum += num;
-			}
-		});
+		for(var i=0;i<items.length;i++){
+            var num = parseFloat(item.get(column),10);
+            if (!isNaN(num)) {
+                sum += num;
+            }
+        }
 
 		return sum;	
 	},
 
 	/**
-	 * @param {ArrayValue} items
+	 * @param {Array} items
 	 * @param {String} column 
 	 */
 	aggregate_avg: function (items, column) {
@@ -121,7 +120,7 @@
 	},
 
 	/**
-	 * @param {ArrayValue} items
+	 * @param {Array} items
 	 * @param {String} column 
 	 */
 	aggregate_min: function (items, column) {
@@ -130,7 +129,7 @@
 	},
 
 	/**
-	 * @param {ArrayValue} items
+	 * @param {Array} items
 	 * @param {String} column 
 	 */
 	aggregate_max: function (items, column) {

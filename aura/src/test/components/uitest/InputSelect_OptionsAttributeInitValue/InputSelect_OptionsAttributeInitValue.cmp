@@ -25,17 +25,16 @@
     <aura:if isTrue="{!v.whichToRender == 'VUWND'}">
         <ui:inputSelect aura:id="Value_Undef_With_No_Default" options="{!m.noOptionsSel}" />
     </aura:if>
-       <!--
-        Checking for case when default for input select is Bear, result 
-        should be bear is the initial item shown
+     <!--
+        Checking for case when no default value is given in inputSelect, 
+        and inputSelectOption is set to true for Lion. Lion should be chosen
      -->
       <aura:if isTrue="{!v.whichToRender == 'VDSE'}">
         <ui:inputSelect aura:id="Value_Def_Selection_Exists" value="Bear" options="{!m.noOptionsSel}" />
     </aura:if>
-   
      <!--
-        Checking for case when no default value is given in inputSelect, 
-        and inputSelectOption is set to true for Lion. Lion should be chosen
+        Checking for case when default for input select is Bear, result 
+        should be bear is the initial item shown
      -->
     <aura:if isTrue="{!v.whichToRender == 'VUWD'}">
         <ui:inputSelect aura:id="Value_Undef_With_Default" options="{!m.secondOptionSel}" />

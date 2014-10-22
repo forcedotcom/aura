@@ -46,7 +46,7 @@
             <ui:inputDate class="formInput" aura:id="inDOB" value="1990-01-01" displayDatePicker="true"/>
         </div>
         <div class="row">
-            <ui:inputSelect class="formInput" label="Size" aura:id="inSize" options="{!m.sizes}"/>
+            <ui:inputSelect label="Size" aura:id="inSize" options="{!m.sizes}"/>
         </div>
         <div class="row">
             <ui:label class="formLabel" label="Appointment Time" for="inAppt"/>

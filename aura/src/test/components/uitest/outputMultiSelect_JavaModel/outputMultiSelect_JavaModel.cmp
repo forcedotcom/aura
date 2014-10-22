@@ -16,11 +16,11 @@
 
 -->
 <aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
-    <ui:outputMultiSelect  value='{!m.String}' aura:id='String' />
+    <ui:outputMultiSelect  value='{!m.string}' aura:id='String' />
     <br/>
-    <ui:outputMultiSelect  value='{!m.StringArray}' aura:id='StringArray' />
+    <ui:outputMultiSelect  value='{!m.stringArray}' aura:id='StringArray' />
     <br/>
-    <ui:outputMultiSelect  value='{!m.StringList}' aura:id='StringList' />
+    <ui:outputMultiSelect  value='{!m.stringList}' aura:id='StringList' />
     <br/>
-    <ui:outputMultiSelect  value='{!m.IntegerArray}' aura:id='IntegerArray' />
+    <ui:outputMultiSelect  value='{!m.integerArray}' aura:id='IntegerArray' />
 </aura:component>

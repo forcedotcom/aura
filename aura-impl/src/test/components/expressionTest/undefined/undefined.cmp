@@ -21,9 +21,6 @@
     <!-- "undefined" in following expressions is not the literal, but from a reference to nothing -->
     <expressionTest:test expression="{!undefined}" exprText="undefined" expected="undefined"/>
     <expressionTest:test expression="{!v.isNotSet}" exprText="v.isNotSet" expected="undefined"/>
-    <expressionTest:test expression="{!v.undefined}" exprText="v.undefined" expected="undefined"/>
-    <expressionTest:test expression="{!m.undefined}" exprText="m.undefined" expected="undefined"/>
-    <expressionTest:test expression="{!c.undefined}" exprText="c.undefined" expected="undefined"/>
     <expressionTest:test expression="{!$Labels.undefined.undefined}" exprText="$Labels.undefined.undefined" expected="undefined"/>
     <expressionTest:test expression="{!$whimsy}" exprText="$whimsy" expected="undefined"/>
 
@@ -33,62 +30,62 @@
     <expressionTest:test expression="{!undefined == false}" exprText="undefined == false" expected="false"/>
     <expressionTest:test expression="{!undefined == ''}" exprText="undefined == ''" expected="false"/>
     <expressionTest:test expression="{!undefined == 0}" exprText="undefined == 0" expected="false"/>
-    <expressionTest:test expression="{!undefined == m.NaN}" exprText="undefined == m.NaN" expected="false"/>
+    <expressionTest:test expression="{!undefined == m.naN}" exprText="undefined == m.naN" expected="false"/>
 
     <expressionTest:test expression="{!undefined != undefined}" exprText="undefined != undefined" expected="false"/>
-    <expressionTest:test expression="{!undefined != m.NaN}" exprText="undefined != m.NaN" expected="true"/>
+    <expressionTest:test expression="{!undefined != m.naN}" exprText="undefined != m.naN" expected="true"/>
 
-    <expressionTest:test expression="{!true &amp;&amp; undefined}" exprText="true &amp;&amp; undefined" expected="null"/>
-    <expressionTest:test expression="{!undefined &amp;&amp; undefined}" exprText="undefined &amp;&amp; undefined" expected="null"/>
-    <expressionTest:test expression="{!undefined &amp;&amp; true}" exprText="undefined &amp;&amp; true" expected="null"/>
+    <expressionTest:test expression="{!true &amp;&amp; undefined}" exprText="true &amp;&amp; undefined" expected="undefined"/>
+    <expressionTest:test expression="{!undefined &amp;&amp; undefined}" exprText="undefined &amp;&amp; undefined" expected="undefined"/>
+    <expressionTest:test expression="{!undefined &amp;&amp; true}" exprText="undefined &amp;&amp; true" expected="undefined"/>
 
-    <expressionTest:test expression="{!false || undefined}" exprText="false || undefined" expected="null"/>
+    <expressionTest:test expression="{!false || undefined}" exprText="false || undefined" expected="undefined"/>
     <expressionTest:test expression="{!undefined || true}" exprText="undefined || true" expected="true"/>
-    <expressionTest:test expression="{!undefined || undefined}" exprText="undefined || undefined" expected="null"/>
+    <expressionTest:test expression="{!undefined || undefined}" exprText="undefined || undefined" expected="undefined"/>
 
     <expressionTest:test expression="{!undefined ? 'yes' : 'no'}" exprText="undefined ? 'yes' : 'no'" expected="'no'"/>
-    <expressionTest:test expression="{!true ? undefined : 'no'}" exprText="true ? undefined : 'no'" expected="null"/>
-    <expressionTest:test expression="{!false ? 'yes' : undefined}" exprText="false ? 'yes' : undefined" expected="null"/>
+    <expressionTest:test expression="{!true ? undefined : 'no'}" exprText="true ? undefined : 'no'" expected="undefined"/>
+    <expressionTest:test expression="{!false ? 'yes' : undefined}" exprText="false ? 'yes' : undefined" expected="undefined"/>
 
-    <expressionTest:test expression="{!undefined + 1}" exprText="undefined + 1" expected="1"/>
+    <expressionTest:test expression="{!undefined + 1}" exprText="undefined + 1" expected="NaN"/>
     <expressionTest:test expression="{!undefined + 'b'}" exprText="undefined + 'b'" expected="'b'"/>
-    <expressionTest:test expression="{!2.5 + undefined}" exprText="2.5 + undefined" expected="2.5"/>
+    <expressionTest:test expression="{!2.5 + undefined}" exprText="2.5 + undefined" expected="NaN"/>
     <expressionTest:test expression="{!'c' + undefined}" exprText="'c' + undefined" expected="'c'"/>
     <expressionTest:test expression="{!undefined + undefined}" exprText="undefined + undefined" expected="''"/>
 
-    <expressionTest:test expression="{!2 - undefined}" exprText="2 - undefined" expected="2"/>
-    <expressionTest:test expression="{!undefined - 3.1}" exprText="undefined - 3.1" expected="-3.1"/>
-    <expressionTest:test expression="{!undefined - undefined}" exprText="undefined - undefined" expected="0"/>
+    <expressionTest:test expression="{!2 - undefined}" exprText="2 - undefined" expected="NaN"/>
+    <expressionTest:test expression="{!undefined - 3.1}" exprText="undefined - 3.1" expected="NaN"/>
+    <expressionTest:test expression="{!undefined - undefined}" exprText="undefined - undefined" expected="NaN"/>
 
-    <expressionTest:test expression="{!3 * undefined}" exprText="3 * undefined" expected="0"/>
-    <expressionTest:test expression="{!undefined * -.1}" exprText="undefined * -.1" expected="0"/>
-    <expressionTest:test expression="{!undefined * undefined}" exprText="undefined * undefined" expected="0"/>
+    <expressionTest:test expression="{!3 * undefined}" exprText="3 * undefined" expected="NaN"/>
+    <expressionTest:test expression="{!undefined * -.1}" exprText="undefined * -.1" expected="NaN"/>
+    <expressionTest:test expression="{!undefined * undefined}" exprText="undefined * undefined" expected="NaN"/>
 
-    <expressionTest:test expression="{!3 / undefined}" exprText="3 / undefined" expected="Infinity"/>
-    <expressionTest:test expression="{!undefined / 3}" exprText="undefined / 3" expected="0"/>
+    <expressionTest:test expression="{!3 / undefined}" exprText="3 / undefined" expected="NaN"/>
+    <expressionTest:test expression="{!undefined / 3}" exprText="undefined / 3" expected="NaN"/>
     <expressionTest:test expression="{!undefined / undefined}" exprText="undefined / undefined" expected="NaN"/>
 
     <expressionTest:test expression="{!3 % undefined}" exprText="3 % undefined" expected="NaN"/>
-    <expressionTest:test expression="{!undefined % 3}" exprText="undefined % 3" expected="0"/>
+    <expressionTest:test expression="{!undefined % 3}" exprText="undefined % 3" expected="NaN"/>
     <expressionTest:test expression="{!undefined % undefined}" exprText="undefined % undefined" expected="NaN"/>
 
-    <expressionTest:test expression="{!1 > undefined}" exprText="1 > undefined" expected="true"/>
+    <expressionTest:test expression="{!1 > undefined}" exprText="1 > undefined" expected="false"/>
     <expressionTest:test expression="{!undefined > 0}" exprText="undefined > 0" expected="false"/>
     <expressionTest:test expression="{!undefined > undefined}" exprText="undefined > undefined" expected="false"/>
 
-    <expressionTest:test expression="{!0 >= undefined}" exprText="0 >= undefined" expected="true"/>
+    <expressionTest:test expression="{!0 >= undefined}" exprText="0 >= undefined" expected="false"/>
     <expressionTest:test expression="{!undefined >= 1}" exprText="undefined >= 1" expected="false"/>
-    <expressionTest:test expression="{!undefined >= undefined}" exprText="undefined >= undefined" expected="true"/>
+    <expressionTest:test expression="{!undefined >= undefined}" exprText="undefined >= undefined" expected="false"/>
 
     <expressionTest:test expression="{!0 &lt; undefined}" exprText="0 &lt; undefined" expected="false"/>
-    <expressionTest:test expression="{!undefined &lt; 1}" exprText="undefined &lt; 1" expected="true"/>
+    <expressionTest:test expression="{!undefined &lt; 1}" exprText="undefined &lt; 1" expected="false"/>
     <expressionTest:test expression="{!undefined &lt; undefined}" exprText="undefined &lt; undefined" expected="false"/>
 
     <expressionTest:test expression="{!1 &lt;= undefined}" exprText="1 &lt;= undefined" expected="false"/>
-    <expressionTest:test expression="{!undefined &lt;= 0}" exprText="undefined &lt;= 0" expected="true"/>
-    <expressionTest:test expression="{!undefined &lt;= undefined}" exprText="undefined &lt;= undefined" expected="true"/>
+    <expressionTest:test expression="{!undefined &lt;= 0}" exprText="undefined &lt;= 0" expected="false"/>
+    <expressionTest:test expression="{!undefined &lt;= undefined}" exprText="undefined &lt;= undefined" expected="false"/>
 
-    <expressionTest:test expression="{!-undefined}" exprText="-undefined" expected="0"/>
+    <expressionTest:test expression="{!-undefined}" exprText="-undefined" expected="NaN"/>
 
-    <expressionTest:test expression="{!abs(undefined)}" exprText="abs(undefined)" expected="0"/>
+    <expressionTest:test expression="{!abs(undefined)}" exprText="abs(undefined)" expected="NaN"/>
 </aura:component>

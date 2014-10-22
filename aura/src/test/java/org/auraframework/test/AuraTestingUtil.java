@@ -90,11 +90,11 @@ public class AuraTestingUtil {
             return StringSourceLoader.getInstance().getSource(descriptor);
         }
     }
-    
+
     /**
      * update source for a resource
-     * @param desc definition descriptor of the resource 
-     * @param content new content for the descriptor 
+     * @param desc definition descriptor of the resource
+     * @param content new content for the descriptor
      */
     public void updateSource(DefDescriptor<?> desc, String content) {
         Source<?> src = getSource(desc);

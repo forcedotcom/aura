@@ -16,7 +16,7 @@
 /*jslint sub: true */
 var p = ControllerDef.prototype;
 exp(p,
-    "getValue", p.getValue,
+    "get", p.get,
     "getActionDef", p.getActionDef,
     "auraType", p.auraType
 );

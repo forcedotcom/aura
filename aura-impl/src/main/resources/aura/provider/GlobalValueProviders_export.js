@@ -16,8 +16,7 @@
 /*jslint sub: true */
 var p = $A.ns.GlobalValueProviders.prototype;
 exp(p,
-    "get", p.get,
-    "getValue", p.getValue
+    "get", p.get
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     	,"loadFromStorage", p.loadFromStorage 
     //#end

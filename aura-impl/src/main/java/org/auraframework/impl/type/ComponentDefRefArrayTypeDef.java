@@ -24,7 +24,7 @@ import java.util.Set;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
-import org.auraframework.impl.root.component.ComponentDefRefArray;
+import org.auraframework.impl.root.component.ComponentDefRefArrayImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
@@ -82,7 +82,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
     @Override
     public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
         if (config != null && config instanceof List) {
-            return new ComponentDefRefArray((List<ComponentDefRef>)config, valueProvider);
+            return new ComponentDefRefArrayImpl((List<ComponentDefRef>)config, valueProvider);
         }
         return config;
     }

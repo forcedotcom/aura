@@ -71,7 +71,7 @@ $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(
  * @private
  */
 $A.ns.AuraComponentService.prototype.getAttributeProviderForElement = function(element) {
-    return this.getRenderingComponentForElement(element).getAttributes().getValueProvider();
+    return this.getRenderingComponentForElement(element).getAttributeValueProvider();
 };
 
 /**
@@ -155,14 +155,13 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
                     "refDescriptor": desc,
                     "attributes": oldConfig["attributes"] ? oldConfig["attributes"]["values"] : null,
                     "exclusive": (oldConfig["load"] === "EXCLUSIVE")
-                }
+                },
+                "valueProvider":oldConfig["valueProvider"]
             }
         };
     }
 
-    var ret = new Component(config, localCreation);
-    ret.fire("init");
-    return ret;
+    return new Component(config, localCreation);
 };
 
 
@@ -227,7 +226,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
 $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp) {
     var action = $A.get("c.aura://ComponentController.getComponent");
 
-    // JBUCH: Where is this coming from in mixed form? Why do we tolerate this?
+    // JBUCH: HALO: TODO: WHERE IS THIS COMING FROM IN MIXED FORM? WHY DO WE ALLOW THIS?
     var attributes = config["attributes"] ?
             (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null;
@@ -287,62 +286,18 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
 
 /**
  * Evaluates value object into their literal values. Typically used to pass configs to server.
- * Iterates through MapValue. Recursion for nested value objects.
  *
  * @param {Object} valueObj Value Object
  * @param {Object} valueProvider value provider
  * @param {Boolean} raw
  *
- * @deprecated JBUCH: MUST GO AWAY
  * @returns {*}
  */
-$A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProvider, raw) {
-    // in case not value object, return
-    if (!$A.util.isValue(valueObj)) {
-        return valueObj;
+$A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProvider) {
+    if(aura.util.isExpression(valueObj)){
+        return valueObj.evaluate(valueProvider);
     }
-
-    var that = this;
-
-
-    if ($A.util.instanceOf(valueObj, MapValue)) {
-
-        var ret = {};
-        // handle attributes with value provider in attributes
-        if (valueObj.contains("valueProvider") && valueObj.contains("values")) {
-            valueProvider = valueObj.getValue("valueProvider");
-        }
-        valueObj.each(function(k,v){
-            // ignore valueProvider
-            if (k !== "valueProvider") {
-                ret[k] = that.computeValue(v, valueProvider, raw);
-            }
-        });
-        return ret;
-
-    } else if ($A.util.instanceOf(valueObj, ArrayValue)) {
-
-        var arr = [];
-        valueObj.each(function(item) {
-            arr.push(that.computeValue(item, valueProvider, raw));
-        });
-        return arr;
-
-    } else {
-
-        // handle PassthroughValue in scenarios when they aren't used in iteration components
-        if ("isExpression" in valueObj) {
-            if (!valueObj.isExpression()) {
-                return valueObj.unwrap();
-            } else {
-                var val = $A.expressionService.get(valueProvider, valueObj);
-                // if raw return raw instead of "{!blah}"
-                return raw ? val : val || valueObj.getValue();
-            }
-        } else {
-            return null;
-        }
-    }
+    return valueObj;
 };
 
 /**
@@ -552,7 +507,7 @@ $A.ns.AuraComponentService.prototype.getIndex = function(){
         if(globalId.indexOf(":1") > -1){
             var cmp = index[globalId];
             var par = "";
-            var vp = cmp.getAttributes().getComponentValueProvider();
+            var vp = cmp.getComponentValueProvider();
             if (vp) {
                 par = vp.getGlobalId() + " : " + vp.getDef().toString();
             }
@@ -565,7 +520,21 @@ $A.ns.AuraComponentService.prototype.getIndex = function(){
     return ret;
 };
 
-$A.ns.AuraComponentService.prototype.getValue = $A.ns.AuraComponentService.prototype.get;
+/**
+ * @memberOf AuraComponentService
+ * @private
+ */
+$A.ns.AuraComponentService.prototype.isConfigDescriptor = function(config) {
+    /*
+     * This check is to distinguish between a AttributeDefRef that came
+     * from server which has a descriptor and value, and just a thing
+     * that somebody on the client passed in. This totally breaks when
+     * somebody pass a map that has a key in it called "descriptor",
+     * like DefModel.java in the IDE TODO: better way to distinguish
+     * real AttDefRefs from random junk
+     */
+    return config && config["descriptor"];
+};
 
 exp($A.ns.AuraComponentService.prototype,
     "get", $A.ns.AuraComponentService.prototype.get,

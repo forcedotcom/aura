@@ -41,29 +41,13 @@
         }
     },
 
-    /**
-     * Values derived using expression service should be of the right native javascript type.
-     */
-    testDerivedTypes:{
-        test: function(cmp) {
-        	var simpleValue = $A.expressionService.create(null,
-                    "something");
-        	$A.test.assertTrue($A.util.isString(simpleValue.unwrap()), "Expression service could not create a simple value");
-            
-        	var mapValue = $A.expressionService.create(null,
-                     {"string":"something","integer":23,"boolean":true});
-            $A.test.assertTrue($A.util.isObject(mapValue.unwrap()),
-                    "Expression service could not create a map value(object)");
-        }
-    },
-
     testErrorFunctionsOnSimpleValueObject:{
         attributes:{intAttribute:3},
         test:function(cmp){
         	//Attribute with no default value
             cmp.clearErrors('v.strAttribute');
             this.verifyErrors(cmp, 'v.strAttribute' ,[]);
-            
+
             //Boundary cases for argument
             cmp.addErrors('v.strAttribute', undefined);
             cmp.addErrors('v.strAttribute');
@@ -98,7 +82,7 @@
     		var button = cmp.find("button");
     		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
     		$A.test.assertEquals(100, cmp.get("v.intAttribute"));
-    		
+
     		$A.test.assertEquals(false, button.isDirty("v.label"));
     		$A.test.assertEquals(100, button.get("v.label"));
 

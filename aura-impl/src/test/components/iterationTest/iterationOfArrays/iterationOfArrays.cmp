@@ -19,8 +19,8 @@
 	<aura:attribute name="list" type="List"/>
 	<aura:attribute name="start" type="integer" default="0"/>
 	<aura:attribute name="end" type="integer" default="100"/>
-	<aura:attribute name="tochange" type="integer"/>
-	<aura:attribute name="newvalue" type="string"/>
+	<aura:attribute name="toChange" type="integer"/>
+	<aura:attribute name="newValue" type="string"/>
 
 	<ui:button press="{!c.setItems}" label="set items"/>
 	<ui:button press="{!c.setCapitalItems}" label="set capitalized items"/>
@@ -33,19 +33,19 @@
 	end: <ui:inputNumber value="{!v.end}"/>
 	</div>
 	<div>
-	change item #<ui:inputNumber value="{!v.tochange}"/> to <ui:inputText value="{!v.newvalue}"/>
+	change item #<ui:inputNumber value="{!v.toChange}"/> to <ui:inputText value="{!v.newValue}"/>
 	<ui:button press="{!c.changeOneValue}" label="Do it"/>
 	</div>
 	<div>
-	insert item at #<ui:inputNumber value="{!v.tochange}"/> with <ui:inputText value="{!v.newvalue}"/>
+	insert item at #<ui:inputNumber value="{!v.toChange}"/> with <ui:inputText value="{!v.newValue}"/>
 	<ui:button press="{!c.insertOneValue}" label="Do it"/>
 	</div>
 	<div>
-	push <ui:inputText value="{!v.newvalue}"/>
+	push <ui:inputText value="{!v.newValue}"/>
 	<ui:button press="{!c.pushOneValue}" label="Do it"/>
 	</div>
 	<div>
-	delete item at #<ui:inputNumber value="{!v.tochange}"/>
+	delete item at #<ui:inputNumber value="{!v.toChange}"/>
 	<ui:button press="{!c.deleteOneValue}" label="Do it"/>
 	</div>
 

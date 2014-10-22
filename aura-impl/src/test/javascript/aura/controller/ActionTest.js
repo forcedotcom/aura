@@ -106,7 +106,7 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function ConstructsIdIfNotSet() {
             // Arrange
-            var expected = String.Format("{0}.{1}", targetNextActionId, targetContextNum);
+            var expected = String.Format("{0};{1}", targetNextActionId, targetContextNum);
             var actual;
 
             // Act
@@ -123,7 +123,7 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function SetsConstructedIdOnAction() {
             // Arrange
-            var expected = String.Format("{0}.{1}", targetNextActionId, targetContextNum);
+            var expected = String.Format("{0};{1}", targetNextActionId, targetContextNum);
             var target;
 
             // Act

@@ -22,7 +22,7 @@
     <hr/>
 
     List, generated columns
-    <ui:listView id="test-list-generated-columns" aura:id="test-list-generated-columns" items="{!m.generatedlistdata}"/>
+    <ui:listView id="test-list-generated-columns" aura:id="test-list-generated-columns" items="{!m.generatedListData}"/>
     <hr/>
 
     Empty list, specified columns
@@ -39,20 +39,20 @@
     <hr/>
 
     List, data does not map to specified columns
-    <ui:listView id="test-list-data-does-not-map-to-specified-columns" aura:id="test-list-data-does-not-map-to-specified-columns" items="{!m.specifiedlistdata}">
+    <ui:listView id="test-list-data-does-not-map-to-specified-columns" aura:id="test-list-data-does-not-map-to-specified-columns" items="{!m.specifiedListData}">
         <ui:column type="Text" title="Non-matching column" fieldName="non-matching column"/>
     </ui:listView>
     <hr/>
 
     List, data partially maps to specified columns
-    <ui:listView id="test-list-data-partially-maps-to-specified-columns" aura:id="test-list-data-partially-maps-to-specified-columns" items="{!m.specifiedlistdata}">
+    <ui:listView id="test-list-data-partially-maps-to-specified-columns" aura:id="test-list-data-partially-maps-to-specified-columns" items="{!m.specifiedListData}">
         <ui:column type="Text" title="Non-matching column" fieldName="non-matching column"/>
         <ui:column type="Text" title="Type:Text" fieldName="type:text"/>
     </ui:listView>
     <hr/>
 
     List, data fully maps to specified columns
-    <ui:listView id="test-list-specified-columns" aura:id="test-list-specified-columns" items="{!m.specifiedlistdata}">
+    <ui:listView id="test-list-specified-columns" aura:id="test-list-specified-columns" items="{!m.specifiedListData}">
         <ui:column type="" title="Type:Empty String" fieldName="type:empty string"/>
         <ui:column title="Type:Undefined" fieldName="type:undefined"/>
         <ui:column type="Text" title="Type:Text" fieldName="type:text"/>
@@ -65,7 +65,7 @@
     <hr/>
 
     List, data fully maps to nested, specified columns
-    <ui:listView id="test-list-nested-columns" aura:id="test-list-nested-columns" items="{!m.nestedcolumnslistdata}">
+    <ui:listView id="test-list-nested-columns" aura:id="test-list-nested-columns" items="{!m.nestedColumnsListData}">
         <ui:column title="First Row 0" fieldName="first row 0">
             <ui:column title="Second Row 0"  fieldName="second row 0">
                 <ui:column title="Third Row 0, Leaf 0" fieldName="third row 0, leaf 0"/>
@@ -81,7 +81,7 @@
     <hr/>
 
     List, data maps from non-leaf-node columns and should not appear in list
-    <ui:listView id="test-list-nested-columns-fields-map-from-non-leaf-columns" aura:id="test-list-nested-columns-fields-map-from-non-leaf-columns" items="{!m.nestedcolumnsfieldsmapsfromnonleafnodecolumnslistdata}">
+    <ui:listView id="test-list-nested-columns-fields-map-from-non-leaf-columns" aura:id="test-list-nested-columns-fields-map-from-non-leaf-columns" items="{!m.nestedColumnsFieldsMapsFromNonLeafNodeColumnsListData}">
         <ui:column title="First Row 0" fieldName="first row 0">
             <ui:column title="Second Row 0"  fieldName="second row 0">
                 <ui:column title="Third Row 0, Leaf 0" fieldName="third row 0, leaf 0"/>
@@ -96,10 +96,10 @@
     </ui:listView>
     <hr/>
 
-    <ui:listView id="test-fireEvents-number" aura:id="test-fireEvents-number" items="{!m.generatedlistdata}" />
+    <ui:listView id="test-fireEvents-number" aura:id="test-fireEvents-number" items="{!m.generatedListData}" />
     <hr/>
     <ui:listView id="test-list-events-webdriver-test" aura:id="test-list-events-webdriver-test"
-        items="{!m.generatedlistdata}"
+        items="{!m.generatedListData}"
         oncellclick="{!c.cellClickHandler}"
         onheaderclick="{!c.headerClickHandler}"
     ></ui:listView>

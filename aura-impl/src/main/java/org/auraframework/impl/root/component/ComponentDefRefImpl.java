@@ -263,9 +263,8 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     @Override
-    public List<Component> newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
-        Component component = new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId);
-		return Lists.<Component> newArrayList(component);
+    public Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
+        return new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId);
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<ComponentDef, ComponentDefRef> implements

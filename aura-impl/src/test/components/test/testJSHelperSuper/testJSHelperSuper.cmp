@@ -16,5 +16,6 @@
 
 -->
 <aura:component extensible="true" extends="test:testJSHelperSuperSuper">
+    {!v.body}
 </aura:component>
 <!--This component is extended by testJSHelperExplicitInheritance and used in its test -->

@@ -23,5 +23,42 @@
  * @returns {Function}
  */
 function Model(def, data, component){
-    return new MapValue(data, def, component);
+    this.def=def;
+    this.data=data;
+    this.component=component;
 }
+
+Model.prototype.get=function(key){
+    var value = undefined;
+    if (key.indexOf('.') < 0) {
+        value = this.data[key];
+    } else {
+        value = aura.expressionService.resolve(key, this.data);
+    }
+    if (aura.util.isExpression(value)) {
+        value = value.evaluate();
+    }
+    return value;
+};
+
+Model.prototype.set=function(key,value){
+    var oldValue;
+    var target=this.data;
+    var step=key;
+    if (key.indexOf('.') >= 0) {
+        var path = key.split('.');
+        target = aura.expressionService.resolve(path.slice(0, path.length - 1), target);
+        $A.assert(target,"Model.set: unable to resolve '"+key+"'.");
+        step=path[path.length-1];
+    }
+    oldValue = target[step];
+    if (oldValue instanceof PropertyReferenceValue) {
+        oldValue.set(value);
+    } else {
+        target[step]=value;
+    }
+};
+
+Model.prototype.destroy=function(async){
+    this.data=this.def=this.component=null;
+};

@@ -18,11 +18,11 @@ var p = FunctionCallValue.prototype;
 exp(p,
     "isDirty", p.isDirty,
     "getValue", p.getValue,
-    "unwrap", p.unwrap,
-    "merge", p.merge,
     "isLiteral", p.isLiteral,
     "isExpression", p.isExpression,
     "isDefined", p.isDefined,
     "destroy", p.destroy,
-    "toString", p.toString
+    "toString", p.toString,
+    "addChangeHandler", p.addChangeHandler,
+    "removeChangeHandler", p.removeChangeHandler
 );

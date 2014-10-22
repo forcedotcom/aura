@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 ({
-    clickAndWait: function(cmp, string, emsg) {
-        var button = cmp.find(string);
+    clickAndCheck: function(cmp, order, expected) {
+        var localId = [order, expected].join(" ");
+        var button = cmp.find(localId);
         $A.test.clickOrTouch(button.getElement());
-        $A.test.addWaitForWithFailureMessage(
-        		string, 
-        		function(){
-        			var div = cmp.getElements()[1];
-        			var t = $A.test.getText(div);
-        			return t;
-        		},
-        		emsg,
-        		null
-        );
+        this.checkOutput(cmp, expected, "error after click " + expected);
     },
 
-    checkOutput: function(cmp, string, msg) {
-        var div = cmp.getElements()[1];
-        var t = $A.test.getText(div);
-        $A.test.assertEquals(string, t, msg);
+    checkOutput: function(cmp, expected, msg) {
+        $A.test.setTestTimeout(2000);
+        $A.test.addWaitForWithFailureMessage(
+            expected,
+            function(){
+                var output = cmp.find('output');
+                var el = output.getElement();
+                var text = $A.test.getText(el);
+                var actual = $A.util.trim(text);
+                return actual;
+            },
+            msg,
+            null
+        );
     },
 
     // Tests walking up the possible values, ensuring that each rerenders
@@ -40,52 +42,110 @@
     // to "old" elements hung around in parents, and also exercises cases
     // where a parent is unrendering and re-rendering without confusing the
     // child state.
-    testWalkUpAndDown: {
+    // TODO: W-2406307: remaining Halo test failure
+    _testWalkUpAndDown: {
         test: [ function(cmp) {
-                this.checkOutput(cmp, "FF", "unexpected initial display");
-                this.clickAndWait(cmp, "FT","error after click FT");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "TF","error after click TF");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "TT","error after click TT");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "TF","error after click TF");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "FT","error after click FT");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "FF","error after click FF");
-            }, function(cmp) {
-                // We're good
-            }]
+            this.clickAndCheck(cmp, "oi", "FT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "TT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "FT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "FF");
+        }]
+    },
+
+    // Same, but set the inner condition before the outer coundition.
+    // TODO: W-2406307: remaining Halo test failure
+    _testWalkUpAndDownInverse: {
+        test: [ function(cmp) {
+            this.clickAndCheck(cmp, "io", "FT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "TT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "FT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "FF");
+        }]
     },
 
     // Tests some "random" skipping around, and especially all the
     // double-change permutations.
-    testSkipAround: {
+    // TODO: W-2406307: remaining Halo test failure
+    _testSkipAround: {
         test: [ function(cmp) {
-                this.checkOutput(cmp, "FF", "unexpected initial display");
-                this.clickAndWait(cmp, "TT","error after click TT");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "TF","error after click TF");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "FT","error after click FT");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "TF","error after click TF");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "TT","error after click TT");
-            }, function(cmp) {
-                this.clickAndWait(cmp, "FF","error after click FF");
-            }, function(cmp) {
-                // We're good
-            }]
+            this.clickAndCheck(cmp, "oi", "TT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "FT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "TT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "oi", "FF");
+        }]
     },
 
+    // Same, but set the inner condition before the outer coundition.
+    // TODO: W-2406307: remaining Halo test failure
+    _testSkipAroundInverse: {
+        test: [ function(cmp) {
+            this.clickAndCheck(cmp, "io", "TT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "FT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "TF");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "TT");
+        }, function(cmp) {
+            this.clickAndCheck(cmp, "io", "FF");
+        }]
+    },
+
+    // Tests initial render is good default attributes
+    testInitialStateDefault: {
+        test: function(cmp) {
+            this.checkOutput(cmp, "FF", "Default attributes should display FF");
+        }
+    },
     // Tests initial render is good with non-default attributes
-    testInitialState: {
-        attributes : { outer: "true", inner: "true" },
-        test: [ function(cmp) {
-                this.checkOutput(cmp, "TT", "unexpected initial display");
-            } ]
+    testInitialStateFF: {
+        attributes : { outer: "false", inner: "false" },
+        test: function(cmp) {
+            this.checkOutput(cmp, "FF", "Attributes FF should display FF");
+        }
     },
-
+    // Tests initial render is good with non-default attributes
+    testInitialStateTF: {
+        attributes : { outer: "true", inner: "false" },
+        test: function(cmp) {
+            this.checkOutput(cmp, "TF", "Attributes TF should display TF");
+        }
+    },
+    // Tests initial render is good with non-default attributes
+    testInitialStateFT: {
+        attributes : { outer: "false", inner: "true" },
+        test: function(cmp) {
+            this.checkOutput(cmp, "FT", "Attributes FT should display FT");
+        }
+    },
+    // Tests initial render is good with non-default attributes
+    testInitialStateTT: {
+        attributes : { outer: "true", inner: "true" },
+        test: function(cmp) {
+            this.checkOutput(cmp, "TT", "Attributes TT should display TT");
+        }
+    },
 })

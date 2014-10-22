@@ -5,7 +5,7 @@
     	    var inputError1 = cmp.find("error1").get("v.domId");
     	    var inputError2 = cmp.find("error2").get("v.domId");
     	    
-    	    inputText.set("v.ariaDescribedby", inputError1+" "+inputError2);
+    	    inputText.set("v.ariaDescribedBy", inputError1+" "+inputError2);
 		}    
 	}
 })

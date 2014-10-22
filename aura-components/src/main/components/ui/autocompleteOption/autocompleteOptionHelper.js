@@ -62,7 +62,7 @@
         var optionCmp = component.find("option");
         var elem = optionCmp ? optionCmp.getElement() : null;
         if (elem) {
-            $A.util.addClass(elem, "mouseovered");
+            $A.util.addClass(optionCmp, "mouseovered");
         }
     },
     
@@ -70,7 +70,7 @@
         var optionCmp = component.find("option");
         var elem = optionCmp ? optionCmp.getElement() : null;
         if (elem) {
-            $A.util.removeClass(elem, "mouseovered");
+            $A.util.removeClass(optionCmp, "mouseovered");
         }
     },
     

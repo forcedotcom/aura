@@ -51,7 +51,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.groups = [];
     this.components = null;
     this.actionId = Action.prototype.nextActionId++;
-    this.id = this.actionId + "." + suffix;
+    this.id = this.actionId + ";" + suffix;
     this.originalResponse = undefined;
     this.storable = false;
     this.caboose = caboose;
@@ -159,7 +159,7 @@ Action.prototype.forceCreationPath = function(path) {
  * This is the mirrored call to 'forceCreationPath' that releases the 'force'.
  * The path must match the call to forceCreationPath, and the path must have
  * been forced.
- * 
+ *
  * @private
  * @param {string} path the path to release.
  */
@@ -169,7 +169,7 @@ Action.prototype.releaseCreationPath = function(path) {
         last = this.pathStack[this.pathStack.length - 1];
     }
     if (!last || last.absPath !== path) {
-        $A.assert(false, "unexpected unwinding of pathStack.  found "
+        $A.warning("unexpected unwinding of pathStack.  found "
             + (last ? (last.absPath + " idx " + last.idx  ) : "empty") + " expected "  + path);
     }
     if (last && last.relPath === "~FORCED~") {
@@ -185,14 +185,14 @@ Action.prototype.releaseCreationPath = function(path) {
  * @param {string} pathPart the new path part to insert.
  */
 Action.prototype.pushCreationPath = function(pathPart) {
-    var addedPath;
     this.canCreate = true;
+
     switch (pathPart) {
-    case "body" : pathPart = "*"; break;
-    case "realbody" : pathPart = "+"; break;
-    case "super" : pathPart = "$"; break;
+	    case "body" : pathPart = "*"; break;
+	    case "super" : pathPart = "$"; break;
     }
-    addedPath = "/"+pathPart;
+
+    var addedPath = "/" + pathPart;
     var newPath = this.topPath() + addedPath;
     var pathEntry = { relPath: addedPath, absPath:newPath, idx: undefined, startIdx: undefined };
     this.pathStack.push(pathEntry);
@@ -209,13 +209,14 @@ Action.prototype.popCreationPath = function(pathPart) {
     this.canCreate = false;
     switch (pathPart) {
     case "body" : pathPart = "*"; break;
-    case "realbody" : pathPart = "+"; break;
+// JBUCH: HALO: TODO: DELETE WHEN READY
+//    case "realbody" : pathPart = "+"; break;
     case "super" : pathPart = "$"; break;
     }
     addedPath = "/"+pathPart;
     var last = this.pathStack.pop();
     if (!last || last.relPath !== addedPath /*|| last.idx !== undefined*/) {
-        $A.assert(false, "unexpected unwinding of pathStack.  found "
+        $A.warning("unexpected unwinding of pathStack.  found "
             + (last ? (last.relPath + " idx " + last.idx  ) : "empty") + " expected "  + addedPath);
     }
     return last;
@@ -268,7 +269,7 @@ Action.prototype.setCreationPathIndex = function(idx) {
  */
 Action.prototype.getCurrentPath = function() {
     if (!this.canCreate) {
-        $A.warning("Not ready to create. path: " + this.topPath());
+        //$A.warning("Not ready to create. path: " + this.topPath());
     }
     this.canCreate = false; // this will cause next call to getCurrentPath to fail if not popped
     return this.topPath();
@@ -444,7 +445,7 @@ Action.prototype.setAllAboardCallback = function(scope, callback) {
         return;
     }
     var that = this;
-    
+
     /**
      * @private
      */
@@ -559,9 +560,9 @@ Action.prototype.runDeprecated = function(evt) {
  * @public
  * @returns {string} The possible action states are:
  *   "NEW": The action was created but is not in progress yet
- *   "RUNNING": The action is in progress    
+ *   "RUNNING": The action is in progress
  *   "SUCCESS": The action executed successfully
- *   "FAILURE": Deprecated. ERROR is returned instead. The action failed. This state is only valid for client-side actions. 
+ *   "FAILURE": Deprecated. ERROR is returned instead. The action failed. This state is only valid for client-side actions.
  *   "ERROR": The server returned an error
  *   "INCOMPLETE": The server didn't return a response. The server might be down or the client might be offline.
  *   "ABORTED": The action was aborted
@@ -584,7 +585,7 @@ Action.prototype.getReturnValue = function() {
  * Each error object has a message field.
  * In any mode except PROD mode, each object also has a stack field, which is a list
  * describing the execution stack when the error occurred.
- * 
+ *
  * For example, to log any errors:
  * <pre><code>
  * var errors = a.getError();

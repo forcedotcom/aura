@@ -56,7 +56,7 @@ var AuraEventService = function() {
          * @memberOf AuraEventService
          * @public
          */
-        getValue : function(name) {
+        get : function(name) {
             return $A.services.event.newEvent(name);
         },
 

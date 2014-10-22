@@ -16,4 +16,5 @@
 
 -->
 <aura:component extends="ui:tab">
+    {!v.body}
 </aura:component>

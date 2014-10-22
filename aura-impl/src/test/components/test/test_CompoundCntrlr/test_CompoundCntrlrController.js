@@ -15,7 +15,7 @@
  */
 ({
     handleClick: function(cmp, event) {
-        var a = $A.expressionService.get(cmp, "c.getString");
+        var a = cmp.get("c.getString");
         a.setCallback(cmp, function(action) {
             var actionReturnValue = action.getReturnValue();
             cmp.set("v.label", actionReturnValue);

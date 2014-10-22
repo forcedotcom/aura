@@ -14,38 +14,41 @@
  * limitations under the License.
  */
 ({
-    raisePollEvent : function (cmp, freq){
-           var event = aura.get("e.auratest:poll");
-            setTimeout(function(){
-                event.fire();
+	raisePollEvent : function(cmp, freq) {
+		var event = aura.get("e.auratest:poll");
+		setTimeout(function() {
+			event.fire();
+		}, freq);
+	},
 
-            }, freq);
-    },
+	updateDisplay : function(cmp, helper) {
+		var testsWithProps = cmp.get("m.testsWithProps");
+		for (var i = 0; i < testsWithProps.length; i++) {
+			var map = testsWithProps[i];
+			if (helper.searchFilter(cmp, map) && helper.failedFilter(cmp, map) && helper.integrationFilter(cmp, map)) {
+				map["isHidden"] = "";
+			} else {
+				map["isHidden"] = "HIDDEN";
+			}
+		}
+		
+		$A.rerender(cmp);
+	},
 
-    updateDisplay: function(cmp, helper){
-     cmp.getValue("m.testsWithProps").each(function(map){
-	 	if(helper.searchFilter(cmp, map) && helper.failedFilter(cmp, map) && helper.integrationFilter(cmp, map)){
-	 		map.getValue("isHidden").setValue("");
-	 	}
-	 	else{
-	 		map.getValue("isHidden").setValue("HIDDEN");
-	 	}
-     });
-    },
+	searchFilter : function(cmp, propMap) {
+		var searchText = cmp.find("searchText").get("v.value");
+		return $A.util.isUndefinedOrNull(searchText) || propMap["name"].toLowerCase().indexOf(searchText.toLowerCase()) != -1;
+	},
 
-    searchFilter: function(cmp, propMap){
-    	var searchText = cmp.find("searchText").get("v.value");
-    	return $A.util.isUndefinedOrNull(searchText) || propMap.get("name").toLowerCase().indexOf(searchText.toLowerCase()) != -1;
-    },
-
-    failedFilter: function(cmp, propMap){
-    	var isShowOnlyFailedTests = $A.util.getBooleanValue(cmp.find("showFailedTests").get("v.value"));
-    	var status = propMap.get("status");
-    	return !isShowOnlyFailedTests || status === "FAILED";
-    },
-    integrationFilter: function(cmp, propMap){
-    	var isShowOnlyIntegrationTests = $A.util.getBooleanValue(cmp.find("showOnlyIntegrationTests").get("v.value"));
-    	var isIntegration = propMap.get("isInteg");
-    	return !isShowOnlyIntegrationTests || isIntegration;
-    }
+	failedFilter : function(cmp, propMap) {
+		var isShowOnlyFailedTests = $A.util.getBooleanValue(cmp.find("showFailedTests").get("v.value"));
+		var status = propMap["status"];
+		return !isShowOnlyFailedTests || status === "FAILED";
+	},
+	
+	integrationFilter : function(cmp, propMap) {
+		var isShowOnlyIntegrationTests = $A.util.getBooleanValue(cmp.find("showOnlyIntegrationTests").get("v.value"));
+		var isIntegration = propMap["isInteg"];
+		return !isShowOnlyIntegrationTests || isIntegration;
+	}
 })

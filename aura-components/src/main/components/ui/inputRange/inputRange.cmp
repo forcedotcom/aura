@@ -28,6 +28,6 @@
     	   max="{!v.max}"
     	   step="{!v.step}"
     	   value="{!v.value}" 
-    	   aria-describedby="{!v.ariaDescribedby}"/>
+    	   aria-describedby="{!v.ariaDescribedBy}"/>
 
 </aura:component>

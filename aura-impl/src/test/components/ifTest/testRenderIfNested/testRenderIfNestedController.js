@@ -14,13 +14,47 @@
  * limitations under the License.
  */
 ({
-    click: function(cmp, event, helper) {
-        var label = event.source.get("v.label");
-        label = label.split(" ")[1];
-        var outer = label[0] === "T";
-        var inner = label[1] === "T";
+    press: function(cmp, event, helper) {
+        var localId = event.source.getLocalId();
 
-        cmp.set("v.outer", outer);
-        cmp.set("v.inner", inner);
+        // Extract flags
+
+        var data = localId.split(" ");
+        var order = data[0];
+
+        var flag = data[1];
+        var outer = flag[0] === "T";
+        var inner = flag[1] === "T";
+
+        // Log action directly in the Dom to avoid rendering cycle
+
+        var text;
+        switch (order) {
+            case "io":
+            text = "- Setting inner to " + flag[0] + " then outer to " + flag[1];
+            break;
+
+            case "oi":
+            text = "- Setting outer to " + flag[1] + " then inner to " + flag[0];
+            break;
+        }
+        var log = cmp.find("log").getElement();
+        log.appendChild(document.createTextNode(text));
+        log.appendChild(document.createElement("br"));
+
+        // Change attributes
+
+        switch (order) {
+            case "io":
+            cmp.set("v.inner", inner);
+            cmp.set("v.outer", outer);
+            break;
+
+            case "oi":
+            cmp.set("v.outer", outer);
+            cmp.set("v.inner", inner);
+            break;
+        }
+
     }
 });

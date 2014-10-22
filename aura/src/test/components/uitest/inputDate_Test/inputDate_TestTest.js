@@ -64,7 +64,7 @@
 		},function(cmp) {
                      var actual = "";
                      var expected = "";
-                     var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                     var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
 
                      for(var i = 0; i<12; i++){
                              expected = this.convertMonth(i) + " 2043";
@@ -87,7 +87,7 @@
         test : [function(cmp) {
                       this.openDatePicker(cmp);
 		},function(cmp) {                     
-                      var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                      var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
 
                       this.iterateCal(7, 5, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToNextYear'));
                       
@@ -105,7 +105,7 @@
         test : [function(cmp) {
                       this.openDatePicker(cmp);
     		},function(cmp) {
-                       var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                       var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
                        this.iterateCal(7, 15, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToPrevYear'));
                        
                        var expected = "February 1997";
@@ -122,7 +122,7 @@
         test : [function(cmp) {
                       this.openDatePicker(cmp);
 		},function(cmp) {
-                      var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+                      var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
                       
                       this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToPrevYear'));
                       
@@ -151,7 +151,7 @@
         test : [function(cmp) {
                       this.openDatePicker(cmp);
     		},function(cmp) {       
-    		        var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
+    		        var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
     		        this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
 	                
     		        var expected = "September 2023";
@@ -167,7 +167,7 @@
     	browsers : ["IPHONE"],
     	attributes : {value: "2012-12-10"},
     	test : function(cmp) {
-    	             var yearTitle = cmp.find("datePickerTestCmp").get('datePicker').find("yearTitle");
+    	             var yearTitle = cmp.find("datePickerTestCmp").find('datePicker').find("yearTitle");
     	             $A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), "year input select not fond");
     	}
     },
@@ -181,8 +181,8 @@
     	test :  [function(cmp) {
     	               this.openDatePicker(cmp);
 		},function(cmp) {
-		       var datePicker = cmp.find("datePickerTestCmp").get('datePicker');
-		       var yearTitle = cmp.find("datePickerTestCmp").get('datePicker').find("yearTitle");
+		       var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
+		       var yearTitle = cmp.find("datePickerTestCmp").find('datePicker').find("yearTitle");
 	        
                        this.iterateCal(1, 0, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
                        var expected = "2013";
@@ -292,7 +292,7 @@
      * 
      */ 
     isViewDesktop : function(){
-                         return $A.get('$Browser').formFactor.toLowerCase() === "desktop";
+                         return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
     },
 
     /**

@@ -16,49 +16,49 @@
 
 -->
 <aura:component>
-<aura:attribute name="cancelEventFired" type="boolean" default="false"/>
-<aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
- <ui:listSorter aura:id="defaultListSorter" class="defaultListSorter" onApply="{!c.handleApplyPressed}" onCancel="{!c.handleCancelPressed}" title="{!v.title}" rowVar="item">
- 	<aura:set attribute="dataProvider">
- 		<uitest:listSorterDataProvider />
- 	</aura:set>
- 	<aura:set attribute="rowDef">
-		<ui:radioToggleMenuItem  value="{!item.fieldName}" label="{!item.label}" aura:id="defaultRadioToggleMenuItem"/>
-	</aura:set>
- 	<aura:set attribute="trigger">
- 		<ui:menuTriggerLink class="defaultListSorterTrigger" label="Default List Sorter" aura:id="defaultListSorterTrigger"/>
- 	</aura:set>
- </ui:listSorter>
-Which Sort got Appplied:<ui:outputText aura:id="defaultListSorterResult" value=""/>
-   
- <br/><br/>
- 
- <ui:listSorter aura:id="largeListSorter" onApply="{!c.handleApplyPressedForLargeList}" onCancel="{!c.handleCancelPressed}" rowVar="item">
- 	<aura:set attribute="dataProvider" >
- 		<uitest:listSorterDataProvider dataType="largeList"/>
- 	</aura:set>
- 	<aura:set attribute="rowDef">
-		<ui:radioToggleMenuItem  value="{!item.fieldName}" label="{!item.label}"/>
-	</aura:set>
- 	<aura:set attribute="trigger">
- 		<ui:menuTriggerLink label="Large List Sorter" aura:id="largeListSorterTrigger"/>
- 	</aura:set>
- </ui:listSorter>
-Which Sort got Appplied:<ui:outputText aura:id="largeListSorterResult" value=""/>
- 
- <br/><br/>
- 
- <ui:listSorter aura:id="emptyListSorter" rowVar="item">
- 	<aura:set attribute="dataProvider" >
- 		<uitest:listSorterDataProvider dataType="emptyList"/>
- 	</aura:set>
- 	<aura:set attribute="rowDef">
-		<ui:radioToggleMenuItem  value="{!item.fieldName}" label="{!item.label}"/>
-	</aura:set>
- 	<aura:set attribute="trigger">
- 		<ui:menuTriggerLink label="Empty List Sorter" aura:id="emptyListSorterTrigger"/>
- 	</aura:set>
- </ui:listSorter>
- 
+    <aura:attribute name="cancelEventFired" type="boolean" default="false"/>
+    <aura:attribute name="title" type="String" default="Sort" description="The title of this component." />
+
+    <ui:listSorter aura:id="defaultListSorter" class="defaultListSorter" onApply="{!c.handleApplyPressed}" onCancel="{!c.handleCancelPressed}" title="{!v.title}" rowVar="item">
+        <aura:set attribute="dataProvider">
+            <uitest:listSorterDataProvider />
+        </aura:set>
+        <aura:set attribute="rowDef">
+            <ui:radioToggleMenuItem  value="{!item.fieldName}" label="{!item.label}" aura:id="defaultRadioToggleMenuItem"/>
+        </aura:set>
+        <aura:set attribute="trigger">
+            <ui:menuTriggerLink class="defaultListSorterTrigger" label="Default List Sorter" aura:id="defaultListSorterTrigger"/>
+        </aura:set>
+    </ui:listSorter>
+    Which Sort got Appplied:<ui:outputText aura:id="defaultListSorterResult" value=""/>
+
+    <br/><br/>
+
+    <ui:listSorter aura:id="largeListSorter" onApply="{!c.handleApplyPressedForLargeList}" onCancel="{!c.handleCancelPressed}" rowVar="item">
+        <aura:set attribute="dataProvider" >
+            <uitest:listSorterDataProvider dataType="largeList"/>
+        </aura:set>
+        <aura:set attribute="rowDef">
+            <ui:radioToggleMenuItem  value="{!item.fieldName}" label="{!item.label}"/>
+        </aura:set>
+        <aura:set attribute="trigger">
+            <ui:menuTriggerLink label="Large List Sorter" aura:id="largeListSorterTrigger"/>
+        </aura:set>
+    </ui:listSorter>
+    Which Sort got Appplied:<ui:outputText aura:id="largeListSorterResult" value=""/>
+
+    <br/><br/>
+
+    <ui:listSorter aura:id="emptyListSorter" rowVar="item">
+        <aura:set attribute="dataProvider" >
+            <uitest:listSorterDataProvider dataType="emptyList"/>
+        </aura:set>
+        <aura:set attribute="rowDef">
+            <ui:radioToggleMenuItem  value="{!item.fieldName}" label="{!item.label}"/>
+        </aura:set>
+        <aura:set attribute="trigger">
+            <ui:menuTriggerLink label="Empty List Sorter" aura:id="emptyListSorterTrigger"/>
+        </aura:set>
+    </ui:listSorter>
 
 </aura:component>

@@ -14,45 +14,26 @@
  * limitations under the License.
  */
 ({
-	clearRootBody : function(cmp){
-		//TODO W-2352987: Why is this cmp.getSuper().set() and not cmp.set()
-		cmp.getSuper().set("v.body", []);
+    // Test changed: cmp.getSuper().set("v.body", []) is no longer valid.
+    // A containing component can set the v.body of any of it's children,
+    // but should not be reconstructing its own definition at runtime.
+
+	clearSimpleCmpBody : function(cmp, event, helper) {
+		helper.clearCmpBody(cmp, 'simpleCmp');
 	},
-	clearFacetButtonBody : function(cmp){
-		cmp.find("facetButton").getSuper().set("v.body", []);
+	setSimpleCmpBody : function(cmp, event, helper){
+        helper.setCmpBody(cmp, 'simpleCmp');
 	},
-	clearFacetCmpBody : function(cmp){
-		cmp.find("facetCmp").set("v.body", []);
+	addSimpleCmpBody : function(cmp, event, helper){
+        helper.addCmpBody(cmp, 'simpleCmp');
 	},
-	setRootBody : function(cmp){
-		$A.newCmpAsync(this,function(newCmp){
-				//W-2352987
-            	cmp.getSuper().set("v.body", [newCmp]);
-			},
-			{	
-				componentDef:"markup://ui:button",
-	            attributes:{
-	          	  values:{
-	          		  		label : "New button cmp on v.body of root component"  
-	                     }
-	            },
-	            localId: "newCmpOnRootbody"
-			}, cmp);
-	},
-	setRootBody_ReUse : function(cmp){
-		$A.newCmpAsync(this,function(newCmp){
-			//Reuse an existing component in the new body
-			//W-2352987
-        	cmp.getSuper().set("v.body", [newCmp, cmp.find("setRootBody_ReUse")]);
-		},
-		{	
-			componentDef:"markup://ui:button",
-            attributes:{
-          	  values:{
-          		  		label : "New button cmp on v.body of root component"  
-                     }
-            },
-            localId: "newCmpOnRootbody"
-		}, cmp);
-	}
+    clearCustomCmpBody : function(cmp, event, helper) {
+        helper.clearCmpBody(cmp, 'customCmp');
+    },
+    setCustomCmpBody : function(cmp, event, helper){
+        helper.setCmpBody(cmp, 'customCmp');
+    },
+    addCustomCmpBody : function(cmp, event, helper){
+        helper.addCmpBody(cmp, 'customCmp');
+    }
 })

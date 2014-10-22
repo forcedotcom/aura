@@ -61,12 +61,7 @@ var clientService;
 // #include aura.util.Bitset
 // #include aura.util.NumberFormat
 // #include aura.context.AuraContext
-// #include aura.value.BaseValue
-// #include aura.value.AttributeValue
-// #include aura.value.SimpleValue
-// #include aura.value.MapValue
-// #include aura.value.ArrayValue
-// #include aura.value.PropertyChain
+// #include aura.value.PropertyReferenceValue
 // #include aura.value.FunctionCallValue
 // #include aura.value.ActionReferenceValue
 // #include aura.value.PassthroughValue
@@ -119,7 +114,7 @@ var clientService;
 // #include aura.provider.GlobalValueProviders
 // #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
-// #include aura.provider.SimpleValueProvider
+// #include aura.provider.ObjectValueProvider
 
 /**
  * @class The Aura framework. Default global instance name is $A.
@@ -143,7 +138,6 @@ $A.ns.Aura = function() {
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
     this.storageService = new AuraStorageService();
-    this.componentStack = new $A.ns.AuraComponentContext();
     this.logger = new $A.ns.Logger();
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -242,7 +236,7 @@ $A.ns.Aura = function() {
          */
         l10n : aura.localizationService,
 
-        getValue : function(key) {
+        get : function(key) {
             var ret = $A.services[key];
             if (!ret && key === "root") {
                 return $A.getRoot();
@@ -355,6 +349,7 @@ $A.ns.Aura = function() {
      * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
      * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
      */
+
     this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
         return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
     };
@@ -368,15 +363,15 @@ $A.ns.Aura = function() {
      * @public
      */
     this.pushCreationPath = function(creationPath) {
-        var ctx = this.getContext();
-        if (!ctx) {
+    	var ctx = this.getContext();
+    	if (!ctx) {
             return;
-        }
-        var act = ctx.getCurrentAction();
-        if (!act) {
+    	}
+    	var act = ctx.getCurrentAction();
+    	if (!act) {
             return;
-        }
-        act.pushCreationPath(creationPath);
+    	}
+    	act.pushCreationPath(creationPath);
     };
 
     /**
@@ -386,15 +381,15 @@ $A.ns.Aura = function() {
      * @public
      */
     this.popCreationPath = function(creationPath) {
-        var ctx = this.getContext();
-        if (!ctx) {
+    	var ctx = this.getContext();
+    	if (!ctx) {
             return;
-        }
-        var act = ctx.getCurrentAction();
-        if (!act) {
+    	}
+    	var act = ctx.getCurrentAction();
+    	if (!act) {
             return;
-        }
-        act.popCreationPath(creationPath);
+    	}
+    	act.popCreationPath(creationPath);
     };
 
     /**
@@ -404,15 +399,15 @@ $A.ns.Aura = function() {
      * @public
      */
     this.setCreationPathIndex = function(idx) {
-        var ctx = this.getContext();
-        if (!ctx) {
+    	var ctx = this.getContext();
+    	if (!ctx) {
             return;
-        }
-        var act = ctx.getCurrentAction();
-        if (!act) {
+    	}
+    	var act = ctx.getCurrentAction();
+    	if (!act) {
             return;
-        }
-        act.setCreationPathIndex(idx);
+    	}
+    	act.setCreationPathIndex(idx);
     };
 
 
@@ -472,10 +467,10 @@ $A.ns.Aura = function() {
         "storage", services.storage,
         "cmp", services.cmp,
         "e", services.e,
-        "getValue", services.getValue,
         "c", {
-                getValue : function(name) {
-                    return services.cmp.getControllerDef({descriptor : name});
+                get: function(name) {
+                    var path = (name||'').split('.');
+                    return services.cmp.getControllerDef({descriptor : path.shift()}).get(path.shift());
                 }
             }
     );
@@ -520,14 +515,14 @@ $A.ns.Aura.prototype.initAsync = function(config) {
     // we don't handle components that come back here. This is used in the case where there
     // are none.
     //
-    $A.context = new AuraContext(config["context"], function() {
-        clientService.initHost(config["host"]);
-        clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
-            $A.initPriv(resp);
-            $A.Perf.endMark("Component Load Complete");
-        }, config["deftype"]);
-        $A.Perf.endMark("Component Load Initiated");
-    });
+    $A.context = new AuraContext(config["context"]);
+    clientService.initHost(config["host"]);
+    clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
+        $A.initPriv(resp);
+        $A.Perf.endMark("Component Load Complete");
+    }, config["deftype"]);
+
+    $A.Perf.endMark("Component Load Initiated");
 };
 
 /**
@@ -545,10 +540,7 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         clientService.initHost(config["host"]);
-
-        // FIXME: AuraContext accepts a callback because its init is async (eg loading of the GVP
-        // from persistent storage). Only AIS uses this setup method and AIS doesn't use persistent
-        // storage with an async fetch (eg Smart Store Adapter).
+        // creating context.
         $A.context = new AuraContext(config["context"]);
         this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices, doNotCallUIPerfOnLoad);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
@@ -556,7 +548,7 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
     } else {
         // Use the existing context and just join the new context into it
         // FIXME: is this used? it won't do the right thing if there are components.
-        $A.getContext().join(config["context"]);
+        $A.getContext().merge(config["context"]);
     }
 };
 
@@ -686,15 +678,29 @@ $A.ns.Aura.prototype.message = function(msg) {
 };
 
 /**
- * Returns the raw value referenced using property syntax. Gets the raw value from within the Value object.
- * Shorthand for <code>getValue().unwrap()</code>.
+ * Returns the value referenced using property syntax. Gets the value from the specified global value provider.
  * @public
  * @function
- * @param {String} key The data key to look up on element, for example, <code>$A.get("root.v.mapAttring.key")</code>.
+ * @param {String} key The data key to look up on element, for example, <code>$A.get("$Label.section.key")</code>.
  * @param {Function} callback The method to call with the result if a server trip is expected.
  */
 $A.ns.Aura.prototype.get = function(key, callback) {
-    return this.expressionService.get($A.services, key, callback);
+    if($A.util.isString(key)) {
+        key = $A.expressionService.normalize(key);
+        var path = key.split('.');
+        var root = path.shift();
+        var valueProvider = $A.services[root];
+        if (!valueProvider) {
+            valueProvider = $A.getGlobalValueProvider(root);
+        }
+        if (valueProvider) {
+            if (path.length) {
+                return valueProvider.get(path.join('.'), callback);
+            }
+            return valueProvider.getValues?valueProvider.getValues():valueProvider;
+        }
+    }
+    return undefined;
 };
 
 /**
@@ -725,18 +731,6 @@ $A.ns.Aura.prototype.getContext = function() {
 };
 
 /**
- * Returns the unwrapped value.
- *
- * @param {Object} val If the Aura type corresponds to "Value", returns the unwrapped value.
- */
-$A.ns.Aura.prototype.unwrap = function(val) {
-    if ($A.util.isValue(val)) {
-        return val.unwrap();
-    }
-    return val;
-};
-
-/**
  * Runs a function within the standard Aura lifecycle.
  *
  * This insures that <code>enqueueAction</code> methods and rerendering are handled properly.
@@ -754,7 +748,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
 
     $A.services.client.pushStack(name);
     try {
-        //console.log("$A.run()", name);
+    	//console.log("$A.run()", name);
 
         return func();
     } catch (e) {
@@ -877,12 +871,13 @@ $A.ns.Aura.prototype.setMode = function(mode) {
 
 /**
  * Get GVP directly.
- * @return {GlobalValueProviders} The global value provider, such as $Label, $Browser, $Locale, etc.
+ * @param {String} type The type of global value provider to retrieve.
+ * @return {GlobalValueProvider} The global value provider, such as $Label, $Browser, $Locale, etc.
  *
  * @private
  */
-$A.ns.Aura.prototype.getGlobalValueProviders = function() {
-    return this.getContext().getGlobalValueProviders();
+$A.ns.Aura.prototype.getGlobalValueProvider = function(type) {
+    return this.getContext().getGlobalValueProvider(type);
 };
 
 

@@ -26,7 +26,7 @@
 			modelItemsKey = cmp._dataProviders[0].get('v.modelItemsKey');	
 
 			if (modelItemsKey) {
-				items = cmp.get('v.dataProvider.0.m.' + modelItemsKey);
+				items = cmp.get("v.dataProvider.0").get("m." + modelItemsKey);
 			}
 		}
 

@@ -164,7 +164,6 @@ $A.ns.ComponentCreationContext.prototype.requestComponent = function(config, avp
             : null,
         atts = {},
         doubleCall = false;
-
     //
     // Note to self, these attributes are _not_ Aura Values. They are instead either
     // a literal string or a (generic object) map.

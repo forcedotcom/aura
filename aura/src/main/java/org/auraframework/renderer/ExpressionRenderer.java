@@ -49,10 +49,8 @@ public class ExpressionRenderer implements Renderer {
                 if (kid instanceof BaseComponent) {
                     renderingService.render((BaseComponent<?, ?>) kid, out);
                 } else if (kid instanceof ComponentDefRef) {
-                    List<Component> cmps = ((ComponentDefRef) kid).newInstance(component);
-                    for (Component cmp : cmps) {
-                        renderingService.render(cmp, out);
-                    }
+                    Component cmp = ((ComponentDefRef) kid).newInstance(component);
+                    renderingService.render(cmp, out);
                 }
             }
         } else if (value != null) {

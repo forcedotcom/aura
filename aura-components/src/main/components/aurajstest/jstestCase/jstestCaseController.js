@@ -21,9 +21,7 @@
     rerun : function(cmp){
         var frame = cmp.find("content").getElement().firstChild;
         cmp.find("results").getElement().innerHTML = "";
-
-        var rerun = cmp.find("rerun").getElement();
-        $A.util.swapClass(rerun,["pass", "fail"], "spin");
+        cmp.set("v.status", "spin");
         var win = frame.contentWindow?frame.contentWindow:frame.contentDocument.window;
         win.location.reload(true);
     },

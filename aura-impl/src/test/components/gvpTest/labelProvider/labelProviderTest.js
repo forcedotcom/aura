@@ -23,7 +23,7 @@
 
                     $A.test.assertTrue(
                         sv2 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
-                        sv2 === "PropertyFile - section DOESNT not found.",
+                        sv2 === "[DOESNT.EXIST]",
                         "Failed to get expected error message");
                 }
             );
@@ -93,11 +93,13 @@
                     $A.test.isActionPending
                 );
             },
+
+// JBUCH: HALO: FIXME: THIS PATTERN IS CURRENTLY ALLOWED. MORE DISCUSSION NECESSARY.
             //Section and name missing from label expression
-            function (cmp) {
-                var labels = $A.get("$Label");
-                $A.test.assertUndefinedOrNull(labels, "$Label should be undefined");
-            },
+//            function (cmp) {
+//                var labels = $A.get("$Label");
+//                $A.test.assertUndefinedOrNull(labels, "$Label should be undefined");
+//            },
             //Expression without Name missing but valid section
             function (cmp) {
                 var section = $A.get("$Label.Related_Lists");
@@ -173,19 +175,11 @@
             }
         ]
     },
-    
+
     testGetWithNonFunctionCallback: {
     	test : function (cmp) {
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
-    	}
-    },
-    /**
-     * Verify that label expressions with the expression delimiter is evaluated by $A.get() 
-     */
-    testGetWithExpressionDelimiters: {
-    	test : function (cmp) {
-            $A.test.addWaitFor("Today + Overdue", function(){return $A.get("{!$Label.Related_Lists.task_mode_today_overdue}")});
     	}
     }
 })

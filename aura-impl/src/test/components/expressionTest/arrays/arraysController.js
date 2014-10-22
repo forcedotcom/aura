@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-    //below is used by expressionTest:arrayValue
     onPassedInArrayLengthChange : function(cmp, evt, helper) {
-        cmp.set("v.passedInArrayLength", evt.getParams().value);
+        var array = evt.getParam('value') || [];
+        cmp.set("v.passedInArrayLength", array.length);
     }
 })

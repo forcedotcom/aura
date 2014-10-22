@@ -19,16 +19,15 @@
  * @constructor
  * @protected
  */
-function FunctionCallValue(config, def, cmp){
+function FunctionCallValue(config, valueProvider){
     this.func = expressionFunctions[config["key"]];
-    this.def = def;
-    this.cmp = cmp;
+    this.valueProvider=valueProvider;
     if (!this.func) {
         throw new Error("couldn't find function from key: " + config["key"]);
     }
     this.args = [];
     for (var i = 0; i < config["args"].length; i++) {
-        this.args.push(valueFactory.create(config["args"][i]));
+        this.args.push(valueFactory.create(config["args"][i],null,this.valueProvider));
     }
 
 //#if {"modes" : ["STATS"]}
@@ -42,64 +41,71 @@ FunctionCallValue.prototype.auraType = "Value";
  * Sets the isDirty flag to false.
  */
 FunctionCallValue.prototype.isDirty = function(){
+	for (var i = 0; i < this.args.length; i++) {
+        var arg = this.args[i];
+        if (aura.util.isExpression(arg) && arg.isDirty()) {
+        	return true;
+        }
+    }
     return false;
 };
 
 /**
  * Returns the value of function call with the given value provider.
  * Throws an error if vp is not provided.
- * @param {Object} vp The value provider to resolve.
+ * @param {Object} valueProvider The value provider to resolve.
  */
-FunctionCallValue.prototype.getValue = function(vp){
-    aura.assert(vp, "no value provider to resolve against");
-    var dirty = false;
+FunctionCallValue.prototype.evaluate = function(valueProvider){
     var resolvedArgs = [];
     for (var i = 0; i < this.args.length; i++) {
-        var a = this.args[i];
-        if (a.isExpression()) {
-            a = expressionService.getValue(vp, a);
+        var arg = this.args[i];
+        if (aura.util.isExpression(arg)) {
+            arg = arg.evaluate(valueProvider || this.valueProvider);
         }
-        
-        var value = null;
-        if (a) {
-            dirty = dirty || a.isDirty();
-            value = a;
-        }
-        
-        resolvedArgs.push(value);
+        resolvedArgs.push(arg);
     }
-    
+
     var result = this.func.call(null, resolvedArgs);
-    
-    var ret;
-    if (result && result.auraType === "Value"){
-        ret = result;
-        result = ret.unwrap();
-    } else{
-        ret = valueFactory.create(result, this.def, this.cmp);
+    if(!this.hasOwnProperty("result")){
+        this["result"]=result;
     }
-
-    if (dirty && ret.makeDirty) {
-        ret.makeDirty();
-    }
-
-    return ret;
+    return result;
 };
 
-/**
- * Always throws an error because the value wrapper cannot be unwrapped.
- * Do not call.
- */
-FunctionCallValue.prototype.unwrap = function(){
-    throw new Error("Cannot unwrap an FunctionCallValue");
+FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
+    if(!fcv){
+        fcv=this;
+    }
+    for (var i = 0; i < this.args.length; i++) {
+        var arg = this.args[i];
+        if (aura.util.isExpression(arg)) {
+            if(arg instanceof PropertyReferenceValue) {
+                arg.addChangeHandler(cmp, key, this.getChangeHandler(cmp,key,fcv));
+            } else {
+                arg.addChangeHandler(cmp, key, fcv);
+            }
+        }
+    }
 };
 
-/**
- * Always throws an error because the value wrapper cannot be merged into.
- * Do not call.
- */
-FunctionCallValue.prototype.merge = function() {
-    throw new Error("Cannot merge into an FunctionCallValue");
+FunctionCallValue.prototype.getChangeHandler=function(cmp,key,fcv){
+    return function FunctionCallValue$getChangeHandler(event) {
+        var result = fcv.evaluate();
+        if (fcv["result"] !== result) {
+            fcv["result"] = result;
+            $A.renderingService.addDirtyValue(key, cmp);
+            cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
+        }
+    };
+};
+
+FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
+    for (var i = 0; i < this.args.length; i++) {
+        var arg = this.args[i];
+        if (aura.util.isExpression(arg)) {
+            arg.removeChangeHandler(cmp,key);
+        }
+    }
 };
 
 /**
@@ -125,8 +131,11 @@ FunctionCallValue.prototype.destroy = function(){
 //#if {"modes" : ["STATS"]}
     valueFactory.deIndex(this);
 //#end
-    delete this.type;
-    delete this.args;
+// JBUCH: HALO: TODO: FIXME
+//    for(var i=0;i<this.args.length;i++){
+//        this.args[i].destroy();
+//    }
+    this.args=this.func=this.valueProvider=null;
 };
 
 /**

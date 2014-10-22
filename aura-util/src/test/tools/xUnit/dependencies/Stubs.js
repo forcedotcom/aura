@@ -88,7 +88,8 @@ Test.Stubs.Aura=new function(){
             getElement:{returnValue:Stubs.Dom.GetNode()},
             getEventDispatcher:{},
             getValue:getValue,
-            setValue:setValue
+            setValue:setValue,
+            set:setValue
         },propertyBag||{});
         stub.constructor=Stubs.Aura.GetComponent;
         return stub;

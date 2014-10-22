@@ -1,0 +1,13 @@
+<aura:component>
+
+    <aura:attribute name="messages" type="List"/>
+    <aura:attribute name="color" type="string"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <div style="{!'margin: 10px; border: 1px solid ' + v.color}">
+        <aura:iteration aura:id="box" items="{!v.messages}" var="message" indexVar="index">
+            {!index}. {!message}<br />
+        </aura:iteration>
+    </div>
+
+</aura:component>

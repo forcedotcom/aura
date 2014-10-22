@@ -147,8 +147,11 @@
     setDisabled: function(component, disabled, disabledCss) {
         component.set('v.disabled', disabled);
         if (disabledCss) {
-            var fn = disabled ? component.addClass : component.removeClass;
-            fn.call(component, disabledCss);
+            if(disabled){
+                $A.util.addClass(component.getElement(),disabledCss);
+            }else{
+                $A.util.removeClass(component.getElement(), disabledCss);
+            }
         }
     }
 

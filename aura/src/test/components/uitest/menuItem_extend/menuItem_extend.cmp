@@ -18,8 +18,8 @@
 <!--<ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
 -->
 <aura:component extends="ui:actionMenuItem">
-<aura:attribute name="class" type="string"/>
-<aura:attribute name="label" type="string"/>
-<aura:set attribute="class" value="{!v.class}"/>
-<aura:set attribute="label" value="{!v.label}"/>
+    <aura:attribute name="zclass" type="string"/>
+    <aura:attribute name="zlabel" type="string"/>
+    <aura:set attribute="class" value="{!v.zclass}"/>
+    <aura:set attribute="label" value="{!v.zlabel}"/>
 </aura:component>

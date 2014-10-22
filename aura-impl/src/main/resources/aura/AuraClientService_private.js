@@ -64,6 +64,7 @@ var priv = {
     loadEventQueue : [],
     appcacheDownloadingEventFired : false,
     isOutdated : false,
+    isUnloading : false,
     initDefsObservers : [],
     isDisconnected : false,
     foreground : new $A.ns.FlightCounter(1),
@@ -76,6 +77,10 @@ var priv = {
      * @private
      */
     checkAndDecodeResponse : function(response, noStrip) {
+        if (priv.isUnloading) {
+            return null;
+        }
+
         var e;
 
         // failure to communicate with server
@@ -341,7 +346,7 @@ var priv = {
                     priv.token = token;
                 }
 
-                $A.getContext().join(responseMessage["context"]);
+                $A.getContext().merge(responseMessage["context"]);
 
                 // Look for any Client side event exceptions
                 var events = responseMessage["events"];
@@ -382,7 +387,7 @@ var priv = {
                     }
                     that.singleAction(action, noAbort, actionResponse);
                 }
-            } else if (priv.isDisconnectedOrCancelled(response)) {
+            } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
                 var actions = collector.getActionsToSend();
 
                 for ( var m = 0; m < actions.length; m++) {
@@ -778,6 +783,13 @@ var priv = {
         }
     }
 };
+
+$A.ns.Util.prototype.on(window, "beforeunload", function(event) {
+    if (!$A.util.isIE) {
+        priv.isUnloading = true;
+        priv.requestQueue = [];
+    }
+});
 
 $A.ns.Util.prototype.on(window, "load", function(event) {
     // Lazy load data-src scripts

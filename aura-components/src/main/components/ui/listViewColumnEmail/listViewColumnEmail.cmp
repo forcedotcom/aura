@@ -15,6 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:listViewColumnLink" extensible="true" support="GA" description="An email column template definition, describes an email mailto: link reference in a table data cell.">
-    <aura:set attribute="url" value="{!'mailto:'+(v.url||v.body)}"></aura:set>
+<aura:component extends="ui:listViewColumnCell" extensible="true" support="GA" description="An email column template definition, describes an email mailto: link reference in a table data cell.">
+    <aura:attribute name="text" type="String" default=""           description="The text of the hyperlink. Defaults to the url provided, if not set."/>
+    <aura:attribute name="url" type="String" default=""            description="The url to link to. Defaults to the body of the component, if not set."/>
+
+    <aura:registerEvent name="onclick" type="ui:listViewEvent" description="The event that fires when the hyperlink is clicked." />
+
+    <a href="{!'mailto:'+v.url}" title="{!v.tooltip||v.url||v.body}" onclick="{!c.clickHandler}">
+        {!v.text||v.url}
+    </a>
 </aura:component>

@@ -136,9 +136,9 @@
     }, 
 
     /**
-     * Add multiple items in Asynchornously and make sure that basic functionality still works (add/remove in v.items)
+     * Add multiple items asynchronously and make sure that basic functionality still works (add/remove in v.items)
      */
-    testAddingElementsInAsyncly : {
+    _testAddingElementsInAsyncly : {
         attributes : {"pageSize" : 0, "numItems2Create" : 20},
         test : [function(cmp){
         	//Verify the page is empty

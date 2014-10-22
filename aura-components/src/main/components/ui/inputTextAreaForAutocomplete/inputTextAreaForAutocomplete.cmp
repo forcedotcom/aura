@@ -30,5 +30,5 @@
         aria-expanded="false"
         aria-haspopup="true"
         aria-activedescendant=""
-        aria-describedby="{!v.ariaDescribedby}"/>
+        aria-describedby="{!v.ariaDescribedBy}"/>
 </aura:component>

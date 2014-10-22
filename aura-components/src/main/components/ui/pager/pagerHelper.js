@@ -77,12 +77,13 @@
 			var pageCount = component.get("v.pageCount");
 			var newPageCount = Math.ceil(totalItems / pageSize);
 			if (!isNaN(newPageCount) && pageCount != newPageCount) {
-				component.set("v.pageCount", newPageCount);
+				component.set("v.pageCount", newPageCount)
 			}
 		} else {
 			component.set("v.pageCount", 1);
 			pageSize = totalItems;
 		}
+		
 		if (totalItems > 0) {
 			var endIndex = (component.get("v.currentPage") * pageSize) - 1;
 			var startIndex = Math.max(0, endIndex - pageSize + 1);

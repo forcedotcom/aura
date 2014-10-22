@@ -1,0 +1,11 @@
+<aura:component>
+
+    <aura:iteration aura:id="loop" items="blue,green,yellow,orange,red" var="color">
+        <iterationTest:cmpWithDefaultAtt color="{!color}"/>
+    </aura:iteration>
+
+    <iterationTest:cmpWithDefaultAtt aura:id="aqua" color="aqua"/>
+    <iterationTest:cmpWithDefaultAtt2 aura:id="black" color="black"/>
+    <iterationTest:cmpWithDefaultAtt2 aura:id="brown" color="brown"/>
+
+</aura:component>

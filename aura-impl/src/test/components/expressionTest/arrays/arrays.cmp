@@ -23,13 +23,13 @@
 	<aura:attribute name="componentArray" type="Aura.Component[]">
 		<div/><span/>text<p/>
 	</aura:attribute>
-	
+
 	<!-- below is used by expressionTest:arrayValue -->
 	<aura:attribute name="passedInArray" type="Object[]" default="['a','b','c']"/>
 	<aura:attribute name="passedInArrayLength" type="Integer" default="0"/>
-	<aura:handler name="change" value="{!v.passedInArray.length}" action="{!c.onPassedInArrayLengthChange}"/>
+	<aura:handler name="change" value="{!v.passedInArray}" action="{!c.onPassedInArrayLengthChange}"/>
 	<!-- above is used by expressionTest:arrayValue -->
-	
+
     <!-- "undefined" in following expressions is not the literal, but from a reference to nothing -->
 
     <!-- arrays -->
@@ -101,7 +101,7 @@
     <expressionTest:test expression="{!m.booleanTrue.length}" exprText="m.booleanTrue.length" expected="undefined"/>
     <expressionTest:test expression="{!m.booleanTrue[3]}" exprText="m.booleanTrue[3]" expected="undefined"/>
     -->
-    
+
     <!-- W-1092610 https://gus.salesforce.com/a07B0000000KXK8IAO
     Some of these pass, but depending on how comparisons will utlimately work, the expected result may change anyways
     <expressionTest:test expression="{!m.emptyArray == m.emptyArray}" exprText="m.emptyArray == m.emptyArray" expected="true"/>

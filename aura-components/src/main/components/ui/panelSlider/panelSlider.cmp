@@ -53,11 +53,16 @@
             class="{!($Browser.isPhone ? 'phone' : 'tablet') +' sliderWrapper ' + (v.slideFrom + 'Position sliding ') + v.class}" 
              role="dialog">
     		<a aura:id="button" class="{!v.buttonClass + ' sliding button'}"  onclick="{!c.toggleSlide}" style="{! v.buttonColor != null ? 'background-color: ' + v.buttonColor : ''}">
-    			<aura:if isTrue="{!v.buttonComponent.length == 0}">
-    			     {!v.icon}
-    			<aura:set attribute="else">
-    				{!v.buttonComponent}
-    			</aura:set>
+    			<aura:if isTrue="{!v.buttonComponent.length &gt; 0}">
+    			     {!v.buttonComponent}
+	    			<aura:set attribute="else">
+	    			    <aura:if isTrue="{!v.icon.length &gt; 0}" >
+	    				    {!v.icon}
+	    				    <aura:set attribute="else">
+	    				       <span class="assistiveText">{!v.iconAltText}</span>
+	    				    </aura:set>
+	    				</aura:if>
+	    			</aura:set>
     			</aura:if>
     		</a>
     		<!-- aria-hidden attr toggled programatically when panel slides into and out of view -->

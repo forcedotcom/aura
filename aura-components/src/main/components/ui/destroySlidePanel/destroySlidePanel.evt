@@ -1,0 +1,27 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!-- 
+	 one:createSlidePanel and one:destroySlidePanel are deprecated.  
+	 Please use force:createPanelSlider and force:destroyPanel instead
+	 (along with force:showPanelSlider and force:hidePanel if you like).
+	 See onetest:panelSliderWrapperTest.js for examples.
+-->
+<aura:event type="APPLICATION" support="DEPRECATED">
+	<aura:attribute name="panel" type="Object" description="Id or panel instance to be destroyed"/>
+    <aura:attribute name="callback" type="Object" description="Callback that will be called once the panel has been destroyed. Can be Aura.Action || function"/>
+</aura:event>

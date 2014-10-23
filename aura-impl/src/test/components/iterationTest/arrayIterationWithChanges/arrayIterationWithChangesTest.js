@@ -54,18 +54,18 @@
 	/**
      *  test click on add before
      */
-    _testABWithDefaultList: {
+    testABWithDefaultList: {
         test: function(cmp) {
         	$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
         	var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore("purple blue green yellow orange red",1);
-            $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivTex,
+            $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to front of default list not showing up in DOM.");
         }
     },
     
-    _testABWithEmptyList: {
+    testABWithEmptyList: {
     	attributes: {
     		colors : ""
     	},
@@ -73,7 +73,7 @@
         	$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
         	var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
-        	var newText = this.getNewListTextAfterAddBdore("",1);
+        	var newText = this.getNewListTextAfterAddBefore("",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to front of empty list not showing up in DOM.");
         }
@@ -82,7 +82,7 @@
     /**
      *  test click on add inside
      */
-    _testAIWithDefaultList: {
+    testAIWithDefaultList: {
     	test: function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
         	var ele_iterationDiv = document.getElementsByClassName("iterationDiv")
@@ -126,8 +126,8 @@
      * Time to mix and match
      */
     shareTextBetweenTests:"", 
-    _testMixAndMatch : {
-    	test: function(cmp) {
+    testMixAndMatch : {
+    	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
         	var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -135,8 +135,7 @@
             $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to end of list #1 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	},
-    	test: function(cmp) {
+    	}, function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
         	var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -144,8 +143,7 @@
             $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to end of list #2 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	},
-    	test: function(cmp) {
+    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
     		var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -153,8 +151,7 @@
             $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to beginning of list #1 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	},
-    	test: function(cmp) {
+    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
     		var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -168,8 +165,7 @@
             "list with new items added to middle of list #1 not showing up in DOM.");
             //shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue green g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2 
             this.shareTextBetweenTests = newText;
-    	},
-    	test: function(cmp) {
+    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
     		var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -183,8 +179,7 @@
             "list with new items added to middle of list #2 not showing up in DOM.");
             //shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue green g-y 2 g-y 1 g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2 
             this.shareTextBetweenTests = newText;
-    	},
-    	test: function(cmp) {
+    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
     		var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -192,8 +187,7 @@
             $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to end of list #3 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	},
-    	test: function(cmp) {
+    	},function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
     		var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
@@ -201,6 +195,6 @@
             $A.test.assertEqualsIgnoreWhitespace(newText, iterationDivText,
             "list with new items added to beginning of list #2 not showing up in DOM.");
             this.shareTextBetweenTests = newText;
-    	}
+    	}]
     }
 })

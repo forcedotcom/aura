@@ -99,6 +99,8 @@ public final class ThemeListImpl implements MutableThemeList {
     @Override
     public Map<String, String> activeDynamicVars() {
         Map<String, String> map = Maps.newHashMap();
+
+        // no need to consult #orderedForEvaluation because we are using a map
         for (DefDescriptor<ThemeDef> theme : themes) {
             map.putAll(dynamicVars.column(theme));
         }
@@ -132,6 +134,11 @@ public final class ThemeListImpl implements MutableThemeList {
             builder.addString(entry.getValue());
         }
         return Optional.of(builder.build().toString());
+    }
+
+    @Override
+    public boolean hasDynamicVars() {
+        return !dynamicVars.isEmpty();
     }
 
     @Override

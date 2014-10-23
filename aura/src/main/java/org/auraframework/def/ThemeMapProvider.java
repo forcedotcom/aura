@@ -26,6 +26,14 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Note that classes implementing this interface are instantiated as singletons. Classes implementing this interface
  * should not have any state data. They must also have a no-arg constructor. They should also be marked with the
  * {@code @Provider} annotation.
+ *
+ *
+ * TODONM: There could be a situation where we end up with a CSS mismatch... if #provide returns one set of vars while we
+ * build up the css url and a different set of vars when we actually return the css for that url. Practically this is
+ * only a real problem if we go from A (url) -> B (file) -> A (url), where the client caches a file with the hash of A,
+ * but the contents of B, where changing things back to A doesn't trigger a cache bust on the client because it's
+ * already cached as A (but it contains B). We might need to solve this problem by adding a new method here requiring
+ * implementers to give us the last mod date and put that (max of all active theme map providers) in the url instead.
  */
 public interface ThemeMapProvider extends Provider {
     /**

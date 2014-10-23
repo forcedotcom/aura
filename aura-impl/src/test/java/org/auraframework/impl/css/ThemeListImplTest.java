@@ -186,6 +186,17 @@ public class ThemeListImplTest extends StyleTestCase {
         assertEquals(theme1, ordered.get(2));
     }
 
+    public void testHasDynamicVarsTrue() throws Exception {
+        DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF));
+        tl.append(theme);
+        assertTrue(tl.hasDynamicVars());
+    }
+
+    public void testHasDynamicVarsFalse() throws Exception {
+        tl.append(theme1);
+        assertFalse(tl.hasDynamicVars());
+    }
+
     /** test that when two map provided themes specify the same var, the correct one is returned */
     @Provider
     public static final class P1 implements ThemeMapProvider {

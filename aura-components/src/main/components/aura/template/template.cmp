@@ -267,15 +267,18 @@
             {!v.auraPreInitBlock}
 
             <script>
-            if ({!v.autoInitialize}) {
-                $A.initAsync({!v.auraInit});
-            }else if({!v.autoInitializeSync}){
-                $A.initConfig({!v.auraInitSync});
-            }
-            function dismissError() {
-                $A.util.removeClass(document.body,'auraError');
-                $A.util.removeClass(auraErrorMask,'auraForcedErrorBox');
-            }
+                if ({!v.autoInitialize}) {
+                    $A.initAsync({!v.auraInit});
+                } else if ({!v.autoInitializeSync}){
+                    $A.initConfig({!v.auraInitSync});
+                }
+                function dismissError() {
+                    $A.util.removeClass(document.body,'auraError');
+                    $A.util.removeClass(auraErrorMask,'auraForcedErrorBox');
+                }
+                window.addEventListener('load', function() {
+                    FastClick.attach(document.body, {tapDelay: 100, touchBoundary: 10});
+                }, false);
             </script>
             
             {!v.auraInitBlock}

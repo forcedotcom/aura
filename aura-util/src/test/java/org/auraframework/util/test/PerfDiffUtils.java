@@ -17,7 +17,7 @@ package org.auraframework.util.test;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;

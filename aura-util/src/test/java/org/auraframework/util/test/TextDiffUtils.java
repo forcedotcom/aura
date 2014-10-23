@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.auraframework.test.UnitTestCase;
 import org.xml.sax.SAXException;

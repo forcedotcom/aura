@@ -51,8 +51,8 @@
     <expressionTest:test expression="{!m.integerString == 511}" exprText="m.integerString == 511" expected="false"/>
     <expressionTest:test expression="{!m.integerString == '511'}" exprText="m.integerString == '511'" expected="true"/>
     <expressionTest:test expression="{!v.Infinity == v.Infinity}" exprText="v.Infinity == v.Infinity" expected="true"/>
-    <expressionTest:test expression="{!m.NaN == v.NaN}" exprText="m.NaN == v.NaN" expected="false"/>
-    <expressionTest:test expression="{!m.NaN == m.NaN}" exprText="m.NaN == m.NaN" expected="false"/>
+    <expressionTest:test expression="{!m.naN == v.NaN}" exprText="m.naN == v.NaN" expected="false"/>
+    <expressionTest:test expression="{!m.naN == m.naN}" exprText="m.naN == m.naN" expected="false"/>
     <expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
 
     <!-- notequals -->
@@ -250,11 +250,11 @@
     <expressionTest:test expression="{!v.NaN >= 0}" exprText="v.NaN >= 0" expected="false"/>
     <expressionTest:test expression="{!v.NaN >= '5o'}" exprText="v.NaN >= '5o'" expected="false"/>
     <expressionTest:test expression="{!v.NaN >= v.Infinity}" exprText="v.NaN >= v.Infinity" expected="false"/>
-    <expressionTest:test expression="{!m.DateLater >= m.Date}" exprText="m.DateLater >= m.Date" expected="true"/>
-    <expressionTest:test expression="{!m.Date >= m.DateLater}" exprText="m.Date >= m.DateLater" expected="false"/>
-    <expressionTest:test expression="{!m.CalendarLater >= m.Calendar}" exprText="m.CalendarLater >= m.Calendar" expected="true"/>
-    <expressionTest:test expression="{!m.Calendar >= m.CalendarLater}" exprText="m.Calendar >= m.CalendarLater" expected="false"/>
-    <expressionTest:test expression="{!m.Calendar >= m.Date}" exprText="m.Calendar >= m.Date" expected="true"/>
+    <expressionTest:test expression="{!m.dateLater >= m.date}" exprText="m.dateLater >= m.date" expected="true"/>
+    <expressionTest:test expression="{!m.date >= m.dateLater}" exprText="m.date >= m.dateLater" expected="false"/>
+    <expressionTest:test expression="{!m.calendarLater >= m.calendar}" exprText="m.calendarLater >= m.calendar" expected="true"/>
+    <expressionTest:test expression="{!m.calendar >= m.calendarLater}" exprText="m.calendar >= m.calendarLater" expected="false"/>
+    <expressionTest:test expression="{!m.calendar >= m.date}" exprText="m.calendar >= m.date" expected="true"/>
 
     <!-- less than -->
     <expressionTest:test expression="{!5 &lt; 2}" exprText="5 &lt; 2" expected="false"/>
@@ -279,11 +279,11 @@
     <expressionTest:test expression="{!v.NaN &lt; 0}" exprText="v.NaN &lt; 0" expected="false"/>
     <expressionTest:test expression="{!v.NaN &lt; '5o'}" exprText="v.NaN &lt; '5o'" expected="false"/>
     <expressionTest:test expression="{!v.NaN &lt; v.Infinity}" exprText="v.NaN &lt; v.Infinity" expected="false"/>
-    <expressionTest:test expression="{!m.DateLater &lt; m.Date}" exprText="m.DateLater &lt; m.Date" expected="false"/>
-    <expressionTest:test expression="{!m.Date &lt; m.DateLater}" exprText="m.Date &lt; m.DateLater" expected="true"/>
-    <expressionTest:test expression="{!m.CalendarLater &lt; m.Calendar}" exprText="m.CalendarLater &lt; m.Calendar" expected="false"/>
-    <expressionTest:test expression="{!m.Calendar &lt; m.CalendarLater}" exprText="m.Calendar &lt; m.CalendarLater" expected="true"/>
-    <expressionTest:test expression="{!m.Calendar &lt; m.Date}" exprText="m.Calendar &lt; m.Date" expected="false"/>
+    <expressionTest:test expression="{!m.dateLater &lt; m.date}" exprText="m.dateLater &lt; m.date" expected="false"/>
+    <expressionTest:test expression="{!m.date &lt; m.dateLater}" exprText="m.date &lt; m.dateLater" expected="true"/>
+    <expressionTest:test expression="{!m.calendarLater &lt; m.calendar}" exprText="m.calendarLater &lt; m.calendar" expected="false"/>
+    <expressionTest:test expression="{!m.calendar &lt; m.calendarLater}" exprText="m.calendar &lt; m.calendarLater" expected="true"/>
+    <expressionTest:test expression="{!m.calendar &lt; m.date}" exprText="m.calendar &lt; m.date" expected="false"/>
 
     <!-- less than or equal -->
     <expressionTest:test expression="{!5 &lt;= 2}" exprText="5 &lt;= 2" expected="false"/>
@@ -308,11 +308,11 @@
     <expressionTest:test expression="{!v.NaN &lt;= 0}" exprText="v.NaN &lt;= 0" expected="false"/>
     <expressionTest:test expression="{!v.NaN &lt;= '5o'}" exprText="v.NaN &lt;= '5o'" expected="false"/>
     <expressionTest:test expression="{!v.NaN &lt;= v.Infinity}" exprText="v.NaN &lt;= v.Infinity" expected="false"/>
-    <expressionTest:test expression="{!m.DateLater &lt;= m.Date}" exprText="m.DateLater &lt;= m.Date" expected="false"/>
-    <expressionTest:test expression="{!m.Date &lt;= m.DateLater}" exprText="m.Date &lt;= m.DateLater" expected="true"/>
-    <expressionTest:test expression="{!m.CalendarLater &lt;= m.Calendar}" exprText="m.CalendarLater &lt;= m.Calendar" expected="false"/>
-    <expressionTest:test expression="{!m.Calendar &lt;= m.CalendarLater}" exprText="m.Calendar &lt;= m.CalendarLater" expected="true"/>
-    <expressionTest:test expression="{!m.Calendar &lt;= m.Date}" exprText="m.Calendar &lt;= m.Date" expected="false"/>
+    <expressionTest:test expression="{!m.dateLater &lt;= m.date}" exprText="m.dateLater &lt;= m.date" expected="false"/>
+    <expressionTest:test expression="{!m.date &lt;= m.dateLater}" exprText="m.date &lt;= m.dateLater" expected="true"/>
+    <expressionTest:test expression="{!m.calendarLater &lt;= m.calendar}" exprText="m.calendarLater &lt;= m.calendar" expected="false"/>
+    <expressionTest:test expression="{!m.calendar &lt;= m.calendarLater}" exprText="m.calendar &lt;= m.calendarLater" expected="true"/>
+    <expressionTest:test expression="{!m.calendar &lt;= m.date}" exprText="m.calendar &lt;= m.date" expected="false"/>
 
     <!-- negate -->
     <expressionTest:test expression="{!-1}" exprText="-1" expected="-1"/>

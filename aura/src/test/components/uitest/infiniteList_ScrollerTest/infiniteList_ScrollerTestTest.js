@@ -26,8 +26,10 @@
    testNoPullToRefreshNoDivSpace: {
        browsers: ["-IE7","-IE8"],
         test: function(cmp) {
-            var scrlrDiv = cmp.find("scroller3").getElements()[1];
-            var divChildren = scrlrDiv.children[0].children.length;
+            var wrapper     = cmp.find("scroller3").getElement(),
+                content     = wrapper.children[0],
+                divChildren = content.children.length;
+
             $A.test.assertFalse(divChildren > 1, "User does not want to pull to refresh, there should not be a div for a spacer here");
         }
     }

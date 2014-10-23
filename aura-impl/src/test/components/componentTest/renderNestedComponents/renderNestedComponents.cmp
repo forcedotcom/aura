@@ -1,0 +1,51 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <div aura:id="wrapper" class="wrapper">
+
+        <p>
+            This test validates that Aura shares DOM markers properly, as it is the case
+            when nesting empty components: in that situation, setting the inner component body
+            and then setting the outer component body is expected to work, but fails if Aura
+            doesn't handle shared markers.
+        </p>
+
+        <div aura:id="output" class="output" style="border: 1px red solid">
+            <componentTest:hasBody aura:id="outer">
+                <componentTest:hasBody aura:id="inner">
+                    <ui:outputText value="Hello!"/>
+                </componentTest:hasBody>
+            </componentTest:hasBody>
+        </div>
+
+        <div>
+            Set outer:
+            <ui:button aura:id="outer Spanish" label="Hola" press="{!c.press}"/>
+            <ui:button aura:id="outer French" label="Bonjour" press="{!c.press}"/>
+        </div>
+
+        <div>
+            Set inner:
+            <ui:button aura:id="inner Spanish" label="Hola" press="{!c.press}"/>
+            <ui:button aura:id="inner French" label="Bonjour" press="{!c.press}"/>
+        </div>
+
+        <div aura:id="log"/>
+    </div>
+
+</aura:component>

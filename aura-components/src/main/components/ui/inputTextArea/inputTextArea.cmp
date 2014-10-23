@@ -34,7 +34,7 @@
             readonly="{!v.readonly}"
             maxlength="{!v.maxlength}"
             placeholder="{!v.placeholder}"
-            aria-describedby="{!v.ariaDescribedby}"/>
+            aria-describedby="{!v.ariaDescribedBy}"/>
         <aura:set attribute="else">
             {!v.body}
         </aura:set>

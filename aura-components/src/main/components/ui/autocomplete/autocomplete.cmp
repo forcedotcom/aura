@@ -17,6 +17,7 @@
 -->
 <aura:component extends="ui:input" support="proto" description="Represents an input field that suggests a list of values from the data provider as you type.">
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
+    <aura:attribute name="emptyListContent" type="Aura.Component[]" description="Content to be shown if the list is empty"/>
     <aura:attribute name="inputClass" type="String" description="The css class for input component."/>
     <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component. We support inputText and inputTextArea for now."/>
     <aura:attribute name="listOption" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated option in the list."/>
@@ -24,6 +25,7 @@
     <aura:attribute name="placeholder" type="String" default="" description="Text that is displayed when the input field is empty, to prompt the user for a valid entry."/>
     <aura:attribute name="propertyToMatch" type="String" default="label" description="The property name in the data object which is used to match typing in the input field."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
+    <aura:attribute name="matchFunc" type="Aura.Action" description="Overrides default list item update behavior to allow custom text matching."/>
     
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
@@ -64,6 +66,7 @@
         dataProvider="{!v.dataProvider}" 
         itemVar="{!v.optionVar}" 
         itemTemplate="{!v.listOption}"
+        emptyListContent="{!v.emptyListContent}"
         header="{!v.header}"
         footer="{!v.footer}"
         theme="{!v.theme}"
@@ -72,5 +75,6 @@
         propertyToMatch="{!v.propertyToMatch}"
         matchDone="{!c.handleMatchDone}"
         selectListOption="{!c.handleSelectOption}"
-        updateAriaAttributes="{!c.updateAriaAttributes}"/>
+        updateAriaAttributes="{!c.updateAriaAttributes}"
+        matchFunc="{!v.matchFunc}"/>
 </aura:component>

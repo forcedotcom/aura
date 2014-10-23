@@ -21,13 +21,11 @@ exp(p,
     "getApp", p.getApp,
     "getCurrentAction", p.getCurrentAction,
     "setCurrentAction", p.setCurrentAction,
-    "getGlobalValueProviders", p.getGlobalValueProviders,
     "clearComponentConfigs", p.clearComponentConfigs
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,
         "getNum", p.getNum,
         "getLoaded", p.getLoaded,
-        "getPreloadedNamespaces", p.getPreloadedNamespaces,
-        "encodeForServer", p.encodeForServer
+        "getPreloadedNamespaces", p.getPreloadedNamespaces
     //#end
 );

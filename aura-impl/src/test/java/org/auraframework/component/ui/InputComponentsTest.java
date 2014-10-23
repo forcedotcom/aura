@@ -57,7 +57,7 @@ public class InputComponentsTest extends AuraTestCase {
      * @throws Exception
      */
     public void testDomEventsAreComponentEvents() throws Exception {
-        HashMap<String, String> events = new HashMap<String, String>();
+        HashMap<String, String> events = new HashMap<>();
         events.put("blur", "markup://ui:blur");
         events.put("change", "markup://ui:change");
         events.put("click", "markup://ui:click");

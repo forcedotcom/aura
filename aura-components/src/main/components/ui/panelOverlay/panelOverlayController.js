@@ -15,7 +15,6 @@
  */
 ({
     onVisibleChange: function(cmp, event, helper) {
-    	debugger;
     },
     
 	show: function (cmp, event, helper) {

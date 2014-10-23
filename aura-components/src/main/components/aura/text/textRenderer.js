@@ -16,11 +16,6 @@
 ({
     render: function(component){
         var value = component.get("v.value");
-        if ($A.util.isUndefined(value)) {
-            value = '';
-        } else if (!$A.util.isString(value)) {
-            value = String(value);
-        }
         
         var trunc = component.get("v.truncate");
         var truncateByWord = $A.util.getBooleanValue(component.get("v.truncateByWord"));
@@ -30,7 +25,18 @@
             trunc = 1 * trunc;
             value = aura.util.truncate(value, trunc, ellipsis, truncateByWord);
         }
-        
-        return document.createTextNode(value);
+        return [document.createTextNode($A.util.isUndefinedOrNull(value)?'':value)];
+    },
+    rerender:function(component){
+        var element=component.getElement();
+        // Check for unowned node so IE doesn't crash
+        if (element && element.parentNode) {
+        	var textValue = component.get("v.value");
+            textValue = $A.util.isUndefinedOrNull(textValue) ? '' : textValue;
+            
+            if (element.nodeValue !== textValue) {
+                element.nodeValue = textValue;
+            }
+        }
     }
 })

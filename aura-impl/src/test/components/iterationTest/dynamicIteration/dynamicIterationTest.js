@@ -34,7 +34,7 @@
     },
 
     /**
-     * Setting iteration items value to another ArrayValue will rerender all the content.
+     * Setting iteration items value to another Array will rerender all the content.
      */
     testSetItems:{
         attributes:{ start:6, end:9 },
@@ -46,7 +46,7 @@
             $A.test.assertEquals("7:hhh", $A.test.getText(children[1]));
             $A.test.assertEquals("8:iii", $A.test.getText(children[2]));
 
-            // set to another ArrayValue
+            // set to another Array
             cmp.get("c.setCapitalItems").runDeprecated();
             this.assertNodesDeleted(children);
             children = $A.test.getNonCommentNodes(container.childNodes);
@@ -55,7 +55,7 @@
             $A.test.assertEquals("7:HHHHH", $A.test.getText(children[1]));
             $A.test.assertEquals("8:IIIII", $A.test.getText(children[2]));
 
-            // then set to empty ArrayValue
+            // then set to empty Array
             cmp.get("c.setOriginalItems").runDeprecated();
             this.assertNodesDeleted(children);
             children = $A.test.getNonCommentNodes(container.childNodes);

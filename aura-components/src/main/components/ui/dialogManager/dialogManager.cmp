@@ -23,5 +23,5 @@
     <!-- events -->
     <aura:handler event="ui:openDialog" action="{!c.openDialog}" description="Activates a single ui:dialog component"/>
     <aura:handler event="ui:closeDialog" action="{!c.closeDialog}" description="Deactivates a single ui:dialog component."/>
-
+    {!v.body}
 </aura:component>

@@ -51,7 +51,7 @@ public class JavaTestController {
     @AuraEnabled
     public static Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
         int count = input == null ? 1 : Integer.parseInt(input);
-        List<Component> cmps = new LinkedList<Component>();
+        List<Component> cmps = new LinkedList<>();
         while (count-- > 0) {
             Object val = token + ":java:" + count;
             Map<String, Object> atts = ImmutableMap.of("value", val);
@@ -320,10 +320,10 @@ public class JavaTestController {
     @SuppressWarnings("rawtypes")
     @AuraEnabled
     public static List<Map> getList(@Key("start") int start, @Key("limit") int limit) throws Exception {
-    	List<Map> myList = new ArrayList<Map>();
+    	List<Map> myList = new ArrayList<>();
     	for (int i=start; i < limit; i++) {
             char alphabet = (char) (65 + (i%26));
-            Map<String, String> row = new HashMap<String, String>();
+            Map<String, String> row = new HashMap<>();
             row.put("index", (i+1) + "");
             row.put("char", "server " + alphabet);
             myList.add(row);          

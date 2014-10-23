@@ -114,6 +114,7 @@ Test.Aura.AuraClientServiceTest = function() {
         this.isBackground = Stubs.GetMethod(false);
         this.runDeprecated = Stubs.GetMethod();
         this.addCallbackGroup = Stubs.GetMethod();
+        this.getAbortableKey = Stubs.GetMethod();
         this.abort = Stubs.GetMethod();
         this.getDef = Stubs.GetMethod({
             isClientAction : Stubs.GetMethod(true),

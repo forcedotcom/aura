@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 ({
-	 
-	render: function(component, helper) {		
-        var domId = component.get('v.domId'),						
-			globalId = component.getConcreteComponent().getGlobalId();			
-        
+
+	render: function(component, helper) {
+        var domId = component.get('v.domId'),
+			globalId = component.getConcreteComponent().getGlobalId();
+
 		if (!domId) {
 			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
-		
+
 		helper.handleErrors(component);
 		return this.superRender();
 	},
-	
+
 	afterRender: function(component, helper) {
         this.superAfterRender();
-		helper.addInputClass(component);
+		//helper.addInputClass(component);
 
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
         concreteHelper.updateErrorElement(component);
-        
+
         if (component.get("v.doFormat")) {
             var value = concreteCmp.get("v.value");
             if (!$A.util.isEmpty(value)) {
@@ -44,17 +44,17 @@
             }
         }
     },
-    
+
     rerender: function(component, helper) {
-    	var concreteCmp = component.getConcreteComponent();
+        var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
-        
+
         if (!component._creatingAsyncErrorCmp) {
         	helper.handleErrors(component);
             helper.updateErrorElement(component);
-        } 
-        
+        }
+
         if (component.get("v.doFormat")) {
             var concreteCmp = component.getConcreteComponent();
             var concreteHelper = concreteCmp.getDef().getHelper();
@@ -66,6 +66,6 @@
         }
 
         this.superRerender();
-        helper.addInputClass(component);
+        //helper.addInputClass(component);
     }
 })

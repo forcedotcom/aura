@@ -34,11 +34,11 @@
      * Verify that the component actually is how we expect it to be
      */
     verifyInputDefaultStructure : function(input, ul, ulLength, childLength, ulIndex2Use){
-    	 $A.test.assertEquals(ul.length, ulLength, "uiInputDefaultError unordered list was not found");
+    	 $A.test.assertEquals(ulLength, ul.length, "uiInputDefaultError unordered list was not found");
          
          //Grab the uls children and verify that there are three
          var chlds = ul[ulIndex2Use].children;
-         $A.test.assertEquals(chlds.length, childLength, "The amount of children is incorrect");
+         $A.test.assertEquals(childLength, chlds.length, "The amount of children is incorrect");
          
        //Verify aria-describedby value on the input tags matches the ul of inputDefaultError
  		this.verifyAriaIdCorrect(ul[ulIndex2Use], input)
@@ -50,7 +50,7 @@
     validateBasic : function(cmp, auraId){  	
     	this.fireErrorValidation(cmp.find("validate"), false);
     	
-    	var ul = $A.test.getElementByClass("uiInputDefaultError");
+    	var ul = $A.test.getElementByClass("uiInputDefaultError") || [];
 		var input = cmp.find(auraId).getElement();
 		
 		this.verifyInputDefaultStructure(input, ul, 1, 3, 0); 
@@ -155,17 +155,18 @@
         }, function(cmp){
     	    //Remove errors
         	this.fireErrorValidation(cmp.find("validate"), true);
-        }, function(cmp){	
-        	//UL should no longer exist
-		    $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"), "There should not be an inputDefaultError on the page!");	
-		    
-    		//Make the component have errors again
-        	this.fireErrorValidation(cmp.find("validate"), false);
-    		var ul = $A.test.getElementByClass("uiInputDefaultError");
+        }, function(cmp) {
+            //UL should no longer exist
+            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"), "There should not be an inputDefaultError on the page!");
+
+            //Make the component have errors again
+            this.fireErrorValidation(cmp.find("validate"), false);
+        },
+        function(cmp){
+            var ul = $A.test.getElementByClass("uiInputDefaultError");
     		var input = cmp.find("defaultInvalid").getElement();
     		//Verify IDS match and the amount of errors match
     		this.verifyInputDefaultStructure(input, ul, 1, 3, 0);
-    		
     	}]
     },
     

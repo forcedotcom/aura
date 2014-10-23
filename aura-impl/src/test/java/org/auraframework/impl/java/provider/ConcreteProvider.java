@@ -85,7 +85,7 @@ public class ConcreteProvider implements ComponentConfigProvider {
             Builder builder = new ComponentDefImpl.Builder();
             builder.setDescriptor(hashedDescriptor);
             //set up attribute definitions. we don't need "whatToDo" any more, but the build still require it
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new HashMap<>();
             DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
             attributeDefs.put(DefDescriptorImpl.getInstance("whatToDo", AttributeDef.class), new AttributeDefImpl(
                     DefDescriptorImpl.getInstance("whatToDo", AttributeDef.class), null, type, null, true,

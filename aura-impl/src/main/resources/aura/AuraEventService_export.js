@@ -16,7 +16,6 @@
 /*jslint sub: true */
 exp(eventService,
     "newEvent", eventService.newEvent,
-    "getValue", eventService.getValue,
     "addHandler", eventService.addHandler,
     "removeHandler", eventService.removeHandler,
     "startFiring", eventService.startFiring,

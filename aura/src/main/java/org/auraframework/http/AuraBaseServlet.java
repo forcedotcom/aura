@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
@@ -46,7 +45,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -90,11 +88,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
     protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
-    private static SourceNotifier sourceNotifier = new SourceNotifier();
-
-    static {
-        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
-    }
 
     protected static void addCookie(HttpServletResponse response, String name, String value, long expiry) {
         if (name != null) {
@@ -333,7 +326,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 // that this is still a bit dangerous, as we seem to have a lot
                 // of magic in the serializer.
                 //
-                context.setSerializeLastMod(false);
                 Aura.getSerializationService().write(mappedEx, null, out);
                 if (format == Format.JSON) {
                     out.write("/*ERROR*/");
@@ -380,8 +372,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return !ManifestUtil.isManifestEnabled(request);
     }
 
-    private final static ConcurrentHashMap<String, Long> lastModMap = new ConcurrentHashMap<String, Long>();
-
     public String getContentType(AuraContext.Format format) {
         switch (format) {
         case MANIFEST:
@@ -417,41 +407,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
             }
         }
         return null;
-    }
-
-    // This routine is about to die!
-    public static long getLastMod() {
-        DefinitionService definitionService = Aura.getDefinitionService();
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
-        Mode mode = context.getMode();
-        long appLastMod = -1;
-
-        // if there are conditions where cache must be disabled, set this boolean false
-        boolean useCache = (Aura.getConfigAdapter().isProduction() || (mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE));
-
-        if (app != null) {
-            if (useCache) {
-                Long tmp = lastModMap.get(app.getQualifiedName());
-                if (tmp != null) {
-                    appLastMod = tmp.longValue();
-                }
-            }
-            if (appLastMod == -1) {
-                try {
-                    String uid = definitionService.getDefRegistry().getUid(null, app);
-                    appLastMod = definitionService.getLastMod(uid);
-                    lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
-                } catch (QuickFixException qfe) {
-                    // ignore. the QFE will get thrown elsewhere.
-                }
-            }
-        }
-        long lastMod = Aura.getConfigAdapter().getAuraJSLastMod();
-        if (appLastMod > lastMod) {
-            lastMod = appLastMod;
-        }
-        return lastMod;
     }
 
     protected DefDescriptor<?> setupQuickFix(AuraContext context) {
@@ -580,15 +535,4 @@ public abstract class AuraBaseServlet extends HttpServlet {
     protected void setBasicHeaders(HttpServletResponse rsp) {
         rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);   
     }
-
-    /**
-     * Singleton class to manage external calls to the parent class' static cache
-     */
-    private static class SourceNotifier implements SourceListener {
-        @Override
-        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-            lastModMap.clear();
-        }
-    }
-
 }

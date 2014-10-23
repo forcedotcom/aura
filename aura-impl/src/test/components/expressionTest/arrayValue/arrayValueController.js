@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 ({
-    onValueChange : function(cmp, evt, helper){
-        if(cmp._log===undefined){
-            cmp._log=[];
-        }
+    onChange1 : function(cmp, evt, helper){
+        var array = evt.getParam('value') || [];
+        cmp.set("v.firstArrayLen", array.length);
+
+        cmp._log || (cmp._log = []);
         cmp._log.push(evt.getParams());
     },
-    /* comment out for W-2351693
-    onValueChange2 : function(cmp, evt, helper){
-        if(cmp._log===undefined){
-            cmp._log=[];
-        }
+    onChange2 : function(cmp, evt, helper){
+        cmp._log || (cmp._log = []);
+        cmp._log.push(evt.getParams());
+
+        var array = evt.getParam('value') || [];
+        cmp.set("v.secondArrayLen", array.length);
+
+        cmp._log || (cmp._log = []);
         cmp._log.push(evt.getParams());
     },
-     */
-    onLengthChange : function(cmp, evt, helper) {
-        cmp.set("v.firstArrayLen", evt.getParams().value);
-    },
-    
-    onLengthChange2 : function(cmp, evt, helper) {
-        cmp.set("v.secondArrayLen", evt.getParams().value);
-    },
-    
     onLengthChangeArrayFromModel : function(cmp, evt, helper) {
-        cmp.set("v.arrayFromModelLen", evt.getParams().value);
+        cmp.set("v.arrayFromModelLen", evt.getParams('value'));
     }
 })

@@ -15,11 +15,11 @@
  */
 ({
     handleClick: function(cmp, event) {
-        var a = $A.expressionService.get(cmp, "c.getString");
-        a.setCallback(cmp, function(action) {
+        var action = cmp.get("c.getString");
+        action.setCallback(cmp, function(action) {
             var actionReturnValue = action.getReturnValue();
             cmp.set("v.label", actionReturnValue);
         });
-        $A.enqueueAction(a);
+        $A.enqueueAction(action);
     }
 })

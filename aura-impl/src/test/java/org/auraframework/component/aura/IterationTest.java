@@ -35,10 +35,6 @@ import com.google.common.collect.Maps;
 
 /**
  * Server-side aura:iteration tests
- * 
- * @userStory a07B0000000LAVl
- * 
- * @since 0.0.254
  */
 public class IterationTest extends AuraImplTestCase {
 
@@ -84,6 +80,19 @@ public class IterationTest extends AuraImplTestCase {
         assertEquals("", getRenderedBaseComponent(iteration));
     }
 
+    public void testItemsWrongType() throws Exception {
+        String source = "<aura:attribute name='stringAttr' type='String' default='someString'/>"
+                + "<aura:iteration items='{!v.stringAttr}' var='x'>{!x}lalala</aura:iteration>";
+        Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("items", Lists.newArrayList("q", "r", "s"));
+        try {
+            getIterationComponent(source, attributes);
+            fail("Expected Exception when expression for iteration's 'items' attribute returns String instead of List");
+        } catch (Exception e) {
+            checkExceptionContains(e, AuraExecutionException.class, "attribute <items> is of the wrong type");
+        }
+    }
+
     public void testVarMissing() throws Exception {
         String source = "<aura:iteration items='{!v.items}'>G</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
@@ -104,13 +113,16 @@ public class IterationTest extends AuraImplTestCase {
         assertEquals("012", getRenderedBaseComponent(iteration));
     }
 
-    @Ignore("W-1300971")
-    public void _testVarInvalid() throws Exception {
+    public void testVarInvalid() throws Exception {
         String source = "<aura:iteration items='{!v.items}' var='99bottles'>{!99bottles}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
-        Component iteration = getIterationComponent(source, attributes);
-        assertEquals("qrs", getRenderedBaseComponent(iteration));
+        try {
+            getIterationComponent(source, attributes);
+            fail("Expected Exception when providing an invalid name to iterations 'var' property");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidExpressionException.class, "unexpected token");
+        }
     }
 
     @Ignore("W-1300971")
@@ -143,6 +155,18 @@ public class IterationTest extends AuraImplTestCase {
         }
     }
 
+    public void testVarWrongType() throws Exception {
+        String source = "<aura:iteration items='{!v.items}' var='{!v.items}'>{!x}lalala</aura:iteration>";
+        Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("items", Lists.newArrayList("q", "r", "s"));
+        try {
+            getIterationComponent(source, attributes);
+            fail("Expected Exception when expression for iteration's 'var' attribute returns List instead of String");
+        } catch (Exception e) {
+            checkExceptionContains(e, AuraExecutionException.class, "attribute <var> is of the wrong type");
+        }
+    }
+
     public void testIndexVarEmpty() throws Exception {
         String source = "<aura:iteration items='{!v.items}' var='x' indexVar=''>{!x}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
@@ -151,13 +175,16 @@ public class IterationTest extends AuraImplTestCase {
         assertEquals("qrs", getRenderedBaseComponent(iteration));
     }
 
-    @Ignore("W-1300971")
-    public void _testIndexVarInvalid() throws Exception {
+    public void testIndexVarInvalid() throws Exception {
         String source = "<aura:iteration items='{!v.items}' var='x' indexVar='99bottles'>{!99bottles}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
-        Component iteration = getIterationComponent(source, attributes);
-        assertEquals("012", getRenderedBaseComponent(iteration));
+        try {
+            getIterationComponent(source, attributes);
+            fail("Expected Exception when providing an invalid name to iterations 'indexVar' property");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidExpressionException.class, "unexpected token");
+        }
     }
 
     @Ignore("W-1300971")
@@ -187,6 +214,18 @@ public class IterationTest extends AuraImplTestCase {
             fail("Expected a AuraExecutionException");
         } catch (Exception e) {
             checkExceptionContains(e, AuraExecutionException.class, "no such property: other");
+        }
+    }
+
+    public void testIndexVarWrongType() throws Exception {
+        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='{!v.items}'>{!x}lalala</aura:iteration>";
+        Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("items", Lists.newArrayList("q", "r", "s"));
+        try {
+            getIterationComponent(source, attributes);
+            fail("Expected Exception when expression for iteration's 'indexVar' attribute returns List instead of String");
+        } catch (Exception e) {
+            checkExceptionContains(e, AuraExecutionException.class, "attribute <indexVar> is of the wrong type");
         }
     }
 
@@ -272,19 +311,6 @@ public class IterationTest extends AuraImplTestCase {
         assertEquals(2, iteration.getAttributes().getValue("end"));
     }
 
-    public void testRealBodyIgnored() throws Exception {
-        String source = "<aura:iteration items='{!v.items}' var='x' indexVar='i'><aura:set attribute='realbody'>casper</aura:set>{!i}{!x+'|'}</aura:iteration>";
-        Map<String, Object> attributes = Maps.newHashMap();
-        attributes.put("items", Lists.newArrayList("q", "r", "s"));
-        Component iteration = getIterationComponent(source, attributes);
-        assertEquals("0q|1r|2s|", getRenderedBaseComponent(iteration));
-        List<?> realBody = (List<?>) iteration.getAttributes().getValue("realbody");
-        assertEquals(6, realBody.size());
-        for (Object bodyPart : realBody) {
-            assertEquals("markup://aura:expression", ((Component) bodyPart).getDescriptor().getQualifiedName());
-        }
-    }
-
     /**
      * Verify that iteams, var and body are required attributes.
      */
@@ -315,6 +341,5 @@ public class IterationTest extends AuraImplTestCase {
                     "Lazy Component References can only have attributes of simple types passed in (body is not simple)");
         }
     }
-    
-   
+
 }

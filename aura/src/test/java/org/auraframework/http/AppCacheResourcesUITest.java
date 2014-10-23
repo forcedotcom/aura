@@ -47,6 +47,7 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -112,8 +113,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         + "return val;"
                         + "};"
                         + "var style = getStyle(c.getElement(),'background-image');"
-                        + "c.getValue('v.output').setValue('@@@TOKEN@@@'"
-                        + "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
+                        + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
                         + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
                         + "}}");
 
@@ -126,8 +126,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening cached app will only query server for the manifest and the component load.
+     * TODO: put BrowserType.SAFARI back for W-2367702, verify it's failing with same reason as locally
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -143,8 +144,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening cached app that had a prior cache error will reload the app.
+     * TODO: put BrowserType.SAFARI back for W-2367702, verify it's failing with same reason as locally
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -178,8 +180,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening uncached app that had a prior cache error will have limited caching.
+     * TODO: put BrowserType.SAFARI back for W-2367702, verify it's failing with same reason as locally
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
 
@@ -190,9 +193,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(), null, null, null, 200));
         expectedChange.add(new Request("/auraResource", null, null, "css", 200));
         expectedChange.add(new Request("/auraResource", null, null, "js", 200));
+        switch (getBrowserType()) {
+        case GOOGLECHROME:
+        	expectedChange.add(new Request(1, getUrl(), null, null, null, 200));
+        	break;
+        default:
+        	expectedChange.add(new Request(getUrl(), null, null, null, 200));
+        }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
         // There may be a varying number of requests, depending on when the initial manifest response is received.
@@ -434,19 +443,43 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see
         // what's cached, so build our URL and call WebDriver.get() directly.
         String url = getUrl();
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
         url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
+        
+        auraUITestingUtil.waitUntilWithCallback(
+        		new Function<WebDriver, Integer>() {
+                    @Override
+                    public Integer apply(WebDriver input) {
+                    	Integer appCacheStatus = Integer.parseInt(auraUITestingUtil.getEval(
+                    	"return window.applicationCache.status;").toString());
+                        if(appCacheStatus != 3 && appCacheStatus != 2 ) {
+                        	return appCacheStatus;
+                        } else {
+                        	return null;
+                        }
+                    }
+                },
+                new ExpectedCondition<String>() {
+                    @Override
+                    public String apply(WebDriver d) {
+                        Object ret = auraUITestingUtil.getRawEval("return window.applicationCache.status");
+                        return "Current AppCache status is " 
+                        		+ auraUITestingUtil.appCacheStatusIntToString(((Long) ret).intValue());
+                    }
+                },
+        		10, 
+        		"fail waiting on application cache not to be Downloading or Checking before clicking on 'clickableme'");
 
         auraUITestingUtil
                 .waitUntil(
                         new Function<WebDriver, WebElement>() {
                             @Override
                             public WebElement apply(WebDriver input) {
-                                WebElement find = findDomElement(By
+                            	try {
+                            		WebElement find = findDomElement(By
                                         .cssSelector(".clickableme"));
-                                try {
                                     if (markupToken.equals(find.getText())) {
                                         return find;
                                     }
@@ -465,9 +498,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 new Function<WebDriver, String>() {
                     @Override
                     public String apply(WebDriver input) {
-                        WebElement find = findDomElement(By
-                                .cssSelector(".clickableme"));
                         try {
+                        	WebElement find = findDomElement(By
+                                .cssSelector(".clickableme"));
                             find.click();
                             WebElement output = findDomElement(By
                                     .cssSelector("div.attroutput"));
@@ -478,7 +511,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         }
                         return null;
                     }
-                }, "couldn't locate output value");
+                }, "fail to click on clickableme or couldn't locate output value");
 
         assertEquals("Unexpected alert text",
                 String.format("%s%s%s", jsToken, cssToken, fwToken), output);
@@ -657,7 +690,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 return super.put(k, v);
             } else {
                 if (extras == null) {
-                    extras = new HashMap<String, String>();
+                    extras = new HashMap<>();
                 }
                 extras.put(k, v);
             }
@@ -715,7 +748,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         SimpleDateFormat sd = new SimpleDateFormat();
         sd.setTimeZone(TimeZone.getTimeZone("GMT"));
         String expiryFormatted = sd.format(expiry);
-        String command = "document.cookie = '" + name + "=error; expires=" + expiryFormatted + "; path=" + path + "';";
+        String command = "document.cookie = '" + name + "="+value+"; expires=" + expiryFormatted + "; path=" + path + "';";
         auraUITestingUtil.getEval(command);
     }
 }

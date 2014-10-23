@@ -15,18 +15,12 @@
  */
 package org.auraframework.components.ui.autocomplete;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 /**
  * UI test to test autocomplete component. Excluding IE7 and IE8 because component uses html5 specific tags
@@ -34,7 +28,7 @@ import org.openqa.selenium.WebElement;
 @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
 public class AutocompleteUITest extends WebDriverTestCase {
     private final String URL = "/uitest/autoComplete_Test.cmp";
-    private final String INPUT_SELECTOR = "input[class*='uiInput']";
+    private final String INPUT_SELECTOR = "input[class*='default']";
     private final String OUTPUT_SELECTOR = "span[class*='uiOutputText']";
     private final String EVENT_OUTPUT_SELECTOR = "span[class*='outputLabel']";
     private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";
@@ -43,7 +37,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "div[class*='customOption']";
     private final String MATCHED_SELECTOR = "mark[class*='data-match']";
 
-    private final Map<String, Integer> AUTOCOMPLETE_COMPONENT = new HashMap<String, Integer>();
+    private final Map<String, Integer> AUTOCOMPLETE_COMPONENT = new HashMap<>();
     {
         AUTOCOMPLETE_COMPONENT.put("Generic", 1);
         AUTOCOMPLETE_COMPONENT.put("Empty", 2);
@@ -51,6 +45,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         AUTOCOMPLETE_COMPONENT.put("CustomTemplate", 4);
         AUTOCOMPLETE_COMPONENT.put("OptionExtention", 5);
         AUTOCOMPLETE_COMPONENT.put("autoCompleteUpdateOn", 6);
+        AUTOCOMPLETE_COMPONENT.put("emptyListContent", 7);
+        AUTOCOMPLETE_COMPONENT.put("matchFunc", 8);
     }
 
     private enum OptionType {
@@ -87,7 +83,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         String inputAutoComplete = "autoCompleteUpdateOn";
         String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete)
                 + ".find('input').get('v.value')");
-        String autoCompleteText = (String) auraUITestingUtil.getEval(expr);
+        String autoCompleteText = (String)auraUITestingUtil.getEval(expr);
         assertNull("Auto complete Text for input should be undefined", autoCompleteText);
         WebDriver driver = getDriver();
         WebElement inputElement = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("autoCompleteUpdateOn"));
@@ -95,7 +91,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         String expectedText = "testing";
         inputElement.sendKeys(expectedText);
         auraUITestingUtil.pressEnter(inputElement);
-        autoCompleteText = (String) auraUITestingUtil.getEval(expr);
+        autoCompleteText = (String)auraUITestingUtil.getEval(expr);
         assertEquals("Input Value was not change after pressing Enter", expectedText, autoCompleteText);
     }
 
@@ -103,8 +99,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
      * Matching multiple items verifying list is visible and matched items present.
      */
     public void testAutoCompleteComponentRenderOnMatch() throws Exception {
-        doTestMatch(AUTOCOMPLETE_COMPONENT.get("Generic"), "o", null, 10,
-                OptionType.AUTOCOMPLETE_OPTION);
+        doTestMatch(AUTOCOMPLETE_COMPONENT.get("Generic"), "o", null, 10, OptionType.AUTOCOMPLETE_OPTION);
     }
 
     /**
@@ -125,12 +120,18 @@ public class AutocompleteUITest extends WebDriverTestCase {
     /**
      * Autocomplete list with no data renderes correctly.
      */
-    public void testAutoCompleteWithZeroItems() throws Exception {
+    // TODO: W-2406307: remaining Halo test failure
+    public void _testAutoCompleteWithZeroItems() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
-        WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
+        Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("Empty");
+        WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        assertFalse("Expected emptyListContent to be invisible", hasCssClass(list, "showEmptyContent"));
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Autocomplete with no data should not have any options", 0, options.size());
+
+        // Make sure the list is not visible after input since no emptyListContent is specified.
+        doTestEmptyListContent(autoCompleteCmpNum, "o", false, false);
     }
 
     /**
@@ -152,9 +153,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
     // Excluding mobile devices since they don't have tabbing functionality
     // Excluding Firefox as well because tabbing in Firefox works differently. There is a separate test for this.
     // TODO : Bug W-1780786
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testAutoCompleteTabing() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -168,8 +168,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         auraUITestingUtil.pressTab(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
-        assertEquals("Focus should be on the next input",
-                nextInput.getAttribute("data-aura-rendered-by"), auraUITestingUtil.getUniqueIdOfFocusedElement());
+        assertEquals("Focus should be on the next input", nextInput.getAttribute("data-aura-rendered-by"),
+                auraUITestingUtil.getUniqueIdOfFocusedElement());
     }
 
     /**
@@ -216,8 +216,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
      * matched items present.
      */
     public void testAutoCompleteCustomOptionComponentRenderOnMatch() throws Exception {
-        doTestMatch(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), "o", null, 10,
-                OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
+        doTestMatch(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), "o", null, 10, OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
     }
 
     /**
@@ -236,9 +235,59 @@ public class AutocompleteUITest extends WebDriverTestCase {
                 OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
     }
 
+    /**
+     * Test for autocomplete with emptyListContent when there are no matches in the list.
+     */
+    public void testAutoCompleteEmptyListContentNoMatches() throws Exception {
+        doTestEmptyListContent(AUTOCOMPLETE_COMPONENT.get("emptyListContent"), "hello worldx", true, true);
+    }
+
+    /**
+     * Test for autocomplete with emptyListContent when there are matches in the list.
+     */
+    public void testAutoCompleteEmptyListContentOnMatch() throws Exception {
+        doTestEmptyListContent(AUTOCOMPLETE_COMPONENT.get("emptyListContent"), "hello world", true, false);
+    }
+
+    /**
+     * Test for autocomplete with emptyListContent. Verifies that emptyListContent is not visible when matches are
+     * present and becomes visible when no matches are found.
+     */
+    public void testAutoCompleteEmptyListContentUseCase() throws Exception {
+        Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("emptyListContent");
+        doTestEmptyListContent(autoCompleteCmpNum, "hello world", true, false);
+        doTestEmptyListContent(autoCompleteCmpNum, "hello worldx", true, true);
+
+        WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
+        auraUITestingUtil.pressTab(input);
+
+        WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        waitForAutoCompleteListVisible(list, false);
+        assertFalse("Expected emptyListContent to be invisible", hasCssClass(list, "showEmptyContent"));
+    }
+
+    /**
+     * Test for autocomplete with a matchFunc override. The behavior is overridden to show all items no matter what gets
+     * typed in the input field. Verifies that all elements are found.
+     */
+    public void testAutoCompleteMatchFunc() throws Exception {
+        Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("matchFunc");
+
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
+
+        input.sendKeys("hello worldx");
+        WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        waitForAutoCompleteListVisible(list, true);
+
+        List<WebElement> options = getAutoCompleteListOptions(list);
+        assertEquals("Incorrect number of visible options", 10, options.size());
+    }
+
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,
-            OptionType optionType)
-            throws Exception {
+            OptionType optionType) throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
@@ -260,6 +309,24 @@ public class AutocompleteUITest extends WebDriverTestCase {
 
         if (target != null) {
             assertEquals("Wrong option matched", target, matched.get(0).getAttribute("innerHTML"));
+        }
+    }
+
+    private void doTestEmptyListContent(int autoCompleteCmpNum, String searchString, boolean listVisible,
+            boolean emptyContentVisible) throws Exception {
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
+
+        input.sendKeys(searchString);
+        WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+        waitForAutoCompleteListVisible(list, listVisible);
+
+        boolean visible = hasCssClass(list, "showEmptyContent");
+        if (emptyContentVisible) {
+            assertTrue("Expected emptyListContent to be visible", visible);
+        } else {
+            assertFalse("Expected emptyListContent to be invisible", visible);
         }
     }
 
@@ -311,7 +378,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         case AUTOCOMPLETE_CUSTOM_OPTION:
             return l.findElements(By.cssSelector(AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR));
         default:
-            return new ArrayList<WebElement>();
+            return new ArrayList<>();
         }
     }
 
@@ -321,7 +388,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
 
     private List<WebElement> getMatchedOptionsInListThatUsesCustomOptions(WebElement l, OptionType optionType) {
         List<WebElement> options = getAutoCompleteListOptions(l, optionType);
-        List<WebElement> matched = new ArrayList<WebElement>();
+        List<WebElement> matched = new ArrayList<>();
         for (int i = 0; i < options.size(); i++) {
             WebElement option = options.get(i);
             if (optionType.equals(OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION)) {

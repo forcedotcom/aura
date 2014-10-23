@@ -37,7 +37,7 @@ public class DebuggerDirective extends DirectiveImpl {
     @Override
     protected EnumSet<JavascriptGeneratorMode> getDefaultModes() {
         return EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT, JavascriptGeneratorMode.AUTOTESTINGDEBUG,
-                JavascriptGeneratorMode.STATS);
+                JavascriptGeneratorMode.TESTINGDEBUG, JavascriptGeneratorMode.STATS);
     }
 
     @Override

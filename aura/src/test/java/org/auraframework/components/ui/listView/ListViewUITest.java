@@ -26,7 +26,6 @@ import org.auraframework.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public class ListViewUITest extends WebDriverTestCase {
 
@@ -171,7 +170,7 @@ public class ListViewUITest extends WebDriverTestCase {
             assertTrue(
                     "Email 'mailto' link was not present or did not contain correct text",
                     isElementPresentInElementWithText("a", rowCellElements.get(3),
-                            "mailto:" + row.get(headerCells.get(3).toLowerCase())));
+                            row.get(headerCells.get(3).toLowerCase())));
 
             // Fifth column will be Type:Checkbox
             List<WebElement> inputFields = rowCellElements.get(4)
@@ -213,8 +212,8 @@ public class ListViewUITest extends WebDriverTestCase {
         WebElement tBodyElement = tableElement.findElement(By.tagName("tbody"));
         tBodyElement.findElement(By.tagName("tr")).findElement(By.tagName("td")).click();
 
-        waitForGlobalVariableDefinedInWindow("cellClickFired",
-                "Test component's cell click handler was not invoked after click event");
+        assertTrue("Test component's cell click handler was not invoked after click event",
+                isGlobalVariableDefinedInWindow("cellClickFired"));
     }
 
     // For some reason Android doesn't want to click on the header element. This test isn't really relevant to Android
@@ -228,8 +227,8 @@ public class ListViewUITest extends WebDriverTestCase {
         WebElement tHeadElement = tableElement.findElement(By.tagName("thead"));
         tHeadElement.findElement(By.tagName("tr")).findElement(By.tagName("th")).click();
 
-        waitForGlobalVariableDefinedInWindow("headerClickFired",
-                "Test component's header click handler was not invoked after click event");
+        assertTrue("Test component's header click handler was not invoked after click event",
+                isGlobalVariableDefinedInWindow("headerClickFired"));
     }
 
     /**
@@ -238,15 +237,9 @@ public class ListViewUITest extends WebDriverTestCase {
      * @param variableName name of the variable we're looking for
      * @return true if the variable is present, false otherwise
      */
-    private void waitForGlobalVariableDefinedInWindow(final String variableName, final String errorMsg) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-            String script = "return !(typeof " + variableName + " === 'undefined')";
-
-            @Override
-            public Boolean apply(WebDriver d) {
-                return (Boolean) auraUITestingUtil.getRawEval(script);
-            }
-        }, errorMsg);
+    private boolean isGlobalVariableDefinedInWindow(String variableName) {
+        String script = "return !(typeof " + variableName + " === 'undefined')";
+        return (Boolean) auraUITestingUtil.getRawEval(script);
     }
 
     /**
@@ -275,7 +268,7 @@ public class ListViewUITest extends WebDriverTestCase {
      * @return list containing text from each element
      */
     private List<String> getTextFromElements(List<WebElement> elements) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (WebElement element : elements) {
             result.add(element.getText());
         }

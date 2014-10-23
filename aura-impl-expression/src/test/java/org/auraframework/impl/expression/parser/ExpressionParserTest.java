@@ -46,9 +46,9 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         e = buildExpression("(536 + .346) * 1.56 / 634 + 11 % 5");
         assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
 
-        result = 1 - -5;
         e = buildExpression("1 - -5");
-        assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
+        // this is an integer
+        assertEquals("Unexpected expression evaluation", 6.0, e.evaluate(null));
 
         e = buildExpression("true ? true : false ? 16 : 21");
         assertEquals("Unexpected expression evaluation", true, e.evaluate(null));
@@ -322,7 +322,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         assertEquals("Escape sequences not parsed correctly", "'stuff me,' the unfilled teddy bear said to the child.",
                 l.getValue());
 
-        e = buildExpression("'the child blinked and replied,\n \t\\'I\\'d be delighted.\\''");
+        e = buildExpression("'the child blinked and replied,\\n \\t\\'I\\'d be delighted.\\''");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
         assertEquals("Escape sequences not parsed correctly", "the child blinked and replied,\n \t'I'd be delighted.'",
@@ -343,16 +343,15 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     public void testNonEscapeBackslashInString() throws Exception {
         verifyInvalidExpressionException("'not\\u32unicode'", "mismatched character 'u' expecting set null");
         verifyInvalidExpressionException("'\\'", "expecting ''', found '<EOF>'");
-        verifyInvalidExpressionException("'back \\ slash'", "unexpected token: '\\'");
-        verifyInvalidExpressionException("'\\escaped'", "unexpected token: '\\'");
+        verifyInvalidExpressionException("'back \\ slash'", "unexpected token: ' '");
+        verifyInvalidExpressionException("'\\escaped'", "unexpected token: 'e'");
         verifyInvalidExpressionException("'not\\'", "expecting ''', found '<EOF>'");
     }
 
     /**
      * Unicode escapes in strings are parsed correctly.
      */
-    // currently fails
-    public void _testUnicodeEscapesInString() throws Exception {
+    public void testUnicodeEscapesInString() throws Exception {
         Expression e = buildExpression("'\\u0032'");
         assertEquals(ExpressionType.LITERAL, e.getExpressionType());
         LiteralImpl l = (LiteralImpl) e;
@@ -383,10 +382,10 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         e = buildExpression("and(false, true)");
         assertFalse("Operator could not be accessed as function call", e.evaluate(null));
         e = buildExpression("add(24, 23525)");
-        assertEquals("Operator could not be accessed as function call", 24 + 23525.0, e.evaluate(null));
+        assertEquals("Operator could not be accessed as function call", 24 + 23525, e.evaluate(null));
 
         e = buildExpression("sub(24, add(63, 23525))");
-        assertEquals("Error evaluating nested operators as function calls", 24 - (63 + 23525.0), e.evaluate(null));
+        assertEquals("Error evaluating nested operators as function calls", 24.0 - (63 + 23525), e.evaluate(null));
 
         e = buildExpression("add('The child', ' picked up the teddy bear in one hand')");
         assertEquals("Error adding strings with add operator as function call",

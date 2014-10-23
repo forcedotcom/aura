@@ -190,7 +190,8 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
                     spaceReclaimed += itemRemoved.getSize();
 
                     if (that.debugLoggingEnabled) {
-                        $A.logInternal("MemoryStorageAdapter.evict(): evicted", [key, itemRemoved, spaceReclaimed]);
+                        var msg = ["MemoryStorageAdapter.evict(): evicted", key, itemRemoved, spaceReclaimed].join(" ");
+                        $A.log(msg);
                     }
 
                     if(spaceReclaimed > spaceNeeded || that.mru.length <= 0) {

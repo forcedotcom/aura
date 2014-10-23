@@ -14,6 +14,105 @@
  * limitations under the License.
  */
 ({
+	_initializeOperations: function (cmp) {
+		return {
+			PickOperation   : this._initializePickOperation(),
+			CreateOperation : this._initializeCreateOperation()
+		};
+	},
+	getOperations: function () {
+		if (!this._initializedOperations) {
+			this._operations = this._initializeOperations();
+			this._initializedOperations = true;
+		}
+		return this._operations;
+	},
+	_initializeCreateOperation: function () {
+		var helper = this;
+
+		function CreateOperation(index, itemval, cmp) {
+			this.index = index;
+			this.itemval = itemval;
+			
+			if (cmp._pendingCreates) {
+				cmp._pendingCreates.push(this);
+			} else {
+				cmp._pendingCreates = [this];
+			}
+		}
+
+		CreateOperation.prototype.run = function(cmp) {
+			if (this.running) {
+				// Create is mid flight just return and wait for the operation to complete
+				return;
+			} 
+			
+			this.running = true;
+			
+			var that = this;
+
+			var items = cmp.get("v.items");
+			helper.createComponentForIndex(cmp, items, this.index, function() {
+				// Remove this create op from the set of pending creates
+				var i = $A.util.arrayIndexOf(cmp._pendingCreates, that);
+				if (i >= 0) {
+					cmp._pendingCreates.splice(i, 1);
+				}
+				
+				this.running = false;
+			});
+		}
+
+		CreateOperation.prototype.toString = function() {
+			return "create(" + this.index + ")";
+		}
+
+		return CreateOperation;
+	},
+	_initializePickOperation: function () {
+		var helper = this;
+
+		function PickOperation(itemval, sourceIndex, targetIndex, components, indexVar, varName) {
+			this.itemval = itemval;
+			this.sourceIndex = sourceIndex;
+			this.targetIndex = targetIndex;
+			this.components = components;
+			this.indexVar = indexVar;
+			this.varName = varName;
+		}
+
+		PickOperation.prototype.run = function(cmp) {
+			var moved = this.sourceIndex !== this.targetIndex;
+			
+			helper.trackItem(cmp, this.itemval, this.targetIndex, this.components);
+			
+			for (var n = 0; n < this.components.length; n++) {
+				var component = this.components[n];
+
+				if (moved) {
+					// Update the index to match the new position in the facet
+					//var vp = component;//.getAttributeValueProvider();
+					// Just can't see how you wouldn't want the attributeValueProvider here
+                    var vp = component.getAttributeValueProvider();
+					if (vp) {
+						vp.set(this.indexVar, this.targetIndex);
+                        //JBUCH: HALO: FIXME: THIS IS TO DEAL WITH THE CHANGE TO PTVs BELOW:
+                        // extraProviders[varName] = cmp.getReference("v.items[" + index + "]");
+                        vp.set(this.varName, cmp.getReference("v.items[" + this.targetIndex + "]"));
+                    }
+					
+//					$A.renderingService.requestRerender(component);
+				}
+			}
+		}
+
+		PickOperation.prototype.toString = function() {
+			return "pick(" + this.sourceIndex + ") to " + this.targetIndex;
+		}
+
+		return PickOperation;
+
+	},
 	createComponentForIndex : function(cmp, itemsval, index, afterCreationCallback) {
 		var helper = this;
 		
@@ -26,24 +125,21 @@
 				if (--collector.expectedCount === 0) {
 					helper.trackItem(collector.cmp, collector.itemval, collector.targetIndex, collector.components);
 
-					var realbody = helper.createFacetFromTrackingInfo(collector.cmp);
+					var body = helper.createFacetFromTrackingInfo(collector.cmp);
 					
-					collector.cmp.set("v.realbody", realbody);
+					collector.cmp.set("v.body", body);
 					
 					if (afterCreationCallback) {
 						afterCreationCallback();
 					}
-					
-					// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
-					//$A.renderingService.removeDirtyValue(collector.cmp.getValue("v.realbody"));
 				}
 			};
 		}
 
-		var itemval = itemsval.getValue(index);
+		var itemval = itemsval[index];
 
 		// Clone the body for this row
-		var body = cmp.get("v.body");
+		var template = cmp.get("v.template");
 		
 		var forceServer = cmp.get("v.forceServer");
 		var collector = {
@@ -51,7 +147,7 @@
 			itemval : itemval,
 			components : [],
 			cmp : cmp,
-			expectedCount : body.length
+			expectedCount : template.length
 		};
 		
 		this.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
@@ -59,7 +155,7 @@
 		});
 	},
 	
-	createRealBodyServer : function(cmp) {
+	createBodyServer : function(cmp) {
 		var helper = this;
 		
 		function createComponentsForIndexFromServer(cmp, itemsval, index) {
@@ -77,31 +173,25 @@
 			return ret;
 		}
 
-		// Although this is becoming an anti-pattern, we actually DO want
-		// getValue() here.  With it, we end up sharing model objects (under
-		// a PassthroughValue for sub-component ownership).  Without it,
-		// ValueFactory makes us a NEW object for child components, and we
-		// don't share a data model.
-		var itemsval = cmp.getValue("v.items");
-
-		if (itemsval && itemsval.getLength && itemsval.getLength() > 0) {
-			$A.pushCreationPath("realbody");
-
+		var items = cmp.get("v.items");
+		if (items && items.length > 0) {
+			$A.pushCreationPath("body");
+			
 			this.resetItemTracking(cmp);
 
 			var startIndex = this.getStart(cmp);
 			var endIndex = this.getEnd(cmp);
 
 			for (var i = startIndex; i < endIndex; i++) {
-				var components = createComponentsForIndexFromServer(cmp, itemsval, i);
+				var components = createComponentsForIndexFromServer(cmp, items, i);
 
-				this.trackItem(cmp, itemsval.getValue(i), i, components);
+				this.trackItem(cmp, items[i], i, components);
 			}
 
-			$A.popCreationPath("realbody");
+			$A.popCreationPath("body");
 		}
 
-		return this.getUpdatedRealBody(cmp);
+		return this.getUpdatedBody(cmp);
 	},
 	
 	resetItemTracking : function(cmp) {
@@ -126,95 +216,20 @@
 	},
 
 	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
-		function PickOperation(itemval, sourceIndex, targetIndex, components, indexVar, varName) {
-			this.itemval = itemval;
-			this.sourceIndex = sourceIndex;
-			this.targetIndex = targetIndex;
-			this.components = components;
-			this.indexVar = indexVar;
-			this.varName = varName;
-		}
-
-		var helper = this;
-		
-		PickOperation.prototype.run = function(cmp) {
-			var moved = this.sourceIndex !== this.targetIndex;
-			
-			helper.trackItem(cmp, this.itemval, this.targetIndex, this.components);
-			
-			for (var n = 0; n < this.components.length; n++) {
-				var component = this.components[n];
-
-				if (moved) {
-					// Update the index to match the new position in the facet
-					var vp = component.getAttributeValueProvider();
-					if (vp) {
-						vp.set(indexVar, this.targetIndex);
-					}
-					
-					$A.renderingService.requestRerender(component);
-				}
-			}
-		}
-
-		PickOperation.prototype.toString = function() {
-			return "pick(" + this.sourceIndex + ") to " + this.targetIndex;
-		}
-
-		function CreateOperation(index, itemval, cmp) {
-			this.index = index;
-			this.itemval = itemval;
-			
-			if (cmp._pendingCreates) {
-				cmp._pendingCreates.push(this);
-			} else {
-				cmp._pendingCreates = [this];
-			}
-		}
-
-		CreateOperation.prototype.run = function(cmp) {
-			if (this.running) {
-				// Create is mid flight just return and wait for the operation to complete
-				return;
-			} 
-			
-			this.running = true;
-			
-			var that = this;
-			// Although this is becoming an anti-pattern, we actually DO want
-			// getValue() here.  With it, we end up sharing model objects (under
-			// a PassthroughValue for sub-component ownership).  Without it,
-			// ValueFactory makes us a NEW object for child components, and we
-			// don't share a data model.
-			var itemsval = cmp.getValue("v.items");
-			helper.createComponentForIndex(cmp, itemsval, this.index, function() {
-				// Remove this create op from the set of pending creates
-				var i = $A.util.arrayIndexOf(cmp._pendingCreates, that);
-				if (i >= 0) {
-					cmp._pendingCreates.splice(i, 1);
-				}
-				
-				this.running = false;
-			});
-		}
-
-		CreateOperation.prototype.toString = function() {
-			return "create(" + this.index + ")";
-		}
-
+		var OperationConstructors = this.getOperations();
 		var itemInfos = this.getItemTracking(cmp).slice();
 		var pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.slice() : undefined;
 		var operations = [];
 
 		for (var i = start; i < end; i++) {
-			var itemval = itemsval.getValue(i);
+			var itemval = itemsval[i];
 
 			// Find existing itemInfo for this item
 			var found = false;
 			for (var j = 0; j < itemInfos.length; j++) {
 				var info = itemInfos[j];
 				if (info && itemval === info.itemval) {
-					operations.push(new PickOperation(itemval, j, i, info.components, indexVar, varName));
+					operations.push(new OperationConstructors.PickOperation(itemval, j, i, info.components, indexVar, varName));
 
 					// Consume the item
 					itemInfos[j] = undefined;
@@ -227,7 +242,7 @@
 			if (!found && pendingCreates) {
 				for (var n = 0; n < pendingCreates.length; n++) {
 					var op = pendingCreates[n];
-					if ($A.util.equalBySource(itemval, op.itemval)) {
+					if (itemval===op.itemval) {
 						op.index = i;
 						
 						operations.push(op);
@@ -241,39 +256,34 @@
 			
 			if (!found) {
 				// Add a create to the list operations to be satisfied
-				operations.push(new CreateOperation(i, itemval, cmp));
+				operations.push(new OperationConstructors.CreateOperation(i, itemval, cmp));
 			}
 		}
 		
 		return operations;
 	},
 
-	updateRealBody : function(cmp) {
-		var realbody = this.getUpdatedRealBody(cmp);
-
-		cmp.set("v.realbody", realbody);
-		
-		// DCHASMAN TODO Rename this horrible misnomer that has nothing to do with rendering and everything to do with updating the contents of the iteration!!!
+	updateBody : function(cmp) {
+		var body = this.getUpdatedBody(cmp);
+		cmp.set("v.body", body);
 		cmp.getEvent("rerenderComplete").fire();
-
-		// DCHASMAN TODO Figure out the best way to deal with the coupling between ArrayValue.commit() and rerendering -> auto Component.destroy()
-		//$A.renderingService.removeDirtyValue(cmp.getValue("v.realbody"));
 	},
 
-	getUpdatedRealBody : function(cmp) {
-        // Although this is becoming an anti-pattern, we actually DO want
-        // getValue() here.  With it, we end up sharing model objects (under
-        // a PassthroughValue for sub-component ownership).  Without it,
-        // ValueFactory makes us a NEW object for child components, and we
-        // don't share a data model.
-        var itemsval = cmp.getValue("v.items");
+	getUpdatedBody : function(cmp) {
+        var items = cmp.get("v.items")||[];
         var varName = cmp.get("v.var");
 		var indexVar = cmp.get("v.indexVar");
 
-		var operations = this.getTransformation(cmp, itemsval, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
+        if($A.util.isExpression(items)){
+            items=items.evaluate();
+        }
+        if(!$A.util.isArray(items)){
+            $A.warning("ui:iteration.update: 'v.items' must be a valid Array. Found '"+items+"'. Resetting to empty Array.");
+            items=[];
+        }
+		var operations = this.getTransformation(cmp, items, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
 				
 		this.resetItemTracking(cmp);
-		// Clean previous components before replacing the body
 		for (var n = 0; n < operations.length; n++) {
 			operations[n].run(cmp);
 		}
@@ -282,16 +292,16 @@
 	},
 
 	createFacetFromTrackingInfo : function(cmp) {
-		var realbody = [];
+		var body = [];
 		var trackingInfo = this.getItemTracking(cmp);
 		for (var n = 0; n < trackingInfo.length; n++) {
 			var info = trackingInfo[n];
 			if (info) {
-				realbody = realbody.concat(info.components);
+				body = body.concat(info.components);
 			}
 		}
 		
-		return realbody;
+		return body;
 	},
 
 	getStart : function(cmp) {
@@ -300,25 +310,21 @@
 	},
 
 	getEnd : function(cmp) {
-	    // Although this is becoming an anti-pattern, we actually DO want
-        // getValue() here.  With it, we end up sharing model objects (under
-        // a PassthroughValue for sub-component ownership).  Without it,
-        // ValueFactory makes us a NEW object for child components, and we
-        // don't share a data model.
-        var itemsval = cmp.getValue("v.items");
-		var length = itemsval && itemsval.getLength ? itemsval.getLength() : 0;
+	    var items = cmp.get("v.items");
+		var length = items && items.length || 0;
 		var end = cmp.get("v.end");
 		
 		return !$A.util.isEmpty(end) ? Math.min(length, this.getNumber(end)) : length;
 	},
 	
-	createComponents : function(cmp, itemsval, index, behavior) {
+	createComponents : function(cmp, items, index, behavior) {
 		function createExtraProviders(cmp, itemval, index) {
 			var varName = cmp.get("v.var");
 			var indexVar = cmp.get("v.indexVar");
 			var extraProviders = {};
 			
-			extraProviders[varName] = $A.expressionService.create(cmp, itemval);
+			//extraProviders[varName] = $A.expressionService.create(cmp, itemval);
+			extraProviders[varName] = cmp.getReference("v.items[" + index + "]"); 
 			if (indexVar) {
 				extraProviders[indexVar] = $A.expressionService.create(cmp, index);
 			}
@@ -327,11 +333,11 @@
 		}
 
 		var ivp;
-		var body = cmp.get("v.body");
+		var body = cmp.get("v.template");
 		for (var n = 0; n < body.length; n++) {
 			var cdr = body[n];
 			if (!ivp) {
-				var extraProviders = createExtraProviders(cmp, itemsval.getValue(index), index);
+				var extraProviders = createExtraProviders(cmp, items[index], index);
 				ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
 			}
 

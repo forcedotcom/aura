@@ -25,7 +25,7 @@
     },
 
     setCapitalItems: function(cmp, evt) {
-        var other = cmp.get("m.capitaldata");
+        var other = cmp.get("m.capitalData");
         cmp.find("iteration").set("v.items", other);
     },
 
@@ -44,8 +44,8 @@
 
     insertOneValue: function(cmp, evt) {
         var data = cmp.find("iteration").get("v.items");
-        data.splice(parseInt(cmp.get("v.tochange"), 10), 
-        			0, 
+        data.splice(parseInt(cmp.get("v.tochange"), 10),
+        			0,
         			{"stringy":cmp.get("v.newvalue")});
         cmp.find("iteration").set("v.items", data);
     },

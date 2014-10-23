@@ -19,8 +19,15 @@
 	<aura:description>
 		<p>
 			A <code>ui:outputEmail</code> component represents an email output that is wrapped in an HTML <code>span</code> tag.
-			This component is typically used with <code>ui:inputEmail</code>, which takes in an email input. 
-			To render this component in an anchor element and automatically append <code>mailto</code> in the <code>href</code> attribute, set <code>actionable</code> to <code>true</code>.
+			This component can be used with <code>ui:inputEmail</code>, which takes in an email input. 
+			The email output is wrapped in an HTML anchor element and <code>mailto</code> is automatically appended to it.
+			This is a simple set up of a <code>ui:outputEmail</code> component.
 		</p>
+		<pre>&lt;ui:outputEmail value="abc@email.com" label="abc@email.com"/></pre>
+		<p>The previous example renders the following HTML.</p>
+		<pre>&lt;a href="mailto:abc@email.com" class="uiOutputEmail">abc@email.com&lt;/span></pre>
 	</aura:description>	
+	<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
+    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	</aura:example>
 </aura:documentation>

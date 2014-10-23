@@ -30,7 +30,8 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 
 public class DefinitionAccessImpl implements DefinitionAccess {
-    
+    private static final long serialVersionUID = 8409052764733035151L;
+
     static public DefinitionAccess defaultAccess(String namespace) {
         return new DefinitionAccessImpl(Aura.getConfigAdapter().isPrivilegedNamespace(namespace));
     }

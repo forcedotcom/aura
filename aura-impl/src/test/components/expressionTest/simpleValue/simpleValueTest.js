@@ -20,26 +20,28 @@
 	    $A.test.assertEquals(value , component._log[0].value, "unexpected value of change");
 	    component._log = undefined; // reset log
 	},
-	//TODO ##$$: RJ Refactor this test case after halo work, the "halo" branch has the correct code
+
     testCreateSimpleValue:{
-		test:[function(component){
-			var value = $A.expressionService.create(null, true);
-			$A.test.assertNotNull(value);
-			
-			//Initial Value is TRUE
-			//$A.test.assertTrue(value); ##$$ uncomment this line
-			$A.test.assertTrue(value.unwrap());//##$$ Remove this line
-			component.set("v.booleanValue", false);
-			//Set value to FALSE
-			$A.test.assertFalse(component.get("v.booleanValue"), "get() should reflect latest value");
-		},function(component){
-		    var val = $A.expressionService.create(null, undefined);
-		    //$A.test.assertUndefined(val, "expected undefined as value"); ##$$ uncomment this line
-		    $A.test.assertUndefined(val.unwrap(), "expected undefined as value"); //##$$ Remove this line
-		    val = $A.expressionService.create(null, null);
-		    //$A.test.assertNull(val, "expected null as value"); ##$$ uncomment this line
-		    $A.test.assertNull(val.unwrap(), "expected null as value"); //##$$ Remove this line
-		}]
+		test:[
+			function(component){
+				var value = $A.expressionService.create(null, true);
+				$A.test.assertNotNull(value);
+				
+				//Initial Value is TRUE
+				$A.test.assertTrue(value);
+
+				component.set("v.booleanValue", false);
+				//Set value to FALSE
+				$A.test.assertFalse(component.get("v.booleanValue"), "get() should reflect latest value");
+			},
+			function(component){
+			    var val = $A.expressionService.create(null, undefined);
+			    $A.test.assertUndefined(val, "expected undefined as value");
+
+			    val = $A.expressionService.create(null, null);
+			    $A.test.assertNull(val, "expected null as value"); 
+			}
+		]
     },
     testGetSetSimpleValues: {
     	attributes : {

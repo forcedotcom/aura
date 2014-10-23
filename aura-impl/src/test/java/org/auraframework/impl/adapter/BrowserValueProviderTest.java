@@ -193,8 +193,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserTypes(UserAgent.IE7, false, false, false, true, false, false, false, false);
         assertBrowserTypes(UserAgent.IE8, false, false, false, false, true, false, false, false);
         assertBrowserTypes(UserAgent.IE9, false, false, false, false, false, true, false, false);
-        // TODO(W-2383688): IE10 user agent is being reported as IE9
-        // assertBrowserTypes(UserAgent.IE10, false, false, false, false, false, false, true, false);
+        assertBrowserTypes(UserAgent.IE10, false, false, false, false, false, false, true, false);
         assertBrowserTypes(UserAgent.IE11, false, false, false, false, false, false, false, true);
         assertBrowserTypes(UserAgent.IE11_WINDOWS_PHONE_8_1_SDK, false, false, false, false, false, false, false,
                 true);

@@ -92,7 +92,7 @@
     },
 
     /**
-     * Verify component with PropertyChain in MapValue attributes has correct values
+     * Verify component with PropertyReferenceValue in MapValue attributes has correct values
      */
     testMapValueProviderForDefFetchedFromServer:{
         test: function(cmp){
@@ -105,11 +105,12 @@
                 $A.test.assertEquals("markup://loadLevelTest:displayMap",
                     mapCmp.getDef().getDescriptor().getQualifiedName(),
                     "Failed to create new component: markup://loadLevelTest:displayMap");
-                $A.test.assertEquals("barFoo", mapCmp.get('v.map.propRef'), "Wrong value for v.map.propRef");
-                $A.test.assertEquals("barFoo", mapCmp.get('v.map.map2.propRef'), "Wrong value for v.map.map2.propRef");
-                mapCmp.set("v.stringAttribute", "fooBar");
-                $A.test.assertEquals("fooBar", mapCmp.get('v.map.propRef'), "Wrong value for v.map.propRef. Should be updated");
-                $A.test.assertEquals("fooBar", mapCmp.get('v.map.map2.propRef'), "Wrong value for v.map.map2.propRef. Should be updated");
+                $A.test.assertEquals("fooBar", mapCmp.get('v.map.propRef'), "Wrong value for v.map.propRef");
+                $A.test.assertEquals("fooBar", mapCmp.get('v.map.map2.propRef'), "Wrong value for v.map.map2.propRef");
+                
+                cmp.set("v.stringAttribute", "somethingNew");
+                $A.test.assertEquals("somethingNew", mapCmp.get('v.map.propRef'), "Wrong value for v.map.propRef. Should be updated");
+                $A.test.assertEquals("somethingNew", mapCmp.get('v.map.map2.propRef'), "Wrong value for v.map.map2.propRef. Should be updated");
 
                 // Verify that new Component was provided the local id specified in config
                 $A.test.assertTruthy(cmp.find("map_Id"), "Failed to find new Component with its localId");

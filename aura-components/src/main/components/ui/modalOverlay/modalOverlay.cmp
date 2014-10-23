@@ -39,7 +39,7 @@
     <aura:dependency resource="markup://ui:panelTransitionEnd" type="EVENT" />
     <aura:dependency resource="markup://ui:updateSize" type="EVENT" />
     
-	<div>
+	<div class="{!v.class}">
 		<!-- Full screen grey glass behind the modal -->
 	    <div aura:id='modal-glass' class="modal-glass" style="display:none"></div>
 	    

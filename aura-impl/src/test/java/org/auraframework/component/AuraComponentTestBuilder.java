@@ -61,6 +61,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         cla = new ComponentLocationAdapter.Impl(componentsPath.toFile());
     }
 
+    @Override
     public void close() {
         if (componentsPath != null) {
             try {
@@ -184,6 +185,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case TESTCASE:
         case VAR:
         case THEME_DEF_REF:
+        case ATTRIBUTE_DESIGN:
             qualified = name;
             break;
         case APPLICATION:
@@ -196,6 +198,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case LAYOUTS:
         case NAMESPACE:
         case THEME:
+        case DESIGN:
             qualified = String.format("%s:%s", ns, name);
             break;
         }

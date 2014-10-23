@@ -18,12 +18,9 @@ package org.auraframework.impl.expression.functions;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.TERNARY;
 import static org.auraframework.impl.expression.functions.MathFunctions.ABSOLUTE;
 import static org.auraframework.impl.expression.functions.MathFunctions.DIVIDE;
-import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN;
-import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN_OR_EQUAL;
-import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN;
-import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MathFunctions.MODULUS;
 import static org.auraframework.impl.expression.functions.MathFunctions.MULTIPLY;
 import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
@@ -31,11 +28,18 @@ import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT
 import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
 import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
 import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
-import static org.auraframework.impl.expression.functions.MultiFunctions.TERNARY;
+import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN;
+import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
+import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
+
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Basic tests of functions
@@ -63,10 +67,10 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     /**
-     * add() always returns a Double.
+     * add() returns the best type available.
      */
     public void testAddTwoInts() throws Exception {
-        assertEquals(235639.0, evaluate(ADD, 314, 235325));
+        assertEquals(235639, evaluate(ADD, 314, 235325));
     }
 
     public void testAddInfinityAndInt() throws Exception {
@@ -87,64 +91,116 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.MAX_VALUE, evaluate(ADD, Double.MAX_VALUE, 2.0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddStringAndDouble() throws Exception {
+    public void testAddStringAndDouble() throws Exception {
         assertEquals("0937.1652", evaluate(ADD, "0", 937.1652));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddZeroAndString() throws Exception {
+    public void testAddZeroAndString() throws Exception {
         assertEquals("01", evaluate(ADD, 0, "1"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddIntAndEmptyString() throws Exception {
+    public void testAddIntAndEmptyString() throws Exception {
         assertEquals("314", evaluate(ADD, 314, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddEmptyStringAndInt() throws Exception {
+    public void testAddEmptyStringAndInt() throws Exception {
         assertEquals("314", evaluate(ADD, "", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddInfinityAndString() throws Exception {
+    public void testAddInfinityAndString() throws Exception {
         assertEquals("InfinityAndBeyond", evaluate(ADD, Double.POSITIVE_INFINITY, "AndBeyond"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddStringAndNegativeInfinity() throws Exception {
+    public void testAddStringAndNegativeInfinity() throws Exception {
         assertEquals("Random-Infinity", evaluate(ADD, "Random", Double.NEGATIVE_INFINITY));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddStringAndNaN() throws Exception {
+    public void testAddStringAndNaN() throws Exception {
         assertEquals("1NaN", evaluate(ADD, "1", Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddNullAndInt() throws Exception {
+    public void testAddNullAndInt() throws Exception {
         assertEquals(1, evaluate(ADD, null, 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddNullAndString() throws Exception {
-        assertEquals("b", evaluate(ADD, null, "b"));
+    public void testAddNullAndString() throws Exception {
+        assertEquals("nullb", evaluate(ADD, null, "b"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddNullAndDouble() throws Exception {
+    public void testAddNullAndDouble() throws Exception {
         assertEquals(2.5, evaluate(ADD, null, 2.5));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddStringAndNull() throws Exception {
-        assertEquals("c", evaluate(ADD, "c", null));
+    public void testAddStringAndNull() throws Exception {
+        assertEquals("cnull", evaluate(ADD, "c", null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAddTwoNulls() throws Exception {
-        assertEquals("", evaluate(ADD, null, null));
+    public void testAddTwoNulls() throws Exception {
+        assertEquals(0, evaluate(ADD, null, null));
+    }
+    
+    public void testAddStringAndNegativeZero() throws Exception {
+    	assertEquals("-0", evaluate(ADD, "", -0.0));
+    }
+
+    public void testAddListNullAndString() throws Exception {
+        List<Object> nullList = Lists.newArrayList();
+        nullList.add(null);
+        assertEquals("a", evaluate(ADD, nullList, "a"));
+    }
+
+    public void testAddList123AndString() throws Exception {
+        assertEquals("1,2,3a", evaluate(ADD, Lists.newArrayList(1, 2, 3), "a"));
+    }
+
+    public void testAddListNullStringAndEmptyString() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        list.add(null);
+        list.add("a");
+        assertEquals(",a", evaluate(ADD, list, ""));
+    }
+
+    public void testAddNestedListNullStringAndEmptyString() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        List<Object> nested = Lists.newArrayList();
+        list.add("a");
+        list.add(nested);
+        nested.add("b");
+        nested.add("c");
+        assertEquals("a,b,c", evaluate(ADD, list, ""));
+    }
+
+    public void testAddTooDeep() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        List<Object> nested = Lists.newArrayList();
+        List<Object> nested2 = Lists.newArrayList();
+        List<Object> nested3 = Lists.newArrayList();
+        List<Object> nested4 = Lists.newArrayList();
+        list.add("a");
+        list.add(nested);
+        nested.add(nested2);
+        nested2.add(nested3);
+        nested3.add(nested4);
+        nested4.add("d");
+        nested.add("b");
+        nested.add("c");
+        assertEquals("a,Too Deep,b,c", evaluate(ADD, list, ""));
+    }
+
+    public void testAddLoop() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        List<Object> nested = Lists.newArrayList();
+        list.add("a");
+        list.add(nested);
+        nested.add(list);
+        assertEquals("a,a,Too Deep", evaluate(ADD, list, ""));
+    }
+
+    public void testAddMapAndEmptyString() throws Exception {
+        Map<Object,Object> map = Maps.newHashMap();
+        map.put("a", null);
+        map.put("b", "c");
+        assertEquals("[object Object]", evaluate(ADD, map, ""));
     }
 
     public void testEqualsSameIntAndDouble() throws Exception {
@@ -266,43 +322,35 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(null, evaluate(TERNARY, Boolean.FALSE, "1", null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryNull() throws Exception {
+    public void testTernaryNull() throws Exception {
         assertEquals("2", evaluate(TERNARY, null, "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryStringTrue() throws Exception {
+    public void testTernaryStringTrue() throws Exception {
         assertEquals("1", evaluate(TERNARY, "true", "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryZero() throws Exception {
+    public void testTernaryZero() throws Exception {
         assertEquals("2", evaluate(TERNARY, 0, "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryDouble() throws Exception {
+    public void testTernaryDouble() throws Exception {
         assertEquals("1", evaluate(TERNARY, 3146431.43266, "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryStringZero() throws Exception {
+    public void testTernaryStringZero() throws Exception {
         assertEquals("1", evaluate(TERNARY, "0", "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryStringFalse() throws Exception {
+    public void testTernaryStringFalse() throws Exception {
         assertEquals("1", evaluate(TERNARY, "false", "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryEmptyString() throws Exception {
+    public void testTernaryEmptyString() throws Exception {
         assertEquals("2", evaluate(TERNARY, "", "1", "2"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testTernaryNaN() throws Exception {
+    public void testTernaryNaN() throws Exception {
         assertEquals("2", evaluate(TERNARY, Double.NaN, "1", "2"));
     }
 
@@ -316,7 +364,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     public void testSubtractIntAndStringInt() throws Exception {
-        assertEquals(null, evaluate(SUBTRACT, 1, "1"));
+        assertEquals(0.0, evaluate(SUBTRACT, 1, "1"));
     }
 
     public void testSubtractIntAndDouble() throws Exception {
@@ -335,59 +383,44 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(SUBTRACT, 3, Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractIntAndString() throws Exception {
+    public void testSubtractIntAndString() throws Exception {
         assertEquals(Double.NaN, evaluate(SUBTRACT, 3, "5c"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractIntAndEmptyString() throws Exception {
-        assertEquals(3, evaluate(SUBTRACT, 3, ""));
+    public void testSubtractIntAndEmptyString() throws Exception {
+        assertEquals(3.0, evaluate(SUBTRACT, 3, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractStringAndInt() throws Exception {
+    public void testSubtractStringAndInt() throws Exception {
         assertEquals(Double.NaN, evaluate(SUBTRACT, "5c", 3));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractEmptyStringAndInt() throws Exception {
-        assertEquals(-3, evaluate(SUBTRACT, "", 3));
+    public void testSubtractEmptyStringAndInt() throws Exception {
+        assertEquals(-3.0, evaluate(SUBTRACT, "", 3));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractTwoEmptyStrings() throws Exception {
-        assertEquals(0, evaluate(SUBTRACT, "", ""));
+    public void testSubtractTwoEmptyStrings() throws Exception {
+        assertEquals(0.0, evaluate(SUBTRACT, "", ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractIntAndStringInt() throws Exception {
-        assertEquals(2, evaluate(SUBTRACT, 3, "1"));
+    public void testSubtractStringIntAndInt() throws Exception {
+        assertEquals(3.0, evaluate(SUBTRACT, "4", 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractStringIntAndInt() throws Exception {
-        assertEquals(3, evaluate(SUBTRACT, "4", 1));
+    public void testSubtractTwoStringInts() throws Exception {
+        assertEquals(-2.0, evaluate(SUBTRACT, "3", "5"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractTwoStringInts() throws Exception {
-        assertEquals(-2, evaluate(SUBTRACT, "3", "5"));
+    public void testSubtractIntAndNull() throws Exception {
+        assertEquals(2.0, evaluate(SUBTRACT, 2, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractIntAndNull() throws Exception {
-        assertEquals(2, evaluate(SUBTRACT, 2, null));
-    }
-
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractNullAndDouble() throws Exception {
+    public void testSubtractNullAndDouble() throws Exception {
         assertEquals(-3.1, evaluate(SUBTRACT, null, 3.1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testSubtractTwoNulls() throws Exception {
-        assertEquals(0, evaluate(SUBTRACT, null, null));
+    public void testSubtractTwoNulls() throws Exception {
+        assertEquals(0.0, evaluate(SUBTRACT, null, null));
     }
 
     public void testMultiplyIntAndDouble() throws Exception {
@@ -422,44 +455,36 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(MULTIPLY, 1, Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyIntAndString() throws Exception {
+    public void testMultiplyIntAndString() throws Exception {
         assertEquals(Double.NaN, evaluate(MULTIPLY, 5, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyStringAndInt() throws Exception {
+    public void testMultiplyStringAndInt() throws Exception {
         assertEquals(Double.NaN, evaluate(MULTIPLY, "5o", 9));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyTwoStrings() throws Exception {
+    public void testMultiplyTwoStrings() throws Exception {
         assertEquals(Double.NaN, evaluate(MULTIPLY, "5o", "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyIntAndStringDouble() throws Exception {
+    public void testMultiplyIntAndStringDouble() throws Exception {
         assertEquals(2.2, evaluate(MULTIPLY, 2, "1.1"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyStringIntAndStringDouble() throws Exception {
-        assertEquals("21.7", evaluate(MULTIPLY, "7", "3.1"));
+    public void testMultiplyStringIntAndStringDouble() throws Exception {
+        assertEquals(21.7, evaluate(MULTIPLY, "7", "3.1"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyIntAndNull() throws Exception {
-        assertEquals(0, evaluate(MULTIPLY, 3, null));
+    public void testMultiplyIntAndNull() throws Exception {
+        assertEquals(0.0, evaluate(MULTIPLY, 3, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyNullAndNegativeDouble() throws Exception {
-        assertEquals(0, evaluate(MULTIPLY, null, -0.1));
+    public void testMultiplyNullAndNegativeDouble() throws Exception {
+        assertEquals(-0.0, evaluate(MULTIPLY, null, -0.1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testMultiplyTwoNulls() throws Exception {
-        assertEquals(0, evaluate(MULTIPLY, null, null));
+    public void testMultiplyTwoNulls() throws Exception {
+        assertEquals(0.0, evaluate(MULTIPLY, null, null));
     }
 
     public void testDivideDoubleAndNegativeDouble() throws Exception {
@@ -490,38 +515,35 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(DIVIDE, 1, Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideStringAndInt() throws Exception {
+    public void testDivideStringAndInt() throws Exception {
         assertEquals(Double.NaN, evaluate(DIVIDE, "5o", 3));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideIntAndString() throws Exception {
+    public void testDivideIntAndString() throws Exception {
         assertEquals(Double.NaN, evaluate(DIVIDE, 3, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideTwoStrings() throws Exception {
-        assertEquals(Double.NaN, evaluate(DIVIDE, "5.5", "1.1"));
+    public void testDivideTwoStringDoubles() throws Exception {
+        assertEquals(5.0, evaluate(DIVIDE, "5.5", "1.1"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideIntAndInfinity() throws Exception {
-        assertEquals(0, evaluate(DIVIDE, 5, Double.NEGATIVE_INFINITY));
+    public void testDivideIntByNegativeZeroString() throws Exception {
+        assertEquals(Double.NEGATIVE_INFINITY, evaluate(DIVIDE, 1, "-0"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideIntAndNull() throws Exception {
+    public void testDivideIntAndInfinity() throws Exception {
+        assertEquals(-0.0, evaluate(DIVIDE, 5, Double.NEGATIVE_INFINITY));
+    }
+
+    public void testDivideIntAndNull() throws Exception {
         assertEquals(Double.POSITIVE_INFINITY, evaluate(DIVIDE, 3, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideNullAndInt() throws Exception {
-        assertEquals(0, evaluate(DIVIDE, null, 3));
+    public void testDivideNullAndInt() throws Exception {
+        assertEquals(0.0, evaluate(DIVIDE, null, 3));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testDivideTwoNulls() throws Exception {
+    public void testDivideTwoNulls() throws Exception {
         assertEquals(Double.NaN, evaluate(DIVIDE, null, null));
     }
 
@@ -553,28 +575,23 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(MODULUS, 1, Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testModulusIntAndString() throws Exception {
+    public void testModulusIntAndString() throws Exception {
         assertEquals(Double.NaN, evaluate(MODULUS, 3, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testModulusTwoStrings() throws Exception {
-        assertEquals(Double.NaN, evaluate(MODULUS, "23", "4"));
+    public void testModulusTwoStrings() throws Exception {
+        assertEquals(3.0, evaluate(MODULUS, "23", "4"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testModulusIntAndNull() throws Exception {
+    public void testModulusIntAndNull() throws Exception {
         assertEquals(Double.NaN, evaluate(MODULUS, 3, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testModulusNullAndInt() throws Exception {
-        assertEquals(0, evaluate(MODULUS, null, 3));
+    public void testModulusNullAndInt() throws Exception {
+        assertEquals(0.0, evaluate(MODULUS, null, 3));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testModulusTwoNulls() throws Exception {
+    public void testModulusTwoNulls() throws Exception {
         assertEquals(Double.NaN, evaluate(MODULUS, null, null));
     }
 
@@ -594,24 +611,20 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(ABSOLUTE, Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAbsoluteValueNegativeIntString() throws Exception {
-        assertEquals(5, evaluate(ABSOLUTE, "-5"));
+    public void testAbsoluteValueNegativeIntString() throws Exception {
+        assertEquals(5.0, evaluate(ABSOLUTE, "-5"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAbsoluteValueString() throws Exception {
+    public void testAbsoluteValueString() throws Exception {
         assertEquals(Double.NaN, evaluate(ABSOLUTE, "-5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAbsoluteValueEmptyString() throws Exception {
-        assertEquals(0, evaluate(ABSOLUTE, ""));
+    public void testAbsoluteValueEmptyString() throws Exception {
+        assertEquals(0.0, evaluate(ABSOLUTE, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAbsoluteValueNull() throws Exception {
-        assertEquals(0, evaluate(ABSOLUTE, (Object) null));
+    public void testAbsoluteValueNull() throws Exception {
+        assertEquals(0.0, evaluate(ABSOLUTE, (Object) null));
     }
 
     public void testNegatePositiveDouble() throws Exception {
@@ -630,24 +643,20 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(NEGATE, Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testNegateString() throws Exception {
+    public void testNegateString() throws Exception {
         assertEquals(Double.NaN, evaluate(NEGATE, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testNegateStringInt() throws Exception {
-        assertEquals(-5, evaluate(NEGATE, "5"));
+    public void testNegateStringInt() throws Exception {
+        assertEquals(-5.0, evaluate(NEGATE, "5"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testNegateStringEmptyString() throws Exception {
-        assertEquals(0, evaluate(NEGATE, ""));
+    public void testNegateStringEmptyString() throws Exception {
+        assertEquals(-0.0, evaluate(NEGATE, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testNegateStringNull() throws Exception {
-        assertEquals(0, evaluate(NEGATE, (Object) null));
+    public void testNegateStringNull() throws Exception {
+        assertEquals(-0.0, evaluate(NEGATE, (Object) null));
     }
 
     public void testGreaterThanTwoDoubles() throws Exception {
@@ -686,73 +695,59 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, Double.NaN, Double.POSITIVE_INFINITY));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanIntAndString() throws Exception {
+    public void testGreaterThanIntAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, 9000, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanStringAndInt() throws Exception {
+    public void testGreaterThanStringAndInt() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, "5o", 4));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanTwoStrings() throws Exception {
+    public void testGreaterThanTwoStrings() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN, "5o", "4o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanTwoStringInts() throws Exception {
+    public void testGreaterThanTwoStringInts() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN, "5", "3.9"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanTwoStringsDifferentCapitalization() throws Exception {
+    public void testGreaterThanTwoStringsDifferentCapitalization() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, "5A", "5a"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanZeroAndEmptyString() throws Exception {
+    public void testGreaterThanZeroAndEmptyString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, 0, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanStringAndNaN() throws Exception {
+    public void testGreaterThanStringAndNaN() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, "zz", Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanNaNAndString() throws Exception {
+    public void testGreaterThanNaNAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, Double.NaN, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanBooleanTrueAndBooleanFalse() throws Exception {
+    public void testGreaterThanBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN, Boolean.TRUE, Boolean.FALSE));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanBooleanTrueAndZero() throws Exception {
+    public void testGreaterThanBooleanTrueAndZero() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN, Boolean.TRUE, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanBooleanTrueAndInt() throws Exception {
+    public void testGreaterThanBooleanTrueAndInt() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, Boolean.TRUE, 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanIntAndNull() throws Exception {
+    public void testGreaterThanIntAndNull() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN, 1, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanNullAndZero() throws Exception {
+    public void testGreaterThanNullAndZero() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, null, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanTwoNulls() throws Exception {
+    public void testGreaterThanTwoNulls() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, null, null));
     }
 
@@ -792,73 +787,59 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, Double.NaN, Double.POSITIVE_INFINITY));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualIntAndString() throws Exception {
+    public void testGreaterThanOrEqualIntAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, 9000, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualStringAndInt() throws Exception {
+    public void testGreaterThanOrEqualStringAndInt() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, "5o", 4));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualTwoStrings() throws Exception {
+    public void testGreaterThanOrEqualTwoStrings() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, "5o", "4o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualStringIntAndStringDouble() throws Exception {
+    public void testGreaterThanOrEqualStringIntAndStringDouble() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, "5", "3.9"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualTwoStringsDifferentCapitalization() throws Exception {
+    public void testGreaterThanOrEqualTwoStringsDifferentCapitalization() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, "5A", "5a"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualZeroAndEmptyString() throws Exception {
+    public void testGreaterThanOrEqualZeroAndEmptyString() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, 0, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualStringAndNaN() throws Exception {
+    public void testGreaterThanOrEqualStringAndNaN() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, "zz", Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualNaNAndString() throws Exception {
+    public void testGreaterThanOrEqualNaNAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, Double.NaN, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualBooleanTrueAndBooleanFalse() throws Exception {
+    public void testGreaterThanOrEqualBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, Boolean.TRUE, Boolean.FALSE));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualBooleanTrueAndZero() throws Exception {
+    public void testGreaterThanOrEqualBooleanTrueAndZero() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, Boolean.TRUE, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualBooleanTrueAndInt() throws Exception {
+    public void testGreaterThanOrEqualBooleanTrueAndInt() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, Boolean.TRUE, 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualIntAndNull() throws Exception {
+    public void testGreaterThanOrEqualIntAndNull() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, 1, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualNullAndZero() throws Exception {
-        assertEquals(Boolean.FALSE, evaluate(GREATER_THAN_OR_EQUAL, null, 0));
+    public void testGreaterThanOrEqualNullAndZero() throws Exception {
+        assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, null, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testGreaterThanOrEqualNullAndNull() throws Exception {
+    public void testGreaterThanOrEqualNullAndNull() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, null, null));
     }
 
@@ -898,73 +879,59 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, Double.NaN, Double.POSITIVE_INFINITY));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanIntAndString() throws Exception {
+    public void testLessThanIntAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, 9000, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanStringAndInt() throws Exception {
+    public void testLessThanStringAndInt() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, "5o", 4));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanTwoStrings() throws Exception {
+    public void testLessThanTwoStrings() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, "5o", "4o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanStringIntAndStringDouble() throws Exception {
+    public void testLessThanStringIntAndStringDouble() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, "5", "3.9"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanTwoStringsDifferentCapitalization() throws Exception {
+    public void testLessThanTwoStringsDifferentCapitalization() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN, "5A", "5a"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanZeroAndEmptyString() throws Exception {
+    public void testLessThanZeroAndEmptyString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, 0, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanStringAndNaN() throws Exception {
+    public void testLessThanStringAndNaN() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, "zz", Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanNaNAndString() throws Exception {
+    public void testLessThanNaNAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, Double.NaN, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanBooleanTrueAndBooleanFalse() throws Exception {
+    public void testLessThanBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, Boolean.TRUE, Boolean.FALSE));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanBooleanTrueAndZero() throws Exception {
+    public void testLessThanBooleanTrueAndZero() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, Boolean.TRUE, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanBooleanTrueAndInt() throws Exception {
+    public void testLessThanBooleanTrueAndInt() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, Boolean.TRUE, 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanZeroAndNull() throws Exception {
+    public void testLessThanZeroAndNull() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, 0, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanNullAndInt() throws Exception {
+    public void testLessThanNullAndInt() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN, null, 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanTwoNulls() throws Exception {
+    public void testLessThanTwoNulls() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, null, null));
     }
 
@@ -1004,73 +971,59 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, Double.NaN, Double.POSITIVE_INFINITY));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualIntAndString() throws Exception {
+    public void testLessThanOrEqualIntAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, 9000, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualStringAndInt() throws Exception {
+    public void testLessThanOrEqualStringAndInt() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, "5o", 4));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualTwoStrings() throws Exception {
+    public void testLessThanOrEqualTwoStrings() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, "5o", "4o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualStringIntAndStringDouble() throws Exception {
+    public void testLessThanOrEqualStringIntAndStringDouble() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, "5", "3.9"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualTwoStringsDifferentCapitalization() throws Exception {
+    public void testLessThanOrEqualTwoStringsDifferentCapitalization() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN_OR_EQUAL, "5A", "5a"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualZeroAndEmptyString() throws Exception {
-        assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, 0, ""));
+    public void testLessThanOrEqualZeroAndEmptyString() throws Exception {
+        assertEquals(Boolean.TRUE, evaluate(LESS_THAN_OR_EQUAL, 0, ""));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualStringAndNaN() throws Exception {
+    public void testLessThanOrEqualStringAndNaN() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, "zz", Double.NaN));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualNaNAndString() throws Exception {
+    public void testLessThanOrEqualNaNAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, Double.NaN, "5o"));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualBooleanTrueAndBooleanFalse() throws Exception {
+    public void testLessThanOrEqualBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, Boolean.TRUE, Boolean.FALSE));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualBooleanTrueAndZero() throws Exception {
+    public void testLessThanOrEqualBooleanTrueAndZero() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, Boolean.TRUE, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualBooleanTrueAndInt() throws Exception {
+    public void testLessThanOrEqualBooleanTrueAndInt() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN_OR_EQUAL, Boolean.TRUE, 1));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualIntAndNull() throws Exception {
+    public void testLessThanOrEqualIntAndNull() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, 1, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualNullAndZero() throws Exception {
+    public void testLessThanOrEqualNullAndZero() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN_OR_EQUAL, null, 0));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testLessThanOrEqualTwoNulls() throws Exception {
+    public void testLessThanOrEqualTwoNulls() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN_OR_EQUAL, null, null));
     }
 
@@ -1094,38 +1047,31 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(null, evaluate(AND, null, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndTwoInts() throws Exception {
+    public void testAndTwoInts() throws Exception {
         assertEquals(235325, evaluate(AND, 314, 235325));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndZeroAndInt() throws Exception {
+    public void testAndZeroAndInt() throws Exception {
         assertEquals(0, evaluate(AND, 0, 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndStringZeroAndInt() throws Exception {
+    public void testAndStringZeroAndInt() throws Exception {
         assertEquals(314, evaluate(AND, "0", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndStringFalseAndInt() throws Exception {
+    public void testAndStringFalseAndInt() throws Exception {
         assertEquals(314, evaluate(AND, "false", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndEmptyStringAndInt() throws Exception {
+    public void testAndEmptyStringAndInt() throws Exception {
         assertEquals("", evaluate(AND, "", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndNaNAndInt() throws Exception {
+    public void testAndNaNAndInt() throws Exception {
         assertEquals(Double.NaN, evaluate(AND, Double.NaN, 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testAndIntAndEmptyString() throws Exception {
+    public void testAndIntAndEmptyString() throws Exception {
         assertEquals("", evaluate(AND, 314, ""));
     }
 
@@ -1149,38 +1095,31 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(null, evaluate(OR, null, null));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrNullAndBooleanTrue() throws Exception {
+    public void testOrNullAndBooleanTrue() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(OR, null, Boolean.TRUE));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrZeroAndInt() throws Exception {
+    public void testOrZeroAndInt() throws Exception {
         assertEquals(314, evaluate(OR, 0, 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrTwoInts() throws Exception {
-        assertEquals(235325, evaluate(OR, 314, 235325));
+    public void testOrTwoInts() throws Exception {
+        assertEquals(314, evaluate(OR, 314, 235325));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrStringZeroAndInt() throws Exception {
+    public void testOrStringZeroAndInt() throws Exception {
         assertEquals("0", evaluate(OR, "0", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrStringFalseAndInt() throws Exception {
+    public void testOrStringFalseAndInt() throws Exception {
         assertEquals("false", evaluate(OR, "false", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrEmptyStringAndInt() throws Exception {
+    public void testOrEmptyStringAndInt() throws Exception {
         assertEquals(314, evaluate(OR, "", 314));
     }
 
-    // W-2361099: Java Expressions should mimic JavaScript functionality
-    public void _testOrNaNAndString() throws Exception {
+    public void testOrNaNAndString() throws Exception {
         assertEquals("Random", evaluate(OR, Double.NaN, "Random"));
     }
 

@@ -969,7 +969,7 @@ public class JsonStreamReader {
         } else {
             Character esc = escapes.get(c);
             if (esc == null) {
-                throw new JsonStreamParseException(String.format("Unknown escape sequence : \\%s", c));
+                throw new JsonStreamParseException(String.format("Unknown escape sequence : \\%c", c));
             } else {
                 c = esc;
             }

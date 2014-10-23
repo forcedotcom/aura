@@ -36,7 +36,6 @@ import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.LineReader;
@@ -46,41 +45,26 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     private static final String APPCACHE_SUPPORTED_USERAGENT = UserAgent.GOOGLE_CHROME.getUserAgentString();
     private static final String APPCACHE_UNSUPPORTED_USERAGENT = UserAgent.EMPTY.getUserAgentString();
     private static final Pattern HTML_MANIFEST_PATTERN = Pattern.compile("<html[^>]* manifest=\"(.*?)\"[^>]*>");
-    private static final Pattern HTML_LM_PATTERN = Pattern.compile("<html[^>]* data-lm=\"(.*?)\"[^>]*>");
-
-    private class ManifestInfo {
-        String url;
-        String lastmod;
-
-        ManifestInfo(String url, String lastmod) {
-            this.url = url;
-            this.lastmod = lastmod;
-        }
-    }
 
     public AppCacheManifestHttpTest(String name) {
         super(name);
     }
 
-    private ManifestInfo getManifestInfo(String appPath, Mode mode) throws Exception {
+    private String getManifestURL(String appPath, Mode mode) throws Exception {
         HttpGet get = obtainGetMethod(appPath + String.format("?aura.mode=%s",mode.toString()));
         HttpResponse response = perform(get);
         String responseBody = getResponseBody(response);
         get.releaseConnection();
         Matcher m = HTML_MANIFEST_PATTERN.matcher(responseBody);
         String url = null;
-        String lastmod = null;
         if (m.find()) {
             url = m.group(1);
         }
-        m = HTML_LM_PATTERN.matcher(responseBody);
-        if (m.find()) {
-            lastmod = m.group(1);
-        }
-        return new ManifestInfo(url, lastmod);
+        return url;
     }
-    private ManifestInfo getManifestInfo(String appPath) throws Exception {
-        return getManifestInfo(appPath, Mode.PROD);
+
+    private String getManifestURL(String appPath) throws Exception {
+        return getManifestURL(appPath, Mode.PROD);
     }
 
     private String getManifestErrorUrl(String manifestURI) {
@@ -105,9 +89,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         return required;
     }
 
-    private void assertManifest(String manifestContent, List<String> requiredLinks, String lastMod) throws Exception {
+    private void assertManifest(String manifestContent, List<String> requiredLinks) throws Exception {
         assertManifestFormat(manifestContent);
-        assertManifestLastMod(manifestContent, lastMod);
+        assertTrue("Could not find the LAST MOD: line in manifest", manifestContent.contains("\n# LAST MOD: app="));
 
         List<String> links = getManifestLinks(manifestContent);
         List<String> required = getRequiredLinks();
@@ -119,18 +103,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     private void assertManifestFormat(String manifestContent) {
         if (!manifestContent.startsWith("CACHE MANIFEST\n")) {
             fail("Manifest should starts with: " + "CACHE MANIFEST");
-        }
-    }
-
-    /**
-     * Check for the 'last mod' line.
-     * 
-     * Note that since the reformat of this line, there is no real last mod date in the manifest.
-     */
-    private void assertManifestLastMod(String manifestContent, String lastMod) throws Exception {
-        String lastModMarker = String.format("\n# LAST MOD: app=");
-        if (!manifestContent.contains(lastModMarker)) {
-            fail("Line not found: " + lastModMarker);
         }
     }
 
@@ -182,15 +154,15 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestWithUnsupportedUserAgent() throws Exception {
         setHttpUserAgent(APPCACHE_UNSUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app");
 
-        HttpGet get = obtainGetMethod(manifest.url);
+        HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
         get.releaseConnection();
 
         if (!response.isEmpty()) {
-            fail("manifest should be empty: *" + manifest.url);
+            fail("manifest should be empty: *" + manifest);
         }
     }
 
@@ -201,9 +173,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     public void testGetManifestWithAppCacheDisabled() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         ServletConfigController.setAppCacheDisabled(true);
-        ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
-        if (manifest.url != null) {
-            fail("no manifest url should be present, but got: " + manifest.url);
+        String manifest = getManifestURL("/appCache/withpreload.app");
+        if (manifest != null) {
+            fail("no manifest url should be present, but got: " + manifest);
         }
     }
 
@@ -212,31 +184,27 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestForAppWithoutPreloads() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/nopreload.app");
-        if (manifest.url == null) {
-            fail("manifest url should be present, but got: " + manifest.url);
+        String manifest = getManifestURL("/appCache/nopreload.app");
+        if (manifest == null) {
+            fail("manifest url should be present, but got: " + manifest);
         }
     }
 
     /**
-     * GET app cache manifest for app with preloads returns a full manifest containing preloading resources. * note that
-     * invalid and absolute css urls are not included
+     * GET app cache manifest for app with preloads returns a full manifest containing preloading resources.
+     *
+     * note that invalid and absolute css urls are not included
      */
     public void testGetManifestForAppWithPreloads() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app");
 
-        HttpGet get = obtainGetMethod(manifest.url);
+        HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
         get.releaseConnection();
 
-        String serializedContextFragment = AuraTextUtil.urlencode(String
-                .format("\"lastmod\":\"%s\"", manifest.lastmod));
-        assertManifest(response, Lists.newArrayList(
-                String.format(".*%s.*/app\\.css", serializedContextFragment),
-                String.format(".*%s.*/app\\.js", serializedContextFragment)),
-                manifest.lastmod);
+        assertManifest(response, Lists.newArrayList(".*/app\\.css", ".*/app\\.js"));
     }
 
     /**
@@ -245,9 +213,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     @UnAdaptableTest
     public void testGetManifestWithAuraErrorParam() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app");
 
-        HttpGet get = obtainGetMethod(getManifestErrorUrl(manifest.url));
+        HttpGet get = obtainGetMethod(getManifestErrorUrl(manifest));
 
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
@@ -267,7 +235,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestWithErrorManifestCookie() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app");
 
         //
         // HttpClient Cookie Example
@@ -277,7 +245,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         //
         addCookie(getHost(), "appCache_withpreload_lm", "error", "/");
         HttpContext httpContext = getHttpCookieContext();
-        HttpGet get = obtainGetMethod(manifest.url);
+        HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get, httpContext);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
@@ -288,19 +256,14 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         assertEquals("", response);
         assertNoCookie(getHost(), "appCache_withpreload_lm", "/");
 
-        get = obtainGetMethod(manifest.url);
+        get = obtainGetMethod(manifest);
         HttpResponse clean = perform(get);
         String cleanResponse = getResponseBody(clean);
         get.releaseConnection();
 
         // Now, after one failed call a new manifest call should go thru.(Error
         // cookie cleared);
-        String serializedContextFragment = AuraTextUtil.urlencode(String
-                .format("\"lastmod\":\"%s\"", manifest.lastmod));
-        assertManifest(cleanResponse, Lists.newArrayList(
-                String.format(".*%s.*/app\\.css", serializedContextFragment),
-                String.format(".*%s.*/app\\.js", serializedContextFragment)),
-                manifest.lastmod);
+        assertManifest(cleanResponse, Lists.newArrayList(".*/app\\.css", ".*/app\\.js"));
     }
 
     /**
@@ -309,21 +272,15 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestForAppWithAdditionalAppCacheURLs() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/appCache/additionalUrls.app");
+        String manifest = getManifestURL("/appCache/additionalUrls.app");
 
-        HttpGet get = obtainGetMethod(manifest.url);
+        HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
         get.releaseConnection();
 
-        String serializedContextFragment = AuraTextUtil.urlencode(String
-                .format("\"lastmod\":\"%s\"", manifest.lastmod));
-        assertManifest(response, Lists.newArrayList(
-                String.format(".*%s.*/app\\.css", serializedContextFragment),
-                String.format(".*%s.*/app\\.js", serializedContextFragment),
-                "/auraFW/resources/aura/auraIdeLogo.png",
-                "/auraFW/resources/aura/resetCSS.css"),
-                manifest.lastmod);
+        assertManifest(response, Lists.newArrayList(".*/app\\.css", ".*/app\\.js",
+                "/auraFW/resources/aura/auraIdeLogo.png", "/auraFW/resources/aura/resetCSS.css"));
     }
 
     /**
@@ -347,8 +304,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                     String.format(appMarkup, value));
             setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-            ManifestInfo manifest = getManifestInfo(getUrl(desc));
-            HttpGet get = obtainGetMethod(manifest.url);
+            String manifest = getManifestURL(getUrl(desc));
+            HttpGet get = obtainGetMethod(manifest);
             HttpResponse httpResponse = perform(get);
             String response = getResponseBody(httpResponse);
             int statusCode = getStatusCode(httpResponse);
@@ -357,12 +314,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             assertEquals("Expected to fail manifest fetching. additionalAppCacheUrls:" + value,
                     HttpStatus.SC_NOT_FOUND, statusCode);
 
-            String serializedContextFragment = AuraTextUtil.urlencode(String
-                    .format("\"lastmod\":\"%s\"", manifest.lastmod));
-            assertManifest(response, Lists.newArrayList(
-                    String.format(".*%s.*/app\\.css", serializedContextFragment),
-                    String.format(".*%s.*/app\\.js", serializedContextFragment)),
-                    manifest.lastmod);
+            assertManifest(response, Lists.newArrayList(".*/app\\.css", ".*/app\\.js"));
         }
     }
     
@@ -372,9 +324,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testUncombinableResourceUrlsAreAddedToAppCacheManifest()throws Exception{
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ManifestInfo manifest = getManifestInfo("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
+        String manifest = getManifestURL("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
         
-        HttpGet get  = obtainGetMethod(manifest.url);
+        HttpGet get  = obtainGetMethod(manifest);
         HttpResponse response = perform(get);
         assertEquals("Failed to fetch manifest", HttpStatus.SC_OK,getStatusCode(response));
         String responseString = getResponseBody(response);

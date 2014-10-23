@@ -115,7 +115,10 @@ public class ResourceLoaderTest extends UnitTestCase {
     }
 
     private String readStreamAsString(InputStream is) {
-        return new Scanner(is).useDelimiter("\\A").next();
+        Scanner scanner = new Scanner(is);
+        String ret = scanner.useDelimiter("\\A").next();
+        scanner.close();
+        return ret;
     }
 
     private void createResourceLoader(boolean deleteCacheOnStart) throws IOException, URISyntaxException {

@@ -45,6 +45,7 @@ public class ComponentController {
      * @since 194
      */
     public static class AuraClientException extends Exception {
+        private static final long serialVersionUID = -5884312216684971013L;
 
         private final Action action;
         private final String jsStack;
@@ -59,7 +60,6 @@ public class ComponentController {
                 action.addError(this);
             } catch (QuickFixException e) {
                 // Uh... okay, we fell over running an action we now can't even define.
-                action = null;
             }
             this.action = action;
             this.jsStack = jsStack;

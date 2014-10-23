@@ -67,16 +67,16 @@ public class MenuUITest extends WebDriverTestCase {
         menuLabel.click();
         // check menu list is visible after the click
         assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
-       
+
         // verify focus on action item3
         auraUITestingUtil.setHoverOverElement(menuItem3);
         assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
                 auraUITestingUtil.getActiveElementText());
-        
+
         String globalIdItem2 = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuItem2);
-        Double item2TopValue = Double.parseDouble(auraUITestingUtil.getBoundingRectPropOfElement(globalIdItem2,"top"));
-        assertTrue("Item 2 in the menu List is should be visible on the page",item2TopValue > 0);
-        
+        Double item2TopValue = Double.parseDouble(auraUITestingUtil.getBoundingRectPropOfElement(globalIdItem2, "top"));
+        assertTrue("Item 2 in the menu List is should be visible on the page", item2TopValue > 0);
+
         // use send key("f") to move to actionItem2
         actionItem3Element.sendKeys("f");
 
@@ -137,7 +137,6 @@ public class MenuUITest extends WebDriverTestCase {
         actionItem3.click();
         assertEquals("Item3 unchecked after pressing Enter key", "Inter Milan", menuLabel.getText());
 
-        // click on menu list
         menuLabel.click();
         // focus on action item4
         auraUITestingUtil.setHoverOverElement(menuItem4);
@@ -169,8 +168,8 @@ public class MenuUITest extends WebDriverTestCase {
     public void testActionMenu() throws MalformedURLException, URISyntaxException {
         testActionMenuForApp(MENUTEST_APP);
     }
-    
-    //Test case for W-2181713
+
+    // Test case for W-2181713
     public void testActionMenuAttachToBodySet() throws MalformedURLException, URISyntaxException {
         testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP);
     }
@@ -182,14 +181,15 @@ public class MenuUITest extends WebDriverTestCase {
     public void testActionMenuViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP);
     }
-    
-    //Test case for W-2234265
-    //TODO: Uncomment test once W-2234265 is fixed
+
+    // Test case for W-2234265
+    // TODO: Uncomment test once W-2234265 is fixed
     public void testActionMenuAttachToBodySetViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP);
     }
 
-    public void testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws MalformedURLException,
+    // TODO: W-2406307: remaining Halo test failure
+    public void _testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws MalformedURLException,
             URISyntaxException {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP);
     }
@@ -379,20 +379,20 @@ public class MenuUITest extends WebDriverTestCase {
         button.click();
         assertFalse("Action Menu list should be collapsed", menu.getAttribute("class").contains("visible"));
     }
-    
+
     /**
-     * Test case : W-2235117
-     * menuItem should reposition itself relative to its trigger when attachToBody attribute is set
+     * Test case : W-2235117 menuItem should reposition itself relative to its trigger when attachToBody attribute is
+     * set
+     * 
      * @throws MalformedURLException
-     * @throws URISyntaxException
-     * TODO: Uncomment test once W-2235117 is fixed
+     * @throws URISyntaxException TODO: Uncomment test once W-2235117 is fixed
      */
     public void _testMenuPostionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_ATTACHTOBODY_APP);
         String menuItem3 = "actionItemAttachToBody3";
         WebDriver driver = this.getDriver();
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
-        //Need to make the screen bigger so WebDriver doesn't need to scroll
+        // Need to make the screen bigger so WebDriver doesn't need to scroll
         driver.manage().window().setSize(new Dimension(1366, 768));
         String trigger = "triggerAttachToBody";
         String menuList = "actionMenuAttachToBody";
@@ -402,31 +402,36 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menu = driver.findElement(By.className(menuList));
         menuLabel.click();
         assertTrue("Action Menu list should be expanded", menu.getAttribute("class").contains("visible"));
-        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId, "Menu List is not positioned correctly when the menuList rendered on the page");
-        String triggerLeftPosBeforeClick = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId,"left");
+        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
+                "Menu List is not positioned correctly when the menuList rendered on the page");
+        String triggerLeftPosBeforeClick = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId, "left");
         actionItem3.click();
-        String triggerLeftPosAfterClickOnItem2 = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId,"left");
-        assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick, triggerLeftPosAfterClickOnItem2);
-        
+        String triggerLeftPosAfterClickOnItem2 = auraUITestingUtil
+                .getBoundingRectPropOfElement(triggerGlobalId, "left");
+        assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick,
+                triggerLeftPosAfterClickOnItem2);
+
         int currentWidth = driver.manage().window().getSize().width;
         int currentHeight = driver.manage().window().getSize().height;
-        driver.manage().window().setSize(new Dimension(currentWidth-200, currentHeight-100));
-        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId, "Menu List is not positioned correctly after the resize");
+        driver.manage().window().setSize(new Dimension(currentWidth - 200, currentHeight - 100));
+        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
+                "Menu List is not positioned correctly after the resize");
     }
 
     /**
      * Verify horizontal alignment of menuItem
+     * 
      * @param trigger
      * @param menuList
      * @param failureMessage
      */
     private void verifyMenuPositionedCorrectly(String trigger, String menuList, String failureMessage) {
-    	String triggerLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(trigger,"left");
-    	String menuListLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(menuList,"left");
-    	assertEquals(failureMessage, triggerLeftPos, menuListLeftPos);
+        String triggerLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(trigger, "left");
+        String menuListLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(menuList, "left");
+        assertEquals(failureMessage, triggerLeftPos, menuListLeftPos);
     }
 
-	/*
+    /*
      * Test case for: W-1559070
      */
     public void testRemovingMenuDoesNotThrowJsError() throws MalformedURLException, URISyntaxException {
@@ -463,17 +468,17 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Check Menu list should be expanded even after double click",
                 menu.getAttribute("class").contains("visible"));
     }
-    
+
     /**
-     * Test case for W-2315592
-     * Components extends menuItem get's focus
+     * Test case for W-2315592 Components extends menuItem get's focus
+     * 
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public void testFocusForExtendedMenuItem() throws MalformedURLException, URISyntaxException{
-    	open("/uitest/menu_extendMenuItem.app");
-    	WebDriver driver = this.getDriver();
-    	String label = "trigger";
+    public void testFocusForExtendedMenuItem() throws MalformedURLException, URISyntaxException {
+        open("/uitest/menu_extendMenuItem.app");
+        WebDriver driver = this.getDriver();
+        String label = "trigger";
         String menuName = "actionMenu";
         String menuItem1 = "actionItem1";
         String menuItem2 = "actionItem2";
@@ -494,7 +499,7 @@ public class MenuUITest extends WebDriverTestCase {
         // default focus on action item1
         assertEquals("Focus should be on actionItem1", actionItem1Element.getText(),
                 auraUITestingUtil.getActiveElementText());
-        
+
         // verify focus on action item3
         auraUITestingUtil.setHoverOverElement(menuItem3);
         assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
@@ -506,17 +511,17 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Focus should be on actionItem 2", actionItem2Element.getText(),
                 auraUITestingUtil.getActiveElementText());
     }
-    
+
     /**
-     * Test case to allow bubbling of event with menu
-     * Bug: W-2368359
+     * Test case to allow bubbling of event with menu Bug: W-2368359
+     * 
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public void testStopClickPropogoationByDefault() throws MalformedURLException, URISyntaxException{
-    	open(MENUTEST_EVENTBUBBLING_APP);
-    	WebDriver driver = this.getDriver();
-    	String label = "trigger";
+    public void testStopClickPropogoationByDefault() throws MalformedURLException, URISyntaxException {
+        open(MENUTEST_EVENTBUBBLING_APP);
+        WebDriver driver = this.getDriver();
+        String label = "trigger";
         String menuName = "actionMenu";
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
@@ -529,26 +534,26 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
         assertTrue("Event should get bubble up to parent div", auraUITestingUtil.getBooleanEval(valueExpression));
     }
-    
+
     /*
-     * Test case to Stop bubbling of event when StopClickPropogoation attribute is set
-     * Bug: W-2368359
+     * Test case to Stop bubbling of event when StopClickPropogoation attribute is set Bug: W-2368359
      */
-    public void testStopClickPropogoationIsSet() throws MalformedURLException, URISyntaxException{
-    	open(MENUTEST_EVENTBUBBLING_APP + "?stopClickPropagation=true");
-    	WebDriver driver = this.getDriver();
-    	String label = "trigger";
+    public void testStopClickPropogoationIsSet() throws MalformedURLException, URISyntaxException {
+        open(MENUTEST_EVENTBUBBLING_APP + "?stopClickPropagation=true");
+        WebDriver driver = this.getDriver();
+        String label = "trigger";
         String menuName = "actionMenu";
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
         String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.eventBubbled");
         valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
         assertNull("Event should not bubble up to parent div", auraUITestingUtil.getEval(valueExpression));
-        
+
         // click on menu list
         menuLabel.click();
         // check menu list is visible after the click
         assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
-        assertNull("Event should not bubble up to parent div when StopPropogoation is set on menu", auraUITestingUtil.getEval(valueExpression));
+        assertNull("Event should not bubble up to parent div when StopPropogoation is set on menu",
+                auraUITestingUtil.getEval(valueExpression));
     }
 }

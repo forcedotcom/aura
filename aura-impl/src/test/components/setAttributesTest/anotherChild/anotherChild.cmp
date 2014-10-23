@@ -17,5 +17,5 @@
 -->
 <!-- THIS COMPONENT IS USED BY TESTS.  BE PREPARED TO FIX TEST FAILURES IF YOU CHANGE IT. -->
 <aura:component extends="setAttributesTest:parent">
-
+    {!v.body}
 </aura:component>

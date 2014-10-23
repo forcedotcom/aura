@@ -477,14 +477,7 @@
 		if (!component || !targetElem) {
 			return false;
 		}
-	    var componentElements = [];
-	    // grab all the siblings
-	    var elements = component.getElements();
-	    for(var index in elements) {
-	        if (elements.hasOwnProperty(index)){
-	            componentElements.push(elements[index]);
-	        }
-	    }
+	    var componentElements = component.getElements();
 	    // go up the chain until it hits either a sibling or the root
 	    var currentNode = targetElem;
 	    do {

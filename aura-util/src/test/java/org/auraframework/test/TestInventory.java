@@ -96,7 +96,7 @@ public class TestInventory {
     
     public void loadTestClasses(Type type) {
     	TestFilter filter = ServiceLocator.get().get(TestFilter.class);
-    	Vector<Class<? extends Test>> vector = new Vector<Class <? extends Test>>();
+    	Vector<Class<? extends Test>> vector = new Vector<>();
     	for (String className : getClassNames(rootUri)) {
             Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
             if (testClass != null) {

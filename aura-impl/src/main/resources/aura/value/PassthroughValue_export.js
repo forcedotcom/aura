@@ -17,7 +17,9 @@
 var p = PassthroughValue.prototype;
 exp(p,
     "auraType", p.auraType,
-    "getValue", p.getValue,
+    "get", p.get,
+    "set", p.set,
+    "getReference", p.getReference,
     "getComponent", p.getComponent,
     "index", p.index,
     "deIndex", p.deIndex

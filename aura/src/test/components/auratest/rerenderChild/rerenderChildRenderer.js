@@ -18,6 +18,8 @@
         if (Window.rerenderTestOrder === undefined) {
             Window.rerenderTestOrder = [];
         }
+        var counter = cmp.get('v.ownRenderCounter') + 1;
+        cmp.set('v.ownRenderCounter', counter, true);
         Window.rerenderTestOrder.push(cmp.get("v.title"));
         this.superRerender();
     }

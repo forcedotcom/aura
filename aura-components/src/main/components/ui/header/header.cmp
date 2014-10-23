@@ -18,5 +18,5 @@
 <aura:component extends="ui:block">
 	<aura:set attribute="tag" value="header"/>
     <aura:set attribute="class" value="{!($Browser.isAndroid ? 'android ' + v.class : v.class) + ' headerLayout'}"/>
-
+    {!v.body}
 </aura:component>

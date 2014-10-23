@@ -237,7 +237,7 @@
         var activeIndex = -1;
         var iterCmp = component.find("iter");
         if (iterCmp) {
-            var iters = iterCmp.get("v.realbody");
+            var iters = iterCmp.get("v.body");
             var highlightedIndex = this.findHighlightedOptionIndex(iters);
             var index = event.getParam("activeIndex");
             if (index < 0) { // highlight previous visible option
@@ -262,7 +262,7 @@
     handlePressOnHighlighted: function(component, event) {
         var iterCmp = component.find("iter");
         if (iterCmp) {
-            var iters = iterCmp.get("v.realbody");
+            var iters = iterCmp.get("v.body");
             var highlightedIndex = this.findHighlightedOptionIndex(iters);
             if (highlightedIndex >= 0) {
                 var targetCmp = iters[highlightedIndex];
@@ -278,6 +278,18 @@
     handleTabkeydown: function(component, event) {
         component.set("v.visible", false);
     },
+    
+    hasVisibleOption : function(items) {
+        var hasVisibleOption = false;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].visible === true) {
+                hasVisibleOption = true;
+                break;
+            }
+        }
+        
+        return hasVisibleOption;
+    },
 
     /**
      * Checks if the object is an HTML element.
@@ -292,7 +304,7 @@
         }
     },
 
-    matchText: function(component) {
+    matchFunc: function(component) {
         var keyword = component.get("v.keyword");
         var propertyToMatch = component.get("v.propertyToMatch");
         var items = component.get("v.items");
@@ -316,20 +328,35 @@
             }
         }
         component.set("v.items", items);
+    },
+
+    matchFuncDone: function(component) {
+        var items = component.get("v.items");
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
     },
 
-    toggleListVisibility: function(component, items) {
-        var hasVisibleOption = false;
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].visible === true) {
-                hasVisibleOption = true;
-                break;
-            }
+    matchText: function(component) {
+        var action = component.get("v.matchFunc");
+        if (action) {
+            action.setCallback(this, function(result) {
+                this.matchFuncDone(component);
+            });
+            $A.enqueueAction(action);
+        } else {
+            this.matchFunc(component);
+            this.matchFuncDone(component);
         }
-        component.set("v.visible", hasVisibleOption);
+    },
+
+    toggleListVisibility: function(component, items) {
+        var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) &&
+                !$A.util.isEmpty(component.get("v.keyword")); 
+        var hasVisibleOption = this.hasVisibleOption(items);
+        var list = component.find("list");
+        $A.util[hasVisibleOption ?  "addClass" :"removeClass"](list.getElement(), "visible");
+        component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },
 
     updateAriaAttributes: function(component, highlightedCmp) {
@@ -345,5 +372,12 @@
             })
             updateAriaEvt.fire();
         }
+    },
+    
+    updateEmptyListContent: function (component) {
+        var visible = component.getConcreteComponent().get("v.visible");
+        var items = component.getConcreteComponent().get("v.items");
+        var hasVisibleOption = this.hasVisibleOption(items);
+        $A.util[!visible || hasVisibleOption ? "removeClass" : "addClass"](component.getElement(), "showEmptyContent");
     }
 })

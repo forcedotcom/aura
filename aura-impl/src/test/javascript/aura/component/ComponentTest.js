@@ -33,7 +33,7 @@ Test.Aura.Component.ComponentTest=function(){
     	function ReturnsNullForInvalidComponent() {
     		//Arrange
             var target = null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){});
+            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
             mockPriv(function(){
                 target = new Component();
                 target.isValid = function() {return false};
@@ -43,36 +43,6 @@ Test.Aura.Component.ComponentTest=function(){
             //Assert
             Assert.Null(actual);
     	}
-    	
-    	//this cover when delegateValueProvider is not null
-        [Fact]
-        function ReturnsNullFromDelegateValueProvider() {
-            //Arrange
-        	var target = null;
-            var localid = "testLocalId";
-            var globalid = "testGlobalId";
-            var expected = "returnFromDelegateValueProvider";
-            var actual = null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "ComponentPriv" : function(){}
-            });
-            var targetValueProvider={
-                deIndex:function(lid,gid){
-                    if((lid==localid)&&(gid==globalid)) return "returnFromDelegateValueProvider";
-                }
-            };
-            mockPriv(function(){
-                target = new Component();
-                target.isValid = function(){return true};
-                target.priv.delegateValueProvider = targetValueProvider;
-            });
-            //Act
-            mockPriv(function(){ 
-                actual = target.deIndex(localid,globalid);
-            });
-            //Assert
-            Assert.Equal(expected, actual);
-        }
         
         //this cover when priv.index does not exist
         [Fact]
@@ -82,7 +52,7 @@ Test.Aura.Component.ComponentTest=function(){
             var actual=null;
             var localid = "testLocalId";
             var globalid = "testGlobalId";
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){});
+            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
             mockPriv(function(){
                 target = new Component();
                 target.isValid = function(){return true};
@@ -108,7 +78,7 @@ Test.Aura.Component.ComponentTest=function(){
                         isArray : function() {return false;}
                     }
                 },
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -139,7 +109,7 @@ Test.Aura.Component.ComponentTest=function(){
                         isArray : function() {return true;}
                     }
                 },
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -172,7 +142,7 @@ Test.Aura.Component.ComponentTest=function(){
                         isArray : function() {return true;}
                     }
                 },
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -205,7 +175,7 @@ Test.Aura.Component.ComponentTest=function(){
                         isArray : function() {return true;}
                     }
                 },
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -231,7 +201,7 @@ Test.Aura.Component.ComponentTest=function(){
             var actual=null;
             var expected=null;
             var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -256,7 +226,7 @@ Test.Aura.Component.ComponentTest=function(){
         function ReturnsNullForInvalidComponent() {
             //Arrange
             var target = null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){});
+            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
             mockPriv(function(){
                 target = new Component();
                 target.assertValid = function(){return false};
@@ -266,35 +236,7 @@ Test.Aura.Component.ComponentTest=function(){
             //Assert
             Assert.Null(actual);
         }
-        //this cover when delegateValueProvider is not null
-        [Fact]
-        function ReturnsResultFromDelegateValueProvider() {
-            //Arrange
-            var localid = "testLocalId";
-            var globalid = "testGlobalId";
-            var expected = "id from delegateValueProvider";
-            var actual = null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "ComponentPriv" : function(){}
-            });
-            var targetValueProvider={
-                index:function(lid,gid){
-                    if((lid==localid)&&(gid==globalid)) return expected;
-                }
-            };
-            mockPriv(function(){
-                target = new Component();
-                target.assertValid = function(){return true};
-                target.priv.delegateValueProvider = targetValueProvider;
-            });
-            //Act
-            mockPriv(function(){ 
-                actual = target.index(localid,globalid);
-            });
-            //Assert
-            Assert.Equal(expected, actual);
-        }
-        
+
         //this cover when index[locaid] does not exist
         [Fact]
         function InitLocalIdWithGlobalId() {
@@ -304,7 +246,7 @@ Test.Aura.Component.ComponentTest=function(){
             var expected = globalid;
             var target = null;
             var actual=null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){});
+            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
             mockPriv(function(){
                 target = new Component();
                 target.assertValid = function(){return true};
@@ -333,7 +275,7 @@ Test.Aura.Component.ComponentTest=function(){
                         isArray : function() {return false;}
                     }
                 },
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -366,7 +308,7 @@ Test.Aura.Component.ComponentTest=function(){
                         isArray : function() {return true;}
                     }
                 },
-                "ComponentPriv" : function(){}
+                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
             });
             mockPriv(function(){
                 target = new Component();
@@ -398,6 +340,12 @@ Test.Aura.Component.ComponentTest=function(){
 							}
 						},
 
+                        expressionService: {
+                            normalize:function(target){
+                                return target;
+                            }
+                        },
+
 						renderingService : {
 							unrender : function() {
 							}
@@ -414,6 +362,8 @@ Test.Aura.Component.ComponentTest=function(){
 
 			var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv",
 					function() {
+                        this.getEventDispatcher=function(){return null};
+                        this.getValueProvider=function(){return null};
 					});
 		
 			renderingServiceMock(function() {
@@ -443,6 +393,7 @@ Test.Aura.Component.ComponentTest=function(){
 			var target = null;
 			var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv",
 					function() {
+                        this.getEventDispatcher=function(){return null}
 					});
 			mockPriv(function() {
 				target = new Component();

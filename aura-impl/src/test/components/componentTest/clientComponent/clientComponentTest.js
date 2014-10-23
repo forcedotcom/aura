@@ -27,7 +27,7 @@
                     false,
                     $A.test.isActionPending,
                     function(){
-                        $A.test.assertEquals(6, cmp.get("v.outputValue"), "Failed: Wrong value from outputNumber");
+                        $A.test.assertEquals("6", cmp.get("v.outputValue"), "Failed: Wrong value from outputNumber");
                     }
                 );
 

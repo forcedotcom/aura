@@ -14,46 +14,46 @@
  * limitations under the License.
  */
 ({
-	/**
+    /**
      * header position: 
      * 		'fixed' when the panel or non-input has focus
      *      'absolute' when an input/textarea has focus
      */
-    setHeaderPosition: function (cmp, evt, inputIsFocused) {
-		var panel = cmp.find('panel').getElement(),
-			header = panel.querySelector('header');
-		
+    setHeaderPosition: function (cmp, evt, inputIsFocused, header) {
     	if (header) {
     		header.style.position = inputIsFocused ? 'absolute' : 'fixed';
     	}
     },
     
+    _getHeaderElement: function(cmp, panelElement) {
+    	return panelElement.querySelector('header');
+	},
+    
     _bindListeners: function (cmp) {
         var self = this,
-        	panel = cmp.find("panel").getElement(),
-        	header = panel.querySelector('header');
+        	panel = cmp.find("panel").getElement();
 
         // attach event handlers for managing the position of the header;
         // when an input on the panel has focus, the header is not displayed
         // in fixed position
+        
         cmp._blur = function (e) {
-            self.setHeaderPosition(cmp, e, false);
+            self.setHeaderPosition(cmp, e, false, self._getHeaderElement(cmp, panel));
         }
         cmp._focus = function (e) {
-        	var inHeader = false;
+        	var inHeader = false, header = self._getHeaderElement(cmp, panel);
         	if (header && e.target) {
         		inHeader = $A.util.contains(header, e.target);
         	}
-        	self.setHeaderPosition(cmp, e, !inHeader);
+        	self.setHeaderPosition(cmp, e, !inHeader, header);
         	
         	// track the last focused element so that it can be 
         	// reset (by panelManager) when a stacked panel is closed
         	// (stacked panel == panel displayed over another panel)
-        	if ( ! $A.get('$Browser.isIOS') || ! $A.util.hasClass(e.target, 'forceInputLookupTrigger') ) {
-        		// setting the focus to an input trigger causes more problems than it solves on iOS;
-        		// 1)  their is no visual indication that the input has focus
-        		// 2)  it exposes an apparent rendering quirk as noted in this bug:
-        		//        https://gus.my.salesforce.com/apex/adm_bugdetail?id=a07B00000010UV2IAM
+        	if ( ! $A.get('$Browser.isIOS') ) {
+        		// setting the focus programmatically causes more problems than it solves on iOS;
+        		// panelManagerHelper will set scrollTop of body and that is sufficient for positioning
+        		// panel contents correctly on iOS.  See bugs:W-2380035, W-2351520
         		cmp.set('v.lastFocusedInput', e.target);
         	}
         }
@@ -116,7 +116,7 @@
         }
     },
 
-    show: function (cmp) {
+    show: function (cmp, event) {
         var self = this,
             panel = cmp.find("panel").getElement(),
             //css animations & transitions
@@ -156,25 +156,13 @@
         panel.style.visibility = 'visible';
         panel.setAttribute("aria-hidden", 'false');
 
-        this.setHeaderPosition(cmp, null, true); // less jagged if header if fixed before sliding instead of after
+        this.setHeaderPosition(cmp, null, true, self._getHeaderElement(cmp, panel)); // less jagged if header if fixed before sliding instead of after
         
         if (removeAnim) {
             finishHandler({});
         } else {
             $A.util.addClass(panel, animName);
         }
-        
-        // Fire the toggleModalSpinner in case there are any global spinners that were popped up
-        // The specific use case this has been added for is showing a spinner for edit, and this will turn off
-        // the spinner. The timeout is needed to queue the event or else for some reason it never gets executed
-        // in time and no spinner shows up on webview.
-//        setTimeout(function () {
-//        	$A.run(function() {
-//	            $A.get("e.force:toggleModalSpinner").setParams({
-//	                "isVisible": false
-//	            }).fire();
-//        	});
-//        }, 0);
     },
 
     // called from panelManagerHelper when the content is to be updated
@@ -221,7 +209,10 @@
         // This option should be only used by the panelManager
         // which knows how to manage the lifecycle of the panels
         if (!options.lazyDestroy) {
-            cmp.destroy(true, "v.body");
+            var body=cmp.get("v.body");
+            for(var i=0;i<body.length;i++){
+                body[i].destroy(true);
+            }
         }
     },
     

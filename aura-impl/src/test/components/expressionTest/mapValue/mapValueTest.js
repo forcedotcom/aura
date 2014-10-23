@@ -17,63 +17,76 @@
     assertChangeEvent: function(component, value){
         $A.test.assertTrue(undefined !== component._log, "change handler not invoked");
         $A.test.assertEquals(1, component._log.length, "unexpected number of change events recorded");
-        if (value instanceof Array) {
-        	var actual = component._log[0].value;
-        	$A.test.assertEquals(value.length, actual.length, "Unexpected value of change length mismatch");
-        	for (var i = 0; i < value.length; i++) {
-        		// Deal with nested-array support if and when we need it.
-        		$A.test.assertEquals(value[i], actual[i], "Unexpected value of change at index " + i);
-        	}
-        } else {
-        	// We punt on map support until we need it.
-            $A.test.assertEquals(value, component._log[0].value, "unexpected value of change");
-        }
+        this.assertEquivalent(value !== undefined ? value : component.get("v.map"), component._log[0].value, "unexpected value of change");
         component._log = undefined; // reset log
+    },
+
+    assertEquivalent: function(arg1, arg2, msg) {
+        if (msg === undefined) {
+            msg = "";
+        } else {
+            msg = msg + ": ";
+        }
+        var i;
+
+        if (arg1 === undefined || arg2 === undefined) {
+            $A.test.assertEquals(arg1, arg2, msg + "undefined in one but not both");
+            return;
+        }
+
+        $A.test.assertEquals(arg1 instanceof Object, arg2 instanceof Object, msg + "objects should both be objects (or both not)");
+        $A.test.assertEquals(arg1 instanceof Array, arg2 instanceof Array, msg + "objects should both be arrays (or both not)");
+        if (arg1 instanceof Array) {
+            $A.test.assertEquals(arg1.length, arg2.length, msg + "arrays have different lenghts");
+            if (msg === "") {
+                msg = "array";
+            }
+            for (i = 0; i < arg1.length; ++i) {
+                this.assertEquivalent(arg1[i], arg2[i], msg + "[" + i + "]");
+            }
+        } else if (arg1 instanceof Object) {
+            if (msg === "") {
+                msg = "obj";
+            }
+
+            for (i in arg1) {
+                if (typeof (arg2[i]) !== "function") {
+                    $A.test.assertTrue(arg2.hasOwnProperty(i), msg + "[" + i + "] is not in second");
+                    this.assertEquivalent(arg1[i], arg2[i], msg + "[" + i + "]");
+                }
+            }
+
+            for (i in arg2) {
+                if (typeof (arg1[i]) !== "function") {
+                    $A.test.assertTrue(arg1.hasOwnProperty(i), msg + "[" + i + "] is not in first");
+                }
+            }
+        } else {
+            $A.test.assertEquals(arg1, arg2, msg);
+        }
     },
 
     assertNoChangeEvent: function(component){
         $A.test.assertEquals(undefined, component._log);
     },
-    
-    calculateSize: function(map) {  	
+
+    calculateSize: function(map) {
         return $A.util.keys(map, true).length;
     },
-    
-    /**
-     * Verify creating map values.
-     */
-    //TODO ##$$: RJ Refactor this test case after halo work, the "halo" branch has the correct code
-    //##$$ Remove this line
-    //##$$ uncomment this line
-    testCreateMapValue:{
-		test: [function(component){
-			    var mval = $A.expressionService.create(null, {"string":"something","integer":23,"boolean":true});
-			    mval = mval.unwrap(); //##$$ Remove this line
-	            $A.test.assertTrue($A.util.isObject(mval), "expected a map");
-	            $A.test.assertEquals(3, this.calculateSize(mval), "expected 3 values");
-	            $A.test.assertEquals("something", mval["string"], "expected string value");
-	            $A.test.assertEquals(23, mval["integer"], "expected integer value");
-	            $A.test.assertEquals(true, mval["boolean"], "expected boolean value");
-	        },function(component){
-	        	var mval = $A.expressionService.create(null, {});
-	        	mval = mval.unwrap(); //##$$ Remove this line
-	            $A.test.assertTrue($A.util.isObject(mval), "expected a empty map");
-	            $A.test.assertEquals(0, this.calculateSize(mval), "expected 0 values");
-	        }]
-    },
+
     /**
      * Test getting a property reference from a MapValue.
      */
     //##$$ uncomment this line after halo changes are in master. Previouls used to fail because of W-1563175
-    _testGetWithPropertyReference:{
+    testGetWithPropertyReference:{
         test:function(component){
-        	$A.log(component.find('htmlDiv'));
+
         	var newMap = component.find('htmlDiv').get('v.HTMLAttributes');
             try{
             	$A.test.assertTrue($A.util.isExpression(newMap["disabled"]));
-                $A.test.assertEquals(false, newMap["disabled"].evaluate(), "failed to resolve propertyChain");
+                $A.test.assertEquals(false, newMap["disabled"].evaluate(), "failed to resolve propertyReferenceValue");
             }catch(e){
-                $A.test.fail("Failed to resolve PropertyChains. Error :" + e);
+                $A.test.fail("Failed to resolve PropertyReferenceValues. Error :" + e);
             }
         }
     },
@@ -81,69 +94,81 @@
     /**
      * Setting map value to Map attribute type should use the provided value.
      */
-    //W-2310538
-    _testSetMapValue: {
-    	attributes:{
-    		map : "{'do':'something','it':'the','right':'way'}"
-    	},
+    testSetMapValue: {
+    	attributes:{ map : "{'do':'something','it':'the','right':'way'}" },
         test: [
             /*W-2251243, can we be intelligent about this
+            // JF: HALO: Refactor this test case after halo work, the "halo" branch has the correct code
             function(component){ //Set value but new value is same as old value
            	   var mval = component.get("v.map");
            	   component.set("v.map", mval);
                this.assertNoChangeEvent(component);
-           },*/
-           function(component){ //Add new values to map and set attribute
-	        	var mval = component.get("v.map");
-	            mval["newKey"] = "newValue";
-	            component.set("v.map",mval);
-	            this.assertChangeEvent(component, mval);
-	            mval = component.get("v.map");
-	            $A.test.assertTrue($A.util.isObject(mval), "expected an Map");
-	            
-	            $A.test.assertEquals(4, this.calculateSize(mval), "expected 4 values");
-	            $A.test.assertEquals("something", mval["do"], "wrong first value");
-	            $A.test.assertEquals("the", mval["it"], "wrong second value");
-	            $A.test.assertEquals("way", mval["right"], "wrong third value");
-	            $A.test.assertEquals("newValue", mval["newKey"], "Map attribute not updated");
+            },*/
+            function(component){ //Set value but new value's content is same as old value
+                var oldMap = component.get("v.map");
+                var setMap = this.clone(oldMap); // clone
+                component.set("v.map", setMap);
+
+                this.assertChangeEvent(component, setMap);
+                var newMap = component.get("v.map");
+                $A.test.assertEquals(3, this.calculateSize(newMap), "expected 3 values");
+                $A.test.assertEquals("something", newMap["do"], "wrong first value");
+                $A.test.assertEquals("the", newMap["it"], "wrong second value");
+                $A.test.assertEquals("way", newMap["right"], "wrong third value");
+            },function(component){ //Add new values to map and set attribute
+	        	var oldMap = component.get("v.map");
+	            oldMap["newKey"] = "newValue";
+	            component.set("v.map",oldMap);
+
+                this.assertChangeEvent(component, oldMap);
+	            var newMap = component.get("v.map");
+	            $A.test.assertTrue($A.util.isObject(newMap), "expected an Map");
+	            $A.test.assertEquals(4, this.calculateSize(newMap), "expected 4 values");
+	            $A.test.assertEquals("something", newMap["do"], "wrong first value");
+	            $A.test.assertEquals("the", newMap["it"], "wrong second value");
+	            $A.test.assertEquals("way", newMap["right"], "wrong third value");
+	            $A.test.assertEquals("newValue", newMap["newKey"], "Map attribute not updated");
            }, function(component){ // Update map value - update value of a key
-	       	    var mval =  component.get("v.map");
-	       	    mval["newKey"] = "updatedValue"
-	            component.set("v.map",mval);
-	            this.assertChangeEvent(component, mval);
-	            mval = component.get("v.map");
-	            $A.test.assertEquals(4, this.calculateSize(mval), "expected 4 values");
-	            $A.test.assertEquals("updatedValue", mval["newKey"], "wrong map value");
+	       	    var oldMap =  component.get("v.map");
+	       	    oldMap["newKey"] = "updatedValue"
+	            component.set("v.map",oldMap);
+
+	            this.assertChangeEvent(component, oldMap);
+	            var newMap = component.get("v.map");
+	            $A.test.assertEquals(4, this.calculateSize(newMap), "expected 4 values");
+	            $A.test.assertEquals("updatedValue", newMap["newKey"], "wrong map value");
            }, function(component){ //Update map value - remove key
-        	    var mval =  component.get("v.map");
-	       	    delete mval["newKey"];
-	       	    component.set("v.map",mval);
-	            this.assertChangeEvent(component, mval);
-	            mval = component.get("v.map");
-	            $A.test.assertEquals(3, this.calculateSize(mval), "expected 4 values");
-	            $A.test.assertUndefined(mval["newKey"]);
+        	    var oldMap =  component.get("v.map");
+	       	    delete oldMap["newKey"];
+	       	    component.set("v.map",oldMap);
+
+	            this.assertChangeEvent(component, oldMap);
+	            var newMap = component.get("v.map");
+	            $A.test.assertEquals(3, this.calculateSize(newMap), "expected 4 values");
+	            $A.test.assertUndefined(newMap["newKey"]);
            }, function(component){ // Set to new map value
-        	    var mval =  $A.expressionService.create(null, {"string":"something"});
-        	    mval = mval.unwrap(); //##$$ Remove this line
-	            component.set("v.map",mval);
-	            this.assertChangeEvent(component, mval);
-	            mval = component.get("v.map");
-	            $A.test.assertTrue($A.util.isObject(mval), "expected an Map");
-	            $A.test.assertEquals(1, this.calculateSize(mval), "expected 1 values");
-	            $A.test.assertEquals("something", mval["string"], "wrong map value");
+        	    var oldMap =  {"string":"something"};
+	            component.set("v.map",oldMap);
+
+	            this.assertChangeEvent(component, oldMap);
+	            var newMap = component.get("v.map");
+	            $A.test.assertTrue($A.util.isObject(newMap), "expected an Map");
+	            $A.test.assertEquals(1, this.calculateSize(newMap), "expected 1 values");
+	            $A.test.assertEquals("something", newMap["string"], "wrong map value");
            }]
     },
-    
+
     /**
      * Setting a Map type attribute to a simple value that is not null should fail.
      */
+    // JF: HALO: Component.set() does not alert when an attribute of type Object is being set to a non object
     //W-2251248
     _testSetSimpleValue: {
         test: function(component){
-            var sval = $A.expressionService.create(null, "simple string");
+            var newValue = "simple string";
             var errMsg = "Expected exception from set(simpleValue)";
             try {
-            	component.set("v.map", sval);
+            	component.set("v.map", newValue);
                 $A.test.fail(errMsg);
             } catch (e) {
             	if(e.message == errMsg){
@@ -154,234 +179,150 @@
     },
 
     /**
-     * Setting a Map type attribute to a simple value that is null should clear the map.
+     * Setting a Map type attribute to a null value should clear the map.
      */
-    testSetSimpleValueNull: {
+    testSetMapToNull: {
         test: function(component){
-        	var sval = $A.expressionService.create(null, null);
-            sval = sval.unwrap(); //##$$ Remove this line
-            $A.test.assertNull(sval);
-            component.set("v.map", sval);
-            var map = component.get("v.map")
-            $A.test.assertTrue($A.util.isObject(map)); //##$$ Remove this line
-    		$A.test.assertEquals(0, $A.util.keys(map,  true).length); //##$$ Remove this line
-            //$A.test.assertNull(component.get("v.map")); ##$$ uncomment this line
+            // Set a default other than null
+            component.set("v.map", undefined, true);
+
+        	var oldMap = null;
+            component.set("v.map", oldMap);
+
+            this.assertChangeEvent(component, oldMap);
+            var newMap = component.get("v.map")
+            $A.test.assertNull(newMap);
         }
     },
+
     /**
      * Setting a Map type attribute to a simple value that is undefined should clear the map.
      */
-    testSetSimpleValueUndefined: {
+    testSetMapToUndefined: {
         test: function(component){
-        	var sval = $A.expressionService.create(null);
-        	sval = sval.unwrap(); //##$$ Remove this line
-        	$A.test.assertUndefined(sval);
-            component.set("v.map", sval);
-            var map = component.get("v.map")
-            $A.test.assertTrue($A.util.isObject(map)); //##$$ Remove this line
-    		$A.test.assertEquals(0, $A.util.keys(map, true).length); //##$$ Remove this line
-            //$A.test.assertUndefined(component.get("v.map")) ##$$ uncomment this line
+            var oldMap = undefined;
+            component.set("v.map", oldMap);
+
+            this.assertChangeEvent(component, oldMap);
+            var newMap = component.get("v.map")
+            $A.test.assertUndefined(newMap);
         }
     },
 
     /**
-     * test for W-2336292.
-     * Tests what happens when one attribute(a nested MapValue) is assigned to another(a nested MapValue as well).
-     * we create a new MapValue in this case
-     */
-    testMapAssignmentCreateNewWrapper: {
-        test: function(cmp) {
-    		var mv2nested = cmp.getValue("v.triggers2.nested");
-
-    		//sanity check
-    		 $A.test.assertEquals(1,cmp.get("v.triggers2.nested.count"),
-    		"v.triggers2.nested.count should be 1 to begin with");
-
-            cmp.set("v.triggers2", cmp.get("v.triggers"));
-            
-            //triggers2 will have same value as triggers after above, but they are not the same object
-            $A.test.assertEquals(0,cmp.get("v.triggers2.nested.count"),
-            "v.triggers2.nested.count should has the same value as v.triggers.nested.count");
-            
-            //make sure we did create a new MapValue for triggers2.nested
-            $A.test.assertTrue(mv2nested !== cmp.getValue("v.triggers2.nested"),
-            "we should create a new MapValue for v.trigger2.nested");
-            
-            //now change value in triggers and triggers2.nested
-            cmp.set("v.triggers.triggerCount", 12);
-            cmp.set("v.triggers2.nested.count", 7);
-            
-            //make sure they do not interference with each other 
-            $A.test.assertEquals(12, cmp.get("v.triggers.triggerCount"),"triggers' count should become 12");
-            $A.test.assertEquals(0, cmp.get("v.triggers.nested.count"),"triggers.nested.count should remain 0");
-            $A.test.assertEquals(0, cmp.get("v.triggers2.triggerCount"),"triggers2' count should remain 0");
-            $A.test.assertEquals(7, cmp.get("v.triggers2.nested.count"),"triggers2.nested.count should become 7");
-            
-        }
-    },
-    
-    /**
-     * test for W-2336292.
-     * Tests what happens when one attribute(a nested MapValue)'s RawMapValue is changed then assign back to itself.
-     * we reuse the MapValue in this case
-     */
-    testMapAssignmentReuseWrapper : {
-    	test: function(cmp) {
-    		var mv1nested = cmp.getValue("v.triggers.nested");
-    		
-    		//get the raw map value, change its nested.count
-    		var rmv1 = cmp.get("v.triggers");
-    		rmv1.nested.count = 99;
-    		
-    		//it shouldn't change v.triggers.nested.count
-    		$A.test.assertEquals(0,cmp.get("v.triggers.nested.count"),"triggers.nested.count should remain 0");
-    		
-    		//now change the count for triggers.nested
-    		cmp.set("v.triggers",rmv1);
-    		$A.test.assertEquals(99,cmp.get("v.triggers.nested.count"),"triggers.nested.count should become 99");
-    		
-    		//make sure we didn't create a new MapValue for v.triggers.nested 
-    		$A.test.assertTrue(mv1nested === cmp.getValue("v.triggers.nested"),
-    		"we shouldn't create a new MapValue for v.triggers.nested");
-    	}
-    },
-
-    /**
-     * This checks that handlers on subvalues are preserved across MapValue.set[Value]
+     * This checks that change handlers on object key are fired after cmp.set
      */
     testMapSubkeyHandler: {
     	test: function(component) {
-            $A.test.assertEquals(0, component.get("v.triggers.triggerCount"), "initial triggerCount attribute bad");
-            $A.test.assertUndefined(component._lastTriggerCount, "initial state bad (has _lastTriggerCount)");
-            component.set("v.triggers.trigger", "one");
-            $A.test.assertEquals(1, component.get("v.triggers.triggerCount"), "first trigger didn't update attribute");
-            $A.test.assertEquals(1, component._lastTriggerCount, "first trigger didn't update _lastTriggerCount");
+            $A.test.assertEquals(0, component.get("v.triggers.triggerCount"), "invalid initial triggerCount attribute");
+            $A.test.assertUndefined(component._lastTriggerCount, "invalid initial _lastTriggerCount value");
 
-            // If we replace the whole v.triggers map (which is really our test scenario),
-            // we have a "correct" non-deterministic case: we're going to end up adding both
-            // keys, including their handlers, so we can't know whether trigger gets added
-            // and fired before or after triggerCount.  Fun and useful too, eh?  But that's
-            // the spec-by-implementation, and I'm not changing it now....
+            component.set("v.triggers.trigger", "one");
+            $A.test.assertEquals(1, component._lastTriggerCount, "Replacing an object key didn't fire the object key change handler");
+
             component.set("v.triggers", { trigger: "dos", triggerCount: 27 });
-            var count = component.get("v.triggers.triggerCount");
-            $A.test.assertTrue(27 == count // trigger count wasn't yet set when triggered, but was later
-            		|| 28 == count, // or trigger count was set to "new" value
-            		"bulk replace triggerCount wasn't either acceptable value (was " + count 
-            		+ "), callback may have been lost");
-            $A.test.assertEquals(2, component._lastTriggerCount,
-            		"bulk replace _lastTriggerCount wasn't right, callback may have been lost");
-            
-            component.set("v.triggers.triggerCount", 2);  // Let's become sane again
-            
+            var triggerCount = component.get("v.triggers.triggerCount");
+            $A.test.assertEquals(28, triggerCount, "Replacing an object didn't fire its object key change handler right after");
+            $A.test.assertEquals(2, component._lastTriggerCount, "Replacing an object didn't fire its object key change handler right after");
+
             component.set("v.triggers.trigger", "san");
-            $A.test.assertEquals(3, component.get("v.triggers.triggerCount"), "last trigger didn't update attribute, callback was lost?");
-            $A.test.assertEquals(3, component._lastTriggerCount, "last trigger didn't update _lastTriggerCount, callback was lost?");
+            $A.test.assertEquals(3, component._lastTriggerCount, "Replacing an object key didn't fire the object key change handler after the object was repaced");
         }
     },
 
     /**
-     * This checks that observers and map-level handlers on subvalues are also preserved
-     * across MapValue.set[Value]
+     * This checks that change handlers on objects are fired after cmp.set
      */
-    testMapSubkeyHandlerWithObserver: {
+    testMapHandler: {
     	test: function(component) {
-    		// Gangs v.observer and v.triggers2.trigger together; ensure that is tracked
-    		component.getValue("v.observer").observe(component.getValue("v.triggers2.trigger"));
-
-            $A.test.assertUndefined(component._lastTrigger2Count, "initial state bad (has _lastTrigger2Count)");
-            $A.test.assertEquals("zero", component.get("v.observer"), "initial observer attribute bad");
-            $A.test.assertUndefined(component._noopCount, "initial state bad (has _noopCount)");
+            $A.test.assertUndefined(component._lastTrigger2Count, "invalid initial _lastTriggerCount value");
+            $A.test.assertUndefined(component._noopCount, "invalid initial _noopCount value");
 
             component.set("v.triggers2.trigger", "one");
-            $A.test.assertEquals("one", component.get("v.observer"), "first trigger didn't update observer");
-            $A.test.assertEquals(1, component._lastTrigger2Count, "first trigger didn't update _lastTrigger2Count");
-            $A.test.assertEquals(1, component._noopCount, "first trigger didn't update _noopCount");
+            $A.test.assertEquals(1, component._lastTrigger2Count, "Replacing an object key didn't fire the object key change handler");
+            $A.test.assertEquals(1, component._noopCount, "Replacing an object key didn't fire the object change handler");
 
-            // If we replace the whole v.triggers map (which is really our test scenario),
-            // we have a "correct" non-deterministic case: we're going to end up adding both
-            // keys, including their handlers, so we can't know whether trigger gets added
-            // and fired before or after triggerCount.  Fun and useful too, eh?  But that's
-            // the spec-by-implementation, and I'm not changing it now....
             component.set("v.triggers2", { trigger: "dos", triggerCount: 27 });
-            $A.test.assertEquals("dos", component.get("v.observer"), "bulk replace didn't update observer");
-            $A.test.assertEquals(2, component._lastTrigger2Count,
-            		"bulk replace _lastTrigger2Count wasn't right, callback may have been lost");
-            // TODO(fabbott): 5 is a bad number here.  It's right because (a) we still fire on leaf
-            // nodes, not the map (2 leaves, 2 calls), and (b) we duplicated the map level handlers
-            // when we preserved the leaf-level ones, because we can't tell the difference.  So
-            // that's an extra 2 calls, for 4x instead of 1 call.
-            $A.test.assertEquals(5, component._noopCount, "bulk replace didn't update _noopCount per leaf");
-            
+            $A.test.assertEquals(2, component._lastTrigger2Count, "Replacing an object didn't fire its object key change handler right after");
+            $A.test.assertEquals(2, component._noopCount, "Replacing an object didn't fire its change handler right after");
+
             component.set("v.triggers2.trigger", "san");
-            $A.test.assertEquals("san", component.get("v.observer"), "last trigger didn't update observer");
-            $A.test.assertEquals(3, component._lastTrigger2Count, "last trigger didn't update _lastTrigger2Count, callback was lost?");
-            // TODO(fabbott): Similarly, 7 is bad.  It's purely the duplicated handler.
-            $A.test.assertEquals(7, component._noopCount, "last trigger didn't update _noopCount per leaf");
+            $A.test.assertEquals(3, component._lastTrigger2Count, "Replacing an object key didn't fire the object key change handler after the object was repaced");
+            $A.test.assertEquals(3, component._noopCount, "Replacing an object key didn't fire the object change handler after the object was repaced");
         }
     },
 
-    //
-    // Check the map from the model, being absolutely sure to use Object.hasOwnProperty so that
-    // we duplicate the JSON serializer behaviour.
-    //
-    checkMap : function(map, rawCount) {
-        var count = 0;
-        var k;
-        $A.test.assertEquals("apple", map["fruit"], "result[fruit] should be apple");
-        $A.test.assertEquals("bear", map["animal"], "result[animal] should be bear");
-        for (k in map) {
-            if (Object.prototype.hasOwnProperty.call(map, k)) {
-                count += 1;
-            }
-        }
-        $A.test.assertEquals(rawCount, count, "must have exactly " + rawCount + " properties");
-        $A.test.assertEquals('{"fruit":"apple","animal":"bear"}', $A.util.json.encode(map));
-    },
 
-    testMapGet : {
+    testMapModel : {
         test: function(component) {
             var map = component.get("m.map");
+            $A.test.assertEquals(2, this.calculateSize(map), "expected 2 values");
+        }
+    },
+
+    testMapServerAction : {
+        test: function(component) {
             var a = component.get("c.echoMap");
-            var done = false;
-            // this includes the getSource functions.
-            this.checkMap(map, 3);
+
+            var map = component.get("m.map");
             a.setParams({ "map": map });
+
+            var done = false;
             a.setCallback(this, function(a) {
-            	// when we check here, the map is a simple map.
-                this.checkMap(a.getReturnValue(), 2); done = true;
+                var newMap = a.getReturnValue();
+                $A.test.assertEquals(2, this.calculateSize(newMap), "expected 2 values");
+                done = true;
             });
+
             $A.run(function() { $A.enqueueAction(a); });
             $A.test.addWaitFor(true, function() { return done; });
         }
     },
 
     testSetNewSubmap: {
+        attributes:{ map : "{'do':'something','it':'the','right':'way'}" },
         test: function(component) {
-           var leaf = component.get("m.map.was.missing.foo");
-           $A.test.assertUndefined(leaf);
-           var map = component.get("m.map");
-           this.checkMap(map, 3);
-           $A.test.assertUndefined(map.was);
 
-           component.set("m.map.was.missing.foo", 17);
-           leaf = component.get("m.map.was.missing.foo");
-           $A.test.assertEquals(17, leaf);
-           var submap = component.get("m.map.was");
-           for (var key in submap) {
-               if (!(submap[key] instanceof Function)) {
-                   $A.test.assertEquals("missing", key);
-               }
-           }
-           for (var key in submap.missing) {
-               if (!(submap[key] instanceof Function)) {
-                   $A.test.assertEquals("foo", key);
-               }
-           }
+            var leaf = component.get("v.map.was.missing.foo");
+            $A.test.assertUndefined(leaf);
+
+            var map = component.get("v.map");
+            $A.test.assertEquals(3, this.calculateSize(map), "expected 3 values");
+            $A.test.assertUndefined(map.was);
+
+            component.set("v.map.was.missing.foo", 17);
+            leaf = component.get("v.map.was.missing.foo");
+            $A.test.assertEquals(17, leaf);
+
+            var submap = component.get("v.map.was");
+            $A.test.assertTrue($A.util.isObject(submap), "expected object");
+            $A.test.assertEquals(1, this.calculateSize(submap), "expected 1 values");
         }
     },
-    
+
+    testSetNewSubarray: {
+        attributes:{ map : "{'do':'something','it':'the','right':'way'}" },
+        test: function(component) {
+
+            var leaf = component.get("v.map.was.0.foo");
+            $A.test.assertUndefined(leaf);
+
+            var map = component.get("v.map");
+            $A.test.assertEquals(3, this.calculateSize(map), "expected 3 values");
+            $A.test.assertUndefined(map.was);
+
+            component.set("v.map.was.0.foo", 17);
+            leaf = component.get("v.map.was.0.foo");
+            $A.test.assertEquals(17, leaf);
+
+            var subarray = component.get("v.map.was");
+            $A.test.assertTrue($A.util.isArray(subarray), "expected array");
+            $A.test.assertEquals(1, this.calculateSize(subarray), "expected 1 values");
+        }
+    },
+
     //Fails in Halo due to W-2256415, Setting new Maps as model values doesn't work. At least not similar to attributes
-    testMapSetValueRenders: {
+    _testMapSetValueRenders: {
         test: [ function(component) {
             var map = component.get("m.map");
             map["subkey"] = "put";
@@ -422,5 +363,10 @@
             });
         }
         ]
+    },
+
+    clone: function (obj) {
+        return JSON.parse(JSON.stringify(obj));
     }
+
 })

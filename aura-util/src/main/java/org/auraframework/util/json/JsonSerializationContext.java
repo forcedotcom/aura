@@ -57,4 +57,14 @@ public interface JsonSerializationContext {
      *         to not get written out. When true, these are written out.
      */
     public boolean isNullValueEnabled();
+
+    /**
+     * sets whether or not null values in arrays and objects get written out.
+     *
+     * By default, this is false. It should be treated as a stack.
+     * 
+     * @param nullValueEnabled the new value to set.
+     * @return the previous value.
+     */
+    public boolean setNullValueEnabled(boolean nullValueEnabled);
 }

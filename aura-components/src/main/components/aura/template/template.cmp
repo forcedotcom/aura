@@ -161,7 +161,7 @@
         }
     </aura:attribute>
     {!v.doctype}
-    <html manifest="{!v.manifest}" data-lm="{!v.lastMod}">
+    <html manifest="{!v.manifest}">
         <head>
             <title>{!v.title}</title>
             <script>var pageStartTime = (new Date()).getTime();</script>

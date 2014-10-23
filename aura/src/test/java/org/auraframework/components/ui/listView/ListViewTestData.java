@@ -37,31 +37,31 @@ public class ListViewTestData {
     public final static int NUM_COLS_SPECIFIED_DATA = SPECIFIED_COLUMN_TITLES.length;
 
     static {
-        GENERATED_LIST_DATA = new ArrayList<Map<String, String>>();
+        GENERATED_LIST_DATA = new ArrayList<>();
         for (int i = 0; i < NUM_ROWS_GENERATED_DATA; ++i) {
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             for (int j = 0; j < NUM_COLS_GENERATED_DATA; ++j) {
                 map.put("Column " + j, "value at (" + i + ", " + j + ")");
             }
             GENERATED_LIST_DATA.add(map);
         }
 
-        SPECIFIED_LIST_DATA = new ArrayList<Map<String, String>>();
+        SPECIFIED_LIST_DATA = new ArrayList<>();
         for (int i = 0; i < NUM_ROWS_SPECIFIED_DATA; ++i) {
-            Map<String, String> row = new HashMap<String, String>();
+            Map<String, String> row = new HashMap<>();
             row.put("type:empty string", "1st text value " + i);
             row.put("type:undefined", "2nd text value " + i);
             row.put("type:text", "3rd text value " + i);
             row.put("type:email", "test " + i + "@email.com");
             row.put("type:checkbox", "");
             row.put("type:link", "http://na" + i + ".salesforce.com");
-            row.put("type:html", "<div style='background-color:blue'>i'm in a blue div " + i + "</div>");
+            row.put("type:html", "<div style=\"background-color:blue\">i'm in a blue div " + i + "</div>");
             SPECIFIED_LIST_DATA.add(row);
         }
 
-        NESTED_COLUMNS_LIST_DATA = new ArrayList<Map<String, String>>();
+        NESTED_COLUMNS_LIST_DATA = new ArrayList<>();
         for (int i = 0; i < NUM_ROWS_SPECIFIED_DATA; ++i) {
-            Map<String, String> row = new HashMap<String, String>();
+            Map<String, String> row = new HashMap<>();
 
             // Keys in this map correspond to hard-wired fieldName attributes of
             // columns in a list in
@@ -77,9 +77,9 @@ public class ListViewTestData {
             NESTED_COLUMNS_LIST_DATA.add(row);
         }
 
-        NESTED_COLUMNS_BAD_LIST_DATA = new ArrayList<Map<String, String>>();
+        NESTED_COLUMNS_BAD_LIST_DATA = new ArrayList<>();
         for (int i = 0; i < NUM_ROWS_SPECIFIED_DATA; ++i) {
-            Map<String, String> row = new HashMap<String, String>();
+            Map<String, String> row = new HashMap<>();
             // Keys in this map correspond to hard-wired fieldName attributes of
             // columns in a list in
             // listView_Test.app. That list has nested columns, and only those

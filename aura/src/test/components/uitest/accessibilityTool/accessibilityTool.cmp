@@ -17,7 +17,17 @@
 -->
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
-    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Testing to make sure that the utility can handle inputs with multiple ids
+        Note that the ariaDescribedBy attribute is set in this components init function.-->
+    <aura:if isTrue="{!v.caseToRender == 'testMultiULToOne'}">
+	    <ui:inputText aura:id="inputTextId" label="hello"/>
+        <ui:inputDefaultError aura:id="error1" value="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError aura:id="error2" value="first error, second error, third error, fourth error"/>
+    	<br/>
+    </aura:if>
+
     <!--Top panel is hidden, no errors-->
     <aura:if isTrue="{!v.caseToRender == 'testTopPanelHidden'}"> 
 	    <section class="stage panelSlide forceAccess" aria-hidden="true">
@@ -33,7 +43,7 @@
          <section class="stage panelSlide forceAccess" aria-hidden="false">
                 <span>test</span>
          </section>
-         <div class="forcePanelModal active">
+         <div class="uiModalOverlay active">
              <div class="panelModal">test</div>
          </div>
      </aura:if>
@@ -43,47 +53,47 @@
           <section class="stage panelSlide forceAccess" aria-hidden="false">
                 <span>test</span>
           </section>
-          <div class="forcePanelModal active">
+          <div class="uiModalOverlay active">
                 <div class="panelModal">test</div>
           </div>
      </aura:if>
-     
+
      <!--Test no active top panel no errors-->
      <aura:if isTrue="{!v.caseToRender == 'testNoActiveTopPanelAriaHiddenOk'}">
            <section class="stage panelSlide forceAccess">
                 <span>test</span>
            </section>
-           <div class="forcePanelModal" aria-hidden="true">
+           <div class="uiModalOverlay" aria-hidden="true">
                 <div class="panelModal">test</div>
            </div>
      </aura:if>
-     
+
      <!--test no active top panel and base panel is set to true, 1 error-->
      <aura:if isTrue="{!v.caseToRender == 'testNoActiveTopPanelBasePanelAriaHiddenIsTrue'}">
             <section class="stage panelSlide forceAccess" aria-hidden="true">
                 <span>test</span>
             </section>
-            <div class="forcePanelOverlay" aria-hidden="true">
+            <div class="uiPanelOverlay" aria-hidden="true">
                 <div class="panelModal">test</div>
             </div>
      </aura:if>
-     
+
      <!--Test no active top panel with aria hidden, error 1-->
      <aura:if isTrue="{!v.caseToRender == 'testNoActiveTopPanelAriaHiddenNotExists'}">
              <section class="stage panelSlide forceAccess" aria-hidden="false">
                 <span>test</span>
              </section>
-             <div class="forcePanelModal">
+             <div class="uiModalOverlay">
                 <div class="panelModal">test</div>
              </div>
      </aura:if>
-    
+
     <!--Should have 1 error -->   
     <aura:if isTrue="{!v.caseToRender == 'testInputDefaultError'}">
-		<uitest:inputDefaultError_Test aura:id="inputErrorTest" caseToRender="all"/>
-		<ui:inputDefaultError value="first error, second error, third error, fourth error"/>
+        <uitest:inputDefaultError_Test aura:id="inputErrorTest" caseToRender="all"/>
+        <ui:inputDefaultError value="first error, second error, third error, fourth error"/>
     </aura:if>
-    
+
       <!--Should Pass Since there are no headers -->   
     <aura:if isTrue="{!v.caseToRender == 'testWithNoHeader'}">
        <table>
@@ -152,7 +162,7 @@
        </table>
     </aura:if>
     <!--Should fail since a TD has an invalid id in its headers--> 
-    <aura:if isTrue="{!v.caseToRender == 'testTDUsesWrongID'}">              
+    <aura:if isTrue="{!v.caseToRender == 'testTDUsesWrongID'}">
        <table>
              <tr> 
                <th rowspan="2" id="h">Homework</th> 
@@ -205,8 +215,7 @@
              </tr> 
        </table>
     </aura:if>
-        
-    
+
     <!--Should fail since a TH does not have an id attribute--> 
     <aura:if isTrue="{!v.caseToRender == 'testTableHeaderWoID'}">
        <table>
@@ -234,7 +243,7 @@
              </tr> 
        </table>
     </aura:if>
-    
+
     <!--Should fail since a TH does not have id--> 
     <aura:if isTrue="{!v.caseToRender == 'testTableHeadersWandWoScope'}">              
        <table>
@@ -270,7 +279,7 @@
              </tr>
        </table>
     </aura:if>
-    
+
     <!--Test for case where VF creates iframes but they dynamically add title after rendering. Test is to make sure that VF items are skipped-->
     <aura:if isTrue="{!v.caseToRender == 'skipIframeForVisForce'}">
         <iframe id="vfFrameId" src="http://localhost.blah.com/apex//testDetail0000?id=000x000xxx0000000"></iframe>
@@ -278,7 +287,7 @@
         <iframe id="vfFrameId" src="/setup/ui/blah.jsp"></iframe>
         <iframe src="http://www.salesforce.com"></iframe> 
     </aura:if>
-    
+
     <!--Test for image alt. Mixture of failures and correct tags-->  
     <aura:if isTrue="{!v.caseToRender == 'imageTagTest'}">
          <img src="1" alt="Blah"/>
@@ -592,5 +601,4 @@
         <button/>
         <iframe/>
     </aura:if>
-    
 </aura:component>

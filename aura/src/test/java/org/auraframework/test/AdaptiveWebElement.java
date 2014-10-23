@@ -45,7 +45,6 @@ public class AdaptiveWebElement extends RemoteWebElement {
     public WebElement scrollIntoView() {
         try {
             getCoordinates().inViewPort();
-            return this;
         } catch (Exception ex) {
             // TODO ios-driver: NullPointerException at RemoteWebElement$1.inViewPort(RemoteWebElement.java:362)
             // Ignore Exception and try a different approach

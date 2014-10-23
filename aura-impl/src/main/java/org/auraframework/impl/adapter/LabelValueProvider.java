@@ -50,7 +50,7 @@ public class LabelValueProvider implements GlobalValueProvider {
         String param = parts.get(1);
         Map<String, String> m = labels.get(section);
         if (m == null) {
-            m = new HashMap<String, String>();
+            m = new HashMap<>();
             labels.put(section, m);
         }
         String ret = m.get(param);

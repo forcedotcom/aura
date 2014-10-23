@@ -18,7 +18,10 @@
 	 * Test to verify action menu works when interacting with the menu items
 	 * using AURA API  
 	 */
+	owner:"ronak.shah",
+	
 	testActionMenu:{
+		owner:"ctatlah,ronak.shah",
 		test: [function(cmp) {
 				actionMenu = cmp.find("actionMenu");
 	        	menuLabel = cmp.find("trigger");
@@ -64,7 +67,7 @@
 	 * using AURA API  
 	 */
     testCheckboxMenu:{
-		test: [function(cmp) {
+    	test: [function(cmp) {
 				menuLabel = cmp.find("checkboxMenuLabel");
 				checkboxMenu = cmp.find("checkboxMenu");
 				ouptutButton = cmp.find("checkboxButton");
@@ -111,7 +114,7 @@
 	 * using AURA API  
 	 */
     testRadioMenu:{
-		test: [function(cmp) {
+    	test: [function(cmp) {
 				menuLabel = cmp.find("radioMenuLabel");
 				radioMenu = cmp.find("radioMenu");
 				ouptutButton = cmp.find("radioButton");
@@ -150,7 +153,7 @@
 	 * Test Case for W-1617363, W-1617518 
 	 */
     testRadioMenuCreatedByIteration:{
-		test: [function(cmp) {
+    	test: [function(cmp) {
 				menuLabel = cmp.find("iterationTrigger");
 				radioMenu = cmp.find("iterationRadioMenu");
 				ouptutButton = cmp.find("radioIterationButton");

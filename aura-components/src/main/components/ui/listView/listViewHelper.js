@@ -147,8 +147,10 @@
 	},
 
 	buildRows : function(component, templates, listBody) {
-		if (!templates)
+		if (!templates) {
 			templates = {};
+		}
+
 		var blockSize = component.get("v.blockSize");
 		var buildRowBlock = buildRowBlock.bind(this);
 		var containerSet = false;
@@ -156,7 +158,7 @@
 		var dataTemplateCount = dataTemplates.length;
 		var index = 0;
 		var items = component.get("v.items");
-		var itemCount = items.length;
+		var itemCount = items ? items.length : 0;
 		var listId = component.get("v.id");
 		var rows = [];
 		var rowTooltip = component.get("v.rowTooltip");
@@ -246,11 +248,23 @@
 					if (!attributes.tooltip && !rowTooltip)
 						attributes.tooltip = this.getTextContent(content);
 					attributes.body = content;
+                    attributes.markup = content;
 
 					// Generate the concrete column type from the template
 					var typeName = template.getDef().getDescriptor().getQualifiedName();
+                    //JBUCH: HALO: FIXME: GIANT HACK
+                    var setUrl=false;
+                    if(typeName=="markup://ui:listViewColumnEmail"){
+                        if(!attributes["url"]||attributes["url"]==="mailto:"){
+                            attributes["url"]=attributes["body"];
+                            attributes["body"]=null;
+                            setUrl=true;
+                        }
+                    }
 					columns[c] = this.generateComponent(typeName, attributes, template.events);
-
+                    if(setUrl){
+                        attributes["url"]='';
+                    }
 					// Reset the tooltip in case we changed it.
 					attributes.tooltip = tooltip;
 				}
@@ -343,8 +357,6 @@
 	},
 
 	formatContent : function(columnTemplate, dataItem, fieldName, items, index, formatters) {
-		if (dataItem.unwrap)
-			dataItem = dataItem.unwrap();
 		var content = dataItem[fieldName];
 		if (content == null)
 			content = this.resolveObject(dataItem, fieldName);
@@ -363,10 +375,10 @@
 
 	generateColumns : function(component) {
 		var columns = [];
-		var itemWrapper = component.get("v.items")[0];
-		if (itemWrapper != undefined) {
-			var item = itemWrapper.unwrap ? itemWrapper.unwrap() : itemWrapper;
-			for ( var column in item) {
+		var items = component.get("v.items");
+		if (items && items.length > 0) {
+			var item = items[0];
+			for (var column in item) {
 				// Only generate columns for first level properties that are not
 				// methods
 				if (!item.hasOwnProperty(column) || typeof (item[column]) == "function")
@@ -401,9 +413,9 @@
 	getAttributes : function(component) {
 		var attributeMap = {};
 		var attributeDelegate = this.getAttribute.bind(this, component, attributeMap);
-		
+
 		component.getDef().getAttributeDefs().each(attributeDelegate);
-		
+
 		return attributeMap;
 	},
 
@@ -417,26 +429,27 @@
 		// Create recursion pointer constructs for first level call
 		if (!columnTemplates)
 			columnTemplates = [];
-		
+
 		if (!colSpans)
 			colSpans = [];
-		
+
 		if (!dataTemplates)
 			dataTemplates = [];
-		
+
 		if (!depth)
 			depth = 0;
-		
+
 		if (!nextId)
 			nextId = 0;
-		
+
 		if (!headers)
 			headers = [];
 		else
 			component.set("v.headers", headers.join(' '));
-		
-		if (!listId){
-			listId = component.find("listView:table").getValue("v.HtmlAttributes.id").getValue(component).getValue();;
+
+		if (!listId) {
+			var table = component.find("listView:table");
+			listId = table.get("v.HTMLAttributes.id");
 		}
 
 		var id = null;
@@ -445,7 +458,7 @@
 			instancesOf : "ui:listViewColumn"
 		});
 
-		if (listViewColumns.length) {
+		if (listViewColumns.length > 0) {
 			// Iterate over child templates at the current depth
 			if (!columnTemplates[depth])
 				columnTemplates[depth] = [];
@@ -477,7 +490,7 @@
 				// lowest level columns
 				colSpans.length += childColumns.length;
 			}
-			
+
 			component.set("v.colSpan", colSpans.length);
 		} else {
 			// No child columns, so add this column to the list of data columns,
@@ -626,7 +639,7 @@
 				var value = attributes[field];
 				var expression = this.getExpression(value);
 				if (expression) {
-					value = $A.expressionService.get(component, expression);
+					value = component.get(expression);
 					if (value) {
 						component.set("v." + field, value);
 					}
@@ -669,32 +682,6 @@
 			setTimeout(callback, 13)
 		}).bind(global);
 		this.setImmediate(callback);
-	},
-
-	// IObserver Members
-	addObservers : function(component, actionDelegate, propertyList) {
-		component = component.getConcreteComponent();
-		var attributes = propertyList.join(',');
-		var attribute = null;
-		for (var i = 0; i < propertyList.length; i++) {
-			
-			// DCHASMAN TODO HALO I have no idea what to do with this
-			
-			attribute = component.getValue("v." + propertyList[i]);
-			attribute.setValue = this.setValueObserver.bind(this, component, attributes, attribute, attribute.setValue.bind(attribute), actionDelegate);
-		}
-	},
-
-	setValueObserver : function(component, attributes, attribute, setValueDelegate, actionDelegate, value, skipObserver) {
-		if (attribute.unwrap() === value)
-			return;
-		setValueDelegate(value);
-		if (!component.observerTimers)
-			component.observerTimers = [];
-		if (component.observerTimers[attributes])
-			clearTimeout(component.observerTimers[attributes]);
-		if (!skipObserver)
-			component.observerTimers[attributes] = setTimeout(actionDelegate.bind(this, component), 13);
 	}
 
 })

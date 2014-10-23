@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -32,8 +33,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Provider
-public class TestJavaProviderSettingAttributeValuesViaComponentConfig {
-    public static ComponentConfig provide() throws QuickFixException {
+public class TestJavaProviderSettingAttributeValuesViaComponentConfig implements ComponentConfigProvider {
+    @Override
+    public ComponentConfig provide() throws QuickFixException {
         ComponentConfig c = new ComponentConfig();
 
         c.setDescriptor(DefDescriptorImpl.getInstance(
@@ -44,7 +46,7 @@ public class TestJavaProviderSettingAttributeValuesViaComponentConfig {
     }
 
     private static Map<String, Object> provideAttributes() throws QuickFixException {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("a1", "a1Provider");
         attributes.put("a2", null);
         attributes.put("b1", "b1Provider");

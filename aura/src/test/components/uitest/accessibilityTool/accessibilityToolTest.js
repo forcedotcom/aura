@@ -16,7 +16,6 @@
 ({
     //Excluding IE7/8 because this test will only work with modern browsers
     browsers: ["-IE7", "-IE8"],
-
     
         runTest: function (expected, errorMessage, element, testsToSkip) {
             var output = $A.devToolService.checkAccessibility(element, testsToSkip);
@@ -28,7 +27,7 @@
             $A.test.assertEquals(expected, actual, errorMessage + output);
            
         },
-        //This test is used for checking that we can conditionally skipp checks
+        //This test is used for checking that we can conditionally skip checks
         testRunSpecificChecks: {
             attributes: {
                 caseToRender: 'full'
@@ -40,6 +39,16 @@
                     this.runTest(9, "Unexpected return from CheckAccessibility, should return 3 errors. output: \n", null, ["A11Y_DOM_06", "A11Y_DOM_02", "A11Y_DOM_08"]);
                 }]
         },
+        
+        testMultiInputDefaultULToSingleInput :  {
+        	attributes: {
+                caseToRender: 'testMultiULToOne'
+            },
+            test: function (cmp) {
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
+            }
+        },
+        
         testInputDefaultError : {
         	attributes: {
                 caseToRender: 'testInputDefaultError'
@@ -54,7 +63,7 @@
                 caseToRender: 'testWithNoHeader'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testThWithScopeNoTD: {
@@ -62,7 +71,7 @@
                 caseToRender: 'testThWithScopeNoTD'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testThWithIdNoTD: {
@@ -70,7 +79,7 @@
                 caseToRender: 'testThWithIdNoTD'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testTableHeaderWithScope: {
@@ -78,7 +87,7 @@
                 caseToRender: 'testTableHeaderWithScope'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testTHandTDtagsAssociateCorrectly: {
@@ -86,7 +95,7 @@
                 caseToRender: 'testTHandTDtagsAssociateCorrectly'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testTDUsesWrongID: {
@@ -142,8 +151,8 @@
                 caseToRender: 'fieldSetWithStyles'
             },
             test: function (cmp) {
-                cmp.get("field_set_W_style_and_legend").getElement().style.display = "none";
-                cmp.get("field_set_field_style_no_legend").getElement().style.display = "none";
+                cmp.find("field_set_W_style_and_legend").getElement().style.display = "none";
+                cmp.find("field_set_field_style_no_legend").getElement().style.display = "none";
 
                 this.runTest(2, "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
             }
@@ -161,7 +170,7 @@
                 caseToRender: 'imageTagTest'
             },
             test: function (cmp) {
-                this.runTest(8, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(8, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testHeadersCorrectOrder: {
@@ -169,7 +178,7 @@
                 caseToRender: 'headersCorrectOrder'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -196,7 +205,7 @@
                 caseToRender: 'headersWrongOrderReverse'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -205,7 +214,7 @@
                 caseToRender: 'anchorWInnerText'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -223,7 +232,7 @@
                 caseToRender: 'anchorInOutputURLInfo'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -250,7 +259,7 @@
                 caseToRender: 'NoRadioErrors'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -259,7 +268,7 @@
                 caseToRender: 'labelTest'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -277,7 +286,7 @@
                 caseToRender: 'anchorMenuTest'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -286,7 +295,7 @@
                 caseToRender: 'ckeditor_test'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
 
@@ -310,7 +319,7 @@
                 caseToRender: 'None'
             },
             test: function (cmp) {
-                this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
+                this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
         testSkipVisualForceIframes: {

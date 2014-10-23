@@ -75,7 +75,7 @@ public class DateServiceTest extends UnitTestCase {
         "EEE, d MMM yyyy HH:mm:ss Z", "yyMMddHHmmssZ", "yyyy-MM-dd'T'HH:mm:ss.SSSZ" };
 
     public List<LocaleConfig> getConfigs() {
-        List<LocaleConfig> configs = new ArrayList<LocaleConfig>();
+        List<LocaleConfig> configs = new ArrayList<>();
         configs.add(new LocaleConfig(Locale.TRADITIONAL_CHINESE, TimeZone.getTimeZone("GMT+8")));
         configs.add(new LocaleConfig(Locale.US, TimeZone.getTimeZone("EST")));
         configs.add(new LocaleConfig(new Locale("en", "US"), TimeZone.getTimeZone("PDT")));

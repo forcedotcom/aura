@@ -52,6 +52,12 @@
         shortName: "Dec"
     }],
 
+    attachToDocumentBody: function(component) {
+        var body = document.getElementsByTagName("body")[0];
+        var elem = component.getElement();
+        body.appendChild(elem);
+    },
+
     focusDate: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.focus");
@@ -188,15 +194,7 @@
     },
 
     isElementInComponent : function(component, targetElem) {
-        var componentElements = [];
-
-        //grab all the siblings
-        var elements = component.getElements();
-        for(var index in elements) {
-            if (elements.hasOwnProperty(index)){
-                componentElements.push(elements[index]);
-            }
-        }
+        var componentElements = component.getElements();
 
         //go up the chain until it hits either a sibling or the root
         var currentNode = targetElem;
@@ -217,7 +215,7 @@
         if (!todayCmp) {
             return;
         }
-        var todayLabel = component.get("m.labelForToday");
+        var todayLabel = $A.get("$Locale.labelForToday");
         if (!todayLabel) {
             todayLabel = "Today";
         }
@@ -228,7 +226,8 @@
         var ret = 'en';
         var lang = [];
         var token = "";
-        var langLocale = component.get("m.langLocale");
+        var langLocale = $A.get("$Locale.langLocale");
+        //var langLocale = component.get("m.langLocale");
         if (langLocale) {
             var index = langLocale.indexOf("_");
             while (index > 0) {
@@ -280,7 +279,7 @@
             var isPhone = $A.get("$Browser.isPhone");
 
             if (isPhone === true) {
-                $A.util.attachToDocumentBody(component.getElement());
+                this.attachToDocumentBody(component);
                 var scrollerDivCmp = component.find("scroller");
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.
@@ -377,9 +376,8 @@
                 if (elem) {
                     var m = grid.get("v.month");
                     var y = grid.get("v.year");
-                    //var title = this.MonthLabels[m].fullName + " " + y;
-                    var monthLabels = component.get("m.monthLabels");
-                    var title = monthLabels[m].fullName + " " + y;
+                    var monthLabels = $A.get("$Locale.nameOfMonths");
+                    var title = monthLabels ? monthLabels[m].fullName + " " + y : this.MonthLabels[m].fullName + " " + y;
                     elem.textContent = elem.innerText = title;
                 }
             }
@@ -393,8 +391,8 @@
             var y = grid.get("v.year");
             var monthTitleCmp = component.find("monthTitle");
             if (monthTitleCmp) {
-                var monthLabels = component.get("m.monthLabels");
-                monthTitleCmp.set("v.value", monthLabels[m].fullName);
+                var monthLabels = $A.get("$Locale.nameOfMonths");
+                monthTitleCmp.set("v.value", monthLabels ? monthLabels[m].fullName : this.MonthLabels[m].fullName);
             }
             var yearTitleCmp = component.find("yearTitle");
             var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
@@ -410,8 +408,8 @@
         if (grid && yearCmp) {
             var e = grid.get("e.updateCalendar");
             if (e) {
-                var y = parseInt(grid.get("v.year"));
-                var selectedYear = parseInt(yearCmp.getElement().value);
+                var y = parseInt(grid.get("v.year"),10);
+                var selectedYear = parseInt(yearCmp.getElement().value,10);
                 e.setParams({monthChange: 0, yearChange: selectedYear - y, setFocus: false});
                 e.fire();
             }

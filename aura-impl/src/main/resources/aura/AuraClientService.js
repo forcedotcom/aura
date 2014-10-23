@@ -515,7 +515,7 @@ var AuraClientService = function() {
             var config = $A.util.json.resolveRefs(rawConfig);
 
             // Save off any context global stuff like new labels
-            $A.getContext().join(config["context"]);
+            $A.getContext().merge(config["context"]);
 
             var actionResult = config["actions"][0];
             var action = $A.get("c.aura://ComponentController.getComponent");
@@ -562,11 +562,10 @@ var AuraClientService = function() {
                     self.addComponentHandlers(c, config["actionEventHandlers"]);
                 }
 
-                var body = root.getValue("v.body");
+                var body = root.get("v.body");
                 body.push(c);
-
                 // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
-                body.commit();
+                root.set("v.body",body,true);
 
                 $A.render(c, element);
 
@@ -585,30 +584,30 @@ var AuraClientService = function() {
          */
         createIntegrationErrorConfig: function(errorText) {
             return {
-                "componentDef" : {
-                    "descriptor" : "markup://ui:message"
-                },
+                        "componentDef" : {
+                            "descriptor" : "markup://ui:message"
+                        },
 
-                "attributes" : {
-                    "values" : {
-                        "title" : "Aura Integration Service Error",
-                        "severity" : "error",
-                        "body" : [
-                            {
-                                "componentDef" : {
-                                    "descriptor" : "markup://ui:outputText"
-                                },
+                        "attributes" : {
+                            "values" : {
+                                "title" : "Aura Integration Service Error",
+                                "severity" : "error",
+                                "body" : [
+                                    {
+                                        "componentDef" : {
+                                            "descriptor" : "markup://ui:outputText"
+                                        },
 
-                                "attributes" : {
-                                    "values" : {
+                                        "attributes" : {
+                                            "values" : {
                                         "value" : $A.util.json.encode(errorText)
+                                            }
+                                        }
                                     }
-                                }
+                                ]
                             }
-                        ]
-                    }
-                }
-            };
+                        }
+                    };
         },
 
         /**
@@ -625,7 +624,7 @@ var AuraClientService = function() {
             if (!hostEl) {
                 error = "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId;
                 hostEl = document.body;
-            }
+                }
 
             if (component.isInstanceOf("aura:text")) {
                 // check for component creation error
@@ -666,20 +665,20 @@ var AuraClientService = function() {
         addComponentHandlers: function(component, actionEventHandlers) {
             if (actionEventHandlers) {
                 var containerValueProvider = {
-                    getValue : function(functionName) {
+                    get : function(functionName) {
                         return {
-                            run : function(evt) {
-                                window[functionName](evt);
+                    run : function(evt) {
+                        window[functionName](evt);
                             },
-                            runDeprecated : function(evt) {
-                                window[functionName](evt);
-                            }
-                        };
-                    }
-                };
+                    runDeprecated : function(evt) {
+                        window[functionName](evt);
+                        }
+                    };
+                }
+            };
 
-                for (var evt in actionEventHandlers) {
-                    component.addHandler(evt, containerValueProvider, actionEventHandlers[evt]);
+            for (var evt in actionEventHandlers) {
+                component.addHandler(evt, containerValueProvider, actionEventHandlers[evt]);
                 }
             }
         },
@@ -788,7 +787,7 @@ var AuraClientService = function() {
                     $A.run(function() {
                         callback(!!response && !!response.value && !response.isExpired);
                     });
-                });
+            });
         },
 
         /**
@@ -821,8 +820,8 @@ var AuraClientService = function() {
         },
 
         /**
-         * Clears an action out of the action cache. 
-         * 
+         * Clears an action out of the action cache.
+         *
          * @param descriptor {String} action descriptor.
          * @param params {Object} map of keys to parameter values.
          * @param successCallback {Function} called after the action was invalidated. Called with true if the action was

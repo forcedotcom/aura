@@ -17,7 +17,7 @@
     waitForLayoutChange: function(test, component, callback){
         aura.test.runAfterIf(
             function(){
-                var elem = component.find("ready").getElement();
+                var elem = component.find("ready");
                 var done = $A.util.hasClass(elem,"layoutChanged");
                 if(done){
                     $A.util.removeClass(elem,"layoutChanged");
@@ -30,7 +30,7 @@
     waitForTitleChange: function(component, callback){
         aura.test.runAfterIf(
             function(){
-                var elem = component.find("ready").getElement();
+                var elem = component.find("ready");
                 var done = $A.util.hasClass(elem,"titleChanged");
                 if(done){
                     $A.util.removeClass(elem,"titleChanged");
@@ -57,7 +57,7 @@
                 return $A.eventService.hasPendingEvents;
             },
             function(){
-                var elem = component.find("ready").getElement();
+                var elem = component.find("ready");
                 aura.test.assertFalse($A.util.hasClass(elem,"layoutChanged"), "LayoutChange fired unexpectedly!");
                 aura.test.assertFalse($A.util.hasClass(elem,"titleChanged"), "TitleChange fired unexpectedly!");
                 if(callback)
@@ -78,7 +78,7 @@
     },
 
     /**
-     * Changing layout with SimpleValue title to no title fires change events with undefined title.
+     * Changing layout title to no title fires change events with undefined title.
      */
     testSimpleTitleToNoTitle: {
         attributes : {__layout: '#stringTitle'},

@@ -209,23 +209,102 @@ $A.ns.Util.prototype.getElement = function(id){
 };
 
 /**
+ * Gets a copy of an object. In the case of an Array or Object, returns a shallow copy. In the case of a literal,
+ * returns the literal value.
+ *
+ * @param {Object} value The value for which to return a comparable copy.
+ * @returns {Object} The comparable copy of the value supplied.
+ */
+$A.ns.Util.prototype.copy = function(value){
+    if(this.isArray(value)){
+        return value.slice();
+    }
+    if(this.isObject(value)){
+        var copy={};
+        this.apply(copy,value,true);
+        return copy;
+    }
+    return value;
+};
+
+/**
+ * Compares values. In the case of an Array or Object, compares first level references only.
+ * In the case of a literal, directly compares value and type equality.
+ *
+ * @param {Object} expected The source value to compare.
+ * @param {Object} actual The target value to compare.
+ * @returns {Object} The result of the comparison, with reasons.
+ */
+$A.ns.Util.prototype.compareValues = function(expected, actual){
+    var result={
+        match:true,
+        reasons:[]
+    };
+    if(this.isArray(expected)){
+        if(!this.isArray(actual)){
+            result.reasons.push({index:-1,reason:"Actual was not an Array."});
+            result.match=false;
+        }else {
+            var length = Math.max(expected.length, actual.length);
+            for (var i = 0; i < length; i++) {
+                if (expected[i] !== actual[i]) {
+                    result.reasons.push({index: i, reason: "Mismatch at position " + i + "."});
+                    result.match = false;
+                }
+            }
+        }
+    }else if(this.isObject(expected)){
+        if(!this.isObject(actual)){
+            result.reasons.push({index:-1,reason:"Actual was not an Object."});
+            result.match=false;
+        }
+        var keyMap={};
+        for(var expectedKey in expected){
+            keyMap[expectedKey]=true;
+            if(expected[expectedKey]!==actual[expectedKey]){
+                result.reasons.push({index: expectedKey, reason: "Mismatch at key " + expectedKey + "."});
+                result.match = false;
+            }
+        }
+        for(var actualKey in actual){
+            if(keyMap[actualKey]){
+                continue;
+            }
+            result.reasons.push({index: actualKey, reason: "Found new key " + actualKey + "."});
+            result.match = false;
+        }
+    }else{
+        if(expected!==actual){
+            result.reasons.push({index:-1,reason:"Literal value mismatch."});
+            result.match=false;
+        }
+    }
+    return result;
+};
+
+
+/**
  * Checks whether the element has the specified class.
  *
  * @param {Object} element The element to check for.
- * @param {String} clz The CSS class name to check for.
+ * @param {String} className The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
  */
-$A.ns.Util.prototype.hasClass = function(element, clz){
-    if(element){
-        var cn = element["className"] || '';
-        var split = cn.split(' ');
-        for (var i = 0; i < split.length; i++) {
-            if (split[i] === clz) {
-                return true;
-            }
+$A.ns.Util.prototype.hasClass = function(element, className){
+    var oldClass='';
+    if(this.isComponent(element)){
+        if(element.isInstanceOf("ui:elementInterface") || element.isInstanceOf("ui:visible")) {
+            oldClass=element.get("v.class");
+        }else if(element.isInstanceOf("aura:html")){
+            oldClass=element.get("v.HTMLAttributes.class");
+        }else{
+            element=element.getElement();
         }
     }
-    return false;
+    if(element && element.tagName){
+        oldClass=element["className"];
+    }
+    return (' '+oldClass+' ').indexOf(' '+className+' ')>-1;
 };
 
 /**
@@ -236,23 +315,8 @@ $A.ns.Util.prototype.hasClass = function(element, clz){
  * @param {String} clz The CSS class to be applied on the element.
  *
  */
-$A.ns.Util.prototype.addClass = function(element, clz){
-    if(element && element.tagName){
-        if (clz) {
-            clz = this.trim(clz);
-            var oldClz = element["className"] || "";
-            oldClz = this.trim(oldClz);
-            if (oldClz) {
-                if ((' ' + oldClz + ' ').indexOf(' ' + clz + ' ') == -1) {
-                    element["className"] = oldClz + ' ' + clz;
-                }
-            } else {
-
-                    element["className"] = clz;
-
-            }
-        }
-    }
+$A.ns.Util.prototype.addClass = function(element, newClass){
+    this.setClass(element,newClass,false);
 };
 
 /**
@@ -260,42 +324,28 @@ $A.ns.Util.prototype.addClass = function(element, clz){
  * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
  *
  * @param {Object} element The element to remove the class from.
- * @param {String} clz The CSS class to be removed from the element.
+ * @param {String} newClass The CSS class to be removed from the element.
  */
-$A.ns.Util.prototype.removeClass = function(element, clz){
-    if(!element){
-        return;
-    }
-    var cn = element["className"] || '';
-    var split = cn.split(' ');
-    var newClass = [];
-    var found = false;
-    for (var i = 0; i < split.length; i++) {
-        var c = split[i];
-        if (c === clz) {
-            found = true;
-        } else {
-            newClass.push(c);
-        }
-    }
-    if (found) {
-        element["className"] = newClass.join(' ');
-    }
+$A.ns.Util.prototype.removeClass = function(element, newClass){
+    this.setClass(element,newClass,true);
 };
 
 /**
  * Adds a class or removes it from an element.
  *
  * @param {Object} element The element to add or remove the class from.
- * @param {String} clz The CSS class to be added or removed from the class.
+ * @param {String} className The CSS class to be added or removed from the class.
  */
-$A.ns.Util.prototype.toggleClass = function(element, clz){
-    if(this.hasClass(element, clz)){
-        this.removeClass(element, clz);
-        return false;
-    }else{
-        this.addClass(element,clz);
+$A.ns.Util.prototype.toggleClass = function(element, className, condition){
+    if(condition===undefined){
+        condition=!this.hasClass(element, className);
+    }
+    if(condition){
+        this.addClass(element,className);
         return true;
+    }else{
+        this.removeClass(element, className);
+        return false;
     }
 };
 
@@ -303,39 +353,106 @@ $A.ns.Util.prototype.toggleClass = function(element, clz){
  * Swaps an element's class by removing the selected class and adding another in its place.
  *
  * @param {Object} element The element to be processed.
- * @param {String} clz1 The class to remove from the element.
- * @param {String} clz2 The class to add to the element.
+ * @param {String} oldClass The class to remove from the element.
+ * @param {String} newClass The class to add to the element.
  */
-$A.ns.Util.prototype.swapClass = function(element, clz1, clz2){
-    clz1 = this.isArray(clz1)?clz1:[clz1];
-    clz2 = this.isArray(clz2)?clz2:[clz2];
-    for(var i=0;i<clz1.length;i++){
-        this.removeClass(element, clz1[i]);
+$A.ns.Util.prototype.swapClass = function(element, oldClass, newClass){
+    oldClass = this.isArray(oldClass)?oldClass:[oldClass];
+    newClass = this.isArray(newClass)?newClass:[newClass];
+    for(var i=0;i<oldClass.length;i++){
+        this.removeClass(element, oldClass[i]);
     }
-    for(i=0;i<clz2.length;i++){
-        this.addClass(element, clz2[i]);
+    for(i=0;i<newClass.length;i++){
+        this.addClass(element, newClass[i]);
     }
+};
+
+$A.ns.Util.prototype.setClass=function(element,newClass,remove){
+    if(this.isComponent(element)){
+        var attribute=null;
+        if(element.isInstanceOf("ui:elementInterface") || element.isInstanceOf("ui:visible")) {
+            attribute="v.class";
+        }else if(element.isInstanceOf("aura:html")){
+            attribute="v.HTMLAttributes.class";
+        }else{
+            element=element.getElement();
+        }
+        if(attribute){
+            var oldClass=element.get(attribute)||"";
+            var constructedClass=this.buildClass(oldClass,newClass,remove);
+            if(oldClass!==constructedClass){
+                element.set(attribute,constructedClass);
+            }
+        }
+    }
+    if(element && element.tagName){
+        element["className"] = this.buildClass(element["className"]||"",newClass,remove);
+    }
+};
+
+$A.ns.Util.prototype.buildClass=function(oldClass, newClass, remove){
+    if(this.isUndefinedOrNull(oldClass)) {
+        oldClass='';
+    }
+    if(this.isUndefinedOrNull(newClass)){
+        return oldClass;
+    }
+    newClass = this.trim(newClass);
+    oldClass = this.trim(oldClass);
+    var found=(' '+oldClass+' ').indexOf(' '+newClass+' ')>-1;
+    if(remove){
+        if(!found){
+            return oldClass;
+        }
+        return this.trim((' '+oldClass+' ').split(' '+newClass+' ').join(' '));
+    }else{
+        if(oldClass){
+            if(!found){
+                return  oldClass + ' ' + newClass;
+            } else {
+                return oldClass;
+            }
+        }else{
+            return newClass;
+        }
+    }
+};
+
+/**
+ * Generates dom nodes from string markup
+ *
+ * @param {String} markup The markup from which to generate dom nodes
+ * @returns {Array} An array of the elements that were generated.
+ */
+$A.ns.Util.prototype.createElementsFromMarkup=function(markup){
+    if(!this.isUndefinedOrNull(markup)) {
+        var tmpNode = document.createElement("span");
+        tmpNode.innerHTML = markup;
+        return Array.prototype.slice.call(tmpNode.childNodes);
+    }
+    return [];
 };
 
 /**
  * Inserts element(s) as the first child of the parent element.
  *
- * @param {Object} parent The parent element
- * @param {Array|Object} child The child element to insert as the first child in the parent element.
+ * @param {Object} newE1 The new element to insert.
+ * @param {Object} referenceE1 The reference element
+ * @returns {Object} The element that was inserted.
  */
-$A.ns.Util.prototype.insertFirst = function(parent, child){
-    if (this.isArray(child)) {
-        for (var i = child.length - 1; i >= 0; i--) {
-            this.insertFirst(parent, child[i]);
-        }
+ $A.ns.Util.prototype.insertFirst = function(newEl, referenceEl){
+    if (this.isArray(newEl)) {
+        var frag = document.createDocumentFragment();
+        this.appendChild(newEl, frag);
+        this.insertFirst(frag, referenceEl);
         return;
     }
-    var firstChild = parent.firstChild;
+    var firstChild = referenceEl.firstChild;
     if (firstChild) {
-        parent.insertBefore(child, firstChild);
+        referenceEl.insertBefore(newEl, firstChild);
     }
     else {
-        parent.appendChild(child);
+        referenceEl.appendChild(newEl);
     }
 };
 
@@ -405,7 +522,9 @@ $A.ns.Util.prototype.appendChild = function(newEl, referenceEl) {
         var frag = document.createDocumentFragment();
         var len = newEl.length;
         for(var i=0;i<len;i++){
-            frag.appendChild(newEl[i]);
+            if(newEl[i]) {
+                frag.appendChild(newEl[i]);
+            }
         }
         newEl = frag;
 
@@ -529,6 +648,8 @@ $A.ns.Util.prototype.truncate = function(st, len, ellipsis, truncateByWord){
     if (!st || !len) {
         return "";
     }
+
+    st=st.toString();
 
     if (len > 0 && st.length > len) {
         if (ellipsis) {
@@ -906,8 +1027,9 @@ $A.ns.Util.prototype.isSubDef = function(def, qname) {
  * @param {Object|Function} baseObject The object that will receive the methods, and properties.
  * @param {Object|Function} members The methods and properties to assign to the baseObject.
  * @param {Boolean} [forceCopy] If the property already exists, should we still copy the member? false by default
+ * @param {Boolean} [deepCopy] Should we continue to navigate child objects if we don't overwrite them? false by default
  */
-$A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy) {
+$A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
     // Probably cheaper to have two loops with only one getting run then doing the if check each time.
     var prop;
     if(forceCopy) {
@@ -918,6 +1040,9 @@ $A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Objec
         for(prop in members) {
             if(!baseObject.hasOwnProperty(prop)) {
                 baseObject[prop] = members[prop];
+            }
+            if(deepCopy){
+                this.apply(baseObject[prop],members[prop]);
             }
         }
     }
@@ -1184,15 +1309,15 @@ if (!!Function.prototype.bind) {
         var args = Array.prototype.slice.call(arguments, 1),
             that = args.shift(),
             util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isFunction(method)) {
             throw new TypeError("$A.util.bind called on non-function.");
-        } 
-        
+        }
+
         if (arguments.length === 1) {
             return method;
         }
-        
+
         return function(/*remaining arguments*/) {
             var remainingArgs = Array.prototype.slice.call(arguments);
             var combined = util.merge([], args, remainingArgs);
@@ -1204,7 +1329,7 @@ if (!!Function.prototype.bind) {
 /**
  * Returns the map's keys as an array.
  * @param {Object} map to extract keys from.
- * @returns {Array} of key {String}s. 
+ * @returns {Array} of key {String}s.
  */
 if (!!(Object && Object.keys)) {
     $A.ns.Util.prototype.keys = function(object, excludeFunctions) {
@@ -1222,15 +1347,15 @@ if (!!(Object && Object.keys)) {
 } else {
     $A.ns.Util.prototype.keys = function(object, excludeFunctions) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         var isAnyObjectType = !util.isObject(object)
             && !util.isFunction(object)
             && !util.isArray(object);
-        
+
         if (isAnyObjectType) {
             throw new TypeError("$A.util.keys called on non-object.");
-        } 
-        
+        }
+
         var keys = [], key;
         for (key in object) {
             if (Object.prototype.hasOwnProperty.call(object, key) && (!excludeFunctions || typeof (object[key]) !== "function")) {
@@ -1278,27 +1403,27 @@ $A.ns.Util.prototype.lookup = function(object /*, var-args of arrays*/) {
 $A.ns.Util.prototype.merge = function(first /*, var-args of arrays*/) {
     var arrays = Array.prototype.slice.call(arguments, 1),
         util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-    
+
     if (!arrays) {
         return first;
     }
-    
+
     if (!util.isArray(first)) {
         throw "Merge takes only arrays as arguments.";
     }
-    
+
     util.forEach(arrays, function(array) {
         if (!util.isArray(array)) {
             throw "Merge takes only arrays as arguments.";
         }
     });
-    
+
     util.forEach(arrays, function(array) {
         util.forEach(array, function(element) {
             first.push(element);
         });
     });
-    
+
     return first;
 };
 
@@ -1316,15 +1441,15 @@ if (!!Array.prototype.forEach) {
      */
     $A.ns.Util.prototype.forEach = function(array, method, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.forEach called on non-array.");
-        }         
-        
+        }
+
         if (!util.isFunction(method)) {
             throw new TypeError("$A.util.forEach called with non-function callback.");
-        } 
-        
+        }
+
         var index;
         for (index = 0; index < array.length; index++) {
             method.call(that, array[index], index);
@@ -1348,15 +1473,15 @@ if (!!Array.prototype.map) {
      */
     $A.ns.Util.prototype.map = function(array, method, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.map called on non-array.");
-        } 
-        
+        }
+
         if (!util.isFunction(method)) {
             throw new TypeError("$A.util.map called with non-function callback.");
-        } 
-        
+        }
+
         var index, result = [];
         for (index = 0; index < array.length; index++) {
             result.push(method.call(that, array[index], index));
@@ -1382,15 +1507,15 @@ if (!!Array.prototype.reduce) {
      */
     $A.ns.Util.prototype.reduce = function(array, method, initial) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.reduce called on non-array.");
-        } 
-        
+        }
+
         if (!util.isFunction(method)) {
             throw new TypeError("$A.util.reduce called with non-function callback.");
-        } 
-        
+        }
+
         var index, result = initial;
         for (index = 0; index < array.length; index++) {
             result = method.call(this, result, array[index], index);
@@ -1414,15 +1539,15 @@ if (!!Array.prototype.every) {
      */
     $A.ns.Util.prototype.every = function(array, predicate, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.every called on non-array.");
-        } 
-        
+        }
+
         if (!util.isFunction(predicate)) {
             throw new TypeError("$A.util.every called with non-function predicate.");
-        } 
-        
+        }
+
         var index;
         for (index = 0; index < array.length; index++) {
             if(!predicate.call(that, array[index], index)) {
@@ -1448,15 +1573,15 @@ if (!!Array.prototype.some) {
      */
     $A.ns.Util.prototype.some = function(array, predicate, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.some called on non-array.");
-        } 
-        
+        }
+
         if (!util.isFunction(predicate)) {
             throw new TypeError("$A.util.some called with non-function predicate.");
-        } 
-        
+        }
+
         var index;
         for (index = 0; index < array.length; index++) {
             if(predicate.call(that, array[index], index)) {
@@ -1482,15 +1607,15 @@ if (!!Array.prototype.filter) {
      */
     $A.ns.Util.prototype.filter = function(array, predicate, that) {
         var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-        
+
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.filter called on non-array.");
-        } 
-        
+        }
+
         if (!util.isFunction(predicate)) {
             throw new TypeError("$A.util.filter called with non-function predicate.");
-        } 
-        
+        }
+
         var index, result = [];
         for (index = 0; index < array.length; index++) {
             if(predicate.call(that, array[index], index)) {
@@ -1703,32 +1828,19 @@ $A.ns.Util.prototype.getWindowSize = function() {
  * @returns {Boolean} True if the object type is a component, or return false otherwise.
  */
 $A.ns.Util.prototype.isComponent = function(obj) {
-    return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Component');
+    return (obj && obj.auraType === 'Component')||false;
 };
 
 /**
- * TODO
+ * Checks if the object is an aura value expression.
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object type is an expression, or false otherwise.
  */
-
-$A.ns.Util.prototype.getNormalizedValueType = function(value) {
-    var valueType;
-
-    if (this.isUndefinedOrNull(value)) {
-        return 'SimpleValue';
-    }
-
-    if (value._getValueType) {
-        valueType = value._getValueType();
-        return valueType === 'RawMapValue' ? 'MapValue' : valueType;
-    } else if ($A.util.isArray(value)) {
-        return 'ArrayValue';
-    } else if ($A.util.isObject(value)) {
-        return 'MapValue';
-    }
-
-    return 'SimpleValue';
-
+$A.ns.Util.prototype.isExpression = function (obj) {
+    return obj&&this.isFunction(obj.isExpression)&&obj.isExpression();
 };
+
 /**
  * Checks if the object is an aura value object via auraType property.
  *
@@ -1736,19 +1848,19 @@ $A.ns.Util.prototype.getNormalizedValueType = function(value) {
  * @returns {Boolean} True if the object type is a component, or return false otherwise.
  */
 $A.ns.Util.prototype.isValue = function(obj) {
-    return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Value');
+    return (obj && obj.auraType === 'Value')||false;
 };
 
 /**
  * Checks if touch events are supported. Cache the result, it shouldn't change.
- * 
+ *
  * @returns {Boolean} True if touch events are supported.
  */
 $A.ns.Util.prototype.supportsTouchEvents = function() {
-    
+
     /*
     * NOTE:
-    * There is no perfect way to detect wether the browser supports touch events or not. 
+    * There is no perfect way to detect wether the browser supports touch events or not.
     * Nice summary here: http://www.stucox.com/blog/you-cant-detect-a-touchscreen
     * But we can get close to it for our use cases making some assumptions.
     */
@@ -1767,7 +1879,7 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
 
             // Aura internal testing
             && ($A.getContext().getMode() !== 'PTEST')
-            && ($A.getContext().getMode() !== 'CADENCE') 
+            && ($A.getContext().getMode() !== 'CADENCE')
             && ($A.getContext().getMode() !== 'SELENIUM')
             && ($A.getContext().getMode() !== 'STATS')
             && ($A.getContext().getMode() !== 'SELENIUMDEBUG');
@@ -1782,31 +1894,6 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
  */
 $A.ns.Util.prototype.estimateSize = function(obj) {
     return this.sizeEstimator.estimateSize(obj);
-};
-
-/**
- * Attempt to track back to the underlying value object 
- *
- * @param {Object} lhs The first object to check.
- * @param {Object} rhs The second object to check.
- */
-$A.ns.Util.prototype.equalBySource = function(lhs, rhs) {
-	if (lhs && rhs) {
-	    // Find the value objects
-	    if (lhs instanceof SimpleValue) {
-	    	lhs = lhs.getValue();
-	    } else {
-	    	lhs = (lhs.getSourceValue && lhs.getSourceValue()) || lhs._arrayValueRef || lhs;
-	    }
-	    
-	    if (rhs instanceof SimpleValue) {
-	    	rhs = rhs.getValue();
-	    } else {
-	    	rhs = (rhs.getSourceValue && rhs.getSourceValue()) || rhs._arrayValueRef || rhs;
-	    }
-	}
-    
-    return lhs === rhs;
 };
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -1893,16 +1980,16 @@ $A.ns.Util.prototype.equalBySource = function(lhs, rhs) {
 	$A.ns.Util.prototype.errorBasedOnMode = function(msg) {
 		$A.error(msg);
 	};
-	
+
 	$A.ns.Util.prototype.includeScript = function(url, callback) {
         if (this.isUndefined(this.includeScript.cache)) {
         	this.includeScript.cache = {};
         }
-        
+
         var cache = this.includeScript.cache;
 
-        var script = cache[url]; 
-        
+        var script = cache[url];
+
         if (script) {
         	if (script.state == "LOADED") {
         		callback.call();
@@ -1911,7 +1998,7 @@ $A.ns.Util.prototype.equalBySource = function(lhs, rhs) {
         	}
         } else {
         	cache[url] = { state: "LOADING", queue: [callback] };
-        	
+
 			var s = document.createElement("script");
 			s.src = url;
 			s.onload = function() {
@@ -1921,7 +2008,7 @@ $A.ns.Util.prototype.equalBySource = function(lhs, rhs) {
 					queue.shift().call();
 				}
 			}
-			
+
 			document.head.appendChild( s ).parentNode.removeChild( s );
         }
 	};

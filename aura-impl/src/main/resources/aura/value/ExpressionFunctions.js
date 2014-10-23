@@ -19,10 +19,8 @@
 /*jslint sub: true */
 var expressionFunctions = {
     "eq": function equals(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         if (aura.util.isUndefinedOrNull(a)) {
             return aura.util.isUndefinedOrNull(b);
         }
@@ -34,17 +32,14 @@ var expressionFunctions = {
     },
 
     "if": function ternary(args) {
-    	var a = args[0];
-    	a = a?a.unwrap():a;
+        var a = args[0];
         return a ? args[1] : args[2];
     },
 
     // add also is string concatenate
     "add": function add(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         if (aura.util.isUndefinedOrNull(a)) {
             if (aura.util.isString(b)) {
                 return b;
@@ -58,100 +53,77 @@ var expressionFunctions = {
     },
 
     "sub": function subtract(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a - b;
     },
 
     "mult": function multiply(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a * b;
     },
 
     "div": function divide(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a / b;
     },
 
     "mod": function modulus(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a % b;
     },
 
     "neg": function negate(args) {
-    	var a = args[0];
-    	a = a?a.unwrap():a;
+        var a = args[0];
         return -a;
     },
 
     "abs": function absolutevalue(args) {
-    	var a = args[0];
-    	a = a?a.unwrap():a;
+        var a = args[0];
         return Math.abs(a);
     },
 
     "gt": function greaterthan(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a > b;
     },
 
     "lt": function lessthan(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a < b;
     },
 
     "ge": function greaterthanorequalto(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a >= b;
     },
 
     "le": function lessthanorequalto(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a <= b;
     },
 
     "and": function and(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
+        var a = args[0];
+        var b = args[1];
         return a && b;
     },
 
     "or": function or(args) {
-    	var a = args[0];
-    	var b = args[1];
-    	a = a?a.unwrap():a;
-    	b = b?b.unwrap():b;
-    	return a || b;
+        var a = args[0];
+        var b = args[1];
+        return a || b;
     },
 
-    "not": function not(args) {                             
-    	var a = args[0];
-        a = a ? a.unwrap() : a;
+    "not": function not(args) {
+        var a = args[0];
         return !a;
     }
 };

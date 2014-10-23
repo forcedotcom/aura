@@ -226,14 +226,14 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
     }
 
     private ClientLibraryDefHandler<ComponentDef> getHandler(String clMarkup) throws Exception {
-        StringSource<ClientLibraryDef> componentSource = new StringSource<ClientLibraryDef>(null, "<aura:component/>", "myID", Format.XML);
+        StringSource<ClientLibraryDef> componentSource = new StringSource<>(null, "<aura:component/>", "myID", Format.XML);
         XMLStreamReader componentXmlReader = getXmlReader(componentSource);
         ComponentDefHandler cdh = new ComponentDefHandler(null, componentSource, componentXmlReader);
         
-        StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<ClientLibraryDef>(null, clMarkup, "myID",
+        StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<>(null, clMarkup, "myID",
                 Format.XML);
         XMLStreamReader xmlReader = getXmlReader(clientLibrarySource);
-        return new ClientLibraryDefHandler<ComponentDef>(cdh, xmlReader,
+        return new ClientLibraryDefHandler<>(cdh, xmlReader,
                 clientLibrarySource);
     }
 

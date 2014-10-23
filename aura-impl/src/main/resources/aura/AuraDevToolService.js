@@ -56,8 +56,8 @@ var AuraDevToolService = function() {
             var cmp = $A.getCmp(event.data);
 
             var elements = cmp.getElements();
-            for(var key in elements){
-                var element = elements[key];
+            for(var i=0;i<elements.length;i++){
+                var element = elements[i];
                 if(element && element["style"]){
                     highlightedElements.push(element);
                     $A.util.addClass(element, "auraDevToolServiceHighlight");
@@ -136,23 +136,14 @@ var AuraDevToolService = function() {
             "actionReferenceValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("ActionReferenceValue"));
             },
-            "arrayValue" : function(){
-                return flattenRegistry(valueFactory.getIndex("ArrayValue"));
-            },
             "functionCallValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("FunctionCallValue"));
-            },
-            "mapValue" : function(){
-                return flattenRegistry(valueFactory.getIndex("MapValue"));
             },
             "passthroughValue" : function(){
                 return flattenRegistry(valueFactory.getIndex("PassthroughValue"));
             },
-            "PropertyChain" : function(){
-                return flattenRegistry(valueFactory.getIndex("PropertyChain"));
-            },
-            "simpleValue" : function(){
-                return flattenRegistry(valueFactory.getIndex("SimpleValue"));
+            "PropertyReferenceValue" : function(){
+                return flattenRegistry(valueFactory.getIndex("PropertyReferenceValue"));
             },
             "value" : function(){
                 var ret = {};
@@ -320,6 +311,7 @@ var AuraDevToolService = function() {
                 if(func !== undefined){
                     val = func.call(root);
                 }else{
+                    //JBUCH: HALO: TODO: INVESTIGATE AND REPLACE
                     if(root.getValue){
                         var f = "";
                         for(var i=place;i<fields.length;i++){
@@ -329,10 +321,8 @@ var AuraDevToolService = function() {
                             f += fields[i];
                         }
                         place = i;
+                        //JBUCH: HALO: TODO: INVESTIGATE AND REPLACE
                         val = root.getValue(f);
-                        if(val && val.unwrap){
-                            val = val.unwrap();
-                        }
                     }
                 }
             }else if($A.util.isFunction(val)){
@@ -476,15 +466,20 @@ var AuraDevToolService = function() {
                  * @returns boolean    - true signifies that it was found
                  */   
              findMatchingId : function (id, tags, attribute2find){
-                 var tagId = null;
+                 var tagIds = null;
                  for(var i = 0; i<tags.length; i++){
-                     tagId = $A.util.getElementAttributeValue(tags[i], attribute2find);
+                     tagIds = $A.util.getElementAttributeValue(tags[i], attribute2find);
                      
-                     if(tagId === id){
-                         return true;
+                     if(!$A.util.isUndefinedOrNull(tagIds)){
+                    	 tagIds = tagIds.trim().split(/\s+/);
+                    	 for(var j = 0; j < tagIds.length; j++){                   	
+	                    	 if(tagIds[j].indexOf(id) == 0){
+	                             return true;
+	                         } 
+                    	 }
                      }
-                 }
-                 
+                     
+                 }                 
                  return false;
              },
             /**
@@ -566,8 +561,8 @@ var AuraDevToolService = function() {
         	     
         	    // Checking for the data_aura_rendered_by attribute 
          	    if(!$A.util.isEmpty(data_aura_rendered_by)){
-         		  imgType = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.imageType');	
-         		  alt     = $A.getCmp(data_aura_rendered_by).getAttributes().getValueProvider().get('v.alt');		 
+         		  imgType = $A.getCmp(data_aura_rendered_by).getAttributeValueProvider().get('v.imageType');	
+         		  alt     = $A.getCmp(data_aura_rendered_by).getAttributeValueProvider().get('v.alt');		 
          	    }
          	    
          	    //Checking for injected image tag
@@ -610,7 +605,7 @@ var AuraDevToolService = function() {
              * 
              * @param   lbls       - All of the labels to
              * @param   inputTags  - The attribute that is being sought (for, id, title, etc)
-             * @returns array     - All errornous tags
+             * @returns array     - All erroneous tags
              */
             inputLabelAide : function(lbls, inputTags){
                 var errorArray = [];
@@ -651,7 +646,7 @@ var AuraDevToolService = function() {
              * @param   attribute - The attribute that is being sought (for, id, title, etc)
              * @param   errorVal  - Value that this attribute should not be set to
              * @param   evalFunc  - Function to evaluate whether or not attribute is valid
-             * @returns array    - All errornous tags
+             * @returns array    - All erroneous tags
              */
             checkForAttrib : function(tags, attribute, errorVal, evalFunc){
                 var errorArray = [];
@@ -704,7 +699,7 @@ var AuraDevToolService = function() {
                     if(!$A.util.isEmpty(data_aura_rendered_by)){
                          cmp = $A.getCmp(data_aura_rendered_by);
                          if(!$A.util.isUndefinedOrNull(cmp)){
-                             cmp = cmp.getAttributes().getValueProvider();
+                        	 cmp = cmp.getAttributeValueProvider();
                              if("getDef" in cmp){
                                  cmp = cmp.getDef().getDescriptor();
                                  cmpName = cmp.getNamespace()+":"+cmp.getName();
@@ -1226,10 +1221,14 @@ var AuraDevToolService = function() {
                 "func" : function (domElem){
                      var accessAideFuncs = aura.devToolService.accessbilityAide;
                      var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
-                        
+                     
+                     var modalOverlay = "div.uiModalOverlay";
+                     var panelOverlay = "div.uiPanelOverlay";
+                     var panelSlide   = "section.stage.panelSlide";
+                     
                      //Get all panels
-                     var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll("div.forcePanelModal"), domElem.querySelectorAll("div.forcePanelOverlay"), domElem.querySelectorAll("section.stage.panelSlide")]);
-                     var topPanelsCount = domElem.querySelectorAll("div.forcePanelOverlay.active").length + domElem.querySelectorAll("div.forcePanelModal.active").length;
+                     var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll(modalOverlay), domElem.querySelectorAll(panelOverlay), domElem.querySelectorAll(panelSlide)]);
+                     var topPanelsCount = domElem.querySelectorAll(modalOverlay+".active").length + domElem.querySelectorAll(panelOverlay+".active").length;
                      var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
                      return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
                 }

@@ -24,9 +24,9 @@ import org.openqa.selenium.WebElement;
 /**
  * Excluding mobile browsers because they have readOnly text fields. Excluding Safari because it does not acknowledge
  * that a value was placed in the inputText box. It works manually though.
- * 
+ *
  * @author mkohanfars
- * 
+ *
  */
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
         BrowserType.SAFARI })
@@ -47,7 +47,7 @@ public class DatePickerManagerUITest extends WebDriverTestCase {
     /**
      * This test is checking for instances where an inputDateTrigger does not have a value attribute set, and that it
      * still opens to the correct value
-     * 
+     *
      * @throws Exception
      */
 

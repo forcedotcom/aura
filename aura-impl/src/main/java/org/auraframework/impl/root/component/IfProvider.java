@@ -46,23 +46,24 @@ public class IfProvider implements ComponentConfigProvider {
         ComponentConfig cc = new ComponentConfig();
         List<Component> components = new ArrayList<Component>();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
-        m.put("realbody", components);
+        m.put("body", components);
         cc.setAttributes(m);
 
         AttributeSet atts = component.getAttributes();
+        m.put("template", atts.getValue("body"));
         Object o = atts.getValue("isTrue");
         Boolean isTrue = (Boolean) o;
-        ComponentDefRefArray facet;
+        ComponentDefRefArrayImpl facet;
         // get body facet if true, else facet if false
         if (isTrue != null && isTrue.booleanValue()) {
-            facet = (ComponentDefRefArray) atts.getValue("body");
+            facet = (ComponentDefRefArrayImpl) atts.getValue("body");
         } else {
-            facet = (ComponentDefRefArray) atts.getValue("else");
+            facet = (ComponentDefRefArrayImpl) atts.getValue("else");
         }
         if (facet != null) {
-            iStack.setAttributeName("realbody");
+            iStack.setAttributeName("body");
             components.addAll(facet.newInstance(atts.getValueProvider()));
-            iStack.clearAttributeName("realbody");
+            iStack.clearAttributeName("body");
         }
         return cc;
     }

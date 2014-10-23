@@ -19,10 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -30,13 +31,14 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 
 @Provider
-public class TestJavaProviderSettingAttributeValues {
-    public static DefDescriptor<ComponentDef> provide() {
-        return DefDescriptorImpl.getInstance("test:testJavaProviderSettingAttributeValuesHelper", ComponentDef.class);
-    }
+public class TestJavaProviderSettingAttributeValues implements ComponentConfigProvider {
+    @Override
+    public ComponentConfig provide() throws QuickFixException {
+        ComponentConfig config = new ComponentConfig();
 
-    public static Map<String, Object> provideAttributes() throws QuickFixException {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        config.setDescriptor(DefDescriptorImpl.getInstance("test:testJavaProviderSettingAttributeValuesHelper",
+                    ComponentDef.class));
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("a1", "a1Provider");
         attributes.put("a2", null);
         attributes.put("b1", "b1Provider");
@@ -48,6 +50,7 @@ public class TestJavaProviderSettingAttributeValues {
             attributes.put("b2", "b2Provider");
         }
 
-        return attributes;
+        config.setAttributes(attributes);
+        return config;
     }
 }

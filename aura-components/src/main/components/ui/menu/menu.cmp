@@ -25,7 +25,7 @@
     <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
     
-    <div aura:id="app" class="{!v.class}" onclick="{!c.click}" role="application">
+    <div aura:id="app" class="{!v.class}"  role="application">
         {!v.body}
     </div>
 </aura:component>

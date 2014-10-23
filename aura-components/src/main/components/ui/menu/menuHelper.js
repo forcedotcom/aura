@@ -42,16 +42,7 @@
     		return false;
     	}
     	
-        var componentElements = [];
-
-        //grab all the siblings
-        var elements = component.getElements();
-        for(var index in elements) {
-            if (elements.hasOwnProperty(index)){
-                componentElements.push(elements[index]);
-            }
-        }
-
+        var componentElements = component.getElements();
         //go up the chain until it hits either a sibling or the root
         var currentNode = targetElem;
 
@@ -179,10 +170,9 @@
         return this.getOnClickEventProp.cache[prop];
     },
     
-    toggleMenuVisible : function(component, index, event) {
+    toggleMenuVisible : function(component, index) {
     	var c = this.getMenuComponent(component);
         c.set("v.focusItemIndex", index);
-        c.set("v.referenceElement", event.getSource().getElement());
         var menuVisible = c.get("v.visible");
         if (menuVisible === true) {
         	c.set("v.visible", false);
@@ -214,4 +204,31 @@
             }
         }
     },
+    
+    addEventHandler: function(cmp) {
+    	//add click event handler here instead of adding "onclick" attribute inside the <div> tag to avoid fastclick issue
+    	//where children component's click event is not fired in mobile devices
+    	var el = cmp.find("app").getElement();
+    	$A.util.on(el, "click", this.getClickHandler(cmp));
+    },
+    
+    removeEventHandler: function(cmp) {
+    	var el = cmp.find("app").getElement();
+    	$A.util.removeOn(el, "click", this.getClickHandler(cmp));
+    },
+    
+    getClickHandler: function(cmp) {
+    	if (!cmp._clickHandler) {
+    		cmp._clickHandler = function(event) {
+		    	if ($A.util.getBooleanValue(cmp.get("v.stopClickPropagation"))) {
+			        if (event.stopPropagation) { // IE9 & Other Browsers
+			          event.stopPropagation();
+			        } else { // IE8 and Lower
+			          event.cancelBubble = true;
+			        }
+		    	}
+    		}
+    	}
+    	return cmp._clickHandler;
+    }
 })

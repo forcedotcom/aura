@@ -84,21 +84,21 @@ public class TestModelWithJavaTypeAnnotation {
     @AuraEnabled
     @Type("Map<String, String>")
     public Map<String, String> getStringMap() {
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
     // List of basic data type
     @AuraEnabled
     @Type("List<String>")
     public List<String> getStringList() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     // Set of basic data type
     @AuraEnabled
     @Type("Set<String>")
     public Set<String> getStringSet() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     // Array of basic data type

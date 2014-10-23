@@ -154,7 +154,7 @@ $A.ns.Test.prototype.releaseRequests = function () {
 
 /**
  * Get total count of foreground and background requests sent to the server.
- * 
+ *
  * This routine can be used to get a before and after count on server requests to attempt to verify
  * we are only sending the necessary amount of requests.
  */
@@ -216,7 +216,7 @@ $A.ns.Test.prototype.runActionsAsTransaction = function(actions, scope, callback
 
 /**
  * Enqueue an action, ensuring that it is safely inside an aura call.
- * 
+ *
  * @param {Action} action
  *          The action to enqueue.
  * @param {Boolean} background
@@ -229,10 +229,10 @@ $A.ns.Test.prototype.enqueueAction = function(action, background) {
 /**
  * Get an instance of a server action that is not available to the component.
  * @description <p>Example:</p>
- * <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/> 
+ * <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/>
  * 			{name:"aura:text", attributes:{value:"valuable"}},<br/>
  * 			function(action){alert(action.getReturnValue().attributes.values.value)})</code>
- * 
+ *
  * @param {Component} component
  *            The scope to run the action with, even if the action is not visible to it
  * @param {String} descriptor
@@ -329,7 +329,7 @@ $A.ns.Test.prototype.markForCompletion = function(action, name) {
  * will check that the callback has been called (and thus
  * that the action is complete). It does not check for
  * success/failure.
- * 
+ *
  * @param {string} name
  *          The name of the action to check for completion
  * @returns {Boolean} true if action has completed, false otherwise.
@@ -347,8 +347,8 @@ $A.ns.Test.prototype.isActionComplete = function(name) {
  * If you have previously called <code>markForCompletion</code> this
  * will check that the callback has been called with a
  * successful completion code.
- * 
- * @param {string} name 
+ *
+ * @param {string} name
  *          The name of the action to check for success
  * @returns {Boolean} true if action has completed successfully, false otherwise.
  */
@@ -366,7 +366,7 @@ $A.ns.Test.prototype.isActionSuccessfullyComplete = function(name) {
  * will check that the callback has been called (and thus
  * that the action is complete). It does not check for
  * success/failure.
- * 
+ *
  * @param {string} name
  *          The name of the Action to check.
  */
@@ -489,7 +489,6 @@ $A.ns.Test.prototype.runAfterIf = function(conditionFunction, callback, interval
 $A.ns.Test.prototype.setTestTimeout = function(timeoutMsec){
     this.timeoutTime = new Date().getTime() + timeoutMsec;
 };
-
 /**
  * Return whether the test is finished.
  * @returns {Boolean}
@@ -589,7 +588,7 @@ $A.ns.Test.prototype.expectAuraWarning = function(w) {
  * <p>Example:</p>
  * Positive: assertTruthy("helloWorld"),
  * Negative: assertTruthy(null)
- * 
+ *
  * @param {Object} condition
  *              The condition to evaluate
  * @param {String} assertMessage
@@ -607,9 +606,9 @@ $A.ns.Test.prototype.assertTruthy = function(condition, assertMessage) {
 };
 /**
  * Assert that the current component HTML is Accessibility compliant.
- * 
+ *
  * @description Calls the checkAccessibilty method to verify certain tags are accessible.
- * 
+ *
  * @param {String} errorMessage
  *          The message that is returned if the condition is not false
  * @throws {Error} Throws Error containing concatenated string representation of all
@@ -712,7 +711,7 @@ $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertM
 
 /**
  * Assert that the a string starts with another.
- * @param {Object} start 
+ * @param {Object} start
  * 				The start string.
  * @param {Object} full
  * 				The string that is expected to start with the start string
@@ -754,7 +753,7 @@ $A.ns.Test.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
 
 /**
  * Assert that the value is not undefined.
- * @param {Object} arg1 
+ * @param {Object} arg1
  * 				The argument to evaluate
  * @param {String} assertMessage
  * 				The message that is returned if arg1 is undefined
@@ -910,9 +909,9 @@ $A.ns.Test.prototype.overrideFunction = function(instance, name, newFunction){
     if(!originalFunction) {
         this.fail("Did not find the specified function '" + name + "' on the given object!");
     }
-    
+
     instance[name] = newFunction;
-    
+
     // Now lets see if there is a corresponding private (obfuscated) version that we also need to mock
     var nonExportedFunctionName;
     for (var key in instance) {
@@ -923,21 +922,21 @@ $A.ns.Test.prototype.overrideFunction = function(instance, name, newFunction){
             // IE: Handle "Unspecified error" for properties like "fileCreatedDate"
             continue;
         }
-        if (key !== name && f === originalFunction) { 
+        if (key !== name && f === originalFunction) {
             nonExportedFunctionName = key;
             instance[key] = newFunction;
-            break; 
-        } 
+            break;
+        }
     }
-    
+
     var override = newFunction;
     override.originalInstance = instance;
     override.originalFunction = originalFunction;
     override.nonExportedFunctionName = nonExportedFunctionName;
-    
+
     override["restore"] = function(){
         override.originalInstance[name] = override.originalFunction;
-        
+
         if (override.nonExportedFunctionName) {
             override.originalInstance[override.nonExportedFunctionName] = override.originalFunction;
         }
@@ -1027,13 +1026,8 @@ $A.ns.Test.prototype.getTextByComponent = function(component){
     if(component){
         var elements = component.getElements();
         if(elements){
-            //If the component has only one element
-            var ele = elements["element"];
-            if(ele && ele.nodeType !== 8/*COMMENT*/){
-                return this.getText(ele);
-            }
             //If the component has an array of elements
-            for(var i=0;elements[i];i++){
+            for(var i=0;i<elements.length;i++){
                 if(elements[i].nodeType !== 8/*COMMENT*/){
                     ret += this.getText(elements[i]);
                 }
@@ -1136,7 +1130,7 @@ $A.ns.Test.prototype.contains = function(testString, targetString){
 
 /**
  * Returns a reference to the object that is currently designated as the active element in the document.
- * 
+ *
  * @returns {DOMElement} The current active element.
  */
 $A.ns.Test.prototype.getActiveElement = function(){
@@ -1145,7 +1139,7 @@ $A.ns.Test.prototype.getActiveElement = function(){
 
 /**
  * Returns the inner text of the current active element in the document.
- * 
+ *
  * @returns {String} The text of the current active DOM element.
  */
 $A.ns.Test.prototype.getActiveElementText = function(){
@@ -1155,7 +1149,7 @@ $A.ns.Test.prototype.getActiveElementText = function(){
 /**
  * Used by getElementsByClassNameCustom for IE7
  * @private
- */	
+ */
 $A.ns.Test.prototype.walkTheDOM = function (node, func) {
   func(node);
   node = node.firstChild;
@@ -1171,11 +1165,11 @@ $A.ns.Test.prototype.walkTheDOM = function (node, func) {
  */
 $A.ns.Test.prototype.getElementsByClassNameCustom = function (className, parentElement) {
     var results = [];
-    
+
     if($A.util.isUndefinedOrNull(parentElement)){
         parentElement = document.body;
     }
-    
+
     this.walkTheDOM(parentElement, function(node) {
         var a, c = node.className,
             i;
@@ -1221,7 +1215,7 @@ $A.ns.Test.prototype.getElementByClass = function(classname){
     } else {
         ret = this.getElementsByClassNameCustom(classname);
     }
- 
+
     if (ret && ret.length > 0) {
         return ret;
     }
@@ -1253,7 +1247,7 @@ $A.ns.Test.prototype.fireDomEvent = function (element, eventName) {
 
 /**
  * Checks if an element supports Touch events. Otherwise, issue a click on the element.
- * 
+ *
  * @param {HTMLElement} element
  *          The element to click or fire touch event on.
  * @param {Boolean} canBubble
@@ -1264,7 +1258,7 @@ $A.ns.Test.prototype.fireDomEvent = function (element, eventName) {
 $A.ns.Test.prototype.clickOrTouch = function (element, canBubble, cancelable) {
     if($A.util.supportsTouchEvents()){
         var ts = document.createEvent('TouchEvent');
-        ts.initTouchEvent('touchstart', canBubble, cancelable); 
+        ts.initTouchEvent('touchstart', canBubble, cancelable);
         var te = document.createEvent('TouchEvent');
         te.initTouchEvent('touchend', canBubble, cancelable);
         element.dispatchEvent(ts);
@@ -1281,7 +1275,7 @@ $A.ns.Test.prototype.clickOrTouch = function (element, canBubble, cancelable) {
 
 /**
  * Checks if the specified node is a text node.
- * @param {Node} node 
+ * @param {Node} node
  *          The node to check
  * @returns {Boolean} true if node is text node.
  */
@@ -1366,7 +1360,7 @@ $A.ns.Test.prototype.isInstanceOfSpanElement = function(element){
 
 /**
  * Checks if the specified element is an instance of another element.
- * 
+ *
  * @param {HTMLElement} element
  *          The element to check
  * @param {HTMLElement} elementType
@@ -1386,7 +1380,7 @@ $A.ns.Test.prototype.isInstanceOf = function(element, elementType, tag){
 
 /**
  * Returns set of keys on passed in Object.
- * 
+ *
  * @param {Object} obj
  *          Object to retrieve set of keys from.
  */
@@ -1438,7 +1432,7 @@ $A.ns.Test.prototype.addEventHandler = function(eventName, handler, component) {
         // component event handler
         // mock a ValueProvider that returns a synthetic action
         component.addHandler(eventName, {
-            getValue : function() {
+            get : function() {
                 return {
                     run : handler,
                     runDeprecated : handler
@@ -1460,7 +1454,7 @@ $A.ns.Test.prototype.getAppCacheEvents = function() {
 
 /**
  * Extract the error message from Aura error div(the grey error message on the page)
- * 
+ *
  * @returns {String} The text of the Aura error
  */
 $A.ns.Test.prototype.getAuraErrorMessage = function(){
@@ -1469,7 +1463,7 @@ $A.ns.Test.prototype.getAuraErrorMessage = function(){
 
 /**
  * Run the test
- * 
+ *
  * @param {String} name
  *          The name of the test in the suite to run
  * @param {String} code
@@ -1477,7 +1471,7 @@ $A.ns.Test.prototype.getAuraErrorMessage = function(){
  * @param {Integer} timeoutOverride
  *          Optional. Use to increase the test timeout by specified time in seconds. If not set the test will
  *          use a default timeout of 10 seconds.
- * 
+ *
  * @public
  */
 $A.ns.Test.prototype.run = function(name, code, timeoutOverride){

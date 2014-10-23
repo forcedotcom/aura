@@ -3,7 +3,7 @@
         
         var tr, td, span, input;
         var amountToCreate = cmp.get("v.total");
-        var body = cmp.get("tbody").getElement();
+        var body = cmp.find("tbody").getElement();
         for(var i = 1; i <= amountToCreate; i++){
             tr = document.createElement("tr")
             

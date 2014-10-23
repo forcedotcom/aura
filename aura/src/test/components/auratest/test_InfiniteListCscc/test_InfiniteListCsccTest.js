@@ -21,15 +21,15 @@
     testServerItemActive: {
         test: function(component){
             // get collection of buttons
-            var btns = component.find("aButton");
-
+            var list = component.find('list');
+            var btns = list.find("aButton");
             // Verify initial state of components
             $A.test.assertStartsWith("isClose-false Server 0", $A.util.getText(btns[0].getElement()));
             $A.test.assertStartsWith("isClose-false Server 1", $A.util.getText(btns[1].getElement()));
             $A.test.assertStartsWith("isClose-false Server 2", $A.util.getText(btns[2].getElement()));
 
             // press the first button,  changing what the expression is dependent on
-            btns[0].get("myButton").get("e.press").fire();
+            btns[0].find("myButton").get("e.press").fire();
 
             $A.test.assertStartsWith("isClosed-true Server 0", $A.util.getText(btns[0].getElement()));
         }
@@ -42,19 +42,20 @@
         test: function(component){
             // add one item to iteration from client using button
             $A.run(function(){
-                component.get("addItem").get("e.press").fire();
+                component.find("addItem").get("e.press").fire();
             });
 
             // get collection of buttons
-            var btns = component.find("aButton");
+            var list = component.find('list');
+            var btns = list.find("aButton");
             
             // verify initial component state
             $A.test.assertStartsWith("isClose-false Client", $A.util.getText(btns[3].getElement()));
             $A.test.assertStartsWith("isClose-false Server 0", $A.util.getText(btns[0].getElement()));
 
             // press the first button,  changing what the expression is dependent on
-            btns[3].get("myButton").get("e.press").fire();
-            btns[0].get("myButton").get("e.press").fire();
+            btns[3].find("myButton").get("e.press").fire();
+            btns[0].find("myButton").get("e.press").fire();
 
             // verify underlying data change is picked up
             $A.test.assertStartsWith("isClosed-true Client", $A.util.getText(btns[3].getElement()));

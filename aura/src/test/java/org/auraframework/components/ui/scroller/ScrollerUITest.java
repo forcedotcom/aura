@@ -15,13 +15,11 @@
  */
 package org.auraframework.components.ui.scroller;
 
-import java.util.List;
 
 import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 
@@ -39,10 +37,6 @@ private WebDriver driver;
 
 public ScrollerUITest(String name) {
     super(name);
-}
-
-public void testNothing() {
-	
 }
 
 public void testScrollingWorkflow() throws Exception {
@@ -214,7 +208,6 @@ public void testScrollingNativeFiresEvents() throws Exception {
 	//assert event onScrollMove fired
     assertEquals("Seems like onScrollMove did not get fired", "1", getEventHandlerExecutionStatus("scrollMoveHandlerCalled"));
 }
- */
 private void startFlick(int xOffset, int yOffset){
 	//for iPhone
 	int yOffsetByDevice = yOffset;
@@ -225,11 +218,12 @@ private void startFlick(int xOffset, int yOffset){
 	}
 	new TouchActions(driver).flick(xOffset, yOffsetByDevice).build().perform();
 }
+ */
 
 private void augmentDriver(){
 	driver = IOSDriverAugmenter.getIOSDriver((RemoteWebDriver)driver);
 }
-
+/*
 private List<WebElement> verifyPullToRefreshData(){
 	List<WebElement> PTRdata = driver.findElements(By.className("onPTR"));
 	return PTRdata;
@@ -279,6 +273,8 @@ private void evaluateEventExpression(String evt, String params){
     String expression = "$A.getRoot().find('test-scroller').getEvent('"+evt+"').setParams("+params+").fire();";
     auraUITestingUtil.getEval(expression);
 }
+*/
+
 /* disable due to W-2233861
 private void evaluateTogglePTLPTR(String evt){
     String expression = "$A.getRoot().find('test-scroller').getScrollerInstance().toggle"+evt+"()";

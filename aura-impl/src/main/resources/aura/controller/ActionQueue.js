@@ -28,10 +28,10 @@
  */
 
 var ActionQueue = function ActionQueue() {
-	this.nextTransactionId = -1;
-	this.lastAbortableTransactionId = -1;
-	this.actions = [];
-        this.xhr = false;
+    this.nextTransactionId = -1;
+    this.lastAbortableTransactionId = -1;
+    this.actions = [];
+    this.xhr = false;
 };
 
 ActionQueue.prototype.auraType = "ActionQueue";
@@ -50,7 +50,7 @@ ActionQueue.prototype.auraType = "ActionQueue";
  */
 ActionQueue.prototype.enqueue = function(action, dontSave) {
     if (action.isAbortable() && (this.lastAbortableTransactionId !== this.nextTransactionId)) {
-        this.actions = this.clearPreviousAbortableActions(this.actions);
+        this.actions = this.clearPreviousAbortableActions(this.actions, action.getAbortableKey());
         this.lastAbortableTransactionId = this.nextTransactionId;
     }
     if (!dontSave) {
@@ -174,25 +174,28 @@ ActionQueue.prototype.getLastAbortableTransactionId = function() {
 /**
  * Clear the previous abortable actions.
  * 
- * This internal function clears out all previous abortable actions, marking them as aborted. and returns the remaining
- * actions.
+ * This internal function clears out previous abortable actions with the same key, marking them as aborted,
+ * and returns the remaining actions.
  * 
  * @private
- * @param {Array}
- *            The incoming array of actions
+ * @param {Array} queue The incoming array of actions
+ * @param {String} key Abortable key
  * @return {Array} A copy of the array with all abortable actions removed.
  */
-ActionQueue.prototype.clearPreviousAbortableActions = function(queue) {
-	var newQueue = [];
-	var counter;
-	for (counter = 0; counter < queue.length; counter++) {
-		if (!queue[counter].isAbortable()) {
-			newQueue.push(queue[counter]);
-		} else {
-			queue[counter].abort();
-		}
-	}
-	return newQueue;
+ActionQueue.prototype.clearPreviousAbortableActions = function(queue, key) {
+    var newQueue = [];
+    var counter;
+    for (counter = 0; counter < queue.length; counter++) {
+        var action = queue[counter],
+            abortable = action.isAbortable();
+        if (!abortable || (abortable && action.getAbortableKey() !== key)) {
+            // push not abortable actions and abortable actions with different key
+            newQueue.push(action);
+        } else {
+            action.abort();
+        }
+    }
+    return newQueue;
 };
 
 /**

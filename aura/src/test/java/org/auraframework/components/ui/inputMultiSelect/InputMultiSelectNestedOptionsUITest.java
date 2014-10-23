@@ -15,6 +15,8 @@
  */
 package org.auraframework.components.ui.inputMultiSelect;
 
+import org.junit.Ignore;
+
 public class InputMultiSelectNestedOptionsUITest extends BaseInputMultiSelect{
     
     /**
@@ -23,5 +25,15 @@ public class InputMultiSelectNestedOptionsUITest extends BaseInputMultiSelect{
     public InputMultiSelectNestedOptionsUITest() {
         super("/uitest/inputMultiSelect_NestedOptionsTest.cmp");
         // TODO Auto-generated constructor stub
+    }
+
+    @Ignore("W-2398377")
+    @Override
+    public void testInputSelectDeselectMultiple() throws Exception {
+    }
+
+    @Ignore("W-2398377")
+    @Override
+    public void testInputSelectDeselectAll() throws Exception {
     }
 }

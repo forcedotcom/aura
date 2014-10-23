@@ -40,7 +40,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(vendor.getApplicationDefDescriptor(),
+        StringSource<ApplicationDef> source = new StringSource<>(vendor.getApplicationDefDescriptor(),
                 "<aura:application controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
                         + vendor.getParentComponentDefDescriptor() + "' implements='"
                         + vendor.getInterfaceDefDescriptor()
@@ -68,7 +68,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ApplicationDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
                 ApplicationDef.class);
-        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(descriptor,
+        StringSource<ApplicationDef> source = new StringSource<>(descriptor,
                 "<aura:application><aura:attribute name=\"implNumber\" type=\"String\"/>"
                         + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:application>", "myID",
                 Format.XML);

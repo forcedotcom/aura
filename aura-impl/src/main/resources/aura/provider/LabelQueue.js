@@ -42,7 +42,7 @@ $A.ns.LabelQueue.prototype.addComponent = function(component) {
 
 /**
  * SimpleValues getter
- * @return {SimpleValue[]} array of SimpleValues
+ * @return {String[]} array of Strings
  */
 $A.ns.LabelQueue.prototype.getReturnValues = function() {
     return this.returnValues;
@@ -50,7 +50,7 @@ $A.ns.LabelQueue.prototype.getReturnValues = function() {
 
 /**
  * Add SimpleValue to return values
- * @param {SimpleValue} value
+ * @param {String} value
  */
 $A.ns.LabelQueue.prototype.addReturnValue = function(value) {
     this.returnValues.push(value);

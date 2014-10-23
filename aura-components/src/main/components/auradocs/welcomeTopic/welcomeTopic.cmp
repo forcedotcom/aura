@@ -31,7 +31,7 @@
          </span>
     </ui:block>
     
-    <p><ui:outputURL value="https://github.com/forcedotcom/aura/blob/master/aura_oss.pdf" label="Help" target="_blank" /> Read the doc to learn more about Aura. Sync the repo to view the PDF.</p><br/>
+    <p><ui:outputURL value="http://help.auraframework.org" label="Help" target="_blank" /> Read the doc to learn more about Aura</p><br/>
 
     <p><ui:outputURL value="https://github.com/forcedotcom/aura" label="Quick Start" target="_blank" /> Dive right in and build an Aura app</p><br/>
  

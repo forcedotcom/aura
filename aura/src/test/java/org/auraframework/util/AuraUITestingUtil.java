@@ -22,11 +22,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.test.SauceUtil;
 import org.auraframework.util.json.JsonReader;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -595,6 +594,66 @@ public class AuraUITestingUtil {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(message).until(addErrorCheck(function));
     }
+    
+    public String appCacheStatusIntToString(Integer ret) {
+    	String status = "Unknown cache state";
+    	switch (ret) {
+        case 0:
+            status = "UNCACHED";
+            break;
+        case 1:
+            status = "IDLE";
+            break;
+        case 2:
+            status = "CHECKING";
+            break;
+        case 3:
+            status = "DOWNLOADING";
+            break;
+        case 4:
+            status = "UPDATEREADY";
+            break;
+        case 5:
+            status = "OBSOLETE";
+            break;
+        }
+    	return status;
+    }
+
+    public void waitForAppCacheReady() {
+        waitUntilWithCallback(
+                new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver d) {
+                        return getBooleanEval("var cache=window.applicationCache;"
+                                + "return $A.util.isUndefinedOrNull(cache) || (cache.status===cache.UNCACHED)"
+                                + "||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
+                    }
+                },
+                new ExpectedCondition<String>() {
+                    @Override
+                    public String apply(WebDriver d) {
+                        Object ret = getRawEval("return window.applicationCache.status");
+                        return "Current AppCache status is " + appCacheStatusIntToString(((Long) ret).intValue());
+                    }
+                },
+                timeoutInSecs,
+                "AppCache is not Ready!");
+    }
+
+    /**
+     * @param function function we will apply again and again until timeout
+     * @param callbackWhenTimeout function we will run when timeout happens, the return will be append to other output
+     *            message, start with "Extra message from callback". we can pass in function to evaluate the client side
+     *            status, like applicationCache status
+     * @param timeoutInSecs
+     * @param message error message when timeout. notice this will get evaluated BEFORE the wait, so just use a string
+     */
+    public <V2, V1> void waitUntilWithCallback(Function<? super WebDriver, V1> function,
+            Function<? super WebDriver, V2> callbackWhenTimeout, long timeoutInSecs, String message) {
+        WebDriverWaitWithCallback wait = new WebDriverWaitWithCallback(driver, timeoutInSecs, message);
+        wait.until(function, callbackWhenTimeout);
+    }
 
     public void waitForAuraInit() {
         waitForAuraInit(null);
@@ -650,18 +709,6 @@ public class AuraUITestingUtil {
                                 return isAuraFrameworkReady();
                             }
                         });
-    }
-
-    public void waitForAppCacheReady() {
-        waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return
-                getBooleanEval("var cache=window.applicationCache;"
-                        + "return $A.util.isUndefinedOrNull(cache) || "
-                        + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
-            }
-        }, "AppCache is not Ready!");
     }
 
     /**
@@ -730,7 +777,7 @@ public class AuraUITestingUtil {
 
         String result = (String) getEval(jsString);
 
-        ArrayList<String> resultList = new ArrayList<String>();
+        ArrayList<String> resultList = new ArrayList<>();
         String output = "";
 
         // No errors

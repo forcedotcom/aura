@@ -59,15 +59,7 @@
 	 * Update page content
 	 */
 	updatePage: function(cmp, pageBody) {
-		var pageContainer = cmp.find('pageContainer').getValue('v.body');
-
-		if (!pageContainer.isEmpty()) {
-			pageContainer.destroy(true);
-        }
-
-		if (pageBody) {
-			pageContainer.setValue(pageBody);
-		}
+		cmp.find('pageContainer').set('v.body', pageBody || []);
 	},
 
 	/**
@@ -95,9 +87,11 @@
 			hiddenClass = 'hidden';
 
 		if (pageIndex == curPage && !isVisible) {
-			$A.util.removeClass(cmp.getElement(), hiddenClass);
-			cmp.getElement().setAttribute('aria-expanded', 'true');
-			cmp.set('v.priv_visible', true);
+            if(cmp.getElement()) {
+                $A.util.removeClass(cmp.getElement(), hiddenClass);
+                cmp.getElement().setAttribute('aria-expanded', 'true');
+            }
+            cmp.set('v.priv_visible', true);
 		}
 	},
 

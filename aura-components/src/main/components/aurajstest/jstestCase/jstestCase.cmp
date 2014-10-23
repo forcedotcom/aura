@@ -20,12 +20,15 @@
     <aura:attribute name="suite" type="java://org.auraframework.def.TestSuiteDef"/>
     <aura:attribute name="url" type="String"/>
 
+	<!-- PRIVATE ATTRIBUTE(S) -->
+    <aura:attribute name="status" type="String" default="spin"/>
+
     <aura:set attribute="scroll" value="false"/>
     <aura:set attribute="title" value="{!v.case.name}"/>
 
     <aura:registerevent name="done" type="aurajstest:testStatus"/>
     <aura:set attribute="icon">    
-        <a href="javascript:void(0);" onclick="{!c.rerun}" class="rerun spin" aura:id="rerun"></a>
+        <a href="javascript:void(0);" onclick="{!c.rerun}" class="{!'rerun ' + v.status}" aura:id="rerun"></a>
     </aura:set>
 
     <aura:handler name="onActivated" action="{!c.onActivate}" />
@@ -33,7 +36,7 @@
     <aura:set attribute="body">
         <section class="content">
             <h1>Content</h1>
-            <div aura:id="content" class="testContent"/>
+            <div aura:id="content" class="testContent"></div>
         </section>
         <section class="results">
             <h1>Results</h1>

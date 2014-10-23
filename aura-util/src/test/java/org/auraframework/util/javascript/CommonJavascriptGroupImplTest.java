@@ -52,9 +52,9 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         localCJG.clear();
         verifyCleanState(localCJG);
         String validJSFile = "head.js";
-        String validJSDirectory = "/dummyDir";
+        String validJSDirectory = "dummyDir";
         String invalidJSFile = "JSfilterValidation.junk.js";
-        String invalidJSDirectory = "/javascriptBoogaBoo";
+        String invalidJSDirectory = "javascriptBoogaBoo";
         // Add a directory to the group
         localCJG.addDirectory(validJSDirectory);
         assertTrue("Directories should be accepted for Javascript Groups", localCJG.getFiles().size() == 1);

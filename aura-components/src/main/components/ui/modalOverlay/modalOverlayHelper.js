@@ -20,7 +20,7 @@
 			if ((e || window.event).keyCode == 27) {
 				if (cmp.isValid() && cmp.get('v.isVisible')) {
 					$A.util.squash(e);
-					this.hide(cmp);
+					self.hide(cmp, event);
 				}
 			}
 		};

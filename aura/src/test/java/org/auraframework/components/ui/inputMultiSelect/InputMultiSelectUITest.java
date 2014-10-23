@@ -15,13 +15,116 @@
  */
 package org.auraframework.components.ui.inputMultiSelect;
 
-public class InputMultiSelectUITest extends BaseInputMultiSelect{
-    
+import java.util.List;
+
+import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.PerfTest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+
+public class InputMultiSelectUITest extends WebDriverTestCase {
+    private final String[] URL = new String[] { "/uitest/inputMultiSelect_Test.cmp",
+            "/uitest/inputMultiSelect_NestedOptionsTest.cmp" };
+    private final By outputLocator = By.xpath("//span[@class='uiOutputText']");
+    private final By selectLocator = By.xpath("//select[1]");
+    private final By submitLocator = By.xpath("//button");
+    private final String optionLocatorString = "//select[1]/option[text()='%s']";
+
+    public InputMultiSelectUITest(String name) {
+        super(name);
+    }
+
+    private void openTestPage(int i) throws Exception {
+        open(URL[i]);
+    }
+
+    private Select getInputSelect() {
+        return new Select(findDomElement(selectLocator));
+    }
+
+    private void selectOption(String optionLabel) {
+        selectDeselectOption(optionLabel, true);
+    }
+
+    private void deselectOption(String optionLabel) {
+        selectDeselectOption(optionLabel, false);
+    }
+
+    private void selectDeselectOption(String optionLabel, boolean isSelect) {
+        if (isSelect) {
+            getInputSelect().selectByVisibleText(optionLabel);
+            verifyOptionSelected(optionLabel);
+        } else {
+            getInputSelect().deselectByVisibleText(optionLabel);
+            verifyOptionDeselected(optionLabel);
+        }
+    }
+
+    private void verifyOptionSelected(String optionLabel) {
+        verifyOptionSelectDeselct(optionLabel, true);
+    }
+
+    private void verifyOptionDeselected(String optionLabel) {
+        verifyOptionSelectDeselct(optionLabel, false);
+    }
+
+    private void verifyOptionSelectDeselct(String optionLabel, boolean isSelected) {
+        WebElement option = findDomElement(By.xpath(String.format(optionLocatorString, optionLabel)));
+        if (isSelected) {
+            assertTrue("Option '" + optionLabel + "' should be selected", option.isSelected());
+        } else {
+            assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
+        }
+    }
+
     /**
-     * This URL runs tests against options created dynamically
+     * Select one. Choose one option. Deselect one. Deselect one option.
      */
-    public InputMultiSelectUITest() {
-        super("/uitest/inputMultiSelect_Test.cmp");
-        // TODO Auto-generated constructor stub
+    @PerfTest
+    public void testInputSelectSingle() throws Exception {
+        for (int i = 0; i < URL.length; i++) {
+            openTestPage(i);
+
+            // select
+            focusSelectElement();
+            selectOption("Option1");
+            verifyOptionDeselected("Option2");
+            verifyOptionDeselected("Option3");
+
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
+            verifyOptionSelected("Option1");
+            verifyOptionDeselected("Option2");
+            verifyOptionDeselected("Option3");
+
+            // deselect
+            focusSelectElement();
+            deselectOption("Option1");
+            selectOption("Option3");
+            verifyOptionDeselected("Option2");
+
+            findDomElement(submitLocator).click();
+            auraUITestingUtil.waitForElementText(outputLocator, "option3", true);
+            verifyOptionSelected("Option3");
+            verifyOptionDeselected("Option1");
+            verifyOptionDeselected("Option2");
+        }
+    }
+    /**
+     * Only for IE10 we need to explicitly bring focus on to select input. selectBy() does not do it. But clicking on
+     * select element corrupts selected/unselected options so we need to preserve the state
+     */
+    private void focusSelectElement() {
+        if (BrowserType.IE10.equals(getBrowserType())) {
+            List<WebElement> selectedOptions = getInputSelect().getAllSelectedOptions();
+            findDomElement(selectLocator).click();
+
+            getInputSelect().deselectAll();
+            for (int i = 0; i < selectedOptions.size(); i++) {
+                getInputSelect().selectByVisibleText(selectedOptions.get(i).getText());
+            }
+        }
     }
 }

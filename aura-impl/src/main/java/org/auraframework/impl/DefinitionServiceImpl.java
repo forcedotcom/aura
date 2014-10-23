@@ -133,28 +133,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         return cs.getCurrentContext().getDefRegistry();
     }
 
-    /**
-     * Get the last mod for a set of descriptorss.
-     */
-    @Override
-    public <T extends Definition> long getLastMod(DefDescriptor<T> descriptor) {
-        String uid;
-        try {
-            uid = getDefRegistry().getUid(null, descriptor);
-        } catch (QuickFixException qfe) {
-            return 0;
-        }
-        return getDefRegistry().getLastMod(uid);
-    }
-
-    /**
-     * Get the last mod for a set of descriptorss.
-     */
-    @Override
-    public long getLastMod(String uid) {
-        return getDefRegistry().getLastMod(uid);
-    }
-
     @Override
     public <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
         Aura.getContextService().assertEstablished();

@@ -37,7 +37,7 @@ public class TestModel {
 
     @AuraEnabled
     public List<String> getStringList() {
-        ArrayList<String> sl = new ArrayList<String>();
+        ArrayList<String> sl = new ArrayList<>();
         sl.add("one");
         sl.add("two");
         sl.add("three");

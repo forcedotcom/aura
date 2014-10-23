@@ -17,60 +17,35 @@
 /**
  * creates the right value object based on whats passed in
  */
-var valueFactory = { 
-    create: function create(valueConfig, def, component, expected) {
-        if (valueConfig) {
-            var source = undefined;
-            if (valueConfig.getSourceValue) {
-                // Object is already wrapped by a MapValue
-                source = valueConfig.getSourceValue();
-            } else if (valueConfig._arrayValueRef) {
-                // Object is already wrapped by an ArrayValue
-                source = valueConfig._arrayValueRef;
-            }
-            // If we have an existing wrapper and it's the source of this value,
-            // then this is really a fancy setValue, not a new creation.  But
-            // if it's a different wrapper, or we don't have one, we do need a
-            // new wrapper.
-            if (source && source === expected) {
-                source._setValue(valueConfig);
-                return source;
-            }
-        }
-
-        // If we get to here, we need a new wrapper of some sort....
+var valueFactory = {
+    create: function create(valueConfig, def, component) {
         if (aura.util.isObject(valueConfig)) {
             if (valueConfig.auraType) {
                 if (valueConfig.auraType === "ActionDef") {
                     return new ActionReferenceValue(valueConfig, def, component);
                 }
-                return valueConfig;
             } else if (valueConfig["exprType"] === "PROPERTY") {
-                return new PropertyChain(valueConfig["path"]);
+                return new PropertyReferenceValue(valueConfig["path"], component);
             } else if (valueConfig["exprType"] === "FUNCTION") {
-                return new FunctionCallValue(valueConfig, def, component);
-            } else {
-                return new MapValue(valueConfig, def, component);
+                return new FunctionCallValue(valueConfig, component);
+            }else{
+                // Recurse over child objects to create Actions, PropertyReferences, and FunctionCalls
+                var childConfig={};
+                for(var key in valueConfig){
+                    childConfig[key]=valueFactory.create(valueConfig[key], def, component);
+                }
+                valueConfig=childConfig;
             }
-        } else if (aura.util.isArray(valueConfig)) {
-            return new ArrayValue(valueConfig, def, component);
-        } else if (valueConfig && valueConfig.indexOf && valueConfig.indexOf("{!") === 0) {
-        	// Property expressions
-        	valueConfig = valueConfig.substring(2, valueConfig.length - 1);
-            return new PropertyChain(valueConfig.split("."));
-        } else {
-            return new SimpleValue(valueConfig, def, component);
+        } else if (aura.util.isString(valueConfig) && valueConfig.indexOf("{!") === 0 && component) {
+            // Property expressions
+            if($A.util.isComponent(component)){
+                return component.getReference(valueConfig);
+            }else{
+                valueConfig = valueConfig.substring(2, valueConfig.length - 1);
+                return new PropertyReferenceValue(valueConfig.split("."), component);
+            }
         }
-    },
-
-    parsePropertyReference: function(str) {
-        // TODO: add [] support
-        if (str.charAt(0) === "{") {
-            str = str.slice(2, str.length - 1);
-        }
-        
-        var path = str.split('.');
-        return new PropertyChain(path);
+        return valueConfig;
     }
 
 //#if {"modes" : ["STATS"]}

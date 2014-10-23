@@ -283,7 +283,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
-                    format = $A.get("$Locale.dateformat");
+                    format = $A.get("$Locale.dateFormat");
                 }
                 return localizationService.displayDateTime(mDate, format, locale);
             } else {
@@ -305,7 +305,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
-                    format = $A.get("$Locale.dateformat");
+                    format = $A.get("$Locale.dateFormat");
                 }
                 return localizationService.displayDateTime(mDate, format, locale);
             } else {
@@ -327,7 +327,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
-                    format = $A.get("$Locale.datetimeformat");
+                    format = $A.get("$Locale.datetimeFormat");
                 }
                 return localizationService.displayDateTime(mDate, format, locale);
             } else {
@@ -348,7 +348,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
-                    format = $A.get("$Locale.datetimeformat");
+                    format = $A.get("$Locale.datetimeFormat");
                 }
                 return localizationService.displayDateTime(mDate, format, locale);
             } else {
@@ -370,7 +370,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
-                    format = $A.get("$Locale.timeformat");
+                    format = $A.get("$Locale.timeFormat");
                 }
                 return localizationService.displayDateTime(mDate, format, locale);
             } else {
@@ -392,7 +392,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
             if (mDate && mDate["isValid"]()) {
                 var format = formatString;
                 if (!format) { // use default format
-                    format = $A.get("$Locale.timeformat");
+                    format = $A.get("$Locale.timeFormat");
                 }
                 return localizationService.displayDateTime(mDate, format, locale);
             } else {

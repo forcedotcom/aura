@@ -22,7 +22,7 @@
             });
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-            var newcmp = cmp.find("target").get("v.body")[0];
+        	var newcmp = cmp.find("target").get("v.body")[0];
             $A.test.assertEquals("bulk", newcmp.get("v.both"));
             $A.test.assertEquals("hulk", newcmp.get("v.server"));
             $A.test.assertEquals("sulk", newcmp.get("v.none"));

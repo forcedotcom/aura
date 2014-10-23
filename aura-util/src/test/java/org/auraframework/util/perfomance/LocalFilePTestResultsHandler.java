@@ -110,7 +110,7 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
      * Get the chart data for each test run stored in the file.
      */
     private final List<ChartAxisPoints> getTestRuns(File refFile) throws IOException {
-        List<ChartAxisPoints> axisPoints = new ArrayList<ChartAxisPoints>();
+        List<ChartAxisPoints> axisPoints = new ArrayList<>();
 
         Scanner scanner = new Scanner(refFile);
 
@@ -139,7 +139,7 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
      * Find all the metric name/value pairs in a string.
      */
     private final List<ChartPoint> parseMetrics(String text) {
-        List<ChartPoint> metricsMap = new ArrayList<ChartPoint>();
+        List<ChartPoint> metricsMap = new ArrayList<>();
 
         String[] metrics = text.trim().split("\\s");
         for (String metric : metrics) {

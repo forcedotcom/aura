@@ -32,7 +32,7 @@ public class JavascriptGeneratorModeTest extends UnitTestCase {
      * generation can cause exceptions.
      */
     public void testUniqueSuffix() {
-        HashSet<String> suffixes = new HashSet<String>();
+        HashSet<String> suffixes = new HashSet<>();
         for (JavascriptGeneratorMode m : JavascriptGeneratorMode.values()) {
             if (suffixes.contains(m.getSuffix())) {
                 fail("JavascriptGeneratorMode: Two modes should not use same suffix. Reused suffix is :"

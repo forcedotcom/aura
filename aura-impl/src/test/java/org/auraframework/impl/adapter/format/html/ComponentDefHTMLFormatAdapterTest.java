@@ -44,7 +44,7 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component render='client'></aura:component>");
         String body = doWrite(desc.getDef());
-        int start = body.indexOf("<html ");
+        int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
             fail("Should not have included a manifest attribute for components:\n" + body);

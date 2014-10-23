@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.1420-SNAPSHOT</version>
+    <version>0.1474-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>http://www.auraframework.org</url>
@@ -17,13 +17,13 @@
             <distribution>repo</distribution>
             <comments>
                   Copyright (C) 2013 salesforce.com, inc.
-                 
+
                   Licensed under the Apache License, Version 2.0 (the "License");
                   you may not use this file except in compliance with the License.
                   You may obtain a copy of the License at
-                 
+
                          http://www.apache.org/licenses/LICENSE-2.0
-                 
+
                   Unless required by applicable law or agreed to in writing, software
                   distributed under the License is distributed on an "AS IS" BASIS,
                   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,18 @@
         <debug>true</debug>
         <skipUnitTests>false</skipUnitTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <selenium.version>2.38.0</selenium.version>
+        <selenium.version>2.42.2</selenium.version>
+        <!-- xUnit properties:
+          xunit.js.testPath the path to an individual test to run
+          xunit.js.auraImpl the path to the aura implementation libraries (if not unpacked, override)
+          xunit.js.engine the engine to use.
+        -->
+        <xunit.js.testPath />
+        <xunit.js.auraImpl>${project.build.directory}/auraImpl/src/main/resources/</xunit.js.auraImpl>
+        <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
+        <xunit.js.engine>rhino</xunit.js.engine>
+        <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
+        <xunit.js.format>xml</xunit.js.format>
     </properties>
     <repositories>
         <repository>
@@ -112,73 +123,73 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-tools</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-resources</artifactId>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>auradocs-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.1420-SNAPSHOT</version>
+                <version>0.1474-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -203,12 +214,12 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.2</version>
+                <version>4.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.2</version>
+                <version>4.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -361,7 +372,7 @@
             <dependency>
                 <groupId>com.salesforce</groupId>
                 <artifactId>omakase</artifactId>
-                <version>0.1.0</version>
+                <version>0.2.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -391,7 +402,7 @@
                                 <requireJavaVersion>
                                     <version>[1.7,)</version>
                                 </requireJavaVersion>
-                            </rules>    
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
@@ -564,6 +575,50 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <phase>disabled</phase>
+                            <id>unpack-xunit</id>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.auraframework</groupId>
+                                        <artifactId>aura-util</artifactId>
+                                        <type>test-jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${project.build.directory}</outputDirectory>
+                                        <includes>tools/**</includes>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <phase>disabled</phase>
+                            <id>unpack-auraImpl</id>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.auraframework</groupId>
+                                        <artifactId>aura-impl</artifactId>
+                                        <type>sources-jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${xunit.js.auraImpl}</outputDirectory>
+                                        <includes>src/main/resources/**</includes>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>2.6</version>
                     <executions>
@@ -619,6 +674,44 @@
                                 </resources>
                             </configuration>
                         </execution>
+                        <execution>
+                            <!-- m2e replacement for unpacking dependencies -->
+                            <id>copy-xunit</id>
+                            <phase>disabled</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${aura.home}/aura-util/src/test</directory>
+                                        <includes>
+                                            <include>tools/*</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <!-- m2e replacement for unpacking dependencies -->
+                            <id>copy-auraImpl</id>
+                            <phase>disabled</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${xunit.js.auraImpl}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${basedir}</directory>
+                                        <includes>
+                                            <include>src/main/resources/**</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
@@ -630,6 +723,19 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.6</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>ant-contrib</groupId>
+                            <artifactId>ant-contrib</artifactId>
+                            <version>1.0b3</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>ant</groupId>
+                                    <artifactId>ant</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <id>index-test-components</id>
@@ -687,6 +793,58 @@
                             <goals>
                                 <goal>run</goal>
                             </goals>
+                        </execution>
+                        <execution>
+                            <id>xunit.js</id>
+                            <!-- use this target to run xunit tests -->
+                            <phase>disabled</phase>
+                            <goals>
+                                 <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
+                                    <echo>Generating Aura framework resources for xUnit.js</echo>
+                                    <java classname="org.auraframework.test.javascript.GenerateXUnitJS" classpathref="maven.test.classpath" fork="true" failonerror="true">
+                                        <jvmarg value="-Daura.home=${basedir}/.." />
+                                        <arg value="${basedir}/src/test/javascript" />
+                                        <arg value="${xunit.js.auraImpl}" />
+                                        <arg value="${project.build.directory}/xunitjs" />
+                                        <arg value="xunitTests" />
+                                    </java>
+                                    <echo>Executing tests</echo>
+                                    <switch value="${xunit.js.engine}">
+                                        <case value="rhino">
+                                            <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="false" resultproperty="xunit.returnvalue" output="${project.build.directory}/xunitjs/rawresults.xml">
+                                                <jvmarg value="-Daura.home=${basedir}/.." />
+                                                <arg value="${xunit.js.console}" />
+                                                <arg value="/output:${xunit.js.format}" />
+                                                <arg value="/strict:false" />
+                                                <arg value="/dependency:${project.build.directory}/tools/xUnit/dependencies/" />
+                                                <arg value="${project.build.directory}/xunitjs/xunitTests/${xunit.js.testPath}" />
+                                            </java>
+                                        </case>
+                                        <default>
+                                            <fail>Unknown XUnit.js engine : ${xunit.js.engine}</fail>
+                                        </default>
+                                    </switch>
+                                    <switch value="${xunit.js.format}">
+                                        <case value="xml">
+                                            <echo>Generating test report</echo>
+                                            <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/target/tools/xUnit/junit.xsl" />
+                                            <echo>Test report completed: ${xunit.js.report}</echo>i
+                                        </case>
+                                        <default>
+                                            <echo>output in: "${project.build.directory}/xunitjs/rawresults.xml"</echo>
+                                        </default>
+                                    </switch>
+                                    <fail message="There were xUnit.js test failures. Check ${xunit.js.report}">
+                                        <condition>
+                                            <not><equals arg1="0" arg2="${xunit.returnvalue}" /></not>
+                                        </condition>
+                                    </fail>
+                                </target>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -754,11 +912,6 @@
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>1.2.1</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.5</version>
-                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings
                     only. It has no influence on the Maven build itself. -->
                 <plugin>
@@ -801,6 +954,19 @@
                                         <versionRange>[1.0.0,)</versionRange>
                                         <goals>
                                             <goal>enforce</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[1.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

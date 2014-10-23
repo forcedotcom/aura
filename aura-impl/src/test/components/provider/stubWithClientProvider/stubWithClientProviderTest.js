@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-/* 
+/*
  * These tests are different from those in js_provider.newComponent$...
  * In this test file provider:clientProvider is included as the facet of the stub.
- * provider:newComponent create the provider:clientProvider component using newComponentAsync() API  
+ * provider:newComponent create the provider:clientProvider component using newComponentAsync() API
  */
 
 ({

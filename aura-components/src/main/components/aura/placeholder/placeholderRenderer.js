@@ -14,50 +14,69 @@
  * limitations under the License.
  */
 ({
+    render:function(cmp){
+        var ret=this.superRender();
+        return ret;
+    },
+
+    rerender:function(cmp){
+        return this.superRerender();
+    },
+
     afterRender : function(cmp){
         if ($A.util.getBooleanValue(cmp.get("v.loaded"))){
             return this.superAfterRender();
         }
 
         var action = $A.get("c.aura://ComponentController.getComponent");
-        var attributes = cmp.getValue("v.attributes");
+        var attributes = cmp.get("v.attributes");
         var atts = {};
-        var avp = cmp.getAttributeValueProvider();
-
-        if(attributes.each){
-            attributes.each(function(key, value){
-                atts[key] = $A.componentService.computeValue(value, avp, true);
-            });
+        for(var x in attributes){
+            var value=attributes[x];
+            if(value["descriptor"]){
+                value=value["value"];
+            }
+            if($A.util.isExpression(value)){
+                value=value.evaluate();
+            }
+            atts[x]=value;
         }
+        var avp = cmp.getAttributeValueProvider();
 
         action.setCallback(this, function(a){
             var newBody;
             if (a.getState() === "SUCCESS"){
-                newBody = $A.newCmpDeprecated(a.getReturnValue(), avp, false, false);
-                newBody.mergeAttributes(attributes, true);
+                var config= a.getReturnValue();
+                if(!config.hasOwnProperty("attributes")){
+                    config["attributes"]={"values":{}};
+                }
+                $A.util.apply(config["attributes"]["values"],attributes);
+                newBody = $A.newCmpDeprecated(config, avp, false, false);
             } else {
                 var errors = a.getError();
                 newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
                 if (errors) {
                     newBody.set("v.value", errors[0].message);
+//                    throw errors[0].message;
                 } else {
                     newBody.set("v.value", 'unknown error');
                 }
             }
-            
-            cmp.set("v.body", newBody);
 
-            $A.rerender(cmp);
+
+//            $A.renderingService.rerenderFacet(cmp,cmp.get("v.body"));
 
             //reindex
             var localId = cmp.getLocalId();
             if(localId){
-                var cvp = cmp.getComponentValueProvider();
+                var cvp = cmp.getAttributeValueProvider();
                 cvp.deIndex(localId, cmp.getGlobalId());
                 cvp.index(localId, newBody.getGlobalId());
             }
+            cmp.set("v.loaded", true, true);
+            cmp.set("v.body", [newBody]);
         });
-        
+
         var desc = cmp.get("v.refDescriptor");
         action.setParams({
             "name" : desc,
@@ -65,7 +84,6 @@
         });
 
         action.setExclusive($A.util.getBooleanValue(cmp.get("v.exclusive")));
-        cmp.set("v.loaded", true);
         $A.enqueueAction(action);
 
         this.superAfterRender();

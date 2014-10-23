@@ -106,6 +106,7 @@ public class DescriptorFileMapper {
         addExtension(".xml", NameFormat.NAMESPACE, "markup", DefType.NAMESPACE, Format.XML);
         addExtension(".theme", NameFormat.BUNDLE, "markup", DefType.THEME, Format.XML);
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
+        addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension("Layouts.xml", NameFormat.BUNDLE, "markup", DefType.LAYOUTS, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);

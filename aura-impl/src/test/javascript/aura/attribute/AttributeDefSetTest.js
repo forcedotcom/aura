@@ -27,11 +27,7 @@ Test.Aura.Attribute.AttributeDefSetTest = function(){
             getDescriptor: function(){
                 return {
                     getQualifiedName: function(){
-                        return {
-                            toLowerCase: function(){
-                                return param;
-                            }
-                        }
+                        return param;
                     }
                 }
             }
@@ -57,9 +53,9 @@ Test.Aura.Attribute.AttributeDefSetTest = function(){
             });
 
             Assert.True(actual.length == 3, "Wrong length for values array");
-            Assert.True(actual[0] == "item1", "First item of config not found at first index of array");
-            Assert.True(actual[1] == "item2", "Second item of config not found at second index of array");
-            Assert.True(actual[2] == "item3", "Third item of config not found at third index of array");
+            Assert.Equal(actual[0],"item1", "First item of config not found at first index of array");
+            Assert.Equal(actual[1],"item2", "Second item of config not found at second index of array");
+            Assert.Equal(actual[2],"item3", "Third item of config not found at third index of array");
         }
     }
 }

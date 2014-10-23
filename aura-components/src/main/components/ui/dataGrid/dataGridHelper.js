@@ -249,7 +249,7 @@
 		if (!cmpDefRef.attributes.values[attribute] || force) {
 			cmpDefRef.attributes.values[attribute] = {
 				descriptor 	: attribute,
-				value 		: $A.util.isArray(value) || value.toString() === 'ArrayValue' ? value : [value]
+				value 		: $A.util.isArray(value) ? value : [value]
 			};	
 		}	
 	},
@@ -272,10 +272,10 @@
 		if (params.last) {
 			params.index = 'last';
 		} else {
-			params.index = parseInt(params.index);
+			params.index = parseInt(params.index, 10);
 		}
 
-		params.count = parseInt(params.count);
+		params.count = parseInt(params.count, 10);
 
 		if (params.remove) {
 			this.removeRows(concrete, params.index, params.count);
@@ -299,13 +299,13 @@
 
 		for (var i = index + count - 1; i >= index; i--) {
 			items.splice(index, 1);
-			priv_rows.splice(index, 1);
 			node = tbody.rows[i];	
 
 			if (node) {
 				tbody.removeChild(node);
 			}
 		}
+		concrete._rowItems = items;
 		concrete.set("v.items", items, true);
 	},
 
@@ -419,15 +419,20 @@
 	
 	updateValueProvidersFromItems: function (concrete) {
 		var items = concrete.get('v.items');
+        for(var i=0;i<items.length;i++){
+            var rowData=concrete._rowData[i];
+            rowData.vp.set('item',items[i]);
+            rowData.vp.set('index',i);
+            for(var j=0;j<rowData.columnData.length;j++){
+                var columnData=rowData.columnData[j];
+                var columns=columnData.components[columnData.cellKey];
+                for(var c=0;c<columns.length;c++){
+                    columns[c].markDirty("DataGrid item changed.");
+                }
+            }
+        }
 
-		$A.util.forEach(items, function (value, i) {
-			var rvp = concrete._rowData[i].vp;
-			
-			rvp.getValue('item').setValue(value);
-			rvp.getValue('index').setValue(i);
-		});
-		
-		// Rerender all components. 
+		// Rerender all components.
 		$A.rerender(concrete._allChildrenCmps);
 
 		// Set the state back to 'idle'.
@@ -586,9 +591,8 @@
 			}
 		} else if (name && index && globalId) {
 
-			// Use value object incase change handlers are important.
 			// For the dataGrid implementation, we provide the internal row object.
-			item = cmp.getValue('v.items.' + index);
+			item = cmp.get('v.items.' + index);
 
 			if (item && cmp._actionDelegate) {
 				cmp._actionDelegate.getEvent('onaction').setParams({
@@ -660,7 +664,7 @@
 
 		// Iterate over rows contexts and set 'selected'.
 		for (var i = 0; i < rowData.length; i++) {
-			rowData[i].vp.getValue('selected').setValue(value);
+			rowData[i].vp.set('selected',value);
 		}
 
 		this.changeSelectedItems(cmp, cmp.get('v.items'), value);
@@ -749,14 +753,12 @@
 
 		// Build up a mapping of the summary columns and their positions.		
 		$A.util.forEach(summaryRow, function (cell, i) {
-			cell = cell.getValue();
-
-			var column = cell.attributes.values.column.value, 
+			var column = cell.get("v.column"),
 				co = concrete._columnOrder[column];
 
 			if (!$A.util.isUndefinedOrNull(co)) {
 				// If an outputComponent has not been definited, inject one.
-				if (cell.attributes && !cell.attributes.values.outputComponent && concrete._columns[column]) {
+				if (!cell.get("v.outputComponent") && concrete._columns[column]) {
 
 					// TODO: investigate valueProvider
 					var cdr = concrete._columns[column].get('v.outputComponent')[0];
@@ -932,30 +934,17 @@
 
 		for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {
 			cdr = cdrs[cdrIndex];
+            $A.componentService.newComponentAsync(this, function (out) {
+                components.push(out);
+                concrete._allChildrenCmps.push(out);
 
-			// Fallback for simple text to use <span> and save on component creation
-			/*if (cdr.attributes.values.value && cdr.attributes.values.value.value.path) {
-				path = cdr.attributes.values.value.value.path;
-				output = vp.getValue("item").unwrap();
-				for (var i = 1; i < path.length; i++) {
-					output = output[path[i]];
-				}
-				span = document.createElement("span");
-				span.innerText = output;
-				element.appendChild(span);
-			} else {*/
-				$A.componentService.newComponentAsync(this, function (out) {
-					components.push(out);
-					concrete._allChildrenCmps.push(out);
-	
-					$A.render(out, element);	// Most of the performance hits here
-					$A.afterRender(out);
-	
-					if (callback && (++resolved === cdrs.length)) {
-						callback();
-					}
-				}, cdr, vp);
-			//}
+                $A.render(out, element);	// Most of the performance hits here
+                $A.afterRender(out);
+
+                if (callback && (++resolved === cdrs.length)) {
+                    callback();
+                }
+            }, cdr, vp);
 		}
 	},
 	

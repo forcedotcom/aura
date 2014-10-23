@@ -23,7 +23,7 @@
             	c.addHandler("menuSelect", component, "c.onMenuItemSelected");
                 children.push(c);
             } else if (c.isInstanceOf("aura:iteration")) { // support external iteration
-                var iters = c.get("v.realbody");
+                var iters = c.get("v.body");
                 for (var k = 0; k < iters.length; k++) {
                     var iter = iters[k];
                     if (iter.isInstanceOf("ui:menuItem")) {

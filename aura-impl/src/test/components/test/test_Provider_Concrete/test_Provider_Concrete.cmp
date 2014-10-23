@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component provider="java://org.auraframework.impl.java.provider.ConcreteProvider" extensible="true" render="client">
+<aura:component provider="java://org.auraframework.impl.java.provider.ConcreteProvider" extensible="true">
     <aura:attribute name="whatToDo" type="String" default="" />
     <aura:attribute name="name" type="String" default="nothing!" />
     <h1>{!v.name}</h1>

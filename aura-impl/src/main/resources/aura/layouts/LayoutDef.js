@@ -27,7 +27,7 @@ function LayoutDef(config){
     if(config["match"]){
         this.match = new RegExp(config["match"]);
     }
-    this.title = valueFactory.create(config["title"]);
+    this.title = config["title"];
 
     var itemConfigs = config["layoutItemDefs"];
     for(var i=0;i<itemConfigs.length;i++){

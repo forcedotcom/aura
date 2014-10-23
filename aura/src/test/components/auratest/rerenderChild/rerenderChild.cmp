@@ -18,6 +18,7 @@
 <aura:component extends="auratest:rerenderParent">
     <aura:attribute name="title" type="String"/>
     <aura:attribute name="toggleChild" type="Boolean"/>
+    <aura:attribute name="ownRenderCounter" type="Integer" default="0"/>
 
     <div class="boxed">
         <ui:outputText value="{!v.title}" aura:id="title"/>

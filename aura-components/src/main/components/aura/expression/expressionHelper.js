@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 ({
-    getTextValue: function(value) {
-        var raw = value.unwrap();
-        return $A.util.isUndefinedOrNull(raw) ? '' : raw;
-    }
+	setupReferenceNode: function(component, ret) {
+		if (!ret || ret.length === 0) {
+			// Create a reference comment node for rerendering support
+			component._referenceNode = document.createComment("render expression: " + component);
+		} else {
+			component._referenceNode = ret[0];
+		}
+	}
 })

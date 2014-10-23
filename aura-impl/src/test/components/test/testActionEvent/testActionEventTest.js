@@ -109,7 +109,8 @@
         			function(dispMsg) {
         				$A.test.assertTrue(
         						dispMsg.indexOf("An internal server error has occurred")===0 || 
-        						dispMsg.indexOf("Unable to process your request")===0);
+        						dispMsg.indexOf("Unable to process your request")===0,
+        						"display message doesn't have key words we expect, message we got:"+dispMsg);
         				$A.message(dispMsg);
         			});
         	cmp.find("trigger").get("e.press").fire();

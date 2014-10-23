@@ -14,14 +14,38 @@
  * limitations under the License.
  */
 ({
-	findCmpsById:function(cmp, ids){
-		var ret = [];
-		for(var i in ids){
-			var bounty = cmp.find(ids[i]);
-			if(!$A.util.isEmpty(bounty)){
-				ret.push(bounty);
-			}
-		}
-		return ret;
-	}
+    clearCmpBody : function(cmp, id) {
+        cmp.find(id).set("v.body", []);
+    },
+    setCmpBody : function(cmp, id){
+        $A.newCmpAsync(this,function(newCmp){
+                cmp.find(id).set("v.body", [newCmp]);
+            },
+            {
+                componentDef:"markup://ui:button",
+                attributes:{
+                  values:{
+                            label : "New Button"
+                         }
+                },
+                localId: "newButton"
+            }, cmp);
+    },
+    addCmpBody : function(cmp, id){
+        $A.newCmpAsync(this,function(newCmp){
+            var body = cmp.find(id).get("v.body");
+            var newBody = body.length > 0 ? [body[0]] : [];
+            newBody.push(newCmp);
+            cmp.find(id).set("v.body", newBody);
+        },
+        {
+            componentDef:"markup://ui:button",
+            attributes:{
+              values:{
+                        label : "Added Button"
+                     }
+            },
+            localId: "addButton"
+        }, cmp);
+    }
 })

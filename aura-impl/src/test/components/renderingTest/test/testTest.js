@@ -65,15 +65,16 @@
 
     /**
      * Verify rendering component array declared in the current component's markup.
+     * W-1198083: At one point, we didn't want to allow findInstancesOf to work on facets.
+     * 			  This is no longer the case, so this has changed a little bit. 
      */
-    // TODO: W-1198083 cannot set default values for Aura.Component[]
-    _testRenderingComponentArrayInMyBody : {
+    testRenderingComponentArrayInMyBody : {
         test : [ function(cmp) {
             var text = cmp.find('localtext');
             var div = cmp.find('localdiv');
             // Verify that the component Array was rendered
-            $A.test.assertTruthy(text);
-            $A.test.assertTruthy(div);
+            $A.test.assertTruthy(text, "localtext is not truthy");
+            $A.test.assertTruthy(div, "localdiv is not truthy");
             $A.test.assertTrue(text.isRendered());
             $A.test.assertTrue(div.isRendered());
 
@@ -86,8 +87,7 @@
      * Verify rendering/rerendering expression intitialized with contitional
      * statements. Also verify that dom nodes are cleaned up after unrendering.
      */
-    // TODO: W-1198083 cannot set default values for Aura.Component[]
-    _testRenderRerenderOfExpressions : {
+    testRenderRerenderOfExpressions : {
         attributes : {
             flag : false
         },
@@ -96,11 +96,15 @@
                     var conditionalRendering = cmp.find('conditionalRendering');
                     $A.test.assertEquals(cmp.get('v.stringAttribute'),
                             conditionalRendering.get('v.stuffToRender'));
+
                     $A.test.assertEquals("London", $A.test
                             .getTextByComponent(conditionalRendering));
                 },
+                
+                /**
+                 * Currently fails because we use getElement() of the component and after a rerender, the new elements don't get associated.
+                 */
                 function(cmp) {
-                    debugger;
                     var conditionalRendering = cmp.find('conditionalRendering');
                     $A.test.assertTruthy(conditionalRendering);
 

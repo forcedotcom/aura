@@ -16,6 +16,8 @@
 
 -->
 <aura:event type="VALUE" support="GA" access="GLOBAL" description="Indicates that a Value has changed.">
-    <aura:attribute name="value" type="Object" access="GLOBAL" description="The value that changed."/>
+    <aura:attribute name="expression" type="String" access="GLOBAL" description="The expression that triggered the value change."/>
+    <aura:attribute name="oldValue" type="Object" access="GLOBAL" description="The previous value that was changed."/>
+    <aura:attribute name="value" type="Object" access="GLOBAL" description="The new value."/>
     <aura:attribute name="index" type="String" access="GLOBAL" description="If the handler was registered through an ArrayValue or MapValue, the name/index of the changed Value in that ArrayValue or MapValue"/>
 </aura:event>

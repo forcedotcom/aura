@@ -24,7 +24,7 @@
             	cmp.getDef().getHelper().runTest(cmp);
             });
             var content = cmp.find("content");
-            $A.util.insertFirst(content.getElement(), frame);
+            $A.util.insertFirst(frame, content.getElement());
         }
     },
 
@@ -57,7 +57,7 @@
         var rerun = cmp.find("rerun").getElement();
         //IF there were any errors in the test case (excluding assertions in callback functions)
         if(win.aura.test.getErrors()!==""){
-            $A.util.swapClass(rerun,"spin", "fail");
+            cmp.set("v.status", "fail");
             var msg = "";
             var errorsInCallbackFunc = eval("("+win.aura.test.getErrors()+")");
             var error = null;
@@ -66,15 +66,17 @@
                 error = errorsInCallbackFunc[i];
                 msg += error.message;
                 if(error["lastStage"]) {
-                    msg += "<br/>Failing Test:<br/><pre>" + error["lastStage"] + "</pre>";
+                    msg += "<br/>Failing Test: "+cmp.get("v.title")+"<br/><pre>" + error["lastStage"] + "</pre>";
                 }
             }
             cmp.find("results").getElement().innerHTML = "Failed.<br/>"+msg;
         }else{
-            $A.util.swapClass(rerun,"spin", "pass");
+            cmp.set("v.status", "pass");
             cmp.find("results").getElement().innerHTML = "Passed.";
         }
-        $A.rerender(cmp);
+
+        //$A.rerender(cmp);
+
         cmp.get("e.done").fire();
     }
 })

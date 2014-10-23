@@ -33,7 +33,7 @@
         var value = elem ? elem.value : null;
         var format = component.get("v.format");
         if (!format) { // use default format
-            format = $A.get("$Locale.datetimeformat");
+            format = $A.get("$Locale.datetimeFormat");
         }
         var langLocale = component.get("v.langLocale");
         if (!langLocale) {
@@ -69,7 +69,7 @@
         if (value) {
             var format = component.get("v.format");
             if (!format) { // use default format
-                format = $A.get("$Locale.datetimeformat");
+                format = $A.get("$Locale.datetimeFormat");
             }
             var langLocale = component.get("v.langLocale");
             if (!langLocale) {
@@ -126,7 +126,7 @@
     is24HourFormat: function(component) {
         var format = component.get("v.format");
         if (!format) {
-            format = $A.get("$Locale.datetimeformat");
+            format = $A.get("$Locale.datetimeFormat");
         }
         return !($A.localizationService.isPeriodTimeView(format));
     },

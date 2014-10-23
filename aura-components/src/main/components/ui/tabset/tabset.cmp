@@ -40,7 +40,6 @@
            onTabActivated="{!c.onTabActivated}"
            onTabClosed="{!c.onTabClosed}" 
         />
-           
         <aura:if isTrue="{!v.lazyRenderTabs == false}">
             {!v.body}
         </aura:if>

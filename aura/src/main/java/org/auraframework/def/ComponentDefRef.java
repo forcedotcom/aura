@@ -15,7 +15,6 @@
  */
 package org.auraframework.def;
 
-import java.util.List;
 import java.util.Map;
 
 import org.auraframework.instance.BaseComponent;
@@ -45,7 +44,7 @@ public interface ComponentDefRef extends Definition {
 
     AttributeDefRef getAttributeDefRef(String name);
 
-    List<Component> newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException;
+    Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException;
 
     String getLocalId();
 

@@ -15,23 +15,29 @@
  */
 ({
     render : function(cmp){
-        return cmp.get("v.value");
+        var elements=$A.util.createElementsFromMarkup(cmp.get("v.value"));
+        if(!elements.length){
+            $A.renderingService.renderFacet(cmp,elements);
+        }
+        return elements;
     },
 
     rerender : function(cmp){
         if (cmp.isDirty("v.value")) {
-            // TODO: This placeholder logic should move up to the rendering service
             var el = cmp.getElement();
-            var placeholder = document.createTextNode("");
-            $A.util.insertBefore(placeholder, el);
-
+            var placeholder=null;
+            if(el){
+                placeholder = document.createTextNode("");
+                $A.util.insertBefore(placeholder, el);
+            }else{
+                placeholder=$A.renderingService.getMarker(cmp);
+            }
             $A.unrender(cmp);
-            
             var results = $A.render(cmp);
-            
-            $A.util.insertBefore(results, placeholder);
-            $A.util.removeElement(placeholder);
-            $A.afterRender(cmp);
+            if(results.length){
+                $A.util.insertBefore(results, placeholder);
+                $A.afterRender(cmp);
+            }
         }
     }
 })

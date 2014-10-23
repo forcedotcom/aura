@@ -36,7 +36,6 @@
 
         var updateOn = this.getUpdateOn(component);
         if (updateOn) {
-
         	var handledEvents = this.getHandledDOMEvents(component);
         	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
 	            if (handledEvents[updateOn[j]] !== true) {
@@ -94,12 +93,8 @@
      *
      */
     handleErrors : function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var value = concreteCmp.getValue("v.value");
-        if (value) {
-            if (!component.hasEventHandler("onError")) { // no onError event handler attached, use default error component
-                this.setErrorComponent(component, value);
-            }
+        if (!component.hasEventHandler("onError")) { // no onError event handler attached, use default error component
+            this.setErrorComponent(component);
         }
     },
 
@@ -142,11 +137,11 @@
     /**
      * Set a default error component.
      */
-    setErrorComponent : function(component, value) {
-        if (value.isValid()) {
+    setErrorComponent : function(component) {
+        if (component.isValid("v.value")) {
             this.validate(component);
         } else {
-            this.invalidate(component, value);
+            this.invalidate(component);
         }
     },
 
@@ -155,7 +150,7 @@
      */
     validate : function(component) {
         var errorCmp = component.get("v.errorComponent")[0];
-
+        
         // Mark as not invalid
         component._invalidValue = false;
 
@@ -168,10 +163,11 @@
     /**
      * Show up the the error messages and put the component in the error state.
      */
-    invalidate : function(component, value) {
+    invalidate : function(component) {
+        //var inputEl = this.getInputElement(component);
         var m = [];
-        var valueErr = value.getErrors();
-
+        var valueErr = component.getErrors("v.value");
+        
         // Mark as invalid
         component._invalidValue = true;
 
@@ -187,10 +183,10 @@
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
-                	var ariaDesc = component.get("v.ariaDescribedby");
+                    var ariaDesc = component.get("v.ariaDescribedBy");
                     ariaDesc = this.addTokenToString(ariaDesc, errorCmp.getGlobalId());
                 	component.set("v.errorComponent", errorCmp);
-                	this.setAttribute(component, {key: "ariaDescribedby", value: ariaDesc});
+                	this.setAttribute(component, {key: "ariaDescribedBy", value: ariaDesc});
                 	component._creatingAsyncErrorCmp = false;
                 },
                 {
@@ -206,10 +202,24 @@
     },
     
     updateErrorElement : function(component) {
-    	var inputEl = this.getInputElement(component);
-    	var classFunc = component._invalidValue ? $A.util.addClass : $A.util.removeClass;
-    	
-    	classFunc.apply($A.util, [inputEl, "inputError"]);
+    	//var inputEl = this.getInputElement(component);
+    	//var classFunc = component._invalidValue ? $A.util.addClass : $A.util.removeClass;
+    	//classFunc.apply($A.util, [inputEl, "inputError"]);
+
+        // KRIS: HALO: 
+        // This updates the instance v.class, which causes 
+        // the textArea to rerender, but we already do that since we update the v.ariaDescribedBy property as well.
+        // If you wanted to optimize this, go to the element both times, and don't go through v.ariaDescribedBy or v.class
+        var errorClass = "inputError";
+        $A.util.toggleClass(component, errorClass, !!component._invalidValue);
+    },
+
+    addClass: function(component, className) {
+        $A.util.addClass(component, className);
+    },
+
+    removeClass: function(component, className) {
+        $A.util.removeClass(component,className);
     },
 
     /**
@@ -259,23 +269,14 @@
     },
 
     setAttribute: function(cmp, attr) {
-        concreteCmp = cmp.getConcreteComponent(),
-        parentCmp = concreteCmp.getSuper();
-
-        concreteCmp.set("v." + attr.key, attr.value);
-        //need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
-        while(parentCmp) {
-        	parentCmp.set("v." + attr.key, attr.value);
-        	parentCmp = parentCmp.getSuper();
-        }
+        cmp.set("v."+attr.key,attr.value,attr.commit);
     },
 
-    // Can str ever be null/undef?
     addTokenToString: function(str, token) {
     	token = $A.util.trim(token);
     	str = $A.util.trim(str);
     	if (str) {
-    		if ((' ' + str + ' ').indexOf(' ' + token + ' ') == -1) {
+            if ((' ' + str + ' ').indexOf(' ' + token + ' ') === -1) {
     			str += ' ' + token;
     		}
     	} else {
@@ -284,12 +285,13 @@
     	return str
     },
 
-    addInputClass: function(cmp) {
-    	if (this.hasLabel(cmp)) {
-    		var inputEl = this.getInputElement(cmp);
-    		$A.util.addClass(inputEl, cmp.getConcreteComponent().getDef().getStyleClassName());
-    	}
-    },
+//    addInputClass: function(component) {
+//    	if (this.hasLabel(component)) {
+//    		//var inputEl = this.getInputElement(cmp);
+//    		//$A.util.addClass(inputEl, cmp.getConcreteComponent().getDef().getStyleClassName());
+//            $A.util.addClass(component, component.getConcreteComponent().getDef().getStyleClassName())
+//    	}
+//    },
 
     hasLabel: function(cmp) {
     	var label = cmp.get('v.label');

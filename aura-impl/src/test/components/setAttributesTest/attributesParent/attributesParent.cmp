@@ -1,0 +1,18 @@
+<aura:component abstract="true">
+
+    <aura:attribute name="city" type="String" default="San Francisco (default parent)"/>
+    <aura:attribute name="state" type="String" default="California (default parent)"/>
+    <aura:attribute name="address" type="Aura.Component[]"/>
+
+    Attribtues:
+    <div id="parent-address" style="margin: 10px; border: 1px solid red">
+        <div>{!v.city}</div>
+        <div>{!v.state}</div>
+    </div>
+
+    Facet:
+    <div id="child-address" style="margin: 10px; border: 1px solid blue">
+        {!v.address}
+    </div>
+
+</aura:component>

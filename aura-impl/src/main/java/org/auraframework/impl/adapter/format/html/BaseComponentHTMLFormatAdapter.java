@@ -95,7 +95,6 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
 
                 attributes.put("auraScriptTags", sb.toString());
                 Map<String, Object> auraInit = Maps.newHashMap();
-                auraInit.put("lastmod", AuraBaseServlet.getLastMod());
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
                     auraInit.put("attributes", componentAttributes);
                 }

@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSortedSet;
  * @since 0.0.178
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
-    private static final Set<String> SYSTEM_TEST_NAMESPACES = new ImmutableSortedSet.Builder<String>(String.CASE_INSENSITIVE_ORDER).add(
+    private static final Set<String> SYSTEM_TEST_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add(
     		"auratest", "actionsTest", "attributesTest", "auraStorageTest", "gvpTest", "preloadTest", "clientLibraryTest", "clientApiTest", 
     	"clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest", "handleEventTest", "ifTest", "iterationTest", 
     	"layoutServiceTest", "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest", "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest",

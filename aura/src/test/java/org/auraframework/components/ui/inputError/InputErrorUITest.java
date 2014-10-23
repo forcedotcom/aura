@@ -105,7 +105,7 @@ public class InputErrorUITest extends WebDriverTestCase {
     public void testErrorWithoutSettingErrorMessage() throws Exception {
         d = getDriver();
         open(URL);
-        setWebElements("ErrorNoErrMsg", "ClearNullErrMsg");
+        setWebElements("ErrorNoErrMsg", "ClearNoEvent");
         induceError(null, false);
         clearError(false);
     }

@@ -17,497 +17,395 @@
 
 /**
  * @namespace Creates an AttributeSet instance.
- * @param {Object} config Sets the values with the config object, if provided.
- * @param {Object} valueProvider Sets the value provider for the attributes.
- * @param {AttributeDefSet} attributeDefSet The metadata describing the attributes in the set.
+ * @param {Object}
+ *            config Sets the values with the config object, if provided.
+ * @param {Object}
+ *            valueProvider Sets the value provider for the attributes.
+ * @param {AttributeDefSet}
+ *            attributeDefSet The metadata describing the attributes in the set.
  * @constructor
  * @protected
  */
-function AttributeSet(config, valueProvider, attributeDefSet, component, localCreation) {
-    this.valueProvider = valueProvider;
-    this.values = new MapValue({});
-    this.attributeDefSet = attributeDefSet;
-    this.component = component;
-    this.localCreation = localCreation;
+function AttributeSet(attributes, attributeDefSet, defaultValueProvider) {
+	this.values = {};
+    this.decorators={};
+	this.attributeDefSet = attributeDefSet;
+//    this.defaultValueProvider=defaultValueProvider;
 
-    this.createInstances(config);
+	// JBUCH: HALO: TODO: Temporary Data Structures
+	this.errors = {};
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    this["values"] = this.values;
-    //#end
+	this.initialize(attributes);
+
+	// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+	this["values"] = this.values;
+	// #end
 }
 
 AttributeSet.prototype.auraType = "AttributeSet";
 
-
-/**
- * DO NOT USE THIS METHOD.
- *
- * @public
- *
- * @deprecated use Component.get(name) instead
- */
-AttributeSet.prototype.getValue = function (name, raw) {
-    //$A.warning("DEPRECATED USE OF attributes.getValue(name). USE component.get(\"v.name\") INSTEAD.");
-    return this._getValue(name,raw);
-};
-
 /**
  * Whether attribute exists
  *
- * @param {String} name - name of attribute
+ * @param {String}
+ *            name - name of attribute
  * @returns {boolean} true if attribute exists
  * @private
  */
 AttributeSet.prototype.hasAttribute = function(name) {
-    return this.values.contains(name);
+	return this.values.hasOwnProperty(name);
 };
 
 /**
- * Returns the value of the attribute with the given name.
- * @param {String} name The name of the attribute.
- * @param {Boolean} [raw] If raw is set to false, evaluate expressions in the form {!xxx}.
- * @returns {Object} Value of the attribute with the given name.
+ * Returns the value referenced using property syntax.
  *
- * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ * @param {String}
+ *            key The data key to look up.
+ * @returns {Object} the value of the attribute
+ * @protected
  *
- * @private
- *
- */
-AttributeSet.prototype._getValue = function(name, raw) {
-    var ve = this.values.getValue(name, true);
-
-    if (!ve) {
-    	this.createDefault(name);
-        ve = this.values.getValue(name);
-    }
-    
-    var value;
-    if (!raw && ve && ve.isExpression && ve.isExpression()) {
-        value = expressionService.getValue(this.getValueProvider(), ve);
-    } else {
-        value = ve;
-    }
-
-    return value;
-};
-
-/**
- * DO NOT USE THIS METHOD.
- *
- * @public
- *
- * @deprecated use Component.get(name) instead
  */
 AttributeSet.prototype.get = function(key) {
-    return $A.expressionService.get(this, key);
-};
+	var value = undefined;
+	if (key.indexOf('.') < 0) {
+        var decorators=this.decorators[key];
+        if(decorators&&decorators.length){
+            if(decorators.decorating){
+                value=decorators.value;
+            }else{
+                decorators.decorating=true;
+                decorators.value=this.values[key];
+                for(var i=0;i<decorators.length;i++){
+                    var decorator=decorators[i];
+                    value=decorator.value=decorators[i].evaluate();
+                }
+                decorators.decorating=false;
+                decorators.value=null;
+            }
+        }else{
+            value = this.values[key];
+        }
+	} else {
+		value = aura.expressionService.resolve(key, this.values);
+	}
 
-/**
- * Returns the raw value referenced using property syntax.
- * @param {String} key The data key to look up on the Attribute.
- *
- * TEMPORARILY INTERNALIZED TO GATE ACCESS
- *
- * @private
- *
- */
-AttributeSet.prototype._get = function (key) {
-    return $A.expressionService.get(this, key);
-};
+	if (aura.util.isExpression(value)) {
+		value = value.evaluate();
+	}
 
-
-/**
- * Returns the raw value based on the given name.
- * @param {String} name The name of the attribute.
- */
-AttributeSet.prototype.getRawValue = function(name) {
-    var ret = this._getValue(name);
-    if (ret && ret._getValue && !ret.getRawValue) {
-        ret = ret._getValue();
-    }
-
-    return ret;
-};
-
-/**
- * DO NOT USE THIS METHOD.
- *
- * @public
- *
- * @deprecated use Component.set(name,value) instead
- */
-AttributeSet.prototype.setValue = function (name,value) {
-    //$A.warning("DEPRECATED USE OF attributes.setValue(name,value). USE component.set(name,value) INSTEAD.");
-    this._setValue(name,value);
+	return value;
 };
 
 /**
  * Set the attribute of the given name to the given value.
- * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
- * @param {Object} value The value to be set.
  *
- * TEMPORARILY INTERNALIZED TO GATE ACCESS
+ * @param {String}
+ *            key The key can be a path expression inside. E.g.
+ *            attribute.nestedValue.value....}
+ * @param {Object}
+ *            value The value to be set.
  *
- * @private
+ * @protected
  *
  */
-AttributeSet.prototype._setValue = function(name, value) {
-    this.createDefault(name);
+AttributeSet.prototype.set = function(key, value) {
+    var target = this.values, nextTarget;
+    var step, nextStep;
 
-    var ve = this.values.getValue(name);
-    if (ve.isExpression()) {
-        expressionService.setValue(this.getValueProvider(), ve, value);
+    if(!$A.util.isUndefinedOrNull(value) && !this.isValueValidForAttribute(key, value)) {
+    	if(this.isTypeOfArray(key)) {
+    		value = !$A.util.isArray(value) ? [value] : value;
+    	} else {
+    		//$A.warning("You set the attribute '" + key + "' to the value '" + value + "' which was the wrong data type for the attribute.");
+            // Do we want to allow.
+            //return;
+    	}
+    }
+
+    // Process all keys except last one
+    if (key.indexOf('.') >= 0) {
+        path = key.split('.');
+        step = path.shift();
+        while (path.length > 0) {
+            nextStep = path.shift();
+            nextTarget = target[step];
+            if (nextTarget === undefined) {
+                // Attempt to do the right thing: create an empty object or an array
+                // depending if the next indice is an object or an array.
+                if (isNaN(nextStep)) {
+                    target[step] = {};
+                } else {
+                    target[step] = [];
+                }
+                target = target[step];
+            } else {
+                if ($A.util.isExpression(nextTarget)) {
+                    target = nextTarget.evaluate();
+                } else {
+                    target = nextTarget;
+                }
+            }
+            step = nextStep;
+        }
+        key = step;
+    }
+
+    if (target[key] instanceof PropertyReferenceValue) {
+        target[key].set(value);
     } else {
-        ve.setValue(value);
+        target[key] = value;
     }
 };
 
 /**
- * DO NOT USE THIS METHOD.
+ * Clears a property reference value of the given name, and returns it. Does nothing if the attribute
+ * does not exist or is not a property reference value.
  *
- * @public
+ * @param {String}
+ *            key The key can be a path expression inside. E.g.
+ *            attribute.nestedValue.value....}
  *
- * @deprecated use Component.set(name,value) instead
- */
-AttributeSet.prototype.set= function (name, value) {
-    //$A.warning("DEPRECATED USE OF attributes.set(name,value). USE component.set(name,value) INSTEAD.");
-    this._set(name, value);
-};
-
-/**
- * Set the attribute of the given name to the given value.
- * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
- * @param {Object} value The value to be set.
- *
- * TEMPORARILY INTERNALIZED TO GATE ACCESS
- *
- * @private
+ * @returns {PropertyReferenceValue} the reference that was found and cleared, or null
+ * @protected
  *
  */
-AttributeSet.prototype._set = function (name, value) {
-    this.createDefault(name);
+AttributeSet.prototype.clearReference = function(key) {
+    var oldValue;
+    var target=this.values;
+    var step=key;
 
-    var ve = this.values._getValue(name);
-    if (ve.isExpression()) {
-        expressionService.setValue(this.getValueProvider(), ve, value);
-    } else {
-        ve.setValue(value);
+    if (key.indexOf('.') >= 0) {
+        var path = key.split('.');
+        target = aura.expressionService.resolve(path.slice(0, path.length - 1), target);
+        step=path[path.length-1];
     }
-};
-
-/**
- * Set the attribute of the given name to the given value.
- * @param {String} name The name can be a path expression inside. E.g. {!xxx....}
- * @param {Object} value The value to be set.
- */
-AttributeSet.prototype.set = function (name, value) {
-    this.createDefault(name);
-
-    var ve = this.values.getValue(name);
-    if (ve.isExpression()) {
-        expressionService.setValue(this.getValueProvider(), ve, value);
-    } else {
-        ve.setValue(value);
-    }
-};
-
-/**
- * Returns the value provider.
- * @return {Object} value provider
- */
-AttributeSet.prototype.getValueProvider = function() {
-    return this.valueProvider;
-};
-
-/**
- * Returns the value provider of the component.
- * @return {Object} component or value provider
- */
-AttributeSet.prototype.getComponentValueProvider = function() {
-    var valueProvider = this.valueProvider;
-    if (!valueProvider) {
-        return undefined;
-    }
-
-    return valueProvider.auraType !== Component.prototype.auraType && $A.util.isFunction(valueProvider.getComponent) ?
-        valueProvider.getComponent() : valueProvider;
-};
-
-/**
- * Merge data from two given objects.
- * @param {Object} yourMap The map to merge with this AttributeSet.
- * @param {Object} overwrite - should identical values in yourMap overwrite existing values
- * and insert new ones if they don't already exist in this AttributeSet.
- */
-AttributeSet.prototype.merge = function(yourMap, overwrite) {
-    var my = this.values.value;
-    var keys = yourMap.value;
-
-    for (var key in keys) {
-        var yourvalue = yourMap.getValue(key);
-        if (overwrite || !(key in my)) {
-            my[key] = yourvalue;
+    if(target) {
+        oldValue = target[step];
+        if (oldValue instanceof PropertyReferenceValue) {
+            target[step] = undefined;
+            return oldValue;
         }
     }
+    return null;
+};
+
+/**
+ * Verifies if a value is valid for the type that the attribute is defined as.
+ * Strings as strings, arrays as arrays, etc.
+ */
+AttributeSet.prototype.isValueValidForAttribute = function(attributeName, value) {
+	var attributeDefSet = this.attributeDefSet;
+	if(attributeName.indexOf(".")>=0){
+		var path = attributeName.split(".");
+		attributeName=path[0];
+		if(attributeName!="body"&&path.length > 1) {
+			// We don't validate setting a value 2 levels deep. (v.prop.subprop)
+			return true;
+		}
+	}
+
+	var attributeDef = attributeDefSet.getDef(attributeName);
+	if(!attributeDef) {
+
+		// Attribute doesn't exist on the component
+		return false;
+	}
+
+	var nativeType = attributeDef.getNativeType();
+
+	// Do not validate property reference values or object types
+	if($A.util.isExpression(value) || nativeType === "object") {
+		return true;
+	}
+
+	// typeof [] == "object", so we need to do this one off for arrays.
+	if(nativeType === "array") {
+		return $A.util.isArray(value);
+	}
+
+	return typeof value === nativeType;
+};
+
+
+AttributeSet.prototype.isTypeOfArray = function(attributeName) {
+	if(attributeName.indexOf(".")>=0){
+		var path = attributeName.split(".");
+		attributeName=path[0];
+		if(attributeName!="body"&&path.length > 1) {
+			// We don't validate setting a value 2 levels deep. (v.prop.subprop)
+			return false;
+		}
+	}
+	var attributeDef = this.attributeDefSet.getDef(attributeName);
+	return attributeDef && attributeDef.getNativeType() === "array";
 };
 
 /**
  * Reset the attribute set to point at a different def set.
  *
- * Allows us to change the set of attributes in a set when
- * we inject a new component. No checking is done here, if checking is
- * desired, it should be done by the caller.
+ * Allows us to change the set of attributes in a set when we inject a new
+ * component. No checking is done here, if checking is desired, it should be
+ * done by the caller.
  *
- * Doesn't check the current state of attributes because they don't matter.
- * This will create/update attributes based on new AttributeDefSet,
- * provided attribute config and current attribute values
+ * Doesn't check the current state of attributes because they don't matter. This
+ * will create/update attributes based on new AttributeDefSet, provided
+ * attribute config and current attribute values
  *
- * @param {AttributeDefSet} attributeDefSet the new def set to install.
- * @param {Object} attributes - new attributes configuration
+ * @param {AttributeDefSet}
+ *            attributeDefSet the new def set to install.
+ * @param {Object}
+ *            attributes - new attributes configuration
  * @private
  */
-AttributeSet.prototype.recreate = function(attributeDefSet, attributes) {
-    $A.assert(attributeDefSet && attributeDefSet.auraType === "AttributeDefSet",
-        "Valid AttributeDefSet is required to recreate attributes");
-    this.attributeDefSet = attributeDefSet;
-
-    var normalized = null;
-    if (attributes) {
-        // in case attributes aren't wrapped in "values" object
-        if (attributes["values"] === undefined) {
-            normalized = {};
-            normalized["values"] = attributes;
-        } else {
-            normalized = attributes;
-        }
+AttributeSet.prototype.merge = function(attributes, attributeDefSet) {
+	if(attributeDefSet){
+        $A.assert(attributeDefSet.auraType === "AttributeDefSet", "AttributeSet.merge: A valid AttributeDefSet is required to merge attributes.");
+        this.attributeDefSet = attributeDefSet;
     }
 
-    // we need to go through new attributeDefs and create/update
-    // attributes with new attributes provided
-    this.createInstances(normalized);
+	// Reinitialize attribute values
+	this.initialize(attributes);
 };
 
 /**
- * Merge data from a simple collection of attribute values, treated as expressions.
- * @param {Object} yourValues The map to merge with this AttributeSet.
- * @param {Object} overwrite - should identical values in yourMap overwrite existing values
- * and insert new ones if they don't already exist in this AttributeSet.
+ * Gets default attribute value.
+ *
+ * @param {String}
+ *            name - name of attribute
  * @private
  */
-AttributeSet.prototype.mergeValues = function(yourValues, overwrite) {
-    var my = this.values.value;
-    for (var key in yourValues) {
-        var yourvalue = yourValues[key];
-        if (overwrite || !(key in my)) {
-            this._getValue(key).setValue(yourvalue);
-        }
-    }
+AttributeSet.prototype.getDefault = function(name) {
+	if (name) {
+		var attributeDef = this.attributeDefSet.getDef(name);
+		if (attributeDef) {
+            return attributeDef.getDefault();
+		}
+	}
+	return null;
 };
 
 /**
- * Creates default attribute. Creation is lazy in getValue and setValue
- * @param {String} name - name of attribute
- * @private
- */
-AttributeSet.prototype.createDefault = function(name) {
-    if (name && !this.hasAttribute(name)) {
-        // Dynamically create the attribute now that something has asked for it
-        var attributeDef = this.attributeDefSet.getDef(name.toLowerCase());
-
-        // DCHASMAN TODO Enable this when we have the time to fix the myriad of places that still reference non-existent attributes
-        // $A.assert(attributeDef, "Unknown attribute " + this.component + "." + name);
-
-        if (attributeDef) {
-            var defaultValue = attributeDef.getDefault();
-            this.createAttribute(name, defaultValue, attributeDef);
-        }
-    }
-};
-
-/**
- * Destroys the component.
- * @param {Boolean} async - whether to put in our own trashcan
+ * Destroys the attributeset.
+ *
+ * @param {Boolean}
+ *            async - whether to put in our own trashcan
  * @private
  */
 AttributeSet.prototype.destroy = function(async) {
-    this.values.destroy(async);
+    var values = this.values;
+    var expressions={};
+    for (var k in values) {
+        var v = values[k];
 
-    this.values = undefined;
-    this.valueProvider = undefined;
-    this.attributeDefSet = undefined;
-    this.component = undefined;
-    this.localCreation = undefined;
+        // Body is special because it's a map
+        // of bodies for each inheritance level
+        // so we need to do a for( var in ) {} loop
+        if(k === "body") {
+        	for(var globalId in v) {
+        		for(var j=0,body=v[globalId];j<body.length;j++) {
+        			body[j].destroy(async);
+        		}
+        	}
+        	continue;
+        }
+
+
+        if(!$A.util.isArray(v)){
+            v=[v];
+        }
+        for(var i=0;i<v.length;i++){
+            if($A.util.isExpression(v[i])){
+                expressions[k]=v[i];
+            }else  if (v[i] && v[i].destroy) {
+                v[i].destroy(async);
+            }
+        }
+    }
+
+    this.values = this.attributeDefSet = undefined;
+    return expressions;
 };
 
 /**
  * Loop through AttributeDefSet and create or update value using provided config
  *
- * @param {Object} config - attribute configuration
+ * @param {Object}
+ *            config - attribute configuration
  * @private
  */
-AttributeSet.prototype.createInstances = function(config){
-    var values = this.attributeDefSet.getValues();
-    var valuesOrder = this.attributeDefSet.getNames();
-    if (values && valuesOrder) {
-        var configValues = config ? config["values"] : null;
+AttributeSet.prototype.initialize = function(attributes) {
+    var attributeDefs = this.attributeDefSet.getValues();
+	var attributeNames = this.attributeDefSet.getNames();
+	if (!attributeDefs || !attributeNames) {
+		return;
+	}
 
-        for (var i = 0; i < valuesOrder.length; i++) {
-            var lowerName = valuesOrder[i];
-            var attributeDef = values[lowerName];
+	var configValues = attributes || {};
 
-            var name = attributeDef.getDescriptor().getQualifiedName();
-            var value = undefined;
+    // Create known attributes and assign values or defaults
+	for (var i = 0; i < attributeNames.length; i++) {
+		var attributeDef = attributeDefs[attributeNames[i]];
+		var name = attributeDef.getDescriptor().getQualifiedName();
+		var hasAttribute = this.hasAttribute(name);
+		var hasValue = configValues.hasOwnProperty(name);
+		var value = configValues[name];
 
-            if (configValues) {
-                value = configValues[name];
+		if (!hasValue && !hasAttribute) {
+			value = this.getDefault(name);
+			hasValue = value !== undefined;
+		}
 
-                /* This check is to distinguish between a AttributeDefRef that came from server
-                 * which has a descriptor and value, and just a  thing that somebody on the client
-                 * passed in. This totally breaks when somebody pass a map that has a key in it
-                 * called "descriptor", like DefModel.java in the IDE
-                 * TODO: better way to distinguish real AttDefRefs from random junk
-                 */
-                if (value && value["descriptor"]) {
-                    value = value["value"];
-                }
-            }
-
-            var hasValue = !$A.util.isUndefined(value);
-            if (!hasValue && !this.hasAttribute(name)) {
-                // We cannot defer creation of default facets because they must be recreated in server order on the client
-                var isFacet = attributeDef.getTypeDefDescriptor() === "aura://Aura.Component[]";
-                if (isFacet) {
-                    value = attributeDef.getDefault();
-                    hasValue = !$A.util.isUndefined(value);
-                }
-            }
-            if (hasValue) {
-
-                if (this.hasAttribute(name)) {
-                    // set new value if attribute already exists
-                    this.setValue(name, value);
-                } else {
-                    // create new if attribute doesn't exist
-                    $A.pushCreationPath(name);
-                    try {
-                        this.createAttribute(name, value, attributeDef);
-                    } finally {
-                        $A.popCreationPath(name);
-                    }
-                }
+        if (attributeDef.isRequired && attributeDef.isRequired()) {
+            if (!hasValue) {
+//                throw new Error("Missing required attribute " + name);
             }
         }
+
+		if ((hasValue && this.values[name]!==value) || !hasAttribute) {
+            if(hasAttribute && value instanceof FunctionCallValue) {
+                if (!this.decorators[name]) {
+                    this.decorators[name] = [];
+                }
+                this.decorators[name].push(value);
+            }else{
+                if (!(value instanceof PropertyReferenceValue && value.equals(this.values[name]))) {
+                    this.values[name] = value;
+                }
+            }
+		}
+	}
+
+    // Guard against unknown attributes
+    var unknownAttributes=[];
+    for(var attribute in configValues){
+        if(!this.hasAttribute(attribute)){
+            unknownAttributes.push(attribute);
+        }
     }
+
+    $A.assert(unknownAttributes.length===0,"AttributeSet.initialize: The following unknown attributes could not be initialized: '"+unknownAttributes.join("', '")+"'. Please confirm the spelling and definition of these attributes.");
 };
 
-
-/**
- * Create attribute and store in values
- *
- * @private
- * @param {String} name - name of attribute
- * @param {Object} config - attribute config(s)
- * @param {AttributeDef} def - attribute definition
- */
-AttributeSet.prototype.createAttribute = function(name, config, def) {
-    var valueConfig;
-    var act = $A.getContext().getCurrentAction();
-    var noInstantiate = def.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]";
-
-    if (config && config["componentDef"]) {
-        // TODO - not sure why doForce param is set false here
-        //  had to make it explicit to add last param, but it was missing (aka false) in the past
-        valueConfig = componentService.newComponentDeprecated(config, null, this.localCreation, true);
-    } else if (aura.util.isArray(config)) {
-        valueConfig = [];
-        var self = this;
-        var createComponent = function(itemConfig) {
-            var ic = itemConfig,
-                varName = ic['var'];
-            return function(item, idx) {
-                if (!ic["attributes"]) {
-                    ic["attributes"] = {
-                        "values": {}
-                    };
-                }
-
-                if (act) {
-                    act.setCreationPathIndex(idx);
-                }
-
-                ic["attributes"]["values"][varName] = item;
-                ic["delegateValueProvider"] = self.valueProvider;
-                ic["valueProviders"] = {};
-                ic["valueProviders"][varName] = item;
-
-                var cmp = componentService.newComponentDeprecated(ic, self.valueProvider, self.localCreation, true);
-                valueConfig.push(cmp);
-            };
-        };
-
-        for(var i = 0; i < config.length; i++) {
-            var v = config[i];
-            if (v["componentDef"]) {
-                if (v["items"]) {
-                    if (act) {
-                        act.setCreationPathIndex(i);
-                        act.pushCreationPath("realbody");
-                    }
-                    // iteration of some sort
-                    var itemsValue = expressionService.getValue(this.valueProvider, valueFactory.create(v["items"]));
-                    // temp workaround for no typedef if value is null
-                    if (itemsValue && itemsValue.each) {
-                        itemsValue.each(createComponent(v), v["reverse"]);
-                    }
-                    if (act) {
-                        act.popCreationPath("realbody");
-                    }
-                } else {
-                    if (noInstantiate) {
-                        // make a shallow clone of the cdr with the proper value provider set
-                        var cdr = {};
-                        cdr["componentDef"] = v["componentDef"];
-                        cdr["localId"] = v["localId"];
-                        cdr["attributes"] = v["attributes"];
-                        cdr["valueProvider"] = this.valueProvider;
-                        valueConfig.push(new SimpleValue(cdr, def, this.component));
-                    } else {
-                        if (act) { act.setCreationPathIndex(i); }
-                        valueConfig.push(componentService.newComponentDeprecated(v, this.valueProvider,
-                            this.localCreation, true));
-                    }
-                }
-
-            } else {
-                valueConfig.push(v);
-            }
-        }
-    } else {
-        valueConfig = config;
-    }
-
-    // For unset maps and lists, we need to get that it's a map or list, and then reset the value to null/undef
-    var hasRealValue = true;
-    if (valueConfig === undefined || valueConfig === null) {
-        var defType = def.getTypeDefDescriptor();
-        if (defType.lastIndexOf("[]") === defType.length - 2 || defType.indexOf("://List") >= 0) {
-            hasRealValue = valueConfig;
-            valueConfig = [];
-        } else if (defType.indexOf("://Map") >= 0) {
-            hasRealValue = valueConfig;
-            valueConfig = {};
-        }
-    }
-
-    valueConfig = valueFactory.create(valueConfig, def, this.component);
-    if (!hasRealValue) {
-        // For maps and arrays that were null or undefined, we needed to make a
-        // fake empty one to get the right value type, but now need to set the
-        // actual value:
-        valueConfig.setValue(hasRealValue);
-    }
-
-    this.values.put(name, valueConfig);
-
+// JBUCH: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE
+AttributeSet.prototype.isValid = function(expression) {
+	return !this.errors.hasOwnProperty(expression);
+};
+AttributeSet.prototype.setValid = function(expression, valid) {
+	if (valid) {
+		this.clearErrors(expression);
+	} else {
+		this.addErrors(expression, []);
+	}
+};
+AttributeSet.prototype.addErrors = function(expression, errors) {
+    if (!this.errors[expression]) {
+		this.errors[expression] = [];
+	}
+	this.errors[expression] = this.errors[expression].concat(errors);
+};
+AttributeSet.prototype.clearErrors = function(expression) {
+	delete this.errors[expression];
+};
+AttributeSet.prototype.getErrors = function(expression) {
+	return this.errors[expression] || [];
 };

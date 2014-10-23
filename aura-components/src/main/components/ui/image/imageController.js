@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 ({
-	init: function(cmp) {
+	init: function(component) {
+		var cmp = component.getConcreteComponent();
     	var imageType = cmp.get('v.imageType'),
     		altText = cmp.get('v.alt') || '',
     		id = cmp.getLocalId() || cmp.getGlobalId() || '';

@@ -33,7 +33,7 @@ import org.auraframework.util.json.Json;
 public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implements TestCaseDef {
     public JavascriptTestCaseDef(DefDescriptor<TestSuiteDef> suiteDescriptor, String name, Location location,
             Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
-            Set<Definition> mocks, Set<String> auraErrorsExpectedDuringInit) {
+            Set<Definition> mocks, Set<String> auraErrorsExpectedDuringInit, String scrumTeam, String owner) {
         super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
                 TestCaseDef.class), location, null);
         this.attributes = AuraUtil.immutableMap(attributes);
@@ -43,6 +43,8 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         this.mocks = AuraUtil.immutableSet(mocks);
         this.name = name;
         this.auraErrorsExpectedDuringInit = auraErrorsExpectedDuringInit;
+        this.scrumTeam = scrumTeam;
+        this.owner = owner;
     }
 
     @Override
@@ -55,10 +57,22 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         json.writeMapEntry("testLabels", testLabels);
         json.writeMapEntry("browsers", browsers);
         json.writeMapEntry("auraErrorsExpectedDuringInit", auraErrorsExpectedDuringInit);
+        json.writeMapEntry("scrumTeam", scrumTeam);
+        json.writeMapEntry("owner", owner);
         json.writeMapEnd();
     }
+    
+    @Override
+    public String getScrumTeam() {
+		return scrumTeam;
+	}
 
     @Override
+    public  String getOwner() {
+		return owner;
+	}
+
+	@Override
     public String getName() {
         return name;
     }
@@ -125,4 +139,6 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
     private final Set<Definition> mocks;
     private final Set<String> auraErrorsExpectedDuringInit;
     private final String name;
+    private final String scrumTeam;
+    private final String owner;
 }

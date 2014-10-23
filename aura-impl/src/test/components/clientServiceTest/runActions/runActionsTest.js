@@ -36,7 +36,7 @@
             $A.renderingService.render(action.getReturnValue(), component.find("results").getElement());
         });
         if (abortable) {
-            a.setAbortable();
+            a.setAbortable(abortable);
         }
         return a;
     },
@@ -193,6 +193,44 @@
                 var results = component.find("results").getElement();
                 this.waitForActions(component, actions, function() {
                     $A.test.assertEquals("a.ac.", $A.test.getText(results));
+                });
+            });
+        }
+    },
+
+    /**
+     * Tests all actions are ran when their abortable key is different
+     */
+    testDifferentAbortableGroupsNoneAborted : {
+        test : function(component) {
+            this.initAndRun(component, function() {
+                var actions = [
+                    [ this.getTestAction(component, "a", false) ],
+                    [ this.getTestAction(component, "b1", "1"), this.getTestAction(component, "b2", "2"),
+                        this.getTestAction(component, "b3", "3") ],
+                    [ this.getTestAction(component, "c", "4") ] ];
+                var results = component.find("results").getElement();
+                this.waitForActions(component, actions, function() {
+                    $A.test.assertEquals("a.ab1.ab1b2.ab1b2b3.ab1b2b3c.", $A.test.getText(results));
+                });
+            });
+        }
+    },
+
+    /**
+     * Tests abortable groups. Only last action of the same group is ran
+     */
+    testDifferentAbortableGroups : {
+        test : function(component) {
+            this.initAndRun(component, function() {
+                var actions = [
+                    [ this.getTestAction(component, "a", false) ],
+                    [ this.getTestAction(component, "b1", "1"), this.getTestAction(component, "b2", "2"),
+                        this.getTestAction(component, "b3", "1") ],
+                    [ this.getTestAction(component, "c", "1") ] ];
+                var results = component.find("results").getElement();
+                this.waitForActions(component, actions, function() {
+                    $A.test.assertEquals("a.ab2.ab2c.", $A.test.getText(results));
                 });
             });
         }

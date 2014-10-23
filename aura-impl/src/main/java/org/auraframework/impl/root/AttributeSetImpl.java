@@ -217,20 +217,15 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public <T> T getValue(String name, Class<T> clazz) throws QuickFixException {
-        PropertyReference expr = new PropertyReferenceImpl(name,
-                AuraUtil.getExternalLocation("direct attributeset access"));
-        if (expr.size() != 1) {
-            throw new InvalidDefinitionException("No dots allowed", expr.getLocation());
-        }
-        Object val = getValue(expr);
+        Object val = getValue(name);
         if (val == null) {
             return null;
         }
         try {
             return clazz.cast(val);
         } catch (ClassCastException cce) {
-            throw new AuraRuntimeException("attribute "+name+" is of the wrong type: expected "
-                    +clazz.getName()+" but got "+val.getClass().getName());
+            throw new AuraRuntimeException("attribute <" + name + "> is of the wrong type: expected "
+                    + clazz.getName() + " but got " + val.getClass().getName());
         }
     }
 

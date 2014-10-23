@@ -24,7 +24,7 @@ function LayoutItemDef(config){
     this.container = config["container"];
     this.body = config["body"];
     this.cache = config["cache"];
-    this.action = valueFactory.create(config["action"]);
+    this.action = config["action"];
 }
 
 LayoutItemDef.prototype.auraType = "LayoutItemDef";
@@ -80,7 +80,11 @@ LayoutItemDef.prototype.getAction = function(valueProvider){
         action.setParams({"components" : components});
         return action;
     }else{
-        return expressionService.get(valueProvider, this.action);
+        if(aura.util.isExpression(this.action)){
+            return this.action.evaluate(valueProvider);
+        }else{
+            return valueFactory.create(this.action,null,valueProvider).evaluate();
+        }
     }
 };
 

@@ -64,17 +64,6 @@ InvalidComponent.prototype.find = function(name){
 /**
  * @private
  */
-InvalidComponent.prototype.findValue = function(name){
-    this.raiseInvalidComponentError();
-};
-
-InvalidComponent.prototype.unwrap = function() {
-	return this;
-};
-
-/**
- * @private
- */
 InvalidComponent.prototype.findInstancesOf = function(type, ret, cmp){
     this.raiseInvalidComponentError();
 };
@@ -215,40 +204,17 @@ InvalidComponent.prototype.getElement = function(){
     this.raiseInvalidComponentError();
 };
 
-InvalidComponent.prototype.getAttributes = function() {
-    this.raiseInvalidComponentError();
-};
-
-InvalidComponent.prototype.getAttributeValueProvider = function() {
-    this.raiseInvalidComponentError();
-};
-
-InvalidComponent.prototype.getComponentValueProvider = function() {
-    this.raiseInvalidComponentError();
-};
-
-InvalidComponent.prototype.mergeAttributes = function(yourMap, overwrite) {
-    this.raiseInvalidComponentError();
-};
-
-/**
- * @public
- */
-InvalidComponent.prototype.getValue = function(key){
-};
-
-/**
- * @public
- */
-InvalidComponent.prototype.setValue = function(key, value){
-    this.raiseInvalidComponentError();
-};
-
-
 /**
  * @public
  */
 InvalidComponent.prototype.get = function(key){
+    this.raiseInvalidComponentError();
+};
+
+/**
+ * @public
+ */
+InvalidComponent.prototype.set = function (key, value) {
     this.raiseInvalidComponentError();
 };
 
@@ -313,20 +279,13 @@ InvalidComponent.prototype.isValid = function(){
  * @public
  */
 InvalidComponent.prototype.toString = function(){
-    return "InvalidComponent";
+    return "InvalidComponent" + (this._description||'');
 };
 
 /**
  * @private
  */
 InvalidComponent.prototype.toJSON = function(){
-    this.raiseInvalidComponentError();
-};
-
-/**
- * @private
- */
-InvalidComponent.prototype.output = function(){
     this.raiseInvalidComponentError();
 };
 
@@ -342,7 +301,7 @@ InvalidComponent.prototype.raiseInvalidComponentError = function(){
 	if (this._globalId && this._componentDef) {
 		error += ": " + this._componentDef + " [" + this._globalId + "]";
 	}
-	
+
     $A.error(error);
 };
 

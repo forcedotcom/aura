@@ -123,7 +123,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         LAYOUT(LayoutDef.class), //
         LAYOUT_ITEM(LayoutItemDef.class), //
         NAMESPACE(NamespaceDef.class),
-        RESOURCE(ResourceDef.class);
+        RESOURCE(ResourceDef.class),
+        DESIGN(DesignDef.class),
+        ATTRIBUTE_DESIGN(AttributeDesignDef.class);
 
 		
 		private static Map<Class<? extends Definition>, DefType> defTypeMap;

@@ -279,6 +279,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case THEME:
             case THEME_DEF_REF:
             case VAR:
+            case DESIGN:
+            case ATTRIBUTE_DESIGN:
                 qualifiedNamePattern = "%s://%s:%s";
                 break;
             case ACTION:
@@ -803,7 +805,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             Definition def = compileDef(descriptor, cc);
             DependencyEntry de;
             String uid;
-            long lmt = 0;
 
             if (def == null) {
                 return null;
@@ -815,7 +816,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             Set<DefDescriptor<? extends Definition>> deps = Sets.newLinkedHashSet();
 
             //
-            // Now walk the sorted list, building up our dependencies, uid, and lmt.
+            // Now walk the sorted list, building up our dependencies, and uid
             //
             StringBuilder sb = new StringBuilder(256);
             Hash.StringBuilder globalBuilder = new Hash.StringBuilder();
@@ -826,7 +827,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
 
                 deps.add(cd.descriptor);
-                lmt = updateLastMod(lmt, cd.def);
 
                 //
                 // Now update our hash.
@@ -841,21 +841,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 sb.append(",");
                 globalBuilder.addString(sb.toString());
             }
-            lmt = updateLastMod(lmt, def);
             uid = globalBuilder.build().toString();
 
             //
             // Now try a re-lookup. This may catch existing cached
             // entries where uid was null.
             //
-            // TODO : this breaks last mod time tests, as it causes the mod time
-            // to stay at the first compile time. We should phase out last mod
-            // time, and then re-instantiate this code.
-            //
-            // de = getDE(uid, key);
-            // if (de == null) {
+            de = getDE(uid, descriptor);
+            if (de != null) {
+                return de;
+            }
 
-            de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), lmt, clientLibs);
+            de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs);
             if (shouldCache(descriptor)) {
                 // put UID-qualified descriptor key for dependency
                 depsCache.put(makeGlobalKey(de.uid, descriptor), de);
@@ -865,24 +862,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     depsCache.put(makeNonUidGlobalKey(descriptor), de);
                 }
             }
-
             // See localDependencies comment
             localDependencies.put(de.uid, de);
             localDependencies.put(key, de);
-            // }
             return de;
         } catch (QuickFixException qfe) {
             // See localDependencies comment
             localDependencies.put(key, new DependencyEntry(qfe));
             throw qfe;
         }
-    }
-
-    private long updateLastMod(long lastModTime, @NonNull Definition def) {
-        if (def.getLocation() != null && def.getLocation().getLastModified() > lastModTime) {
-            lastModTime = def.getLocation().getLastModified();
-        }
-        return lastModTime;
     }
 
     /**
@@ -930,16 +918,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             localDependencies.put(key, de);
         }
         return de;
-    }
-
-    @Override
-    public long getLastMod(String uid) {
-        DependencyEntry de = localDependencies.get(uid);
-
-        if (de != null) {
-            return de.lastModTime;
-        }
-        return 0;
     }
 
     @Override

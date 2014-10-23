@@ -43,13 +43,13 @@
 
 	recurseAChange : function(cmp, evt) {
 		var value = evt.getParam("value");
-		var depth = cmp.getValue("m.recurseADepth");
+		var depth = cmp.get("m.recurseADepth");
 
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';
-		depth.setValue(depth.getValue() + 1);
-		cmp.set("m.recurseA", "recursing(A): " + depth.getValue());
-		depth.setValue(depth.getValue() - 1);
+		cmp.set("m.recurseADepth", ++depth);
+		cmp.set("m.recurseA", "recursing(A): " + depth);
+		cmp.set("m.recurseADepth", --depth);
 	},
 
 	//
@@ -57,13 +57,13 @@
 	//
 	recurseBChange : function(cmp, evt) {
 		var value = evt.getParam("value");
-		var depth = cmp.getValue("m.recurseBDepth");
+		var depth = cmp.get("m.recurseBDepth");
 
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';
-		depth.setValue(depth.getValue() + 1);
-		cmp.set("m.recurseC", "recursing(B): " + depth.getValue());
-		depth.setValue(depth.getValue() - 1);
+		cmp.set("m.recurseBDepth", ++depth);
+		cmp.set("m.recurseC", "recursing(B): " + depth);
+		cmp.set("m.recurseBDepth", --depth);
 	},
 
 	//
@@ -71,13 +71,13 @@
 	//
 	recurseCChange : function(cmp, evt) {
 		var value = evt.getParam("value");
-		var depth = cmp.getValue("m.recurseCDepth");
+		var depth = cmp.get("m.recurseCDepth");
 
 		cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
 		cmp.find("value").getElement().innerHTML = value || 'undefined';
-		depth.setValue(depth.getValue() + 1);
-		cmp.set("m.recurseB", "recursing(C): " + depth.getValue());
-		depth.setValue(depth.getValue() - 1);
+		cmp.set("m.recurseCDepth", ++depth);
+		cmp.set("m.recurseB", "recursing(C): " + depth);
+		cmp.set("m.recurseCDepth", --depth);
 	},
 
 	//

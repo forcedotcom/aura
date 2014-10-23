@@ -26,13 +26,16 @@
     displayText: function(component, keyword) {
         var concreteCmp = component.getConcreteComponent();
         var keyword = concreteCmp.get("v.keyword");
-        if (!keyword) {
-            return;
-        }
         var optionCmp = concreteCmp.find("option");
         var elem = optionCmp ? optionCmp.getElement() : null;
         if (elem) {
             var label = concreteCmp.get("v.label");
+
+            if ($A.util.isEmpty(keyword)) {
+                elem.textContent = label;
+                return;
+            }
+
             var regex;
             try {
                 regex = new RegExp(keyword, "i");
@@ -59,7 +62,7 @@
         var optionCmp = component.find("option");
         var elem = optionCmp ? optionCmp.getElement() : null;
         if (elem) {
-            $A.util.addClass(elem, "mouseovered");
+            $A.util.addClass(optionCmp, "mouseovered");
         }
     },
     
@@ -67,7 +70,7 @@
         var optionCmp = component.find("option");
         var elem = optionCmp ? optionCmp.getElement() : null;
         if (elem) {
-            $A.util.removeClass(elem, "mouseovered");
+            $A.util.removeClass(optionCmp, "mouseovered");
         }
     },
     

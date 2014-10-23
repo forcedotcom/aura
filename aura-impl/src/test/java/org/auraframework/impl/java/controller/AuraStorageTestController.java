@@ -44,10 +44,10 @@ import com.google.common.collect.Maps;
 
 @Controller
 public class AuraStorageTestController {
-    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
-    private static Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<String, Map<String, Semaphore>>();
+    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<>();
+    private static Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<>();
     private static Map<String, List<Object>> buffer = Maps.newHashMap();
-    private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<String, Semaphore>();
+    private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<>();
 
     private enum Command {
         RESET, WAIT, RESUME, APPEND, READ, STAMP, SLEEP;
@@ -191,7 +191,7 @@ public class AuraStorageTestController {
             Map<String, Object> attr = Maps.newHashMap();
             // W-1859020 - W-1859020 - Revert to auraStorageTest:playerFacet
             // attr.put("value", ""+System.currentTimeMillis());
-            Aura.getInstanceService().getInstance("ui:datePicker", ComponentDef.class, attr);
+            Aura.getInstanceService().getInstance("uitest:hasModel", ComponentDef.class, attr);
         }
         AuraStorageTestController.RecordWithComponents r = new AuraStorageTestController.RecordWithComponents(
                 staticCounter.get(testName),
@@ -298,7 +298,7 @@ public class AuraStorageTestController {
             try {
                 // W-1859020 - Revert to auraStorageTest:playerFacet
                 // cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr);
-                cmp = Aura.getInstanceService().getInstance("ui:datePicker", ComponentDef.class, attr);
+                cmp = Aura.getInstanceService().getInstance("uitest:hasModel", ComponentDef.class, attr);
             } catch (QuickFixException e) {
                 // Do nothing
             }
@@ -392,7 +392,7 @@ public class AuraStorageTestController {
                 if (!create) {
                     return null;
                 }
-                subSet = new ConcurrentHashMap<String, Semaphore>();
+                subSet = new ConcurrentHashMap<>();
                 pending.put(key, subSet);
             }
 

@@ -15,7 +15,7 @@
  */
 ({
     makeClient : function(cmp){
-        cmp.find("status").getElement().innerHTML = "";
+        cmp.set("v.status", null)
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
@@ -28,7 +28,7 @@
     },
 
     makeServer : function(cmp){
-        cmp.find("status").getElement().innerHTML = "";
+        cmp.set("v.status", null)
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
@@ -41,7 +41,7 @@
     },
 
     makeExclusiveServer : function(cmp){
-        cmp.find("status").getElement().innerHTML = "";
+        cmp.set("v.status", null)
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
@@ -57,10 +57,10 @@
     },
 
     waiting : function(cmp){
-        cmp.find("status").getElement().innerHTML = "Waiting for Server";
+        cmp.set("v.status", "Waiting for Server")
     },
 
     doneWaiting : function(cmp){
-        cmp.find("status").getElement().innerHTML = "";
+        cmp.set("v.status", null)
     }
 })

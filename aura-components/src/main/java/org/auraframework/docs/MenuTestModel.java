@@ -30,7 +30,7 @@ public class MenuTestModel {
 
     @AuraEnabled
     public List<MenuItem> getData() {
-        ArrayList<MenuItem> a = new ArrayList<MenuItem>(4);
+        ArrayList<MenuItem> a = new ArrayList<>(4);
         MenuItem m1 = new MenuItem("checkboxItem1", "San Francisco 49ers", false, "checkbox");
         a.add(m1);
         MenuItem m2 = new MenuItem("checkboxItem2", "Seattle Seahawks", false, "checkbox");
@@ -44,7 +44,7 @@ public class MenuTestModel {
 
     @AuraEnabled
     public List<MenuItem> getResorts() {
-        ArrayList<MenuItem> a = new ArrayList<MenuItem>(3);
+        ArrayList<MenuItem> a = new ArrayList<>(3);
         MenuItem m1 = new MenuItem("Heavenly", true, "checkbox");
         a.add(m1);
         MenuItem m2 = new MenuItem("North Star", false, "checkbox");
@@ -56,7 +56,7 @@ public class MenuTestModel {
 
     @AuraEnabled
     public List<MenuItem> getPlaces() {
-        ArrayList<MenuItem> a = new ArrayList<MenuItem>(4);
+        ArrayList<MenuItem> a = new ArrayList<>(4);
         MenuItem m1 = new MenuItem("actionItem1", false, "Bayern München", false, "action");
         a.add(m1);
         MenuItem m2 = new MenuItem("actionItem2", true, "FC Barcelona", false, "action");
@@ -70,7 +70,7 @@ public class MenuTestModel {
 
     @AuraEnabled
     public List<MenuItem> getImages() {
-        ArrayList<MenuItem> a = new ArrayList<MenuItem>(3);
+        ArrayList<MenuItem> a = new ArrayList<>(3);
         MenuItem m1 = new MenuItem("tiger1", "Tiger1", false, "action");
         a.add(m1);
         MenuItem m2 = new MenuItem("tiger3", "Tiger2", false, "action");

@@ -35,8 +35,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
- * 
- * @since 0.0.262
  */
 @UnAdaptableTest
 public class ExceptionHandlingUITest extends WebDriverTestCase {
@@ -313,7 +311,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
         // make a client-side change to the page
         findDomElement(By.cssSelector(".update")).click();
-        waitForElementTextPresent(findDomElement(By.cssSelector(".uiOutputText")), "modified");
+        waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "modified", true, 3000);
         assertTrue("Page was not changed after client action",
                 auraUITestingUtil.getBooleanEval("return !!document.__PageModifiedTestFlag"));
 
@@ -331,6 +329,6 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         });
         // Wait for page to reload and aura framework initialization
         auraUITestingUtil.waitForAuraInit();
-        waitForElementTextPresent(findDomElement(By.cssSelector(".uiOutputText")), "initial");
+        waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "initial", true, 3000);
     }
 }

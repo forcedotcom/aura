@@ -16,15 +16,11 @@
 package org.auraframework.impl.java.provider;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.ComponentConfigProvider;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Provider;
@@ -36,61 +32,11 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraExceptionUtil;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements ProviderDef {
-
-    // FIXME: this adaptor should die W-1190554
-    private static class ConfigMethodAdaptor implements ComponentConfigProvider {
-        private final Method configMethod;
-
-        public ConfigMethodAdaptor(Method configMethod) {
-            this.configMethod = configMethod;
-        }
-
-        @Override
-        public ComponentConfig provide() {
-            ComponentConfig config;
-
-            try {
-                config = (ComponentConfig) configMethod.invoke(null);
-            } catch (Exception e) {
-                throw new AuraRuntimeException(e);
-            }
-            return config;
-        }
-    }
-
-    // FIXME: this adaptor should die W-1190554
-    private static class DualMethodAdaptor implements ComponentConfigProvider {
-        private final Method descriptorMethod;
-        private final Method attributesMethod;
-
-        public DualMethodAdaptor(Method descriptorMethod, Method attributesMethod) {
-            this.descriptorMethod = descriptorMethod;
-            this.attributesMethod = attributesMethod;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public ComponentConfig provide() {
-            ComponentConfig config = new ComponentConfig();
-
-            try {
-                config.setDescriptor((DefDescriptor<ComponentDef>) descriptorMethod.invoke(null));
-                if (attributesMethod != null) {
-                    config.setAttributes((Map<String, Object>) attributesMethod.invoke(null));
-                }
-            } catch (Exception e) {
-                throw new AuraRuntimeException(e);
-            }
-            return config;
-        }
-    }
-
     private static final long serialVersionUID = -4972842636058759316L;
     private final ComponentConfigProvider configProvider;
     private final StaticComponentConfigProvider staticConfigProvider;
@@ -103,8 +49,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         StaticComponentConfigProvider staticConfigProv = null;
         ComponentDescriptorProvider descriptorProv = null;
 
-        List<Class<? extends Provider>> interfaces = AuraUtil
-                .findInterfaces(builder.getProviderClass(), Provider.class);
+        List<Class<? extends Provider>> interfaces = AuraUtil.findInterfaces(builder.getProviderClass(), Provider.class);
         if (!interfaces.isEmpty()) {
             try {
                 for (Class<? extends Provider> theIfc : interfaces) {
@@ -113,14 +58,12 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
                     } else if (ComponentDescriptorProvider.class.isAssignableFrom(theIfc)) {
                         descriptorProv = (ComponentDescriptorProvider) builder.getProviderClass().newInstance();
                     }
-
                     if (StaticComponentConfigProvider.class.isAssignableFrom(theIfc)) {
                         staticConfigProv = (StaticComponentConfigProvider) builder.getProviderClass().newInstance();
                     }
                 }
             } catch (InstantiationException ie) {
-                throw new InvalidDefinitionException("Cannot instantiate " + builder.getProviderClass().getName(),
-                        location);
+                throw new InvalidDefinitionException("Cannot instantiate " + builder.getProviderClass().getName(), location);
             } catch (IllegalAccessException iae) {
                 throw new InvalidDefinitionException("Constructor is inaccessible for "
                         + builder.getProviderClass().getName(), location);
@@ -128,49 +71,6 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
                 throw new InvalidDefinitionException("Failed to instantiate " + builder.getProviderClass().getName(),
                         location, e);
             }
-        } else {
-            //
-            // Compatibility mode.
-            // FIXME: this code path should die W-1190554
-            //
-            Method configMeth = null;
-            Method descriptorMeth = null;
-            Method attributeMeth = null;
-            try {
-                Method provideMeth = builder.getProviderClass().getMethod("provide");
-                Class<?> returnType = provideMeth.getReturnType();
-
-                if (Modifier.isStatic(provideMeth.getModifiers())) {
-                    if (ComponentConfig.class.isAssignableFrom(returnType)) {
-                        configMeth = provideMeth;
-                    } else if (DefDescriptor.class.isAssignableFrom(returnType)) {
-                        descriptorMeth = provideMeth;
-                    }
-                }
-            } catch (NoSuchMethodException e) {
-                // That's ok.
-            } catch (Exception e) {
-                throw new AuraRuntimeException(e);
-            }
-            try {
-                attributeMeth = builder.getProviderClass().getMethod("provideAttributes");
-                if (!Modifier.isStatic(attributeMeth.getModifiers())) {
-                    attributeMeth = null;
-                }
-            } catch (NoSuchMethodException e) {
-                // That's ok.
-            } catch (Exception e) {
-                throw new AuraRuntimeException(e);
-            }
-            if (configMeth != null) {
-                configProv = new ConfigMethodAdaptor(configMeth);
-            } else if (descriptorMeth != null) {
-                configProv = new DualMethodAdaptor(descriptorMeth, attributeMeth);
-            }
-            //
-            // End of compatibility mode.
-            // FIXME: this code path should die W-1190554
-            //
         }
         this.configProvider = configProv;
         this.descriptorProvider = descriptorProv;

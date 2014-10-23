@@ -46,8 +46,8 @@ public class InputTextUITest extends WebDriverTestCase {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
                 + "<div id=\"%s\">" + event + ":"
-                + "<ui:inputText aura:id=\"%s\" class=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>" + "</div>"
-                + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.String}\"/>" + "</div>"
+                + "<ui:inputText aura:id=\"%s\" class=\"%s\" value=\"{!m.string}\" updateOn=\"%s\"/>" + "</div>"
+                + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.string}\"/>" + "</div>"
                 + "</aura:component>";
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, baseTag.replaceAll("%s", event));
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
@@ -307,7 +307,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     public void testNullValue() throws Exception {
         String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
-                + "<ui:inputText value=\"{!m.StringNull}\"/>" + "</aura:component>";
+                + "<ui:inputText value=\"{!m.stringNull}\"/>" + "</aura:component>";
         DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(ComponentDef.class, cmpSource);
         open(String.format("/%s/%s.cmp", inputTextNullValue.getNamespace(), inputTextNullValue.getName()));
 

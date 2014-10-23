@@ -48,12 +48,12 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        List<ComponentDefRef> children = new ArrayList<ComponentDefRef>();
+        List<ComponentDefRef> children = new ArrayList<>();
         children.add(vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
                 new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
                 vendor.makeLocation("fakefilename", 10, 10, 0)));
 
-        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
         attributes.put(DefDescriptorImpl.getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, AttributeDef.class),
                 vendor.makeAttributeDefRefWithNulls(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, children, null));
 
@@ -62,7 +62,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     }
 
     public void testComponentDefRef() throws Exception {
-        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
 
         ComponentDefRef testComponentDefRef = vendor.makeComponentDefRef(
                 vendor.makeComponentDefDescriptor("aura:test"), attributes, vendor.makeLocation("filename", 5, 5, 0));
@@ -73,21 +73,21 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     }
 
     public void testAppendDependencies() throws Exception {
-        Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
         testComponentDefRef.appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
         assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("test:text")));
 
-        dependencies = new HashSet<DefDescriptor<?>>();
+        dependencies = new HashSet<>();
         vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
                 new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
                 vendor.makeLocation("fakefilename", 10, 10, 0)).appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
 
-        List<ComponentDefRef> children = new ArrayList<ComponentDefRef>();
+        List<ComponentDefRef> children = new ArrayList<>();
         // children.add(vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("aura:text"),
         // null, vendor.makeLocation("fakefilename2", 20, 20, 0)));
-        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
         attributes.put(DefDescriptorImpl.getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, AttributeDef.class),
                 vendor.makeAttributeDefRef(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, children, null));
 
@@ -98,7 +98,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         testComponentDefRef = vendor.makeComponentDefRef(
                 DefDescriptorImpl.getInstance("test:text", ComponentDef.class), attributes,
                 vendor.makeLocation("filename", 5, 5, 0));
-        dependencies = new HashSet<DefDescriptor<?>>();
+        dependencies = new HashSet<>();
         testComponentDefRef.appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
         assertTrue(dependencies.contains(DefDescriptorImpl.getInstance("test:text", ComponentDef.class)));

@@ -25,7 +25,7 @@ public class StringToCustomPairArrayConverter implements Converter<String, Custo
             return new CustomPairType[] {};
         }
         value = value.substring(1, value.length() - 1);
-        ArrayList<CustomPairType> ret = new ArrayList<CustomPairType>();
+        ArrayList<CustomPairType> ret = new ArrayList<>();
         for (String parts : value.split(",")) {
             ret.add(TypeUtil.convert(parts, CustomPairType.class));
         }

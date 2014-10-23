@@ -23,27 +23,25 @@
     },
 
     changeIntOuter: function(cmp) {
-        var temp = cmp.get("v.intByReference");
-        temp = 9999;
-        cmp.set("v.intByReference", temp);
+        cmp.set("v.intByReference", 9999);
     },
 
     changeIntFacet: function(cmp) {
-        var temp = cmp.find("innerCmp").get("v.intAttribute");
-        temp = 5565;
-        cmp.find("innerCmp").set("v.intAttribute", temp);
+        cmp.find("innerCmp").set("v.intAttribute", 5565);
     },
 
     changeIntCreatedCmp: function(cmp) {
-        var temp = cmp.find("createdCmp").get("v.body")[0].get("v.intAttribute");
-        temp = 12345;
-        cmp.find("createdCmp").get("v.body")[0].set("v.intAttribute", temp);
+        var item = cmp.find("createdCmp").get("v.body.0");
+        if (item) {
+            item .set("v.intAttribute", 12345);
+        }
     },
 
     changeListOuter: function(cmp) {
         var list = cmp.get("v.listByReference");
         list[2][2] = "changedOuter2b";
         cmp.set("v.listByReference", list);
+        cmp.set("v.listByReference[2][2]", 'changedOuter2b');
     },
 
     changeListFacet: function(cmp) {
@@ -75,7 +73,7 @@
         list[list.length - 1] = undefined;
         cmp.find("innerCmp").set("v.listAttribute", list);
     },
-    
+
     changeMapOuter: function(cmp) {
         var map = cmp.get("v.mapByReference");
         map.oneDeeper.evenOneDeeper.layer3 = "changedOuter3";
@@ -94,32 +92,32 @@
         map.oneDeeper['newEntry'] = { newLayer: "addedOuter4" };
         cmp.set("v.mapByReference", map);
     },
-    
+
     appendMapFacet: function(cmp) {
         var map = cmp.find("innerCmp").get("v.mapAttribute");
         map.oneDeeper.evenOneDeeper['layer3b'] = "addedFacet3";
         map.oneDeeper['newEntry'] = { newLayer: "addedFacet4" };
         cmp.find("innerCmp").set("v.mapAttribute", map);
     },
-    
+
     removeMapOuter: function(cmp) {
         var map = cmp.get("v.mapByReference");
         map.oneDeeper.evenOneDeeper['layer3'] = undefined;
         cmp.set("v.mapByReference", map);
     },
-    
+
     removeMapFacet: function(cmp) {
         var map = cmp.find("innerCmp").get("v.mapAttribute");
         map.oneDeeper.evenOneDeeper['layer3'] = undefined;
         cmp.find("innerCmp").set("v.mapAttribute", map);
     },
-    
+
     createCmp: function(cmp) {
         var intValue = cmp.get("v.intByReference");
         $A.newCmpAsync(
                 this,
                 function(newCmp) {
-                    cmp.find("createdCmp").set("v.body", newCmp);
+                    cmp.find("createdCmp").set("v.body", [newCmp]);
                 },
                 {
                     componentDef: "markup://attributesTest:simpleValue",

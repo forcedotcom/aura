@@ -25,4 +25,5 @@
     <aura:registerEvent name="keypress" type="ui:keypress" access="GLOBAL" description="The event fired when the user presses or holds down a keyboard key on the component."/>
     <aura:registerEvent name="keyup" type="ui:keyup" access="GLOBAL" description="The event fired when the user releases a keyboard key on the component."/>
     <aura:registerEvent name="select" type="ui:select" access="GLOBAL" description="The event fired when the user selects some text."/>
+    {!v.body}
 </aura:component>

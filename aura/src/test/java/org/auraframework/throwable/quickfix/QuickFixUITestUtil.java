@@ -15,7 +15,7 @@
  */
 package org.auraframework.throwable.quickfix;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import java.io.File;
 

@@ -16,8 +16,8 @@
 
 -->
 <aura:component extends="ui:dataProvider" model="java://org.auraframework.impl.java.model.TestJavaModel"  description="A list data provider that understands Salesforce filters.">
-<aura:attribute name="dataType" type="String"/>
-<aura:handler name="init" value="{!this}" action="{!c.onInit}"></aura:handler> 
-<aura:handler name="provide" action="{!c.onProvide}"></aura:handler>
-    
+    <aura:attribute name="dataType" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"></aura:handler>
+    <aura:handler name="provide" action="{!c.onProvide}"></aura:handler>
+
 </aura:component>

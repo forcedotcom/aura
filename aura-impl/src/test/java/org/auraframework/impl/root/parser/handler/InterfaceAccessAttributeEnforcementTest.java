@@ -34,7 +34,7 @@ public class InterfaceAccessAttributeEnforcementTest extends
 	public void testExtendRootComponentInterface() throws Exception {
 		String resourceSource = "<aura:interface extends='aura:rootComponent' />";
 		
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;

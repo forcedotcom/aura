@@ -22,7 +22,6 @@
     <aura:attribute name="month" type="Integer" description="The currently rendered month."/>
     <aura:attribute name="year" type="Integer" description="The currently rendered year."/>
     <aura:attribute name="selectedDate" type="Date" description="The selected date."/>
-    <aura:attribute name="weekDays" type="Object" description="The localized weekday labels."/>
     
     <!-- private attributes -->
     <aura:attribute name="_setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
@@ -41,7 +40,7 @@
     <table class="calGrid" aura:id="datePickerGrid">
         <thead>
             <tr>
-                <aura:iteration items="{!v.weekDays}" var="day">
+                <aura:iteration items="{!$Locale.nameOfWeekdays}" var="day">
                     <th scope="col" class="dayOfWeek">{!day.shortName}</th>
                 </aura:iteration>
             </tr>

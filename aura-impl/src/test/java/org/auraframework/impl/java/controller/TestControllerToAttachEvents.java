@@ -31,7 +31,7 @@ public class TestControllerToAttachEvents {
 
     @AuraEnabled
     public static String getDataAndOneEvent() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("strAttr", "Go Giants!");
         Event evt = Aura.getInstanceService().getInstance("handleEventTest:applicationEvent", EventDef.class,
                 attributes);
@@ -42,7 +42,7 @@ public class TestControllerToAttachEvents {
     @AuraEnabled
     public static Component getDataAndThreeEvents() throws Exception {
         // Another event whose definition was preloaded
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("strAttr", "Go Raiders!");
         Event evt = Aura.getInstanceService().getInstance("preloadTest:applicationEvent", EventDef.class, attributes);
         Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
@@ -61,7 +61,7 @@ public class TestControllerToAttachEvents {
 
     @AuraEnabled
     public static String getDupEvents() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("strAttr", "Posey");
         Event evt = Aura.getInstanceService().getInstance("handleEventTest:dupEvent", EventDef.class, attributes);
         Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
@@ -74,7 +74,7 @@ public class TestControllerToAttachEvents {
 
     @AuraEnabled
     public static String getEventChain() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("pandaAttr", "Pablo");
         Event evt = Aura.getInstanceService().getInstance("handleEventTest:chainEvent", EventDef.class, attributes);
         Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);

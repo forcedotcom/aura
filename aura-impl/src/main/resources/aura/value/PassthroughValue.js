@@ -18,9 +18,10 @@
  * @constructor
  * @protected
  */
-function PassthroughValue(primaryProviders, cmp) {
+function PassthroughValue(primaryProviders, component) {
     this.primaryProviders = primaryProviders;
-    this.cmp = cmp;
+    this.component = component;
+    this.references={};
 }
 
 PassthroughValue.prototype.auraType = "Value";
@@ -29,19 +30,7 @@ PassthroughValue.prototype.auraType = "Value";
  * Returns the Component.
  */
 PassthroughValue.prototype.getComponent = function() {
-    return this.cmp;
-};
-
-/**
- * Returns the primary providers associated with the given key or the Component.
- * @param {String} key The data key to look up on the primary providers.
- */
-PassthroughValue.prototype.getValue = function(key) {
-    var v = this.primaryProviders[key];
-    if (!aura.util.isUndefinedOrNull(v)) {
-        return v;
-    }
-    return this.cmp.getValue(key);
+    return this.component;
 };
 
 /**
@@ -49,8 +38,45 @@ PassthroughValue.prototype.getValue = function(key) {
  * @param {String} key The data key to look up on the primary providers.
  */
 PassthroughValue.prototype.get = function(key) {
-    var v = this.getValue(key);
-    return v && v.unwrap ? v.unwrap() : v;
+	var path = key.split('.');
+    if (this.primaryProviders.hasOwnProperty(path[0])){
+        var value = null;
+        if(path.length>1) {
+            value=$A.expressionService.resolve(key, this.primaryProviders);
+        }else{
+            value=this.primaryProviders[key];
+        }
+        while($A.util.isExpression(value)){
+            value = value.evaluate();
+        }
+        return value;
+    } else {
+    	return this.component.get(key);
+    }
+};
+
+/**
+ * Passthrough's have extra providers that can reference other items of data.
+ * If it's raw data, no problem. If it's another reference, you may want to 
+ * expand that reference. {row.value} could expand into {v.item.0.value} if row 
+ * is at index 0. 
+ * @param {String} expression The key to reference on the component, which will get expanded into the reference you were looking for.
+ */
+PassthroughValue.prototype.getExpression = function(expression) {
+    var path = $A.util.isArray(expression)?expression:expression.split(".");
+    
+    if(this.primaryProviders.hasOwnProperty(path[0])){
+        var provider = this.primaryProviders[path[0]];
+        if(provider instanceof PassthroughValue) {
+            return provider.getExpression(path);
+        }
+
+        if(provider instanceof PropertyReferenceValue) {
+            path.splice(0, 1, provider.getExpression());
+            return path.join(".");
+        }
+    }
+    return expression;
 };
 
 /**
@@ -59,18 +85,54 @@ PassthroughValue.prototype.get = function(key) {
  * @param {Object} v The value to be set.
  */
 PassthroughValue.prototype.set = function(key, value) {
-    this.getValue(key).setValue(value);
+   var path = key.split('.');
+    if (this.primaryProviders.hasOwnProperty(path[0])){
+        var target=this.primaryProviders;
+        key=path[path.length-1];
+        if(path.length>1) {
+            target=$A.expressionService.resolve(path.slice(0,path.length-1),target);
+        }
+        var oldValue=target[key];
+        target[key]=value;
+        var valueProvider = this.component;
+        while (valueProvider instanceof PassthroughValue) {
+            valueProvider = valueProvider.getComponent();
+        }
+        valueProvider.fireChangeEvent(key,oldValue,value,key);
+        valueProvider.markDirty(key);
+        return value;
+    }
+
+   return this.component.set(key,value);
 };
 
-/** 
- * Delegates indexing logic to the wrapped value provider. 
- * Likely delegating to a wrapped component. 
- */ 
+/**
+ * Returns a reference to a key on the the primary provider or the Component.
+ * @param {String} key The data key for which to return a reference.
+ */
+PassthroughValue.prototype.getReference = function(key) {
+    key = aura.expressionService.normalize(key);
+    var path = key.split('.');
+    if (this.primaryProviders.hasOwnProperty(path[0])){
+        if(!this.references.hasOwnProperty(key)){
+            this.references[key]=new PropertyReferenceValue(key, this);
+        }
+        return this.references[key];
+    } else {
+        return this.component.getReference(key);
+    }
+};
+
+
+/**
+ * Delegates indexing logic to the wrapped value provider.
+ * Likely delegating to a wrapped component.
+ */
 PassthroughValue.prototype.index = function () {
     var valueProvider = this.getComponent();
 
     // Potentially nested PassthroughValue objects.
-    while (valueProvider && !valueProvider.index) {
+    while (valueProvider instanceof PassthroughValue) {
         valueProvider = valueProvider.getComponent();
     }
 
@@ -78,18 +140,18 @@ PassthroughValue.prototype.index = function () {
         return;
     }
 
-    valueProvider.index.apply(valueProvider, arguments); 
+    valueProvider.index.apply(valueProvider, arguments);
 };
 
 /**
- * Delegates de-indexing logic to the wrapped value provider. 
- * Likely delegating to a wrapped component. 
- */ 
+ * Delegates de-indexing logic to the wrapped value provider.
+ * Likely delegating to a wrapped component.
+ */
 PassthroughValue.prototype.deIndex = function () {
     var valueProvider = this.getComponent();
 
     // Potentially nested PassthroughValue objects.
-    while (valueProvider && !valueProvider.deIndex) {
+    while (valueProvider instanceof PassthroughValue) {
         valueProvider = valueProvider.getComponent();
     }
 

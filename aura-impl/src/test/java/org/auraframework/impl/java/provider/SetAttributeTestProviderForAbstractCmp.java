@@ -16,13 +16,15 @@
 package org.auraframework.impl.java.provider;
 
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 
 @Provider
-public class SetAttributeTestProviderForAbstractCmp {
-    public static DefDescriptor<ComponentDef> provide() {
+public class SetAttributeTestProviderForAbstractCmp implements ComponentDescriptorProvider {
+    @Override
+    public DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("setAttributesTest:abstractCmpExtension", ComponentDef.class);
     }
 }

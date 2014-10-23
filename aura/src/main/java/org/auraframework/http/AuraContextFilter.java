@@ -170,10 +170,6 @@ public class AuraContextFilter implements Filter {
         context.setRequestedLocales(Collections.list(request.getLocales()));
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
         if (configMap != null) {
-            String lastMod = (String) configMap.get("lastmod");
-            if (lastMod != null && !lastMod.isEmpty()) {
-                context.setLastMod(lastMod);
-            }
             getLoaded(context, configMap.get("loaded"));
             @SuppressWarnings("unchecked")
             List<Object> dns = (List<Object>) configMap.get("dn");

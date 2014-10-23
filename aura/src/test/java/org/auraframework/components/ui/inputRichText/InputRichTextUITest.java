@@ -24,7 +24,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
-@UnAdaptableTest("Issue with sfdc environments with sendkeys in iframes. See W-2009411.")
+/* UnAdaptable because issue with sfdc environments with sendkeys in iframes
+ * see W-1985839 and W-2009411
+ */
+@UnAdaptableTest
 public class InputRichTextUITest extends WebDriverTestCase {
     private final String URL = "/uitest/inputRichText_Test.cmp";
     private final String LINKBEFORE_LOCATOR = ".linkbefore";

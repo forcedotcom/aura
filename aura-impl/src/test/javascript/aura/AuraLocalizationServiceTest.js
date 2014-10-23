@@ -51,9 +51,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
 	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
         get:function(value){
-            if(value == "$Locale.dateformat") return targetDateFormat;
-            if(value == "$Locale.datetimeformat") return targetDateTimeFormat;
-            if(value == "$Locale.timeformat") return targetTimeFormat;
+            if(value == "$Locale.dateFormat") return targetDateFormat;
+            if(value == "$Locale.datetimeFormat") return targetDateTimeFormat;
+            if(value == "$Locale.timeFormat") return targetTimeFormat;
             if(value == "$Locale.timezone") return targetTimezone;
         	if(value == "$Locale.numberFormat") return targetNumberFormat;
 			if(value == "$Locale.percentFormat") return targetPercentFormat;

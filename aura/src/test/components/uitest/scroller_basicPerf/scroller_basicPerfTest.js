@@ -39,7 +39,7 @@
         	var toDestroy = body.splice(0,1);
         	$A.getRoot().find("scrollContainer").set("v.body", body);
         	destroyed = toDestroy[0].destroy();
-        	$A.test.addWaitFor(destroyed, function(){return "7:2.a";}, function(){
+        	$A.test.addWaitFor(destroyed, function(){return "7:2;a";}, function(){
         		totalScrollerComponentsInDOM  = queryString.query().groups['markup://ui:scroller'];
             	totalOutputURLComponentsInDOM  = queryString.query().groups['markup://ui:outputURL'];
             	

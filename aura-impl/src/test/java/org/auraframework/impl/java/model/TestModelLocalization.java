@@ -42,9 +42,9 @@ import org.auraframework.util.date.DateOnly;
  */
 @Model
 public class TestModelLocalization {
-    static ArrayList<InputOption> inputOptions = new ArrayList<InputOption>();
-    static ArrayList<InputOption> moreInputOptions = new ArrayList<InputOption>();
-    static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
+    static ArrayList<InputOption> inputOptions = new ArrayList<>();
+    static ArrayList<InputOption> moreInputOptions = new ArrayList<>();
+    static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<>();
 
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
@@ -61,7 +61,7 @@ public class TestModelLocalization {
     }
 
     private static ArrayList<InputOption> getSubCategory(String option) {
-        ArrayList<InputOption> categoryOption = new ArrayList<InputOption>();
+        ArrayList<InputOption> categoryOption = new ArrayList<>();
         if (option.equals("option1")) {
             categoryOption.add(new InputOption("", "", false, "opt1-sub1"));
             categoryOption.add(new InputOption("", "", false, "opt1-sub2"));
@@ -151,7 +151,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public List<String> getStringList() {
-        ArrayList<String> sl = new ArrayList<String>();
+        ArrayList<String> sl = new ArrayList<>();
         sl.add("one");
         sl.add("two");
         sl.add("three");
@@ -165,16 +165,16 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public List<List<String>> getListOfList() {
-        List<List<String>> listofList = new ArrayList<List<String>>();
-        ArrayList<String> l1 = new ArrayList<String>();
+        List<List<String>> listofList = new ArrayList<>();
+        ArrayList<String> l1 = new ArrayList<>();
         l1.add("one");
         l1.add("two");
         l1.add("three");
-        ArrayList<String> l2 = new ArrayList<String>();
+        ArrayList<String> l2 = new ArrayList<>();
         l2.add("un");
         l2.add("do");
         l2.add("tres");
-        ArrayList<String> l3 = new ArrayList<String>();
+        ArrayList<String> l3 = new ArrayList<>();
         l3.add("ek");
         l3.add("do");
         l3.add("theen");
@@ -202,7 +202,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getIntegerList() {
-        ArrayList<Integer> il = new ArrayList<Integer>();
+        ArrayList<Integer> il = new ArrayList<>();
         il.add(123);
         il.add(999);
         il.add(666);
@@ -236,7 +236,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public ArrayList<Boolean> getBooleanList() {
-        ArrayList<Boolean> bl = new ArrayList<Boolean>();
+        ArrayList<Boolean> bl = new ArrayList<>();
         bl.add(true);
         bl.add(false);
         bl.add(true);
@@ -426,7 +426,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getDates() {
-        List<Date> dates = new ArrayList<Date>();
+        List<Date> dates = new ArrayList<>();
         dates.add(new Date());
         dates.add(new Date(1000L));
         dates.add(new Date(1333322872649L));
@@ -435,7 +435,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getTimes() {
-        List<Calendar> times = new ArrayList<Calendar>();
+        List<Calendar> times = new ArrayList<>();
         Date[] dates = { new Date(), // now
                 new Date(1000L), // early in 1970
                 new Date(1333322872649L), // April 1, 2012
@@ -453,7 +453,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getCurrencies() {
-        List<BigDecimal> currencies = new ArrayList<BigDecimal>();
+        List<BigDecimal> currencies = new ArrayList<>();
         currencies.add(new BigDecimal("0"));
         currencies.add(new BigDecimal("10.99"));
         currencies.add(new BigDecimal("123456789123456789123456789.12"));
@@ -463,7 +463,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getNumbers() {
-        List<BigDecimal> numbers = new ArrayList<BigDecimal>();
+        List<BigDecimal> numbers = new ArrayList<>();
         numbers.add(new BigDecimal("0"));
         numbers.add(new BigDecimal("123456789123456789"));
         numbers.add(new BigDecimal("100000000000.123456789"));
@@ -473,7 +473,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getPercentages() {
-        List<Double> percentages = new ArrayList<Double>();
+        List<Double> percentages = new ArrayList<>();
         percentages.add(1.01);
         percentages.add(0.75);
         percentages.add(0.99);
@@ -487,7 +487,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getStrings() {
-        List<String> Strings = new ArrayList<String>();
+        List<String> Strings = new ArrayList<>();
         Strings.add("salesforce.com");
         Strings.add("1 Landmark, San Francisco");
         return Strings;
@@ -495,7 +495,7 @@ public class TestModelLocalization {
 
     @AuraEnabled
     public Object getLocaleData() {
-        List<String> localeData = new LinkedList<String>();
+        List<String> localeData = new LinkedList<>();
         AuraLocale ll = Aura.getLocalizationAdapter().getAuraLocale();
         localeData.add("Currency locale:" + ll.getCurrencyLocale().getDisplayName());
         localeData.add("Date locale:" + ll.getDateLocale().getDisplayName());

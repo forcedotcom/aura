@@ -2,7 +2,7 @@
 			controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
 			implements="auraStorage:refreshObserver"
 			>
-    <aura:dependency resource="ui:datePicker" />
+    <aura:dependency resource="uitest:hasModel" />
     <aura:attribute name="clearStorageOnInit" type="Boolean" default="true"/>
     <aura:attribute name="defaultExpiration" type="Integer" default="50"/>
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>

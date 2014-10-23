@@ -27,68 +27,68 @@ import org.auraframework.util.json.JsonSerializable;
 @Controller
 public class UIScrollerDataProvider {
 
-	private static int PTR_COUNTER = 0;
-	private static int PTL_COUNTER = 0;
-	private static int INF_COUNTER = 0;
+    private static int PTR_COUNTER = 0;
+    private static int PTL_COUNTER = 0;
+    private static int INF_COUNTER = 0;
     @AuraEnabled
     public static List<Item> getItemsPTR(@Key("size") int size) throws Exception {
-    	List<Item> l = null;
-    	if(size > 0){
-	        l = new ArrayList<Item>(size);
-	        for (int i = 0; i < size; i++) {
-	        	int id = ++PTR_COUNTER;
-	            l.add(new Item("After PTR, pretty row " + id + " from server", Integer.toString(id)));
-	        }
-    	}
-    	PTR_COUNTER = 0;
+        List<Item> l = null;
+        if(size > 0){
+            l = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                int id = ++PTR_COUNTER;
+                l.add(new Item("After PTR, pretty row " + id + " from server", Integer.toString(id)));
+            }
+        }
+        PTR_COUNTER = 0;
         return l;
     }
-    
+
     @AuraEnabled
     public static List<Item> getItemsPTL(@Key("size") int size) throws Exception {
-    	List<Item> l = null;
-    	if(size > 0){
-	        l = new ArrayList<Item>(size);
-	        for (int i = 0; i < size; i++) {
-	        	int id = ++PTL_COUNTER;
-	            l.add(new Item("After PTL, pretty row " + id + " from server", Integer.toString(id)));
-	        }
-    	}
-    	PTL_COUNTER = 0;
+        List<Item> l = null;
+        if(size > 0){
+            l = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                int id = ++PTL_COUNTER;
+                l.add(new Item("After PTL, pretty row " + id + " from server", Integer.toString(id)));
+            }
+        }
+        PTL_COUNTER = 0;
         return l;
     }
-    
+
     @AuraEnabled
     public static List<Item> getItemsInfinite(@Key("size") int size) throws Exception {
-    	List<Item> l = null;
-    	if(size > 0){
-	        l = new ArrayList<Item>(size);
-	        for (int i = 0; i < size; i++) {
-	        	int id = ++INF_COUNTER;
-	            l.add(new Item("After INF, pretty row " + id + " from server", Integer.toString(id)));
-	        }
-    	}
-    	INF_COUNTER = 0;
+        List<Item> l = null;
+        if(size > 0){
+            l = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                int id = ++INF_COUNTER;
+                l.add(new Item("After INF, pretty row " + id + " from server", Integer.toString(id)));
+            }
+        }
+        INF_COUNTER = 0;
         return l;
     }
 
     public static class Item implements JsonSerializable {
         private String label;
         private String value;
-        
+
         public Item(String label, String value) {
             this.label = label;
             this.value = value;
         }
-        
+
         public String getLabel() {
             return this.label;
         }
-        
+
         public String getValue() {
             return this.value;
         }
-        
+
         @Override
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();

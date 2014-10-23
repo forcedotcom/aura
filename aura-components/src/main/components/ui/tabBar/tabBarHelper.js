@@ -43,7 +43,7 @@
 		var self = this, items = cmp._tabItems;
 		if ($A.util.isNumber(index) && index >=0 && index <= items.length) {
 			var docFrag = document.createDocumentFragment();
-			var tabValues = $A.expressionService.create(null, [tab]);
+			var tabValues = [tab];
 			var pNode = cmp.find("tabItemsContainer").getElement();
 			this.createAndRenderComponents(cmp, tabValues, docFrag, function(newItems){
 				if (index >= items.length) {
@@ -141,10 +141,8 @@
 	 * @private
 	 */
 	createAndRenderComponents: function (cmp, tabValues, parentEl, callback) {
-		var that = this,
-			items = [],
-			//TODO: JBUCH The following hack because addTab above calls $A.expressionService() to create an array and that returns an ArrayValue
-			len = tabValues.getLength?tabValues.getLength():tabValues.length,
+		var items = [],
+			len = tabValues.length,
 			counter = len;
 		
 		var fn = function (newCmp) {
@@ -158,7 +156,7 @@
 				callback(items);
 			}
 		}
-		
+
 		for (var i=0; i<len; i++) {
 			var config = tabValues.get?tabValues.get(i):tabValues[i];
 			$A.componentService.newComponentAsync(this, fn, config, config.valueProvider);

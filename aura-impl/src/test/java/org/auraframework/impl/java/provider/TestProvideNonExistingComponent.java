@@ -16,6 +16,7 @@
 package org.auraframework.impl.java.provider;
 
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
@@ -23,8 +24,9 @@ import org.auraframework.system.Annotations.Provider;
  * this provider is for JavaProviderDefTest.testInterfaceWithNoProvider
  */
 @Provider
-public class TestProvideNonExistingComponent {
-    public static DefDescriptor<ComponentDef> provide() {
+public class TestProvideNonExistingComponent implements ComponentDescriptorProvider {
+    @Override
+    public DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_nonExisting", ComponentDef.class);
     }
 }

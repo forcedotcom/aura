@@ -48,7 +48,7 @@ public class ExcludedTestsListModel {
 
     public ExcludedTestsListModel() {
         // Initialize map
-        browserMap = new HashMap<WebDriverUtil.BrowserType, Browser>();
+        browserMap = new HashMap<>();
         for (BrowserType bt : BrowserType.values()) {
             Browser b = new Browser(bt.name());
             browserMap.put(bt, b);
@@ -131,7 +131,7 @@ public class ExcludedTestsListModel {
 
     @AuraEnabled
     public List<Browser> getBrowserInfo() {
-        List<Browser> list = new ArrayList<Browser>(browserMap.values());
+        List<Browser> list = new ArrayList<>(browserMap.values());
         Collections.sort(list); // Put in alphabetical order
         return list;
     }

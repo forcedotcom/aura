@@ -30,12 +30,12 @@ public class ServiceLocatorMocker {
      * <p>
      * After calling this method, calls to {@link ServiceLocator#get()} <i>within the same thread</i> will return the 
      * mocked <code>ServiceLoader</code> returned from this method call.
-     * 
+     *
      * @return the mocked <code>ServiceLoader</code>
      */
     public static ServiceLoader mockServiceLocator() {
         try {
-            ThreadLocal<ServiceLoader> alternateServiceLocator = AuraPrivateAccessor.get(ServiceLocator.class, 
+            ThreadLocal<ServiceLoader> alternateServiceLocator = AuraPrivateAccessor.get(ServiceLocator.class,
                     "alternateServiceLocator");
             ServiceLoader mockedProviderFactory = Mockito.mock(ServiceLoader.class);
             alternateServiceLocator.set(mockedProviderFactory);
@@ -54,14 +54,14 @@ public class ServiceLocatorMocker {
      *
      * After calling this method, calls to {@link ServiceLocator#get()} <i>within the same thread</i> will return the 
      * mocked <code>ServiceLoader</code> returned from this method call.
-     * 
+     *
      * @return the mocked <code>ServiceLoader</code>
      */
     public static ServiceLoader spyOnServiceLocator() {
         try {
-            ThreadLocal<ServiceLoader> alternateServiceLocator = AuraPrivateAccessor.get(ServiceLocator.class, 
+            ThreadLocal<ServiceLoader> alternateServiceLocator = AuraPrivateAccessor.get(ServiceLocator.class,
                     "alternateServiceLocator");
-            ServiceLoader instance = AuraPrivateAccessor.get(ServiceLocator.class, 
+            ServiceLoader instance = AuraPrivateAccessor.get(ServiceLocator.class,
                     "instance");
             ServiceLoader previous = alternateServiceLocator.get();
             if (previous != null) {
@@ -74,18 +74,18 @@ public class ServiceLocatorMocker {
             throw new RuntimeException("Exception mocking ServiceLocator", exception);
         }
     }
-    
+
     /**
      * Resets {@link ServiceLocator}, clearing out - <i>for the current thread only</i> - the registered mock, if there
      * <i>is</i> one registered.  If there <i>isn't</i> one registered, it's a no-op (and therefore, this method is
      * idempotent).
-     * 
+     *
      * @return the mock that was registered.  This could conceivably be helpful if, for example, you still want to do
      *         some validation on the mock.
      */
     public static ServiceLoader unmockServiceLocator() {
         try {
-            ThreadLocal<ServiceLoader> currentMock = AuraPrivateAccessor.get(ServiceLocator.class, 
+            ThreadLocal<ServiceLoader> currentMock = AuraPrivateAccessor.get(ServiceLocator.class,
                     "alternateServiceLocator");
             ServiceLoader mock = currentMock.get();
             currentMock.set(null);
@@ -94,21 +94,21 @@ public class ServiceLocatorMocker {
             throw new RuntimeException("Exception unmocking ServiceLocator", exception);
         }
     }
-    
+
     /**
      * Returns the mock {@link ServiceLoader} that's registered with {@link ServiceLocator} under the currently
      * executing thread, or <code>null</code> if there isn't a mock currently registered.
      */
     public static ServiceLoader getMockedServiceLocator() {
         try {
-            ThreadLocal<ServiceLoader> currentMock = AuraPrivateAccessor.get(ServiceLocator.class, 
+            ThreadLocal<ServiceLoader> currentMock = AuraPrivateAccessor.get(ServiceLocator.class,
                     "alternateServiceLocator");
             return currentMock.get();
         } catch (Exception exception) {
             throw new RuntimeException("Exception getting mocked ServiceLocator", exception);
         }
     }
-    
+
     /**
      * Returns <code>true</code> iff there is a mock {@link ServiceLoader} registered with {@link ServiceLocator}
      * under the currently executing thread.
@@ -117,7 +117,6 @@ public class ServiceLocatorMocker {
         return getMockedServiceLocator() != null;
     }
 }
-
 
 
 

@@ -107,7 +107,7 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
             String error = (String) map.get("error");
             if (value != null) {
                 if (error == null) {
-                    return new Returns<T>((T) new MockAction(
+                    return new Returns<>((T) new MockAction(
                             actionDef.getDescriptor(), State.SUCCESS, value));
                 }
             } else {
@@ -115,7 +115,7 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
                     try {
                         new ThrowsExceptionClass<T>(error).answer();
                     } catch (Throwable e) {
-                        return new Returns<T>((T) new MockAction(
+                        return new Returns<>((T) new MockAction(
                                 actionDef.getDescriptor(), State.ERROR, null,
                                 null, null, ImmutableList.<Object> of(e)));
                     }

@@ -65,7 +65,7 @@
         if (value) {
             var format = concCmp.get("v.format");
             if (!format) { // use default format
-                format = $A.get("$Locale.dateformat");
+                format = $A.get("$Locale.dateFormat");
             }
             var langLocale = concCmp.get("v.langLocale");
             var d = $A.localizationService.parseDateTimeUTC(v, format, langLocale);

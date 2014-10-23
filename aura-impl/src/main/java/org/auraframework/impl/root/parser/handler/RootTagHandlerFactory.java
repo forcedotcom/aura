@@ -54,6 +54,9 @@ public class RootTagHandlerFactory {
         case DOCUMENTATION:
             return (RootTagHandler<T>) new DocumentationDefHandler((DefDescriptor<DocumentationDef>) defDescriptor,
                     (Source<DocumentationDef>) source, xmlReader);
+        case DESIGN:
+            return (RootTagHandler<T>) new DesignDefHandler((DefDescriptor<DesignDef>) defDescriptor,
+                    (Source<DesignDef>) source, xmlReader);
         default:
             throw new UnsupportedOperationException();
         }

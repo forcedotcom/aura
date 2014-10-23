@@ -30,7 +30,7 @@ public class EventAccessAttributeEnforcementTest extends
 	 * @throws Exception
 	 */
 	public void testCreateAuraEventTypes() throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 		verifyCreateAuraEventTypes("APPLICATION", failures);
 		verifyCreateAuraEventTypes("COMPONENT", failures);
 		verifyCreateAuraEventTypes("VALUE", failures);
@@ -69,7 +69,7 @@ public class EventAccessAttributeEnforcementTest extends
 	 * @throws Exception
 	 */
 	public void testExtendsAuraApplicationEvents() throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 		verifyExtendsAuraEvents("APPLICATION", "aura:doneRendering", failures);
 		verifyExtendsAuraEvents("APPLICATION", "aura:doneWaiting", failures);
 		verifyExtendsAuraEvents("APPLICATION", "aura:locationChange", failures);
@@ -96,7 +96,7 @@ public class EventAccessAttributeEnforcementTest extends
 	 * @throws Exception
 	 */
 	public void testExtendsAuraValueEvents() throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 		
 		verifyExtendsAuraEvents("VALUE", "aura:valueChange", failures);		
 		verifyExtendsAuraEvents("VALUE", "aura:valueInit", failures);

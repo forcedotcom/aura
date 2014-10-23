@@ -15,9 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component renderer="js://aura.expression, java://org.auraframework.renderer.ExpressionRenderer" template="aura:template" implements="aura:rootComponent" access="GLOBAL" support="GA"
-                        description="Renders the value to which an expression evaluates.  When any expressions are found in free text
-                                        (not a tag or attribute value) is found in markup,
-                                        an instance of this component is created with the value attribute set to the expression found in the markup.">
+<aura:component renderer="js://aura.expression, java://org.auraframework.renderer.ExpressionRenderer"
+                template="aura:template" implements="aura:rootComponent"
+                access="GLOBAL"
+                support="GA"
+                description="Renders the value to which an expression evaluates. Creates an instance of this component which renders the
+                        referenced &quot;property reference value&quot; set to the value attribute when expressions are found in free text or markup.">
     <aura:attribute name="value" type="String" access="GLOBAL" description="The expression to evaluate and render."/>
 </aura:component>

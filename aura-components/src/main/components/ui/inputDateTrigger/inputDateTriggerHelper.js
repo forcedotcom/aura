@@ -19,17 +19,16 @@
 	 */
 	displayDatePicker: function (component) {
 		var self 		= this,
-			concComp	= component.getConcreteComponent(),
-			el 		= component.getElement(),
-			value 		= concComp.get('v.value'),
+			el 			= component.getElement(),
+			value 		= component.getConcreteComponent().get('v.value'),
 			currentDate = value ? $A.localizationService.parseDateTime(value, 'yyyy-MM-dd') : new Date();
 
 		$A.get('e.ui:showDatePicker').setParams({
 			element  	: el,
 			value      	: self.getDateString(currentDate),
 			onselected 	: function (evt) {
-			    concComp.set('v.value', evt.getParam('value'));
+				component.getConcreteComponent().set('v.value', evt.getParam('value'));
 			}
 		}).fire();
-	}			
+	}
 })

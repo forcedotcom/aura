@@ -35,7 +35,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
     public void testEventHandlerDefHandler() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:handler event='aura:click' action='{!c.action}'/></aura:component>", "myID",
                 Format.XML);
         ComponentDef def = parser.parse(descriptor, source);
@@ -45,7 +45,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
     public void testRegisterDuplicateEventNames() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component>"
+        StringSource<ComponentDef> source = new StringSource<>(descriptor, "<aura:component>"
                 + "<aura:registerevent name='dupName' type='aura:click'/>"
                 + "<aura:registerevent name='dupName' type='aura:click'/>" + "</aura:component>", "myID", Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
@@ -67,7 +67,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
     public void testAbstractEvent() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
-        StringSource<EventDef> source = new StringSource<EventDef>(descriptor,
+        StringSource<EventDef> source = new StringSource<>(descriptor,
                 "<aura:event type='component' abstract='true'></aura:event>", "myID", Format.XML);
         EventDef ed = parser.parse(descriptor, source);
         try {

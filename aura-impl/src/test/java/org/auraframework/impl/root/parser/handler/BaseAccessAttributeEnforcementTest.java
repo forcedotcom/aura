@@ -37,7 +37,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	}
 	
 	protected void verifyAccess() throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestNamespace targetNamespace : TestNamespace.values()) {
 			testResourceNamespace = targetNamespace;
@@ -65,7 +65,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	}
 
 	protected void verifyAccess(TestResource[] consumers) throws Exception {
-		ArrayList<String> failures = new ArrayList<String>();
+		ArrayList<String> failures = new ArrayList<>();
 
 		for (TestResource consumer : consumers) {
 			testConsumer = consumer;

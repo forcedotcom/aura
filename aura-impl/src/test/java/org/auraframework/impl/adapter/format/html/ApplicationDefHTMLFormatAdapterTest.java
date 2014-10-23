@@ -54,9 +54,9 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
         String body = doWrite(desc.getDef());
-        int start = body.indexOf("<html ");
+        int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
-        if (tag.contains(" manifest=")) {
+        if (tag.contains("manifest=")) {
             fail("Should not have included a manifest attribute with config disabled:\n" + body);
         }
     }
@@ -71,7 +71,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
         String body = doWrite(desc.getDef());
-        int start = body.indexOf("<html ");
+        int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
             fail("Should not have included a manifest attribute useAppCache = false:\n" + body);
@@ -88,7 +88,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
         String body = doWrite(desc.getDef());
-        int start = body.indexOf("<html ");
+        int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
             fail("Should not have included a manifest attribute with inherited useAppCache = false:\n" + body);
@@ -106,7 +106,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         final String uid = context.getDefRegistry().getUid(null, desc);
         context.addLoaded(desc, uid);
         String body = doWrite(desc.getDef());
-        int start = body.indexOf("<html ");
+        int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
                 "{\"mode\":\"UTEST\",\"app\":\"%s\",\"loaded\":{\"APPLICATION@%s\":\"%s\"},\"test\":\"%s\"}",

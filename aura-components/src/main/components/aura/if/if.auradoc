@@ -33,8 +33,6 @@
 &lt;/aura:if> 
 </pre>
 		</p>
-		<p>To pass an expression into another component that contains your conditional statement, use <code>aura:renderIf</code> instead.
-		   For more information, see the <code>renderIf</code> component reference.</p>
 	</aura:description>	
 		
 	

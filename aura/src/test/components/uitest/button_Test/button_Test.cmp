@@ -33,5 +33,5 @@
     <br/>
     <ui:outputText class='Icon_only' value='{!v.iconOnlyButtonPressedMessage}'/>
     <br/>
-    <ui:button class="testDomEventBtn" label="testDomEvent" press="{!c.checkDomEventSet}" aura:id="domEventBtn"/>
+    <ui:button class="testDomEventBtn" label="testDomEvent" press="{!c.checkDomEventSet}"/>
 </aura:component>

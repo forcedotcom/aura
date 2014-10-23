@@ -49,20 +49,71 @@
 	 * Verify that a locally created component has the same set of default attribute values. In this case the component
 	 * being creates already has its def at the client.
 	 */
-	testDefaultValueOfNewLocalComponentWithDefAtClient : {
+	testNewComponentChangingDefaultValues : {
 		test : function(cmp) {
 			$A.newCmpAsync(
 					this,
 					function (newComp) {
-        				this.verifyDefaultValuesOfBasicDataType(newComp);
-        				this.verifyDefaultValuesOfObjectDataType(newComp);
-        				this.verifyDefaultValuesOfListDataType(newComp);
         				this.verifyChangingAttributeValues(newComp);
-                        this.verifyDefaultValuesOfMapDataType(newComp);
 					},
 					"markup://attributesTest:defaultValue"
 			);
 
+		}
+	},
+
+	testNewComponentDefaultValueBasicDataTypes: {
+		test: function(cmp) {
+			$A.newCmpAsync(
+					this,
+					function (newComp) {
+        				this.verifyDefaultValuesOfBasicDataType(newComp);
+					},
+					"markup://attributesTest:defaultValue"
+			);
+		}
+	},
+
+	testNewComponentDefaultValueObjectDataType: {
+		test: function(cmp) {
+			$A.newCmpAsync(
+					this,
+					function (newComp) {
+        				this.verifyDefaultValuesOfObjectDataType(newComp);
+					},
+					"markup://attributesTest:defaultValue"
+			);
+		}
+	},
+
+	testNewComponentDefaultValueListDataType: {
+		test: function(cmp) {
+			$A.newCmpAsync(
+					this,
+					function (newComp) {
+        				this.verifyDefaultValuesOfListDataType(newComp);
+					},
+					"markup://attributesTest:defaultValue"
+			);
+		}
+	},
+
+	testNewComponentDefaultValueMapDataType: {
+		test: function(cmp) {
+			$A.newCmpAsync(
+					this,
+					function (newComp) {
+        				this.verifyDefaultValuesOfMapDataType(newComp);
+					},
+					"markup://attributesTest:defaultValue"
+			);
+		}
+	},
+
+	testDefaultValueComponentArrayIsArrayOfComponents: {
+		test: function(cmp) {
+			var cmpValue = cmp.get("v.componentDefault");
+			$A.test.assertEquals("Component", cmpValue[0].auraType);
 		}
 	},
 
@@ -83,6 +134,9 @@
 			var cmpValue = cmp.get("v.componentDefault");
 			$A.test.assertTrue($A.util.isArray(cmpValue));
 			$A.test.assertEquals(1, cmpValue.length);
+
+			// KRIS: If this is failing it's possibly because the Array of Components has not been converted to components, but instead
+			// is still component configs.
 			$A.test.assertEquals("markup://aura:text", cmpValue[0].getDef().getDescriptor().toString());
 		}
 	},
@@ -115,16 +169,15 @@
 		$A.test.assertTrue($A.util.isArray(a));
 		$A.test.assertTrue($A.util.isEmpty(a), "Array type attributes without default value should have empty array as value");
 	},
-	
+
 	verifyDefaultValuesOfMapDataType : function(testCmp) {
 		var mapAttr = testCmp.get("v.mapAttributeWithDefaultValue");
 		$A.test.assertTrue($A.util.isObject(mapAttr), "Expected to find attribute of Map(Object)");
 		$A.test.assertEquals(1, mapAttr.a);
 		var a = testCmp.get("v.mapAttributeWithNoDefaultValue");
-		$A.test.assertTrue($A.util.isObject(a));
-		$A.test.assertEquals(0, $A.util.keys(a, true).length, "Expected no-default map to be an empty object");
+        $A.test.assertTrue(a === null, "Expected to find attribute of Map(Object)");
 	},
-	
+
 	verifyChangingAttributeValues : function(testCmp) {
 		testCmp.set("v.strAttributeWithDefaultValue", "nemuL");
 		$A.test.assertEquals("nemuL", testCmp.get("v.strAttributeWithDefaultValue"),

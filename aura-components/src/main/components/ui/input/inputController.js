@@ -15,19 +15,16 @@
  */
 ({
     updateDefaultError : function(component, event, helper){
-        var concreteCmp = component.getConcreteComponent();
-        var value = concreteCmp.getValue("v.value");
-        helper.setErrorComponent(component, value);
+        helper.setErrorComponent(component);
     },
-    
-    init: function(component, event, helper) {
-    	labelPos = component.get('v.labelPosition');
-    		
-    	if ($A.util.arrayIndexOf(['top', 'right', 'bottom', 'left', 'hidden'], labelPos) < 0) {
-    		//once W-1419175 is fixed, then we can set default labelPosition instead of throwing error    		
-    		$A.error("labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'");
-        	//default labelPosition to 'left'
-    		//cmp.getDef().getHelper().setAttribute(cmp, {key: 'labelPosition', value: 'left'});
-        }    
-    } 
+    init: function(cmp) {
+        var positionMap={"top":1,"right":1,"bottom":1,"left":1,"hidden":1};
+        if (!positionMap[cmp.get("v.labelPosition")]) {
+            // JBUCH: HALO: TODO: WAITING ON W-1419175
+            //once W-1419175 is fixed, then we can set default labelPosition instead of throwing error
+            $A.error("labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'");
+            //default labelPosition to 'left'
+            //cmp.getDef().getHelper().setAttribute(cmp, {key: 'labelPosition', value: 'left'});
+        }
+    }
 })

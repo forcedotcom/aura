@@ -19,6 +19,6 @@
       <aura:attribute name="value" type="String" default="2013-09-25"/>
       <ui:inputDateTrigger aura:id="inputWDefValue" displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
       &nbsp;&nbsp;&nbsp;&nbsp;<ui:inputDateTrigger aura:id="inputWODefValue" class="date_input_box" displayDatePicker="true" format="MM/dd/yyyy"/><br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ui:inputDate value="{!v.value}" aura:id="inputWNoDatePicker" displayDatePicker="true" loadDatePicker="true" class="date_input_box" format="yyyy-MM-dd"/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ui:inputDate value="{!v.value}" aura:id="inputWNoDatePicker" displayDatePicker="true" loadDatePicker="true" format="yyyy-MM-dd"/>
       <ui:datePickerManager aura:id="dpm"/>
 </aura:component>

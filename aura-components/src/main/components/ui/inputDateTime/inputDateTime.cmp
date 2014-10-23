@@ -27,9 +27,9 @@
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
     
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
-        <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedby}"/>
+        <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}"/>
         <aura:set attribute="else">
-            <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedby}"/>
+            <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}"/>
         </aura:set>
     </aura:if>
     

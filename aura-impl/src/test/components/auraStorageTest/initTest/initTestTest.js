@@ -100,12 +100,13 @@
      * Verify Action.setStorable() and auto refresh setStorage() accepts
      * configuration. These configuration are helpful for follow up actions but
      * not the first action to be stored.
-     * 
+     *
      * {ignoreExisting: "Ignore existing stored response, but cache my response
      * after the action is complete" "refresh": "Time in seconds to override
      * action's current storage expiration"}
      */
-    testSetStorableAPI : {
+    /* W-2398464 */
+    _testSetStorableAPI : {
         attributes : {
             defaultExpiration : "60",
             defaultAutoRefreshInterval : "60"
@@ -120,7 +121,7 @@
             cmp.getDef().getHelper().testSetStorableAPIStage4.call(this, cmp);
         } ]
     },
-    
+
     /**
      * Refresh action which refresh the response of stored action can be configured to not call the callback.
      * This test case verified that.
@@ -485,7 +486,7 @@
     },
     /**
      * When offline, should not purge cached data.
-     * 
+     *
      */
     testCacheDataNotPurgedWhenOffline : {
         attributes : {
@@ -542,7 +543,7 @@
     /**
      * Go offline (should not purge cached data), then go back online, should
      * use cached data.
-     * 
+     *
      */
     testCacheDataUsedWhenConnectionResumed : {
         attributes : {
@@ -882,9 +883,9 @@
                 });
         } ]
     },
-    
+
     /**
-     * If a action had the same return value but different components were created during the execution of action, 
+     * If a action had the same return value but different components were created during the execution of action,
      * then the response from refresh action replaces the stored response.
      */
     testRefresh_ResponseWithSameReturnValueButAdditionalComponents: {
@@ -974,7 +975,7 @@
             	//sanity check
             	$A.test.assertEquals(action.getReturnValue(),"anything really","we are not using the correct stub");
                 cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
-                    parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
+                    parseInt(cmp.find("callbackCounter").getElement().innerHTML,10)+1);
             });
             $A.test.enqueueAction(a);
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
@@ -988,7 +989,7 @@
             a.setStorable();
             a.setCallback(cmp, function(action){
             	cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
-                    parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
+                    parseInt(cmp.find("callbackCounter").getElement().innerHTML,10)+1);
             });
             $A.test.enqueueAction(a);
             $A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
@@ -1007,7 +1008,7 @@
             a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
-                var newCount = parseInt(cmp.find("callbackCounter").getElement().innerHTML) + 1;
+                var newCount = parseInt(cmp.find("callbackCounter").getElement().innerHTML,10) + 1;
                 cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", newCount);
                 // first action run will be stored refresh action
                 if (newCount == 4) {

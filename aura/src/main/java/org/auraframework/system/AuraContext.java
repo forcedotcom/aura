@@ -243,10 +243,6 @@ public interface AuraContext {
 
     void setContextPath(String path);
 
-    boolean getSerializeLastMod();
-
-    void setSerializeLastMod(boolean serializeLastMod);
-
     /**
      * Are we 'preloading'.
      *
@@ -404,10 +400,6 @@ public interface AuraContext {
     Client getClient();
 
     void setClient(Client client);
-
-    String getLastMod();
-
-    void setLastMod(String lastMod);
 
     /**
      *

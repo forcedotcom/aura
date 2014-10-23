@@ -18,8 +18,8 @@
      */
     testOverridingDefSelectedOptionsBehaviour: {
         test: function(component){
-            var option1 = component.find("option1").get('v.value');
-            var option2 = component.find("option2").get('v.value');
+        	var option1 = component.find("option1").get('v.value');
+        	var option2 = component.find("option2").get('v.value');
             var option3 = component.find("option3").get('v.value');
             $A.test.assertFalse(option1,"Option1 should not be selected by default")
             $A.test.assertTrue(option2,"Option2 should be selected by default");

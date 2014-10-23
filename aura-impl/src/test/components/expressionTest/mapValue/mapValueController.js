@@ -15,31 +15,22 @@
  */
 ({
     onValueChange : function(cmp, evt, helper){
-    	if(cmp._log===undefined){
-            cmp._log=[];
-        }
+        cmp._log || (cmp._log = []);
         cmp._log.push(evt.getParams());
     },
 
     onTriggerChange : function(cmp, evt, helper) {
-    	var old = cmp.get("v.triggers.triggerCount");
-    	if (old !== undefined) {
-    		// Undefined value can, perhaps surprisingly, happen during MapValue.setValue
-        	cmp.set("v.triggers.triggerCount", old + 1);
-    	}
+    	var triggerCount = cmp.get("v.triggers.triggerCount");
+    	cmp.set("v.triggers.triggerCount", (triggerCount || 0) + 1);
 
-    	cmp._lastTriggerCount = cmp._lastTriggerCount ?
-    			cmp._lastTriggerCount + 1 :
-    				1;
+    	cmp._lastTriggerCount = (cmp._lastTriggerCount || 0) + 1;
     },
 
     onTrigger2Change : function(cmp, evt, helper) {
-    	cmp._lastTrigger2Count = cmp._lastTrigger2Count ?
-    			cmp._lastTrigger2Count + 1 :
-    				1;
+    	cmp._lastTrigger2Count = (cmp._lastTrigger2Count || 0) + 1;
     },
 
-    noop : function(cmp, evt, hlp) {
-    	cmp._noopCount = cmp._noopCount ? cmp._noopCount + 1 : 1;
+    noop : function(cmp, evt, helper) {
+    	cmp._noopCount = (cmp._noopCount || 0) + 1;
     }
 })

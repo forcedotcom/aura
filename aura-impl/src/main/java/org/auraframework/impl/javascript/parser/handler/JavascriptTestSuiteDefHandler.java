@@ -28,7 +28,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.parser.handler.mock.JavascriptMockActionHandler;
@@ -43,6 +42,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -96,7 +96,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
     protected JavascriptTestSuiteDef createDefinition(Map<String, Object> map) throws QuickFixException {
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
-        builder.caseDefs = new ArrayList<TestCaseDef>();
+        builder.caseDefs = new ArrayList<>();
 
         DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
                 .getAssociateDescriptor(descriptor, ComponentDef.class,
@@ -104,6 +104,9 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
 
         Map<String, Object> suiteAttributes = (Map<String, Object>) map.get("attributes");
         List<String> suiteLabels = (List<String>) map.get("labels");
+        String suiteScrumTeam = (String) map.get("scrumTeam");
+        String suiteOwner = (String) map.get("owner");
+        
         List<String> suiteBrowsers = (List<String>) (List<?>) map.get("browsers");
         Set<Definition> suiteMocks = parseMocks(compDesc, (List<Object>) map.get("mocks"));
 
@@ -145,7 +148,27 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 if (caseLabels != null) {
                     labels.addAll(caseLabels);
                 }
-
+                
+                String caseScrumTeam = (String) value.get("scrumTeam");
+                String caseOwner = (String) value.get("owner");
+                String scrumTeam = "";
+                String owner = "";
+                
+                //For scrumTeam
+                if (!Strings.isNullOrEmpty(suiteScrumTeam)) {
+                	scrumTeam = suiteScrumTeam;
+                }
+                if (!Strings.isNullOrEmpty(caseScrumTeam)) {
+                	scrumTeam = caseScrumTeam;
+                }
+                //For Owner
+                if (!Strings.isNullOrEmpty(suiteOwner)) {
+                	owner = suiteOwner;
+                }
+                if (!Strings.isNullOrEmpty(caseOwner)) {
+                	owner = caseOwner;
+                }
+                
                 List<String> caseBrowsers = (List<String>) (List<?>) value
                         .get("browsers");
                 Set<String> browsers = caseBrowsers == null ? (suiteBrowsers == null ? Collections.EMPTY_SET
@@ -184,7 +207,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 }
 
                 builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
-                        browsers, mocks, auraErrorsExpectedDuringInit));
+                        browsers, mocks, auraErrorsExpectedDuringInit, scrumTeam, owner));
             }
         }
 

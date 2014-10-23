@@ -172,9 +172,13 @@ public enum UserAgent {
             if (ua.contains(UA.TRIDENT) && ua.contains(UA.MSIE_7) && !ua.contains(UA.TRIDENT_3_1)) {
                 flags += 10;
             }
+
+            // If a Windows laptop with Touch support, consider it a tablet.
+            boolean isTablet = (ua.contains(UA.ARM) || ua.contains(UA.TOUCH)) && !ua.contains(UA.PHONE);
+
             // recent IE mobile contain "iemobile" but we don't need to add this
             // since we already need to look for "mobile" for older versions
-            if (ua.contains(UA.ARM) && !ua.contains(UA.PHONE)) {
+            if (isTablet) {
                 flags += UA.TABLET_FLAG;
             } else if (ua.contains(UA.MOBILE) || ua.contains(UA.PHONE) || ua.contains(UA.WINDOWS_CE) || ua.contains(UA.WINCE)) {
                 flags += UA.MOBILE_FLAG;

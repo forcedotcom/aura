@@ -56,7 +56,7 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
     	expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
-    if(valueProvider!==cmp||expression!==key) {
+    if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
                 $A.renderingService.addDirtyValue(key, cmp);
@@ -78,7 +78,7 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     	expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
-    if(valueProvider!==cmp||this.expression!==key) {
+    if(valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
         valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(),"key":key});
     }
 };

@@ -60,8 +60,10 @@ public interface ConfigAdapter extends AuraAdapter {
 
     String getMomentJSURL();
 
+    String getFastClickJSURL();
+
     List<String> getWalltimeJSURLs();
-    
+
     boolean isPrivilegedNamespace(String namespace);
     String getDefaultNamespace();
 	boolean isUnsecuredPrefix(String prefix);

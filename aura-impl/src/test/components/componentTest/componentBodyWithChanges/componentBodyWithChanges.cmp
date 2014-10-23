@@ -20,10 +20,10 @@
     <aura:attribute name="colors" type="List" default="purple,blue,green,yellow,orange,red"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
-    <div aura:id="output"/>
+    <div aura:id="output" class="outputDiv"/>
 
-    <ui:button label="Add before" press="{!c.addBefore}"/>
-    <ui:button label="Add inside" press="{!c.addInside}"/>
-    <ui:button label="Add after" press="{!c.addAfter}"/>
+    <ui:button aura:id="buttonAddBefore" label="Add before" press="{!c.addBefore}"/>
+    <ui:button aura:id="buttonAddInside" label="Add inside" press="{!c.addInside}"/>
+    <ui:button aura:id="buttonAddAfter" label="Add after" press="{!c.addAfter}"/>
 
 </aura:component>

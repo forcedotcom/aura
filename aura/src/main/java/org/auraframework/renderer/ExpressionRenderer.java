@@ -27,8 +27,6 @@ import org.auraframework.instance.Wrapper;
 import org.auraframework.service.RenderingService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- */
 public class ExpressionRenderer implements Renderer {
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
@@ -42,7 +40,19 @@ public class ExpressionRenderer implements Renderer {
         }
 
         if (value instanceof String) {
-            out.append((String) value);
+            String escaped = (String) value;
+            // This amounts to a convoluted test for "is the direct container
+            // of this expression a template?"  We need that test because we use
+            // "bad" characters like script tags in our own expressions, but want to
+            // deny them from users.
+            boolean inTemplate = component.getAttributes().getValueProvider()
+                    .getDescriptor().getDef().isTemplate();
+            if (!inTemplate) {
+                // We don't escape all the HTML characters, because quotes in particular
+                // would cause problems.
+                escaped = escaped.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+            }
+            out.append(escaped);
         } else if (value instanceof List) {
             List<?> kids = (List<?>) value;
             for (Object kid : kids) {

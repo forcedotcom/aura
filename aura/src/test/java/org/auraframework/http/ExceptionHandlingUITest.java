@@ -33,6 +33,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.google.common.base.Function;
+
 /**
  * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
  */
@@ -330,5 +332,36 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         // Wait for page to reload and aura framework initialization
         auraUITestingUtil.waitForAuraInit();
         waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "initial", true, 3000);
+    }
+
+    /**
+     * Test XSS handling
+     */
+    public void testXssScenarioOne() throws Exception {
+        DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component>{!'&lt;'}script{!'&gt;'}alert('foo');{!'&lt;'}/script{!'&gt;'}</aura:component>");
+        openRaw(getAppUrl("access='GLOBAL'", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        auraUITestingUtil.waitForElementFunction(By.tagName("body"), new Function<WebElement, Boolean>() {
+                @Override
+			    public Boolean apply(WebElement elem) {
+				    return elem.getText().contains("alert(");
+			    }
+            },
+            "XSS may have injected a bad <script> tag");
+        assertEquals("", auraUITestingUtil.getAuraErrorMessage());
+    }
+
+    public void testXssScenarioTwo() throws Exception {
+        DefDescriptor<?>  cdd = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component>{!'&lt;script&gt;'}alert({!'\"foo\");&lt;/script&gt;'}</aura:component>");
+        openRaw(getAppUrl("access='GLOBAL'", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        auraUITestingUtil.waitForElementFunction(By.tagName("body"), new Function<WebElement, Boolean>() {
+                @Override
+		        public Boolean apply(WebElement elem) {
+			        return elem.getText().contains("alert(");
+		        }
+            },
+            "XSS may have injected a bad <script> tag");
+        assertEquals("", auraUITestingUtil.getAuraErrorMessage());
     }
 }

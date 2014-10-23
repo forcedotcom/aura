@@ -15,13 +15,6 @@
             },{
                 text: "ultra-violet 2", color:"black"
             }].concat(items);
-        
-        var text="";
-    	for(var i = 0;i<items.length;i++) {
-    		text=text+" "+items[i].text;
-    	}
-        $A.log("addBefore, new items:",text);
-        
         cmp.set('v.items', items);
     },
     addInside: function(cmp, event) {
@@ -32,13 +25,6 @@
         }
         items.splice(index, 0, {text: "g-y 2", color: "greenyellow"});
         items.splice(index, 0, {text: "g-y 1", color: "greenyellow"});
-        
-        var text="";
-    	for(var i = 0;i<items.length;i++) {
-    		text=text+" "+items[i].text;
-    	}
-        $A.log("add inside, new items:",text);
-        
         cmp.set('v.items', items);
     },
     
@@ -49,13 +35,6 @@
             },{
                 text: "infra-red 2", color: "black"
             }]);
-        
-        var text="";
-    	for(var i = 0;i<items.length;i++) {
-    		text=text+" "+items[i].text;
-    	}
-        $A.log("add after, new items:",text);
-        
         cmp.set('v.items', items);
     }
 

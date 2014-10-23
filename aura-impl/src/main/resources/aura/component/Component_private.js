@@ -386,10 +386,13 @@ if(!this.concreteComponentId) {
         var name = attributeNames[x];
         if (!configValues.hasOwnProperty(name)) {
             var defaultDef = attributeDefs.getDef(name);
-            if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
-                var defaultValue = defaultDef.getDefault();
-                if (defaultValue && defaultValue.length) {
+            var defaultValue = defaultDef.getDefault();
+            if (defaultValue && defaultValue.length) {
+                if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
                     configValues[defaultDef.getDescriptor().getQualifiedName()] = defaultValue;
+                }else{
+                    //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
+                    configValues[defaultDef.getDescriptor().getQualifiedName()]=valueFactory.create(defaultValue,null,cmp);
                 }
             }
         }

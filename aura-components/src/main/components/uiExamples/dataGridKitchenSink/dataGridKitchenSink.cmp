@@ -45,12 +45,11 @@
             <ui:dataGridColumn label="Name" name="who.name"/>
             <ui:dataGridColumn label="Related To" name="what.name"/>
             <ui:dataGridColumn label="Due Date" name="activityDate"/>
-<!--
+
             <ui:dataGridActionColumn label="Actions">
-                <ui:actionButton name="edit" label="Edit" index="{!index}"/>
                 <ui:actionButton name="delete" label="Del" index="{!index}"/>
             </ui:dataGridActionColumn>
--->
+
         </aura:set>
 <!--
         <aura:set attribute="summaryRow">
@@ -64,11 +63,11 @@
                                                    currentPage="{!v.currentPage}"
                                                    totalItems="{!v.totalItems}"/>
         </aura:set>
-<!--
+
         <aura:set attribute="actionDelegate">
             <ui:actionDelegate onaction="{!c.handleAction}"/>
         </aura:set>
--->
+
     </ui:dataGrid>
 
     <ui:pagerNextPrevious pageSize="{!v.pageSize}"

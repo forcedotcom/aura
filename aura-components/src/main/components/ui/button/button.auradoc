@@ -47,9 +47,9 @@ background: url(/path/to/img) no-repeat;
 &lt;/button></pre>
 		
 	</aura:description>	
-		<aura:example name="buttonExample" ref="uiExamples:buttonExample" label="Using ui:button">
-    	<p>This example shows a button that displays the input value you enter.</p>
-    	
-	</aura:example>
-	
+
+    <aura:example name="buttonExample" ref="uiExamples:buttonExample" label="Using ui:button">
+        <p>This example shows a button that displays the input value you enter.</p>
+    </aura:example>
+
 </aura:documentation>

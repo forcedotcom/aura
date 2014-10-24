@@ -15,25 +15,16 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 
 import org.auraframework.Aura;
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.HtmlTag;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidAccessValueException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 
 /**
  * Abstract handler for tags that contain other tags.
@@ -212,5 +203,31 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
             return new ComponentDefRefHandler<P>(parentHandler, xmlReader, source);
         }
+    }
+    
+    /**
+     * If we are dealing with a source that supports a default namespace
+     * then tags need to re-written to make sure they have the correct parent ns
+     * Ex: 
+     * parentNs:foobar
+     * --------------- 
+     * <aura:component><aura:iteration items="{!v.items}" var="item"><c:blurg item={!item} /></></>
+     * 
+     * In this case c:blurg needs to be returned as parentNs:blurg so we can link it to the correct source.
+     */
+    @Override
+    protected final String getTagName() {
+        String tagName = super.getTagName();
+        
+        if ((source != null // if we have the source
+            && source.isDefaultNamespaceSupported()) // and it supports a default namespace, say 'c'
+            && tagName.startsWith(source.getDefaultNamespace() + ':') // and current tag has the default ns ex: <c:blurg/>
+            && !source.getDefaultNamespace().equals(source.getDescriptor().getNamespace())) { // and the source has a different ns
+
+            // use parent ns for the child
+            tagName = source.getDescriptor().getNamespace() + tagName.substring(source.getDefaultNamespace().length()); 
+        }
+        
+        return tagName;
     }
 }

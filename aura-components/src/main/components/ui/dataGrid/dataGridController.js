@@ -64,7 +64,7 @@
 	handleColumnsChange: function(cmp, evt, helper) {
 		var concrete = cmp.getConcreteComponent();
 		helper.initializeNewColumns(concrete);
-		helper.updateRowsWithNewColumns(concrete, concrete._rowData, false);
+		helper.rerenderRowsWithNewColumns(concrete, concrete._rowData, false);
 	},
 
 	handleColumnSortChange: function (cmp, evt, hlp) {

@@ -738,22 +738,8 @@
 		var self = this,
 			items = concrete.get("v.items"),
 			doc = document.createDocumentFragment(),
-			initialRenderCount = concrete.get("v.initialRenderCount"),
-			initialLength = initialRenderCount < items.length ? initialRenderCount : items.length,
-			batchRenderCount = concrete.get("v.batchRenderCount"),
 			tr, asyncParams, rowElements;
 
-		asyncParams = {
-				renderAsync : false,
-				batchCount : batchRenderCount < items.length ? batchRenderCount : items.length
-		}
-		
-		// TODO: Make this whole section better
-		/*for (var i = 0; i < items.length; i++) {
-			asyncParams.renderAsync = !(i < initialLength);
-			tr = self.createTableRow(concrete, items[i], i, asyncParams);
-			doc.appendChild(tr);
-		}*/
 		rowElements = self.createAndRenderTableRows(concrete, concrete._rowData, false);
 		doc.appendChild(rowElements);
 		
@@ -814,7 +800,7 @@
 		}
 	},
 	
-	updateRowsWithNewColumns: function (concrete, rowDataArray, isEditMode) {
+	rerenderRowsWithNewColumns: function (concrete, rowDataArray, isEditMode) {
 		var self = this,
 			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
 			rowElements = concrete.find("tbody").getElement().rows,
@@ -964,10 +950,6 @@
 		}
 
 		return columns;
-	},
-	
-	shouldBatchRender : function(rowCount, rowIndex) {
-		return (rowIndex + 1) % rowCount == 0;
 	},
 	
 	/**

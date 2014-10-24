@@ -87,7 +87,7 @@ $A.ns.Test.prototype["isActionPending"] = $A.ns.Test.prototype.isActionPending;
 $A.ns.Test.prototype["markForCompletion"] = $A.ns.Test.prototype.markForCompletion;
 $A.ns.Test.prototype["isComplete"] = $A.ns.Test.prototype.isComplete;
 $A.ns.Test.prototype["isSuccessfullyComplete"] = $A.ns.Test.prototype.isSuccessfullyComplete;
-$A.ns.Test.prototype["clearCompletion"] = $A.ns.Test.prototype.clearCompletion;
+$A.ns.Test.prototype["clearComplete"] = $A.ns.Test.prototype.clearComplete;
 $A.ns.Test.prototype["getAction"] = $A.ns.Test.prototype.getAction;
 $A.ns.Test.prototype["getExternalAction"] = $A.ns.Test.prototype.getExternalAction;
 $A.ns.Test.prototype["blockRequests"] = $A.ns.Test.prototype.blockRequests;
@@ -96,6 +96,7 @@ $A.ns.Test.prototype["getSentRequestCount"] = $A.ns.Test.prototype.getSentReques
 $A.ns.Test.prototype["enqueueAction"] = $A.ns.Test.prototype.enqueueAction;
 $A.ns.Test.prototype["runActionsAsTransaction"] = $A.ns.Test.prototype.runActionsAsTransaction;
 $A.ns.Test.prototype["clearAndAssertComponentConfigs"] = $A.ns.Test.prototype.clearAndAssertComponentConfigs;
+$A.ns.Test.prototype["setServerReachable"] = $A.ns.Test.prototype.setServerReachable;
 
 // events
 $A.ns.Test.prototype["addEventHandler"] = $A.ns.Test.prototype.addEventHandler;

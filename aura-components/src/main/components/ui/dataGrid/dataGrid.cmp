@@ -28,7 +28,7 @@
 	 ~ Default implementation is a table. Consider moving this logic to ui:dataTable 
 	 ~ A dataTable is potentially a concrete of a dataGrid.
 	 -->
-	<table id="{!globalId}" class="{! v.class + ' ' + v.state + ' ' + v.mode }" onclick="{!c.handleClick}" summary="{!v.summary}">
+	<table class="{! v.class + ' ' + v.state + ' ' + v.mode }" onclick="{!c.handleClick}" summary="{!v.summary}">
 		<thead>
 			<tr aura:id="headerRow">
 				{!v.columns}

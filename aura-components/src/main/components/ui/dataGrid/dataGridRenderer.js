@@ -38,10 +38,6 @@
 		cmp._rendered = true;
 		return table;
 	},
-	
-	rerender: function (cmp) {
-		console.log("Rerendering Function");
-	},
 
 	unrender: function (cmp) {
 		var children = cmp._allChildrenCmps,

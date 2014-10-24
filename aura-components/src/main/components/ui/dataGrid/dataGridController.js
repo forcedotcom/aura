@@ -39,11 +39,8 @@
 		
 		hlp.initializeCaches(cmp);
 		hlp.initializeActionDelegate(cmp);
-		//if (cmp.get("v.columns")) {
-			hlp.initializeNewColumns(cmp);
-			hlp.generateNewItemShape(cmp);
-			//hlp.deriveItemShape(cmp);
-		//}
+		hlp.initializeNewColumns(cmp);
+		hlp.generateNewItemShape(cmp);
 		hlp.initializeRowData(cmp);
 	},
 

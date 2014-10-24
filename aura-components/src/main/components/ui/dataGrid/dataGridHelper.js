@@ -55,7 +55,7 @@
 			isEditMode				= mode.indexOf('EDIT') === 0,
 			headerRow				= concrete.find("headerRow").getElement();
 
-		// TODO cleanup
+		// TODO cleanup components properly
 		concrete._columnCount = columns.length;
 		concrete._outputComponents = concrete._outputComponents.slice(0, columns.length);
 		concrete._inputComponents = concrete._inputComponents.slice(0, columns.length);
@@ -90,10 +90,6 @@
 			if (c.isInstanceOf('ui:dataGridSelectionColumn')) {
 				concrete._selectionColumns.push(c);
 			}
-			
-			if (!c.isRendered()) {
-				$A.render(c, headerRow);
-			}
 		});
 	},
 
@@ -108,6 +104,10 @@
 		}
 	},
     
+	/**
+	 * Create the row data for the initial items in the grid and stores them in
+	 * concrete._rowData
+	 */
     initializeRowData: function(concrete) {
     	var self				= this,
     		items = concrete.get("v.items"),
@@ -115,17 +115,6 @@
     	
     	concrete._rowData = self.createRowData(concrete, items, isEditMode);
     },
-    
-    /**
-	 * Attach action delegate for easier access.
-	 */ 
-	initializeActionDelegate: function (cmp) {
-		var actionDelegate = cmp.get('v.actionDelegate');
-
-		if (actionDelegate && actionDelegate.length > 0) {
-			cmp._actionDelegate = actionDelegate[0];
-		}
-	},
     
 	/*
 	 * ================
@@ -531,6 +520,7 @@
 			node;
 
 		// Remove value providers and children which are no longer needed.
+		// TODO: refactor this function
 		this.shiftRowData(concrete, index, count, true);
 
 		for (var i = index + count - 1; i >= index; i--) {
@@ -609,10 +599,8 @@
 		} else {
 			if (insertItems) {
 				Array.prototype.splice.apply(items, [realIndex, 0].concat(newItems));
-				//items.splice(realIndex, 0, newRowData);
 			}
 			Array.prototype.splice.apply(concrete._rowData, [realIndex, 0].concat(newRowData));
-			//concrete._rowData.splice(realIndex, 0, newRowData);
 			node = tbody.children[realIndex];
 			tbody.insertBefore(newRowElements, node);
 			//self.insertRowData(concrete, newRowData, realIndex);
@@ -665,13 +653,6 @@
             }
         }
 
-		// Rerender all components. 
-		// TODO: we can't maintain this as its current state with the dynamic things we want
-		//$A.rerender(concrete._allChildrenCmps);
-		this.componentMap(concrete, true, function(allCmps) {
-			$A.rerender(allCmps);
-		})
-
 		// Set the state back to 'idle'.
 		// TODO: is this necessary? Not used anywhere else
 		//concrete.set('v.state', 'idle');
@@ -685,7 +666,7 @@
 	 * @param {Integer} colIndex
 	 * @param {Boolean} isEditMode
 	 */
-	createColumnData: function(rowData, colIndex, isEditMode) {
+	createCellData: function(rowData, colIndex, isEditMode) {
 		var cellCmps = {},
 			ioKey = isEditMode ? 'input' : 'output';
 		
@@ -706,7 +687,7 @@
 	 * @param {Integer} colIndex
 	 * @param {HTMLTableRowElement} parentTR
 	 */
-	destroyColumnData: function(rowData, colIndex, parentTR) {
+	destroyCellData: function(rowData, colIndex, parentTR) {
 		var colData = rowData.columnData[colIndex],
 			key;
 		
@@ -800,6 +781,10 @@
 		}
 	},
 	
+	/**
+	 * Updates and rerenders the rows specified by rowDataArray, making sure to pick
+	 * up changes to column metadata
+	 */
 	rerenderRowsWithNewColumns: function (concrete, rowDataArray, isEditMode) {
 		var self = this,
 			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
@@ -814,6 +799,16 @@
 		}
 	},
 	
+	/**
+	 * Renders the row using the data specified in rowData in the element tr.
+	 * Optionally cleans up the component data
+	 * 
+	 * @param {Component} concrete
+	 * @param {Object} rowData
+	 * @param {HTMLTableRowElement} tr
+	 * @param {Boolean} isEditMode
+	 * @param {Booelan} cleanOldComponents
+	 */
 	renderTableRow: function(concrete, rowData, tr, isEditMode, cleanOldComponents) {
 		var self = this,
 			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
@@ -829,18 +824,10 @@
 			// TODO: collapse empty columns
 			if (!cdrs && colData) {
 				self.destroyColumnData(rowData, colIndex, tr);
-				/*key = colData.cellKey;
-				$A.util.forEach(colData.components[key], function(cmp) {
-					cmp.destroy();
-				});
-				colData.components[key] = [];
-				tr.removeChild(colData.elementRef);
-				
-				colData = {};*/
 				resizeRowData = true;
 			} else {			
 				if (!colData) {
-					colData = self.createColumnData(rowData, colIndex, isEditMode);
+					colData = self.createCellData(rowData, colIndex, isEditMode);
 				}
 				
 				if (!colData.elementRef) {
@@ -1024,6 +1011,7 @@
 	},
 	
 	// Components cannot be generated with an empty item shape 
+	// TODO: set all the data to nulls or empty objects
 	generateNewItemShape: function (concrete) {
     	var itemShape = concrete.get('v.itemShape'),
 			item = concrete.get("v.items")[0],
@@ -1034,25 +1022,6 @@
 			template = this.clone(item); // TODO: make empty clone rather than full clone?
 			concrete.set("v.itemShape", template);
 		}
-
-		/*for (var i = 0; i < concrete._columnNames.length; i++) {
-			path = concrete._columnNames[i];
-			sub = item;
-
-			if (path && path.length > 0) {
-				for (var j = 0; j < path.length; j++) {
-					
-					// For leaves, place empty string.
-					// For objects, place an empty object.
-					if (j === path.length - 1) {
-						sub[path[j]] = '';	
-					} else {
-						sub = sub[path[j]] = {};
-					}
-				}
-			}
-		}*/
-		
 
 		concrete.set("v.itemShape", item);
     },

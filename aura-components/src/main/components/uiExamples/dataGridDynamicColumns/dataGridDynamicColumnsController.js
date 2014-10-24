@@ -92,9 +92,11 @@
 			$A.newCmpAsync(
 					this, 
 					function(newCmp) {
-						columns[5].destroy();
+						var oldCmp = columns[5];
 						columns[5] = newCmp;
 						grid.set("v.columns", columns);
+						
+						oldCmp.destroy();
 					},
 					{
 						"componentDef": "markup://ui:dataGridColumn",
@@ -109,9 +111,11 @@
 			$A.newCmpAsync(
 					this, 
 					function(newCmp) {
-						columns[5].destroy();
+						var oldCmp = columns[5];
 						columns[5] = newCmp;
 						grid.set("v.columns", columns);
+						
+						oldCmp.destroy();
 					},
 					{
 						"componentDef": "markup://ui:dataGridColumn",

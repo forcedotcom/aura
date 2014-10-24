@@ -239,6 +239,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public String getFastClickJSURL() {
+        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+        return String.format("%s/auraFW/resources/%s/fastclick/fastclick.js", contextPath, nonce);
+    }
+
+    @Override
     public List<String> getWalltimeJSURLs() {
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
         String locale = al.getTimeZone().getID().replace("/", "-");

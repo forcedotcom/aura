@@ -7,9 +7,12 @@
             var color = colors[i];
             items.push({text: color, color: color});
         }
-
-        var newCmpList = helper.newComponentList(cmp, items);
-        cmp.find('output').set('v.body', newCmpList);
+        if(items.length > 0) {
+        	var newCmpList = helper.newComponentList(cmp, items);
+        	cmp.find('output').set('v.body', newCmpList);
+        } else {
+        	$A.log("colors are empty, do not change v.body:",cmp.get('v.body'));
+        }
     },
     addBefore: function(cmp, event, helper) {
         var newCmpList = helper.newComponentList(cmp, [{
@@ -24,9 +27,9 @@
     },
     addInside: function(cmp, event, helper) {
         var newCmpList = helper.newComponentList(cmp, [{
-            text: 'green-yellow 1', color: 'greenyellow'
+            text: 'g-y 1', color: 'greenyellow'
         },{
-            text: 'green-yellow 2', color: 'greenyellow'
+            text: 'g-y 2', color: 'greenyellow'
         }]);
 
         var body = cmp.find('output').get('v.body');

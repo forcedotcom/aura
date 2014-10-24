@@ -309,7 +309,6 @@ $A.ns.Util.prototype.hasClass = function(element, className){
 
 /**
  * Adds the specified class to the element, depending on whether it already existed on that element.
- * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
  *
  * @param {Object} element The element to apply the class on.
  * @param {String} clz The CSS class to be applied on the element.
@@ -321,7 +320,6 @@ $A.ns.Util.prototype.addClass = function(element, newClass){
 
 /**
  * Removes the class from an element.
- * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
  *
  * @param {Object} element The element to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.

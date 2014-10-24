@@ -15,7 +15,6 @@
             },{
                 text: "ultra-violet 2", color:"black"
             }].concat(items);
-
         cmp.set('v.items', items);
     },
     addInside: function(cmp, event) {
@@ -24,10 +23,11 @@
         while (items[index].text !== "yellow") {
             index++;
         }
-        items.splice(index, 0, {text: "green-yellow 1", color: "greenyellow"});
-        items.splice(index+1, 0, {text: "green-yellow 2", color: "greenyellow"});
+        items.splice(index, 0, {text: "g-y 2", color: "greenyellow"});
+        items.splice(index, 0, {text: "g-y 1", color: "greenyellow"});
         cmp.set('v.items', items);
     },
+    
     addAfter: function(cmp, event) {
         var items = cmp.get('v.items');
         items = items.concat([{

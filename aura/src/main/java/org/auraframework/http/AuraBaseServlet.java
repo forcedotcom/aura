@@ -494,6 +494,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         }
 
         ret.add(config.getMomentJSURL());
+        ret.add(config.getFastClickJSURL());
         ret.addAll(config.getWalltimeJSURLs());
 
         ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.JS));

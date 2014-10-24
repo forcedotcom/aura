@@ -38,11 +38,13 @@ var valueFactory = {
             }
         } else if (aura.util.isString(valueConfig) && valueConfig.indexOf("{!") === 0 && component) {
             // Property expressions
-            if($A.util.isComponent(component)){
+            var isGlobal=valueConfig.indexOf("{!$")===0;
+            if(!isGlobal&&$A.util.isComponent(component)){
                 return component.getReference(valueConfig);
             }else{
+                //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
                 valueConfig = valueConfig.substring(2, valueConfig.length - 1);
-                return new PropertyReferenceValue(valueConfig.split("."), component);
+                return new PropertyReferenceValue(valueConfig.split("."), isGlobal?$A:component);
             }
         }
         return valueConfig;

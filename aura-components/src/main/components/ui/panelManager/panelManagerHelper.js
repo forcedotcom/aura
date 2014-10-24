@@ -219,7 +219,7 @@
         }
 
         // delay setting panel content until panel has been inserted into the dom (bad things happen otherwise)
-        config.body = config.headerButtons = null;
+        config.body = config.headerButtons = [];
         config.animation = config.animation || 'bottom';
 
         this._createPanel(cmp, 'ui:panelOverlay', config, function(panel) {
@@ -244,7 +244,7 @@
         config.closeAction = this.getCloseActionForModal(cmp);
 		
 		 // delay setting panel content until panel has been inserted into the dom (bad things happen otherwise)
-		 config.body = null;
+		 config.body = [];
 		
 		 // return the promise
 		 this._createPanel(cmp, 'ui:modalOverlay', config, function(panel) {
@@ -282,6 +282,7 @@
 
     // ui:createSlidePanel handler
     createPanelSliderDEPRECATED: function(cmp, config) {
+    	var self = this;
         this.createPanelSlider(cmp, config, function(panel) {
             if (config.isVisible || typeof config.isVisible === 'undefined') {
                 setTimeout(function() {

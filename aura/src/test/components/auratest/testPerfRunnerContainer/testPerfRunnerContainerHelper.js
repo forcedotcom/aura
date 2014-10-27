@@ -142,7 +142,7 @@
             regexp = new RegExp(query,'i');
             for (i = 0; i < children.length; i++) {
                 li = children[i];
-                name = li.getElementsByClassName('name')[0].textContent;
+                name = li.getElementsByClassName('ns')[0].textContent;
                 if (!regexp.test(name)) {
                     $A.util.setDataAttribute(li, 'visible', "hidden");
                 }

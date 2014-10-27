@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A container that is displayed in response to a trigger event. If used in a mobile context, it is recommended that curtain be set to true to prevent nested iframes from consuming the closeOnClickOutside event." support="PROTO">
+<aura:component extensible="true" implements="ui:visible" description="A container that is displayed in response to a trigger event. If used in a mobile context, it is recommended that curtain be set to true to prevent nested iframes from consuming the closeOnClickOutside event." support="GA">
     <aura:attribute name="visible" type="Boolean" default="{!false}" description="Controls the visibility of the popup target. The default is false, which hides the menu."/>
     <aura:attribute name="closeOnTabKey" type="Boolean" default="true" description="Indicates whether to close the popup target list on tab key or not." />
     <aura:attribute name="autoPosition" type="Boolean" default="true" description="Move the popup target up when there is not enough space at the bottom to display. Note: even if autoPosition is set to false, popup will still position the menu relative to the trigger. To override default positioning, use manualPosition attribute."/>
@@ -30,7 +30,7 @@
     <aura:registerEvent name="popupCollapse" type="ui:collapse" description="The event fired when the popup target list collapses."/>
     <aura:registerEvent name="popupExpand" type="ui:expand" description="The event fired when the popup target list displays."/>
     <aura:registerEvent name="popupKeyboardEvent" type="ui:popupKeyboardEvent" description="The event fired when the user interacts with the popup using the keyboard."/>
-    <aura:registerEvent name="doClose" type="ui:collapse" description="Tell the target to close itslef."/>
+    <aura:registerEvent name="doClose" type="ui:collapse" description="Tell the target to close itself."/>
     
     <aura:handler name="popupKeyboardEvent" action="{!c.handleKeyboardEvent}"/>
 	

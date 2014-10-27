@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="PROTO">
+<aura:component extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="GA">
     <aura:attribute name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>
     <aura:attribute name="trigger" type="Aura.Component[]" description="Used to override the default HTML and trigger event handling. If used, developer must trigger show/hide events for popup target since v.trigger is not wrapped in a link tag, it is wrapped in a plain div." />
     <aura:attribute name="stopClickPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
@@ -23,16 +23,18 @@
     <aura:registerEvent name="popupTriggerPress" type="ui:popupTriggerPress" description="The event fired when a popup trigger is pressed."/>
     <aura:registerEvent name="popupTargetShow" type="ui:popupTargetShow" description="The trigger fires this event to show the target."/>
     <aura:registerEvent name="popupTargetHide" type="ui:popupTargetHide" description="The trigger fires this event to hide the target."/>
-    <aura:handler event="ui:popupTargetToggle" action="{!c.onPopupToggle}" />
+    <aura:registerEvent name="popupKeyboardEvent" type="ui:popupKeyboardEvent" description="The event fired when a user interacts with a popup via the keyboard."/>
 
-    <div id="{!globalId}" aura:id="popupTrigger" aria-haspopup="true" class="{!v.class}">
+    <aura:handler event="ui:popupTargetToggle" action="{!c.onPopupToggle}"/>
+
+    <div id="{!globalId}" aura:id="popupTrigger" aria-haspopup="true">
 	    <aura:if isTrue="{!v.trigger.length > 0}">
 	    	<div aura:id="popupTriggerElement">
 	    		{!v.trigger}
 	    	</div>
 
 	    	<aura:set attribute="else">
-	    		<a aura:id="popupTriggerElement" title="{!v.title}" onclick="{!c.onClick}">
+	    		<a aura:id="popupTriggerElement" title="{!v.title}" class="{!v.class}" onclick="{!c.onClick}">
 			    	<aura:if isTrue="{!v.label != null}">
 			    		{!v.label}
 			    		<aura:set attribute="else">

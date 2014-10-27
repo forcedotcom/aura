@@ -19,9 +19,14 @@
         var _helper = concreteCmp.getDef().getHelper();
         var target = _helper.getTargetComponent(component);
     	var trigger = _helper.getTriggerComponent(component);
+
     	if (target && trigger) {
-            target.set("v.referenceElement", trigger.find("popupTriggerElement").getElement());
+            var targetElement = _helper.findElement(trigger, "popupTriggerElement");
+            if (targetElement) {
+                target.set("v.referenceElement", targetElement);
+            }
     	}
+
     	this.superAfterRender();
     }
 })

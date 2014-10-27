@@ -15,14 +15,18 @@
  */
 ({
     focus: function(component, event, helper) {
-    	component.getConcreteComponent().getDef().getHelper().focus(concreteCmp);
+    	var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.focus(concreteCmp);
     },
     
     onClick : function(component, event, helper) {
-    	if ($A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        if ($A.util.getBooleanValue(concreteCmp.get("v.stopClickPropagation"))) {
             $A.util.squash(event, true);
         }
-        helper.handleTriggerPress(component);
+        _helper.handleClick(component);
     },
 
     /*

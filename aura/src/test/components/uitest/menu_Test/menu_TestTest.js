@@ -33,7 +33,7 @@
 	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
 	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
 	        	menuLabel.get("e.click").fire();
-	            
+
 	            //Check if secondItem in the menu is disabled
 	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find("actionItem2").get("v.disabled");}, "Check if Item2 in the menu is disabled");
 			}, function(cmp) {
@@ -120,7 +120,7 @@
 				ouptutButton = cmp.find("radioButton");
 				item1 = cmp.find("radioItem1")
 				item2 = cmp.find("radioItem2")
-				
+
 				menuLabel.get("e.click").fire();
 				//check if menu is visible
 				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(radioMenu.getElement(),"visible")}, "Radio Menu should be visible");
@@ -188,7 +188,7 @@
 				//menu item 1 should be unchecked after selecting item2
 				$A.test.assertFalse(item1.get('v.selected'),"Radio Menu item 1 should be unchecked");
 				menuLabel.get("e.click").fire();
-				$A.test.addWaitForWithFailureMessage(false, 
+				$A.test.addWaitForWithFailureMessage(false,
 						function(){
 							return $A.util.hasClass(radioMenu.getElement(),"visible")
 						}, "Radio Menu created by Iteration should not be visible");
@@ -287,7 +287,7 @@
 	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
 	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
 	        	menuLabel.get("e.click").fire();
-	            
+
 	            //Check if secondItem in the menu is disabled
 	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find("actionItem2").get("v.disabled");}, "Check if Item2 in the menu is disabled");
 			}, function(cmp) {

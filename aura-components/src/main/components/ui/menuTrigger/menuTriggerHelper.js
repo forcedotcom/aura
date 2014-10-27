@@ -14,33 +14,16 @@
  * limitations under the License.
  */
 ({
-    addTriggerDomEvents : function(component) {
-        var events = ["click", "keydown"];
-        for (var i=0, len=events.length; i < len; i++) {
-            if (!component.hasEventHandler(events[i])) {
-                this.addDomHandler(component, events[i]);
-            }           
-        }
-    },
-    
-    preEventFiring: function(component, event) {
+    handleClick: function (component) {
         var concreteCmp = component.getConcreteComponent();
-        
-        if (event.type === "keydown") {
-            if (event.keyCode === 32) {  // space key
-                event.preventDefault();
-                this.toggleMenu(component);
-            } else if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
-                event.preventDefault();
-                this.toggleMenu(component);
-            } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
-                event.preventDefault();
-                this.toggleMenu(component, -1);
-            }
+        if ($A.util.getBooleanValue(concreteCmp.get("v.stopClickPropagation"))) {
+            $A.util.squash(event, true);
         }
+        this.handleTriggerPress(concreteCmp);
+        this.fireMenuTriggerPress(concreteCmp);
     },
-    
-    toggleMenu: function(component, index) {
+
+    fireMenuTriggerPress: function(component, index) {
         if ($A.util.isUndefinedOrNull(index)) {
             index = 0;
         }

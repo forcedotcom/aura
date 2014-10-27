@@ -444,6 +444,19 @@ $A.ns.Test.prototype.callServerAction = function(action, doImmediate){
 };
 
 /**
+ * Set whether the server is reachable, to mimick being offline.
+ * @param {Boolean} reachable True or absent to make the server reachable; otherwise the server is made unreachable.
+ */
+$A.ns.Test.prototype.setServerReachable = function(reachable) {
+    if (arguments.length === 0 || reachable) {
+        $A.clientService.initHost();
+    } else {
+        $A.clientService.initHost('//offline');
+    }
+};
+
+
+/**
  * Invoke a callback after the provided condition evaluates to truthy,
  * checking on the condition every specified interval.
  * Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an expression evaluating to true.

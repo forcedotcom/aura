@@ -17,4 +17,5 @@
 -->
 <aura:event type="COMPONENT" support="GA">
     <aura:attribute name="action" type="Aura.Action"/>
+    <aura:attribute name="responseUpdated" type="Boolean" description="After the refresh, was the refreshed response different than the original response"/>
 </aura:event>

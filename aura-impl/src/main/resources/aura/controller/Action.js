@@ -1080,13 +1080,14 @@ Action.prototype.parseAndFireEvent = function(evtObj) {
  *
  * @private
  */
-Action.prototype.fireRefreshEvent = function(event) {
+Action.prototype.fireRefreshEvent = function(event, responseUpdated) {
     // storageService.log("Action.refresh(): auto refresh: "+event+" for "+this.actionId);
     if (this.cmp && this.cmp.isValid()) {
         var isRefreshObserver = this.cmp.isInstanceOf("auraStorage:refreshObserver");
         if (isRefreshObserver) {
             this.cmp.getEvent(event).setParams({
-                    "action" : this
+                    "action" : this,
+                    "responseUpdated": responseUpdated
             }).fire();
         }
     }

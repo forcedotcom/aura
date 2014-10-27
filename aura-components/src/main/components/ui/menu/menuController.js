@@ -14,43 +14,11 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
-        var body = component.get("v.body");
-        for (var i = 0; i < body.length; i++) {
-            var c = body[i];
-            if (c.isInstanceOf("ui:menuTrigger")) {
-            	c.addHandler("menuTriggerPress", component, "c.trigger");
-            }
-            if (c.isInstanceOf("ui:menuList")) {
-            	var focusActionHandler = $A.expressionService.create(component, component.get('c.focusTrigger'));
-            	c.set("v.focusTrigger", focusActionHandler);
-            }
-        }
-    },
-    
     focusTrigger: function(component, event, helper) {
     	var trigger = helper.getTriggerComponent(component);
     	if (trigger) {
     		var action = trigger.get("c.focus");
     		action.runDeprecated();
     	};
-    },
-
-    onMenuListVisible: function(component, event, helper){
-    	helper.handleVisible(component);
-    },
-    
-    trigger: function(component, event, helper) {
-        var index = event.getParam("focusItemIndex");
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        _helper.toggleMenuVisible(concreteCmp, index, event);
-    },
-    
-    refresh: function(component, event, helper) {
-    	var menuList = helper.getMenuComponent(component);
-    	if (menuList) {
-    		menuList.get("e.refresh").fire();
-    	}
     }
 })

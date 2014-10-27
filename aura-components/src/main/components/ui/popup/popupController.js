@@ -15,22 +15,32 @@
  */
 ({
     doInit: function(component, event, helper) {
+        helper = component.getConcreteComponent().getDef().getHelper();
         helper.setEventHandlersOnChildren(component, event);
     },
 
     onTriggerPress: function(component, event, helper) {
-        helper.handleTriggerPress(component);
+        helper = component.getConcreteComponent().getDef().getHelper();
+        helper.handleTriggerPress(component, event);
     },
 
     onTargetShow: function(component, event, helper) {
+        helper = component.getConcreteComponent().getDef().getHelper();
         helper.handleTargetShow(component);
     },
 
     onTargetHide: function(component, event, helper) {
+        helper = component.getConcreteComponent().getDef().getHelper();
         helper.handleTargetHide(component);
     },
 
     onKeyboardEvent: function(component, event, helper) {
+        helper = component.getConcreteComponent().getDef().getHelper();
         helper.handleKeyboardEvent(component, event);
+    },
+
+    onRefresh: function(component, event, helper) {
+        helper = component.getConcreteComponent().getDef().getHelper();
+        helper.handleRefresh(component, event);
     }
 })

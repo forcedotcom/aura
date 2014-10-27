@@ -15,46 +15,20 @@
  */
  ({
     afterRender: function(component, helper) {
-    	var m = helper.getMenuComponent(component);
-    	var t = helper.getTriggerComponent(component);
-    	if (m && t) {
-            m.set("v.referenceElement", t.getElement());
+    	var target = helper.getTargetComponent(component);
+    	var trigger = helper.getTriggerComponent(component);
+    	if (target && trigger) {
+            target.set("v.referenceElement", trigger.getElement());
     	}
-    	helper.addEventHandler(component);
-    	helper.setAriaAttributes(component);
+
+        // This is to support components that have set these attributes on ui:menu. Should remove this code once they are modified.
+        if (target) {
+            target.set("v.closeOnClickOutside", component.get("v.closeOnClickOutside"));
+        }
+        if (trigger) {
+            trigger.set("v.stopClickPropagation", component.get("v.stopClickPropagation"));
+        }
+
     	return this.superAfterRender();
-	},
-	
-	rerender: function(component, helper) {		
-		this.superRerender();
-		helper.addEventHandler(component);
-		helper.setAriaAttributes(component);
-	},
- 
-    unrender: function(component, helper) {
-        if (helper.getOnClickEventProp.cache && 
-            helper.getOnClickEventProp.cache.onClickStartEvent && 
-            component._onClickStartFunc) {
-            if (document.body.removeEventListener) {
-                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
-                                                  component._onClickStartFunc, false);
-            } else if (document.body.detachEvent) {
-                document.body.detachEvent(helper.getOnClickEventProp.cache.onClickStartEvent, 
-                                          component._onClickStartFunc, false);    
-            }
-        }
-        if (helper.getOnClickEventProp.cache &&
-            helper.getOnClickEventProp.cache.onClickEndEvent && 
-            component._onClickEndFunc) {
-            if (document.body.removeEventListener) {
-                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
-                                                  component._onClickEndFunc, false);
-            } else if (document.body.detachEvent) {
-                document.body.detachEvent(helper.getOnClickEventProp.cache.onClickEndEvent, 
-                                          component._onClickEndFunc, false);
-            }
-        }
-        helper.removeEventHandler(component);
-        this.superUnrender();
-    }
+	}
 })

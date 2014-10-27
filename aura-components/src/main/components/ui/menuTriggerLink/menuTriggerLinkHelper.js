@@ -15,12 +15,25 @@
  */
 ({
     focus: function(component) {
-        var linkCmp = component.find("link");
-        if (linkCmp) {
-            var elem = linkCmp.getElement();
-            if (elem) {
-                elem.focus();
-            }
+        var linkCmp = this.getAnchorElement(component);
+        var elem = linkCmp ? linkCmp.getElement() : null;
+        if (elem && elem.focus) {
+            elem.focus();
         }
+    },
+
+    getAnchorElement: function(component) {
+        //Walk up the component ancestor to find the contained component by localId
+        var localId = "link",
+            cmp =  component.getConcreteComponent();
+        var retCmp = null;
+        while (cmp) {
+            retCmp = cmp.find(localId);
+            if (retCmp) {
+                break;
+            }
+            cmp = cmp.getSuper();
+        }
+        return retCmp;
     }
 })

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A popup with a trigger that controls its visibility." support="PROTO">
+<aura:component extensible="true" implements="ui:visible" description="A popup with a trigger that controls its visibility." support="GA">
     <aura:registerEvent name="popupTriggerPress" type="ui:popupTriggerPress" description="The event fired when the popup trigger is pressed. Other components may also fire this event to simulate a trigger press."/>
     <aura:registerEvent name="popupTargetShow" type="ui:popupTargetShow" description="The trigger fires this event to show the target. Other components may also fire this event to show the target."/>
     <aura:registerEvent name="popupTargetHide" type="ui:popupTargetHide" description="The trigger fires this event to hide the target. Other components may also fire this event to hide the target."/>
@@ -27,7 +27,7 @@
     <aura:handler name="popupTargetShow" action="{!c.onTargetShow}"/>
     <aura:handler name="popupTargetHide" action="{!c.onTargetHide}"/>
     <aura:handler name="popupKeyboardEvent" action="{!c.onKeyboardEvent}"/>
-    <aura:handler name="refresh" action="{!c.doInit}"/>
+    <aura:handler name="refresh" action="{!c.onRefresh}"/>
 
     <div aura:id="app" class="{!v.class}">
         {!v.body}

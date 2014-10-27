@@ -260,7 +260,7 @@ var priv = {
                 	action.finishAction($A.getContext());
                 }
                 if (action.isRefreshAction()) {
-                    action.fireRefreshEvent("refreshEnd");
+                    action.fireRefreshEvent("refreshEnd", needUpdate);
                 }
             } else {
                 action.abort();

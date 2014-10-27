@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.ThemeList;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -38,15 +39,16 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
-import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.json.Json;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 public class ServerServiceImpl implements ServerService {
@@ -142,34 +144,51 @@ public class ServerServiceImpl implements ServerService {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Mode mode = context.getMode();
 
+        // build cache key
+        final StringBuilder keyBuilder = new StringBuilder(64);
+        keyBuilder.append("CSS:");
+
+        // browser type
+        keyBuilder.append(context.getClient().getType());
+
+        keyBuilder.append("$");
+
+        // minified or not
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
-        final String mKey = minify ? "MIN:" : "DEV:";
+        keyBuilder.append(minify ? "MIN:" : "DEV:");
 
-        // TODONM:
-        // 1) Themes specified directly to the context (not by app) need to be part of the key. Until then,
-        // context-specified themes shouldn't be used.
-
-        // Optional<String> themesUid = context.getThemeList().getThemeDescriptorsUid();
-        // final String themesKey = themesUid.isPresent() ? themesUid.get() + ":" : "";
-
-        // 2) If a theme uses a map-provider it will affect the css key too. Current idea is to cache a "pre-themed"
-        // version of the CSS (but still ordered and concatenated). Until this is addressed map-providers shouldn't be
-        // used. Another idea is to defer cache to fileforce, etc... once a map-provider is involved.
-
+        // app uid
         DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
         final String uid = context.getUid(appDesc);
+        keyBuilder.append(uid);
 
-        final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
+        // themes uid (themes specified directly to the context (not on the app) need to be considered)
+        final ThemeList themeList = context.getThemeList();
+        Optional<String> themesUid = themeList.getThemeDescriptorsUid();
+        if (themesUid.isPresent()) {
+        	keyBuilder.append(":").append(themesUid.get());
+        }
 
+        // 2) TODONM: If a theme uses a map-provider it will affect the css key too. Current idea is to cache a "pre-themed"
+        // version of the CSS (but still ordered and concatenated). Until this is addressed map-providers shouldn't be
+        // used. Another idea is to defer cache to fileforce, etc... once a map-provider is involved. (actually right now
+        // we are skipping the cache, but when we stop doing that then this needs to be addressed
+
+        final String key = keyBuilder.toString();
         context.setPreloading(true);
 
         String cached = context.getDefRegistry().getCachedString(uid, appDesc, key);
-        if (cached == null) {
+        boolean skipCache = themeList.hasDynamicVars(); // for now, skip caching css with dynamic var overrides
+
+        if (cached == null || skipCache) {
             Collection<StyleDef> orderedStyleDefs = filterAndLoad(StyleDef.class, dependencies, null);
             StringBuffer sb = new StringBuffer();
             Aura.getSerializationService().writeCollection(orderedStyleDefs, StyleDef.class, sb, "CSS");
             cached = sb.toString();
-            context.getDefRegistry().putCachedString(uid, appDesc, key, cached);
+
+            if (!skipCache) {
+                context.getDefRegistry().putCachedString(uid, appDesc, key, cached);
+            }
         }
         out.append(cached);
     }
@@ -243,7 +262,7 @@ public class ServerServiceImpl implements ServerService {
                     // the compression to work.
                     cached = sw.toString();
                 } else {
-                    // if unable to compress, add error comments to the end. 
+                    // if unable to compress, add error comments to the end.
                     // ONLY if not production instance
                     if (!Aura.getConfigAdapter().isProduction()) {
                         sb.append(commentedJavascriptErrors(errors));
@@ -269,10 +288,10 @@ public class ServerServiceImpl implements ServerService {
 
     /**
      * Provide a better way of distinguishing templates from styles..
-     * 
+     *
      * This is used to apply the style definition filter for 'templates', but is getting rather further embedded in
      * code.
-     * 
+     *
      * TODO: W-1486762
      */
     private static interface TempFilter {
@@ -310,10 +329,10 @@ public class ServerServiceImpl implements ServerService {
         }
         return out;
     }
-    
+
     /**
      * Loops through list of javascript errors and return commented text to display
-     * 
+     *
      * @param errors list of javascript syntax errors
      * @return commented errors
      */

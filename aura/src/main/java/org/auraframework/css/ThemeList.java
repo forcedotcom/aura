@@ -55,7 +55,7 @@ public interface ThemeList extends Iterable<DefDescriptor<ThemeDef>> {
 
     /**
      * Gets the theme at the given index.
-     * 
+     *
      * @param index Get the theme at this index.
      * @return The theme.
      * @throws IndexOutOfBoundsException If the index is out of range.
@@ -67,7 +67,7 @@ public interface ThemeList extends Iterable<DefDescriptor<ThemeDef>> {
      * {@link #orderedForEvaluation()}.
      * <p>
      * This also takes into account any vars dynamically specified from themes utilizing a {@link ThemeMapProvider}.
-     * 
+     *
      * @param name Name of the var.
      * @return The var value, or {@link Optional#absent()} if not specified.
      */
@@ -78,7 +78,7 @@ public interface ThemeList extends Iterable<DefDescriptor<ThemeDef>> {
      * <p>
      * Generally this means that the list is reversed, to honor the "last one wins" contract. That is, if two themes
      * specify a value for the same var name, the last theme specified takes precedence.
-     * 
+     *
      * @return The list of themes in the appropriate evaluation order.
      */
     List<DefDescriptor<ThemeDef>> orderedForEvaluation();
@@ -95,7 +95,7 @@ public interface ThemeList extends Iterable<DefDescriptor<ThemeDef>> {
 
     /**
      * Gets a hash of all qualified theme descriptors in this list.
-     * 
+     *
      * @return The hash, or {@link Optional#absent()} if this list is empty.
      */
     Optional<String> getThemeDescriptorsUid();
@@ -103,8 +103,15 @@ public interface ThemeList extends Iterable<DefDescriptor<ThemeDef>> {
     /**
      * Gets a hash of all <em>active</em> dynamically specified vars (via a theme utilizing {@link ThemeMapProvider}).
      * See {@link #activeDynamicVars()} for more details on the meaning of "active".
-     * 
+     *
      * @return The hash, or {@link Optional#absent()} if no dynamic vars are specified by themes in this list.
      */
     Optional<String> getActiveDynamicVarsUid();
+
+    /**
+     * Gets whether any of the themes in this list have dynamic vars (e.g., utilizes a {@link ThemeMapProvider}).
+     *
+     * @return true if dynamic vars are present.
+     */
+    boolean hasDynamicVars();
 }

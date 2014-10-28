@@ -38,7 +38,7 @@
 		cmp._rendered = true;
 		return table;
 	},
-
+	
 	unrender: function (cmp) {
 		var children = cmp._allChildrenCmps,
 			child;

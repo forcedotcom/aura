@@ -45,10 +45,13 @@
 	},
 
 	handleItemsChange: function (cmp, evt, hlp) {
+		hlp.generateNewItemShape(cmp);
+		
 		if (!cmp._rendered) {
+			hlp.initializeRowData(cmp);
 			return;
 		}
-		hlp.generateNewItemShape(cmp);
+		
 		hlp.handleItemsChange(cmp, evt.getParams());
 
 		var concrete = cmp.getConcreteComponent();

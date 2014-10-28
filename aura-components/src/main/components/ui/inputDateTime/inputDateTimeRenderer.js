@@ -20,7 +20,12 @@
         var _helper = concreteCmp.getDef().getHelper();
         _helper.formatDateTime(component);
         _helper.toggleClearButton(component);
-        return ret; 
+
+        var datePicker = concreteCmp.find("datePicker");
+        if (!$A.util.isUndefinedOrNull(datePicker)) {
+            datePicker.set("v.referenceElement", concreteCmp.getElement());
+        }
+        return ret;
     },
     
     rerender: function(component, helper) {

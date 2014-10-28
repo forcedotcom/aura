@@ -26,6 +26,7 @@
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
     <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
+    <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

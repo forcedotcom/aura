@@ -15,10 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="The default implementation of field-level errors, which iterates over the value and displays the message.">
-    <aura:attribute name="value" type="String[]" description="The list of error messages to be displayed."/>
+<aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" description="The default implementation of field-level errors, which iterates over the value and displays the message.">
+
+    <aura:attribute access="GLOBAL" name="value" type="String[]" description="The list of error messages to be displayed."/>
+
     <aura:attribute name="domId" type="String" description="DOM id of the list of errors. By default, this attribute resolved to the globalId of the component to avoid id collision." />
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />	
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
 	<aura:renderIf isTrue="{!v.value.length > 0}">
 	    <ul id="{!v.domId}" class="{!v.class}">
@@ -27,4 +30,5 @@
 	        </aura:iteration>
 	    </ul>
 	</aura:renderIf>
+
 </aura:component>

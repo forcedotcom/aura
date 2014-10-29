@@ -15,6 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="GA" description="An input field for entering a URL.">
+<aura:component access="GLOBAL" support="GA" extends="ui:inputText" extensible="true" description="An input field for entering a URL.">
+
     <aura:set attribute="type" value="url"/>
+
 </aura:component>

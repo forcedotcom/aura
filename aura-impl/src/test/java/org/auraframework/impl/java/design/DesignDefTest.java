@@ -19,8 +19,10 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
 public class DesignDefTest extends AuraImplTestCase {
 
@@ -39,6 +41,17 @@ public class DesignDefTest extends AuraImplTestCase {
         assertNotNull("DesignDef not found!", c);
         assertTrue("DesignDef not found!", c.getDescriptor().exists());
         assertEquals("DesignDef label is incorrect.", "some label", c.getLabel());
+    }
+
+    public void testVerifyDesignDefDoesNotExist() throws Exception {
+        try {
+            Aura.getDefinitionService().getDefinition("test:thisDesignDoesNotExist", DesignDef.class);
+            fail("DesignDef for 'test:thisDesignDoesNotExist' should not exist.");
+        } catch (DefinitionNotFoundException e) {
+            DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor("test:thisDesignDoesNotExist",
+                    DesignDef.class);
+            assertFalse("DesignDef for 'test:thisDesignDoesNotExist' should not exist.", desc.exists());
+        }
     }
 
     public void testLoadFakeDesignWithAttributes() throws Exception {

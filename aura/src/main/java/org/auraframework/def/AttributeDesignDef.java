@@ -39,7 +39,7 @@ public interface AttributeDesignDef extends Definition {
 
     /**
      * Get the name of the attribute this attribute has a dependency on. This is necessary for tracking relationships
-     * between attributes.
+     * between attributes. May only depend on one attribute at any given time.
      * 
      * @return the name of the dependency, may be null
      */

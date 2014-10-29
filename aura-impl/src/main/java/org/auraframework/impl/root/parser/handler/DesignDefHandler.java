@@ -33,7 +33,7 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
-    public static final String TAG = "aura:design";
+    public static final String TAG = "design:component";
 
     private static final String ATTRIBUTE_LABEL = "label";
 

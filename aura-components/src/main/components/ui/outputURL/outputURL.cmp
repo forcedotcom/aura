@@ -15,12 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays a link to a URL as specified by the value attribute, rendered on a given text (label attribute) and image, if any.">
-    <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon or image."/>
-    <aura:attribute name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over his component."/>
-    <aura:attribute name="value" type="String" required="true" description="The text displayed when this component is rendered."/>
-    <aura:attribute name="target" type="String" description="The target destination where this rendered component is displayed. Possible values: _blank, _parent, _self, _top"/>   
-    <aura:attribute name="alt" type="String" description="The alternate text description for image (used when there is no label)"/>
+<aura:component access="GLOBAL" support="GA" extends="ui:output" extensible="true" description="Displays a link to a URL as specified by the value attribute, rendered on a given text (label attribute) and image, if any.">
+    <aura:attribute access="GLOBAL" name="iconClass" type="String" description="The CSS style used to display the icon or image."/>
+    <aura:attribute access="GLOBAL" name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>
+    <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The text displayed when this component is rendered."/>
+    <aura:attribute access="GLOBAL" name="target" type="String" description="The target destination where this rendered component is displayed. Possible values: _blank, _parent, _self, _top"/>
+    <aura:attribute access="GLOBAL" name="alt" type="String" description="The alternate text description for image (used when there is no label)"/>
     <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
     
     <aura:registerevent name="linkClick" type="ui:linkClick" description="The event fired when the user clicks the link."/>

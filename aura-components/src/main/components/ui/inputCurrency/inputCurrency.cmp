@@ -15,4 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputNumber" extensible="true" support="GA" description="An input field for entering a currency."></aura:component>
+<aura:component access="GLOBAL" support="GA" extends="ui:inputNumber" extensible="true" description="An input field for entering a currency.">
+
+</aura:component>

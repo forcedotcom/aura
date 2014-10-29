@@ -41,10 +41,9 @@
     	    disabled="{!v.disabled}"
     	    multiple="{!v.multiple}"
             aria-describedby="{!v.ariaDescribedBy}">
-        <aura:iteration items="{!v.options}" var="option">
-            <ui:inputSelectOption aura:id="options" class="{!option.class}" label="{!option.label}" value="{!option.selected}" text="{!option.value}" disabled="{!option.disabled}"/>
-        </aura:iteration>
-        {!v.body}
+        <aura:if isTrue="{!v.options.length == 0}">
+           {!v.body}
+        </aura:if>
     </select>
 
 </aura:component>

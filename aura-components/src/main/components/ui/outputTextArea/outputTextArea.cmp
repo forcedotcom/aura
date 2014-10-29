@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays the text area as specified by the value attribute.">
+<aura:component access="GLOBAL" support="GA" extends="ui:output" extensible="true" description="Displays the text area as specified by the value attribute.">
     <span aura:id='span' class="{!v.class}">{!v.value}</span>
 </aura:component>

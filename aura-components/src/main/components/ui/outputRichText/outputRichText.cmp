@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays rich text as specified in the value attribute."> 
+<aura:component access="GLOBAL" support="GA" extends="ui:output" extensible="true" description="Displays richly-formatted text including tags such as paragraph, image, and hyperlink, as specified in the value attribute.">
 	<aura:attribute name="supportedTags" type="String" 
 	    description="A list of supported HTML tag names separated by comma; the list is stored in the helper file of this component. Certain tags, such as &lt;script&gt;, are removed. The default value is used if it is not specified."/>
 	<div class="{!v.class}" dir="{!v.dir}" aura:id="div">

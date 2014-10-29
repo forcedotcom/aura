@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="A panel with a button for sliding">
+<aura:component description="A panel with a button for sliding. Use ui:panelManager to manage your panel sliders.">
 
     <aura:attribute name="isModal" type="Boolean" default="true" description="Instanciate modal or panel"/>
     <aura:attribute name="isVisible" type="Boolean" default="false" description="Is visible"/>

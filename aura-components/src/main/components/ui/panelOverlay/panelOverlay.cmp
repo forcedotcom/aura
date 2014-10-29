@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="A panel for full-screen overlays">
+<aura:component description="A panel for full-screen overlays. Use ui:panelManager to manage your panel overlays.">
 
     <aura:attribute name="class" type="String" default="" description="Additional css classes"/>
     <aura:attribute name="animation" type="String" default="bottom" description="Animation to apply"/>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" description="Event used by panelManager to instanciate and show panel/modals">
+<aura:event type="APPLICATION" description="Event used by panelManager to instantiate and show panel/modals">
     <aura:attribute name="title" type="String" description="the title of the window"/>
     <aura:attribute name="titleDisplay" type="Boolean" description="Flag to hide title for accessibility"/>
     <aura:attribute name="detail" type="String" description="the description of the window"/>

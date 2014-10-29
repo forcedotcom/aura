@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 ({
-	//TODO W-2248578
-	_testCaseInSensitivityOfLocalVariable:{
+	testCaseInSensitivityOfLocalVariable:{
         test:function(cmp){
-            $A.test.assertEquals('parentY',cmp.get('v.SIMPLEAttribute'),
+            $A.test.assertEquals(undefined, cmp.get('v.SIMPLEAttribute'),
                     "Attribute expression should be case insensitive.");
             //Positive test case
             $A.test.assertEquals('parentY',cmp.get('v.SimpleAttribute'),

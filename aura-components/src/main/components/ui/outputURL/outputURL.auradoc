@@ -20,7 +20,7 @@
 		<p>
 			A <code>ui:outputURL</code> component represents a URL that is wrapped in an HTML <code>a</code> tag.
 			This component can be used with <code>ui:inputURL</code>, which takes in a URL input. 
-			To display a URL, you can use an attribute value and bind it to the <code>ui:outputTextArea</code> component.
+			To display a URL, you can use an attribute value and bind it to the <code>ui:outputURL</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myURL" type="String" default="http://www.google.com"/>
 &lt;ui:outputURL value="{!v.myURL}" label="{!v.myURL}"/></pre>

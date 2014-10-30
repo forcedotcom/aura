@@ -19,23 +19,24 @@
 	 */
 	testAttachingSingleEventInServerAction : {
 		test : function(cmp) {
-			var action = cmp.get('c.attachOneEvent');
-			action.runDeprecated();
-			$A.eventService.finishFiring();
-			$A.test.addWaitFor(false, $A.test.isActionPending,
-							function() {
-								if (action.getState() === "ERROR") {
-									$A.test.fail("Failed to run server action and attach client events.");
-								}
-								//Verify that application events was attached with the correct parameter.
-								$A.test.assertEquals("Go Giants!", $A.test.getText(cmp.find("events").getElement()),
-										"Failed to attach event at server or failed to set params on event.");
-								//Verify the response of action itself
-								$A.test.assertEquals(
-												"Attached handleEventsTest:applicationEvent to response",
-												$A.test.getText(cmp.find("response").getElement()),
-												"Bad response to action after attaching events.");
-							})
+            $A.run(function() {
+                var action = cmp.get('c.attachOneEvent');
+                action.runDeprecated();
+                $A.test.addWaitFor(false, $A.test.isActionPending,
+                    function() {
+                        if (action.getState() === "ERROR") {
+                            $A.test.fail("Failed to run server action and attach client events.");
+                        }
+                        //Verify that application events was attached with the correct parameter.
+                        $A.test.assertEquals("Go Giants!", $A.test.getText(cmp.find("events").getElement()),
+                                "Failed to attach event at server or failed to set params on event.");
+                        //Verify the response of action itself
+                        $A.test.assertEquals(
+                                        "Attached handleEventsTest:applicationEvent to response",
+                                        $A.test.getText(cmp.find("response").getElement()),
+                                        "Bad response to action after attaching events.");
+                    });
+            });
 		}
 	},
 	/**
@@ -44,22 +45,23 @@
 	 */
 	testAttachingMultipleEventsInServerAction : {
 		test : function(cmp) {
-			var action = cmp.get('c.attachMultipleEvents');
-			action.runDeprecated();
-			$A.eventService.finishFiring();
-			$A.test.addWaitFor(false, $A.test.isActionPending,
-							function() {
-								if (action.getState() === "ERROR") {
-									$A.test.fail("Failed to run server action and attach multiple client events.");
-								}
-								//Verify that two application events were attached with the correct parameters.
-								$A.test.assertEquals("Go Raiders!Go 49ers!",
-										$A.test.getText(cmp.find("events").getElement()),
-										"Failed to attach multiple events at server");
-								//Verify the response of action itself
-								$A.test.assertEquals("New Component", 
-										$A.util.trim($A.test.getText(cmp.find("response").getElement())));
-							})
+            $A.run(function() {
+                var action = cmp.get('c.attachMultipleEvents');
+                action.runDeprecated();
+                $A.test.addWaitFor(false, $A.test.isActionPending,
+                    function() {
+                        if (action.getState() === "ERROR") {
+                            $A.test.fail("Failed to run server action and attach multiple client events.");
+                        }
+                        //Verify that two application events were attached with the correct parameters.
+                        $A.test.assertEquals("Go Raiders!Go 49ers!",
+                                $A.test.getText(cmp.find("events").getElement()),
+                                "Failed to attach multiple events at server");
+                        //Verify the response of action itself
+                        $A.test.assertEquals("New Component", 
+                                $A.util.trim($A.test.getText(cmp.find("response").getElement())));
+                    });
+            });
 		}
 	},
 	/**
@@ -67,22 +69,23 @@
 	 */
 	testAttachingSameEventWithDifferentAttributes:{
 		test : function(cmp){
-			var action = cmp.get('c.attachDupEvent');
-			action.runDeprecated();
-			$A.eventService.finishFiring();
-			$A.test.addWaitFor(false, $A.test.isActionPending,
-							function() {
-								if (action.getState() === "ERROR") {
-									$A.test.fail("Failed to run server action and attach duplicate client events.");
-								}
-								//Verify that both application events were attached with the correct parameters.
-								$A.test.assertEquals("PoseySandavol",
-										$A.test.getText(cmp.find("events").getElement()),
-										"Failed to attach same event twice at server");
-								//Verify the response of action itself
-								$A.test.assertEquals("Attached handleEventsTest:dupEvent", 
-										$A.test.getText(cmp.find("response").getElement()));
-							})
+            $A.run(function() {
+                var action = cmp.get('c.attachDupEvent');
+                action.runDeprecated();
+                $A.test.addWaitFor(false, $A.test.isActionPending,
+                    function() {
+                        if (action.getState() === "ERROR") {
+                            $A.test.fail("Failed to run server action and attach duplicate client events.");
+                        }
+                        //Verify that both application events were attached with the correct parameters.
+                        $A.test.assertEquals("PoseySandavol",
+                                $A.test.getText(cmp.find("events").getElement()),
+                                "Failed to attach same event twice at server");
+                        //Verify the response of action itself
+                        $A.test.assertEquals("Attached handleEventsTest:dupEvent", 
+                                $A.test.getText(cmp.find("response").getElement()));
+                    });
+            });
 		}
 	},
 	/**
@@ -95,10 +98,10 @@
 	 */
 	testEventHandlerChaining:{
 		test:function(cmp){
-			var action = cmp.get('c.attachEventChain');
-			action.runDeprecated();
-			$A.eventService.finishFiring();
-			$A.test.addWaitFor(false, $A.test.isActionPending,
+            $A.run(function() {
+                var action = cmp.get('c.attachEventChain');
+                action.runDeprecated();
+                $A.test.addWaitFor(false, $A.test.isActionPending,
 					function() {
 						if (action.getState() === "ERROR") {
 							$A.test.fail("Failed to run server action and attach duplicate client events.");
@@ -110,7 +113,8 @@
 						//Verify the response of action itself
 						$A.test.assertEquals("Attached handleEventsTest:chainEvent to responseChain Link", 
 								$A.test.getText(cmp.find("response").getElement()));
-					})
+                    });
+            });
 		}
 	}
 })

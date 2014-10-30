@@ -19,22 +19,23 @@
         test: function(component){
             this.whatItIs(component, "Empty string", false);
 
-            // Making sure that globalId for client side component ends with 'c'
-            var newCmp;
-            $A.newCmpAsync(
-                this,
-                function(component){
-                    newCmp = component;
-                },
-                {
-                    "componentDef": "markup://ifTest:testIf"
-                }
-            );
-            $A.eventService.finishFiring();
-            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                var reg = /:c/; 
-                $A.test.assertNotNull(newCmp.getGlobalId().match(reg), "GlobalId for clientSide cmp should end with "
-                        + "'c' but it is" + newCmp.getGlobalId());
+            $A.run(function() {
+                // Making sure that globalId for client side component ends with 'c'
+                var newCmp;
+                $A.newCmpAsync(
+                    this,
+                    function(component){
+                        newCmp = component;
+                    },
+                    {
+                        "componentDef": "markup://ifTest:testIf"
+                    }
+                );
+                $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                    var reg = /:c/; 
+                    $A.test.assertNotNull(newCmp.getGlobalId().match(reg), "GlobalId for clientSide cmp should end with "
+                            + "'c' but it is" + newCmp.getGlobalId());
+                });
             });
         }
     },

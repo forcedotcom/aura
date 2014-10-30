@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:inputTextArea</code> component represents a multi-line text input control, which is rendered as an HTML <code>textarea</code> tag.
+			To render the output from a <code>ui:inputTextArea</code> component, use the <code>ui:outputTextArea</code> component.
+		</p>
+		<p>This is a basic set up of a <code>ui:inputTextArea</code> component.</p>
+		<pre>&lt;ui:inputTextArea aura:id="comments" label="Comments" value="My comments" rows="5"/></pre>
+		<p>This example results in the following HTML.</p>
+<pre>&lt;div class="uiInput uiInputTextArea">
+    &lt;label class="uiLabel-left uiLabel">
+        &lt;span>Comments&lt;/span>
+    &lt;/label>
+    &lt;textarea cols="20" rows="5" aria-describedby placeholder>
+    &lt;/textarea>
+&lt;/div></pre>
+	</aura:description>	
+		<aura:example name="inputTextExample" ref="uiExamples:inputExample" label="Using ui:inputTextArea">
+    	<p>This example shows a <code>ui:inputTextArea</code> component and a corresponding <code>ui:outputTextArea</code> component for text rendering.</p>
+	</aura:example>
+	
+</aura:documentation>

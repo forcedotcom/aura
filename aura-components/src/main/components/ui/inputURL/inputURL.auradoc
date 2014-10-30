@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:inputURL</code> component represents an input field for a URL, which is rendered as an HTML <code>input</code> tag of type <code>url</code>.
+			To render the output from a <code>ui:inputURL</code> component, use the <code>ui:outputURL</code> component.
+		</p>
+		<p>This is a basic set up of a <code>ui:inputURL</code> component.</p>
+		<pre>&lt;ui:inputURL aura:id="url" label="Venue URL" class="field" value="http://www.myURL.com"/></pre>
+		<p>This example results in the following HTML.</p>
+<pre>&lt;div class="uiInput uiInputText uiInputURL">
+    &lt;label class="uiLabel-left uiLabel">
+        &lt;span class="">Venue URL&lt;/span>
+    &lt;/label>
+    &lt;input class="field" aria-describedby="" placeholder="" type="url">
+&lt;/div></pre>
+	</aura:description>	
+		<aura:example name="inputTextExample" ref="uiExamples:inputExample" label="Using ui:inputURL">
+    	<p>This example shows a <code>ui:inputURL</code> component and a corresponding <code>ui:outputURL</code> component.</p>
+	</aura:example>
+	
+</aura:documentation>

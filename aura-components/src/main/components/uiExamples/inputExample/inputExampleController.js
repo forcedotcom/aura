@@ -30,6 +30,8 @@
         var expdate = component.find("expdate").get("v.value");
         var deadline = component.find("deadline").get("v.value");
         var reimbursed = component.find("reimbursed").get("v.value");
+        var comments = component.find("comments").get("v.value");
+        var url = component.find("url").get("v.value");
     
         var oName = component.find("oName");
         oName.set("v.value", name); 
@@ -46,6 +48,12 @@
         oDateTime.set("v.value", deadline);
         var oCheckbox = component.find("oCheckbox");
         oCheckbox.set("v.value", reimbursed);
+        var oTextarea = component.find("oTextarea");
+        oTextarea.set("v.value", comments);
+        var oURL = component.find("oURL");
+        oURL.set("v.value", url);
+        oURL.set("v.label", url);
+        console.log(url);
         
     }
 })

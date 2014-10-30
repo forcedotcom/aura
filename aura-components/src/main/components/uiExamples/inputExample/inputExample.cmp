@@ -30,6 +30,8 @@
         <ui:inputDate aura:id="expdate" label="Expense Date" class="field" value="{!v.today}" displayDatePicker="true" />
         <ui:inputDateTime aura:id="deadline" label="Deadline" class="field" value="{!v.deadline}" displayDatePicker="true" />
         <ui:inputCheckbox aura:id="reimbursed" label="Reimbursed?" value="true"/>
+        <ui:inputTextArea aura:id="comments" label="Comments"  value="My comments" rows="5"/>
+        <ui:inputURL aura:id="url" label="Venue URL" class="field" value="http://www.myURL.com"/>
         <ui:button class="btn" label="Submit" press="{!c.newEntry}"/>	
 	</div>
     
@@ -43,7 +45,9 @@
 			Phone: <ui:outputPhone aura:id="oPhone" value="" /><br/>
 			Date: <ui:outputDate aura:id="oDate" value="" /><br/>
 			Deadline: <ui:outputDateTime aura:id="oDateTime" value="" format="MMM dd, yyy hh:mm:ss A" /><br/>
-			Reimbursed? <ui:outputCheckbox aura:id="oCheckbox" value=""/>
+			Reimbursed? <ui:outputCheckbox aura:id="oCheckbox" value=""/><br/>
+			Comments: <ui:outputTextArea aura:id="oTextarea" value=""/><br/>
+			Venue URL: <ui:outputURL aura:id="oURL" value=""/>
 		</aura:renderIf>
 	</div>
 </aura:component>

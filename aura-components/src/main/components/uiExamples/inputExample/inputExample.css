@@ -43,6 +43,12 @@
 	display: inline;    
 }
 
+.THIS textarea {
+	border: 1px solid #dce4ec;
+    border-radius: 4px;
+    width: 200px;
+}
+
 .THIS.section  {
   width: 400px;
   min-height: 20px;

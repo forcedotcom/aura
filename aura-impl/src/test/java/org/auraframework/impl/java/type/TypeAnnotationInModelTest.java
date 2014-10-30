@@ -88,7 +88,7 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
-    public void _testCaseSensitivityOfTypeAnnotationInJavaModel() throws Exception {
+    public void testCaseSensitivityOfTypeAnnotationInJavaModel() throws Exception {
         Model model = getJavaModelByQualifiedName("java://org.auraframework.impl.java.model.TestModelWithCaseInsensitiveTypeAnnotation");
         assertEachModelMember(model, "string", "Model");
         assertEachModelMember(model, "double", 1.23);

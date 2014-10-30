@@ -1,6 +1,6 @@
 ({
     STATE: {
-        ENQUEUE: 'enqueue',
+        ENQUEUE: 'enqueued',
         RUNNING: 'running',
         FAILED : 'failed'
     },
@@ -181,9 +181,9 @@
             });
 
             this.updateStatus('Enqueueing '+ tests.length +' tests...');
-                $A.run(function () {
-                    cmp._runningTests = true;
-                    $A.enqueueAction(testRunner);
+            $A.run(function () {
+                cmp._runningTests = true;
+                $A.enqueueAction(testRunner);
             });
         } else {
             this.updateStatus('No tests to run...');
@@ -237,15 +237,15 @@
         pollAction.setAbortable(true);
         pollAction.setCallback(this, function (action) {
             if (action.getState() === "SUCCESS") {
-                var actionResult = action.getReturnValue();
-                this.updateTests(actionResult, dom);
-                if (actionResult.testsRunning) {
-                    setTimeout(function () {
-                        self.pollTestResults(cmp, dom);    
-                    }, pollTime);
-                } else {
-                    this.finishTestRun(cmp, actionResult, dom);
-                }
+				var actionResult = action.getReturnValue();
+				self.updateTests(actionResult, dom);
+				if (actionResult.testsRunning) {
+					setTimeout(function() {
+						self.pollTestResults(cmp, dom);
+					}, pollTime);
+				} else {
+					self.finishTestRun(cmp, actionResult, dom);
+				}
             }
         });
 

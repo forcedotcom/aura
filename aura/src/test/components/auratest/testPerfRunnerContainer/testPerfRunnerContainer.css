@@ -146,7 +146,7 @@
     display: none;
 }
 
-.THIS li[data-state="enqueue"], 
+.THIS li[data-state="enqueued"], 
 .THIS li[data-state="running"] {
     background: #F3AE4E;
     border-bottom: 1px solid #555;

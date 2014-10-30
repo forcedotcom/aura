@@ -1113,6 +1113,18 @@ public interface LocalizationService extends AuraService {
      * @throws ParseException if number cannot be parsed
      */
     public BigDecimal parseBigDecimal(String number, Locale locale) throws ParseException;
+    
+    /**
+     * Returns a BigDecimal number from the given localized number String,
+     * Locale object and parseStrict flag.
+     * 
+     * @param number the number String to parse
+     * @param locale the Locale object
+     * @param strict the flag to indicate if we should parse strictly
+     * @return a BigDecimal
+     * @throws ParseException if number cannot be parsed
+     */
+    public BigDecimal parseBigDecimal(String number, Locale locale, boolean strict) throws ParseException;
 
     // Parse a Percent String to a double amount ("75.5%" = 0.755)
     /**

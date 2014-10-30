@@ -152,7 +152,7 @@
     border-bottom: 1px solid #555;
 }
 
-.THIS li[data-state="enqueue"] .status-icon:before,
+.THIS li[data-state="enqueued"] .status-icon:before,
 .THIS li[data-state="running"] .status-icon:before {
     content: "\e600";
 }

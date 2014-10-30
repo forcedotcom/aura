@@ -159,16 +159,20 @@
             testRunner = cmp.get("c.runTestSet"),
             pollTime   = this.POLL_TIME,
             tests      = [],
-            row,li, i;
+            row,li, i, id;
         
         if (cmp._runningTests) {
             return alert('Wait, TestRunner is working...');
         }
+        console.log(testCb);
         for (i = 0; i < testCb.length; i++) {
             row      = testCb[i];
-            li       = this._getLiFromInput(row);
-            tests[i] = $A.util.getDataAttribute(row, 'testid');
-            $A.util.setDataAttribute(li, 'state', this.STATE.ENQUEUE);
+            id       = $A.util.getDataAttribute(row, 'testid');
+            if(id){
+            	tests.push(id);
+                li = this._getLiFromInput(row);
+            	$A.util.setDataAttribute(li, 'state', this.STATE.ENQUEUE);
+            }
         }
 
         if (tests.length) {

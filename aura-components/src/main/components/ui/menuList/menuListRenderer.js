@@ -36,7 +36,6 @@
         }
         helper.handleVisible(component);
         var ret = this.superRerender();
-        helper.setEventHandlersOnChildren(component);
         helper.setFocus(component, currentlyVisible);
         return ret;
     },

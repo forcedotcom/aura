@@ -23,8 +23,10 @@
 	
     <div class="section">
         <ui:inputText aura:id="name" label="Expense" class="field" value="My Expense" required="true"/>
-        <ui:inputNumber aura:id="amount" label="Amount" class="field" value="100" required="true"/>
-        <ui:inputEmail aura:id="email" label="Approver's Email" class="field" value="manager@email.com" required="true"/>
+        <ui:inputNumber aura:id="num" label="Code" class="field" value="123" required="true"/>
+        <ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/>
+        
+        <ui:inputEmail aura:id="email" label="Approver's Email" class="field" value="manager@email.com"/>
         <ui:inputPhone aura:id="phone" label="Approver's Phone" class="field" value="415-123-4567" />
     
         <ui:inputDate aura:id="expdate" label="Expense Date" class="field" value="{!v.today}" displayDatePicker="true" />
@@ -40,11 +42,12 @@
 		<ui:outputText aura:id="oName" value="Click Submit to see the input values." class="output"/>	
 		<aura:renderIf isTrue="{!v.display}">
 			
-			Amount: <ui:outputNumber aura:id="oNumber" value=""/><br/>
+			Code: <ui:outputNumber aura:id="oNumber" value=""/><br/>
+			Amount: <ui:outputCurrency aura:id="oCurrency" value=""/><br/>
 			Email: <ui:outputEmail aura:id="oEmail" value="Email" /><br/>
 			Phone: <ui:outputPhone aura:id="oPhone" value="" /><br/>
 			Date: <ui:outputDate aura:id="oDate" value="" /><br/>
-			Deadline: <ui:outputDateTime aura:id="oDateTime" value="" format="MMM dd, yyy hh:mm:ss A" /><br/>
+			Deadline: <ui:outputDateTime aura:id="oDateTime" value="" format="MMM dd, yyyy hh:mm:ss A" /><br/>
 			Reimbursed? <ui:outputCheckbox aura:id="oCheckbox" value=""/><br/>
 			Comments: <ui:outputTextArea aura:id="oTextarea" value=""/><br/>
 			Venue URL: <ui:outputURL aura:id="oURL" value=""/>

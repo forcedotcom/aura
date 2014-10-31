@@ -23,6 +23,7 @@
     newEntry : function(component, event, helper) {
         component.set("v.display", true);
         var name = component.find("name").get("v.value");
+        var code = component.find("num").get("v.value");
         var amount = component.find("amount").get("v.value");
         var email = component.find("email").get("v.value");
         
@@ -36,7 +37,9 @@
         var oName = component.find("oName");
         oName.set("v.value", name); 
         var oNumber = component.find("oNumber");
-        oNumber.set("v.value", amount);
+        oNumber.set("v.value", code);
+        var oCurrency = component.find("oCurrency");
+        oCurrency.set("v.value", amount);
         var oEmail = component.find("oEmail");
         oEmail.set("v.value", email);
         var oPhone = component.find("oPhone");

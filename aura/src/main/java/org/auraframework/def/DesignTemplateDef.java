@@ -26,7 +26,7 @@ public interface DesignTemplateDef extends Definition {
      * 
      * @return a map of design template region definitions
      */
-    public Map<String, DesignTemplateRegionDef> getDesignTemplateRegionDefs();
+    public Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> getDesignTemplateRegionDefs();
 
     /**
      * Get the design template region with the specified name

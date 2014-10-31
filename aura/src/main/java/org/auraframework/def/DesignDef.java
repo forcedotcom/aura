@@ -32,7 +32,16 @@ public interface DesignDef extends RootDefinition {
      * 
      * @return a map of attribute design definitions
      */
-    public Map<String, AttributeDesignDef> getAttributeDesignDefs();
+    public Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> getAttributeDesignDefs();
+
+    /**
+     * Retrieve an attribute design definition by name.
+     * 
+     * @param name
+     * 
+     * @return the attribute design definition
+     */
+    public AttributeDesignDef getAttributeDesignDef(String name);
 
     /**
      * Get the simple label for this design definition. May be null.

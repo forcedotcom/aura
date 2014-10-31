@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
     private static final long serialVersionUID = -8621907027705407577L;
-    private final Map<String, AttributeDesignDef> attributeDesignDefs;
+    private final Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignDefs;
     private final DesignTemplateDef template;
     private final String label;
 
@@ -57,8 +57,8 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         super.validateReferences();
         DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
                 ComponentDef.class);
-        ComponentDef cmp = cmpDesc.getDef();
 
+        ComponentDef cmp = cmpDesc.getDef();
         if (cmp == null) {
             throw new DefinitionNotFoundException(cmpDesc, getLocation());
         }
@@ -101,8 +101,13 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     @Override
-    public Map<String, AttributeDesignDef> getAttributeDesignDefs() {
+    public Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> getAttributeDesignDefs() {
         return attributeDesignDefs;
+    }
+
+    @Override
+    public AttributeDesignDef getAttributeDesignDef(String name) {
+        return getAttributeDesignDefs().get(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
     }
 
     @Override
@@ -131,7 +136,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<DesignDef> implements DesignDefBuilder {
-        private final LinkedHashMap<String, AttributeDesignDef> attributeDesignMap = new LinkedHashMap<String, AttributeDesignDef>();
+        private final LinkedHashMap<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignMap = new LinkedHashMap<DefDescriptor<AttributeDesignDef>, AttributeDesignDef>();
         private DesignTemplateDef template;
         private String label;
 
@@ -148,8 +153,9 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         }
 
         @Override
-        public DesignDefBuilder addAttributeDesign(String name, AttributeDesignDef attributeDesign) {
-            this.attributeDesignMap.put(name, attributeDesign);
+        public DesignDefBuilder addAttributeDesign(DefDescriptor<AttributeDesignDef> desc,
+                AttributeDesignDef attributeDesign) {
+            this.attributeDesignMap.put(desc, attributeDesign);
             return this;
         }
 

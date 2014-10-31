@@ -24,6 +24,7 @@ import org.auraframework.builder.DesignTemplateDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -32,7 +33,7 @@ import org.auraframework.util.json.Json;
 public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> implements DesignTemplateDef {
     private static final long serialVersionUID = 765275252198138618L;
     private final String name;
-    private final Map<String, DesignTemplateRegionDef> designTemplateRegions;
+    private final Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> designTemplateRegions;
 
     protected DesignTemplateDefImpl(Builder builder) {
         super(builder);
@@ -66,13 +67,13 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
     }
 
     @Override
-    public Map<String, DesignTemplateRegionDef> getDesignTemplateRegionDefs() {
+    public Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> getDesignTemplateRegionDefs() {
         return designTemplateRegions;
     }
 
     @Override
     public DesignTemplateRegionDef getDesignTemplateRegionDef(String name) {
-        return getDesignTemplateRegionDefs().get(name);
+        return getDesignTemplateRegionDefs().get(DefDescriptorImpl.getInstance(name, DesignTemplateRegionDef.class));
     }
 
     @Override
@@ -82,7 +83,7 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
     public static class Builder extends DefinitionImpl.BuilderImpl<DesignTemplateDef> implements
             DesignTemplateDefBuilder {
         private String name;
-        private final LinkedHashMap<String, DesignTemplateRegionDef> designTemplateRegions = new LinkedHashMap<String, DesignTemplateRegionDef>();
+        private final LinkedHashMap<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> designTemplateRegions = new LinkedHashMap<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef>();
 
         public Builder() {
             super(DesignTemplateDef.class);
@@ -100,8 +101,9 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
         }
 
         @Override
-        public DesignTemplateDefBuilder addDesignTemplateRegion(String name, DesignTemplateRegionDef region) {
-            this.designTemplateRegions.put(name, region);
+        public DesignTemplateDefBuilder addDesignTemplateRegion(DefDescriptor<DesignTemplateRegionDef> desc,
+                DesignTemplateRegionDef region) {
+            this.designTemplateRegions.put(desc, region);
             return this;
         }
     }

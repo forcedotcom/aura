@@ -49,7 +49,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
     public void testRetrieveSingleAttributeDesign() throws Exception {
         DesignDef element = getElement("mydesign",
                 "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>");
-        AttributeDesignDef child = element.getAttributeDesignDefs().get("mystring");
+        AttributeDesignDef child = element.getAttributeDesignDef("mystring");
         assertNotNull("Expected one AttributeDesignDef", child);
         assertTrue(child.isRequired());
     }

@@ -51,7 +51,7 @@ public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
     public void testGetElement() throws Exception {
         AttributeDesignDef element = getElement(
                 "mystring",
-                "<design:attribute name=\"mystring\" required=\"true\" readonly=\"true\" type=\"String\" dependsOnAttribute=\"myparent\" datasource=\"one,two,three\" min=\"-100\" max=\"100\" label=\"some label\" placeholderText=\"some placeholder\" />");
+                "<design:attribute name=\"mystring\" required=\"true\" readonly=\"true\" type=\"String\" dependsOnAttribute=\"myparent\" datasource=\"one,two,three\" min=\"-100\" max=\"100\" label=\"some label\" placeholder=\"some placeholder\" />");
 
         assertTrue(element.isRequired());
         assertTrue(element.isReadOnly());

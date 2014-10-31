@@ -15,11 +15,13 @@
  */
 package org.auraframework.builder;
 
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.def.DesignTemplateRegionDef;
 
 public interface DesignTemplateDefBuilder extends DefBuilder<DesignTemplateDef, DesignTemplateDef> {
     public DesignTemplateDefBuilder setName(String name);
 
-    public DesignTemplateDefBuilder addDesignTemplateRegion(String name, DesignTemplateRegionDef region);
+    public DesignTemplateDefBuilder addDesignTemplateRegion(DefDescriptor<DesignTemplateRegionDef> desc,
+            DesignTemplateRegionDef region);
 }

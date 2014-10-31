@@ -27,6 +27,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
 import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.impl.design.DesignDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -86,8 +87,8 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         String tag = getTagName();
         if (AttributeDesignDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDesignDef attributeDesign = new AttributeDesignDefHandler(this, xmlReader, source).getElement();
-            String name = attributeDesign.getName();
-            builder.addAttributeDesign(name, attributeDesign);
+            builder.addAttributeDesign(
+                    DefDescriptorImpl.getInstance(attributeDesign.getName(), AttributeDesignDef.class), attributeDesign);
         } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignTemplateDef template = new DesignTemplateDefHandler(this, xmlReader, source).getElement();
             builder.setDesignTemplateDef(template);

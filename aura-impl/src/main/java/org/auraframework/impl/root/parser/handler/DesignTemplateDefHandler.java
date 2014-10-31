@@ -25,6 +25,7 @@ import org.auraframework.def.DesignDef;
 import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.impl.design.DesignTemplateDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -63,8 +64,9 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
         if (DesignTemplateRegionDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler(getParentHandler(), xmlReader,
                     source).getElement();
-            String name = templateRegion.getName();
-            builder.addDesignTemplateRegion(name, templateRegion);
+            builder.addDesignTemplateRegion(
+                    DefDescriptorImpl.getInstance(templateRegion.getName(), DesignTemplateRegionDef.class),
+                    templateRegion);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }

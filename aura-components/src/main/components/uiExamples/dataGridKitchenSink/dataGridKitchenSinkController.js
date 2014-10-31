@@ -97,5 +97,47 @@
 	
 	replaceData : function(cmp, evt, hlp) {
 		cmp.find("data").getEvent("provide").fire();
+	},
+	
+	switchColumn : function(cmp, evt, hlp) {
+		var grid = cmp.find("grid");
+		var columns = grid.get("v.columns");		
+		
+		var column = columns[5];
+		if (column.get("v.name") === "activityDate") {
+			$A.newCmpAsync(
+					this, 
+					function(newCmp) {
+						columns[5].destroy();
+						columns[5] = newCmp;
+						grid.set("v.columns", columns);
+					},
+					{
+						"componentDef": "markup://ui:dataGridColumn",
+			            "attributes": {
+			                "values": { label: "Name",
+			                			name: "who.name"
+			                		  }
+			            }
+					}
+			);
+		} else {
+			$A.newCmpAsync(
+					this, 
+					function(newCmp) {
+						columns[5].destroy();
+						columns[5] = newCmp;
+						grid.set("v.columns", columns);
+					},
+					{
+						"componentDef": "markup://ui:dataGridColumn",
+			            "attributes": {
+			                "values": { label: "Due Date",
+			                			name: "activityDate"
+			                		  }
+			            }
+					}
+			);
+		}
 	}
 })

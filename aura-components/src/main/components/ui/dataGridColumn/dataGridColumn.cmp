@@ -45,7 +45,10 @@
 	</aura:attribute>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
+	
+	<!-- Currently works only for output components -->
+	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
+	
 	<th scope="{!v.scope}" class="{! v.class + ' ' + v.direction }">
 		
 		<!-- Conditionally insert link for column sorting. -->

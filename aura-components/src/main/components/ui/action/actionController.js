@@ -16,12 +16,13 @@
 ({
 	handleClick: function (cmp, evt) {
 		var el = cmp.getElement(),
+			domEvt = evt.getParam("domEvent"),
 			click;
 
 		// Dispatch clicks within the action as clicks on the action itself.
 		// Ignore clicks coming from its own element, those events will bubble correctly.
-		if (evt.target !== el) {
-			evt.stopPropagation();
+		if (domEvt.target !== el) {
+			domEvt.stopPropagation();
 
 			click = new MouseEvent('click', {
 				bubbles: true

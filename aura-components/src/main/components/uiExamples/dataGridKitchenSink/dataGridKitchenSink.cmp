@@ -25,8 +25,6 @@
     <aura:attribute name="count" type="Integer"/>
     <aura:attribute name="gridItems" type="List"/>
     <aura:attribute name="gridSelectedItems" type="List"/>
-    <aura:attribute name="initialRender" type="Integer" default="200"/>
-    <aura:attribute name="batchRender" type="Integer" default="100"/>
 
     <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
 
@@ -36,8 +34,9 @@
     <ui:button class="kitchenButton" label="Remove" press="{!c.handleRemove}"/>
     <ui:inputText placeholder="index" value="{!v.index}"/>
     <ui:inputText placeholder="count" value="{!v.count}"/>
+    <ui:button class="kitchenButton" label="Change Columns" press="{!c.switchColumn}"/>
 
-    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" initialRenderCount="{!v.initialRender}" batchRenderCount="{!v.batchRender}" summary="Assorted Data for testing">
+    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" summary="Assorted Data for testing">
         <aura:set attribute="columns">
             <ui:dataGridSelectionColumn/>
 
@@ -46,12 +45,11 @@
             <ui:dataGridColumn label="Name" name="who.name"/>
             <ui:dataGridColumn label="Related To" name="what.name"/>
             <ui:dataGridColumn label="Due Date" name="activityDate"/>
-<!--
+
             <ui:dataGridActionColumn label="Actions">
-                <ui:actionButton name="edit" label="Edit" index="{!index}"/>
                 <ui:actionButton name="delete" label="Del" index="{!index}"/>
             </ui:dataGridActionColumn>
--->
+
         </aura:set>
 <!--
         <aura:set attribute="summaryRow">
@@ -65,11 +63,11 @@
                                                    currentPage="{!v.currentPage}"
                                                    totalItems="{!v.totalItems}"/>
         </aura:set>
-<!--
+
         <aura:set attribute="actionDelegate">
             <ui:actionDelegate onaction="{!c.handleAction}"/>
         </aura:set>
--->
+
     </ui:dataGrid>
 
     <ui:pagerNextPrevious pageSize="{!v.pageSize}"

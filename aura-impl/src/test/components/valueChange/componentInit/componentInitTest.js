@@ -77,27 +77,27 @@
      */
     testNewComponentFiresInit:{
         test:function(cmp){
-            $A.componentService.newComponentAsync(
-                this,
-                function(newCmp){
-                	var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                },
-                { componentDef: "markup://valueChange:newComponentInit" }
-            );
-            $A.services.event.finishFiring();
-            
-            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                var newCmp = cmp.get('v.body')[0];
-                $A.test.assertEquals("markup://valueChange:newComponentInit", newCmp.getDef().getDescriptor().getQualifiedName(),
-                        "Failed to create new component: markup://valueChange:newComponentInit");
-                $A.test.assertTrue(newCmp._testNewCmpInitFlag);
-                $A.test.assertTruthy(newCmp._testNewCmpInitEvt);
-                var value = newCmp._testNewCmpInitEvt.getParam("value");
-                $A.test.assertEquals("Component", value.auraType);
-                //Verify that value parameter of event is the new component that was just created.
-                $A.test.assertEquals(newCmp, value, "aura:valueInit was expected to provider current component as 'value' param.");
+            $A.run(function() {
+                $A.componentService.newComponentAsync(
+                    this,
+                    function(newCmp){
+                        var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
+                    },
+                    { componentDef: "markup://valueChange:newComponentInit" }
+                );
+                $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                    var newCmp = cmp.get('v.body')[0];
+                    $A.test.assertEquals("markup://valueChange:newComponentInit", newCmp.getDef().getDescriptor().getQualifiedName(),
+                            "Failed to create new component: markup://valueChange:newComponentInit");
+                    $A.test.assertTrue(newCmp._testNewCmpInitFlag);
+                    $A.test.assertTruthy(newCmp._testNewCmpInitEvt);
+                    var value = newCmp._testNewCmpInitEvt.getParam("value");
+                    $A.test.assertEquals("Component", value.auraType);
+                    //Verify that value parameter of event is the new component that was just created.
+                    $A.test.assertEquals(newCmp, value, "aura:valueInit was expected to provider current component as 'value' param.");
+                });
             });
         }
     }

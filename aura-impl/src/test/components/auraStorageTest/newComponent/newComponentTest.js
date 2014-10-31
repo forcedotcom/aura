@@ -65,19 +65,19 @@
             /**
              * Group of actions.
              */
-            //$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
-            var a = cmp.get("c.getRoster");
-            a.runDeprecated();
-            $A.eventService.finishFiring();
-            $A.test.addWaitFor(false, $A.test.isActionPending,
-                function(){
-                    //Verify result of first action
-                    var teamActionNum =  this.getActionNumberFromPage(cmp)[0];
-                    this.verifyTeamFacet(cmp, teamActionNum);
-                    //Verify result of second action
-                    var playerActionNum = this.getActionNumberFromPage(cmp)[1];
-                    this.verifyPlayersFacet(cmp, playerActionNum);
-                });
+            $A.run(function() {
+                var a = cmp.get("c.getRoster");
+                a.runDeprecated();
+                $A.test.addWaitFor(false, $A.test.isActionPending,
+                    function(){
+                        //Verify result of first action
+                        var teamActionNum =  this.getActionNumberFromPage(cmp)[0];
+                        this.verifyTeamFacet(cmp, teamActionNum);
+                        //Verify result of second action
+                        var playerActionNum = this.getActionNumberFromPage(cmp)[1];
+                        this.verifyPlayersFacet(cmp, playerActionNum);
+                    });
+            });
         },function(cmp){
             /**
              * Individual Actions to get Team

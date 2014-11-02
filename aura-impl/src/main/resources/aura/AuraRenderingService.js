@@ -343,9 +343,9 @@ var AuraRenderingService = function AuraRenderingService(){
                             ret=ret.concat(renderedElements);
                             if(priv.isMarker(component._marker)){
                                 $A.util.removeElement(component._marker);
-                                component._marker=renderedElements[0];
+                                component._marker=ret[0];
                             } else if(calculatedPosition === 0) {
-                                component._marker=renderedElements[0];
+                                component._marker=ret[0];
                             }
                             var nextSibling=target.childNodes[calculatedPosition];
                             priv.insertElements(renderedElements,nextSibling||target,nextSibling,nextSibling);
@@ -376,7 +376,7 @@ var AuraRenderingService = function AuraRenderingService(){
                         if(!priv.isMarker(component._marker)){
                             component._marker=priv.createMarker(component._marker,"unrender facet: " + component.getGlobalId());
                         }
-                        //JBUCH: HALO: TODO: FIND OUT WHY THIS CAN BE UNRENDERING A COMPONENTDEFREF
+                        //JBUCH: HALO: TODO: FIND OUT WHY THIS CAN BE UNRENDERING A COMPONENTDEFREF AND FIX IT
                         if ($A.util.isComponent(info.component)&&info.component.isValid()) {
 	                        this.unrender(info.component);
 	                        info.component.disassociateElements();

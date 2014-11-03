@@ -689,7 +689,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void addAppThemeDescriptors() throws QuickFixException {
+    public void addAppThemeDescriptors() {
         DefDescriptor<? extends BaseComponentDef> desc = getLoadingApplicationDescriptor();
         if (desc != null && desc.getDefType() == DefType.APPLICATION) {
             try {
@@ -722,7 +722,7 @@ public class AuraContextImpl implements AuraContext {
                 caller = instance.getDescriptor();
             }
         }
-        
+
         return caller;
     }
 

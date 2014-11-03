@@ -87,7 +87,7 @@ public class IntegrationImpl implements Integration {
         }
 
         AuraContext context = getContext("is");
-        
+
         try {
             DefinitionService definitionService = Aura.getDefinitionService();
             DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor(tag,
@@ -100,7 +100,7 @@ public class IntegrationImpl implements Integration {
             if(attributes!=null) {
 	            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 	                String key = entry.getKey();
-	
+
 	                AttributeDef attributeDef = componentDef.getAttributeDef(key);
 	                if (attributeDef != null) {
 	                    String name = attributeDef.getName();
@@ -143,11 +143,11 @@ public class IntegrationImpl implements Integration {
 
                 } else {
                     // config printed onto HTML page
-                    
+
                     // mark injectee component as loaded
                     // only when not using async because component defs will be printed onto HTML
                     definitionService.updateLoaded(descriptor);
-                    
+
                     ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
                             ControllerDef.class).getDef();
 
@@ -249,9 +249,13 @@ public class IntegrationImpl implements Integration {
     private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
         if (isSupportedClient(client)) {
             // ensure that we have a context.
-            getContext(null);
+            AuraContext context = getContext(null);
             try {
                 ApplicationDef appDef = getApplicationDescriptor(application).getDef();
+
+                if (observer != null) {
+                    observer.beforeApplicationWritten(this, context, appDef);
+                }
 
                 Aura.getSerializationService().write(appDef, null,
                         appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");

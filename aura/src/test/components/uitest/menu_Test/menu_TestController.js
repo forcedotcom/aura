@@ -89,5 +89,8 @@
     menuExpand: function(cmp){
    	 cmp.set("v.expandEventFired", true);
    	 cmp.set("v.collapseEventFired", false);
+   },
+   incrementMenuSelectFireCount : function(cmp, evt){
+	   cmp.set("v.menuSelectFireCount", cmp.get("v.menuSelectFireCount") + 1);
    }
 })

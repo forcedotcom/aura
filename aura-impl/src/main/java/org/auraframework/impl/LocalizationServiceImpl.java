@@ -744,7 +744,12 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public BigDecimal parseBigDecimal(String number, Locale locale) throws ParseException {
-        if (number == null) {
+        return parseBigDecimal(number, locale, true);
+    }
+    
+    @Override
+    public BigDecimal parseBigDecimal(String number, Locale locale, boolean strict) throws ParseException {
+    	if (number == null) {
             return null;
         }
         if (locale == null) {
@@ -753,7 +758,10 @@ public class LocalizationServiceImpl implements LocalizationService {
         DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(locale);
         df.setParseBigDecimal(true);
         // icu BigDecimal to java BigDecimal
-        return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parseStrict(number, df)).toBigDecimal();
+        if (strict) {
+            return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parseStrict(number, df)).toBigDecimal();
+        }
+        return ((com.ibm.icu.math.BigDecimal) AuraNumberFormat.parse(number, df, false)).toBigDecimal();
     }
 
     @Override

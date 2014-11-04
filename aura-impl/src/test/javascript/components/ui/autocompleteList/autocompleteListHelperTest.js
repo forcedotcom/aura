@@ -14,6 +14,9 @@
  * limitations under the License.
  */
  
+
+// DVAL: HALO: FIXME: All this test shoul be refactored once the refactor the component.
+
 Function.RegisterNamespace("Test.Components.Ui.AutocompleteList");
 
 [Fixture]
@@ -53,6 +56,13 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					if (expression === "v.items") {
 						actual = value;	
 					}
+				},
+				find: function () {
+					return {
+						get: function() {
+							return [];
+						}
+					};
 				}
 			}
 			
@@ -98,6 +108,13 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					if (expression === "v.items") {
 						actual = value;	
 					}
+				},
+				find: function () {
+					return {
+						get: function() {
+							return [];
+						}
+					};
 				}
 			}
 			
@@ -143,6 +160,13 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					if (expression === "v.items") {
 						actual = value;	
 					}
+				},
+				find: function () {
+					return {
+						get: function() {
+							return [];
+						}
+					};
 				}
 			}
 			
@@ -184,6 +208,13 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					if (expression === "v.items") {
 						actual = value;	
 					}
+				},
+				find: function () {
+					return {
+						get: function() {
+							return [];
+						}
+					};
 				}
 			}
 			
@@ -229,6 +260,13 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					if (expression === "v.items") {
 						actual = value;	
 					}
+				},
+				find: function () {
+					return {
+						get: function() {
+							return [];
+						}
+					};
 				}
 			}
 			

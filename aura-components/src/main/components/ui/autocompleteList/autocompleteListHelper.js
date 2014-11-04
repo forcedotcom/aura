@@ -335,7 +335,8 @@
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
-        this.updateEmptyListContent(component);
+        
+        //this.updateEmptyListContent(component);
         //JBUCH: HALO: HACK: WTF: FIXME THIS WHOLE COMPONENT
         var items = component.get("v.items");
         var itemCmps=component.find("iter").get("v.body");

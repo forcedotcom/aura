@@ -81,14 +81,27 @@ Style.prototype.include = function(href) {
 
 /**
  * Gets the CSS property of an element.
+ * note for "background": if we specify "background" in  CSS, Firefox will use "background-color" as key
+ * IE8 will use "backgroundColor", IE9+ are good with "background-color". 
  * @param {HTMLElement} el The HTML element
  * @param {String} cssprop The CSS property to be retrieved
  */
 Style.prototype.getCSSProperty = function(el, cssprop) {
-    if (el.currentStyle){ //IE
-        return el.currentStyle[cssprop];
+	var elcsIE = el.currentStyle;
+    if (elcsIE){ //IE
+    	if(elcsIE[cssprop]!=undefined) {//IE8
+    		return elcsIE[cssprop];
+    	}
+    	else if(elcsIE.getPropertyValue!=undefined){//IE9 or up
+    		return elcsIE.getPropertyValue(cssprop);
+    	}
     }else if (document.defaultView && document.defaultView.getComputedStyle){ //Firefox
-        return document.defaultView.getComputedStyle(el, "")[cssprop];
+    	var elcsFF = document.defaultView.getComputedStyle(el, "");
+    	if(elcsFF[cssprop]!=undefined) {
+    		return elcsFF[cssprop];
+    	}else if(elcsFF.getPropertyValue(cssprop)!=undefined){
+    		return elcsFF.getPropertyValue(cssprop);
+    	}
     }else{ //try and get inline style
         return el.style[cssprop];
     }

@@ -335,6 +335,14 @@
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
+        
+        //this.updateEmptyListContent(component);
+        //JBUCH: HALO: HACK: WTF: FIXME THIS WHOLE COMPONENT
+        var items = component.get("v.items");
+        var itemCmps=component.find("iter").get("v.body");
+        for(var i=0;i<itemCmps.length;i++){
+            $A.util.toggleClass(itemCmps[i],"force");
+        }
     },
 
     matchText: function(component) {
@@ -355,7 +363,7 @@
                 !$A.util.isEmpty(component.get("v.keyword")); 
         var hasVisibleOption = this.hasVisibleOption(items);
         var list = component.find("list");
-        $A.util[hasVisibleOption ?  "addClass" :"removeClass"](list.getElement(), "visible");
+        $A.util.toggleClass(list, "visible", hasVisibleOption);
         component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },
 
@@ -378,6 +386,7 @@
         var visible = component.getConcreteComponent().get("v.visible");
         var items = component.getConcreteComponent().get("v.items");
         var hasVisibleOption = this.hasVisibleOption(items);
-        $A.util[!visible || hasVisibleOption ? "removeClass" : "addClass"](component.getElement(), "showEmptyContent");
+        
+        $A.util.toggleClass(component,"showEmptyContent", visible && hasVisibleOption);
     }
 })

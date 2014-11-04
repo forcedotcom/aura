@@ -42,7 +42,7 @@
 		var concrete_component = component.getConcreteComponent();
 		var items = concrete_component.get("v.items");
 		var has_items = items != null && items.length > 0;
-        $A.util[has_items ? "removeClass" : "addClass"](concrete_component, "showEmptyContent");
+        $A.util[has_items ? "removeClass" : "addClass"](concrete_component.getElement(), "showEmptyContent");
     },
 
     /** Behavior for triggering data providers on initialization **/

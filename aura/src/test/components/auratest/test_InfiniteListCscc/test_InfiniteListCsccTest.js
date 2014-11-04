@@ -21,8 +21,7 @@
     testServerItemActive: {
         test: function(component){
             // get collection of buttons
-            var list = component.find('list');
-            var btns = list.find("aButton");
+            var btns = component.find("aButton");
             // Verify initial state of components
             $A.test.assertStartsWith("isClose-false Server 0", $A.util.getText(btns[0].getElement()));
             $A.test.assertStartsWith("isClose-false Server 1", $A.util.getText(btns[1].getElement()));
@@ -46,9 +45,8 @@
             });
 
             // get collection of buttons
-            var list = component.find('list');
-            var btns = list.find("aButton");
-            
+            var btns = component.find("aButton");
+
             // verify initial component state
             $A.test.assertStartsWith("isClose-false Client", $A.util.getText(btns[3].getElement()));
             $A.test.assertStartsWith("isClose-false Server 0", $A.util.getText(btns[0].getElement()));

@@ -15,52 +15,32 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.auraframework.Aura;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
 import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
-import org.auraframework.impl.source.StringSource;
-import org.auraframework.system.Parser.Format;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
     public DesignTemplateRegionDefHandlerTest(String name) {
         super(name);
     }
 
-    DefDescriptor<DesignDef> designDesc = null;
-    StringSource<DesignDef> designSource = null;
-    XMLStreamReader designXmlReader = null;
-    DesignDefHandler ddh = null;
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        designDesc = Aura.getDefinitionService().getDefDescriptor("mydesign", DesignDef.class);
-        designSource = new StringSource<>(designDesc, "<design:component/>", "myID", Format.XML);
-        ddh = new DesignDefHandler(designDesc, designSource, getXmlReader(designSource));
-    }
-
     public void testGetElement() throws Exception {
-        DesignTemplateRegionDef element = getElement(
-                "regionone",
-                "<design:region name=\"regionone\"/>");
+        String name = "regionone";
+        DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\"/>");
 
         assertEquals("regionone", element.getName());
         assertTrue(element.getAllowedInterfaces().isEmpty());
     }
 
     public void testAllowedInterfaces() throws Exception {
-        DesignTemplateRegionDef element = getElement(
-                "regionone",
-                "<design:region name=\"regionone\" allowedInterfaces=\"test:fakeInterface\"/>");
+        String name = "regionone";
+        DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name
+                + "\" allowedInterfaces=\"test:fakeInterface\"/>");
 
         assertEquals("regionone", element.getName());
         assertTrue(element.getAllowedInterfaces().size() == 1);
@@ -73,41 +53,36 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributeName() throws Exception {
         try {
-            getElement("regionone", "<design:region name=\"regionone\" foo=\"bar\" />");
-            fail("Expected InvalidSystemAttributeException to be thrown");
+            String name = "regionone";
+            setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\" foo=\"bar\" />");
+            fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
-            assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class, "Invalid attribute \"foo\"");
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, "Invalid attribute \"foo\"");
         }
     }
 
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
-            getElement("regionone", "<design:region name=\"regionone\" other:name=\"asdf\" />");
-            fail("Expected InvalidSystemAttributeException to be thrown");
+            String name = "regionone";
+            setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\" other:name=\"asdf\" />");
+            fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
-            assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class,
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
                     "Invalid attribute \"other:name\"");
         }
     }
 
-    private XMLStreamReader getXmlReader(StringSource<?> templateSource) throws FactoryConfigurationError,
-            XMLStreamException {
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(templateSource.getHashingReader());
-        xmlReader.next();
-        return xmlReader;
-    }
+    private DesignTemplateRegionDef setupDesignTemplateRegionDef(String name, String markup) throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                ComponentDef.class);
+        String cmpBody = "<aura:attribute name='mystring' type='String' />";
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpBody));
 
-    private DesignTemplateRegionDefHandler getHandler(String qname, String regionMarkup) throws Exception {
-        DefDescriptor<DesignTemplateRegionDef> regionDesc = Aura.getDefinitionService().getDefDescriptor(qname,
-                DesignTemplateRegionDef.class);
-        StringSource<DesignTemplateRegionDef> regionSource = new StringSource<>(regionDesc, regionMarkup, "myID",
-                Format.XML);
-        XMLStreamReader templateXmlReader = getXmlReader(regionSource);
-        return new DesignTemplateRegionDefHandler(ddh, templateXmlReader,
-                regionSource);
-    }
+        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+                DesignDef.class);
+        addSourceAutoCleanup(designDesc,
+                String.format("<design:component><design:template>%s</design:template></design:component>", markup));
 
-    private DesignTemplateRegionDef getElement(String qname, String templateMarkup) throws Exception {
-        return getHandler(qname, templateMarkup).getElement();
+        return designDesc.getDef().getDesignTemplateDef().getDesignTemplateRegionDef(name);
     }
 }

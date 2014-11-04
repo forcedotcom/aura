@@ -15,19 +15,13 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
-import org.auraframework.impl.source.StringSource;
-import org.auraframework.system.Parser.Format;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class DesignDefHandlerTest extends AuraImplTestCase {
 
@@ -35,20 +29,15 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     public void testGetElement() throws Exception {
-        DesignDef element = getElement("mydesign", "<design:component label=\"some label\" />");
+        DesignDef element = setupSimpleDesignDef("<design:component label=\"some label\" />").getDef();
         assertEquals("some label", element.getLabel());
-        assertEquals("mydesign", element.getName());
     }
 
     public void testRetrieveSingleAttributeDesign() throws Exception {
-        DesignDef element = getElement("mydesign",
-                "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>");
+        DesignDef element = setupSimpleDesignDef(
+                "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>")
+                .getDef();
         AttributeDesignDef child = element.getAttributeDesignDef("mystring");
         assertNotNull("Expected one AttributeDesignDef", child);
         assertTrue(child.isRequired());
@@ -56,40 +45,32 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributeName() throws Exception {
         try {
-            getElement("mydesign", "<design:component foo=\"bar\" />");
-            fail("Expected InvalidSystemAttributeException to be thrown");
+            setupSimpleDesignDef("<design:component foo=\"bar\" />").getDef();
+            fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
-            assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class, "Invalid attribute \"foo\"");
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, "Invalid attribute \"foo\"");
         }
     }
 
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
-            getElement("mydesign", "<design:component other:label=\"some label\" />");
-            fail("Expected InvalidSystemAttributeException to be thrown");
+            setupSimpleDesignDef("<design:component other:label=\"some label\" />").getDef();
+            fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
-            assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class,
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
                     "Invalid attribute \"other:label\"");
         }
     }
 
-    private XMLStreamReader getXmlReader(StringSource<?> attributeSource) throws FactoryConfigurationError,
-            XMLStreamException {
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(attributeSource.getHashingReader());
-        xmlReader.next();
-        return xmlReader;
-    }
+    private DefDescriptor<DesignDef> setupSimpleDesignDef(String markup) {
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                ComponentDef.class);
+        String cmpBody = "<aura:attribute name='mystring' type='String' />";
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpBody));
 
-    private DesignDefHandler getHandler(String qname, String designMarkup) throws Exception {
-        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(qname,
+        DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        StringSource<DesignDef> designSource = new StringSource<>(designDesc, designMarkup, "myID",
-                Format.XML);
-        XMLStreamReader designXmlReader = getXmlReader(designSource);
-        return new DesignDefHandler(designDesc, designSource, designXmlReader);
-    }
-
-    private DesignDef getElement(String qname, String designMarkup) throws Exception {
-        return getHandler(qname, designMarkup).getElement();
+        addSourceAutoCleanup(desc, markup);
+        return desc;
     }
 }

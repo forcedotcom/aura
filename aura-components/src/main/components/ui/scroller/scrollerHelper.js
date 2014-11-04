@@ -2091,6 +2091,12 @@ _initScroller: function () {
             this.scrollTo(x, y, time, easing);
         },
         /**
+         * Enable or disable the scroller
+         */
+        setEnable: function(enabled) {
+        	this.enabled = enabled;
+        },
+        /**
         * Prepend items to the scroller.
         *
         * It's recommended to use this method to add content to the scroller

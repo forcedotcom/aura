@@ -15,6 +15,7 @@
  */
 ({
     doInit : function(cmp) {
+    	// Initialize input select options for dynamic generation
         var opts = [
             { "class": "optionClass", label: "Option1", value: "opt1", selected: "true" },
             { "class": "optionClass", label: "Option2", value: "opt2" },
@@ -22,17 +23,43 @@
 
         ];
         cmp.find("InputSelectDynamic").set("v.options", opts);
+        
     },
 
 	onSingleSelectChange: function(cmp, evt) {
-	         var selectCmp = cmp.find("InputSelectSingle"),
-	             resultCmp = cmp.find("singleResult");
-	         resultCmp.set("v.value", selectCmp.get("v.value"));
+         var selectCmp = cmp.find("InputSelectSingle");
+         resultCmp = cmp.find("singleResult");
+         resultCmp.set("v.value", selectCmp.get("v.value"));
 	 },
 
 	 onMultiSelectChange: function(cmp, evt) {
-	         var selectCmp = cmp.find("InputSelectMultiple"),
-	         resultCmp = cmp.find("multiResult");
-	         resultCmp.set("v.value", selectCmp.get("v.value"));
+         var selectCmp = cmp.find("InputSelectMultiple");
+         resultCmp = cmp.find("multiResult");
+         resultCmp.set("v.value", selectCmp.get("v.value"));
+	 },
+	 
+	 onChange: function(cmp, evt) {
+		 var dynamicCmp = cmp.find("InputSelectDynamic");
+		 resultCmp = cmp.find("dynamicResult");
+		 resultCmp.set("v.value", dynamicCmp.get("v.value"));
+	 },
+	 
+	 onRadio: function(cmp, evt) {
+		 
+		 var stages = cmp.get("v.stages");
+		 var radioId = new Array();
+		 for (var i=1; i<stages.length+1; i++){
+			 radioId.push(stages[i]);
+			 if (stages[i]){
+				 console.log(radioId);
+				 var radioCmp = cmp.find(radioId);
+				 console.log(radioCmp);
+				 
+			 }
+			 resultCmp = cmp.find("radioResult");
+			 resultCmp.set("v.value", radioCmp.get("v.label"));
+		 }
+		 
+		 
 	 }
 })

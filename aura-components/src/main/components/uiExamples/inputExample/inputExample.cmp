@@ -23,7 +23,8 @@
 	
     <div class="section">
         <ui:inputText aura:id="name" label="Expense" class="field" value="My Expense" required="true"/>
-        <ui:inputNumber aura:id="num" label="Code" class="field" value="123" required="true"/>
+        <ui:inputNumber aura:id="num" label="Org Code" class="field" value="123" required="true"/>
+        <ui:inputSecret aura:id="secret" label="Pin" class="field" value="123456"/>
         <ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/>
         
         <ui:inputEmail aura:id="email" label="Approver's Email" class="field" value="manager@email.com"/>

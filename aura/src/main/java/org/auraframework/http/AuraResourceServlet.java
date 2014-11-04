@@ -359,7 +359,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         setLongCache(response);
         AuraContext.Format format = context.getFormat();
         response.setContentType(getContentType(format));
-        setBasicHeaders(response);
+        setBasicHeaders(context.getApplicationDescriptor(), request, response);
         switch (format) {
         case MANIFEST:
             writeManifest(request, response);

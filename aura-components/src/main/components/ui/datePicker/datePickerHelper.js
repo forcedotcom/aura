@@ -315,7 +315,11 @@
                     // Horizontal alignment
                     // getBoundingClientRect method does not return height and width in IE7 and Ie8
                     var width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
-                    elem.style.left = referenceElemRect.right - width + document.documentElement.scrollLeft + "px";
+                    if (referenceElemRect.right < width) {
+                        elem.style.left = document.documentElement.scrollLeft + "px";
+                    } else {
+                        elem.style.left = referenceElemRect.right - width + document.documentElement.scrollLeft + "px";
+                    }
 
                     //attaching to the body causes the date to lose focus so we need to add the focus back
                     this.focusDate(component);

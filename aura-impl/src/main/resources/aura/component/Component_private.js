@@ -485,7 +485,7 @@ if(!this.concreteComponentId) {
                     attributes[attribute] = cdrs;
                 }
             } else {
-                attributes[attribute] = valueFactory.create(value, attributeDef, config["valueProvider"]);
+                attributes[attribute] = valueFactory.create(value, attributeDef, config["valueProvider"] || cmp);
                 if($A.util.isExpression(attributes[attribute])){
                     attributes[attribute].addChangeHandler(cmp,"v."+attribute);
                 }

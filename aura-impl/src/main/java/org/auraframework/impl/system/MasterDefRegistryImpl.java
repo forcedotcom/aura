@@ -283,6 +283,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:
             case DESIGN_TEMPLATE_REGION:
+            case SVG:
                 qualifiedNamePattern = "%s://%s:%s";
                 break;
             case ACTION:

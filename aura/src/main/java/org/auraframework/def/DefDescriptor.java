@@ -124,7 +124,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         DESIGN(DesignDef.class),
         ATTRIBUTE_DESIGN(AttributeDesignDef.class),
         DESIGN_TEMPLATE(DesignTemplateDef.class),
-        DESIGN_TEMPLATE_REGION(DesignTemplateRegionDef.class);
+        DESIGN_TEMPLATE_REGION(DesignTemplateRegionDef.class),
+        SVG(SVGDef.class);
 
         private static Map<Class<? extends Definition>, DefType> defTypeMap;
 

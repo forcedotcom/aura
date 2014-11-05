@@ -26,6 +26,12 @@
         
     },
 
+	 onCheck: function(cmp, evt) {
+		 var checkCmp = cmp.find("checkbox");
+		 resultCmp = cmp.find("checkResult");
+		 resultCmp.set("v.value", ""+checkCmp.get("v.value"));
+	 },
+	 
 	onSingleSelectChange: function(cmp, evt) {
          var selectCmp = cmp.find("InputSelectSingle");
          resultCmp = cmp.find("singleResult");
@@ -45,21 +51,17 @@
 	 },
 	 
 	 onRadio: function(cmp, evt) {
-		 
-		 var stages = cmp.get("v.stages");
-		 var radioId = new Array();
-		 for (var i=1; i<stages.length+1; i++){
-			 radioId.push(stages[i]);
-			 if (stages[i]){
-				 console.log(radioId);
-				 var radioCmp = cmp.find(radioId);
-				 console.log(radioCmp);
-				 
-			 }
-			 resultCmp = cmp.find("radioResult");
-			 resultCmp.set("v.value", radioCmp.get("v.label"));
-		 }
-		 
-		 
+		 var elem = evt.getSource().getElement();
+		 var selected = elem.textContent;
+		 resultCmp = cmp.find("radioResult");
+		 resultCmp.set("v.value", selected);		 
+	 },
+	 
+	 onGroup: function(cmp, evt) {
+		 var elem = evt.getSource().getElement();
+		 var selected = elem.textContent;
+		 resultCmp = cmp.find("radioGroupResult");
+		 resultCmp.set("v.value", selected);
 	 }
+	 
 })

@@ -17,23 +17,27 @@
 -->
 <aura:component access="global">
 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-<aura:attribute name="stages" type="String[]" default="Any, Open, Closed, Closed Won"/>
+<aura:attribute name="stages" type="String[]" default="Any,Open,Closed,Closed Won"/>
+
+<div class="row">
+	<p class="title">Checkbox</p>
+	<ui:inputCheckbox aura:id="checkbox" label="Suscribe?" change="{!c.onCheck}"/>
+	<p>Selected:</p>
+	<p><ui:outputText class="result" aura:id="checkResult" value="false" /></p>
+</div>
 
 <div class="row">
 <p class="title">Single Selection</p>
 <ui:inputSelect class="single" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
-        <ui:inputSelectOptionGroup label="Status">
+
             <ui:inputSelectOption text="Any"/>
             <ui:inputSelectOption text="Open" value="true"/>
             <ui:inputSelectOption text="Closed"/>
             <ui:inputSelectOption text="Closed Won"/>
-        </ui:inputSelectOptionGroup>
-        <ui:inputSelectOptionGroup label="Others">
         	<ui:inputSelectOption text="Prospecting"/>
             <ui:inputSelectOption text="Qualification"/>
             <ui:inputSelectOption text="Needs Analysis"/>
             <ui:inputSelectOption text="Closed Lost"/>
-        </ui:inputSelectOptionGroup>
     </ui:inputSelect>
     <p>Selected Item:</p>
       <p><ui:outputText class="result" aura:id="singleResult" value="" /></p>
@@ -41,19 +45,17 @@
 
 <div class="row">
     <p class="title">Multiple Selection</p>
-    <ui:inputSelect multiple="true" class="multiple" size="5" aura:id="InputSelectMultiple" change="{!c.onMultiSelectChange}">
-        <ui:inputSelectOptionGroup label="Status">
+    <ui:inputSelect multiple="true" class="multiple" aura:id="InputSelectMultiple" change="{!c.onMultiSelectChange}">
+
             <ui:inputSelectOption text="Any"/>
             <ui:inputSelectOption text="Open"/>
             <ui:inputSelectOption text="Closed"/>
             <ui:inputSelectOption text="Closed Won"/>
-        </ui:inputSelectOptionGroup>
-        <ui:inputSelectOptionGroup label="Others">
             <ui:inputSelectOption text="Prospecting"/>
             <ui:inputSelectOption text="Qualification"/>
             <ui:inputSelectOption text="Needs Analysis"/>
             <ui:inputSelectOption text="Closed Lost"/>
-        </ui:inputSelectOptionGroup>
+
     </ui:inputSelect>
     <p>Selected Items:</p>
      <p><ui:outputText class="result" aura:id="multiResult" value="" /></p>
@@ -69,7 +71,7 @@
 <div class="row">     
    <p class="title">Radio Buttons</p>
    <aura:iteration items="{!v.stages}" var="stage">
-   		<ui:inputRadio aura:id="{!stage}" label="{!stage}" change="{!c.onRadio}"/>
+   		<ui:inputRadio label="{!stage}" change="{!c.onRadio}" />
    </aura:iteration>
    
    <p>Selected Items:</p>
@@ -78,10 +80,10 @@
 
 <div class="row">
 	<p class="title">Radio Buttons - Group</p>
-   <ui:inputRadio aura:id="r1" name="others" label="Prospecting" change="{!c.onGroup}"/>
-   <ui:inputRadio aura:id="r2" name="others" label="Qualification" change="{!c.onGroup}" value="true"/>
-   <ui:inputRadio aura:id="r3" name="others" label="Needs Analysis" change="{!c.onGroup}"/>
-   <ui:inputRadio aura:id="r4" name="others" label="Closed Lost" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r0" name="others" label="Prospecting" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r1" name="others" label="Qualification" change="{!c.onGroup}" value="true"/>
+   <ui:inputRadio aura:id="r2" name="others" label="Needs Analysis" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r3" name="others" label="Closed Lost" change="{!c.onGroup}"/>
    <p>Selected Items:</p>
    <p><ui:outputText class="result" aura:id="radioGroupResult" value="" /></p>
 </div>

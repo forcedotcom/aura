@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:inputRadio</code> component represents a radio button whose state is controlled by the <code>value</code> and <code>disabled</code> attributes. It's rendered as an HTML <code>input</code> tag of type <code>radio</code>.
+		</p>
+		<p>This is a basic set up of a radio button.</p>		
+		<pre>&lt;ui:inputRadio label="Yes"/></pre>
+		<p>This example results in the following HTML.</p>
+		<pre>&lt;div class="uiInput uiInputRadio">
+    &lt;label class="uiLabel-left uiLabel">
+        &lt;span>Yes&lt;/span>
+    &lt;/label>
+    &lt;input aria-describedby="" type="radio">
+&lt;/div></pre>
+	<p>This example shows a list of radio buttons whose labels are provided by a component attribute.</p>
+	<pre>&lt;!-- Component Markup -->
+&lt;aura:attribute name="stages" type="String[]" default="Any,Open,Closed,Closed Won"/>
+&lt;aura:iteration items="{!v.stages}" var="stage">
+    &lt;ui:inputRadio label="{!stage}" change="{!c.doSomething}" />
+&lt;/aura:iteration></pre>
+	</aura:description>
+	<aura:example name="inputExample" ref="auradocs:demoSelect" label="Using ui:inputRadio">
+    		This example shows how you can retrieve the value of an <code>ui:inputRadio</code> component.
+    </aura:example>		
+</aura:documentation>

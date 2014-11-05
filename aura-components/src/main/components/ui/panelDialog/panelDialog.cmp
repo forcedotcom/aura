@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="A panel for modals. Use ui:panelManager to manage your modal panels.">
+<aura:component description="A panel for dialogs. Use ui:panelManager to manage your modal panels.">
 
     <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Add listener to close on click outside"/>
     <aura:attribute name="closeAction" type="Aura.Action" default="{!c.hide}" description="Close Aura Action function"/>
@@ -28,8 +28,10 @@
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Automatically focus on the first focusable element"/>
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility"/>
     <aura:attribute name="isScrollable" type="Boolean" default="true" description="Flag to create a scroller inside"/>
-    <aura:attribute name="isTransient" type="Boolean" default="true" description="Flag to indicate if modal is one-time use and should be destroyed when hidden"/>
-    
+    <aura:attribute name="isTransient" type="Boolean" default="true" description="Flag to indicate if dialog is one-time use and should be destroyed when hidden"/>
+    <aura:attribute name="isModal" type="Boolean" default="false" description="Indicates if this dialog is modal"/>
+    <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
+
     <!-- supported callbacks: onClose -->
     <aura:attribute name="callbacks" type="Object" description="Option callbacks that can be set when creating a new panel through the panelManager." />
     <aura:registerEvent name="panelDoneRendering" type="ui:panelDoneRendering"/>
@@ -39,13 +41,16 @@
     <aura:dependency resource="markup://ui:panelTransitionEnd" type="EVENT" />
     <aura:dependency resource="markup://ui:updateSize" type="EVENT" />
     
-	<div class="{!v.class}">
+	<div class="{!v.class + (v.isModal ? ' modal' : ' nonmodal')}">
+
 		<!-- Full screen grey glass behind the modal -->
-	    <div aura:id='modal-glass' class="modal-glass" style="display:none"></div>
+        <aura:if isTrue="{!v.isModal}">
+	        <div aura:id='modal-glass' class="modal-glass" style="display:none"></div>
+        </aura:if>
 	    
 	    <div aura:id='panel'
              tabindex="-1"
-	     	 class="{! 'panel panelModal ' + $Browser.formFactor + ' ' + v.class}"
+	     	 class="{! 'panel panelDialog ' + $Browser.formFactor + ' ' + v.class}"
          	 role="dialog" 
              aria-labeled-by="{!'title_' + globalId}"
 	         style="display:none">

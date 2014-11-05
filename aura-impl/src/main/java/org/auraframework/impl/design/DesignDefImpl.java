@@ -170,5 +170,9 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
             this.template = template;
             return this;
         }
+
+        public DesignTemplateDef getDesignTemplateDef() {
+            return template;
+        }
     }
 }

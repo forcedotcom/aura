@@ -132,4 +132,14 @@ public class DesignDefTest extends AuraImplTestCase {
             assertTrue("InterfaceDef not found!", intf.exists());
         }
     }
+
+    public void testDesignTemplateWithNonExistentInterface() throws Exception {
+        try {
+            Aura.getDefinitionService().getDefinition("test:fakeDesignNonExistentInterface", ComponentDef.class);
+            fail("InterfaceDef should not exist and throw validation error");
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, DefinitionNotFoundException.class,
+                    "No INTERFACE named markup://this:doesNotExist found");
+        }
+    }
 }

@@ -90,6 +90,10 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
             builder.addAttributeDesign(
                     DefDescriptorImpl.getInstance(attributeDesign.getName(), AttributeDesignDef.class), attributeDesign);
         } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
+            if (builder.getDesignTemplateDef() != null) {
+                throw new XMLStreamException(String.format("<%s> may only contain one %s definition", getHandledTag(),
+                        tag));
+            }
             DesignTemplateDef template = new DesignTemplateDefHandler(this, xmlReader, source).getElement();
             builder.setDesignTemplateDef(template);
         } else {

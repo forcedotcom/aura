@@ -1,0 +1,5 @@
+<design:component>
+	<design:template>
+		<design:region name="main" allowedInterfaces="this:doesNotExist" />
+	</design:template>
+</design:component>

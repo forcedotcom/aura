@@ -43,6 +43,18 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         assertTrue(child.isRequired());
     }
 
+    public void testMultipleDesignTemplatesFailure() throws Exception {
+        try {
+            setupSimpleDesignDef(
+                    "<design:component><design:template /><design:template /></design:component>")
+                    .getDef();
+            fail("Expected InvalidDefinitionException to be thrown");
+        } catch (Exception t) {
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+                    "<design:component> may only contain one design:template definition");
+        }
+    }
+
     public void testInvalidSystemAttributeName() throws Exception {
         try {
             setupSimpleDesignDef("<design:component foo=\"bar\" />").getDef();

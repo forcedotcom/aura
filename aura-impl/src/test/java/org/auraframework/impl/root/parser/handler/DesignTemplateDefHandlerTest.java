@@ -30,8 +30,12 @@ public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
 
     public void testGetElement() throws Exception {
         DesignTemplateDef element = setupDesignTemplateDef("<design:template><design:region name=\"regionone\"/></design:template>");
-
         assertNotNull(element.getDesignTemplateRegionDef("regionone"));
+    }
+
+    public void testGetEmptyTemplate() throws Exception {
+        DesignTemplateDef element = setupDesignTemplateDef("<design:template></design:template>");
+        assertTrue(element.getDesignTemplateRegionDefs().isEmpty());
     }
 
     public void testInvalidSystemAttributeName() throws Exception {

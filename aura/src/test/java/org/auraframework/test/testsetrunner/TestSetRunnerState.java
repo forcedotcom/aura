@@ -62,9 +62,6 @@ public class TestSetRunnerState {
     private static class SingletonHolder {
         private static TestSetRunnerState INSTANCE = new TestSetRunnerState();
     }
-    private static class ContainerEnabledSingletonHolder {
-        private static TestSetRunnerState HYBRIDCONTAINER_INSTANCE = new TestSetRunnerState(TestInventory.CONTAINER_TYPE_TESTS);
-    }
     
     private static class PerfSingletonHolder {
         private static TestSetRunnerState PERF_INSTANCE = new TestSetRunnerState(TestInventory.PERF_TESTS);
@@ -87,10 +84,6 @@ public class TestSetRunnerState {
      */
     public static TestSetRunnerState getInstance() {
         return SingletonHolder.INSTANCE;
-    }
-    
-    public static TestSetRunnerState getHybridContainerInstance() {
-    	return ContainerEnabledSingletonHolder.HYBRIDCONTAINER_INSTANCE;
     }
     
     public static TestSetRunnerState getPerfInstance() {

@@ -10,17 +10,6 @@
         <filter-name>AuraContextFilter</filter-name>
         <filter-class>org.auraframework.http.AuraContextFilter</filter-class>
     </filter>
-    
-    <!-- Begin Aura Content Security Policy -->
-    <filter>
-		<filter-name>AuraCSPFilter</filter-name>
-		<filter-class>org.auraframework.http.AuraCSPFilter</filter-class>
-	</filter>
-    <filter-mapping>
-        <filter-name>AuraCSPFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <!-- End Aura Content Security Policy -->
 
     <!-- Begin Aura Servlet -->
 

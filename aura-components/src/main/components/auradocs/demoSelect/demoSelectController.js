@@ -15,6 +15,7 @@
  */
 ({
     doInit : function(cmp) {
+    	// Initialize input select options for dynamic generation
         var opts = [
             { "class": "optionClass", label: "Option1", value: "opt1", selected: "true" },
             { "class": "optionClass", label: "Option2", value: "opt2" },
@@ -22,17 +23,45 @@
 
         ];
         cmp.find("InputSelectDynamic").set("v.options", opts);
+        
     },
 
+	 onCheck: function(cmp, evt) {
+		 var checkCmp = cmp.find("checkbox");
+		 resultCmp = cmp.find("checkResult");
+		 resultCmp.set("v.value", ""+checkCmp.get("v.value"));
+	 },
+	 
 	onSingleSelectChange: function(cmp, evt) {
-	         var selectCmp = cmp.find("InputSelectSingle"),
-	             resultCmp = cmp.find("singleResult");
-	         resultCmp.set("v.value", selectCmp.get("v.value"));
+         var selectCmp = cmp.find("InputSelectSingle");
+         resultCmp = cmp.find("singleResult");
+         resultCmp.set("v.value", selectCmp.get("v.value"));
 	 },
 
 	 onMultiSelectChange: function(cmp, evt) {
-	         var selectCmp = cmp.find("InputSelectMultiple"),
-	         resultCmp = cmp.find("multiResult");
-	         resultCmp.set("v.value", selectCmp.get("v.value"));
+         var selectCmp = cmp.find("InputSelectMultiple");
+         resultCmp = cmp.find("multiResult");
+         resultCmp.set("v.value", selectCmp.get("v.value"));
+	 },
+	 
+	 onChange: function(cmp, evt) {
+		 var dynamicCmp = cmp.find("InputSelectDynamic");
+		 resultCmp = cmp.find("dynamicResult");
+		 resultCmp.set("v.value", dynamicCmp.get("v.value"));
+	 },
+	 
+	 onRadio: function(cmp, evt) {
+		 var elem = evt.getSource().getElement();
+		 var selected = elem.textContent;
+		 resultCmp = cmp.find("radioResult");
+		 resultCmp.set("v.value", selected);		 
+	 },
+	 
+	 onGroup: function(cmp, evt) {
+		 var elem = evt.getSource().getElement();
+		 var selected = elem.textContent;
+		 resultCmp = cmp.find("radioGroupResult");
+		 resultCmp.set("v.value", selected);
 	 }
+	 
 })

@@ -34,13 +34,13 @@
 	<pre>&lt;!-- Component Markup -->
 &lt;ui:inputCheckbox label="Color me" click="{!c.update}"/>
 
-/**Client-Side Controller -->
+/** Client-Side Controller **/
 update : function (cmp, event) {
   var elem = event.getSource().getElement();
   $A.util.toggleClass(elem, "red");
 }</pre>
 	</aura:description>
-	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputCheckbox">
-    		This example shows how you can use <code>ui:inputCheckbox</code> to get user input.
+	<aura:example name="inputExample" ref="auradocs:demoSelect" label="Using ui:inputCheckbox">
+    		This example shows how you can retrieve the value of an <code>ui:inputCheckbox</code> component.
     </aura:example>		
 </aura:documentation>

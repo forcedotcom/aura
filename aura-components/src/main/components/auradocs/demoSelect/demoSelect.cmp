@@ -17,42 +17,75 @@
 -->
 <aura:component access="global">
 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+<aura:attribute name="stages" type="String[]" default="Any,Open,Closed,Closed Won"/>
 
-<div style="padding-bottom:10px;"><b>Single Selection</b></div>
+<div class="row">
+	<p class="title">Checkbox</p>
+	<ui:inputCheckbox aura:id="checkbox" label="Suscribe?" change="{!c.onCheck}"/>
+	<p>Selected:</p>
+	<p><ui:outputText class="result" aura:id="checkResult" value="false" /></p>
+</div>
+
+<div class="row">
+<p class="title">Single Selection</p>
 <ui:inputSelect class="single" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
-        <ui:inputSelectOptionGroup label="Mammal">
-            <ui:inputSelectOption text="Tiger"/>
-            <ui:inputSelectOption text="Lion" value="true"/>
-            <ui:inputSelectOption text="Bear"/>
-        </ui:inputSelectOptionGroup>
-        <ui:inputSelectOptionGroup label="Insect">
-            <ui:inputSelectOption text="Butterfly"/>
-            <ui:inputSelectOption text="Dragonfly"/>
-            <ui:inputSelectOption text="Emmet" label="Ant"/>
-        </ui:inputSelectOptionGroup>
+
+            <ui:inputSelectOption text="Any"/>
+            <ui:inputSelectOption text="Open" value="true"/>
+            <ui:inputSelectOption text="Closed"/>
+            <ui:inputSelectOption text="Closed Won"/>
+        	<ui:inputSelectOption text="Prospecting"/>
+            <ui:inputSelectOption text="Qualification"/>
+            <ui:inputSelectOption text="Needs Analysis"/>
+            <ui:inputSelectOption text="Closed Lost"/>
     </ui:inputSelect>
     <p>Selected Item:</p>
-      <p><ui:outputText class="result" aura:id="singleResult" value="" 
-/></p>
-    
-    <br/>
-    <div style="padding:10px 0 10px 0;"><b>Multiple Selection</b></div>
-    <ui:inputSelect multiple="true" class="multiple" size="5" aura:id="InputSelectMultiple" change="{!c.onMultiSelectChange}">
-        <ui:inputSelectOptionGroup label="Mammal">
-            <ui:inputSelectOption text="Tiger"/>
-            <ui:inputSelectOption text="Lion"/>
-            <ui:inputSelectOption text="Bear"/>
-        </ui:inputSelectOptionGroup>
-        <ui:inputSelectOptionGroup label="Insect">
-            <ui:inputSelectOption text="Butterfly"/>
-            <ui:inputSelectOption text="Dragonfly"/>
-            <ui:inputSelectOption text="Emmet" label="Ant"/>
-        </ui:inputSelectOptionGroup>
+      <p><ui:outputText class="result" aura:id="singleResult" value="" /></p>
+</div>    
+
+<div class="row">
+    <p class="title">Multiple Selection</p>
+    <ui:inputSelect multiple="true" class="multiple" aura:id="InputSelectMultiple" change="{!c.onMultiSelectChange}">
+
+            <ui:inputSelectOption text="Any"/>
+            <ui:inputSelectOption text="Open"/>
+            <ui:inputSelectOption text="Closed"/>
+            <ui:inputSelectOption text="Closed Won"/>
+            <ui:inputSelectOption text="Prospecting"/>
+            <ui:inputSelectOption text="Qualification"/>
+            <ui:inputSelectOption text="Needs Analysis"/>
+            <ui:inputSelectOption text="Closed Lost"/>
+
     </ui:inputSelect>
     <p>Selected Items:</p>
      <p><ui:outputText class="result" aura:id="multiResult" value="" /></p>
-    <br/>
-    
-   <div style="padding-bottom:10px;"><b>Dynamic Option Generation</b></div>
-  	<ui:inputSelect label="Select me: " class="dynamic" aura:id="InputSelectDynamic" />
+</div>
+
+<div class="row">
+   <p class="title">Dynamic Option Generation</p>
+   <ui:inputSelect label="Select me: " class="dynamic" aura:id="InputSelectDynamic" change="{!c.onChange}" />
+   <p>Selected Items:</p>
+   <p><ui:outputText class="result" aura:id="dynamicResult" value="" /></p>
+</div>
+
+<div class="row">     
+   <p class="title">Radio Buttons</p>
+   <aura:iteration items="{!v.stages}" var="stage">
+   		<ui:inputRadio label="{!stage}" change="{!c.onRadio}" />
+   </aura:iteration>
+   
+   <p>Selected Items:</p>
+   <p><ui:outputText class="result" aura:id="radioResult" value="" /></p>
+</div>
+
+<div class="row">
+	<p class="title">Radio Buttons - Group</p>
+   <ui:inputRadio aura:id="r0" name="others" label="Prospecting" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r1" name="others" label="Qualification" change="{!c.onGroup}" value="true"/>
+   <ui:inputRadio aura:id="r2" name="others" label="Needs Analysis" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r3" name="others" label="Closed Lost" change="{!c.onGroup}"/>
+   <p>Selected Items:</p>
+   <p><ui:outputText class="result" aura:id="radioGroupResult" value="" /></p>
+</div>
+  
 </aura:component>

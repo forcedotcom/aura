@@ -21,7 +21,7 @@
 			A <code>ui:inputDate</code> component represents a date input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
 			The value is displayed in the default format specified language locale of the browser. 
 		</p>
-		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>1/30/2014</code>.</p>
+		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>1/30/2014</code>. Specifying <code>format="MMMM d, yyyy"</code> renders the field value as <code>January 30, 2014</code>. </p>
 		<pre>&lt;ui:inputDate aura:id="dateField" label="Birthday" value="2014-01-30" displayDatePicker="true"/></pre>
 		<p>This example results in the following HTML.</p>
 		<pre>&lt;div class="uiInput uiInputDate">
@@ -39,7 +39,23 @@
     &lt;!--Date picker set to visible when icon is clicked-->
   &lt;/div>
 &lt;/div></pre>
-	<p>Specifying <code>format="MMMM d, yyyy"</code> renders the field value as <code>January 30, 2014</code>.</p>
+
+	<h4>Setting a Default Date</h4>
+	<p>This example sets today's date on the date field.</p>
+	<pre>&lt;!-- Component Markup -->
+&lt;aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+&lt;aura:attribute name="today" type="Date" default=""/>
+&lt;ui:inputDate label="Today's Date" value="{!v.today}" /></pre>
+
+	<p>During initialization, the client-side controller <code>doInit</code> sets today's date on the <code>v.today</code> attribute by passing in a default value.</p>
+<pre>/** Client-side Controller **/
+({
+    doInit : function(component, event, helper) {
+        var today = new Date();
+        component.set('v.today', today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate());
+        component.set('v.deadline', today);
+    }
+})</pre>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputDate">
     		This example shows how you can use <code>ui:inputDate</code> to get user input.

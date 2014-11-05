@@ -206,7 +206,7 @@ public interface AuraContext {
 
     /**
      * Get the mode of execution.
-     * 
+     *
      * This should be consistent across the entire request.
      */
     Mode getMode();
@@ -461,28 +461,34 @@ public interface AuraContext {
      * Serialize out the components.
      */
     void serializeAsPart(Json json) throws IOException;
-    
+
     /**
-     * Sets whether theme related info is added during serialization. 
+     * Sets whether theme related info is added during serialization.
      */
     void setSerializeThemes(boolean serializeThemes);
-    
+
     /**
      * Gets whether theme-related info is added during serialization.
      */
     boolean getSerializeThemes();
 
     /**
-     * Prepends all app-specified themes to this context. The themes will be prepended <em>before</em> all themes added
-     * with {@link #appendThemeDescriptor(DefDescriptor)}. This should only be called at most once per context instance.
+     * Prepends all app-specified themes to this context.
+     * <p>
+     * The themes will be prepended <em>before</em> all themes added with {@link #appendThemeDescriptor(DefDescriptor)}.
+     * This should only be called at most once per context instance.
+     * <p>
+     * <b>This is usually only called internally by the framework.</b> If you need to specify an override theme, most
+     * like you want {@link #appendThemeDescriptor(DefDescriptor)} instead.
      */
-    void addAppThemeDescriptors() throws QuickFixException;
+    void addAppThemeDescriptors();
 
     /**
      * Explicitly appends a theme override after other currently specified themes. This will also be after any themes on
      * the current application.
-     * 
+     *
      * @param themeDescriptor The override theme.
+     * @throws QuickFixException If there was a problem loading/validating/etc... the theme descriptor.
      */
     void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException;
 

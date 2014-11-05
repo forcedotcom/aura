@@ -64,9 +64,7 @@ public class TestSetRunnerModel {
     
 	private TestSetRunnerState getTestSetRunnerState() {
 		// Use container tests only when specified, otherwise return classic inventory
-		if (scope != null && scope.equalsIgnoreCase("hybrid_container")) {
-			return TestSetRunnerState.getHybridContainerInstance();
-		} else if (scope != null && scope.equalsIgnoreCase("perf")) {
+		if (scope != null && scope.equalsIgnoreCase("perf")) {
 			return TestSetRunnerState.getPerfInstance();
 		} else {
 			return TestSetRunnerState.getInstance();

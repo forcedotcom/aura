@@ -83,14 +83,11 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 	        while (iterator.hasNext()) {
 	        	LibraryDef library = iterator.next();
 	        	DefDescriptor<LibraryDef> libraryDescriptor = library.getDescriptor();
-	        	json.writeString(libraryDescriptor.getNamespace() 
-        			+ ":" + libraryDescriptor.getName() 
-        			+ ":" + library.getName()
+	        	json.writeArrayEntry(
+        			libraryDescriptor.getNamespace() 
+	        			+ ":" + libraryDescriptor.getName() 
+	        			+ ":" + library.getName()
     			);
-	        	
-	        	if (iterator.hasNext()) {
-	        		json.writeComma();
-	        	}
 	        }
 	        json.writeArrayEnd();
         }
@@ -105,9 +102,11 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
             throw new InvalidDefinitionException("aura:library must contain at least one aura:include attribute", getLocation());
         }
         
+        Set<LibraryDef> externalLibrarySet = Sets.newLinkedHashSet();
         for (IncludeDef includeDef : includes) {
-        	externalLibraries.addAll(extractExternalDependencies(includeDef));
+        	externalLibrarySet.addAll(extractExternalDependencies(includeDef));
         }
+        this.externalLibraries = Lists.newLinkedList(externalLibrarySet);
         
         for (LibraryDef externalLibrary : externalLibraries) {
         	externalLibrary.validateDefinition();

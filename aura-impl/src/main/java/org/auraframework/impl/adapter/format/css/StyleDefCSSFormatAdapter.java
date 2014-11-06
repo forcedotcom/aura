@@ -17,11 +17,15 @@ package org.auraframework.impl.adapter.format.css;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.auraframework.Aura;
 import org.auraframework.def.StyleDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.salesforce.omakase.plugin.Plugin;
 
 /**
  */
@@ -36,9 +40,14 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<StyleDef> {
     @Override
     public void writeCollection(Collection<? extends StyleDef> values, Appendable out)
             throws IOException, QuickFixException {
+        // get the list of plugins that should be run contextually, e.g., where the plugins have access to the full set
+        // of StyleDefs to be combined together. This is important for plugins that need to make decisions based on the
+        // aggregate, e.g., a validator that allows at most one occurrence of a particular thing.
+        List<Plugin> contextualPlugins = Aura.getStyleAdapter().getContextualRuntimePlugins();
+
         for (StyleDef def : values) {
             if (def != null) {
-                out.append(def.getCode());
+                out.append(def.getCode(contextualPlugins));
             }
         }
     }

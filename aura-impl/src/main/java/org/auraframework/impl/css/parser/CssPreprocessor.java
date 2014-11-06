@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.css.parser;
 
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -39,7 +40,7 @@ import com.salesforce.omakase.writer.StyleWriter;
 
 /**
  * Parses CSS source code.
- * 
+ *
  * Use either {@link #initial()} or {@link #runtime(Client.Type)} to get started.
  */
 public final class CssPreprocessor {
@@ -77,12 +78,14 @@ public final class CssPreprocessor {
                 // we only want extra validation on the initial pass. During subsequent runtime calls we will already
                 // know the code is valid so no need to validate again.
                 plugins.add(new StandardValidation());
+                plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
             }
 
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true));
             plugins.add(PrefixPruner.prunePrefixedAtRules());
+            plugins.addAll(Aura.getStyleAdapter().getRuntimePlugins());
         }
 
         /** specify css source code */
@@ -124,6 +127,12 @@ public final class CssPreprocessor {
                 conditionals.manager().addTrueConditions(client.name().toLowerCase());
             }
             plugins.add(conditionals);
+            return this;
+        }
+
+        /** specifies any additional css plugins to run */
+        public ParserConfiguration extras(List<Plugin> plugins) {
+            this.plugins.addAll(plugins);
             return this;
         }
 

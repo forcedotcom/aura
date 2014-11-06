@@ -15,9 +15,7 @@
  */
 package org.auraframework.http;
 
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import com.google.common.collect.Lists;
 
@@ -69,15 +67,14 @@ public class CSP {
         STYLE("style-src"),
         IMG("img-src"),
         MEDIA("media-src"),
-        FRAME_ANCESTOR("frame-ancestors"),  // Sites allowed to frame this page
-        FRAME_SRC("frame-src"),  // Sites this page is allowed to frame
+        FRAME("frame-src"),
         FONT("font-src"),
         CONNECT("connect-src"),
         SANDBOX("sandbox"),
         REPORT_URI("report-uri");
-
+        
         private String directive;
-
+        
         private Directive(String directive) {
             this.directive = directive;
         }
@@ -87,23 +84,23 @@ public class CSP {
             return directive;
         }
     }
-
+    
     /**
      * Special value for allowing a resource type from the same domain as
      * served the initial response.
      */
     public static final String SELF = "'self'";
-
+    
     /**
      * Special value for disallowing a resource type from any domain.
      */
     public static final String NONE = "'none'";
-
+    
     /**
      * Special value for allowing a resource type from any domain.
      */
     public static final String ALL = "*";
-
+    
     /**
      * Special value for allowing inline resource inclusion (such as
      * &lt;style&gt; or &lt;script&gt;).
@@ -111,14 +108,14 @@ public class CSP {
      * Not recommended. 
      */
     public static final String UNSAFE_INLINE = "'unsafe-inline'";
-
+    
     /**
      * Special value for allowing <code>eval()</code> of JavaScript.
      * 
      * Not recommended. 
      */
     public static final String UNSAFE_EVAL = "'unsafe-eval'";
-
+    
     /**
      * Fluent interface for building Content Security Policy headers.
      * 
@@ -126,71 +123,64 @@ public class CSP {
      */
     public static class PolicyBuilder {
         public PolicyBuilder() {}
-
-        private EnumMap<Directive, List<String>> directives = new EnumMap<Directive, List<String>>(Directive.class);
-
+        
+        private static EnumMap<Directive, List<String>> directives = new EnumMap<Directive, List<String>>(Directive.class);
+        
         public PolicyBuilder default_src(String... sources) {
-            return extend(Directive.DEFAULT, sources);
+            directives.put(Directive.DEFAULT, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder script_src(String... sources) {
-            return extend(Directive.SCRIPT, sources);
+            directives.put(Directive.SCRIPT, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder object_src(String... sources) {
-            return extend(Directive.OBJECT, sources);
+            directives.put(Directive.OBJECT, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder style_src(String... sources) {
-            return extend(Directive.STYLE, sources);
+            directives.put(Directive.STYLE, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder img_src(String... sources) {
-            return extend(Directive.IMG, sources);
+            directives.put(Directive.IMG, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder media_src(String... sources) {
-            return extend(Directive.MEDIA, sources);
+            directives.put(Directive.MEDIA, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder frame_src(String... sources) {
-            return extend(Directive.FRAME_SRC, sources);
-        }
-
-        public PolicyBuilder frame_ancestor(String... sources) {
-            return extend(Directive.FRAME_ANCESTOR, sources);
+            directives.put(Directive.FRAME, Lists.newArrayList(sources));
+            return this;
         }
         
         public PolicyBuilder font_src(String... sources) {
-            return extend(Directive.FONT, sources);
+            directives.put(Directive.FONT, Lists.newArrayList(sources));
+            return this;
         }
         
         public PolicyBuilder connect_src(String... sources) {
-            return extend(Directive.CONNECT, sources);
+            directives.put(Directive.CONNECT, Lists.newArrayList(sources));
+            return this;
         }
-
+        
         public PolicyBuilder sandbox(String... flags) {
             directives.put(Directive.SANDBOX, Lists.newArrayList(flags));
             return this;
         }
-
+        
         public PolicyBuilder report_uri(String... uris) {
             directives.put(Directive.REPORT_URI, Lists.newArrayList(uris));
             return this;
         }
-
-        private PolicyBuilder extend(Directive directive, String... sources) {
-            List<String> list = directives.get(directive);
-            if (list == null) {
-                directives.put(directive, Lists.newArrayList(sources));
-            } else {
-                for (String src : sources) {
-                    list.add(src);
-                }
-            }
-            return this;
-        }
-
+        
         public String build() {
             StringBuilder sb = new StringBuilder();
             
@@ -209,6 +199,7 @@ public class CSP {
                     for (String value : values) {
                         sb.append(" ").append(value);
                     }
+                    
                 }
             }
             return sb.toString();

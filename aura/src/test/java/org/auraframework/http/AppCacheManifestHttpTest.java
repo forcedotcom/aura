@@ -131,7 +131,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     private void assertManifestHeaders(HttpResponse response) throws Exception {
-    	assertDefaultAntiClickjacking(response, true, false);
+    	assertAntiClickjacking(response);
         String cacheControlHeader = String.format(",%s,", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue()
                 .replaceAll("\\s", ""));
         if (!cacheControlHeader.contains(",no-cache,") || !cacheControlHeader.contains(",no-store,")) {

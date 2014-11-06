@@ -54,23 +54,22 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
-    private void requestAndAssertContentType(HttpRequestBase method, String url, Format format, boolean expectHeaders)
-            throws Exception {
+    private void requestAndAssertContentType(HttpRequestBase method, String url, Format format) throws Exception {
 
         HttpResponse response = perform(method);
+        assertAntiClickjacking(response);
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
         // Eliminate the spaces separating the content Type specification
         contentType = AuraTextUtil.arrayToString(contentType.split(";\\s+"), ";", -1, false);
         assertEquals(String.format(
                 "Received wrong Content-Type header%nURL(or Action): %s%nContent:%s%nRequest type:%s", url,
                 getResponseBody(response), method.getMethod()), FORMAT_CONTENTTYPE.get(format), contentType);
-        assertDefaultAntiClickjacking(response, expectHeaders, false);
     }
 
     private void getOnAuraServlet(Format f, String tag) throws Exception {
         String url = String.format("/aura?%s&aura.mode=FTEST&aura.format=%s", tag, f.toString());
         HttpGet get = obtainGetMethod(url);
-        requestAndAssertContentType(get, url, f, tag.length() > 0);
+        requestAndAssertContentType(get, url, f);
     }
 
     private void postOnAuraServlet(Format f, Boolean causeException) throws Exception {
@@ -91,8 +90,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         params.put("aura.format", "JSON");
         HttpPost post = obtainPostMethod("/aura", params);
         requestAndAssertContentType(post,
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString", f,
-                !causeException);
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString", f);
     }
 
     /**
@@ -130,7 +128,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
 
     private void getOnAuraResourceServlet(Format f, String url) throws Exception {
         HttpGet get = obtainGetMethod(url);
-        requestAndAssertContentType(get, url, f, true);
+        requestAndAssertContentType(get, url, f);
     }
 
     /**

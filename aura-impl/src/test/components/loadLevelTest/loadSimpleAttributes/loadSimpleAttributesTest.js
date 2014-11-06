@@ -71,11 +71,11 @@
                 return cmp.find('stringAttribute').getDef().getDescriptor().getQualifiedName();
             });
         },function(cmp){
-            $A.run(function() {
+       
                 cmp.set('v.stringAttribute', 'postLoading');
                 cmp.set('v.integerAttribute', 100);
                 cmp.set('v.booleanAttribute', false);
-            });
+            },function(cmp){
             
             $A.test.assertEquals("postLoading", $A.test.getTextByComponent(cmp.find("stringAttribute")), "Failed to rerender dirty string value, could also be a problem with aura:test rerender.");
             $A.test.assertEquals("100", $A.test.getTextByComponent(cmp.find("integerAttribute")), "Failed to rerender dirty integer value, could also be a problem with aura:html rerender.");

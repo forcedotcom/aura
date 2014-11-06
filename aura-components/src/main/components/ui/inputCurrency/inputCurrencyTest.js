@@ -43,16 +43,16 @@
      */
     testUpdateValue: {
     	attributes : {value : 1234, format : "$#,###.0000"},
-        test: function(component){
+        test: [function(component){
      	   var value = component.getElement().value;
      	   $A.test.assertEquals(1234, component.get("v.value"), "Cmp value does not equal expected");
      	   $A.test.assertEquals("$1,234.0000", value, "Element value does not equal expected");
            component.set("v.value", 5678);
-           $A.rerender(component);
-           value = component.getElement().value;
+           }, function(component){
+           var value = component.getElement().value;
            $A.test.assertEquals(5678, component.get("v.value"), "Cmp value does not equal expected");
      	   $A.test.assertEquals("5678", value, "Element value does not equal expected");
-        }
+        }]
     },
 
     /**

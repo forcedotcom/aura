@@ -57,7 +57,7 @@
 	
 	testLazyRendering : {
 		attributes : {"renderItem" : "basic"},
-        test : function (cmp){
+        test : [function (cmp){
         	/*
         	 * Get the active tab and verify that it matches the correct section 
         	 * (in this case there should only be one section since we are loading things lazily)
@@ -68,14 +68,14 @@
         	 
         	 //Verify that section and anchor aria-controled by id match
         	 this.matchSectionAndAnchor(cmp.find("chatter").get("v.title"), "tab 5 contents");
-        	 
+     
         	 //Click on the first item on the list
         	 var lis = tabSet.getElementsByTagName("li");
         	 $A.test.clickOrTouch(lis[6].children[0]);
-        	 
+        }, function (cmp){
         	 //Verify that the new active element is correct and its sections matches correctly
         	 this.matchSectionAndAnchor(cmp.find("dashboard").get("v.title"), "tab 7 contents");
-        }
+        }]
 	},
 	
 	/*************************************************************************************************************

@@ -208,13 +208,14 @@
 	 * General Test to verify focus on menu item using AURA API  
 	 */
     testFocusOnMenuItem:{
-    	test:function(cmp){
+    	test : [function(cmp){
 				trigger = cmp.find("trigger");
 				trigger.get("e.click").fire();
+    	},function(cmp){
 				var menuItem3 = cmp.find("actionItem3");
 				menuItem3.get("e.mouseover").fire();
 				$A.test.addWaitForWithFailureMessage(menuItem3.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 3");
-			}
+			}]
 	},
     
     /**

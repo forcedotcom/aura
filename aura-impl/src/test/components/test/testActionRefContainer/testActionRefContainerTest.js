@@ -21,26 +21,32 @@
         test: [function(component){
             // the text node for pants
             var text = component.find("actionref").getElements()[1];
-            var getButton = component.find("getButton");
-
             $A.test.assertEquals("0", text.nodeValue, "initial value for pants wasn't 0");
-
             var mar = component.get("v.myActionRef");
             $A.test.assertEquals(null, mar, "there should be no action yet");
 
-            //getButton.dispatchEvent(evt);
+        }, function(component){
+        	var getButton = component.find("getButton");
             getButton.get("e.press").fire();
             mar = component.get("v.myActionRef");
             $A.test.assertEquals("Action", mar.auraType, "there should be an actionref");
-        }, function(component) {
-            var text = component.find("actionref").getElements()[1];
-            var runButton = component.find("runButton");
-
-            runButton.get("e.press").fire();
-            $A.test.assertEquals("1", text.nodeValue, "action was not called");
-            runButton.get("e.press").fire();
+        }, function(component) {     
+            component.find("runButton").get("e.press").fire();
+        }, function(component) {           
+        	//Check that the previous Action (firing the button, changed the correct elements)
+        	var text = component.find("actionref").getElements()[1];       	
+        	$A.test.assertEquals("1", text.nodeValue, "action was not called");
+        	
+        	component.find("runButton").get("e.press").fire();
+        }, function(component) {  
+        	//Check that the previous Action (firing the button, changed the correct elements)
+        	var text = component.find("actionref").getElements()[1];
             $A.test.assertEquals("2", text.nodeValue, "action should have been called twice");
-            runButton.get("e.press").fire();
+            
+            component.find("runButton").get("e.press").fire();
+        }, function(component) {
+        	//Check that the previous Action (firing the button, changed the correct elements)
+        	var text = component.find("actionref").getElements()[1];
             $A.test.assertEquals("3", text.nodeValue, "action should have been called thrice");
         }]
     }

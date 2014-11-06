@@ -40,20 +40,21 @@
      * Negative case: Verify that exceptions caused in chained controller are surfaced as part of only that controller and does not affect others.
      */
     testSurfaceExceptionsWhileChaining:{
-        test:function(cmp){
-            var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2});
+        test:[function(cmp){
+            multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2});
             multiply.setChained();
             //Divide by 0 error
-            var divide = $A.test.getAction(cmp,"c.divide",{"a" : 0});
+            divide = $A.test.getAction(cmp,"c.divide",{"a" : 0});
             divide.setChained();
 
-            var add = $A.test.getAction(cmp,"c.add",{
+            add = $A.test.getAction(cmp,"c.add",{
                                         "a" : 1, "b" : 99,
                                         "actions": $A.util.json.encode({
                                             actions: [divide, multiply]
                                         })
                                     });
             this.enqueueServerActionAndFireEvent(cmp, add);
+        }, function(cmp){
             $A.test.addWaitFor("ERROR",
                 function(){return divide.getState()},
                 function(){
@@ -67,7 +68,7 @@
                     $A.test.assertTrue(divide.getError()[0].message.indexOf("java.lang.ArithmeticException: / by zero") != -1,
                         "expected to find the exception string");
                                });
-        }
+        }]
     },
 
     /**

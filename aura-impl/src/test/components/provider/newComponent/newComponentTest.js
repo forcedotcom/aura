@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 ({
+	createComponent : function(cmp){
+		cmp.get('c.createComponent').runDeprecated();
+	},
+	
     getLocallyCreatedComponent:function(cmp){
-        $A.run(function(){
-        	cmp.get('c.createComponent').runDeprecated();
-        });
         var body = cmp.get('v.body');
         $A.test.assertEquals(1, body.length);
         $A.test.assertEquals(true, body[0].isRendered());
@@ -29,11 +30,13 @@
      */
     testClientProvidedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'ui:inputText'}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
         	var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://ui:inputText", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("ui:inputText", creation.getElement().value);
-        }
+        }]
     },
     
     /**
@@ -41,11 +44,13 @@
      */
     testClientProvidedDescriptorNotPreloaded:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'attributesTest:simpleValue'}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://attributesTest:simpleValue", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("button", creation.getElement().getAttribute('type'));
-        }
+        }]
     },
     
     /**
@@ -71,11 +76,13 @@
      */
     testClientProvidedPrefixedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'markup://ui:outputText'}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://ui:outputText", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("markup://ui:outputText", $A.test.getText(creation.getElement()));
-        }
+        }]
     },
     
     
@@ -85,11 +92,13 @@
      */
     testClientProvidedProvider:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'provider:clientProvider'}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("provider:clientProvider", creation.get("v.value"));
-        }
+        }]
     },
 
     /**
@@ -97,11 +106,13 @@
      */
     testClientProvidedConfig:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'aura:text',attributes:{value:'breadwinner'}}\"}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://aura:text", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("breadwinner", $A.test.getText(creation.getElement()));
-        }
+        }]
     },
 
     /**
@@ -109,11 +120,13 @@
      */
     testClientProvidedConfigWithPrefixedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'markup://aura:expression',attributes:{value:'breadchampion'}}\"}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://aura:expression", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("breadchampion", $A.test.getText(creation.getElement()));
-        }
+        }]
     },
 
     /**
@@ -121,11 +134,13 @@
      */
     testClientProvidedProviderConfig:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'provider:clientProvider',attributes:{value:'baconbringerhomer'}}\"}"},
-        test:function(cmp){
+        test : [function(cmp) {
+        	this.createComponent(cmp);
+        }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("baconbringerhomer", creation.get("v.value"));
-        }
+        }]
     },
 
     /**

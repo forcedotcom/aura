@@ -30,12 +30,12 @@
 
     testDirDirty: {
         attributes : {label: 'link', value: 'www.salesforce.com'},
-        test: function(component){
+        test: [function(component){
             aura.test.assertEquals('ltr', component.find("link").getElement().dir, "Dir attribute not set to default");
             component.set("v.dir", "rtl");
-            $A.renderingService.rerender(component);
+        }, function(component){
             aura.test.assertEquals('rtl', component.find("link").getElement().dir, "Dir attribute not updated");
-        }
+        }]
     },
 
     testDisabled: {
@@ -54,12 +54,12 @@
 
     testDisabledDirty: {
         attributes : {label: 'link', value: 'www.salesforce.com'},
-        test: function(component){
+        test: [function(component){
             aura.test.assertFalse($A.util.hasClass(component.find("link").getElement(), "disabled"), "Should not be disabled by default");
             component.set("v.disabled", "true");
-            $A.renderingService.rerender(component);
+        }, function(component){
             aura.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "disabled"), "Disabled class not added correctly");
-        }
+        }]
     },
 
     testValue: {
@@ -99,25 +99,25 @@
 
     testValueDirty: {
         attributes : {label: 'link', value: 'www.salesforce.com'},
-        test: function(component){
+        test: [function(component){
         	aura.test.assertTrue(aura.test.contains(component.find("link").getElement().getAttribute('href'),'www.salesforce.com'), "href attribute not correct");
             component.set("v.value", "www.database.com");
-            $A.renderingService.rerender(component);
+        }, function(component){
             aura.test.assertTrue(aura.test.contains(component.find("link").getElement().getAttribute('href'),'www.database.com'), "href attribute not updated");
-        }
+        }]
     },
 
     testValueFragmentDirty: {
         attributes : {label: 'link', value: '#top'},
-        test: function(component){
+        test: [function(component){
             var href = component.find("link").getElement().getAttribute('href');
             // prod mode doesn't have comment within void
             aura.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#top*/);", "href attribute not correct");
             component.set("v.value", "#bottom");
-            $A.renderingService.rerender(component);
+        }, function(component){
             href = component.find("link").getElement().getAttribute('href');
             aura.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#bottom*/);", "href attribute not updated");
-        }
+        }]
     },
 
     testIconClassMissing: {
@@ -143,13 +143,13 @@
 
     testIconClassDirty: {
         attributes : {iconClass: 'myIcon', label: 'link', value: 'www.salesforce.com'},
-        test: function(component){
+        test: [function(component){
             aura.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "IconClass not correctly added");
             component.set("v.iconClass", "someIconClass");
-            $A.renderingService.rerender(component);
+        }, function(component){
             aura.test.assertFalse($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "Original iconClass not removed");
             aura.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "someIconClass"), "New iconClass not correctly added");
-        }
+        }]
     },
 
     testLabel: {
@@ -175,12 +175,12 @@
 
     testLabelDirty: {
         attributes : {label: 'link', value: 'www.salesforce.com'},
-        test: function(component){
+        test: [function(component){
             aura.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
             component.set("v.label", "updated link");
-            $A.renderingService.rerender(component);
+        }, function(component){
             aura.test.assertEquals('updated link', $A.test.getText(component.find('link').getElement()), "Label attribute not updated");
-        }
+        }]
     },
 
     testTitle: {
@@ -206,12 +206,12 @@
 
     testTitleDirty: {
         attributes : {title: 'hover me', label: 'link', value: 'www.salesforce.com'},
-        test: function(component){
+        test: [function(component){
             aura.test.assertEquals('hover me', component.find("link").getElement().title, "Title attribute not correct");
             component.set("v.title", "check again");
-            $A.renderingService.rerender(component);
+        }, function(component){
             aura.test.assertEquals('check again', component.find("link").getElement().title, "Title attribute not updated");
-        }
+        }]
     },  
     
     testLabelAndIgnorePassedInAlt: {

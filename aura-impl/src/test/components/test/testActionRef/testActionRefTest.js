@@ -29,21 +29,32 @@
      * invoking an action passed as an actionref attribute to another cmp
      */
     testActionPassing: {
-        test: function(component){
+        test: [function(component){
             // the text node for pants
-            var text = component.getElements()[1];
-            var child = component.find("sandputter");
-            var btn = child.find("button");
+           var btnAndText = this.getNecessaryElements(component);
+          
+            $A.test.assertEquals("0", btnAndText["text"].nodeValue, "initial value for pants wasn't 0");
 
-            $A.test.assertEquals("0", text.nodeValue, "initial value for pants wasn't 0");
-
-            btn.get("e.press").fire();
-            $A.test.assertEquals("1", text.nodeValue, "action was not called");
+            btnAndText["btn"].get("e.press").fire();
+        }, function(component){
+        	 var btnAndText = this.getNecessaryElements(component);
+            $A.test.assertEquals("1", btnAndText["text"].nodeValue, "action was not called");
             // click again to make sure the actionref can run twice
-            btn.get("e.press").fire();
-            $A.test.assertEquals("2", text.nodeValue, "action should have been called twice");
-            btn.get("e.press").fire();
-            $A.test.assertEquals("3", text.nodeValue, "action should have been called thrice");
-        }
+            btnAndText["btn"].get("e.press").fire();
+        }, function(component){
+        	 var btnAndText = this.getNecessaryElements(component);
+            $A.test.assertEquals("2", btnAndText["text"].nodeValue, "action should have been called twice");
+            btnAndText["btn"].get("e.press").fire();
+        }, function(component){
+        	 var btnAndText = this.getNecessaryElements(component);
+            $A.test.assertEquals("3", btnAndText["text"].nodeValue, "action should have been called thrice");
+        }]
+    },
+    
+    getNecessaryElements : function(component){
+    	var text = component.getElements()[1];
+        var child = component.find("sandputter");
+        var btn = child.find("button");
+        return {"btn" : btn, "text" : text};
     }
 })

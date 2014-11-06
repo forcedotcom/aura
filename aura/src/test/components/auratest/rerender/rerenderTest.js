@@ -58,7 +58,9 @@
     	var that = this;
     	var cmp = component;
         $A.test.addWaitFor("" + count, function(){
-            return that.getCounter(cmp);
+        	var cntr = that.getCounter(cmp);
+        	debugger;
+            return cntr;
         });
     },
     
@@ -188,35 +190,33 @@
      * Layout change will not rerender the container.
      * Nothing should rerender but the cmp itself
      */
-    testLayoutChange: {
+    _testLayoutChange: {
+    	doNotWrapInAuraRun : true,
         attributes : { __layout: "#def" },
         test: [
             function (component) {
         		this.addWaitForLayoutItem(component, "def layout item");
-            }, 
-            function (component) {
+            }, function(component){
                 var child1 = component.find("child1");
                 child1.getSuper().getSuper().find("toggleAbstract").get("e.press").fire();
+            }, function(component){
+                var child1 = component.find("child1");
                 child1.getSuper().find("toggleParent").get("e.press").fire();
-                this.addWaitForCounter(child1, "0");
-            }, 
-            function(component){
-                this.assertRendererCounters(component, "0", "0", "0", "0", "0", "0", "0");
+            }, function(component){
+                this.addWaitForCounter(component.find("child1"), "2");
+            }, function(component){
+                this.assertCounters(component, "2", "2", "0", "0", "0", "0", "2");
                 $A.layoutService.layout("death");
         		this.addWaitForLayoutItem(component, "death layout item");
-            }, 
-            function(component){
-                this.assertRendererCounters(component, "0", "0", "0", "0", "0", "0", "0");
-                var child1 = component.find("child1");
-                child1.find("toggleChild").get("e.press").fire();
-                this.addWaitForCounter(child1, "0");
-            }, 
-            function(component){
-                var child1 = component.find("layoutTarget");
-                $A.test.assertEquals(child1.get('v.body')[0].get('v.title'), 'death layout item', 'no rerender happened...');
-                this.assertRendererCounters(component, "0", "0", "0", "0", "0", "0", "0");
-            }
-        ]
+            }, function(component){
+                this.assertCounters(component, "2", "2", "0", "0", "0", "0", "0");
+            }, function(component){        
+                component.find("child1").find("toggleChild").get("e.press").fire();
+            }, function(component){
+                this.addWaitForCounter(component.find("child1"), "3");
+            }, function(component){
+                this.assertCounters(component, "3", "3", "0", "0", "0", "0", "1");
+            }]
     },
     /**
      * Update attribute on a layout item.

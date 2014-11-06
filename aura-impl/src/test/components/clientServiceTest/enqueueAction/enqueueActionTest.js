@@ -99,9 +99,10 @@
             $A.enqueueAction(cmp.get("c.client"));
             //Value change
             this.log(cmp, "log1");
+        }, function(cmp) {
             // client action will get called after the value change is processed above
             this.log(cmp, "log2");
-
+        }, function(cmp) {
             this.waitForLog(cmp, 0, "log1");
             this.waitForLog(cmp, 1, "client");
             this.waitForLog(cmp, 2, "log2");
@@ -611,30 +612,30 @@
 
     testAbortQueuedAbortable : {
         test : [ function(cmp) {
-            var that = this;
-            // max out in-flight, to start queueing
-            $A.run(function() {
+                var that = this;
+                // max out in-flight, to start queueing
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "WAIT fore1;APPEND fore1;READ;", function(a) {
                     that.log(cmp, "fore1:" + a.getReturnValue());
                 }, false, false));
-            });
-            // abort abortable action followed by batch with abortables
-            $A.run(function() {
+            }, function(cmp) {
+            	var that = this;
+            
+                // abort abortable action followed by batch with abortables
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore2;READ;", function(a) {
                     that.log(cmp, "fore2:" + a.getReturnValue());
                 }, false, true));
-            });
-            // abort abortable actions in batch followed by batch with abortables
-            $A.run(function() {
+            }, function(cmp) {
+            	var that = this;
+                // abort abortable actions in batch followed by batch with abortables
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore3;READ;", function(a) {
                     that.log(cmp, "fore3:" + a.getReturnValue());
                 }, false, true));
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore4;READ;", function(a) {
                     that.log(cmp, "fore4:" + a.getReturnValue());
                 }, false, false));
-            });
-            // don't abort abortable actions in batch followed by batch without abortables
-            $A.run(function() {
+            }, function(cmp) {
+            	var that = this;
+                // don't abort abortable actions in batch followed by batch without abortables
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore5;READ;", function(a) {
                     that.log(cmp, "fore5:" + a.getReturnValue());
                 }, false, true));
@@ -644,17 +645,16 @@
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore7;READ;", function(a) {
                     that.log(cmp, "fore7:" + a.getReturnValue());
                 }, false, false));
-            });
-            $A.run(function() {
+            }, function(cmp) {
+            	var that = this;
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore8;READ;", function(a) {
                     that.log(cmp, "fore8:" + a.getReturnValue());
                 }, false, false));
-            });
-            // release queue
-            $A.run(function() {
+            }, function(cmp) {
+            	var that = this;
+                // release queue
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "RESUME fore1;"));
-            });
-
+        }, function(cmp) {
             this.waitForLog(cmp, 0, "fore1:fore1");
             this.waitForLog(cmp, 1, "fore4:fore4");
             this.waitForLog(cmp, 2, "fore5:fore5");
@@ -665,42 +665,44 @@
     },
 
     testAbortInFlightAbortable : {
-        test : function(cmp) {
+        test : [function(cmp) {
             var that = this;
             // hold abortable at server
-            $A.run(function() {
-                $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore1;RESUME back1;WAIT fore1;READ;",
-                        function(a) {
-                            that.log(cmp, "fore1:" + a.getReturnValue());
-                        }, false, true));
-            });
-            // queue another abortable action
-            $A.run(function() {
-                $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore2;READ;", function(a) {
-                    that.log(cmp, "fore2:" + a.getReturnValue());
+            $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore1;RESUME back1;WAIT fore1;READ;",
+                    function(a) {
+                         that.log(cmp, "fore1:" + a.getReturnValue());
                 }, false, true));
-            });
+            }, function(cmp) {
+                var that = this;
+            // queue another abortable action
+            
+              $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore2;READ;", function(a) {
+                   that.log(cmp, "fore2:" + a.getReturnValue());
+               }, false, true));
+            }, function(cmp) {
+                var that = this;
             // check initial abortable received at server
-            $A.run(function() {
-                $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
-                        "WAIT back1;APPEND back1;READ;RESUME back2;",
-                        function(a) {
-                            that.log(cmp, "back1:" + a.getReturnValue());
-                        }, true));
-            });
+             $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
+                     "WAIT back1;APPEND back1;READ;RESUME back2;",
+                     function(a) {
+                         that.log(cmp, "back1:" + a.getReturnValue());
+                     }, true));
+            }, function(cmp) {
+                var that = this;
             // release in-flight action
-            $A.run(function() {
+           
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
                         "WAIT back2; SLEEP 1000; APPEND back2;READ;RESUME fore1;",
                         function(a) {
                             that.log(cmp, "back2:" + a.getReturnValue());
                         }, true));
-            });
+            }, function(cmp) {
+                
             // callback of initial abortable action is aborted
             this.waitForLog(cmp, 0, "back1:fore1,back1");
             this.waitForLog(cmp, 1, "back2:back2");
             this.waitForLog(cmp, 2, "fore2:fore2");
-        }
+        }]
     },
 
     testStorableRefresh : {
@@ -851,7 +853,7 @@
     testAbortStorable : {
         test : [ function(cmp) {
             var that = this;
-            $A.run(function() {
+           
                 // prime storage
                 var a = that.getAction(cmp, "c.execute", "WAIT;READ;", function(a) {
                     that.log(cmp, "prime:" + a.isFromStorage() + ":" + a.getReturnValue());
@@ -859,17 +861,16 @@
                 a.setStorable({"refresh":0});
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;"));
-            });
+        }, function(cmp) {
             this.waitForLog(cmp, 0, "prime:false:initial");
         }, function(cmp) {
             var that = this;
             // max out in-flight, to start queueing
-            $A.run(function() {
                 var a = that.getAction(cmp, "c.execute", "WAIT;");
                 $A.enqueueAction(a);
-            });
+        }, function(cmp) {
+            var that = this;
             // queue up storable
-            $A.run(function() {
                 var a;
 
                 a = that.getAction(cmp, "c.execute", "WAIT;READ;", function(a) {
@@ -879,21 +880,20 @@
                 $A.enqueueAction(a);
                 a = that.getAction(cmp, "c.execute", "RESUME back2;");
                 $A.enqueueAction(a);
-            });
+        }, function(cmp) {
+            var that = this;
             // queue up another storable
-            $A.run(function() {
                 var a = that.getAction(cmp, "c.execute", "WAIT;READ;", function(a) {
                     that.log(cmp, "store2:" + a.isFromStorage() + ":" + a.getReturnValue());
                 });
                 a.setStorable({"refresh":0});
                 $A.enqueueAction(a);
-            });
+        }, function(cmp) {
+            var that = this;
             // release
-            $A.run(function() {
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "RESUME;"));
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "WAIT back2;APPEND release;RESUME;"));
-            });
-
+        }, function(cmp) {
             // only last queued storable was sent to server
             this.waitForLog(cmp, 1, "store2:true:initial");
             this.waitForLog(cmp, 2, "store2:false:release");
@@ -927,75 +927,66 @@
     testAbortInFlightStorable : {
         test : [ function(cmp) {
             var that = this;
-            var a;
-            $A.run(function() {
                 // prime storage
-                a = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
-                a.setStorable({'refresh':0});
-                $A.enqueueAction(a);
+            	cmp._a = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
+            	cmp._a.setStorable({'refresh':0});
+                $A.enqueueAction(cmp._a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME fore;"));
-            });
-
+        }, function(cmp) {
+        	var that = this;
             // First read comes from the server
             $A.test.addWaitFor(
                 "false:initial",
-                function() { return a.isFromStorage() + ":" + a.getReturnValue(); },
+                function() { return cmp._a.isFromStorage() + ":" +  cmp._a.getReturnValue(); },
                 function () { that.log(cmp, "SUCCESS - initial value read from server"); }
             );
         }, function(cmp) {
-            var that = this;
-            var a;
-            var storage;
-            var key;
-            // max out in-flight, to start queueing, and hold storable at server
-            $A.run(function () {
-                a = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
-                a.setStorable({'refresh': 0});
-                $A.enqueueAction(a);
-                storage = a.getStorage();
-                key = a.getStorageKey();
-            });
-
-            // Queue up second read
-            // Make this action non-storable so that we can later check storage to see if the aborted action's value
-            // was stored.
-            var b;
-            $A.run(function () {
+                var that = this;
+                // max out in-flight, to start queueing, and hold storable at server
+            	cmp._a = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
+            	cmp._a.setStorable({'refresh': 0});
+                $A.enqueueAction( cmp._a);
+                cmp._storage = cmp._a.getStorage();
+                cmp._key = cmp._a.getStorageKey();
+        }, function(cmp) {
+                var that = this;
+                // Queue up second read
+                // Make this action non-storable so that we can later check storage to see if the aborted action's value
+                // was stored.
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "READ; RESUME back2;"));
-                b = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
-                $A.enqueueAction(b);
-            });
-
-            // Release
-            $A.run(function() {
+                cmp._b = that.getAction(cmp, "c.execute", "WAIT fore;READ;");
+                $A.enqueueAction( cmp._b);
+        }, function(cmp) {
+                var that = this;
+                // Release
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND abortedValue;RESUME fore;"));
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "WAIT back2;APPEND overwriteValue;RESUME fore;"));
-            });
-
+        }, function(cmp) {
+        	var that = this;
             // A value that has already been fetched is read from storage
             $A.test.addWaitFor(
                 "true:initial",
-                function () { return a.isFromStorage() + ":" + a.getReturnValue(); },
+                function () { return  cmp._a.isFromStorage() + ":" + cmp._a.getReturnValue(); },
                 function () { that.log(cmp, "SUCCESS - initial value read from storage"); }
             );
-            
+
             // The new action shows a new value has been retrieved from the server.
             $A.test.addWaitFor(
                 "false:overwriteValue",
-                function() { return b.isFromStorage() + ":" + b.getReturnValue(); },
+                function() { return  cmp._b.isFromStorage() + ":" +  cmp._b.getReturnValue(); },
                 function () { that.log(cmp, "SUCCESS - new value read from server"); }
             );
-
+        	 var that = this;
             // The aborted action's response was stored
             var readAbortedValue = false;
             $A.test.addWaitFor(
                 true,
                 function () {
-                    if (!storage) {
+                    if (!cmp._storage) {
                         return false;
                     }
 
-                    storage.get(key)
+                    cmp._storage.get(cmp._key)
                         .then(function(item) {
                             readAbortedValue = item.value.returnValue[0] === "abortedValue";
                         });
@@ -1116,7 +1107,10 @@
                         that.log(this, "run3 callback");
                     });
 
-                    $A.run(function() {
+                }, 
+                function(cmp) {
+                	var that = this;
+                    var cmp = cmp;
                         // queue up another action
                         $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND fore1;WAIT fore1;READ;", function(a) {
                             that.log(cmp, "fore1:" + a.getReturnValue());
@@ -1127,19 +1121,21 @@
                                 function(a) {
                                     that.log(cmp, "back1:" + a.getReturnValue());
                                 }));
-                    });
+                },
+                function(cmp) {
                     this.waitForLog(cmp, 0, "back1:run1,back1");
                 },
                 function(cmp) {
                     var that = this;
                     var cmp = cmp;
-                    $A.run(function() {
+                  
                         // release in-flight actions
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
                                 "RESUME run1;SLEEP 1000;APPEND back2;READ;", function(a) {
                                     that.log(cmp, "back2:" + a.getReturnValue());
                                 }));
-                    });
+               },
+               function(cmp) {
                     this.waitForLog(cmp, 1, "run1:");
                     this.waitForLog(cmp, 2, "run1 callback");
                     this.waitForLog(cmp, 3, "back2:run2,back2");
@@ -1147,37 +1143,39 @@
                 function(cmp) {
                     var that = this;
                     var cmp = cmp;
-                    $A.run(function() {
+                 
                         // release next action, but pending ones were batched
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
                                 "APPEND back3;RESUME run2;SLEEP 1000;READ;", function(a) {
                                     that.log(cmp, "back3:" + a.getReturnValue());
                                 }));
-                    });
+                },
+                function(cmp) {
                     this.waitForLog(cmp, 4, "back3:run3");
                 },
                 function(cmp) {
                     var that = this;
                     var cmp = cmp;
-                    $A.run(function() {
+                    
                         // release next action, batch still not complete
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
                                 "APPEND back4;RESUME run3;SLEEP 1000;READ;", function(a) {
                                     that.log(cmp, "back4:" + a.getReturnValue());
                                 }));
-                    });
+                },
+                function(cmp) {
                     this.waitForLog(cmp, 5, "back4:fore1");
                 },
                 function(cmp) {
                     var that = this;
                     var cmp = cmp;
-                    $A.run(function() {
                         // release last in batch
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground",
                                 "APPEND back5;RESUME fore1;SLEEP 1000;READ;", function(a) {
                                     that.log(cmp, "back5:" + a.getReturnValue());
                                 }));
-                    });
+                },
+                function(cmp) {
                     this.waitForLog(cmp, 6, "run2:back3");
                     this.waitForLog(cmp, 7, "run2 callback");
                     this.waitForLog(cmp, 8, "run3:back4");

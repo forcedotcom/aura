@@ -4,23 +4,22 @@
      */
     testTouchListElm: {
 	browsers : ["-IE7", "-IE8"],
-	test : function(cmp){
-	    //Grab Autocomplete
-	    var autoCmp = cmp.find("autoComplete");
-	    var autoList = autoCmp.find("list");
-	    
-	    //Fire change event for autocomplete
-	    cmp.get('c.handleInputChangeAutoComplete').runDeprecated({"getParam":function(value){return "h";}});
-	    
-	    //Get the anchor in the list to click as the user would
-	    var ul = autoList.getElement().getElementsByTagName("ul")[0];
-	    var listAnchors = ul.getElementsByTagName("a");
-	    $A.test.clickOrTouch(listAnchors[1]);
-	    
-	    //assert
-	    var actual = autoCmp.find("input").find("txt").getElement().value;
-	    var expected = "hello world2"
-	    $A.test.assertEquals(expected, actual, "List element in autocompleteList is not clickable!");
-	}
+	test : [function(cmp){	    
+	        //Fire change event for autocomplete
+	        cmp.get('c.handleInputChangeAutoComplete').runDeprecated({"getParam":function(value){return "h";}});
+	    }, function(cmp){
+	    	//Grab Autocomplete List
+		    var autoList = cmp.find("autoComplete").find("list");
+		    
+	        //Get the anchor in the list to click as the user would
+	        var ul = autoList.getElement().getElementsByTagName("ul")[0];
+	        var listAnchors = ul.getElementsByTagName("a");
+	        $A.test.clickOrTouch(listAnchors[1]);
+	    }, function(cmp){
+	        //assert
+	        var actual = cmp.find("autoComplete").find("input").find("txt").getElement().value;
+	        var expected = "hello world2"
+	        $A.test.assertEquals(expected, actual, "List element in autocompleteList is not clickable!");
+	    }]
     }
 })

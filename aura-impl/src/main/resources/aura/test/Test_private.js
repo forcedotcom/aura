@@ -122,6 +122,7 @@ $A.ns.Test.prototype.logError = function(msg, e){
  */
 $A.ns.Test.prototype.doTearDown = function() {
     var i;
+    var that = this;
 
     // check if already tearing down
     if(this.inProgress > 1){
@@ -138,9 +139,14 @@ $A.ns.Test.prototype.doTearDown = function() {
     }
     try{
         if(this.suite["tearDown"]){
-            this.suite["tearDown"].call(this.suite, this.cmp);
+            if (this.doNotWrapInAuraRun) {
+                this.suite["tearDown"].call(this.suite, this.cmp);
+            } else {
+                $A.run(function() {
+                    that.suite["tearDown"].call(that.suite, that.cmp);
+                });
+            }
         }
-        var that = this;
         setTimeout(function(){that.inProgress--;}, 100);
     }catch(e){
         this.logError("Error during tearDown", e);
@@ -220,8 +226,14 @@ $A.ns.Test.prototype.continueWhenReady = function() {
                     var callback = this.waits[0].callback;
                     if(callback){
                         //Set the suite as scope for callback function.
-                        //Helpful to expose test suite as 'this' in callbacks for addWaitFor
-                        callback.call(this.suite, this.cmp);
+                        //Helpful to expose test suite as 'this' in callbacks for addWaitFor           
+                        if (this.doNotWrapInAuraRun) {
+                            callback.call(this.suite, this.cmp);
+                        } else {
+                            $A.run(function() {
+                                callback.call(that.suite, that.cmp);
+                            });
+                        }
                     }
                     this.waits.shift();
                     setTimeout(internalCWR, 1);
@@ -239,7 +251,13 @@ $A.ns.Test.prototype.continueWhenReady = function() {
                     this.doTearDown();
                 } else {
                     this.lastStage = this.stages.shift();
-                    this.lastStage.call(this.suite, this.cmp);
+                    if (this.doNotWrapInAuraRun) {
+                        this.lastStage.call(that.suite, that.cmp);
+                    } else {
+                        $A.run(function() {
+                            that.lastStage.call(that.suite, that.cmp);
+                        });
+                    }
                     setTimeout(internalCWR, 1);
                 }
             }

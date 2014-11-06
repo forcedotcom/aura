@@ -18,23 +18,28 @@
 	 * Verify dynamic value change in init
 	 */
 	testChangeSelectionDynamic : {
-		test : function(cmp) {
-			var inputSelectCmp = cmp.find("dynamicSelect");
-			this.validateComponentOptions(inputSelectCmp, "Option4")
-		}
+		test : [function(cmp) {
+			        this.setComponentOption(cmp.find("dynamicSelect"), "Option4");
+		        }, function(cmp) {
+			        this.validateComponentOptions(cmp.find("dynamicSelect"), "Option4");
+		        }]
 	},
 	/**
 	 * Verify value change through model. In this case the component should have everything when it 
 	 * is actually hit the first time
 	 */
 	testChangeSelectionDynamicUsingModel : {
-		test : function(cmp) {
-			var inputSelectCmp = cmp.find("dynamicSelectModel");
-			this.validateComponentOptions(inputSelectCmp, "Option1")
-		}
+		test :  [function(cmp) {
+		            this.setComponentOption(cmp.find("dynamicSelectModel"), "Option1");
+                }, function(cmp) {
+			 		this.validateComponentOptions(cmp.find("dynamicSelectModel"), "Option1");
+		        }]
 	},
+	setComponentOption : function(cmp, option){
+		cmp.set("v.value", option);
+	},
+	
 	validateComponentOptions : function(cmp, option) {
-	        cmp.set("v.value", option);
 		var optionCmps = cmp.getElement().children;
 		this.verifySelectedOption(optionCmps, option);
 	},

@@ -20,9 +20,9 @@
             this.verifyTextContent(cmp,"London");
             //Fire a event, that would go through handler1, fire another event, invoke handler3, come back and finish handler2
             $A.get("e.handleEventTest:applicationEvent").fire();
+        }, function(cmp){
             this.verifyTextContent(cmp,"LondonParisMercuryTokyo");
-        }
-        ]
+        }]
     },
     verifyTextContent:function(cmp, expectedText){
         $A.test.assertEquals(expectedText, $A.test.getText(cmp.find('divOnBody').getElement()),

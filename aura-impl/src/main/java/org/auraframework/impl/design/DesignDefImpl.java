@@ -19,16 +19,21 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.builder.DesignDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -36,13 +41,57 @@ import com.google.common.collect.Lists;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
     private static final long serialVersionUID = -8621907027705407577L;
-    private final LinkedHashMap<String, AttributeDesignDef> attributeDesignDefs;
+    private final Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignDefs;
+    private final DesignTemplateDef template;
     private final String label;
 
     protected DesignDefImpl(Builder builder) {
         super(builder);
-        this.attributeDesignDefs = builder.attributeDesignMap;
+        this.attributeDesignDefs = AuraUtil.immutableMap(builder.attributeDesignMap);
         this.label = builder.label;
+        this.template = builder.template;
+    }
+
+    @Override
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+        // Each <design:attribute> must have a matching <aura:attribute> in the component definition.
+        // This will first validate that the component definition exists. If the component exists, we must
+        // iterate through each design attribute definition and validate that a matching aura attribute
+        // definition exists on the component definition.
+        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
+                ComponentDef.class);
+
+        ComponentDef cmp = cmpDesc.getDef();
+        if (cmp == null) {
+            throw new DefinitionNotFoundException(cmpDesc, getLocation());
+        }
+
+        if (!attributeDesignDefs.isEmpty()) {
+            for (AttributeDesignDef attrDesignDef : attributeDesignDefs.values()) {
+                AttributeDef attr = cmp.getAttributeDef(attrDesignDef.getName());
+                if (attr == null) {
+                    throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(attrDesignDef.getName(),
+                            AttributeDef.class));
+                }
+            }
+        }
+
+        if (template != null) {
+            template.validateReferences();
+        }
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
+                ComponentDef.class);
+        dependencies.add(cmpDesc);
+
+        if (template != null) {
+            template.appendDependencies(dependencies);
+        }
     }
 
     @Override
@@ -56,13 +105,23 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     @Override
-    public Map<String, AttributeDesignDef> getAttributeDesignDefs() {
+    public Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> getAttributeDesignDefs() {
         return attributeDesignDefs;
+    }
+
+    @Override
+    public AttributeDesignDef getAttributeDesignDef(String name) {
+        return getAttributeDesignDefs().get(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
     }
 
     @Override
     public String getLabel() {
         return label;
+    }
+
+    @Override
+    public DesignTemplateDef getDesignTemplateDef() {
+        return template;
     }
 
     @Override
@@ -81,7 +140,8 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<DesignDef> implements DesignDefBuilder {
-        private final LinkedHashMap<String, AttributeDesignDef> attributeDesignMap = new LinkedHashMap<String, AttributeDesignDef>();
+        private final LinkedHashMap<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignMap = new LinkedHashMap<DefDescriptor<AttributeDesignDef>, AttributeDesignDef>();
+        private DesignTemplateDef template;
         private String label;
 
         public Builder() {
@@ -97,8 +157,9 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         }
 
         @Override
-        public DesignDefBuilder addAttributeDesign(String name, AttributeDesignDef attributeDesign) {
-            this.attributeDesignMap.put(name, attributeDesign);
+        public DesignDefBuilder addAttributeDesign(DefDescriptor<AttributeDesignDef> desc,
+                AttributeDesignDef attributeDesign) {
+            this.attributeDesignMap.put(desc, attributeDesign);
             return this;
         }
 
@@ -106,6 +167,16 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         public DesignDefBuilder setLabel(String label) {
             this.label = label;
             return this;
+        }
+
+        @Override
+        public DesignDefBuilder setDesignTemplateDef(DesignTemplateDef template) {
+            this.template = template;
+            return this;
+        }
+
+        public DesignTemplateDef getDesignTemplateDef() {
+            return template;
         }
     }
 }

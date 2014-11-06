@@ -16,48 +16,45 @@
 package org.auraframework.impl.root.parser.handler;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-public class DesignDefHandlerTest extends AuraImplTestCase {
-
-    public DesignDefHandlerTest(String name) {
+public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
+    public DesignTemplateRegionDefHandlerTest(String name) {
         super(name);
     }
 
     public void testGetElement() throws Exception {
-        DesignDef element = setupSimpleDesignDef("<design:component label=\"some label\" />").getDef();
-        assertEquals("some label", element.getLabel());
+        String name = "regionone";
+        DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\"/>");
+
+        assertEquals("regionone", element.getName());
+        assertTrue(element.getAllowedInterfaces().isEmpty());
     }
 
-    public void testRetrieveSingleAttributeDesign() throws Exception {
-        DesignDef element = setupSimpleDesignDef(
-                "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>")
-                .getDef();
-        AttributeDesignDef child = element.getAttributeDesignDef("mystring");
-        assertNotNull("Expected one AttributeDesignDef", child);
-        assertTrue(child.isRequired());
-    }
+    public void testAllowedInterfaces() throws Exception {
+        String name = "regionone";
+        DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name
+                + "\" allowedInterfaces=\"test:fakeInterface\"/>");
 
-    public void testMultipleDesignTemplatesFailure() throws Exception {
-        try {
-            setupSimpleDesignDef(
-                    "<design:component><design:template /><design:template /></design:component>")
-                    .getDef();
-            fail("Expected InvalidDefinitionException to be thrown");
-        } catch (Exception t) {
-            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    "<design:component> may only contain one design:template definition");
+        assertEquals("regionone", element.getName());
+        assertTrue(element.getAllowedInterfaces().size() == 1);
+
+        for (DefDescriptor<InterfaceDef> intf : element.getAllowedInterfaces()) {
+            assertEquals("markup://test:fakeInterface", intf.getQualifiedName());
+            assertTrue(intf.exists());
         }
     }
 
     public void testInvalidSystemAttributeName() throws Exception {
         try {
-            setupSimpleDesignDef("<design:component foo=\"bar\" />").getDef();
+            String name = "regionone";
+            setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\" foo=\"bar\" />");
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, "Invalid attribute \"foo\"");
@@ -66,23 +63,26 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
-            setupSimpleDesignDef("<design:component other:label=\"some label\" />").getDef();
+            String name = "regionone";
+            setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\" other:name=\"asdf\" />");
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    "Invalid attribute \"other:label\"");
+                    "Invalid attribute \"other:name\"");
         }
     }
 
-    private DefDescriptor<DesignDef> setupSimpleDesignDef(String markup) {
+    private DesignTemplateRegionDef setupDesignTemplateRegionDef(String name, String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class);
         String cmpBody = "<aura:attribute name='mystring' type='String' />";
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpBody));
 
-        DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        addSourceAutoCleanup(desc, markup);
-        return desc;
+        addSourceAutoCleanup(designDesc,
+                String.format("<design:component><design:template>%s</design:template></design:component>", markup));
+
+        return designDesc.getDef().getDesignTemplateDef().getDesignTemplateRegionDef(name);
     }
 }

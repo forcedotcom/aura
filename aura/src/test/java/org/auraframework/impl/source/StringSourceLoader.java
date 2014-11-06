@@ -33,6 +33,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
@@ -59,16 +60,15 @@ import com.google.common.collect.Sets;
 
 /**
  * This source loader allows tests to load and unload source from strings.
- *
+ * 
  * This loader is a singleton to ensure that it can be authoritative for the "string" namespace.
- *
- * FIXME: W-1933490!!!! The namespaces map is very dangerous here, as it is mutable in ways that
- * aura does not expect. There is a lock to ensure that the read/modify/write operations that are used
- * by source 'put' methods are atomic, but that does not guarantee coherency. In particular, we may
- * lie to aura and say that we have namespaces that we don't, or provide descriptors via find that aura
- * will not be able to find because it has a fixed idea of the namespaces represented. This could be
- * fixed by providing a fixed view into the namespaces provided.
- *
+ * 
+ * FIXME: W-1933490!!!! The namespaces map is very dangerous here, as it is mutable in ways that aura does not expect.
+ * There is a lock to ensure that the read/modify/write operations that are used by source 'put' methods are atomic, but
+ * that does not guarantee coherency. In particular, we may lie to aura and say that we have namespaces that we don't,
+ * or provide descriptors via find that aura will not be able to find because it has a fixed idea of the namespaces
+ * represented. This could be fixed by providing a fixed view into the namespaces provided.
+ * 
  */
 public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
@@ -84,7 +84,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
             DefType.INCLUDE, DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
             DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
-            DefType.TESTSUITE, DefType.RESOURCE);
+            DefType.TESTSUITE, DefType.RESOURCE, DefType.DESIGN);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls to add a source.
@@ -110,13 +110,12 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 
     private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> customNamespaces = new ConcurrentHashMap<>();
 
-    
     private StringSourceLoader() {
         namespaces.put(DEFAULT_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
         namespaces.put(OTHER_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
-        
+
         customNamespaces.put(DEFAULT_CUSTOM_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
         customNamespaces.put(OTHER_CUSTOM_NAMESPACE,
@@ -155,7 +154,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
                 name = namePrefix.substring(idx + 1);
             }
         }
-        
+
         return descriptorInfo.getDescriptor(namespace, name + counter.incrementAndGet());
     }
 
@@ -171,7 +170,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      */
     public final <D extends Definition> StringSource<D> addSource(Class<D> defClass, String contents,
             @Nullable String namePrefix, boolean isPrivilegedNamespace) {
-    	return putSource(defClass, contents, namePrefix, false, isPrivilegedNamespace);
+        return putSource(defClass, contents, namePrefix, false, isPrivilegedNamespace);
     }
 
     /**
@@ -189,7 +188,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         DefDescriptor<D> descriptor = createStringSourceDescriptor(namePrefix, defClass);
         return putSource(descriptor, contents, overwrite, isPrivilegedNamespace);
     }
-    
+
     /**
      * Load a definition.
      * 
@@ -227,21 +226,21 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         try {
             String namespace = descriptor.getNamespace();
             Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap;
-           
-            if(isPrivilegedNamespace){
-            	sourceMap = namespaces.get(namespace);
+
+            if (isPrivilegedNamespace) {
+                sourceMap = namespaces.get(namespace);
             }
-            else{
-            	sourceMap = customNamespaces.get(namespace);
+            else {
+                sourceMap = customNamespaces.get(namespace);
             }
 
             if (sourceMap == null) {
                 sourceMap = Maps.newHashMap();
-                if(isPrivilegedNamespace){
-                	namespaces.put(namespace, sourceMap);
+                if (isPrivilegedNamespace) {
+                    namespaces.put(namespace, sourceMap);
                 }
-                else{
-                	customNamespaces.put(namespace, sourceMap);
+                else {
+                    customNamespaces.put(namespace, sourceMap);
                 }
             } else {
                 boolean containsKey = sourceMap.containsKey(descriptor);
@@ -271,22 +270,23 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         try {
             String namespace = descriptor.getNamespace();
             Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap;
-            
-            if(namespaces.containsKey(namespace)){
-	            sourceMap = namespaces.get(namespace);
-	            Preconditions.checkState(sourceMap != null);
-	            Preconditions.checkState(sourceMap.remove(descriptor) != null);
-	            if (!DEFAULT_NAMESPACE.equals(namespace) && !OTHER_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
-	                namespaces.remove(namespace);
-	            }
+
+            if (namespaces.containsKey(namespace)) {
+                sourceMap = namespaces.get(namespace);
+                Preconditions.checkState(sourceMap != null);
+                Preconditions.checkState(sourceMap.remove(descriptor) != null);
+                if (!DEFAULT_NAMESPACE.equals(namespace) && !OTHER_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
+                    namespaces.remove(namespace);
+                }
             }
-            else if(customNamespaces.containsKey(namespace)){
-	            sourceMap = customNamespaces.get(namespace);
-	            Preconditions.checkState(sourceMap != null);
-	            Preconditions.checkState(sourceMap.remove(descriptor) != null);
-	            if (!DEFAULT_CUSTOM_NAMESPACE.equals(namespace) && !OTHER_CUSTOM_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
-	            	customNamespaces.remove(namespace);
-	            }	
+            else if (customNamespaces.containsKey(namespace)) {
+                sourceMap = customNamespaces.get(namespace);
+                Preconditions.checkState(sourceMap != null);
+                Preconditions.checkState(sourceMap.remove(descriptor) != null);
+                if (!DEFAULT_CUSTOM_NAMESPACE.equals(namespace) && !OTHER_CUSTOM_NAMESPACE.equals(namespace)
+                        && sourceMap.isEmpty()) {
+                    customNamespaces.remove(namespace);
+                }
             }
         } finally {
             nsLock.unlock();
@@ -333,16 +333,16 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     public <D extends Definition> Set<DefDescriptor<D>> find(Class<D> primaryInterface, String prefix,
             String namespace) {
         Set<DefDescriptor<D>> ret = Sets.newHashSet();
-        
+
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = null;
-        
-        if(namespaces.containsKey(namespace)){
-        	sourceMap = namespaces.get(namespace);
+
+        if (namespaces.containsKey(namespace)) {
+            sourceMap = namespaces.get(namespace);
         }
-        else if(customNamespaces.containsKey(namespace)){
-        	sourceMap = customNamespaces.get(namespace);
+        else if (customNamespaces.containsKey(namespace)) {
+            sourceMap = customNamespaces.get(namespace);
         }
-        
+
         if (sourceMap != null) {
             for (DefDescriptor<? extends Definition> desc : sourceMap.keySet()) {
                 if (desc.getDefType().getPrimaryInterface() == primaryInterface && desc.getPrefix().equals(prefix)) {
@@ -360,10 +360,10 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 
     @Override
     public Set<String> getNamespaces() {
-    	Set<String> allNamespaces = new HashSet<>(namespaces.keySet());
-    	Set<String> cNamespaces = new HashSet<>(customNamespaces.keySet());
-    	allNamespaces.addAll(cNamespaces);
-    	return ImmutableSet.copyOf(allNamespaces);
+        Set<String> allNamespaces = new HashSet<>(namespaces.keySet());
+        Set<String> cNamespaces = new HashSet<>(customNamespaces.keySet());
+        allNamespaces.addAll(cNamespaces);
+        return ImmutableSet.copyOf(allNamespaces);
     }
 
     @Override
@@ -375,14 +375,14 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = null;
-        		
-        if(namespaces.containsKey(descriptor.getNamespace())){
-        	sourceMap = namespaces.get(descriptor.getNamespace());
+
+        if (namespaces.containsKey(descriptor.getNamespace())) {
+            sourceMap = namespaces.get(descriptor.getNamespace());
         }
-        else if(customNamespaces.containsKey(descriptor.getNamespace())){
-        	sourceMap = customNamespaces.get(descriptor.getNamespace());
-        }		
-        
+        else if (customNamespaces.containsKey(descriptor.getNamespace())) {
+            sourceMap = customNamespaces.get(descriptor.getNamespace());
+        }
+
         if (sourceMap != null) {
             StringSource<D> ret = (StringSource<D>) sourceMap.get(descriptor);
             if (ret != null) {
@@ -414,7 +414,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         STYLE(StyleDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
         TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+        THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        DESIGN(DesignDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
 
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
 
@@ -459,9 +460,9 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             return delimiter;
         }
     }
-    
+
     @Override
-	public boolean isPrivilegedNamespace(String namespace) {
-    	return namespace != null && namespaces.containsKey(namespace);		   
-	}
+    public boolean isPrivilegedNamespace(String namespace) {
+        return namespace != null && namespaces.containsKey(namespace);
+    }
 }

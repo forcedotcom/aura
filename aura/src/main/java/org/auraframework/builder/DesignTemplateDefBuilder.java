@@ -15,16 +15,13 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
 import org.auraframework.def.DesignTemplateDef;
+import org.auraframework.def.DesignTemplateRegionDef;
 
-public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
-    public DesignDefBuilder addAttributeDesign(DefDescriptor<AttributeDesignDef> desc,
-            AttributeDesignDef attributeDesign);
+public interface DesignTemplateDefBuilder extends DefBuilder<DesignTemplateDef, DesignTemplateDef> {
+    public DesignTemplateDefBuilder setName(String name);
 
-    public DesignDefBuilder setLabel(String label);
-
-    public DesignDefBuilder setDesignTemplateDef(DesignTemplateDef template);
+    public DesignTemplateDefBuilder addDesignTemplateRegion(DefDescriptor<DesignTemplateRegionDef> desc,
+            DesignTemplateRegionDef region);
 }

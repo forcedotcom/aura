@@ -16,48 +16,31 @@
 package org.auraframework.impl.root.parser.handler;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-public class DesignDefHandlerTest extends AuraImplTestCase {
-
-    public DesignDefHandlerTest(String name) {
+public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
+    public DesignTemplateDefHandlerTest(String name) {
         super(name);
     }
 
     public void testGetElement() throws Exception {
-        DesignDef element = setupSimpleDesignDef("<design:component label=\"some label\" />").getDef();
-        assertEquals("some label", element.getLabel());
+        DesignTemplateDef element = setupDesignTemplateDef("<design:template><design:region name=\"regionone\"/></design:template>");
+        assertNotNull(element.getDesignTemplateRegionDef("regionone"));
     }
 
-    public void testRetrieveSingleAttributeDesign() throws Exception {
-        DesignDef element = setupSimpleDesignDef(
-                "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>")
-                .getDef();
-        AttributeDesignDef child = element.getAttributeDesignDef("mystring");
-        assertNotNull("Expected one AttributeDesignDef", child);
-        assertTrue(child.isRequired());
-    }
-
-    public void testMultipleDesignTemplatesFailure() throws Exception {
-        try {
-            setupSimpleDesignDef(
-                    "<design:component><design:template /><design:template /></design:component>")
-                    .getDef();
-            fail("Expected InvalidDefinitionException to be thrown");
-        } catch (Exception t) {
-            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    "<design:component> may only contain one design:template definition");
-        }
+    public void testGetEmptyTemplate() throws Exception {
+        DesignTemplateDef element = setupDesignTemplateDef("<design:template></design:template>");
+        assertTrue(element.getDesignTemplateRegionDefs().isEmpty());
     }
 
     public void testInvalidSystemAttributeName() throws Exception {
         try {
-            setupSimpleDesignDef("<design:component foo=\"bar\" />").getDef();
+            setupDesignTemplateDef("<design:template name=\"template\" foo=\"bar\" />");
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, "Invalid attribute \"foo\"");
@@ -66,23 +49,24 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
-            setupSimpleDesignDef("<design:component other:label=\"some label\" />").getDef();
+            setupDesignTemplateDef("<design:template name=\"template\" other:name=\"asdf\" />");
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    "Invalid attribute \"other:label\"");
+                    "Invalid attribute \"other:name\"");
         }
     }
 
-    private DefDescriptor<DesignDef> setupSimpleDesignDef(String markup) {
+    private DesignTemplateDef setupDesignTemplateDef(String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class);
         String cmpBody = "<aura:attribute name='mystring' type='String' />";
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpBody));
 
-        DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        addSourceAutoCleanup(desc, markup);
-        return desc;
+        addSourceAutoCleanup(designDesc, String.format("<design:component>%s</design:component>", markup));
+
+        return designDesc.getDef().getDesignTemplateDef();
     }
 }

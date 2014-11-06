@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.def;
 
-import org.auraframework.def.AttributeDesignDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DesignTemplateDef;
+import java.util.Set;
 
-public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
-    public DesignDefBuilder addAttributeDesign(DefDescriptor<AttributeDesignDef> desc,
-            AttributeDesignDef attributeDesign);
+public interface DesignTemplateRegionDef extends Definition {
+    @Override
+    public DefDescriptor<DesignTemplateRegionDef> getDescriptor();
 
-    public DesignDefBuilder setLabel(String label);
-
-    public DesignDefBuilder setDesignTemplateDef(DesignTemplateDef template);
+    /**
+     * Get a set of allowed aura interfaces for the region. A component included within the region must implement at
+     * least one of the interfaces. Optional, may be empty.
+     * 
+     * @return set of allowed interface descriptors, may be empty.
+     */
+    public Set<DefDescriptor<InterfaceDef>> getAllowedInterfaces();
 }

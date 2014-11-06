@@ -44,7 +44,8 @@ public abstract class XMLHandler<T extends Definition> {
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
             EventHandlerDefHandler.TAG, ImportDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG,
             LayoutItemDefHandler.TAG, RegisterEventHandler.TAG, AttributeDefRefHandler.TAG, DependencyDefHandler.TAG,
-            NamespaceDefHandler.TAG, ThemeDefHandler.TAG, DesignDefHandler.TAG, AttributeDesignDefHandler.TAG);
+            NamespaceDefHandler.TAG, ThemeDefHandler.TAG, DesignDefHandler.TAG, AttributeDesignDefHandler.TAG,
+            DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG);
 
     protected final XMLStreamReader xmlReader;
     protected final XMLStreamWriter xmlWriter;

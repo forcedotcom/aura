@@ -18,8 +18,6 @@ package org.auraframework.adapter;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.resource.ResourceLoader;
 
@@ -79,18 +77,4 @@ public interface ConfigAdapter extends AuraAdapter {
 	boolean isDocumentedNamespace(String namespace);
 	
 	boolean isCacheablePrefix(String prefix);
-
-	/**
-	 * Gets the Content-Security-Policy and X-FRAME-OPTION whitelist for a
-	 * given app.  The returned object describes most of what could go into
-	 * a Content-Security-Policy header, although at time of writing only
-	 * {@code frame-src} is used.
-	 *
-	 * @param app the fully-qualified descriptor string for the app
-	 * @param request the HTTP request, for checking URI, authenticated user, etc.
-	 * @return {@code null} to avoid using Content-Security-Policy and X-FRAME-OPTIONS
-	 *    headers entirely.  Or a {@link ContentSecurityPolicy} object describing the
-	 *    actual policy desired.
-	 */
-	ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request);
 }

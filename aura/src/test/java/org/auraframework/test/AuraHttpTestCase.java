@@ -68,6 +68,8 @@ import com.google.common.collect.Maps;
  * Base class with some helper methods specific to Aura.
  */
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
+	private static final String SAMEORIGIN = "SAMEORIGIN";
+	private static final String X_FRAME_OPTIONS = "X-FRAME-OPTIONS";
 	    
     public AuraHttpTestCase(String name) {
         super(name);
@@ -92,70 +94,10 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         assertEquals(msg, statusCode, status);
     }
     
-    /**
-     * Helper method to check that a response has the default X-FRAME-OPTIONS and
-     * Content-Security-Policy headers.  If your test doesn't use the default security policy,
-     * you get to roll your own validation of that, of course.
-     *
-     * Asserts if anything is wrong.
-     *
-     * @param response
-     * @param guarded  If {@code true}, check that we HAVE headers.  If {@code false}, check that they are absent.
-     * @param allowInline Allows inline script-src and style-src
-     */
-    protected void assertDefaultAntiClickjacking(HttpResponse response, boolean guarded, boolean allowInline) {
-        // Check default content security
-        Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
-        if (guarded) {
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
-            assertEquals("SAMEORIGIN", headers[0].getValue());
-        } else {
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
-        }
-        if (guarded) {
-            Map<String, String> csp = getCSP(response);
-            headers = response.getHeaders("Content-Type");
-            assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
-            if (allowInline) {
-                assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'", csp.get("script-src"));
-                assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'", csp.get("style-src"));
-            } else {
-                assertEquals("script-src is wrong", "'self' chrome-extension:", csp.get("script-src"));
-                assertEquals("style-src is wrong", "'self' chrome-extension:", csp.get("style-src"));
-            }
-            // These maybe aren't strictly "anti-clickjacking", but since we're testing the rest of the default CSP:
-            assertEquals("font-src is wrong", "*", csp.get("font-src"));
-            assertEquals("img-src is wrong", "*", csp.get("img-src"));
-            assertEquals("media-src is wrong", "*", csp.get("media-src"));
-            assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
-            assertEquals("object-src is wrong", "'self'", csp.get("object-src"));
-            assertEquals("connect-src is wrong", "'self' http://invalid.salesforce.com", csp.get("connect-src"));
-        } else {
-            headers = response.getHeaders("Content-Security-Policy");
-            assertEquals(0, headers.length);
-        }
-    }
-
-    /**
-     * Helper to take the Content-Security-Policy header and break it into its individual components.
-     * If the header is missing, this will fail the test with an assertion.  Otherwise, a map keyed by
-     * the various CSP directives (script-src, style-src, etc.) with the literal values of each
-     * directive is returned.
-     *
-     * @param response
-     * @return a map of directive to value.
-     */
-    protected Map<String, String> getCSP(HttpResponse response) {
-        Header[] headers = response.getHeaders("Content-Security-Policy");
-        assertEquals("wrong number of CSP header lines", 1, headers.length);
-        String[] split = headers[0].getValue().split(";");
-        Map<String, String> csp = new HashMap<String, String>();
-        for (String term : split) {
-            term = term.trim();
-            String word = term.substring(0, term.indexOf(' '));
-            csp.put(word, term.substring(word.length() + 1));
-        }
-        return csp;
+    protected void assertAntiClickjacking(HttpResponse response) {
+    	assertTrue(response.getFirstHeader(X_FRAME_OPTIONS) != null);
+    	assertEquals("Failed to use anti-clickjacking " + X_FRAME_OPTIONS, 
+                SAMEORIGIN, response.getFirstHeader(X_FRAME_OPTIONS).getValue());
     }
 
     protected String getHost() throws Exception {

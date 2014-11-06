@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext;
@@ -77,8 +76,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
         String charset = Charsets.UTF_8.toString();
         response.setStatus(HttpServletResponse.SC_OK);
         response.setCharacterEncoding(charset);
-        setBasicHeaders(Aura.getContextService().getCurrentContext().getApplicationDescriptor(),
-                request, response);
+        setBasicHeaders(response);
 
         if (report != null) {
             File reportFile = new File(report);

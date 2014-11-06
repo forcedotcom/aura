@@ -32,13 +32,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ContentSecurityPolicy;
-import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.source.file.AuraFileMonitor;
@@ -480,24 +476,5 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean isCacheablePrefix(String prefix) {
         return CACHEABLE_PREFIXES.contains(prefix);
-    }
-
-    /**
-     * This default implementation of {@link ConfigAdapter#getContentSecurityPolicy(String)}
-     * will return a default ContentSecurityPolicy object.
-     */
-    @Override
-    public ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request) {
-        // For some (too many!) URIs, we allow inline style.  Note that the request has already gone
-        // through {@link AuraRewriteFilter}, so its URI may be surprising.
-        boolean inlineStyle = false;  // unless we know we should, we don't want inlines
-        String format = request.getParameter("aura.format");
-        if ("HTML".equals(format)) {
-            String defType = request.getParameter("aura.deftype");
-            if ("APPLICATION".equals(defType) || "COMPONENT".equals(defType)) {
-                inlineStyle = true;  // apps and components allow inlines.  Sigh.
-            }
-        }
-        return new DefaultContentSecurityPolicy(inlineStyle);
     }
 }

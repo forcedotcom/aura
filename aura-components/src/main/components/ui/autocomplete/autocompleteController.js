@@ -21,6 +21,7 @@
             inputCmp.addHandler("keydown", component, "c.handleKeyAction");
             inputCmp.addHandler("focus", component, "c.handleFocus");
         }
+        helper.relayEvents(component);
         // This calls a function (callback) in a delayed manner and it can be cancelled.
         component._delay = (function(){
             var timer = 0;
@@ -34,6 +35,14 @@
     fetchData: function(component, event, helper) {
         helper.fetchData(component, event);
     },
+    
+    fireEventsFromInput: function(component, event, helper) {
+        var e = component.getEvent(event.getName());
+        if (e) {
+        	e.setParams(event.getParams());
+        	e.fire();
+        }
+    }, 
     
     handleFocus: function(component, event, helper) {
         var inputCmp = event.getSource();

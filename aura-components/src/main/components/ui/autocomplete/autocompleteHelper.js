@@ -123,6 +123,22 @@
     },
     
     /**
+     * Any event fired on input field, we need fire a same one on autocomplete.
+     */
+    relayEvents: function(component) {
+    	var inputCmp = component.find("input");
+        if (inputCmp) {
+        	var handledEvents = component.getHandledEvents();
+        	for ( var name in handledEvents) {
+        		var eventDef = inputCmp.getDef().getEventDef(name);
+    			if (eventDef && handledEvents.hasOwnProperty(name) && handledEvents[name] === true) {
+                    inputCmp.addHandler(name, component, "c.fireEventsFromInput");
+    			}
+    		}
+        } 
+    },
+    
+    /**
      * Tell list component which elements it should ignore to handle collapse.
      *
      */

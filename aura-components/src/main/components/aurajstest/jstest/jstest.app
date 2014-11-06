@@ -16,9 +16,6 @@
 
 -->
 <aura:application access="GLOBAL" model="java://org.auraframework.components.aurajstest.JSTestModel">
-    <aura:if isTrue="{!m.isHybrid}">
-        <script src="/auraFW/resources/mobileSdk2.0/cordova-2.3.0.js"></script>
-    </aura:if>
     <aura:attribute name="descriptor" type="String" default="ui:button"/>
     <aura:attribute name="defType" type="String" default="COMPONENT"/>
     <aura:attribute name="index" type="Integer" default="0"/>

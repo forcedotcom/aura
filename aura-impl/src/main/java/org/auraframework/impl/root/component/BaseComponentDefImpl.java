@@ -523,6 +523,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(cmpThemeDescriptor);
         }
 
+        if (designDefDescriptor != null) {
+            dependencies.add(designDefDescriptor);
+        }
+
         if (imports != null) {
             for (ImportDef imported : imports) {
                 dependencies.add(imported.getDescriptor());

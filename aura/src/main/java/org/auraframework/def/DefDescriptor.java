@@ -24,14 +24,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
 /**
- * A descriptor "handle" for a definition. For applications which care about
- * sorting, such as generating a unique hash from an application and all its
- * dependencies, descriptors are comparable by their qualified name
+ * A descriptor "handle" for a definition. For applications which care about sorting, such as generating a unique hash
+ * from an application and all its dependencies, descriptors are comparable by their qualified name
  * (case-insensitively).
  * 
- * @param <T>
- *            the more specific subtype of definition being described, e.g.
- *            {@link ComponentDef}, {@link EventDef}, etc.
+ * @param <T> the more specific subtype of definition being described, e.g. {@link ComponentDef}, {@link EventDef}, etc.
  */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         Serializable, Comparable<DefDescriptor<?>> {
@@ -64,7 +61,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
         @Override
         public int hashCode() {
-            return name.hashCode() + clazz.hashCode() + (bundle !=null?bundle.hashCode():0);
+            return name.hashCode() + clazz.hashCode() + (bundle != null ? bundle.hashCode() : 0);
         }
 
         @Override
@@ -77,7 +74,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
             }
             DescriptorKey dk = (DescriptorKey) obj;
             return dk.clazz.equals(clazz) && dk.name.equals(name)
-                && (dk.bundle == bundle || dk.bundle != null && dk.bundle.equals(bundle));
+                    && (dk.bundle == bundle || dk.bundle != null && dk.bundle.equals(bundle));
         }
 
         public String getName() {
@@ -90,25 +87,25 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
         public DefDescriptor<? extends Definition> getBundle() {
             return bundle;
+        }
     }
-    }
-    
-	public static enum DefType {
-		ATTRIBUTE(AttributeDef.class), //
-		APPLICATION(ApplicationDef.class, true), //
-		COMPONENT(ComponentDef.class, true), //
-		EVENT(EventDef.class, true), //
-		HELPER(HelperDef.class), //
-		INTERFACE(InterfaceDef.class, true), //
-		CONTROLLER(ControllerDef.class), //
-		MODEL(ModelDef.class), //
-		LIBRARY(LibraryDef.class, true), //
-		INCLUDE(IncludeDef.class), //
-		RENDERER(RendererDef.class), //
-		ACTION(ActionDef.class), //
-		TYPE(TypeDef.class), //
-		STYLE(StyleDef.class), //
-		THEME(ThemeDef.class, true), //
+
+    public static enum DefType {
+        ATTRIBUTE(AttributeDef.class), //
+        APPLICATION(ApplicationDef.class, true), //
+        COMPONENT(ComponentDef.class, true), //
+        EVENT(EventDef.class, true), //
+        HELPER(HelperDef.class), //
+        INTERFACE(InterfaceDef.class, true), //
+        CONTROLLER(ControllerDef.class), //
+        MODEL(ModelDef.class), //
+        LIBRARY(LibraryDef.class, true), //
+        INCLUDE(IncludeDef.class), //
+        RENDERER(RendererDef.class), //
+        ACTION(ActionDef.class), //
+        TYPE(TypeDef.class), //
+        STYLE(StyleDef.class), //
+        THEME(ThemeDef.class, true), //
         THEME_DEF_REF(ThemeDefRef.class), //
         THEME_PROVIDER(ThemeDescriptorProviderDef.class), //
         THEME_MAP_PROVIDER(ThemeMapProviderDef.class), //
@@ -125,130 +122,124 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class),
         DESIGN(DesignDef.class),
-        ATTRIBUTE_DESIGN(AttributeDesignDef.class);
+        ATTRIBUTE_DESIGN(AttributeDesignDef.class),
+        DESIGN_TEMPLATE(DesignTemplateDef.class),
+        DESIGN_TEMPLATE_REGION(DesignTemplateRegionDef.class);
 
-		
-		private static Map<Class<? extends Definition>, DefType> defTypeMap;
-		
-		private final Class<? extends Definition> clz;
-		private final boolean definesBundle;
+        private static Map<Class<? extends Definition>, DefType> defTypeMap;
 
-		private DefType(Class<? extends Definition> clz) {
-		    this(clz, false);
-		}
-		
-		private DefType(Class<? extends Definition> clz, boolean definesBundle) {
-			this.clz = clz;
-			this.definesBundle = definesBundle;
-			mapDefType(clz, this);
-		}
+        private final Class<? extends Definition> clz;
+        private final boolean definesBundle;
+
+        private DefType(Class<? extends Definition> clz) {
+            this(clz, false);
+        }
+
+        private DefType(Class<? extends Definition> clz, boolean definesBundle) {
+            this.clz = clz;
+            this.definesBundle = definesBundle;
+            mapDefType(clz, this);
+        }
 
         private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
-			if (defTypeMap == null) {
-				defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
-			}
+            if (defTypeMap == null) {
+                defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
+            }
 
-			defTypeMap.put(clz, defType);
-		}
+            defTypeMap.put(clz, defType);
+        }
 
-		public Class<? extends Definition> getPrimaryInterface() {
-			return clz;
-		}
-		
-		/**
-		 * Indicated this def type can stand alone in a bundle.
-		 */
-		public boolean definesBundle() {
-		    return definesBundle;
-		}
+        public Class<? extends Definition> getPrimaryInterface() {
+            return clz;
+        }
 
-		public static boolean hasDefType(Class<?> primaryInterface) {
-			return defTypeMap.containsKey(primaryInterface);
-		}
+        /**
+         * Indicated this def type can stand alone in a bundle.
+         */
+        public boolean definesBundle() {
+            return definesBundle;
+        }
 
-		public static DefType getDefType(
-				Class<? extends Definition> primaryInterface) {
-			DefType ret = defTypeMap.get(primaryInterface);
-			if (ret == null) {
-				String message = String
-						.format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
-								primaryInterface.getName(), defTypeMap.keySet()
-										.toString());
-				throw new AuraRuntimeException(message);
-			}
-			return ret;
-		}
-	}
+        public static boolean hasDefType(Class<?> primaryInterface) {
+            return defTypeMap.containsKey(primaryInterface);
+        }
 
-	/**
-	 * @return The name of this descriptor
-	 */
-	String getName();
+        public static DefType getDefType(
+                Class<? extends Definition> primaryInterface) {
+            DefType ret = defTypeMap.get(primaryInterface);
+            if (ret == null) {
+                String message = String
+                        .format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
+                                primaryInterface.getName(), defTypeMap.keySet()
+                                        .toString());
+                throw new AuraRuntimeException(message);
+            }
+            return ret;
+        }
+    }
 
-	/**
-	 * @return The pseudo-protocol, namespace, and name of this descriptor
-	 */
-	String getQualifiedName();
+    /**
+     * @return The name of this descriptor
+     */
+    String getName();
 
-	/**
-	 * @return the namespace and name portion of this descriptor for cases where
-	 *         the prefix/protocol is already known.
-	 */
-	String getDescriptorName();
+    /**
+     * @return The pseudo-protocol, namespace, and name of this descriptor
+     */
+    String getQualifiedName();
 
-	/**
-	 * @return The prefix/protocol of this descriptor
-	 */
-	String getPrefix();
+    /**
+     * @return the namespace and name portion of this descriptor for cases where the prefix/protocol is already known.
+     */
+    String getDescriptorName();
 
-	/**
-	 * @return the namespace, if this descriptor has one
-	 */
-	String getNamespace();
+    /**
+     * @return The prefix/protocol of this descriptor
+     */
+    String getPrefix();
 
-	/**
-	 * @return The portion of a name occurring within any generic delimiters,
-	 *         such as < >, including said delimiters
-	 */
-	String getNameParameters();
+    /**
+     * @return the namespace, if this descriptor has one
+     */
+    String getNamespace();
 
-	/**
-	 * @return isParameterized - identifies if additional processing is
-	 *         warranted to consider generic collections should be considered
-	 */
-	boolean isParameterized();
+    /**
+     * @return The portion of a name occurring within any generic delimiters, such as < >, including said delimiters
+     */
+    String getNameParameters();
 
-	/**
-	 * @return The type of this definition, which can be used to branch and
-	 *         parse serialized representations
-	 */
-	DefType getDefType();
+    /**
+     * @return isParameterized - identifies if additional processing is warranted to consider generic collections should
+     *         be considered
+     */
+    boolean isParameterized();
 
+    /**
+     * @return The type of this definition, which can be used to branch and parse serialized representations
+     */
+    DefType getDefType();
 
     /**
      * get the 'bundle' for this descriptor.
-     *
-     * If we have a bundle for the descriptor, then the descriptor is for a file within the
-     * bundle, and it is fully specified by the bundle descriptor plus the name from this
-     * descriptor.
-     *
+     * 
+     * If we have a bundle for the descriptor, then the descriptor is for a file within the bundle, and it is fully
+     * specified by the bundle descriptor plus the name from this descriptor.
+     * 
      * @return the bundle associated with this descriptor.
      */
     DefDescriptor<? extends Definition> getBundle();
 
-	/**
-	 * Gets the actual definition described by this descriptor, compiling it if
-	 * necessary, from Aura's definition service.
-	 * 
-	 * @return the definition (compiles it if necessary)
-	 * @throws QuickFixException
-	 *             if the definition is not found
-	 */
-	T getDef() throws QuickFixException;
+    /**
+     * Gets the actual definition described by this descriptor, compiling it if necessary, from Aura's definition
+     * service.
+     * 
+     * @return the definition (compiles it if necessary)
+     * @throws QuickFixException if the definition is not found
+     */
+    T getDef() throws QuickFixException;
 
-	/**
-	 * @return true if the definition represented by this descriptor exists at
-	 *         all. does not compile the definition
-	 */
-	boolean exists();
+    /**
+     * @return true if the definition represented by this descriptor exists at all. does not compile the definition
+     */
+    boolean exists();
 }

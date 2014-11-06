@@ -47,6 +47,9 @@ public class DesignTemplateRegionDefImpl extends DefinitionImpl<DesignTemplateRe
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
+        // Validate that any referenced interfaces exist as accessible definitions.
+        // If the definition does not exist or isn't accessible, the template definition
+        // will be considered invalid.
         MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         if (!allowedInterfaces.isEmpty()) {
             for (DefDescriptor<InterfaceDef> intf : allowedInterfaces) {

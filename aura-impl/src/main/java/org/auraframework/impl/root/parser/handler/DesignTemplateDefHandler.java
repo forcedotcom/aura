@@ -26,7 +26,6 @@ import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.impl.design.DesignTemplateDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -52,8 +51,7 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
         if (name == null) {
             name = ((DesignDefHandler) getParentHandler()).getNextId();
         }
-        builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor,
-                DesignTemplateDef.class));
+        builder.setDescriptor(DefDescriptorImpl.getInstance(name, DesignTemplateDef.class));
         builder.setName(name);
         builder.setLocation(getLocation());
     }

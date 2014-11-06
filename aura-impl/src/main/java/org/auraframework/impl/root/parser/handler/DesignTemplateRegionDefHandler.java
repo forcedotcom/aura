@@ -27,7 +27,6 @@ import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.design.DesignTemplateRegionDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -55,8 +54,7 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
 
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor,
-                    DesignTemplateRegionDef.class));
+            builder.setDescriptor(DefDescriptorImpl.getInstance(name, DesignTemplateRegionDef.class));
             builder.setName(name);
         } else {
             error("Name attribute is required for design template region definitions");

@@ -55,6 +55,10 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
+        // Each <design:attribute> must have a matching <aura:attribute> in the component definition.
+        // This will first validate that the component definition exists. If the component exists, we must
+        // iterate through each design attribute definition and validate that a matching aura attribute
+        // definition exists on the component definition.
         DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
                 ComponentDef.class);
 

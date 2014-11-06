@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.impl.design.AttributeDesignDefImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -77,8 +77,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         String description = getAttributeValue(ATTRIBUTE_DESCRIPTION);
 
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getParentHandler().defDescriptor,
-                    AttributeDesignDef.class));
+            builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
             builder.setName(name);
         } else {
             error("Name attribute is required for attribute design definitions");

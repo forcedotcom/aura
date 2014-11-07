@@ -2,7 +2,7 @@
 ,{"name":"Aura.CreateComponent.afterRender.removed","value":0}
 ,{"name":"Aura.CreateComponent.component.added","value":19}
 ,{"name":"Aura.CreateComponent.component.removed","value":0}
-,{"name":"Aura.CreateComponent.event.added","value":1}
+,{"name":"Aura.CreateComponent.event.added","value":5}
 ,{"name":"Aura.CreateComponent.event.removed","value":0}
 ,{"name":"Aura.CreateComponent.render.added","value":0}
 ,{"name":"Aura.CreateComponent.render.removed","value":0}
@@ -12,11 +12,11 @@
 ,{"name":"Aura.CreateComponent.unrender.removed","value":0}
 ,{"name":"Aura.RenderComponent.afterRender.added","value":15}
 ,{"name":"Aura.RenderComponent.afterRender.removed","value":0}
-,{"name":"Aura.RenderComponent.component.added","value":0}
+,{"name":"Aura.RenderComponent.component.added","value":3}
 ,{"name":"Aura.RenderComponent.component.removed","value":0}
 ,{"name":"Aura.RenderComponent.event.added","value":0}
 ,{"name":"Aura.RenderComponent.event.removed","value":0}
-,{"name":"Aura.RenderComponent.render.added","value":31}
+,{"name":"Aura.RenderComponent.render.added","value":18}
 ,{"name":"Aura.RenderComponent.render.removed","value":0}
 ,{"name":"Aura.RenderComponent.rerender.added","value":0}
 ,{"name":"Aura.RenderComponent.rerender.removed","value":0}
@@ -27,7 +27,7 @@
 ,{"name":"Timeline.Other.Program","value":18}
 ,{"name":"Timeline.Painting.CompositeLayers","value":4}
 ,{"name":"Timeline.Rendering.ActivateLayerTree","value":4}
-,{"name":"Timeline.Rendering.BeginFrame","value":11}
+,{"name":"Timeline.Rendering.BeginFrame","value":13}
 ,{"name":"Timeline.Rendering.RecalculateStyles","value":1}
 ,{"name":"Timeline.Rendering.RequestMainThreadFrame","value":4}
 ,{"name":"Timeline.Rendering.ScheduleStyleRecalculation","value":1}
@@ -37,4 +37,4 @@
 ,{"name":"Timeline.Scripting.TimeStamp","value":6}
 ,{"name":"Timeline.Scripting.TimerFire","value":3}
 ,{"name":"Timeline.Scripting.TimerInstall","value":3}
-,{"name":"WallTime","value":2015,"units":"milliseconds"}]
+,{"name":"WallTime","value":2689,"units":"milliseconds"}]

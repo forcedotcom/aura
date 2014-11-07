@@ -45,8 +45,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * Used by /expressionTest/expressionFunction.cmp which expects the current
- * return values.
+ * Used by /expressionTest/expressionFunction.cmp which expects the current return values.
  */
 @Model
 public class TestJavaModel {
@@ -59,18 +58,18 @@ public class TestJavaModel {
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<>();
     static List<Item> items;
     static List<Item> itemsEmpty = new ArrayList<>();
-    static List<Item> itemsLarge; 
+    static List<Item> itemsLarge;
     static List<LoadColumn> columns;
     static List<LoadColumn> noColumns = Collections.emptyList();
-    static List<LoadColumn> maxColumns;   
+    static List<LoadColumn> maxColumns;
     static List<ColumnsSelected> columnsSelected;
-    
+
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
         inputOptions.add(new InputOption("Option2", "Opt2", true, "option2"));
         inputOptions.add(new InputOption("Option3", "Opt3", false, "option3"));
         inputOptions.add(new InputOption("Option4", "Opt4", false, "option4", true));
-        
+
         moreInputOptions.add(new InputOption("Option4", "Opt4", false, "val4"));
         moreInputOptions.add(new InputOption("Option5", "Opt5", false, "val5"));
         moreInputOptions.add(new InputOption("Option6", "Opt6", false, "val6"));
@@ -79,39 +78,40 @@ public class TestJavaModel {
             optionMap.put(i.getValue(), getSubCategory(i.getValue()));
         }
     }
-    
-    //Options for perf testing /performanceTest/ui_inputSelect.cmp
+
+    // Options for perf testing /performanceTest/ui_inputSelect.cmp
     static {
-    	InputOption firstOption = new InputOption("Option1", "Opt1", true, "option1");
+        InputOption firstOption = new InputOption("Option1", "Opt1", true, "option1");
         perfInputOptions.add(firstOption);
         morePerfInputOptions.add(firstOption);
         evenMorePerfInputOptions.add(firstOption);
-        
+
         for (int i = 2; i < 101; i++) {
-        	InputOption iOption = new InputOption("Option"+i, "Opt"+i, false, "option"+i);
-        	if (i < 21) {
-        		perfInputOptions.add(iOption);
-        	}
-        	if (i < 51) {
-        		morePerfInputOptions.add(iOption);
-        	}
-        	evenMorePerfInputOptions.add(iOption);
+            InputOption iOption = new InputOption("Option" + i, "Opt" + i, false, "option" + i);
+            if (i < 21) {
+                perfInputOptions.add(iOption);
+            }
+            if (i < 51) {
+                morePerfInputOptions.add(iOption);
+            }
+            evenMorePerfInputOptions.add(iOption);
         }
 
     }
-    
+
     @AuraEnabled
     public ArrayList<InputOption> getPerfOptions() throws QuickFixException {
-    	Integer count = (Integer) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("count");
-    	if (count == null || count < 21) {
-    		return perfInputOptions;
-    	}
-    	else if (count < 51) {
-    		return morePerfInputOptions;
-    	}
-    	else {
-            return evenMorePerfInputOptions;	
-    	}
+        Integer count = (Integer) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+                .getValue("count");
+        if (count == null || count < 21) {
+            return perfInputOptions;
+        }
+        else if (count < 51) {
+            return morePerfInputOptions;
+        }
+        else {
+            return evenMorePerfInputOptions;
+        }
     }
 
     private static ArrayList<InputOption> getSubCategory(String option) {
@@ -128,36 +128,36 @@ public class TestJavaModel {
         }
         return categoryOption;
     }
-    
+
     static {
-    	columns = new ArrayList<>(5);
-    	columns.add(new LoadColumn("Hidden Column", "HiddenColumn", false));
-    	for (int i = 1; i <= 4; i++) {
-    		columns.add(new LoadColumn("Column " + i, "Column" + i));
+        columns = new ArrayList<>(5);
+        columns.add(new LoadColumn("Hidden Column", "HiddenColumn", false));
+        for (int i = 1; i <= 4; i++) {
+            columns.add(new LoadColumn("Column " + i, "Column" + i));
         }
-    	maxColumns = new ArrayList<>(20);
-    	for (int i = 1; i <= 20; i++) {
-    		maxColumns.add(new LoadColumn("Column " + i, "Column" + i));
+        maxColumns = new ArrayList<>(20);
+        for (int i = 1; i <= 20; i++) {
+            maxColumns.add(new LoadColumn("Column " + i, "Column" + i));
         }
     }
-    
+
     static {
-    	columnsSelected = new ArrayList<>(1);
-    	//column2 order should be Z-A
-    	columnsSelected.add(new ColumnsSelected("Column2", false));
+        columnsSelected = new ArrayList<>(1);
+        // column2 order should be Z-A
+        columnsSelected.add(new ColumnsSelected("Column2", false));
     }
-    
+
     static {
-    	items = new ArrayList<>(10);
-    	for (int i = 1; i <= 10; i++) {
+        items = new ArrayList<>(10);
+        for (int i = 1; i <= 10; i++) {
             items.add(new Item("hello world" + i, "id" + i));
         }
-    	itemsLarge = new ArrayList<>(50);
-    	for (int i = 1; i <= 50; i++) {
-    		itemsLarge.add(new Item("some one " + i, "id" + i));
+        itemsLarge = new ArrayList<>(50);
+        for (int i = 1; i <= 50; i++) {
+            itemsLarge.add(new Item("some one " + i, "id" + i));
         }
     }
-    
+
     static {
         iterationData = new LinkedList<>();
         for (int i = 0; i < 26; i++) {
@@ -167,30 +167,29 @@ public class TestJavaModel {
             iterationData.add(theMap);
         }
     }
-   
 
     @AuraEnabled
     public List<Object> getData() {
         return iterationData;
     }
-    
+
     public static class Item implements JsonSerializable {
-        private String label;
-        private String value;
-        
+        private final String label;
+        private final String value;
+
         public Item(String label, String value) {
             this.label = label;
             this.value = value;
         }
-        
+
         public String getLabel() {
             return this.label;
         }
-        
+
         public String getValue() {
             return this.value;
         }
-        
+
         @Override
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();
@@ -199,37 +198,37 @@ public class TestJavaModel {
             json.writeMapEnd();
         }
     }
-    
+
     public static class LoadColumn implements JsonSerializable {
-        private String label;
-        private String fieldName;
-        private Boolean isSortable;
-        
+        private final String label;
+        private final String fieldName;
+        private final Boolean isSortable;
+
         public LoadColumn(String label, String fieldName, Boolean isSortable) {
             this.label = label;
             this.fieldName = fieldName;
             this.isSortable = isSortable;
         }
-        
+
         public LoadColumn(String label, String fieldName) {
             this.label = label;
             this.fieldName = fieldName;
             this.isSortable = true;
         }
-        
+
         public String getLabel() {
-			return label;
-		}
+            return label;
+        }
 
-		public String getFieldName() {
-			return fieldName;
-		}
+        public String getFieldName() {
+            return fieldName;
+        }
 
-		public Boolean getIsSortable() {
-			return isSortable;
-		}
+        public Boolean getIsSortable() {
+            return isSortable;
+        }
 
-		@Override
+        @Override
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();
             json.writeMapEntry("label", this.label);
@@ -238,39 +237,39 @@ public class TestJavaModel {
             json.writeMapEnd();
         }
     }
-    
+
     public static class ColumnsSelected implements JsonSerializable {
-        private String fieldName;
-        private Boolean ascending;
-        
+        private final String fieldName;
+        private final Boolean ascending;
+
         public ColumnsSelected(String fieldName, Boolean ascending) {
-			this.fieldName = fieldName;
-			this.ascending = ascending;
-		}
+            this.fieldName = fieldName;
+            this.ascending = ascending;
+        }
 
-		public String getFieldName() {
-			return fieldName;
-		}
+        public String getFieldName() {
+            return fieldName;
+        }
 
-		public Boolean getAscending() {
-			return ascending;
-		}
-		
-		@Override
+        public Boolean getAscending() {
+            return ascending;
+        }
+
+        @Override
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();
             json.writeMapEntry("fieldName", this.fieldName);
             json.writeMapEntry("ascending", this.ascending);
             json.writeMapEnd();
         }
-		
+
     }
-    
+
     @AuraEnabled
-    public List<ColumnsSelected>  getDefaultOrderByList() {
+    public List<ColumnsSelected> getDefaultOrderByList() {
         return columnsSelected;
     }
-    
+
     @AuraEnabled
     public String getDateTimeISOString() {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.US);
@@ -279,7 +278,7 @@ public class TestJavaModel {
         DateService dateService = DateServiceImpl.get();
         return dateService.getDateTimeISO8601Converter().format(c.getTime());
     }
-    
+
     @AuraEnabled
     public Long getTimestamp() {
         Date d = new Date(1095957000000L);
@@ -338,6 +337,11 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
+    public String getstringLowercase() {
+        return "Model - lowercase method";
+    }
+
+    @AuraEnabled
     public String getStringNull() {
         return null;
     }
@@ -366,49 +370,55 @@ public class TestJavaModel {
     public List<String> getStringListNull() {
         return null;
     }
+
     @AuraEnabled
     public ArrayList<InputOption> getNoOptionsSel() {
-        //String label, String name, boolean selected, String value
+        // String label, String name, boolean selected, String value
         return Lists.newArrayList(
-            new InputOption("Tiger", "Tiger", false, "Tiger"),
-            new InputOption("Lion", "Lion", false, "Lion"),
-            new InputOption("Bear", "Bear", false, "Bear")
-        );
+                new InputOption("Tiger", "Tiger", false, "Tiger"),
+                new InputOption("Lion", "Lion", false, "Lion"),
+                new InputOption("Bear", "Bear", false, "Bear")
+                );
     }
+
     @AuraEnabled
-    public ArrayList<InputOption>  getSecondOptionSel() {
+    public ArrayList<InputOption> getSecondOptionSel() {
         return Lists.newArrayList(
-            new InputOption("Tiger", "Tiger", false, "Tiger"),
-            new InputOption("Lion", "Lion", true, "Lion"),
-            new InputOption("Bear", "Bear", false, "Bear")
-        );
+                new InputOption("Tiger", "Tiger", false, "Tiger"),
+                new InputOption("Lion", "Lion", true, "Lion"),
+                new InputOption("Bear", "Bear", false, "Bear")
+                );
     }
+
     @AuraEnabled
-    public ArrayList<InputOption>  getNoOptionsSelWithNone() {
+    public ArrayList<InputOption> getNoOptionsSelWithNone() {
         return Lists.newArrayList(
-            new InputOption("None", "None", false, ""),
-            new InputOption("Tiger", "Tiger", false, "Tiger"),
-            new InputOption("Lion", "Lion", false, "Lion"),
-            new InputOption("Bear", "Bear", false, "Bear")
-        );
+                new InputOption("None", "None", false, ""),
+                new InputOption("Tiger", "Tiger", false, "Tiger"),
+                new InputOption("Lion", "Lion", false, "Lion"),
+                new InputOption("Bear", "Bear", false, "Bear")
+                );
     }
+
     @AuraEnabled
-    public ArrayList<InputOption>  getThirdOptionSelWithNone() {
+    public ArrayList<InputOption> getThirdOptionSelWithNone() {
         return Lists.newArrayList(
-            new InputOption("None", "None", false, ""),
-            new InputOption("Tiger", "Tiger", false, "Tiger"),
-            new InputOption("Lion", "Lion", true, "Lion"),
-            new InputOption("Bear", "Bear", false, "Bear")
-        );
+                new InputOption("None", "None", false, ""),
+                new InputOption("Tiger", "Tiger", false, "Tiger"),
+                new InputOption("Lion", "Lion", true, "Lion"),
+                new InputOption("Bear", "Bear", false, "Bear")
+                );
     }
+
     @AuraEnabled
-    public ArrayList<InputOption>  getThirdOptionSel() {
+    public ArrayList<InputOption> getThirdOptionSel() {
         return Lists.newArrayList(
-            new InputOption("Tiger", "Tiger", false, "Tiger"),
-            new InputOption("Lion", "Lion", false, "Lion"),
-            new InputOption("Bear", "Bear", true, "Bear")
-        );
+                new InputOption("Tiger", "Tiger", false, "Tiger"),
+                new InputOption("Lion", "Lion", false, "Lion"),
+                new InputOption("Bear", "Bear", true, "Bear")
+                );
     }
+
     @AuraEnabled
     public List<List<String>> getListOfList() {
         List<List<String>> listofList = new ArrayList<>();
@@ -657,43 +667,43 @@ public class TestJavaModel {
     @AuraEnabled
     public String getTextAreaText() {
         return "Some text from server\nspecially created to fit in....\n\n\na textarea!";
-    }  
-    
+    }
+
     @AuraEnabled
     public String getTextWithScriptTag() {
         return "<big>Some text from server with script tag</big><script>Script</script>";
     }
-    
+
     @AuraEnabled
     public String getTextWithStyleTag() {
         return "<big>Some text from server with style tag</big><style>Style</style>";
     }
-    
+
     @AuraEnabled
     public String getTextWithBlacklistedTags() {
         return "Some text from server with blacklisted tags<script>Script</script><style></style>";
     }
-    
+
     @AuraEnabled
     public String getTextWithBlacklistedNestedTags() {
         return "Some text from server with nested blacklisted tags<script><script></script></script><script><style></style></script>";
     }
-    
+
     @AuraEnabled
     public String getTextWithBlacklistedChildrenTags() {
         return "Some text from server with nested blacklisted tags in div<div><script></script><script><style></style></script></div>";
     }
-    
+
     @AuraEnabled
     public String getTextWithWhitelistedChildrenTags() {
         return "Some text from server with nested input in balcklisted tags<script><input></input></script>";
     }
-    
+
     @AuraEnabled
     public String getTextWithEvent() {
         return "Some text from server with input tag with event<input type=\"button\" value=\"click\" onclick=\"alert('hello')\" />";
     }
-    
+
     @AuraEnabled
     public String getTextWithMultipleEvents() {
         return "Some text from server with input tags with events<input type=\"button\" value=\"click\" onclick=\"alert('hello')\" /><input type=\"text\" onclick=\"alert('click')\" onfocus=\"alert('focus')\" />";
@@ -703,43 +713,45 @@ public class TestJavaModel {
     public String getUrl() {
         return "http://www.salesforce.com";
     }
-    
+
     @AuraEnabled
     public String getSelectValue() {
         return "option1";
     }
-    
+
     @AuraEnabled
-    public Map<String,String> getMap(){
-        Map<String,String> items= Maps.newHashMap();
+    public Map<String, String> getMap() {
+        Map<String, String> items = Maps.newHashMap();
         items.put("fruit", "apple");
         items.put("animal", "bear");
         return items;
     }
-    
+
     @AuraEnabled
     public List<Item> getItems() throws QuickFixException {
-    	String dataType = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("dataType");
-    	if (dataType == null) {
-    		return items;
-    	} else if (dataType.equals("largeList")) {
-    		return itemsLarge;
-    	} else if (dataType.equals("emptyList")) {
-    		return itemsEmpty;
-    	}
+        String dataType = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+                .getValue("dataType");
+        if (dataType == null) {
+            return items;
+        } else if (dataType.equals("largeList")) {
+            return itemsLarge;
+        } else if (dataType.equals("emptyList")) {
+            return itemsEmpty;
+        }
         return items;
     }
-    
+
     @AuraEnabled
     public List<LoadColumn> getColumns() throws QuickFixException {
-    	String dataType = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("dataType");
-    	if (dataType == null) {
-    		return columns;
-    	} else if (dataType.equals("largeList")) {
-    		return maxColumns;
-    	} else if (dataType.equals("emptyList")) {
-    		return noColumns;
-    	}
+        String dataType = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+                .getValue("dataType");
+        if (dataType == null) {
+            return columns;
+        } else if (dataType.equals("largeList")) {
+            return maxColumns;
+        } else if (dataType.equals("emptyList")) {
+            return noColumns;
+        }
         return columns;
     }
 }

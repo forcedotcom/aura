@@ -16,7 +16,13 @@
 package org.auraframework.impl.java.type;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
@@ -25,8 +31,7 @@ import org.auraframework.instance.Model;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
- * This class has automation to verify the implementation of @Type() annotation
- * in models.
+ * This class has automation to verify the implementation of @Type() annotation in models.
  */
 public class TypeAnnotationInModelTest extends AuraImplTestCase {
     public TypeAnnotationInModelTest(String name) {
@@ -83,11 +88,6 @@ public class TypeAnnotationInModelTest extends AuraImplTestCase {
 
     }
 
-    /**
-     * TODO: Find out if we should support case insensitivity.
-     * 
-     * @throws Exception
-     */
     public void testCaseSensitivityOfTypeAnnotationInJavaModel() throws Exception {
         Model model = getJavaModelByQualifiedName("java://org.auraframework.impl.java.model.TestModelWithCaseInsensitiveTypeAnnotation");
         assertEachModelMember(model, "string", "Model");

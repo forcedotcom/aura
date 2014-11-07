@@ -34,7 +34,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
     private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";
     private final String AUTOCOMPLETE_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
     private final String AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION_SELECTOR = "div[class*='uitestAutoComplete_CustomTemplate']";
-    private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "div[class*='customOption']";
+    //since W-2419601, 'invisible' is being added to the li contains "div[class*='customOption']";
+    private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
     private final String MATCHED_SELECTOR = "mark[class*='data-match']";
 
     private final Map<String, Integer> AUTOCOMPLETE_COMPONENT = new HashMap<>();
@@ -291,7 +292,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Incorrect number of visible options", 10, options.size());
     }
-
+    
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,
             OptionType optionType) throws Exception {
         open(URL);

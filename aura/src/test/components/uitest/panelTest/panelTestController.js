@@ -1,19 +1,37 @@
 ({
-	showPanel: function(cmp, event, helper) {
-		var openPanelEvent = $A.get('e.ui:openPanel').setParams({
-        	show: true,
-        	title: 'my panel',
-        	'class': 'myPanel',
+    showPanelFullSCreen: function(cmp, event, helper) {
+        var openPanelEvent = $A.get('e.ui:openPanel').setParams({
+            show: true,
+            title: 'my panel',
+            'class': 'myPanel',
+            isFullScreen: true,
             callbacks: { onCreate: function(panel){
-	            	var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
-	            	var overlay = cmps[3];
-	        		overlay.addHandler('press', cmp, 'c.showPanel')
-	        		panel.set("v.body", cmps);
-            	}
+                var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
+                var overlay = cmps[3];
+                overlay.addHandler('press', cmp, 'c.showPanel')
+                panel.set("v.body", cmps);
+            }
             }
         });
         openPanelEvent.fire();
-	},
+    },
+
+    showPanel: function(cmp, event, helper) {
+        var openPanelEvent = $A.get('e.ui:openPanel').setParams({
+            show: true,
+            title: 'my panel',
+            'class': 'myPanel',
+            isFullScreen: false,
+            callbacks: { onCreate: function(panel){
+                var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
+                var overlay = cmps[3];
+                overlay.addHandler('press', cmp, 'c.showPanel')
+                panel.set("v.body", cmps);
+            }
+            }
+        });
+        openPanelEvent.fire();
+    },
 	
 	showModal: function(cmp, event, helper) {
 		var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));

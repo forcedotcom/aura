@@ -127,7 +127,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertEquals("Unexpected status code", STATUS_OK, cspReport.get(CSPReporterServlet.STATUS_CODE).toString());
         assertDocumentUri(cspReport, uri);
         assertSourceFile(cspReport, SOURCE_SUFFIX);
-        assertViolatedDirective(cspReport, "default-src 'self'");
+        assertViolatedDirective(cspReport, "frame-src 'self'");
     }
 
     @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
@@ -150,7 +150,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertEquals("Unexpected status code", STATUS_OK, cspReport.get(CSPReporterServlet.STATUS_CODE).toString());
         assertDocumentUri(cspReport, uri);
         assertSourceFile(cspReport, null);
-        assertViolatedDirective(cspReport, "default-src 'self'");
+        assertViolatedDirective(cspReport, "frame-src 'self'");
     }
 
     /*
@@ -179,8 +179,8 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         Map<String, Object> cspReport = (Map<String, Object>) logs.get(0).get(CSPReporterServlet.JSON_NAME);
 
         assertNotNull("Intentional CSP report not found", cspReport);
-        assertEquals("Not getting the intentional report URI", "http://expectedreport.salesforce.com",
-                cspReport.get(CSPReporterServlet.BLOCKED_URI));
+        assertEquals("Not getting the intentional report URI, probably font wasn't allowed (but should have been)",
+                "http://expectedreport.salesforce.com", cspReport.get(CSPReporterServlet.BLOCKED_URI));
         assertDocumentUri(cspReport, uri);
         assertViolatedDirective(cspReport, "script-src 'self'");
     }
@@ -337,7 +337,8 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
             Thread.sleep(interval);
             waitedFor += interval;
         }
-        fail("Did not find expected number of log lines.");
+        fail("Did not find expected number of log lines (expected " + expectedLogs +
+                ", found " + cspRecords.size() + ").");
         return cspRecords;
     }
 }

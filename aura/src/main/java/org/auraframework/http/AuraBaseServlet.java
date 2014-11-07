@@ -18,8 +18,10 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -84,6 +87,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String HDR_FRAME_OPTIONS = "X-FRAME-OPTIONS";
     /** Baseline clickjack protection level for HDR_FRAME_OPTIONS header */
     public static final String HDR_FRAME_SAMEORIGIN = "SAMEORIGIN";
+
+    /** No-framing-at-all clickjack protection level for HDR_FRAME_OPTIONS header */
+    public static final String HDR_FRAME_DENY = "DENY";
+    /** Open, unprotected level for HDR_FRAME_OPTIONS header */
+    public static final String HDR_FRAME_ALLOW = "ALLOW";
 
     protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     public static final String OUTDATED_MESSAGE = "OUTDATED";
@@ -372,6 +380,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return !ManifestUtil.isManifestEnabled(request);
     }
 
+    private final static ConcurrentHashMap<String, Long> lastModMap = new ConcurrentHashMap<String, Long>();
+
     public String getContentType(AuraContext.Format format) {
         switch (format) {
         case MANIFEST:
@@ -533,7 +543,32 @@ public abstract class AuraBaseServlet extends HttpServlet {
     /**
      * Sets mandatory headers, notably for anti-clickjacking.
      */
-    protected void setBasicHeaders(HttpServletResponse rsp) {
-        rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);   
+    protected void setBasicHeaders(DefDescriptor top, HttpServletRequest req, HttpServletResponse rsp) {
+        ContentSecurityPolicy csp = Aura.getConfigAdapter().getContentSecurityPolicy(
+                top == null ? null : top.getQualifiedName(), req);
+
+        if (csp != null) {
+            rsp.setHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
+            Collection<String> terms = csp.getFrameAncestors();
+            if (terms == null) {
+                // open to the world
+                rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOW);
+            } else {
+                if (terms.size() == 0) {
+                    // closed to any framing at all
+                    rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_DENY);
+                } else {
+                    for (String site : terms) {
+                        if (site == null) {
+                            // Add same-origin headers and policy terms
+                            rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);
+                        } else {
+                            rsp.addHeader(HDR_FRAME_OPTIONS, site);
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }

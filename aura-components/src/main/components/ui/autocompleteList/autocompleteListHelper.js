@@ -386,7 +386,7 @@
         var items = component.getConcreteComponent().get("v.items");
         var hasVisibleOption = this.hasVisibleOption(items);
         
-        $A.util.toggleClass(component,"showEmptyContent", visible && hasVisibleOption);
+        $A.util.toggleClass(component, "showEmptyContent", visible && !hasVisibleOption);
     },
     
     showLoading:function (component, visible) {
@@ -394,7 +394,7 @@
 
         // Originally, no loading indicator was shown. Making it only appear when specified in the facet.
         if (!$A.util.isEmpty(component.get("v.loadingIndicator"))) {
-            $A.util.toggleClass(component, "invisible", !visible)
+            $A.util.toggleClass(component, "invisible", !visible);
         }
     }
 })

@@ -34,6 +34,7 @@ public interface WebDriverProvider {
     String WEBDRIVER_SERVER_PROPERTY = "webdriver.remote.server";
     String REUSE_BROWSER_PROPERTY = "webdriver.reusebrowser";
     String BROWSER_TYPE_PROPERTY = "webdriver.browser.type";
+    String GETDRIVER_TIMEOUT_PROPERTY = "webdriver.timeout.getdriver";
 
     /**
      * Get a a {@link WebDriver} instance.

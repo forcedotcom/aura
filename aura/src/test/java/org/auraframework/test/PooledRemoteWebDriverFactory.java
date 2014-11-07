@@ -156,7 +156,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
                 public WebDriver call() throws Exception {
                     return new PooledRemoteWebDriver(thisPool, serverUrl, capabilities);
                 }
-            }, MAX_GET_RETRIES, "Failed to get a new PooledRemoteWebDriver");
+            }, MAX_GET_RETRIES, getGetDriverTimeout(capabilities), "Failed to get a new PooledRemoteWebDriver");
         }
     }
 

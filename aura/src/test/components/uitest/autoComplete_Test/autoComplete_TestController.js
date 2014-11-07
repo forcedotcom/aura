@@ -102,6 +102,14 @@
         helper.handleMatchDone(cmp, event, "autoCompleteMatchFunc");
     },
     
+    handleOnBlur: function(cmp, event, helper) {
+    	cmp.find("outputLabelOnFocusAndBlur").set("v.value", "Blur Event Fired!!");
+    },
+    
+    handleOnFocus: function(cmp, event, helper) {
+    	cmp.find("outputLabelOnFocusAndBlur").set("v.value", "Focus Event Fired!!");
+    },
+    
     matchFuncShowAll: function(cmp, event, helper) {
         var autocomplete = cmp.find("autoCompleteMatchFunc");
         var input = autocomplete.find("input");

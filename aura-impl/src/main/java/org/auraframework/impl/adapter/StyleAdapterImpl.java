@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.adapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -24,6 +25,7 @@ import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.css.ThemeValueProviderImpl;
+import org.auraframework.impl.css.parser.DuplicateFontFacePlugin;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableList;
@@ -59,6 +61,12 @@ public class StyleAdapterImpl implements StyleAdapter {
 
     @Override
     public List<Plugin> getContextualRuntimePlugins() {
-        return ImmutableList.<Plugin>of();
+        List<Plugin> plugins = new ArrayList<>(1);
+
+        // when pre-compilation is ready, this should probably be there instead
+        // also when we move to multiple app.css files, need to revisit this
+        plugins.add(new DuplicateFontFacePlugin());
+
+        return plugins;
     }
 }

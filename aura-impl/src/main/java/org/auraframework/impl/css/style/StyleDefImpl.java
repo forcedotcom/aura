@@ -90,8 +90,14 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     @Override
     public String getCode(List<Plugin> plugins) {
         try {
-            return CssPreprocessor.runtime().source(content).themes(descriptor).extras(plugins).parse().content();
-        } catch (Exception e) {
+            return CssPreprocessor.runtime()
+                    .source(content)
+                    .resourceName(descriptor.getQualifiedName())
+                    .themes(descriptor)
+                    .extras(plugins)
+                    .parse()
+                    .content();
+        } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
     }

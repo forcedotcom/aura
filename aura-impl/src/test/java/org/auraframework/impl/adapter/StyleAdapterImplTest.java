@@ -119,7 +119,6 @@ public class StyleAdapterImplTest extends StyleTestCase {
         @Override
         public List<Plugin> getCompilationPlugins() {
             List<Plugin> plugins = new ArrayList<>();
-            plugins.addAll(super.getCompilationPlugins());
             plugins.addAll(compilationPlugins);
             return plugins;
         }
@@ -127,7 +126,6 @@ public class StyleAdapterImplTest extends StyleTestCase {
         @Override
         public List<Plugin> getRuntimePlugins() {
             List<Plugin> plugins = new ArrayList<>();
-            plugins.addAll(super.getRuntimePlugins());
             plugins.addAll(runtimePlugins);
             return plugins;
         }
@@ -135,7 +133,6 @@ public class StyleAdapterImplTest extends StyleTestCase {
         @Override
         public List<Plugin> getContextualRuntimePlugins() {
             List<Plugin> plugins = new ArrayList<>();
-            plugins.addAll(super.getContextualRuntimePlugins());
             plugins.addAll(contextualPlugins);
             return plugins;
         }

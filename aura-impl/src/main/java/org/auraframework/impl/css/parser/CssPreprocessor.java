@@ -142,6 +142,11 @@ public final class CssPreprocessor {
             Mode mode = Aura.getContextService().getCurrentContext().getMode();
             StyleWriter writer = mode.prettyPrint() ? StyleWriter.inline() : StyleWriter.compressed();
 
+            if (!runtime) {
+                // write annotated comments out on the initial pass, in case the runtime pass needs them
+                writer.writeComments(true, true);
+            }
+
             // do the parsing
             CssErrorManager em = new CssErrorManager(resourceName);
             PluginRegistry registry = Omakase.source(content).add(plugins).add(writer).add(em).process();

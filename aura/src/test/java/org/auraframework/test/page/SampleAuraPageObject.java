@@ -15,31 +15,26 @@
  */
 package org.auraframework.test.page;
 
+import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.AuraUITestingUtil;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
-public interface PageObject {
-	
-	//settters begin
-	void setCurrentBrowserType(BrowserType currentBrowserType);
+//this is an example of AuraPageObject, it represents uiExamples:buttonExample, with a ui:button and ui:outputText
+public class SampleAuraPageObject extends AuraPageObject<ComponentDef> {
 
-	void setDriver(WebDriver driver);
-	
-	public void setAuraUITestingUtil(AuraUITestingUtil auraUITestingUtil);
-	
-	public void setAuraTestingUtil(AuraTestingUtil auraTestingUtil);
-	
-	public void setMode(Mode mode);
-	
-	public void setTimeoutInSecs(int timeoutInSecs);
-	
-	public void setWaitForInit(Boolean waitForInit);
+	public SampleAuraPageObject(String name, Boolean isComponent, String descriptorString) {
+		super(name, isComponent, descriptorString);
+	}
 
-	//getters begin
-	String getDescriptorString();
+	public void clickOnButton() {
+		WebElement element = getDriver().findElement(By.cssSelector(".uiButton"));
+	    element.click();
+	}
 	
-	String getName();
+	public String getOutputText() {
+		 WebElement content = getDriver().findElement(By.cssSelector(".uiOutputText"));
+	    return content.getText();
+	}
 }

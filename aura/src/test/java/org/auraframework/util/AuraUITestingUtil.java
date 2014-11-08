@@ -17,12 +17,18 @@ package org.auraframework.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.test.SauceUtil;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Assert;
@@ -841,4 +847,5 @@ public class AuraUITestingUtil {
             throw new RuntimeException(ex);
         }
     }
+    
 }

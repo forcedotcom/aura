@@ -835,7 +835,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
             logger.info(driverInfo);
 
-            auraUITestingUtil = new AuraUITestingUtil(currentDriver);
+            setAuraUITestingUtil();//auraUITestingUtil = new AuraUITestingUtil(currentDriver);
             perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }
         return currentDriver;
@@ -843,6 +843,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     
     protected void setCurrentDriver(WebDriver currentDriver) {
 		this.currentDriver = currentDriver;
+    }
+    
+    protected void setAuraUITestingUtil() {
+    	this.auraUITestingUtil = new AuraUITestingUtil(currentDriver);
     }
 
     /**

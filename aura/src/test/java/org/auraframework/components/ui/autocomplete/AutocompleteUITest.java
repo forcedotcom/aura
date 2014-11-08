@@ -48,6 +48,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         AUTOCOMPLETE_COMPONENT.put("autoCompleteUpdateOn", 6);
         AUTOCOMPLETE_COMPONENT.put("emptyListContent", 7);
         AUTOCOMPLETE_COMPONENT.put("matchFunc", 8);
+        AUTOCOMPLETE_COMPONENT.put("blurFocus", 9);
     }
 
     private enum OptionType {
@@ -94,6 +95,31 @@ public class AutocompleteUITest extends WebDriverTestCase {
         auraUITestingUtil.pressEnter(inputElement);
         autoCompleteText = (String)auraUITestingUtil.getEval(expr);
         assertEquals("Input Value was not change after pressing Enter", expectedText, autoCompleteText);
+    }
+    
+    /**
+     * Test to verify blur and focus events works when set in the ui:autocomplete component.
+     * Test case: W-2391008
+     */
+    // Exclude on ios-driver because the driver hides the keyboard after send keys which triggers a blur event
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testAutoCompleteWithBlurAndFocusEvent() throws Exception {
+        open(URL);
+        String inputAutoComplete = "blurFocus";
+        String outputTextLocator = "span[class*='outputLabelOnFocusAndBlur']";
+        Integer inputBlurFocus = AUTOCOMPLETE_COMPONENT.get(inputAutoComplete);
+        Integer matchFuncInput = AUTOCOMPLETE_COMPONENT.get("matchFunc");
+        WebDriver driver = getDriver();
+        WebElement outputText = findDomElement(By.cssSelector(outputTextLocator));
+        assertEquals("No Event should be fire yet", "", outputText.getText());
+        //selecting input to fire focus event
+        WebElement inputElement = getAutoCompleteInput(driver, inputBlurFocus);
+        inputElement.click();
+        assertEquals("Focus Event should be fired", "Focus Event Fired!!", outputText.getText());
+        //selecting different input to fire blur event
+        WebElement inputmatchFunc = getAutoCompleteInput(driver, matchFuncInput);
+        inputmatchFunc.click();
+        assertEquals("Blur Event should be fired", "Blur Event Fired!!", outputText.getText());
     }
 
     /**

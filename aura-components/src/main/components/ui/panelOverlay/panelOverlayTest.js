@@ -30,7 +30,8 @@
 	// verify panel element
 	verifyPanelElements: function(cmp) {
 
-		var ele = cmp.find("panel").getElement();
+        var containerEle = cmp.getElement();
+        var ele = cmp.find("panel").getElement();
 		var attributes = cmp.attributes;
 
 		$A.test.assertTrue($A.util.hasClass(ele, "panel"), "Element is not rendered with panel class");
@@ -65,7 +66,7 @@
 
 		// additional class
 		if(cmp.get("v.class")) {
-    		$A.test.assertTrue($A.util.hasClass(ele, cmp.get("v.class")), "Additional class not added as expected");
+    		$A.test.assertTrue($A.util.hasClass(containerEle, cmp.get("v.class")), "Additional class not added as expected");
     	}
     	else {
     		$A.test.assertTrue($A.util.hasClass(ele, "forceUIPanel"), "Additional class added unexpectedly");

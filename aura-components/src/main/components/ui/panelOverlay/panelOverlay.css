@@ -13,16 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 .THIS {
+    /* Flex & box fallback */
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    -ms-flex-direction: row;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
     position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.THIS .panel{
     background-color: #F0F1F2;
+    border-radius: 5px;
+    overflow: visible;
+}
+
+.THIS.fullScreen .panel {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
 }
 
-.THIS:not(.customHeader) .body {
+.THIS.notFullScreen .panel {
+    position: relative;
+    width: 50%;
+    min-width: 512px;
+    top: 1.75rem;
+    margin: 0 auto auto auto;
+}
+
+.THIS .panel:not(.customHeader) .body {
     padding-top: 42px;
     overflow: hidden;
 }
@@ -62,6 +101,7 @@
     z-index: 1;
     background-color: #FFFFFF;
     border-bottom: 1px solid #DADEE2;
+    border-radius: 5px;
 }
 
 .THIS .titleBar > .bBody button:first-of-type {
@@ -106,14 +146,14 @@
 /*******************************/
 /* Window/Panel styling for POne  */
 /*******************************/
-.THIS {
+.THIS.fullScreen .panel{
     width: 100%;
     height: 100%;
     transition: transform .3s ease-in;
     /*overflow: scroll;*/
 }
 
-.THIS.wp .body {
+.THIS .panel.wp .body {
     height: 100%;
 }
 
@@ -121,7 +161,7 @@
     overflow: scroll;
 }
 
-.THIS.DESKTOP {
+.THIS .panel.DESKTOP {
     overflow: auto;
 }
 
@@ -132,16 +172,16 @@
 	animation: fadeIn .3s;
 }
 
-.THIS.sliding {
+.THIS .panel.sliding {
     transition: transform .3s linear, opacity .2s linear;
 }
 
-.THIS.movefrombottom {
+.THIS .panel.movefrombottom {
     visibility: visible;
     animation: movefrombottom .3s ease both;
 }
 
-.THIS.movetobottom {
+.THIS .panel.movetobottom {
     visibility: visible;
     animation: movetobottom .3s ease both;
 }
@@ -163,4 +203,15 @@
 @keyframes fadeIn {
     from { opacity:0; }
     to   { opacity:1; }
+}
+
+
+.THIS .modal-glass {
+    background-color: #2A4158;
+    opacity: 0.8;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }

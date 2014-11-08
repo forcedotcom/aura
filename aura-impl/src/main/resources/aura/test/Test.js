@@ -87,19 +87,19 @@ $A.ns.Test.prototype.addWaitForAction = function(success, actionName, callback) 
     var that = this;
 
     if ($A.util.isUndefinedOrNull(this.completed[theAction])) {
-        this.fail("Unregistered name "+theAction);
-            }
+        this.fail("Unregistered name " + theAction);
+    }
     this.addWaitForWithFailureMessage(true,  function() {
-            if (that.isActionComplete(theAction)) {
-                if (that.isActionSuccessfullyComplete(theAction) !== success) {
-                    that.fail("Action "+theAction+" did not complete with success = "+success);
-                        }
-                        return true;
-                    }
-                    return false;
-                }, null, callback);
+        if (that.isActionComplete(theAction)) {
+            if (that.isActionSuccessfullyComplete(theAction) !== success) {
+                that.fail("Action " + theAction + " did not complete with success = " + success);
+            }
+            return true;
+        }
+        return false;
+    }, null, callback);
 };
-        
+
 /**
  * 
  * @description Asynchronously wait for a condition before continuing with the next
@@ -172,7 +172,7 @@ $A.ns.Test.prototype.getSentRequestCount = function () {
 $A.ns.Test.prototype.addCleanup = function(cleanupFunction) {
     this.cleanups.push(cleanupFunction);
 };
-        
+
 /**
  * Get an instance of an action based on the specified parameters and callback function.
  *
@@ -195,7 +195,7 @@ $A.ns.Test.prototype.getAction = function(component, name, params, callback){
         if ($A.util.isFunction(callback)) {
             action.setCallback(component, callback);
         } else {
-    this.markForCompletion(action, callback);
+            this.markForCompletion(action, callback);
         }
     }
     return action;
@@ -314,16 +314,16 @@ $A.ns.Test.prototype.isActionPending = function() {
 $A.ns.Test.prototype.markForCompletion = function(action, name) {
     if (!$A.util.isUndefinedOrNull(this.completed[name])) {
         this.fail("Duplicate name "+name);
-            }
-            var myName = name;
+    }
+    var myName = name;
     this.completed[myName] = "INCOMPLETE";
     action.wrapCallback(this, function(a) {
-                if (a.getState() === "SUCCESS") {
+        if (a.getState() === "SUCCESS") {
             this.completed[myName] = "SUCCESS";
-                } else {
+        } else {
             this.completed[myName] = "FAILURE";
-                }
-            });
+        }
+    });
 };
 
 /**
@@ -341,7 +341,7 @@ $A.ns.Test.prototype.markForCompletion = function(action, name) {
 $A.ns.Test.prototype.isActionComplete = function(name) {
     if ($A.util.isUndefinedOrNull(this.completed[name])) {
         this.fail("Unregistered name "+name);
-            }
+    }
     return this.completed[name] !== "INCOMPLETE";
 };
 
@@ -359,7 +359,7 @@ $A.ns.Test.prototype.isActionComplete = function(name) {
 $A.ns.Test.prototype.isActionSuccessfullyComplete = function(name) {
     if ($A.util.isUndefinedOrNull(this.completed[name])) {
         this.fail("Unregistered name "+name);
-            }
+    }
     return this.completed[name] === "SUCCESS";
 };
 
@@ -377,7 +377,7 @@ $A.ns.Test.prototype.isActionSuccessfullyComplete = function(name) {
 $A.ns.Test.prototype.clearComplete = function(name) {
     if ($A.util.isUndefinedOrNull(this.completed[name])) {
         this.fail("Unregistered name "+name);
-            }
+    }
     delete this.completed[name];
 };
 
@@ -394,57 +394,57 @@ $A.ns.Test.prototype.clearComplete = function(name) {
  */
 $A.ns.Test.prototype.callServerAction = function(action, doImmediate){
     if(this.inProgress === 0){
-                return;
-            }
-            //Increment 'inProgress' to indicate that a asynchronous call is going to be initiated, selenium will
-            //wait till 'inProgress' comes down to 0 which indicates all asynchronous calls were complete
+        return;
+    }
+    //Increment 'inProgress' to indicate that a asynchronous call is going to be initiated, selenium will
+    //wait till 'inProgress' comes down to 0 which indicates all asynchronous calls were complete
     this.inProgress++;
-            var actions = $A.util.isArray(action) ? action : [action];
-            var cmp = $A.getRoot();
+    var actions = $A.util.isArray(action) ? action : [action];
+    var cmp = $A.getRoot();
     var that = this;
-            try{
-                if (!!doImmediate){
-                    var requestConfig = {
-                        "url": $A["clientService"]["priv"].host + '/aura',
-                        "method": 'POST',
-                        "scope" : cmp,
-                        "callback" :function(response){
-                            var msg = $A["clientService"]["priv"].checkAndDecodeResponse(response);
-                            if ($A.util.isUndefinedOrNull(msg)) {
-                                for ( var k = 0; k < actions.length; k++) {
+    try {
+        if (!!doImmediate) {
+            var requestConfig = {
+                "url": $A["clientService"]["priv"].host + '/aura',
+                "method": 'POST',
+                "scope" : cmp,
+                "callback" :function(response) {
+                    var msg = $A["clientService"]["priv"].checkAndDecodeResponse(response);
+                    if ($A.util.isUndefinedOrNull(msg)) {
+                        for ( var k = 0; k < actions.length; k++) {
                             that.logError("Unable to execute action", actions[k]);
-                                }
-                            }
-                            var serverActions = msg["actions"];
-                            for (var i = 0; i < serverActions.length; i++) {
-                                for ( var j = 0; j < serverActions[i]["error"].length; j++) {
+                        }
+                    }
+                    var serverActions = msg["actions"];
+                    for (var i = 0; i < serverActions.length; i++) {
+                        for ( var j = 0; j < serverActions[i]["error"].length; j++) {
                             that.logError("Error during action", serverActions[i]["error"][j]);
-                                }
-                            }
+                        }
+                    }
                     that.inProgress--;
-                        },
-                        "params" : {
-                            "message": $A.util.json.encode({"actions" : actions}),
-                            "aura.token" : $A["clientService"]["priv"].token,
-                            "aura.context" : $A.getContext().encodeForServer(),
-                            "aura.num" : 0
-                        }
-                    };
-                    $A.util.transport.request(requestConfig);
-                } else {
-                    $A.clientService.runActions(actions, cmp , function(msg){
-                        for(var i=0;i<msg["errors"].length;i++){
-                    that.logError("Error during action", msg["errors"][i]);
-                        }
-                that.inProgress--;
-                    });
+                },
+                "params" : {
+                    "message": $A.util.json.encode({"actions" : actions}),
+                    "aura.token" : $A["clientService"]["priv"].token,
+                    "aura.context" : $A.getContext().encodeForServer(),
+                    "aura.num" : 0
                 }
-            }catch(e){
-                // If trying to runAction() fails with an error, catch that error, signal that the attempt to run
-                // server action was complete and throw error.
+            };
+            $A.util.transport.request(requestConfig);
+        } else {
+            $A.clientService.runActions(actions, cmp , function(msg) {
+                for(var i=0;i<msg["errors"].length;i++){
+                    that.logError("Error during action", msg["errors"][i]);
+                }
+                that.inProgress--;
+            });
+        }
+    }catch(e){
+        // If trying to runAction() fails with an error, catch that error, signal that the attempt to run
+        // server action was complete and throw error.
         this.inProgress--;
-                throw e;
-            }
+        throw e;
+    }
 };
 
 /**
@@ -473,28 +473,28 @@ $A.ns.Test.prototype.setServerReachable = function(reachable) {
  */
 $A.ns.Test.prototype.runAfterIf = function(conditionFunction, callback, intervalInMs){
     var that = this;
-    if(this.inProgress === 0){
-                return;
+    if (this.inProgress === 0) {
+        return;
+    }
+    try {
+        if (conditionFunction()) {
+            if(callback){
+               callback();
             }
-            try{
-                if(conditionFunction()){
-                    if(callback){
-                       callback();
-                    }
-                }else{
+        } else {
             this.inProgress++;
-                    if(!intervalInMs){
-                        intervalInMs = 500;
-                    }
-                    setTimeout(function(){
-                    that.runAfterIf(conditionFunction, callback);
-                    that.inProgress--;
-                        },intervalInMs);
-                    return;
-                }
-            }catch(e){
-        this.logError("Error in runAfterIf", e);
+            if (!intervalInMs) {
+                intervalInMs = 500;
             }
+            setTimeout(function(){
+                that.runAfterIf(conditionFunction, callback);
+                that.inProgress--;
+            },intervalInMs);
+            return;
+        }
+    } catch(e) {
+        this.logError("Error in runAfterIf", e);
+    }
 };
 
 /**
@@ -523,11 +523,11 @@ $A.ns.Test.prototype.isComplete = function(){
  */
 $A.ns.Test.prototype.getErrors = function(){
     var errors = $A.ns.Test.prototype.errors;
-    if (errors.length > 0){
+    if (errors.length > 0) {
         return aura.util.json.encode(errors);
-            } else {
-                return "";
-            }
+    } else {
+        return "";
+    }
 };
 
 /**
@@ -539,15 +539,15 @@ $A.ns.Test.prototype.getErrors = function(){
  *              The value that is returned as a String type
  */
 $A.ns.Test.prototype.print = function(value) {
-            if (value === undefined) {
-                return "undefined";
-            } else if (value === null) {
-                return "null";
-            } else if ("string" == typeof value) {
-                return '"' + value + '"';
-            } else {
-                return value.toString();
-            }
+    if (value === undefined) {
+        return "undefined";
+    } else if (value === null) {
+        return "null";
+    } else if ("string" == typeof value) {
+        return '"' + value + '"';
+    } else {
+        return value.toString();
+    }
 };
 
 /**
@@ -559,7 +559,7 @@ $A.ns.Test.prototype.print = function(value) {
 $A.ns.Test.prototype.auraError = function(e) {
     if (!this.putMessage(this.preErrors, this.expectedErrors, e)) {
         this.fail(e);
-            }
+    }
 };
 
 /**
@@ -582,11 +582,11 @@ $A.ns.Test.prototype.auraWarning = function(w) {
     if (!this.putMessage(this.preWarnings, this.expectedWarnings, w)) {
         if(this.failOnWarning) {
             this.fail("Unexpected warning = "+w);
-            	}
+        }
         $A.log("Unexpected warning = "+w);
-                return false;
-            }
-            return true;
+        return false;
+    }
+    return true;
 };
 
 /**
@@ -605,8 +605,8 @@ $A.ns.Test.prototype.expectAuraWarning = function(w) {
  * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
  * 
  * @example
- * Positive: assertTruthy("helloWorld"),
- * Negative: assertTruthy(null)
+ * Positive: <code>assertTruthy("helloWorld")</code>,
+ * Negative: <code>assertTruthy(null)</code>
  * 
  * @param {Object} condition
  *              The condition to evaluate
@@ -614,14 +614,14 @@ $A.ns.Test.prototype.expectAuraWarning = function(w) {
  *              The message that is returned if the condition is not true
  */
 $A.ns.Test.prototype.assertTruthy = function(condition, assertMessage) {
-            if (!condition) {
-                if (assertMessage) {
-                    assertMessage += " : "+condition;
-                } else {
-                    assertMessage = "Assertion Failure: expected {Truthy}, but Actual : {" + condition + "}";
-                }
+    if (!condition) {
+        if (assertMessage) {
+            assertMessage += " : " + condition;
+        } else {
+            assertMessage = "Assertion Failure: expected {Truthy}, but Actual : {" + condition + "}";
+        }
         throw this.fail(assertMessage);
-            }
+    }
 };
 
 /**
@@ -635,10 +635,10 @@ $A.ns.Test.prototype.assertTruthy = function(condition, assertMessage) {
  *                 accessibility errors found
  */
 $A.ns.Test.prototype.assertAccessible = function() {
-            var res = aura.devToolService.checkAccessibility();
-            if (res !== "") {
+    var res = aura.devToolService.checkAccessibility();
+    if (res !== "") {
         this.fail(res);
-            }
+    }
 };
 
  /**
@@ -648,19 +648,20 @@ $A.ns.Test.prototype.assertAccessible = function() {
  * @param {String} assertMessage
  * 				The message that is returned if the condition is not false
  * @description A falsey value refers to zero, an empty string, null, undefined, or false.
- * <p>Example:</p>
+ * 
+ * @example
  * Negative: <code>assertFalsy("helloWorld")</code>,
  * Postive: <code>assertFalsy(null)</code>
  */
 $A.ns.Test.prototype.assertFalsy = function(condition, assertMessage) {
-            if (condition) {
-                if (assertMessage) {
-                    assertMessage += " : "+condition;
-                } else {
-                    assertMessage = "Assertion Failure: expected {Falsy}, but Actual : {" + condition + "}";
-                }
+    if (condition) {
+        if (assertMessage) {
+            assertMessage += " : "+condition;
+        } else {
+            assertMessage = "Assertion Failure: expected {Falsy}, but Actual : {" + condition + "}";
+        }
         this.fail(assertMessage);
-            }
+    }
 };
 
  /**
@@ -717,12 +718,12 @@ $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertM
     }
     var arg1s = arg1.replace(/\s+/gm,' ').replace(/^ | $/gm,'');
     var arg2s = arg2.replace(/\s+/gm,' ').replace(/^ | $/gm,'');
-    if(arg1s!==arg2s){
+    if (arg1s!==arg2s) {
         if(!assertMessage){
             assertMessage = "Values not equal";
         }
         assertMessage += "\nExpected: {"+arg1 +"} but Actual: {"+arg2+"}";
-        if(typeof arg1 !== typeof arg2){
+        if (typeof arg1 !== typeof arg2) {
             assertMessage += "\n. Type Mismatch.";
         }
         this.fail(assertMessage);
@@ -739,17 +740,17 @@ $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertM
  * 				The message that is returned if the two values are not equal
  */
 $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
-            if(full.indexOf(start) !== 0){
-                if(!assertMessage){
-                    assertMessage = "StartsWith: ";
-                }
-                var fullStart = full;
-                if (fullStart.length > start.length+20) {
-                    fullStart = fullStart.substring(0, start.length+20);
-                }
-                assertMessage += "\nExpected: {"+start +"} but Actual: {"+fullStart+"}";
+    if(full.indexOf(start) !== 0){
+        if(!assertMessage){
+            assertMessage = "StartsWith: ";
+        }
+        var fullStart = full;
+        if (fullStart.length > start.length+20) {
+            fullStart = fullStart.substring(0, start.length+20);
+        }
+        assertMessage += "\nExpected: {"+start +"} but Actual: {"+fullStart+"}";
         this.fail(assertMessage);
-            }
+    }
 };
 
 /**
@@ -762,13 +763,13 @@ $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
  * 				The message that is returned if the two values are equal
      */
 $A.ns.Test.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
-            if (arg1 === arg2) {
-                if (!assertMessage) {
-                    assertMessage = "Values are equal (via ===)";
-                }
-                assertMessage += "\nValue is: {" + arg1 + "}";
+    if (arg1 === arg2) {
+        if (!assertMessage) {
+            assertMessage = "Values are equal (via ===)";
+        }
+        assertMessage += "\nValue is: {" + arg1 + "}";
         this.fail(assertMessage);
-            }
+    }
 };
 
 /**
@@ -779,9 +780,9 @@ $A.ns.Test.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
  * 				The message that is returned if arg1 is undefined
  */
 $A.ns.Test.prototype.assertDefined = function(arg1, assertMessage) {
-            if (!assertMessage) {
-                assertMessage = "Value is undefined";
-            }
+    if (!assertMessage) {
+        assertMessage = "Value is undefined";
+    }
     this.assertNotEquals(undefined, arg1, assertMessage);
 };
 
@@ -793,9 +794,9 @@ $A.ns.Test.prototype.assertDefined = function(arg1, assertMessage) {
  * 				The message that is returned if the condition !==true
  */
 $A.ns.Test.prototype.assertTrue = function(condition, assertMessage){
-            if(!assertMessage){
-                assertMessage = "Expected: {True}, but Actual: {False} ";
-            }
+    if(!assertMessage){
+        assertMessage = "Expected: {True}, but Actual: {False} ";
+    }
     this.assertEquals(true,condition,assertMessage);
 };
 
@@ -807,9 +808,9 @@ $A.ns.Test.prototype.assertTrue = function(condition, assertMessage){
  * 				The message that is returned if the condition !==false
  */
 $A.ns.Test.prototype.assertFalse = function(condition, assertMessage){
-            if(!assertMessage){
-                assertMessage = "Expected: {False}, but Actual: {True} ";
-            }
+    if(!assertMessage){
+        assertMessage = "Expected: {False}, but Actual: {True} ";
+    }
     this.assertEquals(false,condition,assertMessage);
 };
 
@@ -820,10 +821,10 @@ $A.ns.Test.prototype.assertFalse = function(condition, assertMessage){
  * @param {String} assertMessage
  * 				The message that is returned if the argument is not undefined
  */
-$A.ns.Test.prototype.assertUndefined = function(arg1, assertMessage){
-            if(!assertMessage){
-                assertMessage = "Assertion failure, Expected: {undefined}, but Actual: {"+arg1+"} ";
-            }
+$A.ns.Test.prototype.assertUndefined = function(arg1, assertMessage) {
+    if(!assertMessage) {
+        assertMessage = "Assertion failure, Expected: {undefined}, but Actual: {" + arg1 + "} ";
+    }
     this.assertEquals(undefined, arg1, assertMessage);
 };
 
@@ -834,10 +835,10 @@ $A.ns.Test.prototype.assertUndefined = function(arg1, assertMessage){
  * @param {String} assertMessage
  * 				The message that is returned if the argument is not undefined or null
  */
-$A.ns.Test.prototype.assertNotUndefinedOrNull = function(arg1, assertMessage){
-            if(!assertMessage){
-                assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {"+arg1+"} ";
-            }
+$A.ns.Test.prototype.assertNotUndefinedOrNull = function(arg1, assertMessage) {
+    if(!assertMessage){
+        assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {" + arg1 + "} ";
+    }
     this.assertTrue(!$A.util.isUndefinedOrNull(arg1),assertMessage);
 };
 
@@ -849,10 +850,10 @@ $A.ns.Test.prototype.assertNotUndefinedOrNull = function(arg1, assertMessage){
  * 				The message that is returned if the argument is not undefined or null
  */
 $A.ns.Test.prototype.assertUndefinedOrNull = function(arg1, assertMessage){
-            if(!assertMessage){
-                assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {"+arg1+"} ";
-            }
-    this.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
+    if(!assertMessage){
+        assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {" + arg1 + "} ";
+    }
+    this.assertTrue($A.util.isUndefinedOrNull(arg1), assertMessage);
 };
         
 
@@ -864,8 +865,8 @@ $A.ns.Test.prototype.assertUndefinedOrNull = function(arg1, assertMessage){
  * 				The message that is returned if the value !==null
  */
 $A.ns.Test.prototype.assertNull = function(arg1, assertMessage){
-    if(!assertMessage){
-        assertMessage = "Assertion failure, Expected: {null}, but Actual: {"+arg1+"} ";
+    if (!assertMessage) {
+        assertMessage = "Assertion failure, Expected: {null}, but Actual: {" + arg1 + "} ";
     }
     this.assertEquals(null, arg1, assertMessage);
 };
@@ -878,10 +879,10 @@ $A.ns.Test.prototype.assertNull = function(arg1, assertMessage){
  * 				The message that is returned if the value is null
  */
 $A.ns.Test.prototype.assertNotNull = function(arg1, assertMessage){
-	if(!assertMessage){
-        assertMessage = "Assertion failure, Expected: {non-null}, but Actual:{"+arg1+"}";
+	if (!assertMessage) {
+        assertMessage = "Assertion failure, Expected: {non-null}, but Actual:{" + arg1 + "}";
     }
-    this.assertTrue(arg1!==null,assertMessage);
+    this.assertTrue(arg1 !== null, assertMessage);
 };
 
 /**
@@ -891,10 +892,10 @@ $A.ns.Test.prototype.assertNotNull = function(arg1, assertMessage){
  * @throws {Error}
  *             Throws error with a message
  */
-$A.ns.Test.prototype.fail = function(assertMessage){
-    if(assertMessage){
+$A.ns.Test.prototype.fail = function(assertMessage) {
+    if (assertMessage) {
         throw new Error(assertMessage);
-    }else{
+    } else {
         throw new Error("Assertion failure");
     }
 };
@@ -906,7 +907,7 @@ $A.ns.Test.prototype.fail = function(assertMessage){
  * @returns {Object}
  * 				The prototype of the specified object
  */
-$A.ns.Test.prototype.getPrototype = function(instance){
+$A.ns.Test.prototype.getPrototype = function(instance) {
     return (instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance))) || instance.__proto || instance.constructor.prototype;
 };
 
@@ -925,9 +926,9 @@ $A.ns.Test.prototype.getPrototype = function(instance){
  * @throws {Error}
  *             Throws an error if instance does not have originalFunction as a property
  */
-$A.ns.Test.prototype.overrideFunction = function(instance, name, newFunction){
+$A.ns.Test.prototype.overrideFunction = function(instance, name, newFunction) {
     var originalFunction = instance[name];
-    if(!originalFunction) {
+    if (!originalFunction) {
         this.fail("Did not find the specified function '" + name + "' on the given object!");
     }
 
@@ -996,14 +997,14 @@ $A.ns.Test.prototype.addFunctionHandler = function(instance, name, newFunction, 
     var handler = newFunction;
     var originalFunction = instance[name];
     return this.overrideFunction(instance, name, postProcess ?
-                function(){
-                    handler.apply(this, originalFunction.apply(this, arguments), arguments);
-                } :
-                function(){
-                    handler.apply(this, arguments);
-                    originalFunction.apply(this, arguments);
-                }
-            );
+        function(){
+            handler.apply(this, originalFunction.apply(this, arguments), arguments);
+        } :
+        function(){
+            handler.apply(this, arguments);
+            originalFunction.apply(this, arguments);
+        }
+    );
 };
 
 /**
@@ -1069,17 +1070,17 @@ $A.ns.Test.prototype.getTextByComponent = function(component){
  * 				The CSS property value of the specified DOMElement
  */
 $A.ns.Test.prototype.getStyle = function(elem, style){
-        	var val = "";
-            if(document.defaultView && document.defaultView.getComputedStyle){
-                val = document.defaultView.getComputedStyle(elem, "").getPropertyValue(style);
-            }
-            else if(elem.currentStyle){
-                style = style.replace(/\-(\w)/g, function (s, ch){
-                    return ch.toUpperCase();
-                });
-                val = elem.currentStyle[style];
-            }
-            return val;
+	var val = "";
+    if(document.defaultView && document.defaultView.getComputedStyle){
+        val = document.defaultView.getComputedStyle(elem, "").getPropertyValue(style);
+    }
+    else if(elem.currentStyle){
+        style = style.replace(/\-(\w)/g, function (s, ch){
+            return ch.toUpperCase();
+        });
+        val = elem.currentStyle[style];
+    }
+    return val;
 };
 
 /**
@@ -1090,21 +1091,21 @@ $A.ns.Test.prototype.getStyle = function(elem, style){
  * 				The list of nodes without comment nodes
  */
 $A.ns.Test.prototype.getNonCommentNodes = function(nodes){
-            var ret = [];
-            if($A.util.isObject(nodes)){
-                for(var i in nodes){
-                    if(nodes[i].nodeType && nodes[i].nodeType !== 8) {
-                        ret.push(nodes[i]);
-                    }
-                }
-            }else{
-                for(var j = 0; j < nodes.length; j++){
-                    if(8 !== nodes[j].nodeType) {
-                        ret.push(nodes[j]);
-                    }
-                }
+    var ret = [];
+    if ($A.util.isObject(nodes)) {
+        for(var i in nodes){
+            if(nodes[i].nodeType && nodes[i].nodeType !== 8) {
+                ret.push(nodes[i]);
             }
-            return ret;
+        }
+    } else {
+        for(var j = 0; j < nodes.length; j++){
+            if(8 !== nodes[j].nodeType) {
+                ret.push(nodes[j]);
+            }
+        }
+    }
+    return ret;
 };
 
 /**
@@ -1115,13 +1116,13 @@ $A.ns.Test.prototype.getNonCommentNodes = function(nodes){
  * 				Returns true if the specified node has been deleted, or false otherwise
  */
 $A.ns.Test.prototype.isNodeDeleted = function(node){
-            if (!node.parentNode){
-                return true;
-            }
-            var div = document.createElement("div");
-            document.documentElement.appendChild(div);
-            aura.util.removeElement(div);
-            return node.parentNode === div.parentNode;
+    if (!node.parentNode){
+        return true;
+    }
+    var div = document.createElement("div");
+    document.documentElement.appendChild(div);
+    aura.util.removeElement(div);
+    return node.parentNode === div.parentNode;
 };
 
 /**
@@ -1130,7 +1131,7 @@ $A.ns.Test.prototype.isNodeDeleted = function(node){
  * 				The list of nodes contained in the document node
  */
 $A.ns.Test.prototype.select = function() {
-            return document.querySelectorAll.apply(document, arguments);
+    return document.querySelectorAll.apply(document, arguments);
 };
 
 /**
@@ -1143,19 +1144,19 @@ $A.ns.Test.prototype.select = function() {
  * 				Return true if testString contains targetString, or false otherwise
      */
 $A.ns.Test.prototype.contains = function(testString, targetString){
-            if (!$A.util.isUndefinedOrNull(testString)) {
-                return (testString.indexOf(targetString) != -1);
-            }
-            return false;
+    if (!$A.util.isUndefinedOrNull(testString)) {
+        return (testString.indexOf(targetString) != -1);
+    }
+    return false;
 };
-        
+
 /**
  * Returns a reference to the object that is currently designated as the active element in the document.
  *
  * @returns {DOMElement} The current active element.
  */
 $A.ns.Test.prototype.getActiveElement = function(){
-            return document.activeElement;
+    return document.activeElement;
 };
 
 /**
@@ -1172,12 +1173,12 @@ $A.ns.Test.prototype.getActiveElementText = function(){
  * @private
  */
 $A.ns.Test.prototype.walkTheDOM = function (node, func) {
-          func(node);
-          node = node.firstChild;
-          while (node) {
-    this.walkTheDOM(node, func);
-            node = node.nextSibling;
-          }
+    func(node);
+    node = node.firstChild;
+    while (node) {
+        this.walkTheDOM(node, func);
+        node = node.nextSibling;
+    }
 };
 
 /**
@@ -1192,19 +1193,19 @@ $A.ns.Test.prototype.getElementsByClassNameCustom = function (className, parentE
     }
 
     this.walkTheDOM(parentElement, function(node) {
-                var a, c = node.className,
-                    i;
-                if (c) {
-                    a = c.split(' ');
-                    for (i = 0; i < a.length; i++) {
-                        if (a[i] === className) {
-                            results.push(node);
-                            break;
-                        }
-                    }
+        var a, c = node.className,
+            i;
+        if (c) {
+            a = c.split(' ');
+            for (i = 0; i < a.length; i++) {
+                if (a[i] === className) {
+                    results.push(node);
+                    break;
                 }
-            });
-            return results;
+            }
+        }
+    });
+    return results;
 };
 
 /**
@@ -1215,10 +1216,10 @@ $A.ns.Test.prototype.getElementsByClassNameCustom = function (className, parentE
  */
 $A.ns.Test.prototype.findChildWithClassName = function(parentElement, className){
     var results = this.getElementsByClassNameCustom(className, parentElement);
-            if (results && results.length > 0) {
-                return results;
-            }
-            return null;
+    if (results && results.length > 0) {
+        return results;
+    }
+    return null;
 };
 
 /**
@@ -1288,10 +1289,10 @@ $A.ns.Test.prototype.clickOrTouch = function (element, canBubble, cancelable) {
         if ($A.util.isUndefinedOrNull(element.click)) {
             // manually fire event
             this.fireDomEvent(element, "click");
-                } else {
-                    element.click();
-                }
-            }
+        } else {
+            element.click();
+        }
+    }
 };
 
 /**
@@ -1301,10 +1302,10 @@ $A.ns.Test.prototype.clickOrTouch = function (element, canBubble, cancelable) {
  * @returns {Boolean} true if node is text node.
  */
 $A.ns.Test.prototype.isInstanceOfText = function(node){
-            if(window.Text){
-                return node instanceof window.Text;
-            }
-            return node.nodeType == 3;
+    if(window.Text){
+        return node instanceof window.Text;
+    }
+    return node.nodeType == 3;
 };
 
 /**
@@ -1393,10 +1394,10 @@ $A.ns.Test.prototype.isInstanceOfSpanElement = function(element){
  *                    it's tagName is equal to tag
  */
 $A.ns.Test.prototype.isInstanceOf = function(element, elementType, tag){
-            if(elementType){
-                return element instanceof elementType;
-            }
-            return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
+    if(elementType){
+        return element instanceof elementType;
+    }
+    return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
 };
 
 /**
@@ -1406,19 +1407,18 @@ $A.ns.Test.prototype.isInstanceOf = function(element, elementType, tag){
  *          Object to retrieve set of keys from.
  */
 $A.ns.Test.prototype.objectKeys = function(obj){
-            if (Object.keys) {
-                return Object.keys(obj);
-            } else {
-                var result = [];
-                for(var name in obj) {
-                    if (obj.hasOwnProperty(name)){
-                        result.push(name);
-                    }
-                }
-                return result;
+    if (Object.keys) {
+        return Object.keys(obj);
+    } else {
+        var result = [];
+        for(var name in obj) {
+            if (obj.hasOwnProperty(name)){
+                result.push(name);
             }
+        }
+        return result;
+    }
 };
-        
 
 /**
  * Return attributeValue of an element

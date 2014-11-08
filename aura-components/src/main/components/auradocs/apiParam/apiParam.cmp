@@ -17,16 +17,17 @@
 -->
 <aura:component>
     <aura:attribute name="symbol" type="Object"/>
-    <aura:attribute name="params" type="Aura.Component[]"/>
-    <aura:attribute name="name" type="Aura.Component[]"/>
-    <aura:attribute name="collapsible" type="Boolean" default="false"/>
-    <aura:attribute name="extra" type="Boolean" default="false"/>
+
         <li>
-            <b>{!' ' + v.symbol.name}</b> : {!v.symbol.type.names[0]}
+            <b>{!' ' + v.symbol.name}</b> : 
+            <aura:iteration items="{!v.symbol.type.names}" var="name" indexVar="index">
+                <aura:if isTrue="{!name != ''}">
+                    {!name}&nbsp;
+                    <aura:if isTrue="{!index != (v.symbol.type.names.length - 1)}">
+                        |&nbsp;
+                    </aura:if>
+                </aura:if>
+            </aura:iteration>
             <p><aura:unescapedHtml value="{!v.symbol.description}"/></p>
-            <!--
-            <p>Required?</p>
-            <p>Visibility: public, private, etc..</p>
-            -->
         </li>
 </aura:component>

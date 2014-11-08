@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace A registry for ProviderDefs.
+ * @description A registry for ProviderDefs.
  * @constructor
  * @protected
  */

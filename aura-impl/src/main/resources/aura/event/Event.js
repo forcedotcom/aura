@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates an Event with name, source component, event definition, event dispatcher, parameters, and sets the fired flag to false.
+ * @description Creates an Event with name, source component, event definition, event dispatcher, parameters, and sets the fired flag to false.
  * @constructor
  * @param {Object} config
  */

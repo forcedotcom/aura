@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace Creates a new DefDescriptor (definition descriptor) instance, including the prefix and namespace.
+ * @description Creates a new DefDescriptor (definition descriptor) instance, including the prefix and namespace.
  * @constructor
  * @param {Object} config Throws an error if config is null or undefined.
  */

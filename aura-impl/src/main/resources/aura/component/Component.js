@@ -279,9 +279,9 @@ Component.prototype.isInstanceOf = function(name) {
 };
 
 /**
- * @private
  * @param {Object}
  *            type Applies the type to its definition.
+ * @private
  */
 Component.prototype.implementsDirectly = function(type) {
 	return this.getDef().implementsDirectly(type);
@@ -1217,8 +1217,9 @@ Component.prototype.getFacets = function() {
  *            callback the callback function for the event (will be wrapped)
  * @param {Component}
  *            component the component attached to the handler.
- * @private
+ * 
  * @constructor
+ * @private
  */
 $A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component) {
 	this.eventName = eventName;

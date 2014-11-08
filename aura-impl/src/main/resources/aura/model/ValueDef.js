@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a ValueDef instance.
+ * @description Creates a ValueDef instance.
  * @constructor
  * @param config used to create the value definition.  Only config["name"] is used.
  */

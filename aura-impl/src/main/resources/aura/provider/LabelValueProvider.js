@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Label Provider. Performs server action to retrieve label values
+ * @description Label Provider. Performs server action to retrieve label values
  * @constructor
  */
 $A.ns.LabelValueProvider = function() {

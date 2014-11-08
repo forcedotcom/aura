@@ -140,9 +140,9 @@ $A.ns.ActionCollector.prototype.getNum = function() {
  * Internal routine to create a callback for the storage service.
  *
  * This simply binds to both 'this' and 'action'.
- *
- * @private
+ * 
  * @param {Action} action the action we will use in the call to collectAction.
+ * @private
  */
 $A.ns.ActionCollector.prototype.createResultCallback = function(action) {
     var that = this;
@@ -190,9 +190,9 @@ $A.ns.ActionCollector.prototype.findActionAndClear = function(id) {
  * Once we have collected all of the actions together, we make sure that we refresh any stored responses
  * that need a refresh, and call the callback provided on construction.
  *
- * @private
  * @param {Action} action the action to collect
  * @param {Object} response the response to the action (if from storage).
+ * @private
  */
 $A.ns.ActionCollector.prototype.collectAction = function(action, response) {
     if (response) {

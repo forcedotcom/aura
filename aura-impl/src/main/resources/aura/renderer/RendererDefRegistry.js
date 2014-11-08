@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace A registry for RendererDefs.
+ * @description A registry for RendererDefs.
  * @constructor
  * @protected
  */

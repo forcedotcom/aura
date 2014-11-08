@@ -22,8 +22,8 @@
     <aura:attribute name="collapsible" type="Boolean" default="false"/>
     <aura:attribute name="extra" type="Boolean" default="false"/>
         <li>
-            <b>{!' ' + v.symbol.name}</b> : {!v.symbol.type}
-            <p><aura:unescapedHtml value="{!v.symbol.classDesc + v.symbol.desc}"/></p>
+            <b>{!' ' + v.symbol.name}</b> : {!v.symbol.type.names[0]}
+            <p><aura:unescapedHtml value="{!v.symbol.description}"/></p>
             <!--
             <p>Required?</p>
             <p>Visibility: public, private, etc..</p>

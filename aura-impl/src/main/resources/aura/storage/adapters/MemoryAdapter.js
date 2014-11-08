@@ -16,7 +16,7 @@
 /*jslint sub: true */
 
 /**
- * @namespace The value Object used in the backing store of the MemoryStorageAdapter.
+ * @description The value Object used in the backing store of the MemoryStorageAdapter.
  * @constructor
  */
 var MemoryStorageValue = function MemoryStorageValue(item, size) {
@@ -33,7 +33,7 @@ MemoryStorageValue.prototype.getSize = function() {
 };
 
 /**
- * @namespace The Memory adapter for storage service implementation
+ * @description The Memory adapter for storage service implementation
  * @constructor
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter(config) {

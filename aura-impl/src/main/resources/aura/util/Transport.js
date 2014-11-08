@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-/**
- * @namespace
- */
+
 var Transport = function() {
 
     function createHttpRequest() {

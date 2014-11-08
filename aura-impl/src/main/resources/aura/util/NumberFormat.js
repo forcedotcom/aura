@@ -18,7 +18,7 @@
  * Format is a string using the java format pattern (e.g. #,##0.0). Note that this does not handle quoted 
  * special characters or exponents.
  * Symbols is an optional map of localized symbols to use, otherwise it will use the current locale's symbols
- * @namespace 
+ * 
  * @constructor
  */
 function NumberFormat(format, symbols) {

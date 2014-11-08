@@ -15,7 +15,7 @@
  */
 /*jslint sub: true*/
 /**
- * @namespace Represents a Aura client-side context, created during HTTP requests for component definitions. A context
+ * @description Represents a Aura client-side context, created during HTTP requests for component definitions. A context
  *            can include a mode, such as "DEV" for development mode or "PROD" for production mode.
  * @constructor
  * @protected
@@ -90,9 +90,9 @@ AuraContext.prototype.getMode = function() {
 /**
  * Provides access to global value providers.
  * For example, <code>$A.get("$Label.Related_Lists.task_mode_today");</code> gets the label value.
- *
- * @private
+ * 
  * @return {GlobalValueProviders}
+ * @private
  */
 AuraContext.prototype.getGlobalValueProvider = function(type) {
     return this.globalValueProviders.getValueProvider(type);
@@ -100,8 +100,9 @@ AuraContext.prototype.getGlobalValueProvider = function(type) {
 
 /**
  * JSON representation of context for server requests
- * @private
+ * 
  * @return {String} json representation
+ * @private
  */
 AuraContext.prototype.encodeForServer = function() {
     return aura.util.json.encode({
@@ -117,9 +118,9 @@ AuraContext.prototype.encodeForServer = function() {
 };
 
 /**
- * @private
  * @param {Object}
  *      otherContext the context from the server to join in to this one.
+ * @private
  */
 AuraContext.prototype.merge = function(otherContext) {
     var i, defs;
@@ -161,9 +162,9 @@ AuraContext.prototype.merge = function(otherContext) {
 
 /**
  * FIXME: this should return a string, and it should probably not even be here.
- *
- * @private
+ * 
  * @return {number} the 'num' for this context
+ * @private
  */
 AuraContext.prototype.getNum = function() {
     return this.num;
@@ -187,8 +188,8 @@ AuraContext.prototype.incrementRender = function() {
 };
 
 /**
- * @private
  * @return {Number} incremented transaction number
+ * @private
  */
 AuraContext.prototype.incrementTransaction = function() {
     this.transaction = this.transaction + 1;
@@ -196,8 +197,8 @@ AuraContext.prototype.incrementTransaction = function() {
 };
 
 /**
- * @private
  * @return {Number} gets the number of the current transaction
+ * @private
  */
 AuraContext.prototype.getTransaction = function() {
     return this.transaction;
@@ -213,8 +214,8 @@ AuraContext.prototype.updateTransactionName = function(_transactionName) {
 };
 
 /**
- * @private
  * @return {String} gets the name of the transaction
+ * @private
  */
 AuraContext.prototype.getTransactionName = function() {
     return this.transactionName;
@@ -228,8 +229,8 @@ AuraContext.prototype.clearTransactionName = function() {
 };
 
 /**
- * @private
  * @return {Number} Next global ID
+ * @private
  */
 AuraContext.prototype.getNextGlobalId = function() {
     this.lastGlobalId = this.lastGlobalId + 1;
@@ -238,18 +239,17 @@ AuraContext.prototype.getNextGlobalId = function() {
 
 /**
  * Returns components configs object
- * @private
  * @param {String} creationPath creation path to check
  * @return {Boolean} Whether creation path is in component configs
+ * @private
  */
 AuraContext.prototype.containsComponentConfig = function(creationPath) {
     return this.componentConfigs.hasOwnProperty(creationPath);
 };
 
 /**
- * @private
- *
  * @param {string} creationPath the creation path to look up.
+ * @private
  */
 AuraContext.prototype.getComponentConfig = function(creationPath) {
     var componentConfigs = this.componentConfigs;
@@ -266,11 +266,11 @@ AuraContext.prototype.getApp = function() {
 };
 
 /**
- * @private
  * @param {Object}
  *      otherComponentConfigs the component configs from the server to join in.
  * @param {string}
  *      actionId the id of the action that we are joining in (used to amend the creationPath).
+ * @private
  */
 AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
     var cP, idx, config, def;
@@ -291,10 +291,10 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
 /**
  * Internal routine to clear out component configs to factor out common code.
  *
- * @private
  * @param {string} actionId the action id that we should clear.
  * @param {boolean} logit should we log as we go? including errors.
  * @return {number} the count of component configs removed.
+ * @private
  */
 AuraContext.prototype.internalClear = function(actionId, logit) {
     var count = 0;
@@ -343,8 +343,8 @@ AuraContext.prototype.internalClear = function(actionId, logit) {
  * The Rule: You must consume component configs in the action callback.
  * you may _not_ delay creating components.
  *
- * @private
  * @param {string} actionId the action id that we should clear.
+ * @private
  */
 AuraContext.prototype.finishComponentConfigs = function(actionId) {
     this.internalClear(actionId, true);

@@ -18,7 +18,7 @@
  * A representation of a set of individual bits, addressable as if organized as
  * an array.
  *
- * @namespace
+ * 
  * @constructor
  */
 function Bitset(str) {

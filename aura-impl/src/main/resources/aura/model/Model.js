@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a Model instance.
+ * @description Creates a Model instance.
  * @constructor
  * @param {Object} def
  * @param {Object} data

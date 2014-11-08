@@ -15,7 +15,7 @@
  */
 /*jslint sub: true, evil : true */
 /**
- * @namespace Creates a RendererDef instance.
+ * @description Creates a RendererDef instance.
  * @constructor
  * @protected
  */

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Event Definition including the descriptor, type, and attributes.
+ * @description The Event Definition including the descriptor, type, and attributes.
  * An EventDef instance is created as part of Aura initialization.
  * @constructor
  */

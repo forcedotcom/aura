@@ -21,7 +21,9 @@
     <h3>{!v.title}</h3>
     <div class="alert alert-info">
         <aura:iteration items="{!v.symbols}" var="symbol">
-            <a onclick="{!c.jumpScroll}" class="jumplink">{!symbol._name}</a>
+        	<aura:if isTrue="{!symbol.access != 'private'}">
+            	<a onclick="{!c.jumpScroll}" class="jumplink">{!symbol.name}</a>
+        	</aura:if>
         </aura:iteration>
     </div>
 
@@ -32,10 +34,13 @@
             We can't dynamically set the aura:id. However, our controller just needs to get a handle to the DOM in
             order to scroll this element into view. So, we create a unique DOM ID based on the globalId as a workaround.
             -->
-                <tr id="{!globalId + '_symbol_' + symbol._name}" >
-                    <auradocs:apiSymbol symbol="{!symbol}"/>
-                </tr>
+                <aura:if isTrue="{!symbol.access != 'private'}">
+                	<tr id="{!globalId + '_symbol_' + symbol.name}" >
+                    	<auradocs:apiSymbol symbol="{!symbol}"/>
+                	</tr>
+                </aura:if>
             </aura:iteration>
         </tbody>
     </table>
+
 </aura:component>

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Simple Value Provider. Holds generic map of Key/Value Pairs
+ * @description Simple Value Provider. Holds generic map of Key/Value Pairs
  * @constructor
  */
 $A.ns.ObjectValueProvider = function() {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace
+ * 
  * @constructor
  */
 function Style (){
@@ -37,9 +37,10 @@ Style.prototype.getHead = function(){
 /**
  * Applies a CSS style to an element using the HTML style element.
  * Appends the HTML style element as a child of the head element.
- * @private
+ * 
  * @param {String} styleText The HTML style element, including the type attribute.
  * @returns {Object} The style element
+ * @private
  */
 Style.prototype.apply = function(styleText) {
     //FIXME - This should see if it's already been applied

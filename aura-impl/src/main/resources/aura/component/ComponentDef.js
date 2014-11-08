@@ -15,8 +15,11 @@
  */
 /*jslint sub: true */
 /**
- * @class Constructs a new ComponentDef object, which is a component definition.
- *        A ComponentDef instance is created as part of Aura initialization.
+ * @class ComponentDef
+ *
+ * Constructs a new ComponentDef object, which is a component definition.
+ * A ComponentDef instance is created as part of Aura initialization.
+ *
  * @constructor
  * @protected
  */

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A registry for EventDefs.
+ * @description A registry for EventDefs.
  * @constructor
  */
 function EventDefRegistry() {

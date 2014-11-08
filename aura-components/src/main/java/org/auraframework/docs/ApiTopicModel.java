@@ -37,6 +37,7 @@ public class ApiTopicModel {
         title = title.substring(4);
 
         symbol = ApiContentsModel.getSymbol(title);
+
     }
 
     @AuraEnabled

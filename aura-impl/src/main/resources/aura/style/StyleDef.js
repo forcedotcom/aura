@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new StyleDef instance, including the class name and descriptor.
+ * @description Creates a new StyleDef instance, including the class name and descriptor.
  * @constructor
  * @param {Object} config
  */

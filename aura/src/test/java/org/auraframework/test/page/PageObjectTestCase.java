@@ -15,9 +15,13 @@
  */
 package org.auraframework.test.page;
 
+import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.WebDriverTest;
 import org.openqa.selenium.WebDriver;
 
+//this class doesn't extends WebDriverTestCase, we need the annotation or maven will treat it as unit test.
+@WebDriverTest
 public abstract class PageObjectTestCase<T extends PageObject> extends WebDriverTestCase {
 
 	private final T page;
@@ -31,13 +35,18 @@ public abstract class PageObjectTestCase<T extends PageObject> extends WebDriver
 	protected void setCurrentDriver(WebDriver currentDriver) {
 		super.setCurrentDriver(currentDriver);
 		page.setDriver(currentDriver);
-		page.setAuraTestingUtil(getAuraTestingUtil());
 	}
 	
 	@Override
 	protected void setAuraUITestingUtil() {
 		super.setAuraUITestingUtil();
 		page.setAuraUITestingUtil(auraUITestingUtil);
+	}
+	
+	@Override
+	protected void setAuraTestingUtil() {
+		AuraTestingUtil atu = getAuraTestingUtil();
+		page.setAuraTestingUtil(atu);
 	}
 
 	public T page() {

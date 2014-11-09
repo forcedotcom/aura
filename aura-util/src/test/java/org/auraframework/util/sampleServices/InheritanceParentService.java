@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface InheritanceParentService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface InheritanceParentService extends AuraServiceProvider {
 
 }

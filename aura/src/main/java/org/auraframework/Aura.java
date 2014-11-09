@@ -26,6 +26,7 @@ import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Instance;
@@ -197,7 +198,7 @@ public class Aura {
         return Aura.get(BeanAdapter.class);
     }
     
-    public static <T> T get(Class<T> type) {
+    public static <T extends AuraServiceProvider> T get(Class<T> type) {
         return ServiceLocator.get().get(type);
     }
 

@@ -18,8 +18,11 @@ package org.auraframework.util.type.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.type.Converter;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Convert strings to array lists.
@@ -29,6 +32,7 @@ import org.auraframework.util.type.Converter;
  * errors result).
  */
 @SuppressWarnings("rawtypes")
+@Component (provide=AuraServiceProvider.class)
 public class StringToArrayListConverter implements Converter<String, ArrayList> {
 
     /**

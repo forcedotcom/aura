@@ -77,6 +77,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-osgi-api</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

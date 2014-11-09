@@ -28,6 +28,7 @@ import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.util.json.AuraJsonContext;
@@ -44,8 +45,11 @@ import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.util.ServiceLocator;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class AuraContextServiceImpl implements ContextService {
 
     private static final long serialVersionUID = 2204785781318401371L;

@@ -20,11 +20,15 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.Json;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDef> {
 
     @Override

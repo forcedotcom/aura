@@ -39,6 +39,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.source.file.AuraFileMonitor;
@@ -62,6 +63,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class ConfigAdapterImpl implements ConfigAdapter {
 
     private static final String TIMESTAMP_FORMAT_PROPERTY = "aura.build.timestamp.format";

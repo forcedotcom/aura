@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public class SelfImplementingService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public class SelfImplementingService implements AuraServiceProvider{
 
 }

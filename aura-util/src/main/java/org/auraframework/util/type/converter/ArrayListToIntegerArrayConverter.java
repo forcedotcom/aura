@@ -17,12 +17,16 @@ package org.auraframework.util.type.converter;
 
 import java.util.ArrayList;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.type.Converter;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
 @SuppressWarnings("rawtypes")
+@Component (provide=AuraServiceProvider.class)
 public class ArrayListToIntegerArrayConverter implements Converter<ArrayList, Integer[]> {
 
     @SuppressWarnings("unchecked")

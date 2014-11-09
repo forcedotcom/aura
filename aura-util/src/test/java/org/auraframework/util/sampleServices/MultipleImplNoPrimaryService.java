@@ -15,10 +15,12 @@
  */
 package org.auraframework.util.sampleServices;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
 /**
  * Used in ServiceLocatorTest.java
  */
 
-public interface MultipleImplNoPrimaryService {
+public interface MultipleImplNoPrimaryService extends AuraServiceProvider {
 
 }

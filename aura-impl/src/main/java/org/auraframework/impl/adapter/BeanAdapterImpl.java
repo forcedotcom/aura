@@ -18,16 +18,18 @@ package org.auraframework.impl.adapter;
 import org.auraframework.adapter.BeanAdapter;
 import org.auraframework.def.JavaControllerDef;
 import org.auraframework.def.JavaModelDef;
-
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.Location;
-
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * An implementation for the Bean Adapter for internal use.
  */
+@Component (provide=AuraServiceProvider.class)
 public class BeanAdapterImpl implements BeanAdapter {
     @Override
     public void validateModelBean(JavaModelDef def) throws QuickFixException {

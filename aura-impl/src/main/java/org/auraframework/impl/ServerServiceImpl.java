@@ -33,6 +33,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
@@ -51,6 +52,9 @@ import org.auraframework.util.json.Json;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class ServerServiceImpl implements ServerService {
 
     private static final long serialVersionUID = -2779745160285710414L;

@@ -22,11 +22,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
 import org.auraframework.util.json.Json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class DefaultJsonSerializer implements JsonSerializer<Object> {
     @Override
     public ReferenceType getReferenceType(Object value) {

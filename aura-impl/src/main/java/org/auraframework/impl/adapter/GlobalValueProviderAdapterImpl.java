@@ -21,11 +21,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.adapter.GlobalValueProviderAdapter;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapter {
 
     @Override

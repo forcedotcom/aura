@@ -210,7 +210,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
             // def can be null if a definition not found exception was thrown for that definition. Odd.
             if (def != null) {
-                ControllerDef cd = def.getDeclaredControllerDef();
+                ControllerDef cd = def.getControllerDef();
                 if (cd != null) {
                     // Insure that this def is allowed to create an instance of the controller
                     defRegistry.assertAccess(descriptor, cd);

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 ({
-    //W-2192746
-    // There should be an error here saying that there is a problem with case sensitivity.
+    // TODO(W-2192746): There should be an error here saying that there is a problem with case sensitivity.
     testCaseSensitivityWhenSettingParentAttributes:{
         test:function(cmp){
             $A.test.assertEquals(undefined, cmp.get('v.SIMPLEAttribute'),

@@ -15,8 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" render="client">
-    <aura:attribute name="SimpleAttribute" default="parentY" type="String"/>
-    {!v.SIMPLEAttribute}
-    {!v.SimpleAttribute}
+<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+
+    <!-- Corresponds to getString() on model -->
+    <div aura:id="string1">{!m.string}</div>
+    <div aura:id="string2">{!m.String}</div>
+    <div aura:id="string3">{!m.strinG}</div>
+    <div aura:id="string4">{!m.STRING}</div>
+
+    <!-- Corresponds to getstringLowercase() on model -->
+    <div aura:id="stringLowercase1">{!m.stringLowercase}</div>
+    <div aura:id="stringLowercase2">{!m.StringLowercase}</div>
+    <div aura:id="stringLowercase3">{!m.stringlowercase}</div>
+
 </aura:component>

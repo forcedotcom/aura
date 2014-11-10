@@ -301,20 +301,25 @@
                     // Vertical alignment
                     // getBoundingClientRect method does not return height and width in IE7 and Ie8
                     var height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                    var scrollY = document.documentElement.scrollTop;
                     if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
                         if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
-                            elem.style.top = window.scrollY + "px";
+                            elem.style.top = scrollY + "px";
                         } else { // put it above
-                            elem.style.top = (referenceElemRect.top - height) + window.scrollY + "px";
+                            elem.style.top = (referenceElemRect.top - height) + scrollY + "px";
                         }
                     } else { // put it below
-                        elem.style.top = referenceElemRect.bottom + window.scrollY + "px";
+                        elem.style.top = referenceElemRect.bottom + scrollY + "px";
                     }
 
                     // Horizontal alignment
                     // getBoundingClientRect method does not return height and width in IE7 and Ie8
                     var width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
-                    elem.style.left = referenceElemRect.right - width + window.scrollX + "px";
+                    if (referenceElemRect.right < width) {
+                        elem.style.left = document.documentElement.scrollLeft + "px";
+                    } else {
+                        elem.style.left = referenceElemRect.right - width + document.documentElement.scrollLeft + "px";
+                    }
 
                     //attaching to the body causes the date to lose focus so we need to add the focus back
                     this.focusDate(component);

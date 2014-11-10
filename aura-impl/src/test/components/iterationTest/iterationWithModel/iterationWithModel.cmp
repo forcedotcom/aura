@@ -28,6 +28,8 @@
     <ui:button aura:id="removeRow" label="Click here to remove item" press="{!c.removeRow}" />
     </div>
 
+    <!-- Must set forceServer flag as a temporary workaround when component iterating over has nested
+         server and client dependencies (non-server dependent component wraps a server dependent one) -->
     <aura:iteration items="{!m.stringList}" var="item" forceServer="true">
         <iterationTest:iterationWrapper aura:id="innerCmpWrapper" value="{!item}" />
     </aura:iteration>

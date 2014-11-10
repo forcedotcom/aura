@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:menuTrigger" description="A link that triggers a dropdown menu." support="GA">
+<aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:menuTrigger" description="A link that triggers a dropdown menu.">
 
     <a aura:id="link" class="{!v.class}" title="{!v.title}">
         <aura:if isTrue="{!v.body.length == 0}">

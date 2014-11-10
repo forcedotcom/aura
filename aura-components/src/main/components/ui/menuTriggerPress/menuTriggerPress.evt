@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="Indicates that the menu trigger is clicked.">
+<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that the menu trigger is clicked.">
     <aura:attribute name="focusItemIndex" type="Integer" default="0" description="The index of the item which should be on focus when the menu displays."/>
 </aura:event>

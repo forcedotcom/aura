@@ -24,6 +24,9 @@ import org.openqa.selenium.WebDriver;
 public interface PageObject {
 	
 	//settters begin
+	void passWebdriverInfo(BrowserType browserType, WebDriver currentDriver, Mode mode, int timeoutInSecs, 
+			boolean waitForInit);
+		
 	void setCurrentBrowserType(BrowserType currentBrowserType);
 
 	void setDriver(WebDriver driver);

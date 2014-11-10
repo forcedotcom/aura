@@ -71,15 +71,6 @@ public abstract class AuraPageObject<T extends BaseComponentDef> implements Page
 		}
 	}
 	
-	@Override
-	public void setCurrentBrowserType(BrowserType currentBrowserType) {
-		this.currentBrowserType = currentBrowserType;
-	}
-	
-	@Override
-	public void setDriver(WebDriver driver) {
-		this.driver = driver;
-	}
 	
 	@Override
 	public void setAuraTestingUtil(AuraTestingUtil auraTestingUtil) {
@@ -89,6 +80,16 @@ public abstract class AuraPageObject<T extends BaseComponentDef> implements Page
 	@Override
 	public void setAuraUITestingUtil(AuraUITestingUtil auraUITestingUtil) {
 		this.auraUITestingUtil = auraUITestingUtil;
+	}
+	
+	@Override
+	public void setCurrentBrowserType(BrowserType currentBrowserType) {
+		this.currentBrowserType = currentBrowserType;
+	}
+	
+	@Override
+	public void setDriver(WebDriver driver) {
+		this.driver = driver;
 	}
 	
 	@Override
@@ -133,6 +134,16 @@ public abstract class AuraPageObject<T extends BaseComponentDef> implements Page
 		assert(this.defDescriptor != null);
 		assert(this.name != null);
 		assert(this.isComponent != null);
+	}
+	
+	//TODO browserType&mode etc should belong to [test]Context, not Page Object.
+	@Override
+	public void passWebdriverInfo(BrowserType browserType, WebDriver currentDriver, Mode mode, int timeoutInSecs, boolean waitForInit) {
+		this.currentBrowserType = browserType;
+		this.driver = currentDriver;
+		this.mode = mode;
+		this.timeoutInSecs = timeoutInSecs;
+		this.waitForInit = waitForInit;
 	}
 	
 	public void open() throws MalformedURLException, URISyntaxException {

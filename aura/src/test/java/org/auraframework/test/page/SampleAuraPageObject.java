@@ -16,8 +16,6 @@
 package org.auraframework.test.page;
 
 import org.auraframework.def.ComponentDef;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

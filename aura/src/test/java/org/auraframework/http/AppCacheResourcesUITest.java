@@ -446,7 +446,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         String url = getUrl();
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
-        url = addUrlParams(url, params);
+        url = getAuraTestingUtil().addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
         
         auraUITestingUtil.waitUntilWithCallback(

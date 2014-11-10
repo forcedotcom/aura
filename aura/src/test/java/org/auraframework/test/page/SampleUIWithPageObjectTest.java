@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 
 /**
  * this is an example for testing UI with PageObject pattern.
@@ -27,18 +26,8 @@ import org.auraframework.test.WebDriverUtil.BrowserType;
  */
 public class SampleUIWithPageObjectTest extends PageObjectTestCase<SampleAuraPageObject> {
 
-	public SampleUIWithPageObjectTest(SampleAuraPageObject page) {
-		super(page);
-	}
-	
 	public SampleUIWithPageObjectTest(String name) throws MalformedURLException, URISyntaxException {
 		super(new SampleAuraPageObject(name, true, "uiExamples:buttonExample"));
-		//TODO browserType&mode etc should belong to [test]Context, not Page Object.
-		page().setCurrentBrowserType(this.getBrowserType());
-		page().setDriver(this.currentDriver);
-		page().setMode(getDefaultMode());
-		page().setTimeoutInSecs(timeoutInSecs);
-		page().setWaitForInit(true);
 	}
 	
 	/**
@@ -58,7 +47,9 @@ public class SampleUIWithPageObjectTest extends PageObjectTestCase<SampleAuraPag
 		return Mode.CADENCE;
 	}
 	
-	public void _testButtunUIWithPageObject() throws Exception {
+	public void testButtunUIWithPageObject() throws Exception {
+		//TODO browserType&mode etc should belong to [test]Context, not Page Object.
+		page().passWebdriverInfo(getBrowserType(), this.currentDriver, getDefaultMode(), timeoutInSecs, true);
 		//PageObject is in charge of load itself, clicking , typing , etc
 		page().open();
         page().clickOnButton();

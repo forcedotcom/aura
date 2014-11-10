@@ -668,11 +668,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
-    public ControllerDef getDeclaredControllerDef() throws QuickFixException {
-        return compoundControllerDescriptor != null ? compoundControllerDescriptor.getDef() : null;
-    }
-    
-    @Override
     public StyleDef getStyleDef() throws QuickFixException {
         return styleDescriptor == null ? null : styleDescriptor.getDef();
     }

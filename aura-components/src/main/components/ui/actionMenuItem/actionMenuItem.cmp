@@ -15,9 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item that triggers an action. This component is nested in a ui:menu component.">
+<aura:component access="GLOBAL" support="GA" extends="ui:menuItem" extensible="true" description="​A menu item that triggers an action. This component is nested in a ui:menu component.">
     <aura:handler name="click" action="{!c.handleClick}"/>
-    <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
+    <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
     <li aura:id="listitem" class="{!v.class}" role="presentation">
         <a aura:id="link" role="menuitem">
             <aura:renderIf isTrue="{!v.body.length == 0}">

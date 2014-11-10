@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:popupTrigger" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="GA">
-    <aura:registerevent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
+<aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A trigger that expands and collapses a menu, used in a ui:menu component.">
+    <aura:registerevent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
     <aura:handler name="click" action="{!c.onClick}"/>
 
     <aura:set attribute="trigger">

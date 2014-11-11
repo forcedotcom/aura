@@ -23,9 +23,21 @@
  * @returns {Function}
  */
 function Model(def, data, component){
+    if(!data){
+        data={};
+    }
     this.def=def;
     this.data=data;
     this.component=component;
+    if(def){
+        var members=def.getMembers();
+        for(var i=0;i<members.length;i++){
+            var name=members[i].getName();
+            if(!data.hasOwnProperty(name)){
+                data[name]=null;
+            }
+        }
+    }
 }
 
 Model.prototype.get=function(key){

@@ -20,6 +20,7 @@ import java.util.EnumMap;
 import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.java.writer.JavaScriptWriter;
 import org.auraframework.impl.java.writer.JavaWriter;
+import org.auraframework.impl.java.writer.SVGWriter;
 import org.auraframework.impl.java.writer.StyleWriter;
 import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -49,6 +50,7 @@ public class ParserFactory {
         writers.put(Format.JS, JavaScriptWriter.getInstance());
         writers.put(Format.CSS, StyleWriter.getInstance());
         writers.put(Format.TEMPLATE_CSS, StyleWriter.getInstance());
+        writers.put(Format.SVG, SVGWriter.getInstance());
     }
 
     public static Parser getParser(Format format) {

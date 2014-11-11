@@ -15,7 +15,7 @@
  */
 package org.auraframework.def;
 
-import java.util.Map;
+import org.auraframework.system.Source;
 
 /**
  * 
@@ -23,4 +23,8 @@ import java.util.Map;
  * 
  */
 public interface SVGDef extends RootDefinition {
+    @Override
+    DefDescriptor<SVGDef> getDescriptor();
+
+    Source<SVGDef> getSource();
 }

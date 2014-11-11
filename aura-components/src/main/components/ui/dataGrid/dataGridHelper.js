@@ -110,7 +110,7 @@
 	 */
     initializeRowData: function(concrete) {
     	var self				= this,
-    		items = concrete.get("v.items"),
+    		items = concrete.get("v.items") || [],
     		isEditMode			= false; //mode.indexOf('EDIT') === 0; not yet fully supported
     	
     	concrete._rowData = self.createRowData(concrete, items, isEditMode);
@@ -170,7 +170,7 @@
 		// Loaded once is meant to ensure the first data loaded doesn't break.
 		if (!cmp._hasDataProvider || cmp._loadedOnce) {
 			if (!params.index) {
-				newLength = params.value.length;
+				newLength = (params.value ? params.value.length : 0);
 				// Check for a larger or smaller list.
 				// TODO: concrete vs cmp?
 				if (cmp._rowData.length !== newLength) {
@@ -516,7 +516,7 @@
 	 */
 	removeRows: function (concrete, index, count) {
 		var tbody = concrete.find('tbody').getElement(),
-			items = concrete.get("v.items"),
+			items = concrete.get("v.items") || [],
 			node;
 
 		// Remove value providers and children which are no longer needed.
@@ -560,7 +560,7 @@
 		var self = this,
 			isEditMode = concrete.get("v.mode").indexOf('EDIT') === 0,
 			tbody = concrete.find('tbody').getElement(),
-			items = concrete.get('v.items'),
+			items = concrete.get('v.items') || [],
 			rowDataLength = concrete._rowData.length,
 			resolved = 0, realIndex, tr, node, item, newRowData, newRowElements;
 
@@ -618,7 +618,7 @@
 	// TODO rename to something more accurate
 	resize: function (concrete, length) {
 		var self = this,
-			items = concrete.get('v.items'),
+			items = concrete.get('v.items') || [],
 			itemsLength = items.length,
 			rowDataLength = concrete._rowData.length,
 			diff, index; 
@@ -639,7 +639,7 @@
 	
 	//TODO MERGE: Check merge
 	updateValueProvidersFromItems: function (concrete) {
-		var items = concrete.get('v.items');
+		var items = concrete.get('v.items') || [];
         for(var i=0;i<items.length;i++){
             var rowData=concrete._rowData[i];
             rowData.vp.set('item',items[i]);
@@ -717,7 +717,7 @@
 	// TODO: optimize column iteration
 	createTableBody: function (concrete) {
 		var self = this,
-			items = concrete.get("v.items"),
+			items = concrete.get("v.items") || [],
 			doc = document.createDocumentFragment(),
 			tr, asyncParams, rowElements;
 
@@ -1014,7 +1014,8 @@
 	// TODO: set all the data to nulls or empty objects
 	generateNewItemShape: function (concrete) {
     	var itemShape = concrete.get('v.itemShape'),
-			item = concrete.get("v.items")[0],
+			items = concrete.get("v.items") || [],
+			item = items[0] || {},
 			template,
 			sub, path;
 

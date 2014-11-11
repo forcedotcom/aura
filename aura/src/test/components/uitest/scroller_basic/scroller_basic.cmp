@@ -32,6 +32,7 @@
 		}
 	</style>
 	<div id="header" class="common">New Aura Scroller</div>
+	<aura:attribute name="enabled" default="true" type="Boolean"/>
 		
 		<ui:scroller class="scrollWrapper" 
 			onPullToRefresh="{!c.fetchDataPTR}" 
@@ -40,8 +41,7 @@
 			onScrollStart="{!c.scrollStartHandler}" 
 			onScrollMove="{!c.scrollMoveHandler}" 
 			onScrollEnd="{!c.scrollEndHandler}"  
-			aura:id="test-scroller" showScrollbars="true">
-			
+			aura:id="test-scroller" showScrollbars="true" enabled="{!v.enabled}">
 				<div class="item" id="r1">Pretty row 1</div>
 				<div class="item" id="r2">Pretty row 2</div>
 				<div class="item" id="r3">Pretty row 3</div>
@@ -149,5 +149,4 @@
  <span id="scrollStartHandlerCalled">0</span>
  <span id="scrollMoveHandlerCalled">0</span>
  <span id="scrollEndHandlerCalled">0</span>
-	
 </aura:component>

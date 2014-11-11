@@ -26,11 +26,8 @@
  *            config - component configuration
  * @param {Boolean}
  *            [localCreation] - local creation
- * @param {ComponentCreationContext}
- *            [componentCreationContext] - ccc used to create component
  */
-function Component(config, localCreation, componentCreationContext) {
-	this.ccc = componentCreationContext;
+function Component(config, localCreation) {
 	this.priv = new ComponentPriv(config, this, localCreation);
 	this._destroying = false;
 

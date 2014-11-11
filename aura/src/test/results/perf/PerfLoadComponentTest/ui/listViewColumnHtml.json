@@ -16,7 +16,7 @@
 ,{"name":"Aura.RenderComponent.component.removed","value":0}
 ,{"name":"Aura.RenderComponent.event.added","value":0}
 ,{"name":"Aura.RenderComponent.event.removed","value":0}
-,{"name":"Aura.RenderComponent.render.added","value":9}
+,{"name":"Aura.RenderComponent.render.added","value":6}
 ,{"name":"Aura.RenderComponent.render.removed","value":0}
 ,{"name":"Aura.RenderComponent.rerender.added","value":0}
 ,{"name":"Aura.RenderComponent.rerender.removed","value":0}
@@ -24,7 +24,7 @@
 ,{"name":"Aura.RenderComponent.unrender.removed","value":0}
 ,{"name":"Network.encodedDataLength","value":0,"units":"bytes"}
 ,{"name":"Network.numRequests","value":0}
-,{"name":"Timeline.Other.Program","value":18}
+,{"name":"Timeline.Other.Program","value":21}
 ,{"name":"Timeline.Painting.CompositeLayers","value":4}
 ,{"name":"Timeline.Rendering.ActivateLayerTree","value":4}
 ,{"name":"Timeline.Rendering.BeginFrame","value":11}
@@ -34,9 +34,9 @@
 ,{"name":"Timeline.Rendering.RequestMainThreadFrame","value":4}
 ,{"name":"Timeline.Rendering.ScheduleStyleRecalculation","value":1}
 ,{"name":"Timeline.Scripting.FireAnimationFrame","value":3}
-,{"name":"Timeline.Scripting.FunctionCall","value":6}
+,{"name":"Timeline.Scripting.FunctionCall","value":9}
 ,{"name":"Timeline.Scripting.RequestAnimationFrame","value":3}
 ,{"name":"Timeline.Scripting.TimeStamp","value":6}
 ,{"name":"Timeline.Scripting.TimerFire","value":3}
 ,{"name":"Timeline.Scripting.TimerInstall","value":3}
-,{"name":"WallTime","value":1402,"units":"milliseconds"}]
+,{"name":"WallTime","value":2384,"units":"milliseconds"}]

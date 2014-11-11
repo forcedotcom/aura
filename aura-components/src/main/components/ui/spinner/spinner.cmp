@@ -16,8 +16,8 @@
 
 -->
 <aura:component access="GLOBAL" support="BETA" description="A loading spinner to be used while the real component body is being loaded">
-    <aura:attribute access="GLOBAL" name="isVisible" type="Boolean" default="true"/>
-    <aura:registerEvent access="GLOBAL" name="toggle" type="ui:toggleLoadingIndicator"/>
+    <aura:attribute access="GLOBAL" name="isVisible" type="Boolean" default="true" description="Specifies whether or not this spinner should be visible. Defaults to true."/>
+    <aura:registerEvent access="GLOBAL" name="toggle" type="ui:toggleLoadingIndicator" description="The event fired when the spinner is toggled."/>
     <aura:handler name="toggle" action="{!c.toggleSpinner}"/>
 
     <div aura:id='spinner' role="alert" class="{!v.class + ' spinner ' + (v.isVisible == true ? '': 'hideEl')}">

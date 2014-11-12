@@ -16,6 +16,8 @@
 
 -->
 <aura:component extends="ui:action" description="A checkbox used in ui:dataGrid that enables row-level click events to bubble up to the grid.">
-	<ui:inputCheckbox aura:id="cb" value="{!v.value}" click="{!c.handleClick}" label="{!v.label}" labelClass="{!v.labelClass}"/>
+	<aura:attribute name="disabled" type="Boolean"/>
 	<aura:handler name="change" value="{!v.value}" action="{!c.handleValueChange}"/>
+	
+	<ui:inputCheckbox aura:id="cb" value="{!v.value}" click="{!c.handleClick}" label="{!v.label}" labelClass="{!v.labelClass}" disabled="{!v.disabled}"/>
 </aura:component>

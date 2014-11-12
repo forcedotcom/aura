@@ -23,6 +23,8 @@
     <aura:attribute name="totalItems" type="Integer"/>
     <aura:attribute name="index" type="Integer"/>
     <aura:attribute name="count" type="Integer"/>
+    <aura:attribute name="className" type="String"/>
+    <aura:attribute name="rowIndex" type="Integer"/>
     <aura:attribute name="gridItems" type="List"/>
     <aura:attribute name="gridSelectedItems" type="List"/>
 
@@ -35,6 +37,16 @@
     <ui:inputText placeholder="index" value="{!v.index}"/>
     <ui:inputText placeholder="count" value="{!v.count}"/>
     <ui:button class="kitchenButton" label="Change Columns" press="{!c.switchColumn}"/>
+    
+    <br/>
+    
+    <ui:inputText placeholder="row index" value="{!v.rowIndex}"/>
+    <ui:button class="kitchenButton" label="Disable Row" press="{!c.disableRow}"/>
+    <ui:button class="kitchenButton" label="Enable Row" press="{!c.enableRow}"/>
+    <ui:inputText placeholder="class" value="{!v.className}"/>
+    <ui:button class="kitchenButton" label="Add Class" press="{!c.addClass}"/>
+    <ui:button class="kitchenButton" label="Remove Class" press="{!c.removeClass}"/>
+    <ui:button class="kitchenButton" label="Toggle Class" press="{!c.toggleClass}"/>
 
     <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" summary="Assorted Data for testing">
         <aura:set attribute="columns">
@@ -47,7 +59,9 @@
             <ui:dataGridColumn label="Due Date" name="activityDate"/>
 
             <ui:dataGridActionColumn label="Actions">
-                <ui:actionButton name="delete" label="Del" index="{!index}"/>
+                <ui:actionButton name="disable" label="Disable" index="{!index}" disabled="{!disabled}"/>
+                <ui:actionButton name="enable" label="Enable" index="{!index}" disabled="{!!disabled}"/>
+                <ui:actionButton name="toggleClass" label="Toggle Class" index="{!index}" disabled="{!disabled}"/>
             </ui:dataGridActionColumn>
 
         </aura:set>

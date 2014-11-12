@@ -24,6 +24,6 @@
 
 	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]">
 		<!-- Wire 'selected' and 'index' into action. This is the secret sauce; action won't work without it. -->
-		<ui:actionCheckbox name="dataGrid:select" value="{!selected}" index="{!index}" label="Select row" labelClass="assistiveText"/>
+		<ui:actionCheckbox name="dataGrid:select" value="{!selected}" index="{!index}" label="Select row" labelClass="assistiveText" disabled="{!disabled}"/>
 	</aura:attribute>
 </aura:component>

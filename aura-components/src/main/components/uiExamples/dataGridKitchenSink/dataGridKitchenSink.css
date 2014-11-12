@@ -24,6 +24,14 @@ table.THIS tr {
 	cursor: pointer;
 }
 
+table.THIS tr.error {
+	outline:5px solid #427BD6;
+}
+
+table.THIS tr.disabled {
+	color: #CCC;
+}
+
 table.THIS tbody tr:hover {
 	background-color: #f0f1f2;
 }

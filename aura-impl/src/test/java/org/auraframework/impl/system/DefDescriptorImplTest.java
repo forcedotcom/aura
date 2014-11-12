@@ -204,6 +204,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertTrue(fakeComponent.compareTo(fooComponent) < 0);
         assertTrue(fakeComponent.compareTo(fakeComponentLayout) < 0);
         assertTrue(fakeComponentLayout.compareTo(fakeComponent) > 0);
+        assertTrue(fakeComponent.compareTo(null) > 0);
     }
 
     private void testEquals(DefDescriptor<?> x, DefDescriptor<?> y, int compareTo) throws Exception {
@@ -249,4 +250,31 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         testEquals(DefDescriptorImpl.getInstance("aura:text", ApplicationDef.class),
                 vendor.makeComponentDefDescriptor("aura:text"), -1);
     }
+    
+    public void testEqualsWithSameBundle() throws Exception {
+        DefDescriptor<ComponentDef> bundle = DefDescriptorImpl.getInstance("aura:bundle", ComponentDef.class, null);
+        testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle),
+                DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle), 0);
+    }
+
+    public void testEqualsWithEquivalentBundle() throws Exception {
+        DefDescriptor<ComponentDef> bundle1 = DefDescriptorImpl.getInstance("aura:bundle", ComponentDef.class, null);
+        DefDescriptor<ComponentDef> bundle2 = DefDescriptorImpl.getInstance("aura:BUNDLE", ComponentDef.class, null);
+        testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle1),
+                DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2), 0);
+    }
+
+    public void testEqualsWithDifferentBundle() throws Exception {
+        DefDescriptor<ComponentDef> bundle1 = DefDescriptorImpl.getInstance("aura:bundle1", ComponentDef.class, null);
+        DefDescriptor<ComponentDef> bundle2 = DefDescriptorImpl.getInstance("aura:bundle2", ComponentDef.class, null);
+        testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle1),
+                DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2), -1);
+        testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2),
+                DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle1), 1);
+        testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle1),
+                DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, null), 1);
+        testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, null),
+                DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2), -1);
+    }
+
 }

@@ -261,6 +261,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case RESOURCE:
             case PROVIDER:
             case THEME_PROVIDER:
+            case INCLUDE:
             case THEME_MAP_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
@@ -288,7 +289,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case ACTION:
             case DESCRIPTION:
             case EXAMPLE:
-            case INCLUDE:
+            case INCLUDE_REF:
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
                         .name()));

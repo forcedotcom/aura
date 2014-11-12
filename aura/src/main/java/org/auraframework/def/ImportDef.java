@@ -16,12 +16,5 @@
 package org.auraframework.def;
 
 public interface ImportDef extends Definition {
-	
-    @Override
-    DefDescriptor<LibraryDef> getDescriptor();
-    
-    /**
-     * The name of the library being required.
-     */
-    String getLibraryName();
+    DefDescriptor<LibraryDef> getLibraryDescriptor();
 }

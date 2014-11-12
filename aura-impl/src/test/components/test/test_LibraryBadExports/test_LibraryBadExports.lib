@@ -1,3 +1,0 @@
-<aura:library>
-    <aura:include name="a" exports="(function(){alert('hacked!');return myVar;})()" />
-</aura:library>

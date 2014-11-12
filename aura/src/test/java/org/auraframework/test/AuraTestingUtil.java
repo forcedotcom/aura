@@ -116,11 +116,12 @@ public class AuraTestingUtil {
      * 
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param defClass the interface of the type definition
+     * @param bundle the bundle for this descriptor
      * @return a {@link DefDescriptor} with name that is guaranteed to be unique in the string: namespace.
      */
-    public final <D extends Definition> DefDescriptor<D> createStringSourceDescriptor(@Nullable String namePrefix,
-            Class<D> defClass) {
-        return StringSourceLoader.getInstance().createStringSourceDescriptor(namePrefix, defClass);
+    public final <D extends Definition, B extends Definition> DefDescriptor<D> createStringSourceDescriptor(
+            @Nullable String namePrefix, Class<D> defClass, DefDescriptor<B> bundle) {
+        return StringSourceLoader.getInstance().createStringSourceDescriptor(namePrefix, defClass, bundle);
     }
 
     /**

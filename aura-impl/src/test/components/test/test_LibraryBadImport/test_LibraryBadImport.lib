@@ -1,3 +1,0 @@
-<aura:library>
-    <aura:include name="Malformed" />
-</aura:library>

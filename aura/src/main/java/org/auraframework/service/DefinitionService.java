@@ -55,6 +55,22 @@ public interface DefinitionService extends AuraService, SourceListener {
 
     /**
      * <p>
+     * Create a {@link DefDescriptor} that describes a named {@link Definition}
+     * </p>
+     * <p>
+     * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
+     * </p>
+     * 
+     * @param qualifiedName the name of the Definition
+     * @param defClass The Interface of the type of definition you are trying to
+     *            describe.
+     * @param bundle the bundle for which the descriptor is valid
+     * @return a descriptor. Never returns null.
+     */
+    <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass, DefDescriptor<B> bundle);
+
+    /**
+     * <p>
      * Create a {@link DefDescriptor} that has the same namespace and name as the provided descriptor but a different
      * DefType and prefix.
      * </p>

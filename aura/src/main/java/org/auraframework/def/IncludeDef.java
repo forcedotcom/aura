@@ -15,23 +15,9 @@
  */
 package org.auraframework.def;
 
-import java.util.List;
-
 public interface IncludeDef extends Definition {
     @Override
     DefDescriptor<IncludeDef> getDescriptor();
     
-    String getLibraryName();
-    
-    /**
-     * Gets the included library's dependencies.
-     * @return the imported dependency list.
-     */
-    List<String> getImports();
-    
-    /**
-     * Gets the variable wrapped and exported by the library.
-     * @return the exported variable name.
-     */
-    String getExports();
+    String getCode();
 }

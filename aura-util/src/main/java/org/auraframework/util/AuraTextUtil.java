@@ -68,6 +68,9 @@ public class AuraTextUtil {
             ObjectArrays.concat(ESCAPED_HTML, new String[] { "<br>", "<br/>" }, String.class),
             ObjectArrays.concat(ESCAPED_TEXT, new String[] { "\n", "\n" }, String.class));
 
+    private static final String JS_IDENTIFIER_REGEX = "^[_$a-zA-Z][_$a-zA-Z0-9]*$";
+    private static final Pattern JS_IDENTIFIER_PATTERN = Pattern.compile(JS_IDENTIFIER_REGEX);
+
     /**
      * Makes the first letter of the input string lower case.
      */
@@ -330,7 +333,7 @@ public class AuraTextUtil {
         if (str == null) {
             return null;
         }
-        List<String> result = new ArrayList<String>(limitSize);
+        List<String> result = new ArrayList<>(limitSize);
         int count = limitSize - 1;
         int start = 0;
         int indexof;
@@ -647,5 +650,18 @@ public class AuraTextUtil {
         str1 = new String(str1Arr);
         str2 = new String(str2Arr);
         return str1.equals(str2);
+    }
+    
+    /**
+     * Checks whether input is valid js identifier. Currently ASCII only and doesn't include javascript reserved words.
+     * 
+     * @param input String to match
+     * @return true if identifier is valid
+     */
+    public static boolean isValidJsIdentifier(String input) {
+        if (input != null) {
+            return JS_IDENTIFIER_PATTERN.matcher(input).matches();
+        }
+        return false;
     }
 }

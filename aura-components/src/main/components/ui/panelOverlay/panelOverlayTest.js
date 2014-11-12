@@ -29,13 +29,17 @@
 
 	// verify panel element
 	verifyPanelElements: function(cmp) {
-
-        var containerEle = cmp.getElement();
+		var containerEle = cmp.getElement();
         var ele = cmp.find("panel").getElement();
 		var attributes = cmp.attributes;
-
 		$A.test.assertTrue($A.util.hasClass(ele, "panel"), "Element is not rendered with panel class");
-
+		if(!cmp.get("v.isFullScreen") || $A.get("$Browser").isPhone){
+			$A.test.assertTrue($A.util.hasClass(containerEle, "notFullScreen"), "Container Element is not rendered with notFullScreen class");
+			$A.test.assertTruthy(containerEle.querySelector(".modal-glass"), "modal glass is not rendered");
+		}
+		else{
+			$A.test.assertTrue($A.util.hasClass(containerEle, "fullScreen"), "Container Element is not rendered with notFullScreen class");
+		}
 		$A.test.assertFalsy(cmp.get('v.detail'), "unexpected attr");
 		$A.test.assertFalsy(cmp.get('v.icon'), "unexpected attr");
 		$A.test.assertTruthy(ele.querySelector(".body"), "body is not rendered");
@@ -46,10 +50,10 @@
 
 			// title
 			if(cmp.get("v.title")) {
-				$A.test.assertEquals(cmp.get("v.title"), ele.querySelector(".title").textContent, "title is not expected");
+				$A.test.assertEquals(cmp.get("v.title"), $A.test.getText(ele.querySelector(".title")), "title is not expected");
 			}
 			else {
-				$A.test.assertFalsy(ele.querySelector(".title")?ele.querySelector(".title").textContent:ele.querySelector(".title"), "title is unexpectedly rendered");
+				$A.test.assertFalsy(ele.querySelector(".title")?$A.test.getText(ele.querySelector(".title")):ele.querySelector(".title"), "title is unexpectedly rendered");
 			}
 		}
 		else {
@@ -82,7 +86,8 @@
 			title:"test title",
 			'class': "testClass",
 			isScrollable: true,
-			removeHeader: false
+			removeHeader: false,
+			isFullScreen: true,
 		},
 	    test : function(cmp){
 
@@ -97,6 +102,24 @@
 			title:"test title",
 			'class': "testClass",
 			isScrollable: false
+		},
+	    test : function(cmp){
+
+	    	// Assert
+	    	this.verifyPanelElements(cmp);
+	    }
+	},
+	
+	/**
+	 * Allow ui:panelOverlay to not take up the full screen on desktop via an attribute
+	 * Test case: W-2420802
+	 */
+	testPanelNoFullScreen:{
+		attributes: { 
+			isVisible:true, 
+			title:"test title",
+			'class': "testClass",
+			isFullScreen: false,
 		},
 	    test : function(cmp){
 

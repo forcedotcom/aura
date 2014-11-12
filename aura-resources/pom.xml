@@ -165,7 +165,6 @@
                     <plugin>
                         <groupId>com.github.phasebash</groupId>
                         <artifactId>jsdoc3-maven-plugin</artifactId>
-                        <version>1.0.7</version>
                         <executions>
                             <execution>
                                 <id>generate-jsdoc</id>

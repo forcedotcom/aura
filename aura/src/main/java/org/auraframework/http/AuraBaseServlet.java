@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
@@ -379,8 +378,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
         }
         return !ManifestUtil.isManifestEnabled(request);
     }
-
-    private final static ConcurrentHashMap<String, Long> lastModMap = new ConcurrentHashMap<String, Long>();
 
     public String getContentType(AuraContext.Format format) {
         switch (format) {

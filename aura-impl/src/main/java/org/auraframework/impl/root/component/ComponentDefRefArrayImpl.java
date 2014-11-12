@@ -45,14 +45,17 @@ public class ComponentDefRefArrayImpl implements JsonSerializable, ComponentDefR
         this.vp = vp;
     }
 
+    @Override
     public List<ComponentDefRef> getList() {
         return this.cdrs;
     }
 
+    @Override
     public List<Component> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException {
         return newInstance(fallbackValueProvider, null);
     }
 
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<Component> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException {
         List<Component> components = Lists.newArrayListWithExpectedSize(cdrs.size());

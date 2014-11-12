@@ -77,6 +77,7 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
         return this.controllerClass;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> sddesc) {
         if (sddesc.getDefType() == DefType.ACTION) {

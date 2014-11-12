@@ -1,0 +1,25 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:event type="COMPONENT" description="Updates attributes on a dataGrid row">
+    <aura:attribute name="index" type="Integer" description="Index of the row to update" />
+    
+    <aura:attribute name="className" type="String" description="Class attribute to update. An undefined or null value will leave the class attribute unchanged" />
+    <aura:attribute name="classOp" type="String" description="Operation to do for the class: add, remove, toggle. Any other value will leave the class attribute unchanged."/>
+    
+    <aura:attribute name="attributes" type="List" description="Attributes to update on the row. Each item in the list should be of the form {name: attrName, value: attrValue}. Currently, only the 'disabled' attribute is supported"/>
+</aura:event>

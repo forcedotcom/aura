@@ -160,6 +160,7 @@
 	// TODO rework
 	handleItemsChange: function (cmp, params) {
 		var self = this,
+			concrete = cmp.getConcreteComponent(),
 			newLength;
 		
 		// If adding or removing rows, escape.
@@ -174,7 +175,7 @@
 				// Check for a larger or smaller list.
 				// TODO: concrete vs cmp?
 				if (cmp._rowData.length !== newLength) {
-					this.resize(cmp.getConcreteComponent(), newLength);
+					this.resize(concrete, newLength);
 				} else {
 					this.updateValueProvidersFromItems(cmp);
 				}
@@ -444,6 +445,7 @@
     		rowData = {};
     		
     		rowData.vp = self.createPassthroughValue(concrete, items[rowIndex], rowIndex);
+    		rowData.classes = [];
     		rowData.columnData = [];
     		
     		for (var colIndex = 0; colIndex < concrete._columnCount; colIndex++) {
@@ -640,10 +642,21 @@
 	//TODO MERGE: Check merge
 	updateValueProvidersFromItems: function (concrete) {
 		var items = concrete.get('v.items') || [];
+			tbody = concrete.find("tbody").getElement();
+		
         for(var i=0;i<items.length;i++){
             var rowData=concrete._rowData[i];
+            var rowElement = tbody.rows[i];
+            
             rowData.vp.set('item',items[i]);
             rowData.vp.set('index',i);
+            rowData.vp.set('disabled', false);
+            
+            for(var j=0;j<rowData.classes.length;j++) {
+            	$A.util.toggleClass(rowElement, rowData.classes[j], false);
+            }
+            rowData.classes = [];
+            
             for(var j=0;j<rowData.columnData.length;j++){
                 var columnData=rowData.columnData[j];
                 var columns=columnData.components[columnData.cellKey];
@@ -864,6 +877,52 @@
 	 * ================
 	 */
 	/**
+	 * Updates the class on a <tr> and keeps track of which classes have been
+	 * added on the rowData so that they can be removed or reset by the datagrid
+	 */
+	updateRowClass: function(cmp, rowData, rowElement, params) {
+		var classIndex;
+		
+		switch (params.classOp.toLowerCase()) {
+		case "add":
+			$A.util.toggleClass(rowElement, params.className, true);
+			classIndex = rowData.classes.indexOf(params.className);
+			if (classIndex === -1) {
+				rowData.classes.push(params.className);
+			}
+			break;
+		case "remove":
+			$A.util.toggleClass(rowElement, params.className, false);
+			classIndex = rowData.classes.indexOf(params.className);
+			if (classIndex > -1) {
+				rowData.classes.splice(classIndex, 1);
+			}
+			break;
+		case "toggle":
+			$A.util.toggleClass(rowElement, params.className);
+			classIndex = rowData.classes.indexOf(params.className);
+			if (classIndex === -1) {
+				rowData.classes.push(params.className);
+			} else {
+				rowData.classes.splice(classIndex, 1);
+			}
+			break;
+		default:
+			$A.log("datagrid " + cmp.getGlobalId() + " - updateGridRows handler: unrecognized class operation. Please use \"add\", \"remove\", or \"toggle\".");
+		}
+	},
+	
+	updateValueProvider: function(cmp, rowData, attributes) {
+		for (var i=0; i<attributes.length; i++) {
+			var attr = attributes[i];
+			
+			if (attr.name == 'disabled') {
+				rowData.vp.set("disabled", attr.value);
+			}
+		}
+	},
+	
+	/**
 	 * Maps the given operation onto all the components in the grid
 	 * 
 	 * @param {Component} concrete
@@ -946,7 +1005,8 @@
 		var rowContext = {
 				item : $A.expressionService.create(null, item),
 				selected : $A.expressionService.create(null, false),
-				index : $A.expressionService.create(null, rowIndex)
+				index : $A.expressionService.create(null, rowIndex),
+				disabled : $A.expressionService.create(null, false)
 		};
 		
 		return $A.expressionService.createPassthroughValue(rowContext, concrete);

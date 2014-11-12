@@ -20,7 +20,10 @@
 	<aura:attribute name="batchRenderCount" type="Integer" default="100"/>
 	<aura:attribute name="summary" type="String"/>
 
+	<aura:registerevent name="updateRowAttributes" type="ui:updateGridRow"/>
+
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<aura:handler name="updateRowAttributes" action="{!c.handleUpdateRowAttrs}"/>
 	<aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}" description="This lives here due to a bug in value objects."/>
 	<aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/>
 

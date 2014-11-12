@@ -19,5 +19,26 @@
             .getEvent('addRemove')
             .setParams(params)
             .fire();  
+    },
+    
+    changeRowDisabled: function(cmp, index, disable) {
+    	cmp.find("grid")
+    		.getEvent("updateRowAttributes")
+    		.setParams({
+    			index : index,
+    			className : 'disabled',
+    			classOp : disable ? 'add' : 'remove',
+    			attributes : [{name: "disabled", value: disable}]
+    		}).fire();
+    },
+    
+    changeRowClass: function(cmp, index, className, op) {
+    	cmp.find("grid")
+    		.getEvent("updateRowAttributes")
+    		.setParams({
+    			index : index,
+    			className : className,
+    			classOp : op
+    		}).fire();
     }
 })

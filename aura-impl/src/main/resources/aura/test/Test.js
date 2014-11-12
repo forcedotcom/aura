@@ -1247,51 +1247,45 @@ $A.ns.Test.prototype.getElementByClass = function(classname){
 /**
  * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
  * question's answer.
- * @param {Object} element The HTML element whose corresponding DOM event is to be fired
- * @param {String} eventName Initializes the given event that bubbles up through the event chain
+ * @param {Object} element The HTML element whose corresponding DOM event is to be fired.
+ * @param {String} eventName Initializes the given event that bubbles up through the event chain.
+ * @param {Boolean} canBubble Optional. True if the event can be bubbled, defaults to true.
+ * @param {Boolean} cancelable Optional. Indicates whether the event is cancelable or not, defaults to true.
  */
-$A.ns.Test.prototype.fireDomEvent = function (element, eventName) {
+$A.ns.Test.prototype.fireDomEvent = function (element, eventName, canBubble, cancelable) {
     var event;
     if (document.createEvent) {
         event = document.createEvent("HTMLEvents");
-        event.initEvent(eventName, true, true);
+
+        canBubble = $A.util.isUndefinedOrNull(canBubble) ?  true : canBubble;
+        cancelable = $A.util.isUndefinedOrNull(cancelable) ?  true : cancelable;
+
+        event.initEvent(eventName, canBubble, cancelable);
+
+        element.dispatchEvent(event);
     } else {
         event = document.createEventObject();
         event.eventType = eventName;
-    }
 
-    if (document.createEvent) {
-        element.dispatchEvent(event);
-    } else {
         element.fireEvent("on" + event.eventType, event);
     }
 };
 
 /**
- * Checks if an element supports Touch events. Otherwise, issue a click on the element.
+ * Issue a click on the element.
  *
  * @param {HTMLElement} element
- *          The element to click or fire touch event on.
+ *          The element to click on.
  * @param {Boolean} canBubble
- *          true to allow bubbling of the touch event.
+ *          true to allow bubbling of the click.
  * @param {Boolean} cancelable
- *          true to prevent the default action.
+ *          Indicates whether the event is cancelable or not.
  */
 $A.ns.Test.prototype.clickOrTouch = function (element, canBubble, cancelable) {
-    if($A.util.supportsTouchEvents()){
-        var ts = document.createEvent('TouchEvent');
-        ts.initTouchEvent('touchstart', canBubble, cancelable);
-        var te = document.createEvent('TouchEvent');
-        te.initTouchEvent('touchend', canBubble, cancelable);
-        element.dispatchEvent(ts);
-        element.dispatchEvent(te);
+    if ($A.util.isUndefinedOrNull(element.click)) {
+        this.fireDomEvent(element, "click", canBubble, cancelable);
     } else {
-        if ($A.util.isUndefinedOrNull(element.click)) {
-            // manually fire event
-            this.fireDomEvent(element, "click");
-        } else {
-            element.click();
-        }
+        element.click();
     }
 };
 

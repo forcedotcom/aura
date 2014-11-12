@@ -16,8 +16,6 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popup" description="A dropdown menu list with a trigger that controls its visibility. Need to provide a menuTrigger and menuList component.">
-    <aura:attribute name="closeOnClickOutside" type="Boolean" default="true" description="Close menu when user click or tap outside of the menu" />
-    <aura:attribute name="stopClickPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
 
     {!v.body}
 </aura:component>

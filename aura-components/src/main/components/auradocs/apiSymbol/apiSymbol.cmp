@@ -17,7 +17,7 @@
 -->
 <aura:component>
     <aura:attribute name="symbol" type="Object"/>
-    <aura:attribute name="extra" type="Boolean" default="false"/>
+
     <td><a name="{!v.symbol.name}"/>
         <h4>
             {!v.symbol.name}
@@ -25,7 +25,6 @@
                 (<aura:iteration items="{!v.symbol.params}" var="param">
                     <span class="param">
                     	<aura:iteration items="{!param.type.names}" var="name" indexVar="index">
-                        	<!-- TODO(tbliss): Should we iterate over names instead of just grabbing the first one? -->
                        		<aura:if isTrue="{!name != ''}">
                        			<span class="paramType">{!name}&nbsp;</span>
                        			<aura:if isTrue="{!index != (param.type.names.length - 1)}">

@@ -66,7 +66,7 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
         method.id=cmp.getGlobalId();
         method.key=key;
         var config={"event": "change", "value": expression, "method": method};
-        valueProvider.addValueHandler(config);
+        this.valueProvider.addValueHandler(config);
     }
 };
 
@@ -78,8 +78,8 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     	expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
-    if(valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
-        valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(),"key":key});
+    if(this.valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
+        this.valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(),"key":key});
     }
 };
 
@@ -114,6 +114,9 @@ PropertyReferenceValue.prototype.equals = function (target){
 PropertyReferenceValue.prototype.isDirty = function() {
 	var valueProvider = this.valueProvider;
     var expression = this.expression;
+
+    // KRIS: HALO: I'm really unsure if I want this here or not, do we check against the component if it's dirty? 
+    // Why would we care if the passthrough value is dirty? I would think the 
 	while(valueProvider instanceof PassthroughValue){
     	expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();

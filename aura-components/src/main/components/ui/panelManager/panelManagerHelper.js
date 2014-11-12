@@ -159,7 +159,7 @@
         	if (manager._transitioningInstance.isValid()) {
 	        	transitioningType = manager._transitioningInstance.getDef().getDescriptor().getQualifiedName();
 	        	transitioningIsModal = transitioningType == 'markup://ui:modalOverlay'; 
-	        	if ((config.isModal && transitioningIsModal) || (!config.isModal && !transitioningIsModal)) {
+	        	if ((config.isDialog && transitioningIsModal) || (!config.isDialog && !transitioningIsModal)) {
 	        		return;
 	        	}
         	}
@@ -193,8 +193,8 @@
             if (config.isSlider) {
                 this.createPanelSlider(cmp, config, callback);
             }
-            else if (config.isModal) {
-                this.createModalOverlay(cmp, event, callback);
+            else if (config.isDialog) {
+                this.createPanelDialog(cmp, event, callback);
             }
             else {
                 this.createPanelOverlay(cmp, event, callback);
@@ -230,7 +230,7 @@
     },
 
     // ui:createModal handler; creates modalOverlay cmp and inserts into dom
-    createModalOverlay: function(cmp, event, callback) {
+    createPanelDialog: function(cmp, event, callback) {
         var helper = this,
         	config = event.getParams() || {},
             actionList = config.body,
@@ -239,7 +239,7 @@
 
         // don't modify original config object; needed in testing code
         config = this._copy(config);
-        this.buildModalOverlayConfig(cmp, config);
+        this.buildPanelDialogConfig(cmp, config);
         config.animation = config.animation || 'bottom';
         config.closeAction = this.getCloseActionForModal(cmp);
 		
@@ -247,14 +247,14 @@
 		 config.body = [];
 		
 		 // return the promise
-		 this._createPanel(cmp, 'ui:modalOverlay', config, function(panel) {
+		 this._createPanel(cmp, 'ui:panelDialog', config, function(panel) {
 			 panel.set('v.body', actionList);
-		     panel._isModal = true;
+		     panel._isModalDialog = config.isModal;
 		     callback && callback(panel);
 		 });
     },
     
-    buildModalOverlayConfig: function(cmp, config) {
+    buildPanelDialogConfig: function(cmp, config) {
     	var actionList = config.body;
     	 // add 'closePanel' action to all buttons (so every action also closes the dialog)
         if (actionList && actionList.length) {
@@ -297,8 +297,10 @@
     // generic create method for all panel types
     _createPanel: function(cmp, def, config, callback) {
         var self = this;
+        var referenceElement = config.referenceElement;
+        config.referenceElement = null;
 
-        // if no class set explicitly on the panel, use the class set on the panelManager 
+        // if no class set explicitly on the panel, use the class set on the panelManager
         config['class'] = config['class'] || cmp.get('v.class');
 
         this._createComponent(def, config, function(panel) {
@@ -313,6 +315,8 @@
 
             // inject into dom
             self.attachPanelInstance(cmp, panel);
+
+            panel.set("v.referenceElement", referenceElement);
 
             callback && callback(panel);
         });
@@ -371,7 +375,7 @@
     isPanel: function(component) {
     	var isPanel = component && 
     		$A.util.isComponent(component) &&
-    		/(ui\:panelOverlay|ui\:modalOverlay)/.test(component.getDef().getDescriptor().getQualifiedName());
+    		/(ui\:panelOverlay|ui\:panelDialog)/.test(component.getDef().getDescriptor().getQualifiedName());
     	return isPanel;
     },
 
@@ -382,7 +386,6 @@
             slider,
             stack = manager._stack;
             containerEl = manager.getElement();
-
         if (panel && !panel.isValid()) {
         	// we can get here when two components both fire hidePanel to dismiss the same panel;
         	// this happens in some cases, as with detail.cmp and detailPanel.cmp both 
@@ -616,8 +619,12 @@
 
         if (panel) {
             this.bindKeyHandler(manager);
+            if (panel.get("v.isModal") === false) {
+                this.bindClickHandler(manager);
+            }
         } else {
             this.unbindKeyHandler(manager);
+            this.unbindClickHandler(manager);
         }
     },
     
@@ -647,7 +654,6 @@
     unstackPanel: function(cmp, panel) {
         var manager = this.getManager(cmp),
             stack = manager._stack;
-
         // remove the current panel if and only if last on stack
         if (stack.indexOf(panel) === stack.length-1) {
             stack.pop();
@@ -711,16 +717,24 @@
                 shiftPressed = event.shiftKey,
                 current = document.activeElement,
                 active = manager._active,
+                isModal = active.get("v.isModal") !== false,
                 focusables;
 
             if (active && event.keyCode == 9) {
                 focusables = self.getFocusables(active);
-                if (current === focusables.last && !shiftPressed) {
-                    $A.util.squash(event, true);
-                    focusables.first.focus();
-                } else if (current === focusables.first && shiftPressed) {
-                    $A.util.squash(event, true);
-                    focusables.last.focus();
+                if (isModal) {
+                    if (current === focusables.last && !shiftPressed) {
+                        $A.util.squash(event, true);
+                        focusables.first.focus();
+                    } else if (current === focusables.first && shiftPressed) {
+                        $A.util.squash(event, true);
+                        focusables.last.focus();
+                    }
+                } else {
+                    if (current === focusables.last && !shiftPressed) {
+                        $A.util.squash(event, true);
+                        $A.get('e.ui:closePanel').fire();
+                    }
                 }
             }
         };
@@ -734,6 +748,35 @@
         }
         $A.util.removeOn(document, 'keydown', manager._keydownHandler, false);
         manager._keydownHandler = null;
+    },
+
+    bindClickHandler: function(manager) {
+        var self = this;
+
+        if (manager._clickHandler) {
+            return;
+        }
+
+        manager._clickHandler = function(e) {
+            var event = e || window.event,
+                active = manager._active,
+                panel  = active.find("panel").getElement(),
+                target = event.target || event.srcElement,
+                clickedInside = $A.util.contains(panel, target);
+            if (active && !clickedInside) {
+                $A.get('e.ui:closePanel').fire();
+            }
+        };
+
+        $A.util.on(document, 'click', manager._clickHandler, false);
+    },
+
+    unbindClickHandler: function(manager) {
+        if (!manager._clickHandler) {
+            return;
+        }
+        $A.util.removeOn(document, 'click', manager._clickHandler, false);
+        manager._clickHandler = null;
     },
 
     transitionBegin: function(cmp, event) {

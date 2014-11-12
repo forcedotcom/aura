@@ -36,7 +36,7 @@
 		$A.test.assertTruthy(ele.querySelector(".modalWindow"), "Element is not rendered as modal");
 		$A.test.assertTruthy(ele.querySelector(".closeBtn"), "Close button is not rendered");
 		$A.test.assertTrue($A.util.hasClass(ele, "panel"), "Element is not rendered with panel class");
-		$A.test.assertTrue($A.util.hasClass(ele, "panelModal"), "Element is not rendered with panelModal class");
+		$A.test.assertTrue($A.util.hasClass(ele, "panelDialog"), "Element is not rendered with panelDialog class");
 
 		// title bar
 		if(cmp.get("v.title") || cmp.get("v.detail")) {

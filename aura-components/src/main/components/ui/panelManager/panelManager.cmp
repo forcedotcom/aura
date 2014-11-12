@@ -30,7 +30,7 @@
 	<aura:handler event="ui:destroySlidePanel" action="{!c.destroySlidePanel}" description="The event fired when a slider panel is destroyed."/>
 
 	<aura:dependency resource="markup://ui:panelOverlay" />
-	<aura:dependency resource="markup://ui:modalOverlay" />
+	<aura:dependency resource="markup://ui:panelDialog" />
 	<aura:dependency resource="markup://ui:panelSlider" />
 	<aura:dependency resource="markup://ui:hidePanel" type="EVENT" />
 	

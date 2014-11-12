@@ -26,7 +26,9 @@
     <!-- options -->
     <aura:attribute name="class" type="String" description="Additional css classes"/>
     <aura:attribute name="animation" type="String" description="Animation to apply (default: from bottom)"/>
-	<aura:attribute name="isModal" type="Boolean" description="Instanciate a modal type, otherwise will be a fullscreen panel"/>
+	<aura:attribute name="isModal" type="Boolean" description="Indicates whether the panel is modal if true or non-modal if false"/>
+	<aura:attribute name="isDialog" type="Boolean" description="Indicates whether the panel is a panelDialog"/>
+    <aura:attribute name="referenceElement" type="Object" description="The reference node to which the dialog should be positioned" />
     <aura:attribute name="isSlider" type="Boolean" description="True if panel is a panelSlider"/>
     <aura:attribute name="closeOnClickOut" type="Boolean" description="Add listener to close on click outside"/>
     <aura:attribute name="isScrollable" type="Boolean" description="Flag to create a scroller inside (default true)"/>

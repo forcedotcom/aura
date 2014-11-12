@@ -30,8 +30,8 @@ import org.openqa.selenium.WebElement;
 public class PanelModalOverlayUITest extends WebDriverTestCase {
 
     private static final String APP = "uitest/panelTest.cmp";
-    private final String MODAL_OVERLAY_BUTTON = ".modalOverlayButton";	
-    private final String MODAL_OVERLAY_CMP = ".uiModalOverlay";	
+    private final String MODAL_OVERLAY_BUTTON = ".panelDialogModalButton";
+    private final String MODAL_OVERLAY_CMP = ".uiPanelDialog";
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
     private final String ESC_BUTTON = ".closeBtn";	
     private final String NEWOVERLAY_BUTTON = ".pressOverlay";	

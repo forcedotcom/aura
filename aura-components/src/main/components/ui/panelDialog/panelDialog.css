@@ -31,12 +31,19 @@
 	box-orient: horizontal;
 	box-pack: center;
 	box-align: center;
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	overflow: hidden;
+    position: absolute;
+    width: 100%;
+}
+
+.THIS.modal {
+    height: 100%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.THIS.nonmodal {
+
 }
 
 .THIS .uiScroller>.scroller {
@@ -97,20 +104,15 @@
 		rgb(240, 241, 242));
 }
 
-/*******************************/
-/* Window/Modal styling for POne  */
-/*******************************/
-.THIS .panelModal {
+.THIS .panelDialog {
 	width: 100%;
 	height: 100%;
 	transition: transform .3s ease-in;
 	/*overflow: scroll;*/
 }
 
-.THIS .panelModal {
-	position: relative;
-	margin: auto;
-	height: auto;
+.THIS .panelDialog {
+    height: auto;
 	max-height: 70%;
 	max-width: 292px;
 	border-radius: 5px;
@@ -118,30 +120,45 @@
 	overflow: visible;
 }
 
+.THIS.modal .panelDialog {
+    position: relative;
+    margin: auto;
+}
+
+.THIS.nonmodal .panelDialog {
+    position:relative;
+    border: 1px solid #B6B6B6;
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+    -ms-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+    -o-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+}
+
 @media only screen and (min-width: 35.625em) {
-	.THIS .panelModal {
+	.THIS .panelDialog {
 		max-width: 400px;
 	}
 }
 
-.THIS .panelModal .body {
+.THIS .panelDialog .body {
 	padding-top: 0;
 	background-color: inherit;
 }
 
-.THIS .panelModal .body.scrollbox > div.uiScrollerDeprecated > div {
+.THIS .panelDialog .body.scrollbox > div.uiScrollerDeprecated > div {
 	padding-bottom: 14px
 }
 
-.THIS .panelModal .label {
+.THIS .panelDialog .label {
 	max-width: 100%;
 }
 
-.THIS .panelModal .body.actions button:last-of-type {
+.THIS .panelDialog .body.actions button:last-of-type {
 	margin-bottom: 14px;
 }
 
-.THIS .panelModal .actions {
+.THIS .panelDialog .actions {
 	padding: 1px 14px;
 	border-radius: 5px;
 	-webkit-box-flex: 1;     
@@ -151,21 +168,19 @@
     flex: 1;                 
 }
 
-.THIS .panelModal .actions.scrollbox {
+.THIS .panelDialog .actions.scrollbox {
 	padding: 0 14px 14px 14px;
 }
 
-.THIS .panelModal .actions .uiButton.default {
+.THIS .panelDialog .actions .uiButton.default {
 	display: block;
 	margin-top: 14px;
 	width: 100%;
 }
 
-.THIS .panel.panelModal .uiButton.closeBtn {
+.THIS .panel.panelDialog .uiButton.closeBtn {
 	position: absolute;
 	right: 4px;
-	top: -30px;
-	color: #FFFFFF;
 	font-family: Arial;
 	/*font-weight: 600;*/
 	font-size: 25px;
@@ -177,7 +192,17 @@
 	box-shadow: none;
 }
 
-.THIS .panelModal .titleBar {
+.THIS.nonmodal .panel.panelDialog .uiButton.closeBtn {
+    top: 0px;
+    color: #B6B6B6;
+}
+
+.THIS.modal .panel.panelDialog .uiButton.closeBtn {
+    top: -30px;
+    color: #FFFFFF;
+}
+
+.THIS .panelDialog .titleBar {
 	padding: 0 14px;
 	color: #3C3D3E;
 	font-size: 15px;
@@ -190,31 +215,31 @@
 	background-color: #FFFFFF;
 }
 
-.THIS .panelModal .headerOnly .titleBar {
+.THIS .panelDialog .headerOnly .titleBar {
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
 
-.THIS .panelModal .titleBar .titles {
+.THIS .panelDialog .titleBar .titles {
 	text-align: center;
 	margin: 14px 0;
 	font-family: 'ProximaNovaSoft-Semibold';
 	color: #3C3D3E;
 }
 
-.THIS .panelModal .titleBar .titles .title {
+.THIS .panelDialog .titleBar .titles .title {
 	word-break: break-word;
 }
 
 
-.THIS .panelModal div.body .detail {
+.THIS .panelDialog div.body .detail {
 	font-family: 'ProximaNovaSoft-Regular';
 	padding: 14px 0;
 	text-align: center;
 	word-break: break-word;
 }
 
-.THIS .panelModal .titleBar > .bBody > .forceIcon {
+.THIS .panelDialog .titleBar > .bBody > .forceIcon {
 	width: 100%;
 	height: 40px;
 	font-size: 40px;
@@ -223,15 +248,15 @@
 	display: block;
 }
 
-.THIS .panelModal .titleBar > .bBody > .forceIcon[data-key="warning"] {
+.THIS .panelDialog .titleBar > .bBody > .forceIcon[data-key="warning"] {
 	color: #E6B739;
 }
 
-.THIS .panelModal .titleBar > .bBody > .forceIcon[data-key="error"] {
+.THIS .panelDialog .titleBar > .bBody > .forceIcon[data-key="error"] {
 	color: #B5362D;
 }
 
-.THIS .panelModal .titleBar > .bBody > .forceIcon[data-icon="undefined"] {
+.THIS .panelDialog .titleBar > .bBody > .forceIcon[data-icon="undefined"] {
 	display: none;
 }
 
@@ -240,16 +265,16 @@
 	opacity: 0.8;
 }
 
-.THIS .panelModal.sliding {
+.THIS .panelDialog.sliding {
 	transition: transform .3s linear, opacity .2s linear;
 }
 
-.THIS .panelModal.movefrombottom {
+.THIS .panelDialog.movefrombottom {
 	visibility: visible;
 	animation: movefrombottom .3s ease both;
 }
 
-.THIS .panelModal.movetobottom {
+.THIS .panelDialog.movetobottom {
 	visibility: visible;
 	animation: movetobottom .3s ease both;
 }

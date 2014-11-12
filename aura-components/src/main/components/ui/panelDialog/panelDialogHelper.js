@@ -30,7 +30,8 @@
         var self       = this,
             panel      = cmp.find("panel").getElement(),
             panelBody  = panel.querySelector('.body'),
-            modalGlass = cmp.find("modal-glass").getElement(),
+            isModal    = cmp.get("v.isModal"),
+            modalGlass = isModal ? cmp.find("modal-glass").getElement(): null,
             removeAnim = event.removeAnim || cmp.get('v.animation') === 'none',
 
             //css animations & transitions
@@ -45,8 +46,10 @@
                 panel.style.cssText = 'display:none';
                 panel.removeEventListener(animEnd, finishHandler);
 
-                $A.util.removeClass(modalGlass, 'fadeIn');
-                modalGlass.style.cssText = 'display:none';
+                if (modalGlass !== null) {
+                    $A.util.removeClass(modalGlass, 'fadeIn');
+                    modalGlass.style.cssText = 'display:none';
+                }
                 panelBody.style.cssText = '';
                 // hide root element of component also
                 cmp.getElement().style.display = 'none';
@@ -69,7 +72,9 @@
         panel.offsetWidth; //force the browser to apply the styles and send the composite layer (thanks to .sliding) to the GPU before moving it
 
         // remove the glass panel and transition opacity while hidding on modals
-        modalGlass.style.opacity = '0';
+        if (modalGlass !== null) {
+            modalGlass.style.opacity = '0';
+        }
         panel.style.opacity = '0';
 
         if (removeAnim) {
@@ -84,7 +89,8 @@
             panel      = cmp.find("panel").getElement(),
             panelBody  = panel.querySelector('.body'),
             panelTitle = panel.querySelector('.titleBar'),
-            modalGlass = cmp.find("modal-glass").getElement(),
+            isModal    = cmp.get("v.isModal"),
+            modalGlass = isModal ? cmp.find("modal-glass").getElement(): null,
             removeAnim = cmp.get('v.animation') === 'none',
 
             //custom animation
@@ -136,6 +142,10 @@
                 // add key event listener when modal is shown
         		$A.util.on(document, "keydown", cmp._windowKeyHandler);		
             };
+        //move the dialog to the right position
+        if (!isModal) {
+            this.position(cmp);
+        }
 
         $A.get('e.ui:panelTransitionBegin').setParams({ panel: cmp, isOpening: true }).fire();
 
@@ -145,10 +155,12 @@
         panel.style.display = 'block';
 
         //glass
-        modalGlass.style['display'] = 'block';
-        modalGlass.offsetWidth; //force the browser to paint it.
-        $A.util.addClass(modalGlass, 'fadeIn');
-        
+        if (modalGlass !== null) {
+            modalGlass.style['display'] = 'block';
+            modalGlass.offsetWidth; //force the browser to paint it.
+            $A.util.addClass(modalGlass, 'fadeIn');
+        }
+
         calculateScrollerHeight();
 
         panel.offsetWidth;// make the browser repaint with the new .sliding and inline css style attribrutes
@@ -158,6 +170,41 @@
             finishHandler({});
         } else {
             $A.util.addClass(panel, animName);
+        }
+    },
+
+    position: function(cmp) {
+        var referenceElem = cmp.get('v.referenceElement');
+        if (!$A.util.isUndefinedOrNull(referenceElem)) {
+            var elem = cmp.getElement();
+            var panelElem = cmp.find("panel").getElement();
+            var panelElemRect = panelElem.getBoundingClientRect();
+            var referenceElemRect = referenceElem.getBoundingClientRect();
+            var viewPort = $A.util.getWindowSize();
+
+            // Vertical alignment
+            // getBoundingClientRect method does not return height and width in IE7 and Ie8
+            var height = typeof panelElemRect.height != 'undefined' ? panelElemRect.height : panelElemRect.bottom - panelElemRect.top;
+            var scrollY = document.documentElement.scrollTop;
+            if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
+                if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
+                    elem.style.top = scrollY + "px";
+                } else { // put it above
+                    elem.style.top = (referenceElemRect.top - height) + scrollY + "px";
+                }
+            } else { // put it below
+                elem.style.top = referenceElemRect.bottom + scrollY + "px";
+            }
+
+            // Horizontal alignment
+            // getBoundingClientRect method does not return height and width in IE7 and Ie8
+            var width = typeof panelElemRect.width != 'undefined' ? panelElemRect.width : panelElemRect.right - panelElemRect.left;
+            var scrollX = document.documentElement.scrollLeft;
+            if (viewPort.width - referenceElemRect.left < width) {
+                elem.style.left = referenceElemRect.right - width + scrollX +"px";
+            } else {
+                elem.style.left = referenceElemRect.left - width + scrollX + "px";
+            }
         }
     },
 

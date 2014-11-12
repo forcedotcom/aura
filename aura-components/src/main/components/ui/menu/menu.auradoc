@@ -19,7 +19,6 @@
 	<aura:description>
 		<p>
 			A <code>ui:menu</code> component represents a menu that contains a trigger and list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
-			List items can be initialized in the menu's model. 
 		</p>
 		<p>
 		    The dropdown menu and its menu items are hidden by default. You can change this by setting the <code>visible</code> attribute on the <code>ui:menuList</code> component to <code>true</code>.

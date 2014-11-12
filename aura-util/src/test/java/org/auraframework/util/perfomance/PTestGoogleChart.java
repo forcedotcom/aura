@@ -235,6 +235,7 @@ public class PTestGoogleChart {
      * @param file Write to this file.
      * @return Whether the file was successfully created.
      */
+    @SuppressWarnings("deprecation")
     public boolean writeToFile(File file) throws IOException {
 
         HttpParams httpParams = new BasicHttpParams();
@@ -255,47 +256,51 @@ public class PTestGoogleChart {
 
         post.setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=UTF-8");
 
-        HttpResponse response = http.execute(post);
-
-        InputStream in = null;
-        FileOutputStream fw = null;
-        ByteArrayOutputStream baos = null;
-
-        boolean successful = false;
-        int responseCode = response.getStatusLine().getStatusCode();
         try {
-            if (responseCode == 200) {
-                if (file.exists()) {
-                    file.delete();
+            HttpResponse response = http.execute(post);
+
+            InputStream in = null;
+            FileOutputStream fw = null;
+            ByteArrayOutputStream baos = null;
+
+            boolean successful = false;
+            int responseCode = response.getStatusLine().getStatusCode();
+            try {
+                if (responseCode == 200) {
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    file.createNewFile();
+
+                    in = new BufferedInputStream(response.getEntity().getContent());
+                    baos = new ByteArrayOutputStream();
+                    fw = new FileOutputStream(file);
+
+                    IOUtil.copyStream(in, baos);
+                    byte[] bytes = baos.toByteArray();
+                    fw.write(bytes);
+                    successful = true;
+                } else {
+                    System.out.println(response.getEntity().getContent());
+                    throw new RuntimeException("Callout to Google Charts API failed.");
                 }
-                file.createNewFile();
-
-                in = new BufferedInputStream(response.getEntity().getContent());
-                baos = new ByteArrayOutputStream();
-                fw = new FileOutputStream(file);
-
-                IOUtil.copyStream(in, baos);
-                byte[] bytes = baos.toByteArray();
-                fw.write(bytes);
-                successful = true;
-            } else {
-                System.out.println(response.getEntity().getContent());
-                throw new RuntimeException("Callout to Google Charts API failed.");
+            } finally {
+                post.releaseConnection();
+                if (in != null) {
+                    in.close();
+                }
+                if (fw != null) {
+                    fw.close();
+                }
+                if (baos != null) {
+                    baos.close();
+                }
             }
+
+            return successful;
         } finally {
-            post.releaseConnection();
-            if (in != null) {
-                in.close();
-            }
-            if (fw != null) {
-                fw.close();
-            }
-            if (baos != null) {
-                baos.close();
-            }
+            http.close();
         }
-
-        return successful;
     }
 
 }

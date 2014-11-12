@@ -220,6 +220,9 @@
             console.log(update);
             if (updateState === this.STATE.FAILED) {
                 test.querySelector('.exception').innerHTML = update.exception
+                                                                .replace(/&/g, '&amp;')
+                                                                .replace(/</g, '&lt;')
+                                                                .replace(/>/g, '&gt;')
                                                                 .replace(/\n/g, '<br>')
                                                                 .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
             }

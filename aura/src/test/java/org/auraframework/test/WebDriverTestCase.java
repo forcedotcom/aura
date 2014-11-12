@@ -34,7 +34,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
@@ -43,10 +42,7 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;

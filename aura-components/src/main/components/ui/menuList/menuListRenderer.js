@@ -15,17 +15,18 @@
  */
 ({
     afterRender: function(component, helper) {
-    	helper.addEventHandlers(component);
-        helper.handleVisible(component);
+        helper.setKeyboardEventHandlers(component);
+        helper.setEventHandlersOnChildren(component);
+
         var ret = this.superAfterRender();
-        helper.position(component);
+
         helper.setFocus(component, false);
-        return ret; 
+
+        return ret;
     },
-    
+
     rerender: function(component, helper) {
         var currentlyVisible = false;
-        //var concreteCmp = component.getConcreteComponent();
         var divCmp = component.find("menu");
         if (divCmp) {
             var elem = divCmp.getElement();
@@ -33,14 +34,14 @@
                 currentlyVisible = $A.util.hasClass(elem, "visible");
             }
         }
+        helper.handleVisible(component);
         var ret = this.superRerender();
-        helper.handleVisible(component, currentlyVisible);
-        helper.position(component);
         helper.setFocus(component, currentlyVisible);
         return ret;
     },
-    
+
     unrender: function(component, helper) {
-    	helper.removeEventHandlers(component);
+    	helper.removeKeyboardEventHandlers(component);
+        return this.superUnrender();
     }
 })

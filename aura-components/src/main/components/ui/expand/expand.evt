@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="Indicates that a component expands."></aura:event>
+<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that a component expands."></aura:event>

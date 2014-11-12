@@ -80,8 +80,14 @@
         var name = evt.getParam('name');
 
         switch (name) {
-            case 'delete': 
-                alert('delete '  + evt.getParam('index'));
+            case 'disable': 
+                hlp.changeRowDisabled(cmp, evt.getParam('index'), true);
+                break;
+            case 'enable':
+            	hlp.changeRowDisabled(cmp, evt.getParam('index'), false);
+            	break;
+            case 'toggleClass':
+            	hlp.changeRowClass(cmp, evt.getParam('index'), "error", "toggle");
         }
     },
     
@@ -97,5 +103,71 @@
 	
 	replaceData : function(cmp, evt, hlp) {
 		cmp.find("data").getEvent("provide").fire();
+	},
+	
+	switchColumn : function(cmp, evt, hlp) {
+		var grid = cmp.find("grid");
+		var columns = grid.get("v.columns");		
+		
+		var column = columns[5];
+		if (column.get("v.name") === "activityDate") {
+			$A.newCmpAsync(
+					this, 
+					function(newCmp) {
+						columns[5].destroy();
+						columns[5] = newCmp;
+						grid.set("v.columns", columns);
+					},
+					{
+						"componentDef": "markup://ui:dataGridColumn",
+			            "attributes": {
+			                "values": { label: "Name",
+			                			name: "who.name"
+			                		  }
+			            }
+					}
+			);
+		} else {
+			$A.newCmpAsync(
+					this, 
+					function(newCmp) {
+						columns[5].destroy();
+						columns[5] = newCmp;
+						grid.set("v.columns", columns);
+					},
+					{
+						"componentDef": "markup://ui:dataGridColumn",
+			            "attributes": {
+			                "values": { label: "Due Date",
+			                			name: "activityDate"
+			                		  }
+			            }
+					}
+			);
+		}
+	},
+	
+	/**
+	 * Row Attribute Update Handlers
+	 */
+	
+	disableRow : function(cmp, evt, helper) {
+		helper.changeRowDisabled(cmp, cmp.get("v.rowIndex"), false, true);
+	},
+	
+	enableRow : function(cmp, evt, helper) {
+		helper.changeRowDisabled(cmp, cmp.get("v.rowIndex"), false, false);
+	},
+	
+	addClass : function(cmp, evt, helper) {
+		helper.changeRowClass(cmp, cmp.get("v.rowIndex"), cmp.get("v.className"), "add");
+	},
+	
+	removeClass : function(cmp, evt, helper) {
+		helper.changeRowClass(cmp, cmp.get("v.rowIndex"), cmp.get("v.className"), "remove");
+	},
+	
+	toggleClass : function(cmp, evt, helper) {
+		helper.changeRowClass(cmp, cmp.get("v.rowIndex"), cmp.get("v.className"), "toggle");
 	}
 })

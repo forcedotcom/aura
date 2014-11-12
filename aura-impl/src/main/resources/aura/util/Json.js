@@ -15,7 +15,7 @@
  */
 /*jslint evil: true, sub : true */
 /**
- * @namespace A base class to enable JSON manipulation
+ * @description A base class to enable JSON manipulation
  * @constructor
  */
 function Json() {

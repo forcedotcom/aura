@@ -266,22 +266,25 @@
      */
     testLengthInnerCmp: {
         attributes: { first : "1,2,3,4,5" },
-        test: function(cmp) {
+        test: [function(cmp) {
             var arrayInner = cmp.find("innerCmp").get("v.passedInArray");
             //sanity check
             $A.test.assertEquals(5, arrayInner.length, "expect arrayInner has length 3 to start with");
 
-            //change array
-            var array = cmp.get("v.first");
-            var newArray = ['a','b','c'];
-            array.push(newArray);
-            cmp.set("v.first",array);
-
-            $A.test.assertEquals(6, array.length, "expect array has length 6");
-            $A.test.assertEquals(6, arrayInner.length, "expect arrayInner has length 6");
-            $A.test.assertEquals(6, cmp.find("innerCmp").get("v.passedInArrayLength"), "expect v.passedInArrayLength to be 6");
-            $A.test.assertEquals(3, arrayInner[5].length, "expect arrayInner[5] has length 3");
-        }
+        	//change array
+        	var oldarr = cmp.get("v.first");
+            oldarr.push(['a','b','c']);
+            cmp.set("v.first",oldarr);
+        }, function(cmp) {
+            var arrayInner = cmp.find("innerCmp").get("v.passedInArray");
+            $A.test.assertEquals(arrayInner.length, 6, "expect arrayInner has length 6");
+            $A.test.assertEquals(cmp.find("innerCmp").get("v.passedInArrayLength"), 6,
+                    "expect v.passedInArrayLength to be 6");
+            $A.test.assertEquals(arrayInner[5].length, 3, "expect arrayInner[5] has length 3");
+            /*TODO: arrayInnerWrapped = cmp.find("innerCmp").getValue("v.passedInArray");
+            $A.test.assertEquals(arrayInnerWrapped,cmp.getValue("v.first"),
+                    "again, expect arrayInner and v.first share same wrapper");*/
+        }]
     },
 
     /*
@@ -289,26 +292,27 @@
      */
     // TODO: W-2406307: remaining Halo test failure
     _testLengthArrayFromModel : {
-        test: function(cmp) {
+        test: [function(cmp) {
+
             //sanity check
             $A.test.assertEquals(0, cmp.get("v.firstArrayLen"),
                     "expect v.firstArrayLen to be 0 to start with");
             $A.test.assertEquals(0, cmp.get("v.firstArrayLen.length"),
                     "expect v.firstArrayLen.length to be 0 to start with");
-
             //fill in array from model : ["one","two","three"]
-            cmp.set("v.first", cmp.get("m.stringList"));
-
-            $A.test.assertEquals(3, cmp.get("v.firstArrayLen"), "expect v.firstArrayLen to be updated to 3");
-
+            cmp.set("v.first",cmp.get("m.StringList"));
+        }, function(cmp) {
+            
+            $A.test.assertEquals(cmp.get("v.firstArrayLen"), 3, "expect v.firstArrayLen to be updated to 3");
+            
             var array = cmp.get("v.first");
-            $A.test.assertEquals(3, array.length);
-            $A.test.assertEquals("three", array[2], "expect array[2] to be \"three\"");
-            $A.test.assertEquals(3, cmp.get("v.first.length"), "expect v.first.length to be 3");
-
-        }
+            $A.test.assertEquals(array.length, 3);
+            $A.test.assertEquals(array[2], "three", "expect array[2] to be \"three\"");
+            $A.test.assertEquals(cmp.get("v.first.length"), 3, "expect v.first.length to be 3");
+            
+        }]
     },
-
+    
     clone: function (obj) {
         return JSON.parse(JSON.stringify(obj));
     }

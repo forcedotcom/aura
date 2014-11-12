@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:inputCurrency</code> component represents an input field for a number as a currency, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
+			The browser's locale is used by default. To render the output from a <code>ui:inputCurrency</code> component, use the <code>ui:outputCurrency</code> component.
+		</p>
+		<p>This is a basic set up of a <code>ui:inputCurrency</code> component, which renders an input field with the value <code>$50.00</code> when the browser's currency locale is <code>$</code>.</p>
+		<pre>&lt;ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/></pre>
+		<p>This example results in the following HTML.</p>
+<pre>&lt;div class="uiInput uiInputText uiInputNumber">
+    &lt;label class="uiLabel-left uiLabel">
+        &lt;span>Amount&lt;/span>
+    &lt;/label>
+    &lt;input class="field" aria-describedby="" max="99999999999999" step="1" placeholder="" type="text" min="-99999999999999">
+&lt;/div></pre>
+		<p>To override the browser's locale, set the new format on the <code>v.format</code> attribute of the <code>ui:inputCurrency</code> component.
+		   This example renders an input field with the value <code>£50.00</code>.</p>
+<pre>var curr = component.find("amount");
+curr.set("v.format", '£#,###.00');</pre>
+	</aura:description>	
+		<aura:example name="inputTextExample" ref="uiExamples:inputExample" label="Using ui:inputCurrency">
+    	<p>This example shows a <code>ui:inputCurrency</code> component and a corresponding <code>ui:outputCurrency</code> component.</p>
+	</aura:example>
+	
+</aura:documentation>

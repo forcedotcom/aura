@@ -26,7 +26,35 @@ public interface DesignDef extends RootDefinition {
     @Override
     DefDescriptor<DesignDef> getDescriptor();
 
-    public Map<String, AttributeDesignDef> getAttributeDesignDefs();
+    /**
+     * Get all of the attribute design definitions belonging to this design definition, empty if no attribute designs
+     * were defined.
+     * 
+     * @return a map of attribute design definitions
+     */
+    public Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> getAttributeDesignDefs();
 
+    /**
+     * Retrieve an attribute design definition by name.
+     * 
+     * @param name
+     * 
+     * @return the attribute design definition
+     */
+    public AttributeDesignDef getAttributeDesignDef(String name);
+
+    /**
+     * Get the simple label for this design definition. May be null.
+     * 
+     * @return the label, may be null
+     */
     public String getLabel();
+
+    /**
+     * Return the design template definition. The design template definition will describe which interfaces are allowed
+     * in named template regions. May be null.
+     * 
+     * @return the design template definition, may be null
+     */
+    public DesignTemplateDef getDesignTemplateDef();
 }

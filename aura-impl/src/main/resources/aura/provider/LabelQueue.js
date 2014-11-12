@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Label Queue. Holds the components and callbacks for a particular $Label.
+ * @description Label Queue. Holds the components and callbacks for a particular $Label.
  * Queues request for the same $Label to make server calls efficient
  *
  * @constructor

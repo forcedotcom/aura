@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Storage Service, accessible using $A.storageService. 
+ * @description The Aura Storage Service, accessible using $A.storageService. 
  * @constructor
  */
 var AuraStorageService = function(){

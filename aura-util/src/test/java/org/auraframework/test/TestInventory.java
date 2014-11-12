@@ -34,7 +34,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.auraframework.test.annotation.HybridContainerTest;
 import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.PerfCmpTest;
 import org.auraframework.test.annotation.PerfCustomTest;
@@ -50,13 +49,12 @@ import com.google.common.collect.Sets;
 public class TestInventory {
     public final static String TEST_CLASS_SUFFIX = "Test";
     private final static String CLASS_SUFFIX = ".class";
-    public static final EnumSet<Type> CONTAINER_TYPE_TESTS = EnumSet.of(Type.HYBRID_CONTAINER);
-    public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.complementOf(CONTAINER_TYPE_TESTS);
+    public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.allOf(Type.class);
     public static final EnumSet<Type> PERF_TESTS = EnumSet.of(Type.PERFSUITE, Type.PERFCMP, Type.PERFFRAMEWORK, Type.PERFCUSTOM);
     
 
     public enum Type {
-        UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
+        UNIT, WEB, INTEGRATION, IGNORED, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
     }
 
     private URI rootUri;
@@ -134,9 +132,7 @@ public class TestInventory {
     
     private Type getAnnotationType (Class<? extends Test> testClass) {
     	Type target = null;
-        if (testClass.getAnnotation(HybridContainerTest.class) != null) {
-            target = Type.HYBRID_CONTAINER;
-        } else if (testClass.getAnnotation(PerfTestSuite.class) != null) {
+        if (testClass.getAnnotation(PerfTestSuite.class) != null) {
         	target = Type.PERFSUITE;
         } else if (testClass.getAnnotation(PerfCustomTest.class) != null) {
         	target = Type.PERFCUSTOM;

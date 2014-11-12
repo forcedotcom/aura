@@ -15,8 +15,10 @@
  */
 
 ({
-	
     change : function(cmp, evt) {
         cmp.set("v.myText", "some string");
+        
+        var curr = cmp.find("curr");
+        curr.set("v.format", '£#,###.00');
     }
 })

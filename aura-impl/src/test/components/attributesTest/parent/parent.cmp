@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" render="client" >
+<aura:component extensible="true" render="client">
     <aura:attribute name="SimpleAttribute" default="parentY" type="String"/>
     {!v.SIMPLEAttribute}
     {!v.SimpleAttribute}

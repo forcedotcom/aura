@@ -15,7 +15,7 @@
  */
 /*jslint evil:true, sub: true */
 /**
- * @namespace The top-level namespace/object for all SFDC Util code.
+ * @description The top-level namespace/object for all SFDC Util code.
  * Util methods provide utility functions for browsers in addition to
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
@@ -1011,8 +1011,8 @@ $A.ns.Util.prototype.isSubDef = function(def, qname) {
 };
 
 /**
- * @description
- * Takes the methods, and properties from one object and assigns them to another.
+ * 
+ * @description Takes the methods, and properties from one object and assigns them to another.
  * Returns the base object with the members from the child object.
  * This is commonly used to apply a set of configurations to a default set, to get a single set of configuration properties.
  * @example
@@ -1074,8 +1074,8 @@ $A.ns.Util.prototype.hyphensToCamelCase = function(str) {
 };
 
 /**
- * @description
- * A map of nodeNames that cannot accept custom data attributes.
+ * 
+ * @description A map of nodeNames that cannot accept custom data attributes.
  * @private
  */
 $A.ns.Util.prototype.noData = {
@@ -1086,8 +1086,8 @@ $A.ns.Util.prototype.noData = {
 };
 
 /**
- * @description
- * Returns whether a given DOM element can accept custom data attributes.
+ * 
+ * @description Returns whether a given DOM element can accept custom data attributes.
  *
  * @param {HTMLElement} element The element to check for custom data attribute support.
  * @returns {Boolean} Whether element accepts custom data attributes.
@@ -1134,8 +1134,8 @@ $A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
 };
 
 /**
- * @description
- * Returns a custom data attribute value from a DOM element.
+ * 
+ * @description Returns a custom data attribute value from a DOM element.
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to look up on element.
@@ -1150,8 +1150,8 @@ $A.ns.Util.prototype.getDataAttribute = function(element, key) {
 };
 
 /**
- * @description
- * Sets a custom data attribute value from a DOM element.
+ * 
+ * @description Sets a custom data attribute value from a DOM element.
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to add to element.

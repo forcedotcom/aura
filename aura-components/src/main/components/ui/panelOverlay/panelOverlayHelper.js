@@ -21,7 +21,11 @@
      */
     setHeaderPosition: function (cmp, evt, inputIsFocused, header) {
     	if (header) {
-    		header.style.position = inputIsFocused ? 'absolute' : 'fixed';
+            if (cmp.get("v.isFullScreen") || $A.get("$Browser.formFactor") == "PHONE") {
+    		    header.style.position = inputIsFocused ? 'absolute' : 'fixed';
+            } else {
+                header.style.position = 'absolute';
+            }
     	}
     },
     

@@ -37,10 +37,11 @@
 			this.verifyDefaultValuesOfMapDataType(cmp);
 		}
 	},
-	//TODO W-2248578
-	_testCaseSensitivity : {
+	testCaseSensitivity : {
 		test : function(cmp) {
-			$A.test.assertEquals("Aura", cmp.get("v.strATTRIBUTEWithDefaultValue"));
+			$A.test.assertEquals('Aura', cmp.get("v.strAttributeWithDefaultValue"));
+			$A.test.assertUndefined(cmp.get("v.StrAttributeWithDefaultValue"));
+			$A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
 			$A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
 		}
 	},

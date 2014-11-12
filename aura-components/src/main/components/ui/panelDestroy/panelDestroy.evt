@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" description="Ask the panelManager to destroy all panels">
+<aura:event type="APPLICATION" description="The event used by ui:panelManager to destroy all panels.">
 </aura:event>

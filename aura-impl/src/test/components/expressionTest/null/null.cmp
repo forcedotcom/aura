@@ -93,13 +93,11 @@
 
     <expressionTest:test expression="{!abs(null)}" exprText="abs(null)" expected="0"/>
 
-    <!-- W-1005793 - undefined instead of null is seen when model function returns null
     <expressionTest:test expression="{!m.stringNull}" exprText="m.stringNull" expected="null"/>
     <expressionTest:test expression="{!m.integerNull}" exprText="m.integerNull" expected="null"/>
     <expressionTest:test expression="{!m.doubleNull}" exprText="m.doubleNull" expected="null"/>
     <expressionTest:test expression="{!m.objectNull}" exprText="m.objectNull" expected="null"/>
-    -->
-    
+
     <expressionTest:test expression="{!!m.stringNull}" exprText="!m.stringNull" expected="true"/>
     <expressionTest:test expression="{!!m.objectNull}" exprText="!m.objectNull" expected="true"/>
     <expressionTest:test expression="{!null == m.stringNull}" exprText="null == m.stringNull" expected="true"/>

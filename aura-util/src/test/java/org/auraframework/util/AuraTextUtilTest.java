@@ -358,4 +358,15 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertTrue(AuraTextUtil.stringsHaveSameContent("abc", "cba"));
         assertFalse(AuraTextUtil.stringsHaveSameContent("abc", "def"));
     }
+
+    public void testIsValidJsIdentifier() throws Exception {
+        assertTrue("variable is a valid js identifier", AuraTextUtil.isValidJsIdentifier("variable"));
+        assertTrue("$ is a valid js identifier", AuraTextUtil.isValidJsIdentifier("$"));
+        assertTrue("$$ is a valid js identifier", AuraTextUtil.isValidJsIdentifier("$$"));
+        assertTrue("_ is a valid js identifier", AuraTextUtil.isValidJsIdentifier("_"));
+        assertTrue("_$_1A23$_a2Bc is a valid js identifier", AuraTextUtil.isValidJsIdentifier("_$_1A23$_a2Bc"));
+        assertFalse("{} is not a valid js identifier", AuraTextUtil.isValidJsIdentifier("{}"));
+        assertFalse("function is not a valid js identifier", AuraTextUtil.isValidJsIdentifier("function() {}"));
+        assertFalse("null String is not a valid js identifier", AuraTextUtil.isValidJsIdentifier(null));
+    }
 }

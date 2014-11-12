@@ -102,21 +102,22 @@
      */
     testRerender:{
         attributes : {disabled: false, text: "my value", value: false, label: "I'm broken, fix me"},
-        test:function(component){
+        test:[function(component){
             aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
             aura.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
             aura.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");
+        }, function(component){
             component.set('v.disabled', true);
             component.set('v.text', 'your value');
             component.set('v.value', true);
             component.set('v.label', "I want a pony");
-            $A.rerender(component);
+        }, function(component){
             aura.test.assertEquals("your value", component.find("checkbox").getElement().value, "After rerender, value attribute not correctly set with new value");
             aura.test.assertTrue(component.find("checkbox").getElement().disabled, "After rerender, element not disabled");
             aura.test.assertTrue(component.find("checkbox").getElement().checked, "After rerender, element not correctly selected");
             //TODO: W-1150831, W-943203
             //this.verifyLabel(component, "I want a pony");
-        }
+        }]
     },
     /**
      * Verify that clicking on checkbox toggle it from unselected to selected.

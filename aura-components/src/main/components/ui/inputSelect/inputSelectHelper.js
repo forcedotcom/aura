@@ -51,6 +51,10 @@
      * Updates all options' "selected" attributes in the select element, based on the semicolon-delimited newValue string
      */
     updateOptionsFromValue: function(cmp) {
+    	if (cmp._suspendChangeHandlers) {
+    		return;
+    	}
+    	
         var value = cmp.get("v.value"),
         	optionsPack = this.getOptionsWithStrategy(cmp),
         	selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
@@ -69,7 +73,9 @@
         if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues) && !($A.util.getBooleanValue(cmp.get("v.multiple")) && value == "")) {
         	this.updateValueFromOptions(cmp, optionsPack);
         } else {
+        	cmp._suspendChangeHandlers = true;
         	optionsPack.strategy.persistOptions(cmp, optionsPack.options);
+        	cmp._suspendChangeHandlers = false;
         }
     },
 
@@ -77,6 +83,10 @@
      * Updates this component's "value" attribute based on the state of its options' "selected" attributes
      */
     updateValueFromOptions: function(cmp, optionsPack) {
+    	if (cmp._suspendChangeHandlers) {
+    		return;
+    	}
+    	
         var value = cmp.get("v.value"),
         	isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple")),
         	optionsPack = optionsPack || this.getOptionsWithStrategy(cmp),
@@ -86,8 +96,10 @@
         	if (!isMultiple && !selectedOptions.found) {
         		selectedOptions.optionValue = optionsPack.strategy.getValue(optionsPack.options, 0);
         		optionsPack.strategy.setOptionSelected(optionsPack.options, 0, true);
-
+        		
+        		cmp._suspendChangeHandlers = true;
             	optionsPack.strategy.persistOptions(cmp, optionsPack.options);
+            	cmp._suspendChangeHandlers = false;
         	}
         	cmp.set("v.value", selectedOptions.optionValue, true);
         }
@@ -116,7 +128,6 @@
     	// If an option is in newValues, we want to select it
     	updateOptions : function(cmp, options, newValues) {
     		var found = false;
-            var selectElement=cmp.getElement();
 
     		for(var i=0;i<options.length;i++){
                 var option=options[i];
@@ -125,9 +136,6 @@
 
     			found = found || selectOption;
                 option.selected = selectOption;
-                if(selectElement){
-                    selectElement.options[i].selected = selectOption;
-                }
     		};
 
     		return found;
@@ -159,7 +167,7 @@
     		}
     	},
     	persistOptions : function(cmp, options) {
-    		cmp.set("v.options", options, true);
+    		cmp.set("v.options", options);
     	}
     },
 
@@ -193,7 +201,7 @@
     		}
     	},
     	persistOptions : function(cmp, options) {
-    		cmp.set("v.body", options, true);
+    		cmp.set("v.body", options);
     	},
     	// Performs op on every ui:inputSelectOption in opts, where op = function(optionCmp, resultsObject, optionalArguments)
     	performOperationOnCmps : function(opts, op, result, newValues) {

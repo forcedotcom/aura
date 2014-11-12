@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="A panel for full-screen overlays">
+<aura:component description="A panel for full-screen overlays. Use ui:panelManager to manage your panel overlays.">
 
     <aura:attribute name="class" type="String" default="" description="Additional css classes"/>
     <aura:attribute name="animation" type="String" default="bottom" description="Animation to apply"/>
@@ -28,6 +28,7 @@
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Automatically focus on the first focusable element"/>
     <aura:attribute name="isTransient" type="Boolean" default="true" description="Flag to indicate if panel is one-time use and should be destroyed when hidden"/>
     <aura:attribute name="lastFocusedInput" type="Object" description="The last element within the panel to receive input focus."/>
+    <aura:attribute name="isFullScreen" type="Boolean" default="true" description="Indicates whether full screen is used on non-phone devices"/>
     
     <!-- supported callbacks: onClose -->
     <aura:attribute name="callbacks" type="Object" description="Option callbacks that can be set when creating a new panel through the panelManager." />
@@ -41,31 +42,38 @@
     <aura:dependency resource="markup://ui:panelTransitionBegin" type="EVENT" />
     <aura:dependency resource="markup://ui:panelTransitionEnd" type="EVENT" />
     <aura:dependency resource="markup://ui:updateSize" type="EVENT" />
-    
-    <div aura:id='panel'
-    	 class="{! 'panel panelOverlay ' + ($Browser.isWindowsPhone ? 'wp ' : '') + $Browser.formFactor + ' ' + (v.removeHeader ? 'customHeader ' : '') + v.class}"
-         role="dialog" 
-         aria-labeled-by="{!'title_' + globalId}"
-         style="display:none">
-         
-         <div role="document">
-            <!--Render the header if the title is present and removeHeader option is not set -->
-            <aura:renderIf isTrue="{! !v.removeHeader }">
-               	<ui:header class="titleBar">
-               	    <aura:if isTrue="{!v.assistiveLabel != null}">
-				        <span class="assistiveText">{!v.startOfDialogLabel}</span>
-				    </aura:if>
-				    <div class="titles">
-				        <h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
-				    </div>
-				    <aura:renderIf isTrue="{!v.headerButtons.length > 0}">
-				        {!v.headerButtons}
-				    </aura:renderIf>
-				</ui:header>
-            </aura:renderIf>
-            
-            <div class="{! 'body ' + (v.body.length == 0 ? 'hidden' : '') }">
-            	{!v.body}
+
+    <div class="{!((v.isFullScreen||$Browser.formFactor == 'PHONE') ? ' fullScreen ' : ' notFullScreen ') + v.class}">
+
+        <aura:if isTrue="{!!v.isFullScreen &amp;&amp; $Browser.formFactor != 'PHONE'}">
+            <div aura:id='modal-glass' class="modal-glass" ></div>
+        </aura:if>
+
+        <div aura:id='panel'
+             class="{! 'panel panelOverlay ' + ($Browser.isWindowsPhone ? 'wp ' : '') + $Browser.formFactor + ' ' + (v.removeHeader ? 'customHeader ' : '')}"
+             role="dialog"
+             aria-labeled-by="{!'title_' + globalId}"
+             style="display:none">
+
+            <div role="document">
+                <!--Render the header if the title is present and removeHeader option is not set -->
+                <aura:renderIf isTrue="{! !v.removeHeader }">
+                    <ui:header class="titleBar">
+                        <aura:if isTrue="{!v.assistiveLabel != null}">
+                            <span class="assistiveText">{!v.startOfDialogLabel}</span>
+                        </aura:if>
+                        <div class="titles">
+                            <h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
+                        </div>
+                        <aura:renderIf isTrue="{!v.headerButtons.length > 0}">
+                            {!v.headerButtons}
+                        </aura:renderIf>
+                    </ui:header>
+                </aura:renderIf>
+
+                <div class="{! 'body ' + (v.body.length == 0 ? 'hidden' : '') }">
+                    {!v.body}
+                </div>
             </div>
         </div>
     </div>

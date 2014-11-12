@@ -24,27 +24,27 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.library.ImportDefHandlerImpl;
+import org.auraframework.impl.root.library.ImportDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
-public class ImportDefHandler extends XMLHandler<ImportDefHandlerImpl> {
+public class ImportDefHandler extends XMLHandler<ImportDefImpl> {
 
     public static final String TAG = "aura:import";
 
-    private static final String ATTRIBUTE_MODULE = "library";
+    private static final String ATTRIBUTE_LIBRARY = "library";
     private static final String ATTRIBUTE_PROPERTY = "property";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_MODULE, RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LIBRARY, ATTRIBUTE_PROPERTY,
+            RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     private RootTagHandler<? extends RootDefinition> parentHandler;
-    private final ImportDefHandlerImpl.Builder builder = new ImportDefHandlerImpl.Builder();
+    private final ImportDefImpl.Builder builder = new ImportDefImpl.Builder();
 
     public ImportDefHandler() {
         super();
@@ -57,35 +57,41 @@ public class ImportDefHandler extends XMLHandler<ImportDefHandlerImpl> {
     }
 
     @Override
-    public ImportDefHandlerImpl getElement() throws XMLStreamException, QuickFixException {
+    public ImportDefImpl getElement() throws XMLStreamException, QuickFixException {
+        validateAttributes();
+
         DefDescriptor<? extends RootDefinition> defDescriptor = parentHandler.getDefDescriptor();
         builder.setParentDescriptor(defDescriptor);
         builder.setLocation(getLocation());
 
-        String module = getAttributeValue(ATTRIBUTE_MODULE);
-        String property = getAttributeValue(ATTRIBUTE_PROPERTY);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(module)) {
-            DefDescriptor<LibraryDef> descriptor = DefDescriptorImpl.getInstance(module, LibraryDef.class);
-            builder.setDescriptor(descriptor);
-            builder.setModule(module);
-            builder.setProperty(property);
-        } else {
-            error("Import must specify a valid library name.");
+        String library = getAttributeValue(ATTRIBUTE_LIBRARY);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(library)) {
+            throw new InvalidDefinitionException(String.format("%s missing library attribute", TAG), getLocation());
         }
+        DefDescriptor<LibraryDef> descriptor = DefDescriptorImpl.getInstance(library.trim(), LibraryDef.class);
+        builder.setDescriptor(descriptor);
+
+        String property = getAttributeValue(ATTRIBUTE_PROPERTY);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {
+            throw new InvalidDefinitionException(String.format("%s missing property attribute", TAG), getLocation());
+        }
+        builder.setProperty(property.trim());
+
+        builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
 
         int next = xmlReader.next();
         if (next != XMLStreamConstants.END_ELEMENT || !TAG.equalsIgnoreCase(getTagName())) {
             error("expected end of %s tag", TAG);
         }
+
         builder.setOwnHash(source.getHash());
 
         return builder.build();
     }
 
     @Override
-    public void writeElement(ImportDefHandlerImpl def, Appendable out) {
-        // TODO
-        System.err.println("WRITING");
+    public void writeElement(ImportDefImpl def, Appendable out) {
+        // Do nothing
     }
 
     @Override

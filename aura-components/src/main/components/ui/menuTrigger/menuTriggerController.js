@@ -18,9 +18,5 @@
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.focus(concreteCmp);
-    },
-    
-    handleClick: function(component, event, helper) {
-        helper.toggleMenu(component);
     }
 })

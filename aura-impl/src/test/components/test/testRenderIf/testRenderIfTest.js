@@ -57,7 +57,7 @@
 
     testRerender: {
         attributes : {thang : "true"},
-
+        doNotWrapInAuraRun : true,
         test: function(component){
             this.whatItIs(component, "Testing Renrender: true", true);
             component.set("v.thang", false);

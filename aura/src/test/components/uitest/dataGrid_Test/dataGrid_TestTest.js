@@ -2,7 +2,7 @@
     ADD_ROW_ARRAY    : ["Spidey", "Peter Parker", "Media Inc", "2020-10-12"],
     BASIC_ROW_ARRAY  : ["Foo", "John Doe", "Acme", "2014-01-01"],
     INSERT_ROW_ARRAY : ["Bar", "New John", "SFDC", "2014-11-11"],
-	
+    doNotWrapInAuraRun : true,
 	/**
      * Test verifying that when there is no data present dataGrid does not fail
      * bug tracking: 2327176
@@ -227,14 +227,16 @@
      */
     testDataGridProviderRefire : {
     	attributes : {"pageSize" : 20},
-        test : function(cmp){
+        test : [function(cmp){
             this.setValue(cmp, "index", 0);
             this.setValue(cmp, "count", 5);
+        }, function(cmp){
             this.actAndVerifyRowIsCorrect(cmp, "remove", 0, 
                 this.createOutputArray(6, 10, this.BASIC_ROW_ARRAY), 15);
+        }, function(cmp){
             this.actAndVerifyRowIsCorrect(cmp, "refireDP", 0, 
                 this.createOutputArray(1, 7, this.BASIC_ROW_ARRAY), 20);
-        }
+        }]
     },
 
     /***************************************************************************************************

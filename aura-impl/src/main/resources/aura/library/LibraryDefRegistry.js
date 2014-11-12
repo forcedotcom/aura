@@ -16,7 +16,7 @@
 /*jslint sub: true */
 
 /**
- * @namespace A registry for libraryDefs.
+ * @description A registry for libraryDefs.
  * @constructor
  */
 $A.ns.LibraryDefRegistry = function LibraryDefRegistry() {

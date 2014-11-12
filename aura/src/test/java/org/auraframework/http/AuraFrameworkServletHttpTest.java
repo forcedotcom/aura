@@ -160,7 +160,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(response);
         get.releaseConnection();
         assertEquals(failureMsg, expectedResponseStatus, statusCode);
-        assertAntiClickjacking(response);
+        
     }
 
     /**
@@ -206,7 +206,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         assertEquals("Expected server to return a 200 for unexpired cache without fwUid or nonce.", HttpStatus.SC_OK,
                 statusCode);
         assertNotNull(response);
-        assertAntiClickjacking(httpResponse);
+        assertDefaultAntiClickjacking(httpResponse, true, false);
     }
 
     /**
@@ -227,7 +227,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(httpResponse);
         assertEquals("Expected server to return a 304 for unexpired cache.", HttpStatus.SC_NOT_MODIFIED, statusCode);
         assertNull(getResponseBody(httpResponse));
-        assertAntiClickjacking(httpResponse);
+        assertDefaultAntiClickjacking(httpResponse, true, false);
     }
 
     /**
@@ -242,7 +242,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         Header varyHeader = response.getFirstHeader(HttpHeaders.VARY);
         assertNotNull("Vary header is not set.", varyHeader);
         assertEquals("Vary header set to wrong value.", "Accept-Encoding", varyHeader.getValue());
-        assertAntiClickjacking(response);
+        assertDefaultAntiClickjacking(response, true, false);
     }
 
     /**
@@ -276,7 +276,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         response = perform(get);
 
         checkExpired(response, "image/png");
-        assertAntiClickjacking(response);
+        assertDefaultAntiClickjacking(response, true, false);
         get.releaseConnection();
     }
 
@@ -300,7 +300,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         long expirationMillis = (df.parse(expires).getTime() - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
-        assertAntiClickjacking(httpResponse);
+        assertDefaultAntiClickjacking(httpResponse, true, false);
     }
 
     /**
@@ -323,7 +323,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce, true);
         response = perform(get);
         checkExpired(response, "text/css");
-        assertAntiClickjacking(response);
+        assertDefaultAntiClickjacking(response, true, false);
         get.releaseConnection();
     }
 
@@ -351,7 +351,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
-        assertAntiClickjacking(httpResponse);
+        assertDefaultAntiClickjacking(httpResponse, true, false);
     }
 
     /**
@@ -362,7 +362,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
 
         checkExpired(response, "text/javascript");
-        assertAntiClickjacking(response);
+        assertDefaultAntiClickjacking(response, true, false);
         get.releaseConnection();
     }
 
@@ -373,7 +373,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpGet get = obtainNoncedGetMethod(sampleJavascriptResourcePathWithNonce, false);
         HttpResponse response = perform(get);
         checkLongCache(response, "text/javascript");
-        assertAntiClickjacking(response);
+        assertDefaultAntiClickjacking(response, true, false);
         get.releaseConnection();
     }
 
@@ -385,7 +385,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
         checkExpired(httpResponse, "text/javascript");
-        assertAntiClickjacking(httpResponse);
+        assertDefaultAntiClickjacking(httpResponse, true, false);
         assertTrue(response.contains("(function(e){"));
 
         get.releaseConnection();
@@ -401,7 +401,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         checkExpired(httpResponse, "text/javascript");
         assertTrue(response.contains("function setDefaults("));
-        assertAntiClickjacking(httpResponse);
+        assertDefaultAntiClickjacking(httpResponse, true, false);
 
         get.releaseConnection();
     }

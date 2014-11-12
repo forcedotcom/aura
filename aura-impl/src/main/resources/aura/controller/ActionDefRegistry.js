@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace A registry for ControllerDefs.
+ * @description A registry for ControllerDefs.
  * @constructor
  * @protected
  */

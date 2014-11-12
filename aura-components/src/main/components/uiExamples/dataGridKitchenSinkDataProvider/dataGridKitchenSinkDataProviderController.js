@@ -15,7 +15,7 @@
  */
 ({
     init: function (cmp) {
-        cmp.set('v.totalItems', 1000);
+        cmp.set('v.totalItems', 25);
     },
 
     handleProvide: function (cmp, evt, hlp) {

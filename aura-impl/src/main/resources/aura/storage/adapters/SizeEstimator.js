@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Provides operations to estimate size of JSON objects in memory.
+ * @description Provides operations to estimate size of JSON objects in memory.
  * @constructor
  */
 var SizeEstimator = function SizeEstimator(){

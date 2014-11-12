@@ -25,7 +25,9 @@ import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.impl.design.DesignDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -33,13 +35,16 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
-    public static final String TAG = "aura:design";
+    public static final String TAG = "design:component";
 
     private static final String ATTRIBUTE_LABEL = "label";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
 
     private final DesignDefImpl.Builder builder = new DesignDefImpl.Builder();
+
+    // counter used to index child defs without an explicit id
+    private int idCounter = 0;
 
     public DesignDefHandler() {
         super();
@@ -82,8 +87,15 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         String tag = getTagName();
         if (AttributeDesignDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDesignDef attributeDesign = new AttributeDesignDefHandler(this, xmlReader, source).getElement();
-            String name = attributeDesign.getName();
-            builder.addAttributeDesign(name, attributeDesign);
+            builder.addAttributeDesign(
+                    DefDescriptorImpl.getInstance(attributeDesign.getName(), AttributeDesignDef.class), attributeDesign);
+        } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
+            if (builder.getDesignTemplateDef() != null) {
+                throw new XMLStreamException(String.format("<%s> may only contain one %s definition", getHandledTag(),
+                        tag));
+            }
+            DesignTemplateDef template = new DesignTemplateDefHandler(this, xmlReader, source).getElement();
+            builder.setDesignTemplateDef(template);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }
@@ -94,7 +106,7 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         String text = xmlReader.getText();
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
             throw new XMLStreamException(String.format(
-                    "<%s> can contain only <aura:attributeDesign>  tags.\nFound text: %s",
+                    "<%s> can contain only tags.\nFound text: %s",
                     getHandledTag(), text));
         }
     }
@@ -106,6 +118,12 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
 
     @Override
     public void writeElement(DesignDef def, Appendable out) throws IOException {
+    }
+
+    String getNextId() {
+        String ret = Integer.toString(idCounter);
+        idCounter++;
+        return ret;
     }
 
 }

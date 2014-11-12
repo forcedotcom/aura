@@ -1,6 +1,6 @@
 ({
     STATE: {
-        ENQUEUE: 'enqueue',
+        ENQUEUE: 'enqueued',
         RUNNING: 'running',
         FAILED : 'failed'
     },
@@ -142,7 +142,7 @@
             regexp = new RegExp(query,'i');
             for (i = 0; i < children.length; i++) {
                 li = children[i];
-                name = li.getElementsByClassName('name')[0].textContent;
+                name = li.getElementsByClassName('ns')[0].textContent;
                 if (!regexp.test(name)) {
                     $A.util.setDataAttribute(li, 'visible', "hidden");
                 }
@@ -159,16 +159,20 @@
             testRunner = cmp.get("c.runTestSet"),
             pollTime   = this.POLL_TIME,
             tests      = [],
-            row,li, i;
+            row,li, i, id;
         
         if (cmp._runningTests) {
             return alert('Wait, TestRunner is working...');
         }
+        console.log(testCb);
         for (i = 0; i < testCb.length; i++) {
             row      = testCb[i];
-            li       = this._getLiFromInput(row);
-            tests[i] = $A.util.getDataAttribute(row, 'testid');
-            $A.util.setDataAttribute(li, 'state', this.STATE.ENQUEUE);
+            id       = $A.util.getDataAttribute(row, 'testid');
+            if(id){
+            	tests.push(id);
+                li = this._getLiFromInput(row);
+            	$A.util.setDataAttribute(li, 'state', this.STATE.ENQUEUE);
+            }
         }
 
         if (tests.length) {
@@ -181,9 +185,9 @@
             });
 
             this.updateStatus('Enqueueing '+ tests.length +' tests...');
-                $A.run(function () {
-                    cmp._runningTests = true;
-                    $A.enqueueAction(testRunner);
+            $A.run(function () {
+                cmp._runningTests = true;
+                $A.enqueueAction(testRunner);
             });
         } else {
             this.updateStatus('No tests to run...');
@@ -216,6 +220,9 @@
             console.log(update);
             if (updateState === this.STATE.FAILED) {
                 test.querySelector('.exception').innerHTML = update.exception
+                                                                .replace(/&/g, '&amp;')
+                                                                .replace(/</g, '&lt;')
+                                                                .replace(/>/g, '&gt;')
                                                                 .replace(/\n/g, '<br>')
                                                                 .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
             }
@@ -237,15 +244,15 @@
         pollAction.setAbortable(true);
         pollAction.setCallback(this, function (action) {
             if (action.getState() === "SUCCESS") {
-                var actionResult = action.getReturnValue();
-                this.updateTests(actionResult, dom);
-                if (actionResult.testsRunning) {
-                    setTimeout(function () {
-                        self.pollTestResults(cmp, dom);    
-                    }, pollTime);
-                } else {
-                    this.finishTestRun(cmp, actionResult, dom);
-                }
+				var actionResult = action.getReturnValue();
+				self.updateTests(actionResult, dom);
+				if (actionResult.testsRunning) {
+					setTimeout(function() {
+						self.pollTestResults(cmp, dom);
+					}, pollTime);
+				} else {
+					self.finishTestRun(cmp, actionResult, dom);
+				}
             }
         });
 

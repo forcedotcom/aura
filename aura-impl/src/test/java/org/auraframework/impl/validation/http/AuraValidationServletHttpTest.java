@@ -65,7 +65,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
         method = obtainGetMethod("/qa/auraValidation?path=" + path);
         HttpResponse response = perform(method);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        assertAntiClickjacking(response);
+        assertDefaultAntiClickjacking(response, true, false);
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
         assertTrue(contentType, contentType.contains(Json.MIME_TYPE));
         assertTrue(contentType, contentType.contains(Charsets.UTF_8.toString()));

@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="{!m.title}"/>
     <aura:set attribute="subtitle">type</aura:set>
     <aura:set attribute="example">
-    	<p>{!m.symbol.classDesc}</p>
+    	<p>{!m.symbol.classdesc}</p>
     	<p>{!m.symbol.desc}</p>
     </aura:set>
 

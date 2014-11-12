@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace A value provider that resolves against a few primary providers first, then falls back on a component.
+ * @description A value provider that resolves against a few primary providers first, then falls back on a component.
  * @constructor
  * @protected
  */

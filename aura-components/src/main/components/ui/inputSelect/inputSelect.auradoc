@@ -19,16 +19,23 @@
 	<aura:description>
 		<p>
 			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element. It contains options, represented by the <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
-			Group options using <code>ui:inputSelectOptionGroup</code> and in each group, nest each option with <code>ui:inputSelectOption</code>. <code>ui:inputSelect</code> does not support the use of <code>aura:iteration</code> in its body.
+			 To wire up any client-side logic when an input value is selected, use the <code>change</code> event. 
 		</p>
+<pre>&lt;ui:inputSelect class="single" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
+        &lt;ui:inputSelectOption text="Tiger"/>
+        &lt;ui:inputSelectOption text="Lion" value="true"/>
+        &lt;ui:inputSelectOption text="Bear"/>
+        &lt;ui:inputSelectOption text="Butterfly"/>
+        &lt;ui:inputSelectOption text="Dragonfly"/>
+&lt;/ui:inputSelect></pre>		
 		<h4>Generating Options Dynamically</h4>
 		<p>
-			To generate options dynamically, you can load the options on the controller-side action.
+			<code>ui:inputSelect</code> does not support the use of <code>aura:iteration</code> in its body. To generate options dynamically, you can load the options on the controller-side action.
 		</p>
 		<pre>
 &lt;aura:component>
-    &lt;aura:handler name="init" value="{!this} action="{!c.doInit}"/>
-    &lt;ui:inputSelect label="Select me:" class="dynamic" aura:id="InputSelectDynamic""/>
+    &lt;aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    &lt;ui:inputSelect label="Select me:" class="dynamic" aura:id="InputSelectDynamic"/>
 &lt;/aura:component>
 		</pre>
 		<p>
@@ -51,42 +58,7 @@
 		</pre>
 		<p><code>class</code> is a reserved keyword that might not work with older versions of Internet Explorer. We recommend using <code>"class"</code> with double quotes.</p>
 		
-		<h4>Generating Options using a Model</h4>
-		<p>
-			Display a list of options from a model by using the format <code>&lt;ui:inputSelect options="{!m.selectOptions}" /></code> and creating the list of options in the model using <code>ArrayList&lt;InputOption></code>.
-			The following example shows a model that generates a list of options for a <code>ui:inputSelect</code> component.
-		</p>
-		<pre>
-@Model
-public class SizeModel {
-
-  @AuraEnabled
-  public List&lt;InputOption> getSizes() {
-    ArrayList&lt;InputOption> a = new ArrayList&lt;InputOption>(3);
-    InputOption m1 = new InputOption("Small", "s", false, "Small");
-    a.add(m1);
-    InputOption m2 = new InputOption("Medium", "m", false, "Medium");
-    a.add(m2);
-    InputOption m3 = new InputOption("Large", "l", false, "Large");
-    a.add(m3);
-    return a;
-  }
-}
-		</pre>
-		<p>The following example component displays the list of options using the given model.</p>
-		<pre>
-&lt;aura:component model="org.auraframework.docs.SizeModel">
-  &lt;aura:attribute name="sizes" type="List" description="A list input options."/>
-  &lt;ui:inputSelect label="Size" options="{!m.sizes}"/>
-&lt;/aura:component>
-		</pre>
-		<p>The <code>InputOption</code> object has these parameters.</p>
-		<ul>
-			<li>label (String): The label of the option to display on the user interface</li>
-			<li>name (String): The name of the option</li>
-			<li>selected (Boolean): Indicates whether the option is selected</li>
-			<li>value (String): The value of this option</li>
-		</ul>
+		
 	</aura:description>	
 		<aura:example name="inputselect" ref="auradocs:demoSelect" label="Using ui:inputSelect">
     	<p>This example shows several ways to implement <code>ui:inputSelect</code>.</p>

@@ -239,13 +239,13 @@ var priv = {
      * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
      * error occurs.
      * 
-     * @private
      * @param {Action}
      *            action the action.
      * @param {Boolean}
      *            noAbort if false abortable actions will be aborted.
      * @param {Object}
      *            actionResponse the server response.
+     * @private
      */
     singleAction : function(action, noAbort, actionResponse) {
         var key = action.getStorageKey();
@@ -260,7 +260,7 @@ var priv = {
                 	action.finishAction($A.getContext());
                 }
                 if (action.isRefreshAction()) {
-                    action.fireRefreshEvent("refreshEnd");
+                    action.fireRefreshEvent("refreshEnd", needUpdate);
                 }
             } else {
                 action.abort();
@@ -294,7 +294,6 @@ var priv = {
      * This function does all of the processing for a set of actions that come back from the server. It correctly deals
      * with the case of interrupted communications, and handles aborts.
      * 
-     * @private
      * @param {Object}
      *            response the response from the server.
      * @param {ActionCollector}
@@ -303,6 +302,7 @@ var priv = {
      *            the in flight counter under which the actions were run
      * @param {Scalar}
      *            the abortableId associated with the set of actions.
+     * @private
      */
     actionCallback : function(response, collector, flightCounter, abortableId) {
         var responseMessage = this.checkAndDecodeResponse(response);
@@ -431,11 +431,11 @@ var priv = {
      * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
      * capacity in the channel).
      * 
-     * @private
      * @param {Array}
      *            actions the list of actions to process.
      * @param {FlightCounter}
      *            the flight counter under which the actions should be run.
+     * @private
      */
     request : function(actions, flightCounter) {
         $A.Perf.mark("AuraClientService.request");

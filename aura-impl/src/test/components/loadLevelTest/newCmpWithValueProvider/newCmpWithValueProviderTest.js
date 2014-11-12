@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 ({
+	tearDown : function(cmp){
+		cmp._avp = null;
+		delete cmp._avp;
+	},
     /**
      * Create a new component whose definition was already preloaded and use the current component as attribute value provider.
      */
     testValueProviderForPreloadedDef:{
-        test:function(cmp){
-            $A.run(function(){
-                cmp.get('c.createCmpWithPreloadedDef').runDeprecated();
-            });
+        test:[ function(cmp){
+           
+             cmp.get('c.createCmpWithPreloadedDef').runDeprecated();
+        }, function(cmp) {
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
@@ -32,7 +36,7 @@
             var newTextCmp = cmp.find("txt_Id");
             $A.test.assertTruthy(newTextCmp, "Failed to find new Component with its localId");
             $A.test.assertEquals("markup://aura:text", newTextCmp.getDef().getDescriptor().getQualifiedName());
-        }
+        }]
     },
 
     /**
@@ -41,13 +45,10 @@
      */
     testPassThroughValueAsValueProvider:{
         test:[ function(cmp){
-            var avp;
-
-            $A.run(function(){
                 var a = cmp.get('c.createCmpWithPassthroughValue');
                 a.runDeprecated();
-                avp = a.getReturnValue();
-            });
+                cmp._avp = a.getReturnValue();
+        }, function(cmp) {
 
             //Verify that local ID can be used to find the component
             var newTextCmp = cmp.find("txt_Id");
@@ -56,9 +57,7 @@
             $A.test.assertEquals("markup://aura:text", newTextCmp.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("Washington", newTextCmp.get('v.value'));
             $A.test.assertEquals("Washington", $A.test.getText(newTextCmp.getElement()));
-            cmp._avp = avp;
-        },
-        function(cmp) {
+        }, function(cmp) {
             var newTextCmp = cmp.find("txt_Id");
             // this should test the valueprovider fix.
             cmp._avp.deIndex(newTextCmp);
@@ -164,15 +163,14 @@
      * The attributes of new component has no reference to attributes of the parent component.
      */
     testNewComponentWithoutDependenceOnAVP:{
-        test:function(cmp){
-            $A.run(function(){
+        test : [function(cmp){
                 cmp.get('c.createCmpWithNoRequirementForAVP').runDeprecated();
-            });
+            }, function(cmp){
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
             $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("SelfSustaining", $A.test.getText(body[0].getElement()));
-        }
+        }]
     }
 })

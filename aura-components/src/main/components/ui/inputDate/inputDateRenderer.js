@@ -19,6 +19,11 @@
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayValue(component);
         _helper.toggleClearButton(component);
+
+        var datePicker = concreteCmp.find("datePicker");
+        if (!$A.util.isUndefinedOrNull(datePicker)) {
+            datePicker.set("v.referenceElement", concreteCmp.getElement());
+        }
         return this.superAfterRender();
 	},
 	

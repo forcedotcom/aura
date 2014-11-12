@@ -328,12 +328,10 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         assertEquals("Escape sequences not parsed correctly", "the child blinked and replied,\n \t'I'd be delighted.'",
                 l.getValue());
 
-        /*
-         * TODO(W-1530127): Characters not escaped properly. e =
-         * buildExpression("'top\\\\\\\"2\\\"\\b\\f\\r\\n\\tbottom'"); assertEquals("Unexpected expression type",
-         * ExpressionType.LITERAL, e.getExpressionType()); l = (LiteralImpl) e;
-         * assertEquals("Escape sequences not parsed correctly", "top\"2\"\b\f\r\n\tbottom", l.getValue());
-         */
+        e = buildExpression("'top\\\\\\\"2\\\"\\b\\f\\r\\n\\tbottom'");
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
+        l = (LiteralImpl) e;
+        assertEquals("Escape sequences not parsed correctly", "top\\\"2\"\b\f\r\n\tbottom", l.getValue());
     }
 
     /**

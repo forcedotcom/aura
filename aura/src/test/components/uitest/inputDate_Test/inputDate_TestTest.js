@@ -18,12 +18,12 @@
  	 * Opening date picker with no value set will open datePicker to todays date.
  	 */
  	testDatePickerOpensToToday : {
-            test : function(cmp) {
-                        var today = new Date();
+            test : [function(cmp) {                      
+                        this.openDatePicker(cmp);
+                    }, function(cmp) {
+                    	var today = new Date();
                         var expectedDay = today.getDate();
                         var expected = this.convertMonth(today.getMonth()) + " " + today.getFullYear();
-
-                        this.openDatePicker(cmp);
 
                         var curDate = $A.test.getElementByClass("todayDate")[0];
 
@@ -31,7 +31,7 @@
 
                         var actual = this.getTextFromElm(cmp.find("datePickerTestCmp").find("datePicker"));
                         $A.test.assertEquals(expected, actual, "Date picker did not open to todays month and year");
- 		}
+ 		            }]
  	},
 
  	/**
@@ -41,17 +41,17 @@
             attributes : {value : "2013-09-25"},
             test : [function(cmp) {
                          this.openDatePicker(cmp);
-  		   }, function(cmp) {
+  		            }, function(cmp) {
                          var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
                          var pastWeek   = datePicker.find("grid").find("17");
                          pastWeek.getEvent("click").fire({});
   			
                          $A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker, "visible")});
-  			  
+  		            }, function(cmp) {
                          var expected = "2013-09-18";
                          var actual = cmp.find("datePickerTestCmp").find("inputText").getElement().value;
                          $A.test.assertEquals(expected, actual.toString(), "Clicking on one week prior to todays date did not render the correct result.");
-		   }]	
+		           }]	
     },
 
     /**
@@ -168,7 +168,7 @@
     	attributes : {value: "2012-12-10"},
     	test : function(cmp) {
     	             var yearTitle = cmp.find("datePickerTestCmp").find('datePicker').find("yearTitle");
-    	             $A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), "year input select not fond");
+    	             $A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), "year input select not found");
     	}
     },
 
@@ -184,12 +184,12 @@
 		       var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
 		       var yearTitle = cmp.find("datePickerTestCmp").find('datePicker').find("yearTitle");
 	        
-                       this.iterateCal(1, 0, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
-                       var expected = "2013";
-                       var actualGirdValue = ""+datePicker.find("grid").get("v.year");        
-                       var actualSelectValue = ""+yearTitle.getElement().value;
-                       $A.test.assertEquals(expected, actualGirdValue, "Grid value incorrect"); 
-                       $A.test.assertEquals(expected, actualSelectValue, "Year select value incorrect");    
+               this.iterateCal(1, 0, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
+               var expected = "2013";
+               var actualGirdValue = ""+datePicker.find("grid").get("v.year");        
+               var actualSelectValue = ""+yearTitle.getElement().value;
+               $A.test.assertEquals(expected, actualGirdValue, "Grid value incorrect"); 
+               $A.test.assertEquals(expected, actualSelectValue, "Year select value incorrect");    
     	}]
     },
     /**
@@ -197,13 +197,11 @@
      */
     testDocumentLevelHandler:{
         browsers: ["-IPHONE","-IPAD"],
-        test : function(component){
-                    var input_date = component.find("datePickerTestCmp");
-                    var date_picker = input_date.find("datePicker");
+        test : [function(component){
+                    input_date = component.find("datePickerTestCmp");
+                     date_picker = input_date.find("datePicker");
                     date_picker.set("v.visible", true);
-                  
-                    //this rerender is necessary: we need dataPickerRenderer to updateGlobalEventListeners
-                    $A.rerender(component);
+        }, function(cmp){  
                   
                     //date picker should disappear when click anywhere outside of it, like on the outputText
                     var output_text = document.getElementById("dlh_outputText");
@@ -212,7 +210,7 @@
                     $A.test.fireDomEvent(output_text, "mousedown");
                     $A.test.fireDomEvent(output_text, "mouseup");
                     $A.test.assertFalse(date_picker.get("v.visible"));
-        }
+        }]
     },
     
  	/**

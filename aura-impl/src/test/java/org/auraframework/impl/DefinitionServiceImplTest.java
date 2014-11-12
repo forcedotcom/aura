@@ -240,7 +240,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testUpdateLoadedWithNonExistentDescriptor() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> testDesc = getAuraTestingUtil().createStringSourceDescriptor("garbage",
-                ComponentDef.class);
+                ComponentDef.class, null);
         try {
             Aura.getDefinitionService().updateLoaded(testDesc);
             fail("Expected DefinitionNotFoundException");
@@ -665,7 +665,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         // Find CSS
         DefDescriptor<ApplicationDef> appWithCss = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ApplicationDef.class);
+                ApplicationDef.class, null);
         DefDescriptor<StyleDef> CSSdesc = Aura.getDefinitionService().getDefDescriptor(appWithCss,
                 DefDescriptor.CSS_PREFIX, StyleDef.class);
         addSourceAutoCleanup(appWithCss, baseContents);

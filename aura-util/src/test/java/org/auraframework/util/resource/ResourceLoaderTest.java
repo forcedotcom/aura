@@ -114,6 +114,7 @@ public class ResourceLoaderTest extends UnitTestCase {
         writer.close();
     }
 
+    @SuppressWarnings("resource")
     private String readStreamAsString(InputStream is) {
         Scanner scanner = new Scanner(is);
         String ret = scanner.useDelimiter("\\A").next();

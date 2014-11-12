@@ -15,10 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="GA" description="Represents a message of varying severity levels">
-    <aura:attribute name="title" type="String" description="The title text for the message."/>
-    <aura:attribute name="severity" type="String" default="message" description="The severity of the message. Possible values:  message (default), confirm, info, warning, error"/>
-    <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the alert when clicked. Default value is 'false'."/>
+<aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" description="Represents a message of varying severity levels">
+    <aura:attribute access="GLOBAL" name="title" type="String" description="The title text for the message."/>
+    <aura:attribute access="GLOBAL" name="severity" type="String" default="message" description="The severity of the message. Possible values:  message (default), confirm, info, warning, error"/>
+    <aura:attribute access="GLOBAL" name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the alert when clicked. Default value is 'false'."/>
     <div class="{!v.severity +' '+ v.class}" role="alert">
         <ui:block>
             <aura:set attribute="right">

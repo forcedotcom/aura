@@ -23,6 +23,7 @@
     newEntry : function(component, event, helper) {
         component.set("v.display", true);
         var name = component.find("name").get("v.value");
+        var code = component.find("num").get("v.value");
         var amount = component.find("amount").get("v.value");
         var email = component.find("email").get("v.value");
         
@@ -30,11 +31,15 @@
         var expdate = component.find("expdate").get("v.value");
         var deadline = component.find("deadline").get("v.value");
         var reimbursed = component.find("reimbursed").get("v.value");
+        var comments = component.find("comments").get("v.value");
+        var url = component.find("url").get("v.value");
     
         var oName = component.find("oName");
         oName.set("v.value", name); 
         var oNumber = component.find("oNumber");
-        oNumber.set("v.value", amount);
+        oNumber.set("v.value", code);
+        var oCurrency = component.find("oCurrency");
+        oCurrency.set("v.value", amount);
         var oEmail = component.find("oEmail");
         oEmail.set("v.value", email);
         var oPhone = component.find("oPhone");
@@ -46,6 +51,12 @@
         oDateTime.set("v.value", deadline);
         var oCheckbox = component.find("oCheckbox");
         oCheckbox.set("v.value", reimbursed);
+        var oTextarea = component.find("oTextarea");
+        oTextarea.set("v.value", comments);
+        var oURL = component.find("oURL");
+        oURL.set("v.value", url);
+        oURL.set("v.label", url);
+        console.log(url);
         
     }
 })

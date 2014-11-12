@@ -14,9 +14,9 @@
 	        	<ui:outputText value="This is the inner area"/>
 	        	<fieldset>
 			    	<legend>Gender Select:</legend>
-		            <ui:inputRadio name="gender" value="male" label="Male"/>
+		            <ui:inputRadio aura:id="maleRadio" name="gender" value="male" label="Male"/>
 		            <br/>
-		            <ui:inputRadio name="gender" value="female" label="Female"/>
+		            <ui:inputRadio aura:id="femaleRadio" name="gender" value="female" label="Female"/>
 		        </fieldset>
 	        </div>
 		

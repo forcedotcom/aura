@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace The Aura Expression Service, accessible using
- *            $A.expressionService. Processes Expressions.
+ * @description The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
  * @constructor
  */
 var AuraExpressionService = function AuraExpressionService() {
@@ -58,8 +57,25 @@ var AuraExpressionService = function AuraExpressionService() {
             if(!$A.util.isArray(path)) {
                 path = path.split('.');
             }
+            var segment;
             while (!$A.util.isUndefinedOrNull(target) && path.length) {
-				target = target[path.shift()];
+            	segment = path.shift();
+            	//#if {"modes" : ["TESTINGDEBUG", "AUTOTESTINGDEBUG", "DEVELOPMENT"]}
+            	if(!target["hasOwnProperty"](segment)) {
+            		var searchkey = segment.toLowerCase();
+            		for(var key in target){
+            			if(target.hasOwnProperty(key) && key.toLowerCase() == searchkey) {
+            				// You can't include container and target in the error, as it will json serialize it and causes a max iteration exception.
+    						console.error("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'", [container, target]);
+    						$A.error("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'. Possible you meant '" + key + "'");
+            				return;
+            			}
+            		}					
+				}
+            	//#end
+				
+				target = target[segment];
+			  
 				if ($A.util.isExpression(target)) {
 					target = target.evaluate();
 				}

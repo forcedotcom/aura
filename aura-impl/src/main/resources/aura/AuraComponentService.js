@@ -16,7 +16,7 @@
 /*jslint sub: true */
 
 /**
- * @namespace The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
+ * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
  * @constructor
  */
 $A.ns.AuraComponentService = function(actions, finishedCallback) {
@@ -241,8 +241,8 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
         if (value && value.hasOwnProperty("value")) {
             value = value["value"];
         }
-        // no def or component here, because we don't have one.
-        var auraValue = valueFactory.create(value);
+        // if we have an avp, use it here
+        var auraValue = valueFactory.create(value, null, avp);
         atts[key] = this.computeValue(auraValue, avp);
     }
 

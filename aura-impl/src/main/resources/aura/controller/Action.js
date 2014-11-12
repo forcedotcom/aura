@@ -83,8 +83,8 @@ Action.prototype.auraType = "Action";
 /**
  * Gets the Action Id.
  *
- * @private
  * @returns {string}
+ * @private
  */
 Action.prototype.getId = function() {
     return this.id;
@@ -92,9 +92,9 @@ Action.prototype.getId = function() {
 
 /**
  * Gets the next action scoped Id.
- *
- * @private
+ * 
  * @returns {string}
+ * @private
  */
 Action.prototype.getNextGlobalId = function() {
     if (!this.nextGlobalId) {
@@ -121,8 +121,8 @@ Action.prototype.reactivatePath = function() {
  * to the one supplied. A warning is emitted if the path mismatches but only
  * if it is not the top level.
  *
- * @private
  * @param {string} path the path to force
+ * @private
  */
 Action.prototype.forceCreationPath = function(path) {
     var absPath = "(empty)";
@@ -160,8 +160,8 @@ Action.prototype.forceCreationPath = function(path) {
  * The path must match the call to forceCreationPath, and the path must have
  * been forced.
  *
- * @private
  * @param {string} path the path to release.
+ * @private
  */
 Action.prototype.releaseCreationPath = function(path) {
     var last;
@@ -181,8 +181,8 @@ Action.prototype.releaseCreationPath = function(path) {
 /**
  * push a new part on the creation path.
  *
- * @private
  * @param {string} pathPart the new path part to insert.
+ * @private
  */
 Action.prototype.pushCreationPath = function(pathPart) {
     this.canCreate = true;
@@ -201,8 +201,8 @@ Action.prototype.pushCreationPath = function(pathPart) {
 /**
  * pop off the path part that was previously pushed.
  *
- * @private
  * @param {string} pathPart the path part previously pushed.
+ * @private
  */
 Action.prototype.popCreationPath = function(pathPart) {
     var addedPath;
@@ -225,8 +225,8 @@ Action.prototype.popCreationPath = function(pathPart) {
 /**
  * get the path for the top entry of the path stack.
  *
- * @private
  * @return {string} the top level path.
+ * @private
  */
 Action.prototype.topPath = function() {
     if (this.pathStack.length === 0) {
@@ -239,8 +239,8 @@ Action.prototype.topPath = function() {
 /**
  * set the path index.
  *
- * @private
  * @param {number} the index to set.
+ * @private
  */
 Action.prototype.setCreationPathIndex = function(idx) {
     this.canCreate = true;
@@ -264,8 +264,8 @@ Action.prototype.setCreationPathIndex = function(idx) {
 /**
  * Gets the current creatorPath from the top of the pathStack
  *
- * @private
  * @returns {String}
+ * @private
  */
 Action.prototype.getCurrentPath = function() {
     if (!this.canCreate) {
@@ -293,9 +293,9 @@ Action.prototype.getDef = function() {
  *
  * If this action is already completed, <code>completeAction()</code> is called.
  *
- * @private
  * @param {CallbackGroup} group
  *      the group to add
+ * @private
  */
 Action.prototype.addCallbackGroup = function(group) {
     if (this.state === "NEW") {
@@ -375,8 +375,8 @@ Action.prototype.getParams = function() {
 /**
  * Gets the component for this Action.
  *
- * @private
  * @returns {Component} the component, if any.
+ * @private
  */
 Action.prototype.getComponent = function() {
     return this.cmp;
@@ -391,7 +391,7 @@ Action.prototype.getComponent = function() {
  *            scope The scope in which the function is executed.
  * @param {function}
  *            callback The callback function to run for each controller.
- * @param {string*}
+ * @param {String}
  *            name The action state for which the callback is to be associated with.
  */
 Action.prototype.setCallback = function(scope, callback, name) {
@@ -471,11 +471,11 @@ Action.prototype.callAllAboardCallback = function () {
  * This can be used to add additional functionality to the already existing callbacks, allowing the user to effectively
  * 'append' a function to the current one.
  *
- * @private
  * @param {Object}
  *            scope the scope in which the new function should be called.
  * @param {Function}
  *            callback the callback to call after the current callback is executed.
+ * @private
  */
 Action.prototype.wrapCallback = function(scope, callback) {
     var nestedCallbacks = this.callbacks;
@@ -646,10 +646,10 @@ Action.prototype.runAfter = function(action) {
 /**
  * Update the fields from a response.
  *
- * @private
  * @param {Object}
  *            response The response from the server.
  * @return {Boolean} Returns true if the response differs from the original response
+ * @private
  */
 Action.prototype.updateFromResponse = function(response) {
     this.state = response["state"];
@@ -710,9 +710,9 @@ Action.prototype.updateFromResponse = function(response) {
  *
  * WARNING: Use after finishAction() since getStored() modifies <code>this.components</code>.
  *
- * @private
  * @param {string}
  *            storageName the name of the storage to use.
+ * @private
  */
 Action.prototype.getStored = function(storageName) {
     if (this.storable && this.responseState === "SUCCESS") {
@@ -739,8 +739,8 @@ Action.prototype.getStorageErrorHandler = function() {
 /**
  * Calls callbacks and fires events upon completion of the action.
  *
- * @private
  * @param {AuraContext} context the context for pushing and popping the current action.
+ * @private
  */
 Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
@@ -962,8 +962,8 @@ Action.prototype.setChained = function() {
 /**
  * Returns true if a given function is chained, or false otherwise. For server-side Actions only.
  *
- * @private
  * @returns {Boolean}
+ * @private
  */
 Action.prototype.isChained = function() {
     return this.chained || false;
@@ -1041,8 +1041,8 @@ Action.prototype.getRefreshAction = function(originalResponse) {
 /**
  * Gets the Action storage.
  *
- * @private
  * @returns {Storage}
+ * @private
  */
 Action.prototype.getStorage = function() {
     return Action.getStorage();
@@ -1080,13 +1080,14 @@ Action.prototype.parseAndFireEvent = function(evtObj) {
  *
  * @private
  */
-Action.prototype.fireRefreshEvent = function(event) {
+Action.prototype.fireRefreshEvent = function(event, responseUpdated) {
     // storageService.log("Action.refresh(): auto refresh: "+event+" for "+this.actionId);
     if (this.cmp && this.cmp.isValid()) {
         var isRefreshObserver = this.cmp.isInstanceOf("auraStorage:refreshObserver");
         if (isRefreshObserver) {
             this.cmp.getEvent(event).setParams({
-                    "action" : this
+                    "action" : this,
+                    "responseUpdated": responseUpdated
             }).fire();
         }
     }

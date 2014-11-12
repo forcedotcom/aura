@@ -15,7 +15,7 @@
  */
 /*jslint sub : true */
 /**
- * @namespace Creates a ProviderDef instance with the provide method. An error is displayed if the provider method is not found.
+ * @description Creates a ProviderDef instance with the provide method. An error is displayed if the provider method is not found.
  * @constructor
  * @protected
  */

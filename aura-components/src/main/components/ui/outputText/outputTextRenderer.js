@@ -34,7 +34,6 @@
 
             helper.appendTextElements(value, span);
         }
-        
         this.superRerender();
     }
 })

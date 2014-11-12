@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new AttributeDef instance, including the descriptor.
+ * @description Creates a new AttributeDef instance, including the descriptor.
  * @constructor
  * @param {Object} config
  */
@@ -63,8 +63,9 @@ AttributeDef.prototype.isRequired = function(){
 
 /**
  * Gets the type definition. Returns a TypeDef object.
- * @private
+ * 
  * @returns {TypeDef}
+ * @private
  */
 AttributeDef.prototype.getTypeDef = function(){
     return this.typeDef;
@@ -80,8 +81,9 @@ AttributeDef.prototype.getDefault = function(){
 
 /**
  * Gets the type of the definition descriptor.
- * @private
+ * 
  * @returns {String}
+ * @private
  */
 AttributeDef.prototype.getTypeDefDescriptor = function(){
     return this.typeDefDescriptor;

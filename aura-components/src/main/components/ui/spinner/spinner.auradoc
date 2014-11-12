@@ -25,9 +25,31 @@
 	        <code>cmp.get("e.toggle")</code> is used to retrieve the toggle event, while <code>isVisible</code> is a parameter on the <code>toggle</code> event. 
 	        Finally, call <code>evt.fire();</code> to fire the event. 
 	    </p>
+	    <p>This example shows a spinner when a component is expecting a server response and removes the spinner when the component is no longer waiting for a response.</p>
+<pre>&lt;aura:component>
+    &lt;aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    &lt;aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+   
+   &lt;center>&lt;ui:spinner aura:id="spinner"/>&lt;/center>
+&lt;/aura:component></pre>
+	<p>This client-side controllers shows and hides the spinner accordingly.</p>
+<pre>({
+     showSpinner : function (component, event, helper) {
+        var spinner = component.find('spinner');
+        var evt = spinner.get("e.toggle");
+        evt.setParams({ isVisible : true });
+        evt.fire();    
+    },
+    
+    hideSpinner : function (component, event, helper) {
+       var spinner = component.find('spinner');
+       var evt = spinner.get("e.toggle");
+       evt.setParams({ isVisible : false });
+       evt.fire();    
+    }</pre>	    
 	</aura:description>	
-		<aura:example name="spinner" ref="auradocs:demoSpinner" label="Using ui:message">
-    	<p>This example shows messages in varying severity levels.</p>
+		<aura:example name="spinner" ref="auradocs:demoSpinner" label="Using ui:spinner">
+    	<p>This example shows a spinner that can be toggled.</p>
 	   </aura:example>
 	   
 	

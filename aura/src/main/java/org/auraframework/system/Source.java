@@ -15,10 +15,7 @@
  */
 package org.auraframework.system;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -26,6 +23,7 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
@@ -245,5 +243,23 @@ public abstract class Source<D extends Definition> implements Serializable {
      */
     public void clearContents() {
         // Do nothing.
+    }
+    
+    /**
+     * This adds support for default namespaces, so def handlers can properly deal
+     * with child tags when looking at the source
+     * @return true - if this source type supports default namespace, false - otherwise
+     */
+    public final boolean isDefaultNamespaceSupported() {
+        return StringUtils.isNotEmpty(getDefaultNamespace());
+    }
+    
+    /**
+     * Default namespace. Any source type that supports default namespace
+     * should return a non-empty value
+     * @return default namespace string
+     */
+    public String getDefaultNamespace() {
+        return null;
     }
 }

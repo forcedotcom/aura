@@ -54,7 +54,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
-        setBasicHeaders(response);
+        setBasicHeaders(null, request,  response);
         InputStream in = null;
         try {
 
@@ -170,7 +170,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 return;
             }
             response.reset();
-            setBasicHeaders(response);
+            setBasicHeaders(null, request, response);
             
             // handle any MIME content type, using only file name (not contents)
             String mimeType = mimeTypesMap.getContentType(path);

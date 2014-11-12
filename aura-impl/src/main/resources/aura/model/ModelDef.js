@@ -15,18 +15,17 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new ModelDef instance.
+ * @description Creates a new ModelDef instance.
  * @constructor
  */
 function ModelDef(config){
     this.descriptor = new DefDescriptor(config["descriptor"]);
-    var members = [];
-    this.members = members;
+    this.members = [];
 
     // TODO: members should be valuedefs with typedefs
     for (var i = 0; i < config["members"].length; i++) {
         var m = config["members"][i];
-        members.push(new ValueDef(m));
+        this.members.push(new ValueDef(m));
     }
 }
 

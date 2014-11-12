@@ -39,7 +39,4 @@
 	<aura:example name="menu" ref="auradocs:demoMenu" label="Using ui:menu">
     	<p>This example shows several ways to create a menu.</p>
 	</aura:example>
-	<aura:example name="menumeta" ref="auradocs:demoMenuMeta" label="Using ui:menu with a Model">
-	    <p>This example shows how you retrieve menu items from a model. The dropdown menu and its menu items are hidden by default.</p>
-	</aura:example>
 </aura:documentation>

@@ -51,7 +51,7 @@ public class PopupUITest extends WebDriverTestCase {
     public void testPopupWithExtendedTarget() throws Exception {
         String triggerText = "Trigger" + randString(4);
         String popupText = "Target" + randString(4);
-        String triggerLocator = "div[class='triggerExtendedTrigger']>a";
+        String triggerLocator = "a[class='triggerExtendedTrigger']";
         int popupWidth = 150;
         int popupHeight = 200;
         WebDriver driver = this.getDriver();
@@ -87,7 +87,7 @@ public class PopupUITest extends WebDriverTestCase {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);
         String popupText = "Target" + randString(4);
-        String triggerLocator = "div[class='triggerLabel']>a";
+        String triggerLocator = "a[class='triggerLabel']";
         
         String cmpMarkup = "<aura:application>"
                 + "<ui:popup>"
@@ -245,7 +245,7 @@ public class PopupUITest extends WebDriverTestCase {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);
         String popupText = "Target" + randString(4);
-        String triggerLocator = "div[class='triggerExtendedTarget']>a";
+        String triggerLocator = "a[class='triggerExtendedTarget']";
         int popupWidth = 100;
         int popupHeight = 220;
         int xCoord = 5;
@@ -290,7 +290,7 @@ public class PopupUITest extends WebDriverTestCase {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);
         String popupText = "Target" + randString(4);
-        String triggerLocator = "div[class='triggerExtendedTrigger']>a";
+        String triggerLocator = "a[class='triggerExtendedTrigger']";
         String popupLocator = ".popupCurtain";
         int popupWidth = 100;
         int popupHeight = 220;
@@ -356,7 +356,7 @@ public class PopupUITest extends WebDriverTestCase {
     	WebDriver driver = this.getDriver();
     	String triggerText = "Trigger" + randString(4);
         String popupText = "Target" + randString(4);
-        String triggerLocator = "div[class='triggerExtendedTrigger']>a";
+        String triggerLocator = "a[class='triggerExtendedTrigger']";
         int popupWidth = 150;
         int popupHeight = 200;
         

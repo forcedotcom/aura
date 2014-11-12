@@ -21,6 +21,7 @@
 .THIS label.uiLabel {
     width: 150px;
     float: left;
+    padding-top: 2px;
 }
 
 .THIS .field{
@@ -41,6 +42,12 @@
 
 .THIS .uiButton .label {
 	display: inline;    
+}
+
+.THIS textarea {
+	border: 1px solid #dce4ec;
+    border-radius: 4px;
+    width: 200px;
 }
 
 .THIS.section  {

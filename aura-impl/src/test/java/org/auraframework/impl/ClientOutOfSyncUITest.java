@@ -23,8 +23,10 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
@@ -62,7 +64,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         baseComponentTag,
                         "controller='java://org.auraframework.impl.java.controller.JavaTestController' "
                                 + attrs,
-                                "<button onclick='{!c.post}'>post</button>" + body));
+                        "<button onclick='{!c.post}'>post</button>" + body));
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ControllerDef.class);
@@ -167,7 +169,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public void testGetClientRenderingAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
         DefDescriptor<?> providerDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc,
                 DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag,
@@ -338,20 +340,20 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
             triggerServerAction();
             auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className),
                     new Function<WebElement, Boolean>() {
-                @Override
-                public Boolean apply(WebElement element) {
-                    return "normal".equals(element.getCssValue("font-style"));
-                }
-            });
+                        @Override
+                        public Boolean apply(WebElement element) {
+                            return "normal".equals(element.getCssValue("font-style"));
+                        }
+                    });
             updateStringSource(styleDesc, String.format(".%s {font-style:italic;}", className));
             triggerServerAction();
             auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className),
                     new Function<WebElement, Boolean>() {
-                @Override
-                public Boolean apply(WebElement element) {
-                    return "italic".equals(element.getCssValue("font-style"));
-                }
-            });
+                        @Override
+                        public Boolean apply(WebElement element) {
+                            return "italic".equals(element.getCssValue("font-style"));
+                        }
+                    });
         }
     }
 
@@ -425,7 +427,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public void testPostAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
-                .createStringSourceDescriptor(null, ComponentDef.class);
+                .createStringSourceDescriptor(null, ComponentDef.class, null);
         DefDescriptor<?> providerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
                         ProviderDef.class);
@@ -549,6 +551,124 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 return "final".equals(auraUITestingUtil.getEval(String
                         .format("return window.$A && $A.componentService.getDef('%s').getAttributeDefs().getDef('val').getDefault();",
                                 depDesc.getDescriptorName())));
+            }
+        });
+    }
+
+    public void testGetClientRenderingAfterIncludeChange() throws Exception {
+        DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
+        DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
+        DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
+                libraryDesc);
+        addSourceAutoCleanup(includeDesc, "function(){return 'initialized'}");
+        addSourceAutoCleanup(libraryDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag,
+                        String.format("render='client' helper='%s'", helperDesc.getQualifiedName()),
+                        String.format("<aura:import library='%s' property='mylib'/>", libraryDesc.getDescriptorName())));
+
+        open(cmpDesc);
+        assertEquals("initialized", auraUITestingUtil.getEval(String.format(
+                "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
+
+        updateStringSource(includeDesc, "function(){return 'updated'}");
+
+        open(cmpDesc);
+        assertEquals("updated", auraUITestingUtil.getEval(String.format(
+                "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
+    }
+
+    public void testGetClientRenderingAfterLibraryChange() throws Exception {
+        DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
+        DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
+        DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
+                libraryDesc);
+        addSourceAutoCleanup(includeDesc, "function(){return 'firstpick'}");
+        DefDescriptor<?> includeOtherDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
+                libraryDesc);
+        addSourceAutoCleanup(includeOtherDesc, "function(){return 'secondpick'}");
+        addSourceAutoCleanup(libraryDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag,
+                        String.format("render='client' helper='%s'", helperDesc.getQualifiedName()),
+                        String.format("<aura:import library='%s' property='mylib'/>", libraryDesc.getDescriptorName())));
+
+        open(cmpDesc);
+        assertEquals("firstpick", auraUITestingUtil.getEval(String.format(
+                "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
+
+        updateStringSource(libraryDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeOtherDesc.getName()));
+
+        open(cmpDesc);
+        assertEquals("secondpick", auraUITestingUtil.getEval(String.format(
+                "return $A.getRoot().getDef().getHelper().mylib.%s;", includeOtherDesc.getName())));
+    }
+
+    public void testPostAfterIncludeChange() throws Exception {
+        DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
+        DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
+        final DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
+                libraryDesc);
+        addSourceAutoCleanup(includeDesc, "function(){return 'initialized'}");
+        addSourceAutoCleanup(libraryDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
+        DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
+                String.format("render='client' helper='%s'", helperDesc.getQualifiedName()),
+                String.format("<aura:import library='%s' property='mylib'/>", libraryDesc.getDescriptorName()));
+
+        open(cmpDesc);
+        assertEquals("initialized", auraUITestingUtil.getEval(String.format(
+                "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
+
+        updateStringSource(includeDesc, "function(){return 'updated'}");
+
+        triggerServerAction();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver input) {
+                auraUITestingUtil.waitForDocumentReady();
+                auraUITestingUtil.waitForAuraFrameworkReady(null);
+                return "updated".equals(auraUITestingUtil.getEval(String.format(
+                        "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
+            }
+        });
+    }
+
+    public void testPostAfterLibraryChange() throws Exception {
+        DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
+        DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
+        DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
+                libraryDesc);
+        addSourceAutoCleanup(includeDesc, "function(){return 'firstpick'}");
+        final DefDescriptor<?> includeOtherDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                IncludeDef.class, libraryDesc);
+        addSourceAutoCleanup(includeOtherDesc, "function(){return 'secondpick'}");
+        addSourceAutoCleanup(libraryDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
+        DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
+                String.format("render='client' helper='%s'", helperDesc.getQualifiedName()),
+                String.format("<aura:import library='%s' property='mylib'/>", libraryDesc.getDescriptorName()));
+
+        open(cmpDesc);
+        assertEquals("firstpick", auraUITestingUtil.getEval(String.format(
+                "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
+
+        updateStringSource(libraryDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeOtherDesc.getName()));
+
+        triggerServerAction();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver input) {
+                auraUITestingUtil.waitForDocumentReady();
+                auraUITestingUtil.waitForAuraFrameworkReady(null);
+                return "secondpick".equals(auraUITestingUtil.getEval(String.format(
+                        "return $A.getRoot().getDef().getHelper().mylib.%s;", includeOtherDesc.getName())));
             }
         });
     }

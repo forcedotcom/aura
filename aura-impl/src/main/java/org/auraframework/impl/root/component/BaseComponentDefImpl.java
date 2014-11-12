@@ -163,7 +163,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors,
-                cmpThemeDescriptor);
+                cmpThemeDescriptor, imports);
     }
 
     /**
@@ -523,6 +523,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(cmpThemeDescriptor);
         }
 
+        if (designDefDescriptor != null) {
+            dependencies.add(designDefDescriptor);
+        }
+
         if (imports != null) {
             for (ImportDef imported : imports) {
                 dependencies.add(imported.getDescriptor());
@@ -663,6 +667,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
+    @Override
+    public ControllerDef getDeclaredControllerDef() throws QuickFixException {
+        return !this.controllerDescriptors.isEmpty() && compoundControllerDescriptor != null ? compoundControllerDescriptor.getDef() : null;
+    }
+    
     @Override
     public StyleDef getStyleDef() throws QuickFixException {
         return styleDescriptor == null ? null : styleDescriptor.getDef();

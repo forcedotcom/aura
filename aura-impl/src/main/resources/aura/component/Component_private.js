@@ -97,7 +97,7 @@ var ComponentPriv = (function() { // Scoping priv
         var configAttributes = {"values":{}};
         if (config["attributes"]) {
             $A.util.apply(configAttributes["values"], config["attributes"]["values"],true);
-            configAttributes["valueProvider"]= config["attributes"]["valueProvider"];
+            configAttributes["valueProvider"] = config["attributes"]["valueProvider"] || config["valueProvider"];
         }
         if (partialConfig && partialConfig["attributes"]) {
             $A.util.apply(configAttributes["values"],partialConfig["attributes"]["values"],true);
@@ -471,7 +471,7 @@ if(!this.concreteComponentId) {
                     cdr["componentDef"] = value[i]["componentDef"];
                     cdr["localId"] = value[i]["localId"];
                     cdr["attributes"] = value[i]["attributes"];
-                    cdr["valueProvider"] = config["valueProvider"];
+                    cdr["valueProvider"] = value[i]["valueProvider"] || config["valueProvider"];
 //JBUCH: HALO: TODO: SOMETHING LIKE THIS TO FIX DEFERRED COMPDEFREFS?
 //                    for(var x in cdr["attributes"]["values"]){
 //                        cdr["attributes"]["values"][x] = valueFactory.create(cdr["attributes"]["values"][x], null, config["valueProvider"]);
@@ -485,7 +485,7 @@ if(!this.concreteComponentId) {
                     attributes[attribute] = cdrs;
                 }
             } else {
-                attributes[attribute] = valueFactory.create(value, attributeDef, config["valueProvider"]);
+                attributes[attribute] = valueFactory.create(value, attributeDef, config["valueProvider"] || cmp);
                 if($A.util.isExpression(attributes[attribute])){
                     attributes[attribute].addChangeHandler(cmp,"v."+attribute);
                 }

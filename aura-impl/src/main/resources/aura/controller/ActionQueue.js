@@ -23,8 +23,8 @@
  * This object is not intended to be public.
  * 
  * @name ActionQueue
- * @private
  * @constructor
+ * @private
  */
 
 var ActionQueue = function ActionQueue() {
@@ -177,10 +177,10 @@ ActionQueue.prototype.getLastAbortableTransactionId = function() {
  * This internal function clears out previous abortable actions with the same key, marking them as aborted,
  * and returns the remaining actions.
  * 
- * @private
  * @param {Array} queue The incoming array of actions
  * @param {String} key Abortable key
  * @return {Array} A copy of the array with all abortable actions removed.
+ * @private
  */
 ActionQueue.prototype.clearPreviousAbortableActions = function(queue, key) {
     var newQueue = [];
@@ -201,9 +201,9 @@ ActionQueue.prototype.clearPreviousAbortableActions = function(queue, key) {
 /**
  * Extract action(s) matching the given filter leave the rest in this.actions and return the match(es).
  * 
- * @private
  * @param {Function}
  *            filter A filter function that should return true if the action should be removed and returned.
+ * @private
  */
 ActionQueue.prototype.filterActions = function(filter) {
 	var actionsCopy = this.actions;

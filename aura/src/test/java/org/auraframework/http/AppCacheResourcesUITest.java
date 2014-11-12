@@ -126,9 +126,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening cached app will only query server for the manifest and the component load.
-     * TODO: put BrowserType.SAFARI back for W-2367702, verify it's failing with same reason as locally
+     * BrowserType.SAFARI is disabled : W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -144,9 +144,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening cached app that had a prior cache error will reload the app.
-     * TODO: put BrowserType.SAFARI back for W-2367702, verify it's failing with same reason as locally
+     * BrowserType.SAFARI is disabled : W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.IPAD, BrowserType.IPHONE})
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -180,9 +180,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Opening uncached app that had a prior cache error will have limited caching.
-     * TODO: put BrowserType.SAFARI back for W-2367702, verify it's failing with same reason as locally
+     * BrowserType.SAFARI is disabled : W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
 
@@ -211,8 +211,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Manifest request limit exceeded for the time period should result in reset.
+     * BrowserType.SAFARI is disabled : W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testManifestRequestLimitExceeded() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -445,7 +446,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         String url = getUrl();
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
-        url = addUrlParams(url, params);
+        url = getAuraTestingUtil().addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
         
         auraUITestingUtil.waitUntilWithCallback(

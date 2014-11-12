@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 ({
-	doInit: function(component, event, helper) {
-		helper.doInit(component);
-	},
-	
-    visibleChange: function(component, event, helper) {
-        var concrete = component.getConcreteComponent();
-        var _helper = concrete.getDef().getHelper();
-        _helper.visibleChange(concrete);
-    },
     onMenuItemSelected: function(component, event, helper) {
     	helper.onMenuItemSelected(component, event);
     },
+
     update: function(component, event, helper) {
-    	helper.doInit(component);
+        helper.setEventHandlersOnChildren(component);
     }
 })

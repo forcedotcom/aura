@@ -1,0 +1,8 @@
+.THIS.container .viewport, .THIS.container .footer {
+	position: relative;
+	z-index: 1;
+}
+
+.THIS .myWidth {
+	width: 80%;
+}

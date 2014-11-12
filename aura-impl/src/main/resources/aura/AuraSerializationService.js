@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace The Aura Serialization Service.  Serializes and Deserializes Aura Entities appropriately.
+ * @description The Aura Serialization Service.  Serializes and Deserializes Aura Entities appropriately.
  * @constructor
  */
 var AuraSerializationService = function(){

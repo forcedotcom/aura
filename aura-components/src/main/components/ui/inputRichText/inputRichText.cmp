@@ -15,13 +15,15 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputTextArea"  extensible="true" support="GA" description="An input field for entering rich text.">
+<aura:component access="GLOBAL" support="GA" extends="ui:inputTextArea" extensible="true" description="An input field for entering rich text.">
+
     <aura:clientLibrary name="CkEditor" type="JS" />
+
 	<aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Possible values: standard, full, email. Default value is &quot;basic&quot;. Custom config can be added in inputRichTextHelper."/>
 	<aura:attribute name="toolbarLocation" type="String" default="top" description="Location of the toolbar. Possible options are &quot;top&quot; and &quot;bottom&quot;." /> 
 	 
-	<aura:attribute name="width" type="String"  description="The editor UI outer width. This can be an integer, for pixel sizes, or any CSS-defined unit. If isRichText is set to false, use the cols attribute instead." />
-	<aura:attribute name="height" type="String" default="200" description="The height of the editing area (that includes the editor content). This can be an integer, for pixel sizes, or any CSS-defined length unit. If isRichText is set to false, use the rows attribute instead." />
+	<aura:attribute access="GLOBAL" name="width" type="String"  description="The editor UI outer width. This can be an integer, for pixel sizes, or any CSS-defined unit. If isRichText is set to false, use the cols attribute instead." />
+	<aura:attribute access="GLOBAL" name="height" type="String" default="200" description="The height of the editing area (that includes the editor content). This can be an integer, for pixel sizes, or any CSS-defined length unit." />
 	
 	<aura:attribute name="isRichText" type="Boolean" default="true" description="Indicates if the input is in rich text or plain text. If set to false, a text area replaces the rich text editor." />	
 	

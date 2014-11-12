@@ -22,6 +22,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.IncludeDef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
@@ -75,7 +77,7 @@ public class FileSourceListener implements FileListener{
     }
 
     public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent,
-                                String filePath) {
+            String filePath) {
         Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent, filePath);
     }
 
@@ -89,16 +91,16 @@ public class FileSourceListener implements FileListener{
     }
 
     private DefDescriptor<?> getDefDescriptor(String filePath) {
-        DefDescriptor<?> defDescriptor = null;
         filePath = filePath.replaceAll("\\\\", "/");
+        String paths[] = filePath.split("/");
+        String namespace = paths[paths.length - 3];
+        String name = paths[paths.length - 2];
+        String extension = filePath.substring(filePath.lastIndexOf("."));
+
         for (Map.Entry<DefDescriptor.DefType, String> entry : extensions.entrySet()) {
             String ext = entry.getValue();
             if (filePath.endsWith(ext)) {
                 DefDescriptor.DefType defType = entry.getKey();
-                String paths[] = filePath.split("/");
-                String namespace = paths[paths.length - 3];
-                String name = paths[paths.length - 2];
-                String extension = filePath.substring(filePath.lastIndexOf("."));
 
                 String qname;
                 if (extension.equalsIgnoreCase(".css")) {
@@ -109,10 +111,18 @@ public class FileSourceListener implements FileListener{
                     qname = String.format("markup://%s:%s", namespace, name);
                 }
 
-                defDescriptor = DefDescriptorImpl.getInstance(qname, defType.getPrimaryInterface());
-                break;
+                return DefDescriptorImpl.getInstance(qname, defType.getPrimaryInterface());
             }
         }
-        return defDescriptor;
+        // if no match for a js file so far, treat it as an IncludeDef
+        if (extension.equalsIgnoreCase(".js")) {
+            DefDescriptor<LibraryDef> library = DefDescriptorImpl.getInstance(
+                    String.format("markup://%s:%s", namespace, name), LibraryDef.class);
+            String fileName = paths[paths.length - 1];
+            String resourceName = fileName.substring(0, fileName.length() - extension.length());
+            return DefDescriptorImpl.getInstance(String.format("js://%s.%s", namespace, resourceName),
+                    IncludeDef.class, library);
+        }
+        return null;
     }
 }

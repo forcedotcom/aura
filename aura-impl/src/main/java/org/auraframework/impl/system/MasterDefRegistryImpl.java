@@ -141,7 +141,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         this.depsCache = acs.getDepsCache();
         this.stringsCache = acs.getStringsCache();
         this.descriptorFilterCache = acs.getDescriptorFilterCache();
-        this.accessCheckCache = acs.<String, String>getCacheBuilder()
+        this.accessCheckCache = acs.<String, String> getCacheBuilder()
                 .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
                 .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
                 .setRecordStats(true)
@@ -261,6 +261,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case RESOURCE:
             case PROVIDER:
             case THEME_PROVIDER:
+            case INCLUDE:
             case THEME_MAP_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
@@ -281,12 +282,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case VAR:
             case DESIGN:
             case ATTRIBUTE_DESIGN:
+            case DESIGN_TEMPLATE:
+            case DESIGN_TEMPLATE_REGION:
                 qualifiedNamePattern = "%s://%s:%s";
                 break;
             case ACTION:
             case DESCRIPTION:
             case EXAMPLE:
-            case INCLUDE:
+            case INCLUDE_REF:
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
                         .name()));
@@ -661,7 +664,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 try {
                     if (cd.built && !cd.validated) {
                         if (iteration != 0) {
-                            logger.warn("Nested add of " + cd.descriptor + " during validation of " + currentCC.topLevel);
+                            logger.warn("Nested add of " + cd.descriptor + " during validation of "
+                                    + currentCC.topLevel);
                             // throw new
                             // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                         }
@@ -1254,7 +1258,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                                     defType, target);
                 } else if (!referencingNamespace.equals(namespace)) {
                     // The caller and the def are not in the same namespace
-                    status = String.format("Access to %s '%s' from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()", defType.toString().toLowerCase(), target, referencingNamespace, referencingDescriptor, referencingDescriptor.getDefType());
+                    status = String
+                            .format("Access to %s '%s' from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()",
+                                    defType.toString().toLowerCase(), target, referencingNamespace,
+                                    referencingDescriptor, referencingDescriptor.getDefType());
                 }
             }
 

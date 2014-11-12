@@ -100,8 +100,4 @@ public class JSTestModel {
         return url;
     }
 
-    @AuraEnabled
-    public Boolean getIsHybrid() {
-        return url.contains("/hybridContainerTest/");
-    }
 }

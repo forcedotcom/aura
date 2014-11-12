@@ -44,7 +44,9 @@ public abstract class XMLHandler<T extends Definition> {
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
             EventHandlerDefHandler.TAG, ImportDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG,
             LayoutItemDefHandler.TAG, RegisterEventHandler.TAG, AttributeDefRefHandler.TAG, DependencyDefHandler.TAG,
-            NamespaceDefHandler.TAG, ThemeDefHandler.TAG);
+            NamespaceDefHandler.TAG, ThemeDefHandler.TAG, DesignDefHandler.TAG, AttributeDesignDefHandler.TAG,
+            DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG, LibraryDefHandler.TAG,
+            IncludeDefRefHandler.TAG);
 
     protected final XMLStreamReader xmlReader;
     protected final XMLStreamWriter xmlWriter;
@@ -74,7 +76,7 @@ public abstract class XMLHandler<T extends Definition> {
     /**
      * Handles the XML for this object and returns a new definition. Expects that the reader has already been moved to a
      * START_ELEMENT, and when this method returns it will leave the reader at the appropriate END_ELEMENT
-     *
+     * 
      * @throws XMLStreamException If the stream is not queued up properly
      * @throws QuickFixException
      */
@@ -106,7 +108,7 @@ public abstract class XMLHandler<T extends Definition> {
 
     /**
      * Gets system attribute by prepending system prefix.
-     *
+     * 
      * @param name attribute name
      * @return attribute value
      */
@@ -190,7 +192,7 @@ public abstract class XMLHandler<T extends Definition> {
 
     /**
      * Whether name is system "aura" prefixed
-     *
+     * 
      * @param name tag or attribute name
      * @return whether name is system "aura" prefixed
      */

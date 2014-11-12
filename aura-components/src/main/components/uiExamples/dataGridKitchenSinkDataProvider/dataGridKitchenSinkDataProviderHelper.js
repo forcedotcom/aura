@@ -48,13 +48,17 @@
 
     createTasks: function (cmp) {
         var items = [],
-        	maxItems = cmp.get('v.totalItems');
+        	maxItems = cmp.get('v.totalItems'),
+        	isEven, isTriple;
 
         for (var i = 1; i <= maxItems; i++) {
+        	isEven = i % 2 == 0;
+        	isTriple = i % 3 == 0;
+        	
             items.push({
                 id           : i,
                 subject      : 'Foo ' + i, 
-                activityDate : '2014-01-01',
+                activityDate : isTriple ? '2014-01-01' : null,
                 who          : {
                     name : 'John Doe With A Fairly Long Name ' + i,
                     id   : '00' + i
@@ -62,7 +66,8 @@
                 what: {
                     name : 'Acme' + i,
                     id   : '00' + i
-                }
+                },
+                url: isEven ? 'https://www.google.com' : 'https://www.salesforce.com'
             });
         }
         

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A Value wrapper for a function call.
+ * @description A Value wrapper for a function call.
  * @constructor
  * @protected
  */

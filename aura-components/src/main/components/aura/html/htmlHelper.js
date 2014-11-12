@@ -187,14 +187,26 @@
                 var casedName = this.caseAttribute(lowerName);
                 if (value === false) {
                     element.removeAttribute(casedName);
+                    
+                    // Support for IE's weird handling of checked (unchecking case):
+                    if (casedName === "checked") {
+                        element.removeAttribute("defaultChecked");
+                    }
                 } else {
                     element.setAttribute(casedName, name);
 
-                    // Support for IE's weird handling of checked
+                    // Support for IE's weird handling of checked (checking case):
                     if (casedName === "checked") {
                         element.setAttribute("defaultChecked", true);
                     }
                 }
+                
+                // We still need to make sure that the property is set on the HTMLElement, because it is used for
+                // change detection:
+                if($A.util.isUndefinedOrNull(value)){
+                    value='';
+                }
+                element[casedName] = value;
             } else {
                 // as long as we have a valid value at this point, set
                 // it as an attribute on the DOM node

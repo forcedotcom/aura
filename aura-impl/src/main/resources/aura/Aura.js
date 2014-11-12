@@ -30,7 +30,7 @@ function exp() {
 }
 
 /**
- * @namespace This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
+ * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
  *            attached to it. Note that this almost empty object $A is replaced later, after $A.ns (created below) is
  *            populated with the types that can be used to populate the "real" $A. TODO(fabbott): Make that "only gobal
  *            name" goal become true; today it ain't.
@@ -38,7 +38,7 @@ function exp() {
 window['$A'] = {};
 
 /**
- * @namespace The separate Aura "namespace" object contains Aura types, as opposed to instances and properties and such
+ * @description The separate Aura "namespace" object contains Aura types, as opposed to instances and properties and such
  *            which might hang off $A. This allows some colliding or near-miss variable duplication (e.g. $A.util is an
  *            instance of $A.ns.Util), and collects our proper types into one place. The types themselves must be proper
  *            functional objects with prototypes, or Closure can't deal with obfuscating them (and particularly their
@@ -117,7 +117,8 @@ var clientService;
 // #include aura.provider.ObjectValueProvider
 
 /**
- * @class The Aura framework. Default global instance name is $A.
+ * @class Aura
+ * @classdesc The Aura framework. Default global instance name is $A.
  * @constructor
  */
 $A.ns.Aura = function() {
@@ -152,7 +153,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraRenderingService
-         * @memberOf Aura.prototype
+         * @memberOf Aura
          */
         rendering : aura.renderingService,
         /**
@@ -160,7 +161,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraEventService
-         * @memberOf Aura.prototype
+         * @memberOf Aura
          */
         event : aura.eventService,
         /**
@@ -168,7 +169,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraComponentService
-         * @memberOf Aura.prototype
+         * @memberOf Aura
          */
         component : aura.componentService,
         /**
@@ -619,13 +620,13 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
 };
 
 /**
- * Use <code>$A.error()</code> in response to a serious error that has no recovery path.
+ * @description Use <code>$A.error()</code> in response to a serious error that has no recovery path.
  *
  * If this occurs during a test, the test will be stopped unless you add calls to '$A.test.expectAuraError' for
  * each error that occurs. <code>auraErrorsExpectedDuringInit</code> allows server side errors to not stop the
  * test as well.
  *
- * @description <p>Example:</p>
+ *@example
  * <pre>
  * testDuplicate : {
    auraErrorsExpectedDuringInit : ["Duplicate found!"],
@@ -760,16 +761,18 @@ $A.ns.Aura.prototype.run = function(func, name) {
     return undefined;
 };
 
-/**
+/**@description
  * Checks the condition and if the condition is false, displays an error message.
  *
  * Displays an error message if condition is false, runs <code>trace()</code> and stops JS execution. The
  * app will cease to function until reloaded if this is called, and errors are not caught.
+ * Internal assertion, should never happen
  * <p>For example, <code>$A.assert(cmp.get("v.name") , "The name attribute is required.");</code> checks for the name attribute.
  *
+ * This is protected as it is an internal assertion, should never happen.
+ *
  * @param {Boolean} condition True prevents the error message from being displayed, or false otherwise.
- * @param {String} assertMessage A message to be displayed when condition is false.
- * @protected Internal assertion, should never happen
+ * @param {String} assertMessage A message to be displayed when condition is false
  */
 $A.ns.Aura.prototype.assert = function(condition, assertMessage) {
     this.logger.assert(condition, assertMessage);
@@ -861,8 +864,8 @@ $A.ns.Aura.prototype.trace = function() {
 /**
  * Sets mode to production (default), development, or testing.
  *
- * @private
  * @param {String} mode Possible values are production "PROD", development "DEV", or testing "PTEST".
+ * @private
  */
 $A.ns.Aura.prototype.setMode = function(mode) {
     this.mode = mode;

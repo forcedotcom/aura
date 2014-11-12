@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura History Service, accessible using $A.historyService. Manages Browser History.
+ * @description The Aura History Service, accessible using $A.historyService. Manages Browser History.
  * Internet Explorer 7 and 8 are not supported for this service.
  * @constructor
  */

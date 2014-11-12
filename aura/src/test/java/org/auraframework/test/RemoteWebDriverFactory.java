@@ -17,6 +17,10 @@ package org.auraframework.test;
 
 import java.net.URL;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +36,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public class RemoteWebDriverFactory implements WebDriverProvider {
     protected final int MAX_GET_RETRIES = 3;
     protected final URL serverUrl;
+    private final long GETDRIVER_TIMEOUT_DEFAULT = 300;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public RemoteWebDriverFactory(URL serverUrl) {
         this.serverUrl = serverUrl;
@@ -44,14 +51,29 @@ public class RemoteWebDriverFactory implements WebDriverProvider {
             public WebDriver call() throws Exception {
                 return new AdaptiveWebElementDriver(serverUrl, capabilities);
             }
-        }, MAX_GET_RETRIES, "Failed to get a new RemoteWebDriver");
+        }, MAX_GET_RETRIES, getGetDriverTimeout(capabilities), "Failed to get a new RemoteWebDriver");
     }
 
-    protected <T> T retry(Callable<T> callable, int retries, String msg) {
+    protected long getGetDriverTimeout(DesiredCapabilities capabilities) {
+        try {
+            return Long.parseLong(capabilities.getCapability(WebDriverProvider.GETDRIVER_TIMEOUT_PROPERTY).toString());
+        } catch (Throwable t) {
+        }
+        try {
+            return Long.parseLong(System.getProperty(GETDRIVER_TIMEOUT_PROPERTY));
+        } catch (Throwable t) {
+        }
+        return GETDRIVER_TIMEOUT_DEFAULT;
+    }
+
+    protected <T> T retry(final Callable<T> callable, int retries, long retryTimeout, String msg) {
         for (int i = 0; i < retries; i++) {
+            FutureTask<T> task = new FutureTask<>(callable);
+            executorService.execute(task);
             try {
-                return callable.call();
+                return task.get(retryTimeout, TimeUnit.SECONDS);
             } catch (Throwable t) {
+                task.cancel(true);
                 Logger.getLogger(getClass().getName()).log(Level.WARNING, msg, t);
             }
         }

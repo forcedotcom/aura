@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays the currency in the default or specified format, such as with specific currency code or decimal places.">
-    <aura:attribute name="value" type="Decimal" required="true" description="The output value of the currency, which is defined as type Decimal."/>
-    <aura:attribute name="format" type="String" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the Locale default format will be used."/>
-    <!-- An ISO 4217 code, eg. "USD" -->
-    <aura:attribute name="currencyCode" type="String" description="The currency code specified as a String."/>
-    <aura:attribute name="currencySymbol" type="String" description="The currency symbol specified as a String."/>
+<aura:component access="GLOBAL" support="GA" extends="ui:output" extensible="true" description="Displays the currency in the default or specified format, such as with specific currency code or decimal places.">
+    <aura:attribute access="GLOBAL" name="value" type="Decimal" required="true" description="The output value of the currency, which is defined as type Decimal."/>
+    <aura:attribute access="GLOBAL" name="format" type="String" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the default format based on the browser's locale will be used."/>
+    <aura:attribute access="GLOBAL" name="currencyCode" type="String" description="The ISO 4217 currency code specified as a String, e.g. &ldquo;USD&rdquo;."/>
+    <aura:attribute access="GLOBAL" name="currencySymbol" type="String" description="The currency symbol specified as a String."/>
+
     <span aura:id='span' class="{!v.class}"/>
 </aura:component>

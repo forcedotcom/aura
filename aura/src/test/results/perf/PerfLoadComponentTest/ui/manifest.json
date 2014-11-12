@@ -12,11 +12,11 @@
 ,{"name":"Aura.CreateComponent.unrender.removed","value":0}
 ,{"name":"Aura.RenderComponent.afterRender.added","value":2}
 ,{"name":"Aura.RenderComponent.afterRender.removed","value":0}
-,{"name":"Aura.RenderComponent.component.added","value":0}
+,{"name":"Aura.RenderComponent.component.added","value":2}
 ,{"name":"Aura.RenderComponent.component.removed","value":0}
 ,{"name":"Aura.RenderComponent.event.added","value":0}
 ,{"name":"Aura.RenderComponent.event.removed","value":0}
-,{"name":"Aura.RenderComponent.render.added","value":8}
+,{"name":"Aura.RenderComponent.render.added","value":5}
 ,{"name":"Aura.RenderComponent.render.removed","value":0}
 ,{"name":"Aura.RenderComponent.rerender.added","value":0}
 ,{"name":"Aura.RenderComponent.rerender.removed","value":0}
@@ -41,4 +41,4 @@
 ,{"name":"Timeline.Scripting.TimeStamp","value":6}
 ,{"name":"Timeline.Scripting.TimerFire","value":3}
 ,{"name":"Timeline.Scripting.TimerInstall","value":3}
-,{"name":"WallTime","value":1927,"units":"milliseconds"}]
+,{"name":"WallTime","value":2577,"units":"milliseconds"}]

@@ -20,16 +20,16 @@
     },
 
     rerender : function(component, helper) {
-        var enabled = $A.util.getBooleanValue(component.get("v.enabled"));
-
         this.superRerender();
-
-        if (enabled) {
-            if (!component._scroller) {
-                helper.initAfterRender(component);
-            }
-        } else {
-            helper.deactivate(component);
+        if (component.isDirty("v.enabled")) {
+        	var enabled = component.get("v.enabled");
+	        if (!component._scroller) {
+	        	if (enabled) {
+	                helper.initAfterRender(component);
+	        	}
+	        } else {
+	           	component._scroller.setEnable(enabled);
+	        }
         }
     },
 

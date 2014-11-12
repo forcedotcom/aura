@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:outputTextArea</code> component represents text output that is wrapped in an HTML <code>span</code> tag.
+			This component can be used with <code>ui:inputTextArea</code>, which takes in a multi-line text input. 
+			To display text, you can use an attribute value and bind it to the <code>ui:outputTextArea</code> component.
+		</p>
+		<pre>&lt;aura:attribute name="myTextArea" type="String" default="some string"/>
+&lt;ui:outputTextArea value="{!v.myTextArea}" label="my output"/></pre>
+		<p>The previous example renders the following HTML.</p>
+		<pre>&lt;span class="uiOutputTextArea">some string&lt;/span></pre>
+		
+	</aura:description>	
+		<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
+    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	</aura:example>
+	
+</aura:documentation>

@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 ({
-	//TODO W-2248578
-	_testCaseInSensitivityWhenSettingParentAttributes:{
+    // TODO(W-2192746): There should be an error here saying that there is a problem with case sensitivity.
+    testCaseSensitivityWhenSettingParentAttributes:{
         test:function(cmp){
-            //Child component just seens the values given by parent,
-            //even though it overrides the value of the attribute, it is reflected only in the parent
-            $A.test.assertEquals('parentY',cmp.get('v.SIMPLEAttribute'),
-                "Attribute expression should be case insensitive.");
+            $A.test.assertEquals(undefined, cmp.get('v.SIMPLEAttribute'),
+                "Attribute expression should be case sensitive.");
             $A.test.assertEquals('parentY',cmp.get('v.SimpleAttribute'),
-                "Attribute in Child did not get the value set by parent.");
-
-            //Value set in child must override the parent's attribute value
-            /*TODO : W-1190572
-             * $A.test.assertEquals('childY',cmp.getSuper().get('v.SimpleAttribute'),
                     "Attribute value must have been overriden by aura:set tag");
-            */
         }
     }
 })

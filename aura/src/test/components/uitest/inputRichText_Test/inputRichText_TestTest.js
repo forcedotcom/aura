@@ -34,9 +34,10 @@
     	test : [function(component) {
     		this.assertRichTextInitalized(component.find("Text"));
     	}, function(component) {
-    		component.find("base").find("submitBtn").get("e.press").fire();
+    		$A.test.clickOrTouch(component.find("base").find("submitBtn").getElement());
+    		var cmp = component.find("base").find("outputValue");
     		$A.test.addWaitFor(false, function(){
-    			var content = component.find("base").find("outputValue").get("v.value");
+    			var content = cmp.get("v.value");
     			return content === "<b>some content</b></html>";
 			});
     	}, function(component) {

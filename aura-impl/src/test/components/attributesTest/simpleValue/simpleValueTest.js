@@ -78,7 +78,7 @@
     // dirty value in action should not get overwritten in rerender when evaluating functions
     testMakeDirtyIndirectly:{
     	attributes:{intAttribute:100},
-    	test:function(cmp){
+    	test:[function(cmp){
     		var button = cmp.find("button");
     		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
     		$A.test.assertEquals(100, cmp.get("v.intAttribute"));
@@ -87,17 +87,21 @@
     		$A.test.assertEquals(100, button.get("v.label"));
 
     		button.get("e.press").fire();
+    	}, function(cmp){
+    		var button = cmp.find("button");
     		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
     		$A.test.assertEquals(101, cmp.get("v.intAttribute"));
     		$A.test.assertEquals(false, button.isDirty("v.label"));
     		$A.test.assertEquals(101, button.get("v.label"));
 
     		button.get("e.press").fire();
+    	}, function(cmp){
+    		var button = cmp.find("button");
     		$A.test.assertEquals(false, cmp.isDirty("v.intAttribute"));
     		$A.test.assertEquals(102, cmp.get("v.intAttribute"));
     		$A.test.assertEquals(false, button.isDirty("v.label"));
     		$A.test.assertEquals(102, button.get("v.label"));
-    	}
+    	}]
     },
 
     verifyErrors:function(cmp, expression, expectedErrors){

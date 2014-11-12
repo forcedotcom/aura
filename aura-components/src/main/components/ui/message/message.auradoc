@@ -19,8 +19,23 @@
 	<aura:description>
 		<p>
 			The <code>severity</code> attribute indicates a message's severity level and determines the style to use when displaying the message. 
-	If the <code>closable</code> attribute is set to true, the message is hidden when the &times; symbol is pressed. Additionally, you can wire an action to the <code>ui:message</code> component using the <code>actionable</code> attribute.  
+	If the <code>closable</code> attribute is set to true, the message can be dismissed by pressing the &times; symbol.  
     	</p>
+    	<p>This example shows a success message when a condition evaluates to true or an error message otherwise.</p>
+<pre>&lt;aura:component>
+    &lt;aura:attribute name="myBool" type="Boolean" default="true"/>
+    
+    &lt;aura:renderIf isTrue="!{v.myBool}">
+        &lt;ui:message title="Success" severity="confirm">
+           The operation is successful.
+        &lt;/ui:message>
+        &lt;aura:set attribute="else">
+            &lt;ui:message title="Error" severity="error">
+                This is an error.
+            &lt;/ui:message>
+        &lt;/aura:set>
+    &lt;/aura:renderIf>
+&lt;/aura:component></pre>
 	</aura:description>	
 		<aura:example name="message" ref="auradocs:demoMessage" label="Using ui:message">
     	<p>This example shows messages in varying severity levels.</p>

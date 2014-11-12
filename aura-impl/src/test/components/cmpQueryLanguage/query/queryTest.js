@@ -63,28 +63,27 @@
      */
     testQueryDynamicallyAddedComponents:{
         test:function(cmp){
-            var result = $A.getQueryStatement().query();
-            this.verifyQueryResultCount(result, 2);
-            $A.newCmpAsync(
-                this,
-                function(newCmp){
-                	var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                },
-                {
-                    componentDef:"markup://aura:text",
-                    localId:"txt_Id"
-                },
-                cmp
-            );
-            $A.eventService.finishFiring();
+             var result = $A.getQueryStatement().query();
+             this.verifyQueryResultCount(result, 2);
+             $A.newCmpAsync(
+            		 this,
+                    function(newCmp){
+                            var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
+                    },
+                    {
+                        componentDef:"markup://aura:text",
+                        localId:"txt_Id"
+                    },
+                    cmp
+              );
 
-            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                result = $A.getQueryStatement().query();
-                this.verifyQueryResultCount(result, 3);
-                $A.test.assertEquals(cmp.find("txt_Id"), result.rows[2], "Components created on client side are not retrieved by query.");
-            });
+              $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                   result = $A.getQueryStatement().query();
+                   this.verifyQueryResultCount(result, 3);
+                   $A.test.assertEquals(cmp.find("txt_Id"), result.rows[2], "Components created on client side are not retrieved by query.");
+              });
         }
     },
     /**

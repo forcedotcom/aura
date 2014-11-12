@@ -291,17 +291,51 @@
                     }
                 }
             } else {
-                var elemRect = elem.getBoundingClientRect();
+                var referenceElem = component.getConcreteComponent().get("v.referenceElement");
+                if (!$A.util.isUndefinedOrNull(referenceElem)) {
+                    $A.util.attachToDocumentBody(component.getElement());
+                    var elemRect = elem.getBoundingClientRect();
+                    var referenceElemRect = referenceElem.getBoundingClientRect();
+                    var viewPort = $A.util.getWindowSize();
 
-                if (elemRect.bottom > viewPort.height) { // no enough space below
-                    elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
-                }
-                else {
-                    elem.style.top = "auto";
+                    // Vertical alignment
+                    // getBoundingClientRect method does not return height and width in IE7 and Ie8
+                    var height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                    var scrollY = document.documentElement.scrollTop;
+                    if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
+                        if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
+                            elem.style.top = scrollY + "px";
+                        } else { // put it above
+                            elem.style.top = (referenceElemRect.top - height) + scrollY + "px";
+                        }
+                    } else { // put it below
+                        elem.style.top = referenceElemRect.bottom + scrollY + "px";
+                    }
+
+                    // Horizontal alignment
+                    // getBoundingClientRect method does not return height and width in IE7 and Ie8
+                    var width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
+                    if (referenceElemRect.right < width) {
+                        elem.style.left = document.documentElement.scrollLeft + "px";
+                    } else {
+                        elem.style.left = referenceElemRect.right - width + document.documentElement.scrollLeft + "px";
+                    }
+
+                    //attaching to the body causes the date to lose focus so we need to add the focus back
+                    this.focusDate(component);
+                } else {
+                    var elemRect = elem.getBoundingClientRect();
+
+                    if (elemRect.bottom > viewPort.height) { // no enough space below
+                        elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
+                    }
+                    else {
+                        elem.style.top = "auto";
+                    }
                 }
             }
         }
-    },
+        },
 
     refreshYearSelection: function(component) {
         var minY = component.get("v.minYear");

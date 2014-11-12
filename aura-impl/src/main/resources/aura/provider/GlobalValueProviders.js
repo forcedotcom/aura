@@ -15,7 +15,10 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Global Value Provider. Holds global values: $Label, $Browser, $Locale, etc
+ * @description Global Value Provider. Holds global values: $Label, $Browser, $Locale, etc
+ * @param {Object} gvp an optional serialized GVP to load.
+ * @param {Function} initCallback an optional callback invoked after the GVP has finished its
+ *  asynchronous initialization.
  * @constructor
  */
 $A.ns.GlobalValueProviders = function (gvp, initCallback) {

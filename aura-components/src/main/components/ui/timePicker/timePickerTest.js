@@ -70,68 +70,68 @@
     // testValidTimeForPeriodAfterAlreadyRendered
     testErrorMessagesPeriodHours : {
         attributes : {"is24HourFormat" : false},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("hours").set("v.value", 100);
             var evt = {
             "getSource" : function() {
                 return cmp.find("hours")
-            }
+             }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
-
+        }, function(cmp){
             var hoursErrorList = cmp.find("hourError").getElement().children.length;
             $A.test.assertEquals("1","" + hoursErrorList,"Erroroneous input was put in the hours inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessagesPeriodMinutes : {
         attributes : { "is24HourFormat" : false},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("minutes").set("v.value", 100);
-            var evt = {
-            "getSource" : function() {
-                return cmp.find("minutes")
-            }
+             var evt = {
+                     "getSource" : function() {
+                     return cmp.find("minutes")
+                  }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
-
+        }, function(cmp){
             var minutesErrorList = cmp.find("minuteError").getElement().children.length;
             $A.test.assertEquals( "1","" + minutesErrorList,"Erroroneous input was put in the Minutes inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     // These next two tests constitute:
     // testValidTimeFor24HourAfterAlreadyRendered
     testErrorMessages24hrHours : {
         attributes : {"is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("hours").set("v.value", 25);
             var evt = {
                 "getSource" : function() {
-                return cmp.find("hours")
-            }
+                   return cmp.find("hours")
+                 }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
-
+        }, function(cmp){
             var hoursErrorList = cmp.find("hourError").getElement().children.length;
             $A.test.assertEquals("1","" + hoursErrorList,"Erroroneous input was put in the hours inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessages24hrMinutes : {
         attributes : { "is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("minutes").set("v.value", 60);
             var evt = {
             "getSource" : function() {
                 return cmp.find("minutes")
-            }
+             }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
-
+        }, function(cmp){
             var minutesErrorList = cmp.find("minuteError").getElement().children.length;
             $A.test.assertEquals("1","" + minutesErrorList, "Erroroneous input was put in the Minutes inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     //Test Boundary Cases for 24 hour
@@ -223,98 +223,99 @@
     //Testing for non number values
     testErrorMessages24hrHoursWithSpecialChar : {
         attributes : {"is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("hours").set("v.value", "$25");
             var evt = {
                 "getSource" : function() {
-                return cmp.find("hours")
-            }
+                   return cmp.find("hours")
+                 }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
-
+        }, function(cmp){
             var hoursErrorList = cmp.find("hourError").getElement().children.length;
             $A.test.assertEquals("1","" + hoursErrorList,"Erroroneous input was put in the hours inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessages24hrHoursWithDecimal : {
         attributes : {"is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("hours").set("v.value", "4.0");
             var evt = {
                 "getSource" : function() {
-                return cmp.find("hours")
-            }
+                    return cmp.find("hours")
+                 }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
-
+        }, function(cmp){
             var hoursErrorList = cmp.find("hourError").getElement().children.length;
             $A.test.assertEquals("1","" + hoursErrorList,"Erroroneous input was put in the hours inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessages24hrHoursWithEmptyString : {
         attributes : {"is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("hours").set("v.value", "");
+            
             var evt = {
                 "getSource" : function() {
                 return cmp.find("hours")
             }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
-
+        }, function(cmp) {
             var hoursErrorList = cmp.find("hourError").getElement().children.length;
             $A.test.assertEquals("1","" + hoursErrorList,"Erroroneous input was put in the hours inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessagesMinutesWithSpecialCharWithNum : {
         attributes : { "is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("minutes").set("v.value", "$25");
             var evt = {
             "getSource" : function() {
                 return cmp.find("minutes")
-            }
+             }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
-
+        }, function(cmp){
             var minutesErrorList = cmp.find("minuteError").getElement().children.length;
             $A.test.assertEquals("1","" + minutesErrorList, "Erroroneous input was put in the Minutes inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessagesMinutesWithDecimal : {
         attributes : { "is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("minutes").set("v.value", "4.0");
             var evt = {
             "getSource" : function() {
                 return cmp.find("minutes")
-            }
+             }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
-
+        }, function(cmp){
             var minutesErrorList = cmp.find("minuteError").getElement().children.length;
             $A.test.assertEquals("1","" + minutesErrorList, "Erroroneous input was put in the Minutes inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     testErrorMessagesMinutesWithEmptyString : {
         attributes : { "is24HourFormat" : true},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("minutes").set("v.value", "");
             var evt = {
-            "getSource" : function() {
-                return cmp.find("minutes")
-            }
+	            "getSource" : function() {
+	                return cmp.find("minutes")
+	            }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
-
+        }, function(cmp){
             var minutesErrorList = cmp.find("minuteError").getElement().children.length;
             $A.test.assertEquals("1","" + minutesErrorList, "Erroroneous input was put in the Minutes inputInteger component, an error message did not appear");
-        }
+        }]
     },
 
     // Will work after fix: W-1856385
@@ -345,7 +346,7 @@
 
     testInvalidTimeFor24HourAfterAlreadyRendered : {
         attributes : {"is24HourFormat" : true,"hours" : 48,"minutes" : 61},
-        test : function(cmp) {
+        test : [function(cmp) {
             cmp.find("hours").set("v.value", 14);
             var evt = {
             "getSource" : function() {
@@ -353,11 +354,11 @@
             }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
-
+        }, function(cmp){
             var hours = cmp.find("hours").get("v.value");
             $A.test.assertEquals("14", "" + hours, "The item in the hours textbox was not correctly converted");
             var minutes = cmp.find("minutes").get("v.value");
             $A.test.assertEquals("01", "" + minutes, "The item in the minutes textbox was not correctly converted");
-        }
+        }]
     }
 })

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new ControllerDef, including the descriptor and action definitions.
+ * @description Creates a new ControllerDef, including the descriptor and action definitions.
  * A ControllerDef instance is created as part of the ComponentDef initialization.
  * @constructor
  * @param {Object} config

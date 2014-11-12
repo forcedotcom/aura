@@ -15,18 +15,19 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="GA" description="Represents a drop-down list with options.">
+<aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true" description="Represents a drop-down list with options.">
+
+    <!-- A list of aura.components.ui.InputOption -->
+    <aura:attribute access="GLOBAL" name="options" type="List" description="A list of aura.components.ui.InputOption."/>
+
     <!-- Could be needed in form -->
     <aura:attribute name="name" type="String" description="The name of the component."/>
 
     <!-- multiple select or not -->
-    <aura:attribute name="multiple" type="Boolean" default="false" description="Specifies whether the input is a multiple select. Default value is &#8220;false&#8221;."/>
+    <aura:attribute access="GLOBAL" name="multiple" type="Boolean" default="false" description="Specifies whether the input is a multiple select. Default value is &#8220;false&#8221;."/>
 
     <!-- The size attribute behaviors weird in Google Chrome and Safari. -->
     <aura:attribute name="size" type="Integer" default="1" description="The number of options displayed at one time. Default value is &#8220;1&#8221;."/>
-
-    <!-- A list of aura.components.ui.InputOption -->
-    <aura:attribute name="options" type="List" description="A list of aura.components.ui.InputOption."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
@@ -40,9 +41,9 @@
     	    disabled="{!v.disabled}"
     	    multiple="{!v.multiple}"
             aria-describedby="{!v.ariaDescribedBy}">
-        <aura:iteration items="{!v.options}" var="option">
-            <ui:inputSelectOption aura:id="options" class="{!option.class}" label="{!option.label}" value="{!option.selected}" text="{!option.value}" disabled="{!option.disabled}"/>
-        </aura:iteration>
-        {!v.body}
+        <aura:if isTrue="{!v.options.length == 0}">
+           {!v.body}
+        </aura:if>
     </select>
+
 </aura:component>

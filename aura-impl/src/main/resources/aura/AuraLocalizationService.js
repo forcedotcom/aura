@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Localization service Service, accessible using $A.localizationService. Provides utility methods
+ * @description The Aura Localization service Service, accessible using $A.localizationService. Provides utility methods
  * for localizing data or getting formatters for numbers, currencies, dates, etc.
  * @constructor
  */

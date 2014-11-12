@@ -36,6 +36,7 @@ import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -77,7 +78,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Controller.
      */
     // Click is unsupported in these touch based platforms
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE})
     public void testSimpleComponentWithModelAndController() throws Exception {
         verifySimpleComponentWithModelControllerHelperandProvider(defaultStubCmp);
     }
@@ -86,7 +87,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify using IntegrationService to inject a simple component with a Java model, Javascript Controller and Java
      * Controller. (ASYNC)
      */
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, })
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE})
     public void testSimpleComponentWithModelAndControllerAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
             ComponentDef.class,
@@ -134,8 +135,14 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         WebElement buttonShowStyle = findDomElement(By.cssSelector(".btnShowStyle"));
         buttonShowStyle.click();
-        auraUITestingUtil.waitForElementText(By.cssSelector("div.dataFromAttributeStyle"),
-        		"rgb(255, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box", true);
+        auraUITestingUtil.waitForElementFunction(By.cssSelector("div.dataFromAttributeStyle"), 
+        		new Function<WebElement, Boolean>() {
+		            @Override
+		            public Boolean apply(WebElement element) {
+		                return element.getText().startsWith("rgb(255, 255, 255)")||element.getText().startsWith("#fff");
+		            }
+        	}
+        );
     }
 
     /*
@@ -146,7 +153,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     private DefDescriptor<ComponentDef> setupSimpleComponentWithModelControllerHelperAndProvider() {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
         DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
         DefDescriptor<ProviderDef> jsProviderdesc = Aura.getDefinitionService()
@@ -195,7 +202,9 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
             + "  },"
             + "  showStyle: function(cmp) {"
             + "    var dfaElement = cmp.find('dataFromAttribute').getElement(); "
-            + "    var dfaStyle = $A.util.style.getCSSProperty(dfaElement,'background'); "
+            + "    cmp.set('v.dataFromAttributeStyle','call getCSSProperty');"
+            + "    var dfaStyle = $A.util.style.getCSSProperty(dfaElement,'color'); "
+            + "    if(dfaStyle == undefined) { dfaStyle = 'get background return undefined!';} "
             + "    cmp.set('v.dataFromAttributeStyle',dfaStyle);"
             + "  }"
             + "}"
@@ -223,7 +232,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 	        + "}"
         );
         //fill in CSS
-        addSourceAutoCleanup(CSSdesc, ".THIS .dataFromAttribute { background: red } ");
+        addSourceAutoCleanup(CSSdesc, ".THIS .dataFromAttribute { color: #fff; } ");
 
         return cmpDesc;
     }
@@ -259,7 +268,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     private DefDescriptor<ComponentDef> setupSimpleComponentWithExtension() {
     	DefDescriptor<ComponentDef> baseCmpDesc =  setupSimpleComponentToExtend();
     	DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
     	String systemAttributes=String.format("extends='%s:%s' ", baseCmpDesc.getNamespace(),baseCmpDesc.getName());
     	String bodyMarkup = "<aura:set attribute='SimpleAttribute'> We just Set it </aura:set> "
     			+ "<div class='attrFromBaseCmp'>In BaseCmp : SimpleAttribute={!v.SimpleAttribute}  </div>";
@@ -270,7 +279,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
     private DefDescriptor<ComponentDef> setupSimpleComponentToExtend() {
     	DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class);
+                ComponentDef.class, null);
     	String systemAttributes="extensible='true' ";
     	String bodyMarkup =
     	"<aura:attribute name='SimpleAttribute' type='String' default='DefaultStringFromBaseCmp'/>"

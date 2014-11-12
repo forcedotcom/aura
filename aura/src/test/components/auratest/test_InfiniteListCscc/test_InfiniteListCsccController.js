@@ -18,7 +18,7 @@
         var list = cmp.find('list'),
             task = {
             ActivityDate: "2013-08-27",
-            IsClosed: false,
+            isClosed: false,
             Id: "Client"
         };
 

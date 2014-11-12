@@ -276,9 +276,15 @@
                     $A.util.removeClass(document.body,'auraError');
                     $A.util.removeClass(auraErrorMask,'auraForcedErrorBox');
                 }
-                window.addEventListener('load', function() {
-                    FastClick.attach(document.body, {tapDelay: 100, touchBoundary: 10});
-                }, false);
+                // To support older browsers
+                if (window.addEventListener) {
+                    window.addEventListener('load', function() {
+                        // If server-side only aura rendering, window.FastClick won't be loaded
+                        if (window.FastClick) {
+                            window.FastClick.attach(document.body, {tapDelay: 100, touchBoundary: 10});
+                        }
+                    }, false);
+                }
             </script>
             
             {!v.auraInitBlock}

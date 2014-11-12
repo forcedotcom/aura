@@ -42,6 +42,7 @@
             $A.test.assertEquals(++startactioncount+";a", c.getId(),
                 "Action Numbering gone wild - Server Action(3)");
             $A.test.enqueueAction(c);
+            
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //After a action request was sent to server, context will increment its counter.
@@ -65,6 +66,8 @@
             /**
              * Group of actions.
              */
+
+        	var that = this;
             //$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
             var a = cmp.get("c.getRoster");
             a.runDeprecated();
@@ -72,23 +75,24 @@
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //Verify result of first action
-                    var teamActionNum =  this.getActionNumberFromPage(cmp)[0];
-                    this.verifyTeamFacet(cmp, teamActionNum);
+                    var teamActionNum =  that.getActionNumberFromPage(cmp)[0];
+                    that.verifyTeamFacet(cmp, teamActionNum);
                     //Verify result of second action
-                    var playerActionNum = this.getActionNumberFromPage(cmp)[1];
-                    this.verifyPlayersFacet(cmp, playerActionNum);
+                    var playerActionNum = that.getActionNumberFromPage(cmp)[1];
+                    that.verifyPlayersFacet(cmp, playerActionNum);
                 });
         },function(cmp){
             /**
              * Individual Actions to get Team
              */
+        	var that = this;
             var a = cmp.get("c.getTeam");
             $A.run(function() {a.runDeprecated();});
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //Verify the new auraStorage:teamFacet component fetched by server action
-                    var teamActionNum =  this.getActionNumberFromPage(cmp)[0];
-                    this.verifyTeamFacet(cmp,teamActionNum);
+                    var teamActionNum =  that.getActionNumberFromPage(cmp)[0];
+                    that.verifyTeamFacet(cmp,teamActionNum);
                 });
         },function(cmp){
             this.resetCounter(cmp, "testActionScopedGlobalID");
@@ -148,15 +152,16 @@
              */
             //$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
             var a = cmp.get("c.getRosterFromStorage");
-            $A.run(function() {a.runDeprecated();});
+            a.runDeprecated();
+            var that = this;
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //Verify result of first action
-                    var teamActionNum =  this.getActionNumberFromPage(cmp)[0];
-                    this.verifyTeamFacet(cmp, teamActionNum);
+                    var teamActionNum =  that.getActionNumberFromPage(cmp)[0];
+                    that.verifyTeamFacet(cmp, teamActionNum);
                     //Verify result of second action
-                    var playerActionNum = this.getActionNumberFromPage(cmp)[1];
-                    this.verifyPlayersFacet(cmp, playerActionNum);
+                    var playerActionNum = that.getActionNumberFromPage(cmp)[1];
+                    that.verifyPlayersFacet(cmp, playerActionNum);
                 });
         },function(cmp){
             /**Individual action to get players, should be from storage. 

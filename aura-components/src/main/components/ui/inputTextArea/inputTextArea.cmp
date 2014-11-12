@@ -15,13 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="GA" description="An HTML textarea element that can be editable or read-only. Scroll bars may not appear on Chrome browsers in Android devices, but you can select focus in the textarea to activate scrolling.">
-    <aura:attribute name="rows" type="Integer" default="2" description="The height of the text area, which is defined by the number of rows to display at a time. Default value is &#8220;2&#8221;." />
-    <aura:attribute name="cols" type="Integer" default="20" description="The width of the text area, which is defined by the number of characters to display in a single row at a time. Default value is &#8220;20&#8221;." />
-    <aura:attribute name="readonly" type="Boolean" default="false" description="Specifies whether the text area should be rendered as read-only. Default value is &#8220;false&#8221;." />
-    <aura:attribute name="placeholder" type="String" default="" description="The text that is displayed by default."/>
-    <aura:attribute name="resizable" type="Boolean" default="true" description="Specifies whether or not the textarea should be resizable.  Defaults to true."/>
-    <aura:attribute name="maxlength" type="Integer" description="The maximum number of characters that can be typed into the input field. Corresponds to the maxlength attribute of the rendered HTML textarea element."/>
+<aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true"
+    description="An HTML textarea element that can be editable or read-only. Scroll bars may not appear on Chrome browsers in Android devices, but you can select focus in the textarea to activate scrolling.">
+
+    <aura:attribute access="GLOBAL" name="rows" type="Integer" default="2" description="The height of the text area, which is defined by the number of rows to display at a time. Default value is &#8220;2&#8221;." />
+    <aura:attribute access="GLOBAL" name="cols" type="Integer" default="20" description="The width of the text area, which is defined by the number of characters to display in a single row at a time. Default value is &#8220;20&#8221;." />
+    <aura:attribute access="GLOBAL" name="readonly" type="Boolean" default="false" description="Specifies whether the text area should be rendered as read-only. Default value is &#8220;false&#8221;." />
+    <aura:attribute access="GLOBAL" name="placeholder" type="String" default="" description="The text that is displayed by default."/>
+    <aura:attribute access="GLOBAL" name="resizable" type="Boolean" default="true" description="Specifies whether or not the textarea should be resizable.  Defaults to true."/>
+    <aura:attribute access="GLOBAL" name="maxlength" type="Integer" description="The maximum number of characters that can be typed into the input field. Corresponds to the maxlength attribute of the rendered HTML textarea element."/>
+
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
     
     <aura:renderif isTrue="{!v.body.length == 0}">
@@ -39,4 +42,5 @@
             {!v.body}
         </aura:set>
     </aura:renderif>
+
 </aura:component>

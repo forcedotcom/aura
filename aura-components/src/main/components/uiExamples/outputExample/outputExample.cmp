@@ -18,15 +18,22 @@
 <aura:component>
 	<aura:attribute name="myText" type="String" default="A string waiting to change."/>
 	<aura:attribute name="myNum" type="Decimal" default="10.10"/>
+	<aura:attribute name="myCurr" type="Decimal" default="50000"/>
 	<aura:attribute name="myBool" type="Boolean" default="true"/>
 	<aura:attribute name="myDate" type="Date" default="2014-09-29"/>
 	<aura:attribute name="myDateTime" type="Date" default="2014-09-29T00:17:08z"/>
+	<aura:attribute name="myTextArea" type="String" default="This is a string"/>
+	<aura:attribute name="myURL" type="String" default="http://www.google.com"/>
 
-	<div class="row"><ui:outputText value="{!v.myText}" label="outputText"/> <ui:button label="Change" press="{!c.change}" /></div>  
-	<div class="row"><ui:outputNumber value="{!v.myNum}" label="outputNumer" format=".00"/></div>
+	<ui:button label="Change" press="{!c.change}" />
+	<div class="row"><ui:outputText value="{!v.myText}" label="outputText"/> </div>  
+	<div class="row"><ui:outputNumber value="{!v.myNum}" label="outputNumber" format=".00"/></div>
+	<div class="row"><ui:outputCurrency aura:id="curr" value="{!v.myCurr}" label="outputCurrency" /></div>
 	<div class="row"><ui:outputCheckbox value="{!v.myBool}" label="outputCheckbox"/></div>
 	<div class="row"><ui:outputDate value="{!v.myDate}" label="outputDate"/></div>
 	<div class="row"><ui:outputDateTime value="{!v.myDateTime}" label="outputDateTime"/></div>
 	<div class="row"><ui:outputEmail value="abc@email.com" label="abc@email.com"/></div>
 	<div class="row"><ui:outputPhone value="415-123-4567" label="outputPhone"/></div>
+	<div class="row"><ui:outputTextArea value="{!v.myTextArea}" label="my output"/></div>
+	<div class="row"><ui:outputURL value="{!v.myURL}" label="{!v.myURL}"/></div>
 </aura:component>

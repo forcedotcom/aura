@@ -44,6 +44,10 @@
             });
         }
     },
+
+    handleClick: function(component) {
+        this.handleTriggerPress(component);
+    },
     
     handleTriggerPress: function(component) {
         this.firePopupEvent(component, "e.popupTriggerPress");
@@ -72,7 +76,7 @@
     },
     
     firePopupEvent: function(component, eventName, params) {
-    	var event = component.get(eventName);
+    	var event = component.getConcreteComponent().get(eventName);
     	if (params) {
             event.setParams(params);
         }

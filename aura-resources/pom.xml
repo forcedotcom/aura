@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.1479-SNAPSHOT</version>
+        <version>0.1552-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -43,6 +43,28 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/jsdoc3/jsdoc</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>config/jsdoc3/jsdoc</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -91,15 +113,11 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId>nl.windgazer</groupId>
-                                        <artifactId>
-                                            jsdoctk-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [2.3.2,)
-                                        </versionRange>
+                                        <groupId>com.github.phasebash</groupId>
+                                        <artifactId>jsdoc3-maven-plugin</artifactId>
+                                        <versionRange>[1.0.7,)</versionRange>
                                         <goals>
-                                            <goal>jsdoc</goal>
+                                            <goal>jsdoc3</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
@@ -145,24 +163,22 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>nl.windgazer</groupId>
-                        <artifactId>jsdoctk-plugin</artifactId>
+                        <groupId>com.github.phasebash</groupId>
+                        <artifactId>jsdoc3-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>do-jsdoc</id>
+                                <id>generate-jsdoc</id>
                                 <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>jsdoc</goal>
-                                </goals>
                                 <configuration>
-                                    <srcDir>${basedir}/target/src-gen/main/resources</srcDir>
-                                    <recurse>10</recurse>
-                                    <template>${basedir}/../aura/config/jsdoc/templates</template>
-                                    <directory>${basedir}/target/src-gen/main/resources/jsdoc</directory>
-                                    <exclude>
-                                        <param>^.*/aura_(?!doc)\w+\.js$</param>
-                                    </exclude>
+                                    <sourceFiles>
+                                        <sourceFile>${basedir}/target/src-gen/main/resources/aura/javascript/aura_doc.js</sourceFile>
+                                    </sourceFiles>
+                                    <outputDirectory>${basedir}/target/src-gen/main/resources/jsdoc</outputDirectory>
+                                    <configFile>${basedir}/config/jsdoc3/conf.json</configFile>
                                 </configuration>
+                                <goals>
+                                    <goal>jsdoc3</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

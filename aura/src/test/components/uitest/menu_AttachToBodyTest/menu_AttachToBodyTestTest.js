@@ -36,7 +36,7 @@
 	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
 	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
 	        	menuLabel.get("e.click").fire();
-	            
+
 	            //Check if secondItem in the menu is disabled
 	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find(item2).get("v.disabled");}, "Check if Item2 in the menu is disabled");
 			}, function(cmp) {

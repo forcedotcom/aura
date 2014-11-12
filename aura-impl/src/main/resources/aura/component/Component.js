@@ -26,11 +26,8 @@
  *            config - component configuration
  * @param {Boolean}
  *            [localCreation] - local creation
- * @param {ComponentCreationContext}
- *            [componentCreationContext] - ccc used to create component
  */
-function Component(config, localCreation, componentCreationContext) {
-	this.ccc = componentCreationContext;
+function Component(config, localCreation) {
 	this.priv = new ComponentPriv(config, this, localCreation);
 	this._destroying = false;
 
@@ -279,9 +276,9 @@ Component.prototype.isInstanceOf = function(name) {
 };
 
 /**
- * @private
  * @param {Object}
  *            type Applies the type to its definition.
+ * @private
  */
 Component.prototype.implementsDirectly = function(type) {
 	return this.getDef().implementsDirectly(type);
@@ -1217,8 +1214,9 @@ Component.prototype.getFacets = function() {
  *            callback the callback function for the event (will be wrapped)
  * @param {Component}
  *            component the component attached to the handler.
- * @private
+ * 
  * @constructor
+ * @private
  */
 $A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component) {
 	this.eventName = eventName;

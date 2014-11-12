@@ -300,16 +300,16 @@
     */
    testUpdateValue: {
        attributes : {value : 22.7, format : '##,#0,00.00#####'},
-       test: function(component){
+       test: [function(component){
     	   var value = component.getElement().value;
     	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.value", 49322);
-           $A.rerender(component);
-           value = component.getElement().value;
+       }, function(component){
+    	   var value = component.getElement().value;
     	   $A.test.assertEquals(49322, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('49322', value, "Element: Value not formatted correctly.");
-       }
+       }]
    },
 
    /**
@@ -317,15 +317,15 @@
     */
    testUpdateFormat: {
        attributes : {value : 22.7, format : '##,#0,00.00#####'},
-       test: function(component){
+       test: [function(component){
     	   var value = component.getElement().value;
     	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.format", '.000');
-           $A.rerender(component);
-           value = component.getElement().value;
+       }, function(component){
+           var value = component.getElement().value;
     	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
-       }
+       }]
    }
 })

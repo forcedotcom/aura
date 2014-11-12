@@ -16,9 +16,9 @@
 /*jslint sub: true*/
 
 /**
- * @public
- * @class
+ * @class InvalidComponent
  * @constructor
+ * @private
  */
 function InvalidComponent(){
 	// Never used directly - just its prototype is leveraged
@@ -88,8 +88,8 @@ InvalidComponent.prototype.isInstanceOf = function(name){
 };
 
 /**
- * @private
  * @param {Object} type Applies the type to its definition.
+ * @private
  */
 InvalidComponent.prototype.implementsDirectly = function(type){
     this.raiseInvalidComponentError();

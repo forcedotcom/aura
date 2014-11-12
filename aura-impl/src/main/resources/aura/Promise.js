@@ -17,7 +17,6 @@
 /*jslint sub: true */
 
 /**
- * @namespace
  * @constructor
  * @param {function (function (Object), function (Object))} 
  *		A function which is used to wrap the the promised work. The function should accept a success
@@ -160,12 +159,14 @@ $A.ns.Promise.isThenable = function(object) {
 };
 
 /**
- * Force this to be asynchronous.
+ * @description Force this to be asynchronous.
+ * 
  * This is important because if the consumer of this promise is
  * not performing I/O, then the function will return immediately which 
  * does not allow for the handlers to be properly registered.
  * 
- * @private DO NOT USE THIS EXTERNALLY FROM THE PROMISE OBJECT. 
+ * DO NOT USE THIS EXTERNALLY FROM THE PROMISE OBJECT.
+ * @private 
  */ 
 $A.ns.Promise.exec = function (fn, args, cb) {
 	var self = this;

@@ -23,5 +23,9 @@
 
 	handleClick: function (cmp, evt, hlp) {
 		hlp.toggleSort(cmp);	
+	},
+	
+	updateNameRef: function(cmp, evt, helper) {
+		helper.updateNameRef(cmp);
 	}
 })

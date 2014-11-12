@@ -1,0 +1,59 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<aura:documentation>
+    <aura:description>
+        <p><code>ui:​panelManager</code>​ handles panel overlays, modal overlays, and panel sliders. 
+          You only need one instance of <code>ui:​panelManager</code> in an app. To open a panel, fire the <code>ui:openPanel</code> event. Adding the <code>'class'</code> parameter inserts the style to the <code>div</code> tag of the panel container. This example fires the event to open a panel overlay with body markup passed in via <code>newComponentAsync()</code> in a callback.
+        </p>
+<pre>showPanel: function(cmp, event, helper) {
+    var openPanelEvent = $A.get('e.ui:openPanel').setParams({
+        show: true,
+    	title: 'my panel',
+    	'class': 'myPanel',
+        callbacks: { onCreate: function(panel){
+            	var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
+            	var overlay = cmps[3];
+        		overlay.addHandler('press', cmp, 'c.showPanel')
+        		panel.set("v.body", cmps);
+        	}
+        }
+    });
+    openPanelEvent.fire();
+}</pre>
+	<p>To open a modal overlay, set <code>isModal: true</code> on the <code>ui:openPanel</code> event before you fire it. 
+	   To create a panel slider, set <code>isSlider: true</code> on the <code>ui:openPanel</code> event before you fire it.</p>
+	<p>When working with a modal overlay, you can set its body by passing in the <code>body</code> event parameter.</p>
+<pre>showModal: function(cmp, event, helper) {
+    var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
+    var overlay = cmps[3];
+    overlay.addHandler('press', cmp, 'c.showModal')
+    var openPanelEvent = $A.get('e.ui:openPanel').setParams({
+        show: true,
+        isModal: true,
+        title: 'my panel',
+        'class': 'myClass',
+        body: cmps
+    });
+    openPanelEvent.fire();
+}</pre>
+  </aura:description>
+ 	<aura:example name="panelManagerEx" ref="uitest:panelTest" label="Using ui:panelManager">
+    	<p>This example shows how you can implement the <code>ui:panelManager</code> component.</p>
+	</aura:example>   
+</aura:documentation>

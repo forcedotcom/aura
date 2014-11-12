@@ -177,7 +177,6 @@ public class AuraServlet extends AuraBaseServlet {
         //
         try {
             response.setCharacterEncoding(UTF_ENCODING);
-            setBasicHeaders(response);
             context = Aura.getContextService().getCurrentContext();
             response.setContentType(getContentType(context.getFormat()));
             definitionService = Aura.getDefinitionService();
@@ -236,7 +235,10 @@ public class AuraServlet extends AuraBaseServlet {
             handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
-        
+
+        // Knowing the app, we can do the HTTP headers, so of which depend on
+        // the app in play, so we couldn't do this earlier.
+        setBasicHeaders(defDescriptor, request, response);
 
         try {
             context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
@@ -325,7 +327,6 @@ public class AuraServlet extends AuraBaseServlet {
         ServerService serverService = Aura.getServerService();
         AuraContext context = contextService.getCurrentContext();
         response.setCharacterEncoding(UTF_ENCODING);
-        setBasicHeaders(response);
         boolean written = false;
         setNoCache(response);
 
@@ -381,6 +382,11 @@ public class AuraServlet extends AuraBaseServlet {
             }
 
             DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
+
+            // Knowing the app, we can do the HTTP headers, so of which depend on
+            // the app in play, so we couldn't do this 
+            setBasicHeaders(applicationDescriptor, request, response);
+
 			if (applicationDescriptor != null) {
                 // ClientOutOfSync will drop down.
                 try {

@@ -2,7 +2,7 @@
 ,{"name":"Aura.CreateComponent.afterRender.removed","value":0}
 ,{"name":"Aura.CreateComponent.component.added","value":15}
 ,{"name":"Aura.CreateComponent.component.removed","value":0}
-,{"name":"Aura.CreateComponent.event.added","value":0}
+,{"name":"Aura.CreateComponent.event.added","value":1}
 ,{"name":"Aura.CreateComponent.event.removed","value":0}
 ,{"name":"Aura.CreateComponent.render.added","value":0}
 ,{"name":"Aura.CreateComponent.render.removed","value":0}
@@ -12,11 +12,11 @@
 ,{"name":"Aura.CreateComponent.unrender.removed","value":0}
 ,{"name":"Aura.RenderComponent.afterRender.added","value":9}
 ,{"name":"Aura.RenderComponent.afterRender.removed","value":0}
-,{"name":"Aura.RenderComponent.component.added","value":0}
+,{"name":"Aura.RenderComponent.component.added","value":1}
 ,{"name":"Aura.RenderComponent.component.removed","value":0}
 ,{"name":"Aura.RenderComponent.event.added","value":0}
 ,{"name":"Aura.RenderComponent.event.removed","value":0}
-,{"name":"Aura.RenderComponent.render.added","value":17}
+,{"name":"Aura.RenderComponent.render.added","value":10}
 ,{"name":"Aura.RenderComponent.render.removed","value":0}
 ,{"name":"Aura.RenderComponent.rerender.added","value":0}
 ,{"name":"Aura.RenderComponent.rerender.removed","value":0}
@@ -36,9 +36,9 @@
 ,{"name":"Timeline.Rendering.RequestMainThreadFrame","value":4}
 ,{"name":"Timeline.Rendering.ScheduleStyleRecalculation","value":1}
 ,{"name":"Timeline.Scripting.FireAnimationFrame","value":3}
-,{"name":"Timeline.Scripting.FunctionCall","value":8}
+,{"name":"Timeline.Scripting.FunctionCall","value":9}
 ,{"name":"Timeline.Scripting.RequestAnimationFrame","value":3}
 ,{"name":"Timeline.Scripting.TimeStamp","value":6}
 ,{"name":"Timeline.Scripting.TimerFire","value":3}
 ,{"name":"Timeline.Scripting.TimerInstall","value":3}
-,{"name":"WallTime","value":2708,"units":"milliseconds"}]
+,{"name":"WallTime","value":3305,"units":"milliseconds"}]

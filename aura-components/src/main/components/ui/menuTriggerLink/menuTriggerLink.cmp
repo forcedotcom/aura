@@ -16,6 +16,7 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:menuTrigger" description="A link that triggers a dropdown menu.">
+    <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
 
     <a aura:id="link" class="{!v.class}" title="{!v.title}">
         <aura:if isTrue="{!v.body.length == 0}">

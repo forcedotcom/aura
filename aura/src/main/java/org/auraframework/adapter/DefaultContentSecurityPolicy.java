@@ -160,7 +160,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         CSP.PolicyBuilder builder = new CSP.PolicyBuilder();
 
         builder.frame_ancestor(getTerms(csp.getFrameAncestors()));
-        builder.frame_src(getTerms(csp.getFrameAncestors()));
+        builder.frame_src(getTerms(csp.getFrameSources()));
         builder.script_src(getTerms(csp.getScriptSources()));
         builder.style_src(getTerms(csp.getStyleSources()));
         builder.connect_src(getTerms(csp.getConnectSources()));

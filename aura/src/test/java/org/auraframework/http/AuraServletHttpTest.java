@@ -58,6 +58,90 @@ import org.auraframework.util.json.JsonReader;
 public class AuraServletHttpTest extends AuraHttpTestCase {
    
 
+    private static class MockCsp implements ContentSecurityPolicy {
+        private String[] ancestors;
+        
+        public MockCsp(String... ancestors) {
+            this.ancestors = ancestors;
+        }
+
+        @Override
+        public String getCspHeaderValue() {
+            return DefaultContentSecurityPolicy.buildHeaderNormally(this);
+        }
+
+        @Override
+        public Collection<String> getFrameAncestors() {
+            if (ancestors == null) {
+                return null;
+            }
+            List<String> list = new ArrayList<String>(ancestors.length);
+            for (String item : ancestors) {
+                list.add(item);
+            }
+            return list;
+        }
+
+        @Override
+        public Collection<String> getFrameSources() {
+            return new ArrayList<String>(0);
+        }
+
+        @Override
+        public Collection<String> getScriptSources() {
+            List<String> list = new ArrayList<String>(1);
+            list.add(null);
+            return list;
+        }
+
+        @Override
+        public Collection<String> getStyleSources() {
+            List<String> list = new ArrayList<String>(1);
+            list.add(null);
+            return list;
+        }
+
+        @Override
+        public Collection<String> getConnectSources() {
+            List<String> list = new ArrayList<String>(2);
+            list.add("www.itrustu.com/");
+            list.add("www.also.com/other");
+            return list;
+        }
+
+        @Override
+        public Collection<String> getFontSources() {
+            return null;
+        }
+
+        @Override
+        public Collection<String> getDefaultSources() {
+            List<String> list = new ArrayList<String>(1);
+            list.add(null);
+            return list;
+        }
+
+        @Override
+        public Collection<String> getImageSources() {
+            return null;
+        }
+
+        @Override
+        public Collection<String> getObjectSources() {
+            return new ArrayList<String>(0);
+        }
+
+        @Override
+        public Collection<String> getMediaSources() {
+            return null;
+        }
+
+        @Override
+        public String getReportUrl() {
+            return "http://doesnt.matter.com/";
+        }
+    }
+
     public AuraServletHttpTest(String name) {
         super(name);
     }
@@ -259,119 +343,39 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     @ThreadHostileTest("swaps config adapter")
-    public void testSpecialCsp() throws Exception {
-        ContentSecurityPolicy mockCsp = new ContentSecurityPolicy() {
-
-            @Override
-            public String getCspHeaderValue() {
-                return DefaultContentSecurityPolicy.buildHeaderNormally(this);
-            }
-
-            @Override
-            public Collection<String> getFrameAncestors() {
-                List<String> list = new ArrayList<String>(3);
-                list.add(null);
-                list.add("www.itrustu.com/frame");
-                list.add("www.also.com/other");
-                return list;
-            }
-
-            @Override
-            public Collection<String> getFrameSources() {
-                return new ArrayList<String>(0);
-            }
-
-            @Override
-            public Collection<String> getScriptSources() {
-                List<String> list = new ArrayList<String>(1);
-                list.add(null);
-                return list;
-            }
-
-            @Override
-            public Collection<String> getStyleSources() {
-                List<String> list = new ArrayList<String>(1);
-                list.add(null);
-                return list;
-            }
-
-            @Override
-            public Collection<String> getConnectSources() {
-                List<String> list = new ArrayList<String>(2);
-                list.add("www.itrustu.com/");
-                list.add("www.also.com/other");
-                return list;
-            }
-
-            @Override
-            public Collection<String> getFontSources() {
-                return null;
-            }
-
-            @Override
-            public Collection<String> getDefaultSources() {
-                List<String> list = new ArrayList<String>(1);
-                list.add(null);
-                return list;
-            }
-
-            @Override
-            public Collection<String> getImageSources() {
-                return null;
-            }
-
-            @Override
-            public Collection<String> getObjectSources() {
-                return new ArrayList<String>(0);
-            }
-
-            @Override
-            public Collection<String> getMediaSources() {
-                return null;
-            }
-
-            @Override
-            public String getReportUrl() {
-                return "http://doesnt.matter.com/";
-            }
-        };
-
-        MockConfigAdapter mci = getMockConfigAdapter();
-
-        try {
-            mci.setContentSecurityPolicy(mockCsp);
-
-            // An application with isOnePageApp set to true
-            DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                    "<aura:application isOnePageApp='true'></aura:application>");
-
-            HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
-            HttpResponse response = perform(get);
-
-            // Check X-FRAME-OPTIONS
-            Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 3, headers.length);
-            assertEquals("SAMEORIGIN", headers[0].getValue());
-            assertEquals("www.itrustu.com/frame", headers[1].getValue());
-            assertEquals("www.also.com/other", headers[2].getValue());
-            // And CSP
-            Map<String, String> csp = getCSP(response);
-            assertEquals("frame-ancestors is wrong", "'self' www.itrustu.com/frame www.also.com/other", csp.get("frame-ancestors"));
-            assertEquals("script-src is wrong", "'self'", csp.get("script-src"));
-            assertEquals("style-src is wrong", "'self'", csp.get("style-src"));
-            assertEquals("connect-src is wrong", "www.itrustu.com/ www.also.com/other", csp.get("connect-src"));
-            assertEquals("font-src is wrong", "*", csp.get("font-src"));
-            assertEquals("img-src is wrong", "*", csp.get("img-src"));
-            assertEquals("object-src is wrong", "'none'", csp.get("object-src"));
-            assertEquals("media-src is wrong", "*", csp.get("media-src"));
-            assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
-
-        } finally {
-            mci.setContentSecurityPolicy(null);
-            ServiceLocatorMocker.unmockServiceLocator();
-        }
+    public void testSpecialCspMultipleAncestors() throws Exception {
+        Header[] headers = doSpecialCspTest("'self' www.itrustu.com/frame www.also.com/other",
+                null, "www.itrustu.com/frame", "www.also.com/other");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
     }
 
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspSingleAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("www.itrustu.com/frame", "www.itrustu.com/frame");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("ALLOW-FROM www.itrustu.com/frame", headers[0].getValue());
+    }
+
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspDeniedAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("'none'");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("DENY", headers[0].getValue());
+    }
+
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspSameOriginAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("'self'", (String)null);
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("SAMEORIGIN", headers[0].getValue());
+    }
+
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspAnyAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("*", (String[]) null);
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+    }
+    
     public void testHTMLTemplateCachingWhenAppCacheIsEnable() throws Exception {
         setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
 
@@ -465,6 +469,44 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
     }
 
+    /** Runs a test with special CSP */
+    private Header[] doSpecialCspTest(String expectCspAncestors, String... ancestors) throws Exception {
+        ContentSecurityPolicy mockCsp = new MockCsp(ancestors);
+
+        MockConfigAdapter mci = getMockConfigAdapter();
+
+        try {
+            mci.setContentSecurityPolicy(mockCsp);
+
+            // An application with isOnePageApp set to true
+            DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                    "<aura:application isOnePageApp='true'></aura:application>");
+
+            HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+            HttpResponse response = perform(get);
+
+            // Check X-FRAME-OPTIONS
+            Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
+
+            // And CSP
+            Map<String, String> csp = getCSP(response);
+            assertEquals("frame-ancestors is wrong", expectCspAncestors, csp.get("frame-ancestors"));
+            assertEquals("script-src is wrong", "'self'", csp.get("script-src"));
+            assertEquals("style-src is wrong", "'self'", csp.get("style-src"));
+            assertEquals("connect-src is wrong", "www.itrustu.com/ www.also.com/other", csp.get("connect-src"));
+            assertEquals("font-src is wrong", "*", csp.get("font-src"));
+            assertEquals("img-src is wrong", "*", csp.get("img-src"));
+            assertEquals("object-src is wrong", "'none'", csp.get("object-src"));
+            assertEquals("media-src is wrong", "*", csp.get("media-src"));
+            assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
+
+            return headers;
+        } finally {
+            mci.setContentSecurityPolicy(null);
+            ServiceLocatorMocker.unmockServiceLocator();
+        }
+
+    }
     /**
      * Verify the Script tag to fetch the Aura Framework JS has nonce. The initial get request for an application gets a
      * template as response. Part of the template response should be a script tag which fetches the Aura FW JS. The URL

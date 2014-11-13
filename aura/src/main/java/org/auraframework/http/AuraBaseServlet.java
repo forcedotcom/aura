@@ -547,20 +547,21 @@ public abstract class AuraBaseServlet extends HttpServlet {
         if (csp != null) {
             rsp.setHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
             Collection<String> terms = csp.getFrameAncestors();
-            if (terms == null) {
-                // open to the world
-                rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOW);
-            } else {
+            if (terms != null) {
+                // not open to the world; figure whether we can express an X-FRAME-OPTIONS header:
                 if (terms.size() == 0) {
                     // closed to any framing at all
                     rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_DENY);
                 } else {
-                    for (String site : terms) {
-                        if (site == null) {
-                            // Add same-origin headers and policy terms
-                            rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);
-                        } else {
-                            rsp.addHeader(HDR_FRAME_OPTIONS, site);
+                    // We're only allowed one XFO header, so we have to be open if there are 2+ sites
+                    if (terms.size() == 1) {
+                        for (String site : terms) {
+                            if (site == null) {
+                                // Add same-origin headers and policy terms
+                                rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);
+                            } else {
+                                rsp.addHeader(HDR_FRAME_OPTIONS, "ALLOW-FROM " + site);
+                            }
                         }
                     }
                 }

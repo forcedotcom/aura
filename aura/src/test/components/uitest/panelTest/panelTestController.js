@@ -8,7 +8,7 @@
             callbacks: { onCreate: function(panel){
                 var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
                 var overlay = cmps[3];
-                overlay.addHandler('press', cmp, 'c.showPanel')
+                overlay.addHandler('press', cmp, 'c.showPanelFullSCreen')
                 panel.set("v.body", cmps);
             }
             }
@@ -56,7 +56,7 @@
         var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
         var overlay = cmps[3];
         var referenceElement = cmp.find("nonModalButton").getElement();
-        overlay.addHandler('press', cmp, 'c.showModal');
+        overlay.addHandler('press', cmp, 'c.showNonModal');
 
         var openPanelEvent = $A.get('e.ui:openPanel').setParams({
             show: true,

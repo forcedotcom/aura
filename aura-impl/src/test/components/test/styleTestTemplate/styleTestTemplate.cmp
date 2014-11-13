@@ -16,7 +16,7 @@
 
 -->
 <aura:component isTemplate="true" extends="aura:template" style="templateCss://test.styleTestTemplate">
-    <ui:message> Loaded styleTestTemplate cmp. </ui:message>
+    <!-- <ui:message> Loaded styleTestTemplate cmp. </ui:message> -->
     <aura:set attribute="auraInitBlock">
     <script>
 

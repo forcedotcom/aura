@@ -16,11 +16,14 @@
 /*jslint sub: true */
 var p = PassthroughValue.prototype;
 exp(p,
+    "addValueHandler", p.addValueHandler,
     "auraType", p.auraType,
+    "deIndex", p.deIndex,
+    "fireChangeEvent", p.fireChangeEvent,
     "get", p.get,
-    "set", p.set,
-    "getReference", p.getReference,
     "getComponent", p.getComponent,
+    "getReference", p.getReference,
     "index", p.index,
-    "deIndex", p.deIndex
+    "removeValueHandler", p.removeValueHandler,
+    "set", p.set
 );

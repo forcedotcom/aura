@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 /**
  * @description A value provider that resolves against a few primary providers first, then falls back on a component.
  * @constructor
@@ -22,15 +23,95 @@ function PassthroughValue(primaryProviders, component) {
     this.primaryProviders = primaryProviders;
     this.component = component;
     this.references={};
+    this.handlers={};
 }
 
 PassthroughValue.prototype.auraType = "Value";
 
 /**
- * Returns the Component.
+ * Since PassthroughValue can have its own set of values that can be listen for changes,
+ * it needs it's own value change handler logic. Essentially you should be able to treat
+ * it like a component for change events. It does not mark dirty though, since a passthrough 
+ * does have anything to rerender, marking dirty is the responsibilithy of the referencing components.
  */
-PassthroughValue.prototype.getComponent = function() {
-    return this.component;
+PassthroughValue.prototype.addValueHandler = function(config) {    
+    // KRIS: HALO: 
+    // Only add value handlers for our values, everything else
+    // gets passed to the component we are wrapping.
+    if(!this.primaryProviders.hasOwnProperty(config.value)) {
+        return this.component.addValueHandler(config);
+    }
+
+    var event = config["event"];
+    var handlers = this.handlers[event];
+    if (!handlers) {
+        handlers = this.handlers[event] = {};
+    }
+
+    var expression = config["value"];
+    if($A.util.isExpression(expression)) {
+        expression = expression.getExpression();
+    }
+    if (!handlers[expression]) {
+        handlers[expression] = [];
+    }
+
+    for(var i=0;i<handlers[expression].length;i++){
+        if (handlers[expression][i]===config["method"] || (config["id"] && config["key"] && handlers[expression][i]["id"] === config["id"] && handlers[expression][i]["key"] === config["key"])) {
+            return;
+        }
+    }
+    handlers[expression].push(config["method"]);
+};
+
+/**
+ * Delegates de-indexing logic to the wrapped value provider.
+ * Likely delegating to a wrapped component.
+ */
+PassthroughValue.prototype.deIndex = function () {
+    var valueProvider = this.getComponent();
+
+    // Potentially nested PassthroughValue objects.
+    while (valueProvider instanceof PassthroughValue) {
+        valueProvider = valueProvider.getComponent();
+    }
+
+    if (!valueProvider) {
+        return;
+    }
+
+    valueProvider.deIndex.apply(valueProvider, arguments);
+};
+
+ /**
+ * Fires handlers registered for the specified key when the value changes
+ */
+PassthroughValue.prototype.fireChangeEvent = function(key, oldValue, value, index) {
+    var handlers = this.handlers["change"];
+    var observers=[];
+    var keypath = key+".";
+    for(var handler in handlers){
+        if(handler == key || handler.indexOf(keypath)===0 || key.indexOf(handler+".")===0){
+            observers=observers.concat(handlers[handler]);
+        }
+    }
+    if (observers.length) {
+        var eventDef = $A.get("e").getEventDef("aura:valueChange");
+        var dispatcher = {};
+        dispatcher[eventDef.getDescriptor().getQualifiedName()] = observers;
+        var changeEvent = new Event({
+            "eventDef" : eventDef,
+            "eventDispatcher" : dispatcher
+        });
+
+        changeEvent.setParams({
+            "expression" : key,
+            "value" : value,
+            "oldValue" : oldValue,
+            "index" : index
+        });
+        changeEvent.fire();
+    }
 };
 
 /**
@@ -38,7 +119,7 @@ PassthroughValue.prototype.getComponent = function() {
  * @param {String} key The data key to look up on the primary providers.
  */
 PassthroughValue.prototype.get = function(key) {
-	var path = key.split('.');
+    var path = key.split('.');
     if (this.primaryProviders.hasOwnProperty(path[0])){
         var value = null;
         if(path.length>1) {
@@ -51,8 +132,15 @@ PassthroughValue.prototype.get = function(key) {
         }
         return value;
     } else {
-    	return this.component.get(key);
+        return this.component.get(key);
     }
+};
+
+/**
+ * Returns the Component.
+ */
+PassthroughValue.prototype.getComponent = function() {
+    return this.component;
 };
 
 /**
@@ -80,33 +168,6 @@ PassthroughValue.prototype.getExpression = function(expression) {
 };
 
 /**
- * Sets the value of the primary providers associated value.
- * @param {String} key The data key to look up on the primary providers.
- * @param {Object} v The value to be set.
- */
-PassthroughValue.prototype.set = function(key, value) {
-   var path = key.split('.');
-    if (this.primaryProviders.hasOwnProperty(path[0])){
-        var target=this.primaryProviders;
-        key=path[path.length-1];
-        if(path.length>1) {
-            target=$A.expressionService.resolve(path.slice(0,path.length-1),target);
-        }
-        var oldValue=target[key];
-        target[key]=value;
-        var valueProvider = this.component;
-        while (valueProvider instanceof PassthroughValue) {
-            valueProvider = valueProvider.getComponent();
-        }
-        valueProvider.fireChangeEvent(key,oldValue,value,key);
-        valueProvider.markDirty(key);
-        return value;
-    }
-
-   return this.component.set(key,value);
-};
-
-/**
  * Returns a reference to a key on the the primary provider or the Component.
  * @param {String} key The data key for which to return a reference.
  */
@@ -122,7 +183,6 @@ PassthroughValue.prototype.getReference = function(key) {
         return this.component.getReference(key);
     }
 };
-
 
 /**
  * Delegates indexing logic to the wrapped value provider.
@@ -144,22 +204,68 @@ PassthroughValue.prototype.index = function () {
 };
 
 /**
- * Delegates de-indexing logic to the wrapped value provider.
- * Likely delegating to a wrapped component.
+ * Removes a handler for the specified type of event. Currently only supports
+ * 'change'.
  */
-PassthroughValue.prototype.deIndex = function () {
-    var valueProvider = this.getComponent();
-
-    // Potentially nested PassthroughValue objects.
-    while (valueProvider instanceof PassthroughValue) {
-        valueProvider = valueProvider.getComponent();
+PassthroughValue.prototype.removeValueHandler = function(config) {
+    // KRIS: HALO: 
+    // Only value handlers for our values are added, everything else
+    // gets passed to the component we are wrapping. So remove it there.
+    if(!this.primaryProviders.hasOwnProperty(config.value)) {
+        return this.component.removeValueHandler(config);
     }
 
-    if (!valueProvider) {
-        return;
+    var event = config["event"];
+    var handlers = this.handlers[event];
+    if (handlers) {
+        var expression = config["value"];
+        if ($A.util.isExpression(expression)) {
+            expression = expression.getExpression();
+        }
+        if (handlers[expression]) {
+            for (var i = 0; i < handlers[expression].length; i++) {
+                var method = handlers[expression][i];
+                if (method===config["method"] || (config["id"] && config["key"] && method["id"] === config["id"] && method["key"] === config["key"])) {
+                    handlers[expression].splice(i--, 1);
+                }
+            }
+        }
+    }
+};
+
+/**
+ * Sets the value of the primary providers associated value.
+ * @param {String} key The data key to look up on the primary providers.
+ * @param {Object} v The value to be set.
+ */
+PassthroughValue.prototype.set = function(key, value) {
+   var path = key.split('.');
+    if (this.primaryProviders.hasOwnProperty(path[0])){
+        var target=this.primaryProviders;
+        key=path[path.length-1];
+        if(path.length>1) {
+            target=$A.expressionService.resolve(path.slice(0,path.length-1),target);
+        }
+        var oldValue=target[key];
+        target[key]=value;
+
+        var valueProvider = this.component;
+        while (valueProvider instanceof PassthroughValue) {
+            valueProvider = valueProvider.getComponent();
+        }
+        valueProvider.fireChangeEvent(key,oldValue,value,key);
+        valueProvider.markDirty(key);
+
+        // KRIS: HALO: 
+        // Do we have any change events for the key?
+        // It's possible both we and the component have references that need
+        // to be fired, so I'm firing both here.
+        this.fireChangeEvent(key,oldValue,value,key);
+
+        return value;
     }
 
-    valueProvider.deIndex.apply(valueProvider, arguments);
+   return this.component.set(key,value);
 };
 
 //#include aura.value.PassthroughValue_export

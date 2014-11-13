@@ -19,6 +19,9 @@
 	*/
 
 	browsers:["GOOGLECHROME", "SAFARI"],
+	attributes: {
+		isModal : true
+	},
 
 	setUp: function(cmp) {
 		FORCE = {
@@ -31,13 +34,24 @@
 	// verify modal element
 	verifyModalElements: function(cmp) {
 
+		var containerEle = cmp.getElement();
 		var ele = cmp.find("panel").getElement();
-
+		
 		$A.test.assertTruthy(ele.querySelector(".modalWindow"), "Element is not rendered as modal");
 		$A.test.assertTruthy(ele.querySelector(".closeBtn"), "Close button is not rendered");
 		$A.test.assertTrue($A.util.hasClass(ele, "panel"), "Element is not rendered with panel class");
 		$A.test.assertTrue($A.util.hasClass(ele, "panelDialog"), "Element is not rendered with panelDialog class");
-
+		
+		//check for modal vs nonModal overlay
+		if(cmp.get("v.isModal")) {
+			$A.test.assertTrue($A.util.hasClass(containerEle, "modal"), "Container Element should have modal class");
+			$A.test.assertTruthy(containerEle.querySelector(".modal-glass"), "modal glass is not rendered");
+		}
+		else{
+			$A.test.assertTrue($A.util.hasClass(containerEle, "nonmodal"), "Container Element is not rendered with nonmodal class");
+			$A.test.assertFalsy(containerEle.querySelector(".modal-glass"), "modal glass should not be rendered for nonModal panel Dialog");
+		}
+		
 		// title bar
 		if(cmp.get("v.title") || cmp.get("v.detail")) {
 			
@@ -131,13 +145,36 @@
 	    	);
 	    }
 	},
+	
+	testNonModalAllAttributes:{
+
+		attributes: {
+			isVisible: true, 
+			'class': "testClass",
+			title: "test title",
+			detail: "test detail",
+			isScrollable: true,
+			isModal: false
+		},
+	    test : function(cmp){
+
+	    	var context = this;
+	    	$A.test.runAfterIf(
+	    		function() { return (!cmp.get("v.body").length || cmp.find("panel").getElement().querySelector(".uiButton"));},
+	    		function() {
+	    			// Assert
+	    			context.verifyModalElements(cmp);
+	    		}
+	    	);
+	    }
+	},
 
 	testModalTitleOnly:{
 
 		attributes: {
 			isVisible:true, 
 			'class': "testClass",
-			title: "test title"
+			title: "test title",
 		},
 	    test : function(cmp){
 

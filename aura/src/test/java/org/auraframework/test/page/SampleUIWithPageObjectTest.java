@@ -38,15 +38,6 @@ public class SampleUIWithPageObjectTest extends PageObjectTestCase<SampleAuraPag
 		return Mode.SELENIUM;
 	}
 	
-	/**
-	 * get the mode without fast click, for IPAD and Android browsers
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private Mode getModeWithoutFastClick() {
-		return Mode.CADENCE;
-	}
-	
 	public void testButtunUIWithPageObject() throws Exception {
 		//TODO browserType&mode etc should belong to [test]Context, not Page Object.
 		page().passWebdriverInfo(getBrowserType(), this.currentDriver, getDefaultMode(), timeoutInSecs, true);

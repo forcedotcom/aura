@@ -26,6 +26,22 @@ public class ComponentAccessAttributeEnforcementTest extends
 	}
 	
 	/**
+	 * Verify Creating an Component works with abstract='true'
+	 * @throws Exception
+	 */
+	public void testAbstract() throws Exception {
+		verifyAbstract();
+    }
+	
+	/**
+	 * Verify Creating an Component works with extends='true'
+	 * @throws Exception
+	 */
+	public void testExtends() throws Exception {
+		verifyExtensible();
+    }
+	
+	/**
 	 * Verify Creating an Component works
 	 * @throws Exception
 	 */

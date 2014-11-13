@@ -28,6 +28,14 @@ public class InterfaceAccessAttributeEnforcementTest extends
 	}
 	
 	/**
+	 * Verify Creating a Interface works
+	 * @throws Exception
+	 */
+	public void testAccess() throws Exception {
+		verifyAccess();
+    }
+	
+	/**
 	 * Verify Extending aura:rootComponent interface
 	 * @throws Exception
 	 */

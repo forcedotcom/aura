@@ -16,14 +16,13 @@
 package org.auraframework.impl.root.library;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -33,9 +32,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonConstant;
-import org.auraframework.util.json.JsonStreamReader;
-import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
 
 public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements IncludeDefRef {
     private static final long serialVersionUID = 610875326950592992L;
@@ -97,32 +93,6 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
     public void validateReferences() throws QuickFixException {
         IncludeDef includeDef = includeDescriptor.getDef();
         includeDef.validateDefinition();
-        if (export == null) {
-            // need a second-pass validation that library code is a function
-            String code = includeDef.getCode();
-            JsonStreamReader in = new JsonStreamReader(new StringReader(code), null);
-            try {
-                JsonConstant token = in.next();
-                if (token != JsonConstant.FUNCTION) {
-                    throw new InvalidDefinitionException(String.format("Library: %s does not represent a function",
-                            includeDescriptor.getName()), getLocation());
-                }
-            } catch (JsonStreamParseException e) {
-                throw new InvalidDefinitionException(String.format("Library: %s does not represent a function",
-                        includeDescriptor.getName()), getLocation(), e);
-            } catch (IOException e) {
-                // this shouldn't happen because the code should have passed initial validation in
-                // JavascriptIncludeDefHandler
-                throw new InvalidDefinitionException("Invalid library code", getLocation(), e);
-            } finally {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // this shouldn't happen because the code should have passed initial validation in
-                    // JavascriptIncludeDefHandler
-                }
-            }
-        }
         if (imports != null) {
             for (DefDescriptor<IncludeDef> imported : imports) {
                 imported.getDef().validateDefinition();

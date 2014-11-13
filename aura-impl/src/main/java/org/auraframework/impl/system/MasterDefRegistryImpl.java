@@ -1200,6 +1200,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def,
             Cache<String, String> accessCheckCache) {
+    	if (def == null) {
+    		return null;
+    	}
+    	
         // If the def is access="global" or does not require authentication then anyone can see it
         DefinitionAccess access = def.getAccess();
         if (access.isGlobal() || !access.requiresAuthentication()) {

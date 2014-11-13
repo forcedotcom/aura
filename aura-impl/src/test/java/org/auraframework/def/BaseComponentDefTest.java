@@ -348,7 +348,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "model='oops'", "");
             fail("Should not be able to load component with invalid model");
         } catch (QuickFixException e) {
-            checkExceptionStart(e, DefinitionNotFoundException.class, "No MODEL named java://oops found :");
+            checkExceptionStart(e, DefinitionNotFoundException.class, "No MODEL named java://oops found");
         }
     }
 
@@ -405,7 +405,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "controller='oops'", "");
             fail("Should not be able to load component with invalid controller");
         } catch (QuickFixException e) {
-            checkExceptionStart(e, DefinitionNotFoundException.class, "No CONTROLLER named java://oops found :");
+            checkExceptionStart(e, DefinitionNotFoundException.class, "No CONTROLLER named java://oops found");
         }
     }
 

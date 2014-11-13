@@ -20,8 +20,8 @@
 <aura:attribute name="stopClickPropagation" type="Boolean"/>
 <div style="display:inline-block;width:50%;vertical-align:top;" onclick="{!c.clickPress}">
         <h2>Event bubbling is sets</h2>
-        <ui:menu aura:id="uiMenu" class="clubMenu" stopClickPropagation="{!v.stopClickPropagation}">
-            <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
+        <ui:menu aura:id="uiMenu" class="clubMenu">
+            <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club" stopClickPropagation="{!v.stopClickPropagation}"/>
             <ui:menuList class="actionMenu" aura:id="actionMenu">
                 <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
                 <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>

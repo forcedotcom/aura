@@ -21,14 +21,6 @@
             target.set("v.referenceElement", trigger.getElement());
     	}
 
-        // This is to support components that have set these attributes on ui:menu. Should remove this code once they are modified.
-        if (target) {
-            target.set("v.closeOnClickOutside", component.get("v.closeOnClickOutside"));
-        }
-        if (trigger) {
-            trigger.set("v.stopClickPropagation", component.get("v.stopClickPropagation"));
-        }
-
     	return this.superAfterRender();
 	}
 })

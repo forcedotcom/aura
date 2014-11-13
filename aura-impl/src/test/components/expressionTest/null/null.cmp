@@ -21,8 +21,7 @@
     <expressionTest:test expression="{!null}" exprText="null" expected="null"/>
 
     <expressionTest:test expression="{!v.isNull}" exprText="v.isNull" expected="null"/>
-    <!--W-2256422 - Used to work before halo work -->
-    <!--expressionTest:test expression="{!undefined}" exprText="undefined" expected="undefined"/-->
+    <expressionTest:test expression="{!undefined}" exprText="undefined" expected="undefined"/>
 
     <expressionTest:test expression="{!!null}" exprText="!null" expected="true"/>
 
@@ -31,13 +30,17 @@
     <expressionTest:test expression="{!null == ''}" exprText="null == ''" expected="false"/>
     <expressionTest:test expression="{!null == 0}" exprText="null == 0" expected="false"/>
     <expressionTest:test expression="{!null == null}" exprText="null == null" expected="true"/>
-    <!--expressionTest:test expression="{!null == undefined}" exprText="null == undefined" expected="true"/-->
-    <!--W-2256422 - Expression service says null == m.NaN -->
-    <!--expressionTest:test expression="{!null == m.NaN}" exprText="null == m.NaN" expected="false"/-->
+    <expressionTest:test expression="{!null == undefined}" exprText="null == undefined" expected="true"/>
+    <expressionTest:test expression="{!null == m.naN}" exprText="null == m.naN" expected="false"/>
+    <!-- Oddly, NaN != NaN -->
+    <expressionTest:test expression="{!NaN == m.naN}" exprText="NaN == m.naN" expected="false"/>
+    <expressionTest:test expression="{!'NaN' == m.naN}" exprText="'NaN' == m.naN" expected="false"/>
+    <!-- Just to be sure, check the string version -->
+    <expressionTest:test expression="{!''+null/null == ''+m.naN}" exprText="NaN == m.naN" expected="true"/>
 
     <expressionTest:test expression="{!null != null}" exprText="null != null" expected="false"/>
-    <!--expressionTest:test expression="{!null != undefined}" exprText="null != undefined" expected="false"/-->
-    <!--expressionTest:test expression="{!null != m.NaN}" exprText="null != m.NaN" expected="true"/-->
+    <expressionTest:test expression="{!null != undefined}" exprText="null != undefined" expected="false"/>
+    <expressionTest:test expression="{!null != m.naN}" exprText="null != m.naN" expected="true"/>
 
     <expressionTest:test expression="{!true &amp;&amp; null}" exprText="true &amp;&amp; null" expected="null"/>
     <expressionTest:test expression="{!null &amp;&amp; null}" exprText="null &amp;&amp; null" expected="null"/>
@@ -97,7 +100,7 @@
     <expressionTest:test expression="{!m.integerNull}" exprText="m.integerNull" expected="null"/>
     <expressionTest:test expression="{!m.doubleNull}" exprText="m.doubleNull" expected="null"/>
     <expressionTest:test expression="{!m.objectNull}" exprText="m.objectNull" expected="null"/>
-
+    
     <expressionTest:test expression="{!!m.stringNull}" exprText="!m.stringNull" expected="true"/>
     <expressionTest:test expression="{!!m.objectNull}" exprText="!m.objectNull" expected="true"/>
     <expressionTest:test expression="{!null == m.stringNull}" exprText="null == m.stringNull" expected="true"/>

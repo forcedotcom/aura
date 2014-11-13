@@ -20,7 +20,7 @@
             body      = values.body[cmp.getGlobalId()],
             overflow  = values.overflow,
             container = document.createElement(tag),
-            className = values.class + (overflow ? ' overflow' : '');
+            className = values["class"] + (overflow ? ' overflow' : '');
 
         container.className = className;
         

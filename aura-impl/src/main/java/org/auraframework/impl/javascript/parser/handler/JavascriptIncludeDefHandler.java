@@ -28,7 +28,6 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
-import org.auraframework.util.json.JsonConstant;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
@@ -46,35 +45,31 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
     @Override
     public IncludeDef getDefinition() {
         JsonStreamReader in = null;
-        Map<String, Object> map = null;
-        String contents = "({code:function(){" + source.getContents() + "\n}})";
-
+        String contents = "function(){" + source.getContents() + "\n}";
+        String code = null;
+        in = new JsonStreamReader(new StringReader(contents), getHandlerProvider());
         try {
-            in = new JsonStreamReader(new StringReader(contents), getHandlerProvider());
-            try {
-                JsonConstant token = in.next();
-                if (token == JsonConstant.FUNCTION_ARGS_START) {
-                    in.next();
-                }
-                map = in.getObject();
-            } finally {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // We are in a very confusing state here, don't throw an exception.
-                    // Either we've already had an exception, in which case we have
-                    // more information there, or we successfully finished, in which
-                    // case it is rather unclear how this could happen.
-                }
-            }
-            JsFunction function = (JsFunction) map.get("code");
-            String code = function.getBody();
-            builder.setCode(code);
+            in.next();
+            JsFunction function = (JsFunction) in.getValue();
+            code = function.getBody();
         } catch (JsonParseException pe) {
-            return createDefinition(new AuraRuntimeException(pe, getLocation()));
-        } catch (IOException e) {
-            return createDefinition(new AuraRuntimeException(e, getLocation()));
+            // EVIL: JsonStreamReader doesn't handle js regex during parse, so we can end up here unexpectedly
+            // TODO: will have to find better impl to sanitize and validate library content
+            // until then, at least strip out multi-line comments
+            code = source.getContents();
+            code = code.trim().replaceAll("(?s)/\\*.*?\\*/", "");
+        } catch (IOException ioe) {
+            return createDefinition(new AuraRuntimeException(ioe, getLocation()));
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // We are in a very confusing state here, don't throw an exception. Either we've already had an
+                // exception, in which case we have more information there, or we successfully finished, in which case
+                // it is rather unclear how this could happen.
+            }
         }
+        builder.setCode(code);
         setDefBuilderFields(builder);
         return builder.build();
     }

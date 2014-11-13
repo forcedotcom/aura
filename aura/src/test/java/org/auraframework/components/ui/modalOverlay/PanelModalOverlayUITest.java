@@ -29,7 +29,7 @@ import org.openqa.selenium.WebElement;
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD})
 public class PanelModalOverlayUITest extends WebDriverTestCase {
 
-    private static final String APP = "uitest/panelTest.cmp";
+    private static final String APP = "/uitest/panelTest.cmp";
     private final String MODAL_OVERLAY_BUTTON = ".panelDialogModalButton";
     private final String NONMODAL_OVERLAY_BUTTON = ".panelDialogNonModalButton";
     private final String PANEL_OVERLAY_BUTTON = ".panelOverlayButton";

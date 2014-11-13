@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser.handler.mock;
+package org.auraframework.impl.javascript.testsuite;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
@@ -22,10 +22,8 @@ import java.util.Map;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.javascript.model.JavascriptModelDef.Builder;
 import org.auraframework.instance.Model;
-import org.auraframework.system.Source;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.DelegatingStubHandler;
 import org.auraframework.test.mock.Invocation;
@@ -42,11 +40,9 @@ import com.google.common.collect.Maps;
 public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> {
     private DefDescriptor<ModelDef> modelDefDescriptor = null;
 
-    public JavascriptMockModelHandler(DefDescriptor<TestSuiteDef> descriptor,
-            Source<?> source,
-            DefDescriptor<? extends BaseComponentDef> targetDescriptor,
+    public JavascriptMockModelHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
             Map<String, Object> map) {
-        super(descriptor, source, targetDescriptor, map);
+        super(targetDescriptor, map);
     }
 
     @Override
@@ -67,8 +63,7 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
         if (object != null && Model.class.equals(retClass)) {
             if (!(object instanceof Map)) {
                 throw new InvalidDefinitionException(
-                        "Mock Model expects a map of property names to Answers.",
-                        getLocation());
+                        "Mock Model expects a map of property names to Answers.", getLocation());
             }
             Map<String, Object> properties = Maps.newHashMap();
             Map<?, ?> propMap = (Map<?, ?>) object;

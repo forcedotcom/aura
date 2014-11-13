@@ -15,6 +15,7 @@
  */
 package org.auraframework.def;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ public interface TestCaseDef extends Definition {
      * 
      * @return the Set of Definitions expected by this test case
      */
-    Set<Definition> getLocalDefs();
+    Collection<Definition> getLocalDefs();
 
     /**
      * The set of Aura errors (displayed via $A.error) that are allowed during initialization. These exceptions will not
@@ -90,12 +91,12 @@ public interface TestCaseDef extends Definition {
      * 
      * @return the scrumTeam for this test is tagged with
      */
-	String getScrumTeam();
+    String getScrumTeam();
 
-	/**
+    /**
      * Owner intended for a particular test cases, 
      * 
      * @return the owner for this test is tagged with
      */
-	String getOwner();
+    String getOwner();
 }

@@ -17,6 +17,7 @@ package org.auraframework.impl.clientlibrary;
 
 import java.io.IOException;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.ResourceDefBuilder;
 import org.auraframework.clientlibrary.Combinable;
 import org.auraframework.def.ResourceDef;
@@ -31,17 +32,17 @@ import org.auraframework.util.json.Json;
 public class ResourceDefImpl extends DefinitionImpl<ResourceDef> implements ResourceDef, Combinable {
 
     private static final long serialVersionUID = -840450408511942916L;
-
-    private final Source<ResourceDef> source;
+    private final String contents;
 
     protected ResourceDefImpl(Builder builder) {
         super(builder);
-        this.source = builder.source;
+        this.contents = builder.source.getContents();
     }
 
     @Override
+    @Deprecated
     public Source<ResourceDef> getSource() {
-        return this.source;
+        return Aura.getDefinitionService().getDefRegistry().getSource(getDescriptor());
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ResourceDefImpl extends DefinitionImpl<ResourceDef> implements Reso
 
     @Override
     public String getContents() {
-        return this.source.getContents();
+        return this.contents;
     }
 
     @Override

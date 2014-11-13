@@ -45,13 +45,19 @@
 	handleUpdate : function(cmp, event) {
 		var helper = cmp.getDef().getHelper();
         var updateOn = helper.getUpdateOn(cmp);
-        var editorInstance = this.getEditorInstance(cmp);
         // if this is an event we're supposed to update on
         if ($A.util.arrayIndexOf(updateOn, event.name || event.type) > -1) {
         	var value = cmp.get('v.value');
+        	//TODO: Do we need to compare content here?
         	var content = helper.getContent(cmp);
         	if (value !== content) {
+        		//setting the attribute value will trigger the change event and also rerender the component
+        		//use a flag here prevent the component rerender every time the value is changed
+        		//It is also used to prevent the editor content getting set again in the value change handler
+        		//change event still fires even if "ignoreChange"(third argument) is set to true if v.value is an expression
+        		cmp._updatingValue = true;
         		cmp.set('v.value', content);
+        		cmp._updatingValue = false;
         	}
         }
 	},

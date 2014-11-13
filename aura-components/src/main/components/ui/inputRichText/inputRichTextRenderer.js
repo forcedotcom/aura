@@ -21,16 +21,8 @@
 	},
 	
 	rerender: function(cmp, helper) {
-		var shouldRender = false;
-        var attributes = cmp.getDef().getAttributeDefs();
-        attributes.each(function(attributeDef) {
-            var name = attributeDef.getDescriptor().getName();
-            if (name !== "value" && cmp.isDirty("v." + name)) { // if only date changes, no need to rerender
-                shouldRender = true;
-            }
-        });
-        if (shouldRender) {
-            this.superRerender();
+		if (!cmp.getConcreteComponent()._updatingValue) {
+			this.superRerender();
         }
 	},	
 	 

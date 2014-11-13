@@ -28,5 +28,5 @@
 	<aura:attribute name="isRichText" type="Boolean" default="true" description="Indicates if the input is in rich text or plain text. If set to false, a text area replaces the rich text editor." />	
 	
  	<aura:handler event="ui:toggleRichText" action="{!c.toggle}" description="Handler for ui:toggleRichText event" />
- 	
+ 	<aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
 </aura:component>

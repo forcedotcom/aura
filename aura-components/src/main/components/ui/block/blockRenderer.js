@@ -15,21 +15,22 @@
  */
 ({
     render: function (cmp, hlp) {
-        var values    = cmp.get('v').values,
-            tag       = values.tag,
-            body      = values.body[cmp.getGlobalId()],
-            overflow  = values.overflow,
+        var left      = cmp.get('v.left'),
+            right     = cmp.get('v.right'),
+            tag       = cmp.get('v.tag'),
+            body      = cmp.get('v.body'),
+            overflow  = cmp.get('v.overflow'),
             container = document.createElement(tag),
-            className = values["class"] + (overflow ? ' overflow' : '');
+            className = cmp.get('v.class') + (overflow ? ' overflow' : '');
 
         container.className = className;
         
-        if (values.left.length) {
-            container.appendChild(hlp.createFacetContainerNode('bLeft', values.left));
+        if (left.length) {
+            container.appendChild(hlp.createFacetContainerNode('bLeft', left));
         }
 
-        if (values.right.length) {
-            container.appendChild(hlp.createFacetContainerNode('bRight', values.right));
+        if (right.length) {
+            container.appendChild(hlp.createFacetContainerNode('bRight', right));
         }
 
         if (body.length) {
@@ -39,10 +40,9 @@
         return [container];
     },
     afterRender: function (cmp, hlp) {
-        var values = cmp.get('v').values,
-            left   = values.left,
-            right  = values.right,
-            body   = values.body[cmp.getGlobalId()];
+        var left  = cmp.get('v.left'),
+            right = cmp.get('v.right'),
+            body  = cmp.get('v.body');
 
         if (left.length) {
             $A.afterRender(left);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser.handler.mock;
+package org.auraframework.impl.javascript.testsuite;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -24,9 +24,7 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.instance.Action.State;
-import org.auraframework.system.Source;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.Answer;
 import org.auraframework.test.mock.DelegatingStubHandler;
@@ -46,9 +44,9 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
     private ControllerDef controllerDef;
     private ActionDef actionDef;
 
-    public JavascriptMockActionHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source,
-            DefDescriptor<? extends BaseComponentDef> targetDescriptor, Map<String, Object> map) {
-        super(descriptor, source, targetDescriptor, map);
+    public JavascriptMockActionHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
+            Map<String, Object> map) {
+        super(targetDescriptor, map);
     }
 
     @Override

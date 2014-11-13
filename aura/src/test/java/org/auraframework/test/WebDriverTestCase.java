@@ -150,7 +150,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return browserType;
     }
 
-    public void addMocksToTestContextLocalDef(Set<Definition> mocks) throws Throwable {
+    public void addMocksToTestContextLocalDef(Collection<Definition> mocks) throws Throwable {
         if (mocks != null && !mocks.isEmpty()) {
             TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
             if (testContextAdapter != null) {

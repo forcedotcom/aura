@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser.handler.mock;
+package org.auraframework.impl.javascript.testsuite;
 
 import java.lang.reflect.Array;
 import java.util.List;
@@ -25,9 +25,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.impl.javascript.parser.handler.JavascriptHandler;
-import org.auraframework.system.Source;
+import org.auraframework.system.Location;
 import org.auraframework.test.mock.Answer;
 import org.auraframework.test.mock.Invocation;
 import org.auraframework.test.mock.Stub;
@@ -43,16 +41,14 @@ import com.google.common.collect.Lists;
 /**
  * Parse JSTEST mock definitions into mocks to be applied when running tests.
  * 
- * @param <D>
- *            the type of Definition being modified in the registry
+ * @param <D> the type of Definition being modified in the registry
  */
-public abstract class JavascriptMockHandler<D extends Definition> extends JavascriptHandler<TestSuiteDef, D> {
+public abstract class JavascriptMockHandler<D extends Definition> {
     private final Map<String, Object> sourceMap;
     private final DefDescriptor<? extends BaseComponentDef> compDesc;
 
-    protected JavascriptMockHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source,
-            DefDescriptor<? extends BaseComponentDef> targetDescriptor, Map<String, Object> map) {
-        super(descriptor, source);
+    protected JavascriptMockHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
+            Map<String, Object> map) {
         this.sourceMap = map;
         this.compDesc = targetDescriptor;
     }
@@ -61,7 +57,6 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
         return compDesc;
     }
 
-    @Override
     public D getDefinition() {
         try {
             return createDefinition(sourceMap);
@@ -73,8 +68,12 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
     /**
      * Mocks will have handlers to parse their respective mock objects.
      */
-    @Override
     protected abstract D createDefinition(Map<String, Object> map) throws QuickFixException;
+
+    /**
+     * Mocks will have handlers to parse their respective mock objects.
+     */
+    protected abstract D createDefinition(Throwable t);
 
     /**
      * 
@@ -92,7 +91,7 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
         D ret = getDefaultBaseDefinition();
         if (ret == null) {
             throw new AuraRuntimeException("Descriptor not specified, and default definition not found for " +
-                getTargetDescriptor(), getLocation());
+                getTargetDescriptor() /*, Location */);
         }
         return ret;
     }
@@ -185,6 +184,10 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
         return null;
     }
 
+    protected Location getLocation() {
+        return null;
+    }
+
     /**
      * Read a single or list of answers
      * 
@@ -235,7 +238,7 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
                 }
             }
         }
-        throw new InvalidDefinitionException("Mock answer must specify either 'value' or 'error'", getLocation());
+        throw new InvalidDefinitionException("Mock answer must specify either 'value' or 'error'", null /* getLocation() */);
     }
 
     /**

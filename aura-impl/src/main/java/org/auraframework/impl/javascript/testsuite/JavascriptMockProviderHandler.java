@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser.handler.mock;
+package org.auraframework.impl.javascript.testsuite;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
@@ -24,10 +24,8 @@ import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
 import org.auraframework.instance.ComponentConfig;
-import org.auraframework.system.Source;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.Answer;
 import org.auraframework.test.mock.DelegatingStubHandler;
@@ -40,9 +38,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Parse JSTEST mock Providers.
  */
 public class JavascriptMockProviderHandler extends JavascriptMockHandler<ProviderDef> {
-    public JavascriptMockProviderHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source,
-            DefDescriptor<? extends BaseComponentDef> targetDescriptor, Map<String, Object> map) {
-        super(descriptor, source, targetDescriptor, map);
+    public JavascriptMockProviderHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
+            Map<String, Object> map) {
+        super(targetDescriptor, map);
     }
 
     @Override

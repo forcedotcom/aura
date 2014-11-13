@@ -24,5 +24,11 @@ public interface ResourceDef extends Definition {
     @Override
     DefDescriptor<ResourceDef> getDescriptor();
 
+    /**
+     * This is actually not a good idea.
+     *
+     * @deprecated use DefinitionService instead.
+     */
+    @Deprecated
     Source<ResourceDef> getSource();
 }

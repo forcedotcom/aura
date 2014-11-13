@@ -27,12 +27,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.javascript.parser.handler.mock.JavascriptMockActionHandler;
-import org.auraframework.impl.javascript.parser.handler.mock.JavascriptMockModelHandler;
-import org.auraframework.impl.javascript.parser.handler.mock.JavascriptMockProviderHandler;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef.Builder;
@@ -43,6 +39,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -61,34 +58,15 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         builder.code = source.getContents();
     }
 
-    private Definition parseMock(DefDescriptor<? extends BaseComponentDef> compDesc,
-            Map<String, Object> map) throws QuickFixException {
-        DefType mockType = DefType.valueOf((String) map.get("type"));
-        switch (mockType) {
-        case MODEL:
-            return new JavascriptMockModelHandler(descriptor, source, compDesc, map).getDefinition();
-        case ACTION:
-            return new JavascriptMockActionHandler(descriptor, source, compDesc, map).getDefinition();
-        case PROVIDER:
-            return new JavascriptMockProviderHandler(descriptor, source, compDesc, map).getDefinition();
-        default:
-            return null;
+    private void putMocks(Map<String,Object> mocksMap, List<Object> mocks) {
+        if (mocks == null) {
+            return;
         }
-    }
-
-    private Set<Definition> parseMocks(DefDescriptor<? extends BaseComponentDef> compDesc, List<Object> jsList)
-            throws QuickFixException {
-        Set<Definition> mocks = Sets.newHashSet();
-        if (jsList != null && !jsList.isEmpty()) {
-            for (Object jsItem : jsList) {
-                @SuppressWarnings("unchecked")
-                Definition mockDef = parseMock(compDesc, (Map<String, Object>) jsItem);
-                if (mockDef != null) {
-                    mocks.add(mockDef);
-                }
-            }
+        for (Object obj : mocks) {
+            @SuppressWarnings("unchecked")
+            Map<String,Object> mock = (Map<String,Object>)obj;
+            mocksMap.put((String)mock.get("type") + "@@@" + (String)mock.get("descriptor"), mock);
         }
-        return mocks;
     }
 
     @SuppressWarnings("unchecked")
@@ -108,7 +86,9 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         String suiteOwner = (String) map.get("owner");
         
         List<String> suiteBrowsers = (List<String>) (List<?>) map.get("browsers");
-        Set<Definition> suiteMocks = parseMocks(compDesc, (List<Object>) map.get("mocks"));
+        // Verify that we can parse.
+        List<Object> suiteMocks = (List<Object>) map.get("mocks");
+        Map<String, Object> suiteMocksMap = null;
 
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -130,8 +110,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     }
                 }
 
-                Map<String, Object> caseAttributes = (Map<String, Object>) value
-                        .get("attributes");
+                Map<String, Object> caseAttributes = (Map<String, Object>) value.get("attributes");
                 Map<String, Object> attributes = Maps.newHashMap();
                 if (suiteAttributes != null) {
                     attributes.putAll(suiteAttributes);
@@ -156,21 +135,19 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 
                 //For scrumTeam
                 if (!Strings.isNullOrEmpty(suiteScrumTeam)) {
-                	scrumTeam = suiteScrumTeam;
+                    scrumTeam = suiteScrumTeam;
                 }
                 if (!Strings.isNullOrEmpty(caseScrumTeam)) {
-                	scrumTeam = caseScrumTeam;
+                    scrumTeam = caseScrumTeam;
                 }
                 //For Owner
                 if (!Strings.isNullOrEmpty(suiteOwner)) {
-                	owner = suiteOwner;
+                    owner = suiteOwner;
                 }
                 if (!Strings.isNullOrEmpty(caseOwner)) {
-                	owner = caseOwner;
+                    owner = caseOwner;
                 }
-                
-                List<String> caseBrowsers = (List<String>) (List<?>) value
-                        .get("browsers");
+                List<String> caseBrowsers = (List<String>) (List<?>) value.get("browsers");
                 Set<String> browsers = caseBrowsers == null ? (suiteBrowsers == null ? Collections.EMPTY_SET
                         : Sets.newHashSet(suiteBrowsers))
                         : Sets.newHashSet(caseBrowsers);
@@ -187,23 +164,22 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 }
                 DefType defType = compDesc.getDefType();
 
-                Set<Definition> caseMocks = parseMocks(compDesc, (List<Object>) value.get("mocks"));
+                List<Object> caseMocks = (List<Object>) value.get("mocks");
 
-                Set<Definition> mocks;
-                if (suiteMocks.isEmpty()) {
+                List<Object> mocks;
+                if (suiteMocks == null || suiteMocks.isEmpty()) {
                     mocks = caseMocks;
-                } else if (caseMocks.isEmpty()) {
+                } else if (caseMocks == null || caseMocks.isEmpty()) {
                     mocks = suiteMocks;
                 } else {
-                    // must merge suite-level and case-level mocks
-                    Map<DefDescriptor<?>, Definition> temp = Maps.newHashMap();
-                    for (Definition def : suiteMocks) {
-                        temp.put(def.getDescriptor(), def);
+                    Map<String, Object> mocksMap;
+                    if (suiteMocksMap == null) {
+                        suiteMocksMap = Maps.newHashMap();
+                        putMocks(suiteMocksMap, suiteMocks);
                     }
-                    for (Definition def : caseMocks) {
-                        temp.put(def.getDescriptor(), def);
-                    }
-                    mocks = Sets.newHashSet(temp.values());
+                    mocksMap = Maps.newHashMap(suiteMocksMap);
+                    putMocks(mocksMap, caseMocks);
+                    mocks = Lists.newArrayList(mocksMap.values());
                 }
 
                 builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,

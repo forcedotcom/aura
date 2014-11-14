@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.ArrayList;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -28,7 +29,9 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCase {
 
@@ -81,6 +84,48 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 					} catch (Throwable e) {
 						failures.add(e.getMessage());
 					}				
+				}
+			}
+		}
+
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+	}
+	
+	protected void verifyExtensible() throws Exception {	
+		verifyExtension("extensible");
+	}
+	
+	protected void verifyAbstract() throws Exception {	
+		verifyExtension("abstract");
+	}
+	
+	private void verifyExtension(String attribute) throws Exception {	
+		testConsumer = testResource;
+		String[] values ={"false","true"};
+		ArrayList<String> failures = new ArrayList<>();
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			for (TestNamespace consumerNamespace : TestNamespace.values()) {					
+				testConsumerNamespace = consumerNamespace;
+			
+				for(String val : values){
+					try {
+						runExtensionTestCase(attribute, val);
+					} catch (Throwable e) {
+						failures.add(e.getMessage());
+					}	
 				}
 			}
 		}
@@ -160,8 +205,70 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 
 			descriptor.getDef();
 			
-		} catch (NoAccessException e) {
+		} catch (AuraHandledException e) {
 			fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource);
+		}
+	}
+	
+	protected void runExtensionTestCase(String attribute, String attributeValue) throws Exception {								
+		// target
+		String resourceSource;
+		if(attribute.equals("abstract")){
+			resourceSource =  getAbstractResourceSource(testResource, attributeValue);
+		}
+		else{
+			resourceSource =  getExtensibleResourceSource(testResource, attributeValue);
+		}
+		
+		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testResource), resourceSource,
+				getDefDescriptorName(testResource, true),
+				(testResourceNamespace == TestNamespace.System || testResourceNamespace == TestNamespace.SystemOther ? true : false));
+								
+		// consumer
+		String consumerSource;
+		if(attribute.equals("abstract")){
+			consumerSource= getAbstractResourceConsumerSource(descriptor.getName());
+		}
+		else{
+			consumerSource = getConsumerSource(descriptor.getName());
+		}
+		
+		DefDescriptor<? extends Definition> descriptorConsumer = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testConsumer), consumerSource,
+				getDefDescriptorName(testConsumer, false),
+				(testConsumerNamespace == TestNamespace.System || testConsumerNamespace == TestNamespace.SystemOther ? true : false));
+
+		Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptorConsumer);
+		try {
+			Definition def = parser.parse(descriptorConsumer, source);
+			def.validateDefinition();
+
+			if(attribute.equals("abstract")){
+				Aura.getInstanceService().getInstance(descriptorConsumer.getDef());
+			}
+			else{
+				descriptorConsumer.getDef();
+			}
+			
+			if (attribute.equals("abstract") && attributeValue.equals("true")) {
+				fail("Should have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and instantiated in "
+						+ testConsumerNamespace + "." + testConsumer);
+			}
+			
+			if (attribute.equals("extensible") && attributeValue.equals("false")) {
+				fail("Should have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and extended in "
+						+ testConsumerNamespace + "." + testConsumer);
+			}
+			
+		} catch (InvalidDefinitionException e) {
+			if (attribute.equals("abstract") && attributeValue.equals("false")) {
+				fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and instantiated in "
+						+ testConsumerNamespace + "." + testConsumer);
+			}
+			
+			if (attribute.equals("extensible") && attributeValue.equals("true")) {
+				fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and extended in "
+						+ testConsumerNamespace + "." + testConsumer);
+			}
 		}
 	}
 
@@ -245,7 +352,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		String source = null;
 
 		if (testResource == TestResource.Application || testResource == TestResource.Component) {
-			String extensible = testResourceNamespace == TestNamespace.System || testResourceNamespace == TestNamespace.SystemOther ? " extensible='true'" : "";  
+			String extensible = " extensible='true'";  
 			source = "<aura:" + resource + extensible + (access != null ? " access='" + access + "'" : "") + " />";
 		} else if (testResource == TestResource.Interface) {
 			source = "<aura:interface " + (access != null ? "access='" + access + "'" : "") + " />";
@@ -258,7 +365,21 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		} 
 		
 		return source;
-	}		
+	}	
+	
+	private String getAbstractResourceSource(TestResource testResource, String value) {
+		String resource = testResource.toString().toLowerCase();		
+		String attributeVal = " abstract='"+value+"'";  
+		String source = "<aura:" + resource + attributeVal + " access='GLOBAL'/>";		 
+		return source;
+	}
+	
+	private String getExtensibleResourceSource(TestResource testResource, String value) {
+		String resource = testResource.toString().toLowerCase();		
+		String attributeVal = " extensible='"+value+"'";  
+		String source = "<aura:" + resource + attributeVal + " access='GLOBAL'/>";		 
+		return source;
+	}
 
 	private String getConsumerSource(String targetName) {
 		String resourceName = testConsumer.toString().toLowerCase();
@@ -268,13 +389,16 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		String source = null;
 		String extendsClause = " extends='" + targetNamespace + ":" + targetName + "'";
 		if (testResource == TestResource.Application) {
-			source = "<aura:" + resourceName + " > ";
-			source += "<" + targetNamespace + ":" + targetName + " /> ";
-			source += "</aura:" + resourceName + "> ";
-		} else if (testResource == TestResource.Component) {			
-			source = "<aura:" + resourceName + "> ";
-			source += "<" + targetNamespace + ":" + targetName + " /> ";
-			source += "</aura:" + resourceName + "> ";			
+			source = "<aura:" + resourceName + extendsClause + " /> ";
+		} else if (testResource == TestResource.Component) {	
+			if (testConsumer == TestResource.Application) {
+				source = "<aura:" + resourceName + "> ";
+				source += "<" + targetNamespace + ":" + targetName + " /> ";
+				source += "</aura:" + resourceName + "> ";	
+			}
+			else if (testConsumer == TestResource.Component) {
+				source = "<aura:" + resourceName + extendsClause + " /> ";
+			}
 		} else if (testResource == TestResource.Interface) {
 			if (testConsumer == TestResource.Component) {
 				source = "<aura:" + resourceName + " implements='" + targetNamespace + ":" + targetName + "' /> ";
@@ -299,6 +423,16 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			source += "</aura:" + resourceName + "> ";							
 		}
 
+		return source;
+	}
+	
+	private String getAbstractResourceConsumerSource(String targetName) {
+		String resourceName = testConsumer.toString().toLowerCase();
+		String targetNamespace = getNamespaceValue(testResourceNamespace);		
+
+		String source  = "<aura:" + resourceName + "> ";
+		source += "<" + targetNamespace + ":" + targetName + " /> ";
+		source += "</aura:" + resourceName + "> ";	
 		return source;
 	}
 

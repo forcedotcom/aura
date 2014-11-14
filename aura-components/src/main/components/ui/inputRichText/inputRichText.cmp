@@ -29,4 +29,21 @@
 	
  	<aura:handler event="ui:toggleRichText" action="{!c.toggle}" description="Handler for ui:toggleRichText event" />
  	<aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
+    
+     <aura:renderif isTrue="{!v.body.length == 0}">
+        <textarea aura:id="textAreaElem"
+            id="{!v.domId}"
+            class="{!v.class+(v.resizable?'':' noresize')}"
+            cols="{!v.cols}"
+            rows="{!v.rows}"
+            disabled="{!v.disabled}"
+            readonly="{!v.readonly}"
+            maxlength="{!v.maxlength}"
+            placeholder="{!v.placeholder}"
+            aria-describedby="{!v.ariaDescribedBy}"/>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:renderif>
+    
 </aura:component>

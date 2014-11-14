@@ -32,6 +32,7 @@ public class SVGDefTest extends AuraImplTestCase {
         assertNotNull("SVGDef source should not be null!", svg.getSource());
         String contents = svg.getSource().getContents();
         assertTrue("SVGDef source should not be empty!", contents != null && contents.length() > 0);
+        assertTrue("SVGDef source should contain reference to SVG!", contents.contains("SVG"));
     }
 
     public void testGetNonExistentSVGDef() throws Exception {

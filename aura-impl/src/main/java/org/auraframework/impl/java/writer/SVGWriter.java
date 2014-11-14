@@ -34,6 +34,7 @@ public class SVGWriter extends SourceWriterImpl {
 
         try {
             writer = source.getWriter();
+            writer.write(source.getContents());
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
         } finally {

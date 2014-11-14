@@ -80,7 +80,7 @@
     getDateString: function(date) {
         return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     },
-    
+
     toggleClearButton: function(component) {
         if (($A.get("$Browser.isPhone") === true) || ($A.get("$Browser.isTablet") === true)) {
             var inputCmp = component.find("inputText");
@@ -90,18 +90,19 @@
             if (inputElem && clearElem) {
                 var openIconCmp = component.find("datePickerOpener");
                 var openIconElem = openIconCmp ? openIconCmp.getElement() : null;
-        	    var currentValue = inputElem.value;
-        	    if ($A.util.isUndefinedOrNull(currentValue) || $A.util.isEmpty(currentValue)) { // remove clear icon
-        	    	$A.util.removeClass(clearElem, "display");
+                var currentValue = inputElem.value;
+                if ($A.util.isUndefinedOrNull(currentValue) || $A.util.isEmpty(currentValue)) { // remove clear icon
+                    $A.util.swapClass(clearElem, "display", "hide");
+
                     if (openIconElem) {
-                    	$A.util.removeClass(openIconElem, "hide");
+                        $A.util.swapClass(openIconElem, "hide", "display");
                     }
-        	    } else {
-        	    	$A.util.addClass(clearElem, "display");
-        	    	if (openIconElem) {
-                        $A.util.addClass(openIconElem, "hide");
+                } else {
+                    $A.util.swapClass(clearElem, "hide", "display");
+                    if (openIconElem) {
+                        $A.util.swapClass(openIconElem, "display", "hide");
                     }
-        	    }
+                }
             }
         }
     }

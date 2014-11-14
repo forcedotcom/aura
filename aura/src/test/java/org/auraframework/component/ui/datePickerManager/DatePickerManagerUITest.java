@@ -37,7 +37,7 @@ public class DatePickerManagerUITest extends WebDriverTestCase {
     private final String TEST_DATE_TO_USE = "4/15/2013";
 
     private final String DATE_INPUT_BOX_SEL = "input[class*='date_input_box']";
-    private final String DATE_ICON_SEL = "//a[@class='datePicker-openIcon uiInput uiInputDate'][2]";
+    private final String DATE_ICON_SEL = "//a[@class='datePicker-openIcon display uiInput uiInputDate'][2]";
 
     public DatePickerManagerUITest(String name) {
         super(name);

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="GA" access="GLOBAL"
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent" extensible="true"
     controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
     description="An input field for entering a date and time.">    
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
@@ -34,11 +34,11 @@
     </aura:if>
     
     <aura:if isTrue="{!v.displayDatePicker}">
-        <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}">
+        <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
             <span class="assistiveText">Date Picker</span>
         </a>
     </aura:if>
-    <a aura:id="clear" class="clearIcon" onclick="{!c.clearValue}">
+    <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
         <span class="assistiveText">Clear Button</span>
     </a>
     <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}" hasTime="true"/>

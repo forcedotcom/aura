@@ -426,7 +426,7 @@ $A.ns.Util.prototype.createElementsFromMarkup=function(markup){
     if(!this.isUndefinedOrNull(markup)) {
         var tmpNode = document.createElement("span");
         tmpNode.innerHTML = markup;
-        return Array.prototype.slice.call(tmpNode.childNodes);
+        return this.toArray(tmpNode.childNodes);
     }
     return [];
 };
@@ -1892,6 +1892,32 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
  */
 $A.ns.Util.prototype.estimateSize = function(obj) {
     return this.sizeEstimator.estimateSize(obj);
+};
+
+
+/**
+ * Convert collection to a true array.
+ * When dealing with a NodeList, sometimes you'll need it to actually be an array to properly deal with it.
+ * Cannot always use Array.prototype.slice.call(), since it doesn't work in IE6/7/8 on NodeLists.
+ * @returns An empty array if you pass a null or undefined value to collection.
+ */
+$A.ns.Util.prototype.toArray = function(collection) {
+    if(this.isUndefinedOrNull(collection)) {
+        return [];
+    }
+
+    try {
+        // Done in a Try/Catch as calling this on a NodeList in IE6/7/8 throws an exception
+        return Array.prototype.slice.call(collection);
+    } catch(e) {
+        // Try to just convert the collection to a normal array using a good ole for loop.
+        var length = collection.length;
+        var newCollection = new Array(length);
+        for(var c=0;c<length;c++){
+            newCollection[c] = collection[c];
+        }
+        return newCollection;
+    }
 };
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

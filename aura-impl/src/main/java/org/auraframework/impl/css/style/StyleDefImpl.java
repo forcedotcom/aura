@@ -16,6 +16,7 @@
 package org.auraframework.impl.css.style;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -32,6 +33,9 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.ImmutableList;
+import com.salesforce.omakase.plugin.Plugin;
 
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     private static final long serialVersionUID = 7140896215068458158L;
@@ -80,9 +84,20 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     @Override
     public String getCode() {
+        return getCode(ImmutableList.<Plugin>of());
+    }
+
+    @Override
+    public String getCode(List<Plugin> plugins) {
         try {
-            return CssPreprocessor.runtime().source(content).themes(descriptor).parse().content();
-        } catch (Exception e) {
+            return CssPreprocessor.runtime()
+                    .source(content)
+                    .resourceName(descriptor.getQualifiedName())
+                    .themes(descriptor)
+                    .extras(plugins)
+                    .parse()
+                    .content();
+        } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
     }

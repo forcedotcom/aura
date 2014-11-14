@@ -20,6 +20,7 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
@@ -44,6 +45,11 @@ final class CssErrorManager implements ErrorManager {
      */
     public CssErrorManager(String resourceName) {
         this.resourceName = resourceName;
+    }
+
+    @Override
+    public String getSourceName() {
+        return resourceName;
     }
 
     @Override
@@ -77,16 +83,18 @@ final class CssErrorManager implements ErrorManager {
     /**
      * Combines all gathered messages into a single, formatted string.
      */
-    public String concatMessages() {
+    public String concatMessages(boolean includeTitle) {
         StringBuilder builder = new StringBuilder(256);
 
-        builder.append("Issue(s) found by CSS Parser");
+        if (includeTitle) {
+            builder.append("Issue(s) found by CSS Parser");
 
-        if (resourceName != null) {
-            builder.append(" (").append(resourceName).append(")");
+            if (resourceName != null) {
+                builder.append(" (").append(resourceName).append(")");
+            }
+
+            builder.append(":\n\n");
         }
-
-        builder.append(":\n\n");
 
         for (String message : messages) {
             builder.append(message).append("\n\n");
@@ -97,7 +105,7 @@ final class CssErrorManager implements ErrorManager {
 
     /**
      * Throws an exception if there are any errors.
-     * 
+     *
      * @throws StyleParserException If there are CSS errors.
      */
     public void checkErrors() throws StyleParserException, QuickFixException {
@@ -105,12 +113,14 @@ final class CssErrorManager implements ErrorManager {
         // get confused with the StyleDef itself so we have to wrap it in a runtime exception (and kill the quickfix).
         if (!wrappedExceptions.isEmpty()) {
             QuickFixException e = wrappedExceptions.get(0);
-            if (e instanceof DefinitionNotFoundException) throw new AuraRuntimeException(e);
+            if (e instanceof DefinitionNotFoundException) {
+                throw new AuraRuntimeException(e);
+            }
             throw e;
         }
 
         if (hasMessages()) {
-            throw new StyleParserException(concatMessages(), null);
+            throw new StyleParserException(concatMessages(true), null, new AuraUnhandledException(concatMessages(false)));
         }
     }
 }

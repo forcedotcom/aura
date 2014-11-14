@@ -39,9 +39,17 @@ public class ThrowableCSSFormatAdapter extends CSSFormatAdapter<Throwable> {
         if (mode != Mode.PROD && mode != Mode.PRODDEBUG && !Aura.getConfigAdapter().isProduction()) {
             out.append(AuraExceptionUtil.getStackTrace(t));
         }
+
+        String message = "\\A\\A" + t.getMessage().replaceAll("\n", "\\\\A");
+
         out.append("\n**/\n");
-        out.append(".auraErrorBox{display:block;}\n");
-        out.append(String.format("#auraErrorMessage:after{content:\" %s\";}\n", t.getMessage()));
+        out.append(".auraErrorBox,.auraMsgMask{display:block;}\n");
+
+        out.append("#auraErrorMessage {background-color:gainsboro; margin:0 10px 10px; padding:10px; color:#333;");
+        out.append("min-height:200px; max-height:300px; overflow:auto; font-family:monospace;");
+        out.append("box-shadow:inset 0 0 10px rgba(0,0,0,.4); border:1px solid #666}\n");
+
+        out.append(String.format("#auraErrorMessage:after{white-space: pre; content:\"%s\";}\n", message));
     }
 
 }

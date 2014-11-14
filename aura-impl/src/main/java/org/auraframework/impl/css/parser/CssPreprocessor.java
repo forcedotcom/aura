@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.css.parser;
 
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -39,7 +40,7 @@ import com.salesforce.omakase.writer.StyleWriter;
 
 /**
  * Parses CSS source code.
- * 
+ *
  * Use either {@link #initial()} or {@link #runtime(Client.Type)} to get started.
  */
 public final class CssPreprocessor {
@@ -77,12 +78,14 @@ public final class CssPreprocessor {
                 // we only want extra validation on the initial pass. During subsequent runtime calls we will already
                 // know the code is valid so no need to validate again.
                 plugins.add(new StandardValidation());
+                plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
             }
 
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true));
             plugins.add(PrefixPruner.prunePrefixedAtRules());
+            plugins.addAll(Aura.getStyleAdapter().getRuntimePlugins());
         }
 
         /** specify css source code */
@@ -127,11 +130,22 @@ public final class CssPreprocessor {
             return this;
         }
 
+        /** specifies any additional css plugins to run */
+        public ParserConfiguration extras(List<Plugin> plugins) {
+            this.plugins.addAll(plugins);
+            return this;
+        }
+
         /** parses the CSS according to the specified configuration */
         public ParserResult parse() throws StyleParserException, QuickFixException {
             // determine the output compression level based on the aura mode
             Mode mode = Aura.getContextService().getCurrentContext().getMode();
             StyleWriter writer = mode.prettyPrint() ? StyleWriter.inline() : StyleWriter.compressed();
+
+            if (!runtime) {
+                // write annotated comments out on the initial pass, in case the runtime pass needs them
+                writer.writeComments(true, true);
+            }
 
             // do the parsing
             CssErrorManager em = new CssErrorManager(resourceName);

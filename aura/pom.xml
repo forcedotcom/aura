@@ -66,6 +66,10 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.salesforce</groupId>
+            <artifactId>omakase</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

@@ -130,6 +130,11 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
         }
 
         @Override
+        public String textualValue() {
+            return expression();
+        }
+
+        @Override
         public boolean isWritable() {
             return false;
         }

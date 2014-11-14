@@ -368,15 +368,16 @@ var AuraRenderingService = function AuraRenderingService(){
                         }
                         break;
                     case "unrender":
-                        if(!priv.isMarker(component._marker)){
+                        if (!priv.isMarker(component._marker)) {
                             if (updatedFacet.fullUnrender || !component._marker.nextSibling) {
                                 component._marker = priv.createMarker(component._marker,"unrender facet: " + component.getGlobalId());
-                            } else if (info.component.getElement() === component._marker) {
+                            } else if (info.component.isValid() && info.component.getElement() === component._marker) {
                                 component._marker = component._marker.nextSibling;
                             }
                         }
+
                         //JBUCH: HALO: TODO: FIND OUT WHY THIS CAN BE UNRENDERING A COMPONENTDEFREF AND FIX IT
-                        if ($A.util.isComponent(info.component)&&info.component.isValid()) {
+                        if ($A.util.isComponent(info.component) && info.component.isValid()) {
                             this.unrender(info.component);
                             info.component.disassociateElements();
                             priv.cleanComponent(info.component.getGlobalId());

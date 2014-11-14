@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-    afterRender: function (cmp) {
-        var el = cmp.getElement();
+    afterRender: function (cmp, helper) {
+        var el = helper.getInputElement(cmp);
 
         $A.util.setDataAttribute(el, 'action-global-id', cmp.getGlobalId());
         $A.util.setDataAttribute(el, 'action-name', cmp.get('v.name')); 

@@ -109,8 +109,7 @@ AttributeSet.prototype.get = function(key) {
  *
  */
 AttributeSet.prototype.set = function(key, value) {
-    var target = this.values, nextTarget;
-    var step, nextStep;
+    var target = this.values;
 
     if(!$A.util.isUndefinedOrNull(value) && !this.isValueValidForAttribute(key, value)) {
     	if(this.isTypeOfArray(key)) {
@@ -124,11 +123,11 @@ AttributeSet.prototype.set = function(key, value) {
 
     // Process all keys except last one
     if (key.indexOf('.') >= 0) {
-        path = key.split('.');
-        step = path.shift();
+        var path = key.split('.');
+        var step = path.shift();
         while (path.length > 0) {
-            nextStep = path.shift();
-            nextTarget = target[step];
+            var nextStep = path.shift();
+            var nextTarget = target[step];
             if (nextTarget === undefined) {
                 // Attempt to do the right thing: create an empty object or an array
                 // depending if the next indice is an object or an array.

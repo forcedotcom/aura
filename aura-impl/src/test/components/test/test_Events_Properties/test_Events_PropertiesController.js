@@ -17,10 +17,12 @@
     changeLabel: function(component, event) {
         /*Both controllers perform the same action. They have different names just to make sure that the mapping of Actions to Events is perfect*/
         var innerCmp = component.find('innerComp');
-        innerCmp.set('v.label',"Event Properties." + "Source:"+event.getSource().toString()+ ".Action Invoked at:OuterComponent.Client Action:changeLabel");
+        var src = event.getSource();
+        innerCmp.set('v.label',"Event Properties.Source:"+ src.getDef().getDescriptor() + " {" + src.getGlobalId() + "} {" + src.getLocalId() + "}.Action Invoked at:OuterComponent.Client Action:changeLabel");
     },
     changeLabel2: function(component, event) {
         var innerCmp = component.find('innerComp');
-        innerCmp.set('v.label',"Event Properties." + "Source:"+event.getSource().toString()+ ".Action Invoked at:OuterComponent.Client Action:changeLabel2")
+        var src = event.getSource();
+        innerCmp.set('v.label',"Event Properties.Source:"+ src.getDef().getDescriptor() + " {" + src.getGlobalId() + "} {" + src.getLocalId() + "}.Action Invoked at:OuterComponent.Client Action:changeLabel2")
     }
 })

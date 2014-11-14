@@ -210,11 +210,19 @@
 		// Track the components associated with this item for future v.items delta calculations
 		cmp._itemInfos[index] = {
 			index : index,
-			itemval : itemval,
-			components : components
+			components : components,
+			hash : this.hashItem(itemval)
 		};
 	},
-
+	// If you pass an object to iteration, we will need to detect when some of it's sub-values has changed.
+	// So in order to do that we stringify the object to use it as a hash for comparison
+	hashItem: function (item) {
+		if (!$A.util.isComponent(item) && typeof item === 'object') {
+			return JSON.stringify(item);
+		} else {
+			return item;
+		}
+	},
 	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
 		var OperationConstructors = this.getOperations();
 		var itemInfos = this.getItemTracking(cmp).slice();
@@ -223,14 +231,13 @@
 
 		for (var i = start; i < end; i++) {
 			var itemval = itemsval[i];
-
+			var infoHash = this.hashItem(itemval);
 			// Find existing itemInfo for this item
 			var found = false;
 			for (var j = 0; j < itemInfos.length; j++) {
 				var info = itemInfos[j];
-				if (info && itemval === info.itemval) {
+				if (info && infoHash === info["hash"]) {
 					operations.push(new OperationConstructors.PickOperation(itemval, j, i, info.components, indexVar, varName));
-
 					// Consume the item
 					itemInfos[j] = undefined;
 					found = true;

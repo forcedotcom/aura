@@ -369,7 +369,7 @@ var AuraRenderingService = function AuraRenderingService(){
                         break;
                     case "unrender":
                         if(!priv.isMarker(component._marker)){
-                            if (updatedFacet.fullUnrender) {
+                            if (updatedFacet.fullUnrender || !component._marker.nextSibling) {
                                 component._marker = priv.createMarker(component._marker,"unrender facet: " + component.getGlobalId());
                             } else if (info.component.getElement() === component._marker) {
                                 component._marker = component._marker.nextSibling;
@@ -545,7 +545,7 @@ var AuraRenderingService = function AuraRenderingService(){
                     $A.renderingService.statsIndex["rerenderDirty"].push(cmpsWithWhy);
                 }
                 // #end
-                
+
 
                 $A.Perf.endMark(initialMarkName);
                 $A.get("e.aura:doneRendering").fire();

@@ -149,7 +149,7 @@ AttributeSet.prototype.set = function(key, value) {
         key = step;
     }
 
-    if (target[key] instanceof PropertyReferenceValue) {
+    if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal()) {
         target[key].set(value);
     } else {
         target[key] = value;

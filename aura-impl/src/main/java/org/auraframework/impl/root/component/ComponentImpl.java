@@ -19,13 +19,21 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.ComponentDefRefArray;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
+import org.auraframework.impl.type.ComponentArrayTypeDef;
+import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
+import org.auraframework.impl.type.ComponentTypeDef;
+import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
@@ -37,6 +45,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+
+import com.google.common.collect.Maps;
 
 /**
  * The real runtime component thing that sits in the tree. The Component
@@ -71,7 +81,8 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
 
     // FIXME - move to builder
     @Override
-    protected void injectComponent() throws QuickFixException {
+    protected AfterInjectComponentBehavior injectComponent() throws QuickFixException {
+    	AfterInjectComponentBehavior afterInject = null;
         if (this.intfDescriptor != null) {
             AuraContext context = Aura.getContextService().getCurrentContext();
             context.pushCallingDescriptor(descriptor);
@@ -129,11 +140,34 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
 
                         Map<String, Object> providedAttributes = config.getAttributes();
                         if (providedAttributes != null) {
+                        	Map<String, Object> nonFacets = Maps.newHashMap();
+                            Map<String, Object> facets = Maps.newHashMap();
+                            
+                            // Separate facets from non-facets
+                            ComponentDef def = descriptor.getDef();
+                            for (Map.Entry<String, Object> entry : providedAttributes.entrySet()) {
+								String name = entry.getKey();	
+								AttributeDef attributeDef = def.getAttributeDef(name);
+								if (attributeDef != null) {
+									TypeDef type = attributeDef.getTypeDef();
+	                            	Object value = entry.getValue();
+									if (type instanceof ComponentTypeDef || type instanceof ComponentArrayTypeDef || type instanceof ComponentDefRefArrayTypeDef) {
+	                            		facets.put(name, value);
+	                            	} else {
+	                            		nonFacets.put(name, value);
+	                            	}
+								}
+                            }
+                        	
                             // if there is a remote provider and attributes were
                             // set, we assume/pray the remote provider does too
                             hasProvidedAttributes = true;
                             attributeSet.startTrackingDirtyValues();
-                            attributeSet.set(providedAttributes);
+                            attributeSet.set(nonFacets);
+                            
+                            if (!facets.isEmpty()) {
+                            	afterInject = new ProvidedFacetInitializer(attributeSet, facets);
+                            }
                         }
                     }
 
@@ -146,6 +180,8 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                 context.setCurrentComponent(oldComponent);
             }
         }
+        
+        return afterInject;
     }
 
     @Override
@@ -165,4 +201,19 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
             BaseComponent<?, ?> attributeValueProvider, Component concreteComponent) throws QuickFixException {
         super(descriptor, extender, attributeValueProvider, concreteComponent);
     }
+    
+    private static class ProvidedFacetInitializer implements AfterInjectComponentBehavior {
+		ProvidedFacetInitializer(AttributeSet attributeSet, Map<String, Object> facets) {
+			this.attributeSet = attributeSet;
+    		this.facets = facets;
+    	}
+    	
+        @Override
+        public void run() throws QuickFixException {
+        	attributeSet.set(facets);
+        }
+
+        private final AttributeSet attributeSet;
+        private final Map<String, Object> facets;
+    };
 }

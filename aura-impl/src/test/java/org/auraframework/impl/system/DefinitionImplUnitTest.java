@@ -176,6 +176,12 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
     }
 
     public void testValidateDefinition() throws Exception {
+        if (testAuraContext != null) {
+            Aura.getContextService().endContext();
+        }
+        
+        testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
+    	
         buildDefinition().validateDefinition();
     }
 

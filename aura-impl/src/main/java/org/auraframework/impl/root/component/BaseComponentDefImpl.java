@@ -177,6 +177,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (DependencyDef def : dependencies) {
             def.validateDefinition();
         }
+        
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateDefinition();
             if (events.containsKey(att.getName())) {
@@ -185,16 +186,28 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         getLocation());
             }
         }
+        
+        MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
+        if (modelDefDescriptor != null) {
+        	mdr.assertAccess(this.descriptor, modelDefDescriptor.getDef());
+        }
+
+        for (DefDescriptor<ControllerDef> d : controllerDescriptors) {
+            mdr.assertAccess(this.descriptor, d.getDef());
+        }
 
         for (AttributeDefRef facet : this.facets) {
             facet.validateDefinition();
         }
+        
         for (RegisterEventDef def : events.values()) {
             def.validateDefinition();
         }
+        
         for (EventHandlerDef def : eventHandlers) {
             def.validateDefinition();
         }
+        
         for (ImportDef def : imports) {
             def.validateDefinition();
         }

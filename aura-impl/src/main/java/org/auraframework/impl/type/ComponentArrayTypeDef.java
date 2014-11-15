@@ -103,7 +103,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
                     context.getInstanceStack().clearAttributeIndex(idx);
                     idx += 1;
                 } else {
-                    throw new InvalidDefinitionException(String.format("Expected Component, recieved %s", defRef
+                    throw new InvalidDefinitionException(String.format("Expected Component, received %s", defRef
                             .getClass().getName()), getLocation());
                 }
             }

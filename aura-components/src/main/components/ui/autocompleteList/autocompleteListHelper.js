@@ -338,7 +338,6 @@
         
         //this.updateEmptyListContent(component);
         //JBUCH: HALO: HACK: WTF: FIXME THIS WHOLE COMPONENT
-        var items = component.get("v.items");
         var itemCmps=component.find("iter").get("v.body");
         for(var i=0;i<itemCmps.length;i++){
             $A.util.toggleClass(itemCmps[i],"force");
@@ -388,5 +387,14 @@
         var hasVisibleOption = this.hasVisibleOption(items);
         
         $A.util.toggleClass(component,"showEmptyContent", visible && hasVisibleOption);
+    },
+    
+    showLoading:function (component, visible) {
+        $A.util.toggleClass(component, "loading", visible);
+
+        // Originally, no loading indicator was shown. Making it only appear when specified in the facet.
+        if (!$A.util.isEmpty(component.get("v.loadingIndicator"))) {
+            $A.util.toggleClass(component, "invisible", !visible)
+        }
     }
 })

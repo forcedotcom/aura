@@ -23,10 +23,10 @@
 
         for (var i = 0; i < els.length; i++) {
             var text = $A.test.getText(els[i]);
-            actual.push(text.split("\n").join(";"));
+            actual.push(text.split("\n").join(""));
         }
 
-        aura.test.assertEquals(expected.join(";"), actual.join(";"), "Value not expected in "+ id);        
+        $A.test.assertEqualsIgnoreWhitespace(expected.join(""), actual.join(""), "Value not expected in "+ id);
 
     },
 

@@ -151,7 +151,10 @@ AttributeSet.prototype.set = function(key, value) {
 
     if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal()) {
         target[key].set(value);
-    } else {
+    } else if (!(target[key] instanceof FunctionCallValue)) {
+        // HALO: TODO: JBUCH: This is against all CS known... 
+        // Silently do nothing when you try to set on a FunctionCallValue,
+        // which we need, to support legacy old behaviour due to inheritance.
         target[key] = value;
     }
 };

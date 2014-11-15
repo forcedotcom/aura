@@ -716,13 +716,13 @@ $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertM
     if (arg1 === arg2) {
         return;
     }
-    var arg1s = arg1.replace(/\s+/gm,' ').replace(/^ | $/gm,'');
-    var arg2s = arg2.replace(/\s+/gm,' ').replace(/^ | $/gm,'');
+    var arg1s = arg1.replace(/\s+/gm,'').replace(/^ | $/gm,'');
+    var arg2s = arg2.replace(/\s+/gm,'').replace(/^ | $/gm,'');
     if (arg1s!==arg2s) {
-        if(!assertMessage){
+        if (!assertMessage) {
             assertMessage = "Values not equal";
         }
-        assertMessage += "\nExpected: {"+arg1 +"} but Actual: {"+arg2+"}";
+        assertMessage += "\nExpected: {" + arg1 + "} but Actual: {" + arg2 + "}";
         if (typeof arg1 !== typeof arg2) {
             assertMessage += "\n. Type Mismatch.";
         }

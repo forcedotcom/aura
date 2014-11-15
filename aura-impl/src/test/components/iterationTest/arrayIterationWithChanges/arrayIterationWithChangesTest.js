@@ -101,9 +101,9 @@
      *  test click on add after
      */
     testAAWithDefaultList: {
-    	test: [function(cmp) {
+    	test: [function(cmp) { 
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
-    	}, function(cmp) { 		
+    	}, function(cmp) {
         	var ele_iterationDiv = document.getElementsByClassName("iterationDiv");
             var iterationDivText = $A.util.getText(ele_iterationDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red",1);

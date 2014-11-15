@@ -49,6 +49,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         AUTOCOMPLETE_COMPONENT.put("emptyListContent", 7);
         AUTOCOMPLETE_COMPONENT.put("matchFunc", 8);
         AUTOCOMPLETE_COMPONENT.put("blurFocus", 9);
+        AUTOCOMPLETE_COMPONENT.put("toggle", 10);
     }
 
     private enum OptionType {
@@ -71,6 +72,8 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertTrue("AutocompleteList should be invisible on initial load", hasCssClass(list, "invisible"));
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Autocomplete has the incorrect number of options", 10, options.size());
+        WebElement toggle = getAutoCompleteToggle(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
+        assertNull("List toggle button should not be present", toggle);
         String matchCount = getAutoCompleteMatchCount(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         assertEquals("Match Done should not be fired yet", "", matchCount);
     }
@@ -319,6 +322,27 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertEquals("Incorrect number of visible options", 10, options.size());
     }
     
+    /**
+     * Test for autocomplete with a list toggle button. The behavior is overridden to show all items no matter what gets
+     * typed in the input field. Verifies that the list visibility can be toggled.
+     */
+    public void testAutoCompleteToggle() throws Exception {
+        Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("toggle");
+
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement toggle = getAutoCompleteToggle(driver, autoCompleteCmpNum);
+        WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+
+        assertNotNull("List toggle button should be present", toggle);
+
+        toggle.click();
+        waitForAutoCompleteListVisible(list, true);
+
+        toggle.click();
+        waitForAutoCompleteListVisible(list, false);
+    }
+    
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,
             OptionType optionType) throws Exception {
         open(URL);
@@ -379,6 +403,16 @@ public class AutocompleteUITest extends WebDriverTestCase {
     private WebElement getAutoCompleteInput(WebDriver d, int inputNumber) {
         List<WebElement> inputs = d.findElements(By.cssSelector(INPUT_SELECTOR));
         return inputs.get(inputNumber - 1);
+    }
+
+    private WebElement getAutoCompleteToggle(WebDriver d, int inputNumber) {
+        WebElement input = getAutoCompleteInput(d, inputNumber);
+        List<WebElement> toggles = input.findElements(By.xpath("following-sibling::button"));
+        if (toggles.isEmpty()) {
+            return null;
+        } else {
+            return toggles.get(0);
+        }
     }
 
     private WebElement getAutoCompleteList(WebDriver d, int listNumber) {

@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Indicates that the component has validation error(s).">
+<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that the component has validation error(s).">
     <aura:attribute name="errors" type="Object[]"/>
 </aura:event>

@@ -141,10 +141,9 @@
 
     // ui:openPanel handler 
     // creates panel if it does not already exist and then displays it
-    openPanel: function(cmp, event) {
+    openPanel: function(cmp, config) {
         var self = this,
             manager = this.getManager(cmp),
-            config = event.getParams() || {},
             panel = config.instance,
             transitioningType,
             transitioningIsModal;
@@ -158,8 +157,8 @@
         if (manager._transitioning == 'open') {
         	if (manager._transitioningInstance.isValid()) {
 	        	transitioningType = manager._transitioningInstance.getDef().getDescriptor().getQualifiedName();
-	        	transitioningIsModal = transitioningType == 'markup://ui:modalOverlay'; 
-	        	if ((config.isDialog && transitioningIsModal) || (!config.isDialog && !transitioningIsModal)) {
+	        	transitioningIsModal = transitioningType == 'markup://ui:panelDialog'; 
+	        	if ((config.isModal && transitioningIsModal) || (!config.isModal && !transitioningIsModal)) {
 	        		return;
 	        	}
         	}
@@ -193,19 +192,18 @@
             if (config.isSlider) {
                 this.createPanelSlider(cmp, config, callback);
             }
-            else if (config.isDialog) {
-                this.createPanelDialog(cmp, event, callback);
+            else if (config.isModal || config.isDialog) {
+                this.createPanelDialog(cmp, config, callback);
             }
             else {
-                this.createPanelOverlay(cmp, event, callback);
+                this.createPanelOverlay(cmp, config, callback);
             }
         }
     },
 
     // ui:createPanel handler; creates panelOverlay cmp and inserts into dom
-    createPanelOverlay: function(cmp, event, callback) {
+    createPanelOverlay: function(cmp, config, callback) {
         var self = this,
-            config = event.getParams() || {},
             headerActions = config.headerActions,
             body = config.body,
             button, panel;
@@ -230,9 +228,8 @@
     },
 
     // ui:createModal handler; creates modalOverlay cmp and inserts into dom
-    createPanelDialog: function(cmp, event, callback) {
+    createPanelDialog: function(cmp, config, callback) {
         var helper = this,
-        	config = event.getParams() || {},
             actionList = config.body,
             action, actionButton, button,
             panel;

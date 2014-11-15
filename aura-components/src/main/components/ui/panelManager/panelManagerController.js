@@ -19,7 +19,7 @@
     },
 
     openPanel: function(cmp, event, helper) {
-        helper.openPanel(cmp, event);
+        helper.openPanel(cmp, event.getParams() || {});
     },
 
     closePanel: function(cmp, event, helper) {

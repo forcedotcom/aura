@@ -17,6 +17,8 @@
 -->
 <aura:component extends="ui:inputText" extensible="true" support="proto"
     description="This component is used as input text in a ui:autocomplete component.">
+    <aura:attribute name="autocompleteButton" type="Aura.Component[]" description="Optional button to render with this component."/>
+
     <input aura:id="txt"
            id="{!v.domId}"
            class="{!v.class}"
@@ -33,4 +35,5 @@
            aria-haspopup="true"
            aria-activedescendant=""
            aria-describedby="{!v.ariaDescribedBy}"/>
+    {!v.autocompleteButton}
 </aura:component>

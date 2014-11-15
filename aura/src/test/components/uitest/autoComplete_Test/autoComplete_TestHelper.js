@@ -45,5 +45,32 @@
     	var input = cmp.find(autoCompleteCmpName + "MatchSize");
     	input.set("v.value", event.getParam("size"));
         console.log("For " + autoCompleteCmpName + " There are " + event.getParam("size") + " matched options.");
+    },
+    
+    matchFuncShowAll: function(cmp, event, autoCompleteCmpName) {
+        var autocomplete = cmp.find(autoCompleteCmpName);
+        var list = autocomplete.find("list");
+        var keyword = list.get("v.keyword");
+        var items = list.get("v.items");
+        for (var i = 0; i < items.length; i++) {
+            items[i].keyword = keyword;
+            items[i].visible = true;
+        }
+        list.set("v.items", items);
+    },
+    
+    handleToggleAction: function(cmp, event, autoCompleteCmpName) {
+		var autocomplete = cmp.find(autoCompleteCmpName);
+		var list = autocomplete.find("list");
+		if (list.get("v.visible")) {
+			list.set("v.visible", false);
+		} else {
+			var matchEvt = autocomplete.get("e.inputChange");
+			var params = {
+				value : ""
+			};
+			matchEvt.setParams(params);
+			matchEvt.fire();
+		}
     }
 })

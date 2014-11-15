@@ -228,8 +228,13 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected void finishInit() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
 
-        injectComponent();
+        AfterInjectComponentBehavior afterInject = injectComponent();
+        
         createModel();
+        
+        if (afterInject != null) {
+        	afterInject.run();
+        }
 
         context.getInstanceStack().setAttributeName("$");
         createSuper();
@@ -278,7 +283,11 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     protected abstract void createSuper() throws DefinitionNotFoundException, QuickFixException;
 
-    protected abstract void injectComponent() throws QuickFixException;
+    protected interface AfterInjectComponentBehavior {
+    	void run() throws QuickFixException;
+    }
+    
+    protected abstract AfterInjectComponentBehavior injectComponent() throws QuickFixException;
 
     public D getComponentDef() throws QuickFixException {
         return descriptor.getDef();

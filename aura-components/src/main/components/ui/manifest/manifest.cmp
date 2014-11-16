@@ -27,7 +27,8 @@ NETWORK:
 *
 
 CACHE:
-
+/auraFW/resources/aura/resetCSS.css
+/auraFW/resources/aura/normalize.css
 {!v.resourceURLs}
 
 

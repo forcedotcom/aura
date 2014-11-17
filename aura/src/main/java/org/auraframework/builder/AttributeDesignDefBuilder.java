@@ -28,7 +28,7 @@ public interface AttributeDesignDefBuilder extends DefBuilder<AttributeDesignDef
 
     public AttributeDesignDefBuilder setReadOnly(boolean readonly);
 
-    public AttributeDesignDefBuilder setDependsOnAttribute(String dependency);
+    public AttributeDesignDefBuilder setDependsOn(String dependency);
 
     public AttributeDesignDefBuilder setDataSource(String datasource);
 

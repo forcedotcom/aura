@@ -17,43 +17,27 @@ package org.auraframework.test.page;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-
-import org.auraframework.system.AuraContext.Mode;
-
 /**
  * this is an example for testing UI with PageObject pattern.
  * for more info about the PageObject 'idea': https://code.google.com/p/selenium/wiki/PageObjects
  */
 public class SampleUIWithPageObjectTest extends PageObjectTestCase<SampleAuraPageObject> {
 
-	public SampleUIWithPageObjectTest(String name) throws MalformedURLException, URISyntaxException {
-		super(new SampleAuraPageObject(name, true, "uiExamples:buttonExample"));
-	}
-	
-	/**
-	 * get the default mode 
-	 * @return
-	 */
-	private static Mode getDefaultMode() {
-		return Mode.SELENIUM;
-	}
-	
-	public void testButtunUIWithPageObject() throws Exception {
-		//TODO browserType&mode etc should belong to [test]Context, not Page Object.
-		page().passWebdriverInfo(getBrowserType(), this.currentDriver, getDefaultMode(), timeoutInSecs, true);
-		//PageObject is in charge of load itself, clicking , typing , etc
-		page().open();
-        page().clickOnButton();
-        String outputText = page().getOutputText();
+    public SampleUIWithPageObjectTest(String name) throws MalformedURLException, URISyntaxException {
+        super(name);
+    }
+
+    public void testButtunUIWithPageObject() throws Exception {
+        //create the PageObject
+        SampleAuraPageObject sapo = new SampleAuraPageObject(this.getName(), true, "uiExamples:buttonExample", this);
+        //PageObject is in charge of load itself, clicking , typing , etc
+        sapo.open();
+        sapo.clickOnButton();
+        String outputText = sapo.getOutputText();//page().getOutputText();
 
         //Test case is in charge of assertion.
         //we didn't input anything into inputText, so it's undefined.
         assertEquals("get different text!","Hi, undefined",outputText);
     }
-	
-	//need at least one test per class or it complains
-	public void testDummyPageObject() {
-		return;
-	}
 
 }

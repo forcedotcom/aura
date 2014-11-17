@@ -446,7 +446,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         String url = getUrl();
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
-        url = getAuraTestingUtil().addUrlParams(url, params);
+        url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
         
         auraUITestingUtil.waitUntilWithCallback(
@@ -738,11 +738,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 return super.toString() + String.valueOf(extras);
             }
         }
-    }
-
-    @Override
-    protected Mode getAuraModeForCurrentBrowser() {
-        return Mode.SELENIUM;
     }
 
     private void updateCookie(String name, String value, Date expiry, String path) {

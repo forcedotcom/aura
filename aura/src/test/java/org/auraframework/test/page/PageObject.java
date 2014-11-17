@@ -15,34 +15,7 @@
  */
 package org.auraframework.test.page;
 
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraTestingUtil;
-import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.AuraUITestingUtil;
-import org.openqa.selenium.WebDriver;
-
 public interface PageObject {
-	
-	//settters begin
-	void passWebdriverInfo(BrowserType browserType, WebDriver currentDriver, Mode mode, int timeoutInSecs, 
-			boolean waitForInit);
-		
-	void setCurrentBrowserType(BrowserType currentBrowserType);
-
-	void setDriver(WebDriver driver);
-	
-	public void setAuraUITestingUtil(AuraUITestingUtil auraUITestingUtil);
-	
-	public void setAuraTestingUtil(AuraTestingUtil auraTestingUtil);
-	
-	public void setMode(Mode mode);
-	
-	public void setTimeoutInSecs(int timeoutInSecs);
-	
-	public void setWaitForInit(Boolean waitForInit);
-
 	//getters begin
-	String getDescriptorString();
-	
 	String getName();
 }

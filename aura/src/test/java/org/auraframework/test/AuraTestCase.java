@@ -271,7 +271,7 @@ public abstract class AuraTestCase extends UnitTestCase {
                 .getMessage().contains(message));
     }
 
-    protected AuraTestingUtil getAuraTestingUtil() {
+    public AuraTestingUtil getAuraTestingUtil() {
         if (auraTestingUtil == null) {
             auraTestingUtil = new AuraTestingUtil();
         }

@@ -18,7 +18,6 @@ package org.auraframework.test;
 import java.util.Set;
 
 import org.auraframework.def.Definition;
-
 import com.google.common.collect.Sets;
 
 /**
@@ -27,12 +26,12 @@ import com.google.common.collect.Sets;
 public class TestContextImpl implements TestContext {
     private final String name;
     private Set<Definition> localDefs;
-    
-    public TestContextImpl(String name){
+	
+	public TestContextImpl(String name){
         this.name = (name == null ? "" : name);
     }
-    
-    @Override
+
+	@Override
     public String getName() {
         return name;
     }

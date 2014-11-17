@@ -16,18 +16,14 @@
 ({
     changeLabel: function(cmp, event) {
             var componentForEventController = event.getSource();
-            //Based on which event has been fired, the label for the inner component is changed
-            if(event.getName().toString().indexOf("testPress")>-1){
-                componentForEventController.set("v.label", "Changed Label on Press# Location:test_Events_ClientActionsController# Event:testPress");
-                //Don't require this anymore, dirty values are rerendered at the end of actions.
-                //$A.rerender(componentForEventController);
-            }else if(event.getName().toString().indexOf("testMouseOver")>-1){
-                componentForEventController.set("v.label", "Changed Label# Location:test_Events_ClientActionsController# Event:Mouse Over");
-                //$A.rerender(componentForEventController);
-            }else{
-                componentForEventController.set("v.label", "Something went wrong");
-                //$A.rerender(componentForEventController);
-            }
 
+            //Based on which event has been fired, the label for the inner component is changed
+            if (event.getName().toString().indexOf("testPress")>-1) {
+                componentForEventController.set("v.label", "Changed Label on Press# Location:test_Events_ClientActionsController# Event:testPress");
+            } else if (event.getName().toString().indexOf("testMouseOver")>-1) {
+                componentForEventController.set("v.label", "Changed Label# Location:test_Events_ClientActionsController# Event:Mouse Over");
+            } else {
+                componentForEventController.set("v.label", "Something went wrong");
+            }
     }
 })

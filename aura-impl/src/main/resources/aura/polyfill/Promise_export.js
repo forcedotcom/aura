@@ -15,9 +15,4 @@
  */
 
 /*jslint sub: true */
-var p = $A.ns.Promise.prototype;
-exp(p,
-    "then", p.then,
-    "resolve", p.resolve,
-    "reject", p.reject
-);
+Promise.prototype.then = Promise.prototype['then'];

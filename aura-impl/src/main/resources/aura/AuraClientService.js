@@ -732,27 +732,28 @@ var AuraClientService = function() {
          * Defer the action by returning a Promise object.
          * Configure your action excluding the callback prior to deferring.
          * The Promise is a thenable, meaning it exposes a 'then' function for consumers to chain updates.
-         * Do NOT use the promise constructor to initiate the action - it will subvert the actionQueue.
          *
          * @public
          * @param {Action} action - target action
          * @return {Promise} a promise which is resolved or rejected depending on the state of the action
          */
         deferAction : function (action) {
-            var promise = new $A.util.createPromise();
+            var that = this;
+            var promise = new Promise(function(success, error) {
 
-            action.wrapCallback(this, function (a) {
-                if (a.getState() === 'SUCCESS') {
-                    promise.resolve(a.getReturnValue());
-                }
-                else {
-                    // Reject the promise as it was not successful.
-                    // Give the user a somewhat useful object to use on reject.
-                    promise.reject({ state: a.getState(), action: a });
-                }
+                action.wrapCallback(that, function (a) {
+                    if (a.getState() === 'SUCCESS') {
+                        success(a.getReturnValue());
+                    }
+                    else {
+                        // Reject the promise as it was not successful.
+                        // Give the user a somewhat useful object to use on reject.
+                        error({ state: a.getState(), action: a });
+                    }
+                });
+
+                that.enqueueAction(action);
             });
-
-            this.enqueueAction(action);
 
             return promise;
         },

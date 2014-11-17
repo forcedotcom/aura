@@ -64,6 +64,8 @@ public interface ConfigAdapter extends AuraAdapter {
 
     String getFastClickJSURL();
 
+    String getEs6PromiseJSURL();
+
     List<String> getWalltimeJSURLs();
 
     boolean isPrivilegedNamespace(String namespace);

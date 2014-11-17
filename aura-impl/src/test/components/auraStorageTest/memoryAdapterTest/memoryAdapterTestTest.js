@@ -128,40 +128,40 @@
         test : function(cmp) {
             var adapter = this.adapter;
             var completed = false;
-            $A.util.when(
-                // key: 4 chars = 8 bytes
-                // value: ~32 bytes
-                adapter.setItem("key1", {
-                    "value" : {
-                        "alpha" : "beta",
-                        "gamma" : "delta"
-                    }
-                }),
-                // key: 4 chars = 8 bytes
-                // value: ~34 bytes
-                adapter.setItem("key2", {
-                    "value" : {
-                        "alpha" : "epsilon",
-                        "gamma" : "zeta"
-                    }
-                }),
-                // key: 4 chars = 8 bytes
-                // value: ~31 bytes
-                adapter.setItem("key3", {
-                    "value" : {
-                        "alpha" : "eta",
-                        "gamma" : "theta"
-                    }
-                }),
-                // key: 4 chars = 8 bytes
-                // value: ~32 bytes
-                adapter.setItem("key4", {
-                    "value" : {
-                        "alpha" : "iota",
-                        "gamma" : "kappa"
-                    }
-                })
-            )
+            Promise.all([
+                    // key: 4 chars = 8 bytes
+                    // value: ~32 bytes
+                    adapter.setItem("key1", {
+                            "value" : {
+                                "alpha" : "beta",
+                                "gamma" : "delta"
+                            }
+                    }),
+                    // key: 4 chars = 8 bytes
+                    // value: ~34 bytes
+                    adapter.setItem("key2", {
+                            "value" : {
+                                "alpha" : "epsilon",
+                                "gamma" : "zeta"
+                            }
+                    }),
+                    // key: 4 chars = 8 bytes
+                    // value: ~31 bytes
+                    adapter.setItem("key3", {
+                            "value" : {
+                                "alpha" : "eta",
+                                "gamma" : "theta"
+                            }
+                    }),
+                    // key: 4 chars = 8 bytes
+                    // value: ~32 bytes
+                    adapter.setItem("key4", {
+                            "value" : {
+                                "alpha" : "iota",
+                                "gamma" : "kappa"
+                            }
+                    })
+            ])
                 .then(function() { return adapter.getSize(); })
                 .then(function(size) { $A.test.assertEquals(40+42+39+40, size); })
                 .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
@@ -176,10 +176,10 @@
             var completed = false;
             // key: 4 chars = 8 bytes
             // value: ~32 bytes
-            $A.util.when(
+            Promise.all([
                 that.adapter.setItem("key1", {"value" : {"alpha" : "beta","gamma" : "delta"}}),
                 that.adapter.setItem("key2", {"value" : {"alpha" : "iota","gamma" : "kappa"}})
-            )
+            ])
                 .then(function() { return that.adapter.getSize(); })
                 .then(function(size) { $A.test.assertEquals(40+40, size); })
                 // removing the key, removes it from this.storage

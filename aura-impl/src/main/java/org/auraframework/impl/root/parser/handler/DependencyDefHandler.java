@@ -51,10 +51,6 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
 
     public DependencyDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) throws DefinitionNotFoundException {
         super(parentHandler, xmlReader, source);
-        
-        if (!isInPrivilegedNamespace()) {
-        	throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(TAG, ComponentDef.class));
-        }
 
         this.builder = new DependencyDefImpl.Builder();
         this.builder.setLocation(getLocation());

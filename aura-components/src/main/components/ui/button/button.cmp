@@ -38,13 +38,10 @@
 
     <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' '+v.theme+' uiBlock'}" onclick="{!c.press}" onkeydown="{!c.handleKeydown}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}" tabindex="{!v.tabIndex}">
         <aura:if isTrue="{!v.iconImgSrc != '' || v.iconClass != ''}">
-            <img src="{!v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{!v.iconClass+' icon bLeft'}" alt="{!v.label}"/>
+            <img src="{!v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{!v.iconClass+' icon bLeft'}" alt="{!v.labelDisplay == true ? '' : v.label}"/>
         </aura:if>
         <aura:if isTrue="{!v.labelDisplay}">
             <span aura:id="span" class="{!v.labelClass+' label bBody truncate'}" dir="{!v.labelDir}">{!v.label}</span>
-            <aura:set attribute="else">
-                <span aura:id="hidden" class="assistiveText">{!v.label}</span>
-            </aura:set>
         </aura:if>
         {!v.body}
     </button>

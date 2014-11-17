@@ -16,14 +16,15 @@
 
 -->
 <aura:component>
+
     <div>Testing: Associating controller actions to Events and invoking these actions.</div><br/>
     <!--This component has events associated with client actions-->
     <div>Test Case 1: Click or Mouse over have client actions associated with this</div>
-    <test:test_Events_ComponentForEvent label="#Event Generation#. Click or Mouse Over to Trigger an event"  classIdentifier="WithActions" testPress="{!c.changeLabel}" testMouseOver="{!c.changeLabel}"/>
-    <!--This component has events but not associated with any client actions-->
+    <test:test_Events_ComponentForEvent label="#Event Generation#. Click or Mouse Over to Trigger an event" aura:id="withActions" classIdentifier="WithActions" testPress="{!c.changeLabel}" testMouseOver="{!c.changeLabel}"/>
     <br/>
-    <div>Test Case 2: Click or Mouse over have no client actions associated with this</div>
-    <test:test_Events_ComponentForEvent label="#No Events Generated#. Click or Mouse Over to Trigger an event but no Client Action" classIdentifier="WithoutActions"/>
 
+    <!--This component has events but not associated with any client actions-->
+    <div>Test Case 2: Click or Mouse over have no client actions associated with this</div>
+    <test:test_Events_ComponentForEvent label="#No Events Generated#. Click or Mouse Over to Trigger an event but no Client Action" aura:id="noActions" classIdentifier="WithoutActions"/>
 
 </aura:component>

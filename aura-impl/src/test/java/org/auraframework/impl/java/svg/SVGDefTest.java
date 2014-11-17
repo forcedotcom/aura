@@ -39,6 +39,7 @@ public class SVGDefTest extends AuraImplTestCase {
     public void testGetNonExistentSVGDef() throws Exception {
         try {
             Aura.getDefinitionService().getDefinition("this:doesNotExist", SVGDef.class);
+            fail("SVGDef for 'this:doesNotExist' should not exist.");
         } catch (Exception t) {
             assertExceptionMessageStartsWith(t, DefinitionNotFoundException.class,
                     "No SVG named markup://this:doesNotExist found");
@@ -48,6 +49,7 @@ public class SVGDefTest extends AuraImplTestCase {
     public void testSvgParsingLimit() throws Exception {
         try {
             Aura.getDefinitionService().getDefinition("test:svgIsTooLarge", SVGDef.class);
+            fail("SVGDef for 'test:svgIsTooLarge' should be too large.");
         } catch (Exception t) {
             assertExceptionMessageStartsWith(t, SVGParserException.class,
                     "SVGDef length must be less than");

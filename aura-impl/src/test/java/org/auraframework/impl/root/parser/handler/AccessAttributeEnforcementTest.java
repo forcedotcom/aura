@@ -229,6 +229,40 @@ public class AccessAttributeEnforcementTest extends
     }
 	
 	/**
+	 * Verify Creating a component with aura:dependency
+	 * @throws Exception
+	 */
+	public void testComponentWithDependency() throws Exception {
+		DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+		String resourceSource = "<aura:component><aura:dependency resource='" + cmpDescA.getQualifiedName() + "'/></aura:component>";
+		
+		ArrayList<String> failures = new ArrayList<>();
+
+		for (TestNamespace targetNamespace : TestNamespace.values()) {
+			testResourceNamespace = targetNamespace;
+			
+			try {
+				runSimpleTestCase(resourceSource);
+			} catch (Throwable e) {
+				failures.add(e.getMessage());
+			}	
+			
+		}
+
+		if (!failures.isEmpty()) {
+			String message = "\n";
+			for (int i = 0; i < failures.size(); i++) {
+				message += failures.get(i);
+				if (i != failures.size() - 1) {
+					message += ",\n";
+				}
+			}
+
+			fail("Test failed with " + failures.size() + " errors:" + message);
+		}
+    }
+	
+	/**
 	 * Verify Creating a component with aura:clientLibrary
 	 * @throws Exception
 	 */
@@ -238,17 +272,6 @@ public class AccessAttributeEnforcementTest extends
 		runNegativeTestCase(resourceSource, errorMessage);		
     }
 	
-	/**
-	 * Verify Creating a component with aura:dependency
-	 * @throws Exception
-	 */
-	public void testComponentWithDependency() throws Exception {
-		DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-		String resourceSource = "<aura:component><aura:dependency resource='"+cmpDescA.getQualifiedName()+"'/></aura:component>";
-		String errorMessage = "No COMPONENT named markup://aura:dependency found";
-		runNegativeTestCase(resourceSource, errorMessage);		
-    }
-
 	private void runNegativeTestCase(String resourceSource, String errorMessage) throws Exception {								
 		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource, TestNamespace.Custom+":testCmp", false);
 		Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);

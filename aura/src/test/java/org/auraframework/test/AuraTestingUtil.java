@@ -368,48 +368,5 @@ public class AuraTestingUtil {
         sb.setCharAt(3, flip);
         return sb.toString();
     }
-    
-    /**
-     * Append a query param to avoid possible browser caching of pages
-     */
-    public String addBrowserNonce(String url) {
-        if (!url.startsWith("about:blank")) {
-            Map<String, String> params = new HashMap<>();
-            params.put("browser.nonce", String.valueOf(System.currentTimeMillis()));
-            url = addUrlParams(url, params);
-        }
-        return url;
-    }
-    
-	/**
-     * Add additional parameters to the URL. These paremeters will be added after the query string, and before a hash
-     * (if present).
-     */
-    public String addUrlParams(String url, Map<String, String> params) {
-        // save any fragment
-        int hashLoc = url.indexOf('#');
-        String hash = "";
-        if (hashLoc >= 0) {
-            hash = url.substring(hashLoc);
-            url = url.substring(0, hashLoc);
-        }
-
-        // strip query string
-        int qLoc = url.indexOf('?');
-        String qs = "";
-        if (qLoc >= 0) {
-            qs = url.substring(qLoc + 1);
-            url = url.substring(0, qLoc);
-        }
-
-        // add any additional params
-        List<NameValuePair> newParams = Lists.newArrayList();
-        URLEncodedUtils.parse(newParams, new Scanner(qs), "UTF-8");
-        for (String key : params.keySet()) {
-            newParams.add(new BasicNameValuePair(key, params.get(key)));
-        }
-
-        return url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
-    }
-
+   
 }

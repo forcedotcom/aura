@@ -19,7 +19,7 @@
 		
 		cmp.getEvent('panelDoneRendering').setParams({
 			panelId: cmp.getGlobalId(),
-			panelType: 'ui:panelModal'
+			panelType: 'ui:panelDialog'
 		}).fire();
 		
 		if (cmp.get("v.isVisible")) {

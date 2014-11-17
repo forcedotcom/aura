@@ -15,14 +15,21 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.io.IOException;
+import java.io.Reader;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.svg.SVGDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.SVGParserException;
+import org.auraframework.util.IOUtil;
 
 public class SVGDefHandler<D extends Definition> {
+    private static final int MAX_SVG_LENGTH = 150 * 1024;
+
     private final SVGDefImpl.Builder builder = new SVGDefImpl.Builder();
 
     public SVGDefHandler() {
@@ -30,10 +37,21 @@ public class SVGDefHandler<D extends Definition> {
     }
 
     @SuppressWarnings("unchecked")
-    public SVGDefHandler(DefDescriptor<D> defDescriptor, Source<SVGDef> source) {
+    public SVGDefHandler(DefDescriptor<D> defDescriptor, Source<SVGDef> source) throws SVGParserException {
         builder.setDescriptor((DefDescriptor<SVGDef>) defDescriptor);
         builder.setLocation(source.getSystemId(), source.getLastModified());
         builder.setOwnHash(source.getHash());
+
+        Reader stream = source.getHashingReader();
+        try {
+            long length = IOUtil.countNumberOfCharacters(stream);
+            if (length > MAX_SVG_LENGTH) {
+                throw new SVGParserException("SVGDef length must be less than " + MAX_SVG_LENGTH, null);
+            }
+        } catch (IOException e) {
+            throw new SVGParserException(e.getMessage(), null);
+        }
+
         builder.setSource(source);
     }
 

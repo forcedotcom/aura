@@ -19,6 +19,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.SVGParserException;
 
 public class SVGDefTest extends AuraImplTestCase {
 
@@ -41,6 +42,15 @@ public class SVGDefTest extends AuraImplTestCase {
         } catch (Exception t) {
             assertExceptionMessageStartsWith(t, DefinitionNotFoundException.class,
                     "No SVG named markup://this:doesNotExist found");
+        }
+    }
+
+    public void testSvgParsingLimit() throws Exception {
+        try {
+            Aura.getDefinitionService().getDefinition("test:svgIsTooLarge", SVGDef.class);
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, SVGParserException.class,
+                    "SVGDef length must be less than");
         }
     }
 }

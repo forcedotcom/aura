@@ -23,6 +23,7 @@ import org.auraframework.impl.root.parser.handler.SVGDefHandler;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.SVGParserException;
 
 public class SVGParser implements Parser {
     private static final SVGParser instance = new SVGParser();
@@ -33,12 +34,12 @@ public class SVGParser implements Parser {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
+    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws SVGParserException,
+            QuickFixException {
         if (descriptor.getDefType() == DefType.SVG) {
             return (D) new SVGDefHandler<SVGDef>((DefDescriptor<SVGDef>) descriptor,
                     (Source<SVGDef>) source).createDefinition();
         }
         return null;
     }
-
 }

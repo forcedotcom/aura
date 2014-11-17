@@ -33,6 +33,11 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Defines an SVG for use within the component bundles. It will be parsed out in bulk as markup with minimal validation.
+ * It's primary purpose is to serve an icon that represents the top level component visually for use in various editors.
+ * Generally, the SVG source size should be less than 4096 bytes.
+ */
 public class SVGDefImpl extends RootDefinitionImpl<SVGDef> implements SVGDef {
     private static final long serialVersionUID = 94337546417596992L;
 

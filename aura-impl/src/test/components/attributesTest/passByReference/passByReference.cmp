@@ -19,8 +19,7 @@
     <aura:attribute name="intByReference" default="2007" type="Integer"/>
     <aura:attribute name="listByReference" default="[]" type="List" />
     <aura:attribute name="mapByReference" default="{}" type="Map" />
-    <!-- TODO(W-2338914): Must define a default value for list otherwise setting it later (in init) will not be picked up -->
-    <aura:attribute name="objectWithList" default="{listEntry:[]}" type="Map" />
+    <aura:attribute name="objectWithList" type="Map" />
     
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 

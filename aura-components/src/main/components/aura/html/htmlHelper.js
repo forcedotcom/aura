@@ -208,11 +208,21 @@
                 }
                 element[casedName] = value;
             } else {
+
+                // KRIS: HALO: 
+                // If in older IE's you set the type attribute to a value that the browser doesn't support
+                // you'll get an exception.
+                // Also, you can't change the type after the element has been added to the DOM.
+                // Honestly, I can't see how this wasn't blowing up Pre-halo
+                if ($A.util.isIE && element.tagName === "INPUT" && lowerName === "type") {
+                    try { element.setAttribute("type", value); }
+                    catch(e){}
+                }
                 // as long as we have a valid value at this point, set
                 // it as an attribute on the DOM node
                 // IE renders null value as string "null" for input (text)
                 // element, we have to work around that.
-                if (!aura.util.isUndefined(value) && !($A.util.isIE && element.tagName === "INPUT" && lowerName === "value" && value === null)) {
+                else if (!aura.util.isUndefined(value) && !($A.util.isIE && element.tagName === "INPUT" && lowerName === "value" && value === null)) {
                     var casedAttribute = this.caseAttribute(lowerName);
                     var lowerName = name.toLowerCase();
                     if (lowerName === "style" && $A.util.isIE) {

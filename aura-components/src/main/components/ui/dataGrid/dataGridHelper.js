@@ -42,6 +42,7 @@
 		concrete._outputComponents = [];
 		concrete._inputComponents = [];
 		concrete._row = [];
+		concrete._selectedIndexes = {};
 	},
 	
 	/**
@@ -181,6 +182,8 @@
 				}
 			}
 		}
+		
+		this.selectAll(concrete, false);
 	
 		if (cmp._sorting) {
 			cmp._sorting = false;
@@ -206,10 +209,7 @@
 				c.set('v.direction', direction);
 			});
 
-			// Reset selection columns.
-			for (var i = 0; i < concrete._selectionColumns.length; i++) {
-				concrete._selectionColumns[i].set('v.selectAll', false);
-			}
+			this.selectAll(concrete, false);
 		}
 
 		// Refresh to force fetch from data provider (if available).
@@ -237,7 +237,7 @@
 			} else {
 				// Don't worry about calling 'selectOne'.
 				// hlp.selectOne(cmp, index, value);
-				this.changeSelectedItems(cmp, [cmp.get('v.items.' + index)], value);
+				this.changeSelectedItems(cmp, value, [index]);
 			}
 		} else if (name && index && globalId) {
 
@@ -325,23 +325,6 @@
      * Selection
      * ================
      */
-	
-	/** 
-	 * Changes the selected status of an individual item in the grid. 
-	 *
-	 * @param {Component} cmp
-	 * @param {Number} index zero-based index of the item 
-	 * @param {Boolean} value selected status to propagate 
-	 */ 
-	// TODO rework
-	selectOne: function (cmp, index, value) {
-		var item = cmp._rowItems[index];
-
-		if (item) {
-			item.set('selected', value);
-			this.changeSelectedItems(cmp, [item], value);
-		}
-	},
 
 	/** 
 	 * Changes the selected status of all items in the grid. 
@@ -354,14 +337,17 @@
 		var rowData = cmp._rowData;
 
 		// Set attribute for 'global' select all.
-		cmp.set('v.selectAll', value);
+		for (var i = 0; i < cmp._selectionColumns.length; i++) {
+			cmp._selectionColumns[i].set('v.selectAll', value);
+		}
 
 		// Iterate over rows contexts and set 'selected'.
 		for (var i = 0; i < rowData.length; i++) {
 			rowData[i].vp.set('selected', value);
 		}
 
-		this.changeSelectedItems(cmp, cmp.get('v.items'), value);
+		// This works better than using changeSelectedItems cmp.set("v.selectedItems", (value ? cmp.get("v.items") : []));
+		this.changeSelectedItems(cmp, value);
 	},
 
 	/**
@@ -369,57 +355,50 @@
 	 * Uses an internal set to ensure items only appear once in the array. 
 	 * 
 	 * @param {Component} cmp
-	 * @param {Array} items objects to modify
-	 * @param {Boolean} value are these items selected
+	 * @param {Boolean} value Value 
+	 * @param {Array} rows (optional) Rows to apply the value to. A null or undefined value will apply the value to all rows
 	 */ 
 	// TODO rework, internal set doesn't work in preventing duplicates
-	changeSelectedItems: function (cmp, items, value) {
-		var concrete = cmp.getConcreteComponent();
-
-		// Guarantee correct value object is updated.
-		if (items) {
+	changeSelectedItems: function (cmp, value, rows) {
+		var concrete = cmp.getConcreteComponent(),
+			rowData = concrete._rowData,
+			items = concrete.get("v.items"),
+			selectedIndexes = concrete._selectedIndexes,
+			selectedItems;
+		
+		/*var arrLength = rows ? rows.length : rowData.length;
+		for (var i = 0; i < arrLength; i++) {
+			var index = rows ? rows[i] : i;
 			
-			// Create a set for the selected items.
-			if (!concrete._selected) {
-				concrete._selected = {
-					items: 	items,
-					keys: 	{}
-				};
-
-				setKeys();
-				concrete.set('v.selectedItems', items);
-			} else {
-				setKeys();
-				concrete.set('v.selectedItems', replace(value ? items : []));
+			rowData[index].vp.set("selected", value);
+			selectedIndexes[index] = value;
+		}*/
+		
+		if (!rows) {
+			for (var i = 0; i < rowData.length; i++) {
+				rowData[i].vp.set('selected', value);
+				selectedIndexes[i] = value;
+			}
+		} else {
+			for (var i = 0; i < rows.length; i++) {
+				rowData[rows[i]].vp.set('selected', value);
+				selectedIndexes[rows[i]] = value;
 			}
 		}
-
-		/**
-		 * Replaces the existing set of selected items.
-		 */
-		function replace(newArray) {
-			var keys = concrete._selected.keys,
-				selected = concrete._selected.items;
-
-			for (var i = 0; i < selected.length; i++)	{
-				if (keys[selected[i].id]) {
-					newArray.push(selected[i]);
+		selectedItems = rows ? retrieveSelected(selectedIndexes, items) : (value ? items : []);
+		cmp.set("v.selectedItems", rows ? retrieveSelected(selectedIndexes, items) : selectedItems);
+		
+		function retrieveSelected(selectedCache, items) {
+			var selected = [];
+			for (var index in selectedCache) {
+				if (selectedCache[index]) {
+					selected.push(items[index]);
 				}
 			}
-
-			concrete._selected.items = newArray;
-			return newArray;
-		}
-
-		/**
-		 * Set the keys in the existing set.
-		 */ 
-		function setKeys() {
-			for (var i = 0; i < items.length; i++) {
-				concrete._selected.keys[items[i].id] = value;
-			}
+			return selected;
 		}
 	},
+
     
     /*
      * ================

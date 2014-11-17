@@ -227,7 +227,7 @@
         });
     },
 
-    // ui:createModal handler; creates modalOverlay cmp and inserts into dom
+    // ui:createModal handler; creates PanelDialog cmp and inserts into dom
     createPanelDialog: function(cmp, config, callback) {
         var helper = this,
             actionList = config.body,

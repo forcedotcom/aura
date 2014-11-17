@@ -1223,7 +1223,7 @@ var AuraDevToolService = function() {
                      var accessAideFuncs = aura.devToolService.accessbilityAide;
                      var errorMsg = "[A11Y_DOM_12] Base and top panels should have proper aria-hidden properties.\n  More info http://sfdc.co/a11y_dom_12";
                      
-                     var modalOverlay = "div.uiModalOverlay";
+                     var modalOverlay = "div.uiPanelDialog";
                      var panelOverlay = "div.uiPanelOverlay";
                      var panelSlide   = "section.stage.panelSlide";
                      

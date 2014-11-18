@@ -39,9 +39,9 @@ public class DescriptorFileMapper {
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
     public enum NameFormat {
-        BUNDLE,             //! A 'bundle' file like controller, component, app, helper.
-        BUNDLED_EXTRA,      //! An 'extra' file e.g. library include js file
-        NAMESPACE           //! a namespace .xml file (deprecated)
+        BUNDLE, // ! A 'bundle' file like controller, component, app, helper.
+        BUNDLED_EXTRA, // ! An 'extra' file e.g. library include js file
+        NAMESPACE // ! a namespace .xml file (deprecated)
     };
 
     protected static final class ExtensionInfo {
@@ -61,13 +61,13 @@ public class DescriptorFileMapper {
 
         @Override
         public String toString() {
-            return "ExtensionInfo{"+this.extension+", "+this.prefix+", "+this.nameFormat
-                +", "+this.defType+", "+this.format+"}";
+            return "ExtensionInfo{" + this.extension + ", " + this.prefix + ", " + this.nameFormat
+                    + ", " + this.defType + ", " + this.format + "}";
         }
     }
 
-    protected final static Map<String,ExtensionInfo> byExtension = Maps.newHashMapWithExpectedSize(32);
-    private final static Map<String,Map<DefType, ExtensionInfo>> byCompound = Maps.newHashMapWithExpectedSize(8);
+    protected final static Map<String, ExtensionInfo> byExtension = Maps.newHashMapWithExpectedSize(32);
+    private final static Map<String, Map<DefType, ExtensionInfo>> byCompound = Maps.newHashMapWithExpectedSize(8);
     private final static Set<DefType> defTypes = Sets.newHashSet();
     private final static Set<String> prefixes = Sets.newHashSet();
 
@@ -75,7 +75,7 @@ public class DescriptorFileMapper {
             String prefix, DefType defType, Format format) {
         ExtensionInfo ei = new ExtensionInfo(extension, nameFormat, prefix, defType, format);
         byExtension.put(ei.extension.toLowerCase(), ei);
-        Map<DefType,ExtensionInfo> defTypeMap = byCompound.get(ei.prefix.toLowerCase());
+        Map<DefType, ExtensionInfo> defTypeMap = byCompound.get(ei.prefix.toLowerCase());
         if (defTypeMap == null) {
             defTypeMap = Maps.newHashMap();
             byCompound.put(ei.prefix.toLowerCase(), defTypeMap);
@@ -84,13 +84,13 @@ public class DescriptorFileMapper {
         defTypes.add(defType);
         prefixes.add(ei.prefix);
     }
-    
+
     private boolean havePrefix(DefDescriptor<?> desc) {
         return byCompound.get(desc.getPrefix().toLowerCase()) != null;
     }
 
     protected ExtensionInfo getExtensionInfo(DefDescriptor<?> desc) {
-        Map<DefType,ExtensionInfo> defTypeMap = byCompound.get(desc.getPrefix().toLowerCase());
+        Map<DefType, ExtensionInfo> defTypeMap = byCompound.get(desc.getPrefix().toLowerCase());
         if (defTypeMap != null) {
             return defTypeMap.get(desc.getDefType());
         }
@@ -107,6 +107,7 @@ public class DescriptorFileMapper {
         addExtension(".theme", NameFormat.BUNDLE, "markup", DefType.THEME, Format.XML);
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
+        addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);
         addExtension("Layouts.xml", NameFormat.BUNDLE, "markup", DefType.LAYOUTS, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);
@@ -123,15 +124,15 @@ public class DescriptorFileMapper {
         addExtension(".css", NameFormat.BUNDLE, "css", DefType.STYLE, Format.CSS);
         addExtension("Resource.css", NameFormat.BUNDLE, "css", DefType.RESOURCE, Format.CSS);
     }
-    
+
     protected static DefDescriptor<? extends Definition> getDescriptor(String filename) {
         List<String> names = AuraTextUtil.splitSimple(FILE_SEPARATOR, filename);
         if (names.size() < 3) {
             return null;
         }
-        String last = names.get(names.size()-1);
-        String name = names.get(names.size()-2);
-        String ns = names.get(names.size()-3);
+        String last = names.get(names.size() - 1);
+        String name = names.get(names.size() - 2);
+        String ns = names.get(names.size() - 3);
         //
         // First try the bundled type.
         //
@@ -159,7 +160,7 @@ public class DescriptorFileMapper {
         }
         return null;
     }
-    
+
     protected Format getFormat(DefDescriptor<?> descriptor) {
         ExtensionInfo ei = getExtensionInfo(descriptor);
         if (ei != null) {
@@ -175,9 +176,9 @@ public class DescriptorFileMapper {
 
     /**
      * The magic to convert a descriptor into a path.
-     *
+     * 
      * This handles all of the odd cases, including 'bundled' files like library includes.
-     *
+     * 
      * @param descriptor the descriptor for which we want a path.
      */
     protected String getPath(DefDescriptor<?> descriptor) {
@@ -201,13 +202,16 @@ public class DescriptorFileMapper {
         case BUNDLED_EXTRA:
             if (bundle == null) {
                 // whoops.
-                throw new AuraRuntimeException("Invalid "+descriptor+"@"+descriptor.getDefType()+" with ei="+ei);
+                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
+                        + ei);
             }
-            return String.format("%s%s%s%s%s%s", namespace, FILE_SEPARATOR, bundle.getName(), FILE_SEPARATOR, name, ei.extension);
+            return String.format("%s%s%s%s%s%s", namespace, FILE_SEPARATOR, bundle.getName(), FILE_SEPARATOR, name,
+                    ei.extension);
         case BUNDLE:
             if (bundle != null) {
                 // whoops.
-                throw new AuraRuntimeException("Invalid "+descriptor+"@"+descriptor.getDefType()+" with ei="+ei);
+                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
+                        + ei);
             }
             // Alongside knowing the extension, we also know that namespace+name is a directory,
             // and name+ext is the file inside that directory:
@@ -215,7 +219,8 @@ public class DescriptorFileMapper {
         case NAMESPACE:
             return String.format("%s%s%s%s", namespace, FILE_SEPARATOR, namespace, ei.extension);
         }
-        throw new AuraRuntimeException("Could not get path for "+descriptor+"@"+descriptor.getDefType()+" with ei="+ei);
+        throw new AuraRuntimeException("Could not get path for " + descriptor + "@" + descriptor.getDefType()
+                + " with ei=" + ei);
     }
 
     @SuppressWarnings("unchecked")

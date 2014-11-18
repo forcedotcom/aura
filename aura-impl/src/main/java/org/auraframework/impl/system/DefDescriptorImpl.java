@@ -176,6 +176,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case NAMESPACE:
             case THEME:
             case DESIGN:
+            case SVG:
                 Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
                 if (tagMatcher.matches()) {
                     prefix = tagMatcher.group(1);

@@ -46,6 +46,7 @@ public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
         defaults.put(DefType.RESOURCE, DefDescriptor.JAVASCRIPT_PREFIX);
         defaults.put(DefType.DOCUMENTATION, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.DESIGN, DefDescriptor.MARKUP_PREFIX);
+        defaults.put(DefType.SVG, DefDescriptor.MARKUP_PREFIX);
     }
 
     @Override

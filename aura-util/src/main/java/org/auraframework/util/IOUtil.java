@@ -128,6 +128,26 @@ public class IOUtil {
     }
 
     /**
+     * Count the number of characters read by the stream while throwing away the data. The stream will be closed after
+     * reading, so it should not be used again.
+     * 
+     * @param br
+     * @return
+     * @throws IOException
+     */
+    public static long countNumberOfCharacters(Reader br) throws IOException {
+        int READ_BUFFER = 4096;
+        char[] buff = new char[READ_BUFFER];
+        long len = 0;
+        int read;
+        while ((read = br.read(buff, 0, READ_BUFFER)) != -1) {
+            len += read;
+        }
+        br.close();
+        return len;
+    }
+
+    /**
      * A hopefully more robust to concurrent creation mkdirs method:
      * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4742723
      */
@@ -154,8 +174,7 @@ public class IOUtil {
      * List all files inside the given directory
      * 
      * @param rootDir
-     * @param excludeDirs true if only files need to be listed and not
-     *            directories. false if both.
+     * @param excludeDirs true if only files need to be listed and not directories. false if both.
      * @param recursive true to list files from sub folders recursively
      */
     public static File[] listFiles(File rootDir, boolean excludeDirs, boolean recursive) {
@@ -175,8 +194,7 @@ public class IOUtil {
     }
 
     /**
-     * A method used by listfiles to list the files recursively in the
-     * subfolders
+     * A method used by listfiles to list the files recursively in the subfolders
      * 
      * @param at
      * @param files
@@ -197,8 +215,7 @@ public class IOUtil {
     }
 
     /**
-     * This exception is thrown by {@link #delete(File)} if some level of delete
-     * failed.
+     * This exception is thrown by {@link #delete(File)} if some level of delete failed.
      */
     @SuppressWarnings("serial")
     public static class DeleteFailedException extends Exception {
@@ -215,8 +232,7 @@ public class IOUtil {
     }
 
     /**
-     * This exception is thrown by {@link #delete(File)} if one of the
-     * directories is not readable.
+     * This exception is thrown by {@link #delete(File)} if one of the directories is not readable.
      */
     @SuppressWarnings("serial")
     public static class DirectoryNotReadableException extends DeleteFailedException {
@@ -228,12 +244,10 @@ public class IOUtil {
     /**
      * Recursively delete.
      * 
-     * This makes a best attempt to delete the file/directory in question. It
-     * will recurse down any directory structure and delete all
-     * subdirectories/files. If for some reason a directory is not readable, we
-     * throw {@link DirectoryNotReadableException}, with the name of the
-     * directory. If a delete fails, we throw {@link DeleteFailedException} with
-     * the file we could not delete.
+     * This makes a best attempt to delete the file/directory in question. It will recurse down any directory structure
+     * and delete all subdirectories/files. If for some reason a directory is not readable, we throw
+     * {@link DirectoryNotReadableException}, with the name of the directory. If a delete fails, we throw
+     * {@link DeleteFailedException} with the file we could not delete.
      * 
      * @param file The file to recursively delete.
      * @throws DeleteFailedException if the delete fails for any reason.

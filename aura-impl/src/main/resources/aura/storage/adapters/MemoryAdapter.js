@@ -99,6 +99,7 @@ MemoryStorageAdapter.prototype.setItem = function(key, item) {
 
         if (size > that.maxSize) {
             error("MemoryStorageAdapter.setItem() cannot store an item over the maxSize");
+            return;
         }
 
         that.getSize()

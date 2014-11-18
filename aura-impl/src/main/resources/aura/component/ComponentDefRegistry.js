@@ -52,7 +52,9 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
  */
 ComponentDefRegistry.prototype.getDef = function(config, noInit) {
 
-    $A.assert(config, "ComponentDef Config required for registration");
+    if(config === undefined) {
+        throw new Error("ComponentDef Config required for registration");
+    }
 
     // We don't re-register (or modify in any way) once we've registered
     var descriptor;
@@ -83,7 +85,9 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
             $A.Perf.endMark("ComponentDefRegistry.localStorageCache");
         }
 
-        $A.assert(config !== undefined, "Unknown component "+descriptor);
+        if (config === undefined) {
+            throw new Error("Unknown component: "+descriptor);
+        }
 
         ret = new $A.ns.ComponentDef(config);
         var descString = ret.getDescriptor().toString();

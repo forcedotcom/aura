@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event access="GLOBAL" support="BETA" type="COMPONENT" description="Change the visibility of a ui:spinner component.">
-    <aura:attribute access="GLOBAL" name="isVisible" type="Boolean" required="true" description="Hide/show the spinner"/>
+<aura:event support="BETA" type="COMPONENT" description="Change the visibility of a ui:spinner component.">
+    <aura:attribute name="isVisible" type="Boolean" required="true" description="Hide/show the spinner"/>
 </aura:event>

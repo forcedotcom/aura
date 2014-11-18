@@ -61,7 +61,6 @@ public class ApplicationImpl extends BaseComponentImpl<ApplicationDef, Applicati
     }
 
     @Override
-    protected AfterInjectComponentBehavior injectComponent() {
-    	return null;
+    protected void injectComponent() {
     }
 }

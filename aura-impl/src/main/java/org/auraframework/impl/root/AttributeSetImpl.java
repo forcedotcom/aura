@@ -257,10 +257,7 @@ public class AttributeSetImpl implements AttributeSet {
 
             iStack.markParent(parent);
             iStack.setAttributeName(desc.toString());
-            
-            BaseComponent<?, ?> valueProvider = parent instanceof BaseComponent<?, ?> ? (BaseComponent<?, ?>)parent : null;
-            att.setValue(rootDefDescriptor.getDef().getAttributeDef(att.getName()).getTypeDef().initialize(value, valueProvider));
-            
+            att.setValue(rootDefDescriptor.getDef().getAttributeDef(att.getName()).getTypeDef().initialize(value, null));
             iStack.clearAttributeName(desc.toString());
             iStack.clearParent(parent);
         }

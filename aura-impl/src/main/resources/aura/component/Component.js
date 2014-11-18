@@ -826,11 +826,26 @@ Component.prototype.get = function(key) {
 };
 
 /**
+ * Returns a shadow value. Used for programmatically adding values after FCVs.
+ * THIS IS NOT FOR YOU. DO NOT USE.
+ *
+ * @param {String}
+ *            key The data key to look up on the Component.
+ * @private
+ */
+Component.prototype.getShadowAttribute = function(key) {
+    if(key.indexOf('v.')!==0){
+        return null;
+    }
+    return this.priv.attributes.getShadowValue(key.substr(2));
+};
+
+/**
  * Sets the value referenced using property syntax.
  *
  * @param {String}
- *            key The data key to look up on the Component. E.g.
- *            <code>$A.get("root.v.mapAttring.key")</code>
+ *            key The data key to set on the Component. E.g.
+ *            <code>cmp.set("v.key","value")</code>
  * @param {Object}
  *            value The value to set
  *
@@ -865,6 +880,28 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     }
     return returnValue;
 };
+
+/**
+ * Sets a shadow attribute. Used for programmatically adding values after FCVs.
+ * THIS IS NOT FOR YOU. DO NOT USE.
+ *
+ * @param {String}
+ *            key The data key to set on the Component.
+ * @private
+ */
+Component.prototype.setShadowAttribute = function(key,value) {
+    if(key.indexOf('v.')===0) {
+        var oldValue = this.get(key);
+        var attribute = key.substr(2);
+        this.priv.attributes.setShadowValue(attribute, value);
+        var newValue=this.get(key);
+        if(oldValue!==newValue) {
+            $A.renderingService.addDirtyValue(key, this);
+            this.priv.fireChangeEvent(this, key, oldValue, newValue);
+        }
+    }
+};
+
 
 Component.prototype.markDirty=function(reason){
     $A.renderingService.addDirtyValue(reason||"Component.markDirty()",this);

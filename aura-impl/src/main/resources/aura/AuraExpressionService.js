@@ -49,9 +49,11 @@ var AuraExpressionService = function AuraExpressionService() {
 		 * @param {Object}
 		 *            container The object against which to resolve the
 		 *            expression.
+         * @param {Boolean}
+         *            rawValue Whether or not to evaluate expressions.
 		 * @returns {Object} The target of the expression, or undefined.
 		 */
-		resolve : function(expression, container) {
+		resolve : function(expression, container, rawValue) {
 			var target = container;
 			var path = expression;
             if(!$A.util.isArray(path)) {
@@ -76,7 +78,7 @@ var AuraExpressionService = function AuraExpressionService() {
 				
 				target = target[segment];
 			  
-				if ($A.util.isExpression(target)) {
+				if (!rawValue&&$A.util.isExpression(target)) {
 					target = target.evaluate();
 				}
 			}

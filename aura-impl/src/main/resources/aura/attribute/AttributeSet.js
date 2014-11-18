@@ -26,11 +26,11 @@
  * @constructor
  * @protected
  */
-function AttributeSet(attributes, attributeDefSet, defaultValueProvider) {
+function AttributeSet(attributes, attributeDefSet) {
 	this.values = {};
+    this.shadowValues={};
     this.decorators={};
 	this.attributeDefSet = attributeDefSet;
-//    this.defaultValueProvider=defaultValueProvider;
 
 	// JBUCH: HALO: TODO: Temporary Data Structures
 	this.errors = {};
@@ -93,7 +93,30 @@ AttributeSet.prototype.get = function(key) {
 		value = value.evaluate();
 	}
 
+    if(this.shadowValues.hasOwnProperty(key)) {
+        value += this.getShadowValue(key);
+    }
+
 	return value;
+};
+
+AttributeSet.prototype.getShadowValue=function(key){
+    var value = aura.expressionService.resolve(key, this.values, true);
+    if(value instanceof FunctionCallValue){
+        if(this.shadowValues.hasOwnProperty(key)) {
+            return this.shadowValues[key];
+        }
+        return '';
+    }
+    return undefined;
+};
+
+
+AttributeSet.prototype.setShadowValue=function(key,value){
+    var oldValue = aura.expressionService.resolve(key, this.values, true);
+    if(oldValue instanceof FunctionCallValue){
+        this.shadowValues[key]=value;
+    }
 };
 
 /**
@@ -152,11 +175,16 @@ AttributeSet.prototype.set = function(key, value) {
     if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal()) {
         target[key].set(value);
     } else if (!(target[key] instanceof FunctionCallValue)) {
-        // HALO: TODO: JBUCH: This is against all CS known... 
+        // HALO: TODO: JBUCH: I DON'T LIKE THIS...
         // Silently do nothing when you try to set on a FunctionCallValue,
-        // which we need, to support legacy old behaviour due to inheritance.
+        // which we need to support legacy old behaviour due to inheritance.
         target[key] = value;
     }
+// #if {"excludeModes" : ["PRODUCTION", "STATS"]}
+    else {
+        $A.warning("AttributeSet.set(): unable to override the value for '" + key + "'. FunctionCallValues declared in markup are constant.");
+    }
+// #end
 };
 
 /**

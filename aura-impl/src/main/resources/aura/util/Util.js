@@ -366,6 +366,7 @@ $A.ns.Util.prototype.swapClass = function(element, oldClass, newClass){
 };
 
 $A.ns.Util.prototype.setClass=function(element,newClass,remove){
+    var constructedClass='';
     if(this.isComponent(element)){
         var attribute=null;
         if(element.isInstanceOf("ui:elementInterface") || element.isInstanceOf("ui:visible")) {
@@ -376,15 +377,28 @@ $A.ns.Util.prototype.setClass=function(element,newClass,remove){
             element=element.getElement();
         }
         if(attribute){
-            var oldClass=element.get(attribute)||"";
-            var constructedClass=this.buildClass(oldClass,newClass,remove);
+            var useShadowClass=false;
+            var oldClass=element.getShadowAttribute(attribute);
+            if(oldClass!=undefined){
+                useShadowClass=true;
+            }else{
+                oldClass=element.get(attribute)||'';
+            }
+            constructedClass=this.buildClass(oldClass,newClass,remove);
             if(oldClass!==constructedClass){
-                element.set(attribute,constructedClass);
+                if(useShadowClass){
+                    element.setShadowAttribute(attribute,constructedClass?' '+constructedClass:'');
+                }else{
+                    element.set(attribute,constructedClass);
+                }
             }
         }
     }
     if(element && element.tagName){
-        element["className"] = this.buildClass(element["className"]||"",newClass,remove);
+        constructedClass=this.buildClass(element["className"]||"",newClass,remove);
+        if(element["className"]!=constructedClass) {
+            element["className"]=constructedClass;
+        }
     }
 };
 

@@ -73,7 +73,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
-    public String getDependsOnAttribute() {
+    public String getDependsOn() {
         return dependency;
     }
 
@@ -172,7 +172,7 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         }
 
         @Override
-        public AttributeDesignDefBuilder setDependsOnAttribute(String dependency) {
+        public AttributeDesignDefBuilder setDependsOn(String dependency) {
             this.dependency = dependency;
             return this;
         }

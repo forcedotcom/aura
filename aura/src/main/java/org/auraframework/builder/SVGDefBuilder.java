@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.builder;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.def.SVGDef;
+import org.auraframework.system.Source;
 
-/**
- * Creates Definitions from Source of a particular format.
- */
-public interface Parser {
-
+public interface SVGDefBuilder {
     /**
-     * Supported Source Formats
+     * Source used to get contents
      * 
-     * 
-     * 
+     * @param source source
+     * @return builder
      */
-    public enum Format {
-        XML, JS, CSS, JAVA, TEMPLATE_CSS, APEX, SVG
-    }
-
-    <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException;
+    SVGDefBuilder setSource(Source<SVGDef> source);
 }

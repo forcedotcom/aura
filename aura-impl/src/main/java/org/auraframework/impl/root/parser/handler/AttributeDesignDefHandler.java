@@ -41,7 +41,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_REQUIRED = "required";
     private static final String ATTRIBUTE_READONLY = "readonly";
-    private static final String ATTRIBUTE_DEPENDENCY = "dependsOnAttribute";
+    private static final String ATTRIBUTE_DEPENDENCY = "dependsOn";
     private static final String ATTRIBUTE_DATASOURCE = "dataSource";
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
@@ -85,7 +85,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
 
         builder.setLabel(label);
         builder.setType(type);
-        builder.setDependsOnAttribute(dependency);
+        builder.setDependsOn(dependency);
         builder.setDataSource(datasource);
         builder.setMin(min);
         builder.setMax(max);

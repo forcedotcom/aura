@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.throwable.quickfix;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.system.Location;
 
 /**
- * Creates Definitions from Source of a particular format.
+ * Exception type for any validation errors during SVG parsing
  */
-public interface Parser {
+public class SVGParserException extends AuraValidationException {
 
-    /**
-     * Supported Source Formats
-     * 
-     * 
-     * 
-     */
-    public enum Format {
-        XML, JS, CSS, JAVA, TEMPLATE_CSS, APEX, SVG
+    private static final long serialVersionUID = 6972143087324977978L;
+
+    public SVGParserException(String message, Location l, AuraQuickFix... quickFixes) {
+        super(message, l, quickFixes);
     }
 
-    <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException;
+    public SVGParserException(String message, Location l) {
+        this(message, l, (AuraQuickFix[]) null);
+    }
+
+    public SVGParserException(String message) {
+        this(message, null);
+    }
+
 }

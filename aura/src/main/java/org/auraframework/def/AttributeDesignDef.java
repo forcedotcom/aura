@@ -43,7 +43,7 @@ public interface AttributeDesignDef extends Definition {
      * 
      * @return the name of the dependency, may be null
      */
-    public String getDependsOnAttribute();
+    public String getDependsOn();
 
     /**
      * Get the attribute's datasource. This can include a comma separated list of values or class describing the data

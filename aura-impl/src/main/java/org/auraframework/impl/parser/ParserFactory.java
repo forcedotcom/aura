@@ -20,10 +20,12 @@ import java.util.EnumMap;
 import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.java.writer.JavaScriptWriter;
 import org.auraframework.impl.java.writer.JavaWriter;
+import org.auraframework.impl.java.writer.SVGWriter;
 import org.auraframework.impl.java.writer.StyleWriter;
 import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.XMLWriter;
+import org.auraframework.impl.svg.parser.SVGParser;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.SourceWriter;
@@ -41,12 +43,14 @@ public class ParserFactory {
         parsers.put(Format.CSS, StyleParser.getInstance());
         parsers.put(Format.TEMPLATE_CSS, StyleParser.getNonValidatingInstance());
         parsers.put(Format.JS, JavascriptParser.getInstance());
+        parsers.put(Format.SVG, SVGParser.getInstance());
 
         writers.put(Format.XML, XMLWriter.getInstance());
         writers.put(Format.JAVA, JavaWriter.getInstance());
         writers.put(Format.JS, JavaScriptWriter.getInstance());
         writers.put(Format.CSS, StyleWriter.getInstance());
         writers.put(Format.TEMPLATE_CSS, StyleWriter.getInstance());
+        writers.put(Format.SVG, SVGWriter.getInstance());
     }
 
     public static Parser getParser(Format format) {

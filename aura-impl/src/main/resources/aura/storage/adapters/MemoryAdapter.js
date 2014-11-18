@@ -53,7 +53,7 @@ MemoryStorageAdapter.prototype.getName = function() {
 
 MemoryStorageAdapter.prototype.getSize = function() {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
 
         if (that.isDirtyForCachedSize === true) {
             var newSize = 0;
@@ -73,7 +73,7 @@ MemoryStorageAdapter.prototype.getSize = function() {
 
 MemoryStorageAdapter.prototype.getItem = function(key) {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         var value = that.backingStore[key];
         if (!$A.util.isUndefinedOrNull(value)) {
             // Update the MRU
@@ -92,7 +92,7 @@ MemoryStorageAdapter.prototype.getItem = function(key) {
 
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         // For the size calculation, consider only the inputs to the storage layer: key and value
         // Ignore all the extras added by the Storage layer.
         var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
@@ -118,7 +118,7 @@ MemoryStorageAdapter.prototype.setItem = function(key, item) {
 
 MemoryStorageAdapter.prototype.removeItem = function(key) {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         // Update the MRU
         var value = that.backingStore[key];
 
@@ -138,7 +138,7 @@ MemoryStorageAdapter.prototype.removeItem = function(key) {
 
 MemoryStorageAdapter.prototype.clear = function() {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         that.backingStore = {};
         that.cachedSize = 0;
         that.isDirtyForCachedSize = false;
@@ -151,7 +151,7 @@ MemoryStorageAdapter.prototype.clear = function() {
 
 MemoryStorageAdapter.prototype.getExpired = function() {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         var now = new Date().getTime();
         var expired = [];
 
@@ -177,7 +177,7 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
     var that = this;
     var spaceReclaimed = 0;
 
-    var promise = $A.util.createPromise(function(success, failure) {
+    var promise = new Promise(function(success, failure) {
         if (spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
             success();
             return;
@@ -214,7 +214,7 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
 // #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 MemoryStorageAdapter.prototype.getMRU = function() {
     var that = this;
-    return $A.util.createPromise(function(success, error) {
+    return new Promise(function(success, error) {
         success(that.mru);
     });
 };

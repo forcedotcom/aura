@@ -169,7 +169,7 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
  */
 AuraStorage.prototype.sweep = function() {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
 
         // Do not sweep if we have lost our connection - we'll
         // ignore expiration until sweeping resumes
@@ -195,7 +195,7 @@ AuraStorage.prototype.sweep = function() {
             }
 
             // When all of the remove promises have completed...
-            $A.util.when.apply(that, promiseSet).then(
+            Promise.all(promiseSet).then(
                 function () {
                     $A.storageService.fireModified();
                     success();

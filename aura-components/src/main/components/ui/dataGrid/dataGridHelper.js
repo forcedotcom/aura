@@ -38,11 +38,10 @@
 		concrete._columnNames = [];
 		concrete._columnOrder = {};
 		concrete._columns = {};
-		concrete._selectionColumns = [];
 		concrete._outputComponents = [];
 		concrete._inputComponents = [];
 		concrete._row = [];
-		concrete._selectedIndexes = {};
+		concrete._selectionData = this.createSelectionData();
 	},
 	
 	/**
@@ -89,7 +88,8 @@
 			}
 
 			if (c.isInstanceOf('ui:dataGridSelectionColumn')) {
-				concrete._selectionColumns.push(c);
+				concrete._selectionData.selectionColumns.push(c);
+				
 			}
 		});
 	},
@@ -237,7 +237,7 @@
 			} else {
 				// Don't worry about calling 'selectOne'.
 				// hlp.selectOne(cmp, index, value);
-				this.changeSelectedItems(cmp, value, [index]);
+				this.setSelectedItems(cmp, value, [index]);
 			}
 		} else if (name && index && globalId) {
 
@@ -299,6 +299,7 @@
 		
 		if (!rowData[rowIndex]) {
 			// TODO index validation
+			$A.warning("dataGrid row index out of bounds");
 		}
 		
 		cellData = rowData[rowIndex].columnData[columnIndex];
@@ -325,6 +326,17 @@
      * Selection
      * ================
      */
+	
+	/**
+	 * Initializes the structures to manage dataGrid selection
+	 */
+	// TODO: See why we need selectionColumns as array
+	createSelectionData: function() {
+		return {
+			selectionColumns : [],
+			selectedIndexes : {}
+		};
+	},
 
 	/** 
 	 * Changes the selected status of all items in the grid. 
@@ -334,20 +346,7 @@
 	 */
 	// TODO rework
 	selectAll: function (cmp, value) {
-		var rowData = cmp._rowData;
-
-		// Set attribute for 'global' select all.
-		for (var i = 0; i < cmp._selectionColumns.length; i++) {
-			cmp._selectionColumns[i].set('v.selectAll', value);
-		}
-
-		// Iterate over rows contexts and set 'selected'.
-		for (var i = 0; i < rowData.length; i++) {
-			rowData[i].vp.set('selected', value);
-		}
-
-		// This works better than using changeSelectedItems cmp.set("v.selectedItems", (value ? cmp.get("v.items") : []));
-		this.changeSelectedItems(cmp, value);
+		this.setSelectedItems(cmp, value);
 	},
 
 	/**
@@ -359,35 +358,33 @@
 	 * @param {Array} rows (optional) Rows to apply the value to. A null or undefined value will apply the value to all rows
 	 */ 
 	// TODO rework, internal set doesn't work in preventing duplicates
-	changeSelectedItems: function (cmp, value, rows) {
+	setSelectedItems: function (cmp, value, rows) {
 		var concrete = cmp.getConcreteComponent(),
 			rowData = concrete._rowData,
-			items = concrete.get("v.items"),
-			selectedIndexes = concrete._selectedIndexes,
-			selectedItems;
+			selectionData = concrete._selectionData;
 		
-		/*var arrLength = rows ? rows.length : rowData.length;
-		for (var i = 0; i < arrLength; i++) {
+		// Apply the value either to the specified rows or to all rows depending on whether the rows parameter was defined
+		var rowsLength = rows ? rows.length : rowData.length;
+		for (var i = 0; i < rowsLength; i++) {
 			var index = rows ? rows[i] : i;
 			
 			rowData[index].vp.set("selected", value);
-			selectedIndexes[index] = value;
-		}*/
-		
-		if (!rows) {
-			for (var i = 0; i < rowData.length; i++) {
-				rowData[i].vp.set('selected', value);
-				selectedIndexes[i] = value;
-			}
-		} else {
-			for (var i = 0; i < rows.length; i++) {
-				rowData[rows[i]].vp.set('selected', value);
-				selectedIndexes[rows[i]] = value;
-			}
+			selectionData.selectedIndexes[index] = value;
 		}
-		selectedItems = rows ? retrieveSelected(selectedIndexes, items) : (value ? items : []);
-		cmp.set("v.selectedItems", rows ? retrieveSelected(selectedIndexes, items) : selectedItems);
+
+		// Set the selected items to 
+		var items = concrete.get("v.items"),
+			selectedItems = rows ? retrieveSelected(selectionData.selectedIndexes, items) : (value ? items : []);
+		cmp.set("v.selectedItems", selectedItems);
 		
+		var isSelectAll = (selectedItems.length == items.length);
+		for (var i = 0; i < selectionData.selectionColumns.length; i++) {
+			selectionData.selectionColumns[i].set("v.selectAll", isSelectAll);
+		}
+		
+		/**
+		 * @return {Array} The selected row items on the grid.
+		 */
 		function retrieveSelected(selectedCache, items) {
 			var selected = [];
 			for (var index in selectedCache) {

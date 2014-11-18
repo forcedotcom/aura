@@ -23,7 +23,7 @@
         var el = cmp.getElement();
 
         if (el.tagName.toLowerCase() != 'input') {
-        	el = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] || el;
+        	el = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('button')[0] || el;
         }
         
         return el;

@@ -218,6 +218,9 @@
         }]
     },
     
+    /**
+     * Make sure that selecting and deselecting a single row work
+     */
     testBasicSelectionSingle : {
     	attributes : {"pageSize" : 10},
     	test : function(cmp) {
@@ -234,6 +237,9 @@
     	}
     },
     
+    /**
+     * Make sure that selecting and deselecting all rows work
+     */
     testBasicSelectionAll : {
     	attributes : {"pageSize" : 10},
     	test : function(cmp) {

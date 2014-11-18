@@ -39,14 +39,14 @@ WebSQLStorageAdapter.prototype.getName = function() {
 
 WebSQLStorageAdapter.prototype.getSize = function() {
     var that = this;
-    return $A.util.createPromise(function(success, error) {
+    return new Promise(function(success, error) {
         success(that.size);
     });
 };
 
 WebSQLStorageAdapter.prototype.getItem = function(key) {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         that.db.readTransaction(
             function(tx) {
                 tx.executeSql(
@@ -79,7 +79,7 @@ WebSQLStorageAdapter.prototype.getItem = function(key) {
 
 WebSQLStorageAdapter.prototype.setItem = function(key, item) {
 	var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         that.db.transaction(
             function(tx) {
                 tx.executeSql(
@@ -105,7 +105,7 @@ WebSQLStorageAdapter.prototype.setItem = function(key, item) {
 
 WebSQLStorageAdapter.prototype.removeItem = function(key) {
 	var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         that.db.transaction(
             function(tx) {
                 tx.executeSql(
@@ -122,14 +122,14 @@ WebSQLStorageAdapter.prototype.removeItem = function(key) {
 
 WebSQLStorageAdapter.prototype.clear = function() {
     var that = this;
-    return $A.util.createPromise(function(success, error) {
+    return new Promise(function(success, error) {
         that.createSchema(success, error);
     });
 };
 
 WebSQLStorageAdapter.prototype.getExpired = function() {
     var that = this;
-    var promise = $A.util.createPromise(function(success, error) {
+    var promise = new Promise(function(success, error) {
         that.db.readTransaction(
             function(tx) {
                 var now = new Date().getTime();

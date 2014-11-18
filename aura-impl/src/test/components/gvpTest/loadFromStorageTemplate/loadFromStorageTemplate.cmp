@@ -3,7 +3,7 @@
     <aura:set attribute="auraPreInitBlock">
         <script>
             // a global place so tests can inspect the adapter
-            window.mockStorageAdapter = window.mockStorageAdapter || { getItem: function() { return $A.util.createPromise(function(success, error) { success({}); }); } };
+            window.mockStorageAdapter = window.mockStorageAdapter || { getItem: function() { return new Promise(function(success, error) { success({}); }); } };
 
             // implement the simplest storage adapter so we can customize the behavior of getItem
             // for these tests.
@@ -12,11 +12,11 @@
             MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
 
             MockStorageAdapter.prototype.getSize = function() {
-                return $A.util.createPromise(function(success, error) { success(0); });
+                return new Promise(function(success, error) { success(0); });
             };
 
             MockStorageAdapter.prototype.getItem = function(key) {
-                return $A.util.createPromise(function(success, error) {
+                return new Promise(function(success, error) {
                     // use setTimeout() to trigger a context switch. 1500 is chosen because it's
                     // long enough for aura to initialize if it's not correctly waiting for the callback.
                     setTimeout(function() {
@@ -28,19 +28,19 @@
             };
 
             MockStorageAdapter.prototype.setItem = function(key, item) {
-                return $A.util.createPromise(function(success, error) { success(); });
+                return new Promise(function(success, error) { success(); });
             };
 
             MockStorageAdapter.prototype.removeItem = function(key) {
-                return $A.util.createPromise(function(success, error) { success(); });
+                return new Promise(function(success, error) { success(); });
             };
 
             MockStorageAdapter.prototype.clear = function(key) {
-                return $A.util.createPromise(function(success, error) { success(); });
+                return new Promise(function(success, error) { success(); });
             };
 
             MockStorageAdapter.prototype.getExpired = function() {
-                return $A.util.createPromise(function(success, error) { success([]); });
+                return new Promise(function(success, error) { success([]); });
             };
 
             // register the mock adapter

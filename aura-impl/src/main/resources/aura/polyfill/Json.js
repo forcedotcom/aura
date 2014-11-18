@@ -224,4 +224,4 @@ Json.prototype.encodeFunction = function(value) {
     }
     return value;
 };
-// #include aura.util.Json_export
+// #include aura.polyfill.Json_export

@@ -360,8 +360,10 @@
     toggleListVisibility: function(component, items) {
         var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) &&
                 !$A.util.isEmpty(component.get("v.keyword")); 
+
         var hasVisibleOption = this.hasVisibleOption(items);
         var list = component.find("list");
+
         $A.util.toggleClass(list, "visible", hasVisibleOption);
         component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },

@@ -127,8 +127,7 @@
 	},
 
 	unrender : function(component, helper) {
-		if (helper.canHaveBody(component)) {
-            $A.renderingService.unrenderFacet(component, component.get("v.body"));
-        }
+		// Even if we don't have body we need to deattach the elements from the component itself
+		$A.renderingService.unrenderFacet(component, component.get("v.body"));
 	}
 })

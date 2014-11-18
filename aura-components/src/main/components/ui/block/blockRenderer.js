@@ -61,5 +61,24 @@
             overflow = cmp.get('v.overflow');
 
         $A.util.toggleClass(element, 'overflow', overflow);
+    },
+    unrender: function (cmp, hlp) {
+        var left  = cmp.get('v.left'),
+            right = cmp.get('v.right'),
+            body  = cmp.get('v.body');
+
+        if (left.length) {
+            $A.unrender(left);
+        }
+
+        if (right.length) {
+            $A.unrender(right);
+        }
+
+        if (body.length) {
+            $A.unrender(body);
+        }
+
+        this.superUnrender();
     }
 })

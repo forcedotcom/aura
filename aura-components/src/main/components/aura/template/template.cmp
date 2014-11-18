@@ -119,22 +119,19 @@
         body.auraError .auraErrorBox{
             display:block;
         }
-        ​/* Some utility classes needed by the framework */
-	    /* For hidden text used by accessibility */
-	    .assistiveText {
-	        position: absolute !important;
-	        height: 1px;
-	        width: 1px;
-	        overflow: hidden;
-	        clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-	        clip: rect(1px, 1px, 1px, 1px);
-	    }
-	    .visible {
-	        display: block;
-	    }
-	    .invisible {
-	        display: none;
-	    }        
+        .assistiveText {
+            position: absolute !important;
+            height: 1px;
+            width: 1px;
+            overflow: hidden;
+            clip: rect(1px, 1px, 1px, 1px);
+        }
+        .visible {
+            display: block;
+        }
+        .invisible {
+            display: none;
+        }        
     </aura:attribute>
     <aura:attribute name="appcacheProgressBarStyle" type="Aura.Component[]" description="The CSS style used to display appcache progress bar.">
         <!-- appcache progressbar proto -->

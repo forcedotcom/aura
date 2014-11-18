@@ -70,6 +70,16 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             this.componentSourcePackage = null;
         }
 
+        public Impl(String componentSourcePackage) {
+            if (componentSourcePackage != null && !componentSourcePackage.isEmpty()) {
+                this.componentSourcePackage = componentSourcePackage;
+                this.componentSourceDir = null;
+                this.javaGeneratedSourceDir = null;
+            } else {
+                throw new IllegalArgumentException("componentSourcePackage is null or empty: " + componentSourcePackage);
+            }
+        }
+
         @Override
         public File getComponentSourceDir() {
             return this.componentSourceDir;

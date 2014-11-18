@@ -369,7 +369,7 @@ var AuraClientService = function() {
 
                     count += 1;
                     if (count > 14) {
-                        $A.error("finishFiring has not completed after 15 loops");
+                        $A.error("popStack has not completed after 15 loops");
                     }
                 }
 

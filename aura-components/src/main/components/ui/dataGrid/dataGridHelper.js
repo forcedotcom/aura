@@ -836,7 +836,7 @@
 			// If no cdrs, then these columns should be destroyed
 			// TODO: collapse empty columns
 			if (!cdrs && colData) {
-				self.destroyColumnData(rowData, colIndex, tr);
+				self.destroyCellData(rowData, colIndex, tr);
 				resizeRowData = true;
 			} else {			
 				if (!colData) {

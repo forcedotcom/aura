@@ -42,16 +42,6 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
     }
 
     @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
-        if (!designTemplateRegions.isEmpty()) {
-            for (DesignTemplateRegionDef region : designTemplateRegions.values()) {
-                region.validateReferences();
-            }
-        }
-    }
-
-    @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
         if (!designTemplateRegions.isEmpty()) {

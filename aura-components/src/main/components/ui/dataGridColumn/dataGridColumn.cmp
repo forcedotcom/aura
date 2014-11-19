@@ -24,6 +24,8 @@
 	<aura:attribute name="sortable" type="Boolean"/>
 	<aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
 	<aura:attribute name="direction" type="String" description="{ '', ascending, descending }"/>
+	<aura:attribute name="ascLabel" type="String" default="Ascending" description="Accessibility label to use when column is ascending"/>
+	<aura:attribute name="descLabel" type="String" default="Descending" description="Accessibility label to use when column is descending"/>
 	<aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
     <aura:attribute name="renderAs" type="String" default="text" description="Type override for formatting. { text, currency }"/>
@@ -53,7 +55,11 @@
 		
 		<!-- Conditionally insert link for column sorting. -->
 		<aura:if isTrue="{!v.sortable}">
-			<a class="toggle" onclick="{!c.handleClick}">{!v.label}</a>
+			<a class="toggle" onclick="{!c.handleClick}">
+				{!v.label}
+				<span class="assistiveText">{! (v.direction == 'ascending') ? v.ascLabel 
+													: ((v.direction == 'descending') ? v.descLabel : v.direction)}</span>
+			</a>
 			
 			<aura:set attribute="else">
 				{!v.label}

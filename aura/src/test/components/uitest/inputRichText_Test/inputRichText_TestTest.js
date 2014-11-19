@@ -26,9 +26,9 @@
 	},
 	
     /**
-     * Test html content.
+     * Test html content. Disabled because of flappyness: W-2431773
      */
-    testRichTextHtmlContent:{
+    _testRichTextHtmlContent:{
     	browsers:["-ANDROID_PHONE","-ANDROID_TABLET"],
     	attributes : {testContent: "<b>some content</b></html>"},
     	test : [function(component) {

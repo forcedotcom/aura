@@ -1,0 +1,71 @@
+ <!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+ <aura:component>
+    <aura:attribute name="pageSize"            type="Integer" default="10"/>
+    <aura:attribute name="currentPage"         type="Integer" default="1"/>
+    <aura:attribute name="totalPages"          type="Integer" default="5"/>
+    <aura:attribute name="colCount"            type="Integer" default="0"/>
+    <aura:attribute name="useSecondColumnType" type="Boolean" default="true"/>
+    <aura:attribute name="appendOrOverwrite"   type="String"  default="overwrite"/>
+    <aura:attribute name="useDynamicColumns"   type="Boolean" default="true"/>
+    <aura:attribute name="sortBy"              type="String"/>
+    <aura:attribute name="totalItems"          type="Integer"/>
+    
+    <aura:dependency resource="markup://ui:dataGrid"/>
+    <aura:dependency resource="markup://ui:dataGridColumn"/>
+    <ui:button label="Add a Column"   press='{!c.addAColumn}'              aura:id="addAColumn"/>
+    <ui:button label="5 Columns"      press='{!c.goTo5Columns}'            aura:id="goTo5Columns"/>
+    <ui:button label="2 Columns"      press='{!c.goTo2Columns}'            aura:id="goTo2Columns"/>
+    <ui:button label="1 Columns"      press='{!c.goTo1Column}'             aura:id="goTo1Column"/>
+    <ui:button label="use wrong name" press='{!c.goToColumnWithWrongName}' aura:id="goToColumnWithWrongName"/>
+    <ui:button label="remove Columns" press='{!c.removeColumns}' aura:id="removeColumns"/>
+
+     <aura:if isTrue="{!v.useDynamicColumns}">
+	     <ui:dataGrid aura:id="grid" mode="VIEW" sortBy="{!v.sortBy}">  
+	        <aura:set attribute="dataProvider">
+	            <uitest:dataGrid_TestDataProvider      aura:id="provider"
+	                                                   sortBy="{!v.sortBy}"
+	                                                   pageSize="{!v.pageSize}"
+	                                                   currentPage="{!v.currentPage}"
+	                                                   totalPages="{!v.totalPages}"
+	                                                   totalItems="{!v.totalItems}"
+	                                                   />
+	        </aura:set>
+    	</ui:dataGrid>
+    	<aura:set attribute="else">
+    		<ui:dataGrid aura:id="grid" mode="VIEW" sortBy="{!v.sortBy}">
+	    		<aura:set attribute="columns">     
+		            <ui:dataGridColumn label="Item Id" name="id" editable="false" sortable="true"/>             
+		            <ui:dataGridColumn label="Item Subject" name="subject"/>
+		        </aura:set>  
+		        <aura:set attribute="dataProvider">
+		            <uitest:dataGrid_TestDataProvider      aura:id="provider"
+		                                                   sortBy="{!v.sortBy}"
+		                                                   pageSize="{!v.pageSize}"
+		                                                   currentPage="{!v.currentPage}"
+		                                                   totalPages="{!v.totalPages}"
+		                                                   totalItems="{!v.totalItems}"
+		                                                   />
+		        </aura:set>
+	    	</ui:dataGrid>
+    	</aura:set>
+    </aura:if>
+    
+
+
+ </aura:component>

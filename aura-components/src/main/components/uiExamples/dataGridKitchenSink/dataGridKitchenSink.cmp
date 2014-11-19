@@ -52,7 +52,7 @@
         <aura:set attribute="columns">
             <ui:dataGridSelectionColumn/>
 
-            <ui:dataGridColumn label="Id" name="id" editable="false" sortable="true"/>             
+            <ui:dataGridColumn label="Id" name="id" editable="false" sortable="true" ascLabel="ASC" descLabel="DSC"/>             
             <ui:dataGridColumn label="Subject" name="subject"/>
             <ui:dataGridColumn label="Name" name="who.name"/>
             <ui:dataGridColumn label="Related To" name="what.name"/>

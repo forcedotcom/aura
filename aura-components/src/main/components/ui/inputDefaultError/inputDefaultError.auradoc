@@ -18,9 +18,9 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			<code>ui:inputDefaultError</code> is the default implementation for both default error handling and custom error handling. This component displays as a list of errors below the field.
+			<code>ui:inputDefaultError</code> is the default error handling for your input components. This component displays as a list of errors below the field.
 			Field-level error messages can be added using <code>addErrors()</code>. You can use the default error handling by setting the input value to false and adding the error message. 
-		This example displays a field-level error if the input is not a number.	
+		This client-side controller displays a field-level error if the input is not a number.	
 		</p>
     	<pre>var inputCmp = cmp.find("inputCmp");
 var value = inputCmp.get("v.value");
@@ -28,44 +28,11 @@ if (isNaN(value)) {
     inputCmp.setValue("v.value", false);
     inputCmp.addErrors("v.value", [{message:"Input not a number: " + value}]);
     } else {
-    //clear error
-    inputCmp.setValid("v.value", true);
+        //clear error
+        inputCmp.setValid("v.value", true);
     }
 }
 </pre>
-
-	<p>To use custom error handling on input components, use the <code>onError</code> and <code>onClearErrors</code> attributes, which are wired to <code>ui:validationError</code> and <code>ui:clearErrors</code>
-	events respectively. In the controller methods, you can then fire the appropriate events.</p>
-<pre>// fire event that will set error
-    var errorEvent = inputCmp.getEvent("onError");
-    errorEvent.setParams({ "errors" : [{message:"Input not a number: " + value}]});
-    errorEvent.fire();
-
-    // fire event that will clear error
-    var clearErrorEvent = inputCmp.getEvent("onClearErrors");
-    clearErrorEvent.fire();
-}</pre>
-
-	<p>In the custom event handler, retrieve the errors by calling <code>getParam()</code> and invalidate the input value using <code>setValid()</code>. To update the errors, fire the <code>updateError</code> event.</p>
-<pre>
-var errorsObj = event.getParam("errors");
-
-/* do any custom error handling
- * logic desired here */
-
-// set error using default error component
-inputCmp.setValid("v.value", false);
-inputCmp.addErrors(errorsObj);
-var updateErrorEvent = inputCmp.getEvent("updateError");
-updateErrorEvent.fire();
-</pre>	
-
-	<p> Similarly, you can customize how you want to clear the errors by wiring up the <code>onClearErrors</code> attribute on the input component to a controller method.</p>
-<pre>/* do any custom error handling
- * logic desired here */
-inputCmp.setValid("v.value", true);
-var updateErrorEvent = inputCmp.getEvent("updateError");
-updateErrorEvent.fire();</pre>
 
 	</aura:description>	
 		<aura:example name="inputDefaultError" ref="uiExamples:inputTextExample" label="Using Field-Level Errors">

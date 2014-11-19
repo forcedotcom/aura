@@ -28,10 +28,10 @@
 	
 	hide: function (cmp, event) {
         var self       = this,
-            panel      = cmp.find("panel").getElement(),
+            panel      = this._findContainedComponent(cmp, "panel").getElement(),
             panelBody  = panel.querySelector('.body'),
             isModal    = cmp.get("v.isModal"),
-            modalGlass = isModal ? cmp.find("modal-glass").getElement(): null,
+            modalGlass = isModal ? this._findContainedComponent(cmp, "modal-glass").getElement(): null,
             removeAnim = event.removeAnim || cmp.get('v.animation') === 'none',
 
             //css animations & transitions
@@ -86,11 +86,11 @@
     
     show: function (cmp) {
         var self       = this,
-            panel      = cmp.find("panel").getElement(),
+            panel      = this._findContainedComponent(cmp, "panel").getElement(),
             panelBody  = panel.querySelector('.body'),
             panelTitle = panel.querySelector('.titleBar'),
             isModal    = cmp.get("v.isModal"),
-            modalGlass = isModal ? cmp.find("modal-glass").getElement(): null,
+            modalGlass = isModal ? this._findContainedComponent(cmp, "modal-glass").getElement(): null,
             removeAnim = cmp.get('v.animation') === 'none',
 
             //custom animation
@@ -115,7 +115,7 @@
                     panelBody.style.height = availableHeight - margin + 'px';
                 } else {
                     $A.util.removeClass(panelBody, 'scrollbox');
-                    cmp.find('scroller').set('v.enabled',  false);
+                    self._findContainedComponent(cmp, "scroller").set('v.enabled',  false);
                 }
             },
             //endAnimationHandler: cleanup all classes and events
@@ -177,7 +177,7 @@
         var referenceElem = cmp.get('v.referenceElement');
         if (!$A.util.isUndefinedOrNull(referenceElem)) {
             var elem = cmp.getElement();
-            var panelElem = cmp.find("panel").getElement();
+            var panelElem = this._findContainedComponent(cmp, "panel").getElement();
             var panelElemRect = panelElem.getBoundingClientRect();
             var referenceElemRect = referenceElem.getBoundingClientRect();
             var viewPort = $A.util.getWindowSize();
@@ -207,6 +207,30 @@
             }
         }
     },
+    
+    /**
+     * Returns the modal glass element to panel manager to stack the zIndex
+     */
+    getModalGlassElement: function(cmp) {
+    	var el = null,
+    		modalGlass = this._findContainedComponent(cmp, "modal-glass");
+    	if (modalGlass && modalGlass.isRendered()) {
+    		el = modalGlass.getElement();
+    	}
+    	return el;
+    },
+    
+    /**
+     * Returns the panel element to panel manager to stack the zIndex
+     */
+    getPanelElement: function(cmp) {
+    	var el = null,
+			panel = this._findContainedComponent(cmp, "panel");
+		if (panel) {
+			el = panel.getElement();
+		}
+		return el;
+    },
 
     /*
 	 * This indirection is because there are two different ways to close the panel:
@@ -231,6 +255,16 @@
     	} else {
     		this.hide(cmp);
     	}
+    },
+    
+    _findContainedComponent: function(cmp, localId) {
+    	var p = cmp;
+    	var containedCmp = cmp.find(localId);
+    	while (!containedCmp && p.isInstanceOf("ui:panelDialog")) {
+    		p = p.getSuper();
+    		containedCmp = p.find(localId);
+    	}
+    	return containedCmp;
     },
     
     getPrefix : function () {

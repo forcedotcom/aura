@@ -4,12 +4,8 @@
     <div class="container">
         <div class="footer">
             <div aura:id="content">content to show inside panel</div>
-            <ui:button class="panelOverlayButton" press="{!c.showPanel}" label="Show panel Overlay"></ui:button>
-            <ui:button class="panelOverlayFullScreenButton" press="{!c.showPanelFullScreen}" label="Show Panel Overlay Full Screen"></ui:button>
             <ui:button class="panelDialogModalButton" press="{!c.showModal}" label="Show Panel Dialog Modal"></ui:button>
             <ui:button class="panelDialogNonModalButton" press="{!c.showNonModal}" label="Show Panel Dialog Non-Modal" aura:id="nonModalButton"></ui:button>
-            <ui:button class="showSliderButton" press="{!c.showPanelSlider}" label="Show panel slider"></ui:button>
-            <ui:button class="destorySliderButton" press="{!c.destroyPanelSlider}" label="Destroy panel slider"></ui:button>
         </div>
     </div>
     <ui:panelManager />

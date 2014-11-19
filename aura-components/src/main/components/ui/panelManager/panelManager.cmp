@@ -26,12 +26,8 @@
 	<aura:handler event="ui:panelTransitionBegin" action="{!c._onPanelTransitionBegin}" description="The event fired when a panel transition is started."/>
 	<aura:handler event="ui:panelTransitionEnd" action="{!c._onPanelTransitionEnd}" description="The event fired when a panel transition is ended."/>
 	<aura:handler event="ui:panelDestroy" action="{!c.destroyAllPanels}" description="The event fired when all panels are destroyed from the DOM."/>
-	<aura:handler event="ui:createSlidePanel" action="{!c.createSlidePanel}" description="The event fired when a slider panel is created."/>
-	<aura:handler event="ui:destroySlidePanel" action="{!c.destroySlidePanel}" description="The event fired when a slider panel is destroyed."/>
 
-	<aura:dependency resource="markup://ui:panelOverlay" />
 	<aura:dependency resource="markup://ui:panelDialog" />
-	<aura:dependency resource="markup://ui:panelSlider" />
 	<aura:dependency resource="markup://ui:hidePanel" type="EVENT" />
 	
 	<div aura:id="container" class="{! 'dialog-wrapper ' + $Browser.formFactor}">

@@ -70,7 +70,15 @@ ActionReferenceValue.prototype.isLiteral = function(){
  * Returns false as this is not an expression.
  */
 ActionReferenceValue.prototype.isExpression = function(){
-    return false;
+    return true;
+};
+
+/**
+ * When you evaluate this reference, it should resolve to the action
+ * it is pointing at.
+ */
+ActionReferenceValue.prototype.evaluate = function() {
+    return this.getAction();
 };
 
 /**

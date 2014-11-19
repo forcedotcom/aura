@@ -41,6 +41,8 @@ import org.auraframework.test.client.UserAgent;
  */
 public class AuraResourceServletTest extends AuraTestCase {
 
+    public static final String RESOURCE_URI = "/auraFW/resources/some.css";
+
     public static class SimulatedErrorException extends RuntimeException {
         private static final long serialVersionUID = 411181168049748986L;
     }
@@ -55,7 +57,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Authentication.UNAUTHENTICATED);
 
-        HttpServletRequest request = new DummyHttpServletRequest() {
+        HttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI) {
             @Override
             // This is the method that's going to cause the simulated failure.
             public String getHeader(String name) {
@@ -93,7 +95,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 ApplicationDef.class);
         Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest();
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI);
         DummyHttpServletResponse response = new DummyHttpServletResponse() {
             Cookie cookie;
 
@@ -157,7 +159,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest(){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI){
             @Override
             public long getDateHeader(String name) {
                 return -1;
@@ -202,7 +204,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest(){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI){
             @Override
             public long getDateHeader(String name) {
                 return -1;
@@ -244,7 +246,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest(){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI){
             @Override
             public long getDateHeader(String name) {
                 return -1;

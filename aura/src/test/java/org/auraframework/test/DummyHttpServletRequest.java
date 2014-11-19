@@ -47,8 +47,13 @@ import com.google.common.collect.Maps;
 public class DummyHttpServletRequest implements HttpServletRequest {
 
     private String pathInfo = null;
+    private String requestUri;
     private Map<String, String> queryParams = Maps.newHashMap();
 
+    public DummyHttpServletRequest(String uri) {
+        this.requestUri = uri;
+    }
+    
     @Override
     public Object getAttribute(String name) {
         return null;
@@ -312,7 +317,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getRequestURI() {
-        return null;
+        return requestUri;
     }
 
     @Override

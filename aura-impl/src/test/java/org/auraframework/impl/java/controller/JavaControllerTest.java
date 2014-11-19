@@ -32,6 +32,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.java.model.JavaValueDef;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
@@ -45,6 +46,7 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -275,6 +277,40 @@ public class JavaControllerTest extends AuraImplTestCase {
                     "No ACTION named java://org.auraframework.impl.java.controller.TestController/ACTION$imNotHere found",
                     e.getMessage());
         }
+    }
+    
+    /**
+	 * Verify controller can be accessed in system namespace
+	 */
+	public void testControllerInSystemNamespace() throws Exception {
+		String resourceSource = "<aura:component controller='java://org.auraframework.impl.java.controller.TestController'>Hello World!</aura:component>";
+		
+		DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
+		
+		try {
+            Aura.getInstanceService().getInstance(dd);
+        } catch (NoAccessException e) {
+        	fail("Not Expected NoAccessException");
+        } 
+    }
+	
+	/**
+	 * Verify controller can not be accessed in custom namespace
+	 */
+	public void testControllerInCustomNamespace() throws Exception {
+		String resourceSource = "<aura:component controller='java://org.auraframework.impl.java.controller.TestController'>Hello World!</aura:component>";
+		
+		DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
+		
+		try {
+            Aura.getInstanceService().getInstance(dd);
+            fail("Expected NoAccessException");
+        } catch (NoAccessException e) {
+        	String errorMessage = "Access to controller 'org.auraframework.impl.java.controller:TestController' from namespace '"+StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+"' in '"+dd.getQualifiedName()+"(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()";
+            assertEquals(errorMessage, e.getMessage());
+        }        
     }
 
     public void testDuplicateAction() throws Exception {

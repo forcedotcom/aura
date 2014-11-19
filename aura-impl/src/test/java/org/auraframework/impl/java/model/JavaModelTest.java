@@ -25,6 +25,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.service.DefinitionService;
@@ -32,6 +33,7 @@ import org.auraframework.system.Annotations;
 import org.auraframework.system.Location;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
@@ -202,6 +204,40 @@ public class JavaModelTest extends AuraImplTestCase {
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
             assertEquals("No MODEL named java://goats found", e.getMessage());
+        }
+    }
+    
+    /**
+	 * Verify model can be accessed in system namespace
+	 */
+	public void testModelInSystemNamespace() throws Exception {
+		String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
+		
+		DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
+		
+		try {
+            Aura.getInstanceService().getInstance(dd);
+        } catch (NoAccessException e) {
+        	fail("Not Expected NoAccessException");
+        } 
+    }
+	
+	/**
+	 * Verify model can not be accessed in custom namespace
+	 */
+	public void testModelInCustomNamespace() throws Exception {
+		String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
+		
+		DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
+		
+		try {
+            Aura.getInstanceService().getInstance(dd);
+            fail("Expected NoAccessException");
+        } catch (NoAccessException e) {
+        	String errorMessage = "Access to model 'org.auraframework.impl.java.model:TestModel' from namespace '"+StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+"' in '"+dd.getQualifiedName()+"(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()";
+            assertEquals(errorMessage, e.getMessage());
         }
     }
 

@@ -219,7 +219,7 @@
 		 // return the promise
 		 this._createPanel(cmp, this.PANEL_TYPE.DIALOG, config, function(panel) {
 			 panel.set('v.body', actionList);
-		     panel._isModalDialog = config.isModal;
+		     panel._isModal = config.isModal;
 		     callback && callback(panel);
 		 });
     },

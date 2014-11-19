@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-	handleClick: function (cmp, evt) {
-		var el = cmp.getElement(),
+	handleClick: function (cmp, evt, helper) {
+		var el = helper.getInputElement(cmp),
 			domEvt = evt.getParam("domEvent"),
 			click;
 
@@ -32,8 +32,8 @@
 		}
 	},
 
-	handleValueChange: function (cmp, evt) {
-		var el = cmp.getElement(),
+	handleValueChange: function (cmp, evt, helper) {
+		var el = helper.getInputElement(cmp),
 			value = evt.getParam('value');
 
 		$A.util.setDataAttribute(el, 'action-value', value);

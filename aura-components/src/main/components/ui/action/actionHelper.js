@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 ({
-	handleClick: function (cmp, evt) {
-		cmp.set("v.value", cmp.find('cb').get("v.value"));
-	},
+	/**
+	 * Hotfix workaround for getting the input element from the body.
+	 * Assumes only 1 input element in this action.
+	 * 
+	 */
+    getInputElement: function (cmp) {
+        var el = cmp.getElement();
+
+        if (el.tagName.toLowerCase() != 'input') {
+        	el = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('button')[0] || el;
+        }
+        
+        return el;
+    }
 })

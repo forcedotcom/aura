@@ -107,14 +107,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         // Check default content security
         Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
         if (guarded) {
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
-            assertEquals("SAMEORIGIN", headers[0].getValue());
-        } else {
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
-        }
-        if (guarded) {
             Map<String, String> csp = getCSP(response);
-            headers = response.getHeaders("Content-Type");
             assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
             if (allowInline) {
                 assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'", csp.get("script-src"));
@@ -130,9 +123,14 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
             assertEquals("object-src is wrong", "'self'", csp.get("object-src"));
             assertEquals("connect-src is wrong", "'self' http://invalid.salesforce.com", csp.get("connect-src"));
+
+            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+            assertEquals("SAMEORIGIN", headers[0].getValue());
         } else {
             headers = response.getHeaders("Content-Security-Policy");
             assertEquals(0, headers.length);
+	    // Check X-FRAME-OPTIONS vis-a-vis CSP
+            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
         }
     }
 

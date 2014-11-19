@@ -47,15 +47,16 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         assertNotNull(libDef);
 
         List<IncludeDefRef> includes = libDef.getIncludes();
-        assertEquals(8, includes.size());
+        assertEquals(9, includes.size());
         assertInclude(includes.get(0), "basicFirst", null, null);
         assertInclude(includes.get(1), "basicSecond", null, null);
         assertInclude(includes.get(2), "hasVars", null, "firstVar");
-        assertInclude(includes.get(3), "expectsImport", "basicFirst", null);
-        assertInclude(includes.get(4), "reusesImport", "basicFirst", null);
-        assertInclude(includes.get(5), "importsAndExport", "basicFirst", "anExport");
-        assertInclude(includes.get(6), "handlesMultipleImports", "basicFirst,basicSecond", null);
-        assertInclude(includes.get(7), "expectsImportAlso", "expectsImport", null);
+        assertInclude(includes.get(3), "undefined", null, null);
+        assertInclude(includes.get(4), "expectsImport", "basicFirst", null);
+        assertInclude(includes.get(5), "reusesImport", "basicFirst", null);
+        assertInclude(includes.get(6), "importsAndExport", "basicFirst", "anExport");
+        assertInclude(includes.get(7), "handlesMultipleImports", "basicFirst,basicSecond,undefined", null);
+        assertInclude(includes.get(8), "expectsImportAlso", "expectsImport", null);
     }
 
     private void assertInclude(IncludeDefRef include, String name, String importList, String export) {

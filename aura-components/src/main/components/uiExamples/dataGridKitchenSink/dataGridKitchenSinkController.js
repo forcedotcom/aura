@@ -98,6 +98,7 @@
 	
 	getSelected : function(cmp, evt, hlp) {
     	var list = cmp.find("grid").get("v.selectedItems");
+    	cmp.set("v.gridSelectedItems", []); // workaround for rerendering issue
 		cmp.set("v.gridSelectedItems", list);
 	},
 	
@@ -114,7 +115,6 @@
 			$A.newCmpAsync(
 					this, 
 					function(newCmp) {
-						columns[5].destroy();
 						columns[5] = newCmp;
 						grid.set("v.columns", columns);
 					},
@@ -131,7 +131,6 @@
 			$A.newCmpAsync(
 					this, 
 					function(newCmp) {
-						columns[5].destroy();
 						columns[5] = newCmp;
 						grid.set("v.columns", columns);
 					},

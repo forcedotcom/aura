@@ -74,13 +74,6 @@
 
 .THIS .scrollbox {
 	position: relative;
-	background: #F0F1F2 no-repeat;
-	background-image: radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.2),
-		rgba(0, 0, 0, 0)),
-		radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.2),
-		rgba(0, 0, 0, 0));
-	background-position: 0 0, 0 100%;
-	background-size: 100% 14px;
 }
 
 .THIS .scrollbox:before {
@@ -90,7 +83,6 @@
 	display: block;
 	height: 20px;
 	margin: 0 0 -18px;
-	background: linear-gradient(to bottom, BG_1, BG_1 30%, rgba(240, 241, 242, 0));
 }
 
 .THIS .scrollbox:after {
@@ -100,8 +92,6 @@
 	display: block;
 	height: 6px;
 	margin-top: -6px;
-	background: linear-gradient(to bottom, rgba(240, 241, 242, 0.5) 70%,
-		rgb(240, 241, 242));
 }
 
 .THIS .panelDialog {
@@ -128,11 +118,6 @@
 .THIS.nonmodal .panelDialog {
     position:relative;
     border: 1px solid #B6B6B6;
-    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-    -ms-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-    -o-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
 }
 
 @media only screen and (min-width: 35.625em) {
@@ -194,7 +179,6 @@
 
 .THIS.nonmodal .panel.panelDialog .uiButton.closeBtn {
     top: 0px;
-    color: #B6B6B6;
 }
 
 .THIS.modal .panel.panelDialog .uiButton.closeBtn {
@@ -223,8 +207,6 @@
 .THIS .panelDialog .titleBar .titles {
 	text-align: center;
 	margin: 14px 0;
-	font-family: 'ProximaNovaSoft-Semibold';
-	color: #3C3D3E;
 }
 
 .THIS .panelDialog .titleBar .titles .title {
@@ -233,7 +215,6 @@
 
 
 .THIS .panelDialog div.body .detail {
-	font-family: 'ProximaNovaSoft-Regular';
 	padding: 14px 0;
 	text-align: center;
 	word-break: break-word;
@@ -246,18 +227,6 @@
 	text-align: center;
 	margin: 10px 0;
 	display: block;
-}
-
-.THIS .panelDialog .titleBar > .bBody > .forceIcon[data-key="warning"] {
-	color: #E6B739;
-}
-
-.THIS .panelDialog .titleBar > .bBody > .forceIcon[data-key="error"] {
-	color: #B5362D;
-}
-
-.THIS .panelDialog .titleBar > .bBody > .forceIcon[data-icon="undefined"] {
-	display: none;
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */

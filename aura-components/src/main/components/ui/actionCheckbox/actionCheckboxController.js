@@ -15,19 +15,6 @@
  */
 ({
 	handleClick: function (cmp, evt) {
-		var cb = cmp.find('cb').getElement();
-
-		if (cb) {
-			// Propagate change.
-			cmp.getSuper().set('v.value', cb.checked);
-		}
+		cmp.set("v.value", cmp.find('cb').get("v.value"));
 	},
-
-	handleValueChange: function (cmp, evt) {
-		var cb = cmp.find('cb').getElement();
-
-		if (cb) {
-			cb.checked = evt.getParam('value');
-		}
-	}
 })

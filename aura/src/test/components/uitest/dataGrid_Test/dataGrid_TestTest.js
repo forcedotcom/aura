@@ -35,28 +35,7 @@
             $A.test.assertAccessible();
         }
     },
-    /**
-     * Test that all items selected are valid in v.items and v.selectedItems
-     * 
-     *  CURRENTLY FAILS TRACKED IN BUG: W-2308639
-     */
-    _testItemsSelectAttribute : {
-        test : function(cmp){
-            var elements = this.getRowElements(cmp, 100);
-            var trs = elements[0];
 
-            //Select the first 2 elements (excluding select all)
-            this.selectCheckBox(0, 1, trs);
-            this.verifySelectedElements(cmp, this.createOutputArray(1, 2,  this.BASIC_ROW_ARRAY), trs);
-
-            //Select the head checkbox to select all
-            var thead = document.getElementsByTagName("thead")[0];
-            this.selectCheckBox(0, 0, thead.children);
-
-            //Verify that everything is correctly selected
-            this.verifySelectedElements(cmp, this.createOutputArray(1, 100,  this.BASIC_ROW_ARRAY), trs);
-        }
-    },
     /**
      * Basic test case where we look at an average number of data and make sure paging accounts for it
      */
@@ -238,6 +217,69 @@
                 this.createOutputArray(1, 7, this.BASIC_ROW_ARRAY), 20);
         }]
     },
+    
+    /**
+     * Make sure that selecting and deselecting a single row work
+     */
+    testBasicSelectionSingle : {
+    	attributes : {"pageSize" : 10},
+    	test : function(cmp) {
+    		var elements = this.getRowElements(cmp, 10);
+            var trs = elements[0];
+
+            //Select the first element (excluding select all)
+            this.selectCheckBox(0, 0, trs);
+            this.verifySelectedElements(cmp, this.createOutputArray(1, 1,  this.BASIC_ROW_ARRAY), trs);
+            
+            // Deselect the first element
+            this.selectCheckBox(0, 0, trs);
+            this.verifySelectedElements(cmp, [], trs);
+    	}
+    },
+    
+    /**
+     * Make sure that selecting and deselecting all rows work
+     */
+    testBasicSelectionAll : {
+    	attributes : {"pageSize" : 10},
+    	test : function(cmp) {
+    		var elements = this.getRowElements(cmp, 10);
+            var trs = elements[0];
+    		
+    		//Select all items
+            var thead = document.getElementsByTagName("thead")[0];
+            this.selectCheckBox(0, 0, thead.children);
+            this.verifySelectedElements(cmp, this.createOutputArray(1, 10, this.BASIC_ROW_ARRAY), trs);
+            
+            // Deselect all
+            this.selectCheckBox(0, 0, thead.children);
+            this.verifySelectedElements(cmp, [], trs);
+    	}
+    },
+    
+    /**
+     * Test that all items selected are valid in v.items and v.selectedItems
+     */
+    testSelectionMixed : {
+    	attributes : {"pageSize" : 10},
+        test : function(cmp){
+            var elements = this.getRowElements(cmp, 10);
+            var trs = elements[0];
+
+            //Select the first 2 elements (excluding select all)
+            this.selectCheckBox(0, 1, trs);
+            this.verifySelectedElements(cmp, this.createOutputArray(1, 2,  this.BASIC_ROW_ARRAY), trs.slice(0, 2));
+
+            //Select the head checkbox to select all and verify
+            var thead = document.getElementsByTagName("thead")[0];
+            this.selectCheckBox(0, 0, thead.children);
+            this.verifySelectedElements(cmp, this.createOutputArray(1, 10,  this.BASIC_ROW_ARRAY), trs);
+            
+            // Deselect the first element
+            this.selectCheckBox(0, 0, trs);
+            this.verifySelectedElements(cmp, this.createOutputArray(2, 10, this.BASIC_ROW_ARRAY), trs.slice(1));
+        }
+    },
 
     /***************************************************************************************************
      * Helper functions              
@@ -274,6 +316,7 @@
      */ 
     verifySelectedElements : function(cmp, expectedItemsSelected, trs){
     	//setup
+
         var selected = this.getGridAttribute(cmp, "selectedItems"),
             expectedLen = expectedItemsSelected.length;
         //Verify that v.selected is the length that we expect
@@ -295,7 +338,7 @@
 
         //This is backwards because the selected cache pushes stack like (FILO)
         for(var i = endElm; i >= beginElm; i--){
-            $A.test.clickOrTouch(rows[i].children[0].children[0]);
+            $A.test.clickOrTouch(rows[i].children[0].children[0].children[1]);
         }
     },
 

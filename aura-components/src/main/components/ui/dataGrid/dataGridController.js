@@ -75,12 +75,6 @@
 
 			concrete._sorting = true;
 			cmp.getSuper().set('v.sortBy', evt);
-
-			// 'Fire' action to reset selection.
-			hlp.handleAction(concrete, {
-				name 	: 'dataGrid:select',
-				value 	: false
-			});
 		}
 	},
 

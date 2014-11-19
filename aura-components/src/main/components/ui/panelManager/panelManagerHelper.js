@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+	PANEL_TYPE : {DIALOG: "ui:panelDialog"},
+    
 	initialize: function(cmp, event) {
         // store management state on the component
         cmp._active = null; // current visible panel instance
@@ -157,7 +159,7 @@
         if (manager._transitioning == 'open') {
         	if (manager._transitioningInstance.isValid()) {
 	        	transitioningType = manager._transitioningInstance.getDef().getDescriptor().getQualifiedName();
-	        	transitioningIsModal = transitioningType == 'markup://ui:panelDialog'; 
+	        	transitioningIsModal = this.isModal(transitioningType); 
 	        	if ((config.isModal && transitioningIsModal) || (!config.isModal && !transitioningIsModal)) {
 	        		return;
 	        	}
@@ -188,43 +190,14 @@
             // if it has already been created, display it
             callback(panel);
         } else {
-            // otherwise create it (async)
-            if (config.isSlider) {
-                this.createPanelSlider(cmp, config, callback);
-            }
-            else if (config.isModal || config.isDialog) {
-                this.createPanelDialog(cmp, config, callback);
-            }
-            else {
-                this.createPanelOverlay(cmp, config, callback);
-            }
+            this.createPanel(cmp, config, callback);
         }
     },
-
-    // ui:createPanel handler; creates panelOverlay cmp and inserts into dom
-    createPanelOverlay: function(cmp, config, callback) {
-        var self = this,
-            headerActions = config.headerActions,
-            body = config.body,
-            button, panel;
-
-        // don't modify original config object; needed in testing code
-        config = this._copy(config);
-
-        // if no header actions provided, create an action to close the panel
-        if (!headerActions || !headerActions.length) {
-            headerActions = [this.createCancelButton(cmp)];
+    
+    createPanel: function(cmp, config, callback) {
+        if (config.isModal || config.isDialog) {
+            this.createPanelDialog(cmp, config, callback);
         }
-
-        // delay setting panel content until panel has been inserted into the dom (bad things happen otherwise)
-        config.body = config.headerButtons = [];
-        config.animation = config.animation || 'bottom';
-
-        this._createPanel(cmp, 'ui:panelOverlay', config, function(panel) {
-            panel.set('v.body', body);
-            panel.set('v.headerButtons', headerActions);
-            callback && callback(panel);
-        });
     },
 
     // ui:createModal handler; creates PanelDialog cmp and inserts into dom
@@ -244,11 +217,15 @@
 		 config.body = [];
 		
 		 // return the promise
-		 this._createPanel(cmp, 'ui:panelDialog', config, function(panel) {
+		 this._createPanel(cmp, this.PANEL_TYPE.DIALOG, config, function(panel) {
 			 panel.set('v.body', actionList);
 		     panel._isModalDialog = config.isModal;
 		     callback && callback(panel);
 		 });
+    },
+    
+    isModal: function(panelType) {
+    	return  panelType == 'markup://ui:panelDialog'
     },
     
     buildPanelDialogConfig: function(cmp, config) {
@@ -272,34 +249,15 @@
     	}
     },
 
-    // ui:createPanelSlider handler
-    createPanelSlider: function(cmp, config, callback) {
-        this._createPanel(cmp, 'ui:panelSlider', config, callback);
-    },
-
-    // ui:createSlidePanel handler
-    createPanelSliderDEPRECATED: function(cmp, config) {
-    	var self = this;
-        this.createPanelSlider(cmp, config, function(panel) {
-            if (config.isVisible || typeof config.isVisible === 'undefined') {
-                setTimeout(function() {
-                	$A.run(function() {
-                		self.openInstance(cmp, panel, config);
-                	});
-                }, 0);
-            }
-        });
-    },
-
     // generic create method for all panel types
     _createPanel: function(cmp, def, config, callback) {
-        var self = this;
+    	var self = this;
         var referenceElement = config.referenceElement;
         config.referenceElement = null;
 
         // if no class set explicitly on the panel, use the class set on the panelManager
         config['class'] = config['class'] || cmp.get('v.class');
-
+        
         this._createComponent(def, config, function(panel) {
             // add handler to trap the render event in order to invoke onCreate callback
             panel.addHandler('panelDoneRendering', cmp, 'c.onPanelLoaded');
@@ -487,12 +445,10 @@
         if (pos !== -1) {
             auraContainer.splice(pos, 1);
             container.set("v.body", auraContainer);
-            setTimeout(function() {
-                // aura needs to run its life cycle before lets us touch anything else...
-                $A.run(function() {
-                	panel.destroy(true);
-                });
-            }, 0);
+            // aura needs to run its life cycle before lets us touch anything else...
+            $A.run(function() {
+            	panel.destroy(true);
+            });
         }
 
         manager._panels[panelId] = null;
@@ -628,24 +584,44 @@
     afterSetActiveInstance: function(panel) {
     	//template for  subcomponents
     },
+    
+    /**
+     * TODO: Need to find a better way of updating the panel zIndex
+     */
+    _updateModalGlasszIndex: function(panelHelper, panel, stackIndex) {
+    	var el = null;
+    	if (panelHelper && panelHelper["getModalGlassElement"]) {
+    		var el = panelHelper["getModalGlassElement"](panel);
+    		if (el) {
+  	            el.style.zIndex = stackIndex;
+    		}
+    	}
+    },
+    /**
+     * TODO: Need to find a better way of updating the panel zIndex
+     */
+    _updatePanelElementzIndex: function(panelHelper, panel, stackIndex) {
+    	if (panelHelper && panelHelper["getPanelElement"]) {
+    		var el = panelHelper["getPanelElement"](panel);
+    		if (el) {
+    			el.style.zIndex = stackIndex;
+    		}
+    	}
+    },
 
     // set the panel's zIndex stacking order; 
     // if the panel has a modal-glass component, update it too
     stackPanel: function(cmp, panel) {
-        var glass = panel.find('modal-glass'),
+		var panelHelper = panel.getDef().getHelper(),
             manager = this.getManager(cmp),
             stack = manager._stack,
             stackIndex = manager._startStackLevel + stack.length + 1;
-
         stack.push(panel);
         this.setActiveInstance(cmp, panel);
-
-        if (glass && glass.isRendered()) {
-            glass.getElement().style.zIndex = stackIndex;
-        }
-        panel.find('panel').getElement().style.zIndex = stackIndex;
+        this._updateModalGlasszIndex(panelHelper, panel, stackIndex);
+        this._updatePanelElementzIndex(panelHelper, panel, stackIndex);
     },
-
+    
     // remove the currently active panel from the top of the zIndex stack
     // and move the next panel on the stack to the active state
     unstackPanel: function(cmp, panel) {
@@ -836,7 +812,7 @@
         }
     },
 
-    // one:panelDoneRendering handler
+    // ui:panelDoneRendering handler
     // call onCreate callback if it exists
     onPanelLoaded: function(cmp, event) {
         var params = event.getParams(),

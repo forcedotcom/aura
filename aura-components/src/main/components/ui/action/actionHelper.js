@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 ({
-    onVisibleChange: function(cmp, event, helper) {
-    },
-    
-	show: function (cmp, event, helper) {
-        helper.show(cmp, event);
-    },
-    
-    hide: function (cmp, event, helper) {
-        helper.hide(cmp, event);
-    },
-    
-    close: function (cmp, event, helper) {
-    	helper.close(cmp, event);
-    },
-    
-    toggleHeaderPosition : function(cmp, event, helper) {
-    	var inFocus = event.getParam('inFocus');
-    	helper.setHeaderPosition(cmp, event, inFocus);
-    },
-    
-    update: function(cmp, payload, helper) {
-    	helper.update(cmp, payload);
+	/**
+	 * Hotfix workaround for getting the input element from the body.
+	 * Assumes only 1 input element in this action.
+	 * 
+	 */
+    getInputElement: function (cmp) {
+        var el = cmp.getElement();
+
+        if (el.tagName.toLowerCase() != 'input') {
+        	el = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('button')[0] || el;
+        }
+        
+        return el;
     }
 })

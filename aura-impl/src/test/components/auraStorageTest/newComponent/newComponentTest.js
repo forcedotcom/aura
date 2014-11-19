@@ -66,12 +66,11 @@
             /**
              * Group of actions.
              */
-
-        	var that = this;
-            //$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
-            var a = cmp.get("c.getRoster");
-            a.runDeprecated();
-            $A.eventService.finishFiring();
+            var that = this;
+            $A.run(function () {
+                var a = cmp.get("c.getRoster");
+                a.runDeprecated();
+            });
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     //Verify result of first action

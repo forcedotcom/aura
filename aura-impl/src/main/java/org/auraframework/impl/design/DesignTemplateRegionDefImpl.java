@@ -18,15 +18,12 @@ package org.auraframework.impl.design;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.DesignTemplateRegionDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -42,24 +39,6 @@ public class DesignTemplateRegionDefImpl extends DefinitionImpl<DesignTemplateRe
         super(builder);
         this.allowedInterfaces = AuraUtil.immutableSet(builder.allowedInterfaces);
         this.name = builder.name;
-    }
-
-    @Override
-    public void validateReferences() throws QuickFixException {
-        super.validateReferences();
-        // Validate that any referenced interfaces exist as accessible definitions.
-        // If the definition does not exist or isn't accessible, the template definition
-        // will be considered invalid.
-        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-        if (!allowedInterfaces.isEmpty()) {
-            for (DefDescriptor<InterfaceDef> intf : allowedInterfaces) {
-                InterfaceDef interfaze = intf.getDef();
-                if (interfaze == null) {
-                    throw new DefinitionNotFoundException(intf, getLocation());
-                }
-                registry.assertAccess(descriptor, interfaze);
-            }
-        }
     }
 
     @Override

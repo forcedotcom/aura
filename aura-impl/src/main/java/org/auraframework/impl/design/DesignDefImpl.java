@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.DesignDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDesignDef;
@@ -28,11 +29,14 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
 import org.auraframework.def.DesignTemplateDef;
+import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -77,8 +81,26 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
             }
         }
 
+        // Validate that any referenced interfaces exist as accessible definitions.
+        // If the definition does not exist or isn't accessible, the template definition
+        // will be considered invalid.
         if (template != null) {
-            template.validateReferences();
+            Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> regions = template
+                    .getDesignTemplateRegionDefs();
+            MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
+            for (DesignTemplateRegionDef region : regions.values()) {
+                Set<DefDescriptor<InterfaceDef>> allowedInterfaces = region.getAllowedInterfaces();
+                if (allowedInterfaces == null || allowedInterfaces.isEmpty()) {
+                    continue;
+                }
+                for (DefDescriptor<InterfaceDef> intf : allowedInterfaces) {
+                    InterfaceDef interfaze = intf.getDef();
+                    if (interfaze == null) {
+                        throw new DefinitionNotFoundException(intf, getLocation());
+                    }
+                    registry.assertAccess(descriptor, interfaze);
+                }
+            }
         }
     }
 

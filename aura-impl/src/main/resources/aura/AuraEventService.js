@@ -98,33 +98,6 @@ var AuraEventService = function() {
         },
 
         /**
-         * Pushes a marker to the event stack.
-         *
-         * Deprecated. Do not use.
-         *
-         * @param {Event} event ignored
-         * @memberOf AuraEventService
-         * @public
-         */
-        startFiring : function(event) {
-            $A.clientService.pushStack("$A.eventServices.fire");
-        },
-
-        /**
-         * Pops a marker off if valid to do so.
-         *
-         * Deprecated. Do not use.
-         *
-         * @memberOf AuraEventService
-         * @public
-         */
-        finishFiring : function() {
-            if ($A.clientService.checkPublicPop("$A.eventServices.fire")) {
-                $A.clientService.popStack("$A.eventServices.fire");
-            }
-        },
-
-        /**
          * Returns the event definition.
          * @param {Object} config The parameters for the event
          * @return {EventDef} The event definition.

@@ -28,15 +28,17 @@
      * @return {void}
      */
     activateDialog : function(dialog, manager) {
-        var isModal         = dialog.get("v.isModal"),
-            clickOutToClose = dialog.get("v.clickOutToClose"),
-            autoFocus       = dialog.get("v.autoFocus"),
-            handlerConfig   = this.getHandlerConfig(dialog, isModal, clickOutToClose);
-
-        this.applyHandlers(handlerConfig);
-        this.toggleDisplay(true, dialog, autoFocus, isModal, handlerConfig);
-        manager.set("v._activeDialog", dialog);
-        dialog.set("v._handlerConfig", handlerConfig);
+        var oldHandlerConfig   = dialog.get("v._handlerConfig");
+        if ($A.util.isUndefinedOrNull(oldHandlerConfig)) {
+            var isModal         = dialog.get("v.isModal"),
+                clickOutToClose = dialog.get("v.clickOutToClose"),
+                autoFocus       = dialog.get("v.autoFocus"),
+                handlerConfig   = this.getHandlerConfig(dialog, isModal, clickOutToClose);
+            this.applyHandlers(handlerConfig);
+            this.toggleDisplay(true, dialog, autoFocus, isModal, handlerConfig);
+            manager.set("v._activeDialog", dialog);
+            dialog.set("v._handlerConfig", handlerConfig);
+        }
     },
 
 
@@ -55,11 +57,12 @@
         var isModal       = dialog.get("v.isModal"),
             autoFocus     = dialog.get("v.autoFocus"),
             handlerConfig = dialog.get("v._handlerConfig");
-
-        this.removeHandlers(handlerConfig);
-        this.toggleDisplay(false, dialog, autoFocus, isModal, handlerConfig);
-        manager.set("v._activeDialog", null);
-        dialog.set("v._handlerConfig", null);
+        if (!$A.util.isUndefinedOrNull(handlerConfig)) {
+            this.removeHandlers(handlerConfig);
+            this.toggleDisplay(false, dialog, autoFocus, isModal, handlerConfig);
+            manager.set("v._activeDialog", null);
+            dialog.set("v._handlerConfig", null);
+        }
     },
 
 

@@ -93,6 +93,10 @@ AttributeSet.prototype.get = function(key) {
 		value = value.evaluate();
 	}
 
+    if(value instanceof ActionReferenceValue) {
+        value = value.getAction();
+    }
+
     if(this.shadowValues.hasOwnProperty(key)) {
         value += this.getShadowValue(key);
     }

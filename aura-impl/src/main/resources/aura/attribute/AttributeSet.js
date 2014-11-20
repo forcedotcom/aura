@@ -419,7 +419,11 @@ AttributeSet.prototype.initialize = function(attributes) {
                 this.decorators[name].push(value);
             }else{
                 if (!(value instanceof PropertyReferenceValue && value.equals(this.values[name]))) {
-                    this.values[name] = value;
+                    if (this.values[name] instanceof PropertyReferenceValue && !this.values[name].isGlobal()) {
+                        this.values[name].set(value);
+                    } else {
+                        this.values[name] = value;
+                    }
                 }
             }
 		}

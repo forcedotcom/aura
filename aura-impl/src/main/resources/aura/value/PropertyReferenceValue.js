@@ -52,10 +52,10 @@ PropertyReferenceValue.prototype.set = function(value) {
 PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
     var valueProvider=this.valueProvider;
     var expression = this.expression;
-    while(valueProvider instanceof PassthroughValue){
-    	expression = valueProvider.getExpression(expression);
-        valueProvider=valueProvider.getComponent();
-    }
+    // while(valueProvider instanceof PassthroughValue){
+    // 	expression = valueProvider.getExpression(expression);
+    //     valueProvider=valueProvider.getComponent();
+    // }
     if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
@@ -65,8 +65,12 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
         }
         method.id=cmp.getGlobalId();
         method.key=key;
-        var config={"event": "change", "value": expression, "method": method};
+        var config={"event": "change", "value": expression, "method": method, "cmp": cmp};
         this.valueProvider.addValueHandler(config);
+
+        // if(this.valueProvider instanceof PassthroughValue) {
+        //     this.valueProvider.addValueHandler({"event": "change", "value": this.expression, "method": method});
+        // }
     }
 };
 
@@ -95,6 +99,20 @@ PropertyReferenceValue.prototype.isGlobal = function() {
  */
 PropertyReferenceValue.prototype.getExpression = function() {
 	return this.expression;
+};
+
+PropertyReferenceValue.prototype.getReference = function(path) {
+    if(!path) {
+        return this;
+    }
+    
+    var valueProvider=this.valueProvider;
+    var expression = this.expression;
+    while(valueProvider instanceof PassthroughValue){
+        expression = valueProvider.getExpression(expression);
+        valueProvider=valueProvider.getComponent();
+    }
+    return valueProvider.getReference(expression + "." + path);
 };
 
 /**
@@ -145,6 +163,8 @@ PropertyReferenceValue.prototype.isExpression = function() {
  * Destroys the path.
  */
 PropertyReferenceValue.prototype.destroy = function() {
+
+
 	// #if {"modes" : ["STATS"]}
 	valueFactory.deIndex(this);
 	// #end

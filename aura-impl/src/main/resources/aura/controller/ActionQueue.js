@@ -45,45 +45,26 @@ ActionQueue.prototype.auraType = "ActionQueue";
  * @protected
  * @param {Action}
  *            action the action to enqueue
- * @param {Boolean}
- *            dontSave do not actually put the action in the queue (internal use only).
  */
-ActionQueue.prototype.enqueue = function(action, dontSave) {
-    if (action.isAbortable() && (this.lastAbortableTransactionId !== this.nextTransactionId)) {
-        this.actions = this.clearPreviousAbortableActions(this.actions, action.getAbortableKey());
-        this.lastAbortableTransactionId = this.nextTransactionId;
-    }
-    if (!dontSave) {
-        //
-        // only do this in the case that we are saving the action, because otherwise
-        // we would think we have an XHR even if it was a bypass. XHR is only set for
-        // forground server actions that are not forced into a boxcar.
-        //
-        if (!action.isCaboose() && action.getDef().isServerAction() && !action.isBackground()) {
-            this.xhr = true;
+ActionQueue.prototype.enqueue = function(action) {
+    if (action.isAbortable()) {
+        if (action.getAbortableId() == undefined) {
+            if (this.lastAbortableTransactionId !== this.nextTransactionId) {
+                this.actions = this.clearPreviousAbortableActions(this.actions);
+                this.lastAbortableTransactionId = this.nextTransactionId;
+            }
+            action.setAbortableId(this.nextTransactionId);
+        } else if (action.getAbortableId() !== this.lastAbortableTransactionId) {
+            // whoops, action is already aborted.
+            action.abort();
+            return;
         }
-        this.actions.push(action);
     }
-};
-
-/**
- * Handle a set of actions, but bypass the queue.
- * 
- * This function is used if the actions will not use the normal queuing mechanism, but will rather be 'fast-tracked'
- * around the queue. This is needed to maintain the correct state for abortable actions.
- * 
- * @protected
- * @param {Array}
- *            actions the set of actions that will bypass the queue.
- */
-ActionQueue.prototype.bypass = function(actions) {
-	var i;
-
-	for (i = 0; i < actions.length; i++) {
-		if (actions[i]) {
-			this.enqueue(actions[i], true);
-		}
-	}
+    // XHR is only set for forground server actions that are not forced into a boxcar.
+    if (!action.isCaboose() && action.getDef().isServerAction() && !action.isBackground()) {
+        this.xhr = true;
+    }
+    this.actions.push(action);
 };
 
 /**
@@ -93,7 +74,7 @@ ActionQueue.prototype.bypass = function(actions) {
  * @return {Number} the next transaction id.
  */
 ActionQueue.prototype.getTransactionId = function() {
-	return this.nextTransactionId;
+    return this.nextTransactionId;
 };
 
 /**
@@ -104,7 +85,7 @@ ActionQueue.prototype.getTransactionId = function() {
  * @protected
  */
 ActionQueue.prototype.incrementNextTransactionId = function() {
-	this.nextTransactionId++;
+    this.nextTransactionId++;
 };
 
 /**
@@ -124,9 +105,9 @@ ActionQueue.prototype.needXHR = function() {
  */
 ActionQueue.prototype.getServerActions = function() {
         this.xhr = false;
-	return this.filterActions(function(action) {
-		return action.getDef().isServerAction() && !action.isBackground();
-	});
+    return this.filterActions(function(action) {
+        return action.getDef().isServerAction() && !action.isBackground();
+    });
 };
 
 /**
@@ -138,15 +119,15 @@ ActionQueue.prototype.getServerActions = function() {
  * @return {Action} The first action in the queue that is marked as background.
  */
 ActionQueue.prototype.getNextBackgroundAction = function() {
-	for ( var i = 0; i < this.actions.length; i++) {
-		var action = this.actions[i];
+    for ( var i = 0; i < this.actions.length; i++) {
+        var action = this.actions[i];
 
-		if (action.isBackground() && action.getDef().isServerAction()) {
-			this.actions.splice(i, 1);
-			return action;
-		}
-	}
-	return null;
+        if (action.isBackground() && action.getDef().isServerAction()) {
+            this.actions.splice(i, 1);
+            return action;
+        }
+    }
+    return null;
 };
 
 /**
@@ -157,9 +138,9 @@ ActionQueue.prototype.getNextBackgroundAction = function() {
  * @return {Array} the set of client actions.
  */
 ActionQueue.prototype.getClientActions = function() {
-	return this.filterActions(function(action) {
-		return action.getDef().isClientAction();
-	});
+    return this.filterActions(function(action) {
+        return action.getDef().isClientAction();
+    });
 };
 
 /**
@@ -168,28 +149,27 @@ ActionQueue.prototype.getClientActions = function() {
  * @protected
  */
 ActionQueue.prototype.getLastAbortableTransactionId = function() {
-	return this.lastAbortableTransactionId;
+    return this.lastAbortableTransactionId;
 };
 
 /**
  * Clear the previous abortable actions.
  * 
- * This internal function clears out previous abortable actions with the same key, marking them as aborted,
+ * This internal function clears out previous abortable actions, marking them as aborted,
  * and returns the remaining actions.
  * 
  * @param {Array} queue The incoming array of actions
- * @param {String} key Abortable key
  * @return {Array} A copy of the array with all abortable actions removed.
  * @private
  */
-ActionQueue.prototype.clearPreviousAbortableActions = function(queue, key) {
+ActionQueue.prototype.clearPreviousAbortableActions = function(queue) {
     var newQueue = [];
     var counter;
     for (counter = 0; counter < queue.length; counter++) {
         var action = queue[counter],
             abortable = action.isAbortable();
-        if (!abortable || (abortable && action.getAbortableKey() !== key)) {
-            // push not abortable actions and abortable actions with different key
+        if (!abortable) {
+            // push not abortable actions
             newQueue.push(action);
         } else {
             action.abort();
@@ -206,21 +186,21 @@ ActionQueue.prototype.clearPreviousAbortableActions = function(queue, key) {
  * @private
  */
 ActionQueue.prototype.filterActions = function(filter) {
-	var actionsCopy = this.actions;
-	this.actions = [];
-	var newActions = [];
-	var requestedActions = [];
-	var action;
-	var counter;
+    var actionsCopy = this.actions;
+    this.actions = [];
+    var newActions = [];
+    var requestedActions = [];
+    var action;
+    var counter;
 
-	for (counter = 0; counter < actionsCopy.length; counter++) {
-		action = actionsCopy[counter];
-		if (filter(action)) {
-			requestedActions.push(action);
-		} else {
-			newActions.push(action);
-		}
-	}
-	this.actions = newActions;
-	return requestedActions;
+    for (counter = 0; counter < actionsCopy.length; counter++) {
+        action = actionsCopy[counter];
+        if (filter(action)) {
+            requestedActions.push(action);
+        } else {
+            newActions.push(action);
+        }
+    }
+    this.actions = newActions;
+    return requestedActions;
 };

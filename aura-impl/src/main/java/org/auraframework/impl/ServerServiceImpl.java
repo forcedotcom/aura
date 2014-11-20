@@ -190,7 +190,9 @@ public class ServerServiceImpl implements ServerService {
                 context.getDefRegistry().putCachedString(uid, appDesc, key, cached);
             }
         }
-        out.append(cached);
+        if (out != null) {
+            out.append(cached);
+        }
     }
 
     @Override
@@ -273,7 +275,9 @@ public class ServerServiceImpl implements ServerService {
             context.getDefRegistry().putCachedString(uid, applicationDescriptor, key, cached);
         }
 
-        out.append(cached);
+        if (out != null) {
+            out.append(cached);
+        }
     }
 
     @Override

@@ -22,11 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.SVGDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Client.Type;
 import org.auraframework.system.Client;
+import org.auraframework.system.Client.Type;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
@@ -138,28 +139,27 @@ public class AuraResourceServletTest extends AuraTestCase {
     }
 
     /*
-     * for W-2136514 
-     * this test is to verify we cache CSS by appDescriptor+browserType, 
-     * so when different browser request on the same page, they don't get each other's cache one
-     * server cache CSS for cmp too.
+     * for W-2136514 this test is to verify we cache CSS by appDescriptor+browserType, so when different browser request
+     * on the same page, they don't get each other's cache one server cache CSS for cmp too.
      */
-    private void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String cssMsgToVerify) throws Exception {
-    	String cmpname = "appCache:withpreload";
-    	String cmporapp = "app";
-    	DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(cmpname,
-    			ApplicationDef.class);
+    private void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String cssMsgToVerify)
+            throws Exception {
+        String cmpname = "appCache:withpreload";
+        String cmporapp = "app";
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(cmpname,
+                ApplicationDef.class);
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         Client clientWEBKIT = new Client(ua);
-        assertEquals(uaType,clientWEBKIT.getType());
-		context.setClient(clientWEBKIT);
-		final String uid = context.getDefRegistry().getUid(null, appDesc);
+        assertEquals(uaType, clientWEBKIT.getType());
+        context.setClient(clientWEBKIT);
+        final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         Mode mode = context.getMode();
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI) {
             @Override
             public long getDateHeader(String name) {
                 return -1;
@@ -174,20 +174,20 @@ public class AuraResourceServletTest extends AuraTestCase {
         // Verify something was actually added to cache
         String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNotNull("Nothing added to CSS cache", cssCache);
-        if(!cssMsgToVerify.isEmpty()) {
-        	assertTrue(cssCache.contains(cssMsgToVerify));
+        if (!cssMsgToVerify.isEmpty()) {
+            assertTrue(cssCache.contains(cssMsgToVerify));
         }
-        
+
         Aura.getContextService().endContext();
     }
-    
+
     public void testRequestFromDifferentBrowserOnSamePage() throws Exception {
-    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(),Type.IE9,"");
-    	//ui:button has special session for IE7 in button.css under @if (IE7){...}
-    	runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE7.getUserAgentString(),Type.IE7,"display:inline; zoom:1; overflow:visible!important");
+        runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(), Type.IE9, "");
+        // ui:button has special session for IE7 in button.css under @if (IE7){...}
+        runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE7.getUserAgentString(), Type.IE7,
+                "display:inline; zoom:1; overflow:visible!important");
     }
-    
-    
+
     /**
      * Verify the CSS cache is cleared in DEV mode after a source change. Usually this would be picked up by the file
      * source monitor, but we'll just emulate a source change for the sake of speed and simplicity. Original dev caching
@@ -204,7 +204,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI) {
             @Override
             public long getDateHeader(String name) {
                 return -1;
@@ -232,7 +232,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     /**
      * Verify cache of Javascript definitions is cleared on source change in DEV mode.
-     *
+     * 
      * FIXME: this test should not be here.... it should be on MDR.
      */
     public void testJsCacheClearedOnSourceChange() throws Exception {
@@ -246,7 +246,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI){
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI) {
             @Override
             public long getDateHeader(String name) {
                 return -1;
@@ -269,6 +269,44 @@ public class AuraResourceServletTest extends AuraTestCase {
         jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         Aura.getContextService().endContext();
         assertNull("JS cache not cleared after source change event", jsCache);
+    }
+
+    /**
+     * Verify cache of SVG definitions is cleared on source change in DEV mode.
+     */
+    public void testSvgCacheClearedOnSourceChange() throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
+                ApplicationDef.class);
+        AuraContext context = Aura.getContextService()
+                .startContext(Mode.DEV, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+
+        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
+        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        context.addLoaded(appDesc, uid);
+
+        DummyHttpServletRequest request = new DummyHttpServletRequest() {
+            @Override
+            public long getDateHeader(String name) {
+                return -1;
+            }
+        };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
+        HttpServletResponse response = new DummyHttpServletResponse();
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
+
+        final String key = "SVG:" + context.getClient().getType() + "$" + uid;
+
+        // Verify something was actually added to cache
+        String svgCache = context.getDefRegistry().getCachedString(uid, svgDesc, key);
+        assertNotNull("Nothing added to SVG cache", svgCache);
+
+        // Now force a source change event and verify cache is emptied
+        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+
+        svgCache = context.getDefRegistry().getCachedString(uid, svgDesc, key);
+        Aura.getContextService().endContext();
+        assertNull("SVG cache not cleared after source change event", svgCache);
     }
 
 }

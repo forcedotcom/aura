@@ -93,6 +93,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     DefDescriptor<DesignDef> getDesignDefDescriptor();
 
+    DefDescriptor<SVGDef> getSVGDefDescriptor();
+
     DefDescriptor<ComponentDef> getTemplateDefDescriptor();
 
     public List<ClientLibraryDef> getClientLibraries();

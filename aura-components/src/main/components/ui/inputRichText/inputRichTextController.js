@@ -21,11 +21,5 @@
 	 */
 	toggle : function(cmp, evt, helper) {
 		helper.toggle(cmp, evt.getParam('isRichText'));		
-	},
-	
-	valueChange: function(cmp, evt, helper) {
-		if (!cmp.getConcreteComponent()._updatingValue) {
-			helper.setContent(cmp, cmp.get("v.value"));
-		}
-    }
+	}
 })

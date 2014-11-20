@@ -17,7 +17,6 @@
 var p = ActionReferenceValue.prototype;
 exp(p,
     "auraType", p.auraType,
-    "evaluate", p.evaluate,
     "getAction", p.getAction,
     "isDefined", p.isDefined,
     "isDirty", p.isDirty,

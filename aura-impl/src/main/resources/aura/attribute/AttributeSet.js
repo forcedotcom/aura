@@ -93,6 +93,10 @@ AttributeSet.prototype.get = function(key) {
 		value = value.evaluate();
 	}
 
+    if(value instanceof ActionReferenceValue) {
+        value = value.getAction();
+    }
+
     if(this.shadowValues.hasOwnProperty(key)) {
         value += this.getShadowValue(key);
     }
@@ -342,16 +346,17 @@ AttributeSet.prototype.destroy = function(async) {
         	continue;
         }
 
+        // KRIS: HALO:
         // HTML Elements store their attributes in the HTMLAttributes map. 
         // Since we don't go recursively down the attributes we don't clean these.
         // We should at least destroy them, PRV's still don't release their references.
-        if(k === "HTMLAttributes") {
-            for(var attribute in v) {
-                if(v[attribute] && v[attribute].destroy) {
-                    v[attribute].destroy(async);
-                }
-            }
-        }
+        // if(k === "HTMLAttributes") {
+        //     for(var attribute in v) {
+        //         if(v[attribute] && v[attribute].destroy) {
+        //             v[attribute].destroy(async);
+        //         }
+        //     }
+        // }
 
         if(!$A.util.isArray(v)){
             v=[v];
@@ -414,7 +419,11 @@ AttributeSet.prototype.initialize = function(attributes) {
                 this.decorators[name].push(value);
             }else{
                 if (!(value instanceof PropertyReferenceValue && value.equals(this.values[name]))) {
-                    this.values[name] = value;
+                    if (this.values[name] instanceof PropertyReferenceValue && !this.values[name].isGlobal()) {
+                        this.values[name].set(value);
+                    } else {
+                        this.values[name] = value;
+                    }
                 }
             }
 		}

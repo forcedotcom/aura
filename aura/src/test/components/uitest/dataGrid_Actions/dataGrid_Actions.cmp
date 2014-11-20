@@ -1,0 +1,38 @@
+<aura:component>
+    <aura:attribute name="pageSize" type="Integer" default="100"/>
+    <aura:attribute name="currentPage" type="Integer" default="1"/>
+    <aura:attribute name="totalPages" type="Integer" default="5"/>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="totalItems" type="Integer"/>
+    <aura:attribute name="mode" type="String" default="VIEW"/>
+    <!--aura:handler action="{!c.init}" name="init" value="{!this}"/-->
+    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}">      
+        <aura:set attribute="columns">     
+	        <ui:dataGridSelectionColumn/>
+
+            <ui:dataGridColumn label="Id" name="id" editable="false" sortable="true"/>             
+            <ui:dataGridColumn label="Subject" name="subject"/>
+            <ui:dataGridColumn label="Name" name="name"/>
+            <ui:dataGridColumn label="Related To" name="relatedTo"/>
+            <ui:dataGridColumn label="Due Date" name="date"/>
+            <ui:dataGridActionColumn label="Actions">
+                <ui:actionButton name="disable" label="Disable" index="{!index}" disabled="{!disabled}"/>
+                <ui:actionButton name="enable" label="Enable" index="{!index}" disabled="{!!disabled}"/>
+                <ui:actionButton name="toggleClass" label="Toggle Class" index="{!index}" disabled="{!disabled}"/>
+            </ui:dataGridActionColumn>
+            
+        </aura:set>
+        <aura:set attribute="actionDelegate">
+            <ui:actionDelegate onaction="{!c.handleAction}"/>
+        </aura:set>
+        <aura:set attribute="dataProvider">
+            <uitest:dataGrid_TestDataProvider      aura:id="provider"
+                                                   sortBy="{!v.sortBy}"
+                                                   pageSize="{!v.pageSize}"
+                                                   currentPage="{!v.currentPage}"
+                                                   totalPages="{!v.totalPages}"
+                                                   totalItems="{!v.totalItems}"
+                                                   />
+        </aura:set>
+    </ui:dataGrid>
+</aura:component>

@@ -34,7 +34,14 @@ Test.Aura.Controller.ActionQueueTest = function() {
             util : {
                 isUndefinedOrNull: function (obj) {
                     return obj === undefined || obj === null;
+                },
+                json : {
+                    encode : function(val) {
+                        return val;
+                    }
                 }
+            },
+            log : function() {
             }
         }
     });
@@ -48,6 +55,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
         },
         isCaboose : function() {
             return false;
+        },
+        getDescriptor : function() {
+            return "serverDef";
         }
     };
 
@@ -60,6 +70,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
         },
         isCaboose : function() {
             return true;
+        },
+        getDescriptor : function() {
+            return "serverCabooseDef";
         }
     };
 
@@ -72,6 +85,9 @@ Test.Aura.Controller.ActionQueueTest = function() {
         },
         isCaboose : function() {
             return false;
+        },
+        getDescriptor : function() {
+            return "clientDef";
         }
     };
 
@@ -210,7 +226,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
             var abortable = new Action(serverDef);
             var target = new ActionQueue();
             target.incrementNextTransactionId();
-            target.clearPreviousAbortableActions = Stubs.GetMethod("queue", "key", []);
+            target.clearPreviousAbortableActions = Stubs.GetMethod("queue", []);
             target.actions = expected;
 
             mockGlobal(function() {
@@ -220,8 +236,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
 
             Assert.Equal([ {
                 Arguments : {
-                    queue : expected,
-                    key: ""
+                    queue : expected
                 },
                 // abortable not returned but pushed onto returned list
                 ReturnValue : [ abortable ]
@@ -303,33 +318,6 @@ Test.Aura.Controller.ActionQueueTest = function() {
             var actual = target.actions;
 
             Assert.Equal([ nonAbortable1, nonAbortable2, expected ], actual);
-        }
-
-        [ Fact ]
-        function PrunesOnlyAbortableActionsWithSameKey() {
-            var oldest = new Action(serverDef);
-            var older = new Action(serverDef);
-            var old = new Action(serverDef);
-            var expected = new Action(serverDef);
-            var nonAbortable1 = new Action(serverDef);
-            var nonAbortable2 = new Action(serverDef);
-
-            var target = new ActionQueue();
-            target.actions = [ oldest, nonAbortable1, older, nonAbortable2, old ];
-            target.incrementNextTransactionId();
-
-            mockGlobal(function() {
-                oldest.setAbortable("c");
-                older.setAbortable("a");
-                old.setAbortable("a");
-                expected.setAbortable("a");
-
-                target.enqueue(expected);
-            });
-
-            var actual = target.actions;
-
-            Assert.Equal([ oldest, nonAbortable1, nonAbortable2, expected ], actual);
         }
 
         [ Fact ]

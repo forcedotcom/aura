@@ -30,6 +30,7 @@ import org.auraframework.service.testdata.LocalizationServiceTestData;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.util.number.AuraNumberFormat;
 
+import com.google.common.collect.ImmutableMap;
 import com.ibm.icu.text.NumberFormat;
 
 /**
@@ -496,6 +497,73 @@ public class LocalizationServiceImplTest extends AuraTestCase {
             }
         }
     }
+    
+    /**
+     * Test decimal parsing with delimiters in incorrect places.
+     */
+    public void testBigNumberParsing() {
+    	Map<Locale, String[]> testNumbers = new HashMap<>();
+        Map<Locale, String[]> testNumbersExpected = new HashMap<>();
+        
+        testNumbers.put(Locale.ENGLISH, new String[] { "1,23", "12,34", "1,23.45", "1,23,45.67", "1,234" });
+        testNumbersExpected.put(Locale.ENGLISH, new String[] { "123", "1234", "123.45", "12345.67", "1234" });
+        
+        
+        testNumbers.put(Locale.FRANCE, new String[] { "1.23", "12.34", "1.23,45", "1.23.45,67", "1.234" });
+        testNumbersExpected.put(Locale.FRANCE, new String[] { "123", "1234", "123.45", "12345.67", "1234" });
+
+    	doBigNumberParsingTest(testNumbers, testNumbersExpected, false);
+    }
+    
+    /**
+     * Test decimal parsing with delimiters and passing the strict flag. Should get exceptions thrown because
+     * delimiters are in the wrong place.
+     */
+    public void testStrictBigNumberParsing() {
+    	Map<Locale, String[]> testNumbers = new HashMap<>();
+        
+        testNumbers.put(Locale.ENGLISH, new String[] { "1,23", "12,34", "1,23.45", "1,23,45.67" });
+        testNumbers.put(Locale.FRANCE, new String[] { "1.23", "12.34", "1.23,45", "1.23.45,67", });
+        
+        // expect errors to be thrown.
+    	doBigNumberParsingTest(testNumbers, null, true);
+    }
+    
+    private void doBigNumberParsingTest(Map<Locale, String[]> testNumbers, 
+    		Map<Locale, String[]> testNumbersExpected, boolean isStrict) {
+    	LocalizationServiceImpl ls = new LocalizationServiceImpl();
+    	String[] testNums = {};
+    	String[] testNumsExpected = {};
+    	
+        for (Locale locale : testNumbers.keySet()) {
+        	testNums = testNumbers.get(locale);
+        	if (testNumbersExpected != null) {
+        		testNumsExpected = testNumbersExpected.get(locale);	
+        	} else {
+        		testNumsExpected = new String[testNums.length];
+        	}
+        	
+            for (int i=0; i<testNums.length; i++) {
+            	String num = testNums[i];
+            	String expected = testNumsExpected[i];
+            	
+            	try {
+                	String actual = ls.parseBigDecimal(num, locale, isStrict).toString();
+                	if (isStrict) {
+                		fail("Should have gotten an exception for: " + locale + " - " + num + " - " + isStrict);
+                	} else {
+                		assertEquals("Number is not formated correctly for " + locale, expected, actual);
+                	}
+                } catch (Exception e) {
+                	if (isStrict) {
+                		checkExceptionFull(e, ParseException.class, getErrorMsg(num));
+                	} else {
+                		fail("Should NOT have gotten an exception for: " + locale + " - " + num + " - " + isStrict);
+                	}
+                }
+            }
+        }
+    } 
     
     /*
      * return error message we are expecting, throw by parse() in AuraNumberFormat.java

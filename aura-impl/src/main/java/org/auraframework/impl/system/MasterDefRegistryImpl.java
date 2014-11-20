@@ -980,7 +980,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 validateHelper(dd);
             }
             for (CompilingDef<?> compiling : currentCC.compiled.values()) {
-                if (!fillCompilingDef(compiling, currentCC.context)) {
+                if (compiling.def == null && !fillCompilingDef(compiling, currentCC.context)) {
                     throw new DefinitionNotFoundException(descriptor);
                 }
             }

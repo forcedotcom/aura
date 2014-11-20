@@ -72,13 +72,7 @@
                     "Button not rendered with specified labelStyle class")
         }
     },
-    //According to @jhausler, a button should have either image or label.
-    _testLabelHidden: {
-        attributes : {label : 'shucks', labelDisplay: "false"},
-        test: function(component){
-            aura.test.assertEquals('shucks', $A.test.getText(component.find("hidden").getElement()), "Label not found");
-        }
-    },
+    
     testButtonWithIcon:{
         attributes:{label : 'Ok', iconImgSrc:'/auraFW/resources/aura/images/bug.png', iconClass:'Red'},
         test:function(component){

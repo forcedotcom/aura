@@ -157,7 +157,7 @@
                 this.runTest(2, "Unexpected return from CheckAccessibility, should return 2 error. output: \n");
             }
         },
-        _testButtonLabelValid: {
+        testButtonLabelValid: {
             attributes: {
                 caseToRender: 'buttonLabelValid'
             },

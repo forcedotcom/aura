@@ -315,7 +315,6 @@
       
        <!--Three buttons that are set correctly-->
        <ui:button iconImgSrc="/auraFW/resources/aura/images/bug.png" label="bug Icon" />
-       <ui:button labelDisplay="false" label="This should not be shown"/> 
        <ui:button label="This should be shown"/>  
     </aura:if> 
     

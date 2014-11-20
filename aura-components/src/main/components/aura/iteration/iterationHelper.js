@@ -218,7 +218,7 @@
 	// So in order to do that we stringify the object to use it as a hash for comparison
 	hashItem: function (item) {
 		if (!$A.util.isComponent(item) && typeof item === 'object') {
-			return JSON.stringify(item);
+			return $A.util.json.encode(item);
 		} else {
 			return item;
 		}

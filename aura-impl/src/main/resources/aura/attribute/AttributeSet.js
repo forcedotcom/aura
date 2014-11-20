@@ -332,22 +332,37 @@ AttributeSet.prototype.destroy = function(async) {
         // so we need to do a for( var in ) {} loop
         if(k === "body") {
         	for(var globalId in v) {
-        		for(var j=0,body=v[globalId];j<body.length;j++) {
-        			body[j].destroy(async);
-        		}
+                var body = v[globalId];
+                if(body) {
+            		for(var j=0;j<body.length;j++) {
+            			body[j].destroy(async);
+            		}
+                }
         	}
         	continue;
         }
 
+        // HTML Elements store their attributes in the HTMLAttributes map. 
+        // Since we don't go recursively down the attributes we don't clean these.
+        // We should at least destroy them, PRV's still don't release their references.
+        if(k === "HTMLAttributes") {
+            for(var attribute in v) {
+                if(v[attribute] && v[attribute].destroy) {
+                    v[attribute].destroy(async);
+                }
+            }
+        }
 
         if(!$A.util.isArray(v)){
             v=[v];
         }
-        for(var i=0;i<v.length;i++){
-            if($A.util.isExpression(v[i])){
-                expressions[k]=v[i];
-            }else  if (v[i] && v[i].destroy) {
-                v[i].destroy(async);
+
+        for(var i=0,value;i<v.length;i++){
+            value = v[i];
+            if($A.util.isExpression(value)){
+                expressions[k]=value;
+            } else if (value && value.destroy) {
+                value.destroy(async);
             }
         }
     }

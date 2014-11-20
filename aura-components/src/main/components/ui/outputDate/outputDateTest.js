@@ -42,6 +42,17 @@
         }
     },
     /**
+     * Verify behavior when 'Value' attribute is set to undefined.
+     */
+    testUndefinedValue: {
+        attributes: {value : '2004-09-23'},
+        test: function(component){
+        	component.set('v.value', undefined);
+        	$A.rerender(component);
+        	aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
+        }
+    },
+    /**
      * Verify behavior when 'Value' attribute is assigned a Garbage value.
      */
     testInvalidValue: {

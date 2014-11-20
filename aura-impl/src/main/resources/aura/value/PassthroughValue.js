@@ -38,8 +38,24 @@ PassthroughValue.prototype.addValueHandler = function(config) {
     // KRIS: HALO: 
     // Only add value handlers for our values, everything else
     // gets passed to the component we are wrapping.
-    if(!this.primaryProviders.hasOwnProperty(config.value)) {
+    // v.items.0.label
+    var path = config.value.split(".");
+    if(!this.primaryProviders.hasOwnProperty(path[0])) {
+        // not this.component
         return this.component.addValueHandler(config);
+    }
+
+    var provider = this.primaryProviders[path[0]];
+
+    if($A.util.isExpression(provider)) {
+        // If the provider is a reference to another value, then we need to go into that reference, and
+        // then get the value we actually want. 
+        // Think v.items in iteration, we want item.label to become v.items.0.label
+        var reference = path.length > 1 ? provider.getReference(path.slice(1).join('.')) : provider;
+        if(reference) {
+            reference.addChangeHandler(config["cmp"], reference.getExpression(), config["method"]);
+            return;
+        }
     }
 
     var event = config["event"];
@@ -208,11 +224,24 @@ PassthroughValue.prototype.index = function () {
  * 'change'.
  */
 PassthroughValue.prototype.removeValueHandler = function(config) {
+    var path = config.value.split(".");
     // KRIS: HALO: 
     // Only value handlers for our values are added, everything else
     // gets passed to the component we are wrapping. So remove it there.
-    if(!this.primaryProviders.hasOwnProperty(config.value)) {
+    if(!this.primaryProviders.hasOwnProperty(path[0])) {
         return this.component.removeValueHandler(config);
+    }
+
+    var provider = this.primaryProviders[path[0]];
+    if($A.util.isExpression(provider)) {
+        // If the provider is a reference to another value, then we need to go into that reference, and
+        // then get the value we actually want. 
+        // Think v.items in iteration, we want item.label to become v.items.0.label
+        var reference = provider.getReference(path.slice(1).join('.'));
+        if(reference) {
+            reference.removeChangeHandler($A.getCmp(config["id"]), reference.getExpression());
+            return;
+        }
     }
 
     var event = config["event"];
@@ -241,8 +270,21 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
 PassthroughValue.prototype.set = function(key, value) {
    var path = key.split('.');
     if (this.primaryProviders.hasOwnProperty(path[0])){
+        var provider = this.primaryProviders[path[0]];
+     
+        var fullPath = this.getExpression(key);
         var target=this.primaryProviders;
         key=path[path.length-1];
+        
+        if(path.length > 1 && $A.util.isExpression(provider)) {
+            var reference = provider.getReference(key);
+            if(reference) {
+                reference.set(value);
+                return;
+            }
+        }
+
+
         if(path.length>1) {
             target=$A.expressionService.resolve(path.slice(0,path.length-1),target);
         }
@@ -253,8 +295,8 @@ PassthroughValue.prototype.set = function(key, value) {
         while (valueProvider instanceof PassthroughValue) {
             valueProvider = valueProvider.getComponent();
         }
-        valueProvider.fireChangeEvent(key,oldValue,value,key);
-        valueProvider.markDirty(key);
+        valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
+        valueProvider.markDirty(fullPath);
 
         // KRIS: HALO: 
         // Do we have any change events for the key?

@@ -13,16 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = ActionReferenceValue.prototype;
-exp(p,
-    "auraType", p.auraType,
-    "evaluate", p.evaluate,
-    "getAction", p.getAction,
-    "isDefined", p.isDefined,
-    "isDirty", p.isDirty,
-    "isLiteral", p.isLiteral,
-    "isExpression", p.isExpression,
-    "destroy", p.destroy,
-    "toString", p.toString
-);
+function() {
+    return undefined;
+}

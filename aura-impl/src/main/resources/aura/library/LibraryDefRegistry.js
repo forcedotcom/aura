@@ -66,14 +66,13 @@ $A.ns.LibraryDefRegistry.prototype.define = function(/*var args*/) {
         
         return this.require(identifier.library + ":" + arg);
     }, this);
-    
     this.libraryDefs[identifier.library] = this.libraryDefs[identifier.library] || {};
     this.libraryDefs[identifier.library][identifier.name] = module.apply({}, imports);
 };
 
 $A.ns.LibraryDefRegistry.prototype.require = function(locator) {
     var identifier = $A.ns.LibraryDefRegistry.parseLocator(locator);
-    if (this.libraryDefs[identifier.library] && this.libraryDefs[identifier.library][identifier.name]) {
+    if (this.libraryDefs[identifier.library] && Object.prototype.hasOwnProperty.call(this.libraryDefs[identifier.library],identifier.name)) {
         return this.libraryDefs[identifier.library][identifier.name];
     } else {
         throw "Library with locator: " + locator + " is not registered";

@@ -58,7 +58,7 @@
             var helper = cmp.getDef().getHelper();
             $A.test.assertDefined(helper.imported);
             $A.test.assertDefined(helper.imported.handlesMultipleImports);
-            $A.test.assertEquals("MULTIPLE:BASIC1|BASIC2|", helper.imported.handlesMultipleImports());
+            $A.test.assertEquals("MULTIPLE:BASIC1|BASIC2|undefined|", helper.imported.handlesMultipleImports());
         }
     },
 
@@ -201,6 +201,18 @@
             $A.test.assertEquals(7, helper.imported.basicFirst.getCounter());
             helper.externallyImported.expectsImportAlso()
             $A.test.assertEquals(8, helper.imported.basicFirst.getCounter());
+        }
+    },
+
+    /**
+     * The Include evaluates falsy but is still available in the registry.
+     */
+    testFalsyLibrary : {
+        test : function(cmp) {
+            var helper = cmp.getDef().getHelper();
+            $A.test.assertDefined(helper.imported);
+            $A.test.assertTrue(Object.prototype.hasOwnProperty.call(helper.imported, "undefined"));
+            $A.test.assertUndefined(helper.imported.undefined);
         }
     }
 })

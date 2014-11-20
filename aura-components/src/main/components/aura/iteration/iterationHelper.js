@@ -217,11 +217,11 @@
 	// If you pass an object to iteration, we will need to detect when some of it's sub-values has changed.
 	// So in order to do that we stringify the object to use it as a hash for comparison
 	hashItem: function (item) {
-		if (!$A.util.isComponent(item) && typeof item === 'object') {
-			return JSON.stringify(item);
-		} else {
+		// if (!$A.util.isComponent(item) && typeof item === 'object') {
+		// 	return JSON.stringify(item);
+		// } else {
 			return item;
-		}
+		//}
 	},
 	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
 		var OperationConstructors = this.getOperations();

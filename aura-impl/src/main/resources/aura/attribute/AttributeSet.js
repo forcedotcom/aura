@@ -346,6 +346,7 @@ AttributeSet.prototype.destroy = function(async) {
         	continue;
         }
 
+        // KRIS: HALO:
         // HTML Elements store their attributes in the HTMLAttributes map. 
         // Since we don't go recursively down the attributes we don't clean these.
         // We should at least destroy them, PRV's still don't release their references.

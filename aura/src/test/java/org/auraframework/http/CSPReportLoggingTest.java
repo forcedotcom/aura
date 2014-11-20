@@ -219,11 +219,23 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
     }
 
     /**
-     * Automation for the connect-src CSP policy. With connect-src set to 'self', a report should be generated when an
-     * XHR is sent to another origin. Note that due to the Access-Control-Allow-Origin header the XHR will fail anyway,
-     * but attempting the XHR will still generate the report for testing purposes.
+     * Automation for the connect-src CSP policy. With connect-src set to 'self' and http://invalid.salesforce.com, 
+     * a report should be generated when an XHR is sent to invalid origin. 
      */
     public void testReportXHRConnect() throws Exception {
+    	String externalUri = "http://www.example.com";
+    	runTestReportXHRConnect("\"http://www.example.com\"",externalUri, 1);
+    }
+    
+    /**
+     * Automation for the connect-src CSP policy. 
+     * http://invalid.salesforce.com is white-listed, getting it via XHR shouldn't give us CSP error
+     */
+    public void testReportXHRConnectWhitelistedUrl() throws Exception {
+    	runTestReportXHRConnect("\"http://invalid.salesforce.com\"","", 0);
+    }
+    
+    public void runTestReportXHRConnect(String urlString, String externalUri, int expectedLogs) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag, "",
@@ -265,22 +277,28 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
                         ControllerDef.class);
         addSourceAutoCleanup(
                 controllerDesc,
-                "{post:function(c,e,h){h.request(\"http://www.example.com\");}}");
-        String externalUri = "http://www.example.com";
+                "{post:function(c,e,h){h.request("+urlString+");}}");
+        //'http://www.example.com' \"http://www.example.com\"
+        
 
         open(cmpDesc);
         auraUITestingUtil.findDomElement(By.cssSelector(".button")).click();
 
-        List<Map<String, Object>> logs = getCspReportLogs(1);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> cspReport = (Map<String, Object>) logs.get(0).get(
-                CSPReporterServlet.JSON_NAME);
-
-        assertNotNull("No CSP report found", cspReport);
-        assertEquals("Unexpected blocked resource", externalUri,
-                cspReport.get(CSPReporterServlet.BLOCKED_URI));
-        assertSourceFile(cspReport, APP_SOURCE_SUFFIX);
-        assertViolatedDirective(cspReport, "connect-src 'self'");
+        List<Map<String, Object>> logs = getCspReportLogs(expectedLogs);
+        
+        //only check log contect if there is csp violation
+        //when expectedLogs is 0, getCspReportLogs(int) above verify we didn't get any logs.
+        if(expectedLogs >0 ) {
+	        @SuppressWarnings("unchecked")
+	        Map<String, Object> cspReport = (Map<String, Object>) logs.get(0).get(
+	                CSPReporterServlet.JSON_NAME);
+	
+	        assertNotNull("No CSP report found", cspReport);
+	        assertEquals("Unexpected blocked resource", externalUri,
+	                cspReport.get(CSPReporterServlet.BLOCKED_URI));
+	        assertSourceFile(cspReport, APP_SOURCE_SUFFIX);
+	        assertViolatedDirective(cspReport, "connect-src 'self'");
+        }
     }
 
     private void assertDocumentUri(Map<String, Object> cspReport, String expectedContains) {
@@ -337,8 +355,10 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
             Thread.sleep(interval);
             waitedFor += interval;
         }
-        fail("Did not find expected number of log lines (expected " + expectedLogs +
+        if(expectedLogs != cspRecords.size()) {
+        	fail("Did not find expected number of log lines (expected " + expectedLogs +
                 ", found " + cspRecords.size() + ").");
+        }
         return cspRecords;
     }
 }

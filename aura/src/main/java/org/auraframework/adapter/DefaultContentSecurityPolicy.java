@@ -92,7 +92,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     /** We allow style from same origin and chrome extensions.  And sometimes, sadly, inline. */
     @Override
     public Collection<String> getStyleSources() {
-        List<String> list = new ArrayList<String>(inlineStyle ? 4 : 2);
+        List<String> list = new ArrayList<String>(inlineStyle ? 3 : 2);
         list.add(null);  // Same origin allowed
         list.add("chrome-extension:");
         if (inlineStyle) {

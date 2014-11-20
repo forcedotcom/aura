@@ -373,7 +373,7 @@
 		}
 
 		// Set the selected items to 
-		var items = concrete.get("v.items"),
+		var items = concrete.get("v.items") || [],
 			selectedItems = rows ? retrieveSelected(selectionData.selectedIndexes, items) : (value ? items : []);
 		cmp.set("v.selectedItems", selectedItems);
 		

@@ -93,6 +93,12 @@
         return a;
     },
 
+    getActionAndLog : function(cmp, actionName, commands, label, background, abortable, allAboardCallback) {
+        var that = this;
+        return this.getAction(cmp, actionName, commands, function (a) { that.log(cmp, label+a.getReturnValue()); },
+                background, abortable, allAboardCallback);
+    },
+
     testEnqueueClientAction : {
         test : [ function(cmp) {
             //Action is enqueued but not executed
@@ -1183,5 +1189,100 @@
                     this.waitForLog(cmp, 10, "fore1:back5");
                     this.waitForLog(cmp, 11, "back5:");
                 } ]
+    },
+
+    /**
+     * Check the case where we call abort on the first action if it is aborted in flight.
+     */
+    testAbortWithNoParent : {
+        test : [ function(cmp) {
+            cmp._aborted1 = false;
+            var a = this.getAction(cmp, "c.execute", "WAIT testAbortWithNoParent-fore;")
+            a.setAbortable();
+            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            var that = this;
+            var a = this.getActionAndLog(cmp, "c.execute", "WAIT testAbortWithNoParent-fore2;APPEND done; READ;",
+                                         "bah: ");
+            cmp._aborted2 = false;
+            a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
+            a.setAbortable();
+            $A.enqueueAction(a);
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortWithNoParent-fore; RESUME testAbortWithNoParent-fore2;");
+            $A.enqueueAction(b);
+            this.waitForLog(cmp, 0, "bah: done");
+        }, function(cmp) {
+            $A.test.assertTrue(cmp._aborted1);
+            $A.test.assertFalse(cmp._aborted2);
+        } ]
+    },
+
+    /**
+     * Check the case where we do not abort the parent of a parented action.
+     */
+    testNoAbortWithParent : {
+        test : [ function(cmp) {
+            var a = this.getAction(cmp, "c.execute", "WAIT testNoAbortWithParent-fore;")
+            cmp._first_a = a;
+            a.setAbortable();
+            cmp._aborted1 = false;
+            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            var that = this;
+            var a = this.getActionAndLog(cmp, "c.execute", "WAIT testNoAbortWithParent-fore2;APPEND done; READ;",
+                                         "bah: ");
+            cmp._aborted2 = false;
+            a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
+            a.setAbortable();
+            a.setParentAction(cmp._first_a);
+            $A.enqueueAction(a);
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testNoAbortWithParent-fore; RESUME testNoAbortWithParent-fore2;");
+            $A.enqueueAction(b);
+            $A.test.assertFalse(cmp._aborted1);
+            $A.test.assertFalse(cmp._aborted2);
+            this.waitForLog(cmp, 0, "bah: done");
+        }, function(cmp) {
+            $A.test.assertFalse(cmp._aborted1);
+            $A.test.assertFalse(cmp._aborted2);
+        } ]
+    },
+
+    /**
+     * And finally, try enqueing a parented action of an already aborted parent, it should be aborted.
+     */
+    testAbortOnEnqueueWithParent : {
+        test : [ function(cmp) {
+            cmp._aborted = false;
+            var a = this.getAction(cmp, "c.execute", "WAIT testAbortOnEnqueueWithParent-fore;")
+            cmp._first_a = a;
+            a.setAbortable();
+            cmp._aborted1 = false;
+            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            var that = this;
+            var a = this.getActionAndLog(cmp, "c.execute", "WAIT testAbortOnEnqueueWithParent-fore2;APPEND done; READ;",
+                                         "bah: ");
+            cmp._aborted2 = false;
+            a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
+            a.setAbortable();
+            $A.enqueueAction(a);
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortOnEnqueueWithParent-fore; RESUME testAbortOnEnqueueWithParent-fore2;");
+            $A.enqueueAction(b);
+            this.waitForLog(cmp, 0, "bah: done");
+        }, function(cmp) {
+            $A.test.assertTrue(cmp._aborted1);
+            $A.test.assertFalse(cmp._aborted2);
+        }, function(cmp) {
+            var a = this.getAction(cmp, "c.execute", "WAIT testAbortOnEnqueueWithParent-fore3;APPEND done; READ;");
+            cmp._aborted3 = false;
+            a.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
+            a.setAbortable();
+            a.setParentAction(cmp._first_a);
+            $A.enqueueAction(a);
+            $A.test.assertTrue(cmp._aborted3);
+        } ]
     }
 })

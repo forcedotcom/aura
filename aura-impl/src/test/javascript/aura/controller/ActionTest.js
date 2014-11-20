@@ -471,10 +471,9 @@ Test.Aura.Controller.ActionTest = function() {
             var target = new Action();
 
             // Act
-
-                        // Assert 
-                        Assert.Undefined(target.allAboardCallback);
-                }
+            // Assert 
+            Assert.Undefined(target.allAboardCallback);
+        }
 
         [ Fact ]
         function SetsCallback() {
@@ -488,10 +487,10 @@ Test.Aura.Controller.ActionTest = function() {
                 target.setAllAboardCallback(expectedScope, expectedCallback);
             });
 
-                        // Assert (we can't tell exactly what it is, so just look for set).
-                        Assert.False(target.allAboardCallback === undefined);
-                }
+            // Assert (we can't tell exactly what it is, so just look for set).
+            Assert.False(target.allAboardCallback === undefined);
         }
+    }
 
     [ Fixture ]
     function WrapCallback() {
@@ -586,15 +585,15 @@ Test.Aura.Controller.ActionTest = function() {
                     actual = msg;
                 },
                 get : function(actDesc) {
-                	return {
+                    return {
                         setStorable: function() { },
                         setAbortable: function() { },
                         setParams: function() { },
                         setCallback: function() { }
-                	};
+                    };
                 },
                 clientService: {
-                	enqueueAction: function() { sentToServer = true; }
+                    enqueueAction: function() { sentToServer = true; }
                 }
             });
             var cmp = {
@@ -1214,7 +1213,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal("", target.abortable);
+            Assert.Equal(true, target.abortable);
         }
 
         [ Fact ]
@@ -1231,7 +1230,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal("", target.getAbortableKey());
         }
 
         [ Fact ]
@@ -1248,7 +1246,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.False(abortable);
-            Assert.Equal(undefined, target.abortable);
+            Assert.Equal(false, target.abortable);
         }
 
         [ Fact ]
@@ -1265,7 +1263,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal("", target.getAbortableKey());
         }
 
         [ Fact ]
@@ -1282,7 +1279,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal("1", target.abortable);
+            Assert.Equal(true, target.abortable);
         }
 
         [ Fact ]
@@ -1299,7 +1296,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal("false", target.abortable);
+            Assert.Equal(true, target.abortable);
         }
     }
 
@@ -1315,11 +1312,9 @@ Test.Aura.Controller.ActionTest = function() {
         });
 
         [ Fact ]
-        function ReturnsAbortableIfSet() {
+        function ReturnsFalseByDefault() {
             // Arrange
-            var expected = "expected";
             var target = new Action();
-            target.abortable = expected;
             var abortable;
 
             // Act
@@ -1328,15 +1323,14 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             // Assert
-            Assert.True(abortable);
-            Assert.Equal(expected, target.getAbortableKey());
+            Assert.False(abortable);
         }
 
         [ Fact ]
-        function ReturnsFalseIfAbortableNotSet() {
+        function ReturnsTrueIfSetToTrue() {
             // Arrange
             var target = new Action();
-            target.abortable = undefined;
+            target.abortable = true;
             var actual;
 
             // Act
@@ -1345,7 +1339,7 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             // Assert
-            Assert.False(actual);
+            Assert.True(actual);
         }
     }
 
@@ -1471,30 +1465,30 @@ Test.Aura.Controller.ActionTest = function() {
         
         [ Fact ]
         function StorableErrorHandlerFromParam() {
-                // Arrange
-                var expected = function expected() {};
-            
-                var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                    assert : function() {
-                    }
+            // Arrange
+            var expected = function expected() {};
+        
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                assert : function() {
+                }
+            });
+            var target = new Action();
+            target.def = {
+                isServerAction : function() {}
+            };
+            target.setAbortable = target.getStorageKey = function() {};
+            var actual;
+
+            // Act
+            mockAssert(function() {
+                target.setStorable({
+                    errorHandler: expected
                 });
-                var target = new Action();
-                target.def = {
-                    isServerAction : function() {}
-                };
-                target.setAbortable = target.getStorageKey = function() {};
-                var actual;
+                actual = target.getStorageErrorHandler();
+            })
 
-                // Act
-                mockAssert(function() {
-                    target.setStorable({
-                        errorHandler: expected
-                    });
-                    actual = target.getStorageErrorHandler();
-                })
-
-                // Assert
-                Assert.Equal(expected, actual);
+            // Assert
+            Assert.Equal(expected, actual);
         }
 
         [ Fact ]
@@ -1552,43 +1546,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.Equal(expected, actual);
-        }
-
-        [ Fact ]
-        function AssertAbortableKeyIsDefaultWhenNotProvided() {
-            // Arrange
-            var target = new Action();
-            target.def = {
-                isServerAction: function() {}
-            };
-
-            // Act
-            mock(function() {
-                target.setStorable({});
-            });
-            var actual = target.getAbortableKey();
-
-            // Assert
-            Assert.Equal("", actual);
-        }
-
-        [ Fact ]
-        function AssertAbortableKeyIsDefaultWhenNoStorableConfig() {
-            // Arrange
-            var target = new Action();
-            target.def = {
-                isServerAction: function() {}
-            };
-
-
-            // Act
-            mock(function() {
-                target.setStorable();
-            });
-            var actual = target.getAbortableKey();
-
-            // Assert
-            Assert.Equal("", actual);
         }
     }
 
@@ -2114,11 +2071,30 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function Abort() {
+        var mockGlobal = Mocks.GetMocks(Object.Global(), {
+            "$A" : {
+                util : {
+                    isUndefinedOrNull: function (obj) {
+                        return obj === undefined || obj === null;
+                    },
+                    json : {
+                        encode : function(val) {
+                            return val;
+                        }
+                    }
+                },
+                log : function() {
+                }
+            }
+        });
+
         [ Fact ]
         function SetsStateToAborted() {
             var target = new Action();
 
-            target.abort();
+            mockGlobal(function() {
+                target.abort();
+            });
 
             Assert.Equal("ABORTED", target.state);
         }
@@ -2128,12 +2104,32 @@ Test.Aura.Controller.ActionTest = function() {
             var target = new Action();
             target.completeGroups = Stubs.GetMethod(null);
 
-            target.abort();
+            mockGlobal(function() {
+                target.abort();
+            });
 
             Assert.Equal([ {
                 Arguments : {},
                 ReturnValue : null
             } ], target.completeGroups.Calls);
+        }
+
+        [ Fact ]
+        function CallsAbortedCallback() {
+            var target = new Action();
+            var actual = false;
+            target.callbacks = { "ABORTED" : {
+                fn : function() {
+                    actual = true;
+                },
+                ss : null
+            }};
+
+            mockGlobal(function() {
+                target.abort();
+            });
+
+            Assert.Equal(actual, true);
         }
     }
 }

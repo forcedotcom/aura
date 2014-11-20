@@ -18,8 +18,29 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:menu</code> component represents a menu that contains a trigger and list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
+			A <code>ui:menu</code> component contains a trigger and list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
+			This example shows a menu with list items, which when pressed updates the label on the trigger.
 		</p>
+<pre>&lt;ui:menu>
+    &lt;ui:menuTriggerLink aura:id="trigger" label="Opportunity Status"/>
+        &lt;ui:menuList class="actionMenu" aura:id="actionMenu">
+              &lt;ui:actionMenuItem aura:id="item1" label="Any" click="{!c.updateTriggerLabel}"/>
+              &lt;ui:actionMenuItem aura:id="item2" label="Open" click="{!c.updateTriggerLabel}" disabled="true"/>
+              &lt;ui:actionMenuItem aura:id="item3" label="Closed" click="{!c.updateTriggerLabel}"/>
+              &lt;ui:actionMenuItem aura:id="item4" label="Closed Won" click="{!c.updateTriggerLabel}"/>
+          &lt;/ui:menuList>
+&lt;/ui:menu></pre><p>This client-side controller updates the trigger label when a menu item is clicked.</p>
+
+<pre>({
+    updateTriggerLabel: function(cmp, event) {
+        var triggerCmp = cmp.find("trigger");
+        if (triggerCmp) {
+            var source = event.getSource();
+            var label = source.get("v.label");
+            triggerCmp.set("v.label", label);
+        }
+    }
+})</pre>
 		<p>
 		    The dropdown menu and its menu items are hidden by default. You can change this by setting the <code>visible</code> attribute on the <code>ui:menuList</code> component to <code>true</code>.
 		     The menu items are shown only when you click the <code>ui:menuTriggerLink</code> component.

@@ -563,7 +563,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 }
             }
         }
-    }
+    } 
     
     /*
      * return error message we are expecting, throw by parse() in AuraNumberFormat.java

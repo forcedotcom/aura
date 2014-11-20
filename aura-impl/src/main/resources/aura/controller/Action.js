@@ -56,7 +56,8 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.storable = false;
     this.caboose = caboose;
     this.allAboardCallback = undefined;
-    this.abortable = undefined;
+    this.abortable = false;
+    this.abortableId = undefined;
 
     this.pathStack = [];
     this.canCreate = true;
@@ -386,6 +387,10 @@ Action.prototype.getComponent = function() {
  * Sets the callback function that is executed after the server-side Action returns. Call a server-side Action from a
  * client-side controller using <code>callback</code>.
  *
+ * Note that you can register a callback for an explicit state, or you can use 'ALL' which registers callbacks for
+ * "SUCCESS", "ERROR", and "INCOMPLETE" (but not "ABORT" for historical compatibility. It is recommended that you
+ * use an explicit name, and not the default 'undefined' to signify 'ALL'.
+ *
  * @public
  * @param {Object}
  *            scope The scope in which the function is executed.
@@ -414,7 +419,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
             s : scope
         };
     } else {
-        if (name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE") {
+        if (name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE" && name !== "ABORTED") {
             $A.error("Illegal name " + name);
             return;
         }
@@ -565,7 +570,7 @@ Action.prototype.runDeprecated = function(evt) {
  *   "FAILURE": Deprecated. ERROR is returned instead. The action failed. This state is only valid for client-side actions.
  *   "ERROR": The server returned an error
  *   "INCOMPLETE": The server didn't return a response. The server might be down or the client might be offline.
- *   "ABORTED": The action was aborted
+ *   "ABORTED": The action was aborted. You can register a callback for this explicitly
  */
 Action.prototype.getState = function() {
     return this.state;
@@ -789,36 +794,67 @@ Action.prototype.finishAction = function(context) {
  */
 Action.prototype.abort = function() {
     this.state = "ABORTED";
+    var cb = this.callbacks["ABORTED"];
+    if (cb) {
+        cb.fn.call(cb.s, this, this.cmp);
+    }
+    $A.log("ABORTED: "+this.getStorageKey());
     this.completeGroups();
 };
 
 /**
- * Marks the Action as abortable. For server-side Actions only. Optionally set its abortable key. The key is used
- * to determine which abortable actions to clear when enqueued. Passing undefined or null will enable abortable and
- * set to default "".
+ * Marks the Action as abortable. For server-side Actions only.
  *
- * @public
+ * Note that the incoming value is assumed to be boolean, if missing, or not
+ * equal to false, it will be set to true. I.e. action.setAbortable() sets it to
+ * true.
  *
- * @param {String|Boolean} [key] abortable key or boolean to disable or enable default key of ""
+ * @param {Boolean} value : defaults to setting to true, only sets false if === false
  */
-Action.prototype.setAbortable = function(key) {
-    if (key !== false) {
-        // set key to default "" otherwise, string value of key
-        this.abortable = ($A.util.isUndefinedOrNull(key) || key === true) ? "" : key + "";
+Action.prototype.setAbortable = function(value) {
+    if (value !== false) {
+        this.abortable = true;
     } else {
-        this.abortable = undefined;
+        this.abortable = false;
     }
 };
 
 /**
- * Returns abortable key
+ * set the abortable 'UI transaction' id for this action.
+ *
+ * @private
+ * @param {string} id the abortable ID.
+ */
+Action.prototype.setAbortableId = function(id) {
+    this.abortableId = id;
+};
+
+/**
+ * Set a parent action for this action.
+ *
+ * This function can be used to group actions for the purposes of 'abortable' when Aura cannot
+ * reasonably be expected to do the grouping for you. This should be used in callbacks for actions
+ * or in setTimeout functions when enqueing a new action to update/continue a display.
+ *
+ * @private
+ * @param {Action} the action which is the logical parent of this action.
+ */
+Action.prototype.setParentAction = function(action) {
+    if (this.abortableId !== undefined) {
+        throw new Error("You may only set the parent action once, and it must be before enqueueing:"
+            +this.getStorageKey());
+    }
+    this.abortableId = action.abortableId;
+};
+
+/**
+ * Get the abortable ID for this action.
  *
  * @public
- *
- * @returns {String} abortable key
+ * @returns {string} the abortable id that was set for this action.
  */
-Action.prototype.getAbortableKey = function() {
-    return this.abortable;
+Action.prototype.getAbortableId = function() {
+    return this.abortableId;
 };
 
 /**
@@ -837,7 +873,7 @@ Action.prototype.isRefreshAction = function() {
  * @returns {Boolean} The function is abortable (true), or false otherwise.
  */
 Action.prototype.isAbortable = function() {
-    return !$A.util.isUndefinedOrNull(this.abortable);
+    return this.abortable;
 };
 
 /**

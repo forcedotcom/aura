@@ -17,7 +17,7 @@
     render : function(cmp){
         var elements=$A.util.createElementsFromMarkup(cmp.get("v.value"));
         if(!elements.length){
-            $A.renderingService.renderFacet(cmp,elements);
+            elements=$A.renderingService.renderFacet(cmp,elements);
         }
         return elements;
     },

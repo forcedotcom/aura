@@ -14,29 +14,6 @@
  * limitations under the License.
  */
 ({
-    handleClick: function(component, event, helper) {
-        if ($A.util.supportsTouchEvents()) {
-            var element = event.target || event.srcElement;
-            var event; // The custom event that will be created 
-
-            if (document.createEvent) {
-                event = document.createEvent("HTMLEvents");
-                event.initEvent("customclick", true, true);
-            } else {
-                event = document.createEventObject();
-                event.eventType = "customclick";
-            }
-
-            event.eventName = "customclick";
-
-            if (document.createEvent) {
-                element.dispatchEvent(event);
-            } else {
-                element.fireEvent("on" + event.eventType, event);
-            }
-        } 
-    },
-    
     handleMouseover: function(component, event, helper) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

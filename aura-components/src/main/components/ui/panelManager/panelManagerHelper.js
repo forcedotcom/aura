@@ -48,7 +48,6 @@
             componentDef: 'markup://ui:button',
             attributes: {
                 values: {
-                    "class": 'default primaryButton',
                     label: cmp.get("v.cancelButtonLabel")
                 }
             }

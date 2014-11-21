@@ -364,6 +364,18 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //3.if we set ancestor resources with [], DENY get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspProtocolAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("https:", "https:");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+    }
+
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspWildcardAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("https://*.foo.com", "https://*.foo.com");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+    }
+
+    @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspDeniedAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'none'");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);

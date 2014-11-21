@@ -90,8 +90,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /** No-framing-at-all clickjack protection level for HDR_FRAME_OPTIONS header */
     public static final String HDR_FRAME_DENY = "DENY";
-    /** Open, unprotected level for HDR_FRAME_OPTIONS header */
-    public static final String HDR_FRAME_ALLOW = "ALLOW";
+    /** Limited access for HDR_FRAME_OPTIONS */
+    public static final String HDR_FRAME_ALLOWFROM = "ALLOW-FROM ";
 
     protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     public static final String OUTDATED_MESSAGE = "OUTDATED";
@@ -563,8 +563,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
                             if (site == null) {
                                 // Add same-origin headers and policy terms
                                 rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);
-                            } else {
-                                rsp.addHeader(HDR_FRAME_OPTIONS, "ALLOW-FROM " + site);
+                            } else if (!site.contains("*") && !site.matches("^[a-z]+:$")) {
+                                // XFO can't express wildcards or protocol-only, so set only for a specific site:
+                                rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOWFROM + site);
                             }
                         }
                     }

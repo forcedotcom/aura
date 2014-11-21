@@ -81,7 +81,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
     public static final String MANIFEST_CONTENT_TYPE = "text/cache-manifest";
     public static final String CSS_CONTENT_TYPE = "text/css";
-    
+    public static final String SVG_CONTENT_TYPE = "image/svg+xml";
+
     /** Clickjack protection HTTP header */
     public static final String HDR_FRAME_OPTIONS = "X-FRAME-OPTIONS";
     /** Baseline clickjack protection level for HDR_FRAME_OPTIONS header */
@@ -391,6 +392,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
             return (Json.MIME_TYPE);
         case HTML:
             return (AuraBaseServlet.HTML_CONTENT_TYPE);
+        case SVG:
+            return (AuraBaseServlet.SVG_CONTENT_TYPE);
         }
         return ("text/plain");
     }

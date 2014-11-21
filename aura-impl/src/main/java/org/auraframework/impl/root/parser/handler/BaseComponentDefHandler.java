@@ -39,6 +39,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.ResourceDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
@@ -398,6 +399,13 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
 
             if (mdr.exists(designDescriptor)) {
                 builder.designDefDescriptor = designDescriptor;
+            }
+
+            DefDescriptor<SVGDef> svgDescriptor = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(),
+                    SVGDef.class, DefDescriptor.MARKUP_PREFIX);
+
+            if (mdr.exists(svgDescriptor)) {
+                builder.svgDefDescriptor = svgDescriptor;
             }
 
             builder.render = getAttributeValue(ATTRIBUTE_RENDER);

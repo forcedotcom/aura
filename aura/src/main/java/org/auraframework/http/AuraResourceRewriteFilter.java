@@ -39,23 +39,31 @@ public class AuraResourceRewriteFilter implements Filter {
     public static final String FORMAT_PARAM = "aura.format";
     public static final String CONTEXT_PARAM = "aura.context";
     public static final String TYPE_PARAM = "aura.type";
+    public static final String LOOKUP_PARAM = "aura.lookup";
 
     private ServletContext servletContext;
 
     private static final String uriPattern = "/auraResource?%s=%s&%s=%s&%s=%s";
+    private static final String lookupPattern = "&%s=%s";
 
-    private static final Pattern pattern = Pattern.compile("^/l/([^/]*)/(app|resources).?(.*)$");
+    private static final Pattern pattern = Pattern.compile("^/l/([^/]*)/(?:([^/]*)/)?(app|resources).?(.*)$");
 
     @Override
     public void destroy() {
 
     }
 
-    private static String createURI(String context, String format, String type) {
-        return String.format(uriPattern,
+    private static String createURI(String context, String format, String type, String lookup) {
+        StringBuilder sb = new StringBuilder(String.format(uriPattern,
                 FORMAT_PARAM, format,
                 CONTEXT_PARAM, AuraTextUtil.urldecode(context),
-                TYPE_PARAM, type);
+                TYPE_PARAM, type));
+
+        if (lookup != null && !lookup.isEmpty()) {
+            sb.append(String.format(lookupPattern, LOOKUP_PARAM, lookup));
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -69,7 +77,7 @@ public class AuraResourceRewriteFilter implements Filter {
         String newUri = null;
         Matcher matcher = pattern.matcher(path);
         if (matcher.matches()) {
-            newUri = createURI(matcher.group(1), matcher.group(3), matcher.group(2));
+            newUri = createURI(matcher.group(1), matcher.group(4), matcher.group(3), matcher.group(2));
             // Sometimes original request URI can be useful: Eg: manifast in
             // AuraResourceServlet
             request.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI,

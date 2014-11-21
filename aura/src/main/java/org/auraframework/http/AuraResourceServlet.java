@@ -36,6 +36,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.SVGDef;
+import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -65,6 +67,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private static final String UID = "uid";
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
+
+    protected static final StringParam lookup = new StringParam(AuraServlet.AURA_PREFIX + "lookup", 0, false);
 
     private static ServletContext servletContext;
 
@@ -310,6 +314,16 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
     }
 
+    private void writeSvg(HttpServletRequest request, AuraContext context, Writer out) throws IOException,
+            QuickFixException {
+        String fqn = lookup.get(request);
+        if (fqn == null || fqn.isEmpty()) {
+            fqn = context.getApplicationDescriptor().getQualifiedName();
+        }
+        DefDescriptor<SVGDef> svg = Aura.getDefinitionService().getDefDescriptor(fqn, SVGDef.class);
+        Aura.getServerService().writeAppSvg(svg, out);
+    }
+
     /**
      * Serves up CSS or JS resources for a list of namespaces.
      * 
@@ -399,6 +413,13 @@ public class AuraResourceServlet extends AuraBaseServlet {
             }
             try {
                 Aura.getServerService().writeComponents(topLevel, response.getWriter());
+            } catch (Throwable t) {
+                handleServletException(t, true, context, request, response, true);
+            }
+            break;
+        case SVG:
+            try {
+                writeSvg(request, context, response.getWriter());
             } catch (Throwable t) {
                 handleServletException(t, true, context, request, response, true);
             }

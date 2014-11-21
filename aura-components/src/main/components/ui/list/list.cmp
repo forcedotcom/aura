@@ -15,11 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:abstractList" support="proto"
-    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list" description="A list component that iterates over and displays the items in the ui:dataProvider component.">
+<aura:component
+    extends="ui:abstractList"
+    support="proto"
+    description="A list component that iterates over and displays the items in the ui:dataProvider component.">
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<ul class="{!v.class}">
-	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
-
-	</aura:iteration>
+    	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
 	</ul>
 </aura:component>

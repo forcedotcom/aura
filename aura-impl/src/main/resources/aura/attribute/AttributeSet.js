@@ -347,7 +347,7 @@ AttributeSet.prototype.destroy = function(async) {
         }
 
         // KRIS: HALO:
-        // HTML Elements store their attributes in the HTMLAttributes map. 
+        // HTML Elements store their attributes in the HTMLAttributes map.
         // Since we don't go recursively down the attributes we don't clean these.
         // We should at least destroy them, PRV's still don't release their references.
         // if(k === "HTMLAttributes") {
@@ -419,11 +419,7 @@ AttributeSet.prototype.initialize = function(attributes) {
                 this.decorators[name].push(value);
             }else{
                 if (!(value instanceof PropertyReferenceValue && value.equals(this.values[name]))) {
-                    if (this.values[name] instanceof PropertyReferenceValue && !this.values[name].isGlobal()) {
-                        this.values[name].set(value);
-                    } else {
-                        this.values[name] = value;
-                    }
+                    this.values[name] = value;
                 }
             }
 		}

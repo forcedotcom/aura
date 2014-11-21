@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 ({
+    init: function(component) {
+        var dataProvider = component.get("v.dataProvider[0]");
+        if(dataProvider && dataProvider.getModel()) {
+            component.set("v.items", dataProvider.get("m.items"));
+        }
+    },
+
     handleClick: function(component, event, helper) {
         var targetCmp = helper.getEventSourceComponent(component, event);
         var selectEvt = component.get("e.selectListOption");
@@ -22,21 +29,21 @@
         });
         selectEvt.fire();
     },
-    
+
     handleListHighlight: function(component, event, helper) {
         helper.handleListHighlight(component, event);
     },
-    
+
     handlePressOnHighlighted: function(component, event, helper) {
         helper.handlePressOnHighlighted(component, event);
     },
-    
+
     matchText: function(component, event, helper) {
         helper.matchText(component, event.getParam("keyword"));
     },
-    
+
     visibleChange: function(component, event, helper) {
-        var obj = {};  
+        var obj = {};
         var visible = component.get("v.visible");
 
         if (visible === false) { // auto complete list is hidden.
@@ -44,16 +51,16 @@
             $A.util.removeClass(list, "visible");
             // Remove loading indicator
             obj["aria-activedescendant"] = "",
-            obj["aria-expanded"] = false;          
+            obj["aria-expanded"] = false;
             // De-register list expand/collapse events
             $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-            $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component)); 
+            $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
         } else { // Register list expand/collapse events
             obj["aria-expanded"] = true;
             $A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-            $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component)); 
+            $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
         }
-        
+
         // Update accessibility attributes
         var updateAriaEvt = component.get("e.updateAriaAttributes");
         if (updateAriaEvt) {

@@ -51,10 +51,10 @@
         test:[ 
             function(cmp){
             	//test loading script , with eval() on top level application
-            	$A.test.assertEquals("test result from eval: /cspTest/basicCspTest.app", document._eval_res, 
+            	$A.test.assertEquals("test result from eval: /test/basicCspTest.app", document._eval_res, 
             			"fail to load script with eval on top level application");
             	/*test loading script , with eval() on child cmp --  this doesn't work
-            	$A.test.assertEquals("test result from eval: /cspTest/basicCspCmpExtendsTemplate.cmp", 
+            	$A.test.assertEquals("test result from eval: /test/basicCspCmpExtendsTemplate.cmp", 
             			document._eval_res_from_child_template, 
     			"fail to load script with eval from child cmp"); */
             	//test loading script from same origin

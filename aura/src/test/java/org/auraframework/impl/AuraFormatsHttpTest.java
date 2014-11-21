@@ -200,7 +200,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
 
                 // Bad preload namespace, should cause an exception in
                 // AuraResourceServlet.
-                // But the response should still be in CSS mime type
+                // But the response should still be in SVG mime type
                 modeAndPreload = "{'mode':'DEV','preloads':['test']}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.svg";
                 getOnAuraResourceServlet(format, url);

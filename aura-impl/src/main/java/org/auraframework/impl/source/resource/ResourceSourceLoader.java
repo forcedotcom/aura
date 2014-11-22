@@ -15,11 +15,11 @@
  */
 package org.auraframework.impl.source.resource;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,7 +103,7 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
             return;
         }
         for (String file : files) {
-            DefDescriptor<?> desc = getDescriptor(file);
+            DefDescriptor<?> desc = getDescriptor(file, "/");
             if (desc == null) {
                 // This should be a fatal error, and we should always compile our sources (FAIL FAST).
                 // throw new AuraRuntimeException("Unrecognized entry, source skew "+file);
@@ -160,14 +160,14 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
 
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        Source<D> ret = new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor), getFormat(descriptor));
+        Source<D> ret = new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor, "/"), getFormat(descriptor));
         if (!ret.exists()) {
             @SuppressWarnings("unchecked")
             Set<DefDescriptor<D>> all = find((Class<D>) descriptor.getDefType().getPrimaryInterface(),
                     descriptor.getPrefix(), descriptor.getNamespace());
             for (DefDescriptor<D> candidate : all) {
                 if (candidate.equals(descriptor)) {
-                    ret = new ResourceSource<D>(candidate, resourcePrefix + "/" + getPath(candidate), getFormat(descriptor));
+                    ret = new ResourceSource<D>(candidate, resourcePrefix + "/" + getPath(candidate, "/"), getFormat(descriptor));
                 }
             }
         }

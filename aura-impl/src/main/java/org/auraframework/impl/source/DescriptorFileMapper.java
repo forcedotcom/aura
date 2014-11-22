@@ -126,7 +126,11 @@ public class DescriptorFileMapper {
     }
 
     protected static DefDescriptor<? extends Definition> getDescriptor(String filename) {
-        List<String> names = AuraTextUtil.splitSimple(FILE_SEPARATOR, filename);
+    	return getDescriptor(filename, FILE_SEPARATOR);    	
+    }
+
+    protected static DefDescriptor<? extends Definition> getDescriptor(String filename, String separator) {
+        List<String> names = AuraTextUtil.splitSimple(separator, filename);
         if (names.size() < 3) {
             return null;
         }
@@ -181,7 +185,7 @@ public class DescriptorFileMapper {
      * 
      * @param descriptor the descriptor for which we want a path.
      */
-    protected String getPath(DefDescriptor<?> descriptor) {
+    protected String getPath(DefDescriptor<?> descriptor, String separator) {
         // Get rid of the inner type qualifier.
         ExtensionInfo ei;
         String name = descriptor.getName();
@@ -196,7 +200,7 @@ public class DescriptorFileMapper {
             // The $ split here is just wrong...
             //
             name = AuraTextUtil.splitSimple("$", name).get(0);
-            return String.format("%s/%s.%s", namespace.replace(".", FILE_SEPARATOR), name, descriptor.getPrefix());
+            return String.format("%s/%s.%s", namespace.replace(".", separator), name, descriptor.getPrefix());
         }
         switch (ei.nameFormat) {
         case BUNDLED_EXTRA:
@@ -205,7 +209,7 @@ public class DescriptorFileMapper {
                 throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
                         + ei);
             }
-            return String.format("%s%s%s%s%s%s", namespace, FILE_SEPARATOR, bundle.getName(), FILE_SEPARATOR, name,
+            return String.format("%s%s%s%s%s%s", namespace, separator, bundle.getName(), separator, name,
                     ei.extension);
         case BUNDLE:
             if (bundle != null) {
@@ -215,14 +219,18 @@ public class DescriptorFileMapper {
             }
             // Alongside knowing the extension, we also know that namespace+name is a directory,
             // and name+ext is the file inside that directory:
-            return String.format("%s%s%s%s%s%s", namespace, FILE_SEPARATOR, name, FILE_SEPARATOR, name, ei.extension);
+            return String.format("%s%s%s%s%s%s", namespace, separator, name, separator, name, ei.extension);
         case NAMESPACE:
-            return String.format("%s%s%s%s", namespace, FILE_SEPARATOR, namespace, ei.extension);
+            return String.format("%s%s%s%s", namespace, separator, namespace, ei.extension);
         }
         throw new AuraRuntimeException("Could not get path for " + descriptor + "@" + descriptor.getDefType()
                 + " with ei=" + ei);
     }
 
+    protected String getPath(DefDescriptor<?> descriptor) {
+    	return getPath(descriptor, FILE_SEPARATOR);
+    }
+    
     @SuppressWarnings("unchecked")
     protected <D extends Definition> DefDescriptor<D> updateDescriptorName(DefDescriptor<D> desc, String newNamespace,
             String newName) {

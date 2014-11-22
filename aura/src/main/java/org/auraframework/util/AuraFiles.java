@@ -35,7 +35,7 @@ public enum AuraFiles {
     /**
      * Aura-Test Module Root dir
      */
-    AuraTestModuleDirectory(AuraModuleDirectory.getPath(), "src/test"),
+    AuraTestModuleDirectory(AuraModuleDirectory.getPath(), "src" + File.separator + "test"),
     /**
      * Root dir for File-based components only available to test contexts.
      */

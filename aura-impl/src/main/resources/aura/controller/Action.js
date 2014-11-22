@@ -836,10 +836,13 @@ Action.prototype.setAbortableId = function(id) {
  * reasonably be expected to do the grouping for you. This should be used in callbacks for actions
  * or in setTimeout functions when enqueing a new action to update/continue a display.
  *
- * @private
+ * @public
  * @param {Action} the action which is the logical parent of this action.
  */
 Action.prototype.setParentAction = function(action) {
+    if($A.util.isUndefinedOrNull(action) || $A.util.isUndefined(action.auraType) || action.auraType!=="Action"){
+        throw new Error("The provided parent action is not a valid Action: " + action);
+    }
     if (this.abortableId !== undefined) {
         throw new Error("You may only set the parent action once, and it must be before enqueueing:"
             +this.getStorageKey());

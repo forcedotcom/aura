@@ -35,7 +35,7 @@
         cmp.set("v.log", logValue);
     },
 
-    waitForLog : function(cmp, index, content) {
+    addWaitForLog : function(cmp, index, content) {
         var actual;
         $A.test.addWaitForWithFailureMessage(false,
                 function() {
@@ -52,7 +52,7 @@
     /**
      * Wait for a log entry that will fall in a range due to race conditions.
      */
-    waitForLogRace : function(cmp, index1, index2, content) {
+    addWaitForLogRace : function(cmp, index1, index2, content) {
         var actual;
         $A.test.addWaitForWithFailureMessage(false, 
                 function() {
@@ -109,9 +109,9 @@
             // client action will get called after the value change is processed above
             this.log(cmp, "log2");
         }, function(cmp) {
-            this.waitForLog(cmp, 0, "log1");
-            this.waitForLog(cmp, 1, "client");
-            this.waitForLog(cmp, 2, "log2");
+            this.addWaitForLog(cmp, 0, "log1");
+            this.addWaitForLog(cmp, 1, "client");
+            this.addWaitForLog(cmp, 2, "log2");
         } ]
     },
 
@@ -130,7 +130,7 @@
                     }));
                 });
                 // verify only background action ran
-                this.waitForLog(cmp, 0, "back1:back1");
+                this.addWaitForLog(cmp, 0, "back1:back1");
             },
             function(cmp) {
                 var that = this;
@@ -148,7 +148,7 @@
                     }));
                 });
                 // verify only background action ran (still)
-                this.waitForLog(cmp, 1, "back2:back2");
+                this.addWaitForLog(cmp, 1, "back2:back2");
             },
             function(cmp) {
                 var that = this;
@@ -158,10 +158,10 @@
                     }));
                 });
                 // new foreground action should flush out all pending caboose actions
-                this.waitForLog(cmp, 2, "caboose1:caboose1");
-                this.waitForLog(cmp, 3, "caboose2:caboose2");
-                this.waitForLog(cmp, 4, "caboose3:caboose3");
-                this.waitForLog(cmp, 5, "fore1:fore1");
+                this.addWaitForLog(cmp, 2, "caboose1:caboose1");
+                this.addWaitForLog(cmp, 3, "caboose2:caboose2");
+                this.addWaitForLog(cmp, 4, "caboose3:caboose3");
+                this.addWaitForLog(cmp, 5, "fore1:fore1");
             }
         ]
     },
@@ -185,7 +185,7 @@
                     }));
                 });
                 // verify only background action ran
-                this.waitForLog(cmp, 0, "back1:back1");
+                this.addWaitForLog(cmp, 0, "back1:back1");
             },
             function(cmp) {
                 var that = this;
@@ -193,8 +193,8 @@
                 this.log(cmp, "log1");
 
                 // verify client actions ran but did not cause caboose action to run
-                this.waitForLog(cmp, 1, "log1");
-                this.waitForLog(cmp, 2, "client");
+                this.addWaitForLog(cmp, 1, "log1");
+                this.addWaitForLog(cmp, 2, "client");
             }
         ]
     },
@@ -212,8 +212,8 @@
                         that.log(cmp, "back1:" + a.getReturnValue());
                     }));
                 // verify background action ran, even though it is marked as caboose
-                this.waitForLogRace(cmp, 0, 1, "cabooseAndBack1:cabooseAndBack1");
-                this.waitForLogRace(cmp, 0, 1, "back1:back1");
+                this.addWaitForLogRace(cmp, 0, 1, "cabooseAndBack1:cabooseAndBack1");
+                this.addWaitForLogRace(cmp, 0, 1, "back1:back1");
             }
         ]
     },
@@ -244,7 +244,7 @@
                     }));
                 });
                 // only background action should have run
-                this.waitForLog(cmp, 0, "back1:back1");
+                this.addWaitForLog(cmp, 0, "back1:back1");
             },
             function(cmp){
                 var that = this;
@@ -256,12 +256,12 @@
                     }));
                 });
                 // verify allAboardCallback's are called before their associated actions complete
-                this.waitForLog(cmp, 1, "allAboardCaboose1");
-                this.waitForLog(cmp, 2, "allAboardCaboose2");
-                this.waitForLog(cmp, 3, "allAboardFore");
-                this.waitForLog(cmp, 4, "caboose1:caboose1");
-                this.waitForLog(cmp, 5, "caboose2:caboose2");
-                this.waitForLog(cmp, 6, "fore1:fore1");
+                this.addWaitForLog(cmp, 1, "allAboardCaboose1");
+                this.addWaitForLog(cmp, 2, "allAboardCaboose2");
+                this.addWaitForLog(cmp, 3, "allAboardFore");
+                this.addWaitForLog(cmp, 4, "caboose1:caboose1");
+                this.addWaitForLog(cmp, 5, "caboose2:caboose2");
+                this.addWaitForLog(cmp, 6, "fore1:fore1");
             }
         ]
     },
@@ -294,9 +294,9 @@
                         that.log(cmp, "fore1:" + a.getReturnValue());
                     }));
                 });
-                this.waitForLog(cmp, 0, "allAboardCallback");
-                this.waitForLog(cmp, 1, "caboose1:initialString,updatedString");
-                this.waitForLog(cmp, 2, "fore1:fore1");
+                this.addWaitForLog(cmp, 0, "allAboardCallback");
+                this.addWaitForLog(cmp, 1, "caboose1:initialString,updatedString");
+                this.addWaitForLog(cmp, 2, "fore1:fore1");
             }
         ]
     },
@@ -353,11 +353,11 @@
                             }));
                 });
                 // back1 must finish before back4 starts!
-                this.waitForLog(cmp, 0, "back1:");
+                this.addWaitForLog(cmp, 0, "back1:");
                 
                 // back4 & fore1 are in a race 
-                this.waitForLogRace(cmp, 1, 2, "fore1:fore1");
-                this.waitForLogRace(cmp, 1, 2, "back4:");
+                this.addWaitForLogRace(cmp, 1, 2, "fore1:fore1");
+                this.addWaitForLogRace(cmp, 1, 2, "back4:");
 
                 // back 2 & 3 are waiting.
 
@@ -370,14 +370,14 @@
                                 that.log(cmp, "fore2:" + a.getReturnValue());
                             }));
                 });
-                this.waitForLog(cmp, 3, "fore2:back4,fore2");
+                this.addWaitForLog(cmp, 3, "fore2:back4,fore2");
             }, function(cmp) {
                 var that = this;
                 // now release back2
                 $A.run(function() {
                     $A.enqueueAction(that.getAction(cmp, "c.execute", "RESUME back2.e"));
                 })
-                this.waitForLog(cmp, 4, "back2:");
+                this.addWaitForLog(cmp, 4, "back2:");
             }, function(cmp) {
                 var that = this;
                 // now release back3, reading out the text
@@ -387,8 +387,8 @@
                                 that.log(cmp, "fore3:" + a.getReturnValue());
                             }));
                 });
-                this.waitForLogRace(cmp, 5, 6, "fore3:back2.e");
-                this.waitForLogRace(cmp, 5, 6, "back3:back1,back2,back3");
+                this.addWaitForLogRace(cmp, 5, 6, "fore3:back2.e");
+                this.addWaitForLogRace(cmp, 5, 6, "back3:back1,back2,back3");
             } ]
     },
 
@@ -418,7 +418,7 @@
                         $A.enqueueAction(a);
                     });
                     // client action executed immediately even if "background"
-                    this.waitForLog(cmp, 0, "client");
+                    this.addWaitForLog(cmp, 0, "client");
                 }, function(cmp) {
                     var that = this;
                     $A.run(function() {
@@ -428,10 +428,10 @@
                         }));
                     });
                     // The foreground and all 3 background actions are in a race to finish
-                    this.waitForLogRace(cmp, 1, 4, "fore1:");
-                    this.waitForLogRace(cmp, 1, 4, "back1:");
-                    this.waitForLogRace(cmp, 1, 4, "back2:");
-                    this.waitForLogRace(cmp, 1, 4, "back3:");
+                    this.addWaitForLogRace(cmp, 1, 4, "fore1:");
+                    this.addWaitForLogRace(cmp, 1, 4, "back1:");
+                    this.addWaitForLogRace(cmp, 1, 4, "back2:");
+                    this.addWaitForLogRace(cmp, 1, 4, "back3:");
                 } ]
     },
 
@@ -457,15 +457,15 @@
                                     that.log(cmp, "back1:" + a.getReturnValue());
                                 }));
                     }); // check that only the first foreground action was received by the server
-                    this.waitForLog(cmp, 0, "back1:fore1,back1");
+                    this.addWaitForLog(cmp, 0, "back1:fore1,back1");
                 }, function(cmp) {
                     var that = this;
                     $A.run(function() {
                         // fire background action that releases pending actions
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND back2;RESUME fore1;"));
                     });
-                    this.waitForLog(cmp, 1, "fore1:back2");
-                    this.waitForLog(cmp, 2, "fore2:fore2");
+                    this.addWaitForLog(cmp, 1, "fore1:back2");
+                    this.addWaitForLog(cmp, 2, "fore2:fore2");
                 } ]
     },
 
@@ -485,7 +485,7 @@
                         }));
                     });
                     // check that only the first background action was received by the server at first
-                    this.waitForLog(cmp, 0, "fore1:back1,fore1");
+                    this.addWaitForLog(cmp, 0, "fore1:back1,fore1");
                 },
                 function(cmp) {
                     var that = this;
@@ -508,8 +508,8 @@
                         }));
                     });
                     // check that only the first background action was received by the server at first
-                    this.waitForLog(cmp, 1, "fore2:back2,fore2");
-                    this.waitForLog(cmp, 2, "back1:");
+                    this.addWaitForLog(cmp, 1, "fore2:back2,fore2");
+                    this.addWaitForLog(cmp, 2, "back1:");
                 }, function(cmp) {
                     var that = this;
                     $A.run(function() {
@@ -520,10 +520,10 @@
                         }));
                     });
                     // check that only the second background action was received by the server next
-                    this.waitForLog(cmp, 3, "fore3:fore3");
-                    this.waitForLog(cmp, 4, "back2:");
+                    this.addWaitForLog(cmp, 3, "fore3:fore3");
+                    this.addWaitForLog(cmp, 4, "back2:");
                     // check that final background action was received by the server
-                    this.waitForLog(cmp, 5, "back3:back3");
+                    this.addWaitForLog(cmp, 5, "back3:back3");
                 } ]
     },
 
@@ -544,7 +544,7 @@
                                 }));
                     });
                     // check that only the first foreground action was received by the server at first
-                    this.waitForLog(cmp, 0, "back1:fore1,back1");
+                    this.addWaitForLog(cmp, 0, "back1:fore1,back1");
                 },
                 function(cmp) {
                     var that = this;
@@ -573,8 +573,8 @@
                         }));
                     });
                     // check that only the first foreground action was received by the server at first
-                    this.waitForLog(cmp, 1, "back2:back2");
-                    this.waitForLog(cmp, 2, "fore1:");
+                    this.addWaitForLog(cmp, 1, "back2:back2");
+                    this.addWaitForLog(cmp, 2, "fore1:");
                 },
                 function(cmp) {
                     var that = this;
@@ -594,10 +594,10 @@
                         }));
                     });
                     // check that only the foreground batch was received by the server
-                    this.waitForLog(cmp, 3, "back3:fore3,back3");
-                    this.waitForLog(cmp, 4, "fore2:fore2");
-                    this.waitForLog(cmp, 5, "fore3:");
-                    this.waitForLog(cmp, 6, "fore4:fore4");
+                    this.addWaitForLog(cmp, 3, "back3:fore3,back3");
+                    this.addWaitForLog(cmp, 4, "fore2:fore2");
+                    this.addWaitForLog(cmp, 5, "fore3:");
+                    this.addWaitForLog(cmp, 6, "fore4:fore4");
                 },
                 function(cmp) {
                     var that = this;
@@ -610,9 +610,9 @@
                                 }));
                     });
                     // check that the foreground batch was received by the server
-                    this.waitForLog(cmp, 7, "back4:fore6,back4");
-                    this.waitForLog(cmp, 8, "fore5:fore5");
-                    this.waitForLog(cmp, 9, "fore6:");
+                    this.addWaitForLog(cmp, 7, "back4:fore6,back4");
+                    this.addWaitForLog(cmp, 8, "fore5:fore5");
+                    this.addWaitForLog(cmp, 9, "fore6:");
                 } ]
     },
 
@@ -661,12 +661,12 @@
                 // release queue
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "RESUME fore1;"));
         }, function(cmp) {
-            this.waitForLog(cmp, 0, "fore1:fore1");
-            this.waitForLog(cmp, 1, "fore4:fore4");
-            this.waitForLog(cmp, 2, "fore5:fore5");
-            this.waitForLog(cmp, 3, "fore6:fore6");
-            this.waitForLog(cmp, 4, "fore7:fore7");
-            this.waitForLog(cmp, 5, "fore8:fore8");
+            this.addWaitForLog(cmp, 0, "fore1:fore1");
+            this.addWaitForLog(cmp, 1, "fore4:fore4");
+            this.addWaitForLog(cmp, 2, "fore5:fore5");
+            this.addWaitForLog(cmp, 3, "fore6:fore6");
+            this.addWaitForLog(cmp, 4, "fore7:fore7");
+            this.addWaitForLog(cmp, 5, "fore8:fore8");
         } ]
     },
 
@@ -705,9 +705,9 @@
             }, function(cmp) {
                 
             // callback of initial abortable action is aborted
-            this.waitForLog(cmp, 0, "back1:fore1,back1");
-            this.waitForLog(cmp, 1, "back2:back2");
-            this.waitForLog(cmp, 2, "fore2:fore2");
+            this.addWaitForLog(cmp, 0, "back1:fore1,back1");
+            this.addWaitForLog(cmp, 1, "back2:back2");
+            this.addWaitForLog(cmp, 2, "fore2:fore2");
         }]
     },
 
@@ -723,7 +723,7 @@
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;", "bgAction1"));
             });
-            this.waitForLog(cmp, 0, "prime:false:initial");
+            this.addWaitForLog(cmp, 0, "prime:false:initial");
             // This test assumes actions from each test stage are complete before moving on to the next stage. So we
             // need to wait on actions that don't log to the screen. On slower browsers without the wait the actions
             // get backed up and begin aborting themselves, causing the test to fail.
@@ -739,7 +739,7 @@
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;", "bgAction2"));
             });
-            this.waitForLog(cmp, 1, "foreground match:true:initial");
+            this.addWaitForLog(cmp, 1, "foreground match:true:initial");
             $A.test.addWaitForAction(true, "bgAction2");
         }, function(cmp) {
             var that = this;
@@ -753,7 +753,7 @@
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND initial;RESUME;", "foreAction1"));
             });
-            this.waitForLog(cmp, 2, "background match:true:initial");
+            this.addWaitForLog(cmp, 2, "background match:true:initial");
             $A.test.addWaitForAction(true, "foreAction1");
         }, function(cmp) {
             var that = this;
@@ -766,8 +766,8 @@
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND updated;RESUME;", "bgAction3"));
             });
-            this.waitForLog(cmp, 3, "foreground differs:true:initial");
-            this.waitForLog(cmp, 4, "foreground differs:false:updated"); // from differing refresh
+            this.addWaitForLog(cmp, 3, "foreground differs:true:initial");
+            this.addWaitForLog(cmp, 4, "foreground differs:false:updated"); // from differing refresh
             $A.test.addWaitForAction(true, "bgAction3");
         }, function(cmp) {
             var that = this;
@@ -781,8 +781,8 @@
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.execute", "APPEND revised;RESUME;"));
             });
-            this.waitForLog(cmp, 5, "background differs:true:updated");
-            this.waitForLog(cmp, 6, "background differs:false:revised"); // from differing refresh
+            this.addWaitForLog(cmp, 5, "background differs:true:updated");
+            this.addWaitForLog(cmp, 6, "background differs:false:revised"); // from differing refresh
         } ]
     },
 
@@ -831,8 +831,8 @@
             });
 
             // both callbacks with stored value executed
-            this.waitForLog(cmp, 1, "foreground:true:" + cmp._initialValue);
-            this.waitForLog(cmp, 2, "background:true:" + cmp._initialValue);
+            this.addWaitForLog(cmp, 1, "foreground:true:" + cmp._initialValue);
+            this.addWaitForLog(cmp, 2, "background:true:" + cmp._initialValue);
 
             // both callbacks with refreshed value executed
             // ordering is not guaranteed
@@ -868,7 +868,7 @@
                 $A.enqueueAction(a);
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "APPEND initial;RESUME;"));
         }, function(cmp) {
-            this.waitForLog(cmp, 0, "prime:false:initial");
+            this.addWaitForLog(cmp, 0, "prime:false:initial");
         }, function(cmp) {
             var that = this;
             // max out in-flight, to start queueing
@@ -901,8 +901,8 @@
                 $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "WAIT back2;APPEND release;RESUME;"));
         }, function(cmp) {
             // only last queued storable was sent to server
-            this.waitForLog(cmp, 1, "store2:true:initial");
-            this.waitForLog(cmp, 2, "store2:false:release");
+            this.addWaitForLog(cmp, 1, "store2:true:initial");
+            this.addWaitForLog(cmp, 2, "store2:false:release");
         } ]
     },
 
@@ -1026,10 +1026,10 @@
                 }));
             });
 
-            this.waitForLog(cmp, 0, "fore1:fore1");
-            this.waitForLog(cmp, 1, "run1:run1");
-            this.waitForLog(cmp, 2, "run1 callback");
-            this.waitForLog(cmp, 3, "fore2:afterRun1,fore2");
+            this.addWaitForLog(cmp, 0, "fore1:fore1");
+            this.addWaitForLog(cmp, 1, "run1:run1");
+            this.addWaitForLog(cmp, 2, "run1 callback");
+            this.addWaitForLog(cmp, 3, "fore2:afterRun1,fore2");
         } ]
     },
 
@@ -1055,7 +1055,7 @@
                                     that.log(cmp, "back1:" + a.getReturnValue());
                                 }));
                     });
-                    this.waitForLog(cmp, 0, "back1:fore1,back1");
+                    this.addWaitForLog(cmp, 0, "back1:fore1,back1");
                 },
                 function(cmp) {
                     var that = this;
@@ -1072,17 +1072,17 @@
                     });
                     // background action in set is processed because background is not blocked
                     // foreground action is queued
-                    this.waitForLog(cmp, 1, "run2:run2");
+                    this.addWaitForLog(cmp, 1, "run2:run2");
                 }, function(cmp) {
                     var that = this;
                     $A.run(function() {
                         // flush pending
                         $A.enqueueAction(that.getAction(cmp, "c.executeBackground", "RESUME fore1;"));
                     });
-                    this.waitForLog(cmp, 2, "fore1:");
-                    this.waitForLog(cmp, 3, "fore2:fore2");
-                    this.waitForLog(cmp, 4, "run1:run1");
-                    this.waitForLog(cmp, 5, "run1 callback");
+                    this.addWaitForLog(cmp, 2, "fore1:");
+                    this.addWaitForLog(cmp, 3, "fore2:fore2");
+                    this.addWaitForLog(cmp, 4, "run1:run1");
+                    this.addWaitForLog(cmp, 5, "run1 callback");
                 } ]
     },
 
@@ -1129,7 +1129,7 @@
                                 }));
                 },
                 function(cmp) {
-                    this.waitForLog(cmp, 0, "back1:run1,back1");
+                    this.addWaitForLog(cmp, 0, "back1:run1,back1");
                 },
                 function(cmp) {
                     var that = this;
@@ -1142,9 +1142,9 @@
                                 }));
                },
                function(cmp) {
-                    this.waitForLog(cmp, 1, "run1:");
-                    this.waitForLog(cmp, 2, "run1 callback");
-                    this.waitForLog(cmp, 3, "back2:run2,back2");
+                    this.addWaitForLog(cmp, 1, "run1:");
+                    this.addWaitForLog(cmp, 2, "run1 callback");
+                    this.addWaitForLog(cmp, 3, "back2:run2,back2");
                 },
                 function(cmp) {
                     var that = this;
@@ -1157,7 +1157,7 @@
                                 }));
                 },
                 function(cmp) {
-                    this.waitForLog(cmp, 4, "back3:run3");
+                    this.addWaitForLog(cmp, 4, "back3:run3");
                 },
                 function(cmp) {
                     var that = this;
@@ -1170,7 +1170,7 @@
                                 }));
                 },
                 function(cmp) {
-                    this.waitForLog(cmp, 5, "back4:fore1");
+                    this.addWaitForLog(cmp, 5, "back4:fore1");
                 },
                 function(cmp) {
                     var that = this;
@@ -1182,107 +1182,334 @@
                                 }));
                 },
                 function(cmp) {
-                    this.waitForLog(cmp, 6, "run2:back3");
-                    this.waitForLog(cmp, 7, "run2 callback");
-                    this.waitForLog(cmp, 8, "run3:back4");
-                    this.waitForLog(cmp, 9, "run3 callback");
-                    this.waitForLog(cmp, 10, "fore1:back5");
-                    this.waitForLog(cmp, 11, "back5:");
+                    this.addWaitForLog(cmp, 6, "run2:back3");
+                    this.addWaitForLog(cmp, 7, "run2 callback");
+                    this.addWaitForLog(cmp, 8, "run3:back4");
+                    this.addWaitForLog(cmp, 9, "run3 callback");
+                    this.addWaitForLog(cmp, 10, "fore1:back5");
+                    this.addWaitForLog(cmp, 11, "back5:");
                 } ]
     },
 
     /**
-     * Check the case where we call abort on the first action if it is aborted in flight.
+     * Check the case where we abort an in-flight that is not the current action's parent
      */
-    testAbortWithNoParent : {
+    testAbortIfNotParentOf : {
         test : [ function(cmp) {
+            // keep abortable in-flight
             cmp._aborted1 = false;
-            var a = this.getAction(cmp, "c.execute", "WAIT testAbortWithNoParent-fore;")
+            var a = this.getAction(cmp, "c.execute", "WAIT testAbortIfNotParent;")
             a.setAbortable();
             a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
             $A.enqueueAction(a);
         }, function(cmp) {
+            // queue new unparented abortable
             var that = this;
-            var a = this.getActionAndLog(cmp, "c.execute", "WAIT testAbortWithNoParent-fore2;APPEND done; READ;",
-                                         "bah: ");
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND done; READ;", "bah: ");
             cmp._aborted2 = false;
             a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
             a.setAbortable();
             $A.enqueueAction(a);
-            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortWithNoParent-fore; RESUME testAbortWithNoParent-fore2;");
+
+            // release held action
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortIfNotParent");
             $A.enqueueAction(b);
-            this.waitForLog(cmp, 0, "bah: done");
+            this.addWaitForLog(cmp, 0, "bah: done");
         }, function(cmp) {
-            $A.test.assertTrue(cmp._aborted1);
-            $A.test.assertFalse(cmp._aborted2);
+            $A.test.assertTrue(cmp._aborted1, "parent should have aborted");
+            $A.test.assertFalse(cmp._aborted2, "new unparented action shouldn't abort");
         } ]
     },
 
     /**
      * Check the case where we do not abort the parent of a parented action.
      */
-    testNoAbortWithParent : {
+    testNoAbortIfParentOf : {
         test : [ function(cmp) {
-            var a = this.getAction(cmp, "c.execute", "WAIT testNoAbortWithParent-fore;")
+            // keep abortable in-flight
+            var a = this.getAction(cmp, "c.execute", "WAIT testNoAbortIfParent;")
             cmp._first_a = a;
             a.setAbortable();
             cmp._aborted1 = false;
             a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
             $A.enqueueAction(a);
         }, function(cmp) {
+            // queue new abortable whose parent is in-flight
             var that = this;
-            var a = this.getActionAndLog(cmp, "c.execute", "WAIT testNoAbortWithParent-fore2;APPEND done; READ;",
-                                         "bah: ");
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND done; READ;", "bah: ");
             cmp._aborted2 = false;
             a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
             a.setAbortable();
             a.setParentAction(cmp._first_a);
             $A.enqueueAction(a);
-            var b = this.getAction(cmp, "c.executeBackground", "RESUME testNoAbortWithParent-fore; RESUME testNoAbortWithParent-fore2;");
+            
+            // queue new abortable whose parent is the new child
+            var b = this.getActionAndLog(cmp, "c.execute", "APPEND finally; READ;", "really: ");
+            cmp._aborted3 = false;
+            b.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
+            b.setAbortable();
+            b.setParentAction(a);
             $A.enqueueAction(b);
-            $A.test.assertFalse(cmp._aborted1);
-            $A.test.assertFalse(cmp._aborted2);
-            this.waitForLog(cmp, 0, "bah: done");
+
+            // release held action
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testNoAbortIfParent;");
+            $A.enqueueAction(b);
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "parented action should not have been aborted");
+            $A.test.assertFalse(cmp._aborted3, "granchild action should not have been aborted");
+            this.addWaitForLog(cmp, 0, "bah: done");
+            this.addWaitForLog(cmp, 1, "really: finally");
         }, function(cmp) {
-            $A.test.assertFalse(cmp._aborted1);
-            $A.test.assertFalse(cmp._aborted2);
+            // last abortable should not have been aborted 
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "parented action should not have been aborted");
+            $A.test.assertFalse(cmp._aborted3, "another parented action should not have been aborted");
         } ]
     },
 
     /**
-     * And finally, try enqueing a parented action of an already aborted parent, it should be aborted.
+     * If enqueing a parented action of an already aborted parent, it should be aborted.
      */
-    testAbortOnEnqueueWithParent : {
+    testAbortOnEnqueueIfParentAborted : {
         test : [ function(cmp) {
-            cmp._aborted = false;
-            var a = this.getAction(cmp, "c.execute", "WAIT testAbortOnEnqueueWithParent-fore;")
+            // keep abortable in-flight
+            var a = this.getAction(cmp, "c.execute", "WAIT testAbortOnEnqueueIfParentAborted;")
             cmp._first_a = a;
             a.setAbortable();
             cmp._aborted1 = false;
             a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
             $A.enqueueAction(a);
         }, function(cmp) {
+            // queue new unparented abortable
             var that = this;
-            var a = this.getActionAndLog(cmp, "c.execute", "WAIT testAbortOnEnqueueWithParent-fore2;APPEND done; READ;",
-                                         "bah: ");
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND done; READ;", "bah: ");
             cmp._aborted2 = false;
             a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
             a.setAbortable();
             $A.enqueueAction(a);
-            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortOnEnqueueWithParent-fore; RESUME testAbortOnEnqueueWithParent-fore2;");
+            
+            // release held action
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortOnEnqueueIfParentAborted;");
             $A.enqueueAction(b);
-            this.waitForLog(cmp, 0, "bah: done");
+            this.addWaitForLog(cmp, 0, "bah: done");
         }, function(cmp) {
-            $A.test.assertTrue(cmp._aborted1);
-            $A.test.assertFalse(cmp._aborted2);
+            $A.test.assertTrue(cmp._aborted1, "parent should have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "unparented action should not have been aborted");
         }, function(cmp) {
-            var a = this.getAction(cmp, "c.execute", "WAIT testAbortOnEnqueueWithParent-fore3;APPEND done; READ;");
+            // queue up abortable parented to aborted action
+            var a = this.getAction(cmp, "c.execute", "APPEND never; READ;");
             cmp._aborted3 = false;
             a.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
             a.setAbortable();
             a.setParentAction(cmp._first_a);
             $A.enqueueAction(a);
-            $A.test.assertTrue(cmp._aborted3);
+        }, function(cmp) {
+            $A.test.assertTrue(cmp._aborted1, "parent should have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "unparented action should not have been aborted");
+            $A.test.assertTrue(cmp._aborted3, "parented action should have been aborted");
+        } ]
+    },
+
+    /**
+     * If enqueing a parented action of an already completed parent, but a new abortable transaction has been started,
+     * the parented action should be aborted.
+     */
+    testAbortOnEnqueueIfParentEffectivelyAborted : {
+        test : [ function(cmp) {
+            // let parent abortable complete
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND parent;READ;", "first: ");
+            cmp._first_a = a;
+            a.setAbortable();
+            cmp._aborted1 = false;
+            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+            this.addWaitForLog(cmp, 0, "first: parent");
+        }, function(cmp) {
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+        }, function(cmp) {
+            // send new unparented abortable
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND next;READ;", "second: ");
+            cmp._second_a = a;
+            a.setAbortable();
+            cmp._aborted2 = false;
+            a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+            this.addWaitForLog(cmp, 1, "second: next");
+        }, function(cmp) {
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "new action should not have been aborted");
+        }, function(cmp) {
+            // queue new abortable whose parent was effectively aborted
+            var that = this;
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND never; READ;", "third: ");
+            cmp._aborted3 = false;
+            a.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
+            a.setAbortable();
+            a.setParentAction(cmp._first_a);
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            // parented abortable is aborted
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "new action should not have been aborted");
+            $A.test.assertTrue(cmp._aborted3, "parented action should have been aborted");
+        }, function(cmp) {
+            // queue new abortable whose parent is current
+            var that = this;
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND finally; READ;", "fourth: ");
+            cmp._aborted4 = false;
+            a.setCallback(this, function (a) { cmp._aborted4 = true; }, "ABORTED");
+            a.setAbortable();
+            a.setParentAction(cmp._second_a);
+            $A.enqueueAction(a);
+            this.addWaitForLog(cmp, 2, "fourth: finally");
+        }, function(cmp) {
+            // new parented abortable is not aborted
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "new action should not have been aborted");
+            $A.test.assertTrue(cmp._aborted3, "parented action should have been aborted");
+            $A.test.assertFalse(cmp._aborted4, "parented action of new action should not have been aborted");
+        } ]
+    },
+
+    /**
+     * If parented action is enqueued, but parent is aborted by a subsequent action, the parented action should be
+     * aborted.
+     */
+    testAbortAfterEnqueueIfParentAborted : {
+        test : [ function(cmp) {
+            // let parent abortable complete
+            var a = this.getAction(cmp, "c.execute", "WAIT testAbortAfterEnqueueIfParentAborted;");
+            cmp._first_a = a;
+            a.setAbortable();
+            cmp._aborted1 = false;
+            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            // queue up parented abortable
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND next;READ;", "second: ");
+            cmp._second_a = a;
+            a.setAbortable();
+            a.setParentAction(cmp._first_a);
+            cmp._aborted2 = false;
+            a.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+            // good so far
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "parented action should not have been aborted");
+
+            // queue up new unparented abortable
+            var b = this.getActionAndLog(cmp, "c.execute", "APPEND again;READ;", "third: ");
+            cmp._second_a = b;
+            b.setAbortable();
+            cmp._aborted3 = false;
+            b.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
+            $A.enqueueAction(b);
+            // parent and previous parented abortables are aborted (although parent abortable callback hasn't been called yet)
+            $A.test.assertFalse(cmp._aborted1, "parent callback should not have been executed yet");
+            $A.test.assertTrue(cmp._aborted2, "parented action should now have been aborted");
+            $A.test.assertFalse(cmp._aborted3, "unparented action should not have been aborted");
+
+            // queue up another parented abortable
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND repeat;READ;", "fourth: ");
+            cmp._second_a = a;
+            a.setAbortable();
+            a.setParentAction(cmp._first_a);
+            cmp._aborted4 = false;
+            a.setCallback(this, function (a) { cmp._aborted4 = true; }, "ABORTED");
+            $A.enqueueAction(a);
+            // this is aborted on enqueue
+            $A.test.assertFalse(cmp._aborted1, "parent callback should still not have been executed yet");
+            $A.test.assertTrue(cmp._aborted2, "parented action should have already been aborted");
+            $A.test.assertFalse(cmp._aborted3, "unparented action should have remained not aborted");
+            $A.test.assertTrue(cmp._aborted4, "new parented action should have been aborted");
+            
+            // release held action
+            var b = this.getAction(cmp, "c.executeBackground", "RESUME testAbortAfterEnqueueIfParentAborted;");
+            $A.enqueueAction(b);
+            this.addWaitForLog(cmp, 0, "third: again");
+        }, function(cmp) {
+            // now parent's abortable callback has executed
+            $A.test.assertTrue(cmp._aborted1, "parent should now be aborted");
+            $A.test.assertTrue(cmp._aborted2, "parented action should have remained aborted");
+            $A.test.assertFalse(cmp._aborted3, "unparented action should have remained not aborted");
+            $A.test.assertTrue(cmp._aborted4, "new parented action should have remained aborted");
+        } ]
+    },
+    
+    /**
+     * What happens if action parented to unqueued parent?
+     * Currently grandchild is aborted
+     */
+    _testParentingBeforeEnqueuing : {
+        test : [ function(cmp) {
+            // lock queue & prime abortable id
+            var a = this.getAction(cmp, "c.execute", "WAIT testParentingBeforeEnqueuing;")
+            a.setAbortable();
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            // create parent
+            var a = this.getActionAndLog(cmp, "c.execute", "APPEND parent;READ;", "first: ");
+            cmp._first_a = a;
+            a.setAbortable();
+            cmp._aborted1 = false;
+            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
+            
+            // create child
+            var b = this.getActionAndLog(cmp, "c.execute", "APPEND child;READ;", "second: ");
+            cmp._second_a = b;
+            b.setAbortable();
+            b.setParentAction(a);
+            cmp._aborted2 = false;
+            b.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
+            
+            $A.enqueueAction(a);
+            $A.enqueueAction(b);
+            
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "child should not have been aborted");
+
+            // release held action
+            var c = this.getAction(cmp, "c.executeBackground", "RESUME testParentingBeforeEnqueuing;");
+            $A.enqueueAction(c);
+            
+            this.addWaitForLog(cmp, 0, "first: parent");
+            this.addWaitForLog(cmp, 1, "second: child");
+        }, function(cmp) {
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "child should not have been aborted");
+        }, function(cmp) {
+            $A.test.blockRequests();
+            try{
+                // create another child
+                var a = this.getActionAndLog(cmp, "c.execute", "APPEND adopted;READ;", "third: ");
+                cmp._first_a = a;
+                a.setAbortable();
+                a.setParentAction(cmp._first_a);
+                cmp._aborted3 = false;
+                a.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
+                
+                // create grandchild
+                var b = this.getActionAndLog(cmp, "c.execute", "APPEND grandchild;READ;", "fourth: ");
+                b.setAbortable();
+                b.setParentAction(cmp._second_a);
+                cmp._aborted4 = false;
+                b.setCallback(this, function (a) { cmp._aborted4 = true; }, "ABORTED");
+
+                $A.enqueueAction(a);
+                $A.enqueueAction(b);
+            } catch (e) {
+                throw e;
+            } finally {
+                $A.test.releaseRequests();
+            }
+
+            this.addWaitForLog(cmp, 2, "third: adopted");
+            this.addWaitForLog(cmp, 3, "fourth: grandchild");
+        }, function(cmp) {
+            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
+            $A.test.assertFalse(cmp._aborted2, "child should not have been aborted");
+            $A.test.assertFalse(cmp._aborted3, "adopted should not have been aborted");
+            $A.test.assertFalse(cmp._aborted4, "grandchild should not have been aborted");
         } ]
     }
 })

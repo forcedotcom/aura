@@ -47,7 +47,7 @@
         </div>
         <div>
             <br/>component below will load, but it's custom script is gone<br/> 
-            <cspTest:basicCspCmpExtendsTemplate/>
+            <test:basicCspCmpExtendsTemplate/>
             <br/>component above will load, but it's custom script is gone<br/>
         </div>
     </aura:if>

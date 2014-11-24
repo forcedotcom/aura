@@ -263,7 +263,7 @@ function(component, helper) {
                 if($A.util.isUndefinedOrNull(value)){
                     value = "";
                 }
-                if(component._lastRenderedValue){
+                if(component._lastRenderedValue && component._lastRenderedValue.isValid()){
                     
                     component._lastRenderedValue.set("v.value",value,true);
                     value=component._lastRenderedValue;

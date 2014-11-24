@@ -23,7 +23,7 @@
 
                     $A.test.assertTrue(
                         sv2 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
-                        sv2 === "[DOESNT.EXIST]",
+                        sv2 === "PropertyFile - section DOESNT not found.",
                         "Failed to get expected error message");
                 }
             );

@@ -28,7 +28,8 @@ public enum AuraValueProviderType implements ValueProviderType {
     FOREACH(null), // key for foreach is dynamic
     LABEL("$Label", true),
     BROWSER("$Browser", true),
-    LOCALE("$Locale", true);
+    LOCALE("$Locale", true),
+    GLOBAL("$Global", true);
     
     static {
         Map<String, AuraValueProviderType> m = Maps.newHashMapWithExpectedSize(values().length);

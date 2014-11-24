@@ -596,7 +596,7 @@ $A.ns.Test.prototype.expectAuraWarning = function(w) {
  * Assert that the current component HTML is Accessibility compliant.
  *
  * @description Calls the checkAccessibilty method to verify certain tags are accessible.
- *
+ * 
  * @param {String} errorMessage The message that is returned if the condition is not false
  * @throws {Error} Throws Error containing concatenated string representation of all accessibility errors found
  */
@@ -639,7 +639,7 @@ $A.ns.Test.prototype.assertTruthy = function(condition, assertMessage) {
 $A.ns.Test.prototype.assertFalsy = function(condition, assertMessage) {
     if (condition) {
         this.fail(assertMessage, "\nExpected: {falsy} but Actual: {"+condition+"}");
-    }
+        }
 };
 
  /**
@@ -712,11 +712,11 @@ $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
  * @param {Object} arg1 The argument to evaluate against arg2
  * @param {Object} arg2 The argument to evaluate against arg1
  * @param {String} assertMessage The message that is returned if the two values are equal
- */
+     */
 $A.ns.Test.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
     if (arg1 === arg2) {
         this.fail(assertMessage, "\nExpected values to not be equal but both were: {"+arg1+"}");
-    }
+        }
 };
 
 /**
@@ -790,7 +790,7 @@ $A.ns.Test.prototype.assertUndefinedOrNull = function(condition, assertMessage){
         this.fail(assertMessage, "\nExpected: {undefined or null} but Actual: {"+condition+"}");
     }
 };
-
+        
  /**
  * Assert that value === null.
  * 
@@ -828,8 +828,8 @@ $A.ns.Test.prototype.fail = function(assertMessage, extraInfoMessage) {
         msg += extraInfoMessage;
     }
     var error = new Error(msg);
-    this.failed = error;
-    throw error;
+	this.failed = error;
+	throw error;
 };
 
 /**

@@ -36,7 +36,7 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
 
     @Override
     public List<GlobalValueProvider> createValueProviders() {
-        List<GlobalValueProvider> l = new LinkedList<GlobalValueProvider>();
+        List<GlobalValueProvider> l = new LinkedList<>();
 
         // $Label.Section.Key
         l.add(new LabelValueProvider());
@@ -47,11 +47,18 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
         // $Browser
         l.add(new BrowserValueProvider());
         
+        // $Global
+        l.add(new ContextValueProvider());
+        
         return l;
     }
 
     @Override
     public Set<ValueProviderType> getKeys() {
-        return Sets.<ValueProviderType>newHashSet(AuraValueProviderType.LABEL, AuraValueProviderType.LOCALE, AuraValueProviderType.BROWSER);
+        return Sets.<ValueProviderType>newHashSet(
+               AuraValueProviderType.LABEL, 
+               AuraValueProviderType.LOCALE, 
+               AuraValueProviderType.BROWSER, 
+               AuraValueProviderType.GLOBAL);
     }
 }

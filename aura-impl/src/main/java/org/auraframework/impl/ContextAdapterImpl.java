@@ -26,7 +26,6 @@ import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;

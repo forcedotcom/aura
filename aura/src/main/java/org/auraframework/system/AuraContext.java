@@ -32,10 +32,14 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializationContext;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * AuraContext public interface
@@ -113,6 +117,27 @@ public interface AuraContext {
         GLOBAL,
         PRIVATE,
         INTERNAL
+    }
+
+    static class GlobalValue implements JsonSerializable {
+        public boolean writable; // if not writable, the contextImpl must provide a mechanism to set
+        public Object defaultValue;
+        public Object value;
+        
+        public GlobalValue(boolean writable, Object defaultValue, Object value) {
+            this.writable = writable;
+            this.defaultValue = defaultValue;
+            this.value = value;
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+            json.writeMapBegin();
+            json.writeMapEntry("writable", this.writable);
+            json.writeMapEntry("defaultValue", this.defaultValue);
+            json.writeMapEntry("value", this.value);
+            json.writeMapEnd();
+        }
     }
 
     /**
@@ -269,14 +294,14 @@ public interface AuraContext {
      * 
      * @param clientLoaded the set of loaded descriptors from the client.
      */
-    void setClientLoaded(Map<DefDescriptor<?>, String> clientLoaded);
+    void setClientLoaded(Map<DefDescriptor<?>,String> clientLoaded);
 
     /**
      * Get the set of descriptors loaded on the client, and sent in the request.
      * 
      * @return a map of descriptor to UID, unmodifiable.
      */
-    Map<DefDescriptor<?>, String> getClientLoaded();
+    Map<DefDescriptor<?>,String> getClientLoaded();
 
     /**
      * Add a loaded descriptor+UID pair.
@@ -496,4 +521,32 @@ public interface AuraContext {
      * Get a location stack for the current context at the current moment.
      */
     List<String> createComponentStack();
+    
+    /**
+     * @return state of context Globals
+     */
+    ImmutableMap<String,AuraContext.GlobalValue> getGlobals();
+
+    /**
+     * @return state of a context Global
+     * Non-registered names will throw
+     * Registered names will never return null unless that is the defined default.
+     */
+    Object getGlobal(String approvedName) throws AuraRuntimeException;
+
+    /**
+     * validates the global's existence
+     * Non-registered names will return false
+     */
+    boolean validateGlobal(String approvedName);
+    
+    /**
+     * @set state of one approved Globals
+     */
+    void setGlobal(String approvedName, Object value);
+    
+   
+    
+
+
 }

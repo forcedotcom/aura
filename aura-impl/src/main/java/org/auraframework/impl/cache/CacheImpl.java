@@ -18,12 +18,9 @@ package org.auraframework.impl.cache;
 import java.util.ArrayList;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.auraframework.Aura;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.cache.Cache;
 import org.auraframework.impl.AuraImpl;
-import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.system.LoggingContext;
 
 import com.google.common.cache.CacheStats;

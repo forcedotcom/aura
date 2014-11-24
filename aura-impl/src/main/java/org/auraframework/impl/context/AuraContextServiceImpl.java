@@ -31,9 +31,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.json.AuraJsonContext;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -46,6 +46,8 @@ import org.auraframework.throwable.NoContextException;
 import org.auraframework.util.ServiceLocator;
 
 import aQute.bnd.annotation.component.Component;
+import com.google.common.collect.ImmutableMap;
+
 
 /**
  */
@@ -181,5 +183,15 @@ public class AuraContextServiceImpl implements ContextService {
         if (!isEstablished()) {
             throw new NoContextException();
         }
+    }
+
+    @Override
+    public void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue) {
+        AuraContextImpl.registerGlobal(approvedName, publicallyWritable, defaultValue);
+    }
+    
+    @Override
+    public ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals()  {
+        return (ImmutableMap<String, AuraContext.GlobalValue>) AuraUtil.immutableMap(AuraContextImpl.getAllowedGlobals());
     }
 }

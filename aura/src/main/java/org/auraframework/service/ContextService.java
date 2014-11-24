@@ -26,6 +26,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * <p>
  * Service for creating or interacting with a {@link AuraContext} A AuraContext
@@ -113,4 +115,17 @@ public interface ContextService extends AuraService {
      * Throw a RuntimeException if no context is currently established.
      */
     void assertEstablished();
+    
+    /**
+     * @register a Global value to be managed by the context.  
+     * This mechanism is both valuable and expensive.  $Global can 
+     * retrieve the managed value and set change-handlers for it.
+     * However, the cost is that - even if not set - the name, value, and default 
+     * of this item is sent on every Aura message.
+     * Non-registered names will throw  
+     * Registered names will never return null unless that is the defined default.
+     */
+    void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue);
+    
+    ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals(); 
 }

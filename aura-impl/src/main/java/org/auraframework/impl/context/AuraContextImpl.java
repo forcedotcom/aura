@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -44,6 +46,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.ThemeListImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
@@ -56,6 +59,7 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -70,6 +74,7 @@ import java.util.Deque;
 
 public class AuraContextImpl implements AuraContext {
     private static final Logger logger = Logger.getLogger(AuraContextImpl.class);
+
     public static class SerializationContext extends BaseJsonSerializationContext {
         public SerializationContext() {
             super(false, false, -1, -1, false);
@@ -332,6 +337,13 @@ public class AuraContextImpl implements AuraContext {
     private static final int MAX_COMPONENT_COUNT        = 10000;
     private int componentCount;
 
+    public static Map<String, GlobalValue> allowedGlobalValues;
+    private Map<String,AuraContext.GlobalValue> globalValues;
+
+    static {
+        allowedGlobalValues = new HashMap<>();
+    }
+    
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
@@ -343,6 +355,7 @@ public class AuraContextImpl implements AuraContext {
         this.jsonContext = jsonContext;
         this.globalProviders = globalProviders;
         this.isDebugToolEnabled = isDebugToolEnabled;
+        globalValues = new HashMap<>();
     }
 
     @Override
@@ -758,5 +771,70 @@ public class AuraContextImpl implements AuraContext {
             }
         }
         return info;
+    }
+
+    @Override
+    public ImmutableMap<String, AuraContext.GlobalValue> getGlobals() {
+        Map<String, AuraContext.GlobalValue> result = new HashMap<>();
+        for (String key :allowedGlobalValues.keySet()) {
+            result.put(key,getGlobalValue(key)); // add registered defaults
+        }
+        return (ImmutableMap<String, GlobalValue>) AuraUtil.immutableMap(result);
+    }
+
+    public AuraContext.GlobalValue getGlobalValue(String approvedName) throws AuraRuntimeException {
+        if (!validateGlobal(approvedName)) {
+            throw new AuraRuntimeException("Attempt to retrieve unknown $Global variable: " + approvedName);
+        }
+        if (globalValues.containsKey(approvedName)) {
+            return globalValues.get(approvedName);
+        }
+        return allowedGlobalValues.get(approvedName);
+    }
+
+    @Override
+    public Object getGlobal(String approvedName) throws AuraRuntimeException {
+        if (!validateGlobal(approvedName)) {
+            throw new AuraRuntimeException("Attempt to retrieve unknown $Global variable: " + approvedName);
+        }
+        if (globalValues.containsKey(approvedName)) {
+            return (globalValues.get(approvedName)).value;
+        }
+        return allowedGlobalValues.get(approvedName).defaultValue;
+    }
+
+    @Override
+    public void setGlobal(String approvedName, Object value) {
+        if (!validateGlobal(approvedName)) {
+            throw new AuraRuntimeException("Attempt to set unknown $Global variable: " + approvedName);
+        }
+        
+        if (globalValues.containsKey(approvedName)) {
+            (globalValues.get(approvedName)).value = value;
+        }
+        else {
+            //copy the registered record to globals, replacing value with supplied value
+            GlobalValue temp = allowedGlobalValues.get(approvedName);
+
+            // You could add "if (temp.defaultValue.equals(value)) return;" 
+            // if you wished to store values sparsely (not re-storing default even if explicitly set)
+            // But you would lose the ability to test whether the value was explicitly set
+            globalValues.put(approvedName, new GlobalValue(temp.writable,temp.defaultValue,value));
+        }
+    }
+
+    @Override
+    public boolean validateGlobal(String approvedName) {
+        return (allowedGlobalValues.containsKey(approvedName));
+    }
+    
+    static ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals() {
+        Map<String, AuraContext.GlobalValue> result = new HashMap<>();
+        allowedGlobalValues.putAll(result); // add registered defaults
+        return (ImmutableMap<String, GlobalValue>) AuraUtil.immutableMap(result);
+    }
+
+    static void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue) {
+        allowedGlobalValues.put(approvedName, new GlobalValue(publicallyWritable,defaultValue,null));
     }
 }

@@ -88,14 +88,10 @@ FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
     }
 };
 
-FunctionCallValue.prototype.getChangeHandler=function(cmp,key,fcv){
+FunctionCallValue.prototype.getChangeHandler=function(cmp, key, fcv) {
     return function FunctionCallValue$getChangeHandler(event) {
-        var result = fcv.evaluate();
-        if (fcv["result"] !== result) {
-            fcv["result"] = result;
-            $A.renderingService.addDirtyValue(key, cmp);
-            cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
-        }
+        $A.renderingService.addDirtyValue(key, cmp);
+        cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
     };
 };
 

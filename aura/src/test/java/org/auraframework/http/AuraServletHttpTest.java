@@ -351,7 +351,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     public void testSpecialCspMultipleAncestors() throws Exception {
         Header[] headers = doSpecialCspTest("'self' www.itrustu.com/frame www.also.com/other",
                 null, "www.itrustu.com/frame", "www.also.com/other");
-        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("ALLOWALL", headers[0].getValue());
     }
 
     //2.if we set ancestor resources with one url, that url will get written into X-FRAME-OPTIONS
@@ -362,19 +363,29 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("ALLOW-FROM www.itrustu.com/frame", headers[0].getValue());
     }
 
-    //3.if we set ancestor resources with [], DENY get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspProtocolAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https:", "https:");
-        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("ALLOWALL", headers[0].getValue());
     }
 
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspWildcardAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https://*.foo.com", "https://*.foo.com");
-        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("ALLOWALL", headers[0].getValue());
     }
 
+
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspMultiWildcardAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("'self' https://*.foo.com", null, "https://*.foo.com");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+        assertEquals("ALLOWALL", headers[0].getValue());
+    }
+
+    //3.if we set ancestor resources with [], DENY get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspDeniedAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'none'");

@@ -32,12 +32,14 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
@@ -166,12 +168,14 @@ public class ServerServiceImpl implements ServerService {
         final ThemeList themeList = context.getThemeList();
         Optional<String> themesUid = themeList.getThemeDescriptorsUid();
         if (themesUid.isPresent()) {
-        	keyBuilder.append(":").append(themesUid.get());
+            keyBuilder.append(":").append(themesUid.get());
         }
 
-        // 2) TODONM: If a theme uses a map-provider it will affect the css key too. Current idea is to cache a "pre-themed"
+        // 2) TODONM: If a theme uses a map-provider it will affect the css key too. Current idea is to cache a
+        // "pre-themed"
         // version of the CSS (but still ordered and concatenated). Until this is addressed map-providers shouldn't be
-        // used. Another idea is to defer cache to fileforce, etc... once a map-provider is involved. (actually right now
+        // used. Another idea is to defer cache to fileforce, etc... once a map-provider is involved. (actually right
+        // now
         // we are skipping the cache, but when we stop doing that then this needs to be addressed
 
         final String key = keyBuilder.toString();
@@ -193,6 +197,44 @@ public class ServerServiceImpl implements ServerService {
         if (out != null) {
             out.append(cached);
         }
+    }
+
+    @Override
+    public void writeAppSvg(DefDescriptor<SVGDef> svg, Writer out)
+            throws IOException, QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
+        // build cache key
+        final StringBuilder keyBuilder = new StringBuilder(64);
+        keyBuilder.append("SVG:");
+
+        // browser type
+        keyBuilder.append(context.getClient().getType());
+
+        keyBuilder.append("$");
+
+        DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
+
+        // verify the app has access to the svg
+        SVGDef svgDef = svg.getDef();
+        context.getDefRegistry().assertAccess(appDesc, svgDef);
+
+        // svg uid
+        final String uid = context.getDefRegistry().getUid(null, svg);
+        keyBuilder.append(uid);
+
+        final String key = keyBuilder.toString();
+        context.setPreloading(true);
+
+        String cached = context.getDefRegistry().getCachedString(uid, svg, key);
+
+        if (cached == null) {
+            StringBuffer sb = new StringBuffer();
+            Aura.getSerializationService().write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
+            cached = sb.toString();
+            context.getDefRegistry().putCachedString(uid, svg, key, cached);
+        }
+        out.append(cached);
     }
 
     @Override
@@ -292,10 +334,10 @@ public class ServerServiceImpl implements ServerService {
 
     /**
      * Provide a better way of distinguishing templates from styles..
-     *
+     * 
      * This is used to apply the style definition filter for 'templates', but is getting rather further embedded in
      * code.
-     *
+     * 
      * TODO: W-1486762
      */
     private static interface TempFilter {
@@ -336,7 +378,7 @@ public class ServerServiceImpl implements ServerService {
 
     /**
      * Loops through list of javascript errors and return commented text to display
-     *
+     * 
      * @param errors list of javascript syntax errors
      * @return commented errors
      */
@@ -344,11 +386,11 @@ public class ServerServiceImpl implements ServerService {
         StringBuilder errorMsgs = new StringBuilder();
         if (errors != null && !errors.isEmpty()) {
             errorMsgs
-                .append("/**")
-                .append(System.lineSeparator())
-                .append("There are errors preventing this file from being minimized! ")
-                .append("Start from the first error as they cascade and produce additional errors.")
-                .append(System.lineSeparator());
+                    .append("/**")
+                    .append(System.lineSeparator())
+                    .append("There are errors preventing this file from being minimized! ")
+                    .append("Start from the first error as they cascade and produce additional errors.")
+                    .append(System.lineSeparator());
             for (JavascriptProcessingError err : errors) {
                 errorMsgs.append(err);
             }

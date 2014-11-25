@@ -1,0 +1,3 @@
+<aura:component render="client" template="test:basicCspTemplate">
+    <h1>Hi, I'm a child component, I'm trying to load some JavaScript from my template</h1>
+</aura:component>

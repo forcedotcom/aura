@@ -41,7 +41,7 @@
     	    disabled="{!v.disabled}"
     	    multiple="{!v.multiple}"
             aria-describedby="{!v.ariaDescribedBy}">
-        <aura:if isTrue="{!v.options.length == 0}">
+        <aura:if isTrue="{!and(v.options.length eq 0, v.body.length gt 0)}">
            {!v.body}
         </aura:if>
     </select>

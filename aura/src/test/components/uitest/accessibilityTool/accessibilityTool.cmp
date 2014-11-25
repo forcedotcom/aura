@@ -33,7 +33,7 @@
 	    <section class="stage panelSlide forceAccess" aria-hidden="true">
 	        <span>test</span>
 	    </section>
-        <div class="forcePanelModal active" aria-hidden="false">
+        <div class="forcePanelOverlay active" aria-hidden="false">
             <div class="panelModal">test</div>
         </div>
     </aura:if>
@@ -43,7 +43,7 @@
          <section class="stage panelSlide forceAccess" aria-hidden="false">
                 <span>test</span>
          </section>
-         <div class="uiModalOverlay active">
+         <div class="uiPanelDialog active">
              <div class="panelModal">test</div>
          </div>
      </aura:if>
@@ -53,7 +53,7 @@
           <section class="stage panelSlide forceAccess" aria-hidden="false">
                 <span>test</span>
           </section>
-          <div class="uiModalOverlay active">
+          <div class="uiPanelDialog active">
                 <div class="panelModal">test</div>
           </div>
      </aura:if>
@@ -63,7 +63,7 @@
            <section class="stage panelSlide forceAccess">
                 <span>test</span>
            </section>
-           <div class="uiModalOverlay" aria-hidden="true">
+           <div class="uiPanelDialog" aria-hidden="true">
                 <div class="panelModal">test</div>
            </div>
      </aura:if>
@@ -83,7 +83,7 @@
              <section class="stage panelSlide forceAccess" aria-hidden="false">
                 <span>test</span>
              </section>
-             <div class="uiModalOverlay">
+             <div class="uiPanelDialog">
                 <div class="panelModal">test</div>
              </div>
      </aura:if>

@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 ({
-    handleMouseover: function(component, event, helper) {
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        _helper.handleMouseover(concreteCmp);
-    },
-    
-    handleMouseout: function(component, event, helper) {
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        _helper.handleMouseout(concreteCmp);
-    }   
+
+	post: function(c,e,h) {
+		h.request(c, "http://invalid.salesforce.com");
+	}
+	
 })

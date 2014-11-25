@@ -48,7 +48,6 @@
             componentDef: 'markup://ui:button',
             attributes: {
                 values: {
-                    "class": 'default primaryButton',
                     label: cmp.get("v.cancelButtonLabel")
                 }
             }
@@ -522,6 +521,7 @@
     },
 
     // set the currently visible panel, update classes and aria-hidden attr on all panels 
+    //TODO: Need to look at this again since this function call is in the animation path
     setActiveInstance: function(cmp, panel) {
         var self = this,
             manager = this.getManager(cmp),
@@ -572,7 +572,8 @@
 
         if (panel) {
             this.bindKeyHandler(manager);
-            if (panel.get("v.isModal") === false) {
+            //TODO: need to decouple the logic here
+            if (panel.get("v.isModal") === false && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") == -1) {
                 this.bindClickHandler(manager);
             }
         } else {
@@ -777,7 +778,7 @@
         }
     },
 
-    // one:panelTransitionEnd handler
+    // ui:panelTransitionEnd handler
     // if 'hide' transition has ended then remove transient panel from the dom
     transitionEnd: function(cmp, event) {
         var manager = this.getManager(cmp),

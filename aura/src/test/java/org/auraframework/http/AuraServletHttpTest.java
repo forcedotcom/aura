@@ -342,6 +342,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertResponseSetToLongCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
     }
 
+    //following 5 tests are mainly for mapping between custom CSP to X-FRAME-OPTIONS
+    //the logic is in AuraBaseServlet.setBasicHeaders()
+    
+    //1.if we set ancestor resources with more than one url(include 'self' or not)
+    //nothing is being written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspMultipleAncestors() throws Exception {
         Header[] headers = doSpecialCspTest("'self' www.itrustu.com/frame www.also.com/other",
@@ -349,11 +354,25 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
     }
 
+    //2.if we set ancestor resources with one url, that url will get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspSingleAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("www.itrustu.com/frame", "www.itrustu.com/frame");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
         assertEquals("ALLOW-FROM www.itrustu.com/frame", headers[0].getValue());
+    }
+
+    //3.if we set ancestor resources with [], DENY get written into X-FRAME-OPTIONS
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspProtocolAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("https:", "https:");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+    }
+
+    @ThreadHostileTest("swaps config adapter")
+    public void testSpecialCspWildcardAncestor() throws Exception {
+        Header[] headers = doSpecialCspTest("https://*.foo.com", "https://*.foo.com");
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
     }
 
     @ThreadHostileTest("swaps config adapter")
@@ -363,6 +382,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("DENY", headers[0].getValue());
     }
 
+    //4.if we set ancestor resources with [null], SAMEORIGIN get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspSameOriginAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'self'", (String)null);
@@ -370,6 +390,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("SAMEORIGIN", headers[0].getValue());
     }
 
+    //5.if we set ancestor resources with null, '*' get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspAnyAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("*", (String[]) null);

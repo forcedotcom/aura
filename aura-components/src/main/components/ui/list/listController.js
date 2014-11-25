@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({        
-    provide : function AbstractListProvider(component) {
+({
+    init: function(component) {
         var dataProvider = component.get("v.dataProvider[0]");
-        var items = [];
+
         if(dataProvider && dataProvider.getModel()) {
-        	items = dataProvider.get("m.items");
+        	component.set("v.items", dataProvider.get("m.items"));
         }
-        
-        return {
-            attributes: {
-                "items": items
-            }
-        };
     }
 })

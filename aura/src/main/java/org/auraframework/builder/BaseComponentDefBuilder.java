@@ -25,6 +25,7 @@ import org.auraframework.def.DesignDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 
 /**
@@ -39,6 +40,8 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> setTemplateDef(ComponentDef templateDef);
 
     BaseComponentDefBuilder<T> setDesignDef(DesignDef designDef);
+
+    BaseComponentDefBuilder<T> setSVGDef(SVGDef svgDef);
 
     BaseComponentDefBuilder<T> setTemplate(String templateName);
 

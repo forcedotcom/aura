@@ -78,6 +78,7 @@ import org.auraframework.impl.adapter.format.json.LibraryDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.MessageJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.TestSuiteDefJSONFormatAdapter;
 import org.auraframework.impl.adapter.format.json.ThrowableJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.svg.SVGFormatAdapter;
 import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.impl.context.AuraContextServiceImpl;
 import org.auraframework.impl.context.AuraPrefixDefaultsProviderImpl;
@@ -199,7 +200,7 @@ public class AuraImplConfig {
     public static CachingService cachingService() {
         return new CachingServiceImpl();
     }
-    
+
     @Impl
     @PrimaryImpl
     public static DefinitionService definitionService() {
@@ -210,7 +211,7 @@ public class AuraImplConfig {
     public static FormatAdapter<?> eventDefJSONFormatAdapter() {
         return new EventDefJSONFormatAdapter();
     }
-    
+
     @Impl
     public static FormatAdapter<?> libraryDefJSONFormatAdapter() {
         return new LibraryDefJSONFormatAdapter();
@@ -276,7 +277,7 @@ public class AuraImplConfig {
     public static DefinitionParserAdapter auraImplDefinitionParserAdapter() {
         return new DefinitionParserAdapterImpl();
     }
-    
+
     @Impl
     public static LoggingService auraImplLoggingService() {
         return new LoggingServiceImpl();
@@ -322,6 +323,11 @@ public class AuraImplConfig {
     @Impl
     public static FormatAdapter<?> styleDefCSSFormatAdapter() {
         return new StyleDefCSSFormatAdapter();
+    }
+
+    @Impl
+    public static FormatAdapter<?> svgDefSVGFormatAdapter() {
+        return new SVGFormatAdapter();
     }
 
     @Impl

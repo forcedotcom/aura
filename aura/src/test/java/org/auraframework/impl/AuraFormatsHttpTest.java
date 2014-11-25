@@ -48,6 +48,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         FORMAT_CONTENTTYPE.put(Format.HTML, "text/html;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.CSS, "text/css;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.MANIFEST, "text/cache-manifest;charset=" + AuraBaseServlet.UTF_ENCODING);
+        FORMAT_CONTENTTYPE.put(Format.SVG, "image/svg+xml;charset=" + AuraBaseServlet.UTF_ENCODING);
     }
 
     public AuraFormatsHttpTest(String name) {
@@ -119,6 +120,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 break;
             case JS:// No implementation for this format
             case CSS:// No implementation for this format
+            case SVG:// No implementation for this format
             case MANIFEST:// No implementation for this format
                 break;
             default:
@@ -188,6 +190,19 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 String appManifestUrl = "{'mode':'DEV','app':'appCache:testApp'}";
                 url = "/l/" + AuraTextUtil.urlencode(appManifestUrl) + "/app.manifest";
                 setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
+                getOnAuraResourceServlet(format, url);
+                break;
+            case SVG:
+                // Valid preload namespace
+                modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.svg";
+                getOnAuraResourceServlet(format, url);
+
+                // Bad preload namespace, should cause an exception in
+                // AuraResourceServlet.
+                // But the response should still be in SVG mime type
+                modeAndPreload = "{'mode':'DEV','preloads':['test']}";
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.svg";
                 getOnAuraResourceServlet(format, url);
                 break;
             default:

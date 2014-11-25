@@ -173,8 +173,10 @@ var AuraRenderingService = function AuraRenderingService(){
                 if(!$A.util.isComponent(cmp)){
                     $A.error("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.");
                 }
-                var renderer = cmp.getRenderer();
-                renderer.def.afterRender(renderer.renderable);
+                if(cmp.isValid()) {
+                    var renderer = cmp.getRenderer();
+                    renderer.def.afterRender(renderer.renderable);
+                }
             }
 
             //#if {"modes" : ["STATS"]}

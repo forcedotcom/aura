@@ -301,15 +301,14 @@ var ComponentPriv = (function() { // Scoping priv
             var components=[];
             for (var index = 0; index < facetConfig.length; index++) {
                 var config = facetConfig[index];
-                if(config&&config["componentDef"]) {
+
+                if (config && config.auraType === "Component") {
+                    components.push(config);
+                } else if (config && config["componentDef"]) {
                     if (action) {
                         action.setCreationPathIndex(index);
                     }
-                    var component=$A.componentService.newComponentDeprecated(config, valueProvider, localCreation, true);
-                    components.push(component);
-                } else if(config&&config.auraType === "Component") {
-                    // Was just an instance of a component, add to collection and move on.
-                    components.push(config);
+                    components.push($A.componentService.newComponentDeprecated(config, valueProvider, localCreation, true));
                 } else {
                 	// KRIS: HALO: 
                 	// This is hit, when you create a newComponentDeprecated and use raw values, vs configs on the attribute values.

@@ -33,11 +33,14 @@
         var atts = {};
         for(var x in attributes){
             var value=attributes[x];
-            if(value["descriptor"]){
-                value=value["value"];
-            }
-            if($A.util.isExpression(value)){
-                value=value.evaluate();
+            // Attribute values can be falsey values, which will not be a descriptor or an expression
+            if(value) {
+	            if(value["descriptor"]){
+	                value=value["value"];
+	            }
+	            if($A.util.isExpression(value)){
+	                value=value.evaluate();
+	            }
             }
             atts[x]=value;
         }

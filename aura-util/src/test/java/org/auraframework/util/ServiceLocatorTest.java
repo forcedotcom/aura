@@ -18,7 +18,6 @@ package org.auraframework.util;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLocator.ServiceLocatorException;
@@ -260,7 +259,7 @@ public class ServiceLocatorTest extends UnitTestCase {
         assertNull(s.get(SimpleService.class, "IGOTTANAME"));
     }
 
-    private <X extends AuraServiceProvider, Y extends AuraServiceProvider> void verifyServiceLocated(Class<X> serviceInterface, Class<Y> serviceProvider) {
+    private <X, Y> void verifyServiceLocated(Class<X> serviceInterface, Class<Y> serviceProvider) {
         X sis = s.get(serviceInterface);
         assertNotNull("Failed to locate the provider for service interface:" + serviceInterface.getSimpleName(), sis);
         assertTrue(
@@ -270,7 +269,7 @@ public class ServiceLocatorTest extends UnitTestCase {
         assertEquals(serviceProvider.getSimpleName(), sis.getClass().getSimpleName());
     }
 
-    private <X extends AuraServiceProvider> void verifyAllServicesLocated(Class<X> serviceInterface, Class<?>[] serviceProviders) {
+    private <X> void verifyAllServicesLocated(Class<X> serviceInterface, Class<?>[] serviceProviders) {
         Set<X> sis = s.getAll(serviceInterface);
         assertNotNull("Failed to locate the provider for service interface:" + serviceInterface.getName(), sis);
         assertEquals(

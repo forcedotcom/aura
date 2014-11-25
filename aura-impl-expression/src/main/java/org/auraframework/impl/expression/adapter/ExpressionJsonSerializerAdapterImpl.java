@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.expression.FunctionCallImpl;
 import org.auraframework.impl.expression.LiteralImpl;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
@@ -27,12 +26,9 @@ import org.auraframework.util.json.JsonSerializer;
 
 import com.google.common.collect.Maps;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * direct serializers for expression implementations
  */
-@Component (provide=AuraServiceProvider.class)
 public class ExpressionJsonSerializerAdapterImpl implements JsonSerializerAdapter {
 
     @Override

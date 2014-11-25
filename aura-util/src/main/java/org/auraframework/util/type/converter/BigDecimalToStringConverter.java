@@ -17,10 +17,7 @@ package org.auraframework.util.type.converter;
 
 import java.math.BigDecimal;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
@@ -28,7 +25,6 @@ import aQute.bnd.annotation.component.Component;
  * 
  * @since 0.0.142
  */
-@Component (provide=AuraServiceProvider.class)
 public class BigDecimalToStringConverter implements Converter<BigDecimal, String> {
 
     @Override

@@ -15,8 +15,6 @@
  */
 package org.auraframework.util.sampleServices;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
-public interface SimpleService extends AuraServiceProvider {
+public interface SimpleService {
 
 }

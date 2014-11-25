@@ -33,7 +33,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
@@ -42,9 +41,6 @@ import org.auraframework.system.SourceListener;
 
 import com.google.common.base.Optional;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component (provide=AuraServiceProvider.class)
 public class CachingServiceImpl implements CachingService {
 
     private static final long serialVersionUID = -3311707270226573084L;

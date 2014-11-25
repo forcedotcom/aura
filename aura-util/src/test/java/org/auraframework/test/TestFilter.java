@@ -18,9 +18,7 @@ package org.auraframework.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
-public interface TestFilter extends AuraServiceProvider {
+public interface TestFilter {
     Class<? extends Test> applyTo(Class<? extends Test> testClass);
 
     TestCase applyTo(TestCase test);

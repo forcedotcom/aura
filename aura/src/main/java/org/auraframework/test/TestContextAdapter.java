@@ -15,12 +15,10 @@
  */
 package org.auraframework.test;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
 /**
  * Provide TestContexts to persist the state of tests across multiple requests.
  */
-public interface TestContextAdapter extends AuraServiceProvider {
+public interface TestContextAdapter {
 
 	/**
 	 * Get the current TestContext, or null if one hasn't been created.

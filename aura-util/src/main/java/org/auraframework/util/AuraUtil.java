@@ -15,7 +15,6 @@
  */
 package org.auraframework.util;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.adapter.SourceControlAdapter;
 
 /**
@@ -30,7 +29,7 @@ public class AuraUtil {
         return AuraUtil.get(SourceControlAdapter.class);
     }
 
-    public static <T extends AuraServiceProvider> T get(Class<T> type) {
+    public static <T> T get(Class<T> type) {
         return ServiceLocator.get().get(type);
     }
 }

@@ -15,14 +15,10 @@
  */
 package org.auraframework.impl;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.service.ClientService;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  */
-@Component (provide=AuraServiceProvider.class)
 public class ClientServiceImpl implements ClientService {
 
     /**

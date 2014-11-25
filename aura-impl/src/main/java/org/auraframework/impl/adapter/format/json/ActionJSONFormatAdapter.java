@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -33,11 +32,8 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Lists;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  */
-@Component (provide=AuraServiceProvider.class)
 public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
 
     @Override

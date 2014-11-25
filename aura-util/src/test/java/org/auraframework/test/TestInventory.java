@@ -34,7 +34,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.PerfCmpTest;
 import org.auraframework.test.annotation.PerfCustomTest;
@@ -47,7 +46,7 @@ import org.auraframework.util.ServiceLocator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class TestInventory  implements AuraServiceProvider {
+public class TestInventory {
     public final static String TEST_CLASS_SUFFIX = "Test";
     private final static String CLASS_SUFFIX = ".class";
     public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.allOf(Type.class);

@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.ServiceLocator.ServiceLocatorException;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
@@ -82,7 +81,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
     }
 
     @Override
-    public <T extends AuraServiceProvider> T get(Class<T> type) {
+    public <T> T get(Class<T> type) {
         try {
 
             Set<Class<?>> classes = reflections.getTypesAnnotatedWith(AuraConfiguration.class);
@@ -143,7 +142,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends AuraServiceProvider> Set<T> getAll(Class<T> type) {
+    public <T> Set<T> getAll(Class<T> type) {
         Set<Method> beanMethods = Sets.newHashSet();
 
         Set<T> ret = Sets.newHashSet();
@@ -180,7 +179,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
     }
 
     @Override
-    public <T extends AuraServiceProvider> T get(Class<T> type, final String name) {
+    public <T> T get(Class<T> type, final String name) {
         try {
 
             Predicate<? super Method> predicate = Predicates.and(ServiceLoaderImpl.predicate, new Predicate<Method>() {

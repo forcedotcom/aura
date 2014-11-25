@@ -15,12 +15,10 @@
  */
 package org.auraframework.util.sampleServices;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
 /**
  * Used in ServiceLocatorTest.java
  */
 
-public interface SingleImplService extends AuraServiceProvider {
+public interface SingleImplService {
 
 }

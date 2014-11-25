@@ -19,11 +19,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
-import aQute.bnd.annotation.component.Component;
-
-@Component (provide=AuraServiceProvider.class)
 public class SourceControlAdapterImpl implements SourceControlAdapter {
 
     @Override

@@ -19,14 +19,13 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Service for client libraries
  */
-public interface ClientLibraryService extends AuraServiceProvider {
+public interface ClientLibraryService {
     /**
      *
      * Resolves url for client library that didn't specify url.

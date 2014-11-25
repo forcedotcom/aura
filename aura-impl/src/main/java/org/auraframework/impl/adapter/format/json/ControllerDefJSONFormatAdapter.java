@@ -22,12 +22,9 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Controller JSON format adapter.
@@ -35,7 +32,6 @@ import aQute.bnd.annotation.component.Component;
  * @since 0.0.116
  */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
 public class ControllerDefJSONFormatAdapter extends JSONFormatAdapter<ControllerDef> {
 
     @Override

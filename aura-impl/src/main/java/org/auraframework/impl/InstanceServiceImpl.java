@@ -26,7 +26,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.root.application.ApplicationImpl;
 import org.auraframework.impl.root.component.ComponentImpl;
 import org.auraframework.impl.root.event.EventImpl;
@@ -37,11 +36,8 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  */
-@Component (provide=AuraServiceProvider.class)
 public class InstanceServiceImpl implements InstanceService {
 
     /**

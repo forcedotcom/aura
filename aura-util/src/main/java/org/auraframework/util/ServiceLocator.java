@@ -21,8 +21,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -104,7 +102,7 @@ public class ServiceLocator implements ServiceLoader {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends AuraServiceProvider> T get(Class<T> type) {
+    public <T> T get(Class<T> type) {
         try {
             Optional<Object> o = instanceCache.get(type);
             if (o == null) {
@@ -119,7 +117,7 @@ public class ServiceLocator implements ServiceLoader {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends AuraServiceProvider> Set<T> getAll(Class<T> type) {
+    public <T> Set<T> getAll(Class<T> type) {
         try {
             Set<?> s = setCache.get(type);
             if (s == null) {
@@ -134,7 +132,7 @@ public class ServiceLocator implements ServiceLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends AuraServiceProvider> T get(Class<T> type, String name) {
+    public <T> T get(Class<T> type, String name) {
         try {
             ConcurrentMap<String, Optional<Object>> c = namedInstanceCache.get(type);
             if (c == null) {
@@ -152,7 +150,7 @@ public class ServiceLocator implements ServiceLoader {
         }
     }
 
-    private Optional<Object> loadInstance(Class<? extends AuraServiceProvider> key) {
+    private Optional<Object> loadInstance(Class<?> key) {
         for (ServiceLoader loader : loaders) {
             Object val = loader.get(key);
             if (val != null) {
@@ -162,7 +160,7 @@ public class ServiceLocator implements ServiceLoader {
         return Optional.absent();
     }
 
-    private Optional<Object> loadNamedInstance(Class<? extends AuraServiceProvider> clazz, String key) {
+    private Optional<Object> loadNamedInstance(Class<?> clazz, String key) {
         for (ServiceLoader loader : loaders) {
             Object val = loader.get(clazz, key);
             if (val != null) {
@@ -172,7 +170,7 @@ public class ServiceLocator implements ServiceLoader {
         return Optional.absent();
     }
 
-    private Set<?> loadSet(Class<? extends AuraServiceProvider > key) {
+    private Set<?> loadSet(Class<?> key) {
         Set<Object> ret = Sets.newHashSet();
         for (ServiceLoader loader : loaders) {
             Collection<?> val = loader.getAll(key);

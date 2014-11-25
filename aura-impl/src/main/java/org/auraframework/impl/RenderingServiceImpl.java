@@ -20,13 +20,17 @@ import java.io.IOException;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.RenderingService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class RenderingServiceImpl implements RenderingService {
 
     /**

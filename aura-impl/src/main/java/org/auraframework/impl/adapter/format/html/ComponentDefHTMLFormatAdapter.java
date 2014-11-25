@@ -16,9 +16,13 @@
 package org.auraframework.impl.adapter.format.html;
 
 import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class ComponentDefHTMLFormatAdapter extends BaseComponentDefHTMLFormatAdapter<ComponentDef> {
 
     @Override

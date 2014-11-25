@@ -15,10 +15,12 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Component;
 
 /**
  */
+@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
 public class ComponentHTMLFormatAdapter extends BaseComponentHTMLFormatAdapter<Component> {
 
     @Override

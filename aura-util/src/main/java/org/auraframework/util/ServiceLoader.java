@@ -17,6 +17,8 @@ package org.auraframework.util;
 
 import java.util.Set;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
 /**
  * @since 0.0.233
  */
@@ -25,17 +27,17 @@ public interface ServiceLoader {
     /**
      * return an implementation of the given class
      */
-    <T> T get(Class<T> type);
+    <T extends AuraServiceProvider> T get(Class<T> type);
 
     /**
      * return an instance of the given class that has been assigned the given
      * name
      */
-    <T> T get(Class<T> type, String name);
+    <T extends AuraServiceProvider> T get(Class<T> type, String name);
 
     /**
      * Return all implementations of the given class
      */
-    <T> Set<T> getAll(Class<T> type);
+    <T extends AuraServiceProvider> Set<T> getAll(Class<T> type);
 
 }

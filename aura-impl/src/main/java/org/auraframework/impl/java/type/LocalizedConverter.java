@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.java.type;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.AuraLocale;
 
 /**
@@ -39,7 +40,7 @@ import org.auraframework.util.AuraLocale;
  * 
  * @see Converter
  **/
-public interface LocalizedConverter<F, T> {
+public interface LocalizedConverter<F, T> extends AuraServiceProvider {
     /*
      * This was previously a child of Converter, but the Aura service loader
      * loads by class type and precaches all the converters for performance. If

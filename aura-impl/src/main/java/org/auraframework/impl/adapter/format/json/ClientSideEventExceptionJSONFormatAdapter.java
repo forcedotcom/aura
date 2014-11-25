@@ -21,13 +21,17 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.collect.Maps;
 
+import aQute.bnd.annotation.component.Component;
+
 @ThreadSafe
+@Component (provide=AuraServiceProvider.class)
 public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter<ClientSideEventException> {
 
     @Override

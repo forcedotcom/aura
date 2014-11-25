@@ -23,13 +23,17 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.FormatAdapter;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class SerializationServiceImpl implements SerializationService {
 
     private static final long serialVersionUID = 1658556277689777526L;

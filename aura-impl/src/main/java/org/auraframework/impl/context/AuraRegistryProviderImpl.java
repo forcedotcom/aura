@@ -42,6 +42,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.css.style.StyleDefFactory;
@@ -75,6 +76,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener {
     private static final Logger _log = Logger.getLogger(RegistryAdapter.class);
 

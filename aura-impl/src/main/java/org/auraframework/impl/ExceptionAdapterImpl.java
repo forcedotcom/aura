@@ -22,14 +22,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.util.json.Json;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class ExceptionAdapterImpl implements ExceptionAdapter {
     private static final Log log = LogFactory.getLog(ExceptionAdapterImpl.class);
 

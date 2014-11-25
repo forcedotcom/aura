@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public abstract class AbstractService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public abstract class AbstractService implements AuraServiceProvider {
 
 }

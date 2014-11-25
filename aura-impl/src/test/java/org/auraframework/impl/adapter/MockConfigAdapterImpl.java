@@ -65,7 +65,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         @Override
         public Collection<String> getFrameSources() {
-            return baseline.getFrameAncestors();
+            return baseline.getFrameSources();
         }
 
         @Override

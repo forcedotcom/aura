@@ -25,7 +25,7 @@ Test.Aura.Controller.ActionQueueTest = function() {
 	// #import aura.controller.Action
 	
 	//This file is testing the implementation for ActionQueue, so import that
-        // #import aura.controller.ActionQueue
+    // #import aura.controller.ActionQueue
 	
     });
 
@@ -269,6 +269,39 @@ Test.Aura.Controller.ActionQueueTest = function() {
             });
 
             Assert.Equal(0, target.clearPreviousAbortableActions.Calls.length);
+        }
+
+        [ Fact ]
+        function DoesNotCallClearPreviousAbortableActionsWhenParentedAbortableActionIsEnqueued() {
+            var action = new Action(serverDef);
+            var target = new ActionQueue();
+            target.incrementNextTransactionId();
+            target.clearPreviousAbortableActions = Stubs.GetMethod();
+            action.setAbortableId(target.getLastAbortableTransactionId());
+
+            mockGlobal(function() {
+                target.enqueue(action);
+            });
+
+            Assert.Equal(0, target.clearPreviousAbortableActions.Calls.length);
+        }
+
+        [ Fact ]
+        function AbortsActionIfParentAborted() {
+            var action = new Action(serverDef);
+            var target = new ActionQueue();
+            var actual = false;
+
+            mockGlobal(function() {
+                action.abort = function() {
+                    actual = true;
+                }
+                action.setAbortable();
+                action.setAbortableId("ALREADYABORTED");
+                target.enqueue(action);
+            });
+
+            Assert.Equal(true, actual);
         }
     }
 

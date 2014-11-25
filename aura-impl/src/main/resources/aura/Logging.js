@@ -52,8 +52,9 @@
         }
 
         var trace;
-        if ($A.util.isError(error)) {
-            trace = $A.logger.getStackTrace(error);
+        if ($A.util.isError(error) || level == "ERROR") {
+            // remove some junk logger stack
+            trace = $A.logger.getStackTrace(error, 4);
         } else if (error && error.stack) {
             trace = error.stack;
         }

@@ -98,39 +98,46 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * you get to roll your own validation of that, of course.
      *
      * Asserts if anything is wrong.
+     * 
+     * As a safety provision, if the config adapter *isn't* recognized as "ours," we don't
+     * check anything.  (This covers the fact that inside SFDC, we have a different config
+     * adapter with a different default CSP.)
      *
      * @param response
      * @param guarded  If {@code true}, check that we HAVE headers.  If {@code false}, check that they are absent.
      * @param allowInline Allows inline script-src and style-src
      */
     protected void assertDefaultAntiClickjacking(HttpResponse response, boolean guarded, boolean allowInline) {
-        // Check default content security
-        Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
-        if (guarded) {
-            Map<String, String> csp = getCSP(response);
-            assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
-            if (allowInline) {
-                assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'", csp.get("script-src"));
-                assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'", csp.get("style-src"));
-            } else {
-                assertEquals("script-src is wrong", "'self' chrome-extension:", csp.get("script-src"));
-                assertEquals("style-src is wrong", "'self' chrome-extension:", csp.get("style-src"));
-            }
-            // These maybe aren't strictly "anti-clickjacking", but since we're testing the rest of the default CSP:
-            assertEquals("font-src is wrong", "*", csp.get("font-src"));
-            assertEquals("img-src is wrong", "*", csp.get("img-src"));
-            assertEquals("media-src is wrong", "*", csp.get("media-src"));
-            assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
-            assertEquals("object-src is wrong", "'self'", csp.get("object-src"));
-            assertEquals("connect-src is wrong", "'self' http://invalid.salesforce.com", csp.get("connect-src"));
+        String adapterClassName = Aura.getConfigAdapter().getClass().getName();
+        if (adapterClassName.equals("org.auraframework.impl.adapter.ConfigAdapterImpl") ||
+                adapterClassName.equals("org.auraframework.impl.adapter.MockConfigAdapterImpl")) {
+            Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
+            if (guarded) {
+                Map<String, String> csp = getCSP(response);
+                assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
+                if (allowInline) {
+                    assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'", csp.get("script-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'", csp.get("style-src"));
+                } else {
+                    assertEquals("script-src is wrong", "'self' chrome-extension:", csp.get("script-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension:", csp.get("style-src"));
+                }
+                // These maybe aren't strictly "anti-clickjacking", but since we're testing the rest of the default CSP:
+                assertEquals("font-src is wrong", "*", csp.get("font-src"));
+                assertEquals("img-src is wrong", "*", csp.get("img-src"));
+                assertEquals("media-src is wrong", "*", csp.get("media-src"));
+                assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
+                assertEquals("object-src is wrong", "'self'", csp.get("object-src"));
+                assertEquals("connect-src is wrong", "'self' http://invalid.salesforce.com", csp.get("connect-src"));
 
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
-            assertEquals("SAMEORIGIN", headers[0].getValue());
-        } else {
-            headers = response.getHeaders("Content-Security-Policy");
-            assertEquals(0, headers.length);
-	    // Check X-FRAME-OPTIONS vis-a-vis CSP
-            assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+                assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+                assertEquals("SAMEORIGIN", headers[0].getValue());
+            } else {
+                headers = response.getHeaders("Content-Security-Policy");
+                assertEquals(0, headers.length);
+                // Check X-FRAME-OPTIONS vis-a-vis CSP
+                assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
+            }
         }
     }
 

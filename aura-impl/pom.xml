@@ -94,6 +94,11 @@
             <artifactId>ios-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>biz.aQute</groupId>
+            <artifactId>bnd</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

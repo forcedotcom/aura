@@ -13,6 +13,7 @@
         <dependency>
             <groupId>biz.aQute</groupId>
             <artifactId>bnd</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

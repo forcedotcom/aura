@@ -19,12 +19,16 @@ import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraLocale;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class LocalizationAdapterImpl implements LocalizationAdapter {
 
     /**

@@ -21,8 +21,12 @@ import java.util.Map;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext.Mode;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
 
     protected static final Map<DefType, String> defaults = new EnumMap<DefType, String>(DefType.class);

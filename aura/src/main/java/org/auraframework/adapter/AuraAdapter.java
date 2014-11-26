@@ -15,8 +15,10 @@
  */
 package org.auraframework.adapter;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
 /**
  */
-public interface AuraAdapter {
+public interface AuraAdapter extends AuraServiceProvider {
 
 }

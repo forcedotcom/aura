@@ -19,9 +19,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraExceptionUtil;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class ThrowableCSSFormatAdapter extends CSSFormatAdapter<Throwable> {
 
     @Override

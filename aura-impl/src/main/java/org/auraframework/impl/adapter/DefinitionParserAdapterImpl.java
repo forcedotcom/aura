@@ -17,9 +17,13 @@ package org.auraframework.impl.adapter;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefinitionAccess;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
 
     @Override

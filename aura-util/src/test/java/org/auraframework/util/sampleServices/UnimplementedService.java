@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface UnimplementedService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface UnimplementedService extends AuraServiceProvider {
 
 }

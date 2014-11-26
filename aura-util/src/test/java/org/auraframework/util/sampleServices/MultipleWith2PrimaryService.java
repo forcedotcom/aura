@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface MultipleWith2PrimaryService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface MultipleWith2PrimaryService extends AuraServiceProvider {
 
 }

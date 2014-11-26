@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface CyclicServicePartA {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface CyclicServicePartA extends AuraServiceProvider {
 
 }

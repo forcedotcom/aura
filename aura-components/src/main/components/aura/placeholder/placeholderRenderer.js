@@ -48,6 +48,9 @@
 
         action.setCallback(this, function(a){
             var newBody;
+            if(!cmp.isValid()){
+                return;
+            }
             if (a.getState() === "SUCCESS"){
                 var config= a.getReturnValue();
                 if(!config.hasOwnProperty("attributes")){

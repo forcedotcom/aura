@@ -48,7 +48,7 @@
         test: [function(cmp) {
         	$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
         }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore("purple blue green yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -64,7 +64,7 @@
     	test: [function(cmp) {
         	$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
     	 }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore("",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -79,7 +79,7 @@
     	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
     	 }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddInside("purple blue green","yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -95,7 +95,7 @@
     	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
     	 }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -111,7 +111,7 @@
     	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
     	 }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -127,7 +127,7 @@
     	test: [function(cmp) {
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
     	 }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red",1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -135,7 +135,7 @@
             this.shareTextBetweenTests = newText;
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
     	 }, function(cmp) {
-        	var ele_outputDiv = document.getElementsByClassName("outputDiv");
+        	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -143,7 +143,7 @@
             this.shareTextBetweenTests = newText;
     		$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
     	 }, function(cmp) {
-    		var ele_outputDiv = document.getElementsByClassName("outputDiv");
+    		var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -151,7 +151,7 @@
             this.shareTextBetweenTests = newText;
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
     	 }, function(cmp) {
-    		var ele_outputDiv = document.getElementsByClassName("outputDiv");
+    		var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
     		var oldText = this.shareTextBetweenTests;
     		//"ultra-violet 1 ultra-violet 2 purple blue green", no space after green
@@ -165,7 +165,7 @@
             this.shareTextBetweenTests = newText;
     		$A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
     	 }, function(cmp) {
-    		var ele_outputDiv = document.getElementsByClassName("outputDiv");
+    		var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
       		var oldText = this.shareTextBetweenTests;
       		//"ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue green g-y 2 g-y 1"
@@ -179,7 +179,7 @@
             this.shareTextBetweenTests = newText;
     		$A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
     	 }, function(cmp) {
-    		var ele_outputDiv = document.getElementsByClassName("outputDiv");
+    		var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddAfter(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
@@ -187,7 +187,7 @@
             this.shareTextBetweenTests = newText;
     		$A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
     	 }, function(cmp) {
-    		var ele_outputDiv = document.getElementsByClassName("outputDiv");
+    		var ele_outputDiv = $A.test.getElementByClass("outputDiv");
             var outputDivText = $A.util.getText(ele_outputDiv[0]);
         	var newText = this.getNewListTextAfterAddBefore(this.shareTextBetweenTests,1);
             $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,

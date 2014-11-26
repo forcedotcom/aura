@@ -15,7 +15,13 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
@@ -176,11 +182,11 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     private void createLocaleProperties_ENZA(HashMap<String, Object> localeProperties) {
         localeProperties.put(LocaleValueProvider.LANGUAGE, "en");
         localeProperties.put(LocaleValueProvider.COUNTRY, "ZA");
-        localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#\u00A0##0,00");
+        localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00");  // Patterns shouldn't localize
         localeProperties.put(LocaleValueProvider.GROUPING, '\u00A0');
         localeProperties.put(LocaleValueProvider.DECIMAL, ',');
-        localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#\u00A0##0,###");
-        localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#\u00A0##0%");
+        localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");
+        localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#,##0%");
         localeProperties.put(LocaleValueProvider.DATE_FORMAT, "dd MMM yyyy");
         localeProperties.put(LocaleValueProvider.TIME_FORMAT, "h:mm:ss a");
         localeProperties.put(LocaleValueProvider.DATETIME_FORMAT, "dd MMM yyyy h:mm:ss a");
@@ -192,11 +198,11 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     private void createLocaleProperties_FRFR(HashMap<String, Object> localeProperties) {
     	localeProperties.put(LocaleValueProvider.LANGUAGE, "fr");
         localeProperties.put(LocaleValueProvider.COUNTRY, "FR");
-        localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "#\u00A0##0,00'\u00A0'¤");
+        localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "#,##0.00 ¤");  // Patterns shouldn't localize
         localeProperties.put(LocaleValueProvider.GROUPING, '\u00A0');
         localeProperties.put(LocaleValueProvider.DECIMAL, ',');
-        localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#\u00A0##0,###");
-        localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#\u00A0##0'\u00A0'%");
+        localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");
+        localeProperties.put(LocaleValueProvider.PERCENT_FORMAT, "#,##0 %");
         localeProperties.put(LocaleValueProvider.DATE_FORMAT, "d MMM yyyy");
         localeProperties.put(LocaleValueProvider.TIME_FORMAT, "HH:mm:ss");
         localeProperties.put(LocaleValueProvider.DATETIME_FORMAT, "d MMM yyyy HH:mm:ss");
@@ -208,7 +214,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     private void createLocaleProperties_ENUS(HashMap<String, Object> localeProperties) {
     	 localeProperties.put(LocaleValueProvider.LANGUAGE, "en");
          localeProperties.put(LocaleValueProvider.COUNTRY, "US");
-         localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00;(¤#,##0.00)");
+         localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00;(¤#,##0.00)");  // Patterns shouldn't localize
          localeProperties.put(LocaleValueProvider.GROUPING, ',');
          localeProperties.put(LocaleValueProvider.DECIMAL, '.');
          localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");

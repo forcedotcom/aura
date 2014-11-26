@@ -157,6 +157,7 @@
 					startY 			: touch.pageY,
 					initialPosition : initialPosition 
 		    	};
+				$A.util.addClass(row, 'swiping');
     		}
     	}
     },
@@ -283,6 +284,7 @@
 	    		setTimeout(function () {
         			cmp._isSnapping = false;
         			swipe.body.style.transition = '';
+					$A.util.removeClass(swipe.row, 'swiping');
         			
         			if (shouldSnapOpen) {
         				cmp._openRow = swipe.row;
@@ -350,7 +352,8 @@
         this.translateX(cmp, swipe.body, 0);
 
         // Null these fields as 'touchend' will not execute.
-        $A.util.removeClass(cmp._openRow, 'open');
+		$A.util.removeClass(cmp._openRow, 'open');
+		$A.util.removeClass(cmp._openRow, 'swiping');
         cmp._openRow = null;
         cmp._swipe = null;
                 

@@ -17,11 +17,15 @@ package org.auraframework.util.type.converter;
 
 import java.util.Date;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.type.Converter;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
+@Component (provide=AuraServiceProvider.class)
 public class LongToDateConverter implements Converter<Long, Date> {
 
     @Override

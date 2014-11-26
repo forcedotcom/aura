@@ -19,10 +19,14 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class ThrowableJSFormatAdapter extends JSFormatAdapter<Throwable> {
 
     @Override

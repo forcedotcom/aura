@@ -17,10 +17,12 @@ package org.auraframework.util;
 
 import java.util.List;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
 /**
  * @since 0.0.242
  */
-public interface ServiceLocatorConfigurator {
+public interface ServiceLocatorConfigurator extends AuraServiceProvider {
 
     List<ServiceLoader> getServiceLoaders();
 

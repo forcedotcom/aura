@@ -30,26 +30,26 @@ import org.auraframework.clientlibrary.Combinable;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ResourceDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-
-
-
 //import com.google.common.cache.Cache;
 //import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * Service for including external client libraries (CSS or JS)
  */
+@Component (provide=AuraServiceProvider.class)
 public class ClientLibraryServiceImpl implements ClientLibraryService {
 
 
@@ -371,24 +371,5 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
             }
         }
         return combinable;
-    }
-
-
-    /**
-     * Invalidate caches on source changes
-     */
-    private static SourceNotifier sourceNotifier = new SourceNotifier();
-
-    static {
-        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
-    }
-
-    private static class SourceNotifier implements SourceListener {
-        @Override
-        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-        	
-            Aura.getCachingService().getClientLibraryOutputCache().invalidateAll();
-            Aura.getCachingService().getClientLibraryUrlsCache().invalidateAll();
-        }
     }
 }

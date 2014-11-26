@@ -18,7 +18,9 @@ package org.auraframework.util.adapter;
 import java.io.File;
 import java.io.IOException;
 
-public interface SourceControlAdapter {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface SourceControlAdapter extends AuraServiceProvider {
 
     public boolean canCheckout();
 

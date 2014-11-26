@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.Json;
@@ -30,6 +31,7 @@ import org.auraframework.util.json.Json;
 /**
  */
 @ThreadSafe
+@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
 public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
 
     @Override

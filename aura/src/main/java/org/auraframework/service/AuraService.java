@@ -17,6 +17,9 @@ package org.auraframework.service;
 
 import java.io.Serializable;
 
+import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
 /**
  * <p>
  * Base Aura Service. Aura Services are the supported entrypoints for the Aura
@@ -25,6 +28,6 @@ import java.io.Serializable;
  * Instances of all AuraServices should be retrieved from {@link Aura}
  * </p>
  */
-public interface AuraService extends Serializable {
+public interface AuraService extends Serializable, AuraServiceProvider {
 
 }

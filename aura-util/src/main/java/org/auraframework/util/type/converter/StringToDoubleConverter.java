@@ -15,11 +15,15 @@
  */
 package org.auraframework.util.type.converter;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.type.Converter;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
+@Component (provide=AuraServiceProvider.class)
 public class StringToDoubleConverter implements Converter<String, Double> {
     @Override
     public Double convert(String value) {

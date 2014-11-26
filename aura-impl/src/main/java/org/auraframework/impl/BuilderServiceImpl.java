@@ -21,6 +21,7 @@ import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.style.StyleDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
@@ -30,8 +31,11 @@ import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class BuilderServiceImpl implements BuilderService {
 
     /**

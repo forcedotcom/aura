@@ -16,16 +16,17 @@
 package org.auraframework.test.configuration;
 
 
-import org.apache.http.client.HttpClient;
-
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.apache.http.client.HttpClient;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 
 
 /**
  * @since 0.0.59
  */
-public interface TestServletConfig {
+public interface TestServletConfig extends AuraServiceProvider {
     public URL getBaseUrl() throws MalformedURLException;
 
     public HttpClient getHttpClient() throws Exception;

@@ -92,6 +92,7 @@
         <module>aura-integration-test</module>
         <module>auradocs-integration-test</module>
         <module>aura-archetype</module>
+        <module>aura-osgi-api</module>
     </modules>
     <scm>
         <connection>scm:git:git@github.com:forcedotcom/lumen-beta.git</connection>
@@ -183,6 +184,21 @@
                 <artifactId>auradocs-integration-test</artifactId>
                 <type>test-jar</type>
                 <version>0.1660-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-osgi-api</artifactId>
+                <version>0.1591-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-osgi-api</artifactId>
+                <version>0.1591-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-osgi-api</artifactId>
+                <version>0.1582-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -366,6 +382,11 @@
                 <groupId>com.salesforce</groupId>
                 <artifactId>omakase</artifactId>
                 <version>0.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>biz.aQute</groupId>
+                <artifactId>bnd</artifactId>
+                <version>1.50.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -778,7 +799,7 @@
                                             <include name="**/*.css" />
                                             <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
-											<include name="**/*.auradoc" />
+                                            <include name="**/*.auradoc" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">

@@ -25,6 +25,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Application;
@@ -42,6 +43,7 @@ import com.google.common.collect.Maps;
 /**
  */
 @ThreadSafe
+@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
 public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatAdapter<ApplicationDef> {
 
     @Override

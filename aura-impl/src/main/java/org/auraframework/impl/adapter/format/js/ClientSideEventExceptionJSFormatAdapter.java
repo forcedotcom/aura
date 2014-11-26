@@ -21,10 +21,14 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import aQute.bnd.annotation.component.Component;
+
 @ThreadSafe
+@Component (provide=AuraServiceProvider.class)
 public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<ClientSideEventException> {
 
     @Override

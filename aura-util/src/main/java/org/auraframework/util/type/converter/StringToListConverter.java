@@ -18,12 +18,16 @@ package org.auraframework.util.type.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.type.Converter;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
 @SuppressWarnings("rawtypes")
+@Component (provide=AuraServiceProvider.class)
 public class StringToListConverter implements Converter<String, List> {
 
     @Override

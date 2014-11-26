@@ -27,6 +27,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.StyleDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.BaseComponent;
@@ -46,6 +47,7 @@ import com.google.common.collect.Maps;
 /**
  */
 @ThreadSafe
+@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
 public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, ?>> extends HTMLFormatAdapter<T> {
 
     @Override

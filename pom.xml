@@ -188,17 +188,7 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-osgi-api</artifactId>
-                <version>0.1591-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.auraframework</groupId>
-                <artifactId>aura-osgi-api</artifactId>
-                <version>0.1591-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.auraframework</groupId>
-                <artifactId>aura-osgi-api</artifactId>
-                <version>0.1582-SNAPSHOT</version>
+                <version>0.1660-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

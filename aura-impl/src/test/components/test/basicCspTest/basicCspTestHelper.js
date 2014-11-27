@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 ({
-	createHttpRequest: function() {
+	createHttpRequest: function(cmp) {
 		if (window.XMLHttpRequest) {
+		    cmp.set("v.xmlHttpRequestDebug","window.XMLHttpRequest exist, return one");
 			return new XMLHttpRequest();   
            } else if (window.ActiveXObject) { // code for IE6, IE5
         	   try { 
@@ -30,18 +31,21 @@
     },
     
     request: function(cmp, url) {
-            var request = this.createHttpRequest();   
+            var request = this.createHttpRequest(cmp);   
             if(request != null) {
 	            request.open("GET", url, true);   
 	            request["onreadystatechange"] = function() {   
 		            if (request["readyState"] == 4) {   
 		                      cmp.set("v.xmlHttpRequestComplete",true);
-		                      console.log("from action callback");   
+		                      cmp.set("v.xmlHttpRequestDebug","request readyState = "+request["readyState"]);
+		                      //console.log("from action callback"); -- btw IE9 doesn't like console
+		             } else {
+		                 cmp.set("v.xmlHttpRequestDebug","request readyState = "+request["readyState"]);
 		             }   
 	            };   
 	            request.send();   
             } else {
-            	$A.error("request is null");
+                cmp.set("v.xmlHttpRequestDebug","new XMLHttpRequest() return null");
             }
     }
 })

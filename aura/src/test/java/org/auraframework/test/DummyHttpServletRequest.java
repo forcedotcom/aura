@@ -50,8 +50,9 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     private String requestUri;
     private Map<String, String> queryParams = Maps.newHashMap();
 
-    public DummyHttpServletRequest() {}
-
+    //if you use this one, please note that its requestUri will be null, risk of NPE !!!
+    public DummyHttpServletRequest() {} 
+    
     public DummyHttpServletRequest(String uri) {
         this.requestUri = uri;
     }

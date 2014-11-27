@@ -15,6 +15,9 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface LocalPrimaryService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+
+public interface LocalPrimaryService extends AuraServiceProvider {
 
 }

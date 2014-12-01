@@ -44,10 +44,7 @@
       &lt;aura:attribute name="warnings" type="String[]" description="Warnings for input text"/>
     Enter a number: &lt;ui:inputNumber aura:id="inputCmp" label="number"/>
     &lt;ui:button label="Submit" press="{!c.doAction}"/>
-    
-    &lt;aura:renderIf isTrue="{!v.warnings.length != 0}">
-   		 &lt;ui:inputDefaultError aura:id="number" value="{!v.warnings}" />
-    &lt;/aura:renderIf>
+    &lt;ui:inputDefaultError aura:id="number" value="{!v.warnings}" />
 &lt;/aura:component></pre>
 		<p>This client-side controller diplays an error by adding a string to the <code>warnings</code> attribute.</p>
 <pre>doAction : function(component, event) {

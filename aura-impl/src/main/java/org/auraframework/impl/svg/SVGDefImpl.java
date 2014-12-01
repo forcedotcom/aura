@@ -28,6 +28,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -41,11 +42,19 @@ import com.google.common.collect.Lists;
 public class SVGDefImpl extends RootDefinitionImpl<SVGDef> implements SVGDef {
     private static final long serialVersionUID = 94337546417596992L;
 
-    private final Source<SVGDef> source;
+    private final String contents;
 
     protected SVGDefImpl(Builder builder) {
         super(builder);
-        this.source = builder.source;
+        this.contents = builder.contents;
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        if (contents == null) {
+            throw new InvalidDefinitionException("no contents for definition", getLocation());
+        }
     }
 
     @Override
@@ -74,20 +83,26 @@ public class SVGDefImpl extends RootDefinitionImpl<SVGDef> implements SVGDef {
     }
 
     @Override
-    public Source<SVGDef> getSource() {
-        return this.source;
+    public String getContents() {
+        return this.contents;
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<SVGDef> implements SVGDefBuilder {
-        private Source<SVGDef> source;
+        private String contents;
 
         public Builder() {
             super(SVGDef.class);
         }
 
+        /**
+         * Fixme: we should probably take the contents instead of the source here, but then, we probably should
+         * not simply be jamming contents on the def.
+         */
         @Override
         public SVGDefBuilder setSource(Source<SVGDef> source) {
-            this.source = source;
+            if (source != null) {
+                this.contents = source.getContents();
+            }
             return this;
         }
 

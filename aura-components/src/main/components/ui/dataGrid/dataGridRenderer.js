@@ -35,7 +35,7 @@
 		if (summaryRow) {
 			tfoot.appendChild(summaryRow);
 		}
-		cmp._rendered = true;
+
 		return table;
 	},
 	

@@ -19,7 +19,6 @@
 		
 		// Use for loading logic. 
 		cmp._hasDataProvider = cmp._dataProviders && cmp._dataProviders.length > 0;
-		cmp._rendered = false;
 
 		// Attempt to extract the initial set of items. 
 		if (cmp._hasDataProvider) {
@@ -47,7 +46,7 @@
 	handleItemsChange: function (cmp, evt, hlp) {
 		hlp.generateNewItemShape(cmp);
 		
-		if (!cmp._rendered) {
+		if (!cmp.isRendered()) {
 			hlp.initializeRowData(cmp);
 			return;
 		}

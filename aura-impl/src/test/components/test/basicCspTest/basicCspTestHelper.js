@@ -16,7 +16,7 @@
 ({
 	createHttpRequest: function(cmp) {
 		if (window.XMLHttpRequest) {
-		    cmp.set("v.xmlHttpRequestDebug","window.XMLHttpRequest exist, return one");
+		    cmp.set("v.xmlHttpRequestDebug",cmp.get("v.xmlHttpRequestDebug")+"window.XMLHttpRequest exist, return one; ");
 			return new XMLHttpRequest();   
            } else if (window.ActiveXObject) { // code for IE6, IE5
         	   try { 
@@ -37,15 +37,15 @@
 	            request["onreadystatechange"] = function() {   
 		            if (request["readyState"] == 4) {   
 		                      cmp.set("v.xmlHttpRequestComplete",true);
-		                      cmp.set("v.xmlHttpRequestDebug","request readyState = "+request["readyState"]);
+		                      cmp.set("v.xmlHttpRequestDebug",cmp.get("v.xmlHttpRequestDebug")+"request readyState = "+request["readyState"]+"; ");
 		                      //console.log("from action callback"); -- btw IE9 doesn't like console
 		             } else {
-		                 cmp.set("v.xmlHttpRequestDebug","request readyState = "+request["readyState"]);
+		                 cmp.set("v.xmlHttpRequestDebug",cmp.get("v.xmlHttpRequestDebug")+"request readyState = "+request["readyState"]+"; ");
 		             }   
 	            };   
 	            request.send();   
             } else {
-                cmp.set("v.xmlHttpRequestDebug","new XMLHttpRequest() return null");
+                cmp.set("v.xmlHttpRequestDebug",cmp.get("v.xmlHttpRequestDebug")+"new XMLHttpRequest() return null; ");
             }
     }
 })

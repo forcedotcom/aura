@@ -1,49 +1,137 @@
-var AuraInspectorContentScript = {
-    
-    port : null,
-    dtsPort : null,
+(function(global){
 
-    connect : function(){
-        AuraInspectorContentScript.dtsPort = document.getElementById("AuraDevToolServicePort");
-        if (!AuraInspectorContentScript.dtsPort) {
-            AuraInspectorContentScript.dtsPort = null;
-            setTimeout(AuraInspectorContentScript.connect, 1500);
-        }
-        AuraInspectorContentScript.port = chrome.extension.connect();
-        AuraInspectorContentScript.port.onMessage.addListener(AuraInspectorContentScript.handleMessage);
-        AuraInspectorContentScript.port.onDisconnect.addListener(AuraInspectorContentScript.disconnect);
-        setTimeout(AuraInspectorContentScript.actions.getComponentTree, 1500);
-    },
-    
-    handleMessage : function(message){
-        AuraInspectorContentScript.actions[message.action](message.params);
-    },
+    // Initialize    
+    var inspector = new AuraInspectorContentScript();
+        inspector.init();
+        inspector.addEventLogMessage("AuraDevTools: Content Script Loaded");
+        
+    global.AuraInspector = global.AuraInspector || {};
+    global.AuraInspector.ContentScript = inspector;
 
-    disconnect : function(port) {
-        // doh! what should we do?
-        AuraInspectorContentScript.port = null;
-        AuraInspectorContentScript.dtsPort = null;
-        setTimeout(AuraInspectorContentScript.connect, 1500);
-    },
-    
-    actions : {
-        getComponentTree : function(){
-            if (AuraInspectorContentScript.port == null || AuraInspectorContentScript.dtsPort == null) {
-                return;
+
+    function AuraInspectorContentScript(){
+        var actions = new Map();
+        var runtime = null;
+        //var EXTENSION_ID = "mhfgenmncdnmcoonglmkepfdnjjjcpla";
+
+        /**
+         * Initializes the connection to the chrome extensions runtime
+         */
+        this.connect = function () {
+            // Don't setup everything again, that wouldn't make sense
+            if(runtime) { return; }
+            //runtime = chrome.runtime.connect(EXTENSION_ID);
+            runtime = chrome.runtime.connect();
+            runtime.onMessage.addListener(handleMessage);
+            runtime.onDisconnect.addListener(this.disconnect.bind(this));
+
+            // Inject the script that will talk with the $A services.
+            var src = chrome.extension.getURL('AuraInspectorInjectedScript.js');
+            var scriptElement = global.document.createElement("script");
+            scriptElement.src = src;            
+            scriptElement.onload = function() {
+                this.parentNode.removeChild(this);
+            };
+            (document.head||document.documentElement).appendChild(scriptElement);
+        };
+
+        /**
+         * Not quite sure when this would happen.
+         */
+        this.disconnect = function() {
+            // doh! what should we do?
+            runtime = null;
+            actions = new Map();
+
+            setTimeout(this.init.bind(this), 1500);
+        };
+
+        this.init = function(){
+            this.connect();
+
+            // Initialize Actions which map messages to commands that get run
+            // After running, we should get this response, and need to handle the response
+            window.addEventListener("message", function AuraInspectorContent$Response(event){
+                if(event.data.action === "AuraDevToolService.RequestComponentTreeResponse") {
+                    return this.updateComponentTree(event.data.responseText);
+                }
+                if(event.data.action === "AuraDevToolService.RequestComponentViewResponse") {
+                    return this.updateComponentView(null, event.data.responseText);
+                }
+                if(event.data.action === "AuraDevToolService.OnError") {
+                    return this.addEventLogMessage(event.data.text);
+                }
+            }.bind(this));
+
+            setTimeout(this.updateComponentTree, 1500);
+        };
+
+        this.highlightElement = function(globalId) {
+            global.postMessage({
+                action: "AuraDevToolService.HighlightElement",
+                globalId: globalId
+            }, "*");
+        };
+
+        this.removeHighlightElement = function() {
+            global.postMessage({
+                action: "AuraDevToolService.RemoveHighlightElement"
+            }, "*");
+        };
+
+        this.isConnected = function() {
+            return !!runtime;
+        };
+
+        this.updateComponentTree = function(json) {
+            if(json) {
+                // With the new result, notify the Background Page
+                // So it can tell the DevToolsPanel to draw the tree.
+                runtime.postMessage({
+                    action: "AuraInspector.DevToolsPanel.PublishComponentTree",
+                    params: json
+                });
+            } else {
+                //actions.get("AuraInspector.ContentScript.GetComponentTree").run();
+                window.postMessage({
+                    action: "AuraDevToolService.RequestComponentTree"
+                }, "*");
             }
-            var customEvent = document.createEvent('Event');
-            customEvent.initEvent('getComponentTreeEvent', true, true);
-            document.body.dispatchEvent(customEvent);
-            AuraInspectorContentScript.port.postMessage({action : "publishComponentTree",
-                                                         params : AuraInspectorContentScript.dtsPort.innerText});
-            AuraInspectorContentScript.dtsPort.innerText = "";
-        },
+        };
 
-        highlightElements : function(globalId){
-            var customEvent = document.createEvent('MessageEvent');
-            customEvent.initMessageEvent('highlightElementsEvent', true, true, globalId);
-            document.body.dispatchEvent(customEvent);
+        this.updateComponentView = function(globalId, json) {
+            if(json) {
+                // With the new result, notify the Background Page
+                // So it can tell the DevToolsPanel to draw the tree.
+                runtime.postMessage({
+                    action: "AuraInspector.DevToolsPanel.PublishComponentView",
+                    params: json
+                });
+            } else {
+                //actions.get("AuraInspector.ContentScript.GetComponentTree").run(globalId);
+                window.postMessage({
+                    action: "AuraDevToolService.RequestComponentTree",
+                    globalId: globalId
+                }, "*");
+            }
+        };
+
+        this.addEventLogMessage = function(msg) {
+            if(!msg) { return; }
+            runtime.postMessage({
+                action: "AuraInspector.DevToolsPanel.OnEvent",
+                params: msg
+            });
+        };
+
+        /* Private Methods */
+        function handleMessage(message, sender) {
+            var action = actions.get(message.action);
+            if(!action) {
+                console.warn("Tried to handle unknown action: ", message.action);    
+            }
+            action.run(message.params);
         }
     }
-};
-AuraInspectorContentScript.connect();
+
+})(this);

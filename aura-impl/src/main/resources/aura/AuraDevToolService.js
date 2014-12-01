@@ -21,51 +21,6 @@
  * @protected
  */
 var AuraDevToolService = function() {
-    var port = document.createElement("span");
-    port.id = "AuraDevToolServicePort";
-    port.style.display = "none";
-    document.body.appendChild(port);
-
-    $A.ns.Util.prototype.on(document.body,'getComponentTreeEvent', function() {
-        var root = $A.getRoot();
-        if(root){
-            port.innerText = $A.getRoot().toJSON();
-        }else{
-            port.innerText = "";
-        }
-    });
-
-    var highlightedElements = [];
-
-    var appliedHighlightStyle = false;
-
-    $A.ns.Util.prototype.on(document.body,'highlightElementsEvent', function(event) {
-
-        if(!appliedHighlightStyle){
-            aura.util.style.apply(".auraDevToolServiceHighlight:before{position:absolute;display:block;width:100%;height:100%;" +
-                    "background-color:#006699;opacity:.3;content:' ';border : 2px dashed white;}");
-            appliedHighlightStyle = true;
-        }
-
-        while(highlightedElements.length > 0){
-            var el = highlightedElements.pop();
-            $A.util.removeClass(el, "auraDevToolServiceHighlight");
-        }
-
-        if(event.data){
-            var cmp = $A.getCmp(event.data);
-
-            var elements = cmp.getElements();
-            for(var i=0;i<elements.length;i++){
-                var element = elements[i];
-                if(element && element["style"]){
-                    highlightedElements.push(element);
-                    $A.util.addClass(element, "auraDevToolServiceHighlight");
-                }
-            }
-        }
-    });
-
 
     /**
      * Mostly used by select.

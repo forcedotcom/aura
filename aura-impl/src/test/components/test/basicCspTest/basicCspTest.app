@@ -22,7 +22,7 @@
     <aura:attribute name='testMediaSource' type='Boolean' default='false'/>
     <aura:attribute name='testConnectionSource' type='Boolean' default='false'/>
     <aura:attribute name='xmlHttpRequestComplete' type='Boolean' default='false'/>
-    <aura:attribute name='xmlHttpRequestDebug' type='String' default='Nothing'/>
+    <aura:attribute name='xmlHttpRequestDebug' type='String' default='Start; '/>
     <aura:attribute name='testObjectSource' type='Boolean' default='false'/>
     
     <!-- frameSource, by default, we can load same origin , also we can be ifram-ed by same origin -->

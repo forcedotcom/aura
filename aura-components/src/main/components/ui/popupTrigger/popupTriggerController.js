@@ -20,13 +20,13 @@
         _helper.focus(concreteCmp);
     },
     
-    onClick : function(component, event, helper) {
+    onClick : function(component, event) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         if ($A.util.getBooleanValue(concreteCmp.get("v.stopClickPropagation"))) {
-            $A.util.squash(event, true);
+            $A.util.squash(event.getParam("domEvent"), true);
         }
-        _helper.handleClick(component);
+        _helper.handleClick(component, event);
     },
 
     /*

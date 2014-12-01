@@ -16,9 +16,6 @@
 ({
     handleClick: function (component) {
         var concreteCmp = component.getConcreteComponent();
-        if ($A.util.getBooleanValue(concreteCmp.get("v.stopClickPropagation"))) {
-            $A.util.squash(event, true);
-        }
         this.handleTriggerPress(concreteCmp);
         this.fireMenuTriggerPress(concreteCmp);
     },

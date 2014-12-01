@@ -359,7 +359,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //2.if we set ancestor resources with one url (without wildcard), that url will get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
-    @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspSingleAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("www.itrustu.com/frame", "www.itrustu.com/frame");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -368,7 +367,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //3.if we set ancestor resources with protocal like url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
-    @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspProtocolAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https:", "https:");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -377,7 +375,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //4.if we set ancestor with one wildcard url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
-    @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspWildcardAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https://*.foo.com", "https://*.foo.com");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -386,7 +383,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //5.if we set ancestor resources with null, DENY get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
-    @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspDeniedAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'none'");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -395,7 +391,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //6.if we set ancestor resources with [null], SAMEORIGIN get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
-    @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspSameOriginAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'self'", (String)null);
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -404,7 +399,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     //7.if we set ancestor resources with null [], we won't change X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
-    @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspAnyAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("*", (String[]) null);
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);

@@ -27,5 +27,13 @@
     onNope : function(cmp, event, helper) {
         cmp.set("v.myValueString", "nope");
         cmp.set("v.myValueBoolean", false);
+    },
+
+    changeHandlerString:function(cmp,event,helper){
+        cmp.set("v.myValueString",event.source.get("v.text"));
+    },
+
+    changeHandlerBoolean:function(cmp,event,helper){
+        cmp.set("v.myValueBoolean",event.source.get("v.value"));
     }
 })

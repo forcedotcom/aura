@@ -285,13 +285,13 @@
     	return str
     },
 
-//    addInputClass: function(component) {
-//    	if (this.hasLabel(component)) {
-//    		//var inputEl = this.getInputElement(cmp);
-//    		//$A.util.addClass(inputEl, cmp.getConcreteComponent().getDef().getStyleClassName());
+    addInputClass: function(component) {
+    	if (this.hasLabel(component)) {
+    		var inputEl = this.getInputElement(component);
+    		$A.util.addClass(inputEl, component.getConcreteComponent().getDef().getStyleClassName());
 //            $A.util.addClass(component, component.getConcreteComponent().getDef().getStyleClassName())
-//    	}
-//    },
+    	}
+    },
 
     hasLabel: function(cmp) {
     	var label = cmp.get('v.label');

@@ -21,23 +21,23 @@
     
     <aura:attribute name="myValueString" type="String" />
     <aura:attribute name="myValueBoolean" type="Boolean" />
-    
+
     <ui:button aura:id="yup" press="{!c.onYup}" label="Yup"/>
     <ui:button aura:id="nope" press="{!c.onNope}" label="Nope"/>
     
-    <ui:inputRadio aura:id="expYup" name="myValueStringGroup" text="yup" value="{!equals(v.myValueString, 'yup')}"
+    <ui:inputRadio aura:id="expYup" change="{!c.changeHandlerString}" name="myValueStringGroup" text="yup" value="{!equals(v.myValueString, 'yup')}"
                                    label="Yup (String)" labelPosition="right"/>
     
-    <ui:inputRadio aura:id="expNope" name="myValueStringGroup" text="nope" value="{!equals(v.myValueString, 'nope')}"
+    <ui:inputRadio aura:id="expNope" change="{!c.changeHandlerString}" name="myValueStringGroup" text="nope" value="{!equals(v.myValueString, 'nope')}"
                                    label="Nope (String)" labelPosition="right"/>
     
-    <ui:inputRadio aura:id="booleanYup" name="myValueBooleanGroup" text="true" value="{!v.myValueBoolean}"
+    <ui:inputRadio aura:id="booleanYup" change="{!c.changeHandlerBoolean}" name="myValueBooleanGroup" text="true" value="{!v.myValueBoolean}"
                                    label="Yup (Boolean)" labelPosition="right"/>
     
-    <ui:inputRadio aura:id="booleanNope" name="myValueBooleanGroup" text="false" value="{!!v.myValueBoolean}"
+    <ui:inputRadio aura:id="booleanNope" change="{!c.changeHandlerBoolean}" name="myValueBooleanGroup" text="false" value="{!!v.myValueBoolean}"
                                    label="Nope (Boolean)" labelPosition="right"/>
-                                   
+
     myValueString: {!v.myValueString}<br/>
-    myValueBoolean: {!v.myValueBoolean}
-    
+    myValueBoolean: {!v.myValueBoolean}<br/>
+
  </aura:component>

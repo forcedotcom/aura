@@ -93,7 +93,8 @@
                       totalItems="{!v.totalItems}"/>
                       
     
-    <ui:button label="Re-fire datagrid's provide" press="{!c.replaceData}"/><br/>               
+    <ui:button label="Re-fire datagrid's provide" press="{!c.replaceData}"/><br/> 
+    <ui:button label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/><br/>              
     <ui:block>
     	<aura:set attribute="left">
     		<ui:button label="Spit Out Items" press="{!c.spit}"/><br/>

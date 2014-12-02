@@ -22,6 +22,7 @@
     <aura:attribute name="editable" type="Boolean"/>
 	<aura:attribute name="filterable" type="Boolean"/>
 	<aura:attribute name="sortable" type="Boolean"/>
+	<aura:attribute name="disabled" type="Boolean" default="false" description="Sets whether the column header's interactions should be disabled"/>
 	<aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
 	<aura:attribute name="direction" type="String" description="{ '', ascending, descending }"/>
 	<aura:attribute name="ascLabel" type="String" default="Ascending" description="Accessibility label to use when column is ascending"/>
@@ -47,18 +48,20 @@
 	</aura:attribute>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<aura:handler name="change" value="{!v.disabled}" action="{!c.handleDisabledChange}"/>
 	
 	<!-- Currently works only for output components -->
 	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
 	
-	<th scope="{!v.scope}" class="{! v.class + ' ' + v.direction }">
+	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }">
 		
 		<!-- Conditionally insert link for column sorting. -->
 		<aura:if isTrue="{!v.sortable}">
-			<a class="toggle" onclick="{!c.handleClick}">
+			<a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
 				{!v.label}
-				<span class="assistiveText">{! (v.direction == 'ascending') ? v.ascLabel 
-													: ((v.direction == 'descending') ? v.descLabel : v.direction)}</span>
+				<span class="assistiveText">{! v.disabled ? ''
+												: ((v.direction == 'ascending') ? v.ascLabel 
+													: ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
 			</a>
 			
 			<aura:set attribute="else">

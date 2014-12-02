@@ -62,3 +62,7 @@ button.THIS.kitchenButton {
 	font-size: inherit;
 }
 
+.THIS a.disabled {
+	color: gray;
+}
+

@@ -103,6 +103,12 @@
 	},
 	
 	replaceData : function(cmp, evt, hlp) {
+		cmp.find("data").set("v.empty", false);
+		cmp.find("data").getEvent("provide").fire();
+	},
+	
+	emptyData : function(cmp, evt, hlp) {
+		cmp.find("data").set("v.empty", true);
 		cmp.find("data").getEvent("provide").fire();
 	},
 	

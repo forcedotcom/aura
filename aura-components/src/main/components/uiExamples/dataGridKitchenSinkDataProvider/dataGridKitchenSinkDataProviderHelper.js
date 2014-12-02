@@ -71,7 +71,6 @@
             });
         }
         
-        cmp._tasks = items;
-        return items;
+        return cmp.get("v.empty") ? [] : items;
     }
 })

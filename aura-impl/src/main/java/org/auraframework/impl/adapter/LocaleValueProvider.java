@@ -132,7 +132,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
         // DecimalFormat is expected
         DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(al.getNumberLocale());
 
-        builder.put(NUMBER_FORMAT, df.toLocalizedPattern());
+        // Patterns are not localized; the "." means "locale decimal" not "dot"
+        builder.put(NUMBER_FORMAT, df.toPattern());
         DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
         builder.put(DECIMAL, dfs.getDecimalSeparator());
         builder.put(GROUPING, dfs.getGroupingSeparator());
@@ -140,11 +141,13 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
         df = (DecimalFormat) DecimalFormat.getPercentInstance(al.getNumberLocale());
 
-        builder.put(PERCENT_FORMAT, df.toLocalizedPattern());
+        // Don't localize the patterns
+        builder.put(PERCENT_FORMAT, df.toPattern());
 
         df = (DecimalFormat) DecimalFormat.getCurrencyInstance(al.getCurrencyLocale());
 
-        builder.put(CURRENCY_FORMAT, df.toLocalizedPattern());
+        // Don't localize the patterns
+        builder.put(CURRENCY_FORMAT, df.toPattern());
         DecimalFormatSymbols cdfs = df.getDecimalFormatSymbols();
         Currency cur = cdfs.getCurrency();
         builder.put(CURRENCY_CODE, cur != null ? cur.getCurrencyCode() : "");

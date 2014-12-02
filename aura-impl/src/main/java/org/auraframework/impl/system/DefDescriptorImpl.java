@@ -311,7 +311,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     private static <E extends Definition> DefDescriptor<E> buildInstance(String qualifiedName,
             Class<E> defClass, DefDescriptor<?> bundle) {
         if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
-            TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getDef(qualifiedName);
+            TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getInsensitiveDef(qualifiedName);
             if (typeDef != null) {
                 @SuppressWarnings("unchecked")
                 DefDescriptor<E> result = (DefDescriptor<E>) typeDef.getDescriptor();

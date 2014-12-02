@@ -30,10 +30,12 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 @UnAdaptableTest
 public class InputRichTextUITest extends WebDriverTestCase {
     private final String URL = "/uitest/inputRichText_Test.cmp";
+    private final String CMP_URL = "/ui/inputRichText.cmp";
     private final String LINKBEFORE_LOCATOR = ".linkbefore";
     private final String CK_EDITOR_LOCATOR = ".cke_contents";
     private final String SUBMIT_BUTTON_LOCATOR = ".uiButton";
     private final String OUTPUT_LOCATOR = ".uiOutputText";
+    private final String IN_RICHTEXT_BODY = ".inputRichTextBody"; 
     private final String RT_CMP = "Text";
 
     public InputRichTextUITest(String name) {
@@ -89,6 +91,25 @@ public class InputRichTextUITest extends WebDriverTestCase {
         ckEditor.click();
         ckEditorInput.sendKeys(html);
         waitForTextInRichText(RT_CMP, escapedHtml);
+    }
+    /**
+     * ui:inputRichText doesn't render its initial value
+     * Test case: W-2428455
+     * @throws Exception
+     * Excluding test as switchTo not supported with ios and android drivers
+     */
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+        BrowserType.IPAD, BrowserType.IPHONE })
+    public void testRenderInitialValueOfRichText() throws Exception {
+        String defaultText = "testing text";
+        WebDriver driver = this.getDriver();
+    	open(String.format("%s?value=%s",CMP_URL,defaultText));
+        WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
+        driver.switchTo().frame(ckEditorInput);
+        waitForElementPresent(driver.findElement(By.cssSelector(IN_RICHTEXT_BODY)));
+        auraUITestingUtil.waitForElementText(By.cssSelector(IN_RICHTEXT_BODY), defaultText, true);
+        driver.switchTo().defaultContent();
     }
 
     private void waitForTextInRichText(final String auraId, final String text) {

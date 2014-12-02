@@ -21,7 +21,7 @@
     <div class="amp" aura:id="amp">&amp;</div>
     <div class="apos" aura:id="apos">&apos;</div>
     <div class="quot" aura:id="quot">&quot;</div>
-    <div class="nbsp" aura:id="nbsp">&nbsp;</div>
+    <div class="nbsp" aura:id="nbsp">C&nbsp;D</div>
     <div class="ensp" aura:id="ensp">in&ensp;side</div>
     <div class="emsp" aura:id="emsp">in&emsp;side</div>
     <div class="mdash" aura:id="mdash">&mdash;</div>
@@ -42,7 +42,7 @@
     <div class="amp" aura:id="amp">{!'&amp;'}</div>
     <div class="apos" aura:id="apos">{!'\&apos;'}</div>
     <div class="quot" aura:id="quot">{!'&quot;'}</div>
-    <div class="nbsp" aura:id="nbsp">{!'&nbsp;'}</div>
+    <div class="nbsp" aura:id="nbsp">C{!'&nbsp;'}D</div>
     <div class="ensp" aura:id="ensp">{!'&ensp;'}</div>
     <div class="emsp" aura:id="emsp">{!'&emsp;'}</div>
     <div class="mdash" aura:id="mdash">{!'&mdash;'}</div>
@@ -63,7 +63,7 @@
     <aura:text  aura:id="amp" value="&amp;"/>
     <aura:text  aura:id="apos" value="&apos;"/>
     <aura:text  aura:id="quot" value="&quot;"/>
-    <aura:text  aura:id="nbsp" value="&nbsp;"/>
+    <aura:text  aura:id="nbsp" value="C&nbsp;D"/>
     <aura:text  aura:id="ensp" value="&ensp;"/>
     <aura:text  aura:id="emsp" value="&emsp;"/>
     <aura:text  aura:id="mdash" value="&mdash;"/>
@@ -84,7 +84,7 @@
     <ui:outputText class="amp" aura:id="amp" value="{!'&amp;'}"/>
     <ui:outputText class="apos" aura:id="apos" value="{!'\&apos;'}"/>
     <ui:outputText class="quot" aura:id="quot" value="{!'&quot;'}"/>
-    <ui:outputText class="nbsp" aura:id="nbsp" value="{!'&nbsp;'}"/>
+    <ui:outputText class="nbsp" aura:id="nbsp" value="{!'C&nbsp;D'}"/>
     <ui:outputText class="ensp" aura:id="ensp" value="{!'&ensp;'}"/>
     <ui:outputText class="emsp" aura:id="emsp" value="{!'&emsp;'}"/>
     <ui:outputText class="mdash" aura:id="mdash" value="{!'&mdash;'}"/>

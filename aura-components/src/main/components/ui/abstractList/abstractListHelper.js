@@ -144,7 +144,7 @@
 	},
     
     showLoading:function (component, visible) {
-        $A.util[visible ? "addClass" : "removeClass"](component, "loading");
+        $A.util.toggleClass(component, "loading", !!visible);
     },
 
     triggerDataProvider: function(component, index) {

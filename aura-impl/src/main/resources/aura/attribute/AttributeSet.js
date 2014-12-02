@@ -186,7 +186,7 @@ AttributeSet.prototype.set = function(key, value) {
     }
 // #if {"excludeModes" : ["PRODUCTION", "STATS"]}
     else {
-        $A.warning("AttributeSet.set(): unable to override the value for '" + key + "'. FunctionCallValues declared in markup are constant.");
+        $A.warning("AttributeSet.set(): unable to override the value for '" + key + "=" + target[key] + "'. FunctionCallValues declared in markup are constant.");
     }
 // #end
 };

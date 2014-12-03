@@ -16,12 +16,12 @@
 .THIS.content {
 	margin-left: 15px;
 	border-left: 3px dashed #002D23;
-	background-color: #B8C0E0;
+	background-color: #A1A8C4;
 }
 
 .THIS .toolbar {
 	width: 100%;
-	background-color: #7A8EAF;
+	background-color: #4C586D;
 	color: #E8F2FC;
 	padding: 10px;
 	padding-left: 20px;
@@ -56,7 +56,7 @@
 	margin-left: 120px;
 	opacity: 1;
 	overflow: scroll;
-	color: #999;
+	color: #000;
 	background-color: #335D72;
 }
 

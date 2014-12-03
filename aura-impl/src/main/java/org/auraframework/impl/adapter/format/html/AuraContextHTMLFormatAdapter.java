@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.context.AuraContextImpl.SerializationContext;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraExceptionUtil;
@@ -27,9 +28,12 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
 @ThreadSafe
+@Component (provide=AuraServiceProvider.class)
 public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext> {
 
     @Override

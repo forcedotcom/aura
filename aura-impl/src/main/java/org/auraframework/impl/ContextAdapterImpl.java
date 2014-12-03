@@ -22,6 +22,7 @@ import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.GlobalValueProvider;
@@ -34,8 +35,11 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.JsonSerializationContext;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class ContextAdapterImpl implements ContextAdapter {
 
     private static ThreadLocal<AuraContext> currentContext = new ThreadLocal<AuraContext>();

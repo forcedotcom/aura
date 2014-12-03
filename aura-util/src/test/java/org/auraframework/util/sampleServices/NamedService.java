@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface NamedService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface NamedService extends AuraServiceProvider {
 
 }

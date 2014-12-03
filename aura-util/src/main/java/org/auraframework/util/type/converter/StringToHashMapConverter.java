@@ -18,10 +18,14 @@ package org.auraframework.util.type.converter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
 
+import aQute.bnd.annotation.component.Component;
+
 @SuppressWarnings("rawtypes")
+@Component (provide=AuraServiceProvider.class)
 public class StringToHashMapConverter implements Converter<String, HashMap> {
 
     @Override

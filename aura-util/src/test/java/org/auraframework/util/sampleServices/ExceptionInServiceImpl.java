@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public class ExceptionInServiceImpl {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public class ExceptionInServiceImpl implements AuraServiceProvider {
 
 }

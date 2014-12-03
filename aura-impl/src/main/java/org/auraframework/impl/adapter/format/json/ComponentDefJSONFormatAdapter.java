@@ -22,13 +22,17 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
 @ThreadSafe
+@Component (provide=AuraServiceProvider.class)
 public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseComponentDef> {
 
     @Override

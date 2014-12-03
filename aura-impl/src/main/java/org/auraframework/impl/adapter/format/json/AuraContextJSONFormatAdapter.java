@@ -18,12 +18,16 @@ package org.auraframework.impl.adapter.format.json;
 import java.io.IOException;
 import java.util.Map;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class AuraContextJSONFormatAdapter extends JSONFormatAdapter<AuraContext> {
 
     @Override

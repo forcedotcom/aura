@@ -27,6 +27,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
@@ -42,12 +43,15 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Sets;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * The public access to definitions inside Aura.
  * 
  * This class manages all of the permissions checking and fetching of implementations
  * for consumers of aura definitions.
  */
+@Component (provide=AuraServiceProvider.class)
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
     private static final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<>();

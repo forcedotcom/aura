@@ -22,6 +22,7 @@
     <aura:attribute name='testMediaSource' type='Boolean' default='false'/>
     <aura:attribute name='testConnectionSource' type='Boolean' default='false'/>
     <aura:attribute name='xmlHttpRequestComplete' type='Boolean' default='false'/>
+    <aura:attribute name='xmlHttpRequestDebug' type='String' default='Start; '/>
     <aura:attribute name='testObjectSource' type='Boolean' default='false'/>
     
     <!-- frameSource, by default, we can load same origin , also we can be ifram-ed by same origin -->
@@ -61,7 +62,9 @@
         </div>
     </aura:if>
     
-    <!-- MediaSources: *, should be anything, but the non-same-domain src is blocked by connect-src anyway -->
+    <!-- MediaSources: *, should be anything, but the non-same-domain src is blocked by connect-src anyway 
+         NOTE: MP4 type isn't supported on Firefox, For Firefox you'll need .ogg file or.webm video files as sources
+    -->
     <aura:if isTrue='{!v.testMediaSource}'>
          <video id='videoSameDomain' width="400" controls="controls" preload="preload">
             <source src="/auraFW/resources/aura/videos/Test6.mp4" type="video/mp4"></source>
@@ -72,6 +75,7 @@
     <!-- connect-src : 'self' http://invalid.salesforce.com , not used in js test, here for easy trying-out -->
     <aura:if isTrue='{!v.testConnectionSource}'>
         <ui:button aura:id='uiButton_sendXHR' press='{!c.post}' label='Send XHR' class='button'/>
+        xmlHttpRequestDebug = {!v.xmlHttpRequestDebug} <br/>
     </aura:if>
     
     <!-- object-src: 'self': actually this doesn't matter as we don't allow the object tag in htmlTag.java

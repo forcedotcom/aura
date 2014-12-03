@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.sampleServices;
 
-public interface DoubleExposureService {
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
+public interface DoubleExposureService extends AuraServiceProvider {
 
 }

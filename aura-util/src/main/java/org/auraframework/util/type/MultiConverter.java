@@ -17,13 +17,15 @@ package org.auraframework.util.type;
 
 import java.util.Set;
 
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+
 /**
  * The MultiConverter interface is a type converter that converts a value from one Java type 
  * to variety of other Java types. You can implement this interface to provide a custom converter 
  * for your own custom type for converting data sent from the client to the server, 
  * such as input parameters of server-side controller actions or component attributes.
  **/
-public interface MultiConverter<T> {
+public interface MultiConverter<T> extends AuraServiceProvider {
 
     /**
      * Converts fromValue to a value of the type specified by toClass.

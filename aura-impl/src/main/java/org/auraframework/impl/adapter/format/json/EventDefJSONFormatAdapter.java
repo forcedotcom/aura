@@ -22,14 +22,18 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Event JSON format adapter.
  */
 @ThreadSafe
+@Component (provide=AuraServiceProvider.class)
 public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef> {
 
     @Override

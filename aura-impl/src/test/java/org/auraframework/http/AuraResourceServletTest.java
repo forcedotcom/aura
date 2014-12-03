@@ -284,7 +284,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest() {
+        DummyHttpServletRequest request = new DummyHttpServletRequest("dummy.app") {
             @Override
             public long getDateHeader(String name) {
                 return -1;

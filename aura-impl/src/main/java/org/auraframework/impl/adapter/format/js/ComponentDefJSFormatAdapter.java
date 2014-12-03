@@ -20,10 +20,14 @@ import java.util.Collection;
 
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  */
+@Component (provide=AuraServiceProvider.class)
 public class ComponentDefJSFormatAdapter extends JSFormatAdapter<BaseComponentDef> {
 
     @Override

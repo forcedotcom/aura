@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateService;
@@ -34,9 +35,12 @@ import com.ibm.icu.text.DecimalFormat;
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.Currency;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * Default implementation for the Localization Service
  */
+@Component (provide=AuraServiceProvider.class)
 public class LocalizationServiceImpl implements LocalizationService {
 
     // make pluggable in the future?

@@ -288,7 +288,7 @@
                             break;
                         case "Html":
                             expected=items[i][columns[j].get("v.fieldName")];
-                            actual=this.getTableBodyCellComponentAt(component, i, j).getElement().innerHTML.replace(/ data-aura-rendered-by=[^>]+/,'');
+                            actual=this.getTableBodyCellComponentAt(component, i, j).getElement().innerHTML.replace(/data-aura-rendered-by="\S+"[\s]{1}|\s{1}data-aura-rendered-by="\S+"/,'');
                             break;
                         default:
                             expected = items[i][columns[j].get("v.fieldName")];

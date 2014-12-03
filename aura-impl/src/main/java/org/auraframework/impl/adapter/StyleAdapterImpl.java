@@ -24,6 +24,7 @@ import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.ThemeValueProviderImpl;
 import org.auraframework.impl.css.parser.DuplicateFontFacePlugin;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -31,6 +32,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableList;
 import com.salesforce.omakase.plugin.Plugin;
 
+import aQute.bnd.annotation.component.Component;
+
+@Component (provide=AuraServiceProvider.class)
 public class StyleAdapterImpl implements StyleAdapter {
     @Override
     public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor) throws QuickFixException {

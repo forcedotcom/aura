@@ -18,13 +18,17 @@ package org.auraframework.impl.java.type.converter;
 import java.util.Locale;
 
 import org.auraframework.Aura;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.type.converter.StringToDoubleConverter;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
+@Component (provide=AuraServiceProvider.class)
 public class LocalizedStringToDoubleConverter extends StringToDoubleConverter implements
         LocalizedConverter<String, Double> {
 

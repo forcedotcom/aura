@@ -16,7 +16,13 @@
 ({
 
 	post: function(c,e,h) {
-		h.request(c, "http://invalid.salesforce.com");
+		if( $A.get("$Browser.isIE7") ) {
+			//IE7 doesn't like sending HTTP request to url that doesn't exist
+			h.request(c, "/test/basicCspTest.app");
+		} else {
+			h.request(c, "http://invalid.salesforce.com");
+		}
+		
 	}
 	
 })

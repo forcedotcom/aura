@@ -278,23 +278,26 @@ var AuraRenderingService = function AuraRenderingService(){
             if(component._facetInfo) {
                 for (var i = 0; i < facet.length; i++) {
                     var child = facet[i];
-                    var found = false;
-                    for (var j = 0; j < component._facetInfo.length; j++) {
-                        if (child && child === component._facetInfo[j]) {
-                            updatedFacet.components.push({action:"rerender",component: child, oldIndex: j, newIndex: i});
-                            if(j!=(i-renderCount)){
-                                updatedFacet.useFragment=true;
+                    // Guard against undefined/null facets, as these will cause troubles later.
+                    if (child) {
+                        var found = false;
+                        for (var j = 0; j < component._facetInfo.length; j++) {
+                            if (child === component._facetInfo[j]) {
+                                updatedFacet.components.push({action:"rerender",component: child, oldIndex: j, newIndex: i});
+                                if(j!=(i-renderCount)){
+                                    updatedFacet.useFragment=true;
+                                }
+                                found = true;
+                                component._facetInfo[j] = undefined;
+                                break;
                             }
-                            found = true;
-                            component._facetInfo[j] = undefined;
-                            break;
                         }
+                        if (!found) {
+                            updatedFacet.components.push({action:"render",component: child, oldIndex: -1, newIndex: i});
+                            renderCount++;
+                        }
+                        updatedFacet.facetInfo.push(child);
                     }
-                    if (!found) {
-                        updatedFacet.components.push({action:"render",component: child, oldIndex: -1, newIndex: i});
-                        renderCount++;
-                    }
-                    updatedFacet.facetInfo.push(child);
                 }
                 if(!updatedFacet.components.length){
                     updatedFacet.fullUnrender=true;

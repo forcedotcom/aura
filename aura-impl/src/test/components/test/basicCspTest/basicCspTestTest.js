@@ -15,7 +15,7 @@
  */
 ({
     /**
-     * automation for default CSP like following -- as Nov.19.2014
+     * automation for default CSP in stand-alone-aura like following -- as Nov.19.2014
      * Content-Security-Policy:
         default-src 'self'; 
         script-src 'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'; 
@@ -31,7 +31,9 @@
         
        Note: these are all positive tests, negative ones are in CSPReportLoggingTest.java
      */
-	
+    
+    labels : ["UnAdaptableTest"],//mark as unadaptable as csp is different between aura-stand-alone and the core
+    
 	//test for [frame-ancestors 'self'] and [frame-src 'self'] 
     testChildCmpInsideIframe:{
     	attributes: { testIframe: true },
@@ -47,18 +49,24 @@
     
     //test for [script-src 'self' chrome-extension: 'unsafe-eval' 'unsafe-inline';]
     testScriptSource : {
+        browsers : [ "-IE8", "-IE7" ],
     	attributes: { testScriptSource: true },
         test:[ 
-            function(cmp){
-            	//test loading script , with eval() on top level application
-            	$A.test.assertEquals("test result from eval: /test/basicCspTest.app", document._eval_res, 
-            			"fail to load script with eval on top level application");
-            	/*test loading script , with eval() on child cmp --  this doesn't work
-            	$A.test.assertEquals("test result from eval: /test/basicCspCmpExtendsTemplate.cmp", 
-            			document._eval_res_from_child_template, 
-    			"fail to load script with eval from child cmp"); */
-            	//test loading script from same origin
-            	$A.test.assertDefined(CodeMirror,"fail to load script from same origin : codemirror.js");
+            function(cmp) {
+                //test loading script from same origin
+                $A.test.assertDefined(CodeMirror,"fail to load script from same origin : codemirror.js");
+            },function(cmp){
+                //test loading script , with eval() on top level application
+                /*test loading script , with eval() on child cmp --  this doesn't work
+                $A.test.assertEquals("test result from eval: /test/basicCspCmpExtendsTemplate.cmp", 
+                        document._eval_res_from_child_template, 
+                "fail to load script with eval from child cmp"); */
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { 
+                              return document._eval_res == "test result from eval: /test/basicCspTest.app";
+                        },
+                        "fail to load script with eval on top level application."
+                );
             }
         ]
     },
@@ -68,13 +76,20 @@
     	attributes: { testStyleSource: true },
         test:[ 
             function(cmp){
-            	var ele = document.getElementsByTagName('h1')[0];
-            	$A.test.assertEquals("rgb(0, 0, 255)", $A.test.getStyle(ele, "color"), "fail to load inline style");
+            	
+            	$A.test.addWaitForWithFailureMessage(true,
+                        function() { 
+            	                var ele = document.getElementsByTagName('h1')[0];
+            	                var styleString = $A.test.getStyle(ele, "color");
+            	                return (styleString == "rgb(0, 0, 255)")||( styleString == "blue");//IE8 is different
+                        },
+                        "fail to load inline style."
+                );
             }
         ]
     },
     
-    //test for [connect-src 'self' http://invalid.salesforce.com] 
+    //test for the whitelist url: [connect-src 'self' http://invalid.salesforce.com] 
     testConnectionSource : {
     	attributes: { testConnectionSource: true },
     	test: [function(cmp) {
@@ -82,7 +97,9 @@
     			$A.test.clickOrTouch(cmp.find("uiButton_sendXHR").getElement());
     		}, function(cmp) {
     			$A.test.addWaitForWithFailureMessage(true,
-    					function() { return cmp.get("v.xmlHttpRequestComplete"); },
+    					function() { 
+    			            return cmp.get("v.xmlHttpRequestComplete"); 
+    			        },
     					"xmlHttpRequest fail to complete."
     			);
     		}
@@ -91,7 +108,11 @@
     
     //test for [media-src *; ] -- 
     //though we don't put restriction for media-src, but the src has to be same-domain, or it will get blocked by connect-src
+    //Firefox doesn't support mp4
+    //IE9 is giving me error: "getApplication not implemented", not sure why, not CSP related though
+    //IE8 and below doesn't support HTML5 video
     testMediaSource : {
+        browsers : [ "-FIREFOX", "-IE9", "-IE8", "-IE7"],
     	attributes: { testMediaSource: true },
     	test: [function(cmp) {
     		var ele = document.getElementById('videoSameDomain');

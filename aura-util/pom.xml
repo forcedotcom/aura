@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.1653-SNAPSHOT</version>
+        <version>0.1675-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -76,6 +76,15 @@
                     <groupId>dom4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-osgi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>biz.aQute</groupId>
+            <artifactId>bnd</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <properties>

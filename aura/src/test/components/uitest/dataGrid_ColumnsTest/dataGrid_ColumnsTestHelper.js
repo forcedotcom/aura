@@ -22,15 +22,20 @@
 
     	    COLUMN_HEADER_B = [{label:'Item Id', name: "id"},
     	                       {label:'Item Subject',  name: "subject"},{label:'Item Name', name: "name"},
-    	                       {label:'Item RelatedTo', name: "relatedTo"}, {label:'Item Due Date', name: "date"}];
+    	                       {label:'Item RelatedTo', name: "relatedTo"}, {label:'Item Due Date', name: "date"}],
+    	    
+    	    COLUMN_HEADER_S = [{label:'Item Id', name: "id", sortable: "true"},
+    	         	           {label:'Item Subject',  name: "subject"},{label:'Item Name', name: "name", sortable: "true"},
+    	               	       {label:'Item RelatedTo', name: "relatedTo"}, {label:'Item Due Date', name: "date"}];
+    	
     	 var arr = [];
-    	 if (useGroup == "A"){
+    	 if (useGroup == "A") {
     		 arr = COLUMN_HEADER_A;
-    	 }
-    	 else if(useGroup == "B"){
+    	 } else if (useGroup == "B") {
     		 arr = COLUMN_HEADER_B;
-    	 }
-    	 else{
+    	 } else if (useGroup == "S") {
+    		 arr = COLUMN_HEADER_S; 
+    	 } else {
     		 arr = COLUMN_HEADER_A;
     		 arr[4].name = "Date";
     	 }

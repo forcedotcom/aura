@@ -54,5 +54,10 @@
 	
 	removeColumns : function(cmp, evt, helper){
 		helper.addColumns(cmp, [], "overwrite");
+	},
+	
+	goToSortedColumns : function(cmp, evt, helper) {
+		var cols = helper.getColumnJson(0, 5, "S");
+		helper.addColumns(cmp, cols, cmp.get("v.appendOrOverwrite"));
 	}
 })

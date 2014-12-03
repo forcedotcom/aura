@@ -34,6 +34,7 @@
     <ui:button label="1 Columns"      press='{!c.goTo1Column}'             aura:id="goTo1Column"/>
     <ui:button label="use wrong name" press='{!c.goToColumnWithWrongName}' aura:id="goToColumnWithWrongName"/>
     <ui:button label="remove Columns" press='{!c.removeColumns}' aura:id="removeColumns"/>
+    <ui:button label="Sortable Columns" press='{!c.goToSortedColumns}' aura:id="goToSortedColumns"/>
 
      <aura:if isTrue="{!v.useDynamicColumns}">
 	     <ui:dataGrid aura:id="grid" mode="VIEW" sortBy="{!v.sortBy}">  

@@ -13,6 +13,16 @@
             this.verifyDataGridUsingPager(cmp, [true,true,true,true],"0 - 0 of 0");
         }
     },
+    
+    testGridWithUndefinedItems : {
+        attributes : {"pageSize" : 10},
+        test : [function(cmp) {
+        	cmp.find("grid").set("v.items", undefined);
+        }, function(cmp) {
+        	$A.test.assertEquals(0, cmp.find("grid").get("v.items").length, "There should be zero items");
+        	this.verifyNumberOfTrs(0, cmp.find("grid").getElement());
+        }]
+    },
 
     /**
      * Start at last possible page, then verify that last paging elements acknowledge the change

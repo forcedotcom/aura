@@ -50,7 +50,9 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     private String requestUri;
     private Map<String, String> queryParams = Maps.newHashMap();
 
-    public DummyHttpServletRequest() {} 
+    public DummyHttpServletRequest() {
+    	this.requestUri = "/";
+    } 
     
     public DummyHttpServletRequest(String uri) {
         this.requestUri = uri;
@@ -319,11 +321,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getRequestURI() {
-    	if(this.requestUri != null) {
-    		return this.requestUri;
-    	} else {
-    		return "dummy.app";
-    	}
+    	return this.requestUri;
     }
 
     @Override

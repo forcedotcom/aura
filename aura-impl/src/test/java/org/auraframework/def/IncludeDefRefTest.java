@@ -65,7 +65,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
             def.validateDefinition();
             fail("IncludeDefRef with invalid export not validated");
         } catch (InvalidDefinitionException t) {
-            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+            assertExceptionMessageEndsWith(
+                    t,
+                    InvalidDefinitionException.class,
                     String.format("%s 'export' attribute must be valid javascript identifier", IncludeDefRefHandler.TAG));
         }
     }
@@ -85,12 +87,13 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
             def.validateDefinition();
             fail("IncludeDefRef with invalid export not validated");
         } catch (InvalidDefinitionException t) {
-            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+            assertExceptionMessageEndsWith(
+                    t,
+                    InvalidDefinitionException.class,
                     String.format("%s 'export' attribute must be valid javascript identifier", IncludeDefRefHandler.TAG));
         }
     }
 
-    // exported code is not currently validated
     public void testValidateReferencesExportedCodeIsInvalid() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
@@ -101,11 +104,16 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         builder.setIncludeDescriptor(includeDesc);
         builder.setExport("someVar");
         IncludeDefRef def = builder.build();
-        def.validateReferences();
+        try {
+            def.validateReferences();
+            fail("IncludeDef with invalid code not validated");
+        } catch (InvalidDefinitionException t) {
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+                    String.format(": Parse error. missing ; before statement\n", IncludeDefRefHandler.TAG));
+        }
     }
 
-    // TODO: validate exported code is valid
-    public void _testValidateReferencesNonexportedCodeIsInvalid() throws Exception {
+    public void testValidateReferencesNonexportedCodeIsInvalid() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("invalidSource",
@@ -114,13 +122,12 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         builder.setDescriptor(descriptor);
         builder.setIncludeDescriptor(includeDesc);
         IncludeDefRef def = builder.build();
-
         try {
             def.validateReferences();
-            fail("Referenced library containing invalid code is not validated");
+            fail("IncludeDef with invalid code not validated");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    String.format("Library: %s does not represent a function", includeDesc.getName()));
+                    String.format(": Parse error. missing ; before statement\n", IncludeDefRefHandler.TAG));
         }
     }
 
@@ -148,9 +155,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "\n" +
-                        "function(define) {define(\"%s:%s\", function(){}\n" +
-                        ");}\n" +
+                        "function(define){define(\"%s:%s\", function(){})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }
@@ -180,12 +185,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "\n" +
-                        "function(define) {define(\"%s:%s\", \n" +
-                        "function(){\n" +
-                        "\n" +
-                        "return this;}\n" +
-                        ");}\n" +
+                        "function(define){define(\"%s:%s\", function(){return this})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }
@@ -215,12 +215,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "\n" +
-                        "function(define) {define(\"%s:%s\", \n" +
-                        "function(){\n" +
-                        "return this;}\n" +
-                        "\n" +
-                        ");}\n" +
+                        "function(define){define(\"%s:%s\", function(){return this})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }
@@ -252,22 +247,57 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "\n" +
-                        "function(define) {define(\"%s:%s\", \"%s\", function(){}\n" +
-                        ");}" +
+                        "function(define){define(\"%s:%s\", \"%s\", function(){})}" +
                         "\n}",
                         libDesc.getDescriptorName(), includeDesc.getName(), importDesc.getName()), buffer.toString());
+    }
+
+    public void testSerializeWithExternalImport() throws Exception {
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
+                null);
+        DefDescriptor<LibraryDef> extLibDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                LibraryDef.class, null);
+        DefDescriptor<IncludeDef> importDesc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
+                IncludeDef.class, extLibDesc);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
+                IncludeDef.class, libDesc);
+        Mockito.doReturn(includeDesc.getName()).when(descriptor).getName();
+        addSourceAutoCleanup(includeDesc, "function(){}");
+
+        StringBuffer buffer = new StringBuffer();
+        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+                .getJsonSerializationContext());
+
+        builder.setDescriptor(descriptor);
+        builder.setIncludeDescriptor(includeDesc);
+        builder.setImports(ImmutableList.of(importDesc));
+        IncludeDefRef def = builder.build();
+
+        def.validateDefinition();
+        json.writeMapBegin();
+        def.serialize(json);
+        json.writeMapEnd();
+        json.close();
+
+        assertEquals(
+                String.format("{\n" +
+                        "function(define){define(\"%s:%s\", \"%s:%s\", function(){})}" +
+                        "\n}",
+                        libDesc.getDescriptorName(), includeDesc.getName(), extLibDesc.getDescriptorName(),
+                        importDesc.getName()), buffer.toString());
     }
 
     public void testSerializeWithMultipleImports() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
+        DefDescriptor<LibraryDef> extLibDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                LibraryDef.class, null);
         DefDescriptor<IncludeDef> import1Desc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
                 IncludeDef.class, libDesc);
         DefDescriptor<IncludeDef> import2Desc = getAuraTestingUtil().createStringSourceDescriptor("secondimport",
                 IncludeDef.class, libDesc);
         DefDescriptor<IncludeDef> import3Desc = getAuraTestingUtil().createStringSourceDescriptor("thirdimport",
-                IncludeDef.class, libDesc);
+                IncludeDef.class, extLibDesc);
 
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImports",
                 IncludeDef.class, libDesc);
@@ -291,12 +321,11 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "\n" +
-                        "function(define) {define(\"%s:%s\", \"%s\", \"%s\", \"%s\", function(){}\n" +
-                        ");}\n" +
+                        "function(define){define(\"%s:%s\", \"%s\", \"%s\", \"%s:%s\", function(){})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), import1Desc.getName(),
-                        import2Desc.getName(), import3Desc.getName()), buffer.toString());
+                        import2Desc.getName(), extLibDesc.getDescriptorName(), import3Desc.getName()),
+                buffer.toString());
     }
 
     public void testSerializeWithExports() throws Exception {
@@ -324,13 +353,8 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "\n" +
-                        "function(define) {define(\"%s:%s\", \n" +
-                        "function(){\n" +
-                        "var myexpt=function(){return 'something'}\n" +
-                        ";\n" +
-                        "return myexpt;\n" +
-                        "});}\n" +
+                        "function(define){define(\"%s:%s\", function(){var myexpt=function(){return\"something\"};\n" +
+                        "return myexpt})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }

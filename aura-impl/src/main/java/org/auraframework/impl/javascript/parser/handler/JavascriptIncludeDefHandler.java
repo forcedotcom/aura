@@ -16,7 +16,9 @@
 package org.auraframework.impl.javascript.parser.handler;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,14 +28,14 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.library.IncludeDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsFunction;
-import org.auraframework.util.json.JsonStreamReader;
-import org.auraframework.util.json.JsonStreamReader.JsonParseException;
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptWriter;
 
-/**
- */
 public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, IncludeDef> {
+
+    private static final String JS_PREFIX = "A="; // let first unnamed function satisfy Closure
 
     private final IncludeDefImpl.Builder builder = new IncludeDefImpl.Builder();
 
@@ -41,34 +43,49 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
         super(descriptor, source);
     }
 
-    // json-ify the js so we can have basic validation and ensure well-formed output
     @Override
     public IncludeDef getDefinition() {
-        JsonStreamReader in = null;
-        String contents = "function(){" + source.getContents() + "\n}";
-        String code = null;
-        in = new JsonStreamReader(new StringReader(contents), getHandlerProvider());
-        try {
-            in.next();
-            JsFunction function = (JsFunction) in.getValue();
-            code = function.getBody();
-        } catch (JsonParseException pe) {
-            // EVIL: JsonStreamReader doesn't handle js regex during parse, so we can end up here unexpectedly
-            // TODO: will have to find better impl to sanitize and validate library content
-            // until then, at least strip out multi-line comments
-            code = source.getContents();
-            code = code.trim().replaceAll("(?s)/\\*.*?\\*/", "");
-        } catch (IOException ioe) {
-            return createDefinition(new AuraRuntimeException(ioe, getLocation()));
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                // We are in a very confusing state here, don't throw an exception. Either we've already had an
-                // exception, in which case we have more information there, or we successfully finished, in which case
-                // it is rather unclear how this could happen.
-            }
+        String code = source.getContents();
+
+        // Check for well-formed js before storing code in definition.
+
+        // We allow unnamed function at root, but Closure compiler doesn't.
+
+        // Remove leading whitespace and comments to get to code
+        code = code.replaceFirst("(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+", "");
+        final boolean isUnnamedFunction = code.matches("(?s)^function\\s*\\(.*");
+
+        if (isUnnamedFunction) {
+            code = JS_PREFIX + code;
         }
+
+        Writer w = new StringWriter();
+        List<JavascriptProcessingError> errors;
+        try {
+            // strip whitespace, comments, and some unnecessary tokens
+            errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(code, w, source.getUrl());
+        } catch (IOException e) {
+            return createDefinition(new AuraRuntimeException(e, getLocation()));
+        }
+        if (!errors.isEmpty()) {
+            StringBuilder errorSummary = new StringBuilder();
+            for (JavascriptProcessingError error : errors) {
+                errorSummary.append('\n');
+                if (isUnnamedFunction && error.getLine() == 1) {
+                    // adjust for prefix
+                    error.setStartColumn(error.getStartColumn() - JS_PREFIX.length());
+                }
+                errorSummary.append(error.toString());
+            }
+            return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
+        }
+        code = w.toString();
+
+        if (isUnnamedFunction) {
+            // strip our prefix, and a trailing semicolon that compiler added
+            code = code.substring(JS_PREFIX.length(), code.length() - 1);
+        }
+
         builder.setCode(code);
         setDefBuilderFields(builder);
         return builder.build();

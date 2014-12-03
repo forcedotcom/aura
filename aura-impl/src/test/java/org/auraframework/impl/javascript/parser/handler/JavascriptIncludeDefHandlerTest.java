@@ -30,10 +30,11 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
 
     @Mock
     DefDescriptor<IncludeDef> descriptor;
+    private String filename = "dummyPath";
 
     public void testEmpty() throws Exception {
         String code = "";
-        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, null, null);
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         def.validateDefinition();
@@ -42,62 +43,68 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
 
     public void testFunction() throws Exception {
         String code = "function(){return 'anything'}";
-        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, null, null);
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         def.validateDefinition();
-        assertEquals(code, def.getCode().trim());
+        assertEquals("function(){return\"anything\"}", def.getCode());
     }
 
     public void testOtherJsButNotJson() throws Exception {
         String code = "var something = 'borrowed'";
-        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, null, null);
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         def.validateDefinition();
-        assertEquals(code, def.getCode().trim());
+        assertEquals("var something=\"borrowed\";", def.getCode());
     }
 
-    // TODO: should output well-formed code
-    public void _testInvalidTryToBreakOut() throws Exception {
-        String code = "}) alert('watch out')";
-        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, null, null);
+    public void testInvalidTryToBreakOut() throws Exception {
+        String code = "function(){\n}}) alert('watch out')";
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         try {
             def.validateDefinition();
             fail("Invalid breaking JS wasn't validated");
         } catch (InvalidDefinitionException t) {
-            String message = t.getMessage();
-            assertTrue("Unexpected message: " + t,
-                    message.contains("$JsonStreamParseException: Expected ',' or '}', got FUNCTION_ARGS_END"));
+            assertExceptionMessageEndsWith(
+                    t,
+                    InvalidDefinitionException.class,
+                    String.format("JS Processing Error: %s (line 2, char 1) : Parse error. syntax error\n", filename));
         }
     }
 
-    public void testExtraHarmless() throws Exception {
-        String code = "function(){return 66;}";
+    public void testExtraCurlyBrace() throws Exception {
+        String code = "var a=66;\n}";
         // source will have an extra curly brace at the end
-        StringSource<IncludeDef> source = new StringSource<>(descriptor, code + "}", null, null);
-        JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
-        IncludeDef def = handler.getDefinition();
-        def.validateDefinition();
-        // we only read in 1 object, so this is actually okay, and we get a well-formed object anyways
-        assertEquals(code, def.getCode().trim());
-    }
-
-    // TODO: should output well-formed code
-    public void _testUnClosed() throws Exception {
-        String code = "function(){return 66;";
-        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, null, null);
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         try {
             def.validateDefinition();
             fail("Invalid unclosed JS wasn't validated");
-        } catch (InvalidDefinitionException t) {
-            String message = t.getMessage();
-            assertTrue("Unexpected message: " + t,
-                    message.contains("$JsonStreamParseException: Expected ',' or '}', got FUNCTION_ARGS_END"));
+        } catch (Throwable t) {
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+                    String.format("JS Processing Error: %s (line 2, char 0) : Parse error. syntax error\n", filename));
+        }
+    }
+
+    public void testUnClosed() throws Exception {
+        String code = "function(){return 66;";
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
+        JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
+        IncludeDef def = handler.getDefinition();
+        try {
+            def.validateDefinition();
+            fail("Invalid unclosed JS wasn't validated");
+        } catch (Throwable t) {
+            assertExceptionMessageEndsWith(
+                    t,
+                    InvalidDefinitionException.class,
+                    String.format(
+                            "JS Processing Error: %s (line 1, char %s) : Parse error. missing } after function body\n",
+                            filename, code.length() - 1));
         }
     }
 }

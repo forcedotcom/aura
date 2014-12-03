@@ -38,7 +38,7 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeValue(code);
+        json.writeLiteral(code);
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<IncludeDef> {

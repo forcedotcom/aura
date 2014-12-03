@@ -16,7 +16,6 @@
 package org.auraframework.impl.root.library;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -30,7 +29,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 
 public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements IncludeDefRef {
@@ -40,7 +38,6 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
     private final String export;
     private final List<DefDescriptor<IncludeDef>> imports;
     private final DefDescriptor<IncludeDef> includeDescriptor;
-    private String code;
 
     protected IncludeDefRefImpl(Builder builder) {
         super(builder);
@@ -72,8 +69,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
 
     @Override
     public void serialize(Json json) throws IOException {
-        JsFunction function = new JsFunction(Arrays.asList("define"), prepareCode());
-        json.writeValue(function);
+        json.writeLiteral(String.format("function(define){%s}", prepareCode()));
     }
 
     @Override
@@ -128,50 +124,47 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
     }
 
     private String prepareCode() {
-        if (code == null) {
-            String source;
-            try {
-                source = Aura.getDefinitionService().getDefinition(getIncludeDescriptor()).getCode();
-            } catch (QuickFixException qfe) {
-                throw new AuraRuntimeException(qfe);
-            }
-
-            DefDescriptor<?> localBundle = includeDescriptor.getBundle();
-
-            StringBuilder builder = new StringBuilder();
-            builder.append("define(\"");
-            builder.append(localBundle.getDescriptorName());
-            builder.append(":");
-            builder.append(getName());
-            builder.append("\", ");
-            if (imports != null && !imports.isEmpty()) {
-                for (DefDescriptor<IncludeDef> imported : imports) {
-                    DefDescriptor<?> importedBundle = imported.getBundle();
-
-                    builder.append("\"");
-                    if (!localBundle.equals(importedBundle)) {
-                        builder.append(importedBundle.getDescriptorName());
-                        builder.append(":");
-                    }
-                    builder.append(imported.getName());
-                    builder.append("\", ");
-                }
-            }
-
-            // Wrap exported libraries in a function:
-            if (export != null) {
-                builder.append("\nfunction(){\n");
-                builder.append(source);
-                builder.append(";\nreturn ");
-                builder.append(export);
-                builder.append(";\n}");
-            } else {
-                builder.append(source);
-            }
-            builder.append(");");
-            code = builder.toString();
+        String source;
+        try {
+            source = Aura.getDefinitionService().getDefinition(getIncludeDescriptor()).getCode();
+        } catch (QuickFixException qfe) {
+            throw new AuraRuntimeException(qfe);
         }
-        return code;
+
+        DefDescriptor<?> localBundle = includeDescriptor.getBundle();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("define(\"");
+        builder.append(localBundle.getDescriptorName());
+        builder.append(":");
+        builder.append(getName());
+        builder.append("\", ");
+        if (imports != null && !imports.isEmpty()) {
+            for (DefDescriptor<IncludeDef> imported : imports) {
+                DefDescriptor<?> importedBundle = imported.getBundle();
+
+                builder.append("\"");
+                if (!localBundle.equals(importedBundle)) {
+                    builder.append(importedBundle.getDescriptorName());
+                    builder.append(":");
+                }
+                builder.append(imported.getName());
+                builder.append("\", ");
+            }
+        }
+
+        // Wrap exported libraries in a function:
+        if (export != null) {
+            builder.append("function(){");
+            builder.append(source);
+            builder.append("\nreturn ");
+            builder.append(export);
+            builder.append("}");
+        } else {
+            builder.append(source);
+        }
+        builder.append(")");
+        return builder.toString();
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<IncludeDefRef> {

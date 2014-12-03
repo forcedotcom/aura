@@ -651,7 +651,7 @@ public class AuraTextUtil {
         str2 = new String(str2Arr);
         return str1.equals(str2);
     }
-    
+
     /**
      * Checks whether input is valid js identifier. Currently ASCII only and doesn't include javascript reserved words.
      * 

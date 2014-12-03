@@ -106,8 +106,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         openIntegrationStub(stub, cmpToInject, attributes);
 
-        assertTrue("Injected component not found inside placeholder",
-                isElementPresent(By.cssSelector(selectorForPlaceholder + ">" + "div.wrapper")));
+        auraUITestingUtil.waitForElement("Injected component not found inside placeholder", 
+        		By.cssSelector(selectorForPlaceholder + ">" + "div.wrapper"));
         WebElement attrValue = findDomElement(By.cssSelector("div.dataFromAttribute"));
         assertEquals("Failed to see data from model of injected component", "Oranges", attrValue.getText());
         WebElement modelValue = findDomElement(By.cssSelector("div.dataFromModel"));

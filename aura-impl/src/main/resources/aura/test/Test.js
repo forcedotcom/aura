@@ -35,6 +35,7 @@ $A.ns.Test = function() {
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
+    this.failed = undefined;
 };
 
 //#include aura.test.Test_private
@@ -893,11 +894,9 @@ $A.ns.Test.prototype.assertNotNull = function(arg1, assertMessage){
  *             Throws error with a message
  */
 $A.ns.Test.prototype.fail = function(assertMessage) {
-    if (assertMessage) {
-        throw new Error(assertMessage);
-    } else {
-        throw new Error("Assertion failure");
-    }
+	var error = new Error(assertMessage || "Assertion failure");
+	this.failed = error;
+	throw error;
 };
 
 /**

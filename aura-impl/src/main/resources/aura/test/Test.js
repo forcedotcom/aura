@@ -292,7 +292,7 @@ $A.ns.Test.prototype.clearAndAssertComponentConfigs = function(a) {
  * Peek if there are any pending server actions.
  *
  * NOTE: this is used as a predicate and does not have access to 'this'. If this function changes
- * to rquire 'this', either the uses will need to be refactored, or isActionPending will need to be
+ * to require 'this', either the uses will need to be refactored, or isActionPending will need to be
  * auto-bound.
  *
  * @returns {Boolean} Returns true if there are pending server actions, or false otherwise.

@@ -402,7 +402,8 @@
             }
         },
 
-        testAssertAccessible: {
+        // TODO(W-2443993): Convert this test to xUnit or remove completely
+        _testAssertAccessible: {
             test: function (cmp) {
                 var expected = 10;
                 var actual = "";

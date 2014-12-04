@@ -35,6 +35,7 @@ $A.ns.Test = function() {
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
+    this.failed = undefined;
 };
 
 //#include aura.test.Test_private
@@ -291,7 +292,7 @@ $A.ns.Test.prototype.clearAndAssertComponentConfigs = function(a) {
  * Peek if there are any pending server actions.
  *
  * NOTE: this is used as a predicate and does not have access to 'this'. If this function changes
- * to rquire 'this', either the uses will need to be refactored, or isActionPending will need to be
+ * to require 'this', either the uses will need to be refactored, or isActionPending will need to be
  * auto-bound.
  *
  * @returns {Boolean} Returns true if there are pending server actions, or false otherwise.
@@ -893,11 +894,9 @@ $A.ns.Test.prototype.assertNotNull = function(arg1, assertMessage){
  *             Throws error with a message
  */
 $A.ns.Test.prototype.fail = function(assertMessage) {
-    if (assertMessage) {
-        throw new Error(assertMessage);
-    } else {
-        throw new Error("Assertion failure");
-    }
+	var error = new Error(assertMessage || "Assertion failure");
+	this.failed = error;
+	throw error;
 };
 
 /**

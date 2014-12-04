@@ -213,7 +213,9 @@ $A.ns.Test.prototype.continueWhenReady = function() {
         if(this.inProgress > 2){
             setTimeout(internalCWR, 200);
         }else{
-            if(this.waits.length > 0){
+            if(this.failed) {
+                throw this.failed;
+            } else if(this.waits.length > 0){
                 var exp = this.waits[0].expected;
                 if($A.util.isFunction(exp)){
                     exp = exp();

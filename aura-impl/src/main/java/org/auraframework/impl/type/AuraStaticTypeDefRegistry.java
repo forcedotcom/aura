@@ -38,36 +38,41 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
     private static final Set<String> prefixes = Sets.newHashSet(PREFIX);
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.TYPE);
     private static final Map<String, TypeDef> defs = Maps.newHashMap();
+    private static final Map<String, TypeDef> lowercasedefs = Maps.newHashMap();
+
+    private static void putAuraType(String name, TypeDef def) {
+        defs.put(name, def);
+        lowercasedefs.put(name.toLowerCase(), def);
+    }
+
+    private static void putAuraType(JavaTypeDefFactory factory, String name) throws QuickFixException {
+        TypeDef def;
+        def = factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", name), TypeDef.class));
+        putAuraType(name, def);
+    }
+
 
     static {
         String[] baseTypes = { "Integer", "Long", "Double", "Decimal", "Boolean", "String", "Date", "DateTime",
                 "Object", "Map", "List", "Set" };
 
-        defs.put("Aura.Component", new ComponentTypeDef.Builder().build());
-        defs.put("Aura.Component[]", new ComponentArrayTypeDef.Builder().build());
-        defs.put("Aura.ComponentDefRef[]", new ComponentDefRefArrayTypeDef.Builder().build());
+        putAuraType("Aura.Component", new ComponentTypeDef.Builder().build());
+        putAuraType("Aura.Component[]", new ComponentArrayTypeDef.Builder().build());
+        putAuraType("Aura.ComponentDefRef[]", new ComponentDefRefArrayTypeDef.Builder().build());
         // TODO: non array defref type
-        defs.put("Aura.Action", new ActionTypeDef.Builder().build());
+        putAuraType("Aura.Action", new ActionTypeDef.Builder().build());
 
         JavaTypeDefFactory factory = new JavaTypeDefFactory(null);
-        for (String baseType : baseTypes) {
-            try {
-                defs.put(baseType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", baseType),
-                        TypeDef.class)));
-                
-                String listType = String.format("List<%s>", baseType);
-                defs.put(listType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", listType),
-                        TypeDef.class)));
-                String arrayType = String.format("%s[]", baseType);
-                defs.put(arrayType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", arrayType),
-                        TypeDef.class)));
-                String setType = String.format("Set<%s>", baseType);
-                defs.put(setType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", setType),
-                        TypeDef.class)));
-            } catch (QuickFixException qfe) {
-                // This should _never_ happen
-                throw new AuraRuntimeException(qfe);
+        try {
+            for (String baseType : baseTypes) {
+                putAuraType(factory, baseType);
+                putAuraType(factory, String.format("List<%s>", baseType));
+                putAuraType(factory, String.format("%s[]", baseType));
+                putAuraType(factory, String.format("Set<%s>", baseType));
             }
+        } catch (QuickFixException qfe) {
+            // This should _never_ happen
+            throw new AuraRuntimeException(qfe);
         }
     }
 
@@ -82,5 +87,13 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
             name = "Map";
         }
         return defs.get(name);
+    }
+
+    public TypeDef getInsensitiveDef(String name) {
+        String lcname = name.toLowerCase();
+        if (lcname.startsWith("map<")) {
+            lcname = "map";
+        }
+        return lowercasedefs.get(lcname);
     }
 }

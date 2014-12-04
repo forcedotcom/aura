@@ -71,11 +71,10 @@
                       });
                 $A.clientService.runActions([ a ], cmp);
                 $A.test.addWaitFor(true, function() {
-                        return cmp.get("v.errorMessage") !== null;
+                        return !!cmp.get("v.errorMessage");
                     });
             }, function(cmp) {
                  var message = cmp.get("v.errorMessage");
-                 $A.test.assertTrue(message != null, "No error message from server at all");
                  $A.test.assertTrue(message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
                      "Wrong message received from server: " + message);
             }]

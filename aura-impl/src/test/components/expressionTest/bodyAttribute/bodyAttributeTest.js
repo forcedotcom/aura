@@ -19,20 +19,19 @@
 		$A.test.clickOrTouch(cmp.find(buttonId).getElement());
 	},
     verifyBodyChanged: function(cmp, addedIds, deletedIds, failureMsg){
-        
-        for (var i in addedIds) {
+    	for(var i=0; i<addedIds.length; i++) {
             $A.test.assertDefined(cmp.find(addedIds[i]), failureMsg + ": unable to access new component by aura:id");
         }
-        for (var i in deletedIds) {
+    	for(var i=0; i<deletedIds.length; i++) {
             $A.test.assertUndefined(cmp.find(deletedIds[i]), failureMsg + ": still able to access old component by aura:id");
         }
     },
     verifyDOMContent:function(cmp, componentId, addedText, deletedText, failureMsg){
         var actual = $A.test.getTextByComponent(cmp.find(componentId));
-        for (var i in addedText) {
+        for(var i=0; i<addedText.length; i++) {
             $A.test.assertTrue(actual.indexOf(addedText[i]) >= 0, failureMsg + ": unable to find new text");
         }
-        for (var i in deletedText) {
+        for(var i=0; i<deletedText.length; i++) {
             $A.test.assertFalse(actual.indexOf(deletedText[i]) >= 0, failureMsg + ": still able find old text");
         }
     },
@@ -43,7 +42,7 @@
      */
     testClearSimpleCmpBody: {
         test:[function(cmp){
-            this.verifyDOMContent(cmp, "simpleCmp", ["Facet of Simple Cmp", "Clear Body of Simple Cmp"], [],
+        	this.verifyDOMContent(cmp, "simpleCmp", ["Facet of Simple Cmp", "Clear Body of Simple Cmp"], [],
                 "Failed verify initial state");
             this.clickButtonToSetBody(cmp, "clearSimpleCmpBody");
         }, function(cmp){

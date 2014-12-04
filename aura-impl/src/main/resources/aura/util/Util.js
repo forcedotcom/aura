@@ -1827,7 +1827,7 @@ $A.ns.Util.prototype.isComponent = function(obj) {
  * @returns {Boolean} True if the object type is an expression, or false otherwise.
  */
 $A.ns.Util.prototype.isExpression = function (obj) {
-    return obj&&this.isFunction(obj.isExpression)&&obj.isExpression();
+    return obj instanceof PropertyReferenceValue || obj instanceof FunctionCallValue;
 };
 
 /**

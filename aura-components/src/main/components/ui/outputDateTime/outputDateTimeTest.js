@@ -88,6 +88,7 @@
      */
     testChangeLangLocale:{
     	attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
+        doNotWrapInAuraRun : true,
         test: function(component){
             aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
                 aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");

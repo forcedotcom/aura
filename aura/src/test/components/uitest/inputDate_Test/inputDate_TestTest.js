@@ -59,6 +59,7 @@
      */
     testValidateMonths :{
         attributes : {value: "2043-01-01", format: "MM-dd-yyyy"},
+        doNotWrapInAuraRun : true,
         test : [function(cmp) {
                      this.openDatePicker(cmp);
 		},function(cmp) {
@@ -86,11 +87,11 @@
         attributes : {value: "2012-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
                       this.openDatePicker(cmp);
-		},function(cmp) {                     
-                      var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
+		     },function(cmp) {                     
+                      datePicker = cmp.find("datePickerTestCmp").find('datePicker');
 
                       this.iterateCal(7, 5, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToNextYear'));
-                      
+		     },function(cmp) { 
                       var expected = "February 2017";
                       var actual   = this.getTextFromElm(datePicker);
                       $A.test.assertEquals(expected, actual, "Month year combo incorrect");       
@@ -105,9 +106,9 @@
         test : [function(cmp) {
                       this.openDatePicker(cmp);
     		},function(cmp) {
-                       var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
+                       datePicker = cmp.find("datePickerTestCmp").find('datePicker');
                        this.iterateCal(7, 15, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToPrevYear'));
-                       
+    		},function(cmp) {
                        var expected = "February 1997";
                        var actual   = this.getTextFromElm(datePicker);
                        $A.test.assertEquals(expected, actual, "Initial value incorrect");
@@ -121,11 +122,11 @@
         attributes : {value: "2038-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
                       this.openDatePicker(cmp);
-		},function(cmp) {
-                      var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
+		    },function(cmp) {
+                      datePicker = cmp.find("datePickerTestCmp").find('datePicker');
                       
                       this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToPrevYear'));
-                      
+		    },function(cmp) {
                       var expected = "September 2029";
                       var actual   = this.getTextFromElm(datePicker);
 	              $A.test.assertEquals(expected, actual, "Initial value incorrect");       
@@ -151,9 +152,9 @@
         test : [function(cmp) {
                       this.openDatePicker(cmp);
     		},function(cmp) {       
-    		        var datePicker = cmp.find("datePickerTestCmp").find('datePicker');
+    		        datePicker = cmp.find("datePickerTestCmp").find('datePicker');
     		        this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
-	                
+    		  },function(cmp) {
     		        var expected = "September 2023";
     		        var actual   = this.getTextFromElm(datePicker);
     		        $A.test.assertEquals(expected, actual, "Initial value incorrect");

@@ -87,6 +87,31 @@
                 <div class="panelModal">test</div>
              </div>
      </aura:if>
+     
+     <!-- PanelSlider should have no errors-->
+     <aura:if isTrue="{!v.caseToRender == 'testNoActiveSliderAriaHiddenCorrect'}">
+             <div class="forcePanelSlider">
+                <a title="blah">test</a>
+                <div class="body" aria-hidden="true">test</div>
+             </div>
+     </aura:if>
+     
+      <!-- PanelSlider should have 1 error-->
+     <aura:if isTrue="{!v.caseToRender == 'testActiveSliderAriaHiddenIncorrect'}">
+             <div class="forcePanelSlider active">
+                <a title="blah">test</a>
+                <div class="body" aria-hidden="true">test</div>
+             </div>
+     </aura:if>
+     
+      <!-- PanelSlider should have no errors-->
+     <aura:if isTrue="{!v.caseToRender == 'testActivePanelSliderAriaHiddenCorrect'}">
+            <div class="forcePanelSlider active">
+                <a title="blah">test</a>
+                <div class="body" aria-hidden="false">test</div>
+             </div>
+     </aura:if>
+     
 
     <!--Should have 1 error -->   
     <aura:if isTrue="{!v.caseToRender == 'testInputDefaultError'}">

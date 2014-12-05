@@ -31,7 +31,7 @@
     
 	<aura:handler name="setActive" action="{!c.setActive}" />
  
-    <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '') + (v.active ? ' active' : '')}" aura:id="tabBody" role="tabpanel" aria-expanded="{!v.active ? 'true' : 'false'}">
+    <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">
         {!v.body}
     </section>
        

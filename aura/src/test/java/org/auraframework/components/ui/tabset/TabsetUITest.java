@@ -26,7 +26,7 @@ import org.openqa.selenium.*;
 public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabset_Test.cmp";
     private By ACTIVE_LI_LOCATOR = By.cssSelector("li[class*='tabItem uiTabItem active'] > a");
-    private By ACTIVE_SECTION = By.cssSelector("section[class*='active uiTab']");
+    private By ACTIVE_SECTION = By.cssSelector("section[class*='tabBody uiTab active']");
     private String [] TITLE_ARRAY = {"Accounts", "Contacts", "Opportunities", "Leads", "Chatter", "Icon", "Dashboards"};
     private String [] BODY_ARRAY = {"tab 1 contents", "tab 2 contents", "tab 3 contents", "tab 4 contents", "tab 5 contents", "tab 6 contents", "tab 7 contents",};
     private int NUMBER_OF_TABS = 7;

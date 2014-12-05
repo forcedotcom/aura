@@ -23,11 +23,11 @@ function PropertyReferenceValue(path, valueProvider) {
     var isArray=$A.util.isArray(path);
     this.path = isArray?path:path.split('.');
     this.expression = isArray?path.join('.'):path;
-	this.valueProvider = valueProvider;
+    this.valueProvider = valueProvider;
 
-	// #if {"modes" : ["STATS"]}
-	valueFactory.index(this);
-	// #end
+    // #if {"modes" : ["STATS"]}
+    valueFactory.index(this);
+    // #end
 }
 
 PropertyReferenceValue.prototype.auraType = "Value";
@@ -36,9 +36,9 @@ PropertyReferenceValue.prototype.auraType = "Value";
  * Returns the dereferenced value indicated by the path supplied.
  */
 PropertyReferenceValue.prototype.evaluate = function(valueProvider) {
-	if (this.isGlobal()) {
-		return aura.get(this.expression);
-	}
+    if (this.isGlobal()) {
+        return aura.get(this.expression);
+    }
     return (valueProvider || this.valueProvider).get(this.expression);
 };
 
@@ -53,14 +53,20 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
     var valueProvider=this.valueProvider;
     var expression = this.expression;
     // while(valueProvider instanceof PassthroughValue){
-    // 	expression = valueProvider.getExpression(expression);
+    //  expression = valueProvider.getExpression(expression);
     //     valueProvider=valueProvider.getComponent();
     // }
     if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
                 $A.renderingService.addDirtyValue(key, cmp);
-                cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
+
+                // DVAL: HALO: FIXME:
+                // Iteration can set this flag to true so we can 
+                // prevent the events from firing on PRV where we know nothing has changed.
+                if (!cmp["stopPropagationPRV"]) {
+                    cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
+                }
             };
         }
         method.id=cmp.getGlobalId();
@@ -79,7 +85,7 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     var valueProvider=this.valueProvider;
     var expression = this.expression;
     while(valueProvider instanceof PassthroughValue){
-    	expression = valueProvider.getExpression(expression);
+        expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
     if(this.valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
@@ -91,14 +97,14 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
  * Returns true if the property reference starts with '$'.
  */
 PropertyReferenceValue.prototype.isGlobal = function() {
-	return this.path && this.path[0] && this.path[0].charAt(0) === '$';
+    return this.path && this.path[0] && this.path[0].charAt(0) === '$';
 };
 
 /**
  * Returns the value in the format "v.expression".
  */
 PropertyReferenceValue.prototype.getExpression = function() {
-	return this.expression;
+    return this.expression;
 };
 
 PropertyReferenceValue.prototype.getReference = function(path) {
@@ -119,7 +125,7 @@ PropertyReferenceValue.prototype.getReference = function(path) {
  * Sets the isDefined flag to true.
  */
 PropertyReferenceValue.prototype.isDefined = function() {
-	return true;
+    return true;
 };
 
 PropertyReferenceValue.prototype.equals = function (target){
@@ -130,18 +136,18 @@ PropertyReferenceValue.prototype.equals = function (target){
  * Sets the isDirty flag to false.
  */
 PropertyReferenceValue.prototype.isDirty = function() {
-	var valueProvider = this.valueProvider;
+    var valueProvider = this.valueProvider;
     var expression = this.expression;
 
     // KRIS: HALO: I'm really unsure if I want this here or not, do we check against the component if it's dirty? 
     // Why would we care if the passthrough value is dirty? I would think the 
-	while(valueProvider instanceof PassthroughValue){
-    	expression = valueProvider.getExpression(expression);
+    while(valueProvider instanceof PassthroughValue){
+        expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
     
-	// Check Render service, since the value it could be referencing is dirty.
-	return $A.renderingService.isDirtyValue(expression, valueProvider);
+    // Check Render service, since the value it could be referencing is dirty.
+    return $A.renderingService.isDirtyValue(expression, valueProvider);
 };
 
 /**
@@ -149,14 +155,14 @@ PropertyReferenceValue.prototype.isDirty = function() {
  * changed.
  */
 PropertyReferenceValue.prototype.isLiteral = function() {
-	return false;
+    return false;
 };
 
 /**
  * Sets the isExpression flag to true to denote an expression.
  */
 PropertyReferenceValue.prototype.isExpression = function() {
-	return true;
+    return true;
 };
 
 /**
@@ -165,9 +171,9 @@ PropertyReferenceValue.prototype.isExpression = function() {
 PropertyReferenceValue.prototype.destroy = function() {
 
 
-	// #if {"modes" : ["STATS"]}
-	valueFactory.deIndex(this);
-	// #end
+    // #if {"modes" : ["STATS"]}
+    valueFactory.deIndex(this);
+    // #end
     this.valueProvider=this.expression=this.path=null;
 };
 
@@ -175,17 +181,17 @@ PropertyReferenceValue.prototype.destroy = function() {
  * Returns "PropertyReferenceValue" as String.
  */
 PropertyReferenceValue.prototype.toString = function() {
-	//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-		return "{!"+this.expression+"}";
-	//#end
-	return "PropertyReferenceValue";
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        return "{!"+this.expression+"}";
+    //#end
+    return "PropertyReferenceValue";
 };
 
 /**
  * When serializing say an Action, we don't want to serialize the reference elements, but the value under the covers.
  */
 PropertyReferenceValue.prototype.toJSON = function() {
-	return this.evaluate();
+    return this.evaluate();
 };
 
 

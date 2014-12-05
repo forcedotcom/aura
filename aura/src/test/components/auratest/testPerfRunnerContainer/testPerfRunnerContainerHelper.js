@@ -162,7 +162,13 @@
             row,li, i, id;
         
         if (cmp._runningTests) {
-            return alert('Wait, TestRunner is working...');
+        	var r = confirm("Tests are still pending execution. Are you sure you want to submit a new request?");
+        	if (r == true) {
+        		this.updateStatus("Submiting a new request");
+        	} else {
+        		this.updateStatus("Continue working on pending execution.");
+        		return;
+        	}
         }
         console.log(testCb);
         for (i = 0; i < testCb.length; i++) {

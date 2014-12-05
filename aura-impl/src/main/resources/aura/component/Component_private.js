@@ -310,10 +310,10 @@ var ComponentPriv = (function() { // Scoping priv
                     }
                     components.push($A.componentService.newComponentDeprecated(config, valueProvider, localCreation, true));
                 } else {
-                	// KRIS: HALO: 
+                	// KRIS: HALO:
                 	// This is hit, when you create a newComponentDeprecated and use raw values, vs configs on the attribute values.
                 	// newComponentDeprecated("ui:button", {label: "Foo"});
-                	
+
                     // JBUCH: HALO: TODO: VERIFY THIS IS NEVER HIT
                     $A.error("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
                 }
@@ -878,6 +878,39 @@ if(!this.concreteComponentId) {
         if (!$A.util.hasDataAttribute(element, $A.componentService.renderedBy)) {
             $A.util.setDataAttribute(element, $A.componentService.renderedBy, cmp.getGlobalId());
         }
+    };
+
+    ComponentPriv.prototype.callOnExpression = function(callback, expression, option) {
+        expression = $A.expressionService.normalize(expression);
+
+        var path = expression.split('.');
+        var root = path.shift();
+        var valueProvider = this.getValueProvider(root, this);
+
+        $A.assert(valueProvider, "Unable to get value for expression '" + expression + "'. No value provider was found for '" + root + "'.");
+
+        var subPath = path.join('.');
+        return callback.call(this, valueProvider, root, subPath, option);
+    };
+
+    ComponentPriv.prototype.isValidCallback = function(valueProvider, root, subPath) {
+        $A.assert(valueProvider.isValid, "Value provider '" + root + "' doesn't implement isValid().");
+        return valueProvider.isValid(subPath);
+    };
+
+    ComponentPriv.prototype.setValidCallback = function(valueProvider, root, path, subPath) {
+        $A.assert(valueProvider.setValid, "Value provider '" + root + "' doesn't implement setValid().");
+        valueProvider.setValid(path, subPath);
+    };
+
+    ComponentPriv.prototype.addErrorsCallback = function(valueProvider, root, subPath, errors) {
+        $A.assert(valueProvider.addErrors, "Value provider '" + root + "' doesn't implement addErrors().");
+        valueProvider.addErrors(subPath, errors);
+    };
+
+    ComponentPriv.prototype.getErrorsCallback = function(valueProvider, root, subPath) {
+        $A.assert(valueProvider.getErrors, "Value provider '" + root + "' doesn't implement getErrors().");
+        return valueProvider.getErrors(subPath);
     };
 
     ComponentPriv.prototype.output = function(value, avp, serialized, depth) {

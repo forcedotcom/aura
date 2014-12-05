@@ -29,6 +29,7 @@ function Model(def, data, component){
     this.def=def;
     this.data=data;
     this.component=component;
+    this.errors = {};
     if(def){
         var members=def.getMembers();
         for(var i=0;i<members.length;i++){
@@ -71,6 +72,29 @@ Model.prototype.set=function(key,value){
     }
 };
 
+Model.prototype.isValid = function(expression) {
+    return !this.errors.hasOwnProperty(expression);
+};
+Model.prototype.setValid = function(expression, valid) {
+    if (valid) {
+        this.clearErrors(expression);
+    } else {
+        this.addErrors(expression, []);
+    }
+};
+Model.prototype.addErrors = function(expression, errors) {
+    if (!this.errors[expression]) {
+        this.errors[expression] = [];
+    }
+    this.errors[expression] = this.errors[expression].concat(errors);
+};
+Model.prototype.clearErrors = function(expression) {
+    delete this.errors[expression];
+};
+Model.prototype.getErrors = function(expression) {
+    return this.errors[expression] || [];
+};
+
 Model.prototype.destroy=function(async){
-    this.data=this.def=this.component=null;
+    this.data = this.def = this.component = this.errors = null;
 };

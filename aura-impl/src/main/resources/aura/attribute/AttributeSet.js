@@ -372,7 +372,7 @@ AttributeSet.prototype.destroy = function(async) {
         }
     }
 
-    this.values = this.attributeDefSet = undefined;
+    this.values = this.attributeDefSet = this.errors = undefined;
     return expressions;
 };
 
@@ -438,24 +438,72 @@ AttributeSet.prototype.initialize = function(attributes) {
 
 // JBUCH: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE
 AttributeSet.prototype.isValid = function(expression) {
-	return !this.errors.hasOwnProperty(expression);
+    return this.callOnExpression(AttributeSet.prototype.isValidCallback, Component.prototype.isValid, expression);
 };
 AttributeSet.prototype.setValid = function(expression, valid) {
-	if (valid) {
-		this.clearErrors(expression);
-	} else {
-		this.addErrors(expression, []);
-	}
+    if (valid) {
+        this.clearErrors(expression);
+    } else {
+        this.addErrors(expression, []);
+    }
+};
+AttributeSet.prototype.clearErrors = function(expression) {
+    this.callOnExpression(AttributeSet.prototype.clearErrorsCallback, Component.prototype.clearErrors, expression);
 };
 AttributeSet.prototype.addErrors = function(expression, errors) {
+    this.callOnExpression(AttributeSet.prototype.addErrorsCallback, Component.prototype.addErrors, expression, errors);
+};
+AttributeSet.prototype.getErrors = function(expression) {
+    return this.callOnExpression(AttributeSet.prototype.getErrorsCallback, Component.prototype.getErrors, expression);
+};
+
+AttributeSet.prototype.callOnExpression = function(callback, componentCallback, expression, options) {
+    var value;
+
+    if (expression.indexOf('.') < 0) {
+        value = this.values[expression];
+    } else {
+        var path = expression.split('.');
+        value = this.values;
+        while (!$A.util.isUndefinedOrNull(value) && path.length) {
+            var segment = path.shift();
+            value = value[segment];
+
+            if (value instanceof PropertyReferenceValue || value instanceof FunctionCallValue || value instanceof ActionReferenceValue) {
+                break;
+            }
+        }
+    }
+
+    if (value instanceof PropertyReferenceValue) {
+        var valueProvider = value.valueProvider;
+        expression = value.expression;
+        while(valueProvider instanceof PassthroughValue){
+            expression = valueProvider.getExpression(expression);
+            valueProvider=valueProvider.getComponent();
+        }
+        return componentCallback.call(valueProvider, expression, options);
+    }
+
+    if (value instanceof FunctionCallValue || value instanceof ActionReferenceValue) {
+        return;
+    }
+
+    return callback.call(this, expression, options);
+};
+
+AttributeSet.prototype.isValidCallback = function(expression) {
+    return !this.errors.hasOwnProperty(expression);
+};
+AttributeSet.prototype.addErrorsCallback = function(expression, errors) {
     if (!this.errors[expression]) {
 		this.errors[expression] = [];
 	}
 	this.errors[expression] = this.errors[expression].concat(errors);
 };
-AttributeSet.prototype.clearErrors = function(expression) {
+AttributeSet.prototype.clearErrorsCallback = function(expression) {
 	delete this.errors[expression];
 };
-AttributeSet.prototype.getErrors = function(expression) {
+AttributeSet.prototype.getErrorsCallback = function(expression) {
 	return this.errors[expression] || [];
 };

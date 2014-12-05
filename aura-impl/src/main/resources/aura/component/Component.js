@@ -1080,13 +1080,10 @@ Component.prototype.isDirty = function(expression) {
  * @public
  */
 Component.prototype.isValid = function(expression) {
-	// JBUCH TODO: TEMPORARY PASSTHROUGH TO REMOVE SIMPLEVALUES; isValid()
-	// SHOULD BE HANDLED THROUGH ERROR EVENTS
-	if (expression) {
-		return this.priv.attributes.isValid(expression);
+	if (!expression) {
+		return !this._scheduledForAsyncDestruction && this.priv !== undefined;
 	}
-
-	return !this._scheduledForAsyncDestruction && this.priv !== undefined;
+    return this.priv.callOnExpression(ComponentPriv.prototype.isValidCallback, expression);
 };
 
 /**
@@ -1096,13 +1093,10 @@ Component.prototype.isValid = function(expression) {
  * @deprecated TEMPORARY WORKAROUND
  */
 Component.prototype.setValid = function(expression, valid) {
-	// JBUCH TODO: TEMPORARY PASSTHROUGH TO REMOVE SIMPLEVALUES; setValid()
-	// SHOULD BE HANDLED THROUGH ERROR EVENTS
-	if(valid != this.priv.attributes.isValid(expression)) {
-		$A.renderingService.addDirtyValue(expression, this);
-	}
-	
-	this.priv.attributes.setValid(expression, valid);
+    this.priv.callOnExpression(ComponentPriv.prototype.setValidCallback, expression, valid);
+    if(valid != this.priv.attributes.isValid(expression)) {
+        $A.renderingService.addDirtyValue(expression, this);
+    }
 };
 
 /**
@@ -1112,13 +1106,10 @@ Component.prototype.setValid = function(expression, valid) {
  * @deprecated TEMPORARY WORKAROUND
  */
 Component.prototype.addErrors = function(expression, errors) {
-	// JBUCH TODO: TEMPORARY PASSTHROUGH TO REMOVE SIMPLEVALUES; addErrors()
-	// SHOULD BE HANDLED THROUGH ERROR EVENTS
     if($A.util.isUndefinedOrNull(errors)){
         return;
     }
-    this.setValid(expression,false);
-	this.priv.attributes.addErrors(expression, errors);
+    this.priv.callOnExpression(ComponentPriv.prototype.addErrorsCallback, expression, errors);
 };
 
 /**
@@ -1128,8 +1119,6 @@ Component.prototype.addErrors = function(expression, errors) {
  * @deprecated TEMPORARY WORKAROUND
  */
 Component.prototype.clearErrors = function(expression) {
-	// JBUCH TODO: TEMPORARY PASSTHROUGH TO REMOVE SIMPLEVALUES; clearErrors()
-	// SHOULD BE HANDLED THROUGH ERROR EVENTS
     this.setValid(expression,true);
 };
 
@@ -1140,9 +1129,7 @@ Component.prototype.clearErrors = function(expression) {
  * @deprecated TEMPORARY WORKAROUND
  */
 Component.prototype.getErrors = function(expression) {
-	// JBUCH TODO: TEMPORARY PASSTHROUGH TO HIDE SIMPLEVALUES; getErrors()
-	// SHOULD BE HANDLED THROUGH ERROR EVENTS
-	return this.priv.attributes.getErrors(expression);
+    return this.priv.callOnExpression(ComponentPriv.prototype.getErrorsCallback, expression);
 };
 
 /**
@@ -1251,7 +1238,7 @@ Component.prototype.getFacets = function() {
  *            callback the callback function for the event (will be wrapped)
  * @param {Component}
  *            component the component attached to the handler.
- * 
+ *
  * @constructor
  * @private
  */

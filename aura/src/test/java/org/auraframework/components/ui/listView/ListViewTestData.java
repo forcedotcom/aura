@@ -55,7 +55,7 @@ public class ListViewTestData {
             row.put("type:email", "test " + i + "@email.com");
             row.put("type:checkbox", "");
             row.put("type:link", "http://na" + i + ".salesforce.com");
-            row.put("type:html", "<div style=\"background-color:blue\">i'm in a blue div " + i + "</div>");
+            row.put("type:html", "<div>i'm in a div " + i + "</div>");
             SPECIFIED_LIST_DATA.add(row);
         }
 

@@ -287,8 +287,8 @@
                             var actual = this.getTableBodyCellComponentAt(component, i, j).getElement().getElementsByTagName('input')[0].checked;
                             break;
                         case "Html":
-                            expected=items[i][columns[j].get("v.fieldName")];
-                            actual=this.getTableBodyCellComponentAt(component, i, j).getElement().innerHTML.replace(/data-aura-rendered-by="\S+"[\s]{1}|\s{1}data-aura-rendered-by="\S+"/,'');
+                            expected=items[i][columns[j].get("v.fieldName")].toLowerCase();
+                            actual=this.getTableBodyCellComponentAt(component, i, j).getElement().innerHTML.replace(/data-aura-rendered-by="\S+"[\s]{1}|\s{1}data-aura-rendered-by="\S+"/,'').toLowerCase();
                             break;
                         default:
                             expected = items[i][columns[j].get("v.fieldName")];

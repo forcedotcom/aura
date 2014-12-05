@@ -30,8 +30,7 @@ public class SVGDefTest extends AuraImplTestCase {
     public void testGetSVGDef() throws Exception {
         SVGDef svg = Aura.getDefinitionService().getDefinition("test:fakeComponent", SVGDef.class);
         assertNotNull("SVGDef not found!", svg);
-        assertNotNull("SVGDef source should not be null!", svg.getSource());
-        String contents = svg.getSource().getContents();
+        String contents = svg.getContents();
         assertTrue("SVGDef source should not be empty!", contents != null && contents.length() > 0);
         assertTrue("SVGDef source should contain reference to SVG!", contents.contains("SVG"));
     }

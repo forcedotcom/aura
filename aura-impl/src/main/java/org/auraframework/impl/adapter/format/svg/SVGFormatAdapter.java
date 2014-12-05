@@ -43,7 +43,7 @@ public class SVGFormatAdapter extends BaseFormatAdapter<SVGDef> {
             QuickFixException {
         SVGDef def = (SVGDef) value;
         if (def != null) {
-            out.append(def.getSource().getContents());
+            out.append(def.getContents());
         }
     }
 }

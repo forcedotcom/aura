@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.util.FileChangeEvent;
@@ -34,33 +35,9 @@ import org.auraframework.util.FileListener;
  * Used by {@link FileSourceLoader} to monitor and notify when file has changed. When a file does change, it notifies
  * its listener to clear cache of specific descriptor.
  */
-public class FileSourceListener implements FileListener{
+public class FileSourceListener extends DescriptorFileMapper implements FileListener {
 
     private static final Logger LOG = Logger.getLogger(FileSourceListener.class);
-    private static final EnumMap<DefDescriptor.DefType, String> extensions = new EnumMap<>(
-            DefDescriptor.DefType.class);
-
-    static {
-        extensions.put(DefDescriptor.DefType.APPLICATION, ".app");
-        extensions.put(DefDescriptor.DefType.COMPONENT, ".cmp");
-        extensions.put(DefDescriptor.DefType.EVENT, ".evt");
-        extensions.put(DefDescriptor.DefType.LIBRARY, ".lib");
-        extensions.put(DefDescriptor.DefType.INTERFACE, ".intf");
-        extensions.put(DefDescriptor.DefType.STYLE, ".css");
-        extensions.put(DefDescriptor.DefType.LAYOUTS, "Layouts.xml");
-        extensions.put(DefDescriptor.DefType.NAMESPACE, ".xml");
-        extensions.put(DefDescriptor.DefType.TESTSUITE, "Test.js");
-        extensions.put(DefDescriptor.DefType.CONTROLLER, "Controller.js");
-        extensions.put(DefDescriptor.DefType.RENDERER, "Renderer.js");
-        extensions.put(DefDescriptor.DefType.PROVIDER, "Provider.js");
-        extensions.put(DefDescriptor.DefType.HELPER, "Helper.js");
-        extensions.put(DefDescriptor.DefType.MODEL, "Model.js");
-        extensions.put(DefDescriptor.DefType.RESOURCE, "Resource.css");
-        extensions.put(DefDescriptor.DefType.RESOURCE, "Resource.js");
-        extensions.put(DefDescriptor.DefType.DOCUMENTATION, ".auradoc");
-        extensions.put(DefDescriptor.DefType.DESIGN, ".design");
-        extensions.put(DefDescriptor.DefType.SVG, ".svg");
-    }
 
     @Override
     public void fileCreated(FileChangeEvent event) throws Exception {
@@ -87,43 +64,7 @@ public class FileSourceListener implements FileListener{
         String filePath = path.toString();
         LOG.info("File " + filePath + " changed due to: " + smEvent);
 
-        DefDescriptor<?> defDescriptor = getDefDescriptor(filePath);
+        DefDescriptor<?> defDescriptor = getDescriptor(filePath);
         onSourceChanged(defDescriptor, smEvent, filePath);
-    }
-
-    private DefDescriptor<?> getDefDescriptor(String filePath) {
-        filePath = filePath.replaceAll("\\\\", "/");
-        String paths[] = filePath.split("/");
-        String namespace = paths[paths.length - 3];
-        String name = paths[paths.length - 2];
-        String extension = filePath.substring(filePath.lastIndexOf("."));
-
-        for (Map.Entry<DefDescriptor.DefType, String> entry : extensions.entrySet()) {
-            String ext = entry.getValue();
-            if (filePath.endsWith(ext)) {
-                DefDescriptor.DefType defType = entry.getKey();
-
-                String qname;
-                if (extension.equalsIgnoreCase(".css")) {
-                    qname = String.format("css://%s.%s", namespace, name);
-                } else if (extension.equalsIgnoreCase(".js")) {
-                    qname = String.format("js://%s.%s", namespace, name);
-                } else {
-                    qname = String.format("markup://%s:%s", namespace, name);
-                }
-
-                return DefDescriptorImpl.getInstance(qname, defType.getPrimaryInterface());
-            }
-        }
-        // if no match for a js file so far, treat it as an IncludeDef
-        if (extension.equalsIgnoreCase(".js")) {
-            DefDescriptor<LibraryDef> library = DefDescriptorImpl.getInstance(
-                    String.format("markup://%s:%s", namespace, name), LibraryDef.class);
-            String fileName = paths[paths.length - 1];
-            String resourceName = fileName.substring(0, fileName.length() - extension.length());
-            return DefDescriptorImpl.getInstance(String.format("js://%s.%s", namespace, resourceName),
-                    IncludeDef.class, library);
-        }
-        return null;
     }
 }

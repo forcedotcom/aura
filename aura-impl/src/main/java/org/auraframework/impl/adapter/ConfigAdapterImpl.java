@@ -289,7 +289,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public String getEs6PromiseJSURL() {
         String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/%s/es6-promise/es6-promise-2.0.0.js", contextPath, nonce);
+        return String.format("%s/auraFW/resources/%s/es6-promise/es6-promise-2.0.1.js", contextPath, nonce);
     }
 
     @Override

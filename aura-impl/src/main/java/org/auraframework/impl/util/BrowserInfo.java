@@ -36,6 +36,10 @@ import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_7_5;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WINPH_8_1;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_8;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_RT;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_8_1;
+import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_RT_8_1;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_MAX;
 import static org.auraframework.impl.util.BrowserConsts.PLATFORM_WIN_NT;
 import static org.auraframework.impl.util.UserAgent.ANDROID_WEBKIT;
@@ -77,6 +81,7 @@ public class BrowserInfo {
     private boolean isIE10;
     private boolean isIE11;
     private boolean isWindowsPhone;
+    private boolean isWindowsTablet;
 
     public BrowserInfo(String userAgentString) {
         if (userAgentString == null) {
@@ -112,6 +117,10 @@ public class BrowserInfo {
 
     public boolean isWindowsPhone() {
         return isWindowsPhone;
+    }
+    
+    public boolean isWindowsTablet() {
+        return isWindowsTablet;
     }
 
     public String getFormFactor() {
@@ -160,6 +169,7 @@ public class BrowserInfo {
         isWebkit = false;
         isFirefox = false;
         isWindowsPhone = false;
+        isWindowsTablet = false;
         formFactor = FormFactor.DESKTOP.toString();
         platformType = 0;
         browserType = 0;
@@ -182,11 +192,11 @@ public class BrowserInfo {
         isIE9 = isBrowserIE9();
         isIE10 = isBrowserIE10();
         isIE11 = isBrowserIE11();
-        isWindowsPhone = isPlatformWindowsPhone();
         formFactor = getHardwareFormFactor().toString();
         isTablet = isTabletClient();
         isPhone = isSmartPhoneClient();
-
+        isWindowsPhone = isPlatformWindowsPhone();
+        isWindowsTablet = isPlatformWindowsTablet();
     }
 
     private boolean isBrowserIE11() {
@@ -368,10 +378,22 @@ public class BrowserInfo {
     }
 
     public boolean isPlatformWindowsPhone() {
-        return platformType == PLATFORM_WINPH_7
-            || platformType == PLATFORM_WINPH_7_5
-            || platformType == PLATFORM_WINPH_8
-            || platformType == PLATFORM_WINPH_8_1;
+    	return platformType == PLATFORM_WINPH_7
+                || platformType == PLATFORM_WINPH_7_5
+                || platformType == PLATFORM_WINPH_8
+                || platformType == PLATFORM_WINPH_8_1;
+    }
+    
+    /**
+     * Checks if this is a Windows Tablet (Surface) device running Windows
+     *
+     * @return true if a match, false otherwise
+     */
+    public boolean isPlatformWindowsTablet() {
+        return isTablet && (platformType == PLATFORM_WIN_8
+                || platformType == PLATFORM_WIN_RT
+                || platformType == PLATFORM_WIN_8_1
+                || platformType == PLATFORM_WIN_RT_8_1);
     }
 
     /**

@@ -50,7 +50,10 @@
 
 	unrender : function(component, helper) {
         $A.renderingService.unrenderFacet(component);
-        component._lastRenderedValue=null;
+        if (component._lastRenderedValue) {
+            component._lastRenderedValue.destroy();
+            component._lastRenderedValue = null;
+        }
 	},
 
 	afterRender : function(component, helper) {

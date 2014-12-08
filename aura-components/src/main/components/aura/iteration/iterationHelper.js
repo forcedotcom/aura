@@ -17,7 +17,8 @@
 	_initializeOperations: function (cmp) {
 		return {
 			PickOperation   : this._initializePickOperation(),
-			CreateOperation : this._initializeCreateOperation()
+			CreateOperation : this._initializeCreateOperation(),
+			DeleteOperation : this._initializeDeleteOperation()
 		};
 	},
 	getOperations: function () {
@@ -102,6 +103,8 @@
                     }
 					
 //					$A.renderingService.requestRerender(component);
+				} else {
+					component["stopPropagationPRV"] = true;	
 				}
 			}
 		}
@@ -112,6 +115,28 @@
 
 		return PickOperation;
 
+	},
+	_initializeDeleteOperation: function () {
+		var helper = this;
+
+		// DVAL: HALO: FIXME:
+		// DeleteOperation just marks the cmp to stop propagating the prv changes
+		// The destroying is done later, on the rendering cycle.
+		function DeleteOperation(index, trackItems) {
+			this.index = index;
+			this.trackItems = trackItems;
+		}
+
+		DeleteOperation.prototype.run = function (cmp) {
+			var cmps = this.trackItems.components,
+				del;
+			for (var i = 0; i < cmps.length; i++) {
+				del = cmps[i];
+				del["stopPropagationPRV"] = true;
+			}
+		}
+
+		return DeleteOperation;
 	},
 	createComponentForIndex : function(cmp, itemsval, index, afterCreationCallback) {
 		var helper = this;
@@ -228,7 +253,6 @@
 		var itemInfos = this.getItemTracking(cmp).slice();
 		var pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.slice() : undefined;
 		var operations = [];
-
 		for (var i = start; i < end; i++) {
 			var itemval = itemsval[i];
 			var infoHash = this.hashItem(itemval);
@@ -266,7 +290,15 @@
 				operations.push(new OperationConstructors.CreateOperation(i, itemval, cmp));
 			}
 		}
-		
+
+		// What is left in itemInfos, are components to remove later on
+		// we need to marked so they don't propagate events on their prvs.
+		for (i = 0; i < itemInfos.length; i++) {
+			if (itemInfos[i]) {
+				operations.push(new OperationConstructors.DeleteOperation(i, itemInfos[i]));
+			}
+		}
+
 		return operations;
 	},
 

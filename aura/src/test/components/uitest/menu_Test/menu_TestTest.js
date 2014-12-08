@@ -17,9 +17,10 @@
 	/**
 	 * Test to verify action menu works when interacting with the menu items
 	 * using AURA API  
+	 * Disabling test from IE7 and IE8 as sauce labs env issue.
 	 */
 	owner:"ronak.shah",
-	
+	browsers: ["-IE7","-IE8"],
 	testActionMenu:{
 		owner:"ctatlah,ronak.shah",
 		test: [function(cmp) {

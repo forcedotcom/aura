@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 ({
+	init: function(component, event, helper) {
+		var concreteId = component.getConcreteComponent().getGlobalId();
+		
+		component.set("v.domId", concreteId);
+	},
+	
     handleMouseover: function(component, event, helper) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

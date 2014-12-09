@@ -175,6 +175,8 @@
      * Strategy object for an array of components (used for maintaining support for using inputSelectOption components in the body)
      */
     bodyStrategy: {
+		SUPPORTEDCONTAINERS : ["ui:inputSelectOptionGroup", "aura:iteration", "aura:if", "aura:renderIf"],
+
     	// Updates options based on their existence in newValues
     	updateOptions : function(cmp, options, newValues) {
             var result = { found : false };
@@ -207,19 +209,14 @@
     	performOperationOnCmps : function(opts, op, result, newValues) {
     		for(var i=0;i<opts.length;i++){
         		var cmp=opts[i];
-                if(cmp.isInstanceOf("ui:inputSelectOptionGroup")){
+				if (cmp.isInstanceOf("ui:inputSelectOption")) {
+					op(cmp, result, newValues);
+				} else if (this.canSupportOptions(cmp)) {
         			var groupBody = cmp.get("v.body");
         			if (!$A.util.isEmpty(groupBody)) {
-        				for(var j=0;j<groupBody.length;j++){
-                            var groupBodyCmp=groupBody[j];
-        					if (groupBodyCmp.isInstanceOf("ui:inputSelectOption")) {
-        						op(groupBodyCmp, result, newValues);
-        					}
-        				}
+						this.performOperationOnCmps(groupBody, op, result, newValues);
         			}
-        		} else if (cmp.isInstanceOf("ui:inputSelectOption")) {
-    				op(cmp, result, newValues);
-    			} else {
+        		} else {
                     var descriptor = cmp.getDef().getDescriptor();
                     var cmpName = descriptor.getNamespace() + ":" + descriptor.getName();
     				$A.warning("<" + cmpName + "> is currently not supported inside <ui:inputSelect> since it does not properly " +
@@ -247,6 +244,14 @@
 					valueList.push(text);
 				}
 			}
+		},
+		canSupportOptions : function(cmp) {
+			for (var i = 0; i < this.SUPPORTEDCONTAINERS.length; i++) {
+				if (cmp.isInstanceOf(this.SUPPORTEDCONTAINERS[i])) {
+					return true;
+				}
+			}
+			return false;
 		}
     },
 

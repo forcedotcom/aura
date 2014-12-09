@@ -26,9 +26,13 @@ import org.openqa.selenium.support.ui.Select;
 
 public class InputSelectUITest extends WebDriverTestCase {
 
-    private final String URL = "/uitest/inputSelect_DynamicOptions.cmp";
-    private final By selectLocator = By.xpath("//select[1]");
-    private final String optionLocatorString = "//select[1]/option[text()='%s']";
+    private final String DYNAMIC_SELECT_URL = "/uitest/inputSelect_DynamicOptions.cmp";
+    private final String NESTED_SELECT_URL = "/uitest/inputSelect_OptionsInBodySetValue.cmp";
+
+    private final String selectLocator = "select[class*='%s']";
+    private final String optionLocator = "option[text()='%1$s'] | optgroup/option[text()='%1$s']";
+
+    private String selectId;
 
     public InputSelectUITest(String name) {
         super(name);
@@ -41,8 +45,8 @@ public class InputSelectUITest extends WebDriverTestCase {
      */
     @PerfTest
     public void testSelectingOption() throws Exception {
-
-        open(URL);
+        selectId = "dynamicSelect";
+        open(DYNAMIC_SELECT_URL);
         focusSelectElement();
 
         // There should be 4 options with Option2 as selected
@@ -64,8 +68,8 @@ public class InputSelectUITest extends WebDriverTestCase {
      * @throws Exception
      */
     public void testSelectingFirstOption() throws Exception {
-
-        open(URL);
+        selectId = "dynamicSelect";
+        open(DYNAMIC_SELECT_URL);
         focusSelectElement();
 
         // There should be 4 options with Option2 as selected
@@ -87,8 +91,8 @@ public class InputSelectUITest extends WebDriverTestCase {
      * @throws Exception
      */
     public void testSelectingLastOption() throws Exception {
-
-        open(URL);
+        selectId = "dynamicSelect";
+        open(DYNAMIC_SELECT_URL);
         focusSelectElement();
 
         // There should be 4 options with Option2 as selected
@@ -104,8 +108,63 @@ public class InputSelectUITest extends WebDriverTestCase {
         verifyOptionDeselected("Option2");
     }
 
+    public void testSelectOptionInIteration() throws Exception {
+        selectId = "InputSelectIteration";
+        open(NESTED_SELECT_URL);
+        focusSelectElement();
+
+        selectOption("Montreal");
+        verifyOptionSelected("Montreal");
+        verifyOptionDeselected("Quebec");
+
+        selectOption("Toronto");
+        verifyOptionSelected("Toronto");
+        verifyOptionDeselected("Montreal");
+
+        selectOption("Quebec");
+        verifyOptionSelected("Quebec");
+        verifyOptionDeselected("Toronto");
+    }
+
+    public void testSelectOptionInCondition() throws Exception {
+        selectId = "InputSelectRenderIf";
+        open(NESTED_SELECT_URL + "?condition=true");
+        focusSelectElement();
+
+        selectOption("Toronto");
+        verifyOptionSelected("Toronto");
+        verifyOptionDeselected("Quebec");
+
+        boolean montrealNotInList = false;
+        try {
+            getOption("Montreal");
+        } catch (Exception e) {
+            montrealNotInList = true;
+        }
+        assertTrue("Montreal should not be in the list", montrealNotInList);
+
+        selectOption("Quebec");
+        verifyOptionSelected("Quebec");
+        verifyOptionDeselected("Toronto");
+    }
+
+    public void testSelectOptionInGroup() throws Exception {
+        selectId = "InputSelectOptionGroup";
+        open(NESTED_SELECT_URL);
+        focusSelectElement();
+
+        selectOption("Ottawa");
+        verifyOptionSelected("Ottawa");
+        verifyOptionDeselected("Quebec");
+
+        selectOption("Quebec");
+        verifyOptionSelected("Quebec");
+        verifyOptionDeselected("Ottawa");
+    }
+
     private Select getInputSelect() {
-        return new Select(findDomElement(selectLocator));
+        WebElement element = findDomElement(By.cssSelector(String.format(selectLocator, selectId)));
+        return new Select(element);
     }
 
     private int selectOptionsSize() {
@@ -114,24 +173,36 @@ public class InputSelectUITest extends WebDriverTestCase {
 
     private void selectOption(String optionLabel) {
         getInputSelect().selectByVisibleText(optionLabel);
-        verifyOptionSelected(optionLabel);
+    }
+
+    private WebElement getOption(String optionLabel) {
+        WebElement selectElement = findDomElement(By.cssSelector(String.format(selectLocator, selectId)));
+        return selectElement.findElement(By.xpath(String.format(optionLocator, optionLabel)));
     }
 
     private void verifyOptionSelected(String optionLabel) {
-        verifyOptionSelectDeselct(optionLabel, true);
+        verifyOptionSelectDeselect(optionLabel, true);
     }
 
     private void verifyOptionDeselected(String optionLabel) {
-        verifyOptionSelectDeselct(optionLabel, false);
+        verifyOptionSelectDeselect(optionLabel, false);
     }
 
-    private void verifyOptionSelectDeselct(String optionLabel, boolean isSelected) {
-        WebElement option = findDomElement(By.xpath(String.format(optionLocatorString, optionLabel)));
+    private void verifyOptionSelectDeselect(String optionLabel, boolean isSelected) {
+        WebElement option = getOption(optionLabel);
+        String cmpValue = getComponentValue(selectId);
         if (isSelected) {
             assertTrue("Option '" + optionLabel + "' should be selected", option.isSelected());
+            assertEquals("input select should have the correct v.value", optionLabel, cmpValue);
         } else {
             assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
+            assertFalse("v.value should be different from the selected option", optionLabel.equals(cmpValue));
         }
+    }
+
+    private String getComponentValue(String componentId) {
+        String valueExpression = auraUITestingUtil.getValueFromCmpRootExpression(componentId, "v.value");
+        return (String) auraUITestingUtil.getEval(valueExpression);
     }
 
     /**
@@ -141,7 +212,7 @@ public class InputSelectUITest extends WebDriverTestCase {
     private void focusSelectElement() {
         if (BrowserType.IE10.equals(getBrowserType())) {
             List<WebElement> selectedOptions = getInputSelect().getAllSelectedOptions();
-            findDomElement(selectLocator).click();
+            findDomElement(By.cssSelector(String.format(selectLocator, selectId))).click();
 
             getInputSelect().deselectAll();
             for (int i = 0; i < selectedOptions.size(); i++) {

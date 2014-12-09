@@ -19,14 +19,6 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:attribute name="case" type="String"/>
 	
-    <aura:if isTrue="{!v.case == 'iteration'}">
-    	<ui:inputSelect aura:id="ValueFromIteration">
-	    	<aura:iteration items="{!m.selectOptions}" var="item">
-	    		<ui:inputSelectOption text="{!item.value}" label="{!item.label}"/>
-	    	</aura:iteration>	
-	    </ui:inputSelect>   
-    </aura:if>
-    
     <aura:if isTrue="{!v.case == 'badsel'}">
     	<ui:inputSelect aura:id="dynamicSelect" />
     </aura:if>

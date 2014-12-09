@@ -17,5 +17,5 @@
 -->
 <aura:component>
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <ui:inputSelect aura:id="dynamicSelect"/>
+    <ui:inputSelect aura:id="dynamicSelect" class="dynamicSelect"/>
 </aura:component>

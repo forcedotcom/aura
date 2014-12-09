@@ -165,6 +165,10 @@
         var m = [];
         var valueErr = component.getErrors("v.value");
 
+        if (!$A.util.isArray(valueErr)) {
+            return;
+        }
+
         for (var i = 0; i < valueErr.length; i++) {
             m.push(valueErr[i].message);
         }
@@ -196,8 +200,7 @@
     },
 
     updateErrorElement : function(component) {
-        var el = this.getInputElement(component);
-        $A.util.toggleClass(el, "inputError", !component.isValid("v.value"));
+        $A.util.toggleClass(component, "inputError", !component.isValid("v.value"));
     },
 
     addClass: function(component, className) {

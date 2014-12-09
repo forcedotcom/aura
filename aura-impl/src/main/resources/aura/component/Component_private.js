@@ -880,39 +880,6 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.callOnExpression = function(callback, expression, option) {
-        expression = $A.expressionService.normalize(expression);
-
-        var path = expression.split('.');
-        var root = path.shift();
-        var valueProvider = this.getValueProvider(root, this);
-
-        $A.assert(valueProvider, "Unable to get value for expression '" + expression + "'. No value provider was found for '" + root + "'.");
-
-        var subPath = path.join('.');
-        return callback.call(this, valueProvider, root, subPath, option);
-    };
-
-    ComponentPriv.prototype.isValidCallback = function(valueProvider, root, subPath) {
-        $A.assert(valueProvider.isValid, "Value provider '" + root + "' doesn't implement isValid().");
-        return valueProvider.isValid(subPath);
-    };
-
-    ComponentPriv.prototype.setValidCallback = function(valueProvider, root, path, subPath) {
-        $A.assert(valueProvider.setValid, "Value provider '" + root + "' doesn't implement setValid().");
-        valueProvider.setValid(path, subPath);
-    };
-
-    ComponentPriv.prototype.addErrorsCallback = function(valueProvider, root, subPath, errors) {
-        $A.assert(valueProvider.addErrors, "Value provider '" + root + "' doesn't implement addErrors().");
-        valueProvider.addErrors(subPath, errors);
-    };
-
-    ComponentPriv.prototype.getErrorsCallback = function(valueProvider, root, subPath) {
-        $A.assert(valueProvider.getErrors, "Value provider '" + root + "' doesn't implement getErrors().");
-        return valueProvider.getErrors(subPath);
-    };
-
     ComponentPriv.prototype.output = function(value, avp, serialized, depth) {
         if (serialized === undefined) {
             serialized = [];

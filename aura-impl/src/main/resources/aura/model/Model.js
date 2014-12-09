@@ -72,6 +72,7 @@ Model.prototype.set=function(key,value){
     }
 };
 
+// JF: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE
 Model.prototype.isValid = function(expression) {
     return !this.errors.hasOwnProperty(expression);
 };

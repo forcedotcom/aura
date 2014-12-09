@@ -24,6 +24,7 @@ function PassthroughValue(primaryProviders, component) {
     this.component = component;
     this.references={};
     this.handlers={};
+    this.errors = {};
 }
 
 PassthroughValue.prototype.auraType = "Value";
@@ -31,11 +32,11 @@ PassthroughValue.prototype.auraType = "Value";
 /**
  * Since PassthroughValue can have its own set of values that can be listen for changes,
  * it needs it's own value change handler logic. Essentially you should be able to treat
- * it like a component for change events. It does not mark dirty though, since a passthrough 
+ * it like a component for change events. It does not mark dirty though, since a passthrough
  * does have anything to rerender, marking dirty is the responsibilithy of the referencing components.
  */
-PassthroughValue.prototype.addValueHandler = function(config) {    
-    // KRIS: HALO: 
+PassthroughValue.prototype.addValueHandler = function(config) {
+    // KRIS: HALO:
     // Only add value handlers for our values, everything else
     // gets passed to the component we are wrapping.
     // v.items.0.label
@@ -49,7 +50,7 @@ PassthroughValue.prototype.addValueHandler = function(config) {
 
     if($A.util.isExpression(provider)) {
         // If the provider is a reference to another value, then we need to go into that reference, and
-        // then get the value we actually want. 
+        // then get the value we actually want.
         // Think v.items in iteration, we want item.label to become v.items.0.label
         var reference = path.length > 1 ? provider.getReference(path.slice(1).join('.')) : provider;
         if(reference) {
@@ -161,14 +162,14 @@ PassthroughValue.prototype.getComponent = function() {
 
 /**
  * Passthrough's have extra providers that can reference other items of data.
- * If it's raw data, no problem. If it's another reference, you may want to 
- * expand that reference. {row.value} could expand into {v.item.0.value} if row 
- * is at index 0. 
+ * If it's raw data, no problem. If it's another reference, you may want to
+ * expand that reference. {row.value} could expand into {v.item.0.value} if row
+ * is at index 0.
  * @param {String} expression The key to reference on the component, which will get expanded into the reference you were looking for.
  */
 PassthroughValue.prototype.getExpression = function(expression) {
     var path = $A.util.isArray(expression)?expression:expression.split(".");
-    
+
     if(this.primaryProviders.hasOwnProperty(path[0])){
         var provider = this.primaryProviders[path[0]];
         if(provider instanceof PassthroughValue) {
@@ -225,7 +226,7 @@ PassthroughValue.prototype.index = function () {
  */
 PassthroughValue.prototype.removeValueHandler = function(config) {
     var path = config.value.split(".");
-    // KRIS: HALO: 
+    // KRIS: HALO:
     // Only value handlers for our values are added, everything else
     // gets passed to the component we are wrapping. So remove it there.
     if(!this.primaryProviders.hasOwnProperty(path[0])) {
@@ -235,7 +236,7 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
     var provider = this.primaryProviders[path[0]];
     if($A.util.isExpression(provider)) {
         // If the provider is a reference to another value, then we need to go into that reference, and
-        // then get the value we actually want. 
+        // then get the value we actually want.
         // Think v.items in iteration, we want item.label to become v.items.0.label
         var reference = provider.getReference(path.slice(1).join('.'));
         if(reference) {
@@ -271,11 +272,11 @@ PassthroughValue.prototype.set = function(key, value) {
    var path = key.split('.');
     if (this.primaryProviders.hasOwnProperty(path[0])){
         var provider = this.primaryProviders[path[0]];
-     
+
         var fullPath = this.getExpression(key);
         var target=this.primaryProviders;
         key=path[path.length-1];
-        
+
         if(path.length > 1 && $A.util.isExpression(provider)) {
             var reference = provider.getReference(key);
             if(reference) {
@@ -298,7 +299,7 @@ PassthroughValue.prototype.set = function(key, value) {
         valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
         valueProvider.markDirty(fullPath);
 
-        // KRIS: HALO: 
+        // KRIS: HALO:
         // Do we have any change events for the key?
         // It's possible both we and the component have references that need
         // to be fired, so I'm firing both here.
@@ -308,6 +309,27 @@ PassthroughValue.prototype.set = function(key, value) {
     }
 
    return this.component.set(key,value);
+};
+
+// JF: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE
+PassthroughValue.prototype.hasExpression = function(expression) {
+    return $A.util.isExpression(this.references[expression]);
+};
+
+PassthroughValue.prototype.isValid = function(expression) {
+    return !this.errors.hasOwnProperty(expression);
+};
+PassthroughValue.prototype.addErrors = function(expression, errors) {
+    if (!this.errors[expression]) {
+        this.errors[expression] = [];
+    }
+    this.errors[expression] = this.errors[expression].concat(errors);
+};
+PassthroughValue.prototype.clearErrors = function(expression) {
+    delete this.errors[expression];
+};
+PassthroughValue.prototype.getErrors = function(expression) {
+    return this.errors[expression] || [];
 };
 
 //#include aura.value.PassthroughValue_export

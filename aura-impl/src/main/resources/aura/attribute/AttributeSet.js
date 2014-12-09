@@ -438,7 +438,7 @@ AttributeSet.prototype.initialize = function(attributes) {
 
 // JBUCH: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE
 AttributeSet.prototype.isValid = function(expression) {
-    return this.callOnExpression(AttributeSet.prototype.isValidCallback, Component.prototype.isValid, expression);
+    return this.callOnExpression(AttributeSet.prototype.isValidCallback, Component.prototype.isValid, PassthroughValue.prototype.isValid, expression);
 };
 AttributeSet.prototype.setValid = function(expression, valid) {
     if (valid) {
@@ -448,16 +448,16 @@ AttributeSet.prototype.setValid = function(expression, valid) {
     }
 };
 AttributeSet.prototype.clearErrors = function(expression) {
-    this.callOnExpression(AttributeSet.prototype.clearErrorsCallback, Component.prototype.clearErrors, expression);
+    this.callOnExpression(AttributeSet.prototype.clearErrorsCallback, Component.prototype.clearErrors, PassthroughValue.prototype.clearErrors, expression);
 };
 AttributeSet.prototype.addErrors = function(expression, errors) {
-    this.callOnExpression(AttributeSet.prototype.addErrorsCallback, Component.prototype.addErrors, expression, errors);
+    this.callOnExpression(AttributeSet.prototype.addErrorsCallback, Component.prototype.addErrors, PassthroughValue.prototype.addErrors, expression, errors);
 };
 AttributeSet.prototype.getErrors = function(expression) {
-    return this.callOnExpression(AttributeSet.prototype.getErrorsCallback, Component.prototype.getErrors, expression);
+    return this.callOnExpression(AttributeSet.prototype.getErrorsCallback, Component.prototype.getErrors, PassthroughValue.prototype.getErrors, expression);
 };
 
-AttributeSet.prototype.callOnExpression = function(callback, componentCallback, expression, options) {
+AttributeSet.prototype.callOnExpression = function(callback, componentCallback, passthroughCallback, expression, options) {
     var value;
 
     if (expression.indexOf('.') < 0) {
@@ -478,15 +478,21 @@ AttributeSet.prototype.callOnExpression = function(callback, componentCallback, 
     if (value instanceof PropertyReferenceValue) {
         var valueProvider = value.valueProvider;
         expression = value.expression;
-        while(valueProvider instanceof PassthroughValue){
+        while(valueProvider instanceof PassthroughValue && valueProvider.hasExpression(expression)){
             expression = valueProvider.getExpression(expression);
             valueProvider=valueProvider.getComponent();
         }
-        return componentCallback.call(valueProvider, expression, options);
+        if (valueProvider instanceof PassthroughValue) {
+            return passthroughCallback.call(valueProvider, expression, options);
+        }
+        if (valueProvider instanceof Component) {
+            return componentCallback.call(valueProvider, expression, options);
+        }
+        $A.error('Invalid value provider for expression: ' + expression);
     }
 
     if (value instanceof FunctionCallValue || value instanceof ActionReferenceValue) {
-        return;
+        return true;
     }
 
     return callback.call(this, expression, options);

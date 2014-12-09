@@ -1083,7 +1083,7 @@ Component.prototype.isValid = function(expression) {
 	if (!expression) {
 		return !this._scheduledForAsyncDestruction && this.priv !== undefined;
 	}
-    return this.priv.callOnExpression(ComponentPriv.prototype.isValidCallback, expression);
+    return this.callOnExpression(Component.prototype.isValidCallback, expression);
 };
 
 /**
@@ -1093,10 +1093,10 @@ Component.prototype.isValid = function(expression) {
  * @deprecated TEMPORARY WORKAROUND
  */
 Component.prototype.setValid = function(expression, valid) {
-    this.priv.callOnExpression(ComponentPriv.prototype.setValidCallback, expression, valid);
-    if(valid != this.priv.attributes.isValid(expression)) {
+    if(valid != this.callOnExpression(Component.prototype.isValidCallback, expression)) {
         $A.renderingService.addDirtyValue(expression, this);
     }
+    this.callOnExpression(Component.prototype.setValidCallback, expression, valid);
 };
 
 /**
@@ -1109,7 +1109,7 @@ Component.prototype.addErrors = function(expression, errors) {
     if($A.util.isUndefinedOrNull(errors)){
         return;
     }
-    this.priv.callOnExpression(ComponentPriv.prototype.addErrorsCallback, expression, errors);
+    this.callOnExpression(Component.prototype.addErrorsCallback, expression, errors);
 };
 
 /**
@@ -1129,7 +1129,40 @@ Component.prototype.clearErrors = function(expression) {
  * @deprecated TEMPORARY WORKAROUND
  */
 Component.prototype.getErrors = function(expression) {
-    return this.priv.callOnExpression(ComponentPriv.prototype.getErrorsCallback, expression);
+    return this.callOnExpression(Component.prototype.getErrorsCallback, expression);
+};
+
+Component.prototype.callOnExpression = function(callback, expression, option) {
+    expression = $A.expressionService.normalize(expression);
+
+    var path = expression.split('.');
+    var root = path.shift();
+    var valueProvider = this.priv.getValueProvider(root, this);
+
+    $A.assert(valueProvider, "Unable to get value for expression '" + expression + "'. No value provider was found for '" + root + "'.");
+
+    var subPath = path.join('.');
+    return callback.call(this, valueProvider, root, subPath, option);
+};
+
+Component.prototype.isValidCallback = function(valueProvider, root, subPath) {
+    $A.assert(valueProvider.isValid, "Value provider '" + root + "' doesn't implement isValid().");
+    return valueProvider.isValid(subPath);
+};
+
+Component.prototype.setValidCallback = function(valueProvider, root, path, subPath) {
+    $A.assert(valueProvider.setValid, "Value provider '" + root + "' doesn't implement setValid().");
+    valueProvider.setValid(path, subPath);
+};
+
+Component.prototype.addErrorsCallback = function(valueProvider, root, subPath, errors) {
+    $A.assert(valueProvider.addErrors, "Value provider '" + root + "' doesn't implement addErrors().");
+    valueProvider.addErrors(subPath, errors);
+};
+
+Component.prototype.getErrorsCallback = function(valueProvider, root, subPath) {
+    $A.assert(valueProvider.getErrors, "Value provider '" + root + "' doesn't implement getErrors().");
+    return valueProvider.getErrors(subPath);
 };
 
 /**

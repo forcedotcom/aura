@@ -81,7 +81,16 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         // Careful. Android doesn't like more than one statement.
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");
         auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
-        waitForCondition("return !document._waitingForReload");
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                Object ret = auraUITestingUtil.getRawEval("return !document._waitingForReload");
+                if (ret != null && ((Boolean) ret).booleanValue()) {
+                    return true;
+                }
+                return false;
+            }
+        }, timeoutInSecs, "Page failed to refresh after server action triggered.");
         auraUITestingUtil.waitForDocumentReady();
         waitForAuraFrameworkReady();
     }

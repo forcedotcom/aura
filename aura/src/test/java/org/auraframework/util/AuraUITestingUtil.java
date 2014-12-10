@@ -289,7 +289,8 @@ public class AuraUITestingUtil {
         } catch (WebDriverException e) {
             // shouldn't come here that often as we are also wrapping the js
             // script being passed to us in try/catch above
-            Assert.fail("Script execution failed.\n" + "Failure Message: " + e.getMessage() + "\n" + "Arguments: ("
+            Assert.fail("Script execution failed.\n" + "Exception type: " + e.getClass().getName()
+                    + "\n" + "Failure Message: " + e.getMessage() + "\n" + "Arguments: ("
                     + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n");
             throw e;
         } catch (NullPointerException npe) {
@@ -594,10 +595,10 @@ public class AuraUITestingUtil {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(message).until(addErrorCheck(function));
     }
-    
+
     public String appCacheStatusIntToString(Integer ret) {
-    	String status = "Unknown cache state";
-    	switch (ret) {
+        String status = "Unknown cache state";
+        switch (ret) {
         case 0:
             status = "UNCACHED";
             break;
@@ -617,7 +618,7 @@ public class AuraUITestingUtil {
             status = "OBSOLETE";
             break;
         }
-    	return status;
+        return status;
     }
 
     public void waitForAppCacheReady() {
@@ -841,5 +842,5 @@ public class AuraUITestingUtil {
             throw new RuntimeException(ex);
         }
     }
-    
+
 }

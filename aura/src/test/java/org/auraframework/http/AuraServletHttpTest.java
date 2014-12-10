@@ -278,7 +278,14 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
 
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, getStatusCode(response));
-        assertEquals(expectedRedirect, response.getFirstHeader(HttpHeaders.LOCATION).getValue());
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+        assertTrue("Location is not absolute (but should be by spec): " + location, location.matches("^https?://[a-zA-Z0-9_\\-.]*:[0-9]*(/.*)?$"));
+        int index = location.indexOf(':');
+        index = location.indexOf(':', index + 1) + 1;  // find the port-separating colon
+        while (location.charAt(index) >= '0' && location.charAt(index) <= '9') {
+        	index++;
+        }
+        assertEquals("Wrong URI path", expectedRedirect, location.substring(index));
         assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
         assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
         assertDefaultAntiClickjacking(response, false, false);  // Redirects don't have XFO/CSP guarding
@@ -291,6 +298,18 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
                 "http://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8")),
                 "/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam");
+    }
+
+    /**
+     * This handles a Chrome (or maybe WebKit) bug where a Location semi-correctly beginning
+     * with a double or more slash is taken as a hostname (i.e. as if it were http: + the location),
+     * 
+     */
+    public void testNoCacheDoubleSlash() throws Exception {
+        assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s",
+        		URLEncoder.encode("http://any.host//www.badnews.com", "UTF-8")),
+        		"//www.badnews.com");
+        assertNoCacheRequest("/aura?aura.tag&nocache=/", "/");
     }
 
     public void testNoCacheNoFragment() throws Exception {

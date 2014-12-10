@@ -150,9 +150,6 @@
      */
     validate : function(component) {
         var errorCmp = component.get("v.errorComponent")[0];
-        
-        // Mark as not invalid
-        component._invalidValue = false;
 
         // Remove errors
         if (errorCmp && errorCmp.get("v.value.length") > 0) {
@@ -167,9 +164,10 @@
         //var inputEl = this.getInputElement(component);
         var m = [];
         var valueErr = component.getErrors("v.value");
-        
-        // Mark as invalid
-        component._invalidValue = true;
+
+        if (!$A.util.isArray(valueErr)) {
+            return;
+        }
 
         for (var i = 0; i < valueErr.length; i++) {
             m.push(valueErr[i].message);
@@ -200,18 +198,9 @@
             );
         }
     },
-    
-    updateErrorElement : function(component) {
-    	//var inputEl = this.getInputElement(component);
-    	//var classFunc = component._invalidValue ? $A.util.addClass : $A.util.removeClass;
-    	//classFunc.apply($A.util, [inputEl, "inputError"]);
 
-        // KRIS: HALO: 
-        // This updates the instance v.class, which causes 
-        // the textArea to rerender, but we already do that since we update the v.ariaDescribedBy property as well.
-        // If you wanted to optimize this, go to the element both times, and don't go through v.ariaDescribedBy or v.class
-        var errorClass = "inputError";
-        $A.util.toggleClass(component, errorClass, !!component._invalidValue);
+    updateErrorElement : function(component) {
+        $A.util.toggleClass(component, "inputError", !component.isValid("v.value"));
     },
 
     addClass: function(component, className) {

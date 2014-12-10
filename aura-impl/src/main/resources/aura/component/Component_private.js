@@ -310,10 +310,10 @@ var ComponentPriv = (function() { // Scoping priv
                     }
                     components.push($A.componentService.newComponentDeprecated(config, valueProvider, localCreation, true));
                 } else {
-                	// KRIS: HALO: 
+                	// KRIS: HALO:
                 	// This is hit, when you create a newComponentDeprecated and use raw values, vs configs on the attribute values.
                 	// newComponentDeprecated("ui:button", {label: "Foo"});
-                	
+
                     // JBUCH: HALO: TODO: VERIFY THIS IS NEVER HIT
                     $A.error("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
                 }

@@ -8,7 +8,7 @@
 				{ "label": "item1"},
 				{ "label": "item2"},
 				{ "label": "item3"},
-				{ "label": "item4"},
+				{ "label": "item4"}
 			]
 		};
 

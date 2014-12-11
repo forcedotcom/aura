@@ -16,6 +16,12 @@
 /*jslint sub: true */
 var priv = {
     dirtyComponents : {},
+    // KRIS: HALO: HACK:
+    // IE11 is not returning the Object.keys() for dirtyComponents in the order they were added.
+    // So we rerender dirty out of order.
+    // This array assures we rerender in the order that we add keys to the array.
+    // Ideally, we shouldn't care what order we rerender in, but that's a more difficult bug to track down in 194/patch
+    dirtyComponentIds: [],
     needsCleaning : false,
 
     cleanComponent : function(id) {

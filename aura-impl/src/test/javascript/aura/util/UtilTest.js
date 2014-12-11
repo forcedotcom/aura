@@ -17,41 +17,41 @@ Function.RegisterNamespace("Test.Aura.Util");
 
 [Fixture]
 Test.Aura.UtilTest=function(){
-	var auraMock=function(delegate){
-		Mocks.GetMocks(Object.Global(),{
-			exp:function() {},
-			window:Object.Global(),
-			document:{createDocumentFragment:function() {}},
-			Json:function() {},
-			Transport:function() {},
-			Style:function() {},
-			Bitset:{},
-			NumberFormat:{},			
-			$A:{ns:{}},
-			navigator:{userAgent:''}
-		})(function(){
-			// #import aura.util.Util
-			delegate();
-		});
-	}
-	
-	var targetUtil;
-	auraMock(function(){
-		targetUtil = new $A.ns.Util();
-	});
-	
-	[Fixture]
+    var auraMock=function(delegate){
+        Mocks.GetMocks(Object.Global(),{
+            exp:function() {},
+            window:Object.Global(),
+            document:{createDocumentFragment:function() {}},
+            Json:function() {},
+            Transport:function() {},
+            Style:function() {},
+            Bitset:{},
+            NumberFormat:{},
+            $A:{ns:{}},
+            navigator:{userAgent:''}
+        })(function(){
+            // #import aura.util.Util
+            delegate();
+        });
+    }
+
+    var targetUtil;
+    auraMock(function(){
+        targetUtil = new $A.ns.Util();
+    });
+
+    [Fixture]
     function transportRequest(){
         [Fact]
         function testTransportRequestNotPublic(){
-        	var targetUtil;
+            var targetUtil;
             auraMock(function(){
                 targetUtil = new $A.ns.Util();
             });
-            
+
             var method = targetUtil.transport.request;
-            
-            Assert.Equal(undefined, method); 
+
+            Assert.Equal(undefined, method);
         }
     }
 
@@ -93,227 +93,227 @@ Test.Aura.UtilTest=function(){
             });
 
             mockUserAgentIOS7Safari(function(){
-                actual = targetUtil.isIOSWebView(); 
+                actual = targetUtil.isIOSWebView();
             })
 
             Assert.False(actual);
         }
     }
 
-	[Fixture]
-	function stripTags(){
-		
-		var tags = ['script', 'style'];
-		
-		var mockElement = {
-			name: '',	
-			parentNode: ''
-		};
-		
-		var mockDiv = {				
-			innerHTML:'',
-			getElementsByTagName:function(name){							
-				mockElement.name = name;
-				mockElement.parentNode = this;
-											
-				var str;
-				if(name == 'script'){						
-					str = '<script>';
-				}
-				else{
-					str = '<style>';
-				}
-				var count = 0;								
-				var index = this.innerHTML.indexOf(str);
-				while(index != -1){
-					count++;
-					index = this.innerHTML.indexOf(str, index+1);
-				}
-				
-				var arr = new Array();					
-				for (var j = 0; j < count; j++){
-					arr[j] = mockElement;
-				}					
-				return arr;				
-			},
-			removeChild:function(element) {				
-				if(element.name == 'script') {
-					this.innerHTML = this.innerHTML.replace('<script>', '');
-					this.innerHTML = this.innerHTML.replace('</script>', '');
-				}
-				if(element.name == 'style') {
-					this.innerHTML = this.innerHTML.replace('<style>', '');
-					this.innerHTML = this.innerHTML.replace('</style>', '');
-				}
-			}
-		};
-		
-		var mockDocument = Mocks.GetMock(Object.Global(), "document", {				
-			createElement:function(value){
-				if(value == 'div') return mockDiv;										
-			}
-		});		
-					
-		var mockRemoveElement = Mocks.GetMock(targetUtil, "removeElement", function(element){
-			if(element != mockDiv) throw new Error("Wrong Element, expected div");
-	    });	    
-		
-		[Fact]
-		function undefinedValue(){
-			var expected = undefined;  
-			var actual = targetUtil.stripTags(undefined, tags);
-			
+    [Fixture]
+    function stripTags(){
+
+        var tags = ['script', 'style'];
+
+        var mockElement = {
+            name: '',
+            parentNode: ''
+        };
+
+        var mockDiv = {
+            innerHTML:'',
+            getElementsByTagName:function(name){
+                mockElement.name = name;
+                mockElement.parentNode = this;
+
+                var str;
+                if(name == 'script'){
+                    str = '<script>';
+                }
+                else{
+                    str = '<style>';
+                }
+                var count = 0;
+                var index = this.innerHTML.indexOf(str);
+                while(index != -1){
+                    count++;
+                    index = this.innerHTML.indexOf(str, index+1);
+                }
+
+                var arr = new Array();
+                for (var j = 0; j < count; j++){
+                    arr[j] = mockElement;
+                }
+                return arr;
+            },
+            removeChild:function(element) {
+                if(element.name == 'script') {
+                    this.innerHTML = this.innerHTML.replace('<script>', '');
+                    this.innerHTML = this.innerHTML.replace('</script>', '');
+                }
+                if(element.name == 'style') {
+                    this.innerHTML = this.innerHTML.replace('<style>', '');
+                    this.innerHTML = this.innerHTML.replace('</style>', '');
+                }
+            }
+        };
+
+        var mockDocument = Mocks.GetMock(Object.Global(), "document", {
+            createElement:function(value){
+                if(value == 'div') return mockDiv;
+            }
+        });
+
+        var mockRemoveElement = Mocks.GetMock(targetUtil, "removeElement", function(element){
+            if(element != mockDiv) throw new Error("Wrong Element, expected div");
+        });
+
+        [Fact]
+        function undefinedValue(){
+            var expected = undefined;
+            var actual = targetUtil.stripTags(undefined, tags);
+
             // Assert
-            Assert.Equal(expected, actual); 		
-			
-		}
-		
-		[Fact]
-		function invalidValue(){
-			var expected = undefined;  
-			var actual = targetUtil.stripTags('', tags);
-			
+            Assert.Equal(expected, actual);
+
+        }
+
+        [Fact]
+        function invalidValue(){
+            var expected = undefined;
+            var actual = targetUtil.stripTags('', tags);
+
             // Assert
-            Assert.Equal(expected, actual); 					
-		}
-		
-		[Fact]
-		function invalidTags(){
-			var expected = 'value';  
-			var actual;						
-												
-			mockDocument(function(){
-				mockRemoveElement(function(){
-					actual = targetUtil.stripTags('value', '');
-				});
-			});
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function invalidTags(){
+            var expected = 'value';
+            var actual;
+
+            mockDocument(function(){
+                mockRemoveElement(function(){
+                    actual = targetUtil.stripTags('value', '');
+                });
+            });
             // Assert
-            Assert.Equal(expected, actual); 					
-		}
-		
-		[Fact]
-		function noTags(){
-			var expected = 'value';  
-			var actual;						
-												
-			mockDocument(function(){
-				mockRemoveElement(function(){
-					actual = targetUtil.stripTags('value', tags);
-				});
-			});
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function noTags(){
+            var expected = 'value';
+            var actual;
+
+            mockDocument(function(){
+                mockRemoveElement(function(){
+                    actual = targetUtil.stripTags('value', tags);
+                });
+            });
             // Assert
-            Assert.Equal(expected, actual); 					
-		}		
-		
-		[Fact]
-		function withTags(){
-			var expected = 'value';  
-			var actual;						
-												
-			mockDocument(function(){
-				mockRemoveElement(function(){
-					actual = targetUtil.stripTags('<script>value</script>', tags);
-				});
-			});
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function withTags(){
+            var expected = 'value';
+            var actual;
+
+            mockDocument(function(){
+                mockRemoveElement(function(){
+                    actual = targetUtil.stripTags('<script>value</script>', tags);
+                });
+            });
             // Assert
-            Assert.Equal(expected, actual); 					
-		}
-				
-		[Fact]
-		function withMultipleTags(){
-			var expected = 'value';  
-			var actual;						
-												
-			mockDocument(function(){
-				mockRemoveElement(function(){
-					actual = targetUtil.stripTags('<script></script>value<script></script>', tags);
-				});
-			});
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function withMultipleTags(){
+            var expected = 'value';
+            var actual;
+
+            mockDocument(function(){
+                mockRemoveElement(function(){
+                    actual = targetUtil.stripTags('<script></script>value<script></script>', tags);
+                });
+            });
             // Assert
-            Assert.Equal(expected, actual); 					
-		}
-		
-		[Fact]
-		function withNestedTags(){
-			var expected = 'value';  
-			var actual;						
-												
-			mockDocument(function(){
-				mockRemoveElement(function(){
-					actual = targetUtil.stripTags('<script><script><style>value</style></script></script>', tags);
-				});
-			});
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function withNestedTags(){
+            var expected = 'value';
+            var actual;
+
+            mockDocument(function(){
+                mockRemoveElement(function(){
+                    actual = targetUtil.stripTags('<script><script><style>value</style></script></script>', tags);
+                });
+            });
             // Assert
-            Assert.Equal(expected, actual); 					
-		}
-		
-		[Fact]
-		function withMultipleValues(){
-			var expected = 'value1 value2 value3';  
-			var actual;						
-												
-			mockDocument(function(){
-				mockRemoveElement(function(){
-					actual = targetUtil.stripTags('value1 <script><script><style>value2</style></script></script> value3', tags);
-				});
-			});
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function withMultipleValues(){
+            var expected = 'value1 value2 value3';
+            var actual;
+
+            mockDocument(function(){
+                mockRemoveElement(function(){
+                    actual = targetUtil.stripTags('value1 <script><script><style>value2</style></script></script> value3', tags);
+                });
+            });
             // Assert
-            Assert.Equal(expected, actual); 					
-		}
-	}
-	
-	[Fixture]
-	function isIE(){
-		var auraMockCustomUserAgent=function(delegate, userAgentOverride){
-			Mocks.GetMocks(Object.Global(),{
-				exp:function() {},
-				window:Object.Global(),
-				document:{createDocumentFragment:function() {}},
-				Json:function() {},
-				Transport:function() {},
-				Style:function() {},
-				Bitset:{},
-				NumberFormat:{},			
-				$A:{ns:{}},
-				navigator:{userAgent : userAgentOverride }
-			})(function(){
-				// #import aura.util.Util
-				delegate();
-			});
-		}
-		
-		[Fact]
-		function IE11UserAgentReturnsTrue(){
-			//Arrange
-			var actual;
-			var userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko";
-			
-			//Act
-			auraMockCustomUserAgent(function(){
-				var targetUtil = new $A.ns.Util();
-				actual = targetUtil.isIE; 
-			}, userAgent);
-			
-			// Assert
-			Assert.True(actual);
-		}
-		
-		[Fact]
-		function ChromeUserAgentReturnsFalse(){
-			//Arrange
-			var actual;
-			var userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36";
-			
-			//Act
-			auraMockCustomUserAgent(function(){
-				var targetUtil = new $A.ns.Util();
-				actual = targetUtil.isIE; 
-			}, userAgent);
-			
-			// Assert
-			Assert.False(actual);
-		}
-	}
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function isIE(){
+        var auraMockCustomUserAgent=function(delegate, userAgentOverride){
+            Mocks.GetMocks(Object.Global(),{
+                exp:function() {},
+                window:Object.Global(),
+                document:{createDocumentFragment:function() {}},
+                Json:function() {},
+                Transport:function() {},
+                Style:function() {},
+                Bitset:{},
+                NumberFormat:{},
+                $A:{ns:{}},
+                navigator:{userAgent : userAgentOverride }
+            })(function(){
+                // #import aura.util.Util
+                delegate();
+            });
+        }
+
+            [Fact]
+        function IE11UserAgentReturnsTrue(){
+            //Arrange
+            var actual;
+            var userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko";
+
+            //Act
+            auraMockCustomUserAgent(function(){
+                var targetUtil = new $A.ns.Util();
+                actual = targetUtil.isIE;
+            }, userAgent);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ChromeUserAgentReturnsFalse(){
+            //Arrange
+            var actual;
+            var userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36";
+
+            //Act
+            auraMockCustomUserAgent(function(){
+                var targetUtil = new $A.ns.Util();
+                actual = targetUtil.isIE;
+            }, userAgent);
+
+            // Assert
+            Assert.False(actual);
+        }
+    }
 
     [Fixture]
     function merge() {
@@ -325,14 +325,14 @@ Test.Aura.UtilTest=function(){
                     array2 = [2, 3, 4],
                     array3 = [5, 6, 7, 8],
                     i = 0;
-                
+
                 // Merge arrays into array1 and test:
                 util.merge(array1, array2, array3);
                 Assert.Equal(9, array1.length);
                 for (i = 0; i < array1.length; i++) {
                     Assert.Equal(i, array1[i]);
                 }
-                
+
                 // Merge just array1 and make sure it doesn't change.
                 util.merge(array1);
                 Assert.Equal(9, array1.length);
@@ -341,7 +341,7 @@ Test.Aura.UtilTest=function(){
                 }
             });
         }
-        
+
         [Fact]
         function testMergeError() {
             auraMock(function() {
@@ -351,7 +351,7 @@ Test.Aura.UtilTest=function(){
                 } catch (e) {
                     Assert.Equal("Merge takes only arrays as arguments.", e);
                 }
-                
+
                 try {
                     new $A.ns.Util().merge([0], [1, 2], {});
                     Assert.False(true, "Invalid arguments. Should throw exception.");
@@ -363,6 +363,119 @@ Test.Aura.UtilTest=function(){
     }
 
     [Fixture]
+    function apply() {
+
+        // Checks if objects are equal
+        function isEqualObjects(a, b) {
+            // handle primitives
+            if (a === b) {
+                return true;
+            }
+
+            // lame but we don't care about non-objects
+            if (typeof a !== "object" || a instanceof Array) {
+                return false;
+            }
+
+            // verify b is equal or a superset of a
+            for (var i in a) {
+                if (!b.hasOwnProperty(i)) {
+                    return false;
+                }
+                if (!isEqualObjects(a[i], b[i])) {
+                    return false;
+                }
+            }
+
+            // verify b is only equal, not a superset of a
+            for (var i in b) {
+                if (!a.hasOwnProperty(i)) {
+                    return false;
+                }
+            }
+
+            // b is equal to a
+            return true;
+        };
+
+
+        [Fact]
+        function testForceFalseDeepFalse() {
+            auraMock(function() {
+
+                // Arrange
+                var util = new $A.ns.Util(),
+                    base     =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { "j": 6 } },
+                    members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 7 },
+                    expected =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { "j": 6 } };
+
+                // Act
+                util.apply(base, members, false, false);
+
+                // Assert
+                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+            });
+        }
+
+        [Fact]
+        function testForceTrueDeepFalse() {
+            auraMock(function() {
+
+                // Arrange
+                var util = new $A.ns.Util(),
+                    base     =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { "j": 6 } },
+                    members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 7 },
+                    expected =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 7 };
+
+                // Act
+                util.apply(base, members, true, false);
+
+                // Assert
+                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+            });
+        }
+
+        [Fact]
+        function testForceFalseDeepTrue() {
+            auraMock(function() {
+                // Arrange
+                var util = new $A.ns.Util(),
+                    base     =  { "a": { "b": { "c": 1,  "d": { "e": 2,  "f": 3 }         }}, "h": 5,  "i": { j: 7 } },
+                    members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 6 },
+                    expected =  { "a": { "b": { "c": 10, "d": { "e": 20, "f": 3 }, "g": 4 }}, "h": 50,  "i": 6 };
+                // TODO: new apply() algorithm generates this output
+                //  expected =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 6 },
+                // that is, top-level i property is overwritten. should this test change or the algorithm?
+
+                // Act
+                util.apply(base, members, false, true);
+
+                // Assert
+                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+            });
+        }
+
+
+        [Fact]
+        function testForceTrueDeepTrue() {
+            auraMock(function() {
+                // Arrange
+                var util = new $A.ns.Util(),
+                    base     =  { "a": { "b": { "c": 1,  "d": { "e": 2,  "f": 3 }         }}, "h": 5,  "i": { j: 7 } },
+                    members  =  { "a": { "b": { "c": 10, "d": { "e": 20         }, "g": 4 }}, "h": 50, "i": 6 },
+                    expected =  { "a": { "b": { "c": 10, "d": { "e": 20, "f": 3 }, "g": 4 }}, "h": 50, "i": 6 };
+
+                // Act
+                util.apply(base, members, true, true);
+
+                // Assert
+                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+            });
+        }
+    }
+
+
+    [Fixture]
     function supportsTouchEvents() {
         var mockIsUndefinedReturnsFalse = Mocks.GetMock(Object.Global(), "$A", {
             util: {
@@ -372,7 +485,7 @@ Test.Aura.UtilTest=function(){
             }
         });
 
-        [Fact] 
+        [Fact]
         function ReturnsCachedResultIfExistsAndTruthy() {
             var actual;
             var expected = true;
@@ -385,7 +498,7 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        [Fact] 
+        [Fact]
         function ReturnsCachedResultIfExistsAndFalsy() {
             var actual;
             var expected = false;
@@ -398,7 +511,7 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        [Fact] 
+        [Fact]
         function ReturnsTrueWhenOnTouchStartInWindow() {
             var actual;
             var expected = true;
@@ -432,7 +545,7 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        [Fact] 
+        [Fact]
         function ReturnsTrueForWindowsPhone() {
             var actual;
             var expected = true;
@@ -468,7 +581,7 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        [Fact] 
+        [Fact]
         function ReturnsTrueForMaxTouchPoints() {
             var actual;
             var expected = true;
@@ -505,7 +618,7 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        [Fact] 
+        [Fact]
         function ReturnsFalseForBlacklistedMode() {
             var actual;
             var expected = false;
@@ -535,11 +648,11 @@ Test.Aura.UtilTest=function(){
             mockItAll(function() {
                 actual = targetUtil.supportsTouchEvents();
             });
- 
+
             Assert.Equal(expected, actual);
         }
 
-        [Fact] 
+        [Fact]
         // This case covers non-touch IE11 where msPointerEnabled is true
         function ReturnsFalseForPointerEnabledNotWindowsPhone() {
             var actual;
@@ -579,7 +692,7 @@ Test.Aura.UtilTest=function(){
             Assert.Equal(expected, actual);
         }
     }
-    
+
     [Fixture]
     function lookup() {
         [Fact]
@@ -594,52 +707,51 @@ Test.Aura.UtilTest=function(){
                     }
                 }
             };
-            
+
             auraMock(function() {
                 Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, "first", "second", "third"));
             });
         }
-        
+
         [Fact]
         function looksUpNestedArrayProperties() {
             var structure = ["WRONG", ["WRONG", ["VALUE", "WRONG"]]];
-            
+
             auraMock(function() {
                 Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, 1, 1, 0));
             });
         }
-        
+
         [Fact]
         function looksUpNestedMixedProperties() {
             var structure = {
                 wrong: {},
                 first: ["WRONG", ["WRONG", [{result: "VALUE"}, "WRONG"]]]
             };
-            
+
             auraMock(function() {
                 Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, "first", 1, 1, 0, "result"));
             });
         }
-        
+
         [Fact]
         function handlesUnfoundProperties() {
             var structure = {
                 wrong: {},
                 first: ["WRONG", ["WRONG", [{result: "VALUE"}, "WRONG"]]]
             };
-            
+
             auraMock(function() {
-                var util = new $A.ns.Util(); 
-                
+                var util = new $A.ns.Util();
+
                 var found = 0;
                 found += util.lookup(structure, "second", 1, 4, 3, "result") === undefined ? 0 : 1;
                 found += util.lookup(structure, "first", 2, 4, 3, "result") === undefined ? 0 : 1;
                 found += util.lookup(structure, "first", 1, 1, 1, "result") === undefined ? 0 : 1;
                 found += util.lookup(structure, "first", 1, 1, 0, "resultMispelled") === undefined ? 0 : 1;
-                
+
                 Assert.Equal(0, found);
             });
         }
     }
 }
- 

@@ -35,7 +35,7 @@ $A.ns.ObjectValueProvider.prototype.getValues = function(values) {
  * @param values
  */
 $A.ns.ObjectValueProvider.prototype.merge = function(values) {
-    $A.util.apply(this.values, values, false, true);
+    $A.util.apply(this.values, values, true, true);
 };
 
 /**

@@ -1019,19 +1019,28 @@ $A.ns.Util.prototype.isSubDef = function(def, qname) {
  * @param {Boolean} [deepCopy] Should we continue to navigate child objects if we don't overwrite them? false by default
  */
 $A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
-    // Probably cheaper to have two loops with only one getting run then doing the if check each time.
-    var prop;
-    if(forceCopy) {
-        for(prop in members) {
-            baseObject[prop] = members[prop];
-        }
-    } else {
-        for(prop in members) {
-            if(!baseObject.hasOwnProperty(prop)) {
-                baseObject[prop] = members[prop];
-            }
-            if(deepCopy){
-                this.apply(baseObject[prop],members[prop]);
+    if(members) {
+        var property;
+        var value;
+        for (property in members) {
+            if(forceCopy||!baseObject.hasOwnProperty(property)||deepCopy){
+                value=members[property];
+                if(deepCopy&&value!=undefined) {
+                    var branchValue = null;
+                    switch (value.constructor) {
+                        case Array:
+                            branchValue = baseObject[property] || [];
+                            break;
+                        case Object:
+                            branchValue = baseObject[property] || {};
+                            break;
+                    }
+                    if (branchValue) {
+                        baseObject[property] = this.apply(branchValue, value, forceCopy, deepCopy);
+                        continue;
+                    }
+                }
+                baseObject[property]=value;
             }
         }
     }

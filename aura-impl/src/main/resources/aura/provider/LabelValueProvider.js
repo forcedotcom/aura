@@ -127,7 +127,7 @@ $A.ns.LabelValueProvider.prototype.getValues = function(values) {
  * Merges $Label values
  */
 $A.ns.LabelValueProvider.prototype.merge = function(values) {
-    $A.util.apply(this.values, values, false, true);
+    $A.util.apply(this.values, values, true, true);
 };
 
 /**

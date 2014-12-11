@@ -2020,10 +2020,14 @@ _initScroller: function () {
             
         **/
         plug: function (plugin) {
-            var ScrollerPlugin = typeof plugin === 'string' ? PLUGINS[plugin] : plugin,
-                protoExtension =  ScrollerPlugin.prototype,
+        	var ScrollerPlugin = typeof plugin === 'string' ? PLUGINS[plugin] : plugin,
                 whiteList      = ['init'],
                 methodName;
+            
+            if (ScrollerPlugin === null || typeof ScrollerPlugin === "undefined") {
+            	return;
+        	}
+            var protoExtension =  ScrollerPlugin.prototype;
                 
             for (methodName in protoExtension) {
                 if (whiteList.indexOf(methodName) === -1) {

@@ -21,6 +21,7 @@ import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * UI test to test autocomplete component. Excluding IE7 and IE8 because component uses html5 specific tags
@@ -341,6 +342,55 @@ public class AutocompleteUITest extends WebDriverTestCase {
 
         toggle.click();
         waitForAutoCompleteListVisible(list, false);
+    }
+    
+    /**
+     * Test accessibility when autocompleteOptions is extended 
+     */
+    // Excluding mobile devices since they dont have arrow key functionality
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
+            BrowserType.IPAD, BrowserType.IPHONE })
+    public void _testAutoCompleteOptionExtentionAccessibility() throws Exception {
+        open(URL);
+        WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("OptionExtention"));
+
+        // do search
+        input.sendKeys("o");
+        WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("OptionExtention"));
+        waitForAutoCompleteListVisible(list, true);
+
+        // go to second option in list.
+        input.sendKeys(Keys.ARROW_DOWN + "" + Keys.ARROW_DOWN + "");
+        list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("OptionExtention"));
+        List<WebElement> options = getAutoCompleteListOptions(list, OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
+        waitForOptionHighlighted(options.get(1));
+        
+        // verify aria attributes
+        String ariaActiveDecendant = input.getAttribute("aria-activedescendant");
+        String ariaExpanded = input.getAttribute("aria-expanded");
+        String optionId = options.get(1).findElement(By.tagName("a")).getAttribute("id");
+        assertTrue("aria-expanded should be true", Boolean.parseBoolean(ariaExpanded));
+        assertEquals("aria-activedescendant incorrect", optionId, ariaActiveDecendant);
+        
+        // escape and verify everything gets reset
+        input.sendKeys(Keys.ESCAPE);
+        list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("OptionExtention"));
+        waitForAutoCompleteListVisible(list, false);
+        
+        ariaActiveDecendant = input.getAttribute("aria-activedescendant");
+        ariaExpanded = input.getAttribute("aria-expanded");
+        assertFalse("aria-expanded should be false after hitting escape", Boolean.parseBoolean(ariaExpanded));
+        assertEquals("aria-activedescendant incorrect after hitting escape", "", ariaActiveDecendant);
+    }
+    
+    private void waitForOptionHighlighted(final WebElement o) {
+    	auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return hasCssClass(o, "highlighted");
+            }
+        }, timeoutInSecs,"fail on waiting for option to be highlighted");
     }
     
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,

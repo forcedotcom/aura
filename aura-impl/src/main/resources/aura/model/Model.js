@@ -23,19 +23,16 @@
  * @returns {Function}
  */
 function Model(def, data, component){
-    if(!data){
-        data={};
-    }
     this.def=def;
-    this.data=data;
+    this.data=$A.util.apply({}, data, true, true);
     this.component=component;
     this.errors = {};
     if(def){
         var members=def.getMembers();
         for(var i=0;i<members.length;i++){
             var name=members[i].getName();
-            if(!data.hasOwnProperty(name)){
-                data[name]=null;
+            if(!this.data.hasOwnProperty(name)){
+                this.data[name]=null;
             }
         }
     }

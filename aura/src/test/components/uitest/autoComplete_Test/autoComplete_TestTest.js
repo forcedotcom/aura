@@ -13,7 +13,9 @@
 		    
 	        //Get the anchor in the list to click as the user would
 	        var ul = autoList.getElement().getElementsByTagName("ul")[0];
-	        var listAnchors = ul.getElementsByTagName("a");
+	        //Test case for W-2428589
+	        $A.test.assertTrue($A.util.hasClass(ul,"visible"), "Class name should contain visible");
+        	var listAnchors = ul.getElementsByTagName("a");
 	        $A.test.clickOrTouch(listAnchors[1]);
 	    }, function(cmp){
 	        //assert

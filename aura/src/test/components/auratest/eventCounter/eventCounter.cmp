@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client">
+    <aura:attribute default="0" type="Integer" name="renderCount"></aura:attribute>
+    <aura:attribute default="0" type="Integer" name="rerenderCount"></aura:attribute>
+    <aura:attribute default="0" type="Integer" name="unrenderCount"></aura:attribute>
+
+    <!-- Increment to make component dirty -->
+    <aura:attribute default="0" type="Integer" name="dirty"></aura:attribute>
+    <aura:attribute type="String" name="passthrough"></aura:attribute>
+
+    <ul>
+        <li>render count: <span aura:id="renderCount">{!v.renderCount}</span></li>
+        <li>rerender count: <span aura:id="rerenderCount">{!v.rerenderCount}</span></li>
+        <li>unrender count: <span aura:id="unrenderCount">{!v.unrenderCount}</span></li>
+        <li>Passthrough: {!v.passthrough.label}</li>
+    </ul>
+</aura:component>

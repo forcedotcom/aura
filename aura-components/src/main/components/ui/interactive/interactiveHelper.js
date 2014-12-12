@@ -75,9 +75,13 @@
      * @param event must be a DOM event
      */
      fireEvent : function (component, event, helper) {
-        var e = component.getEvent(event.type);
-        helper.setEventParams(e, event);
-        e.fire();
+    	 // As the result as another event
+    	 // this component could become invalid, so guard just in-case
+    	 if(component.isValid()) {
+	        var e = component.getEvent(event.type);
+	        helper.setEventParams(e, event);
+	        e.fire();
+    	 }
      },
 
     /**

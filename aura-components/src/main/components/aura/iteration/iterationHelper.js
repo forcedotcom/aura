@@ -99,13 +99,12 @@
 						vp.set(this.indexVar, this.targetIndex);
                         //JBUCH: HALO: FIXME: THIS IS TO DEAL WITH THE CHANGE TO PTVs BELOW:
                         // extraProviders[varName] = cmp.getReference("v.items[" + index + "]");
-                        vp.set(this.varName, cmp.getReference("v.items[" + this.targetIndex + "]"));
+                        vp.set(this.varName, cmp.getReference("v.items[" + this.targetIndex + "]"), true);
                     }
 					
 //					$A.renderingService.requestRerender(component);
-				} else {
-					component["stopPropagationPRV"] = true;	
 				}
+				
 			}
 		}
 
@@ -119,21 +118,22 @@
 	_initializeDeleteOperation: function () {
 		var helper = this;
 
-		// DVAL: HALO: FIXME:
-		// DeleteOperation just marks the cmp to stop propagating the prv changes
-		// The destroying is done later, on the rendering cycle.
+		
 		function DeleteOperation(index, trackItems) {
 			this.index = index;
 			this.trackItems = trackItems;
 		}
 
 		DeleteOperation.prototype.run = function (cmp) {
-			var cmps = this.trackItems.components,
-				del;
-			for (var i = 0; i < cmps.length; i++) {
-				del = cmps[i];
-				del["stopPropagationPRV"] = true;
-			}
+			var cmps = this.trackItems.components;
+
+			cmp.get("v.body").splice(this.trackItems.index, cmps.length);
+			// KRIS: HALO:
+			// Ideally we would do this
+			// $A.unrender(cmps);
+			// But if we unrender the marker for the iteration, iteration rendering blows up
+			// So until the framework supports it, we can't do this. 196ish 
+			
 		}
 
 		return DeleteOperation;
@@ -236,17 +236,8 @@
 		cmp._itemInfos[index] = {
 			index : index,
 			components : components,
-			hash : this.hashItem(itemval)
+			hash : itemval
 		};
-	},
-	// If you pass an object to iteration, we will need to detect when some of it's sub-values has changed.
-	// So in order to do that we stringify the object to use it as a hash for comparison
-	hashItem: function (item) {
-		// if (!$A.util.isComponent(item) && typeof item === 'object') {
-		// 	return JSON.stringify(item);
-		// } else {
-			return item;
-		//}
 	},
 	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
 		var OperationConstructors = this.getOperations();
@@ -255,7 +246,7 @@
 		var operations = [];
 		for (var i = start; i < end; i++) {
 			var itemval = itemsval[i];
-			var infoHash = this.hashItem(itemval);
+			var infoHash = itemval;
 			// Find existing itemInfo for this item
 			var found = false;
 			for (var j = 0; j < itemInfos.length; j++) {
@@ -305,6 +296,15 @@
 	updateBody : function(cmp) {
 		var body = this.getUpdatedBody(cmp);
 		cmp.set("v.body", body);
+		
+		// KRIS: HALO:
+		// Cause a rerender early, so that we remove elements appropriately
+		// before their PRV's fire.
+		// We may only need this when we have a DeleteOperation
+		if(cmp._hasCreateOrDelete && cmp.isRendered()) {
+			delete cmp._hasCreateOrDelete;
+			$A.rerender(cmp);
+		}
 		cmp.getEvent("rerenderComplete").fire();
 	},
 
@@ -323,8 +323,12 @@
 		var operations = this.getTransformation(cmp, items, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
 				
 		this.resetItemTracking(cmp);
-		for (var n = 0; n < operations.length; n++) {
-			operations[n].run(cmp);
+		for (var n = 0, opteration; n < operations.length; n++) {
+			operation = operations[n];
+			operation.run(cmp);
+			if(operation instanceof this._operations.CreateOperation || operation instanceof this._operations.DeleteOperation) {
+				cmp._hasCreateOrDelete = true;
+			}
 		}
 		
 		return this.createFacetFromTrackingInfo(cmp);

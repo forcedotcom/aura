@@ -1109,6 +1109,7 @@ Component.prototype.addErrors = function(expression, errors) {
     if($A.util.isUndefinedOrNull(errors)){
         return;
     }
+    $A.renderingService.addDirtyValue(expression, this);
     this.callOnExpression(Component.prototype.addErrorsCallback, expression, errors);
     $A.renderingService.addDirtyValue(expression, this);
     this.priv.fireChangeEvent(this,expression,undefined,undefined,undefined);

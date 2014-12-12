@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.Util");
+Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.UtilTest=function(){
@@ -364,41 +364,6 @@ Test.Aura.UtilTest=function(){
 
     [Fixture]
     function apply() {
-
-        // Checks if objects are equal
-        function isEqualObjects(a, b) {
-            // handle primitives
-            if (a === b) {
-                return true;
-            }
-
-            // lame but we don't care about non-objects
-            if (typeof a !== "object" || a instanceof Array) {
-                return false;
-            }
-
-            // verify b is equal or a superset of a
-            for (var i in a) {
-                if (!b.hasOwnProperty(i)) {
-                    return false;
-                }
-                if (!isEqualObjects(a[i], b[i])) {
-                    return false;
-                }
-            }
-
-            // verify b is only equal, not a superset of a
-            for (var i in b) {
-                if (!a.hasOwnProperty(i)) {
-                    return false;
-                }
-            }
-
-            // b is equal to a
-            return true;
-        };
-
-
         [Fact]
         function testForceFalseDeepFalse() {
             auraMock(function() {
@@ -413,7 +378,7 @@ Test.Aura.UtilTest=function(){
                 util.apply(base, members, false, false);
 
                 // Assert
-                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+                Assert.Equal(base, expected);
             });
         }
 
@@ -431,7 +396,7 @@ Test.Aura.UtilTest=function(){
                 util.apply(base, members, true, false);
 
                 // Assert
-                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+                Assert.Equal(base, expected);
             });
         }
 
@@ -440,18 +405,15 @@ Test.Aura.UtilTest=function(){
             auraMock(function() {
                 // Arrange
                 var util = new $A.ns.Util(),
-                    base     =  { "a": { "b": { "c": 1,  "d": { "e": 2,  "f": 3 }         }}, "h": 5,  "i": { j: 7 } },
+                    base     =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { j: 7 } },
                     members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 6 },
-                    expected =  { "a": { "b": { "c": 10, "d": { "e": 20, "f": 3 }, "g": 4 }}, "h": 50,  "i": 6 };
-                // TODO: new apply() algorithm generates this output
-                //  expected =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 6 },
-                // that is, top-level i property is overwritten. should this test change or the algorithm?
+                    expected =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }, "g": 4 }}, "h": 5,  "i": { j: 7 } };
 
                 // Act
                 util.apply(base, members, false, true);
 
                 // Assert
-                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+                Assert.Equal(base, expected);
             });
         }
 
@@ -469,7 +431,7 @@ Test.Aura.UtilTest=function(){
                 util.apply(base, members, true, true);
 
                 // Assert
-                Assert.True(isEqualObjects(base, expected), "base not equal to expected");
+                Assert.Equal(base, expected);
             });
         }
     }

@@ -1020,10 +1020,10 @@ $A.ns.Util.prototype.isSubDef = function(def, qname) {
  */
 $A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
     if(members) {
-        var property;
-        var value;
-        for (property in members) {
-            if(forceCopy||!baseObject.hasOwnProperty(property)||deepCopy){
+        var value=null;
+        for (var property in members) {
+            var setValue=forceCopy||!baseObject.hasOwnProperty(property);
+            if(setValue||deepCopy){
                 value=members[property];
                 if(deepCopy&&value!=undefined) {
                     var branchValue = null;
@@ -1040,7 +1040,9 @@ $A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Objec
                         continue;
                     }
                 }
-                baseObject[property]=value;
+                if(setValue) {
+                    baseObject[property] = value;
+                }
             }
         }
     }

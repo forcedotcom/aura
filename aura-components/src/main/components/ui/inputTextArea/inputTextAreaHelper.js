@@ -25,7 +25,15 @@
             if ($A.util.isUndefinedOrNull(value)) {
                 elem.value = "";
             } else {
-                elem.value = value;
+                if (document.activeElement == elem) {
+                    var selectionStart = elem.selectionStart;
+                    var selectionEnd = elem.selectionEnd;
+                    elem.value = value;
+                    elem.setSelectionRange(selectionStart,selectionEnd);
+                } else {
+                    elem.value = value;
+                }
+
                 // carriage returns are added for new lines to match form encoded textarea behavior
                 var carriageReturnValue = value.replace(/(\r\n)|\n/g,'\r\n');
                 component.set("v.value",carriageReturnValue,true);

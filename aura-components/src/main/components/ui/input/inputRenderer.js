@@ -51,8 +51,8 @@
         concreteHelper.addInputDomEvents(component);
 
         if (!component._creatingAsyncErrorCmp) {
-        	helper.handleErrors(component);
-            helper.updateErrorElement(component);
+        	concreteHelper.handleErrors(component);
+            concreteHelper.updateErrorElement(component);
         }
 
         if (component.get("v.doFormat")) {

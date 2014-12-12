@@ -149,7 +149,9 @@
      * Dismiss the error messages and restore the component to the normal state.
      */
     validate : function(component) {
-        this.updateErrorElement(component)
+        var concreteCmp = component.getConcreteComponent();
+        var concreteHelper = concreteCmp.getDef().getHelper();
+        concreteHelper.updateErrorElement(component);
 
         var errorCmp = component.get("v.errorComponent")[0];
 
@@ -163,7 +165,9 @@
      * Show up the the error messages and put the component in the error state.
      */
     invalidate : function(component) {
-        this.updateErrorElement(component)
+        var concreteCmp = component.getConcreteComponent();
+        var concreteHelper = concreteCmp.getDef().getHelper();
+        concreteHelper.updateErrorElement(component);
 
         var valueErr = component.getErrors("v.value");
 

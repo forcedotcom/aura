@@ -365,18 +365,28 @@ var AuraDevToolService = function() {
         accessbilityAide:{
             
             /**
-             * @param nodelistArray - array of elements that are needed to be turned into an actual array
-             * @return the new array
-             */
-            nodeListToArray : function(nodeListArray){
-                var normalArray = [];
-                
-                for(var i = 0; i < nodeListArray.length; i++){
-                    for(var j = 0; j < nodeListArray[i].length; j++){
-                        normalArray.push(nodeListArray[i][j]);
-                    }
-                }
-                return normalArray;
+             * @param array       - the array that we are going add elements to
+             * @param nodeList    - array of elements that are needed to be turned into an array of objects
+             * @param activeClass - class of where the active element is (null if on the current tag, non null if on a child)
+             */      	 
+            nodeListToObjectArray : function(array, nodeList, activeClass){
+            	var node;
+            	for(var i = 0; i < nodeList.length; i++){
+            		node =  nodeList[i];
+            		if($A.util.isUndefinedOrNull(activeClass)){
+            			 array.push({
+            				"activeElm" : node 
+            			 });
+            		 }
+            		 else{
+            			 array.push({
+             				"activeElm" : node,
+             				"ariaHidden" : node.querySelectorAll(activeClass)[0]
+             			 });
+            		 }
+                                 		 
+            	 }
+            	
             },
             
             /**
@@ -386,44 +396,53 @@ var AuraDevToolService = function() {
              */
             findTopLevelErrors : function(panels, topPanelsCount){
                 var errorArray = [];
-                var panel = null;
+                var activePanel = null;
+                var panelObj = null;
                 var hiddenValue = "";
-                               
+                                        
                 for(var i = 0; i< panels.length; i++){
-                    panel = panels[i];
-                    hiddenValue = $A.util.getElementAttributeValue(panel, "aria-hidden");
+                    panelObj = panels[i];
+                    activePanel = panelObj["activeElm"];
+                    
+                    if(panelObj.hasOwnProperty("ariaHidden")){
+                        panelWithAriaHidden = panelObj["ariaHidden"];
+                    }
+                    else{
+                        panelWithAriaHidden = panelObj["activeElm"];
+                    }
+                    
+                    hiddenValue = $A.util.getElementAttributeValue(panelWithAriaHidden, "aria-hidden");
                     //Panel is not the top element
-                    if($A.util.hasClass(panel, "panelSlide")){                       
+                    if($A.util.hasClass(activePanel, "panelSlide")){               
                         //If there is a top element, make sure that it has its aria-hidden attribute set to true
                         if(topPanelsCount > 0){
                             if($A.util.isEmpty(hiddenValue) || (hiddenValue.toLowerCase().indexOf("false") > -1)){
-                                errorArray.push(panel);
+                                errorArray.push(activePanel);
                             }
                         }
                         else{
                             //Otherwise, the panel should have the correct 
                             if(!$A.util.isUndefinedOrNull(hiddenValue) && (hiddenValue.toLowerCase().indexOf("true") > -1)){
-                                errorArray.push(panel);
+                                errorArray.push(activePanel);
                             }
                         }
                     }
                     //Panel is the top element
                     else{
-                        if($A.util.hasClass(panel, "active")){
+                        if($A.util.hasClass(activePanel, "active")){
                             if(!$A.util.isUndefinedOrNull(hiddenValue) && (hiddenValue.toLowerCase().indexOf("true") > -1)){
-                                errorArray.push(panel);
+                                errorArray.push(activePanel);
                             }
                         }
                         else{
                             if( $A.util.isEmpty(hiddenValue) || (hiddenValue.toLowerCase().indexOf("false") > -1)){
-                                errorArray.push(panel);
+                                errorArray.push(activePanel);
                             }
                         }
                     }
                 }
 
-                return errorArray;
-                
+                return errorArray;               
             },
 
             /**
@@ -516,10 +535,7 @@ var AuraDevToolService = function() {
                   }
                   return false;
             },
-            /**
-             * Keeps track of total number of errors in seen
-             */
-            errorCount : 0,
+            
             /**
              * Function that goes through all labels and turns the for attribute into a key
              * @param   labels    - All the labels that we want to go through
@@ -734,8 +750,7 @@ var AuraDevToolService = function() {
                  var elm = null;
                  var errStr = tagError+"\n";
                  var accessAideFuncs = aura.devToolService.accessbilityAide;
-                 accessAideFuncs.errorCount = len + accessAideFuncs.errorCount; 
-                     
+                    
                  for(var i = 0; i<len; i++){
                  	elm = errArray[i];
                      nodeName = elm.nodeName.toLowerCase();
@@ -1225,10 +1240,15 @@ var AuraDevToolService = function() {
                      var modalOverlay = "div.uiPanelDialog";
                      var panelOverlay = "div.forcePanelOverlay";
                      var panelSlide   = "section.stage.panelSlide";
-                     
+                     var panelSliderOverlay = "div.forcePanelSlider";
                      //Get all panels
-                     var panels = accessAideFuncs.nodeListToArray([domElem.querySelectorAll(modalOverlay), domElem.querySelectorAll(panelOverlay), domElem.querySelectorAll(panelSlide)]);
-                     var topPanelsCount = domElem.querySelectorAll(modalOverlay+".active").length + domElem.querySelectorAll(panelOverlay+".active").length;
+                     panels = []; 
+                     accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(modalOverlay));
+                     accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelOverlay)); 
+                     accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelSlide));
+                     accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelSliderOverlay), "div.body");
+                     var topPanelsCount = domElem.querySelectorAll(modalOverlay+".active").length + domElem.querySelectorAll(panelOverlay+".active").length+domElem.querySelectorAll(panelSliderOverlay+".active").length;
+
                      var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
                      return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
                 }

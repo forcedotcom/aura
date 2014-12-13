@@ -28,6 +28,33 @@
            
         },
         
+
+        testNoActivePanelSliderWithActiveDiv : {
+        	attributes: {
+                caseToRender: 'testNoActiveSliderAriaHiddenCorrect'
+            },
+            test: function (cmp) {
+                this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
+            }
+        },
+        
+        testActiveSliderAriaHiddenIncorrect : {
+        	attributes: {
+                caseToRender: 'testActiveSliderAriaHiddenIncorrect'
+            },
+            test: function (cmp) {
+                this.runTest(1, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
+            }
+        },
+        testActiveSliderAriaHiddenIncorrect : {
+        	attributes: {
+                caseToRender: 'testActivePanelSliderAriaHiddenCorrect'
+            },
+            test: function (cmp) {
+                this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
+            }
+        },
+        
         testTopPanelHidden : {
         	attributes: {
                 caseToRender: 'testTopPanelHidden'

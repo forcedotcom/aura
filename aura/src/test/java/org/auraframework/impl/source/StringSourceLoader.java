@@ -15,6 +15,20 @@
  */
 package org.auraframework.impl.source;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.auraframework.Aura;
+import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.system.Parser.Format;
+import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.auraframework.system.SourceLoader;
+
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -22,42 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.Nullable;
-
-import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.LibraryDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.system.Parser.Format;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
-import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener.SourceMonitorEvent;
-import org.auraframework.system.SourceLoader;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -432,6 +410,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         DESIGN(DesignDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        SVG(SVGDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         INCLUDE(IncludeDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, ".");
 
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;

@@ -15,10 +15,6 @@
  */
 package org.auraframework.http;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -33,6 +29,12 @@ import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
 import org.auraframework.test.client.UserAgent;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -84,7 +86,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
-        Aura.getContextService().endContext();
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
     }
 
@@ -121,8 +122,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertTrue("Cookie should contain : but was:" + cookie.getValue(), cookie.getValue().contains(":"));
         String countStr = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
         String startTimeStr = cookie.getValue().substring(countStr.length() + 1);
-
-        Aura.getContextService().endContext();
 
         try {
             int count = Integer.parseInt(countStr);
@@ -177,8 +176,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         if (!cssMsgToVerify.isEmpty()) {
             assertTrue(cssCache.contains(cssMsgToVerify));
         }
-
-        Aura.getContextService().endContext();
     }
 
     public void testRequestFromDifferentBrowserOnSamePage() throws Exception {
@@ -225,7 +222,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
-        Aura.getContextService().endContext();
 
         assertNull("CSS cache not cleared after source change event", cssCache);
     }
@@ -267,7 +263,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
-        Aura.getContextService().endContext();
         assertNull("JS cache not cleared after source change event", jsCache);
     }
 
@@ -290,7 +285,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return -1;
             }
         };
-        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
         HttpServletResponse response = new DummyHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
@@ -305,8 +300,153 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         svgCache = context.getDefRegistry().getCachedString(uid, svgDesc, key);
-        Aura.getContextService().endContext();
         assertNull("SVG cache not cleared after source change event", svgCache);
+    }
+
+    /**
+     * Verify SVG requests return a correct etag.
+     */
+    public void testSvgCacheUsesEtag() throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
+                ApplicationDef.class);
+        AuraContext context = Aura.getContextService()
+                .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+
+        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
+        String etag = svgDesc.getDef().getOwnHash();
+
+        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        context.addLoaded(appDesc, uid);
+
+        DummyHttpServletRequest request = new DummyHttpServletRequest("dummy.app") {
+            @Override
+            public long getDateHeader(String name) {
+                return -1;
+            }
+
+            @Override
+            public String getHeader(String name) {
+                if (name.equalsIgnoreCase("referer")) {
+                    //If referer is empty we assume the image is not viewed from within a webpage
+                    return "ANotNullString";
+                }
+                return super.getHeader(name);
+            }
+        };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
+        HttpServletResponse response = new DummyHttpServletResponse() {
+            Map<String, String> headers = new HashMap<>();
+            @Override
+            public void setHeader(String name, String value) {
+                headers.put(name.toLowerCase(), value);
+            }
+
+            @Override
+            public String getHeader(String name) {
+                return headers.get(name.toLowerCase());
+            }
+        };
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
+
+        String etagResponce = response.getHeader("etag");
+        assertEquals(etag, etagResponce);
+        //For etag to work properly, we need to "disable" the browser from caching it permanently.
+        assertEquals("no-cache",response.getHeader("cache-control"));
+        //If referer is not null, the image should be sent as a embedded image.
+        // IE not an attachment.
+        assertNull(response.getHeader("Content-Disposition"));
+    }
+
+    /**
+     * Verify SVG servlet returns 304 if etag's match.
+     */
+    public void testSvgReturns304() throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
+                ApplicationDef.class);
+        AuraContext context = Aura.getContextService()
+                .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+
+        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
+        final String etag = svgDesc.getDef().getOwnHash();
+
+        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        context.addLoaded(appDesc, uid);
+
+        DummyHttpServletRequest request = new DummyHttpServletRequest("dummy.app") {
+            @Override
+            public long getDateHeader(String name) {
+                return -1;
+            }
+
+            @Override
+            public String getHeader(String name) {
+                if (name.equalsIgnoreCase("if-none-match")) {
+                    return etag;
+                } else if (name.equalsIgnoreCase("referer")) {
+                    //If referer is empty we assume the image is not viewed from within a webpage
+                    return "ANotNullString";
+                }
+                return super.getHeader(name);
+            }
+        };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
+        HttpServletResponse response = new DummyHttpServletResponse() {
+            int status;
+            @Override
+            public int getStatus() {
+                return status;
+            }
+
+            @Override
+            public void setStatus(int sc) {
+                status = sc;
+            }
+        };
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
+
+        assertEquals(304, response.getStatus());
+    }
+
+    /**
+     * Verify SVG servlet returns Content-Disposition = attachment; filename=resources.svg if referer header is null
+     * This is to prevent any scripts hidden in the SVG from running on the local domain
+     */
+    public void testSvgNoReferer() throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
+                ApplicationDef.class);
+        AuraContext context = Aura.getContextService()
+                .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+
+        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
+
+        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        context.addLoaded(appDesc, uid);
+
+        DummyHttpServletRequest request = new DummyHttpServletRequest("dummy.app") {
+            @Override
+            public long getDateHeader(String name) {
+                return -1;
+            }
+        };
+        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
+        HttpServletResponse response = new DummyHttpServletResponse() {
+            Map<String, String> headers = new HashMap<>();
+            @Override
+            public void setHeader(String name, String value) {
+                headers.put(name.toLowerCase(), value);
+            }
+
+            @Override
+            public String getHeader(String name) {
+                return headers.get(name.toLowerCase());
+            }
+        };
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
+
+        assertTrue(response.getHeader("Content-Disposition").contains("attachment; filename"));
     }
 
 }

@@ -122,7 +122,8 @@ public class AuraServlet extends AuraBaseServlet {
      * @param response the response (for setting the location header.
      * @returns true if we are finished with the request.
      */
-    private void handleNoCacheRedirect(String nocache, HttpServletResponse response) throws IOException {
+    private void handleNoCacheRedirect(String nocache, HttpServletRequest request,
+    		HttpServletResponse response) throws IOException {
     	//
         // FIXME:!!!
         // This is part of the appcache refresh, forcing a reload while
@@ -138,7 +139,11 @@ public class AuraServlet extends AuraBaseServlet {
             final URI uri = new URI(nocache);
             final String fragment = uri.getFragment();
             final String query = uri.getQuery();
-            final StringBuilder sb = new StringBuilder(uri.getPath());
+            final StringBuffer sb = request.getRequestURL();
+            int index = sb.indexOf("//");
+            index = sb.indexOf("/", index + 2);  // find the 3rd slash, start of path
+            sb.setLength(index);
+            sb.append(uri.getPath());
             if(query != null && !query.isEmpty()) {
                 sb.append("?").append(query);
             }
@@ -204,7 +209,7 @@ public class AuraServlet extends AuraBaseServlet {
         try {
             String nocache = nocacheParam.get(request);
             if (nocache != null && !nocache.isEmpty()) { 
-                handleNoCacheRedirect(nocache, response);
+                handleNoCacheRedirect(nocache, request, response);
                 return;
             }
             tagName = tag.get(request);

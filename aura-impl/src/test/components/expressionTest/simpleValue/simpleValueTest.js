@@ -21,6 +21,10 @@
 	    component._log = undefined; // reset log
 	},
 
+    assertNoChangeEvent: function(component){
+        $A.test.assertEquals(undefined, component._log);
+    },
+    
     testCreateSimpleValue:{
 		test:[
 			function(component){
@@ -74,6 +78,26 @@
 		    $A.test.assertNull(component.get("v.booleanValue"), "expected null as value");
 		}]
     },
+
+    testSetOriginalValue: {
+        attributes: {
+            booleanValue : true, integerValue : 180 , stringValue : "Tesla"
+        },
+        test: function(component) {
+            var orig = component.get("v.booleanValue");
+            component.set("v.booleanValue", orig);
+            this.assertNoChangeEvent(component);
+
+            var orig = component.get("v.integerValue");
+            component.set("v.integerValue", orig);
+            this.assertNoChangeEvent(component);
+            
+            var orig = component.get("v.stringValue");
+            component.set("v.stringValue", orig);
+            this.assertNoChangeEvent(component);
+        }
+    },
+
     //W-2251248
     _testVerifyTypeChecking:{
     	attributes:{

@@ -272,7 +272,7 @@
 			select = cmp.find("select").getElement(),
 			optFrag, option, internalText;
 
-		if ($A.util.isEmpty(options)) {
+		if ($A.util.isEmpty(options) && (!$A.util.isEmpty(cmp.get("v.body")))) {
 			return;
 		}
 

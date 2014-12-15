@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 ({
+   
 	init : function(cmp) {
-		var opts = [{ "label": "Option1", "value": "Option1", "class": "option" },
-		            { "label": "Option2", "value": "Option2", "class": "option", selected: true },
-		            { "label": "Option3", "value": "Option3", "class": "option" },
-		            { "label": "Option4", "value": "Option4", "class": "option" }];
+		var opts = [];
+		opts4 =[{ "label": "Option1", "value": "Option1", "class": "option" },
+	            { "label": "Option2", "value": "Option2", "class": "option", selected: true },
+	            { "label": "Option3", "value": "Option3", "class": "option" },
+	            { "label": "Option4", "value": "Option4", "class": "option" }],
+	    opts2 = [{ "label": "OptionA", "value": "OptionA", "class": "option", selected: true },
+		            { "label": "OptionB", "value": "OptionB", "class": "option" }];    
 		
+		//Checking which options should be set
+		var which2use = cmp.get("v.whichOption");
+		if(which2use == 4){
+		    opts = opts4;	
+		}
+		else if(which2use == 2){
+			opts = opts2;
+		}
+			
 		cmp.find("dynamicSelect").set("v.options", opts);
 	}
 })

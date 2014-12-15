@@ -21,19 +21,32 @@
 			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element. It contains options, represented by the <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
 			 To wire up any client-side logic when an input value is selected, use the <code>change</code> event. 
 		</p>
-<pre>&lt;ui:inputSelect class="single" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
-        &lt;ui:inputSelectOption text="Tiger"/>
-        &lt;ui:inputSelectOption text="Lion" value="true"/>
-        &lt;ui:inputSelectOption text="Bear"/>
-        &lt;ui:inputSelectOption text="Butterfly"/>
-        &lt;ui:inputSelectOption text="Dragonfly"/>
-&lt;/ui:inputSelect></pre>		
+<pre>>&lt;ui:inputSelect multiple="true">
+    &lt;ui:inputSelectOption text="All Primary" label="All Contacts" value="true"/>
+    &lt;ui:inputSelectOption text="All Primary" label="All Primary"/>
+    &lt;ui:inputSelectOption text="All Secondary" label="All Secondary"/>
+&lt;/ui:inputSelect></pre>
+
+                <h4>Generating Options with <code>aura:iteration</code></h4>
+                 <p>You can use <code>aura:iteration</code> to iterate over a list of items to generate options. 
+                 This example iterates over a list of items and conditionally renders the options.</p>
+<pre>&lt;aura:attribute name="contacts" type="String[]" default="All Contacts,Others"/>
+&lt;ui:inputSelect>
+    &lt;aura:iteration items="{!v.contacts}" var="contact">
+        &lt;aura:if isTrue="{!contact == 'All Contacts'}"> 
+            &lt;ui:inputSelectOption text="{!contact}" label="{!contact}"/>
+            &lt;aura:set attribute="else">
+                &lt;ui:inputSelectOption text="All Primary" label="All Primary"/>
+                &lt;ui:inputSelectOption text="All Secondary" label="All Secondary"/>
+            &lt;/aura:set>
+        &lt;/aura:if>
+    &lt;/aura:iteration>
+&lt;/ui:inputSelect></pre>
 		<h4>Generating Options Dynamically</h4>
 		<p>
-			<code>ui:inputSelect</code> does not support the use of <code>aura:iteration</code> in its body. To generate options dynamically, you can load the options on the controller-side action.
+		    Generate the options dynamically on component initialization using a controller-side action.
 		</p>
-		<pre>
-&lt;aura:component>
+<pre>&lt;aura:component>
     &lt;aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     &lt;ui:inputSelect label="Select me:" class="dynamic" aura:id="InputSelectDynamic"/>
 &lt;/aura:component>

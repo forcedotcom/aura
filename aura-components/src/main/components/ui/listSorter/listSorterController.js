@@ -26,7 +26,7 @@
         	helper.initItems(cmp, data.columns, data.orderBy);
         	if (cmp._openAfterDataProvided) {
         		cmp._openAfterDataProvided = false;
-        		helper.handleOnOpen(cmp);
+        		helper.handleOnOpen(cmp, true);
         	}
 		}
 	},

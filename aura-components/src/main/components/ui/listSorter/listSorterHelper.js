@@ -93,14 +93,16 @@
 			cmp._selectedItems = sList;
 			cmp.set('v.defaultSelectedItems', selectedItems);
 			cmp.set('v.items', filteredItems);
+			//show apply button only when item is not empty
+			$A.util.removeClass(cmp.find("set").getElement(), "hidden", "visible");
 			this.refreshMenu(cmp);
 		}
 	},
 
 	
-	handleOnOpen : function(cmp) {
-		var items = cmp.get('v.items');		
-		if (cmp.get('v.visible') || !cmp.isRendered()) {
+	handleOnOpen : function(cmp, force) {
+		var items = cmp.get('v.items');	
+		if ((cmp.get('v.visible') || !cmp.isRendered()) && !force) {
 			return;
 		}		
 		this.attachEventHandler(cmp);		
@@ -120,7 +122,7 @@
 			var index = selected[0].index;
 			if (items[index]) {
 				cmp.find('sorterMenuList').set("v.focusItemIndex", index);
-			}			
+			}
 		}
 		cmp.set('v.visible', true);
 		this.appendElementToBody(cmp);
@@ -232,14 +234,12 @@
     },
 	
 	setVisible : function(cmp, visible) {
+		var cssClass = "open";
 		if (cmp.get('v.modal')) {
-			$A.util[visible ? 'addClass' : 'removeClass'](cmp.find('mask').getElement(),'open');
-			var el = cmp.find('sorterContainer').getElement();
-			$A.util[visible ? 'addClass' : 'removeClass'](el,'open');
-			$A.util[visible ? 'addClass' : 'removeClass'](el,'modal');
-		} else {
-			$A.util[visible ? 'addClass' : 'removeClass'](cmp.find('sorterContainer').getElement(),'open');
+			$A.util.toggleClass(cmp.find('mask').getElement(), "open", visible);
+			cssClass += " modal";
 		}
+		$A.util.toggleClass(cmp.find('sorterContainer').getElement(), cssClass, visible);
 	},
 	
 	updateSortOrder : function(cmp) {

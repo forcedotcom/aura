@@ -1062,10 +1062,17 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Wait for text to be present for element.
+     * Wait for the exact text to be present for element.
      */
     public void waitForElementTextPresent(WebElement e, String text) {
-        waitForElementText(e, text, true, timeoutInSecs);
+        waitForElementText(e, text, true, timeoutInSecs, true);
+    }
+    
+    /**
+     * Wait for element to contains the text.
+     */
+    public void waitForElementTextContains(WebElement e, String text) {
+        waitForElementText(e, text, true, timeoutInSecs, false);
     }
 
     /**
@@ -1076,13 +1083,23 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Wait for text on element to be either cleared or present.
+     * Wait for text on element to be either cleared or present. 
+     * This will check the exact match of text. 
+     * If we wish to only check it contains some text, use waitForElementTextContains instead
      */
     protected void waitForElementText(final WebElement e, final String text, final boolean isPresent, long timeout) {
+    	waitForElementText(e, text, isPresent, timeout, true);
+    }
+    		
+    private void waitForElementText(final WebElement e, final String text, final boolean isPresent, long timeout, final boolean checkFullText) {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return isPresent == text.equals(e.getText());
+            	if(checkFullText == true) {
+            		return isPresent == text.equals(e.getText());
+            	} else {
+            		return isPresent == ( ( e.getText() != null) && e.getText().contains(text) );
+            	}
             }
         }, timeout,"fail on waiting for element text:"+text);
     }

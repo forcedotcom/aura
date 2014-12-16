@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 ({
-    testControllerClickHandler:{
+		labels : [ "UnAdaptableTest" ],
+		testEmpty : {
+			test: function(){
+				$A.test.assertTrue(true);
+			}
+		}
+})
+/* Disabling test as the cmp is deprecated
+     testControllerClickHandler:{
         test:[
             function CallsFireEvents(component) {
                 var actual = false;
@@ -2292,4 +2300,4 @@
         return null;
     }
 
-})
+})*/

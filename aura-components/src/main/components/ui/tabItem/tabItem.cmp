@@ -16,7 +16,7 @@
 
 -->
 <aura:component extensible="true" description="A tab that is rendered by the ui:tabBar component">
-    <aura:attribute name="title" type="String" description="The text to display as a tooltip when the mouse hovers over the tab."/>
+    <aura:attribute name="title" type="String" description="The text to display on the tab."/>
     <aura:attribute name="name" type="String" description="The internal name of the tab that can be referenced to."/>
     <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>

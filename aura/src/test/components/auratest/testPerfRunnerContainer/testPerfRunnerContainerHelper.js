@@ -162,34 +162,40 @@
             row,li, i, id;
         
         if (cmp._runningTests) {
-        	var r = confirm("Tests are still pending execution. Are you sure you want to submit a new request?");
-        	if (r == true) {
-        		this.updateStatus("Submiting a new request");
-        	} else {
-        		this.updateStatus("Continue working on pending execution.");
-        		return;
-        	}
+               var r = confirm("Tests are still pending execution. Are you sure you want to submit a new request?");
+               if (r == true) {
+                      this.updateStatus("Submiting a new request");
+               } else {
+                      this.updateStatus("Continue working on pending execution.");
+                      return;
+               }
         }
         console.log(testCb);
         for (i = 0; i < testCb.length; i++) {
             row      = testCb[i];
             id       = $A.util.getDataAttribute(row, 'testid');
             if(id){
-            	tests.push(id);
+                   tests.push(id);
                 li = this._getLiFromInput(row);
-            	$A.util.setDataAttribute(li, 'state', this.STATE.ENQUEUE);
+                   $A.util.setDataAttribute(li, 'state', this.STATE.ENQUEUE);
             }
         }
 
         if (tests.length) {
             testRunner.setParams({testSet: tests});
             testRunner.setCallback(this, function(action) {
-                setTimeout(function () {
-                    self.pollTestResults(cmp, dom);
-                }, pollTime);
-                
+                   if (action.getState() === "SUCCESS") {
+                       setTimeout(function () {
+                              //we don't have first pollAction yet, pass undefined 
+                           self.pollTestResults(cmp, dom, undefined, action);
+                       }, pollTime);
+                   } else if (action.getState() == "INCOMPLETE" || action.getState() == "ERROR") {
+                          alert("testRunner Action un-successful (return state = "+action.getState()+"), please check the server");
+                          finishTestRun(cmp, null, null, false);
+                   } else {
+                          console.log("we have abort the testRunner action#"+action.getId(),action);
+                   }
             });
-
             this.updateStatus('Enqueueing '+ tests.length +' tests...');
             $A.run(function () {
                 cmp._runningTests = true;
@@ -235,35 +241,48 @@
         }
         this.updateStatus('Tests Running | Last update: ' + (new Date()).toLocaleString());
     },
-    finishTestRun: function (cmp, actionResult, dom) {
-        this.updateTests(actionResult, dom);
-        this.updateStatus('Ready to run more tests!');
+    finishTestRun: function (cmp, actionResult, dom, success) {
+        if(success) {
+               this.updateTests(actionResult, dom);
+               this.updateStatus('Ready to run more tests!');
+        }
         cmp._runningTests = false;
         cmp._finishRun = true;
     },
-    pollTestResults: function (cmp, containerDOM) {
+    pollTestResults: function (cmp, containerDOM, previousPollActionForThisTestRunnerAction, testRunnerActionCurrent) {
         var self       = this,
             pollAction = cmp.get("c.pollForTestRunStatus"),
             pollTime   = this.POLL_TIME,
             dom        = containerDOM || cmp.getElement();
-
+        
         pollAction.setAbortable(true);
         pollAction.setCallback(this, function (action) {
             if (action.getState() === "SUCCESS") {
-				var actionResult = action.getReturnValue();
-				self.updateTests(actionResult, dom);
-				if (actionResult.testsRunning) {
-					setTimeout(function() {
-						self.pollTestResults(cmp, dom);
-					}, pollTime);
-				} else {
-					self.finishTestRun(cmp, actionResult, dom);
-				}
+                var actionResult = action.getReturnValue();
+                self.updateTests(actionResult, dom);
+                if (actionResult.testsRunning) {
+                    setTimeout(function() {
+                        self.pollTestResults(cmp, dom, action, testRunnerActionCurrent);
+                                   }, pollTime);
+                            } else {
+                                          self.finishTestRun(cmp, actionResult, dom, true);
+                            }
+            } else if (action.getState() == "INCOMPLETE" || action.getState() == "ERROR"){
+                   alert("poll Action un-successful (return state = "+action.getState()+"), please check the server");
+                   self.finishTestRun(cmp, null, null, false);//we still better to clear cmp._XXX up
+            } else {
+                   console.log("we have abort the pollAction:"+action.getId()); 
             }
         });
+        
+        //we only set abortableID to pollActions after the first one for each testRunner Action.
+        //so when new testRunner Action success, the pollActions belong to revious testRunner Action will get aborted.
+        if( previousPollActionForThisTestRunnerAction != undefined ) {
+            pollAction.setParentAction(previousPollActionForThisTestRunnerAction); 
+           }
 
         $A.run(function () {
-            $A.enqueueAction(pollAction);
+               $A.enqueueAction(pollAction);
         });
     }
 })

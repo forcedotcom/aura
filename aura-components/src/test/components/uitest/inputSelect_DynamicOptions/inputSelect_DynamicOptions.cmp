@@ -19,4 +19,11 @@
 	<aura:attribute name="whichOption" type="String" default="4"/>
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <ui:inputSelect aura:id="dynamicSelect" class="dynamicSelect"/>
+    <br/>
+    
+    <ui:inputSelect aura:id="inputSelectIteration">
+    	<aura:iteration items="1,2,3,4,5" var="item">
+    		<ui:inputSelectOption text="{!item}" label="{!item}"/>
+    	</aura:iteration>
+    </ui:inputSelect>
 </aura:component>

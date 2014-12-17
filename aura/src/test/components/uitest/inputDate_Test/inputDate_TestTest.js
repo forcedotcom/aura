@@ -297,15 +297,16 @@
     /**
      * We have to ways that we need to get elements. Either from a output/select combo or from a header tag  
      */
-    getTextFromElm: function(cmp){
-	                 if(this.isViewDesktop()){
-	                     return $A.util.getText(cmp.find("calTitle").getElement());
-	                 }
-	
-                         var year = cmp.find("yearTitle").getElement().value;
-                         var month = $A.util.getText(cmp.find("monthTitle").getElement());
-		
-                         return month +" "+year;
+    getTextFromElm: function (cmp) {
+        if (this.isViewDesktop()) {
+            return $A.util.getText(cmp.find("calTitle").getElement());
+        }
+
+        var year = cmp.find("yearTitle").getElement().value;
+        // On iOS getting the text out of the span doesn't return the newly rendered value; getting
+        // the component value instead.
+        var month = cmp.find("monthTitle").get("v.value");
+        return month + " " + year;
     },
 
     convertMonth : function(intMonth) {

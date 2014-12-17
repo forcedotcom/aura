@@ -705,13 +705,22 @@ var priv = {
     	if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
-
         if (window.applicationCache
                 && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
             return;
         }
 
-        priv.hardRefresh();
+        /**
+         * BB10 triggers appcache ERROR when the current manifest is a 404.
+         * Other browsers triggers OBSOLETE and we refresh the page to get
+         * the new manifest.
+         *
+         * For BB10, we append cache busting param to url to force BB10 browser
+         * not to use cached HTML via hardRefresh
+         */
+        if (priv.isBB10()) {
+            priv.hardRefresh();
+        }
 
         var manifestURL = priv.getManifestURL();
         if (priv.isDevMode()) {

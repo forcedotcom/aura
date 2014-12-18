@@ -45,7 +45,7 @@ var AuraRenderingService = function AuraRenderingService(){
 
             components = priv.getArray(components);
             var elements = [];
-
+             
             for (var i=0; i < components.length; i++){
                 var cmp = components[i];
                 //JBUCH: HALO: FIXME: WE SHOULD REFUSE TO RENDER THINGS THAT AREN'T COMPONENTS
@@ -78,7 +78,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 'endTime' : (new Date()).getTime()
             });
             //#end
-
+            
             return elements;
         },
 
@@ -435,6 +435,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 var list = priv.dirtyComponents[id];
                 if (!list) {
                     list = priv.dirtyComponents[id] = {};
+                    priv.dirtyComponentIds.push(id);
                 }
                 while(expression.indexOf('.')>-1){
                     list[expression]=true;
@@ -490,8 +491,9 @@ var AuraRenderingService = function AuraRenderingService(){
                     var dirty = [];
                     priv.needsCleaning = false;
                     maxiterations--;
-
-                    for ( var id in priv.dirtyComponents) {
+                                        
+                    while(priv.dirtyComponentIds.length) {
+                    	var id = priv.dirtyComponentIds.shift();
                         var cmp = $A.componentService.get(id);
 
                         // uncomment this to see what's dirty and why. (please don't delete me again. it burns.)

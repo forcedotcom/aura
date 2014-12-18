@@ -104,7 +104,7 @@
 		var items = cmp.get('v.items');	
 		if ((cmp.get('v.visible') || !cmp.isRendered()) && !force) {
 			return;
-		}		
+		}
 		this.attachEventHandler(cmp);		
 		var selected = this.getDefaultSortBy(cmp);
 		if (selected && selected.length > 0 && items && items.length > 0) {
@@ -152,9 +152,11 @@
 			var selectedItems = this.getSelectedMenuItems(cmp);
 			for (var i=0; i < selectedItems.length; i++) {
 				// append prefix for descending order
-				order = selectedItems[i].isAscending ? '' : this.CONSTANTS.DESC_PREFIX;
+				order = selectedItems[i].ascending ? '' : this.CONSTANTS.DESC_PREFIX;
 				result.push({ sortBy: order + selectedItems[i].fieldName, label: selectedItems[i].label });
-			}			
+			}
+			//update default selected items so correct item is selected when open next time
+			cmp.set("v.defaultSelectedItems", selectedItems);
 			action.runDeprecated(result);
 		}
 	},
@@ -179,7 +181,7 @@
 		for (var i=0; i < menuItems.length; i++) {			 
 			var item = menuItems[i];
 			if (item.get('v.selected') === true) {
-				item.set('v.selected', false, true);
+				item.set('v.selected', false);
 			}
 			
 			item.set('v.isAscending', true);
@@ -247,7 +249,7 @@
 		if (selectedItems && selectedItems.length > 0) {
 			var values = [];
 			for (var i=0; i<selectedItems.length; i++) {
-				cmp._sortOrderMap[selectedItems[i].fieldName].order = selectedItems[i].isAscending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
+				cmp._sortOrderMap[selectedItems[i].fieldName].order = selectedItems[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
 			}
 		}
 	},
@@ -260,7 +262,7 @@
 			for (var i = 0; i < menuItems.length; i++) {
 				var c = menuItems[i];
 			    if (c.get('v.selected') === true) {			    	
-			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i, isAscending: c.get('v.isAscending')});
+			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i, ascending: c.get('v.isAscending')});
 			    }
 			}
 	    }

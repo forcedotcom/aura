@@ -484,7 +484,7 @@
         }
 
         // @todo: revisit this sequence when destroy events are added
-        this.closeInstance(cmp, panel);
+        this.closeInstance(cmp, panel, {removeAnim: true});
         this.unstackPanel(cmp, panel);
 
         panel && this.removeInstance(cmp, panel, true);

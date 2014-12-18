@@ -17,6 +17,7 @@ package org.auraframework.adapter;
 
 import org.auraframework.def.JavaControllerDef;
 import org.auraframework.def.JavaModelDef;
+import org.auraframework.def.JavaProviderDef;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -68,8 +69,35 @@ public interface BeanAdapter extends AuraAdapter {
      * this is not the case, a static controller (with no state) should be used
      * to enforce the contract.
      *
+     * The implementing adapter can define if it is single instance or multi-instance.
+     *
      * @param def the controller def for which we need a bean
      * @return a bean that is tied to the current context.
      */
     Object getControllerBean(JavaControllerDef def);
+    
+    /**
+     * Validate a bean for a provider.
+     *
+     * @param def the definition to validate
+     * @param clazz the class to validate.
+     * @throws QuickFixException if there is an error in the validation.
+     */
+    void validateProviderBean(JavaProviderDef def, Class<?> clazz) throws QuickFixException;
+
+    /**
+     * Get a bean for a provider.
+     *
+     * This method can return the same bean for all calls within a single context
+     * (i.e. request). Providers cannot assume that each call is on a new bean,
+     * but rather should assume that the use context is the same.
+     *
+     * The implementing adapter can define if it is single instance or multi-instance.
+     *
+     * @param T the type of the provider to return
+     * @param def the provider def for which we need a bean
+     * @param clazz the class to return.
+     * @return a bean that is tied to the current context.
+     */
+    <T> T getProviderBean(JavaProviderDef def, Class<T> clazz);
 }

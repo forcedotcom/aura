@@ -43,20 +43,20 @@ import org.auraframework.util.json.Json;
 public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> implements JavaControllerDef {
     private static final long serialVersionUID = -8294844909051767366L;
     private final Class<?> controllerClass;
-    private final boolean bean;
+    private final boolean useAdapter;
     private final Map<String, JavaActionDef> actionMap;
 
     protected JavaControllerDefImpl(Builder builder) {
         super(builder);
         this.controllerClass = builder.controllerClass;
         this.actionMap = AuraUtil.immutableMap(builder.actionMap);
-        this.bean = builder.bean;
+        this.useAdapter = builder.useAdapter;
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (this.bean) {
+        if (this.useAdapter) {
             Aura.getBeanAdapter().validateControllerBean(this);
         }
     }
@@ -112,7 +112,7 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
             throw new DefinitionNotFoundException(desc);
         }
         Object controller = null;
-        if (bean) {
+        if (useAdapter) {
             controller = Aura.getBeanAdapter().getControllerBean(this);
         }
         return new JavaAction(getDescriptor(), actionDef, controller, paramValues);
@@ -131,7 +131,7 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
 
         private Class<?> controllerClass;
         private Map<String, JavaActionDef> actionMap;
-        private boolean bean;
+        private boolean useAdapter;
 
         @Override
         public JavaControllerDefImpl build() {
@@ -145,8 +145,8 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
             this.controllerClass = controllerClass;
         }
 
-        public void setBean(boolean bean) {
-            this.bean = bean;
+        public void setUseAdapter(boolean useAdapter) {
+            this.useAdapter = useAdapter;
         }
 
         /**

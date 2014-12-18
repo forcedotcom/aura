@@ -100,8 +100,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         attributes.put("whatToDo", "replace");
         Component component = Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class,
                 attributes);
-        assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.", component
-                .getDescriptor().getQualifiedName(), "markup://test:test_Provider_Concrete_Sub");
+        assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.",
+                component.getDescriptor().getQualifiedName(), "markup://test:test_Provider_Concrete_Sub");
     }
 
     public void testConcreteProviderNull() throws Exception {
@@ -110,8 +110,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         attributes.put("whatToDo", "label");
         Component component = Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class,
                 attributes);
-        assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.", component
-                .getDescriptor().getQualifiedName(), "markup://test:test_Provider_Concrete");
+        assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.",
+                component.getDescriptor().getQualifiedName(), "markup://test:test_Provider_Concrete");
     }
 
     public void testConcreteProviderNotComponent() throws Exception {
@@ -170,7 +170,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(InterfaceDef.class, markupTestCase);
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
-                fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
+                fail("Invalid provider defined, but passed: "+testcase);
             } catch (AuraRuntimeException expected) {
             }
         }
@@ -179,7 +179,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(InterfaceDef.class, markupTestCase);
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
-                fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
+                fail("Invalid provider defined, but passed: "+testcase);
             } catch (InvalidDefinitionException expected) {
             }
         }
@@ -188,7 +188,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(InterfaceDef.class, markupTestCase);
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
-                fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
+                fail("Invalid provider defined, but passed: "+testcase);
             } catch (DefinitionNotFoundException expected) {
             }
         }
@@ -500,11 +500,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             javaPrvdrDefDesc.getDef();
             fail("Expected a InvalidDefinitionException");
         } catch (Exception e) {
-            checkExceptionFull(
-                    e,
-                    InvalidDefinitionException.class,
-                    "Constructor is inaccessible for org.auraframework.impl.java.provider.TestProviderWithPrivateConstructor",
-                    javaPrvdrDefDesc.getDescriptorName());
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Default constructor is not public.", javaPrvdrDefDesc.getDescriptorName());
         }
     }
 
@@ -519,8 +516,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             fail("Expected a InvalidDefinitionException");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Cannot instantiate org.auraframework.impl.java.provider.TestProviderWithoutNoArgConstructor",
-                    javaPrvdrDefDesc.getDescriptorName());
+                    "No default constructor found.", javaPrvdrDefDesc.getDescriptorName());
         }
     }
 
@@ -535,8 +531,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             fail("Expected an intentional error");
         } catch (Throwable e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Failed to instantiate org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation",
-                    javaPrvdrDefDesc.getDescriptorName());
+                    "Unable to instantiate class", javaPrvdrDefDesc.getDescriptorName());
         }
     }
 

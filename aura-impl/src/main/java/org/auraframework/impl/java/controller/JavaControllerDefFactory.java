@@ -74,15 +74,15 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
         builder.setControllerClass(c);
         // FIXME = "we need an md5";
         builder.setLocation(c.getCanonicalName(), -1);
-        Controller ann = c.getAnnotation(Controller.class);
+        Controller ann = findAnnotation(c, Controller.class);
         if (ann == null) {
             throw new InvalidDefinitionException(String.format(
                     "@Controller annotation is required on all Controllers.  Not found on %s", descriptor),
                     builder.getLocation());
         }
-        builder.setBean(ann.bean());
+        builder.setUseAdapter(ann.useAdapter());
         try {
-            builder.setActionMap(createActions(c, builder.getDescriptor(), ann.bean()));
+            builder.setActionMap(createActions(c, builder.getDescriptor(), ann.useAdapter()));
         } catch (QuickFixException qfe) {
             builder.setParseError(qfe);
         }
@@ -179,7 +179,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
 
     private static void throwControllerError(String message, Class<?> clazz, Method method) throws QuickFixException {
         throw new InvalidDefinitionException(message + method.getName(),
-                new Location("java://"+clazz.getCanonicalName(), 0));
+                new Location(clazz.getCanonicalName(), 0));
     }
 
     /**
@@ -194,7 +194,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
      * @param controllerDesc a descriptor for the class.
      */
     public static Map<String, JavaActionDef> createActions(Class<?> controllerClass,
-            DefDescriptor<ControllerDef> controllerDesc, boolean bean) throws QuickFixException {
+            DefDescriptor<ControllerDef> controllerDesc, boolean useAdapter) throws QuickFixException {
         Map<String, JavaActionDef> actions = Maps.newTreeMap();
         for (Method method : controllerClass.getMethods()) {
             if (method.isAnnotationPresent(AuraEnabled.class)) {
@@ -203,7 +203,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                 if (!Modifier.isPublic(modifiers)) {
                     throwControllerError("Invalid non-public action: ", controllerClass, method);
                 }
-                if (bean) {
+                if (useAdapter) {
                     if (Modifier.isStatic(modifiers)) {
                         throwControllerError("Invalid static action in a bean: ", controllerClass, method);
                     }

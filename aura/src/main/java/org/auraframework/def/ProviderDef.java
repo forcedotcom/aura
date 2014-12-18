@@ -23,7 +23,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface ProviderDef extends Definition {
     @Override
-    DefDescriptor<ProviderDef> getDescriptor();
+    DefDescriptor<? extends ProviderDef> getDescriptor();
 
     ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) throws QuickFixException;
 

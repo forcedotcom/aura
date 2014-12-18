@@ -40,7 +40,7 @@ import org.auraframework.util.json.Json;
 /**
  * A java model.
  *
- * A java model can have a 'bean' flag similar to a controller, but the meaning here is subtly different.
+ * A java model can have a 'useAdapter' flag similar to a controller, but the meaning here is subtly different.
  * If you set the bean flag on a model, it goes through the bean adapter just like a controller. This should
  * not be depended on in stand-alone aura, as a given implementation may change the semantics of BeanAdapter.
  *
@@ -64,7 +64,7 @@ public class JavaModel implements Model {
         iStack.setAttributeName("m");
         this.path = iStack.getPath();
         try {
-            if (modelDef.isBean()) {
+            if (modelDef.isUseAdapter()) {
                 this.bean = Aura.getBeanAdapter().getModelBean(modelDef);
             } else {
                 this.bean = BeanAdapterImpl.buildValidatedClass(modelDef.getJavaType());

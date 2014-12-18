@@ -17,13 +17,13 @@ package org.auraframework.impl.java.provider;
 
 import java.util.List;
 
-import org.auraframework.def.ProviderDef;
+import org.auraframework.def.JavaProviderDef;
 import org.auraframework.impl.java.provider.AbstractJavaProviderDef.Builder;
 import org.auraframework.system.SourceLoader;
 
 /**
  */
-public class JavaProviderDefFactory extends AbstractJavaProviderDefFactory<ProviderDef> {
+public class JavaProviderDefFactory extends AbstractJavaProviderDefFactory<JavaProviderDef> {
     public JavaProviderDefFactory() {
         super();
     }
@@ -33,7 +33,8 @@ public class JavaProviderDefFactory extends AbstractJavaProviderDefFactory<Provi
     }
 
     @Override
-    protected Builder<ProviderDef> newBuilder() {
-        return new JavaProviderDef.Builder();
+    protected Builder<JavaProviderDef> newBuilder() {
+        JavaProviderDefImpl.Builder builder = new JavaProviderDefImpl.Builder();
+        return builder;
     }
 }

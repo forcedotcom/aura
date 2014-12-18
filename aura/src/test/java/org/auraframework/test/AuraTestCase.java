@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import junit.framework.AssertionFailedError;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.MockConfigAdapter;
@@ -31,8 +33,7 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.AuraExceptionInfo;
 
 /**
  * Base class for unit tests referencing the Aura framework.
@@ -178,6 +179,9 @@ public abstract class AuraTestCase extends UnitTestCase {
      * Check that an exception exactly matches the message, ignore location.
      */
     protected void checkExceptionFull(Throwable e, Class<?> clazz, String message) {
+        if (e instanceof AssertionFailedError && clazz != e.getClass()) {
+            throw (AssertionFailedError)e;
+        }
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
@@ -189,6 +193,9 @@ public abstract class AuraTestCase extends UnitTestCase {
      * Check that an exception matches the regex, ignore location.
      */
     protected void checkExceptionRegex(Throwable e, Class<?> clazz, String regex) {
+        if (e instanceof AssertionFailedError && clazz != e.getClass()) {
+            throw (AssertionFailedError)e;
+        }
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
@@ -299,10 +306,8 @@ public abstract class AuraTestCase extends UnitTestCase {
      */
     private void assertLocation(Throwable e, String expectedLoc) {
         Location l = null;
-        if (e instanceof QuickFixException) {
-            l = ((QuickFixException) e).getLocation();
-        } else if (e instanceof AuraRuntimeException) {
-            l = ((AuraRuntimeException) e).getLocation();
+        if (e instanceof AuraExceptionInfo) {
+            l = ((AuraExceptionInfo) e).getLocation();
         }
         assertNotNull("Unable to find location, expected " + expectedLoc, l);
         assertEquals("Unexpected location.", expectedLoc, l.getFileName());

@@ -291,9 +291,11 @@
         // on to onPullToRefresh and onPullToRefresh with error or success arguments
         // for the scroller to update its 'loading' state.
         $A.run(function () {
-            auraAction.run(function () {
-                callback.apply(this, arguments);
-            });    
+        	if (component.isValid()) {
+        		auraAction.run(function() {
+        			callback.apply(this, arguments);
+        		});
+        	}
         });
         
     },

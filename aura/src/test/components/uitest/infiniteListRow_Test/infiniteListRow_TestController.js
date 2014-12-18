@@ -22,5 +22,13 @@
 	showMore: function(component, event, helper) {
         var list = component.find("list");
         list.get("e.showMore").fire();
-	}
+    },
+
+    openRow: function(component, event, helper) {
+        $A.log("Opening row: " + event.getParam("row"));
+    },
+
+    closeRow: function(component, event, helper) {
+        $A.log("Closing row: " + event.getParam("row"));
+    }
 })

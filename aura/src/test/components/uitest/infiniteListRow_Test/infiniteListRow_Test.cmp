@@ -19,7 +19,9 @@
     <aura:handler name="showMore" action="{!c.showMore}"/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 	<div class="container" style="width: 320px; height:480px; border: 1px solid red; margin: 0px auto; overflow-x:hidden;">
-	<ui:infiniteList enableRowSwipe="true" aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+	<ui:infiniteList aura:id="list" itemVar="row" enableRowSwipe="true" onRowOpen="{!c.openRow}" onRowClose="{!c.closeRow}"
+		currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">
+
 		<aura:set attribute="dataProvider">
 			<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}"/>		
 		</aura:set>

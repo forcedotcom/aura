@@ -26,6 +26,9 @@
          created component can announce its completion -->
     <aura:registerEvent name="rerenderComplete" type="aura:asyncRerender" description="The event fired when this component completes its asynchronous rerender."/>
 
+    <aura:registerEvent name="onRowOpen" type="ui:openRow" description="Fired when a row is swiped open."/>
+    <aura:registerEvent name="onRowClose" type="ui:closeRow" description="Fired when a row is swiped closed."/>
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="showMore" action="{!c.showMore}"/>
 

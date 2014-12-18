@@ -1785,7 +1785,7 @@ _initScroller: function () {
         * @protected
         */
         _translate: function (x, y) {
-            this.scrollerStyle[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + x +',' + y +', 0, 1)';
+            this.scrollerStyle[STYLES.transform] = 'translate3d(' + x +'px,' + y +'px, 0)';
             this.x = x;
             this.y = y;
         },

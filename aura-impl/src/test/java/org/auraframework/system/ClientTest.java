@@ -61,6 +61,9 @@ public class ClientTest extends AuraImplTestCase {
         pairs.put(UserAgent.GOOD_IPHONE.getUserAgentString(), Type.WEBKIT);
         pairs.put(UserAgent.GOOD_ANDROID.getUserAgentString(), Type.WEBKIT);
         pairs.put(UserAgent.NEXUS_10.getUserAgentString(), Type.WEBKIT);
+        pairs.put(UserAgent.NEXUS_9_CHROME.getUserAgentString(), Type.WEBKIT);
+        pairs.put(UserAgent.NEXUS_9_SFDC_CONTAINER.getUserAgentString(), Type.WEBKIT);
+        pairs.put(UserAgent.NEXUS_7_SFDC_CONTAINER.getUserAgentString(), Type.WEBKIT);
         pairs.put(UserAgent.OPERA12.getUserAgentString(), Type.OTHER);
         pairs.put(UserAgent.OPERA_MINI.getUserAgentString(), Type.OTHER);
         pairs.put(UserAgent.NETSCAPE.getUserAgentString(), Type.OTHER);

@@ -162,16 +162,24 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserProperties(UserAgent.ANDROID2_3, false, true, true, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.ANDROID4_2, false, true, true, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.NEXUS_10, true, false, true, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.NEXUS_9_SFDC_CONTAINER, true, false, true, "TABLET", false, false, false,
+                false);
+        assertBrowserProperties(UserAgent.NEXUS_9_CHROME, true, false, true, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.NEXUS_7_SFDC_CONTAINER, true, false, true, "TABLET", false, false, false,
+                false);
         assertBrowserProperties(UserAgent.KINDLE_FIRE, true, false, false, "TABLET", false, false, false, false);
         assertBrowserProperties(UserAgent.PLAYBOOK, true, false, false, "TABLET", false, false, false, false);
         assertBrowserProperties(UserAgent.NOKIA_N95, false, true, false, "PHONE", false, false, false, false);
         assertBrowserProperties(UserAgent.NOKIA_920, false, true, false, "PHONE", false, false, false, true);
         assertBrowserProperties(UserAgent.LUMIA_928, false, true, false, "PHONE", false, false, false, true);
-        assertBrowserProperties(UserAgent.IE10_WINDOWS_PHONE_8, false, true, false, "PHONE", false, false, false, true);
-        assertBrowserProperties(UserAgent.IE10_WINDOWS_RT_8, true, false, false, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE10_WINDOWS_PHONE_8, false, true, false, "PHONE", false, false, false,
+                true);
+        assertBrowserProperties(UserAgent.IE10_WINDOWS_RT_8, true, false, false, "TABLET", false, false, false,
+                false);
         assertBrowserProperties(UserAgent.IE11_WINDOWS_PHONE_8_1, false, true, false, "PHONE", false, false, false,
                 true);
-        assertBrowserProperties(UserAgent.IE11_WINDOWS_RT_8_1, true, false, false, "TABLET", false, false, false, false);
+        assertBrowserProperties(UserAgent.IE11_WINDOWS_RT_8_1, true, false, false, "TABLET", false, false, false,
+                false);
         assertBrowserProperties(UserAgent.IE11_WINDOWS_PHONE_8_1, false, true, false, "PHONE", false, false, false,
                 true);
         assertBrowserProperties(UserAgent.BLACKBERRY_10, false, true, false, "PHONE", false, false, false, false);
@@ -211,6 +219,9 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserTypes(UserAgent.IPAD_7, true, false, false, false, false, false, false, false);
         assertBrowserTypes(UserAgent.IPAD_WEBVIEW, true, false, false, false, false, false, false, false);
         assertBrowserTypes(UserAgent.NEXUS_10, true, false, false, false, false, false, false, false);
+        assertBrowserTypes(UserAgent.NEXUS_9_CHROME, true, false, false, false, false, false, false, false);
+        assertBrowserTypes(UserAgent.NEXUS_9_SFDC_CONTAINER, true, false, false, false, false, false, false, false);
+        assertBrowserTypes(UserAgent.NEXUS_7_SFDC_CONTAINER, true, false, false, false, false, false, false, false);
         assertBrowserTypes(UserAgent.OPERA12, false, false, false, false, false, false, false, false);
         assertBrowserTypes(UserAgent.OPERA12_MOBILE, false, false, false, false, false, false, false, false);
         assertBrowserTypes(UserAgent.OPERA_MINI, false, false, false, false, false, false, false, false);

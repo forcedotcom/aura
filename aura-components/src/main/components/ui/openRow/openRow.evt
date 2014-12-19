@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="COMPONENT">
-    <aura:attribute name="row" type="Component[]"/>
+    <aura:attribute name="row" type="Aura.Component[]"/>
 </aura:event>

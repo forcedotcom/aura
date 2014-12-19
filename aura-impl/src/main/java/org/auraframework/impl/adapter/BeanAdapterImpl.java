@@ -18,6 +18,7 @@ package org.auraframework.impl.adapter;
 import org.auraframework.adapter.BeanAdapter;
 import org.auraframework.def.JavaControllerDef;
 import org.auraframework.def.JavaModelDef;
+import org.auraframework.def.JavaProviderDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -44,6 +45,7 @@ public class BeanAdapterImpl implements BeanAdapter {
     @Override
     public void validateControllerBean(JavaControllerDef def) throws QuickFixException {
         validateConstructor(def.getJavaType());
+        validateInstantiation(def.getJavaType());
     }
 
     @Override
@@ -52,9 +54,20 @@ public class BeanAdapterImpl implements BeanAdapter {
         return buildValidatedClass(def.getJavaType());
     }
 
+    @Override
+    public void validateProviderBean(JavaProviderDef def, Class<?> clazz) throws QuickFixException {
+        validateConstructor(clazz);
+        validateInstantiation(clazz);
+    }
+
+    @Override
+    public <T> T getProviderBean(JavaProviderDef def, Class<T> clazz) {
+        return buildValidatedClass(clazz);
+    }
+
     private static void throwConstructorError(String message, Class<?> clazz) throws QuickFixException {
         throw new InvalidDefinitionException(message,
-                new Location("java://" + clazz.getCanonicalName(), 0));
+                new Location(clazz.getCanonicalName(), 0));
     }
 
     /**
@@ -89,6 +102,18 @@ public class BeanAdapterImpl implements BeanAdapter {
     }
 
     /**
+     * Validate that we can instantiate a class.
+     */
+    public static void validateInstantiation(Class<?> clazz) throws QuickFixException {
+        try {
+            clazz.newInstance();
+        } catch (Throwable t) {
+            throw new InvalidDefinitionException("Unable to instantiate class",
+                    new Location(clazz.getCanonicalName(), 0), t);
+        }
+    }
+
+    /**
      * Build an object for a class that was previously validated by {@link #validateConstructor()}.
      *
      * If the object would not pass validation, an exception will be generated.
@@ -96,9 +121,9 @@ public class BeanAdapterImpl implements BeanAdapter {
      * @param clazz the class to build
      * @throws AuraRuntimeException if the constructor cannot be invoked.
      */
-    public static Object buildValidatedClass(Class<?> clazz) {
+    public static <T> T buildValidatedClass(Class<T> clazz) {
         try {
-            return clazz.newInstance();
+            return (T)clazz.newInstance();
         } catch (InstantiationException ie) {
             // This should never happen...
             throw new AuraRuntimeException(ie);

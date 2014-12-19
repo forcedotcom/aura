@@ -273,7 +273,7 @@ public class JavaModelTest extends AuraImplTestCase {
             definitionService.getDefinition(desc);
             fail("Expected exception");
         } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, message, "java://" + clazz.getCanonicalName());
+            checkExceptionStart(e, InvalidDefinitionException.class, message, clazz.getCanonicalName());
         }
     }
 
@@ -307,7 +307,7 @@ public class JavaModelTest extends AuraImplTestCase {
         checkInvalidModel(ModelBadConstructor.class, "No default constructor found");
     }
 
-    @Annotations.Model(bean = true)
+    @Annotations.Model(useAdapter = true)
     public static class BeanModelPrivateConstructor {
         private BeanModelPrivateConstructor() {
         }
@@ -318,7 +318,7 @@ public class JavaModelTest extends AuraImplTestCase {
         checkInvalidModel(BeanModelPrivateConstructor.class, "Default constructor is not public");
     }
 
-    @Annotations.Model(bean = true)
+    @Annotations.Model(useAdapter = true)
     public static class BeanModelProtectedConstructor {
         protected BeanModelProtectedConstructor() {
         }
@@ -329,7 +329,7 @@ public class JavaModelTest extends AuraImplTestCase {
         checkInvalidModel(BeanModelProtectedConstructor.class, "Default constructor is not public");
     }
 
-    @Annotations.Model(bean = true)
+    @Annotations.Model(useAdapter = true)
     public static class BeanModelBadConstructor {
         public BeanModelBadConstructor(String value) {
         }

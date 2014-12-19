@@ -54,13 +54,13 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
         super(builder);
         this.modelClass = builder.modelClass;
         this.memberMap = AuraUtil.immutableMap(builder.memberMap);
-        this.bean = builder.bean;
+        this.useAdapter = builder.useAdapter;
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (this.bean) {
+        if (this.useAdapter) {
             Aura.getBeanAdapter().validateModelBean(this);
         } else {
             BeanAdapterImpl.validateConstructor(this.modelClass);
@@ -80,8 +80,8 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
     /**
      * is this model meant to be instantiated by the bean service.
      */
-    public boolean isBean() {
-        return bean;
+    public boolean isUseAdapter() {
+        return useAdapter;
     }
 
     /**
@@ -158,7 +158,7 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
 
         private Class<?> modelClass;
         private Map<String, JavaValueDef> memberMap;
-        private boolean bean;
+        private boolean useAdapter;
 
         public Builder setModelClass(Class<?> c) {
             this.modelClass = c;
@@ -174,8 +174,8 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
             this.memberMap.put(name, member);
         }
 
-        public void setBean(boolean bean) {
-            this.bean = bean;
+        public void setUseAdapter(boolean useAdapter) {
+            this.useAdapter = useAdapter;
         }
         
         @Override
@@ -200,5 +200,5 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
     private static final long serialVersionUID = -1808570833698749554L;
     private final Class<?> modelClass;
     private final Map<String, JavaValueDef> memberMap;
-    private final boolean bean;
+    private final boolean useAdapter;
 }

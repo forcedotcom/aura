@@ -57,6 +57,7 @@ abstract class AbstractJavaProviderDef<T extends Provider, D extends Definition>
 
     static abstract class Builder<T extends Definition> extends DefinitionImpl.BuilderImpl<T> {
         private Class<?> providerClass;
+        private boolean useAdapter;
 
         protected Builder(Class<T> defClass) {
             super(defClass);
@@ -65,6 +66,15 @@ abstract class AbstractJavaProviderDef<T extends Provider, D extends Definition>
         public Builder<T> setProviderClass(Class<?> klass) {
             this.providerClass = klass;
             return this;
+        }
+
+        public Builder<T> setUseAdapter(boolean useAdapter) {
+            this.useAdapter = useAdapter;
+            return this;
+        }
+
+        public boolean isUseAdapter() {
+            return useAdapter;
         }
 
         public Class<?> getProviderClass() {

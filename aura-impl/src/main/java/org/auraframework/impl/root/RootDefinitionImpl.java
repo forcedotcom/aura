@@ -152,7 +152,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     @Override
-    public DefDescriptor<ProviderDef> getProviderDescriptor() throws QuickFixException {
+    public DefDescriptor<? extends ProviderDef> getProviderDescriptor() throws QuickFixException {
         if (providerDescriptors != null && providerDescriptors.size() == 1) {
             return providerDescriptors.get(0);
         }

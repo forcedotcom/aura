@@ -22,7 +22,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.Annotations.Provider;
-import org.auraframework.system.Location;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -49,16 +48,17 @@ abstract class AbstractJavaProviderDefFactory<D extends Definition> extends Base
             return null;
         }
 
-        if (!providerClass.isAnnotationPresent(Provider.class)) {
-            throw new InvalidDefinitionException(String.format(
-                    "@Provider annotation is required on all Providers.  Not found on %s", descriptor),
-                    new Location(providerClass.getCanonicalName(), 0));
-        }
-
         AbstractJavaProviderDef.Builder<D> builder = newBuilder();
         builder.setDescriptor(descriptor);
         builder.setLocation(providerClass.getCanonicalName(), 0);
         builder.setProviderClass(providerClass);
+        Provider ann = findAnnotation(providerClass, Provider.class);
+        if (ann == null) {
+            throw new InvalidDefinitionException(String.format(
+                    "@Provider annotation is required on all Providers.  Not found on %s", descriptor),
+                    builder.getLocation());
+        }
+        builder.setUseAdapter(ann.useAdapter());
         return builder;
     }
 }

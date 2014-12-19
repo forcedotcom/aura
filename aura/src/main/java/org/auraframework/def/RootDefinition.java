@@ -60,7 +60,7 @@ public interface RootDefinition extends Definition {
 
     boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException;
 
-    DefDescriptor<ProviderDef> getProviderDescriptor() throws QuickFixException;
+    DefDescriptor<? extends ProviderDef> getProviderDescriptor() throws QuickFixException;
 
     ProviderDef getProviderDef() throws QuickFixException;
 

@@ -19,7 +19,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller(bean=true)
+@Controller(useAdapter=true)
 public class TestControllerBean {
 	private int counter = -1;
 	boolean debug=false;

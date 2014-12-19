@@ -18,35 +18,45 @@ package test.model;
 import java.util.ArrayList;
 
 import org.auraframework.Aura;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @Model
 public class TestReinitializeModel {
-	@SuppressWarnings("unchecked")
-	public TestReinitializeModel() throws QuickFixException {
-		this.value = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("attr");
-		this.valueParent = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("attrInParent");
-		this.itemList = (ArrayList<String>) Aura.getContextService().getCurrentContext().
-                getCurrentComponent().getAttributes().getValue("listToShow");
-	}
-	
-	@AuraEnabled
+    @SuppressWarnings("unchecked")
+    public TestReinitializeModel() throws QuickFixException {
+        BaseComponent<?,?> c;
+
+        c = Aura.getContextService().getCurrentContext().getCurrentComponent();
+
+        if (c != null) {
+            this.value = (String) c.getAttributes().getValue("attr");
+            this.valueParent = (String) c.getAttributes().getValue("attrInParent");
+            this.itemList = (ArrayList<String>) c.getAttributes().getValue("listToShow");
+        } else {
+            this.value = "attr";
+            this.valueParent = "attrInParent";
+            this.itemList = new ArrayList<String>();
+        }
+    }
+    
+    @AuraEnabled
     public String getValue() {
-    	return value;
+        return value;
     }
-	
-	@AuraEnabled
+    
+    @AuraEnabled
     public String getValueParent() {
-    	return valueParent;
+        return valueParent;
     }
-	
-	@AuraEnabled
+    
+    @AuraEnabled
     public ArrayList<String> getItemList() {
         return itemList;
     }
-	
+    
     private String value;
     private String valueParent;
     private ArrayList<String> itemList;

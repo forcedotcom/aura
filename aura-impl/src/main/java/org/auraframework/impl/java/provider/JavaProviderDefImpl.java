@@ -23,10 +23,11 @@ import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.JavaProviderDef;
 import org.auraframework.def.Provider;
-import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StaticComponentConfigProvider;
+import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.ComponentConfig;
@@ -36,49 +37,41 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements ProviderDef {
+public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> implements JavaProviderDef {
     private static final long serialVersionUID = -4972842636058759316L;
-    private final ComponentConfigProvider configProvider;
-    private final StaticComponentConfigProvider staticConfigProvider;
-    private final ComponentDescriptorProvider descriptorProvider;
+    private final boolean useAdapter;
+    private final Class<ComponentConfigProvider> configProvider;
+    private final Class<StaticComponentConfigProvider> staticConfigProvider;
+    private final Class<ComponentDescriptorProvider> descriptorProvider;
 
-    protected JavaProviderDef(Builder builder) throws QuickFixException {
+    protected JavaProviderDefImpl(Builder builder) throws QuickFixException {
         super(builder);
+        this.useAdapter = builder.isUseAdapter();
+        this.configProvider = builder.configProvider;
+        this.staticConfigProvider = builder.staticConfigProvider;
+        this.descriptorProvider = builder.descriptorProvider;
+    }
 
-        ComponentConfigProvider configProv = null;
-        StaticComponentConfigProvider staticConfigProv = null;
-        ComponentDescriptorProvider descriptorProv = null;
-
-        List<Class<? extends Provider>> interfaces = AuraUtil.findInterfaces(builder.getProviderClass(), Provider.class);
-        if (!interfaces.isEmpty()) {
-            try {
-                for (Class<? extends Provider> theIfc : interfaces) {
-                    if (ComponentConfigProvider.class.isAssignableFrom(theIfc)) {
-                        configProv = (ComponentConfigProvider) builder.getProviderClass().newInstance();
-                    } else if (ComponentDescriptorProvider.class.isAssignableFrom(theIfc)) {
-                        descriptorProv = (ComponentDescriptorProvider) builder.getProviderClass().newInstance();
-                    }
-                    if (StaticComponentConfigProvider.class.isAssignableFrom(theIfc)) {
-                        staticConfigProv = (StaticComponentConfigProvider) builder.getProviderClass().newInstance();
-                    }
-                }
-            } catch (InstantiationException ie) {
-                throw new InvalidDefinitionException("Cannot instantiate " + builder.getProviderClass().getName(), location);
-            } catch (IllegalAccessException iae) {
-                throw new InvalidDefinitionException("Constructor is inaccessible for "
-                        + builder.getProviderClass().getName(), location);
-            } catch (RuntimeException e) {
-                throw new InvalidDefinitionException("Failed to instantiate " + builder.getProviderClass().getName(),
-                        location, e);
-            }
+    /**
+     * Validate that a bean, if present, is a valid class that can be instantiated.
+     */
+    private void validateBean(Class<?> beanClass) throws QuickFixException {
+        if (beanClass == null) {
+            return;
         }
-        this.configProvider = configProv;
-        this.descriptorProvider = descriptorProv;
-        this.staticConfigProvider = staticConfigProv;
+        if (useAdapter) {
+            Aura.getBeanAdapter().validateProviderBean(this, beanClass);
+        } else {
+            BeanAdapterImpl.validateConstructor(beanClass);
+            BeanAdapterImpl.validateInstantiation(beanClass);
+        }
+    }
 
-        // FIXME!!! W-1191791
-        if (configProvider == null && descriptorProvider == null) {
-            throw new InvalidDefinitionException("@Provider must have a provider interface.", location);
+    private <T> T getBean(Class<T> beanClass) {
+        if (useAdapter) {
+            return Aura.getBeanAdapter().getProviderBean(this, beanClass);
+        } else {
+            return BeanAdapterImpl.buildValidatedClass(beanClass);
         }
     }
 
@@ -91,6 +84,12 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
+        validateBean(configProvider);
+        validateBean(descriptorProvider);
+        validateBean(staticConfigProvider);
+        if (configProvider == null && descriptorProvider == null) {
+            throw new InvalidDefinitionException("@Provider must have a provider interface.", location);
+        }
     }
 
     @Override
@@ -101,11 +100,11 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         loggingService.startTimer("java");
         try {
             if (configProvider != null) {
-                config = configProvider.provide();
+                config = getBean(configProvider).provide();
                 loggingService.incrementNum("JavaCallCount");
             } else if (descriptorProvider != null) {
                 config = new ComponentConfig();
-                config.setDescriptor(descriptorProvider.provide());
+                config.setDescriptor(getBean(descriptorProvider).provide());
                 loggingService.incrementNum("JavaCallCount");
             }
         } catch (Exception e) {
@@ -126,7 +125,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         loggingService.startTimer("java");
 
         try {
-            config = staticConfigProvider.provide(ref);
+            config = getBean(staticConfigProvider).provide(ref);
             loggingService.incrementNum("JavaCallCount");
         } catch (Exception e) {
             throw AuraExceptionUtil.wrapExecutionException(e, this.location);
@@ -152,14 +151,35 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         return true;
     }
 
-    public static final class Builder extends AbstractJavaProviderDef.Builder<ProviderDef> {
+    public static final class Builder extends AbstractJavaProviderDef.Builder<JavaProviderDef> {
+        private Class<ComponentConfigProvider> configProvider = null;
+        private Class<StaticComponentConfigProvider> staticConfigProvider = null;
+        private Class<ComponentDescriptorProvider> descriptorProvider = null;
+
         public Builder() {
-            super(ProviderDef.class);
+            super(JavaProviderDef.class);
+        }
+
+        @SuppressWarnings("unchecked")
+        private void getClasses() {
+            Class<?> pClazz = getProviderClass();
+            List<Class<? extends Provider>> interfaces = AuraUtil.findInterfaces(pClazz, Provider.class);
+            for (Class<? extends Provider> theIfc : interfaces) {
+                if (ComponentConfigProvider.class.isAssignableFrom(theIfc)) {
+                    configProvider = (Class<ComponentConfigProvider>) pClazz;
+                } else if (ComponentDescriptorProvider.class.isAssignableFrom(theIfc)) {
+                    descriptorProvider = (Class<ComponentDescriptorProvider>) pClazz;
+                }
+                if (StaticComponentConfigProvider.class.isAssignableFrom(theIfc)) {
+                    staticConfigProvider = (Class<StaticComponentConfigProvider>) pClazz;
+                }
+            }
         }
 
         @Override
         public JavaProviderDef build() throws QuickFixException {
-            return new JavaProviderDef(this);
+            getClasses();
+            return new JavaProviderDefImpl(this);
         }
     }
 }

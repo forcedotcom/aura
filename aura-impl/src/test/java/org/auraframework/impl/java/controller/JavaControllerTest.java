@@ -137,7 +137,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testNonStaticAction() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction",
                 InvalidDefinitionException.class, "Invalid non-static action in a controller: appendStrings",
-                "java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction");
+                "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction");
     }
 
     public void testActionNoParameters() throws Exception {
@@ -545,11 +545,11 @@ public class JavaControllerTest extends AuraImplTestCase {
             definitionService.getDefinition(desc);
             fail("Expected exception");
         } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, message, "java://" + clazz.getCanonicalName());
+            checkExceptionStart(e, InvalidDefinitionException.class, message, clazz.getCanonicalName());
         }
     }
 
-    @Controller(bean = true)
+    @Controller(useAdapter = true)
     public static class BadBeanControllerConstructor {
         public BadBeanControllerConstructor(String value) {
         }
@@ -560,7 +560,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkInvalidBeanConstructor(BadBeanControllerConstructor.class, "No default constructor found");
     }
 
-    @Controller(bean = true)
+    @Controller(useAdapter = true)
     public static class PrivateBeanControllerConstructor {
         private PrivateBeanControllerConstructor() {
         }
@@ -571,7 +571,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkInvalidBeanConstructor(PrivateBeanControllerConstructor.class, "Default constructor is not public");
     }
 
-    @Controller(bean = true)
+    @Controller(useAdapter = true)
     public static class ProtectedBeanControllerConstructor {
         protected ProtectedBeanControllerConstructor() {
         }
@@ -582,7 +582,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkInvalidBeanConstructor(ProtectedBeanControllerConstructor.class, "Default constructor is not public");
     }
 
-    @Controller(bean = true)
+    @Controller(useAdapter = true)
     public static class StaticBeanControllerMethod {
         public StaticBeanControllerMethod() {
         }

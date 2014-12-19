@@ -363,6 +363,12 @@ var AuraRenderingService = function AuraRenderingService(){
                         }else{
                             renderedElements=info.component.getElements();
                         }
+
+                        if(renderedElements.length && priv.isMarker(component._marker)) {
+                                $A.util.removeElement(component._marker);
+                                component._marker = renderedElements[0];
+                        }
+                        
                         info.component.disassociateElements();
                         priv.associateElements(info.component, renderedElements);
                         ret = ret.concat(renderedElements);

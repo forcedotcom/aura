@@ -99,8 +99,10 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
             if (key.getName().equals("attr")) {
                 AttributeDefImpl attr = (AttributeDefImpl) attMap.get(key);
                 assertEquals(expectedTypeDesc, attr.getTypeDesc().getQualifiedName());
+                return;
             }
         }
+        fail("Failed to create test attribute 'attr' of type " + attributeType);
     }
 
     private void verifyInvalidAttributeDefType(String attributeType, String errorMsg) {

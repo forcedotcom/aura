@@ -19,7 +19,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.auraframework.def.RootDefinition.SupportLevel;
+import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -39,7 +41,6 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         return defClass;
     }
 
-   
     protected T define(String source) throws QuickFixException {
         DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), source);
         return desc.getDef();
@@ -88,6 +89,70 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
         }
+    }
+
+    private void verifyAttributeDefType(String attributeType, String expectedTypeDesc) throws Exception {
+        String attribute = "<aura:attribute name=\"attr\" type=\"" + attributeType + "\"/>";
+        T def = define(baseTag, "", attribute);
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getAttributeDefs();
+        for (DefDescriptor<AttributeDef> key : attMap.keySet()) {
+            if (key.getName().equals("attr")) {
+                AttributeDefImpl attr = (AttributeDefImpl) attMap.get(key);
+                assertEquals(expectedTypeDesc, attr.getTypeDesc().getQualifiedName());
+            }
+        }
+    }
+
+    private void verifyInvalidAttributeDefType(String attributeType, String errorMsg) {
+        try {
+            define(baseTag, "", "<aura:attribute name=\"attr\" type=\"" + attributeType + "\"/>");
+            fail("Expected Exception for attribute of type " + attributeType);
+        } catch (Exception e) {
+            checkExceptionContains(e, DefinitionNotFoundException.class, errorMsg);
+        }
+    }
+
+    /**
+     * Verify Aura attributes are mapped to the correct corresponding Aura or Java type.
+     */
+    public void testAttributeDefTypes() throws Exception {
+        verifyAttributeDefType("String", "aura://String");
+        verifyAttributeDefType("Boolean", "aura://Boolean");
+        verifyAttributeDefType("Date", "aura://Date");
+        verifyAttributeDefType("DateTime", "aura://DateTime");
+        verifyAttributeDefType("Decimal", "aura://Decimal");
+        verifyAttributeDefType("Double", "aura://Double");
+        verifyAttributeDefType("Integer", "aura://Integer");
+        verifyAttributeDefType("Long", "aura://Long");
+        verifyAttributeDefType("List", "aura://List");
+        verifyAttributeDefType("Map", "aura://Map");
+        verifyAttributeDefType("Set", "aura://Set");
+        verifyAttributeDefType("Aura.Component", "aura://Aura.Component");
+        verifyAttributeDefType("Aura.Component[]", "aura://Aura.Component[]");
+        verifyAttributeDefType("Aura.Action", "aura://Aura.Action");
+        verifyAttributeDefType("java://String", "java://String");
+        verifyAttributeDefType("aura://String", "aura://String");
+        verifyAttributeDefType("String[]", "aura://String[]");
+    }
+
+    // TODO(W-2458027): Inconsistencies in attribute type case sensitivity
+    public void testAttributeDefTypesCaseInsensitive() throws Exception {
+        verifyAttributeDefType("string", "aura://String");
+        verifyAttributeDefType("aura://string", "aura://string");
+        verifyAttributeDefType("java://string", "java://string");
+        verifyAttributeDefType("datetime", "aura://DateTime");
+        verifyAttributeDefType("dateTime", "aura://DateTime");
+        verifyAttributeDefType("aura.component", "aura://Aura.Component");
+    }
+
+    public void testAttributeDefInvalidTypes() throws Exception {
+        verifyInvalidAttributeDefType("blah", "No TYPE named java://blah found");
+        verifyInvalidAttributeDefType("aura://blah", "No TYPE named aura://blah found");
+        verifyInvalidAttributeDefType("apex://string", "No TYPE named apex://string found");
+
+        // TODO(W-2453205, W-1883001): type 'array' should not be valid
+        // verifyInvalidAttributeDefType("array", "No TYPE named java://Array found");
+        // verifyInvalidAttributeDefType("Array", "No TYPE named java://Array found");
     }
 
     /**

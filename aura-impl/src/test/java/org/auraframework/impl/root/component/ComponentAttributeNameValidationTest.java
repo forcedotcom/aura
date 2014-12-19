@@ -110,12 +110,13 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Prefixed attribute name must be referenced with prefix on component tag
-     *
+     * 
      * @expectedResults attribute value is retrieved
      */
     public void testInvalidAttributePrefix() throws Exception {
         try {
             getComponentInstance("<aura:component><aura:attribute name='aura:special1' type='String' default='hi'/></aura:component>");
+            fail("Expected Exception for invalide attribute prefix");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Invalid attribute name: 'aura:special1'");
         }

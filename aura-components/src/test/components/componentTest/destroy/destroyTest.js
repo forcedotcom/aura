@@ -127,6 +127,62 @@
         }
     },
 
+    testDestroySameComponentTwice: {
+        test: function(cmp) {
+            var outerFacet = cmp.find("outerFacet");
+            outerFacet.destroy();
+            this.verifyComponentDestroyed(cmp);
+
+            // Already destroyed components will call destroy on InvalidComponent, which is a no-op
+            $A.test.assertTrue(outerFacet.toString().indexOf("InvalidComponent") === 0);
+            outerFacet.destroy();
+            this.verifyComponentDestroyed(cmp);
+        }
+    },
+
+    /**
+     * After a component is destroyed it's prototype is swapped with InvalidComponent to display error messages if
+     * the user tries to execute furthur operations. Verify we get that error with the correct info.
+     */
+    testInvalidComponentError: {
+        test: function(cmp) {
+            $A.test.expectAuraError("Invalid component");
+            var textCmp = cmp.find("textInOuterFacet");
+            var globalId = textCmp.getGlobalId();
+            $A.test.assertTrue(textCmp.toString().indexOf("InvalidComponent") === -1,
+                    "Component should not be an InvalidComponent before being destroyed.");
+            textCmp.destroy();
+            $A.test.assertTrue(textCmp.toString().indexOf("InvalidComponent") === 0,
+                    "Component prototype was not swapped with InvalidComponent after being destroyed.");
+            textCmp.set("v.value", "New value");
+            var errorMsg = $A.test.getAuraErrorMessage();
+            this.verifyInvalidComponentErrorMessage(errorMsg, "set", "v.value,New value", "markup://aura:text", globalId);
+        }
+    },
+
+    verifyInvalidComponentErrorMessage: function(msg, func, params, cmpFQN, globalId) {
+        var index = 0;
+
+        var opening = "Invalid component tried calling function [" + func + "]";
+        var chunk = msg.substr(index, opening.length);
+        $A.test.assertEquals(opening, chunk, "InvalidComponent error message did not display expected function info.");
+
+        var paramsMsg = " with arguments [" + params + "]";
+        index += opening.length;
+        chunk = msg.substr(index, paramsMsg.length);
+        $A.test.assertEquals(paramsMsg, chunk, "InvalidComponent error message did not display expected parameter info.");
+
+        var cmpMsg = ", " + cmpFQN;
+        index += paramsMsg.length;
+        chunk = msg.substr(index, cmpMsg.length);
+        $A.test.assertEquals(cmpMsg, chunk, "InvalidComponent error message did not display expected component name.");
+
+        var globalIdMsg = " [" + globalId + "]";
+        index += cmpMsg.length;
+        chunk = msg.substr(index, globalIdMsg.length);
+        $A.test.assertEquals(globalIdMsg, chunk, "InvalidComponent error message did not display expected globalId.");
+    },
+
     verifyComponentDestroyed : function(cmp) {
         $A.test.assertUndefinedOrNull(cmp.find("outerFacet"));
         $A.test.assertUndefinedOrNull(cmp.find("textInOuterFacet"));

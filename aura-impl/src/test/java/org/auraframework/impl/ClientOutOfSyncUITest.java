@@ -74,13 +74,35 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         return cmpDesc;
     }
 
+    private boolean isIE() {
+        switch (getBrowserType()) {
+        case IE7:
+        case IE8:
+        case IE9:
+        case IE10:
+        case IE11:
+            return true;
+        default:
+            break;
+        }
+        return false;
+    }
+
     /**
      * Trigger a server action and wait for the browser to begin refreshing.
      */
     private void triggerServerAction() {
         // Careful. Android doesn't like more than one statement.
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");
+
+        // This test flaps on slower environments in IE. Give it a little more time to process the javascript.
+        if (isIE()) {
+            waitFor(3);
+        }
         auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
+        if (isIE()) {
+            waitFor(3);
+        }
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {

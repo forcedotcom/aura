@@ -15,17 +15,12 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ContentSecurityPolicy;
-import org.auraframework.adapter.DefaultContentSecurityPolicy;
-import org.auraframework.adapter.MockConfigAdapter;
+import org.auraframework.adapter.*;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
@@ -234,4 +229,8 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 	public boolean isUnsecuredNamespace(String namespace) {
 		return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);
 	}
+
+    @Override
+    public void setValidateCSRFTokenException(RuntimeException exception) {
+    }
 }

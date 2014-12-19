@@ -33,4 +33,6 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setValidateCss(boolean validateCss);
     
     void setContentSecurityPolicy(ContentSecurityPolicy csp);
+    
+    void setValidateCSRFTokenException(RuntimeException exception);
 }

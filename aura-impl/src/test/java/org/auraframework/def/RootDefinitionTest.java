@@ -140,6 +140,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     // TODO(W-2458027): Inconsistencies in attribute type case sensitivity
     public void testAttributeDefTypesCaseInsensitive() throws Exception {
         verifyAttributeDefType("string", "aura://String");
+        verifyAttributeDefType("strIng", "aura://String");
         verifyAttributeDefType("aura://string", "aura://string");
         verifyAttributeDefType("java://string", "java://string");
         verifyAttributeDefType("datetime", "aura://DateTime");
@@ -150,7 +151,6 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     public void testAttributeDefInvalidTypes() throws Exception {
         verifyInvalidAttributeDefType("blah", "No TYPE named java://blah found");
         verifyInvalidAttributeDefType("aura://blah", "No TYPE named aura://blah found");
-        verifyInvalidAttributeDefType("apex://string", "No TYPE named apex://string found");
 
         // TODO(W-2453205, W-1883001): type 'array' should not be valid
         // verifyInvalidAttributeDefType("array", "No TYPE named java://Array found");

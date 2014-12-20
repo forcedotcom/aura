@@ -278,7 +278,7 @@
 					cmp._openRow = null;
 				}
 
-	    		setTimeout(function () {
+	    		this.setCheckedTimeout(cmp, function () {
         			cmp._isSnapping = false;
         			swipe.body.style.transition = '';
 					$A.util.removeClass(swipe.row, 'swiping');
@@ -318,6 +318,14 @@
 
 	fireRowClose: function(cmp, row) {
 		cmp.get("e.onRowClose").setParams({row: row}).fire();
+	},
+
+	setCheckedTimeout: function(cmp, code, delay) {
+		setTimeout(function() {
+			if (cmp && cmp.isValid() && code) {
+				code();
+			}
+		}, delay);
 	},
 
     /**
@@ -367,7 +375,7 @@
         cmp._isClosing = true;
         this.block(cmp);
         
-        setTimeout(function () {
+        this.setCheckedTimeout(cmp, function () {
             cmp._isClosing = false;
             swipe.body.style.transition = '';
         }, this.CLOSE_TIMEOUT);
@@ -402,7 +410,7 @@
     			animate(row);
     		}
     		
-    		setTimeout(function () {
+    		this.setCheckedTimeout(component, function () {
     			rm();
     			
     			if (callback) {

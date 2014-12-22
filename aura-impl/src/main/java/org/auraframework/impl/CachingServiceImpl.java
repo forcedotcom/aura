@@ -31,8 +31,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.LibraryDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
@@ -48,10 +46,20 @@ import aQute.bnd.annotation.component.Component;
 public class CachingServiceImpl implements CachingService {
 
     private static final long serialVersionUID = -3311707270226573084L;
-    private final static int DEFINITION_CACHE_SIZE = 4096;
+
+    /** Default size of definition caches, in number of entries */
+    private final static int DEFINITION_CACHE_SIZE = 6 * 1024;
+
+    /** Default size of dependency caches, in number of entries */
     private final static int DEPENDENCY_CACHE_SIZE = 1024;
-    private final static int FILTER_CACHE_SIZE = 1024;
+
+    /** Default size of descriptor filter caches, in number of entries */
+    private final static int FILTER_CACHE_SIZE = 2048;
+
+    /** Default size of string caches, in number of entries */
     private final static int STRING_CACHE_SIZE = 100;
+
+    /** Default size of client lib caches, in number of entries */
     private final static int CLIENT_LIB_CACHE_SIZE = 30;
 
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -74,54 +82,69 @@ public class CachingServiceImpl implements CachingService {
     private static final Logger logger = Logger.getLogger(CachingServiceImpl.class);
 
     public CachingServiceImpl() {
+        int size = getCacheSize("aura.cache.existsCacheSize", DEFINITION_CACHE_SIZE);
         existsCache = this.<DefDescriptor<?>, Boolean> getCacheBuilder()
-                .setInitialSize(DEFINITION_CACHE_SIZE)
-                .setMaximumSize(DEFINITION_CACHE_SIZE).setRecordStats(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setRecordStats(true)
                 .setName("existsCache")
                 .setSoftValues(true).build();
 
+        size = getCacheSize("aura.cache.defsCacheSize", DEFINITION_CACHE_SIZE);
         defsCache = this
                 .<DefDescriptor<?>, Optional<? extends Definition>> getCacheBuilder()
-                .setInitialSize(DEFINITION_CACHE_SIZE)
-                .setMaximumSize(DEFINITION_CACHE_SIZE).setRecordStats(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setRecordStats(true)
                 .setName("defsCache")
                 .setSoftValues(true).build();
 
+        size = getCacheSize("aura.cache.stringsCacheSize", STRING_CACHE_SIZE);
         stringsCache = this.<String, String> getCacheBuilder()
-                .setInitialSize(STRING_CACHE_SIZE)
-                .setMaximumSize(STRING_CACHE_SIZE).setRecordStats(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setRecordStats(true)
                 .setName("stringsCache")
                 .setSoftValues(true).build();
 
+        size = getCacheSize("aura.cache.filterCacheSize", FILTER_CACHE_SIZE);
         descriptorFilterCache = this
                 .<String, Set<DefDescriptor<?>>> getCacheBuilder()
-                .setInitialSize(FILTER_CACHE_SIZE)
-                .setMaximumSize(FILTER_CACHE_SIZE).setRecordStats(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setRecordStats(true)
                 .setName("descriptorFilterCache")
                 .setSoftValues(true).build();
 
+        size = getCacheSize("aura.cache.depsCacheSize", DEPENDENCY_CACHE_SIZE);
         depsCache = this.<String, DependencyEntry> getCacheBuilder()
-                .setInitialSize(DEPENDENCY_CACHE_SIZE)
-                .setMaximumSize(DEPENDENCY_CACHE_SIZE).setRecordStats(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setRecordStats(true)
                 .setName("depsCache")
                 .setSoftValues(true).build();
 
+        size = getCacheSize("aura.cache.clientLibraryOutputCacheSize", CLIENT_LIB_CACHE_SIZE);
         clientLibraryOutputCache = this.<String, String> getCacheBuilder()
-                .setInitialSize(CLIENT_LIB_CACHE_SIZE)
-                .setMaximumSize(CLIENT_LIB_CACHE_SIZE).setSoftValues(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setSoftValues(true)
                 .setName("clientLibraryOutputCache")
                 .setRecordStats(true).build();
 
+        size = getCacheSize("aura.cache.clientLibraryUrlsCacheSize", CLIENT_LIB_CACHE_SIZE);
         clientLibraryUrlsCache = this.<String, Set<String>> getCacheBuilder()
-                .setInitialSize(CLIENT_LIB_CACHE_SIZE)
-                .setMaximumSize(CLIENT_LIB_CACHE_SIZE).setSoftValues(true)
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                 .setSoftValues(true)
                 .setName("clientLibraryUrlsCache")
                 .setRecordStats(true).build();
 
+        size = getCacheSize("aura.cache.defDescByNameCacheSize", 1024 * 20);
         defDescriptorByNameCache =
                 this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getCacheBuilder()
                         .setInitialSize(512)
-                        .setMaximumSize(1024 * 10)
+                        .setMaximumSize(size)
                         .setConcurrencyLevel(20)
                         .setName("defDescByNameCache")
                         .build();
@@ -287,4 +310,22 @@ public class CachingServiceImpl implements CachingService {
 
     }
 
+    /**
+     * Computes a size for a given cache.  The defaults can be overridden
+     * with system properties.
+     */
+    private int getCacheSize(String propName, int defaultSize) {
+        String prop = System.getProperty(propName);
+        if (prop == null) {
+            prop = System.getProperty("aura.cache.defaultCacheSize");
+        }
+        if (prop != null && !prop.isEmpty()) {
+            try {
+                return Integer.parseInt(prop);
+            } catch (NumberFormatException e) {
+                // ne'ermind, use the default
+            }
+        }
+        return defaultSize;
+    }
 }

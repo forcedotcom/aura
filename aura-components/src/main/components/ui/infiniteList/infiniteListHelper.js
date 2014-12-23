@@ -89,7 +89,7 @@
     attachListeners: function (cmp) {
     	var ul = cmp.getElement();
     	ul.addEventListener(this.getEventNames().move, cmp._ontouchmove, false);
-        ul.addEventListener(this.getEventNames().end, cmp._ontouchend, false);
+        ul.addEventListener(this.getEventNames().end, cmp._ontouchend, true);
         ul.addEventListener("dragstart", cmp._preventEvent, true);
     },
    
@@ -99,7 +99,7 @@
     detachListeners: function (cmp) {
     	var ul = cmp.getElement();
     	ul.removeEventListener(this.getEventNames().move, cmp._ontouchmove);
-    	ul.removeEventListener(this.getEventNames().end, cmp._ontouchend);
+    	ul.removeEventListener(this.getEventNames().end, cmp._ontouchend, true);
     	ul.removeEventListener("dragstart", cmp._preventEvent, true);
     },
     
@@ -136,7 +136,7 @@
                     // Cancel all further events - this handler is registered in the 'capture' phase.
                     e.stopPropagation();
                     e.preventDefault();
-                    
+
                     // Close the row,
 					this.fireRowClose(cmp, cmp._openRow);
                 	this.closeRowBlockAndReset(cmp, cmp._previousSwipe);
@@ -300,6 +300,8 @@
         // A 'blocked interaction' means that all pointer events are cancelled as long as 
         // the pointer is active (down).
         if (this.isBlocked(cmp)) {
+        	e.stopPropagation();
+        	e.preventDefault();
         	this.unblock(cmp);
         }
     	

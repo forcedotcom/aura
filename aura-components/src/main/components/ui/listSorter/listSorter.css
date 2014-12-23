@@ -24,8 +24,8 @@
 	box-shadow: 0 1px 5px rgba(0, 0, 0, .75);
 }
 
-.THIS .open.phone.listSorterContainer {
-	margin: 0;	
+.THIS .open.PHONE.listSorterContainer, .THIS .open.TABLET.listSorterContainer {
+	margin: 0;
 }
 
 .THIS .hidden {

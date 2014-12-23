@@ -338,17 +338,15 @@
      */
     updateSize : function(cmp) {
     	var containerEl = cmp.find('sorterContainer').getElement(); 
-		var isPhone = $A.get("$Browser.isPhone");
-		if (isPhone) {
+		var formfactor = $A.get("$Browser.formFactor");
+		if (formfactor !== 'DESKTOP') {
 			var viewPort = $A.util.getWindowSize(),
 				header = cmp.find('headerBar').getElement(),
 				menuListHeight = viewPort.height - header.offsetHeight;
 			
 			//fill up the whole screen
-			$A.util.addClass(cmp.find('sorterContainer').getElement(), 'phone');
-			containerEl.style.width = viewPort.width + 'px';
-			containerEl.style.height = viewPort.height + 'px';
-			
+			$A.util.addClass(cmp.find('sorterContainer').getElement(), formfactor);
+			containerEl.setAttribute("style", "width: " + viewPort.width + "px; height: " + viewPort.height + "px");
 			//update sorter menu size to fill up the rest of the screen with the menu list
 			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
 		} else {

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.1726-SNAPSHOT</version>
+        <version>0.1726</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
@@ -107,9 +107,7 @@
                         <phase>process-test-classes</phase>
                         <configuration>
                             <target>
-                                <java classname="org.auraframework.tools.definition.AuraCompiler"
-                                        classpathref="maven.test.classpath"
-                                        fork="true" failonerror="true">
+                                <java classname="org.auraframework.tools.definition.AuraCompiler" classpathref="maven.test.classpath" fork="true" failonerror="true">
                                     <jvmarg value="-Daura.home=${basedir}/.." />
                                     <arg value="${basedir}/src/test/components" />
                                     <arg value="${project.build.directory}/${component.test.dir}" />

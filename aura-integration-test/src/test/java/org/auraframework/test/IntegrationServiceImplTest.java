@@ -24,6 +24,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.Integration;
 import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;

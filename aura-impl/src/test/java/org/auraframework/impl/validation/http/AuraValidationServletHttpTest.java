@@ -60,7 +60,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
     }
 
     public void testServlet() throws Exception {
-        String path = AuraFiles.Core.getPath() + "/aura-impl/src/test/components/validationTest/basic";
+        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
         assertTrue(path, new File(path).exists());
         method = obtainGetMethod("/qa/auraValidation?path=" + path);
         HttpResponse response = perform(method);
@@ -80,7 +80,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
      * Same as testServlet(), but only uses JDK classes
      */
     public void testServletStandalone() throws Exception {
-        String path = AuraFiles.Core.getPath() + "/aura-impl/src/test/components/validationTest/basic";
+        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
         assertTrue(path, new File(path).exists());
         String url = getTestServletConfig().getBaseUrl().toURI().resolve("/qa/auraValidation?path=" + path).toString();
         InputStream stream = new URL(url).openStream();

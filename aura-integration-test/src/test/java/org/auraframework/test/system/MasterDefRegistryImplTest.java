@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,6 +55,8 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.CachingService;
@@ -90,6 +93,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
@@ -108,7 +113,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         super(name);
     }
 
-    private MasterDefRegistryImpl getDefRegistry(boolean asMocks) {
+    private MasterDefRegistryImplOverride getDefRegistry(boolean asMocks) {
         Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
         List<DefRegistry<?>> mdrregs = Lists.newArrayList();
 
@@ -125,12 +130,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 }
             }
         }
-        MasterDefRegistryImpl registry = new MasterDefRegistryImpl(mdrregs.toArray(new DefRegistry<?>[mdrregs.size()]));
+        MasterDefRegistryImplOverride registry = new MasterDefRegistryImplOverride(mdrregs.toArray(new DefRegistry<?>[mdrregs.size()]));
         return asMocks ? Mockito.spy(registry) : registry;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void spyOnDefs(final MasterDefRegistryImpl registry) throws QuickFixException {
+    private void spyOnDefs(final MasterDefRegistryImplOverride registry) throws QuickFixException {
         final MockUtil mockUtil = new MockUtil();
         for (DefRegistry<?> subReg : registry.getAllRegistries()) {
             Mockito.doAnswer(new Answer<Definition>() {
@@ -171,7 +176,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private void assertIdenticalDependencies(DefDescriptor<?> desc1, DefDescriptor<?> desc2) throws Exception {
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         Set<DefDescriptor<?>> deps1 = registry.getDependencies(registry.getUid(null, desc1));
         Set<DefDescriptor<?>> deps2 = registry.getDependencies(registry.getUid(null, desc2));
         assertNotNull(deps1);
@@ -203,7 +208,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         addSourceAutoCleanup(ApplicationDef.class, String.format(baseApplicationTag, "", ""),
                 String.format("%s:pantsparty", namespace));
 
-        MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
 
         assertTrue("find() not finding all sources",
                 masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*", namespace))).size() == 3);
@@ -338,7 +343,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String namespace = "testStringCache" + getAuraTestingUtil().getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
-        MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
         masterDefReg.putCachedString(uid, houseboat, "test1", "value");
@@ -352,7 +357,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertFalse(namespace + "  should not have been isPriveleged", configAdapter.isPrivilegedNamespace(namespace));
         DefDescriptor<ApplicationDef> houseboat = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace), false);
-        MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
         masterDefReg.putCachedString(uid, houseboat, "test1", "value");
@@ -364,7 +369,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String namePrefix = String.format("%s:houseboat", namespace);
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", ""), namePrefix);
-        MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNotNull(uid);
         // Check unchanged app gets same UID value
@@ -386,10 +391,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 "<aura:application><" + child.getDescriptorName() + "/></aura:application>",
                 "testUidDependenciesParent");
 
-        MasterDefRegistryImpl masterDefReg1 = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg1 = getDefRegistry(false);
         String parentUid1 = masterDefReg1.getUid(null, parent);
 
-        MasterDefRegistryImpl masterDefReg2 = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg2 = getDefRegistry(false);
         masterDefReg2.getUid(null, child);
         String parentUid2 = masterDefReg2.getUid(null, parent);
 
@@ -416,7 +421,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String cmpName = "ui:outputNumber";
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpName, ComponentDef.class);
-        MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
         Set<DefDescriptor<?>> dependencies = masterDefReg.getDependencies(uid);
@@ -437,17 +442,17 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetUidDescriptorNull() throws Exception {
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         assertNull(registry.getUid(null, null));
     }
 
     public void testGetUidDescriptorDoesntExist() throws Exception {
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         assertNull(registry.getUid(null, DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
     }
 
     public void testGetUidLocalDef() throws Exception {
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         ComponentDef def = Mockito.spy(registry.getDef(DefDescriptorImpl.getInstance("aura:component",
                 ComponentDef.class)));
         registry.invalidate(null); // clear any cached results from the preceding getDef call
@@ -458,9 +463,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testGetUidSameAcrossInstances() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        MasterDefRegistryImpl registry1 = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry1 = getDefRegistry(false);
         String uid1 = registry1.getUid(null, cmpDesc);
-        MasterDefRegistryImpl registry2 = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry2 = getDefRegistry(false);
         registry2.invalidate(null);
         String uid2 = registry2.getUid(null, cmpDesc);
         assertEquals("Expected same UID for def from separate registry instances", uid1, uid2);
@@ -469,7 +474,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testGetUidUnique() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ComponentDef> cmpDesc2 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         String uid1 = registry.getUid(null, cmpDesc1);
         String uid2 = registry.getUid(null, cmpDesc2);
         assertTrue("Components with same markup and dependencies should have different UIDs", !uid1.equals(uid2));
@@ -477,7 +482,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testGetUidCachedForChangedDefinition() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         String uid = registry.getUid(null, cmpDesc);
 
         // UID cached for current registry
@@ -487,14 +492,14 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertEquals("UID not cached", uid, uidNew);
 
         // UID not cached for new registry
-        MasterDefRegistryImpl registryNext = getDefRegistry(false);
+        MasterDefRegistryImplOverride registryNext = getDefRegistry(false);
         String uidNext = registryNext.getUid(null, cmpDesc);
         assertFalse("UID not cached in new registry", uid.equals(uidNext));
     }
 
     public void testGetUidCachedForRemovedDefinition() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>", null);
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         String uid = registry.getUid(null, cmpDesc);
 
         // UID cached for current registry
@@ -503,7 +508,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertEquals("UID not cached", uid, uidNew);
 
         // UID not cached for new registry
-        MasterDefRegistryImpl registryNext = getDefRegistry(false);
+        MasterDefRegistryImplOverride registryNext = getDefRegistry(false);
         String uidNext = registryNext.getUid(null, cmpDesc);
         assertNull("UID cached in new registry", uidNext);
     }
@@ -511,7 +516,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testGetUidForQuickFixException() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><unknown:component/></aura:component>", null);
-        MasterDefRegistryImpl registry = getDefRegistry(true);
+        MasterDefRegistryImplOverride registry = getDefRegistry(true);
         try {
             registry.getUid(null, cmpDesc);
             fail("Expected DefinitionNotFoundException");
@@ -534,7 +539,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testGetUidForNonQuickFixException() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component invalidAttribute=''/>", null);
-        MasterDefRegistryImpl registry = getDefRegistry(true);
+        MasterDefRegistryImplOverride registry = getDefRegistry(true);
         try {
             registry.getUid(null, cmpDesc);
             fail("Expected InvalidDefinitionException");
@@ -565,7 +570,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                         String.format("<%s/><%s/>", cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
 
         // spy on MDR
-        final MasterDefRegistryImpl registry = getDefRegistry(true);
+        final MasterDefRegistryImplOverride registry = getDefRegistry(true);
         registry.invalidate(null);
         spyOnDefs(registry);
 
@@ -600,7 +605,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def).getDescriptor();
 
         // spy on MDR's registries to spy on defs
-        final MasterDefRegistryImpl registry = getDefRegistry(true);
+        final MasterDefRegistryImplOverride registry = getDefRegistry(true);
         registry.invalidate(null);
         spyOnDefs(registry);
         registry.addLocalDef(def);
@@ -627,7 +632,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // getDef on registry should compile the def
         String cmpContent = "<aura:component/>";
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpContent);
-        MasterDefRegistryImpl registry = getDefRegistry(true);
+        MasterDefRegistryImplOverride registry = getDefRegistry(true);
         registry.getDef(cmpDesc);
         Mockito.verify(registry, Mockito.times(1)).compileDE(Mockito.eq(cmpDesc));
 
@@ -643,18 +648,18 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetDefDescriptorNull() throws Exception {
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         assertNull(registry.getDef(null));
     }
 
     public void testGetDefDescriptorDoesntExist() throws Exception {
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         assertNull(registry.getDef(DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
     }
 
     public void testGetDefCachedForChangedDefinition() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         ComponentDef def = registry.getDef(cmpDesc);
         assertNull(def.getAttributeDef("str"));
 
@@ -665,14 +670,14 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNull(defNew.getAttributeDef("str"));
 
         // Definition not cached for new registry
-        MasterDefRegistryImpl registryNext = getDefRegistry(false);
+        MasterDefRegistryImplOverride registryNext = getDefRegistry(false);
         ComponentDef defNext = registryNext.getDef(cmpDesc);
         assertNotNull(defNext.getAttributeDef("str"));
     }
 
     public void testGetDefCachedForRemovedDefinition() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>", null);
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         ComponentDef def = registry.getDef(cmpDesc);
         assertNotNull(def);
 
@@ -682,7 +687,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNotNull(defNew);
 
         // Definition not cached for new registry
-        MasterDefRegistryImpl registryNext = getDefRegistry(false);
+        MasterDefRegistryImplOverride registryNext = getDefRegistry(false);
         ComponentDef defNext = registryNext.getDef(cmpDesc);
         assertNull(defNext);
     }
@@ -753,7 +758,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                         String.format("<aura:dependency resource=\"" + depCmpDesc2.getQualifiedName()
                                 + "\"/><%s/><%s/>", cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
 
-        MasterDefRegistryImpl registry = getDefRegistry(false);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
         String uid = registry.getUid(null, cmpDesc);
         Set<DefDescriptor<?>> deps = registry.getDependencies(uid);
         assertTrue("Component should have dependency on aura:component by default",
@@ -789,7 +794,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
         contextService.startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
 
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        MasterDefRegistryImplOverride mdr = getDefRegistry(false);
         DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:deleteMeAfterTest",
                 ComponentDef.class);
 
@@ -820,7 +825,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Wait for MasterDefRegistry and CachingDefRegistry caches to be cleared after a source change.
      */
-    private void assertNotCached(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImpl mdr, String uid)
+    private void assertNotCached(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImplOverride mdr, String uid)
             throws Exception {
         long startTime = System.nanoTime();
         long timeoutInMilliseconds = 10000;
@@ -839,7 +844,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * Return true if DefDescriptor has been removed from MasterDefRegistry static cache. This does not take into
      * account the non-static local cache.
      */
-    private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImpl mdr, String uid)
+    private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImplOverride mdr, String uid)
             throws Exception {
         Cache<String, DependencyEntry> dependencies = AuraPrivateAccessor.get(mdr, "depsCache");
         String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
@@ -854,7 +859,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     @ThreadHostileTest("requires cache to remain stable")
     public void testInvalidateCacheCmpFile() throws Exception {
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        MasterDefRegistryImplOverride mdr = getDefRegistry(false);
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
@@ -873,7 +878,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     @ThreadHostileTest("requires cache to remain stable")
     public void testInvalidateCacheNamespaceFile() throws Exception {
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        MasterDefRegistryImplOverride mdr = getDefRegistry(false);
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> namespaceDef = defs.get(DefType.NAMESPACE);
@@ -895,7 +900,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     @ThreadHostileTest("requires cache to remain stable")
     public void testInvalidateCacheLayoutsFile() throws Exception {
-        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        MasterDefRegistryImplOverride mdr = getDefRegistry(false);
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> layoutsDef = defs.get(DefType.LAYOUTS);
@@ -979,6 +984,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return Boolean.TRUE == cache.getIfPresent(dd);
     }
 
+    private <D extends Definition> void callAssertAccess(MasterDefRegistryImpl mdr,
+            DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache)
+            throws Exception {
+        Method assertAccess = mdr.getClass().getMethod("assertAccess", DefDescriptor.class,
+                Definition.class, Cache.class);
+        assertAccess.setAccessible(true);
+        assertAccess.invoke(mdr, referencingDescriptor, def, accessCheckCache);
+    }
+
     /**
      * Verify basic functionality of MasterDefRegistryImpl.getClientLibraries. The same methods are test in
      * ClientLibraryServiceImplTest, where we use ClientLibraryService.getUrls()
@@ -1035,7 +1049,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn("Error");
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
         try {
-            mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+            callAssertAccess(mdr, null, desc.getDef(), mockAccessCheckCache);
             fail("Expected NoAccessException because accessCache has reason to block def");
         } catch (Exception e) {
             this.assertExceptionMessageStartsWith(e, NoAccessException.class, "Error");
@@ -1053,7 +1067,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn("");
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
-        mdr.assertAccess(null, desc.getDef(), mockAccessCheckCache);
+        callAssertAccess(mdr, null, desc.getDef(), mockAccessCheckCache);
 
         verify(mockAccessCheckCache).getIfPresent(anyString());
     }
@@ -1065,11 +1079,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
 
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
-        mdr.assertAccess(desc, desc.getDef(), mockAccessCheckCache);
+        callAssertAccess(mdr, desc, desc.getDef(), mockAccessCheckCache);
 
         verify(mockAccessCheckCache).put(anyString(), anyString());
 
-        mdr.assertAccess(desc, desc.getDef(), mockAccessCheckCache);
+        callAssertAccess(mdr, desc, desc.getDef(), mockAccessCheckCache);
         verify(mockAccessCheckCache, times(2)).getIfPresent(anyString());
     }
 
@@ -1816,6 +1830,18 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             Mockito.verify(lti.wLock, Mockito.never()).unlock();
         } finally {
             lti.clear();
+        }
+    }
+
+    private class MasterDefRegistryImplOverride extends MasterDefRegistryImpl {
+        public MasterDefRegistryImplOverride(@NonNull DefRegistry<?>... registries) {
+            super(registries);
+        }
+
+        @Override
+        public <T extends Definition> DependencyEntry compileDE(@NonNull DefDescriptor<T> descriptor)
+                throws QuickFixException {
+            return super.compileDE(descriptor);
         }
     }
 }

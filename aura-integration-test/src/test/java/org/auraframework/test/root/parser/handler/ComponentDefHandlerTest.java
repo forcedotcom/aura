@@ -23,20 +23,39 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
-
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ComponentDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
-    ComponentDefHandler cdHandler;
+    ComponentDefHandlerOverride cdHandler;
     XMLParser parser = XMLParser.getInstance();
 
     public ComponentDefHandlerTest(String name) {
         super(name);
     }
+
+    private static class ComponentDefHandlerOverride extends ComponentDefHandler {
+        public ComponentDefHandlerOverride(DefDescriptor<ComponentDef> componentDefDescriptor,
+                Source<?> source, XMLStreamReader xmlReader) {
+            super(componentDefDescriptor, source, xmlReader);
+        }
+
+        @Override
+        public void readAttributes() throws QuickFixException {
+            super.readAttributes();
+        }
+
+        @Override
+        public ComponentDefImpl createDefinition() throws QuickFixException {
+            return (ComponentDefImpl)super.createDefinition();
+        }
+    };
 
     @Override
     public void setUp() throws Exception {
@@ -48,12 +67,12 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
                         + "' abstract='true'>Child Text<aura:foo/></aura:component>", "myID", Format.XML);
         xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
-        cdHandler = new ComponentDefHandler(vendor.getComponentDefDescriptor(), source, xmlReader);
+        cdHandler = new ComponentDefHandlerOverride(vendor.getComponentDefDescriptor(), source, xmlReader);
     }
 
     public void testReadAttributes() throws Exception {
         cdHandler.readAttributes();
-        ComponentDefImpl cd = (ComponentDefImpl) cdHandler.createDefinition();
+        ComponentDefImpl cd = cdHandler.createDefinition();
         assertEquals(vendor.getParentComponentDefDescriptor(), cd.getExtendsDescriptor());
         assertEquals(vendor.getInterfaceDefDescriptor(), cd.getInterfaces().iterator().next());
         assertTrue(cd.isAbstract());

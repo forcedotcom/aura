@@ -19,6 +19,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDescriptorProvider;
 import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.java.provider.TestThemeDescriptorProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;

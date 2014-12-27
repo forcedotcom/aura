@@ -20,6 +20,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.adapter.BrowserValueProvider;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;

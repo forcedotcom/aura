@@ -18,7 +18,7 @@
  */
 
 /* title of the component blocks */
-.uitestLocalizationComponent_Test .title{
+.THIS .title{
 	background-color: #B0C4DE;
 	font-size: 14px;
 	font-weight: bold;
@@ -30,7 +30,7 @@
 }
 
 /* placeholder for component blocks */
-.uitestLocalizationComponent_Test.container{
+.THIS.container{
 	border: 1px solid grey;
 	border-radius: 5px;
 	margin: 5px;
@@ -39,7 +39,7 @@
 }
 
 /* locale representation and submit count container */
-.uitestLocalizationComponent_Test.banner {
+.THIS.banner {
 	font-size: 10px;
 	font-family: monospace;
 	color: black;
@@ -51,21 +51,21 @@
 }
 
 /* top banner */
-.uitestLocalizationComponent_Test.top {
+.THIS.top {
 	width:9%;
 	top: 0px;
 	height: 11px;
 }
 
 /* down banner */
-.uitestLocalizationComponent_Test.down {
+.THIS.down {
 	padding: 2px;
 	top: 14px;
 	height: 80px;
 }
 
 /* label text alongside fields*/
-.uitestLocalizationComponent_Test .bText {
+.THIS .bText {
 	color: #437BC4;
 	font-size: 12px;
 	font-weight: bold;
@@ -74,14 +74,14 @@
 }
 
 /* submit button */
-.uitestLocalizationComponent_Test .custom {
+.THIS .custom {
 	font-weight: normal;
 	font-size: 0.8em;
 	padding:0;
 }
 
 /* heading */
-.uitestLocalizationComponent_Test.underline{
+.THIS.underline{
 	text-decoration: underline;
 	padding-bottom: 10px;
 	display: block;
@@ -89,13 +89,13 @@
 }
 
 /* serialized output component */
-.uitestLocalizationComponent_Test .opt {
+.THIS .opt {
 	color: black;
 	display: inline-block;
 }
 
 /* message block for exception */
-.uitestLocalizationComponent_Test .uiMessage h4 {
+.THIS .uiMessage h4 {
 	font-size: 13px;
 	line-height: 14px;
 	font-weight: normal;

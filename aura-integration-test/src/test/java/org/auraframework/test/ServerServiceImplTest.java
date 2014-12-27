@@ -33,6 +33,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;

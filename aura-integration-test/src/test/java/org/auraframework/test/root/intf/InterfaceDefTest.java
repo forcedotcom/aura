@@ -32,6 +32,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
+import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;

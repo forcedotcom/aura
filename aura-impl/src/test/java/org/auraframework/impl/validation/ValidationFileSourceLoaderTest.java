@@ -18,14 +18,19 @@ package org.auraframework.impl.validation;
 import java.io.File;
 import java.util.Set;
 
-import org.auraframework.components.AuraComponentsFiles;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.util.AuraFiles;
 
+/**
+ * Ugh...
+ *
+ * Fixme... this test should be written using something other than aura-components.
+ */
 public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase {
 
     public ValidationFileSourceLoaderTest(String name) {
@@ -36,10 +41,13 @@ public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase
         if (skipTestIfNotRunningWithAuraSource()) {
             return;
         }
+        String basepath = AuraFiles.Core.getPath() + "/aura-components/";
+        String main_components = basepath+"src/main/components/";
+        String test_components = basepath+"src/test/components/";
 
         // find in component folder
-        File root = new File("src/test/components/validationTest/basic");
-        ValidationFileSourceLoader loader = new ValidationFileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        File root = new File(test_components+"validationTest/basic");
+        ValidationFileSourceLoader loader = new ValidationFileSourceLoader(new File(test_components));
         Set<DefDescriptor<?>> found = loader.findIn(root);
         assertEquals(3, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://validationTest:basic", ComponentDef.class)));
@@ -47,7 +55,7 @@ public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase
         assertTrue(found.contains(DefDescriptorImpl.getInstance("css://validationTest.basic", StyleDef.class)));
 
         // find in namespace folder
-        root = new File("src/test/components/validationTest");
+        root = new File(test_components+"validationTest");
         found = loader.findIn(root);
         assertEquals(3, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://validationTest:basic", ComponentDef.class)));
@@ -55,23 +63,23 @@ public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase
         assertTrue(found.contains(DefDescriptorImpl.getInstance("css://validationTest.basic", StyleDef.class)));
 
         // find in file
-        root = new File("src/test/components/validationTest/basic/basicController.js");
+        root = new File(test_components+"validationTest/basic/basicController.js");
         found = loader.findIn(root);
         assertEquals(1, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("js://validationTest.basic", ControllerDef.class)));
-        root = new File("src/test/components/validationTest/basic/basic.css");
+        root = new File(test_components+"validationTest/basic/basic.css");
         found = loader.findIn(root);
         assertEquals(1, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("css://validationTest.basic", StyleDef.class)));
 
         // find nothing
-        root = new File("src/test/components/validationTest/basic/missing.js");
+        root = new File(test_components+"validationTest/basic/missing.js");
         found = loader.findIn(root);
         assertEquals(0, found.size());
 
         // can find aura components
-        loader = new ValidationFileSourceLoader(AuraComponentsFiles.Components.asFile());
-        root = new File(AuraComponentsFiles.Components.getPath() + "/ui/button/button.cmp");
+        loader = new ValidationFileSourceLoader(new File(main_components));
+        root = new File(main_components + "ui/button/button.cmp");
         found = loader.findIn(root);
         assertEquals(1, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://ui:button", ComponentDef.class)));

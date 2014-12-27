@@ -35,6 +35,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
+import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;

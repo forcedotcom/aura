@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.SerializationServiceImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.SerializationService;

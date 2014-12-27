@@ -23,6 +23,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;

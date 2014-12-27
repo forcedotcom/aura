@@ -22,6 +22,8 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.validation.AuraValidationTestCase;
+import org.auraframework.impl.validation.ValidationEngine;
 import org.auraframework.util.validation.ValidationError;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {

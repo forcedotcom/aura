@@ -23,7 +23,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
 
-abstract class AuraValidationTestCase extends AuraImplTestCase {
+public abstract class AuraValidationTestCase extends AuraImplTestCase {
 
     protected static final Log LOG = LogFactory.getLog(AuraValidationTestCase.class);
 

@@ -23,6 +23,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.clientlibrary.ResourceDefImpl;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Charsets;

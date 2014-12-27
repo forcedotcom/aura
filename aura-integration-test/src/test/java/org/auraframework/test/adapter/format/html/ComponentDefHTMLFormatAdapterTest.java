@@ -17,6 +17,7 @@ package org.auraframework.test.adapter.format.html;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**

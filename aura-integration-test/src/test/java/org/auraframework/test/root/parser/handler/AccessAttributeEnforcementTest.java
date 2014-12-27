@@ -19,6 +19,7 @@ package org.auraframework.test.root.parser.handler;
 import java.util.ArrayList;
 
 import org.auraframework.def.*;
+import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
 

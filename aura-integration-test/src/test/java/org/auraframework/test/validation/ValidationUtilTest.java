@@ -25,6 +25,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
+import org.auraframework.impl.validation.AuraValidationTestCase;
+import org.auraframework.impl.validation.ValidationUtil;
 
 public final class ValidationUtilTest extends AuraValidationTestCase {
 

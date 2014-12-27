@@ -23,19 +23,39 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
-    ApplicationDefHandler cdHandler;
+    ApplicationDefHandlerOverride cdHandler;
 
     public ApplicationDefHandlerTest(String name) {
         super(name);
     }
+
+    private static class ApplicationDefHandlerOverride extends ApplicationDefHandler {
+        public ApplicationDefHandlerOverride(DefDescriptor<ApplicationDef> applicationDefDescriptor,
+                Source<ApplicationDef> source, XMLStreamReader xmlReader) {
+            super(applicationDefDescriptor, source, xmlReader);
+        }
+
+        @Override
+        public void readAttributes() throws QuickFixException {
+            super.readAttributes();
+        }
+
+        @Override
+        public ApplicationDefImpl createDefinition() throws QuickFixException {
+            return (ApplicationDefImpl)super.createDefinition();
+        }
+    };
+
 
     @Override
     public void setUp() throws Exception {
@@ -47,12 +67,12 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                         + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
         xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
-        cdHandler = new ApplicationDefHandler(vendor.getApplicationDefDescriptor(), source, xmlReader);
+        cdHandler = new ApplicationDefHandlerOverride(vendor.getApplicationDefDescriptor(), source, xmlReader);
     }
 
     public void testReadAttributes() throws Exception {
         cdHandler.readAttributes();
-        ApplicationDefImpl cd = (ApplicationDefImpl) cdHandler.createDefinition();
+        ApplicationDefImpl cd = cdHandler.createDefinition();
         assertEquals(vendor.getParentComponentDefDescriptor().getQualifiedName(), cd.getExtendsDescriptor()
                 .getQualifiedName());
         assertEquals(vendor.getInterfaceDefDescriptor(), cd.getInterfaces().iterator().next());

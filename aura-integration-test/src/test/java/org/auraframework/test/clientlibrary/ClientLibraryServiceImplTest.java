@@ -29,6 +29,8 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.clientlibrary.ClientLibraryResolverRegistryImpl;
+import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;

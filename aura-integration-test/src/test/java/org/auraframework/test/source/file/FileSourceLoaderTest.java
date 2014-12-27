@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.Parser.Format;

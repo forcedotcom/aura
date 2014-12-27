@@ -76,11 +76,13 @@
     your Phone value is: <ui:outputText aura:id="outPhone" value=""/> <br/>
     <br/>
 
+    <!--
     <div>Input Picklist</div>
     select Picklist: <ui:inputPicklist aura:id="inPicklist"/> <br/>
     <ui:button buttonTitle="Picklist" label="submit" press="{!c.submit}"/> <br/>
     your Picklist value is: <ui:outputText aura:id="outPicklist" value=""/> <br/>
     <br/>
+    -->
 
     <div>Input Search</div>
     enter Search: <ui:inputSearch aura:id="inSearch" value="{!m.search}"/> <br/>

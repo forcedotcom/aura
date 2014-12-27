@@ -15,6 +15,8 @@
  */
 package org.auraframework.test.root.parser.handler;
 
+import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
+
 public class ApplicationAccessAttributeEnforcementTest extends
 		BaseAccessAttributeEnforcementTest {
 	

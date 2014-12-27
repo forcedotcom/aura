@@ -31,6 +31,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;

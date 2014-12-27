@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.java.controller.JavaActionDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;

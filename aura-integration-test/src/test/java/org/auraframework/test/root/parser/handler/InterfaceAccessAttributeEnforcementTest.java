@@ -17,8 +17,9 @@ package org.auraframework.test.root.parser.handler;
 
 import java.util.ArrayList;
 
-public class InterfaceAccessAttributeEnforcementTest extends
-		BaseAccessAttributeEnforcementTest {
+import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
+
+public class InterfaceAccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest {
 	
 	private TestResource[] consumers = new TestResource[]{TestResource.Component, TestResource.Interface};
 

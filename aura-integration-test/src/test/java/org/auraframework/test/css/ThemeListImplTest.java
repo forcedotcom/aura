@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeMapProvider;
+import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.css.ThemeListImpl;
 import org.auraframework.impl.java.provider.TestThemeDescriptorProvider;
 import org.auraframework.impl.java.provider.TestThemeMapProvider;
 import org.auraframework.system.Annotations.Provider;

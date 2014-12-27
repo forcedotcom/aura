@@ -19,6 +19,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
+import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;

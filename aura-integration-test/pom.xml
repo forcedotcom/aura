@@ -18,8 +18,24 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-impl</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -31,6 +47,17 @@
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-impl</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -67,10 +94,10 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-server</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
         <dependency>
             <groupId>net.sourceforge.pjl-comp-filter</groupId>
             <artifactId>pjl-comp-filter</artifactId>
@@ -116,6 +143,15 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
@@ -636,6 +672,30 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jarsOnly</id>
+            <activation>
+                <property>
+                    <name>jarsOnly</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemProperties>
+                                <systemProperty>
+                                    <name>aura.home</name>
+                                    <value />
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

@@ -16,6 +16,8 @@
 package org.auraframework.test.root.component;
 
 import org.auraframework.def.ComponentDef;
+import org.auraframework.impl.root.component.BaseComponentDefImplUnitTest;
+import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl.Builder;
 
 public class ComponentDefImplUnitTest extends

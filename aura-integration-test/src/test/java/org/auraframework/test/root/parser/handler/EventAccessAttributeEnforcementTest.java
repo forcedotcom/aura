@@ -17,9 +17,9 @@ package org.auraframework.test.root.parser.handler;
 
 import java.util.ArrayList;
 
-public class EventAccessAttributeEnforcementTest extends
-		BaseAccessAttributeEnforcementTest {
-		
+import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
+
+public class EventAccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest { 
 	public EventAccessAttributeEnforcementTest(String name) {
 		super(name);
 		testResource = TestResource.Event;

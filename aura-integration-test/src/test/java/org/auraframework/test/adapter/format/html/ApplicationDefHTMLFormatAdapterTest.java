@@ -22,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.AuraTextUtil;

@@ -16,11 +16,14 @@
 package org.auraframework.util.type;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-public class CustomPairType implements JsonSerializable {
+public class CustomPairType implements JsonSerializable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String strMember = null;
     private int intMember;
 
@@ -67,7 +70,5 @@ public class CustomPairType implements JsonSerializable {
         json.writeMapEntry("strMember", getStrMember());
         json.writeMapEntry("intMember", getIntMember());
         json.writeMapEnd();
-
     }
-
 }

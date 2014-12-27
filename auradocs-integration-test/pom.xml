@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>test</scope>

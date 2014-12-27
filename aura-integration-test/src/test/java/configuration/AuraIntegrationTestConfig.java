@@ -19,21 +19,43 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.auraframework.adapter.LoggingAdapter;
+import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.impl.context.TestLoggingAdapterImpl;
 import org.auraframework.test.PooledRemoteWebDriverFactory;
 import org.auraframework.test.RemoteWebDriverFactory;
 import org.auraframework.test.SauceUtil;
 import org.auraframework.test.SeleniumServerLauncher;
+import org.auraframework.test.TestInventory;
 import org.auraframework.test.WebDriverProvider;
 import org.auraframework.test.configuration.JettyTestServletConfig;
+import org.auraframework.test.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
 import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 import org.openqa.selenium.net.PortProber;
 
 @AuraConfiguration
 public class AuraIntegrationTestConfig {
     private static TestServletConfig testServletConfig = null;
     private static WebDriverProvider webDriverProvider = null;
+
+    @Impl(name = "auraIntegrationTestInventory")
+    public static TestInventory auraImplTestInventory() throws Exception {
+        return new TestInventory(AuraImplTestConfig.class);
+    }
+
+    @Impl
+    @PrimaryImpl
+    public static LoggingAdapter auraImplTestLoggingAdapter() {
+        return new TestLoggingAdapterImpl();
+    }
+
+    @Impl
+    public static RegistryAdapter auraImplTestRegistryAdapterWithNulls() {
+        return new AuraTestRegistryProviderWithNulls();
+    }
 
     @Impl
     public synchronized static TestServletConfig auraJettyServletTestInfo() throws Exception {

@@ -22,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
+import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**

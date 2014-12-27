@@ -30,6 +30,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -120,11 +121,11 @@ public class EventDefTest extends AuraImplTestCase {
         ed.validateReferences();
     }
 
-    public void testGetSuperDefs() throws Exception {
+    public void testGetExtends() throws Exception {
         DefDescriptor<EventDef> eventDefDescriptor = vendor.makeEventDefDescriptor("test:fakeEvent");
         DefDescriptor<EventDef> eventDefDescriptorParent = vendor.makeEventDefDescriptor("test:parentEvent");
-        EventDef ed = vendor.makeEventDef(eventDefDescriptor, eventDefDescriptorParent).getSuperDef();
-        assertEquals("parentEvent", ed.getDescriptor().getName());
+        EventDef ed = vendor.makeEventDef(eventDefDescriptor, eventDefDescriptorParent);
+        assertEquals("parentEvent", ed.getExtendsDescriptor().getName());
     }
 
     public void testDependencies() throws Exception {

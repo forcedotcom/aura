@@ -97,7 +97,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
         }
     }
 
-    protected EventDef getSuperDef() throws QuickFixException {
+    private EventDef getSuperDef() throws QuickFixException {
         EventDef ret = null;
         if (getExtendsDescriptor() != null) {
             ret = getExtendsDescriptor().getDef();

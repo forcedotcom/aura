@@ -15,50 +15,51 @@
  */
 package org.auraframework.test.root.parser.handler;
 
-public class AttributeAccessAttributeEnforcementTest extends
-		BaseAccessAttributeEnforcementTest {
-	
-	private TestResource[] consumers = new TestResource[]{TestResource.Application, TestResource.Component};
+import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
 
-	public AttributeAccessAttributeEnforcementTest(String name) {
-		super(name);
-		testResource = TestResource.Attribute;
-	}		
-	
-	/**
-	 * Verify Default access enforcement
-	 * @throws Exception
-	 */
-	public void testDefaultAccess() throws Exception {
-		testCase = TestCase.DEFAULT;
-		verifyAccess(consumers);
+public class AttributeAccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest {
+    
+    private TestResource[] consumers = new TestResource[]{TestResource.Application, TestResource.Component};
+
+    public AttributeAccessAttributeEnforcementTest(String name) {
+        super(name);
+        testResource = TestResource.Attribute;
+    }       
+    
+    /**
+     * Verify Default access enforcement
+     * @throws Exception
+     */
+    public void testDefaultAccess() throws Exception {
+        testCase = TestCase.DEFAULT;
+        verifyAccess(consumers);
     }
-	
-	/**
-	 * Verify Private access enforcement
-	 * @throws Exception
-	 */
-	public void _testPrivateAccess() throws Exception {
-		testCase = TestCase.PRIVATE;
-		verifyAccess(consumers);
+    
+    /**
+     * Verify Private access enforcement
+     * @throws Exception
+     */
+    public void _testPrivateAccess() throws Exception {
+        testCase = TestCase.PRIVATE;
+        verifyAccess(consumers);
     }
-	
-	/**
-	 * Verify Public access enforcement
-	 * @throws Exception
-	 */
-	public void testPublicAccess() throws Exception {
-		testCase = TestCase.PUBLIC;
-		verifyAccess(consumers);
+    
+    /**
+     * Verify Public access enforcement
+     * @throws Exception
+     */
+    public void testPublicAccess() throws Exception {
+        testCase = TestCase.PUBLIC;
+        verifyAccess(consumers);
     }
-	
-	/**
-	 * Verify Global access enforcement
-	 * @throws Exception
-	 */
-	public void testGlobalAccess() throws Exception {
-		testCase = TestCase.GLOBAL;
-		verifyAccess(consumers);
+    
+    /**
+     * Verify Global access enforcement
+     * @throws Exception
+     */
+    public void testGlobalAccess() throws Exception {
+        testCase = TestCase.GLOBAL;
+        verifyAccess(consumers);
     }
 
 }

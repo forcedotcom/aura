@@ -15,8 +15,9 @@
  */
 package org.auraframework.test.root.parser.handler;
 
-public class ComponentAccessAttributeEnforcementTest extends
-		BaseAccessAttributeEnforcementTest {
+import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
+
+public class ComponentAccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest {
 	
 	private TestResource[] consumers = new TestResource[]{TestResource.Application, TestResource.Component};
 

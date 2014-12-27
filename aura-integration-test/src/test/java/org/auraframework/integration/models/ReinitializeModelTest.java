@@ -29,7 +29,7 @@ import com.google.common.collect.Maps;
 
 import test.model.TestReinitializeModelWithCount;
 
-public class reinitializeModelTest extends AuraImplTestCase {
+public class ReinitializeModelTest extends AuraImplTestCase {
     private final boolean debug = false;
 
     String componentTag = "<auratest:test_Model_Parent attrInParent=%s/>";
@@ -48,7 +48,7 @@ public class reinitializeModelTest extends AuraImplTestCase {
             + "<aura:set attribute='attrInParent' value='%s'/>"
             + "<br/>GrandCHILD CMP<br/>" + "%s" + "</aura:component>";
 
-    public reinitializeModelTest(String name) {
+    public ReinitializeModelTest(String name) {
         super(name);
     }
 

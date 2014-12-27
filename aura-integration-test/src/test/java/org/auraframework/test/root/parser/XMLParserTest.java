@@ -27,6 +27,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.event.EventDefImpl;
+import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;

@@ -30,6 +30,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;

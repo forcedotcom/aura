@@ -30,4 +30,9 @@ public class AuraComponentsConfig {
         return new ComponentLocationAdapter.Impl(AuraComponentsFiles.Components.asFile(), null,
                 "components_aura_components");
     }
+
+    @Impl
+    public static ComponentLocationAdapter auraTestComponentLocationAdapterImpl() {
+        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.TestComponents.asFile(), null, "components_aura_test");
+    }
 }

@@ -84,21 +84,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- This is temporary, and should be removed when the compile epic is finished: W-2342861 -->
-            <plugin>
-                <groupId>org.auraframework</groupId>
-                <artifactId>aura-tools</artifactId>
-                <executions>
-                    <execution>
-                        <id>aura:compile-components</id>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <componentDirectory>../aura-components/src/main/components</componentDirectory>
-                            <outputDirectory>${basedir}/target/classes/</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -118,27 +103,6 @@
                                         <versionRange>[1.0.7,)</versionRange>
                                         <goals>
                                             <goal>jsdoc3</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.auraframework
-                                        </groupId>
-                                        <artifactId>
-                                            aura-tools
-                                        </artifactId>
-                                        <versionRange>
-                                            [0.1352-SNAPSHOT,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>
-                                                compile-components
-                                            </goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

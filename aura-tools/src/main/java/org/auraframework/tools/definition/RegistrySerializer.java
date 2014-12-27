@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -38,6 +40,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -56,6 +59,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * one per namespace, that contain all of the defs that are in the namespaces.
  */
 public class RegistrySerializer {
+    private static final Log log =
+        LogFactory.getLog(RegistrySerializer.class);
+
     /**
      * An exception during serialization.
      */
@@ -337,14 +343,26 @@ public class RegistrySerializer {
         } catch (FileNotFoundException fnfe) {
             throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
         }
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
         try {
-            write(namespaces, out);
+            try {
+                Aura.getContextService().startContext(Mode.DEV, null, Format.JSON, Authentication.AUTHENTICATED, null);
+            } catch (QuickFixException qfe) {
+                throw new RegistrySerializerException("problem creating context "+qfe);
+            }
+            try {
+                write(namespaces, out);
+            } finally {
+                Aura.getContextService().endContext();
+            }
+            if (error) {
+                throw new RegistrySerializerException("one or more errors occurred during compile");
+            }
         } finally {
-            Aura.getContextService().endContext();
-        }
-        if (error) {
-            throw new RegistrySerializerException("one or more errors occurred during compile");
+            try {
+                out.close();
+            } catch (IOException ioe) {
+                log.error(ioe);
+            }
         }
     }
 

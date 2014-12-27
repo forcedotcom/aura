@@ -22,10 +22,6 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-components</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -116,6 +112,33 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-js-for-test</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/tools/src/main/resources/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.7</source>
@@ -130,27 +153,6 @@
                     <execution>
                         <phase>generate-test-resources</phase>
                         <id>unpack-xunit</id>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-test-components</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <outputDirectory>target/test-classes/components_aura_impl</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>index-test-components</id>
-                        <phase>generate-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>

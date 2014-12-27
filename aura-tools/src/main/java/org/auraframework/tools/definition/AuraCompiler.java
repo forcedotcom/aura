@@ -119,6 +119,7 @@ public abstract class AuraCompiler {
             new RegistrySerializer(componentsDir, outputDir, ns.toArray(new String [ns.size()]), cll).execute();
         } catch (RegistrySerializerException rse) {
             cll.error(rse.getMessage(), rse.getCause());
+            System.exit(1);
         }
     }
 

@@ -32,7 +32,7 @@ public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
     public void testExceptionLineColNums() throws Exception {
         // Verify -1,-1 aren't line/col numbers in stacktrace if Location doesn't provide them
         ServerAction a = new ServerAction(
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$throwExceptionNoLineNums",
+                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$throwExceptionNoLineNums",
                 null);
         a.run();
         Map<String, Object> error = (Map<String, Object>) a.getErrors().get(0);
@@ -41,7 +41,7 @@ public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
 
         // Verify correct line/column numbers present in stacktrace when Location provides them
         a = new ServerAction(
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$throwExceptionWithLineNums",
+                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$throwExceptionWithLineNums",
                 null);
         a.run();
         error = (Map<String, Object>) a.getErrors().get(0);

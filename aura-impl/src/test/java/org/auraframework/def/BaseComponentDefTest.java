@@ -647,11 +647,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testGetControllerDefDescriptors() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
+                "extensible='true' controller='java://org.auraframework.component.test.java.controller.TestController2'", "")
                 .getDescriptor();
         List<DefDescriptor<ControllerDef>> dds = define(
                 baseTag,
-                "controller='java://org.auraframework.impl.java.controller.TestController' extends='"
+                "controller='java://org.auraframework.component.test.java.controller.TestController' extends='"
                         + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDefDescriptors();
         assertNotNull(dds);
         assertEquals(2, dds.size());
@@ -661,8 +661,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 return input.getQualifiedName();
             }
         });
-        assertTrue(names.containsAll(ImmutableSet.of("java://org.auraframework.impl.java.controller.TestController",
-                "java://org.auraframework.impl.java.controller.TestController2")));
+        assertTrue(names.containsAll(ImmutableSet.of("java://org.auraframework.component.test.java.controller.TestController",
+                "java://org.auraframework.component.test.java.controller.TestController2")));
     }
 
     /**
@@ -678,11 +678,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testGetControllerDef() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> ddParent = define(baseTag,
-                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
+                "extensible='true' controller='java://org.auraframework.component.test.java.controller.TestController2'", "")
                 .getDescriptor();
         ControllerDef d = define(
                 baseTag,
-                "controller='java://org.auraframework.impl.java.controller.TestController' extends='"
+                "controller='java://org.auraframework.component.test.java.controller.TestController' extends='"
                         + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDef();
         assertNotNull(d);
         String name = d.getDescriptor().getQualifiedName();

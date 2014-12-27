@@ -78,7 +78,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
         Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
         String jsonMessage = Json.serialize(message);
@@ -92,7 +92,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         params.put("aura.format", "JSON");
         HttpPost post = obtainPostMethod("/aura", params);
         requestAndAssertContentType(post,
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString", f,
+                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString", f,
                 !causeException);
     }
 

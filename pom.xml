@@ -46,7 +46,7 @@
           xunit.js.engine the engine to use.
         -->
         <xunit.js.testPath />
-        <xunit.js.auraImpl>${project.build.directory}/auraImpl/src/main/resources/</xunit.js.auraImpl>
+        <xunit.js.auraImpl>${project.build.directory}/tools/src/main/resources/</xunit.js.auraImpl>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
         <xunit.js.engine>rhino</xunit.js.engine>
         <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
@@ -154,6 +154,12 @@
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
+                <artifactId>aura-impl</artifactId>
+                <version>0.1726-SNAPSHOT</version>
+                <type>sources</type>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
                 <version>0.1726-SNAPSHOT</version>
                 <type>test-jar</type>
@@ -162,6 +168,12 @@
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
                 <version>0.1726-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-components</artifactId>
+                <version>0.1726-SNAPSHOT</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
@@ -616,10 +628,10 @@
                                     <artifactItem>
                                         <groupId>org.auraframework</groupId>
                                         <artifactId>aura-impl</artifactId>
-                                        <type>sources-jar</type>
+                                        <type>test-jar</type>
                                         <overWrite>true</overWrite>
                                         <outputDirectory>${xunit.js.auraImpl}</outputDirectory>
-                                        <includes>src/main/resources/**</includes>
+                                        <includes>tools/src/main/resources/**</includes>
                                     </artifactItem>
                                 </artifactItems>
                             </configuration>
@@ -855,6 +867,42 @@
                                 </target>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>aura:compile-components</id>
+                            <phase>disabled</phase>
+                            <configuration>
+                                <target>
+                                    <java classname="org.auraframework.tools.definition.AuraCompiler"
+                                            classpathref="maven.compile.classpath"
+                                            fork="true" failonerror="true">
+                                        <jvmarg value="-Daura.home=${basedir}/.." />
+                                        <arg value="${basedir}/src/main/components" />
+                                        <arg value="${project.build.directory}/${component.dir}" />
+                                    </java>
+                                </target>
+                            </configuration>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>aura:compile-test-components</id>
+                            <phase>disabled</phase>
+                            <configuration>
+                                <target>
+                                    <java classname="org.auraframework.tools.definition.AuraCompiler"
+                                            classpathref="maven.test.classpath"
+                                            fork="true" failonerror="true">
+                                        <jvmarg value="-Daura.home=${basedir}/.." />
+                                        <arg value="${basedir}/src/test/components" />
+                                        <arg value="${project.build.directory}/${component.test.dir}" />
+                                    </java>
+                                </target>
+                            </configuration>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
@@ -868,24 +916,6 @@
                             <version>1.6.4</version>
                         </dependency>
                     </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.auraframework</groupId>
-                    <artifactId>aura-tools</artifactId>
-                    <version>${project.version}</version>
-                    <executions>
-                        <execution>
-                            <id>aura:compile-components</id>
-                            <phase>disabled</phase>
-                            <configuration>
-                                <outputDir>target/generated-sources/components/</outputDir>
-                                <componentDir>src/main/components</componentDir>
-                            </configuration>
-                            <goals>
-                                <goal>compile-components</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

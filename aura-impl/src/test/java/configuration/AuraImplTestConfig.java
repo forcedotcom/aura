@@ -15,14 +15,8 @@
  */
 package configuration;
 
-import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.impl.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
 import org.auraframework.impl.adapter.MockConfigAdapterImpl;
-import org.auraframework.impl.context.TestLoggingAdapterImpl;
-import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.test.TestInventory;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
@@ -38,25 +32,10 @@ public class AuraImplTestConfig {
         return new TestInventory(AuraImplTestConfig.class);
     }
 
-    @Impl(name = "auraImplTestComponentLocationAdapterImpl")
-    public static ComponentLocationAdapter auraImplTestComponentLocationAdapterImpl() {
-        return new ComponentLocationAdapter.Impl(AuraImplFiles.TestComponents.asFile(), null, "components_aura_impl");
-    }
-
     @Impl
     @PrimaryImpl
     public static ConfigAdapter auraImplTestConfigAdapter() {
         return new MockConfigAdapterImpl();
     }
 
-    @Impl
-    @PrimaryImpl
-    public static LoggingAdapter auraImplTestLoggingAdapter() {
-        return new TestLoggingAdapterImpl();
-    }
-
-    @Impl
-    public static RegistryAdapter auraImplTestRegistryAdapterWithNulls() {
-        return new AuraTestRegistryProviderWithNulls();
-    }
 }

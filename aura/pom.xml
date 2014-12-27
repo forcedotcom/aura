@@ -130,27 +130,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-test-components</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <outputDirectory>target/test-classes/components_aura</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>index-test-components</id>
-                        <phase>generate-test-resources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
                 <version>${project.version}</version>

@@ -32,6 +32,7 @@ import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerL
  * 
  * @phase process-classes
  * @phase process-test-classes
+ * @requiresDependencyResolution runtime
  */
 public class CompilerMojo extends AbstractMojo {
     /**

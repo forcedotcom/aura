@@ -50,7 +50,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);

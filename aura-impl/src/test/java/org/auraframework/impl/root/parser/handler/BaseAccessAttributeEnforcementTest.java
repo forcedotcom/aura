@@ -517,7 +517,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		}
 	}
 
-	XMLParser parser = XMLParser.getInstance();
+	protected XMLParser parser = XMLParser.getInstance();
 
 	protected TestCase testCase;
 	protected TestResource testResource;

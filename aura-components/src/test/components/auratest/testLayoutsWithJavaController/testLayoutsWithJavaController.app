@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application controller="java://org.auraframework.impl.java.controller.JavaTestController" locationChangeEvent="auratest:locationChange">
+<aura:application controller="java://org.auraframework.component.test.java.controller.JavaTestController" locationChangeEvent="auratest:locationChange">
     <aura:handler event="aura:layoutChange" action="{!c.layoutDone}"/>
     <div aura:id="ready"/>
     <div aura:id="containerA">initial</div>

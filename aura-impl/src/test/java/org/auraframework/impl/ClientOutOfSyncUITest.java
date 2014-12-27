@@ -62,7 +62,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 ComponentDef.class,
                 String.format(
                         baseComponentTag,
-                        "controller='java://org.auraframework.impl.java.controller.JavaTestController' "
+                        "controller='java://org.auraframework.component.test.java.controller.JavaTestController' "
                                 + attrs,
                         "<button onclick='{!c.post}'>post</button>" + body));
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
@@ -315,7 +315,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         open(cmpDesc);
         assertEquals("free", getText(By.cssSelector("#sample")));
         updateStringSource(cmpDesc, String.format(baseComponentTag,
-                "controller='java://org.auraframework.impl.java.controller.JavaTestController'",
+                "controller='java://org.auraframework.component.test.java.controller.JavaTestController'",
                 "<button onclick='{!c.post}'>post</button><div id='sample'>deposit</div>"));
         triggerServerAction();
         auraUITestingUtil.waitForElementText(By.cssSelector("#sample"), "deposit", true);
@@ -418,7 +418,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 ComponentDef.class,
                 String.format(
                         baseComponentTag,
-                        "controller='java://org.auraframework.impl.java.controller.JavaTestController'",
+                        "controller='java://org.auraframework.component.test.java.controller.JavaTestController'",
                         "<button onclick='{!c.post}'>post</button><div id='click' onclick='{!c.clicked}'>click</div>"));
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
@@ -467,7 +467,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 String.format(
                         baseComponentTag,
                         String.format(
-                                "controller='java://org.auraframework.impl.java.controller.JavaTestController' provider='%s'",
+                                "controller='java://org.auraframework.component.test.java.controller.JavaTestController' provider='%s'",
                                 providerDesc.getQualifiedName()),
                         "<button onclick='{!c.post}'>post</button><aura:attribute name='given' type='string' default=''/><div id='result'>{!v.given}</div>"));
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()

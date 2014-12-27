@@ -357,10 +357,10 @@
     	}, function(cmp){
             //Run the action that sets up other actions to be storable
             this.initiateServerAction(cmp, "testNewStorableActionDefsInResponse", 
-                            ["java://org.auraframework.impl.java.controller.TestController/ACTION$getString"] );
+                            ["java://org.auraframework.component.test.java.controller.TestController/ACTION$getString"] );
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
-                    var storageKey = "java://org.auraframework.impl.java.controller.TestController/ACTION$getString";
+                    var storageKey = "java://org.auraframework.component.test.java.controller.TestController/ACTION$getString";
                     //Check if storage service has the expected action
                     $A.storageService.getStorage("actions").get(storageKey, function(response){
                         if(response){

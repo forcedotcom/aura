@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.TestController">
+<aura:component controller="java://org.auraframework.component.test.java.controller.TestController">
     <actionsTest:chainLocalActions aura:id='facet'/>
     <aura:registerevent name="press" type="ui:press"/>
 </aura:component>

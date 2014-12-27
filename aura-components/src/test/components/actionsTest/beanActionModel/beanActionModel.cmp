@@ -16,7 +16,7 @@
 
 -->
 <aura:component 
-    controller="java://org.auraframework.impl.java.controller.TestControllerBean"
+    controller="java://org.auraframework.component.test.java.controller.TestControllerBean"
     model="java://org.auraframework.impl.java.model.TestModelBean">
     <aura:handler name="init" value="{!this}" action="{!c.onInit}"></aura:handler> 
     <aura:attribute name="counter" type="string"/>

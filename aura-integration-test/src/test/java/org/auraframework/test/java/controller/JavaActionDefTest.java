@@ -31,7 +31,7 @@ public class JavaActionDefTest extends AuraImplTestCase {
     }
     
     public void testCreatingJavaActionDef(){
-        DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.controller.TestController", ControllerDef.class);
+        DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.component.test.java.controller.TestController", ControllerDef.class);
         DefDescriptor<ActionDef> actionDefDesc = SubDefDescriptorImpl.getInstance("getString", controllerDesc, ActionDef.class);
         try{
             ActionDef actionDef = actionDefDesc.getDef();
@@ -43,7 +43,7 @@ public class JavaActionDefTest extends AuraImplTestCase {
         }catch(Exception e){
             fail("Failed to create a valid java actiondef without parameters");
         }
-        controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.controller.TestControllerWithParameters", ControllerDef.class);
+        controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.component.test.java.controller.TestControllerWithParameters", ControllerDef.class);
         actionDefDesc = SubDefDescriptorImpl.getInstance("sumValues", controllerDesc, ActionDef.class);
         try{
             ActionDef actionDef = actionDefDesc.getDef();
@@ -61,23 +61,23 @@ public class JavaActionDefTest extends AuraImplTestCase {
     
     public void testGetLoggableParams()throws Exception{
         //No annotation specified for logging
-        JavaActionDef actionDef = getJavaActionDef("java://org.auraframework.impl.java.controller.TestController", "getString");
+        JavaActionDef actionDef = getJavaActionDef("java://org.auraframework.component.test.java.controller.TestController", "getString");
         assertEquals("Action with no parameters should not have any loggable parameters", 0, actionDef.getLoggableParams().size());
         
         //@key annotation is marked for logging
-        actionDef = getJavaActionDef("java://org.auraframework.impl.java.controller.JavaTestController", "getLoggableString");
+        actionDef = getJavaActionDef("java://org.auraframework.component.test.java.controller.JavaTestController", "getLoggableString");
         assertEquals("Action with parameters marked as loggable should be logged", 
                 1, actionDef.getLoggableParams().size());
         assertEquals("param", actionDef.getLoggableParams().get(0));
         
         //Selected param set as loggable
-        actionDef = getJavaActionDef("java://org.auraframework.impl.java.controller.JavaTestController", "getSelectedParamLogging");
+        actionDef = getJavaActionDef("java://org.auraframework.component.test.java.controller.JavaTestController", "getSelectedParamLogging");
         assertEquals("Only parameters marked as loggable should be logged", 
                 1, actionDef.getLoggableParams().size());
         assertEquals("strparam", actionDef.getLoggableParams().get(0));
         
         //Param explicitly set as not loggable
-        actionDef = getJavaActionDef("java://org.auraframework.impl.java.controller.JavaTestController", "getExplicitExcludeLoggable");
+        actionDef = getJavaActionDef("java://org.auraframework.component.test.java.controller.JavaTestController", "getExplicitExcludeLoggable");
         assertEquals("parameters marked as loggable should not be logged", 
                 0, actionDef.getLoggableParams().size());
     }

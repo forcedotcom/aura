@@ -34,7 +34,7 @@ public class RootDefRegistryTest extends AuraImplTestCase {
         ComponentDef def = childDescriptor.getDef();
         assertEquals(parentDescriptor, def.getExtendsDescriptor());
         assertEquals(2, def.getModelDefDescriptors().size());
-        assertEquals("java://org.auraframework.impl.java.controller.TestController", def.getControllerDefDescriptors()
+        assertEquals("java://org.auraframework.component.test.java.controller.TestController", def.getControllerDefDescriptors()
                 .get(0).getQualifiedName());
         assertEquals("java://org.auraframework.impl.java.model.TestModel", def.getModelDef().getDescriptor()
                 .getQualifiedName());

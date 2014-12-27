@@ -16,7 +16,7 @@
 
 package org.auraframework.test.java.controller;
 
-import org.auraframework.impl.java.controller.JavaControllerTest.JavaValueDefExt;
+import org.auraframework.test.java.controller.JavaControllerTest.JavaValueDefExt;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;

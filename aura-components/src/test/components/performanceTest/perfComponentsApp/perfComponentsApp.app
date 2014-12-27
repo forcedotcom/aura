@@ -1,5 +1,5 @@
 <aura:application render="client" model="java://org.auraframework.impl.java.model.TestIterationModel" 
-                                  controller="java://org.auraframework.impl.java.controller.TestController">
+                                  controller="java://org.auraframework.component.test.java.controller.TestController">
 
     <aura:attribute name="perf" default="test" type="String"/>
     <div class="test">

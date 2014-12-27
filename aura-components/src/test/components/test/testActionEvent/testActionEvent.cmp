@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.JavaTestController">
+<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController">
     <aura:attribute name="eventName" type="String" description="Name of event to associate with the exception in server action. GenericEventException will encapsulate this event"/>
     <aura:attribute name="eventParamName" type="String" description="Parameter to set on the exception"/>
     <aura:attribute name="eventParamValue" type="String"/>

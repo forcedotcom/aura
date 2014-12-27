@@ -20,7 +20,7 @@
         attributes : { throwableClass:"java.lang.Throwable",
                        throwableCause:"couldn't decide" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " +
                                                 "java.lang.Throwable: couldn't decide");
         }
     },
@@ -29,7 +29,7 @@
         attributes : { throwableClass:"java.lang.RuntimeException",
                        throwableCause:"java.lang.IllegalAccessException" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " +
                                                 "java.lang.RuntimeException: java.lang.IllegalAccessException");
         }
     },
@@ -38,7 +38,7 @@
         attributes : { throwableClass:"java.lang.Error",
                        throwableCause:"java.lang.RuntimeException" },
         test: function(cmp){
-        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
+        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " + 
                                                 "java.lang.Error: java.lang.RuntimeException");
         }
     },
@@ -47,7 +47,7 @@
         attributes : { throwableClass:"java.lang.reflect.InvocationTargetException",
                        throwableCause:"java.lang.IllegalArgumentException" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " +
                                                 "java.lang.reflect.InvocationTargetException");
         }
     },
@@ -56,7 +56,7 @@
         attributes : { throwableClass:"java.lang.reflect.InvocationTargetException",
                        throwableCause:"aura.throwable.AuraHandledException" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " +
                                                 "java.lang.reflect.InvocationTargetException");
         }
     },
@@ -65,7 +65,7 @@
         attributes : { throwableClass:"java.lang.IllegalArgumentException",
                        throwableCause:"you're not listening" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " + 
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " + 
                                                 "java.lang.IllegalArgumentException: you're not listening");
         }
     },
@@ -74,7 +74,7 @@
         attributes : { throwableClass:"java.lang.IllegalAccessException",
                        throwableCause:"under 21" },
         test: function(cmp){
-        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.impl.java.controller.JavaTestController: " +
+        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.component.test.java.controller.JavaTestController: " +
                                                 "java.lang.IllegalAccessException: under 21");
         }
     },

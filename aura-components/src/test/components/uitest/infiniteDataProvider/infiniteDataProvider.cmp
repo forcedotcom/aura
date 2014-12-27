@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:dataProvider" controller="java://org.auraframework.impl.java.controller.JavaTestController">
+<aura:component extends="ui:dataProvider" controller="java://org.auraframework.component.test.java.controller.JavaTestController">
     
     <aura:attribute name="listType" type="String"/>
     <aura:attribute name="getDataFromServer" type="Boolean"/>

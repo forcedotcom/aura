@@ -32,7 +32,7 @@
             param: "TEST_STRING"
         });
         this._action.setStorable(true);
-        this._actionDescriptor = "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString";
+        this._actionDescriptor = "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString";
         this._actionParams = this._action.getParams();
     },
     

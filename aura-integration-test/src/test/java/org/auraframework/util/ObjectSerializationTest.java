@@ -71,7 +71,7 @@ public class ObjectSerializationTest extends AuraImplTestCase {
         assertTrue(newtest.getBrowsers().isEmpty());
         assertTrue(newtest.getTestLabels().isEmpty());
         Definition controllerDef = newtest.getLocalDefs().get(0);
-        assertEquals("java://org.auraframework.impl.java.controller.JavaTestController", controllerDef.getDescriptor()
+        assertEquals("java://org.auraframework.component.test.java.controller.JavaTestController", controllerDef.getDescriptor()
                 .getQualifiedName());
         assertEquals("what I expected",
                 ((ControllerDef) controllerDef).createAction("getString", ImmutableMap.<String, Object> of())

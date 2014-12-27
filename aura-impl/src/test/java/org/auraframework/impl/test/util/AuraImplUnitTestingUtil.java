@@ -314,7 +314,7 @@ public class AuraImplUnitTestingUtil {
 
     public DefDescriptor<ControllerDef> getControllerDescriptor() {
             return DefDescriptorImpl.getInstance(
-                            "java://org.auraframework.impl.java.controller.TestController",
+                            "java://org.auraframework.component.test.java.controller.TestController",
                             ControllerDef.class);
     }
 

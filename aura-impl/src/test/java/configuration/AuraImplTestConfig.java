@@ -19,7 +19,7 @@ import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.impl.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
+import org.auraframework.test.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
 import org.auraframework.impl.adapter.MockConfigAdapterImpl;
 import org.auraframework.impl.context.TestLoggingAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;

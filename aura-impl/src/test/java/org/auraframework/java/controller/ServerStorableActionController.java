@@ -83,7 +83,7 @@ public class ServerStorableActionController {
                 Map<String, Object> params = Maps.newHashMap();
                 params.put("testName", testName);
                 runActionAndMarkStorable(actions, actionCursor, params, true);
-            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.TestController/ACTION$getString")){
+            }else if(actionCursor.equals("java://org.auraframework.component.test.java.controller.TestController/ACTION$getString")){
                 runActionAndMarkStorable(actions, actionCursor, null, true);
             }
         }

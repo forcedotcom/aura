@@ -1,5 +1,5 @@
 <aura:application render="client" model="java://org.auraframework.impl.java.model.TestIterationModel" 
-                                  controller="java://org.auraframework.impl.java.controller.TestController">
+                                  controller="java://org.auraframework.component.test.java.controller.TestController">
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 

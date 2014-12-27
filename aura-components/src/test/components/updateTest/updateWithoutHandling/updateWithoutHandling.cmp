@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.JavaTestController" extensible="true">
+<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController" extensible="true">
     <aura:attribute name="text" type="string"/>
     <ui:outputText value="{!v.text}"/>
     <ui:button aura:id="update" class="update" press="{!c.updateText}" label="update text"/>

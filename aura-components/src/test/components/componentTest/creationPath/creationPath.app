@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application controller="java://org.auraframework.impl.java.controller.JavaTestController">
+<aura:application controller="java://org.auraframework.component.test.java.controller.JavaTestController">
 
     <componentTest:hasBody aura:id="topbody">
         topbody

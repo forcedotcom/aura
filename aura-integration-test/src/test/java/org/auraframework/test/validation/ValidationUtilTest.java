@@ -91,7 +91,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
 
         // finding java definitions
         DefDescriptor<TypeDef> javaDescriptor = definitionService.getDefDescriptor(
-                "java://org.auraframework.impl.java.controller.TestController", TypeDef.class);
+                "java://org.auraframework.component.test.java.controller.TestController", TypeDef.class);
         TypeDef javaDef = javaDescriptor.getDef();
         assertEquals("TestController", javaDef.getName());
     }

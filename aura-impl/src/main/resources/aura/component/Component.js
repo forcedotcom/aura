@@ -1110,6 +1110,8 @@ Component.prototype.addErrors = function(expression, errors) {
         return;
     }
     this.callOnExpression(Component.prototype.addErrorsCallback, expression, errors);
+    $A.renderingService.addDirtyValue(expression, this);
+    this.priv.fireChangeEvent(this,expression,undefined,undefined,undefined);
 };
 
 /**
@@ -1120,6 +1122,8 @@ Component.prototype.addErrors = function(expression, errors) {
  */
 Component.prototype.clearErrors = function(expression) {
     this.setValid(expression,true);
+    $A.renderingService.addDirtyValue(expression, this);
+    this.priv.fireChangeEvent(this,expression,undefined,undefined,undefined);
 };
 
 /**

@@ -138,7 +138,7 @@ public abstract class XMLHandler<T extends Definition> {
     }
 
     protected boolean getBooleanAttributeValue(String name) {
-        return Boolean.parseBoolean(xmlReader.getAttributeValue(null, name));
+        return Boolean.parseBoolean(getAttributeValue(name));
     }
 
     protected String getTagName() {

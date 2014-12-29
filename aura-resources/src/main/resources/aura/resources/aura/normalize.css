@@ -16,7 +16,7 @@ html {
   box-sizing: border-box; /* 3 */
 }
 *, *:before, *:after {
-  box-sizing: inherit; /* 3 */
+  box-sizing: border-box; /* 3 */
 }
 
 /**

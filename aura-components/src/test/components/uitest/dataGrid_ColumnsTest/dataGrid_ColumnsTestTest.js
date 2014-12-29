@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 ({
   Browsers: ["-IE7","-IE8"],
 	  
@@ -132,9 +147,16 @@
 		  }
 		  
 		  if (foundColIndex >= 0) {
-			  var actualSort = $A.test.getText(header.getElementsByTagName("span")[0]);
-			  var expectedSort = expectedSortableHeaders[foundColIndex].sort;
-			  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
+			  var expectedHeader = expectedSortableHeaders[foundColIndex];
+			  
+			  if (expectedHeader.isEnabled) {
+				  var expectedSort = expectedHeader.sort;
+				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[0]);
+				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
+			  } else {
+				  var headerClass = $A.util.getElementAttributeValue(header, "class");
+				  $A.test.assertEquals("toggle disabled", headerClass, "header should have been disalbed");  
+			  }
 		  } else {
 			  $A.test.fail("Could not find '" + headerText + "' in list of expected columns");
 		  }
@@ -199,6 +221,14 @@
     	  };
       }
       this.verifyRow(body_rendered, expectedElements ,body_internal, assertFunc, isDecending);
+  },
+  
+  /**
+   * Verify there should be zero table rows in body.
+   */
+  verifyEmptyBody : function(cmp) {
+	  var trs = this.getRowElements(cmp, 0)[0];
+      $A.test.assertEquals(0, trs.length, "there should be no rows on the page")
   },
   
   /**
@@ -369,27 +399,49 @@
 			  this.fireAndWait(cmp, "goToSortedColumns", "Item Id");
 		  }, function(cmp) {
 			  // test insital sort
-			  var expectedSortableColumns = [{name:"Item Id",sort:""}, {name:"Item Name",sort:""}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"));
 			  this.toggleSortForSortableColumn(2);
 		  }, function(cmp) {
 			  // test sort of 2nd sortable column
-			  var expectedSortableColumns = [{name:"Item Id",sort:""}, {name:"Item Name",sort:"Descending"}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"Descending",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"), null, true);
 			  this.toggleSortForSortableColumn(2);
 		  }, function(cmp) {
 			  // test toggling sort order on same column
-			  var expectedSortableColumns = [{name:"Item Id",sort:""}, {name:"Item Name",sort:"Ascending"}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"Ascending",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"));
 			  this.toggleSortForSortableColumn(1);
 		  }, function(cmp) {
 			  // test switching sort order to another column
-			  var expectedSortableColumns = [{name:"Item Id",sort:"Descending"}, {name:"Item Name",sort:""}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"Descending",isEnabled:true}, {name:"Item Name",sort:"",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"), null, true);
+	  }]
+  },
+  
+  /*
+   * Test sortable headers with empty data set.
+   */
+  _testSortOnEmptyDataSet : {
+	  attributes : {"pageSize" : 0},
+	  test : [function(cmp) {
+		  }, function(cmp) {
+			  this.fireAndWait(cmp, "goToSortedColumns", "Item Id");
+		  }, function(cmp) {
+			  // test initial sort
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"",isEnabled:true}];
+			  this.verifySortableHeaders(expectedSortableColumns);
+			  this.verifyEmptyBody(cmp);
+			  this.toggleSortForSortableColumn(2);
+		  }, function(cmp) {
+			  // test sort of 2nd sortable column
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:false}, {name:"Item Name",sort:"",isEnabled:false}];
+			  this.verifySortableHeaders(expectedSortableColumns);
+			  this.verifyEmptyBody(cmp);
 	  }]
   }
   

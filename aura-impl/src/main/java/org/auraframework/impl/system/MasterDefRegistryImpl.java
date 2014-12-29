@@ -423,6 +423,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final List<ClientLibraryDef> clientLibs;
         public final DefDescriptor<? extends Definition> topLevel;
+        public final boolean compiling;
         public int level;
 
         /** Is this def's dependencies cacheable? */
@@ -433,12 +434,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             this.topLevel = topLevel;
             this.level = 0;
             this.shouldCacheDependencies = true;
+            this.compiling = true;
         }
 
         public CompileContext(DefDescriptor<? extends Definition> topLevel) {
             this.clientLibs = null;
             this.topLevel = topLevel;
             this.shouldCacheDependencies = true;
+            this.compiling = false;
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -1014,17 +1017,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             return getLocalDef(descriptor);
         }
         //
-        // If our current context is not null, we always want to recurse
-        // in to properly include the defs. Note that in this case, we already
-        // own the lock, so it can be outside the locking below.
+        // If our current context is not null, we want to recurse in to properly include the defs when we
+        // are compiling. Note that in this case, we already own the lock, so it can be outside the locking below.
+        // When we are 'building' instead of 'compiling' we should already have the def somewhere, so we just
+        // fill it in and continue. If no def is present, we explode.
         //
         if (currentCC != null) {
             if (currentCC.compiled.containsKey(descriptor)) {
                 @SuppressWarnings("unchecked")
                 CompilingDef<D> cd = (CompilingDef<D>) currentCC.compiled.get(descriptor);
+                if (cd.def == null && !currentCC.compiling) {
+                    fillCompilingDef(cd, currentCC.context);
+                }
                 if (cd.def != null) {
                     return cd.def;
                 }
+            } else if (!currentCC.compiling) {
+                throw new IllegalStateException("Attempting to add missing def "+descriptor+" to "+currentCC.topLevel);
             }
 
             //

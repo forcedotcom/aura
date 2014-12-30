@@ -23,6 +23,14 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 		windowMock=Test.Mocks.NeededMocks.getWindowMock();
 
 	windowMock(function(){
+		var callback = function (path, fn) {fn();};
+		ImportJson("ui.scrollerLib.bootstrap", callback);
+		ImportJson("ui.scrollerLib.browserSupport", callback);
+		ImportJson("ui.scrollerLib.browserStyles", callback);
+		ImportJson("ui.scrollerLib.CubicBezier", callback);
+		ImportJson("ui.scrollerLib.ScrollerJS", callback);
+		ImportJson("ui.scrollerLib.EndlessPlugin", callback);
+		
 		ImportJson("ui.scroller.scrollerHelper",function(path,result){
 			targetHelper=result;
 		});

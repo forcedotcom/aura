@@ -17,6 +17,9 @@
 -->
 <aura:component support="BETA" extensible="true" description="A scrollable view with scroll bars and pull-to-refresh support">
 
+    <!-- Library which holds the vanillaJS ScrollerJS and its plugins -->
+    <aura:import library="ui:scrollerLib" property="lib" />
+
     <!-- Exposed attributes -->
     <aura:attribute name="scroll"                type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal or vertical"/>
     <aura:attribute name="enabled"               type="Boolean" default="true"     description="Sets the default state of the scroller"/>

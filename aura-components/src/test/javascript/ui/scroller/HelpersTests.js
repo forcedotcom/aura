@@ -23,6 +23,10 @@ Test.Components.Ui.Scroller.Helpers=function(){
 		windowMock=Test.Mocks.NeededMocks.getWindowMock();
 
 	windowMock(function(){
+		var callback = function (path, fn) {fn();};
+		ImportJson("ui.scrollerLib.bootstrap", callback);
+		ImportJson("ui.scrollerLib.helpers", callback);
+
 		ImportJson("ui.scroller.scrollerHelper",function(path,result){
 			targetHelper=result;
 		});

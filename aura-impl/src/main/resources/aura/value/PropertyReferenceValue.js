@@ -59,14 +59,10 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
     if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
+            	// If not valid, don't fire change events
+            	if(!cmp.isValid()) { return; }
                 $A.renderingService.addDirtyValue(key, cmp);
-
-                // DVAL: HALO: FIXME:
-                // Iteration can set this flag to true so we can 
-                // prevent the events from firing on PRV where we know nothing has changed.
-                if (!cmp["stopPropagationPRV"]) {
-                    cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
-                }
+                cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
             };
         }
         method.id=cmp.getGlobalId();

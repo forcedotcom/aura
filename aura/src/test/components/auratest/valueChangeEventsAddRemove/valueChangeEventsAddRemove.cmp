@@ -1,0 +1,82 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client">
+    <aura:handler event="auratest:renderEvent" action="{!c.logRenderEvent}"/>
+
+    <aura:attribute name="mapdata" type="Object"/>
+    <aura:attribute name="listdata" type="List"/>
+
+    <aura:attribute name="count" type="Integer" default="0"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    Iteration (v.items)<br/>
+    <button onclick="{!c.pop}">Pop</button> 
+    <button onclick="{!c.pop2}">Pop2</button> 
+    <button onclick="{!c.shift}">Shift</button> 
+    <button onclick="{!c.push}">Push</button> 
+    <button onclick="{!c.targeted}">Targeted</button> 
+    <br/><br/>
+    
+    Component (v.mapdata.items)<br/>
+    <button onclick="{!c.cmppop}">Pop</button> 
+    <button onclick="{!c.cmppush}">Push</button> 
+    <button onclick="{!c.cmpshift}">Shift</button> 
+    <button onclick="{!c.cmpcopy}">Copy Data</button> 
+    <button onclick="{!c.cmpaddremove}">Add and remove</button> 
+    
+
+
+    <!-- For testing deep level references -->
+    <table width="100%">
+        <tr>
+            <td width="50%">
+                <ul>
+                    Source:<br/>
+                    <aura:iteration aura:id="iteration" items="{!v.listdata}" var="item" indexVar="index">
+                       <li>
+                            <auratest:eventCounter passthrough="{!item}"/>
+                       </li>
+                    </aura:iteration>
+                </ul>
+
+            </td>
+            <td>
+            	<!--
+                <ul>
+                    Mirror:<br/>
+                    <aura:iteration aura:id="iteration2" items="{!v.listdata}" var="item" indexVar="index">
+                       <li>
+                            <auratest:eventCounter passthrough="{!item}"/>
+                       </li>
+                    </aura:iteration>
+                </ul>
+				-->
+            </td>
+        </tr>
+    </table>
+
+    <!--
+    <button onclick="{!c.makeDirty}">Make Dirty</button>
+    <button onclick="{!c.popAndDirty}">Pop And Make Dirty</button>
+    -->
+
+    <br/><br/>
+    v.mapdata.items.length
+    <span>{!v.listdata.length}</span>
+</aura:component>

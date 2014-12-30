@@ -268,7 +268,7 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
  * @param {String} key The data key to look up on the primary providers.
  * @param {Object} v The value to be set.
  */
-PassthroughValue.prototype.set = function(key, value) {
+PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
    var path = key.split('.');
     if (this.primaryProviders.hasOwnProperty(path[0])){
         var provider = this.primaryProviders[path[0]];
@@ -292,23 +292,27 @@ PassthroughValue.prototype.set = function(key, value) {
         var oldValue=target[key];
         target[key]=value;
 
-        var valueProvider = this.component;
-        while (valueProvider instanceof PassthroughValue) {
-            valueProvider = valueProvider.getComponent();
+        if(!ignoreChanges) {
+	        var valueProvider = this.component;
+	        while (valueProvider instanceof PassthroughValue) {
+	            valueProvider = valueProvider.getComponent();
+	        }
+        
+	        valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
+	        valueProvider.markDirty(fullPath);
+        
+        
+	        // KRIS: HALO:
+	        // Do we have any change events for the key?
+	        // It's possible both we and the component have references that need
+	        // to be fired, so I'm firing both here.
+	        this.fireChangeEvent(key,oldValue,value,key);
         }
-        valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
-        valueProvider.markDirty(fullPath);
-
-        // KRIS: HALO:
-        // Do we have any change events for the key?
-        // It's possible both we and the component have references that need
-        // to be fired, so I'm firing both here.
-        this.fireChangeEvent(key,oldValue,value,key);
-
+                
         return value;
     }
 
-   return this.component.set(key,value);
+   return this.component.set(key,value, ignoreChanges);
 };
 
 // JF: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE

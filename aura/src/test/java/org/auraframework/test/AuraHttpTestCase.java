@@ -68,7 +68,7 @@ import com.google.common.collect.Maps;
  * Base class with some helper methods specific to Aura.
  */
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
-	    
+        
     public AuraHttpTestCase(String name) {
         super(name);
     }
@@ -339,7 +339,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     protected HttpPost obtainPostMethod(String path, Map<String, String> params)
             throws MalformedURLException, URISyntaxException,
             UnsupportedEncodingException {
-    	
+        
         HttpPost post = new HttpPost(getTestServletConfig().getBaseUrl()
                 .toURI().resolve(path).toString());
 
@@ -472,13 +472,13 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
-        	this.qualifiedName = new ArrayList<>();
-        	this.qualifiedName.add(qualifiedName);
-        	this.actionParams = new ArrayList<>();
+            this.qualifiedName = new ArrayList<>();
+            this.qualifiedName.add(qualifiedName);
+            this.actionParams = new ArrayList<>();
             if(actionParams != null) {
-            	this.actionParams.add(actionParams);
+                this.actionParams.add(actionParams);
             } else {
-            	this.actionParams.add(null);
+                this.actionParams.add(null);
             }
             
             
@@ -491,16 +491,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
          */
         
         public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
-        	
-        	this.qualifiedName = qualifiedName;
-        	this.actionParams = actionParams;
-        	if(qualifiedName == null || actionParams == null) {
-        		throw new IllegalArgumentException("Cannot pass in a null list. You can pass in a list of null parameters if parameters are not yet known");
-        	}
-        	//Now will verify that we have actions and params
-        	if(this.qualifiedName.toArray().length != this.actionParams.toArray().length) {
-        		throw new IllegalArgumentException("Number of action names does not match number of action parameters");
-        	}
+            
+            this.qualifiedName = qualifiedName;
+            this.actionParams = actionParams;
+            if(qualifiedName == null || actionParams == null) {
+                throw new IllegalArgumentException("Cannot pass in a null list. You can pass in a list of null parameters if parameters are not yet known");
+            }
+            //Now will verify that we have actions and params
+            if(this.qualifiedName.toArray().length != this.actionParams.toArray().length) {
+                throw new IllegalArgumentException("Number of action names does not match number of action parameters");
+            }
         }
         /**
          * Will insert the given key-value pair as a parameter in the first entry of the action parameters list.
@@ -528,15 +528,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
          */
         
         public ServerAction putParamUsingQName(String qualifiedName, String name, Object value) {
-        	int index = this.qualifiedName.indexOf(qualifiedName);
-        	if(index<0){
-        		throw new IllegalArgumentException("Qualified name does not exist.");
-        	}
-        	if(actionParams.get(index)==null) {
-        		actionParams.add(index,Maps.newHashMap(new HashMap<String,Object>()));
-        	}
-        	actionParams.get(index).put(name, value);
-        	return this;
+            int index = this.qualifiedName.indexOf(qualifiedName);
+            if(index<0){
+                throw new IllegalArgumentException("Qualified name does not exist.");
+            }
+            if(actionParams.get(index)==null) {
+                actionParams.add(index,Maps.newHashMap(new HashMap<String,Object>()));
+            }
+            actionParams.get(index).put(name, value);
+            return this;
         }
 
         public ServerAction setContext(String value) {
@@ -546,16 +546,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
         public HttpPost getPostMethod() throws Exception {
             if (post == null) {
-            	
+                
                 Map<String, Object> message = Maps.newHashMap();
                 ArrayList<Map<String,Object>> actionInstanceArray = new ArrayList<>();
                 for(int i = 0;i<qualifiedName.size();i++){
-                	Map<String, Object> actionInstance = Maps.newHashMap();
-                	actionInstance.put("descriptor", qualifiedName.get(i));
-                	if(actionParams.get(i) != null) {
-                		actionInstance.put("params", actionParams.get(i));
-                	}
-                	actionInstanceArray.add(actionInstance);
+                    Map<String, Object> actionInstance = Maps.newHashMap();
+                    actionInstance.put("descriptor", qualifiedName.get(i));
+                    if(actionParams.get(i) != null) {
+                        actionInstance.put("params", actionParams.get(i));
+                    }
+                    actionInstanceArray.add(actionInstance);
                 }
                 message.put("actions", actionInstanceArray.toArray());
                 String jsonMessage = Json.serialize(message);
@@ -588,11 +588,11 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         
         public ArrayList<String> getQualifiedName() {
-        	return qualifiedName;
+            return qualifiedName;
         }
         
         public DefDescriptor<ActionDef> getDescriptor(String qualifiedName) {
-        	return Aura.getDefinitionService().getDefDescriptor(qualifiedName,ActionDef.class);
+            return Aura.getDefinitionService().getDefDescriptor(qualifiedName,ActionDef.class);
         }
 
         @Override
@@ -617,20 +617,19 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 HttpResponse response = getHttpClient().execute(post);
                 assertEquals(HttpStatus.SC_OK, getStatusCode(response));
                 rawResponse = getResponseBody(response);
-                assertEquals(
-                        AuraBaseServlet.CSRF_PROTECT,
-                        rawResponse.substring(0,
-                                AuraBaseServlet.CSRF_PROTECT.length()));
+                assertEquals(AuraBaseServlet.CSRF_PROTECT,
+                        rawResponse.substring(0, AuraBaseServlet.CSRF_PROTECT.length()));
+                if (rawResponse.endsWith("/*ERROR*/")) {
+                    fail("Error response:"+rawResponse);
+                }
                 Map<String, Object> json = (Map<String, Object>) new JsonReader()
-                        .read(rawResponse
-                                .substring(AuraBaseServlet.CSRF_PROTECT
-                                        .length()));
+                        .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
                 ArrayList<Map<String,Object>> actions = (ArrayList<Map<String, Object>>) json.get("actions");
                 for(Map<String,Object> action: actions) {
                 
-                	this.stateList.add(State.valueOf(action.get("state").toString()));
-                	this.returnValueList.add(action.get("returnValue"));
-                	this.errorsList.add((List<Object>) action.get("error"));
+                    this.stateList.add(State.valueOf(action.get("state").toString()));
+                    this.returnValueList.add(action.get("returnValue"));
+                    this.errorsList.add((List<Object>) action.get("error"));
                 }
                 //for legacy uses
                 Map<String, Object> action = (Map<String, Object>) ((List<Object>) json
@@ -645,7 +644,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         
         public String getrawResponse() {
-        	return this.rawResponse;
+            return this.rawResponse;
         }
         
         @Override
@@ -664,7 +663,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         
         public ArrayList<Object> getReturnValueList() {
-        	return returnValueList;
+            return returnValueList;
         }
 
         @Override
@@ -673,7 +672,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         
         public ArrayList<State> getStateList() {
-        	return stateList;
+            return stateList;
         }
 
         @Override
@@ -682,7 +681,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         
         public ArrayList<List<Object>> getErrorsList() {
-        	return errorsList;
+            return errorsList;
         }
 
         @Override

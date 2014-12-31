@@ -34,10 +34,6 @@ public enum AuraImplFiles {
      */
     AuraImplTestModuleDirectory(AuraImplModuleDirectory.getPath(), "src/test"),
     /**
-     * Root dir for File-based components only available to test contexts.
-     */
-    TestComponents(AuraImplTestModuleDirectory.getPath(), "components"),
-    /**
      * javascript source directory
      */
     AuraJavascriptSourceDirectory(AuraImplModuleDirectory.getPath(), "src/main/resources"),

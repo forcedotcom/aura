@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -1048,12 +1049,18 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn("Error");
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
+        Throwable ex = null;
         try {
             callAssertAccess(mdr, null, desc.getDef(), mockAccessCheckCache);
-            fail("Expected NoAccessException because accessCache has reason to block def");
+        } catch (InvocationTargetException ite) {
+        	ex = ite.getTargetException();
         } catch (Exception e) {
-            this.assertExceptionMessageStartsWith(e, NoAccessException.class, "Error");
+        	ex = e;
         }
+        if (ex == null) {
+            fail("Expected NoAccessException because accessCache has reason to block def");
+        }
+        this.assertExceptionMessageStartsWith(ex, NoAccessException.class, "Error");
         verify(mockAccessCheckCache).getIfPresent(anyString());
     }
 
@@ -1351,7 +1358,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testJavaProtocolIsCached() throws Exception {
         DefDescriptor<ControllerDef> controllerDef = DefDescriptorImpl.getInstance(
-                "java://org.auraframework.java.controller.TestController", ControllerDef.class);
+                "java://org.auraframework.component.test.java.controller.TestController", ControllerDef.class);
         controllerDef.getDef();
         String prefix = controllerDef.getPrefix();
         assertEquals(prefix, "java");

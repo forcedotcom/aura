@@ -42,8 +42,8 @@ public class AuraIntegrationTestConfig {
     private static WebDriverProvider webDriverProvider = null;
 
     @Impl(name = "auraIntegrationTestInventory")
-    public static TestInventory auraImplTestInventory() throws Exception {
-        return new TestInventory(AuraImplTestConfig.class);
+    public static TestInventory auraIntegrationTestInventory() throws Exception {
+        return new TestInventory(AuraIntegrationTestConfig.class);
     }
 
     @Impl

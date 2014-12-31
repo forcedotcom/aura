@@ -1192,7 +1192,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         assertAccess(referencingDescriptor, def, accessCheckCache);
     }
 
-    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def,
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def,
             Cache<String, String> accessCheckCache) {
         String status = hasAccess(referencingDescriptor, def, accessCheckCache);
         if (status != null) {

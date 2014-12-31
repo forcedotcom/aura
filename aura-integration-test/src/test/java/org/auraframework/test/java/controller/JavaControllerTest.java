@@ -105,18 +105,18 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Verify that class level annotation is required for a java Controller.
      */
     public void testClassLevelAnnotationForJavaController() throws Exception {
-        assertControllerThrows("java://org.auraframework.component.test.java.controller.TestControllerWithoutAnnotation",
+        assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithoutAnnotation",
                 InvalidDefinitionException.class, "@Controller annotation is required on all Controllers.",
-                "org.auraframework.component.test.java.controller.TestControllerWithoutAnnotation");
+                "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
     }
 
     /**
      * Ensure that a key is required for every parameter.
      */
     public void testMissingKeyAnnotation() throws Exception {
-        assertControllerThrows("java://org.auraframework.component.test.java.controller.TestControllerMissingKey",
+        assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerMissingKey",
                 InvalidDefinitionException.class, "@Key annotation is required on all action parameters",
-                "org.auraframework.component.test.java.controller.TestControllerMissingKey.appendStrings");
+                "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
     }
 
     /**
@@ -125,7 +125,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * rather complex way (walking up the class hierarchy).
      */
     public void testProtectedAction() throws Exception {
-        ControllerDef cont = getJavaController("java://org.auraframework.component.test.java.controller.TestControllerWithProtectedAction");
+        ControllerDef cont = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithProtectedAction");
 
         assertNotNull("could not find controller", cont);
         assertNull("should not have appendStrings", cont.getActionDefs().get("appendStrings"));
@@ -138,9 +138,9 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Ensure that an action must be static.
      */
     public void testNonStaticAction() throws Exception {
-        assertControllerThrows("java://org.auraframework.component.test.java.controller.TestControllerWithNonStaticAction",
+        assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction",
                 InvalidDefinitionException.class, "Invalid non-static action in a controller: appendStrings",
-                "org.auraframework.component.test.java.controller.TestControllerWithNonStaticAction");
+                "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction");
     }
 
     public void testActionNoParameters() throws Exception {
@@ -163,19 +163,19 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Verify correct errors are thrown when invalid parameters are passed to the controller.
      */
     public void testActionWithParametersError() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestControllerWithParameters");
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
         Map<String, Object> args = new HashMap<>();
 
         // A custom type parameter without a converter for what's passed to it (String)
         args.put("a", "x");
         checkFailAction(controller, "customParam", args, State.ERROR, AuraUnhandledException.class,
-                "Error on parameter a: java://org.auraframework.component.test.java.controller.TestControllerWithParameters$CustomParam");
+                "Error on parameter a: java://org.auraframework.impl.java.controller.TestControllerWithParameters$CustomParam");
 
         // No parameters to a controller method that requires params
         args.clear();
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
                 "org.auraframework.throwable.AuraExecutionException: " +
-                        "java://org.auraframework.component.test.java.controller.TestControllerWithParameters: " +
+                        "java://org.auraframework.impl.java.controller.TestControllerWithParameters: " +
                         "java.lang.NullPointerException");
 
         // Passing the wrong type (Strings instead of Integers)
@@ -189,7 +189,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Test to ensure that parameters get passed correctly.
      */
     public void testActionWithParameters() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestControllerWithParameters");
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
         Map<String, Object> args = new HashMap<>();
 
         args.put("a", "x");
@@ -233,7 +233,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null);
         Map<String, Object> args = new HashMap<>();
         args.put("keya", jvd);
-    	ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestControllerOnlyForJavaControllerTest");
+    	ControllerDef controller = getJavaController("java://org.auraframework.test.java.controller.TestControllerOnlyForJavaControllerTest");
      	
     	//we actually catch the QFE in JavaAction.getArgs(), then wrap it up with AuraUnhandledException 
     	String errorMsg = "org.auraframework.test.java.controller.JavaControllerTest$TestQuickFixException: new quick fix exception";
@@ -311,15 +311,15 @@ public class JavaControllerTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected NoAccessException");
         } catch (NoAccessException e) {
-        	String errorMessage = "Access to controller 'org.auraframework.impl.java.controller:TestController' from namespace '"+StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+"' in '"+dd.getQualifiedName()+"(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()";
+        	String errorMessage = "Access to controller 'org.auraframework.component.test.java.controller:TestController' from namespace '"+StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+"' in '"+dd.getQualifiedName()+"(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()";
             assertEquals(errorMessage, e.getMessage());
         }        
     }
 
     public void testDuplicateAction() throws Exception {
-        assertControllerThrows("java://org.auraframework.component.test.java.controller.TestControllerWithDuplicateAction",
+        assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithDuplicateAction",
                 InvalidDefinitionException.class, "Duplicate action appendStrings",
-                "org.auraframework.component.test.java.controller.TestControllerWithDuplicateAction");
+                "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
     }
 
     public void testGetSubDefinition() throws Exception {

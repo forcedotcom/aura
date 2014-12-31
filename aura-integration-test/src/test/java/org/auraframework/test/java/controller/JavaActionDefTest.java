@@ -44,7 +44,7 @@ public class JavaActionDefTest extends AuraImplTestCase {
         }catch(Exception e){
             fail("Failed to create a valid java actiondef without parameters");
         }
-        controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.component.test.java.controller.TestControllerWithParameters", ControllerDef.class);
+        controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.controller.TestControllerWithParameters", ControllerDef.class);
         actionDefDesc = SubDefDescriptorImpl.getInstance("sumValues", controllerDesc, ActionDef.class);
         try{
             ActionDef actionDef = actionDefDesc.getDef();

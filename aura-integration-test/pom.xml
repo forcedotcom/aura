@@ -121,7 +121,6 @@
         <aura.home>${basedir}/..</aura.home>
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
-        <skipUnitTests>true</skipUnitTests>
         <testClasses>**/*IntegrationTests.java</testClasses>
         <testCoverageClasses>**/*IntegrationCoverageTests.java</testCoverageClasses>
         <testNameContains /> <!-- case insensitive -->
@@ -370,6 +369,27 @@
         </pluginManagement>
     </build>
     <profiles>
+        <profile>
+            <id>autotest</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <includes>
+                                    <include>**/*UnitTestSuite.java</include>
+                                </includes>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <profile>
             <id>runIntTests</id>
             <activation>

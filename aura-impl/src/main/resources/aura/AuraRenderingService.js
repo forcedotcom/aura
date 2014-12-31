@@ -363,10 +363,20 @@ var AuraRenderingService = function AuraRenderingService(){
                         }else{
                             renderedElements=info.component.getElements();
                         }
-
+                        // KRIS: HALO: 
+                        // I anticipate this code going away when JohnBuch refactors the markers
+                        // to support nested renderIf.
+                        // The reason it is necessary is because when we rerender something like an iteration, it 
+                        // can have it's original marker unrendered, and thus it moves to the next element. Which 
+                        // can then be unrendered too, and so on and so on. Eventually the marker moves to the last element
+                        // but there may at this point be new elements in the iteration. So if you unrender the last element
+                        // and you rerender it's sub-components resulting in new elements, change its marker to the new elements
                         if(renderedElements.length && priv.isMarker(component._marker)) {
-                                $A.util.removeElement(component._marker);
-                                component._marker = renderedElements[0];
+                        	// KRIS: HALO:
+                        	// We can't do this, some components share markers, and this can potentially 
+                        	// remove the marker for another component.
+                            //$A.util.removeElement(component._marker);
+                            component._marker = renderedElements[0];
                         }
                         
                         info.component.disassociateElements();

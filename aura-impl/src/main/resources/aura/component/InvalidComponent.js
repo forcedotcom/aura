@@ -279,7 +279,7 @@ InvalidComponent.prototype.isValid = function(){
  * @public
  */
 InvalidComponent.prototype.toString = function(){
-    return "InvalidComponent" + (this._description||'');
+    return "InvalidComponent" + (this._description ? ' ' + this._description : '');
 };
 
 /**

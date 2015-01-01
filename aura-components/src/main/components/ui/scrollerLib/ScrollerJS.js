@@ -373,6 +373,17 @@ function (w) {
         _mergeConfigOptions: function (cfg, toMerge) {
             return HELPERS.simpleMerge(cfg, toMerge);
         },
+
+        /**
+        * Enables or disables the scroller
+        *
+        * @method setEnable
+        * @param enabled {Boolean} Enablement.
+        * @private
+        */
+        setEnable: function (enabled) {
+            this.enabled = enabled;
+        },
         /**
         * Merges the default configuration with the configuraton provided by the 
         * user and attaches the options to the instances.

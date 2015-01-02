@@ -23,10 +23,14 @@ Test.Components.Ui.Scroller.BrowserStyles=function(){
 		windowMock=Test.Mocks.NeededMocks.getWindowMock();
 
 	windowMock(function(){
-		ImportJson("ui.scroller.scrollerHelper",function(path,result){
+		ImportJson("ui.scrollerLib.bootstrap",function (path, fn) {fn();});
+		ImportJson("ui.scrollerLib.browserSupport", function (path, fn) {fn();});
+		ImportJson("ui.scrollerLib.browserStyles", function (path, fn) {fn();});
+		ImportJson("ui.scroller.scrollerHelper", function(path, result) {
 			targetHelper=result;
 		});
-		styles=targetHelper.getScrollerNamespace().styles;
+
+		styles = targetHelper.getScrollerNamespace().styles;
 	});
 
 	[Fixture]

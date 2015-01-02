@@ -16,7 +16,6 @@
 package org.auraframework.util.javascript;
 
 import java.io.IOException;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -29,10 +28,12 @@ import java.util.logging.Level;
 import org.auraframework.util.IOUtil;
 
 import com.google.common.collect.Lists;
+import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
 import com.google.javascript.jscomp.Result;
@@ -49,6 +50,7 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
+            options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         }
     },
 
@@ -56,6 +58,7 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
+            options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         }
     },
 

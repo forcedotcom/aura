@@ -185,29 +185,6 @@ public class AuraContextImpl implements AuraContext {
             }
 
             if (forClient) {
-                // client needs value providers, urls don't
-                boolean started = false;
-
-                for (GlobalValueProvider valueProvider : ctx.getGlobalProviders().values()) {
-                    if (!valueProvider.isEmpty()) {
-                        if (!started) {
-                            json.writeMapKey("globalValueProviders");
-                            json.writeArrayBegin();
-                            started = true;
-                        }
-                        json.writeComma();
-                        json.writeIndent();
-                        json.writeMapBegin();
-                        json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
-                        json.writeMapEntry("values", valueProvider.getData());
-                        json.writeMapEnd();
-                    }
-                }
-
-                if (started) {
-                    json.writeArrayEnd();
-                }
-
                 //
                 // Now comes the tricky part, we have to serialize all of the definitions that are
                 // required on the client side, and, of all types. This way, we won't have to handle
@@ -233,6 +210,11 @@ public class AuraContextImpl implements AuraContext {
                         // that the MDR should have done when filtering.
                         //
                         if (d != null) {
+                            try {
+                                d.retrieveLabels();
+                            } catch (QuickFixException qfe) {
+                                // this should not throw a QFE
+                            }
                             if (DefType.COMPONENT.equals(dt) || DefType.APPLICATION.equals(dt)) {
                                 componentDefs.add(d);
                             } else if (DefType.EVENT.equals(dt)) {
@@ -247,6 +229,32 @@ public class AuraContextImpl implements AuraContext {
                     writeDefs(json, "libraryDefs", libraryDefs);
                 }
                 ctx.serializeAsPart(json);
+
+                //
+                // client needs value providers, urls don't
+                // Note that we do this _post_ components, because they load labels.
+                //
+                boolean started = false;
+
+                for (GlobalValueProvider valueProvider : ctx.getGlobalProviders().values()) {
+                    if (!valueProvider.isEmpty()) {
+                        if (!started) {
+                            json.writeMapKey("globalValueProviders");
+                            json.writeArrayBegin();
+                            started = true;
+                        }
+                        json.writeComma();
+                        json.writeIndent();
+                        json.writeMapBegin();
+                        json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
+                        json.writeMapEntry("values", valueProvider.getData());
+                        json.writeMapEnd();
+                    }
+                }
+
+                if (started) {
+                    json.writeArrayEnd();
+                }
             }
             json.writeMapEnd();
         }

@@ -141,16 +141,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public void retrieveLabels() throws QuickFixException {
-        super.retrieveLabels();
-
-        if (layoutsDefDescriptor != null) {
-            LayoutsDef layouts = layoutsDefDescriptor.getDef();
-            layouts.retrieveLabels();
-        }
-    }
-
-    @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
 

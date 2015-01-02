@@ -239,8 +239,6 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
         BaseComponentDef def = getComponentDef();
 
-        def.retrieveLabels();
-
         DefDescriptor<RendererDef> rendererDesc = def.getRendererDescriptor();
         if ((rendererDesc != null && rendererDesc.getDef().isLocal())) {
             hasLocalDependencies = true;

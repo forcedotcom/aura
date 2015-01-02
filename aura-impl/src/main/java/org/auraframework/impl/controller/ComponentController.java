@@ -21,8 +21,10 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
@@ -31,6 +33,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -75,12 +78,26 @@ public class ComponentController {
 
     }
 
+    private static void loadLabels(DefDescriptor<? extends BaseComponentDef> desc) throws QuickFixException {
+        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        ctx.getDefRegistry().getDef(desc);
+        if (desc.equals(ctx.getApplicationDescriptor())) {
+            Map<DefDescriptor<? extends Definition>, Definition> defMap;
+
+            defMap = ctx.getDefRegistry().filterRegistry(null);
+            for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
+                entry.getValue().retrieveLabels();
+            }
+        }
+    }
+
     @AuraEnabled
     public static Component getComponent(@Key(value = "name", loggable = true) String name, @Key("attributes") Map<String, Object> attributes)
             throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
         definitionService.updateLoaded(desc);
+        loadLabels(desc);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 
@@ -90,6 +107,7 @@ public class ComponentController {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
         definitionService.updateLoaded(desc);
+        loadLabels(desc);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 

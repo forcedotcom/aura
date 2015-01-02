@@ -441,20 +441,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
-    /**
-     * Retrieve labels for a list of descriptors.
-     */
-    private <D extends Definition> void retrieveListLabels(DefinitionService definitionService,
-            List<DefDescriptor<D>> descriptors) throws QuickFixException {
-        if (descriptors != null) {
-            for (DefDescriptor<D> desc : descriptors) {
-                definitionService.getDefinition(desc).retrieveLabels();
-            }
-        }
-    }
-
     @Override
     public void retrieveLabels() throws QuickFixException {
+        // only get our direct labels, all others are handled by dependencies.
         GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
                 .get(LABEL);
         for (PropertyReference e : expressionRefs) {
@@ -462,12 +451,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 labelProvider.getValue(e.getStem());
             }
         }
-
-        DefinitionService definitionService = Aura.getDefinitionService();
-        retrieveListLabels(definitionService, controllerDescriptors);
-        retrieveListLabels(definitionService, rendererDescriptors);
-        retrieveListLabels(definitionService, helperDescriptors);
-        retrieveListLabels(definitionService, providerDescriptors);
     }
 
     @Override

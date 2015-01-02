@@ -39,9 +39,9 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     public void testCombinableResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app");
         waitForAuraFrameworkReady();
-        Object yearThruMoment = auraUITestingUtil.getEval("return moment(new Date()).year()");
-        assertNotNull(yearThruMoment);
-        assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long) yearThruMoment).intValue());
+        Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
+        assertNotNull(minuteThruMoment);
+        assertEquals(Calendar.getInstance().get(Calendar.MINUTE), ((Long) minuteThruMoment).intValue());
 
         Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
         assertTrue(walltime);
@@ -81,9 +81,9 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         assertTrue(UIPerfUI);
 
         // Mode independent resources
-        Object yearThruMoment = auraUITestingUtil.getEval("return moment(new Date()).year()");
-        assertNotNull(yearThruMoment);
-        assertEquals(Calendar.getInstance().get(Calendar.YEAR), ((Long) yearThruMoment).intValue());
+        Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
+        assertNotNull(minuteThruMoment);
+        assertEquals( Calendar.getInstance().get(Calendar.MINUTE), ((Long) minuteThruMoment).intValue());
 
         Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
         assertTrue(walltime);

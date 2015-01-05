@@ -24,7 +24,8 @@ function (w) {
         CAF            = w.cancelAnimationFrame,
 
     // iOS Feature detection
-        IOS            = navigator.userAgent.match(/iP(?:hone|ad;(?: U;)? CPU) OS (\d+)/),
+        NAV            = w.navigator, // For testing, we dont want to mock navigator for all cases
+        IOS            = NAV && NAV.userAgent && NAV.userAgent.match(/iP(?:hone|ad;(?: U;)? CPU) OS (\d+)/),
         IS_IOS         = !!IOS,
         IOS_SCROLL     = IOS && IOS[1] >= 8,
 

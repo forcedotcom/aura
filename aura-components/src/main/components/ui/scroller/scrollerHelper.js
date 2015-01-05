@@ -343,12 +343,7 @@
         var self             = this,
             wrapper          = scrollerInstance.wrapper,
             pullToRefresh    = wrapper.getElementsByClassName('pullToRefresh')[0],
-            pullToLoadMore   = wrapper.getElementsByClassName('pullToLoadMore')[0],
-            scrollMoveAction = cmp.get("v.onScrollMove"),
-            scrollEndAction  = cmp.get("v.onScrollEnd"),
-            browser          = $A.get('$Browser'),
-            detectsOnMove    = browser.formFactor === 'DESKTOP' || browser.isWindowsPhone;
-
+            pullToLoadMore   = wrapper.getElementsByClassName('pullToLoadMore')[0];
 
         if (pullToRefresh) {
             pullToRefresh.addEventListener('click', function () {
@@ -361,22 +356,6 @@
                 scrollerInstance.triggerPTL();
             }, false);
         }
-
-        // iOS and Android does not fire scroll til the end. Desktop or windowsPhone does
-        // So switch the scroll action to fired based on this
-        wrapper.addEventListener('scroll', function (e) {
-            //scrollEndAction.run.apply(detectsOnMove ? scrollMoveAction : scrollEndAction, arguments);
-            var eventName = detectsOnMove ? 'scrollMove' : 'scrollEnd',
-                action    = detectsOnMove ? 'gestureMove': 'animationEnd',
-                currentX  = -wrapper.scrollLeft,
-                currentY  = -wrapper.scrollTop;
-
-            scrollerInstance.x = currentX;
-            scrollerInstance.y = currentY;
-
-            scrollerInstance._fire(eventName, action, currentX, currentY, e);
-            
-        }, false);
     },
 
     /*

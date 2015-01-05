@@ -23,6 +23,12 @@ function (w) {
         RAF            = w.requestAnimationFrame,
         CAF            = w.cancelAnimationFrame,
 
+    // iOS Feature detection
+        NAV            = w.navigator, // For testing, we dont want to mock navigator for all cases
+        IOS            = NAV && NAV.userAgent && NAV.userAgent.match(/iP(?:hone|ad;(?: U;)? CPU) OS (\d+)/),
+        IS_IOS         = !!IOS,
+        IOS_SCROLL     = IOS && IOS[1] >= 8,
+
     // NAMESPACES
         SCROLLER       = w.__S || {},
         PLUGINS        = SCROLLER.plugins,
@@ -41,10 +47,13 @@ function (w) {
         ACTION_LOCK          = 'lock',
         ACTION_GESTURE_START = 'gestureStart',
         ACTION_GESTURE_MOVE  = 'gestureMove',
+        ACTION_SCROLL_MOVE   = 'scrollMove',
         ACTION_GESTURE_END   = 'gestureEnd',
         ACTION_ANIM_START    = 'animationStart',
         ACTION_ANIM_MOVING   = 'animationMove',
         ACTION_ANIM_END      = 'animationEnd',
+        ACTION_SCROLL        = 'scroll',
+        ACION_DOM_MUTATION   = 'mutationObserver',
         HOOK_BEFORE          = 'before',
         HOOK_AFTER           = 'after',
 
@@ -121,6 +130,7 @@ function (w) {
             enabled               : true,
             bounceTime            : 600,
             useCSSTransition      : false,
+            useNativeScroller     : false,
             dualListeners         : false,
             minThreshold          : 5,     // It should be in the [0, 10] range
             minDirectionThreshold : 2,     // It should be smaller than minThreshold
@@ -358,7 +368,7 @@ function (w) {
             observer.observe(this.wrapper, config);
         },
         _observedDOMChange: function (e) {
-            this.refresh();
+            this.refresh(ACION_DOM_MUTATION);
         },
         /**
         * Helper method to merge two object configurations.
@@ -438,8 +448,14 @@ function (w) {
             this.scroller      = this.wrapper.children[0];
             this.scrollerStyle = this.scroller.style;
 
+            // Add default classes
             this.scroller.classList.add('scroller');
+            this.wrapper.classList.add('scroller-wrapper');
             this.scroller.classList.add( this.scrollVertical ? 'scroll-vertical' : 'scroll-horizontal');
+
+            if (this.opts.useNativeScroller) {
+                this.wrapper.classList.add('native');
+            }
         },
         /**
         * Queries the wrapper element to get the updated size, in width and height.
@@ -526,7 +542,21 @@ function (w) {
     * Event handling and bindings
     * ================================================== 
     */
-
+        /**
+        * When scrolling using native CSS (webkit-overflow-scrolling: touch), 
+        * iOS will bounce the viewport if you are in the top, which is pretty annoying
+        * We can't prevent default because that will break the scrolling itself,
+        * so we just detect on touchStart if is on 0 and we set it to 1
+        *
+        * @params event {TouchEvent} DOM Event
+        * @method _iosScrollFixture
+        * @private
+        */
+        _iosScrollFixture: function (e) {
+            if (this.wrapper.scrollTop === 0) {
+                this.wrapper.scrollTop = 1;
+            }
+        },
         /**
         * Add or remove all of the neccesary event listeners, based on the provided configuration.
         *
@@ -535,7 +565,8 @@ function (w) {
         * @private
         */
         _handleEvents: function (action) {
-            var eventType = action === 'bind' ? HELPERS.bind : HELPERS.unbind,
+            var self      = this,
+                eventType = action === 'bind' ? HELPERS.bind : HELPERS.unbind,
                 wrapper   = this.wrapper,
                 target    = this.opts.bindToWrapper ? wrapper : window,
                 pHandlers = false, // pointerHandlers flag
@@ -543,6 +574,20 @@ function (w) {
 
             eventType(window, 'orientationchange', this);
             eventType(window, 'resize', this);
+
+            if (this._observeChanges()) {
+                this._initializeDOMObserver();
+            }
+
+            if (this.opts.useNativeScroller) {
+                eventType(wrapper, 'scroll', this);
+                if (IS_IOS) {
+                    eventType(wrapper, 'touchstart', function (e) {self._iosScrollFixture.apply(self, arguments);});
+                }
+                return;
+            }
+
+            // Touch interaction handlers
 
             if (SUPPORT.touch && !this.opts.disableTouch) {
                 eventType(wrapper, 'touchstart',  this);
@@ -574,18 +619,18 @@ function (w) {
                 eventType(target,  'mouseup',     this);
             }
 
-            if (!this.opts.disableWheel) {
+            if (!this.opts.disableWheel && !this.opts.useNativeScroller) {
                 eventType(wrapper, 'wheel', this);
                 eventType(wrapper, 'mousewheel', this);
                 eventType(wrapper, 'DOMMouseScroll', this);
             }
 
+            // TRANSITIONS 
+
             eventType(this.scroller, 'transitionend', this);
             eventType(this.scroller, SUPPORT.prefix + 'TransitionEnd', this);
 
-            if (this._observeChanges()) {
-                this._initializeDOMObserver();
-            }
+            
         },
 
         /**
@@ -651,7 +696,7 @@ function (w) {
         * @private
         */
         handleEvent: function (e) {
-            switch ( e.type ) {
+            switch (e.type) {
                 case 'touchstart':
                 case 'pointerdown':
                 case 'MSPointerDown':
@@ -687,6 +732,8 @@ function (w) {
                 case 'mousewheel':
                     this._wheel(e);
                     break;
+                case 'scroll': 
+                    this._nativeScroll(e);
             }
         },
     /* 
@@ -791,7 +838,7 @@ function (w) {
                 self._translate(self.x, self.y);
                 self._trackVelocity(t);
                 self._update();
-                self._fire('scrollMove', ACTION_GESTURE_MOVE, self.x, self.y);
+                self._fire(ACTION_SCROLL_MOVE, ACTION_GESTURE_MOVE, self.x, self.y);
                 self._rafMoving = RAF(moveStep);
             }
             moveStep();
@@ -940,7 +987,7 @@ function (w) {
 
             // If minThrehold is defined, do not start moving until the distance is over it. 
             if (this.opts.minThreshold && (absDistX < this.opts.minThreshold && absDistY < this.opts.minThreshold)) {
-                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y, e);
+                this._fire(ACTION_SCROLL_MOVE, ACTION_GESTURE_MOVE, this.x, this.y, e);
                 return;
             }
 
@@ -956,7 +1003,7 @@ function (w) {
             if (this.opts.useCSSTransition && !this.opts.debounce) {
                 // If debounce is set to false, we force the browser to update the position every time
                 this._translate(this.x, this.y);
-                this._fire('scrollMove', ACTION_GESTURE_MOVE, this.x, this.y, e);
+                this._fire(ACTION_SCROLL_MOVE, ACTION_GESTURE_MOVE, this.x, this.y, e);
 
                 // The timeStart reset helps keeping track only on the recent past of the gesture
                 // which reduces variability and gets a more consistent velocity calculation
@@ -1416,7 +1463,7 @@ function (w) {
 
                 // Set the new position and notify changes
                 self._translate(newX, newY);
-                self._fire('scrollMove', ACTION_ANIM_MOVING, newX, newY);
+                self._fire(ACTION_SCROLL_MOVE, ACTION_ANIM_MOVING, newX, newY);
                 self._update();
 
                 if (self._isAnimating) {
@@ -1484,7 +1531,7 @@ function (w) {
         _scrollTo: function (x, y, time, easing) {
             easing || (easing = EASING.regular);
 
-            if (this.opts.userNativeScroller) {
+            if (this.opts.useNativeScroller) {
                 return this._wrapperScrollTo(x,y);
             }
 
@@ -1502,6 +1549,12 @@ function (w) {
             } else {
                 this._animate(x, y, time, easing.fn);
             }
+        },
+        _nativeScroll: function (e) {
+            this.x = this.wrapper.scrollLeft;
+            this.y = this.wrapper.scrollTop;
+            this._fire(ACTION_SCROLL_MOVE, ACTION_SCROLL, this.x, this.y);
+            this._update();
         },
 
         /**

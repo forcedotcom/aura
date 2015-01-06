@@ -46,9 +46,8 @@
     
     handleFocus: function(component, event, helper) {
         var inputCmp = event.getSource();
-        var elem = inputCmp ? inputCmp.getElement() : null;
-        if (elem) {
-            elem.setAttribute("aria-activedescendant", "");
+        if (inputCmp) {
+        	inputCmp.set("v.ariaActiveDescendant", "");
         }
     },
     

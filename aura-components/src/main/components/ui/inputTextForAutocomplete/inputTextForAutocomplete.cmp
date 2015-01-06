@@ -18,6 +18,9 @@
 <aura:component extends="ui:inputText" extensible="true" support="proto"
     description="This component is used as input text in a ui:autocomplete component.">
     <aura:attribute name="autocompleteButton" type="Aura.Component[]" description="Optional button to render with this component."/>
+    
+    <aura:attribute name="ariaExpanded" type="String" default="false" description="Whether the autocomplete list is expanded"/>
+    <aura:attribute name="ariaActiveDescendant" type="String" default="" description="The ID of the active descendant option"/>
 
     <input aura:id="txt"
            id="{!v.domId}"
@@ -31,9 +34,9 @@
            size="{!v.size}"
            role="combobox"
            aria-autocomplete="list"
-           aria-expanded="false"
+           aria-expanded="{!v.ariaExpanded}"
            aria-haspopup="true"
-           aria-activedescendant=""
+           aria-activedescendant="{!v.ariaActiveDescendant}"
            aria-describedby="{!v.ariaDescribedBy}"/>
     {!v.autocompleteButton}
 </aura:component>

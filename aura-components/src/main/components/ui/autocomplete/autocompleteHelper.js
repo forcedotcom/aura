@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 ({  
+	/**
+	 * Map from the element aria attributes to the component attribute names
+	 * since attributes with hyphens currently don't work inside expressions.
+	 * 
+	 * TODO: This needs to live somewhere more accessible to most components
+	 * that deal with aria attributes.
+	 */
+	ariaAttributeMap: {
+		aria-expanded : "ariaExpanded",
+		aria-activedescendant : "ariaActiveDescendant"
+	},
+	
     fetchData: function(component, event) {
         // Show loading indicator
         var listCmp = component.find("list");
@@ -153,14 +165,13 @@
     
     updateAriaAttributes: function(component, event) {
         var inputCmp = component.find("input");
-        var elem = inputCmp ? inputCmp.getElement() : null;
-        if (elem) {
-            var attrs = event.getParam("attrs");
-            for (var key in attrs) {
-                if (attrs.hasOwnProperty(key)) {
-                    elem.setAttribute(key, attrs[key]);
-                }
-            }
+        if (inputCmp) {
+        	var attrs = event.getParam("attrs");
+        	for (var key in attrs) {
+        		if (attrs.hasOwnProperty(key) && this.ariaAttributeMap[key]) {
+        			inputCmp.set("v." + this.ariaAttributeMap[key], attrs[key]);
+        		}
+        	}
         }
     }
 })

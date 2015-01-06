@@ -1,0 +1,55 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<aura:attribute name="autocompleteValue" type="String"/>
+	<aura:attribute name="autocompleteExtendedOptsValue" type="String"/>
+	<aura:attribute name="classes" type="Boolean" default="false"/>
+	
+	<ui:button label="Press" press="{!c.changeClasses}"/>
+	<br/>
+	<div class="panel standardPanel">
+		<div><span>Standard Autocomplete</span></div><br/>
+		<ui:label class="fieldLabel" label="Selected Value"/>
+	    <ui:outputText value="{!v.autocompleteValue}" class="{!'output ' + (v.classes ? '' : 'stuff')}"/><br/>
+		<ui:autocomplete aura:id="autocomplete" inputClass="autocomplete" optionVar="row" matchDone="{!c.handleMatch}" inputChange="{!c.handleInput}" 
+        selectListOption="{!c.handleSelection}" label="Autocomplete">
+	        <aura:set attribute="dataProvider">
+	            <uiExamples:autocompleteDataProvider/>
+	        </aura:set>
+	        <aura:set attribute="listOption">
+	            <ui:autocompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
+	        </aura:set>
+	    </ui:autocomplete>
+	</div>
+	
+	<div class="panel extendPanel">
+		<div><span>Extended Options</span></div><br/>
+		<ui:label class="fieldLabel" label="Selected Value"/>
+	    <ui:outputText value="{!v.autocompleteExtendedOptsValue}" class="{!'output ' + (v.classes ? '' : 'stuff')}"/>
+		<ui:autocomplete aura:id="autocompleteExtendedOpts" inputClass="autocomplete" optionVar="row" matchDone="{!c.handleMatch}" inputChange="{!c.handleInput}" 
+        selectListOption="{!c.handleSelection}" label="Autocomplete">
+	        <aura:set attribute="dataProvider">
+	            <uiExamples:autocompleteDataProvider/>
+	        </aura:set>
+	        <aura:set attribute="listOption">
+	            <uiExamples:autocompleteOptionExampleExtended label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
+	        </aura:set>
+	    </ui:autocomplete>
+	</div>
+
+</aura:component>

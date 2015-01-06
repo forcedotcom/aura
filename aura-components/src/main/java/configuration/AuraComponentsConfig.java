@@ -27,12 +27,11 @@ public class AuraComponentsConfig {
 
     @Impl
     public static ComponentLocationAdapter auraComponentLocationAdapterImpl() {
-        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.Components.asFile(), null,
-                "components_aura_components");
+        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.Components.asFile(), null, "components_aura_components");
     }
 
-    @Impl
+    @Impl(name="auraTestComponentLocationAdapterImpl")
     public static ComponentLocationAdapter auraTestComponentLocationAdapterImpl() {
-        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.TestComponents.asFile(), null, "components_aura_test");
+        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.TestComponents.asFile(), null, "components_aura_components_test");
     }
 }

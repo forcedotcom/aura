@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.Reader;
 import java.util.Set;
 
+import org.auraframework.components.AuraComponentsFiles;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -27,7 +28,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -46,13 +46,13 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     @Override
     public void runTest() throws Throwable {
         // filesystem tests are only good if loading from filesystem
-        if (AuraImplFiles.TestComponents.asFile().exists()) {
+        if (AuraComponentsFiles.TestComponents.asFile().exists()) {
             super.runTest();
         }
     }
 
     public void testFileSourceLoaderSanity() {
-        assertNotNull(new FileSourceLoader(AuraImplFiles.TestComponents.asFile()));
+        assertNotNull(new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile()));
     }
 
     public void testFileSourceLoaderWithNonExistentFile() {
@@ -75,12 +75,12 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     }
 
     public void testGetComponentSource() {
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:parent", ComponentDef.class);
         Source<?> src = loader.getSource(descriptor);
         assertNotNull(src);
         assertEquals(Format.XML, src.getFormat());
-        assertEquals(new File(AuraImplFiles.TestComponents.asFile(), "test" + File.separator + "parent"
+        assertEquals(new File(AuraComponentsFiles.TestComponents.asFile(), "test" + File.separator + "parent"
                 + File.separator + "parent.cmp").lastModified(), src.getLastModified());
         assertTrue(src.getSystemId().endsWith("parent.cmp"));
         Reader reader = null;
@@ -109,12 +109,12 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     }
 
     public void testGetEventSource() {
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
         Source<EventDef> src = loader.getSource(descriptor);
         assertNotNull(src);
         assertEquals(Format.XML, src.getFormat());
-        assertEquals(new File(AuraImplFiles.TestComponents.asFile(), "test" + File.separator + "anevent"
+        assertEquals(new File(AuraComponentsFiles.TestComponents.asFile(), "test" + File.separator + "anevent"
                 + File.separator + "anevent.evt").lastModified(), src.getLastModified());
         assertTrue(src.getSystemId().endsWith("anevent.evt"));
         Reader reader = null;
@@ -141,7 +141,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     }
 
     public void testGetNamespaces() {
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         Set<String> namespaces = loader.getNamespaces();
         assertTrue(namespaces.contains("test"));
         assertTrue(namespaces.contains("preloadTest"));
@@ -149,7 +149,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     }
 
     public void testFindRegex() {
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         Set<DefDescriptor<?>> found;
 
         found = loader.find(new DescriptorFilter("markup://test:extendsParent"));
@@ -172,7 +172,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
      * All namespaces loaded by FileSourceLoader are privileged, verify that FileSourceLoader says so.
      */
     public void testIsPrivilegedNamespace(){
-        FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         assertTrue("All namespaces loaded by FileSourceLoader are to be privileged", 
                 loader.isPrivilegedNamespace(null));
         assertTrue("All namespaces loaded by FileSourceLoader are to be privileged," +

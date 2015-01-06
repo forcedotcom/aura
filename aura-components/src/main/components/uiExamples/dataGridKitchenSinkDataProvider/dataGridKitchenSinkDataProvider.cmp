@@ -17,6 +17,7 @@
 -->
 <aura:component extends="ui:dataProvider">
     <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="empty" type="Boolean" default="false"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="provide" action="{!c.handleProvide}"/>

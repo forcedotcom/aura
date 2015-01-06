@@ -50,4 +50,5 @@
                       
     
     <ui:button label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
+    <ui:button label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/><br/>  
 </aura:component>

@@ -18,7 +18,13 @@
         // Tell the grid to fetch new items from the dataProvider.
         cmp.find('grid').getEvent('refresh').fire();
     },
-	replaceData : function(cmp, evt, hlp) {
+    replaceData : function(cmp, evt, hlp) {
+		cmp.find("data").set("v.empty", false);
+		cmp.find("data").getEvent("provide").fire();
+	},
+	
+	emptyData : function(cmp, evt, hlp) {
+		cmp.find("data").set("v.empty", true);
 		cmp.find("data").getEvent("provide").fire();
 	},
 	
@@ -34,7 +40,8 @@
 					"componentDef": "markup://ui:dataGridColumn",
 		            "attributes": {
 		                "values": { label: "Id",
-		                			name: "id"
+		                			name: "id",
+		                			sortable: true
 		                		  }
 		            }
 				}/*,{

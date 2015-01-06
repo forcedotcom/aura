@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 ({
-	
 	/*
 	 * ================
 	 * Initialization Methods
@@ -402,6 +401,17 @@
      * Data Methods
      * ================
      */
+	
+	/**
+	 * Updates column attributes that are dependent on the data
+	 * in the datagrid.
+	 * 
+	 * @param {Component} cmp
+	 */
+	updateColumnAttributes: function(cmp) {
+		var concrete = cmp.getConcreteComponent();
+		this.updateColumns(concrete, 'disabled', (concrete._rowData.length == 0));
+	},
     
     /**
      * Sets up the row data needed to display and work with the specified items
@@ -895,6 +905,22 @@
 			if (attr.name == 'disabled') {
 				rowData.vp.set("disabled", attr.value);
 			}
+		}
+	},
+	
+	/**
+	 * Updates the specified attribute of all the column components with
+	 * the specified value
+	 * 
+	 * @param {Component} 	concrete
+	 * @param {String} 		attribute 	The attribute to be updated
+	 * @param {Object} 		value 		The value to use for the attribute
+	 */
+	updateColumns: function(concrete, attribute, value) {
+		var columns = this.getColumns(concrete);
+		
+		for (var i=0;i<columns.length;++i) {
+			columns[i].set('v.' + attribute, value);
 		}
 	},
 	

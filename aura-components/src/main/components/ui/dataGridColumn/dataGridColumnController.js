@@ -22,10 +22,23 @@
 	},
 
 	handleClick: function (cmp, evt, hlp) {
-		hlp.toggleSort(cmp);	
+		if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
+            event.preventDefault();
+            return false;
+        }
+        hlp.toggleSort(cmp);
+        return true;
 	},
 	
 	updateNameRef: function(cmp, evt, helper) {
 		helper.updateNameRef(cmp);
+	},
+	
+	handleDisabledChange: function(cmp, evt, helper) {
+		var disabled = cmp.get("v.disabled");
+		
+		if (disabled) {
+			cmp.set("v.direction", '');
+		}
 	}
 })

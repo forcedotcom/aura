@@ -22,7 +22,7 @@
         var currentPage = cmp.get('v.currentPage'),
             pageSize = cmp.get('v.pageSize'),
             sortBy = cmp.get('v.sortBy'),
-            tasks = cmp._tasks || hlp.createTasks(cmp),
+            tasks = hlp.createTasks(cmp),
             column = sortBy, 
             descending = false,
         	requestedTasks;

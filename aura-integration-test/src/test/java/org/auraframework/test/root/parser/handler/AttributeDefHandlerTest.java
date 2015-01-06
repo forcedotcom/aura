@@ -133,6 +133,11 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         assertEquals(false, ad.isRequired());
     }
 
+    public void testRequiredMixedCase() throws Exception {
+        AttributeDefImpl ad = getElement("<aura:attribute name='required' type='String' ReQuireD='true'/>");
+        assertEquals(true, ad.isRequired());
+    }
+
     public void testSerializeTo() throws Exception {
         AttributeDefImpl ad = getElement("<aura:attribute name='lower' type='String' serializeTo='server'/>");
         assertEquals(SerializeToType.SERVER, ad.getSerializeTo());

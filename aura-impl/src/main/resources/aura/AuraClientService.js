@@ -291,6 +291,14 @@ var AuraClientService = function() {
                     });
 
                     clientService.enqueueAction(action);
+
+                    //
+                    // Now make sure we load labels....
+                    //
+                    var labelAction = $A.get("c.aura://ComponentController.loadLabels");
+                    // no parameters, no callback.
+                    labelAction.setCallback(that, function(a) {});
+                    clientService.enqueueAction(labelAction);
                 }, "loadComponent");
             });
         },
@@ -654,6 +662,12 @@ var AuraClientService = function() {
             $A.componentService.newComponentAsync(undefined, function(component) {
                 $A.clientService.renderInjection(component, locatorDomId, eventHandlers);
             }, config, $A.getRoot(), false, false, true);
+            //
+            // Now we go ahead and stick a label load on the request.
+            //
+            var labelAction = $A.get("c.aura://ComponentController.loadLabels");
+            labelAction.setCallback(this, function(a) {});
+            clientService.enqueueAction(labelAction);
         },
 
         /**

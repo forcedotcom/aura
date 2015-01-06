@@ -21,7 +21,6 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -78,17 +77,20 @@ public class ComponentController {
 
     }
 
-    private static void loadLabels(DefDescriptor<? extends BaseComponentDef> desc) throws QuickFixException {
+    @AuraEnabled
+    public static Boolean loadLabels() throws QuickFixException {
         AuraContext ctx = Aura.getContextService().getCurrentContext();
-        ctx.getDefRegistry().getDef(desc);
-        if (desc.equals(ctx.getApplicationDescriptor())) {
-            Map<DefDescriptor<? extends Definition>, Definition> defMap;
+        Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
-            defMap = ctx.getDefRegistry().filterRegistry(null);
-            for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
-                entry.getValue().retrieveLabels();
+        ctx.getDefRegistry().getDef(ctx.getApplicationDescriptor());
+        defMap = ctx.getDefRegistry().filterRegistry(null);
+        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
+            Definition def = entry.getValue();
+            if (def != null) {
+                def.retrieveLabels();
             }
         }
+        return Boolean.TRUE;
     }
 
     @AuraEnabled
@@ -97,7 +99,6 @@ public class ComponentController {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
         definitionService.updateLoaded(desc);
-        loadLabels(desc);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 
@@ -107,7 +108,6 @@ public class ComponentController {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
         definitionService.updateLoaded(desc);
-        loadLabels(desc);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 

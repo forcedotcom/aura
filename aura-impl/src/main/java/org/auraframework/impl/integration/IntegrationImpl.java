@@ -98,24 +98,24 @@ public class IntegrationImpl implements Integration {
 
             ComponentDef componentDef = descriptor.getDef();
             if(attributes!=null) {
-	            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-	                String key = entry.getKey();
+                for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+                    String key = entry.getKey();
 
-	                AttributeDef attributeDef = componentDef.getAttributeDef(key);
-	                if (attributeDef != null) {
-	                    String name = attributeDef.getName();
-	                    actionAttributes.put(name, entry.getValue());
-	                } else {
-	                    RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
-	                    if (eventDef != null) {
-	                        // Emit component.addHandler() wired to special global scope value provider
-	                        String name = eventDef.getAttributeName();
-	                        actionEventHandlers.put(name, (String) entry.getValue());
-	                    } else {
-	                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
-	                    }
-	                }
-	            }
+                    AttributeDef attributeDef = componentDef.getAttributeDef(key);
+                    if (attributeDef != null) {
+                        String name = attributeDef.getName();
+                        actionAttributes.put(name, entry.getValue());
+                    } else {
+                        RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
+                        if (eventDef != null) {
+                            // Emit component.addHandler() wired to special global scope value provider
+                            String name = eventDef.getAttributeName();
+                            actionEventHandlers.put(name, (String) entry.getValue());
+                        } else {
+                            throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
+                        }
+                    }
+                }
             }
 
             try {
@@ -158,9 +158,17 @@ public class IntegrationImpl implements Integration {
                     Action action = componentControllerDef.createAction("getComponent", paramValues);
                     action.setId("ais");
 
+                    //
+                    // Now build a second action.... to load all of the relevant labels.
+                    //
+                    Action labelAction = componentControllerDef.createAction("loadLabels", null);
+                    labelAction.setId("aisLabels");
+
                     Action previous = context.setCurrentAction(action);
                     try {
                         action.run();
+                        context.setCurrentAction(labelAction);
+                        labelAction.run();
                     } finally {
                         context.setCurrentAction(previous);
                     }

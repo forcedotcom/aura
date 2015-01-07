@@ -29,6 +29,7 @@
 .uiScroller.native {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
 }
 
 .uiScroller.native > .scroller > .pullToRefresh,

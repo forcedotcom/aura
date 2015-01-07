@@ -50,7 +50,6 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-            options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         }
     },
 
@@ -58,7 +57,6 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
-            options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         }
     },
 

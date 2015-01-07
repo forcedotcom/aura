@@ -23,5 +23,8 @@ exp(p,
     "suspendSweeping", p.suspendSweeping,
     "resumeSweeping", p.resumeSweeping,
     "get", p.get,
-    "put", p.put
+    "put", p.put,
+    "getAll", p.getAll,
+    "isPersistent", p.isPersistent,
+    "isSecure", p.isSecure
 );

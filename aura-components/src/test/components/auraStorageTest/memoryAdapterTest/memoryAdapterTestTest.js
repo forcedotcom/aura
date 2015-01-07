@@ -263,5 +263,46 @@
             $A.test.addWaitFor('MemoryStorageAdapter.setItem() cannot store an item over the maxSize',
                 function() { return result; })
         }
+    },
+
+    testGetAll: {
+        test: function() {
+            var adapter = this.adapter;
+            var completed = false;
+            Promise.all([
+                adapter.setItem("2", {
+                    "a" : 5,
+                    "b" : 6
+                }),
+                adapter.setItem("0", {
+                    "a" : 1,
+                    "b" : 2
+                }),
+                adapter.setItem("3", {
+                    "a" : 7,
+                    "b" : 8
+                }),
+                adapter.setItem("1", {
+                    "a" : 3,
+                    "b" : 4
+                })
+            ])
+            .then(function() { return adapter.getAll(); })
+            .then(
+                function(results) {
+                    var resultsLength = results.length;
+                    $A.test.assertEquals(4, resultsLength, "There should be 4 items");
+                    for (var i = 0; i < resultsLength; i++) {
+                        var val = results[i].value,
+                            key = results[i].key,
+                            keyNum = +key,
+                            expected = (keyNum * 2) + 1;
+                        $A.test.assertEquals(expected, val["a"], "Item 'a' value should be " + expected);
+                    }
+                })
+            .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        }
     }
 })

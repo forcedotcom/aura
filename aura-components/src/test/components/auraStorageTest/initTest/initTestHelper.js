@@ -177,19 +177,24 @@
             });
     },
     testCacheExpirationStage4:function(cmp){
-        //Run the action and verify that new response was fetched from server
-        var aSecond = cmp.get("c.fetchDataRecord");
-        aSecond.setParams({testName : "testCacheExpiration"});
-        aSecond.setStorable();
-        $A.test.enqueueAction(aSecond);
-        $A.test.addWaitFor(
-            "SUCCESS",
-            function(){return aSecond.getState()},
-            function(){
-                $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
-                $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
-            }
-        );
+        // Run the action and verify that new response was fetched from server
+        // Cause sweep by performing get after expired time in testCacheExpirationStage3
+        $A.storageService.getStorage("actions").get("foo").then(function() {
+            var aSecond = cmp.get("c.fetchDataRecord");
+            aSecond.setParams({testName: "testCacheExpiration"});
+            aSecond.setStorable();
+            $A.test.enqueueAction(aSecond);
+            $A.test.addWaitFor(
+                "SUCCESS",
+                function () {
+                    return aSecond.getState()
+                },
+                function () {
+                    $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
+                    $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
+                }
+            );
+        });
     },
     
     // The sequential stages of testActionKeyOverloading

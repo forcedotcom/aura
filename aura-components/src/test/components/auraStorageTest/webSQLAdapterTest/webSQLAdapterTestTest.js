@@ -6,7 +6,15 @@
     setUp : function(cmp) {
 		$A.test.overrideFunction($A.storageService, "selectAdapter", function() {
 			return "websql";});
-		$A.storageService.initStorage("browserdb", false, true, 1024, 200, 300, true, true);
+		var storage = $A.storageService.initStorage("browserdb", false, true, 1024, 2000, 3000, true, true);
+        var completed = false;
+        storage.clear().then(function() {
+            // websql clear() recreates 'cache' table. We want to ensure the table is available
+            // before running websql queries.
+            completed = true;
+        });
+
+        $A.test.addWaitFor(true, function() { return completed; });
     },
 
     resetCounters:function(cmp){
@@ -29,7 +37,6 @@
 
     testClear:{
 		test:[function(cmp){
-		    $A.test.setTestTimeout(5000);
 		    var storage = $A.storageService.getStorage("browserdb");
             var completed = false;
 		    this.resetCounters(cmp);
@@ -65,7 +72,6 @@
 
     testGetSize:{
 		test:[function(cmp){
-		    $A.test.setTestTimeout(15000);
             var completed = false;
 		    var storage = $A.storageService.getStorage("browserdb");
             storage.put("key1", new Array(1024).join("x"))  // 1kb
@@ -129,7 +135,6 @@
          * Bad key values
          */
         function(cmp){
-            $A.test.setTestTimeout(15000);
             var completed = false;
             var storage = $A.storageService.getStorage("browserdb");
             storage.get("key1")
@@ -205,7 +210,6 @@
          * Insert a value
          */
          test: function(cmp){
-                $A.test.setTestTimeout(15000);
                 var storage = $A.storageService.getStorage("browserdb");
                 storage.put("key1", new Array(1024).join("x"))  // 1kb
                     .then(function() {return storage.get("key1"); })
@@ -215,12 +219,12 @@
          }
     },
 
-    testPutBadValues:{ test:[
+    testPutBadValues: {
+        test:[
         /**
 		 * Insert bad values
 		 */
 		function(cmp){
-		    $A.test.setTestTimeout(15000);
 		    var storage = $A.storageService.getStorage("browserdb");
 		    storage.put("NULL", null)
                 .then(function() { return storage.get("NULL"); })
@@ -261,5 +265,56 @@
                 .then(function() { return storage.get("dup"); })
                 .then(function(item) { $A.test.assertEquals("DUPLICATE", item.value); });
 		}]
+    },
+
+    testGetAll: {
+        test: function() {
+            var storage = $A.storageService.getStorage("browserdb");
+            var completed = false;
+
+            Promise.all([
+                storage.put("2", {
+                    "a" : 5,
+                    "b" : 6
+                }),
+                storage.put("0", {
+                    "a" : 1,
+                    "b" : 2
+                }),
+                storage.put("3", {
+                    "a" : 7,
+                    "b" : 8
+                }),
+                storage.put("1", {
+                    "a" : 3,
+                    "b" : 4
+                })
+            ])
+                .then(function() { return storage.getAll(); })
+                .then(
+                function(results) {
+                    var resultsLength = results.length;
+                    $A.test.assertEquals(4, resultsLength, "There should be 4 items");
+                    for (var i = 0; i < resultsLength; i++) {
+                        var val = results[i].value,
+                            key = results[i].key,
+                            keyNum = +key,
+                            expected = (keyNum * 2) + 1;
+                        $A.test.assertEquals(i + "", key, "Should be ordered by key asc: " + expected);
+                        $A.test.assertEquals(expected, val["a"], "Item 'a' value should be " + expected);
+                    }
+                })
+                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        }
+    },
+
+    testStorageInfo: {
+        test: function(cmp) {
+            var storage = $A.storageService.getStorage("browserdb");
+            $A.test.assertTrue(storage.isPersistent(), "websql is a persistent storage");
+            $A.test.assertFalse(storage.isSecure(), "websql is not a secure storage");
+        }
     }
 })

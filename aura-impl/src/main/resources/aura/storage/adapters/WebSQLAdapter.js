@@ -26,15 +26,15 @@ var WebSQLStorageAdapter = function WebSQLStorageAdapter(config) {
     this.createSchemaErrorCallbacks = [];
 
     var instanceName = "AIS:" + config["name"];
-	this.db = openDatabase(instanceName, "1.0", instanceName + " database", 50 * 1024 * 1024);
+    this.db = openDatabase(instanceName, "1.0", instanceName + " database", 50 * 1024 * 1024);
 
-	this.createSchema();
+    this.createSchema();
 };
 
 WebSQLStorageAdapter.NAME = "websql";
 
 WebSQLStorageAdapter.prototype.getName = function() {
-	return WebSQLStorageAdapter.NAME;
+    return WebSQLStorageAdapter.NAME;
 };
 
 WebSQLStorageAdapter.prototype.getSize = function() {
@@ -77,8 +77,46 @@ WebSQLStorageAdapter.prototype.getItem = function(key) {
     return promise;
 };
 
+/**
+ * Get all items from storage
+ * @returns {Promise} Promise with array of all rows
+ */
+WebSQLStorageAdapter.prototype.getAll = function() {
+    var that = this;
+    var promise = new Promise(function(success, error) {
+        that.db.readTransaction(
+            function(tx) {
+                tx.executeSql(
+                    "SELECT key, value, created, expires FROM cache ORDER BY key ASC;",
+                    [],
+                    function(tx, results) {
+                        var values = [];
+                        var rows = results.rows;
+                        for (var i = 0; i < rows.length; i++) {
+                            var row = rows.item(i);
+
+                            values.push({
+                                key: row["key"],
+                                value: $A.util["json"].decode(row["value"]),
+                                created: row["created"],
+                                expires: row["expires"]
+                            });
+                        }
+
+                        success(values);
+                    },
+                    function(transaction, errorMsg) { error(errorMsg); }
+                );
+            },
+            error
+        );
+    });
+
+    return promise;
+};
+
 WebSQLStorageAdapter.prototype.setItem = function(key, item) {
-	var that = this;
+    var that = this;
     var promise = new Promise(function(success, error) {
         that.db.transaction(
             function(tx) {
@@ -93,7 +131,7 @@ WebSQLStorageAdapter.prototype.setItem = function(key, item) {
                             function() { that.updateSize(success); },
                             function(transaction, errorMsg) { error(errorMsg); });
                     },
-                    error
+                    function(transaction, errorMsg) { error(errorMsg); }
                 );
             },
             error
@@ -104,7 +142,7 @@ WebSQLStorageAdapter.prototype.setItem = function(key, item) {
 };
 
 WebSQLStorageAdapter.prototype.removeItem = function(key) {
-	var that = this;
+    var that = this;
     var promise = new Promise(function(success, error) {
         that.db.transaction(
             function(tx) {
@@ -167,9 +205,9 @@ WebSQLStorageAdapter.prototype.getExpired = function() {
 
 
 WebSQLStorageAdapter.prototype.updateSize = function(sizeUpdatedCallback) {
-	// Prime the this.size pump with a SELECT SUM() query
-	var that = this;
-	this.db.transaction(
+    // Prime the this.size pump with a SELECT SUM() query
+    var that = this;
+    this.db.transaction(
         function(tx) {
             tx.executeSql(
                 "SELECT SUM(size) AS totalSize FROM cache;",
@@ -258,9 +296,9 @@ WebSQLStorageAdapter.prototype.createSchema = function(successCallback, errorCal
 
 // Only register this adapter if the WebSQL API is present
 if (window.openDatabase) {
-	$A.storageService.registerAdapter({
-		"name": WebSQLStorageAdapter.NAME,
-		"adapterClass": WebSQLStorageAdapter,
-		"persistent": true
-	});
+    $A.storageService.registerAdapter({
+        "name": WebSQLStorageAdapter.NAME,
+        "adapterClass": WebSQLStorageAdapter,
+        "persistent": true
+    });
 }

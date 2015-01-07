@@ -20,16 +20,24 @@
  * @constructor
  */
 var MemoryStorageValue = function MemoryStorageValue(item, size) {
-	this.item = item;
-	this.size = size;
+    this.item = item;
+    this.size = size;
 };
 
+/**
+ * Returns item
+ * @returns {*} item
+ */
 MemoryStorageValue.prototype.getItem = function() {
-	return this.item;
+    return this.item;
 };
 
+/**
+ * Returns size of item
+ * @returns {Number} size of item
+ */
 MemoryStorageValue.prototype.getSize = function() {
-	return this.size;
+    return this.size;
 };
 
 /**
@@ -37,50 +45,49 @@ MemoryStorageValue.prototype.getSize = function() {
  * @constructor
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter(config) {
-	this.backingStore = {};
-	this.mru = [];
-	this.cachedSize = 0;
-	this.isDirtyForCachedSize = false;
-	this.maxSize = config["maxSize"];
-	this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.backingStore = {};
+    this.mru = [];
+    this.cachedSize = 0;
+    this.maxSize = config["maxSize"];
+    this.debugLoggingEnabled = config["debugLoggingEnabled"];
 };
 
 MemoryStorageAdapter.NAME = "memory";
 
+/**
+ * Returns name of memory adapter, "memory"
+ * @returns {String} name of memory adapter
+ */
 MemoryStorageAdapter.prototype.getName = function() {
-	return MemoryStorageAdapter.NAME;
+    return MemoryStorageAdapter.NAME;
 };
 
+/**
+ * Return adapter size used
+ * @returns {Promise} Promise with size used in adapter
+ */
 MemoryStorageAdapter.prototype.getSize = function() {
     var that = this;
-    var promise = new Promise(function(success, error) {
-
-        if (that.isDirtyForCachedSize === true) {
-            var newSize = 0;
-            for (var key in that.backingStore) {
-                newSize += that.backingStore[key].getSize();
-            }
-
-            that.cachedSize = newSize;
-            that.isDirtyForCachedSize = false;
-        }
-
+    var promise = new Promise(function(success) {
         success(that.cachedSize);
     });
 
     return promise;
 };
 
+/**
+ * Retrieve item from storage
+ *
+ * @param {String} key storage key for item to retrieve
+ * @returns {Promise} Promise with item
+ */
 MemoryStorageAdapter.prototype.getItem = function(key) {
     var that = this;
     var promise = new Promise(function(success, error) {
         var value = that.backingStore[key];
         if (!$A.util.isUndefinedOrNull(value)) {
             // Update the MRU
-            var index = $A.util.arrayIndexOf(that.mru, key);
-            that.mru.splice(index, 1);
-            that.mru.push(key);
-
+            that.updateMRU(key);
             success(value.getItem());
         } else {
             success();
@@ -90,6 +97,52 @@ MemoryStorageAdapter.prototype.getItem = function(key) {
     return promise;
 };
 
+/**
+ * Get all items in storage
+ * @returns {Promise} Promise with array of all items
+ */
+MemoryStorageAdapter.prototype.getAll = function() {
+    var that = this;
+    var promise = new Promise(function(success, error) {
+        var store = that.backingStore;
+        var values = [];
+        for (var key in store) {
+            if (store.hasOwnProperty(key)) {
+                var value = store[key];
+                if (!$A.util.isUndefinedOrNull(value)) {
+                    values.push({
+                        key: key,
+                        value: value.getItem()
+                    });
+                    that.updateMRU(key);
+                }
+            }
+        }
+        success(values);
+    });
+
+    return promise;
+};
+
+/**
+ * Update key in most recently used list
+ * @param {String} key the key to update
+ */
+MemoryStorageAdapter.prototype.updateMRU = function(key) {
+    var index = $A.util.arrayIndexOf(this.mru, key);
+    if (index > -1) {
+        this.mru.splice(index, 1);
+        this.mru.push(key);
+    }
+};
+
+/**
+ * Store item into storage using key as reference
+ *
+ * @param {String} key key for item
+ * @param {*} item item to store
+ * @returns {Promise} Promise
+ */
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
     var that = this;
     var promise = new Promise(function(success, error) {
@@ -102,47 +155,21 @@ MemoryStorageAdapter.prototype.setItem = function(key, item) {
             return;
         }
 
-        that.getSize()
-            .then(function (adapterSize) { return (size + adapterSize) - that.maxSize; })
-            .then(function(spaceNeeded) { that.evict(spaceNeeded); })
-            .then(function() {
-                that.backingStore[key] = new MemoryStorageValue(item, size);
-                // Update the MRU
-                that.mru.push(key);
-                that.isDirtyForCachedSize = true;
-                success();
-            });
-    });
-
-    return promise;
-};
-
-MemoryStorageAdapter.prototype.removeItem = function(key) {
-    var that = this;
-    var promise = new Promise(function(success, error) {
-        // Update the MRU
-        var value = that.backingStore[key];
-
-        var index = $A.util.arrayIndexOf(that.mru, key);
-        if (index >= 0) {
-            that.mru.splice(index, 1);
+        // existing item ?
+        var existingItem = that.backingStore[key],
+            existingItemSize = 0;
+        if (!$A.util.isUndefinedOrNull(existingItem)) {
+            existingItemSize = existingItem.getSize();
         }
 
-        delete that.backingStore[key];
-        that.isDirtyForCachedSize = true;
+        var itemSize =  size - existingItemSize,
+            spaceNeeded = itemSize + that.cachedSize - that.maxSize;
 
-        success(value);
-    });
-
-    return promise;
-};
-
-MemoryStorageAdapter.prototype.clear = function() {
-    var that = this;
-    var promise = new Promise(function(success, error) {
-        that.backingStore = {};
-        that.cachedSize = 0;
-        that.isDirtyForCachedSize = false;
+        that.backingStore[key] = new MemoryStorageValue(item, size);
+        // Update the MRU
+        that.mru.push(key);
+        that.cachedSize += itemSize;
+        that.evict(spaceNeeded);
 
         success();
     });
@@ -150,6 +177,55 @@ MemoryStorageAdapter.prototype.clear = function() {
     return promise;
 };
 
+/**
+ * Remove item from storage
+ *
+ * @param {String} key key referencing item to remove
+ * @returns {Promise} Promise with removed item
+ */
+MemoryStorageAdapter.prototype.removeItem = function(key) {
+    var that = this;
+    var promise = new Promise(function(success, error) {
+        // Update the MRU
+        var value = that.backingStore[key];
+
+        if (!$A.util.isUndefinedOrNull(value)) {
+            var index = $A.util.arrayIndexOf(that.mru, key);
+            if (index >= 0) {
+                that.mru.splice(index, 1);
+            }
+
+            // adjust actual size
+            that.cachedSize -= value.getSize();
+
+            delete that.backingStore[key];
+        }
+        success(value);
+    });
+
+    return promise;
+};
+
+/**
+ * Clear storage
+ * @returns {Promise} Promise for clear
+ */
+MemoryStorageAdapter.prototype.clear = function() {
+    var that = this;
+    var promise = new Promise(function(success, error) {
+        that.backingStore = {};
+        that.cachedSize = 0;
+
+        success();
+    });
+
+    return promise;
+};
+
+/**
+ * Returns currently expired items
+ * @returns {Promise} Promise with array of expired items
+ */
 MemoryStorageAdapter.prototype.getExpired = function() {
     var that = this;
     var promise = new Promise(function(success, error) {
@@ -208,11 +284,11 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
     return promise;
 };
 
+// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 /**
  * Asynchronously gets the most-recently-used list.
  * @returns {Promise} Returns a Promise that will retrieve the mru.
  */
-// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 MemoryStorageAdapter.prototype.getMRU = function() {
     var that = this;
     return new Promise(function(success, error) {
@@ -223,8 +299,8 @@ MemoryStorageAdapter.prototype.getMRU = function() {
 
 //#include aura.storage.adapters.MemoryAdapter_export
 
-$A.storageService.registerAdapter({ 
-	"name": MemoryStorageAdapter.NAME, 
-	"adapterClass": MemoryStorageAdapter,
-	"secure": true
+$A.storageService.registerAdapter({
+    "name": MemoryStorageAdapter.NAME,
+    "adapterClass": MemoryStorageAdapter,
+    "secure": true
 });

@@ -371,13 +371,16 @@ var AuraRenderingService = function AuraRenderingService(){
                         // can then be unrendered too, and so on and so on. Eventually the marker moves to the last element
                         // but there may at this point be new elements in the iteration. So if you unrender the last element
                         // and you rerender it's sub-components resulting in new elements, change its marker to the new elements
-                        if(renderedElements.length && priv.isMarker(component._marker)) {
+                        //if(renderedElements.length && priv.isMarker(component._marker)) {
                         	// KRIS: HALO:
                         	// We can't do this, some components share markers, and this can potentially 
                         	// remove the marker for another component.
                             //$A.util.removeElement(component._marker);
-                            component._marker = renderedElements[0];
-                        }
+                        	
+                        	// KRIS: HALO: 
+                        	// Still failing things. Bleh.
+                            //component._marker = renderedElements[0];
+                        //}
                         
                         info.component.disassociateElements();
                         priv.associateElements(info.component, renderedElements);

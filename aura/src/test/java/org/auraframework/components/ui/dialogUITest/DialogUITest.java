@@ -43,10 +43,12 @@ import org.openqa.selenium.WebElement;
 public class DialogUITest extends WebDriverTestCase {
 
     private final String URL_MODAL = "/uitest/dialog_ModalTest.cmp";
+    private final String URL_MODAL_TABINDEX = "/uitest/dialog_ModalFocusTest.cmp";
     private final String URL_NON_MODAL = "/uitest/dialog_NonModalTest.cmp";
     private final String URL_NON_MODAL_WITH_CHECKBOXES = "/uitest/dialog_NonModalWCheckboxesTest.cmp";
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
     private final String TITLE = "return $A.test.getActiveElement().title";
+    private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
     private final String SHIFT_TAB = Keys.SHIFT + "" + Keys.TAB;
     private final String CONFIRM_STR = "Click to confirm";
     private final String CANCEL_STR = "Click to cancel";
@@ -106,6 +108,10 @@ public class DialogUITest extends WebDriverTestCase {
         return driver.findElement(By.cssSelector(classOfActiveElem));
     }
 
+    private WebElement getActiveElement() {
+        return (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+    }
+
     /***********************************************************************************************
      ******************************* MODAL DIALOG BOX CHECK******************************************
      ***********************************************************************************************/
@@ -132,6 +138,26 @@ public class DialogUITest extends WebDriverTestCase {
         boolean dialogStillUp = element.getAttribute("class").contains("fadeIn");
         assertTrue("The Modal Dialog box was closed by clicking outside of it", dialogStillUp);
     }
+
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testFocusElementsInDialog() throws MalformedURLException, URISyntaxException, InterruptedException {
+        open(URL_MODAL_TABINDEX);
+        WebDriver driver = getDriver();
+
+        openDialogBox(driver);
+
+        WebElement activeElement = getActiveElement();
+        if (activeElement.getTagName().contains("button")) {
+            // switch to the dialog if button still has focus
+            auraUITestingUtil.pressTab(activeElement);
+        }
+
+        assertEquals("list item with tabindex=0 should be active element", "coffee", auraUITestingUtil.getEval(CLASSNAME));
+
+        auraUITestingUtil.pressTab(getActiveElement());
+        assertEquals("anchor element should be active", "anchor", auraUITestingUtil.getEval(CLASSNAME));
+    }
+
 
     /***********************************************************************************************
      *************************** NON-MODAL DIALOG BOX CHECK******************************************

@@ -321,10 +321,12 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         for (int i=0; i<values.size(); i++) {
             String shortName = values.get(i).getShortName();
             String fullName = values.get(i).getFullName();
-            assertTrue("Could not find short name '" + shortName + "' in expected short names for locale " + locale,
+            if (shortName != null && !shortName.isEmpty()) {
+                assertTrue("Could not find short name '" + shortName + "' in expected short names for locale " + locale,
                     expectedShortNames.contains(shortName));
-            assertEquals("Long names for locale " + locale + " do not equal",
+                assertEquals("Long names for locale " + locale + " do not equal",
                     expectedData.get(shortName), fullName);
+            }
         }
     }   
         

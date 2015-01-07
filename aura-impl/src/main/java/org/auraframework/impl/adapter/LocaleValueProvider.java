@@ -192,8 +192,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
         DateFormatSymbols monthSymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] months = monthSymbols.getMonths();
         String[] shortMonths = monthSymbols.getShortMonths();
-        ArrayList<LocalizedLabel> monthList = new ArrayList<LocalizedLabel>(12);
-        for (int i = 0; i < months.length - 1; i++) {
+        ArrayList<LocalizedLabel> monthList = new ArrayList<LocalizedLabel>(months.length);    
+        for (int i = 0; i < months.length; i++) {
             monthList.add(new LocalizedLabel(months[i], shortMonths[i]));
         }
         return monthList;

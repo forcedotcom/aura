@@ -251,7 +251,7 @@
             $A.assert(false, "Trying to find a focusable element in the dialog, but no container specified.");
         } else if (document.querySelectorAll) {
             // sorry IE7, you're outta luck
-            formElements = container.querySelectorAll("input,button,a,textarea,select");
+            formElements = container.querySelectorAll("input,button,a,textarea,select,[tabindex='0']");
             length = formElements.length;
             if (length > 0) {
                 for (var i=0; i<length; i++) {

@@ -115,6 +115,18 @@
 			this.verifySelectedOptions(inputSelectCmp, []);
 		}
 	},
+	
+	/**
+	 * Check that setting v.options to empty doesn't empty the options
+	 */
+	testEmptyOptionsAttribute : {
+		test : function(cmp) {
+			var inputSelectCmp = cmp.find("InputSelectSingle");
+			
+			inputSelectCmp.set("v.options", []);
+			this.verifySelectedOptions(inputSelectCmp, "Lion");
+		}
+	},
 
 	changeSelection : function(inputSelectCmp, newOptionsText, doNotDeselectTheseOptions) {
 		var optionCmps = this.getOptions(inputSelectCmp);

@@ -19,11 +19,6 @@
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -41,12 +36,6 @@
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

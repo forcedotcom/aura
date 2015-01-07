@@ -95,9 +95,9 @@
         <module>aura-osgi-api</module>
     </modules>
     <scm>
-        <connection>scm:git:git@github.com:forcedotcom/lumen-beta.git</connection>
-        <url>scm:git:git@github.com:forcedotcom/lumen-beta.git</url>
-        <developerConnection>scm:git:git@github.com:forcedotcom/lumen-beta.git</developerConnection>
+        <connection>scm:git:git@github.com:forcedotcom/aura.git</connection>
+        <url>scm:git:git@github.com:forcedotcom/aura.git</url>
+        <developerConnection>scm:git:git@github.com:forcedotcom/aura.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <dependencies>

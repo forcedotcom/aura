@@ -356,4 +356,23 @@ public class LoggingContextImpl implements LoggingContext {
         log(report);
     }
 
+	@Override
+	public void info(String message) {
+		logger.info(message);
+	}
+
+	@Override
+	public void warn(String message) {
+		logger.warn(message);
+	}
+
+	@Override
+	public void error(String message) {
+		logger.error(message);
+	}
+
+	@Override
+	public void error(String message, Throwable cause) {
+		logger.error(message, cause);
+	}
 }

@@ -122,7 +122,7 @@ var clientService;
  * @constructor
  */
 $A.ns.Aura = function() {
-    this.util = new $A.ns.Util(); 
+    this.util = new $A.ns.Util();
     this["util"] = this.util;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this.test = new $A.ns.Test();
@@ -476,18 +476,18 @@ $A.ns.Aura = function() {
             }
     );
 
-    
+
     this.eventService.addHandler({
         event : 'aura:clientRedirect',
         "globalId" : "Aura",
         "handler" : function(evt) {
         	var url = evt.getParam('url');
         	if (url != null) {
-        		window.location = url; 
+        		window.location = url;
         	}
         }
     });
-        
+
     this.eventService.addHandler({
         event : 'aura:systemError',
         "globalId" : "Aura",
@@ -516,14 +516,15 @@ $A.ns.Aura.prototype.initAsync = function(config) {
     // we don't handle components that come back here. This is used in the case where there
     // are none.
     //
-    $A.context = new AuraContext(config["context"]);
-    clientService.initHost(config["host"]);
-    clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
-        $A.initPriv(resp);
-        $A.Perf.endMark("Component Load Complete");
-    }, config["deftype"]);
+    $A.context = new AuraContext(config["context"], function() {
+        clientService.initHost(config["host"]);
+        clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
+            $A.initPriv(resp);
+            $A.Perf.endMark("Component Load Complete");
+        }, config["deftype"]);
 
-    $A.Perf.endMark("Component Load Initiated");
+        $A.Perf.endMark("Component Load Initiated");
+    });
 };
 
 /**

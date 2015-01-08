@@ -105,7 +105,7 @@ $A.ns.GlobalValueProviders.prototype.loadFromStorage = function(callback) {
         storage.get("globalValueProviders").then(function (item) {
             $A.run(function() {
                 if (item) {
-                    that.merge(item, true);
+                    that.merge(item.value, true);
                 }
                 callback(!!item);
             });

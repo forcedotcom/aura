@@ -3,7 +3,7 @@
     <aura:set attribute="auraPreInitBlock">
         <script>
             // a global place so tests can inspect the adapter
-            window.mockStorageAdapter = window.mockStorageAdapter || { getItem: function() { return new Promise(function(success, error) { success({}); }); } };
+            window.mockStorageAdapter = window.mockStorageAdapter || { getItemInvocations: {} };
 
             // implement the simplest storage adapter so we can customize the behavior of getItem
             // for these tests.
@@ -21,8 +21,15 @@
                     // long enough for aura to initialize if it's not correctly waiting for the callback.
                     setTimeout(function() {
                         // record which keys had their callbacks invoked
-                        window.mockStorageAdapter.getItem[key] = true;
-                        success({});
+                        window.mockStorageAdapter.getItemInvocations[key] = true;
+
+                        var result = { value: null, expires: new Date().getTime() };
+	                    // return a well-known value for the GVP. this is tested in loadFromStorageTest.js.
+	                    if (key === "globalValueProviders") {
+	                        result.value = [{type:"$Custom", values:{foo:"bar"} }];
+	                    }
+
+                        success(result);
                     }, 1500);
                 });
             };

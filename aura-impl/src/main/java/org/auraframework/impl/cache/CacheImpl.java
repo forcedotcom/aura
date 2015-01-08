@@ -19,8 +19,12 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.auraframework.Aura;
+import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.cache.Cache;
+import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.adapter.ConfigAdapterImpl;
+import org.auraframework.system.LoggingContext;
 
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.RemovalCause;
@@ -68,12 +72,15 @@ public class CacheImpl<K, T> implements Cache<K, T> {
             if (notification.getCause() == RemovalCause.SIZE) {
                 evictions++;
                 if (evictions >= nextLogThreshold) {
-                    Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
-                    CacheStats stats = cache.stats();
-                    logger.info(String.format(
-                        "Cache %s evicted %d entries for size pressure, hit rate=%.3f, evictions=%d, loads=%d %s",
-                        name, evictions, stats.hitRate(), stats.evictionCount(),
-                        stats.loadCount(), stats.toString()));
+                	LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
+                	if (adapter != null && adapter.isEstablished()) {
+                		LoggingContext loggingCtx = adapter.getLoggingContext();
+                        CacheStats stats = cache.stats();
+                        loggingCtx.info(String.format(
+                            "Cache %s evicted %d entries for size pressure, hit rate=%.3f, evictions=%d, loads=%d %s",
+                            name, evictions, stats.hitRate(), stats.evictionCount(),
+                            stats.loadCount(), stats.toString()));
+                	}
                     // We want to log every 10 until 100, every 100 until 1000, every 1000 thereafter
                     if (nextLogThreshold == 1) {
                         nextLogThreshold = 10;

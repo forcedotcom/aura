@@ -58,4 +58,37 @@ public interface LoggingContext {
     }
 
     void logCSPReport(Map<String, Object> report);
+ 
+    /**
+     * Logs an informational message, independent of context such as action or
+     * timers, for which context-sensitive methods can be provided via other
+     * methods.  Use this method to report "important" stuff (i.e. worth cluttering
+     * the logs with) that arises during normal, successful operation.
+     */
+    void info(String message);
+    
+    /**
+     * Logs a warning message, independent of context such as action or
+     * timers, for which context-sensitive methods can be provided via other
+     * methods.  Use this method to report suspicious, but perhaps not wrong,
+     * situations, or minor problems for which a clear workaround is available and
+     * will be followed.
+     */
+    void warn(String message);
+    
+    /**
+     * Logs an error message, independent of context such as action or timers,
+     * for which context-sensitive methods can be provided via other methods.
+     * Use this method to report serious problems where something is definitely
+     * wrong.
+     */
+    void error(String message);
+
+    /**
+     * Logs an error message, independent of context such as action or timers,
+     * for which context-sensitive methods can be provided via other methods.
+     * Use this method to report serious problems where something is definitely
+     * wrong.
+     */
+    void error(String message, Throwable cause);
 }

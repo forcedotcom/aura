@@ -29,7 +29,7 @@
         	                      // the focus is still in hour field. That is, the hour value doesn't get updated.
             var hoursCmp = component.find("hours");
             var currentHourValue = hoursCmp.getElement().value;
-            hoursCmp.setValue("v.value", currentHourValue);
+            hoursCmp.set("v.value", currentHourValue); 
             if (helper.validateHours(component)) {
                 if (amPmCmp) { // it must be in 12 hour format
                     if (amPmCmp.get("v.value") == "am") {

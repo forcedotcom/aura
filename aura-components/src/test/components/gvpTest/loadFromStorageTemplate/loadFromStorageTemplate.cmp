@@ -50,6 +50,10 @@
                 return new Promise(function(success, error) { success([]); });
             };
 
+            MockStorageAdapter.prototype.getAll = function() {
+                return new Promise(function(success, error) { success([]); });
+            };
+
             // register the mock adapter
             $A.storageService.registerAdapter({
                 "name": MockStorageAdapter.NAME,

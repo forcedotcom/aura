@@ -158,6 +158,14 @@ var AuraStorageService = function(){
         	}
         	
         	return match["name"];
+        },
+
+        /**
+         * Deletes reference to storage
+         * @param {String} name name of storage
+         */
+        deleteStorage: function(name) {
+            delete storages[name];
         }
         
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

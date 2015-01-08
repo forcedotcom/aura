@@ -117,7 +117,7 @@ AuraStorage.prototype.get = function(key) {
             return undefined;
         }
 
-        return { value : item.value, isExpired : (new Date().getTime() > item.expires) };
+        return { "value" : item.value, "isExpired" : (new Date().getTime() > item.expires) };
     });
 
     this.sweep();
@@ -141,7 +141,7 @@ AuraStorage.prototype.getAll = function() {
                 // then only replace first occurrence
                 key = item["key"].replace(that.version, "");
             }
-            return { key: key, value: item["value"], isExpired : (new Date().getTime() > item.expires) };
+            return { "key": key, "value": item["value"], "isExpired": (new Date().getTime() > item.expires) };
         });
     });
 };

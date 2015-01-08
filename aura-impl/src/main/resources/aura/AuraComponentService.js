@@ -508,14 +508,6 @@ $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = functio
         ret.push(name);
     }
 
-    // Union in any locally cached component defs
-    var catalog = this.registry.getLocalCacheCatalog();
-    for (name in catalog) {
-        if (!componentDefs[name]) {
-            ret.push(name);
-        }
-    }
-
     return ret;
 };
 

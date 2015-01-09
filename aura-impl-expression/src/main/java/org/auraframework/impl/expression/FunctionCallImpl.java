@@ -44,6 +44,7 @@ public class FunctionCallImpl implements FunctionCall {
     private final List<Expression> args;
     private final Function f;
     private final Location l;
+    private boolean byValue=false;
 
     public FunctionCallImpl(Function f, List<Expression> args, Location l) {
         this.args = args;
@@ -81,6 +82,14 @@ public class FunctionCallImpl implements FunctionCall {
     }
 
     @Override
+    public void setByValue(boolean byValue){
+        this.byValue=byValue;
+        for (Expression e : args) {
+            e.setByValue(byValue);
+        }
+    }
+
+    @Override
     public void gatherPropertyReferences(Set<PropertyReference> propRefs) {
         for (Expression e : args) {
             e.gatherPropertyReferences(propRefs);
@@ -96,6 +105,7 @@ public class FunctionCallImpl implements FunctionCall {
             json.writeMapEntry("exprType", value.getExpressionType());
             json.writeMapEntry("key", value.f.getKeys()[0]);
             json.writeMapEntry("args", value.args);
+            json.writeMapEntry("byValue", value.byValue);
             json.writeMapEnd();
         }
     }

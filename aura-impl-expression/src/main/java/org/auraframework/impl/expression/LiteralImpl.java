@@ -75,6 +75,11 @@ public class LiteralImpl implements Literal {
         // none here.
     }
 
+    @Override
+    public void setByValue(boolean byValue){
+        // literals are always by value
+    }
+
     public static final Serializer SERIALIZER = new Serializer();
 
     private static class Serializer extends NoneSerializer<LiteralImpl> {

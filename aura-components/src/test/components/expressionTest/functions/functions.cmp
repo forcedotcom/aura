@@ -26,6 +26,8 @@
     <aura:attribute name="NegativeInfinity" type="double"/>
     <aura:attribute name="NaN" type="double"/>
 
+    <aura:attribute name="object" type="Object"/>
+
     <!-- asserts -->
     <expressionTest:test expression="{!v.integer}" exprText="v.integer" expected="7"/>
     <expressionTest:test expression="{!v.double}" exprText="v.double" expected="3.1"/>
@@ -335,6 +337,40 @@
     <expressionTest:test expression="{!abs(-v.Infinity)}" exprText="abs(-v.Infinity)" expected="Infinity"/>
     <expressionTest:test expression="{!abs(m.NaN)}" exprText="abs(m.NaN)" expected="NaN"/>
     <expressionTest:test expression="{!abs(v.double)}" exprText="abs(v.double)" expected="3.1"/>
+
+    <!-- empty -->
+    <expressionTest:test expression="{!empty(null)}" exprText="empty(null)" expected="true"/>
+
+    <expressionTest:test expression="{!empty(true)}" exprText="empty(true)" expected="false"/>
+    <expressionTest:test expression="{!empty(false)}" exprText="empty(false)" expected="false"/>
+
+    <expressionTest:test expression="{!empty(0)}" exprText="empty(0)" expected="false"/>
+    <expressionTest:test expression="{!empty(0.0)}" exprText="empty(0.0)" expected="false"/>
+    <!-- WXXXX - NaN is interpreted as "undefined"
+    <expressionTest:test expression="{!empty(NaN)}" exprText="empty(NaN)" expected="false"/>
+    -->
+    <expressionTest:test expression="{!empty(m.integer)}" exprText="empty(m.integer)" expected="false"/>
+    <expressionTest:test expression="{!empty(m.double)}" exprText="empty(m.double)" expected="false"/>
+    <!-- WXXXX - NaN is interpreted as "undefined"
+    <expressionTest:test expression="{!empty(m.NaN)}" exprText="empty(m.NaN)" expected="false"/>
+    -->
+    <expressionTest:test expression="{!empty(v.NaN)}" exprText="empty(v.NaN)" expected="false"/>
+
+    <expressionTest:test expression="{!empty('')}" exprText="empty('')" expected="true"/>
+    <expressionTest:test expression="{!empty('Random')}" exprText="empty('Random')" expected="false"/>
+    <expressionTest:test expression="{!empty(m.stringEmpty)}" exprText="empty(m.stringEmpty)" expected="true"/>
+    <expressionTest:test expression="{!empty(m.string)}" exprText="empty(m.string)" expected="false"/>
+
+    <expressionTest:test expression="{!empty(m.emptyList)}" exprText="empty(m.emptyList)" expected="true"/>
+    <expressionTest:test expression="{!empty(m.stringList)}" exprText="empty(m.stringList)" expected="false"/>
+    <!-- WXXXX - [null] is interpreted as []
+        <expressionTest:test expression="{!empty(m.listOfNull)}" exprText="empty(m.listOfNull)" expected="false"/>
+    -->
+    <!-- WXXXX - Objects is serialized as "undefined"
+        <expressionTest:test expression="{!empty(m.object)}" exprText="empty(m.object)" expected="false"/>
+    -->
+    <expressionTest:test expression="{!empty(m.objectNull)}" exprText="empty(m.objectNull)" expected="true"/>
+    <expressionTest:test expression="{!empty(v.object)}" exprText="empty(v.object)" expected="false"/>
 
     <!-- misc -->
     <expressionTest:test expression="{!m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)}" exprText="m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)" expected="'4.15.11'"/>

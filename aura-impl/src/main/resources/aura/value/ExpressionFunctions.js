@@ -125,5 +125,10 @@ var expressionFunctions = {
     "not": function not(args) {
         var a = args[0];
         return !a;
+    },
+
+    "empty": function empty(args) {
+        var a = args[0];
+        return aura.util.isEmpty(a);
     }
 };

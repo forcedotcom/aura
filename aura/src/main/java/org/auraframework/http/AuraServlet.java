@@ -372,13 +372,18 @@ public class AuraServlet extends AuraBaseServlet {
             // The bootstrap action cannot not have a CSRF token so we let it
             // through
             boolean isBootstrapAction = false;
-            if (message.getActions().size() == 1) {
+            if (message.getActions().size() == 2) {
                 Action action = message.getActions().get(0);
                 String name = action.getDescriptor().getQualifiedName();
                 if (name.equals("aura://ComponentController/ACTION$getApplication")
                         || (name.equals("aura://ComponentController/ACTION$getComponent") && !isProductionMode(context
                                 .getMode()))) {
                     isBootstrapAction = true;
+                }
+                Action labelAction = message.getActions().get(1);
+                name = labelAction.getDescriptor().getQualifiedName();
+                if (!name.equals("aura://ComponentController/ACTION$loadLabels")) {
+                    isBootstrapAction = false;
                 }
             }
 

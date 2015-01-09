@@ -76,7 +76,7 @@ var AuraClientService = function() {
             try {
                 //#end
 
-            	if (token) {
+                if (token) {
                     priv.token = token;
                 }
 
@@ -265,10 +265,10 @@ var AuraClientService = function() {
                             var storage = Action.prototype.getStorage();
                             if (storage) {
                                 var key = action.getStorageKey();
-                                storage.get(key, function(actionResponse) {
-                                    if (actionResponse) {
-                                        storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
-                                        action.updateFromResponse(actionResponse);
+                                storage.get(key).then(function(value) {
+                                    if (value) {
+                                        storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, value.value]);
+                                        action.updateFromResponse(value.value);
                                         action.finishAction($A.getContext());
                                     } else {
                                         $A.error("Unable to load application.");
@@ -728,7 +728,7 @@ var AuraClientService = function() {
          * @public
          */
         setConnected: function(isConnected) {
-        	priv.setConnected(isConnected);
+            priv.setConnected(isConnected);
         },
 
         /**

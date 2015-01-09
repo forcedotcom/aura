@@ -29,7 +29,7 @@
  */
 function Component(config, localCreation) {
 	this.priv = new ComponentPriv(config, this, localCreation);
-	this._destroying = false;
+	this._destroying =false;
 
 	// #if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG",
 	// "AUTOTESTINGDEBUG"]}

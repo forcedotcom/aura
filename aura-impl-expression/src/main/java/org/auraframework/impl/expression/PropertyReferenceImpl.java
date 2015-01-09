@@ -45,6 +45,7 @@ public class PropertyReferenceImpl implements PropertyReference {
     private static final long serialVersionUID = -6332112591620619082L;
     private final List<String> pieces;
     private final Location l;
+    private boolean byValue=false;
 
     public PropertyReferenceImpl(String expr, Location l) {
         // TODO: delete this constructor, splitting should be done by the parser
@@ -126,12 +127,18 @@ public class PropertyReferenceImpl implements PropertyReference {
     }
 
     @Override
+    public void setByValue(boolean byValue){
+        this.byValue=byValue;
+    }
+
+    @Override
     public String toString() {
         return toString(false);
     }
 
-    public String toString(boolean curlyBang) {
-        return AuraTextUtil.collectionToString(pieces, ".", null, curlyBang ? "{!" : null, curlyBang ? "}" : null);
+    public String toString(boolean curlies) {
+        char curlyType=this.byValue?'#':'!';
+        return AuraTextUtil.collectionToString(pieces, ".", null, curlies ? "{" + curlyType : null, curlies ? "}" : null);
     }
 
     @Override

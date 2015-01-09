@@ -36,15 +36,21 @@ var valueFactory = {
                 }
                 valueConfig=childConfig;
             }
-        } else if (aura.util.isString(valueConfig) && valueConfig.indexOf("{!") === 0 && component) {
-            // Property expressions
-            var isGlobal=valueConfig.indexOf("{!$")===0;
-            if(!isGlobal&&$A.util.isComponent(component)){
-                return component.getReference(valueConfig);
-            }else{
-                //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                valueConfig = valueConfig.substring(2, valueConfig.length - 1);
-                return new PropertyReferenceValue(valueConfig.split("."), isGlobal?$A:component);
+        } else if (aura.util.isString(valueConfig) && valueConfig.charAt(0)==='{' && component) {
+            // Property Expressions:
+            switch(valueConfig.charAt(1)){
+                // By Value
+                case '#':
+                    return component.get(valueConfig.substring(2, valueConfig.length - 1));
+                // By Reference
+                case '!':
+                    var isGlobal=valueConfig.charAt(2)==='$';
+                    if(!isGlobal&&$A.util.isComponent(component)){
+                        return component.getReference(valueConfig);
+                    }
+                    //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
+                    valueConfig = valueConfig.substring(2, valueConfig.length - 1);
+                    return new PropertyReferenceValue(valueConfig.split("."), isGlobal?$A:component);
             }
         }
         return valueConfig;

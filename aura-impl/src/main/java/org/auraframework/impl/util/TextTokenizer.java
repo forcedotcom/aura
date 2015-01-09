@@ -48,7 +48,7 @@ import com.google.common.collect.Sets;
  * the appropriate types of ComponentDefRefs or Strings
  */
 public class TextTokenizer implements Iterable<TextTokenizer.Token> {
-    public static final String BEGIN = "{!";
+    public static final String BEGIN = "{(!|#)";
     public static final String END = "}";
 
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile("(\\" + BEGIN + "[^}]+?\\" + END + ")",
@@ -67,8 +67,8 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     
     public static enum TokenType {
-        PLAINTEXT(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)), EXPRESSION(DefDescriptorImpl
-                .getInstance("aura:expression", ComponentDef.class));
+        PLAINTEXT(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)),
+        EXPRESSION(DefDescriptorImpl.getInstance("aura:expression", ComponentDef.class));
 
         private final DefDescriptor<ComponentDef> componentDefDescriptor;
 
@@ -213,7 +213,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     public static String unwrap(String value) {
         Matcher matcher = EXPRESSION_UNWRAPPING_PATTERN.matcher(value);
         if (matcher.find()) {
-            return matcher.group(1);
+            return matcher.group(2);
         } else {
             return value;
         }
@@ -254,6 +254,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
             	propRefs = Sets.newHashSetWithExpectedSize(2);
                 Expression e = AuraImpl.getExpressionAdapter().buildExpression(unwrap(raw), location);
                 e.gatherPropertyReferences(propRefs);
+                e.setByValue(raw.charAt(1)=='#');
                 result = e;
             } else {
                 // Let's see if we can find any "naked" $Label.section.name references in the plain text

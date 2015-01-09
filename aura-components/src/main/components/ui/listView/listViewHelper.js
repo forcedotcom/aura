@@ -574,7 +574,7 @@
 	},
 
 	getExpression : function(value) {
-		var isExpression = value && aura.util.isString(value) && value.indexOf("{#") == 0 && value.lastIndexOf("}") == value.length - 1;
+		var isExpression = value && aura.util.isString(value) && value.indexOf("{"+"#") == 0 && value.lastIndexOf("}") == value.length - 1;
 		if (isExpression) {
 			return value.substring(2, value.length - 1);
 		}

@@ -22,8 +22,9 @@
 function FunctionCallValue(config, valueProvider){
     this.func = expressionFunctions[config["key"]];
     this.valueProvider=valueProvider;
+    this.byValue = config["byValue"];
     if (!this.func) {
-        throw new Error("couldn't find function from key: " + config["key"]);
+        throw new Error("FunctionCallValue.ctor(): Unknown function '" + config["key"]+'.');
     }
     this.args = [];
     for (var i = 0; i < config["args"].length; i++) {

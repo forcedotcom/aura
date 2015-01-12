@@ -96,6 +96,17 @@
         } ]
     },
 
+    textForName : function(cmp, name) {
+        var subcmp = cmp.find(name);
+        if(!subcmp) {
+            subcmp = cmp.getSuper().find(name);
+        }
+        if(!subcmp) {
+            return null;
+        }
+        return $A.test.getText(subcmp.getElement());
+    },
+
     /**
      * Verify Action.setStorable() and auto refresh setStorage() accepts
      * configuration. These configuration are helpful for follow up actions but
@@ -104,21 +115,133 @@
      * {ignoreExisting: "Ignore existing stored response, but cache my response
      * after the action is complete" "refresh": "Time in seconds to override
      * action's current storage expiration"}
+     *
+     * We crank up the default refresh and expiration to make them irrelevant here.
      */
-    /* W-2398464 */
-    _testSetStorableAPI : {
+    testSetStorableAPI : {
         attributes : {
-            defaultExpiration : "60",
-            defaultAutoRefreshInterval : "60"
+            defaultExpiration : "600",
+            defaultAutoRefreshInterval : "600"
         },
         test : [ function(cmp) {
-            cmp.getDef().getHelper().testSetStorableAPIStage1.call(this, cmp);
+            //
+            // Reset everything.
+            //
+            $A.test.setTestTimeout(30000);
+            this.resetCounter(cmp, "testSetStorableAPI");
         }, function(cmp) {
-            cmp.getDef().getHelper().testSetStorableAPIStage2.call(this, cmp);
+            //
+            // Run a single 'fetch', and store the result. This should never run from
+            // storage, and should always give a zero response.
+            //
+            $A.test.setTestTimeout(30000);
+            var a = cmp.get("c.fetchDataRecord");
+            a.setParams({testName : "testSetStorableAPI"});
+            a.setStorable();
+            $A.test.enqueueAction(a);
+            $A.test.addWaitFor("SUCCESS", 
+                function(){return a.getState()},
+                function(){
+                    $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
+                    $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
+                    //Set response stored time
+                    cmp._requestStoredTime = new Date().getTime();
+                });
         }, function(cmp) {
-            cmp.getDef().getHelper().testSetStorableAPIStage3.call(this, cmp);
+            //
+            // Now, go and get it again, we should always get a response from storage, and we should never
+            // cause a refresh.
+            //
+            $A.test.setTestTimeout(30000);
+            var aSecond = cmp.get("c.fetchDataRecord");
+            var that = this;
+            aSecond.setParams({testName : "testSetStorableAPI"});
+            aSecond.setStorable();
+            $A.test.enqueueAction(aSecond);
+            $A.test.addWaitFor("SUCCESS", 
+                function(){return aSecond.getState()},
+                function(){
+                    $A.test.assertEquals(0, aSecond.getReturnValue().Counter, "aSecond response invalid.");
+                    $A.test.assertEquals("", that.textForName(cmp, "refreshBegin"),
+                            "refreshBegin fired unexpectedly");
+                    $A.test.assertEquals("", that.textForName(cmp, "refreshEnd"),
+                            "refreshEnd fired unexpectedly");
+                });
         }, function(cmp) {
-            cmp.getDef().getHelper().testSetStorableAPIStage4.call(this, cmp);
+            //
+            // Now that we have tested a stored response, make sure that refresh still has not fired,
+            // and go ahead and put in a blocking request, followed by a request for the data record.
+            // This should give us an immediate callback for the stored response, along with a refresh
+            // event, followed by a wait.
+            //
+            // Once we get the refresh event, we send a resume to the server, ensuring that we unblock
+            // the server.
+            //
+            var that = this;
+            $A.test.setTestTimeout(30000);
+            $A.test.assertEquals("", this.textForName(cmp, "refreshBegin"),
+                    "refreshBegin fired unexpectedly");
+            $A.test.assertEquals("", this.textForName(cmp, "refreshEnd"),
+                    "refreshEnd fired unexpectedly");
+            var block = cmp.get("c.block");
+            var that = this;
+            var refreshState = "none";
+            block.setParams({testName : "testSetStorableAPI"});
+            $A.test.callServerAction(block, true);
+            var requestTime;
+            //Wait till the block action is executed
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function(){
+                    var aThird = cmp.get("c.fetchDataRecord");
+                    aThird.setParams({testName : "testSetStorableAPI"});
+                    //Keeping the auto refresh time to 0, helps testing the override
+                    aThird.setStorable({"refresh": 0});
+                    requestTime = new Date().getTime();
+                    $A.test.enqueueAction(aThird);
+                    $A.test.addWaitFor("SUCCESS", 
+                        function(){return aThird.getState()},
+                        function(){
+                            $A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
+                        });
+                });
+            //Verify that refreshBegin was fired
+            $A.test.addWaitFor("refreshBegin", function(){ return that.textForName(cmp, "refreshBegin"); },
+                function(){
+                    var refreshTime = new Date().getTime();
+                    //Verify that the refresh begin event kicked off
+                    $A.test.assertEquals(refreshState, "none");
+                    refreshState = "start";
+                    $A.test.assertTrue((refreshTime-requestTime)< 6000,
+                        "Expected refresh within 5 seconds, got "+((refreshTime-requestTime)/1000) );
+                    //resume controller only after refreshBegin
+                    var resume = cmp.get("c.resume");
+                    resume.setParams({testName : "testSetStorableAPI"});
+                    $A.test.callServerAction(resume, true);
+                });
+            //Verify that refreshEnd was fired
+            $A.test.addWaitFor("refreshEnd", function(){ return that.textForName(cmp, "refreshEnd"); },
+                function(){
+                    $A.test.assertEquals(refreshState, "start");
+                    refreshState = "end";
+                });
+        }, function(cmp) {
+            $A.test.setTestTimeout(30000);
+            var aFourth = cmp.get("c.fetchDataRecord");
+            aFourth.setParams({testName : "testSetStorableAPI"});
+            aFourth.setStorable();
+            $A.test.enqueueAction(aFourth);
+            $A.test.addWaitForWithFailureMessage(
+                "SUCCESS",
+                function(){return aFourth.getState()},
+                "Expected action to become SUCCESSful.",
+                function(){
+                    $A.test.assertTrue(aFourth.isFromStorage(), "aFourth should have been from storage");
+                }
+            );
+            // Storage is asynchronous; therefore, the Action may be SUCCESS before the value is stored.
+            $A.test.addWaitForWithFailureMessage(1,
+                    function() { return aFourth.getReturnValue().Counter; },
+                    "aFourth should have fetched a refreshed response.");
         } ]
     },
 
@@ -655,11 +778,11 @@
                                 "The converse is not true. Abortable does not mean its storable.")
                 abortable2.setStorable();
 
-                // Why does abortable work only in another action's
-                // callback? Gerald?
+                // Why does abortable work only in another action's callback? Gerald?
+                // Gordon Answers: Abortable only works for currently enqueued actions.
                 var a = cmp.get("c.fetchDataRecord");
                 a.setParams({
-                        testName : "testSetStorableAPI"
+                        testName : "testAbortableAction"
                     });
                 $A.test.enqueueAction(a);
                 $A.test.runAfterIf(function() { return "SUCCESS" === a.getState(); }, function() {
@@ -894,7 +1017,7 @@
             defaultAutoRefreshInterval : 0 // refresh every action
         },
         test : [function(cmp) {
-        	$A.test.setTestTimeout(30000);
+            $A.test.setTestTimeout(30000);
             cmp._testName = "testDontSkipReplayOnNonIdenticalComponentsInRefresh";
             this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalComponentsInRefresh");
             $A.test.addWaitFor(false, $A.test.isActionPending);

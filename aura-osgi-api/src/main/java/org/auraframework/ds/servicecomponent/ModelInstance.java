@@ -16,9 +16,8 @@
 package org.auraframework.ds.servicecomponent;
 
 /**
- * DS ServiceComponent Model marker interface
+ * DS ServiceComponent ModelInstance marker interface
  */
-@Deprecated
-public interface Model {
+public interface ModelInstance {
 
 }

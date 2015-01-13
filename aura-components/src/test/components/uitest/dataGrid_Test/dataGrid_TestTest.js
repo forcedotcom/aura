@@ -1,4 +1,5 @@
 ({
+    browsers         : ["-IE7","-IE8"],
     ADD_ROW_ARRAY    : ["Spidey", "Peter Parker", "Media Inc", "2020-10-12"],
     BASIC_ROW_ARRAY  : ["Foo", "John Doe", "Acme", "2014-01-01"],
     INSERT_ROW_ARRAY : ["Bar", "New John", "SFDC", "2014-11-11"],

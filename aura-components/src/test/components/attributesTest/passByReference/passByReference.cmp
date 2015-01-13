@@ -16,6 +16,7 @@
 
 -->
 <aura:component>
+    <aura:attribute name="stringByReference" default="default string" type="String"/>
     <aura:attribute name="intByReference" default="2007" type="Integer"/>
     <aura:attribute name="listByReference" default="[]" type="List" />
     <aura:attribute name="mapByReference" default="{}" type="Map" />
@@ -53,6 +54,9 @@
     <attributesTest:passByReferenceInner aura:id="innerCmp" intAttribute="{!v.intByReference}" listAttribute="{!v.listByReference}" mapAttribute="{!v.mapByReference}" objectAttribute="{!v.objectWithList}"/>
 
     <div aura:id="createdCmp" /><br/>
+    
+    Outer component FunctionCall :
+    <div aura:id="functionCallOutput">{!v.stringByReference+' FCV CONCAT'}</div><br/>
     
     Outer component Integer attribute output:
     <div aura:id="intOutput">

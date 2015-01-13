@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Indicates that we should clean up the validation error(s) on a component.">
+<aura:event access="GLOBAL" support="GA" type="COMPONENT" description="Indicates that we should clean up the validation error(s) on a component.">
 </aura:event>

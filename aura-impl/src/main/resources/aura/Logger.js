@@ -262,9 +262,9 @@ $A.ns.Logger.prototype.unsubscribe = function(level, callback) {
             var sub = this.subscribers[i];
             if (sub.level === level && sub.fn === callback) {
                 this.subscribers.splice(i, 1);
+                this.adjustSubscriptions(level, -1);
             }
         }
-        this.adjustSubscriptions(level, -1);
     }
 };
 

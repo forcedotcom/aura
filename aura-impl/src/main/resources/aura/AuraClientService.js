@@ -158,6 +158,8 @@ var AuraClientService = function() {
 
             priv.initDefsObservers = [];
 
+            $A.log("initDefs complete");
+
             // Use the non-existence of initDefs() as the sentinel indicating that defs are good to go
             delete this.initDefs;
         },

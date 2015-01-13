@@ -1,0 +1,66 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <!-- initValue doesn't work as init() on controller is too late for this -->
+    <aura:attribute name="initValue" type="String"/>
+    <div aura:id="PV_initContainer">{#v.initValue}</div>
+    
+    <aura:attribute name="booleanValue" type="Boolean" default="true"/>
+    <div aura:id="PV_booleanContainer">{#v.booleanValue}</div>
+    
+    <aura:attribute name="numberValue" type="Double" default="7357"/>
+    <div aura:id="PV_numberContainer">{#v.numberValue}</div>
+    
+    <aura:attribute name="stringValue" type="String" default="default string value"/>
+    <div aura:id="PV_stringContainer">{#v.stringValue}</div>
+    <div aura:id="PV_fcvContainer">{#v.stringValue+' FCV CONCAT'}</div>
+    
+    <aura:attribute name="listValue" type="List" default="purple,blue,green"/>
+    <div aura:id="PV_listContainer">
+        <aura:iteration aura:id="box" items="{#v.listValue}" var="message" indexVar="index">
+                {!index}:{!message}<br />
+        </aura:iteration>
+    </div>
+    
+    <!-- map doesn't work as we don't have a way to defined it with default value, what we put in init() is too late for this -->
+    <aura:attribute name="mapValue" type="Map" default="{}"/>
+    <div aura:id="PV_mapContainer">{#v.mapValue.key1}</div>
+    
+    <aura:attribute name="pairAttr" type="java://org.auraframework.util.type.CustomPairType" default="HouseNo$300"/>
+    <div aura:id="PV_customAttributeContainer">{#v.pairAttr.strMember}:{#v.pairAttr.intMember}</div>
+    
+    <br/> pass value to inner component:<br/>
+    <div aura:id="PV_innerCmpContainer">
+        <attributesTest:passByValueInner aura:id="innerCmp" stringValue="{#v.stringValue}" 
+        booleanValue="{#v.booleanValue}" numberValue="{#v.numberValue}" listValue="{#v.listValue}" 
+        mapValue="{#v.mapValue}" pairAttr="{#v.pairAttr}"/>
+    </div>
+    
+    <!--
+    
+    <aura:attribute name="mapValue" type="Map" default="{}"/>
+    <aura:attribute name="objectValue" type="Object" />
+    
+    <div aura:id="PV_objectContainer">{#v.objectValue}</div>
+    -->
+    <br/>
+
+    <ui:button aura:id="changeButton" label="Change Properties" press="{!c.changeProperties}"></ui:button>
+</aura:component>

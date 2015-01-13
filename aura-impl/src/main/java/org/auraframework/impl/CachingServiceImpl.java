@@ -54,7 +54,7 @@ public class CachingServiceImpl implements CachingService {
     private final static int DEPENDENCY_CACHE_SIZE = 1024;
 
     /** Default size of descriptor filter caches, in number of entries */
-    private final static int FILTER_CACHE_SIZE = 2048;
+    private final static int FILTER_CACHE_SIZE = 4096;
 
     /** Default size of string caches, in number of entries */
     private final static int STRING_CACHE_SIZE = 100;

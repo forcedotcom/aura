@@ -267,7 +267,7 @@ public class ServerServiceImpl implements ServerService {
         if (cached == null) {
 
             StringBuilder sb = new StringBuilder();
-
+            sb.append("$A.mark(\"app.js parse\");\n");
             sb.append("$A.clientService.initDefs({");
 
             // append component definitions
@@ -299,7 +299,7 @@ public class ServerServiceImpl implements ServerService {
             Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
 
             sb.append("});");
-
+            sb.append("\n$A.endMark(\"app.js parse\");");
             cached = sb.toString();
             // only use closure compiler in prod mode, due to compile cost
             if (minify) {

@@ -637,11 +637,32 @@ $A.ns.Util.prototype.urlDecode = function(url){
 /**
  * Trims a string by removing newlines, spaces, and tabs from the beginning and end of the string.
  *
- * @param {String} st The string to be trimmed.
+ * @param {String} value The string to be trimmed.
  * @returns {String}
  */
-$A.ns.Util.prototype.trim = function(st){
-    return (st || "").replace(/^\s+|\s+$/g, '');
+$A.ns.Util.prototype.trim = function(value){
+    return (value || "").replace(/^\s+|\s+$/g, '');
+};
+
+/**
+ * Formats an arbitrary number of arguments into a string by replacing {0}, {1}, ... {n} with the corresponding argument supplied after 'formatString'.
+ *
+ * @param {String} formatString The string to be formatted.
+ * @param {String} arg1...argN The list of arguments to splice into formatString.
+ * @returns {String}
+ */
+$A.ns.Util.prototype.format=function(formatString,arg1,arg2,argN){
+    $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
+    var formatArguments=Array.prototype.slice.call(arguments,1);
+    return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index,position){
+        if(formatArguments[index]==undefined){
+            //#if {"modes" : ["PRODUCTION"]}
+            match='';
+            //#end
+            return match;
+        }
+        return formatArguments[index]+'';
+    });
 };
 
 /**

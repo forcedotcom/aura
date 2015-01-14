@@ -44,6 +44,7 @@ p["attachToDocumentBody"] = p.attachToDocumentBody;
 p["stringEndsWith"] = p.stringEndsWith;
 p["urlDecode"] = p.urlDecode;
 p["trim"] = p.trim;
+p["format"] = p.format;
 p["truncate"] = p.truncate;
 p["on"] = p.on;
 p["removeOn"] = p.removeOn;

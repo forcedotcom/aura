@@ -1717,6 +1717,7 @@ Test.Aura.Controller.ActionTest = function() {
             var expectedEncode = "encodedString";
             var expectedDescriptor = "expectedDescriptor";
             var expected = expectedDescriptor + ":" + expectedEncode;
+            var actual=null;
             var mockContext = Mocks.GetMock(Object.Global(), "$A", {
                 util : {
                     json : {

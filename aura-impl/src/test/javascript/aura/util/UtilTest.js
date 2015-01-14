@@ -27,7 +27,7 @@ Test.Aura.UtilTest=function(){
             Style:function() {},
             Bitset:{},
             NumberFormat:{},
-            $A:{ns:{}},
+            $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
             navigator:{userAgent:''}
         })(function(){
             // #import aura.util.Util
@@ -363,9 +363,94 @@ Test.Aura.UtilTest=function(){
     }
 
     [Fixture]
+    function format(){
+        [Fact]
+        function ThrowsIfFormatStringIsNotConvertibleToString(){
+            var expected="$A.util.format(): 'formatString' must be convertible to String.";
+
+            var actual=Record.Exception(function(){
+                auraMock(function(){
+                    targetUtil.format(null);
+                });
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function FormatsPrimitivesIntoString(){
+            var target="Boolean: {0}, Number:{1}, String:{2}";
+            var expected="Boolean: true, Number:7357, String:test";
+            var actual=null;
+
+            auraMock(function(){
+                actual=targetUtil.format(target,true,7357,"test");
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function FormatsObjectIntoString(){
+            var expected="Object: [object Object]";
+            var actual=null;
+            var target="Object: {0}";
+
+            auraMock(function(){
+               actual=targetUtil.format(target,{});
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function FormatsArrayIntoString(){
+            var expected="Array: this,is,an,array,test";
+            var actual=null;
+            var target="Array: {0}";
+
+            auraMock(function(){
+                actual=targetUtil.format(target,["this","is","an","array","test"]);
+            });
+
+            Assert.Equal(expected,actual);
+
+        }
+
+        [Fact]
+        function FormatsObjectUsingCustomToString(){
+            var expected="Object: Custom toString. Value is: TEST";
+            var actual=null;
+            var targetString="Object: {0}";
+            var targetObject={value:"TEST"};
+            targetObject.toString=function(){
+                return "Custom toString. Value is: "+this.value;
+            };
+
+            auraMock(function(){
+                actual=targetUtil.format(targetString,targetObject);
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function IgnoresTokensWithNullOrUndefinedParameters(){
+            var expected="Format String: {0} test {2} {3}";
+            var target="Format String: {0} {1} {2} {3}";
+            var actual=null;
+
+            auraMock(function(){
+                actual=targetUtil.apply(expected,undefined,"test",null);
+            });
+
+            Assert.Equal(expected,actual);}
+    }
+
+    [Fixture]
     function apply() {
         [Fact]
-        function testForceFalseDeepFalse() {
+        function CopiesTopLevelMembersWithoutOverridingExistingValues() {
             auraMock(function() {
 
                 // Arrange
@@ -383,7 +468,7 @@ Test.Aura.UtilTest=function(){
         }
 
         [Fact]
-        function testForceTrueDeepFalse() {
+        function CopiesTopLevelMembersAndOverridesExistingValues() {
             auraMock(function() {
 
                 // Arrange
@@ -401,7 +486,7 @@ Test.Aura.UtilTest=function(){
         }
 
         [Fact]
-        function testForceFalseDeepTrue() {
+        function DeepCopiesMembersWithoutOverridingExistingValues() {
             auraMock(function() {
                 // Arrange
                 var util = new $A.ns.Util(),
@@ -419,7 +504,7 @@ Test.Aura.UtilTest=function(){
 
 
         [Fact]
-        function testForceTrueDeepTrue() {
+        function DeepCopiesMembersAndOverridesExistingValues() {
             auraMock(function() {
                 // Arrange
                 var util = new $A.ns.Util(),

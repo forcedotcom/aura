@@ -458,12 +458,13 @@ AttributeSet.prototype.getErrors = function(expression) {
 };
 
 AttributeSet.prototype.callOnExpression = function(callback, componentCallback, passthroughCallback, expression, options) {
+    var path;
     var value;
 
     if (expression.indexOf('.') < 0) {
         value = this.values[expression];
     } else {
-        var path = expression.split('.');
+        path = expression.split('.');
         value = this.values;
         while (!$A.util.isUndefinedOrNull(value) && path.length) {
             var segment = path.shift();
@@ -478,6 +479,9 @@ AttributeSet.prototype.callOnExpression = function(callback, componentCallback, 
     if (value instanceof PropertyReferenceValue) {
         var valueProvider = value.valueProvider;
         expression = value.expression;
+        if (path && path.length) {
+            expression += "." + path.join(".");
+        }
         while(valueProvider instanceof PassthroughValue && valueProvider.hasExpression(expression)){
             expression = valueProvider.getExpression(expression);
             valueProvider=valueProvider.getComponent();

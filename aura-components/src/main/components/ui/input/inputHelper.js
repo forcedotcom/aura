@@ -149,6 +149,10 @@
      * Dismiss the error messages and restore the component to the normal state.
      */
     validate : function(component) {
+        var concreteCmp = component.getConcreteComponent();
+        var concreteHelper = concreteCmp.getDef().getHelper();
+        concreteHelper.updateErrorElement(component);
+
         var errorCmp = component.get("v.errorComponent")[0];
 
         // Remove errors
@@ -161,17 +165,21 @@
      * Show up the the error messages and put the component in the error state.
      */
     invalidate : function(component) {
-        //var inputEl = this.getInputElement(component);
-        var m = [];
+        var concreteCmp = component.getConcreteComponent();
+        var concreteHelper = concreteCmp.getDef().getHelper();
+        concreteHelper.updateErrorElement(component);
+
         var valueErr = component.getErrors("v.value");
 
         if (!$A.util.isArray(valueErr)) {
             return;
         }
 
+        var m = [];
         for (var i = 0; i < valueErr.length; i++) {
             m.push(valueErr[i].message);
         }
+
         // Update error component
         var errorCmp = component.get("v.errorComponent")[0];
         if (errorCmp) {

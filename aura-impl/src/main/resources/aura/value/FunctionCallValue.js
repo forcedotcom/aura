@@ -74,6 +74,9 @@ FunctionCallValue.prototype.evaluate = function(valueProvider){
 };
 
 FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
+    if(this.byValue){
+        return;
+    }
     if(!fcv){
         fcv=this;
     }
@@ -101,6 +104,9 @@ FunctionCallValue.prototype.getChangeHandler=function(cmp, key, fcv) {
 };
 
 FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
+    if(this.byValue){
+        return;
+    }
     for (var i = 0; i < this.args.length; i++) {
         var arg = this.args[i];
         if (aura.util.isExpression(arg)) {

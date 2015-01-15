@@ -16,6 +16,13 @@
 
 -->
 <aura:component>
+    <aura:dependency resource="auratest:renderEvent" type="EVENT"/>
+    <br/>Inner Component<br/>
+    <aura:attribute default="0" type="Integer" name="renderCount"></aura:attribute>
+    <aura:attribute default="0" type="Integer" name="rerenderCount"></aura:attribute>
+    <li>render count: <span aura:id="renderCount">{!v.renderCount}</span></li>
+    <li>rerender count: <span aura:id="rerenderCount">{!v.rerenderCount}</span></li>
+
     <aura:attribute name="booleanValue" type="Boolean"/>
     <div aura:id="PV_booleanContainer">{!v.booleanValue}</div>
     
@@ -25,22 +32,23 @@
     <aura:attribute name="stringValue" type="String"/>
     <div aura:id="PV_stringContainer">{!v.stringValue}</div>
     <div aura:id="PV_fcvContainer">{!v.stringValue+' FCV CONCAT'}</div>
+    <br/>
     
     <aura:attribute name="listValue" type="List"/>
     <div aura:id="PV_listContainer">
         <aura:iteration aura:id="box" items="{!v.listValue}" var="message" indexVar="index">
-                {!index}:{!message}<br />
+                {!index}:{!message}<br/>
         </aura:iteration>
     </div>
+    <br/>
     
-    <!-- map doesn't work -->
     <aura:attribute name="mapValue" type="Map"/>
-    {!v.mapValue.key1}
+    <div aura:id="PV_mapContainer">{#v.mapValue.whatever}</div>
+    <br/>
     
     <aura:attribute name="pairAttr" type="java://org.auraframework.util.type.CustomPairType"/>
     <div aura:id="PV_customAttributeContainer">
         {!v.pairAttr.strMember}:{!v.pairAttr.intMember}
     </div>
 
-    
 </aura:component>

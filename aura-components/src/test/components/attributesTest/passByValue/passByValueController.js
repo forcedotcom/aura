@@ -15,9 +15,10 @@
  */
 ({
     init:function(component){
+    	//setting value here won't make into markup where it reference the value with #.
         component.set("v.initValue","value from init method");
-        var mp = {"key1":1, "key2":2};
-        component.set("v.mapValue", mp);
+        //var mp = component.get("v.mapValue");
+        //component.set("v.mapValue", mp);
     },
 
     changeProperties:function(component){
@@ -25,5 +26,9 @@
         component.set("v.booleanValue",false);
         component.set("v.numberValue","8335");
         component.set("v.stringValue","CHANGED string value");
+    },
+    
+    handleMapValueChangeEvent: function(component) {
+    	component.set("v.changeEventTriggered", true);
     }
 })

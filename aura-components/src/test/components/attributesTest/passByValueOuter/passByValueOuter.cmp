@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestIterationModel">
-    <attributesTest:passByValue aura:id="passByValueCmp" mapValue="{!m.data[0]}" />
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <attributesTest:passByValue aura:id="passByValueCmp" mapValue="{!m.map}" />
 </aura:component>

@@ -37,20 +37,20 @@ var valueFactory = {
                 valueConfig=childConfig;
             }
         } else if (aura.util.isString(valueConfig) && valueConfig.charAt(0)==='{' && component) {
+            var expression=valueConfig.substring(2, valueConfig.length - 1);
+            var isGlobal=expression.charAt(0)==='$';
             // Property Expressions:
             switch(valueConfig.charAt(1)){
                 // By Value
                 case '#':
-                    return component.get(valueConfig.substring(2, valueConfig.length - 1));
+                    return (isGlobal?$A:component).get(expression);
                 // By Reference
                 case '!':
-                    var isGlobal=valueConfig.charAt(2)==='$';
+                    //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
                     if(!isGlobal&&$A.util.isComponent(component)){
                         return component.getReference(valueConfig);
                     }
-                    //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                    valueConfig = valueConfig.substring(2, valueConfig.length - 1);
-                    return new PropertyReferenceValue(valueConfig.split("."), isGlobal?$A:component);
+                    return new PropertyReferenceValue(expression.split("."), isGlobal?$A:component);
             }
         }
         return valueConfig;

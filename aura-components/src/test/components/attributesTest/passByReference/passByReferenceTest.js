@@ -20,14 +20,14 @@
             $A.test.assertEquals(2007, cmp.find("innerCmp").get("v.intAttribute"));
             $A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("intOutput")));
             $A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("innerCmp").find("intOutput")));
-        }, function(cmp){
+
             $A.test.clickOrTouch(cmp.find("changeIntOuterButton").getElement());
         }, function(cmp){
             $A.test.assertEquals(9999, cmp.get("v.intByReference"));
             $A.test.assertEquals(9999, cmp.find("innerCmp").get("v.intAttribute"));
             $A.test.assertEquals("9999", this.getTextNoWhitespaces(cmp.find("intOutput")));
             $A.test.assertEquals("9999", this.getTextNoWhitespaces(cmp.find("innerCmp").find("intOutput")));
-        }, function(cmp){
+
             $A.test.clickOrTouch(cmp.find("changeIntFacetButton").getElement());
         }, function(cmp){
             $A.test.assertEquals(5565, cmp.get("v.intByReference"));
@@ -422,24 +422,23 @@
     // TODO: W-2406307: remaining Halo test failure
     _testIterationListInsideMap: {
         test: [function(cmp) {
-
             $A.test.assertEquals("FirstSecondThird", this.getTextNoWhitespaces(cmp.find("iterOutput")));
             $A.test.assertEquals("FirstSecondThird", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
-        }, function(cmp){
+
             var list = cmp.get("v.objectWithList.listEntry");
             list[1] = "New!";
             cmp.set("v.objectWithList.listEntry", list);
         }, function(cmp){
             $A.test.assertEquals("FirstNew!Third", this.getTextNoWhitespaces(cmp.find("iterOutput")));
             $A.test.assertEquals("FirstNew!Third", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
-        }, function(cmp){
+
             var facetList = cmp.find("innerCmp").get("v.objectAttribute.listEntry");
             facetList[1] = "Again!";
             cmp.find("innerCmp").set("v.objectAttribute.listEntry", facetList);
         }, function(cmp){
             $A.test.assertEquals("FirstAgain!Third", this.getTextNoWhitespaces(cmp.find("iterOutput")));
             $A.test.assertEquals("FirstAgain!Third", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
-        }, function(cmp){
+
             // Shift elements to right, adding new element to 0 index and removing last element
             var list = cmp.get("v.objectWithList.listEntry");
             list.unshift("Zero");
@@ -448,7 +447,7 @@
         }, function(cmp){
             $A.test.assertEquals("ZeroFirstAgain!", this.getTextNoWhitespaces(cmp.find("iterOutput")));
             $A.test.assertEquals("ZeroFirstAgain!", this.getTextNoWhitespaces(cmp.find("innerCmp").find("iterOutput")));
-        }, function(cmp){
+
             // Remove last element in list, verify output updated
             var list = cmp.get("v.objectWithList.listEntry");
             list.splice(list.length - 1, 1);
@@ -459,24 +458,103 @@
         }]
     },
 
-    testClientSideComponentCreation: {
+    /**
+     * Dynamically create a component, passing the attributes to the new component by value and verify changing the
+     * parent and child attributes do not affect each other.
+     */
+    testClientSideComponentCreation_byValue: {
         test: [function(cmp) {
-            $A.test.clickOrTouch(cmp.find("createCmpButton").getElement());
-            
+            $A.test.clickOrTouch(cmp.find("createCmpByValueButton").getElement());
         }, function(cmp){
-        	$A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("createdCmp")));
+            var createdCmp = cmp.find("createdCmp").get("v.body.0");
+            var initialList = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c'];
+            var initialMap = {
+                    layer1: "initial1",
+                    oneDeeper: {
+                        layer2: "initial2",
+                        evenOneDeeper: {
+                            layer3: "initial3"
+                        }
+                    }
+                };
+            // Verify initial values
+            $A.test.assertEquals(2007, createdCmp.get("v.intAttribute"));
+            this.assertListItems(initialList, createdCmp.get("v.listAttribute"));
+            this.assertMapItems(initialMap, createdCmp.get("v.mapAttribute"));
+
+            // Change parent component attribute, verify does not change client-created cmp
+            cmp.set("v.intByReference", 9999);
+            cmp.set("v.listByReference", ['one', 'two']);
+            cmp.set("v.mapByReference", { layer1: "hi", layer1b: "bye"});
         }, function(cmp){
-            // Change outer component attribute, verify does not change client-created cmp
-            $A.test.clickOrTouch(cmp.find("changeIntOuterButton").getElement());           
+            var createdCmp = cmp.find("createdCmp").get("v.body.0");
+            var initialList = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c'];
+            var initialMap = {
+                    layer1: "initial1",
+                    oneDeeper: {
+                        layer2: "initial2",
+                        evenOneDeeper: {
+                            layer3: "initial3"
+                        }
+                    }
+                };
+            $A.test.assertEquals(2007, createdCmp.get("v.intAttribute"));
+            this.assertListItems(initialList, createdCmp.get("v.listAttribute"));
+            this.assertMapItems(initialMap, createdCmp.get("v.mapAttribute"));
+
+            // Change attribute on created component, verify does not change parent component
+            createdCmp.set("v.intAttribute", 1111);
+            createdCmp.set("v.listAttribute", ['three', 'four']);
+            createdCmp.set("v.mapAttribute", { layer2: "roy", layer2b: "rogers" });
         }, function(cmp){
-        	$A.test.assertEquals("2007", this.getTextNoWhitespaces(cmp.find("createdCmp")));
             $A.test.assertEquals(9999, cmp.get("v.intByReference"));
+            this.assertListItems(['one', 'two'], cmp.get("v.listByReference"));
+            this.assertMapItems({ layer1: "hi", layer1b: "bye"}, cmp.get("v.mapByReference"));
+        }]
+    },
+
+    /**
+     * Dynamically create a component, passing the attribute to the new component by reference and verify changing the
+     * parent attribute also changes the child and vice versa.
+     */
+    testClientSideComponentCreation_byReference: {
+        test: [function(cmp) {
+            $A.test.clickOrTouch(cmp.find("createCmpByReferenceButton").getElement());
         }, function(cmp){
-            // Change attribute on created component, verify does not change outer component
-            $A.test.clickOrTouch(cmp.find("changeIntCsccButton").getElement());
+            var createdCmp = cmp.find("createdCmp").get("v.body.0");
+            var initialList = ['level1a', 'level1b', ['level2a', ['level3a'], 'level2b'], 'level1c'];
+            var initialMap = {
+                    layer1: "initial1",
+                    oneDeeper: {
+                        layer2: "initial2",
+                        evenOneDeeper: {
+                            layer3: "initial3"
+                        }
+                    }
+                };
+            // Verify initial values
+            $A.test.assertEquals(2007, createdCmp.get("v.intAttribute"));
+            this.assertListItems(initialList, createdCmp.get("v.listAttribute"));
+            this.assertMapItems(initialMap, createdCmp.get("v.mapAttribute"));
+
+            // Change parent component attribute, verify *does* change client-created cmp
+            cmp.set("v.intByReference", 9999);
+            cmp.set("v.listByReference", ['one', 'two']);
+            cmp.set("v.mapByReference", { layer1: "hi", layer1b: "bye"});
         }, function(cmp){
-            $A.test.assertEquals("12345", this.getTextNoWhitespaces(cmp.find("createdCmp")));
-            $A.test.assertEquals(9999, cmp.get("v.intByReference"));
+            var createdCmp = cmp.find("createdCmp").get("v.body.0");
+            $A.test.assertEquals(9999, createdCmp.get("v.intAttribute"));
+            this.assertListItems(['one', 'two'], createdCmp.get("v.listAttribute"));
+            this.assertMapItems({ layer1: "hi", layer1b: "bye"}, createdCmp.get("v.mapAttribute"));
+
+            // Change attribute on created component, verify *does* change parent component
+            createdCmp.set("v.intAttribute", 1111);
+            createdCmp.set("v.listAttribute", ['three', 'four']);
+            createdCmp.set("v.mapAttribute", { layer2: "roy", layer2b: "rogers" });
+        }, function(cmp){
+            $A.test.assertEquals(1111, cmp.get("v.intByReference"));
+            this.assertListItems(['three', 'four'], cmp.get("v.listByReference"));
+            this.assertMapItems({ layer2: "roy", layer2b: "rogers" }, cmp.get("v.mapByReference"));
         }]
     },
 

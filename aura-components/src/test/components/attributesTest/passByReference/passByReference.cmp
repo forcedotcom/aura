@@ -48,7 +48,8 @@
     <ui:button label="Remove item from facet map" press="{!c.removeMapFacet}" aura:id="removeMapFacetButton" />
     <br/><br/>
 
-    <ui:button label="Create new component" press="{!c.createCmp}" aura:id="createCmpButton" />
+    <ui:button label="Create new component (by value)" press="{!c.createCmpByValue}" aura:id="createCmpByValueButton" />
+    <ui:button label="Create new component (by reference)" press="{!c.createCmpByReference}" aura:id="createCmpByReferenceButton" />
     <br/>
  
     <attributesTest:passByReferenceInner aura:id="innerCmp" intAttribute="{!v.intByReference}" listAttribute="{!v.listByReference}" mapAttribute="{!v.mapByReference}" objectAttribute="{!v.objectWithList}"/>

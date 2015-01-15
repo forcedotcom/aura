@@ -15,8 +15,8 @@
  */
 ({
 	/**
-	 * These tests are for passing object as value between components.
-	 * Note that we don't really have a way to put default value for custom objects (map included), 
+	 * These tests are for passing attribute object as value between components.
+	 * Note that we don't really have a way to put default value for objects (map included), 
 	 * init them in controller's init() does not work for #v.someObject.
 	 * 
 	 * passByValueOuter has passByValue in its markup. it pass m.data[0] as v.mapValue to passByValue.
@@ -27,23 +27,23 @@
 		test: [function(component) {
 			//check passByValue
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "Map value is not right in passByValueCmp");
+            $A.test.assertEquals("apple", actual, "markup is not right in passByValueCmp");
             //check passByValueInner
             var actual=component.find("passByValueCmp").find("innerCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "Map value is not right in innerCmp");
+            $A.test.assertEquals("apple", actual, "markup is not right in innerCmp");
 		}, function(component) {
 			//change model
-			var m = component.get("m.data")[0];
-			m.whatever = "hola";
+			var m = component.get("m.map");
+			m.fruit = "orange";
 		}, function(component) {
 			//markup doesn't change
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "mark up shouldn't change after updating model");
+            $A.test.assertEquals("apple", actual, "mark up shouldn't change after updating model");
             //v.mapValue in passByValueCmp get updated
-            $A.test.assertEquals("hola", component.find("passByValueCmp").get("v.mapValue").whatever, 
+            $A.test.assertEquals("orange", component.find("passByValueCmp").get("v.mapValue.fruit"), 
             		"v.mapValue in passByValueCmp should get updated after we change m.data");
             //so is v.mapValue in innerCmp
-            $A.test.assertEquals("hola", component.find("passByValueCmp").find("innerCmp").get("v.mapValue").whatever,
+            $A.test.assertEquals("orange", component.find("passByValueCmp").find("innerCmp").get("v.mapValue.fruit"),
             		"v.mapValue in innerCmp after should get updated after we update v.mapValue in passByValueCmp");
             //but change event didn't get triggered
             $A.test.assertEquals(false, component.find("passByValueCmp").get("v.changeEventTriggered"), 
@@ -58,23 +58,23 @@
 		test: [function(component) {
 			//check passByValue
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "Map value is not right in passByValueCmp");
+            $A.test.assertEquals("apple", actual, "markup is not right in passByValueCmp");
             //check passByValueInner
             var actual=component.find("passByValueCmp").find("innerCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "Map value is not right in innerCmp");
+            $A.test.assertEquals("apple", actual, "markup is not right in innerCmp");
 		}, function(component) {
 			//change v.mapValue in passByValueCmp
             var m1 = component.find("passByValueCmp").get("v.mapValue");
-            m1.whatever = "hola again";
+            m1.fruit = "orange";
 		}, function(component) {
 			//markup doesn't change
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "mark up shouldn't change after updating v.mapValue");
+            $A.test.assertEquals("apple", actual, "mark up shouldn't change after updating v.mapValue");
             //m.data should get updated
-            $A.test.assertEquals("hola again", component.get("m.data")[0].whatever, 
+            $A.test.assertEquals("orange", component.get("m.map.fruit"), 
             		"m.data should get updated after we update v.mapValue in passByValueCmp");
             //so is v.mapValue in innerCmp
-            $A.test.assertEquals("hola again", component.find("passByValueCmp").find("innerCmp").get("v.mapValue").whatever,
+            $A.test.assertEquals("orange", component.find("passByValueCmp").find("innerCmp").get("v.mapValue.fruit"),
             		"v.mapValue in innerCmp after we update v.mapValue in passByValueCmp");
             //but change event didn't get triggered
             $A.test.assertEquals(false, component.find("passByValueCmp").get("v.changeEventTriggered"), 
@@ -89,25 +89,25 @@
 		test: [function(component) {
 			//check passByValue
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "Map value is not right in passByValueCmp");
+            $A.test.assertEquals("apple", actual, "markup is not right in passByValueCmp");
             //check passByValueInner
             var actual=component.find("passByValueCmp").find("innerCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, "Map value is not right in innerCmp");
+            $A.test.assertEquals("apple", actual, "markup is not right in innerCmp");
 		}, function(component) {
             //change v.mapValue in innerCmp
             var m2 = component.find("passByValueCmp").find("innerCmp").get("v.mapValue");
-            m2.whatever = "hola the third time";
+            m2.fruit = "orange";
 		}, function(component) {
-			//markup doesn't change
+			//markup in innerCmp won't change as it's #v.mapValue
             var actual=component.find("passByValueCmp").find("innerCmp").find("PV_mapContainer").getElement().textContent;
-            $A.test.assertEquals("hooray for everybody", actual, 
-            		"Map value is not right in innerCmp after chaging v.mapValue in innerCmp");
+            $A.test.assertEquals("apple", actual, 
+            		"markup is not right in innerCmp after changing attribute in innerCmp");
             //m.data should get updated
-            $A.test.assertEquals("hola the third time", component.get("m.data")[0].whatever, 
+            $A.test.assertEquals("orange", component.get("m.map.fruit"), 
             		"m.data should get updated after chaging v.mapValue in innerCmp");
             //so is v.mapValue in passByValueCmp get updated
-            $A.test.assertEquals("hola the third time", component.find("passByValueCmp").get("v.mapValue").whatever, 
-            		"v.mapValue in passByValueCmp should get updated after we change m.data");
+            $A.test.assertEquals("orange", component.find("passByValueCmp").get("v.mapValue.fruit"), 
+            		"m.map in passByValueCmp should get updated after we change attribute in inner cmp");
             //but change event didn't get triggered
             $A.test.assertEquals(false, component.find("passByValueCmp").get("v.changeEventTriggered"), 
             		"shouldn't trigger change handler when updating model");

@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 ({
+	/**
+	 * This test cover pass by value on attribute value. #v.someValue
+	 * Type covered: String, Number, Boolean, Function Call, Custom Type, List, 
+	 * and all these type pass as value to another component
+	 * 
+	 */
 	_testInitStringValue: {
 		//this is not the way {#v.something} suppose to work. setting value in init() of controller is too late for it
 		test: [function(component) {

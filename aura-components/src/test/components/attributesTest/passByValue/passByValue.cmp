@@ -15,10 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
     <!-- initValue doesn't work as init() on controller is too late for this -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="initValue" type="String"/>
     <div aura:id="PV_initContainer">{#v.initValue}</div>
     
@@ -33,6 +32,11 @@
     <div aura:id="PV_fcvContainer">{#v.stringValue+' FCV CONCAT'}</div>
     <br/>
     
+    <!-- map value need to get init when we create this component, not in the js controller(that's too late), 
+    we do it in the outter component-->
+    <div aura:id="PV_mapFromModelContainer">{#v.map.fruit}</div>
+    
+    
     <aura:attribute name="listValue" type="List" default="purple,blue,green"/>
     <div aura:id="PV_listContainer">
         <aura:iteration aura:id="box" items="{#v.listValue}" var="message" indexVar="index">
@@ -46,7 +50,7 @@
     <aura:attribute name="mapValue" type="Map" default="{}"/>
     <aura:handler name="change" value="{!v.mapValue}" action="{!c.handleMapValueChangeEvent}"/>
     <aura:attribute name="changeEventTriggered" type="boolean" default="false"/>
-    <div aura:id="PV_mapContainer">{#v.mapValue.whatever}</div>
+    <div aura:id="PV_mapContainer">{#v.mapValue.fruit}</div>
     <div aura:id="PV_mapValueChangeEventTriggered">changeEventTriggered:{!v.changeEventTriggered}</div>
     <br/>
     
@@ -60,7 +64,6 @@
         booleanValue="{#v.booleanValue}" numberValue="{#v.numberValue}" listValue="{#v.listValue}" 
         mapValue="{#v.mapValue}" pairAttr="{#v.pairAttr}"/>
     </div>
-    
 
     <br/><ui:button aura:id="changeButton" label="Change Properties" press="{!c.changeProperties}"></ui:button>
 </aura:component>

@@ -54,7 +54,10 @@
         test:[ 
             function(cmp) {
                 //test loading script from same origin
-                $A.test.assertDefined(CodeMirror,"fail to load script from same origin : codemirror.js");
+            	$A.test.addWaitForWithFailureMessage (true,
+            			function() { return CodeMirror != undefined; },
+            			"fail to load script from same origin : codemirror.js"
+            			);
             },function(cmp){
                 //test loading script , with eval() on top level application
                 /*test loading script , with eval() on child cmp --  this doesn't work

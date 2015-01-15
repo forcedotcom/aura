@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+    pass by value from Model<br/>
+    <div aura:id="PV_booleanContainer">{#m.booleanFalse}</div>
+    <div aura:id="PV_numberContainer">{#m.double}</div>
+    <div aura:id="PV_stringContainer">{#m.string}</div>
+    <div aura:id="PV_fcvContainer">{#m.string+' FCV CONCAT'}</div>
+    <div aura:id="PV_listContainer">
+        <aura:iteration aura:id="box" items="{#m.stringList}" var="message" indexVar="index">
+                {!index}:{!message}<br />
+        </aura:iteration>
+    </div>
+    <div aura:id="PV_mapContainer">{#m.map.fruit}</div>
+    <br/>
+
+    <div aura:id="PV_innerCmpDataContainer">
+        <attributesTest:passByValueInner aura:id="innerCmp" stringValue="{#m.string}" 
+        booleanValue="{#m.booleanFalse}" numberValue="{#m.double}" listValue="{#m.stringList}" 
+        mapValue="{#m.map}"/>
+    </div>
+    
+
+    <br/><ui:button aura:id="changeButton" label="Change Properties" press="{!c.changeProperties}"></ui:button>
+</aura:component>

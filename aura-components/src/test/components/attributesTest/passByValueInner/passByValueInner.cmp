@@ -43,7 +43,7 @@
     <br/>
     
     <aura:attribute name="mapValue" type="Map"/>
-    <div aura:id="PV_mapContainer">{#v.mapValue.whatever}</div>
+    <div aura:id="PV_mapContainer">{#v.mapValue.fruit}</div>
     <br/>
     
     <aura:attribute name="pairAttr" type="java://org.auraframework.util.type.CustomPairType"/>

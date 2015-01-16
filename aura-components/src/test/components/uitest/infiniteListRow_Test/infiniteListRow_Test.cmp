@@ -38,5 +38,8 @@
 	</div>
 	<ui:button aura:id="btnShowMore" class="btnShowMore" label="show more" press="{!c.showMore}"/><br/>
 	<ui:button aura:id="btnRefresh" class="btnRefresh" label="refresh" press="{!c.refresh}"/>
-	
+	<br/>
+	<ui:outputText aura:id="rowOpened" class="rowOpened" value="No Rows opened"/>
+	<br/>
+	<ui:outputText aura:id="rowClosed" class="rowClosed" value="No Rows closed"/>
 </aura:component>

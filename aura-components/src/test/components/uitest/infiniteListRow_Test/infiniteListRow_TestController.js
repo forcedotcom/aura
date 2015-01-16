@@ -25,10 +25,12 @@
     },
 
     openRow: function(component, event, helper) {
-        $A.log("Opening row: " + event.getParam("row"));
+    	var text = $A.util.getText(event.getParam("row")).replace('\n',' ')
+        component.find("rowOpened").set("v.value","Opening row: " + text);
     },
 
     closeRow: function(component, event, helper) {
-        $A.log("Closing row: " + event.getParam("row"));
+    	var text = $A.util.getText(event.getParam("row")).replace('\n',' ')
+    	component.find("rowClosed").set("v.value", "Closing row: " + text);
     }
 })

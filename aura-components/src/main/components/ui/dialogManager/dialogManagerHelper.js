@@ -254,8 +254,9 @@
             formElements = container.querySelectorAll("input,button,a,textarea,select,[tabindex='0']");
             length = formElements.length;
             if (length > 0) {
+                var hiddenPattern = /hidden/i;
                 for (var i=0; i<length; i++) {
-                    if (!formElements[i].disabled && formElements[i].type.toLowerCase() !== "hidden") {
+                    if (!formElements[i].disabled && !hiddenPattern.test(formElements[i].type)) {
                         element = formElements[i];
                         break;
                     }

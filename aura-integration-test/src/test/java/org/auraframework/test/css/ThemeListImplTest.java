@@ -18,6 +18,7 @@ package org.auraframework.test.css;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
@@ -249,5 +250,34 @@ public class ThemeListImplTest extends StyleTestCase {
 
         tl.appendAll(ImmutableList.of(themeA, themeB, themeC, themeD));
         assertEquals("red", tl.getValue("color").get());
+    }
+
+    @Provider
+    public static final class P4 implements ThemeMapProvider {
+        @Override
+        public Map<String, String> provide() throws QuickFixException {
+            return ImmutableMap.of("bbb", "b");
+        }
+    }
+
+    public void testGetVarNames() throws Exception {
+        DefDescriptor<ThemeDef> t1 = addSeparateTheme(theme().var("aaa", "1"));
+        DefDescriptor<ThemeDef> t2 = addSeparateTheme(theme().var("aaa", "2"));
+        DefDescriptor<ThemeDef> t3 = addSeparateTheme(theme().mapProvider("java://" + P4.class.getName()));
+        DefDescriptor<ThemeDef> t4 = addSeparateTheme(theme().var("ccc", "3"));
+        DefDescriptor<ThemeDef> t5 = addSeparateTheme(theme().var("ddd", "4"));
+
+        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("eee", "5"));
+        DefDescriptor<ThemeDef> t6 = addSeparateTheme(theme().parent(parent).var("fff", "6"));
+
+        tl.append(t1).append(t2).append(t3).append(t4).append(t5).append(t6);
+        Set<String> names = tl.getVarNames();
+        assertEquals(6, names.size());
+        assertTrue(names.contains("aaa"));
+        assertTrue("missing name from map provided theme", names.contains("bbb"));
+        assertTrue(names.contains("ccc"));
+        assertTrue(names.contains("ddd"));
+        assertTrue("missing name from parent theme", names.contains("eee"));
+        assertTrue(names.contains("fff"));
     }
 }

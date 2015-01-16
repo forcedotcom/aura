@@ -17,6 +17,7 @@ package org.auraframework.css;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
@@ -52,6 +53,15 @@ public interface ThemeList extends Iterable<DefDescriptor<ThemeDef>> {
      * Returns true if there are no themes specified in this list.
      */
     boolean isEmpty();
+
+    /**
+     * Returns the combined set of var names referenced by themes in this list. This includes any var names from map
+     * providers.
+     *
+     * @return The combined set of var names referenced by themes in this list.
+     * @throws QuickFixException If one of the contained themes is invalid.
+     */
+    Set<String> getVarNames() throws QuickFixException;
 
     /**
      * Gets the theme at the given index.

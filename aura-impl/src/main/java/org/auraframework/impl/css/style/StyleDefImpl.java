@@ -16,21 +16,27 @@
 package org.auraframework.impl.css.style;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ExpressionAdapter;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.root.theme.Themes;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -103,6 +109,41 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     }
 
     @Override
+    public String getRawCode() {
+        return content;
+    }
+
+    @Override
+    public String getClassName() {
+        return className;
+    }
+
+    @Override
+    public Set<String> getExpressions() {
+        return expressions;
+    }
+
+    @Override
+    public Set<String> getVarNames() throws AuraValidationException {
+        Set<String> set = new HashSet<>();
+
+        if (!expressions.isEmpty()) {
+            Set<PropertyReference> tmp = new HashSet<>();
+            ExpressionAdapter adapter = AuraImpl.getExpressionAdapter();
+            for (String rawExpression : expressions) {
+                Expression expression = adapter.buildExpression(rawExpression, null);
+                expression.gatherPropertyReferences(tmp);
+            }
+
+            for (PropertyReference propRef : tmp) {
+                set.add(propRef.getRoot());
+            }
+        }
+
+        return set;
+    }
+
+    @Override
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         json.writeMapBegin();
@@ -118,11 +159,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
         json.writeMapEntry("className", className);
         json.writeMapEnd();
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<StyleDef> implements StyleDefBuilder {

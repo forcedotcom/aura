@@ -66,7 +66,7 @@ final class CssErrorManager implements ErrorManager {
     }
 
     @Override
-    public void report(ErrorLevel level, Syntax<?> cause, String message) {
+    public void report(ErrorLevel level, Syntax cause, String message) {
         // warnings are ignored in prod mode
         if (level != ErrorLevel.WARNING || mode != Mode.PROD) {
             messages.add(String.format("%s (line %s, col %s)", message, cause.line(), cause.column()));

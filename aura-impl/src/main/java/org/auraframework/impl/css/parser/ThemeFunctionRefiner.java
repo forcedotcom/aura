@@ -23,25 +23,21 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import com.salesforce.omakase.ast.atrule.AtRule;
-import com.salesforce.omakase.ast.atrule.GenericAtRuleExpression;
-import com.salesforce.omakase.ast.atrule.MediaQueryList;
-import com.salesforce.omakase.ast.declaration.GenericFunctionValue;
 import com.salesforce.omakase.ast.declaration.RawFunction;
 import com.salesforce.omakase.broadcast.Broadcaster;
-import com.salesforce.omakase.broadcast.SingleInterestBroadcaster;
 import com.salesforce.omakase.parser.ParserException;
 import com.salesforce.omakase.parser.ParserFactory;
 import com.salesforce.omakase.parser.Source;
 import com.salesforce.omakase.parser.refiner.AtRuleRefiner;
 import com.salesforce.omakase.parser.refiner.FunctionRefiner;
-import com.salesforce.omakase.parser.refiner.GenericRefiner;
+import com.salesforce.omakase.parser.refiner.MasterRefiner;
+import com.salesforce.omakase.parser.refiner.Refinement;
 import com.salesforce.omakase.util.Args;
 
 /**
- * Parses the arguments to custom {@link ThemeFunction} AST objects.
+ * Parses the arguments to custom {@link ThemeFunction} and {@link ThemeExpression} AST objects.
  */
 final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
     private static final String UNABLE_PARSE = "Unable to parse the remaining content '%s'";
@@ -71,17 +67,19 @@ final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
     }
 
     /**
-     * Refines theme functions, e.g., "theme(varname)".
+     * Refines theme functions, e.g., "theme(varName)".
      */
     @Override
-    public boolean refine(RawFunction raw, Broadcaster broadcaster, GenericRefiner refiner) {
-        if (!raw.name().equals(NORMAL) && !raw.name().equals(SHORTHAND)) return false;
+    public Refinement refine(RawFunction raw, Broadcaster broadcaster, MasterRefiner refiner) {
+        if (!raw.name().equals(NORMAL) && !raw.name().equals(SHORTHAND)) {
+            return Refinement.NONE;
+        }
 
         try {
             String expression = expression(raw.args());
 
             if (passthrough) {
-                broadcaster.broadcast(new GenericFunctionValue(raw.line(), raw.column(), NORMAL, expression));
+                broadcaster.broadcast(new ThemeFunction(raw.line(), raw.column(), NORMAL, expression));
             } else {
                 Location location = new Location(null, raw.line(), raw.column(), -1);
                 String evaluated = provider.getValue(expression, location).toString();
@@ -96,19 +94,23 @@ final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
             throw new ParserException(e);
         }
 
-        return true;
+        return Refinement.FULL;
     }
 
     /**
      * Refines theme functions inside of the media query expression.
      */
     @Override
-    public boolean refine(AtRule atRule, Broadcaster broadcaster, GenericRefiner refiner) {
-        if (!atRule.name().equals(MEDIA) || !atRule.rawExpression().isPresent()) return false;
+    public Refinement refine(AtRule atRule, Broadcaster broadcaster, MasterRefiner refiner) {
+        if (!atRule.name().equals(MEDIA) || !atRule.rawExpression().isPresent()) {
+            return Refinement.NONE;
+        }
 
         // check if the raw expression starts with the theme function
         String raw = atRule.rawExpression().get().content();
-        if (!raw.startsWith(NORMAL_FUNCTION) && !raw.startsWith(SHORTHAND_FUNCTION)) return false;
+        if (!raw.startsWith(NORMAL_FUNCTION) && !raw.startsWith(SHORTHAND_FUNCTION)) {
+            return Refinement.NONE;
+        }
 
         int line = atRule.rawExpression().get().line();
         int col = atRule.rawExpression().get().column();
@@ -118,7 +120,8 @@ final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
             String expression = expression(Args.extract(raw));
 
             if (passthrough) {
-                atRule.expression(new GenericAtRuleExpression(NORMAL_FUNCTION + expression + ")"));
+                ThemeExpression themeExpression = new ThemeExpression(NORMAL_FUNCTION + expression + ")");
+                broadcaster.broadcast(themeExpression);
             } else {
                 Object evaluated = provider.getValue(expression, new Location(null, line, col, -1));
 
@@ -129,16 +132,7 @@ final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
 
                 // parse the media query expression
                 Source source = new Source(evaluated.toString(), line, col);
-
-                SingleInterestBroadcaster<MediaQueryList> single = SingleInterestBroadcaster
-                        .of(MediaQueryList.class, broadcaster);
-
-                ParserFactory.mediaQueryListParser().parse(source, single, refiner);
-                Optional<MediaQueryList> queryList = single.broadcasted();
-
-                if (queryList.isPresent()) {
-                    atRule.expression(queryList.get());
-                }
+                ParserFactory.mediaQueryListParser().parse(source, broadcaster, refiner);
 
                 // nothing should be left in the expression content
                 if (!source.skipWhitepace().eof()) {
@@ -149,8 +143,8 @@ final class ThemeFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
             throw new ParserException(e);
         }
 
-        // return false because we didn't refine the block, just the expression. the standard refiner will pick that up.
-        return false;
+        // we didn't refine the block, just the expression. the standard refiner will pick that up.
+        return Refinement.PARTIAL;
     }
 
     private String expression(String raw) throws QuickFixException {

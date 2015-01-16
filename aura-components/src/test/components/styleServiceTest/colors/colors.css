@@ -1,0 +1,11 @@
+.THIS {
+    font-family: Arial;
+    font-size: 20px;
+    margin: 25px;
+}
+
+.THIS.color1 { color: t(color1) }
+.THIS.color2 { color: t(color2) }
+.THIS.color3 { color: t(color3) }
+.THIS.color4 { color: t(color4) }
+.THIS.color5 { color: t(color5) }

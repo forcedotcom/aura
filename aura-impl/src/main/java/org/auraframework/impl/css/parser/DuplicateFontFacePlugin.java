@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.css.parser;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import com.google.common.base.Optional;
 import com.salesforce.omakase.ast.atrule.FontDescriptor;
@@ -93,8 +95,8 @@ public final class DuplicateFontFacePlugin implements Plugin {
         String unicodeRange = null;
         String fontFeatureSettings = null;
 
-        if (checkAllFontDescriptors && descriptor.group().isPresent()) {
-            for (FontDescriptor sibling : descriptor.group().get()) {
+        if (checkAllFontDescriptors) {
+            for (FontDescriptor sibling : descriptor.group()) {
                 if (sibling.isProperty(Property.FONT_STYLE)) {
                     fontStyle = sibling.propertyValue().singleTextualValue().get();
                 } else if (sibling.isProperty(Property.FONT_WEIGHT)) {

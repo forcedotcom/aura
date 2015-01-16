@@ -276,9 +276,9 @@ public class ThemeResolutionTest extends StyleTestCase {
     public void testCmpThemeForApp() throws Exception {
         addNsTheme(theme().var("color1", "red"));
 
-        addContextApp("<aura:application/>");
         addContextAppBundleTheme(theme().var("color2", "green"));
         DefDescriptor<StyleDef> styleDef = addContextAppBundleStyle(".THIS {color:theme(color2)}");
+        addContextApp("<aura:application/>");
 
         assertStyle(styleDef, ".THIS {color:green}");
     }

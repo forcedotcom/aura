@@ -23,17 +23,17 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
+import org.auraframework.component.test.java.controller.JavaTestController;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.def.TypeDef;
-import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.java.controller.JavaActionDef;
-import org.auraframework.component.test.java.controller.JavaTestController;
 import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -207,56 +207,56 @@ public class JavaControllerTest extends AuraImplTestCase {
         args.put("a", "1");
         args.put("b", "2");
         checkPassAction(controller, "sumValues", args, State.SUCCESS, new Integer(3));
-        
+
     }
-    
-    /** 
-     * This is testing JavaAction with parameter that throws QFE when accessing. 
-     * verify AuraUnhandledException is added when this happen in JavaAction
+
+    /**
+     * This is testing JavaAction with parameter that throws QFE when accessing. verify AuraUnhandledException is added
+     * when this happen in JavaAction
      */
     public void testActionWithBadParameterThrowsQFE() throws Exception {
-    	//create DefDescriptor for JavaValueDefExt, type doesn't matter as we plan to spy on it.
-    	String instanceName = "java://java.lang.String";
-    	DefDescriptor<TypeDef> JavaValueDefDesc = DefDescriptorImpl.getInstance(instanceName, TypeDef.class);
-    	//spy on DefDescriptor, ask it to throw QFE when calling getDef()
-    	DefDescriptor<TypeDef> JavaValueDefDescMocked = Mockito.spy(JavaValueDefDesc);
-    	Mockito.when(JavaValueDefDescMocked.getDef()).thenThrow(new TestQuickFixException("new quick fix exception"));
-    	//time to ask MDR give us what we want
-    	String name = "java://org.auraframework.test.java.controller.JavaControllerTest$JavaValueDefExt";
-    	Class<TypeDef> defClass = TypeDef.class;
-    	DescriptorKey dk = new DescriptorKey(name, defClass);
+        // create DefDescriptor for JavaValueDefExt, type doesn't matter as we plan to spy on it.
+        String instanceName = "java://java.lang.String";
+        DefDescriptor<TypeDef> JavaValueDefDesc = DefDescriptorImpl.getInstance(instanceName, TypeDef.class);
+        // spy on DefDescriptor, ask it to throw QFE when calling getDef()
+        DefDescriptor<TypeDef> JavaValueDefDescMocked = Mockito.spy(JavaValueDefDesc);
+        Mockito.when(JavaValueDefDescMocked.getDef()).thenThrow(new TestQuickFixException("new quick fix exception"));
+        // time to ask MDR give us what we want
+        String name = "java://org.auraframework.test.java.controller.JavaControllerTest$JavaValueDefExt";
+        Class<TypeDef> defClass = TypeDef.class;
+        DescriptorKey dk = new DescriptorKey(name, defClass);
         Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
-        		Aura.getCachingService().getDefDescriptorByNameCache();
+                Aura.getCachingService().getDefDescriptorByNameCache();
         cache.put(dk, JavaValueDefDescMocked);
-        
-    	//jvd doesn't matter that much for triggering QFE, as we only used it as the Object param
+
+        // jvd doesn't matter that much for triggering QFE, as we only used it as the Object param
         JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null);
         Map<String, Object> args = new HashMap<>();
         args.put("keya", jvd);
-    	ControllerDef controller = getJavaController("java://org.auraframework.test.java.controller.TestControllerOnlyForJavaControllerTest");
-     	
-    	//we actually catch the QFE in JavaAction.getArgs(), then wrap it up with AuraUnhandledException 
-    	String errorMsg = "org.auraframework.test.java.controller.JavaControllerTest$TestQuickFixException: new quick fix exception";
-    	checkFailAction(controller, "customErrorParam", args, State.ERROR, AuraUnhandledException.class,
-    			errorMsg);
-    	
+        ControllerDef controller = getJavaController("java://org.auraframework.test.java.controller.TestControllerOnlyForJavaControllerTest");
+
+        // we actually catch the QFE in JavaAction.getArgs(), then wrap it up with AuraUnhandledException
+        String errorMsg = "org.auraframework.test.java.controller.JavaControllerTest$TestQuickFixException: new quick fix exception";
+        checkFailAction(controller, "customErrorParam", args, State.ERROR, AuraUnhandledException.class,
+                errorMsg);
+
     }
-    
+
     @SuppressWarnings("serial")
-	public class JavaValueDefExt extends JavaValueDef {
-		public JavaValueDefExt(String name,
-				DefDescriptor<TypeDef> typeDescriptor, Location location) {
-			super(name, typeDescriptor, location);
-		}
+    public class JavaValueDefExt extends JavaValueDef {
+        public JavaValueDefExt(String name,
+                DefDescriptor<TypeDef> typeDescriptor, Location location) {
+            super(name, typeDescriptor, location);
+        }
     }
-    
-    
+
     private static class TestQuickFixException extends QuickFixException {
-	        private static final long serialVersionUID = 7887234381181710432L;
-	        public TestQuickFixException(String name) {
-	            super(name, null);
-	        }
-	 }
+        private static final long serialVersionUID = 7887234381181710432L;
+
+        public TestQuickFixException(String name) {
+            super(name, null);
+        }
+    }
 
     /**
      * Verify that nice exception is thrown if controller def doesn't exist
@@ -281,39 +281,45 @@ public class JavaControllerTest extends AuraImplTestCase {
                     e.getMessage());
         }
     }
-    
+
     /**
-	 * Verify controller can be accessed in system namespace
-	 */
-	public void testControllerInSystemNamespace() throws Exception {
-		String resourceSource = "<aura:component controller='java://org.auraframework.component.test.java.controller.TestController'>Hello World!</aura:component>";
-		
-		DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
-				StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
-		
-		try {
+     * Verify controller can be accessed in system namespace
+     */
+    public void testControllerInSystemNamespace() throws Exception {
+        String resourceSource = "<aura:component controller='java://org.auraframework.component.test.java.controller.TestController'>Hello World!</aura:component>";
+
+        DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                resourceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
+
+        try {
             Aura.getInstanceService().getInstance(dd);
         } catch (NoAccessException e) {
-        	fail("Not Expected NoAccessException");
-        } 
+            fail("Not Expected NoAccessException");
+        }
     }
-	
-	/**
-	 * Verify controller can not be accessed in custom namespace
-	 */
-	public void testControllerInCustomNamespace() throws Exception {
-		String resourceSource = "<aura:component controller='java://org.auraframework.component.test.java.controller.TestController'>Hello World!</aura:component>";
-		
-		DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
-				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
-		
-		try {
+
+    /**
+     * Verify controller can not be accessed in custom namespace
+     */
+    public void testControllerInCustomNamespace() throws Exception {
+        String resourceSource = "<aura:component controller='java://org.auraframework.component.test.java.controller.TestController'>Hello World!</aura:component>";
+
+        DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                resourceSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
+
+        try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected NoAccessException");
         } catch (NoAccessException e) {
-        	String errorMessage = "Access to controller 'org.auraframework.component.test.java.controller:TestController' from namespace '"+StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+"' in '"+dd.getQualifiedName()+"(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()";
+            String errorMessage = "Access to controller 'org.auraframework.component.test.java.controller:TestController' from namespace '"
+                    + StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE
+                    + "' in '"
+                    + dd.getQualifiedName()
+                    + "(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()";
             assertEquals(errorMessage, e.getMessage());
-        }        
+        }
     }
 
     public void testDuplicateAction() throws Exception {
@@ -427,8 +433,9 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertEquals(1, logs.size());
         assertTrue(
                 "Failed to log a server action",
-                logs.get(0).containsKey(
-                        "action_java://org.auraframework.component.test.java.controller.TestController/ACTION$getString"));
+                logs.get(0)
+                        .containsKey(
+                                "action_java://org.auraframework.component.test.java.controller.TestController/ACTION$getString"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")

@@ -180,7 +180,7 @@ public abstract class AuraTestCase extends UnitTestCase {
      */
     protected void checkExceptionFull(Throwable e, Class<?> clazz, String message) {
         if (e instanceof AssertionFailedError && clazz != e.getClass()) {
-            throw (AssertionFailedError)e;
+            throw (AssertionFailedError) e;
         }
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
@@ -194,7 +194,7 @@ public abstract class AuraTestCase extends UnitTestCase {
      */
     protected void checkExceptionRegex(Throwable e, Class<?> clazz, String regex) {
         if (e instanceof AssertionFailedError && clazz != e.getClass()) {
-            throw (AssertionFailedError)e;
+            throw (AssertionFailedError) e;
         }
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
@@ -202,7 +202,8 @@ public abstract class AuraTestCase extends UnitTestCase {
 
         String message = e.getMessage();
         Pattern pattern = Pattern.compile(regex);
-        assertTrue("Unexpected message: " + message, pattern.matcher(message).find());
+        assertTrue("Expected exception message to match regex <" + regex + ">, but was <" + message + ">", pattern
+                .matcher(message).find());
     }
 
     /**
@@ -238,7 +239,8 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
-        assertTrue("Unexpected message: " + e.getMessage() + "!=" + message, e.getMessage().startsWith(message));
+        assertTrue("Expected exception message to start with <" + message + ">, but was <" + e.getMessage()
+                + ">", e.getMessage().startsWith(message));
     }
 
     /**
@@ -284,10 +286,10 @@ public abstract class AuraTestCase extends UnitTestCase {
         }
         return auraTestingUtil;
     }
-    
+
     protected AuraTestingMarkupUtil getAuraTestingMarkupUtil() {
         if (auraTesingMarkupUtil == null) {
-        	auraTesingMarkupUtil = new AuraTestingMarkupUtil();
+            auraTesingMarkupUtil = new AuraTestingMarkupUtil();
         }
         return auraTesingMarkupUtil;
     }

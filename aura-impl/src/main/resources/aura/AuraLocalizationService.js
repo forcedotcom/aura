@@ -918,7 +918,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
                 timezone = $A.get("$Locale.timezone");
                 if (timezone == "GMT" || timezone == "UTC") {
                     return d;
-        }
+                }
                 try {
                     ret = WallTime["WallTimeToUTC"](timezone, d);
                 } catch (ignore) {}

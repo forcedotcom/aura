@@ -17,622 +17,622 @@ Function.RegisterNamespace("Test.Aura.Controller");
 
 [ Fixture ]
 Test.Aura.Controller.ActionDefTest = function() {
-    // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMock(Object.Global(), "exp", function() {
-    })(function() {
-        // #import aura.controller.ActionDef
-        // #import aura.controller.Action
-    });
+	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+	Mocks.GetMock(Object.Global(), "exp", function() {
+	})(function() {
+		// #import aura.controller.ActionDef
+		// #import aura.controller.Action
+	});
 
-    [ Fixture ]
-    function Constructor() {
-        [ Fact ]
-        function SetsName() {
-            // Arrange
-            var expected = "expected";
-            var config = {
-                name : expected
-            };
-            var actual;
+	[ Fixture ]
+	function Constructor() {
+		[ Fact ]
+		function SetsName() {
+			// Arrange
+			var expected = "expected";
+			var config = {
+				name : expected
+			};
+			var actual;
 
-            // Act
-            var actual = new ActionDef(config).name;
+			// Act
+			var actual = new ActionDef(config).name;
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
 
-        [ Fact ]
-        function SetsDescriptor() {
-            // Arrange
-            var expected = "expected";
-            var config = {
-                descriptor : expected
-            };
-            var actual;
+		[ Fact ]
+		function SetsDescriptor() {
+			// Arrange
+			var expected = "expected";
+			var config = {
+				descriptor : expected
+			};
+			var actual;
 
-            // Act
-            var actual = new ActionDef(config).descriptor;
+			// Act
+			var actual = new ActionDef(config).descriptor;
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
 
-        [ Fact ]
-        function SetsActionType() {
-            // Arrange
-            var expected = "expected";
-            var config = {
-                actionType : expected
-            };
-            var actual;
+		[ Fact ]
+		function SetsActionType() {
+			// Arrange
+			var expected = "expected";
+			var config = {
+				actionType : expected
+			};
+			var actual;
 
-            // Act
-            var actual = new ActionDef(config).actionType;
+			// Act
+			var actual = new ActionDef(config).actionType;
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
 
-        [ Fixture ]
-        function ServerActionType() {
-            var ValueDef = function(param) {
-                return {
-                    name : param,
-                    getName : function() {
-                        return this.name;
-                    }
-                };
-            };
-            var mockValueDef = Mocks.GetMock(Object.Global(), "ValueDef", ValueDef);
+		[ Fixture ]
+		function ServerActionType() {
+			var ValueDef = function(param) {
+				return {
+					name : param,
+					getName : function() {
+						return this.name;
+					}
+				};
+			};
+			var mockValueDef = Mocks.GetMock(Object.Global(), "ValueDef", ValueDef);
 
-            [ Fact ]
-            function SetsReturnType() {
-                // Arrange
-                var expected = "expected";
-                var config = {
-                    actionType : "SERVER",
-                    returnType : expected
-                };
+			[ Fact ]
+			function SetsReturnType() {
+				// Arrange
+				var expected = "expected";
+				var config = {
+					actionType : "SERVER",
+					returnType : expected
+				};
+				var actual;
+
+				// Act
+				mockValueDef(function() {
+					actual = new ActionDef(config).returnType;
+				})
+
+				// Assert
+				Assert.Equal(new ValueDef(expected), actual);
+			}
+
+			[ Fact ]
+			function SetsEmptyParamDefsWhenParamsNotArray() {
+				// Arrange
+				var config = {
+					actionType : "SERVER",
+					params : [ "ignored" ]
+				};
+				var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+					util : {
+						isArray : function(obj) {
+							return false;
+						}
+					}
+				});
+
+				var actual;
+
+				// Act
+				mockAuraUtil(function() {
+					mockValueDef(function() {
+						actual = new ActionDef(config).paramDefs;
+					})
+				});
+
+				// Assert
+				Assert.Empty(actual);
+			}
+
+			[ Fixture ]
+			function WithParams() {
+				var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+					util : {
+						isArray : function(obj) {
+							return true;
+						}
+					}
+				});
+
+				[ Fact ]
+				function SetsEmptyParamDefsWhenParamsEmpty() {
+					// Arrange
+					var config = {
+						actionType : "SERVER",
+						params : []
+					};
+					var actual;
+
+					// Act
+					mockAuraUtil(function() {
+						mockValueDef(function() {
+							actual = new ActionDef(config).paramDefs;
+						})
+					});
+
+					// Assert
+					Assert.Empty(actual);
+				}
+
+				[ Fact ]
+				function SetsParamDefsWhenParamsHasOne() {
+					// Arrange
+					var config = {
+						actionType : "SERVER",
+						params : [ "expected" ]
+					};
+					var actual;
+
+					// Act
+					mockAuraUtil(function() {
+						mockValueDef(function() {
+							actual = new ActionDef(config).paramDefs;
+						})
+					});
+
+					// Assert
+					Assert.Equal({
+						expected : new ValueDef("expected")
+					}, actual);
+				}
+
+				[ Fact ]
+				function SetsParamDefsWhenParamsHasTwo() {
+					// Arrange
+					var config = {
+						actionType : "SERVER",
+						params : [ "expected1", "expected2" ]
+					};
+					var actual;
+
+					// Act
+					mockAuraUtil(function() {
+						mockValueDef(function() {
+							actual = new ActionDef(config).paramDefs;
+						})
+					});
+
+					// Assert
+					Assert.Equal({
+						expected1 : new ValueDef("expected1"),
+						expected2 : new ValueDef("expected2")
+					}, actual);
+				}
+			}
+			[ Fact ]
+			function DefaultBackground() {
+				// Arrange
+				var config = {
+					actionType : "SERVER",
+				};
+				var actual;
+
+				// Act
+				mockValueDef(function() {
+					actual = new ActionDef(config).background;
+				})
+
+				// Assert
+				Assert.Equal(false, actual);
+			}
+			[ Fact ]
+			function SetsBackground() {
+				// Arrange
+				var expected = "expected";
+				var config = {
+					actionType : "SERVER",
+					background : expected
+				};
+				var actual;
+
+				// Act
+				mockValueDef(function() {
+					actual = new ActionDef(config).background;
+				})
+
+				// Assert
+				Assert.Equal(true, actual);
+			}
+			[ Fact ]
+			function DefaultCaboose() {
+				// Arrange
+				var config = {
+					actionType : "SERVER",
+				};
+				var actual;
+
+				// Act
+				mockValueDef(function() {
+					actual = new ActionDef(config).caboose;
+				})
+
+				// Assert
+				Assert.Equal(false, actual);
+			}
+
+			[ Fact ]
+			function SetsCaboose() {
+				// Arrange
+				var expected = "expected";
+				var config = {
+					actionType : "SERVER",
+					caboose : expected
+				};
+				var actual;
+
+				// Act
+				mockValueDef(function() {
+					actual = new ActionDef(config).caboose;
+				})
+
+				// Assert
+				Assert.Equal(true, actual);
+			}
+
+			[ Fact ]
+			function SetsMethNull() {
+				// Arrange
+				var config = {
+					actionType : "SERVER",
+					code : "ignored"
+				};
+				var actual;
+
+				// Act
+				mockValueDef(function() {
+					actual = new ActionDef(config).meth;
+				})
+
+				// Assert
+				Assert.Null(actual);
+			}
+		}
+
+		[ Fixture ]
+		function ClientActionType() {
+			var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+				util : {
+					json : {
+						decodeString : function() {
+							return "decoded";
+						}
+					}
+				}
+			});
+
+			[ Fact ]
+			function SetsMeth() {
+				// Arrange
+				var config = {
+					actionType : "CLIENT",
+					code : "expected"
+				};
+				var actual;
+
+				// Act
+				mockAuraUtil(function() {
+					actual = new ActionDef(config).meth;
+				});
+
+				// Assert
+				Assert.Equal("decoded", actual);
+			}
+
+			[ Fact ]
+			function DecodesCodeProperty() {
+				// Arrange
+				var config = {
+					actionType : "CLIENT",
+					code : "decode me"
+				};
+				var stubbedDecoder = Stubs.GetMethod("toDecode", null);
+
+				// Act
+				mockAuraUtil(function() {
+					$A.util.json.decodeString = stubbedDecoder;
+					new ActionDef(config);
+				});
+				var actual = stubbedDecoder.Calls[0].Arguments.toDecode;
+
+				// Assert
+				Assert.Equal("decode me", actual);
+			}
+
+			[ Fact ]
+			function DoesNotSetReturnType() {
+				// Arrange
+				var config = {
+					actionType : "CLIENT",
+					returnType : "ignored"
+				};
+				var actual;
+
+				// Act
+				mockAuraUtil(function() {
+					actual = new ActionDef(config).returnType;
+				});
+
+				// Assert
+				Assert.Undefined(actual);
+			}
+
+			[ Fact ]
+			function SetsEmptyParamDefs() {
+				// Arrange
+				var config = {
+					actionType : "CLIENT"
+				};
+				var actual;
+
+				// Act
+				mockAuraUtil(function() {
+					actual = new ActionDef(config).paramDefs;
+				});
+
+				// Assert
+				Assert.Empty(actual);
+			}
+
+			[ Fact ]
+			function DoesNotSetBackground() {
+				// Arrange
+				var config = {
+					actionType : "CLIENT",
+					background : true
+				};
+				var actual;
+
+				// Act
+				mockAuraUtil(function() {
+					actual = new ActionDef(config).background;
+				});
+
+				// Assert
+				Assert.Equal(false, actual);
+			}
+
+			[ Fact ]
+			function LogsDecodeError() {
+				// Arrange
+				var config = {
+					actionType : "CLIENT",
+					code : "decodable"
+				};
+				var expected = new Error("expected");
                 var actual;
+				var stubbedLogger = Stubs.GetMethod("msg", "error", null);
+				var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+					util : {
+						json : {
+							decodeString : function() {
+								throw expected;
+							}
+						}
+					},
+					error : stubbedLogger
+				});
 
-                // Act
-                mockValueDef(function() {
-                    actual = new ActionDef(config).returnType;
-                })
-
-                // Assert
-                Assert.Equal(new ValueDef(expected), actual);
-            }
-
-            [ Fact ]
-            function SetsEmptyParamDefsWhenParamsNotArray() {
-                // Arrange
-                var config = {
-                    actionType : "SERVER",
-                    params : [ "ignored" ]
-                };
-                var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-                    util : {
-                        isArray : function(obj) {
-                            return false;
-                        }
-                    }
-                });
-
-                var actual;
-
-                // Act
-                mockAuraUtil(function() {
-                    mockValueDef(function() {
-                        actual = new ActionDef(config).paramDefs;
-                    })
-                });
-
-                // Assert
-                Assert.Empty(actual);
-            }
-
-            [ Fixture ]
-            function WithParams() {
-                var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-                    util : {
-                        isArray : function(obj) {
-                            return true;
-                        }
-                    }
-                });
-
-                [ Fact ]
-                function SetsEmptyParamDefsWhenParamsEmpty() {
-                    // Arrange
-                    var config = {
-                        actionType : "SERVER",
-                        params : []
-                    };
-                    var actual;
-
-                    // Act
-                    mockAuraUtil(function() {
-                        mockValueDef(function() {
-                            actual = new ActionDef(config).paramDefs;
-                        })
-                    });
-
-                    // Assert
-                    Assert.Empty(actual);
-                }
-
-                [ Fact ]
-                function SetsParamDefsWhenParamsHasOne() {
-                    // Arrange
-                    var config = {
-                        actionType : "SERVER",
-                        params : [ "expected" ]
-                    };
-                    var actual;
-
-                    // Act
-                    mockAuraUtil(function() {
-                        mockValueDef(function() {
-                            actual = new ActionDef(config).paramDefs;
-                        })
-                    });
-
-                    // Assert
-                    Assert.Equal({
-                        expected : new ValueDef("expected")
-                    }, actual);
-                }
-
-                [ Fact ]
-                function SetsParamDefsWhenParamsHasTwo() {
-                    // Arrange
-                    var config = {
-                        actionType : "SERVER",
-                        params : [ "expected1", "expected2" ]
-                    };
-                    var actual;
-
-                    // Act
-                    mockAuraUtil(function() {
-                        mockValueDef(function() {
-                            actual = new ActionDef(config).paramDefs;
-                        })
-                    });
-
-                    // Assert
-                    Assert.Equal({
-                        expected1 : new ValueDef("expected1"),
-                        expected2 : new ValueDef("expected2")
-                    }, actual);
-                }
-            }
-            [ Fact ]
-            function DefaultBackground() {
-                // Arrange
-                var config = {
-                    actionType : "SERVER",
-                };
-                var actual;
-
-                // Act
-                mockValueDef(function() {
-                    actual = new ActionDef(config).background;
-                })
-
-                // Assert
-                Assert.Equal(false, actual);
-            }
-            [ Fact ]
-            function SetsBackground() {
-                // Arrange
-                var expected = "expected";
-                var config = {
-                    actionType : "SERVER",
-                    background : expected
-                };
-                var actual;
-
-                // Act
-                mockValueDef(function() {
-                    actual = new ActionDef(config).background;
-                })
-
-                // Assert
-                Assert.Equal(true, actual);
-            }
-            [ Fact ]
-            function DefaultCaboose() {
-                // Arrange
-                var config = {
-                    actionType : "SERVER",
-                };
-                var actual;
-
-                // Act
-                mockValueDef(function() {
-                    actual = new ActionDef(config).caboose;
-                })
-
-                // Assert
-                Assert.Equal(false, actual);
-            }
-
-            [ Fact ]
-            function SetsCaboose() {
-                // Arrange
-                var expected = "expected";
-                var config = {
-                    actionType : "SERVER",
-                    caboose : expected
-                };
-                var actual;
-
-                // Act
-                mockValueDef(function() {
-                    actual = new ActionDef(config).caboose;
-                })
-
-                // Assert
-                Assert.Equal(true, actual);
-            }
-
-            [ Fact ]
-            function SetsMethNull() {
-                // Arrange
-                var config = {
-                    actionType : "SERVER",
-                    code : "ignored"
-                };
-                var actual;
-
-                // Act
-                mockValueDef(function() {
-                    actual = new ActionDef(config).meth;
-                })
-
-                // Assert
-                Assert.Null(actual);
-            }
-        }
-
-        [ Fixture ]
-        function ClientActionType() {
-            var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-                util : {
-                    json : {
-                        decodeString : function() {
-                            return "decoded";
-                        }
-                    }
-                }
-            });
-
-            [ Fact ]
-            function SetsMeth() {
-                // Arrange
-                var config = {
-                    actionType : "CLIENT",
-                    code : "expected"
-                };
-                var actual;
-
-                // Act
-                mockAuraUtil(function() {
-                    actual = new ActionDef(config).meth;
-                });
-
-                // Assert
-                Assert.Equal("decoded", actual);
-            }
-
-            [ Fact ]
-            function DecodesCodeProperty() {
-                // Arrange
-                var config = {
-                    actionType : "CLIENT",
-                    code : "decode me"
-                };
-                var stubbedDecoder = Stubs.GetMethod("toDecode", null);
-
-                // Act
-                mockAuraUtil(function() {
-                    $A.util.json.decodeString = stubbedDecoder;
-                    new ActionDef(config);
-                });
-                var actual = stubbedDecoder.Calls[0].Arguments.toDecode;
-
-                // Assert
-                Assert.Equal("decode me", actual);
-            }
-
-            [ Fact ]
-            function DoesNotSetReturnType() {
-                // Arrange
-                var config = {
-                    actionType : "CLIENT",
-                    returnType : "ignored"
-                };
-                var actual;
-
-                // Act
-                mockAuraUtil(function() {
-                    actual = new ActionDef(config).returnType;
-                });
-
-                // Assert
-                Assert.Undefined(actual);
-            }
-
-            [ Fact ]
-            function SetsEmptyParamDefs() {
-                // Arrange
-                var config = {
-                    actionType : "CLIENT"
-                };
-                var actual;
-
-                // Act
-                mockAuraUtil(function() {
-                    actual = new ActionDef(config).paramDefs;
-                });
-
-                // Assert
-                Assert.Empty(actual);
-            }
-
-            [ Fact ]
-            function DoesNotSetBackground() {
-                // Arrange
-                var config = {
-                    actionType : "CLIENT",
-                    background : true
-                };
-                var actual;
-
-                // Act
-                mockAuraUtil(function() {
-                    actual = new ActionDef(config).background;
-                });
-
-                // Assert
-                Assert.Equal(false, actual);
-            }
-
-            [ Fact ]
-            function LogsDecodeError() {
-                // Arrange
-                var config = {
-                    actionType : "CLIENT",
-                    code : "decodable"
-                };
-                var expected = new Error("expected");
-                var actual;
-                var stubbedLogger = Stubs.GetMethod("msg", "error", null);
-                var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-                    util : {
-                        json : {
-                            decodeString : function() {
-                                throw expected;
-                            }
-                        }
-                    },
-                    log : stubbedLogger
-                });
-
-                // Act
-                mockAuraUtil(function() {
+				// Act
+				mockAuraUtil(function() {
                     actual = Record.Exception(function() {
                         new ActionDef(config);
                     });
                 });
 
-                // Assert
+				// Assert
                 Assert.Equal(expected, actual);
-                Assert.Equal("decodable", stubbedLogger.Calls[0].Arguments.msg);
-                Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.error);
-            }
-        }
-    }
-    [ Fixture ]
-    function GetName() {
-        [ Fact ]
-        function ReturnsName() {
-            // Arrange
-            var expected = "expected";
-            var target = new ActionDef({});
-            target.name = expected;
+				Assert.Equal("decodable", stubbedLogger.Calls[0].Arguments.msg);
+				Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.error);
+			}
+		}
+	}
+	[ Fixture ]
+	function GetName() {
+		[ Fact ]
+		function ReturnsName() {
+			// Arrange
+			var expected = "expected";
+			var target = new ActionDef({});
+			target.name = expected;
 
-            // Act
-            var actual = target.getName();
+			// Act
+			var actual = target.getName();
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+	}
 
-    [ Fixture ]
-    function GetDescriptor() {
-        [ Fact ]
-        function ReturnsDescriptor() {
-            // Arrange
-            var expected = "expected";
-            var target = new ActionDef({});
-            target.descriptor = expected;
+	[ Fixture ]
+	function GetDescriptor() {
+		[ Fact ]
+		function ReturnsDescriptor() {
+			// Arrange
+			var expected = "expected";
+			var target = new ActionDef({});
+			target.descriptor = expected;
 
-            // Act
-            var actual = target.getDescriptor();
+			// Act
+			var actual = target.getDescriptor();
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+	}
 
-    [ Fixture ]
-    function GetActionType() {
-        [ Fact ]
-        function ReturnsActionType() {
-            // Arrange
-            var expected = "expected";
-            var target = new ActionDef({});
-            target.actionType = expected;
+	[ Fixture ]
+	function GetActionType() {
+		[ Fact ]
+		function ReturnsActionType() {
+			// Arrange
+			var expected = "expected";
+			var target = new ActionDef({});
+			target.actionType = expected;
 
-            // Act
-            var actual = target.getActionType();
+			// Act
+			var actual = target.getActionType();
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+	}
 
-    [ Fixture ]
-    function IsBackground() {
-        [ Fact ]
-        function ReturnsTrueIfBackgroundTrue() {
-            var target = new ActionDef({});
-            target.background = true;
+	[ Fixture ]
+	function IsBackground() {
+		[ Fact ]
+		function ReturnsTrueIfBackgroundTrue() {
+			var target = new ActionDef({});
+			target.background = true;
 
-            var actual = target.isBackground();
+			var actual = target.isBackground();
 
-            Assert.True(actual);
-        }
+			Assert.True(actual);
+		}
 
-        [ Fact ]
-        function ReturnsFalseIfBackgroundNotTrue() {
-            var target = new ActionDef({});
-            target.background = "true";
+		[ Fact ]
+		function ReturnsFalseIfBackgroundNotTrue() {
+			var target = new ActionDef({});
+			target.background = "true";
 
-            var actual = target.isBackground();
+			var actual = target.isBackground();
 
-            Assert.False(actual);
-        }
-    }
+			Assert.False(actual);
+		}
+	}
 
-    [ Fixture ]
-    function IsClientAction() {
-        [ Fact ]
-        function ReturnsTrueIfActionTypeEqualsCLIENT() {
-            // Arrange
-            var target = new ActionDef({});
-            target.actionType = "CLIENT";
+	[ Fixture ]
+	function IsClientAction() {
+		[ Fact ]
+		function ReturnsTrueIfActionTypeEqualsCLIENT() {
+			// Arrange
+			var target = new ActionDef({});
+			target.actionType = "CLIENT";
 
-            // Act
-            var actual = target.isClientAction();
+			// Act
+			var actual = target.isClientAction();
 
-            // Assert
-            Assert.True(actual);
-        }
+			// Assert
+			Assert.True(actual);
+		}
 
-        [ Fact ]
-        function ReturnsFalseIfActionTypeNotEqualsCLIENT() {
-            // Arrange
-            var target = new ActionDef({});
-            target.actionType = "client";
+		[ Fact ]
+		function ReturnsFalseIfActionTypeNotEqualsCLIENT() {
+			// Arrange
+			var target = new ActionDef({});
+			target.actionType = "client";
 
-            // Act
-            var actual = target.isClientAction();
+			// Act
+			var actual = target.isClientAction();
 
-            // Assert
-            Assert.False(actual);
-        }
-    }
+			// Assert
+			Assert.False(actual);
+		}
+	}
 
-    [ Fixture ]
-    function IsServerAction() {
-        [ Fact ]
-        function ReturnsTrueIfActionTypeEqualsSERVER() {
-            // Arrange
-            var target = new ActionDef({});
-            target.actionType = "SERVER";
+	[ Fixture ]
+	function IsServerAction() {
+		[ Fact ]
+		function ReturnsTrueIfActionTypeEqualsSERVER() {
+			// Arrange
+			var target = new ActionDef({});
+			target.actionType = "SERVER";
 
-            // Act
-            var actual = target.isServerAction();
+			// Act
+			var actual = target.isServerAction();
 
-            // Assert
-            Assert.True(actual);
-        }
+			// Assert
+			Assert.True(actual);
+		}
 
-        [ Fact ]
-        function ReturnsFalseIfActionTypeNotEqualsSERVER() {
-            // Arrange
-            var target = new ActionDef({});
-            target.actionType = "server";
+		[ Fact ]
+		function ReturnsFalseIfActionTypeNotEqualsSERVER() {
+			// Arrange
+			var target = new ActionDef({});
+			target.actionType = "server";
 
-            // Act
-            var actual = target.isServerAction();
+			// Act
+			var actual = target.isServerAction();
 
-            // Assert
-            Assert.False(actual);
-        }
-    }
+			// Assert
+			Assert.False(actual);
+		}
+	}
 
-    [ Fixture ]
-    function NewInstance() {
-        [ Fact ]
-        function ReturnsActionWithDef() {
-            // Arrange
-            var target = new ActionDef({});
+	[ Fixture ]
+	function NewInstance() {
+		[ Fact ]
+		function ReturnsActionWithDef() {
+			// Arrange
+			var target = new ActionDef({});
 
-            // Act
-            var actual = target.newInstance().def;
+			// Act
+			var actual = target.newInstance().def;
 
-            // Assert
-            Assert.Equal(target, actual);
-        }
+			// Assert
+			Assert.Equal(target, actual);
+		}
 
-        [ Fact ]
-        function ReturnsActionWithMeth() {
-            // Arrange
-            var expected = "expected";
-            var target = new ActionDef({});
-            target.meth = expected;
+		[ Fact ]
+		function ReturnsActionWithMeth() {
+			// Arrange
+			var expected = "expected";
+			var target = new ActionDef({});
+			target.meth = expected;
 
-            // Act
-            var actual = target.newInstance().meth;
+			// Act
+			var actual = target.newInstance().meth;
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
 
-        [ Fact ]
-        function ReturnsActionWithParamDefs() {
-            // Arrange
-            var expected = "expected";
-            var target = new ActionDef({});
-            target.paramDefs = expected;
+		[ Fact ]
+		function ReturnsActionWithParamDefs() {
+			// Arrange
+			var expected = "expected";
+			var target = new ActionDef({});
+			target.paramDefs = expected;
 
-            // Act
-            var actual = target.newInstance().paramDefs;
+			// Act
+			var actual = target.newInstance().paramDefs;
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
 
-        [ Fact ]
-        function ReturnsActionWithBackgroundFromIsBackground() {
+		[ Fact ]
+		function ReturnsActionWithBackgroundFromIsBackground() {
                         // Note, this used to use 'expected', but that breaks with the new
                         // more strict values.
-            var expected = true;
-            var target = new ActionDef({});
+			var expected = true;
+			var target = new ActionDef({});
                         target.background = expected;
 
-            var actual = target.newInstance().background;
+			var actual = target.newInstance().background;
 
-            Assert.Equal(expected, actual);
-        }
+			Assert.Equal(expected, actual);
+		}
 
-        [ Fact ]
-        function ReturnsActionWithCmp() {
-            // Arrange
-            var expected = "expected";
-            var target = new ActionDef({});
+		[ Fact ]
+		function ReturnsActionWithCmp() {
+			// Arrange
+			var expected = "expected";
+			var target = new ActionDef({});
 
-            // Act
-            var actual = target.newInstance(expected).cmp;
+			// Act
+			var actual = target.newInstance(expected).cmp;
 
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+	}
 }

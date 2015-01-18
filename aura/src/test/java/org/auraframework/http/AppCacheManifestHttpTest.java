@@ -50,7 +50,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
-    private String getManifestURL(String appPath, Mode mode) throws Exception {
+    private String getManifestURL(String appPath, Mode mode, boolean expectNull) throws Exception {
         HttpGet get = obtainGetMethod(appPath + String.format("?aura.mode=%s",mode.toString()));
         HttpResponse response = perform(get);
         String responseBody = getResponseBody(response);
@@ -60,11 +60,14 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         if (m.find()) {
             url = m.group(1);
         }
+        if( (expectNull == false)&&(url == null) ) {
+        	fail("getManifestURL fail to get valid url, appPath:"+appPath+"\n responseBody:"+responseBody+"\n");
+        }
         return url;
     }
 
-    private String getManifestURL(String appPath) throws Exception {
-        return getManifestURL(appPath, Mode.PROD);
+    private String getManifestURL(String appPath, boolean expectNull) throws Exception {
+        return getManifestURL(appPath, Mode.PROD, expectNull);
     }
 
     private String getManifestErrorUrl(String manifestURI) {
@@ -154,7 +157,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestWithUnsupportedUserAgent() throws Exception {
         setHttpUserAgent(APPCACHE_UNSUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app", false);
 
         HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get);
@@ -173,7 +176,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     public void testGetManifestWithAppCacheDisabled() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         ServletConfigController.setAppCacheDisabled(true);
-        String manifest = getManifestURL("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app", true);
         if (manifest != null) {
             fail("no manifest url should be present, but got: " + manifest);
         }
@@ -184,7 +187,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestForAppWithoutPreloads() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/nopreload.app");
+        String manifest = getManifestURL("/appCache/nopreload.app", false);
         if (manifest == null) {
             fail("manifest url should be present, but got: " + manifest);
         }
@@ -197,7 +200,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestForAppWithPreloads() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app", false);
 
         HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get);
@@ -213,7 +216,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     @UnAdaptableTest
     public void testGetManifestWithAuraErrorParam() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app", false);
 
         HttpGet get = obtainGetMethod(getManifestErrorUrl(manifest));
 
@@ -235,7 +238,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestWithErrorManifestCookie() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/withpreload.app");
+        String manifest = getManifestURL("/appCache/withpreload.app", false);
 
         //
         // HttpClient Cookie Example
@@ -272,7 +275,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testGetManifestForAppWithAdditionalAppCacheURLs() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/additionalUrls.app");
+        String manifest = getManifestURL("/appCache/additionalUrls.app", false);
 
         HttpGet get = obtainGetMethod(manifest);
         HttpResponse httpResponse = perform(get);
@@ -304,7 +307,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                     String.format(appMarkup, value));
             setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-            String manifest = getManifestURL(getUrl(desc));
+            String manifest = getManifestURL(getUrl(desc), false);
             HttpGet get = obtainGetMethod(manifest);
             HttpResponse httpResponse = perform(get);
             String response = getResponseBody(httpResponse);
@@ -324,7 +327,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      */
     public void testUncombinableResourceUrlsAreAddedToAppCacheManifest()throws Exception{
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
+        String manifest = getManifestURL("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST, false);
         
         HttpGet get  = obtainGetMethod(manifest);
         HttpResponse response = perform(get);

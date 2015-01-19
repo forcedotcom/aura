@@ -35,7 +35,7 @@
             }, cmp);
 		} else {
 			var el = this.getInputElement(cmp);
-	        $A.util.on(el, event, this.domEventHandler);
+	        $A.util.on(el, event, this.lib.interactive.domEventHandler);
 		}
 	},
 

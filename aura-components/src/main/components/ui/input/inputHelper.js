@@ -19,7 +19,7 @@
 	 */
 	addDomHandler : function(component, event) {
         var el = this.getInputElement(component);
-        $A.util.on(el, event, this.domEventHandler);
+        $A.util.on(el, event, this.lib.interactive.domEventHandler);
 	},
 
 	/**
@@ -36,7 +36,7 @@
 
         var updateOn = this.getUpdateOn(component);
         if (updateOn) {
-        	var handledEvents = this.getHandledDOMEvents(component);
+        	var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
         	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
 	            if (handledEvents[updateOn[j]] !== true) {
 	                this.addDomHandler(component, updateOn[j]);
@@ -59,7 +59,7 @@
 
         updateOn = updateOn.toLowerCase().split(/[\W,]+/); // split on whitespace or commas
 
-        var domEvents = this.getDomEvents(component);
+        var domEvents = this.lib.interactive.getDomEvents(component);
         for(var i=0, len=domEvents.length; i < len; i++){
         	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
 		        if(domEvents[i].toLowerCase()===updateOn[j]){
@@ -77,6 +77,10 @@
      */
     getDomElementValue : function (element) {
     	return element.value;
+    },
+    
+    getHandledDOMEvents : function(component) {
+    	return this.lib.interactive.getHandledDOMEvents(component);
     },
 
     /**
@@ -104,6 +108,16 @@
     preEventFiring : function(component, event) {
         this.handleUpdate(component, event);
     },
+    
+    /**
+     * Fire the equivalent Aura event for DOM one.
+     * This can be overridden by extended component
+     *
+     * @param event must be a DOM event
+     */
+     fireEvent : function (component, event, helper) {
+    	 this.lib.interactive.fireEvent(component, event, helper);
+     },
 
     /**
      * handle the value update.
@@ -117,6 +131,15 @@
             helper.doUpdate(component, helper.getDomElementValue(this.getInputElement(component)));
         }
     },
+    
+    /**
+     * Set event's parameters with the value from DOM event.
+     * The event's parameter name should be the same as the property name in DOM event.
+     */
+    setEventParams : function(e, DOMEvent) {
+        this.lib.interactive.setEventParams(e, DOMEvent);
+    },
+
 
     /**
      * Returns the input dom element in the component. If there are multiple input elements, only the first one is return.
@@ -297,5 +320,17 @@
 
     formatValue: function(cmp) {
         return cmp.get("v.value");
+    },
+    
+    setDisabled: function(component, disabled, disabledCss) {
+    	this.lib.interactive.setEventParams(component, disabled, disabledCss);
+    },
+    
+    getDomEvents : function(component) {
+        return this.lib.interactive.getDomEvents(component);
+    },
+    
+    domEventHandler : function (event) {
+    	this.lib.interactive.domEventHandler(event);
     }
 })

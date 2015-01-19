@@ -15,8 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" abstract="true" extends="ui:interactive"
+<aura:component extensible="true" abstract="true" implements="ui:visible, ui:uiEvents"
     description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA">
+    
+    <!-- Library which holds the Aura events registration -->
+    <aura:import library="ui:eventLib" property="lib"/>
+    
     <aura:attribute name="required" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
     <aura:attribute name="updateOn" type="String" access="GLOBAL" default="change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
     <aura:attribute name="value" type="String" access="GLOBAL" description="The value currently in the input field."/>
@@ -26,6 +30,9 @@
 	<aura:attribute name="labelClass" access="GLOBAL" type="String" default="" description="The CSS class of the label component" />
 	<aura:attribute name="requiredIndicatorClass" type="String" access="GLOBAL" default="" description="The CSS class of the required indicator component" />
 	<aura:attribute name="labelPosition" type="String" default="left" description="The position in which the label should be displayed. Possible values are &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, and &quot;hidden&quot;. Default value is &quot;left&quot;." />
+	
+	<aura:attribute name="disabled" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
+    <aura:attribute name="disableDoubleClicks" type="Boolean" default="false" description="Disables double clicking the component within 350ms"/>
 		
     <aura:registerEvent name="change" type="ui:change" access="GLOBAL" description="The event fired when the user changes the content of the input."/>
     <aura:registerEvent name="input" type="ui:inputEvent" description="The event fired when the user enters an input."/>

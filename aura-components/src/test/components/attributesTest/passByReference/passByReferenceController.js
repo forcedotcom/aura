@@ -112,18 +112,45 @@
         cmp.find("innerCmp").set("v.mapAttribute", map);
     },
 
-    createCmp: function(cmp) {
-        var intValue = cmp.get("v.intByReference");
+    /**
+     * Getting attribute value for dynamically created component via Component.get API will pass the attribute by value.
+     */
+    createCmpByValue: function(cmp) {
         $A.newCmpAsync(
                 this,
                 function(newCmp) {
                     cmp.find("createdCmp").set("v.body", [newCmp]);
                 },
                 {
-                    componentDef: "markup://attributesTest:simpleValue",
+                    componentDef: "markup://attributesTest:passByReferenceInner",
                     attributes: {
                         values: {
-                            intAttribute: intValue
+                            intAttribute: cmp.get("v.intByReference"),
+                            listAttribute: cmp.get("v.listByReference"),
+                            mapAttribute: cmp.get("v.mapByReference")
+                        }
+                    }
+                }
+        );
+    },
+    
+    /**
+     * Getting attribute value for dynamically created component via Component.getReference API will pass the attribute
+     * by reference.
+     */
+    createCmpByReference: function(cmp) {
+        $A.newCmpAsync(
+                this,
+                function(newCmp) {
+                    cmp.find("createdCmp").set("v.body", [newCmp]);
+                },
+                {
+                    componentDef: "markup://attributesTest:passByReferenceInner",
+                    attributes: {
+                        values: {
+                            intAttribute: cmp.getReference("v.intByReference"),
+                            listAttribute: cmp.getReference("v.listByReference"),
+                            mapAttribute: cmp.getReference("v.mapByReference")
                         }
                     }
                 }

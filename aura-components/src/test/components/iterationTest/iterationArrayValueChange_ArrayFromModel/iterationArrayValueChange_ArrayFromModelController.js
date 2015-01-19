@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 ({
-	init : function(cmp){
-		cmp.set("v.listOfMapAttr", [{'a':'Tony'},{'a':'Romo'}]);
+
+	changeOneValueOnIterationItems: function(cmp, event, helper) {
+		var index = parseInt(cmp.get("v.indexToChange"), 10);
+    	var newValue = cmp.get("v.newValueToChange");
+    	var iter = cmp.find("iterationOnArrayModel");
+        var data = iter.get("v.items");
+        data[index] = newValue; 
+        iter.set("v.items", data);
 	},
-	changeItems : function(cmp){
-		var simpleList = cmp.get("v.simpleListAttr");
-		cmp._originalSimpleList = simpleList;
-		cmp.set("v.simpleListAttr", [99,100,101,102,103]);
-		
-		var listOfMap = cmp.get("v.listOfMapAttr");
-		cmp._listOfMap = listOfMap;
-		cmp.set("v.listOfMapAttr", [{'a':'Tom'},{'a':'Brady'}]);
-	},
-	clearItems : function(cmp){
-		cmp.set("v.simpleListAttr", []);
-		cmp.set("v.listOfMapAttr", []);
+	
+	changeOneValueInModel: function(cmp, event, helper) {
+		var index = parseInt(cmp.get("v.indexToChange"), 10);
+    	var newValue = cmp.get("v.newValueToChange");
+        var data = cmp.get("m.dataIntList");
+        data[index] =  newValue; 
+        cmp.set("m.dataIntList", data);
 	}
 })

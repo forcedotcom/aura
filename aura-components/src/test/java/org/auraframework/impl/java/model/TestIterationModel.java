@@ -37,6 +37,7 @@ import com.google.common.collect.ImmutableList;
 public class TestIterationModel {
 
     private final List<Object> data;
+    private final Map<String, Object> mapdata;
     private final List<Object> capitaldata;
     private final List<String> innerdata;
     private final List<Integer> dataIntList;
@@ -45,6 +46,8 @@ public class TestIterationModel {
         data = new LinkedList<>();
         capitaldata = new LinkedList<>();
         dataIntList = new LinkedList<>();
+        mapdata = new HashMap<>();
+        LinkedList<Object> items_in_mapdata = new LinkedList<>();
         for (int i = 0; i < 26; i++) {
             Map<String, Object> dora = new HashMap<>();
             char c = (char) ('a' + i);
@@ -58,13 +61,23 @@ public class TestIterationModel {
             capitaldata.add(dora);
             // fill dataInt
             dataIntList.add(i);
+            //fill in mapdata
+            Map<String, Object> item = new HashMap<>();
+            item.put("label", i);
+            items_in_mapdata.add(item);
         }
+        mapdata.put("items",items_in_mapdata);
         innerdata = ImmutableList.of("gah", "bah", "stah", "brah", "yah", "nah", "hah");
     }
 
     @AuraEnabled
     public List<Object> getData() {
         return data;
+    }
+    
+    @AuraEnabled
+    public Map<String, Object> getMapdata() {
+        return mapdata;
     }
 
     @AuraEnabled

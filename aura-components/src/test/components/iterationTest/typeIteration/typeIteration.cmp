@@ -54,21 +54,6 @@
         </aura:iteration>
     </div>
 
-    <!-- no longer working again :(
-    <div aura:id="barecomponents">
-        <aura:iteration items="{!m.textComponents}" var="x">
-            {!x}
-        </aura:iteration>
-    </div>
-    -->
-
-    <!-- W-1300578 can't pass components?
-    <div aura:id="innercomponents">
-        <aura:iteration items="{!m.textComponents}" var="x">
-            <div>{!x}</div>
-        </aura:iteration>
-    </div>
-    -->
     <div>
         <iterationTest:componentIteration start="0" end="2" aura:id="componentArray">
             <aura:set attribute="cmps">

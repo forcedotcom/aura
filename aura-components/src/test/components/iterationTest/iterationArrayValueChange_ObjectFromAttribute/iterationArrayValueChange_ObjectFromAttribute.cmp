@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+    <!-- init mapdata and listdata in controller -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <!-- object (map) as component attribute -->
+    <aura:attribute name="mapdata" type="Object"/>
+    
+    <!-- attributes for the array -->
+    <aura:attribute name="start" type="integer" default="0"/>
+    <aura:attribute name="end" type="integer" default="100"/>
+    
+    <!-- attributes for array operation -->
+    <aura:attribute name="indexToChange" type="integer" default="0"/>
+    <aura:attribute name="newValueToChange" type="string" default="new value to edit"/>
+    <aura:attribute name="indexToInsert" type="string" default="0"/>
+    <aura:attribute name="newValueToInsert" type="string" default="new value to insert"/>
+    <aura:attribute name="indexToDelete" type="string" default="0"/>
+    
+    <br/>
+    Iteration on Object(map) from Attribute
+    <div class="div_iterationOnMapAttribute" >
+    <aura:iteration aura:id="iterationOnMapAttribute" items="{!v.mapdata.items}" var="item" indexVar="index" start="{!v.start}" end="{!v.end}">
+        <span> <div aura:id="simpleObjectFromAttribute" class="{!'row row'+index}"> {!index}:{!item.label}</div> </span>
+    </aura:iteration>
+    </div>
+    
+</aura:component>

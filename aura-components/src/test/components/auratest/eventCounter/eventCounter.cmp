@@ -16,18 +16,25 @@
 
 -->
 <aura:component render="client">
+    <aura:dependency resource="auratest:renderEvent" type="EVENT"/>
+    
     <aura:attribute default="0" type="Integer" name="renderCount"></aura:attribute>
     <aura:attribute default="0" type="Integer" name="rerenderCount"></aura:attribute>
     <aura:attribute default="0" type="Integer" name="unrenderCount"></aura:attribute>
-
+    
+    <aura:attribute type="String" name="passthrough"></aura:attribute>
+    <aura:attribute type="Object" name="passthroughObj"></aura:attribute>
+    
     <!-- Increment to make component dirty -->
     <aura:attribute default="0" type="Integer" name="dirty"></aura:attribute>
-    <aura:attribute type="String" name="passthrough"></aura:attribute>
+    
 
     <ul>
         <li>render count: <span aura:id="renderCount">{!v.renderCount}</span></li>
         <li>rerender count: <span aura:id="rerenderCount">{!v.rerenderCount}</span></li>
         <li>unrender count: <span aura:id="unrenderCount">{!v.unrenderCount}</span></li>
-        <li>Passthrough: {!v.passthrough.label}</li>
+
+        <li>Passthrough String: {!v.passthrough}</li>
+        <li>Passthrough Object's Label: {!v.passthroughObj.label}</li>
     </ul>
 </aura:component>

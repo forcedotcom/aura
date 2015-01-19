@@ -136,7 +136,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     /**
      * Able to select an item from autocomplete list.
      */
-    public void _testAutoCompleteSelectOption() throws Exception {
+    public void testAutoCompleteSelectOption() throws Exception {
         doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
     }
 
@@ -238,7 +238,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     /**
      * For a component using a custom template able to select item in list.
      */
-    public void _testAutoCompleteCustomTemplateComponentSelectOption() throws Exception {
+    public void testAutoCompleteCustomTemplateComponentSelectOption() throws Exception {
         doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
     }
 
@@ -384,6 +384,19 @@ public class AutocompleteUITest extends WebDriverTestCase {
         assertEquals("aria-activedescendant incorrect after hitting escape", "", ariaActiveDecendant);
     }
     
+    /**
+     * Test editing value to new value works.
+     */
+    public void testAutocompleteEditSelectedValue() throws Exception {
+    	doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
+    	WebDriver driver = getDriver();
+        WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
+        
+    	// edit input
+        input.sendKeys("xyz");
+        waitForInputValue(input, "hello world3xyz");
+    }
+    
     private void waitForOptionHighlighted(final WebElement o) {
     	auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
@@ -391,6 +404,15 @@ public class AutocompleteUITest extends WebDriverTestCase {
                 return hasCssClass(o, "highlighted");
             }
         }, timeoutInSecs,"fail on waiting for option to be highlighted");
+    }
+    
+    private void waitForInputValue(final WebElement input, final String expectedOption) {
+    	auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return expectedOption.equals(input.getAttribute("value"));
+            }
+        }, timeoutInSecs,"fail on waiting for option '" + expectedOption + "' to be selected");
     }
     
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,
@@ -447,7 +469,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         waitForAutoCompleteListVisible(list, true);
         WebElement element = getInnerElementOfAutoCompleteOptionInList(list, 3, optionType);
         element.click();
-        assertEquals("Wrong option was selected", "hello world3", input.getAttribute("value"));
+        waitForInputValue(input, "hello world3");
     }
 
     private WebElement getAutoCompleteInput(WebDriver d, int inputNumber) {

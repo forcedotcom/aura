@@ -16,6 +16,10 @@
 ({
 	handleClick: function (cmp) {
 		alert("ROW CLICK");
+	},
+	
+	handleEdit: function (cmp) {
+		alert("EDIT");
 	}
 
 	/* API not exposed yet.

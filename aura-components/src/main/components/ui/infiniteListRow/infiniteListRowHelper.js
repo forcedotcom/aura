@@ -45,8 +45,16 @@
 				bubbles 	: true,
 				cancelable 	: true
 			},
-			evt = new CustomEvent(name, cfg);
+			event;
+		
+		// This kind of behavior works differently on IE
+		if (navigator.userAgent.toLowerCase().toString().indexOf("trident") > 0) {
+			event = document.createEvent('CustomEvent');
+			event.initCustomEvent(name, true, true, detail);
+		} else {
+			event = new CustomEvent(name, cfg);
+		}
 
-		el.dispatchEvent(evt);
+		el.dispatchEvent(event);
 	}
 })

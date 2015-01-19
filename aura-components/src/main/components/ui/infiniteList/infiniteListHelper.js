@@ -113,7 +113,7 @@
 		ul.addEventListener(this.getEventNames().cancel, cmp._ontouchcancel, false);
 		ul.addEventListener("dragstart", cmp._preventEvent, true);
     },
-   
+    
     /**
      * Detaches event listeners to their handlers.
      */
@@ -161,7 +161,12 @@
 
                     // Close the row,
 					this.fireRowClose(cmp, cmp._openRow);
-                	this.closeRowBlockAndReset(cmp, cmp._previousSwipe);
+					
+					// body doesn't always exist here...
+					if (!cmp._previousSwipe.body) {
+						cmp._previousSwipe.body = cmp._previousSwipe.row.querySelector('.body');
+					}
+                	this.closeRowBlockAndReset(cmp, cmp._previousSwipe.body, true);
                     
                 	return;
                 }
@@ -256,7 +261,7 @@
                 e.stopPropagation();
                 e.preventDefault();
 
-            	this.closeRowBlockAndReset(cmp, swipe);
+            	this.closeRowBlockAndReset(cmp, swipe.body, true);
             }
     	}
     },
@@ -321,6 +326,20 @@
         	// Prevent anything else from happening (clicks, etc).
         	e.stopPropagation();
             e.preventDefault();
+        
+        // If the interaction wasn't a swipe, but was on the body of the 
+        // open row, we should close and reset the row
+        } else if (cmp._isInteractionOnOpenRow) {
+        	var body = this.getRow(e.target, 'body', cmp.getElement().className || 'uiInfiniteList');
+        	if (body) {
+        		// Cancel all further events - this handler is registered in the 'capture' phase.
+                e.stopPropagation();
+                e.preventDefault();
+
+                // Close the row,
+    			this.fireRowClose(cmp, cmp._openRow);
+            	this.closeRowBlockAndReset(cmp, body, true);
+        	}
         }
 
         // Reset '_isBlockedInteraction' so that future touch events are not cancelled.
@@ -370,29 +389,25 @@
     		useTransition = e.detail && e.detail.useTransition;
     	
     	if (body && $A.util.hasClass(target, 'open')) {
-    		if (useTransition) {
-    			body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
-    		}
-    		
-    		this.translateX(cmp, body, 0);
-    		
-    		setTimeout(function () {
-    			if (useTransition) {
-    				body.style.transition = '';
-    			}
-    			
-    			$A.util.removeClass(body, 'open');
-    		}, this.CLOSE_TIMEOUT);
+    		this.closeRowBlockAndReset(cmp, body, useTransition);
+    	}
+    	
+    	if (this.isBlocked(cmp)) {
+    		this.unblock(cmp);
     	}
     },
     
     /**
      * Given an active swipe, close the row and reset.
      */
-    closeRowBlockAndReset: function (cmp, swipe) {
+    closeRowBlockAndReset: function (cmp, body, useTransition) {
         // Perform close operation.
-    	swipe.body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
-        this.translateX(cmp, swipe.body, 0);
+    	if (body) {
+    		if (useTransition) {
+        		body.style.transition = 'all ' + this.CLOSE_TIMEOUT + 'ms';
+        	}
+            this.translateX(cmp, body, 0);
+    	}
 
         // Null these fields as 'touchend' will not execute.
 		$A.util.removeClass(cmp._openRow, 'open');
@@ -408,8 +423,11 @@
 		var self = this;
 
         this.setCheckedTimeout(cmp, function () {
+        	if (useTransition && body) {
+        		body.style.transition = '';
+        	}
+        	
             cmp._isClosing = false;
-            swipe.body.style.transition = '';
 			self.unblock(cmp);
         }, this.CLOSE_TIMEOUT);
     },

@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 ({
-    render : function(cmp){
+    render: function (cmp, helper) {
+        if ($A.util.getBooleanValue(cmp.get("v.fixURL"))) {
+            helper.fixURL(cmp);
+        }
+
         var ret = this.superRender();
+
         if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
             var link = cmp.find("link");
             if (link) {
@@ -26,15 +31,20 @@
         return ret;
     },
 
-    rerender : function(cmp){
+    rerender: function (cmp, helper) {
+        if ($A.util.getBooleanValue(cmp.get("v.fixURL"))) {
+            helper.fixURL(cmp);
+        }
+
         this.superRerender();
+
         if (cmp.isDirty("v.disabled")) {
             var link = cmp.find("link");
             if (link) {
                 var element = link.getElement();
-                if($A.util.getBooleanValue(cmp.get("v.disabled"))){
+                if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
                     $A.util.addClass(element, "disabled");
-                }else{
+                } else {
                     $A.util.removeClass(element, "disabled");
                 }
 

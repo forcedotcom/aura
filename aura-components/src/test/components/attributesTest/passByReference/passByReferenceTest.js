@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 ({
+	testHtmlAttributesPrv : {
+		test: function(component) {
+			var item = component.find("liWithPrv");
+			var newValue = 999;
+			item.set("v.HTMLAttributes.prv", newValue);
+
+			var expected = "999";
+			$A.test.addWaitForWithFailureMessage(true, function() {
+				actual = $A.util.getText(item.getElement());
+				return expected	=== actual;
+			}, "Updating the PRV to the passthrough value never caused a markDirty and rerender.");
+		}
+	},
+	
     testPassingIntToFacet: {
         test: [function(cmp) {
             $A.test.assertEquals(2007, cmp.get("v.intByReference"));

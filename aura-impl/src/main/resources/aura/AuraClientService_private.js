@@ -73,7 +73,7 @@ var priv = {
 
     /**
      * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
-     * 
+     *
      * @private
      */
     checkAndDecodeResponse : function(response, noStrip) {
@@ -235,10 +235,10 @@ var priv = {
 
     /**
      * Process a single action/response.
-     * 
+     *
      * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
      * error occurs.
-     * 
+     *
      * @param {Action}
      *            action the action.
      * @param {Boolean}
@@ -269,7 +269,7 @@ var priv = {
             if (storage) {
                 toStore = action.getStored(storage.getName());
                 errorHandler = action.getStorageErrorHandler();
-                
+
                 if (toStore) {
                     storage.put(key, toStore).then(
                         function() {},
@@ -291,10 +291,10 @@ var priv = {
 
     /**
      * Callback for an XHR for a set of actions.
-     * 
+     *
      * This function does all of the processing for a set of actions that come back from the server. It correctly deals
      * with the case of interrupted communications, and handles aborts.
-     * 
+     *
      * @param {Object}
      *            response the response from the server.
      * @param {ActionCollector}
@@ -321,16 +321,16 @@ var priv = {
                 this.auraStack = [];
             }
         }
-        
-        var stackName = "actionCallback["; 
-        var actionsToSend = collector.getActionsToSend(); 
-        for (var n = 0; n < actionsToSend.length; n++) { 
-        	var actionToSend = actionsToSend[n]; 
-        	if (n > 0) { 
-        		stackName += ", "; 
+
+        var stackName = "actionCallback[";
+        var actionsToSend = collector.getActionsToSend();
+        for (var n = 0; n < actionsToSend.length; n++) {
+        	var actionToSend = actionsToSend[n];
+        	if (n > 0) {
+        		stackName += ", ";
     		}
 
-        	stackName += actionToSend.getStorageKey(); 
+        	stackName += actionToSend.getStorageKey();
     	}
         stackName += "]";
 
@@ -344,6 +344,7 @@ var priv = {
                 var token = responseMessage["token"];
                 if (token) {
                     priv.token = token;
+                    priv.saveTokenToStorage();
                 }
 
                 $A.getContext().merge(responseMessage["context"]);
@@ -409,7 +410,7 @@ var priv = {
      * Execute the list of client actions synchronously. Populate state and return values and execute the action
      * callbacks. This method does not interact with the inFlight counter and does no throttling. All actions will be
      * run as it is assumed abortable actions have already been pruned.
-     * 
+     *
      * @private
      */
     runClientActions : function(actions) {
@@ -423,14 +424,14 @@ var priv = {
 
     /**
      * Start a request sequence for a set of actions and an 'in-flight' counter.
-     * 
+     *
      * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
      * no request is sent to the server, it is because the request was either a storable action without needing refresh,
      * or all abortable actions that will be aborted (not sure if that is even possible).
-     * 
+     *
      * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
      * capacity in the channel).
-     * 
+     *
      * @param {Array}
      *            actions the list of actions to process.
      * @param {FlightCounter}
@@ -478,10 +479,10 @@ var priv = {
 
     /**
      * The last step before sending to the server.
-     * 
+     *
      * This routine does the actual XHR request to the server, using the collected actions to do so. In the event that
      * there are no actions to send, it simply completes the request.
-     * 
+     *
      * @private
      */
     finishRequest : function(collector, flightCounter, abortableId, flightHandled) {
@@ -498,10 +499,10 @@ var priv = {
                     var retryAction = info.action.getRetryFromStorageAction();
                     if (retryAction) {
                         $A.log("Finishing cached action failed. Trying to refetch from server.");
-                        
+
                         // Clear potential leftover configs
                         $A.getContext().clearComponentConfigs(info.action.getId());
-                        
+
                         // Enqueue the retry action
                         $A.enqueueAction(retryAction);
                     } else {
@@ -618,19 +619,19 @@ var priv = {
             url = url.substring(0, cutIndex);
         }
 
-                
+
         var sIndex = url.lastIndexOf("/");
         var appName = url.substring(sIndex+1,url.length);
         var newUrl = appName + params;
         //use history.pushState to change the url of current page without actually loading it.
-        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl' 
+        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl'
         //after reload, someUrl will become the current url.
         //state is null: don't need to track the state with popstate
         //title is null: don't want to set the page title.
         history.pushState(null,null,newUrl);
-        
+
     	//fallback to old way : set location.href will trigger the reload right away
-    	//we need this because when AuraResourceServlet's GET request with a 'error' cookie, 
+    	//we need this because when AuraResourceServlet's GET request with a 'error' cookie,
     	//AuraServlet doesn't get to do the GET reqeust
     	if( (location.href).indexOf("?nocache=") > -1 ) {
     		location.href = (url + params);
@@ -817,14 +818,14 @@ var priv = {
         }
         return false;
     },
-    
+
     setConnected : function(isConnected) {
     	var isDisconnected = !isConnected;
     	if (isDisconnected === priv.isDisconnected) {
     		// Already in desired state so no work to be done:
     		return;
     	}
-    	
+
         e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
         if (e) {
             priv.isDisconnected = isDisconnected;
@@ -833,6 +834,34 @@ var priv = {
             // looks like no definitions loaded yet
             alert(isDisconnected ? "Connection lost" : "Connection resumed");
         }
+    },
+
+    /**
+     * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
+     */
+    saveTokenToStorage : function() {
+        // update the persisted CSRF token so it's accessible when the app is launched while offline.
+        // fire-and-forget style, matching action response persistence.
+        var storage = Action.prototype.getStorage();
+        if (storage && priv.token) {
+            var value = {token:priv.token};
+            storage.put("$AuraClientService.priv$", value).then(
+                function() { /* noop on success */ },
+                function(err){ $A.warning("AuraClientService_priv.saveTokenToStorage(): failed to persist token: " + err); }
+            );
+        }
+    },
+
+    /**
+     * Loads the CSRF token from Actions storage.
+     * @return {Promise} resolves or rejects based on data loading.
+     */
+    loadTokenFromStorage : function() {
+        var storage = Action.prototype.getStorage();
+        if (storage) {
+            return storage.get("$AuraClientService.priv$");
+        }
+        return Promise.reject(new Error("no Action storage"));
     }
 };
 

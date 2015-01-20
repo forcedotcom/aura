@@ -258,14 +258,30 @@ var AuraClientService = function() {
 
                     action.setCallback(that, function(a) {
                         var state = a.getState();
+
                         if (state === "SUCCESS") {
+                            // Persists the CSRF token so it's accessible when the app is launched while offline.
+                            priv.saveTokenToStorage();
                             callback(a.getReturnValue());
                         } else if (state === "INCOMPLETE"){
                             // Use a stored response if one exists
                             var storage = Action.prototype.getStorage();
                             if (storage) {
                                 var key = action.getStorageKey();
-                                storage.get(key).then(function(value) {
+                                priv.loadTokenFromStorage()
+                                .then(function(value) {
+                                        if (value && value.value && value.value.token) {
+                                            priv.token = value.value.token;
+                                        }
+                                    }, function(err) {
+                                        // So this isn't good: we don't have the CSRF token so if we go back online the server
+                                        // Actions will fail due to not having a token. But cached data remains accessible so we
+                                        // warn rather than error.
+                                        $A.warning("AuraClientService.loadComponent(): failed to load token: " + err);
+                                })
+                                // load getApplication() from storage
+                                .then(function() { return storage.get(key); })
+                                .then(function(value) {
                                     if (value) {
                                         storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, value.value]);
                                         action.updateFromResponse(value.value);

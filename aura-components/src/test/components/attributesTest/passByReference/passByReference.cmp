@@ -91,5 +91,11 @@
             {!item}
         </aura:iteration>
     </div><br/>
+    
+     Test for Changing HTMLAttributes.prv: 
+    <li aura:id="liWithPrv" prv="{!v.objectWithList.intEntry}"> 
+        {!v.objectWithList.intEntry} 
+    </li>
+    <br/>
 
 </aura:component>

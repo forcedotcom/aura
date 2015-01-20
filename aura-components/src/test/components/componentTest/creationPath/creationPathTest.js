@@ -130,7 +130,7 @@
             $A.run(function(){cmp.set("v.iftrue", true)});
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("truebody"))}, "'true' components not instantiated");
         }, function(cmp) {
-            console.log("Looking For: ", cmp.find("truebody").creationPath, " to be client created");
+            $A.log("Looking For: ", cmp.find("truebody").creationPath, " to be client created");
             this.assertCreationPath(cmp.find("truebody"), "client created");
         }]
     },

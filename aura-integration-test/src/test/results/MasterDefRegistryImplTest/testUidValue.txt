@@ -1,4 +1,4 @@
-markup://ui:outputNumber : i9KDDDO7Vx428wNJLCo6kg
+markup://ui:outputNumber : DG9wLm7r5ofQCNH9I45t5g
 aura://Aura.Component[] : null
 aura://Map : null
 aura://String : null
@@ -57,7 +57,6 @@ markup://aura:valueChange : qCSp7Jg28OfYeWn4-8Gh2A
 markup://aura:valueDestroy : 0T_Je8fvDZCqJgs80JREVQ
 markup://aura:valueInit : ZDbpGiBAnM4SjRoKEmfWGg
 markup://aura:waiting : lTL7rqBJb8QwmBpiYL3D5Q
-markup://ui:baseKeyboardEvent : 3OM1MhFH7DCwfUNtZCpgEQ
 markup://ui:click : Ypuq9ogsYEGm_XSJUpD8gw
 markup://ui:dblclick : EOO5mEk5siad7S645II7Uw
 markup://ui:mousedown : 26Iz3mkvBrebx5dPXPyIfg
@@ -65,19 +64,9 @@ markup://ui:mousemove : GNmWoIk6Gn878CuFJtXIjA
 markup://ui:mouseout : Ji9HCF0a4A_tCR4a4oB8VQ
 markup://ui:mouseover : eo9SLuKU96kiRzO_c0wWvQ
 markup://ui:mouseup : b5t6ukooCQ-rdCAwKuxJqA
-js://ui.interactive : yaHrpl2aHMpphQ0OHzTCOw
-js://ui.interactive : Skrm_x53tqo7Cl_lheK8pA
-markup://aura:component : uO4SM3tbq_IxqlRU6Yax9g
-markup://ui:blur : AwQyduAttR6049cXFgIfVg
-markup://ui:focus : j_2l3_Edljtohqy-rneN6Q
-markup://ui:keydown : lkAZ2QYkVyQQC_4FbZ_uJw
-markup://ui:keypress : iCfU2A1q4lZpHOEtfc3WbQ
-markup://ui:keyup : TKn52QtEPDn7w4VLIOCzqw
-markup://ui:select : iuvU8dusDt3Ku-zIJntvPg
-markup://ui:visible : qh8fTvPxYesT1pNXmVi-9g
-markup://ui:interactive : D6QVNSj0Cv51UkuZAovW1Q
 aura://Decimal : null
 css://ui.outputNumber : 8bm_8b0q-ftoIJVkYGSIMA
 js://ui.outputNumber : 0uYwClLjY0aBsjMQvV-O0A
-markup://ui:output : osL0BB5egCJG1Q-CyKaQZA
-markup://ui:outputNumber : cqtmcvNViQDtzWJ5vVSOJA
+markup://aura:component : uO4SM3tbq_IxqlRU6Yax9g
+markup://ui:visible : qh8fTvPxYesT1pNXmVi-9g
+markup://ui:outputNumber : 0hw6JbTEeg7D3cCiGDB94A

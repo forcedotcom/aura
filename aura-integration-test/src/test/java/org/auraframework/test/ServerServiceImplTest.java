@@ -607,7 +607,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 "\"descriptor\":\"markup://aura:placeholder\"",
                 "\"descriptor\":\"markup://ui:input\"",
                 "\"descriptor\":\"markup://ui:inputText\"",
-                "\"descriptor\":\"markup://ui:output\"",
                 "\"descriptor\":\"markup://ui:outputText\"",
                 "\"descriptor\":\"markup://test:testValidCSS\""
         };

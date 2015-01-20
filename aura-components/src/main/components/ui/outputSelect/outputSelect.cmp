@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays a list of options based on the value attribute.">
+<aura:component implements="ui:visible" extensible="true" support="GA" description="Displays a list of options based on the value attribute.">
     <span class="{!v.class}" aura:id="span">{!v.value}</span>
 </aura:component>

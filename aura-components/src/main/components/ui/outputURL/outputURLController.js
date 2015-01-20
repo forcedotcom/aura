@@ -34,6 +34,12 @@
         var clickEvent = cmp.getEvent("linkClick");
         clickEvent.setParams({ "domEvent" : event });
         clickEvent.fire();
-        return true;
+
+        var navigateToUrl = !$A.util.getBooleanValue(cmp.get("v.stopNavigation"));
+        if (!navigateToUrl) {
+            event.preventDefault();
+        }
+
+        return navigateToUrl;
     }
 })

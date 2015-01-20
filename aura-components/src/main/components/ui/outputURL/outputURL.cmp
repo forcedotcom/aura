@@ -23,7 +23,9 @@
     <aura:attribute access="GLOBAL" name="alt" type="String" description="The alternate text description for image (used when there is no label)"/>
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
     <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
-    
+    <aura:attribute name="fixURL" type="Boolean" default="false" description="If true prepends 'http://' to links that don't specify a protocol nor start with '/'"/>
+    <aura:attribute name="stopNavigation" type="Boolean" default="false" description="Prevents navigation to specified URL on click if true."/>
+
     <aura:registerevent name="linkClick" type="ui:linkClick" description="The event fired when the user clicks the link."/>
     <a aura:id="link" class="{!v.class}" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}">
         <aura:if isTrue="{!and(v.iconClass != null, v.iconClass != '')}">

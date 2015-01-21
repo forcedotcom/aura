@@ -1,65 +1,65 @@
 ({
-	/**
-	 * Test the server side action is a background action
-	 */
-	testServerActionIsBackground : {
-		test : function(component) {
-			var foregroundAction = component.get("c.executeInForeground");
-			$A.test.assertFalse(foregroundAction.isBackground(),
-					"foreground action should have had isBackground === false");
-			var foregroundActionWR = component.get("c.executeInForegroundWithReturn");
-			$A.test.assertFalse(foregroundActionWR.isBackground(),
-					"foreground action with return should have had isBackground === false");
-			var backgroundAction = component.get("c.executeInBackground");
-			$A.test.assertTrue(backgroundAction.isBackground(),
-					"background action should have had isBackground === true");
-			var backgroundActionWR = component.get("c.executeInBackgroundWithReturn");
-			$A.test.assertTrue(backgroundActionWR.isBackground(),
-					"background action with return should have had isBackground === true");
+    /**
+     * Test the server side action is a background action
+     */
+    testServerActionIsBackground : {
+        test : function(component) {
+            var foregroundAction = component.get("c.executeInForeground");
+            $A.test.assertFalse(foregroundAction.isBackground(),
+                    "foreground action should have had isBackground === false");
+            var foregroundActionWR = component.get("c.executeInForegroundWithReturn");
+            $A.test.assertFalse(foregroundActionWR.isBackground(),
+                    "foreground action with return should have had isBackground === false");
+            var backgroundAction = component.get("c.executeInBackground");
+            $A.test.assertTrue(backgroundAction.isBackground(),
+                    "background action should have had isBackground === true");
+            var backgroundActionWR = component.get("c.executeInBackgroundWithReturn");
+            $A.test.assertTrue(backgroundActionWR.isBackground(),
+                    "background action with return should have had isBackground === true");
 
-			var wasFG = component.get("c.executeInForeground");
-			wasFG.setBackground(true);
-			$A.test.assertTrue(wasFG.isBackground(), "wasFG action should have had isBackground set to true");
-			var stillBG = component.get("c.executeInBackground");
-			stillBG.setBackground(false);
-			$A.test.assertTrue(stillBG.isBackground(), "stillBG action should not have had isBackground set to false");
-		}
-	},
+            var wasFG = component.get("c.executeInForeground");
+            wasFG.setBackground(true);
+            $A.test.assertTrue(wasFG.isBackground(), "wasFG action should have had isBackground set to true");
+            var stillBG = component.get("c.executeInBackground");
+            stillBG.setBackground(false);
+            $A.test.assertTrue(stillBG.isBackground(), "stillBG action should not have had isBackground set to false");
+        }
+    },
 
-	testEnqueuedCallbackJavascriptError : {
-		test : function(cmp) {
-		    $A.test.expectAuraError("Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{} : this is intentional");
-		    var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
+    testEnqueuedCallbackJavascriptError : {
+        test : function(cmp) {
+            $A.test.expectAuraWarning("Callback failed: java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground");
+            $A.test.expectAuraError("Uncaught error in actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : this is intentional");
+            var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
                 throw new Error("this is intentional");
             });
-            $A.run(function() {
-                $A.enqueueAction(a);
-            });
-            $A.test.addWaitFor(false, $A.test.isActionPending);
-		}
-	},
+            $A.run(function() { $A.enqueueAction(a); });
+            $A.test.addWaitFor(true, function() { return a.getState() != "NEW" && a.getState() != "RUNNING"; },
+                    function() {});
+        }
+    },
 
-	testRunActionsCallbackJavascriptError : {
-		test : function(cmp) {
-		    $A.test.expectAuraError("Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{} : this is intentional");
-	        var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
-	            throw new Error("this is intentional");
-	        });
-	        $A.clientService.runActions([ a ], cmp, function() {
-	        });
-	        $A.test.addWaitFor(false, $A.test.isActionPending);
-		}
-	},
+    testRunActionsCallbackJavascriptError : {
+        test : function(cmp) {
+            $A.test.expectAuraError("Uncaught error in actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : this is intentional");
+            var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
+                throw new Error("this is intentional");
+            });
+            $A.clientService.runActions([ a ], cmp, function() { });
+            $A.test.addWaitFor(true, function() { return a.getState() != "NEW" && a.getState() != "RUNNING"; },
+                    function() {});
+        }
+    },
 
     testRunActionsGroupCallbackJavascriptError : {
         test : function(cmp) {
-            $A.test.expectAuraError("Error while running java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{} : this is intentional");
-            var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
-            });
+            $A.test.expectAuraError("Uncaught error in actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : this is intentional");
+            var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() { });
             $A.clientService.runActions([ a ], cmp, function() {
                 throw new Error("this is intentional");
             });
-            $A.test.addWaitFor(false, $A.test.isActionPending);
+            $A.test.addWaitFor(true, function() { return a.getState() != "NEW" && a.getState() != "RUNNING"; },
+                    function() {});
         }
     },
 

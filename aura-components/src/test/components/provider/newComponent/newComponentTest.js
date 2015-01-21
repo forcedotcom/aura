@@ -197,6 +197,7 @@
     testClientProvidedServerDependent: {
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'markup://provider:cmpWithModel',attributes:{value:'secondThing'}}\"}"},
         test:function(cmp){
+            $A.test.expectAuraError("Uncaught error in $A.run() : Assertion Failed!: Client provided component cannot have server dependencies: markup://provider:cmpWithModel");
             $A.run(function(){
                 cmp.get('c.createComponent').runDeprecated();
             });

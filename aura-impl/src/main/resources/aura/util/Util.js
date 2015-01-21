@@ -1226,7 +1226,7 @@ $A.ns.Util.prototype.isElement = function(obj) {
     if (typeof HTMLElement === "object") {
         return obj instanceof HTMLElement;
     } else {
-        return typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName==="string";
+        return obj && obj.nodeType === 1 && typeof obj.nodeName==="string";
     }
 };
 

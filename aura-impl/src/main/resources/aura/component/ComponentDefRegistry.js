@@ -102,6 +102,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
                 this.writeToCache(descriptor, config);
             } catch (e) {
                 // Clear localStorage and try one more time to write through
+                // How is this a good idea?
                 localStorage.clear();
                 $A.Perf.endMark("Cleared localStorage (out of space) ");
 

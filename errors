@@ -1,0 +1,2 @@
+  js_provider.newComponent$testClientProvidedServerDependent(org.auraframework.test.ComponentJSTestSuiteTest$ComponentTestCase): class java.lang.AssertionError: Test error: Uncaught error in $A.run() : Assertion Failed!: Client provided component cannot have server dependencies: markup://provider:cmpWithModel : undefined(..)
+

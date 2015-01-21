@@ -223,8 +223,8 @@ var priv = {
             try {
                 $A.util.json.decodeString(resp["defaultHandler"])();
             } catch (e) {
-                // W-1728079 : verify & remove this comment when error() take two parameters in the future
                 $A.error("Error in defaultHandler for event: " + descriptor, e);
+                throw e;
             }
         }
     },

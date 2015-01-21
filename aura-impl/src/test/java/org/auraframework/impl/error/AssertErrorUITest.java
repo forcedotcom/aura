@@ -30,7 +30,7 @@ public class AssertErrorUITest extends WebDriverTestCase {
         open("/test/test_ErrorMsg_Assert.cmp");
         findDomElement(By.cssSelector(".createErrorButton")).click();
         String errorMsg = getText(By.cssSelector("div[id='auraErrorMessage']"));
-        assertEquals("Proper error message from failed assert not displayed",
-                "Assertion Failed!: Assert failed in test_ErrorMsg_AssertController! : false", errorMsg);
+        assertTrue("Proper error message from failed assert not displayed",
+            errorMsg.startsWith("Uncaught error in $A.run() : Assertion Failed!: Assert failed in test_ErrorMsg_AssertController! : false"));
     }
 }

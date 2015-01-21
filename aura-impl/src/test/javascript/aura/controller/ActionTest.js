@@ -23,6 +23,18 @@ Test.Aura.Controller.ActionTest = function() {
         // #import aura.controller.Action
     });
 
+    var mockGlobal = Mocks.GetMocks(Object.Global(), {
+        "$A" : {
+            clientService : {
+                inAuraLoop : function() {
+                    return false;
+                }
+            },
+            mark : function() {
+            }
+        },
+    });
+
     var targetNextActionId = 123;
     var mockActionId = Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId);
 
@@ -529,11 +541,21 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function RunDeprecated() {
+        var mockGlobals = Mocks.GetMock(Object.Global(), "$A", {
+            clientService : {
+                inAuraLoop : function() {
+                    return false;
+                }
+            },
+            assert : function(param) {
+            },
+        });
+
         [ Fact ]
         function AssertsIsClientAction() {
             // Arrange
             var expected = "expected";
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function(param) {
                     actual = param;
                 }
@@ -562,7 +584,7 @@ Test.Aura.Controller.ActionTest = function() {
             var actual = null;
 
             // Act
-            mockAssert(function() {
+            mockAura(function() {
                 target.runDeprecated();
             })
 
@@ -578,7 +600,7 @@ Test.Aura.Controller.ActionTest = function() {
             var expected = "Action failed: " + expectedQualifiedName + " -> " + expectedName;
             var sentToServer = false;
 
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function(param) {
                 },
                 warning : function(msg) {
@@ -597,6 +619,9 @@ Test.Aura.Controller.ActionTest = function() {
                     };
                 },
                 clientService : {
+                    inAuraLoop : function() {
+                        return false;
+                    },
                     enqueueAction : function() {
                         sentToServer = true;
                     }
@@ -634,7 +659,7 @@ Test.Aura.Controller.ActionTest = function() {
             var actual = null;
 
             // Act
-            mockAssert(function() {
+            mockAura(function() {
                 target.runDeprecated();
             })
             Assert.Equal(true, sentToServer);
@@ -707,6 +732,9 @@ Test.Aura.Controller.ActionTest = function() {
                     };
                 },
                 clientService : {
+                    inAuraLoop : function() {
+                        return false;
+                    },
                     enqueueAction : function() {
                         sentToServer++;
                     }
@@ -1030,19 +1058,29 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function FinishAction() {
-        var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-            getContext : function() {
-                return {
-                    joinComponentConfigs : function() {
-                    },
-                    finishComponentConfigs : function() {
-                    },
-                    getNum : function() {
-                        return 0;
+        var mockContext = function(inloop) {
+            return Mocks.GetMock(Object.Global(), "$A", {
+                getContext : function() {
+                    return {
+                        joinComponentConfigs : function() {
+                        },
+                        finishComponentConfigs : function() {
+                        },
+                        getNum : function() {
+                            return 0;
+                        }
+                    };
+                },
+                clientService : {
+                    inAuraLoop : function() {
+                        return inloop;
                     }
-                };
-            }
-        });
+                },
+                warning : function() {
+                },
+                error : Stubs.GetMethod("msg", "error", null)
+            });
+        };
 
         [ Fact ]
         function CallsActionCallbackIfCmpIsValid() {
@@ -1112,8 +1150,9 @@ Test.Aura.Controller.ActionTest = function() {
         }
 
         [ Fact ]
-        function CallsCompleteGroupsEvenOnErrors() {
+        function CallsCompleteGroupsEvenOnErrorsInLoop() {
             var target = new Action();
+            var errorStub;
             target.completeGroups = Stubs.GetMethod(null);
             target.components = "something";
             target.getStorage = function() {
@@ -1124,7 +1163,8 @@ Test.Aura.Controller.ActionTest = function() {
             };
 
             var error = Record.Exception(function() {
-                mockContext(function() {
+                mockContext(true)(function() {
+                    errorStub = $A.error;
                     target.finishAction({
                         setCurrentAction : function() {
                         },
@@ -1140,6 +1180,40 @@ Test.Aura.Controller.ActionTest = function() {
                 ReturnValue : null
             } ], target.completeGroups.Calls);
             Assert.Equal("intentional", error);
+            Assert.Equal(0, errorStub.Calls.length);
+        }
+
+        [ Fact ]
+        function CallsCompleteGroupsEvenOnErrorsOutOfLoop() {
+            var target = new Action();
+            var errorStub = undefined;
+            var expected = new Error("intentional");
+            target.completeGroups = Stubs.GetMethod(null);
+            target.components = "something";
+            target.getStorage = function() {
+                return false;
+            };
+            target.getId = function() {
+                return "1";
+            };
+
+            mockContext(false)(function() {
+                errorStub = $A.error;
+                target.finishAction({
+                    setCurrentAction : function() {
+                    },
+                    joinComponentConfigs : function() {
+                        throw expected
+                    }
+                });
+            });
+
+            Assert.Equal([ {
+                Arguments : {},
+                ReturnValue : null
+            } ], target.completeGroups.Calls);
+            Assert.Equal(1, errorStub.Calls.length);
+            Assert.Equal(expected, errorStub.Calls[0].Arguments.error);
         }
 
         [ Fact ]

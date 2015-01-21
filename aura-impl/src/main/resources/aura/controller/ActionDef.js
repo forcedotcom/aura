@@ -23,40 +23,41 @@
  *            config
  */
 function ActionDef(config) {
-	this.name = config["name"];
-	this.descriptor = config["descriptor"];
-	this.actionType = config["actionType"];
-	this.meth = null;
-	this.paramDefs = {};
+    this.name = config["name"];
+    this.descriptor = config["descriptor"];
+    this.actionType = config["actionType"];
+    this.meth = null;
+    this.paramDefs = {};
         this.background = false;
         this.caboose = false;
 
-	if (this.actionType === "SERVER") {
-		this.returnType = new ValueDef(config["returnType"]);
+    if (this.actionType === "SERVER") {
+        this.returnType = new ValueDef(config["returnType"]);
 
-		var params = config["params"];
-		if (!!params && $A.util.isArray(params)) {
-			for ( var i = 0; i < params.length; i++) {
-				var paramConfig = params[i];
-				var param = new ValueDef(paramConfig);
-				this.paramDefs[param.getName()] = param;
-			}
-		}
+        var params = config["params"];
+        if (!!params && $A.util.isArray(params)) {
+            for ( var i = 0; i < params.length; i++) {
+                var paramConfig = params[i];
+                var param = new ValueDef(paramConfig);
+                this.paramDefs[param.getName()] = param;
+            }
+        }
                 if (config["background"]) {
                     this.background = true;
                 }
                 if (config["caboose"]) {
                     this.caboose = true;
                 }
-	}
+    }
 
-	if (this.actionType === "CLIENT") {
-		try {
-			this.meth = $A.util.json.decodeString(config["code"]);
-		} catch (e) {
-			$A.log(config["code"], e);
-		}
-	}
+    if (this.actionType === "CLIENT") {
+        try {
+            this.meth = $A.util.json.decodeString(config["code"]);
+        } catch (e) {
+            $A.log(config["code"], e);
+                        throw e;
+        }
+    }
 }
 
 ActionDef.prototype.auraType = "ActionDef";
@@ -67,7 +68,7 @@ ActionDef.prototype.auraType = "ActionDef";
  * @returns {String}
  */
 ActionDef.prototype.getName = function() {
-	return this.name;
+    return this.name;
 };
 
 /**
@@ -77,7 +78,7 @@ ActionDef.prototype.getName = function() {
  * @private
  */
 ActionDef.prototype.getDescriptor = function() {
-	return this.descriptor;
+    return this.descriptor;
 };
 
 /**
@@ -87,7 +88,7 @@ ActionDef.prototype.getDescriptor = function() {
  * @private
  */
 ActionDef.prototype.getActionType = function() {
-	return this.actionType;
+    return this.actionType;
 };
 
 /**
@@ -97,7 +98,7 @@ ActionDef.prototype.getActionType = function() {
  * @returns {!boolean}
  */
 ActionDef.prototype.isClientAction = function() {
-	return this.actionType === "CLIENT";
+    return this.actionType === "CLIENT";
 };
 
 /**
@@ -107,7 +108,7 @@ ActionDef.prototype.isClientAction = function() {
  * @returns {!boolean}
  */
 ActionDef.prototype.isServerAction = function() {
-	return this.actionType === "SERVER";
+    return this.actionType === "SERVER";
 };
 
 /**
@@ -116,7 +117,7 @@ ActionDef.prototype.isServerAction = function() {
  * @returns {!boolean}
  */
 ActionDef.prototype.isBackground = function() {
-	return this.background === true;
+    return this.background === true;
 };
 
 /**
@@ -125,7 +126,7 @@ ActionDef.prototype.isBackground = function() {
  * @returns {!boolean}
  */
 ActionDef.prototype.isCaboose = function() {
-	return this.caboose === true;
+    return this.caboose === true;
 };
 
 /**
@@ -138,6 +139,13 @@ ActionDef.prototype.isCaboose = function() {
  */
 ActionDef.prototype.newInstance = function(cmp) {
     return new Action(this, "a", this.meth, this.paramDefs, this.background, cmp, this.caboose);
+};
+
+/**
+ * Get a reasonable string representation of the def.
+ */
+ActionDef.prototype.toString = function() {
+    return this.descriptor.toString();
 };
 
 // #include aura.controller.ActionDef_export

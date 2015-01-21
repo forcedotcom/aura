@@ -27,7 +27,6 @@ var ComponentPriv = (function() { // Scoping priv
         this.inUnrender = false;
         this.localId = config["localId"];
         this.valueProviders = {};
-        this.actionRefs = undefined;
         this.eventDispatcher = undefined;
         this.docLevelHandlers = undefined;
         this.references={};
@@ -118,15 +117,15 @@ var ComponentPriv = (function() { // Scoping priv
         // initialize attributes
         this.setupAttributes(cmp, configAttributes, localCreation);
 
-        // runs component provider and replaces this component with the
-        // provided one
-        this.injectComponent(config, cmp, localCreation, cmp.ccc);
-
         // instantiates this components model
         this.setupModel(config["model"], cmp);
 
         // create all value providers for this component m/v/c etc.
         this.setupValueProviders(config["valueProviders"], cmp);
+
+        // runs component provider and replaces this component with the
+        // provided one
+        this.injectComponent(config, cmp, localCreation, cmp.ccc);
 
         // sets up component level events
         this.setupComponentEvents(cmp, configAttributes);
@@ -195,78 +194,45 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
     ComponentPriv.prototype.getValueProvider = function(key, cmp) {
-        if(!$A.util.isString(key)){
-            $A.error("ComponentPriv.getValueProvider: 'key' must be a valid String.");
+        if (!$A.util.isString(key)) {
+            $A.error("ComponentPriv.getValueProvider(): 'key' must be a valid String.");
         }
-        key=key.toLowerCase();
-        // Try the most commonly accessed non-map based provider keys first
-        if (key === "v") {
-            return this.attributes;
-        } else if (key === "m") {
-            return this.model;
-        } else {
-            // Try map based providers followed by the rarely accessed keys
-            // (globalId, def, ...)
-            var provider = this.valueProviders[key];
-            if (provider) {
-                return provider;
-            } else{
-                switch(key){
-                    case "globalid":
-                        return this.globalId;
-                    case "def":
-                        return valueFactory.create(this.componentDef);
-                    case "this":
-                        return cmp;
-                    case "null":
-                        return null;
-                    default:
-                        // JBUCH: HALO: TODO: TRACK DOWN WHY/IF THIS IS NECESSARY. SEE uitest/carousel_Test.cmp
-                        if(cmp!=cmp.getConcreteComponent()){
-                            return cmp.getConcreteComponent().get(key);
-                        }
-                        return undefined;
-                }
-            }
-        }
+        return this.valueProviders[key.toLowerCase()];
     };
 
     /**
      * Create the value providers
      */
-    ComponentPriv.prototype.setupValueProviders = function(config, cmp) {
-        var actionProvider = this.createActionValueProvider(cmp);
-        if (actionProvider) {
-            this.valueProviders["c"] = actionProvider;
-        }
+    ComponentPriv.prototype.setupValueProviders = function(customValueProviders, cmp) {
+        var vp=this.valueProviders;
+        vp["v"]=this.attributes;
+        vp["m"]=this.model;
+        vp["c"]=this.createActionValueProvider(cmp);
+        vp["e"]=this.getEventDispatcher(cmp);
+        vp["this"]=cmp;
+        vp["globalid"]=cmp.getGlobalId();
+        vp["def"]=this.componentDef;
+        vp["super"]=this.superComponent;
+        vp["null"]=null;
 
-        var extraValueProviders = config;
-        for ( var key in extraValueProviders) {
-            var value = extraValueProviders[key];
-            if (key !== "m" && key !== "v" && key !== "c") {
-                this.getValueProviders()[key.toLowerCase()] = valueFactory.create(value);
-            }
+        for (var key in customValueProviders) {
+            cmp.addValueProvider(key,customValueProviders[key]);
         }
-    };
-
-    ComponentPriv.prototype.getValueProviders = function() {
-        return this.valueProviders;
     };
 
     ComponentPriv.prototype.createActionValueProvider = function(cmp) {
         var controllerDef = this.componentDef.getControllerDef();
         if (controllerDef) {
-            this.actionRefs = {};
-            var ar = this.actionRefs;
             return {
+                actions:{},
                 get : function(key) {
-                    var ret = ar[key];
+                    var ret = this.actions[key];
                     if (!ret) {
                         var actionDef = controllerDef.getActionDef(key);
                         $A.assert(actionDef,"Unknown controller action '"+key+"'");
                         if (actionDef) {
                             ret = valueFactory.create(actionDef, null, cmp);
-                            ar[key] = ret;
+                            this.actions[key] = ret;
                         }
                     }
                     return ret.getAction();
@@ -361,7 +327,7 @@ var ComponentPriv = (function() { // Scoping priv
 
     ComponentPriv.prototype.setSuperComponent = function(component) {
         if(component){
-            this.superComponent = this.valueProviders["super"] = component;
+            this.superComponent = component;
         }
     };
 
@@ -576,7 +542,6 @@ if(!this.concreteComponentId) {
                 }
             };
             this.eventDispatcher = dispatcher;
-            this.valueProviders["e"] = dispatcher;
         }
 
         return this.eventDispatcher;
@@ -813,13 +778,12 @@ if(!this.concreteComponentId) {
                 $A.assert(!realComponentDef.hasRemoteDependencies() || (realComponentDef.hasRemoteDependencies() && self.partialConfig),
                     "Client provided component cannot have server dependencies: " + realComponentDef);
 
+                // JBUCH: HALO: TODO: FIND BETTER WAY TO RESET THESE AFTER PROVIDER INJECTION
                 self.componentDef = realComponentDef;
                 self.attributes.merge(attributes, realComponentDef.getAttributeDefs());
-                // Re attaching values providers when injecting components
-                // self.setupValueProviders(config["valueProviders"], cmp);
-                // FIXME: @dval this is a BAD HACK, we need to understand rendering distance
-                // on injected components...
-                // self.componentDef.getRenderingDetails().distance-=1;
+                self.setupModel(config["model"],cmp);
+                self.valueProviders["m"]=self.model;
+                self.valueProviders["c"]=self.createActionValueProvider(cmp);
             };
 
             var providerDef = componentDef.getProviderDef();

@@ -21,8 +21,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventType;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
@@ -73,6 +78,16 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
             AttributeDefImpl attributeDef = new AttributeDefHandler<EventDef>(this, xmlReader, source).getElement();
             builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
+        } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
+        	RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<EventDef>(this,
+        			xmlReader, source).getElement();
+        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
+        			.getDescriptor();
+        	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
+        		error("Duplicate namespace %s found on tag %s",
+        				requiredVersionDesc.getName(), tag);
+        	}	
+        	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else {
             error("Found unexpected tag %s", tag);
         }

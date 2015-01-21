@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.DescriptorFileMapper;
@@ -172,6 +173,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case THEME_PROVIDER:
         case THEME_MAP_PROVIDER:
         case INCLUDE:
+        case REQUIRED_VERSION:
             qualified = String.format("%s.%s", ns, name);
             break;
         // subtypes

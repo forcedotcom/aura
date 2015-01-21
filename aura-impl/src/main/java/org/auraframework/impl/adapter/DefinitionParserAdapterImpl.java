@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.adapter;
 
+import java.util.Map;
+
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -30,5 +32,10 @@ public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
     public DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException {
         return new DefinitionAccessImpl(namespace, access);
     }
+
+	@Override
+	public Map<String, String> getRequiredVersions() {
+		return null;
+	}
 
 }

@@ -50,15 +50,15 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      * @param location The location where this AttributeDef was defined in the markup.
      */
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
-                            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-                            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
-        super(descriptor, location, visibility);
-        this.parentDescriptor = parentDescriptor;
-        this.typeDefDescriptor = typeDefDescriptor;
-        this.defaultValue = defaultValue;
-        this.required = required;
-        this.serializeTo = serializeTo;
-    }
+				            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+				            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
+		super(descriptor, location, visibility);
+		this.parentDescriptor = parentDescriptor;
+		this.typeDefDescriptor = typeDefDescriptor;
+		this.defaultValue = defaultValue;
+		this.required = required;
+		this.serializeTo = serializeTo;
+	}
 
     protected AttributeDefImpl(Builder builder) {
         super(builder);
@@ -192,6 +192,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         public DefDescriptor<TypeDef> typeDefDescriptor;
         public AttributeDefRef defaultValue;
         public SerializeToType serializeTo;
+        public String minVersion = null;
+        public String maxVersion = null;
 
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private boolean required;
@@ -260,5 +262,5 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     private final AttributeDefRef defaultValue;
     private final boolean required;
     private final SerializeToType serializeTo;
-
+    
 }

@@ -44,7 +44,7 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
 
         // $Browser
         l.add(new BrowserValueProvider());
-
+        
         return l;
     }
 

@@ -29,6 +29,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LayoutDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -94,6 +95,11 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() {
         return null;
+    }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("LayoutsDef cannot contain RequiredVersionDefs.");
     }
 
     @Override

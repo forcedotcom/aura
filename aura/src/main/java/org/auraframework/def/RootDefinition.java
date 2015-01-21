@@ -18,13 +18,14 @@ package org.auraframework.def;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.instance.Versionable;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * RootDefinitions are the Definitions that can be defined at the top-level of markup. This includes things like
  * component, interface, and event. The common trait of all of these types is that they can include AttributeDefs.
  */
-public interface RootDefinition extends Definition {
+public interface RootDefinition extends Definition, Versionable {
     public enum SupportLevel {
         PROTO, DEPRECATED, BETA, GA
     }
@@ -42,6 +43,12 @@ public interface RootDefinition extends Definition {
      * @throws QuickFixException
      */
     Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException;
+    
+    /**
+     * @return all the required versions for this component
+     * @throws QuickFixException
+     */
+    Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs();
 
     /**
      * @param name
@@ -49,6 +56,12 @@ public interface RootDefinition extends Definition {
      * @throws QuickFixException
      */
     AttributeDef getAttributeDef(String name) throws QuickFixException;
+    
+    /**
+     * @param namespace
+     * @return The RequiredVersionDef for the given namespace
+     */
+    RequiredVersionDef getRequiredVersion(String namespace);
 
     /**
      * This is used to validate by the compiler to validate EventDefRefs.

@@ -18,7 +18,6 @@ package org.auraframework.impl.root.namespace;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -26,6 +25,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -92,6 +92,11 @@ public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implement
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         return null;
+    }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("NamespaceDef cannot contain RequiredVersionDefs.");
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<NamespaceDef> {

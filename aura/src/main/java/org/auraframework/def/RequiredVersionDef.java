@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.adapter;
+package org.auraframework.def;
 
-import java.util.Map;
-
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.throwable.quickfix.InvalidAccessValueException;
-
-public interface DefinitionParserAdapter extends AuraAdapter {
-    /* parse the value of the ACCESS attribute */
-    DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException;
+/**
+ * Required version for a component/application
+ *
+ */
+public interface RequiredVersionDef extends Definition {
+    @Override
+    DefDescriptor<RequiredVersionDef> getDescriptor();
     
-    Map<String, String> getRequiredVersions();
+    String getVersion();
 }

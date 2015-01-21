@@ -34,7 +34,9 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.instance.Versionable;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -46,6 +48,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
@@ -266,6 +269,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
             case ATTRIBUTE:
+            case REQUIRED_VERSION:
             case LAYOUT:
             case LAYOUT_ITEM:
             case TESTCASE:
@@ -1202,7 +1206,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             throw new NoAccessException(message);
         }
     }
-
+    
     @Override
     public <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def) {
         return hasAccess(referencingDescriptor, def, accessCheckCache);

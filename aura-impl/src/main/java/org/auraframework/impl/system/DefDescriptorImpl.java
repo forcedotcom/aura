@@ -154,6 +154,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 throw new AuraRuntimeException(
                         String.format("%s descriptor must be a subdef: %s", defType.name(), qualifiedName));
             case ATTRIBUTE:
+            case REQUIRED_VERSION:
             case LAYOUT:
             case LAYOUT_ITEM:
             case TESTCASE:

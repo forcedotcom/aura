@@ -32,6 +32,7 @@ import org.auraframework.def.DesignTemplateDef;
 import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -124,6 +125,11 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         throw new UnsupportedOperationException("DesignDef cannot contain AttributeDefs.");
+    }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+        throw new UnsupportedOperationException("DesignDef cannot contain RequiredVersionDefs.");
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDescriptorProviderDef;
@@ -407,6 +408,11 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         throw new UnsupportedOperationException("attributes not supported on ThemeDef");
+    }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("ThemeDef cannot contain RequiredVersionDefs.");
     }
 
     @Override

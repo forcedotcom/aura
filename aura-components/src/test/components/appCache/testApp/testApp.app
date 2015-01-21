@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application useAppcache="true" render="client">
+<aura:application access="global" useAppcache="true" render="client">
     <div>This should appear after the appcache has been populated.</div>
 </aura:application>

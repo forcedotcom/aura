@@ -490,17 +490,15 @@ Component.prototype.destroy = function(async) {
 		$A.componentService.deIndex(globalId);
 
 		var vp = priv.valueProviders;
-		if (vp) {
-			for ( var k in vp) {
-				var v = vp[k];
-				if (v) {
-					if ($A.util.isFunction(v.destroy)) {
-						v.destroy(async);
-					}
-					delete vp[k];
-				}
-			}
-		}
+        for ( var k in vp) {
+            var v = vp[k];
+            if (v&&v!=this) {
+                if ($A.util.isFunction(v.destroy)) {
+                    v.destroy(async);
+                }
+                delete vp[k];
+            }
+        }
 
        // Swap in InvalidComponent prototype to keep us from having to add
         // validity checks all over the place
@@ -819,7 +817,11 @@ Component.prototype.get = function(key) {
 	var valueProvider = this.priv.getValueProvider(root, this);
 	if (path.length) {
         $A.assert(valueProvider, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
-        return valueProvider.get(path.join('.'));
+        if($A.util.isFunction(valueProvider.get)){
+            return valueProvider.get(path.join('.'));
+        }else{
+            return $A.expressionService.resolve(path,valueProvider);
+        }
 	} else {
 		return valueProvider;
 	}
@@ -976,6 +978,19 @@ Component.prototype.getComponentValueProvider = function() {
 
     return valueProvider.auraType !== Component.prototype.auraType && $A.util.isFunction(valueProvider.getComponent) ?
         valueProvider.getComponent() : valueProvider;
+};
+
+/**
+ * Adds Custom ValueProviders to a component
+ * @param {String} key string by which to identify the valueProvider. Used in expressions in markup, etc.
+ * @param {Object} valueProvider the object to request data from. Must implement .get(expression), can implement .set(key,value).
+ * @public
+ */
+Component.prototype.addValueProvider=function(key,valueProvider){
+    $A.assert($A.util.isString(key),"Component.addValueProvider(): 'key' must be a valid String.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,".indexOf(","+key.toLowerCase()+",")==-1,"Component.addValueProvider(): '"+key+"' is a reserved valueProvider.");
+    $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"Component.addValueProvider(): 'valueProvider' is required.");
+    this.priv.valueProviders[key]=valueProvider;
 };
 
 /**

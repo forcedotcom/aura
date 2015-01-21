@@ -1,0 +1,7 @@
+<aura:component>
+    <div class="color1">Color 1</div>
+    <div class="color2">Color 2</div>
+    <div class="color3">Color 3</div>
+    <div class="color4">Color 4</div>
+    <div class="color5">Color 5</div>
+</aura:component>

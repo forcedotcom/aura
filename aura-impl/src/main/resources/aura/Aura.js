@@ -105,6 +105,7 @@ var clientService;
 // #include aura.AuraEventService
 // #include aura.AuraLayoutService
 // #include aura.AuraLocalizationService
+// #include aura.AuraStyleService
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 // #include aura.value.ValueFactory
 // #include aura.value.ExpressionFunctions
@@ -139,6 +140,7 @@ $A.ns.Aura = function() {
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
     this.storageService = new AuraStorageService();
+    this.styleService = new AuraStyleService();
     this.logger = new $A.ns.Logger();
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -217,6 +219,7 @@ $A.ns.Aura = function() {
          * @see Aura#services.component
          */
         cmp : aura.componentService,
+
         /**
          * Alias of Event Service
          *
@@ -236,6 +239,15 @@ $A.ns.Aura = function() {
          * @see Aura#service.localization
          */
         l10n : aura.localizationService,
+
+        /**
+         * Style Service
+         *
+         * @public
+         * @type AuraStyleService
+         * @memberOf Aura.prototype
+         */
+        style: aura.styleService,
 
         get : function(key) {
             var ret = $A.services[key];
@@ -434,6 +446,7 @@ $A.ns.Aura = function() {
         "eventService", aura.eventService,
         "layoutService", aura.layoutService,
         "storageService", aura.storageService,
+        "styleService", aura.styleService,
         "services", aura.services,
         "enqueueAction", aura.enqueueAction,
         "deferAction", aura.deferAction,

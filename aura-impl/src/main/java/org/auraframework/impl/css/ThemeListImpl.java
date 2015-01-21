@@ -17,10 +17,12 @@ package org.auraframework.impl.css;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.auraframework.css.MutableThemeList;
 import org.auraframework.def.DefDescriptor;
@@ -31,6 +33,7 @@ import org.auraframework.util.text.Hash;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -58,6 +61,19 @@ public final class ThemeListImpl implements MutableThemeList {
     @Override
     public boolean isEmpty() {
         return themes.isEmpty();
+    }
+
+    @Override
+    public Set<String> getVarNames() throws QuickFixException {
+        Set<String> names = new HashSet<>();
+
+        for (DefDescriptor<ThemeDef> theme : themes) {
+            Iterables.addAll(names, theme.getDef().getAllNames());
+        }
+
+        names.addAll(dynamicVars.rowKeySet());
+
+        return names;
     }
 
     @Override

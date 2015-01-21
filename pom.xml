@@ -52,7 +52,7 @@
         <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.format>xml</xunit.js.format>
     </properties>
-    <repositories>      
+    <repositories>
         <repository>
             <snapshots>
                 <enabled>false</enabled>
@@ -383,7 +383,7 @@
             <dependency>
                 <groupId>com.salesforce</groupId>
                 <artifactId>omakase</artifactId>
-                <version>0.2.2</version>
+                <version>0.3.0</version>
             </dependency>
             <dependency>
                 <groupId>biz.aQute</groupId>

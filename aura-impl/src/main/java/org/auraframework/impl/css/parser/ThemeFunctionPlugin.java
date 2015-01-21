@@ -27,15 +27,12 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.salesforce.omakase.SupportMatrix;
 import com.salesforce.omakase.ast.atrule.AtRule;
 import com.salesforce.omakase.ast.declaration.AbstractTerm;
 import com.salesforce.omakase.ast.declaration.Declaration;
-import com.salesforce.omakase.ast.declaration.PropertyValueMember;
 import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.broadcast.annotation.Subscribable;
 import com.salesforce.omakase.broadcast.annotation.Validate;
-import com.salesforce.omakase.data.Prefix;
 import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.parser.refiner.RefinerRegistry;
@@ -44,7 +41,8 @@ import com.salesforce.omakase.writer.StyleAppendable;
 import com.salesforce.omakase.writer.StyleWriter;
 
 /**
- * Enables resolution of the theme function custom AST objects in the CSS source code.
+ * Enables resolution of the {@link ThemeFunction} and {@link ThemeExpression} custom AST objects in the CSS source
+ * code.
  */
 final class ThemeFunctionPlugin implements SyntaxPlugin {
     private static final String MSG = "Theme functions cannot evaluate to an empty string when used with other terms. "
@@ -52,9 +50,8 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
 
     private final ThemeFunctionRefiner themeRefiner;
 
-    /** use a constructor method instead */
+    /** for public construction use a constructor method instead */
     private ThemeFunctionPlugin(boolean passthrough, DefDescriptor<StyleDef> styleDef) throws QuickFixException {
-
         ThemeValueProvider provider;
         if (passthrough) {
             provider = Aura.getStyleAdapter().getThemeValueProviderNoOverrides(styleDef);
@@ -102,8 +99,8 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
     public void validate(EmptyTerm empty, ErrorManager em) {
         // can't have the function evaluate to empty (which means "remove the declaration") if there are other terms
         // besides the theme function in the declaration value.
-        if (empty.group().get().size() > 1) {
-            em.report(ErrorLevel.FATAL, empty, String.format(MSG, empty.expression()));
+        if (empty.group().size() > 1) {
+            em.report(ErrorLevel.FATAL, empty, String.format(MSG, empty.textualValue()));
         }
     }
 
@@ -125,13 +122,9 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
             this.expression = expression;
         }
 
-        public String expression() {
-            return expression;
-        }
-
         @Override
         public String textualValue() {
-            return expression();
+            return expression;
         }
 
         @Override
@@ -144,7 +137,7 @@ final class ThemeFunctionPlugin implements SyntaxPlugin {
         }
 
         @Override
-        protected PropertyValueMember makeCopy(Prefix prefix, SupportMatrix support) {
+        public EmptyTerm copy() {
             return new EmptyTerm(expression);
         }
     }

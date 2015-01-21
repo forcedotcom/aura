@@ -27,6 +27,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -150,7 +151,8 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     }
 
     /**
-     * adds an app to the ns, and restarts the context with new app
+     * adds an app to the ns, and restarts the context with new app. Must be called after any other addContextApp*
+     * methods.
      */
     public DefDescriptor<ApplicationDef> addContextApp(CharSequence src) throws QuickFixException {
         String fmt = String.format("%s:%s", ns1, "testApp");
@@ -162,7 +164,9 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
+        AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
+        ctx.setApplicationDescriptor(appDesc);
+        Aura.getDefinitionService().updateLoaded(appDesc);
         return appDesc;
     }
 

@@ -66,7 +66,9 @@ public interface ThemeDef extends RootDefinition {
      * <p>
      * If you only need to know if a variable is defined for this theme, this method is faster than
      * {@link #getVar(String)} as it doesn't have to perform any evaluation.
-     * 
+     * <p>
+     * This does <em>not</em> check the map provider, if present.
+     *
      * @param name Check for a var with this name.
      */
     boolean hasVar(String name) throws QuickFixException;
@@ -78,7 +80,9 @@ public interface ThemeDef extends RootDefinition {
      * themes are checked, in reverse order (such that the last imported theme is checked first). This assumes the
      * requirement that imported themes are added before any declared vars. If no imported theme has the var then the
      * parent theme is checked, if present.
-     * 
+     * <p>
+     * This does <em>not</em> check the map provider, if present.
+     *
      * @param name Get the value for a variable with this name.
      * @return The value, which might be a String, an Integer, or even a {@link PropertyReference} if the value was an
      *         expression (cross reference).
@@ -90,7 +94,7 @@ public interface ThemeDef extends RootDefinition {
      * <p>
      * See {@link #getVar(String)} for information regarding which {@link VarDef} will be returned in the context of
      * declared vars, imported vars and inherited vars.
-     * 
+     *
      * @param name Get the {@link VarDef} for a variable with this name.
      * @see {@link #getVar(String)}.
      */
@@ -133,6 +137,8 @@ public interface ThemeDef extends RootDefinition {
      * theme ({@link #getImportedNames()}).
      * <p>
      * Returns an iterable to avoid copying strings until required.
+     * <p>
+     * This does <em>not</em> check the map provider, if present.
      */
     Iterable<String> getOwnNames() throws QuickFixException;
 
@@ -140,6 +146,8 @@ public interface ThemeDef extends RootDefinition {
      * Gets the set of every var name that can be provided by this theme (declared, imported or inherited vars).
      * <p>
      * Returns an iterable to avoid copying strings until required.
+     * <p>
+     * This does <em>not</em> check the map provider, if present.
      */
     Iterable<String> getAllNames() throws QuickFixException;
 

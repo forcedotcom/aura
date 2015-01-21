@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 
 /**
  * Tests for StyleDefImpl.
- * 
+ *
  * @since 0.0.240
  */
 public class StyleDefImplTest extends StyleTestCase {
@@ -100,11 +100,13 @@ public class StyleDefImplTest extends StyleTestCase {
         String expected = style.getNamespace() + AuraTextUtil.initCap(style.getName());
         assertEquals(expected, style.getDef().getClassName());
     }
+
     /**
      * Verify that if already preloaded, StyleDef doesn't include code when serialized.
+     *
      * @throws Exception
      */
-    public void testDefSerializationWhenPreloaded()throws Exception{
+    public void testDefSerializationWhenPreloaded() throws Exception {
         DefDescriptor<StyleDef> styleDesc = addStyleDef(".THIS {color: red }");
         Aura.getContextService().getCurrentContext().setPreloading(false);
         Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
@@ -112,30 +114,47 @@ public class StyleDefImplTest extends StyleTestCase {
         Aura.getContextService().getCurrentContext().setPreloadedDefinitions(preloaded);
         verifyStyleDefSerialization(styleDesc, false);
     }
-    
+
     /**
      * Verify that if not preloaded, StyleDef includes code when serialized.
+     *
      * @throws Exception
      */
-    public void testDefSerializationWhenNotPreloaded()throws Exception{
+    public void testDefSerializationWhenNotPreloaded() throws Exception {
         DefDescriptor<StyleDef> styleDesc = addStyleDef(".THIS {color: green }");
         Aura.getContextService().getCurrentContext().setPreloading(false);
         Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
         Aura.getContextService().getCurrentContext().setPreloadedDefinitions(preloaded);
         verifyStyleDefSerialization(styleDesc, true);
     }
-    
+
+    public void testGetVarNames() throws Exception {
+        addNsTheme(theme()
+                .var("color", "red")
+                .var("margin1", "10px")
+                .var("margin2", "5px")
+                .var("margin3", "15px"));
+
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color); font-weight: bold; margin: t(margin1 + ' 5px ' + margin2); }");
+
+        Set<String> varNames = style.getDef().getVarNames();
+        assertEquals("didn't have expected size", 3, varNames.size());
+        assertTrue(varNames.contains("color"));
+        assertTrue(varNames.contains("margin1"));
+        assertTrue(varNames.contains("margin2"));
+    }
+
     @SuppressWarnings("unchecked")
-    private void verifyStyleDefSerialization(DefDescriptor<StyleDef> styleDesc, Boolean expectCode)throws Exception{
+    private void verifyStyleDefSerialization(DefDescriptor<StyleDef> styleDesc, Boolean expectCode) throws Exception {
         String serialized = Json.serialize(styleDesc.getDef());
         Object o = new JsonReader().read(serialized);
         assertTrue(o instanceof Map);
         Map<String, Object> outerMap = (Map<String, Object>) o;
         assertEquals(styleDesc.toString(), outerMap.get("descriptor"));
         assertEquals(styleDesc.getNamespace() + AuraTextUtil.initCap(styleDesc.getName()), outerMap.get("className"));
-        if(expectCode){
-            assertEquals("StyleDef content not included.", styleDesc.getDef().getCode(),outerMap.get("code"));
-        }else{
+        if (expectCode) {
+            assertEquals("StyleDef content not included.", styleDesc.getDef().getCode(), outerMap.get("code"));
+        } else {
             assertNull("StyleDef content should not be included.", outerMap.get("code"));
         }
     }

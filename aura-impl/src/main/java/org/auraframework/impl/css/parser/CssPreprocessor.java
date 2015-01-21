@@ -45,7 +45,8 @@ import com.salesforce.omakase.writer.StyleWriter;
  */
 public final class CssPreprocessor {
     /** Use one of the constructor methods instead */
-    private CssPreprocessor() {}
+    private CssPreprocessor() {
+    }
 
     /** For the initial preprocessing of css, this includes all syntax validations and static rework */
     public static ParserConfiguration initial() {
@@ -62,6 +63,11 @@ public final class CssPreprocessor {
         return new ParserConfiguration(true).clientType(type);
     }
 
+    /** For parsing css without any of the default plugins */
+    public static ParserConfiguration raw() {
+        return new ParserConfiguration();
+    }
+
     /** Configuration for the css parser */
     public static final class ParserConfiguration {
         private String content;
@@ -69,11 +75,14 @@ public final class CssPreprocessor {
         private final boolean runtime;
         private final Set<Plugin> plugins = Sets.newLinkedHashSet();
 
+        public ParserConfiguration() {
+            this.runtime = false;
+        }
+
         public ParserConfiguration(boolean runtime) {
             this.runtime = runtime;
 
             // add default plugins
-
             if (!runtime) {
                 // we only want extra validation on the initial pass. During subsequent runtime calls we will already
                 // know the code is valid so no need to validate again.
@@ -130,6 +139,12 @@ public final class CssPreprocessor {
             return this;
         }
 
+        /** adds the given plugin */
+        public ParserConfiguration extra(Plugin plugin) {
+            this.plugins.add(plugin);
+            return this;
+        }
+
         /** specifies any additional css plugins to run */
         public ParserConfiguration extras(List<Plugin> plugins) {
             this.plugins.addAll(plugins);
@@ -144,12 +159,12 @@ public final class CssPreprocessor {
 
             if (!runtime) {
                 // write annotated comments out on the initial pass, in case the runtime pass needs them
-                writer.writeComments(true, true);
+                writer.writeAnnotatedComments(true);
             }
 
             // do the parsing
             CssErrorManager em = new CssErrorManager(resourceName);
-            PluginRegistry registry = Omakase.source(content).add(plugins).add(writer).add(em).process();
+            PluginRegistry registry = Omakase.source(content).use(plugins).use(writer).use(em).process();
 
             // report any errors found during parsing
             em.checkErrors();

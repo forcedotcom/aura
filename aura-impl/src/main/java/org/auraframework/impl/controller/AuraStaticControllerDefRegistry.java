@@ -19,10 +19,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.java.controller.JavaControllerDefImpl.Builder;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
+import org.auraframework.impl.java.controller.JavaControllerDefImpl.Builder;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,6 +45,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     public static final String COMPONENT_CONTROLLER = "aura://ComponentController";
     public static final String LABEL_CONTROLLER = "aura://LabelController";
     public static final String TIMEZONEINFO_CONTROLLER = "aura://TimeZoneInfoController";
+    public static final String DYNAMIC_STYLING_CONTROLLER = "aura://DynamicStylingController";
 
     private static final Set<String> prefixes = Sets.newHashSet(PREFIX);
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.CONTROLLER);
@@ -66,9 +68,13 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
         builder = getControllerBuilder(LabelController.class, LABEL_CONTROLLER);
         // FIXME="need an md5";
         ret.put(builder.getDescriptor(), builder.build());
-        
+
         // Add TimeZoneInfo Controller
         builder = getControllerBuilder(TimeZoneInfoController.class, TIMEZONEINFO_CONTROLLER);
+        ret.put(builder.getDescriptor(), builder.build());
+
+        // Add Dynamic Styling Controller
+        builder = getControllerBuilder(DynamicStylingController.class, DYNAMIC_STYLING_CONTROLLER);
         ret.put(builder.getDescriptor(), builder.build());
 
         return ret;

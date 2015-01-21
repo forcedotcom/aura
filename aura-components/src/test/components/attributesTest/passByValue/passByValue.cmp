@@ -16,6 +16,20 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+
+    <div aura:id="PV_staticLabelContainer">
+        <aura:label value="{0} Members">
+            {#v.numberValue}
+        </aura:label>
+    </div>
+    <!-- This is just to show #$ also works. but please notice #$Label.xxx or !$Label.xxx doesn't matter here, 
+    as we cannot change dynamic_label_for_test which is defined in TestLabelProvider. -->
+    <div aura:id="PV_dynamicLabelContainer">
+        <aura:label value="{#$Label.does_not_matter.dynamic_label_for_test}">
+            {#v.numberValue}
+        </aura:label>
+    </div>
+
     <!-- initValue doesn't work as init() on controller is too late for this -->
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="initValue" type="String"/>

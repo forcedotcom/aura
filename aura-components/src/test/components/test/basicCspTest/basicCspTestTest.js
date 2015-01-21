@@ -55,7 +55,7 @@
             function(cmp) {
                 //test loading script from same origin
             	$A.test.addWaitForWithFailureMessage (true,
-            			function() { return CodeMirror != undefined; },
+            			function() { return CodeMirror !== undefined; },
             			"fail to load script from same origin : codemirror.js"
             			);
             },function(cmp){

@@ -18,8 +18,43 @@
 	 * This test cover pass by value on attribute value. #v.someValue
 	 * Type covered: String, Number, Boolean, Function Call, Custom Type, List, 
 	 * and all these type pass as value to another component
-	 * 
 	 */
+	//Test for static labels. 
+	testStaticLabels: {
+		test: [
+			function(component) {
+			    var actual = $A.test.getText(component.find("PV_staticLabelContainer").getElement());
+			    $A.test.assertEquals("7357 Members", actual, "label value did not match attribute.");
+			    //change attribute
+			    component.set("v.numberValue",2015);
+			}, 
+			function(component) {
+				   $A.test.assertEquals(2015, component.get("v.numberValue"), "v.numerValue wasn't updated");
+			     var actual = $A.test.getText(component.find("PV_staticLabelContainer").getElement());
+			     $A.test.assertEquals("7357 Members", actual, "Number value should stays the same");
+			}
+		]
+	},
+	
+	//Test for dynamic labels. 
+	//This is just to show #$ also works. but please notice #$Label.xxx or !$Label.xxx doesn't matter, 
+    //as we cannot change dynamic_label_for_test which is defined in TestLabelProvider
+	testDynamicLabels: {
+		test: [
+			function(component) {
+			    var actual = $A.test.getText(component.find("PV_dynamicLabelContainer").getElement());
+			    $A.test.assertEquals("we have 7357 members", actual, "label value did not match attribute.");
+			    //change attribute
+			    component.set("v.numberValue",2015);
+			}, 
+			function(component) {
+				   $A.test.assertEquals(2015, component.get("v.numberValue"), "v.numerValue wasn't updated");
+			     var actual = $A.test.getText(component.find("PV_dynamicLabelContainer").getElement());
+			     $A.test.assertEquals("we have 7357 members", actual, "Number value should stays the same");
+			}
+		]
+	},
+	
 	_testInitStringValue: {
 		//this is not the way {#v.something} suppose to work. setting value in init() of controller is too late for it
 		test: [function(component) {

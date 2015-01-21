@@ -14,6 +14,40 @@
  * limitations under the License.
  */
 ({
+	//Test for static labels. 
+	testStaticLabels: {
+		test: [
+			function(component) {
+			    var actual = $A.test.getText(component.find("staticLabelContainer").getElement());
+			    $A.test.assertEquals("2007 Members", actual, "label value did not match attribute.");
+			    //change attribute
+			    component.set("v.intByReference",2015);
+			}, 
+			function(component) {
+				   $A.test.assertEquals(2015, component.get("v.intByReference"), "v.intByReference wasn't updated");
+			     var actual = $A.test.getText(component.find("staticLabelContainer").getElement());
+			     $A.test.assertEquals("2015 Members", actual, "Label should get updated");
+			}
+		]
+	},
+	
+	//Test for dynamic labels. 
+	testDynamicLabels: {
+		test: [
+			function(component) {
+			    var actual = $A.test.getText(component.find("dynamicLabelContainer").getElement());
+			    $A.test.assertEquals("we have 2007 members", actual, "label value did not match attribute.");
+			    //change attribute
+			    component.set("v.intByReference",2015);
+			}, 
+			function(component) {
+				   $A.test.assertEquals(2015, component.get("v.intByReference"), "v.numerValue wasn't updated");
+			     var actual = $A.test.getText(component.find("dynamicLabelContainer").getElement());
+			     $A.test.assertEquals("we have 2015 members", actual, "Label should get updated");
+			}
+		]
+	},
+	
 	testHtmlAttributesPrv : {
 		test: function(component) {
 			var item = component.find("liWithPrv");

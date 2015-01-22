@@ -284,9 +284,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Test case for W-2031902
+    // TODO: disabled due to flapper W-2479332
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
-    public void testValueChangeEvent() throws Exception {
+    public void _testValueChangeEvent() throws Exception {
         open(URL);
         // Tab test Begins
         // Getting input textbox in focus

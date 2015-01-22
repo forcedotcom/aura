@@ -194,12 +194,14 @@ public class MenuUITest extends WebDriverTestCase {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP);
     }
 
+    // TODO: W-2479332, disabled due to flapper
     @PerfTest
-    public void testCheckboxMenu() throws MalformedURLException, URISyntaxException {
+    public void _testCheckboxMenu() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
-    public void testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
+    // TODO: W-2479332, disabled due to flapper
+    public void _testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
 

@@ -19,7 +19,9 @@
 <aura:documentation>
     <aura:description>
         <p><code>ui:​panelManager</code>​ handles panel overlays, modal overlays, and panel sliders. 
-          You only need one instance of <code>ui:​panelManager</code> in an app. To open a panel, fire the <code>ui:openPanel</code> event. Adding the <code>'class'</code> parameter inserts the style to the <code>div</code> tag of the panel container. This example fires the event to open a panel overlay with body markup passed in via <code>newComponentAsync()</code> in a callback.
+          You only need one instance of <code>ui:​panelManager</code> in an app. 
+          To open a panel, fire the <code>ui:openPanel</code> event. Adding the <code>'class'</code> parameter inserts the style to the <code>div</code> tag of the panel container. 
+          You can provide a definition or an existing component as the panel body. This example fires the event to open a panel overlay with a definition passed in via <code>newComponentAsync()</code> in a callback.
         </p>
 <pre>showPanel: function(cmp, event, helper) {
     var openPanelEvent = $A.get('e.ui:openPanel').setParams({

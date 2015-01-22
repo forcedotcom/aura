@@ -2,7 +2,7 @@
 	setUp : function(component){
     	$A.storageService.getStorage("actions").clear();
     },
-    
+
     testStorageOfServerAction:{
         test:function(cmp){
         	var storage = $A.storageService.getStorage("actions");
@@ -36,23 +36,23 @@
     	test:[function(cmp){
     		 $A.test.setTestTimeout(30000);
     		this.resetCounter(cmp, "testStorageOfServerActionWithSimpleValues");
-    	},function(cmp){ 
+    	},function(cmp){
     		//Run the action that sets up other actions to be storable
-    		this.initiateServerAction(cmp, "testStorageOfServerActionWithSimpleValues", 
+    		this.initiateServerAction(cmp, "testStorageOfServerActionWithSimpleValues",
     				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$simpleValuesAsParams"] );
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
             			var storedAction = cmp.get("c.simpleValuesAsParams");
             			//Order of parameter should not matter for storage key
-            			storedAction.setParams({mvp: "Buster Posey", year: 2012, 
+            			storedAction.setParams({mvp: "Buster Posey", year: 2012,
             				testName: "testStorageOfServerActionWithSimpleValues"});
             			var storageKey = storedAction.getStorageKey();
             			//Check if storage service has the expected action
-            			$A.storageService.getStorage("actions").get(storageKey, function(response){
+            			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
             				if(response){
             					//If the action was stored, make sure it succeeded and return value is correct
-            					$A.test.assertEquals("SUCCESS", response.state);
-            					$A.test.assertEquals("Message 1 : Buster Posey was the MVP in 2012", response.returnValue);
+            					$A.test.assertEquals("SUCCESS", response.value.state);
+            					$A.test.assertEquals("Message 1 : Buster Posey was the MVP in 2012", response.value.returnValue);
             				}else{
             					//If the action was not stored, fail
             					$A.test.fail("Storage service does not have the response for the " +
@@ -69,7 +69,7 @@
     		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
                     function(){
     					$A.test.assertTrue(action.isFromStorage(), "Should have cached the action response.");
-                        $A.test.assertEquals("Message 1 : Buster Posey was the MVP in 2012", action.getReturnValue(), 
+                        $A.test.assertEquals("Message 1 : Buster Posey was the MVP in 2012", action.getReturnValue(),
                         		"Unexpected action response from cache");
                     });
     	}, function(cmp){//Force the action to run at server
@@ -79,7 +79,7 @@
     		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
                     function(){
     					$A.test.assertFalse(action.isFromStorage(), "Should have fetched the action response from server.");
-                        $A.test.assertEquals("Message 2 : Buster Posey was the MVP in 2012", action.getReturnValue(), 
+                        $A.test.assertEquals("Message 2 : Buster Posey was the MVP in 2012", action.getReturnValue(),
                         		"Failed to get updated response from server.");
                     });
     	}
@@ -94,22 +94,22 @@
     		$A.test.setTestTimeout(30000);
    		 	this.resetCounter(cmp, "testStorageOfServerActionWithListValues");
     	},function(cmp){
-    		this.initiateServerAction(cmp, "testStorageOfServerActionWithListValues", 
+    		this.initiateServerAction(cmp, "testStorageOfServerActionWithListValues",
     				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$complexValuesAsParams"]);
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
             			var storedAction = cmp.get("c.complexValuesAsParams");
             			//Order of parameter should not matter for storage key
-            			storedAction.setParams({players: ["Buster Posey", "Pablo Sandavol", "Angel Pagan"], 
+            			storedAction.setParams({players: ["Buster Posey", "Pablo Sandavol", "Angel Pagan"],
             				testName: "testStorageOfServerActionWithListValues"});
             			var storageKey = storedAction.getStorageKey();
             			//Check if storage service has the expected action
-            			$A.storageService.getStorage("actions").get(storageKey, function(response){
+            			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
             				if(response){
             					//If the action was stored, make sure it succeeded and return value is correct
-            					$A.test.assertEquals("SUCCESS", response.state);
-            					$A.test.assertEquals("Message 1 : Team contains Buster Posey, Pablo Sandavol, Angel Pagan, ", 
-            							response.returnValue);
+            					$A.test.assertEquals("SUCCESS", response.value.state);
+            					$A.test.assertEquals("Message 1 : Team contains Buster Posey, Pablo Sandavol, Angel Pagan, ",
+            							response.value.returnValue);
             				}else{
             					//If the action was not stored, fail
             					$A.test.fail("Storage service does not have the response for the following " +
@@ -121,14 +121,14 @@
     	]
     },
     /**
-     * Verify that server actions marked as storable at the serverside are not stored if they fail. 
+     * Verify that server actions marked as storable at the serverside are not stored if they fail.
      */
     testStorageOfFailedServerActions:{
     	test:[function(cmp){
     		$A.test.setTestTimeout(30000);
    		 	this.resetCounter(cmp, "testStorageOfFailedServerActions");
     	},function(cmp){
-    		this.initiateServerAction(cmp, "testStorageOfFailedServerActions", 
+    		this.initiateServerAction(cmp, "testStorageOfFailedServerActions",
     				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$throwsException"]);
     		$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
@@ -137,7 +137,7 @@
             			storedAction.setParams({testName: "testStorageOfFailedServerActions"});
             			var storageKey = storedAction.getStorageKey();
             			//Check if failed action was stored.
-            			$A.storageService.getStorage("actions").get(storageKey, function(response){
+            			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
             				if(response){
             					//If the action was stored, fail
             					$A.test.fail("Failed actions should not be stored.");
@@ -150,7 +150,7 @@
                 $A.run(function() { $A.enqueueAction(action); });
     		$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
-    					$A.test.assertEquals("ERROR", action.getState(), 
+    					$A.test.assertEquals("ERROR", action.getState(),
                 			"Test setup failure, expected the action to error");
     					$A.test.assertFalse(action.isFromStorage(), "Failed action should be refetched from server");
                         $A.test.assertTrue(action.getError()[0].message.indexOf("Message 2") != -1);
@@ -162,20 +162,20 @@
     	test:[function(cmp){
 	   		$A.test.setTestTimeout(30000);
 	   		this.resetCounter(cmp, "testStorageofActionWithNoParams");
-	   	},function(cmp){ 
+	   	},function(cmp){
 	   		//Run the action that sets up other actions to be storable
-	   		this.initiateServerAction(cmp, "testStorageofActionWithNoParams", 
+	   		this.initiateServerAction(cmp, "testStorageofActionWithNoParams",
 	   				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$returnNothing"] );
 	        $A.test.addWaitFor(false, $A.test.isActionPending,
 	                   function(){
 	           			var action = cmp.get("c.returnNothing");
 	           			var storageKey = action.getStorageKey();
 	           			//Check if storage service has the expected action
-	           			$A.storageService.getStorage("actions").get(storageKey, function(response){
+	           			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
 	           				if(response){
 	           					//If the action was stored, make sure it succeeded and return value is correct
-	           					$A.test.assertEquals("SUCCESS", response.state);
-	           					$A.test.assertFalsy(response.returnValue, "Action should have no return value");
+	           					$A.test.assertEquals("SUCCESS", response.value.state);
+	           					$A.test.assertFalsy(response.value.returnValue, "Action should have no return value");
 	           				}else{
 	           					//If the action was not stored, fail
 	           					$A.test.fail("Storage service does not have the response " +
@@ -187,7 +187,7 @@
 	            		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
 	                            function(){
 	            					$A.test.assertTrue(action.isFromStorage(), "Should have cached the action response.");
-	                                $A.test.assertFalsy(action.getReturnValue(), 
+	                                $A.test.assertFalsy(action.getReturnValue(),
 	                                		"Action should have no return value");
 	                            });
 	                   });
@@ -199,7 +199,7 @@
     		$A.test.setTestTimeout(30000);
 	   		this.resetCounter(cmp, "testChainingUnstoredAction");
     	},function(cmp){
-    		this.initiateServerAction(cmp, "testChainingUnstoredAction", 
+    		this.initiateServerAction(cmp, "testChainingUnstoredAction",
     				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$unStoredAction"]);
     		$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
@@ -207,7 +207,7 @@
             			unstoredAction.setParams({testName: "testChainingUnstoredAction"});
             			var storageKey = unstoredAction.getStorageKey();
             			//Check if action was stored.
-            			$A.storageService.getStorage("actions").get(storageKey, function(response){
+            			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
             				if(response){
             					//If the action was stored, fail
             					$A.test.fail("Action was not marked to be stored.");
@@ -222,7 +222,7 @@
             this.resetCounter(cmp, "testComponentsFromStoredServerAction");
     	}, function(cmp){
     		//Run the action that sets up other actions to be storable
-            this.initiateServerAction(cmp, "testComponentsFromStoredServerAction", 
+            this.initiateServerAction(cmp, "testComponentsFromStoredServerAction",
                 ["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$getComponent"]);
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
@@ -230,10 +230,10 @@
                     storedAction.setParams({testName: "testComponentsFromStoredServerAction"});
                     var storageKey = storedAction.getStorageKey();
                     //Check if storage service has the expected action
-                    $A.storageService.getStorage("actions").get(storageKey, function(response){
+                    $A.storageService.getStorage("actions").get(storageKey).then(function(response){
                     	if(response){
                             //If the action was stored, make sure it succeeded and return value is correct
-                            $A.test.assertEquals("SUCCESS", response.state);
+                            $A.test.assertEquals("SUCCESS", response.value.state);
                         }else{
                             //If the action was not stored, fail
                             $A.test.fail("Storage service does not have the response " +
@@ -241,7 +241,7 @@
                         }
                     });
                 });
-    	}, 
+    	},
     	// Verify that components can be created with cached action response
     	function(cmp){
     		//Run the action which is stored, create a component with the response
@@ -272,7 +272,7 @@
                         return "";
                     }
                 });
-    	}, 
+    	},
     	//Verify that components can be created multiple times with the same action response
     	function(cmp){
             var dupAction = cmp.get("c.getComponent");
@@ -283,7 +283,7 @@
                         this,
                         function(secondNewComponent){
                         	//push newly fetched component
-                        	var body = cmp.find("facet").get("v.body"); 
+                        	var body = cmp.find("facet").get("v.body");
                             body.push(secondNewComponent);
                             cmp.find("facet").set("v.body", body);
                         },
@@ -312,7 +312,7 @@
     },
     /**
      * Verify that original action cannot get marked as storable.
-     * Access the original action going from the client by accessing it from context. 
+     * Access the original action going from the client by accessing it from context.
      */
     //W-1554641 - Original action's callback is not called
     _testMarkingOriginalActionAsStorable:{
@@ -332,11 +332,11 @@
     		var storedAction = cmp.get("c.setStorable");
 			var storageKey = storedAction.getStorageKey();
 			//Check if storage service has the expected action
-			$A.storageService.getStorage("actions").get(storageKey, function(response){
+			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
 				if(response){
 					//If the action was stored, make sure it succeeded and return value is correct
-					$A.test.assertEquals("SUCCESS", response.state);
-					$A.test.assertEquals("Marking my self as storable", response.returnValue);
+					$A.test.assertEquals("SUCCESS", response.value.state);
+					$A.test.assertEquals("Marking my self as storable", response.value.returnValue);
 				}else{
 					//If the action was not stored, fail
 					$A.test.fail("Originating action's response was not stored.");
@@ -362,10 +362,10 @@
                 function(){
                     var storageKey = "java://org.auraframework.component.test.java.controller.TestController/ACTION$getString";
                     //Check if storage service has the expected action
-                    $A.storageService.getStorage("actions").get(storageKey, function(response){
+                    $A.storageService.getStorage("actions").get(storageKey).then(function(response){
                         if(response){
                             //If the action was stored, make sure it succeeded and return value is correct
-                            $A.test.assertEquals("SUCCESS", response.state);
+                            $A.test.assertEquals("SUCCESS", response.value.state);
                         }else{
                             //If the action was not stored, fail
                             $A.test.fail("Storage service does not have the response for new action def");

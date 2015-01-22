@@ -17,6 +17,8 @@ package org.auraframework.system;
 
 import java.util.Map;
 
+import com.google.common.cache.CacheStats;
+
 /**
  * LoggingContext public interface
  */
@@ -59,6 +61,15 @@ public interface LoggingContext {
 
     void logCSPReport(Map<String, Object> report);
  
+    /**
+     * Log cache statistics.
+     * @param name the name of the cache for which statistics are being reported.
+     * @param message human message text, often not used for reporting or trending.
+     * @param size cache size in entries
+     * @param stats cache statistics to report
+     */
+    void logCacheInfo(String name, String message, long size, CacheStats stats);
+    
     /**
      * Logs an informational message, independent of context such as action or
      * timers, for which context-sensitive methods can be provided via other

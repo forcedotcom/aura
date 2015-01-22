@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 
+import com.google.common.cache.CacheStats;
 import com.google.common.collect.Maps;
 
 /**
@@ -374,5 +375,10 @@ public class LoggingContextImpl implements LoggingContext {
 	@Override
 	public void error(String message, Throwable cause) {
 		logger.error(message, cause);
+	}
+
+	@Override
+	public void logCacheInfo(String name, String message, long size, CacheStats stats) {
+		logger.info(String.format("Cache %s: %s (size=%s, %s)", name, message, size, stats.toString()));
 	}
 }

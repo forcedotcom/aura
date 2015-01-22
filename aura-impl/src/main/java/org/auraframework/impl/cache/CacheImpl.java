@@ -66,38 +66,44 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
         @Override
         public void onRemoval(RemovalNotification<K, T> notification) {
-            // We don't much care about removal for reasons other than space constraint;
-            // those happen for lots of reasons.  But size eviction means size pressure,
-            // which we do care about.
+        	LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
+        	boolean dayHasPassed = (System.currentTimeMillis() >= lastFull + ONE_DAY);
+        	
             if (notification.getCause() == RemovalCause.SIZE) {
+            	// If there is size pressure, log about it occasionally, more often in dev envs
+            	// (where numbers are "small") and less often in production (where they are "large").
                 evictions++;
+                boolean emit = dayHasPassed;
                 if (evictions >= nextLogThreshold) {
-                	LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
-                	if (adapter != null && adapter.isEstablished()) {
-                		LoggingContext loggingCtx = adapter.getLoggingContext();
-                        CacheStats stats = cache.stats();
-                        loggingCtx.info(String.format(
-                            "Cache %s evicted %d entries for size pressure, hit rate=%.3f, evictions=%d, loads=%d %s",
-                            name, evictions, stats.hitRate(), stats.evictionCount(),
-                            stats.loadCount(), stats.toString()));
-                	}
-                    // We want to log every 10 until 100, every 100 until 1000, every 1000 thereafter
-                    if (nextLogThreshold == 1) {
-                        nextLogThreshold = 10;
-                    } else if (nextLogThreshold < 100) {
-                        nextLogThreshold += 10;
-                    } else if (nextLogThreshold < 1000) {
-                        nextLogThreshold += 100;
-                    } else {
-                        nextLogThreshold += 1000;
-                    }
+                	emit = true;
+            		// We want to log every 10 until 100, every 100 until 1000, every 1000 thereafter
+            		if (nextLogThreshold == 1) {
+            			nextLogThreshold = 10;
+            		} else if (nextLogThreshold < 100) {
+            			nextLogThreshold += 10;
+            		} else if (nextLogThreshold < 1000) {
+            			nextLogThreshold += 100;
+            		} else {
+            			nextLogThreshold += 1000;
+            		}
                 }
-            }
-            if (System.currentTimeMillis() >= lastFull + ONE_DAY) {
-                Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
+                if (emit && adapter != null && adapter.isEstablished()) {
+                	LoggingContext loggingCtx = adapter.getLoggingContext();
+                    CacheStats stats = cache.stats();
+                    loggingCtx.logCacheInfo(name,
+                    		String.format("evicted %d entries for size pressure, hit rate=%.3f", 
+                    				evictions, stats.hitRate()),
+                    		cache.size(), stats);
+                    lastFull = System.currentTimeMillis();
+                }
+            } else if (dayHasPassed) {
+            	// Even without size pressure, we want to 
+        		LoggingContext loggingCtx = adapter.getLoggingContext();
                 CacheStats stats = cache.stats();
-                logger.info(String.format("Cache %s has hit rate=%.3f, stats %s\n",
-                        name, stats.hitRate(), stats.toString()));
+                loggingCtx.logCacheInfo(name,
+                		String.format("cache has little size pressure, hit rate=%.3f", stats.hitRate()),
+                	    cache.size(), stats);
+                lastFull = System.currentTimeMillis();
             }
         }
     };

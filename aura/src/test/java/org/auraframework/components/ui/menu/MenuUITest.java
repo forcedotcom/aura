@@ -196,12 +196,12 @@ public class MenuUITest extends WebDriverTestCase {
 
     // TODO: W-2479332, disabled due to flapper
     @PerfTest
-    public void _testCheckboxMenu() throws MalformedURLException, URISyntaxException {
+    public void testCheckboxMenu() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
     // TODO: W-2479332, disabled due to flapper
-    public void _testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
+    public void testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
 
@@ -265,7 +265,8 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Item3 should be Selected after the click", (Boolean) auraUITestingUtil.getEval(selectedValueM3Exp));
 
         // click on item3 again
-        auraUITestingUtil.pressEnter(item3Element);
+        //Keys.Enter does not work with chrome v40.0.2214.91
+        item3Element.sendKeys(Keys.SPACE);
         // verify not selected
         assertFalse("Item3 aria attribute should be Uncheked after Pressing Enter",
                 Boolean.valueOf(item3Element.getAttribute("aria-checked")));

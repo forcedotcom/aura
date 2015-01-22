@@ -287,7 +287,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // TODO: disabled due to flapper W-2479332
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
-    public void _testValueChangeEvent() throws Exception {
+    public void testValueChangeEvent() throws Exception {
         open(URL);
         // Tab test Begins
         // Getting input textbox in focus
@@ -310,7 +310,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
 
         // Moving from the on focus element to the today link
-        auraUITestingUtil.pressEnter(element);
+        //Keys.Enter does not work with chrome v40.0.2214.91
+        element.click();
         // make sure value change event got fired
         element = findDomElement(By.cssSelector(OUTPUT_ST));
         assertEquals("Value Change event should not be fired", "Value Change Event Fired", element.getText());

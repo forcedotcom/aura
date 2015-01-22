@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application useAppcache="true" render="client">
+<aura:application access="global" useAppcache="true" render="client">
     <appcache:slate/>
 </aura:application>

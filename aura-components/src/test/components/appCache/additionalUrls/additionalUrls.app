@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application useAppcache="true" render="client"
+<aura:application access="global" useAppcache="true" render="client"
     controller="java://org.auraframework.component.test.java.controller.TestController"
     additionalAppCacheURLs="{!c.getAppCacheUrls}">
     <div>This should appear after the appcache has been populated.</div>

@@ -64,8 +64,10 @@
             $A.test.assertEquals("apple", actual, "markup is not right in innerCmp");
 		}, function(component) {
 			//change v.mapValue in passByValueCmp
-            var m1 = component.find("passByValueCmp").get("v.mapValue");
-            m1.fruit = "orange";
+			component.find("passByValueCmp").set("v.mapValue.fruit","orange");
+			//NOTE: If we change the mapValue like below, change event won't get fired
+            //var m1 = component.find("passByValueCmp").get("v.mapValue");
+            //m1.fruit = "orange";
 		}, function(component) {
 			//markup doesn't change
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
@@ -76,9 +78,11 @@
             //so is v.mapValue in innerCmp
             $A.test.assertEquals("orange", component.find("passByValueCmp").find("innerCmp").get("v.mapValue.fruit"),
             		"v.mapValue in innerCmp after we update v.mapValue in passByValueCmp");
-            //but change event didn't get triggered
-            $A.test.assertEquals(false, component.find("passByValueCmp").get("v.changeEventTriggered"), 
-            		"shouldn't trigger change handler when updating model");
+            //change event in passByValue get fired, but in innerCmp the change event didn't get triggered
+            $A.test.assertEquals(true, component.find("passByValueCmp").get("v.changeEventTriggered"), 
+				"should trigger change handler in innerCmp when updating map value");
+            $A.test.assertEquals(false, component.find("passByValueCmp").find("innerCmp").get("v.changeEventTriggered"), 
+				"shouldn't trigger change handler in innerCmp when updating map value in passByValueCmp");
             //so the rerender count remains 0
             $A.test.assertEquals(0, component.find("passByValueCmp").find("innerCmp").get("v.rerenderCount"),
             		"shouldn't trigger rerender of inner cmp");
@@ -95,8 +99,9 @@
             $A.test.assertEquals("apple", actual, "markup is not right in innerCmp");
 		}, function(component) {
             //change v.mapValue in innerCmp
-            var m2 = component.find("passByValueCmp").find("innerCmp").get("v.mapValue");
-            m2.fruit = "orange";
+			component.find("passByValueCmp").find("innerCmp").set("v.mapValue.fruit", "orange");
+            //var m2 = component.find("passByValueCmp").find("innerCmp").get("v.mapValue");
+            //m2.fruit = "orange";
 		}, function(component) {
 			//markup in innerCmp won't change as it's #v.mapValue
             var actual=component.find("passByValueCmp").find("innerCmp").find("PV_mapContainer").getElement().textContent;
@@ -110,9 +115,11 @@
             		"m.map in passByValueCmp should get updated after we change attribute in inner cmp");
             //but change event didn't get triggered
             $A.test.assertEquals(false, component.find("passByValueCmp").get("v.changeEventTriggered"), 
-            		"shouldn't trigger change handler when updating model");
-            //so the rerender count remains 0
-            $A.test.assertEquals(0, component.find("passByValueCmp").find("innerCmp").get("v.rerenderCount"),
+            		"shouldn't trigger change handler when updating map value in innerCmp");
+            $A.test.assertEquals(true, component.find("passByValueCmp").find("innerCmp").get("v.changeEventTriggered"), 
+			"should't trigger change handler in innerCmp when updating map value");
+            //so the rerender happens once
+            $A.test.assertEquals(1, component.find("passByValueCmp").find("innerCmp").get("v.rerenderCount"),
             		"shouldn't trigger rerender of inner cmp");
 		}
 	]}

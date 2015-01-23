@@ -44,6 +44,9 @@
     
     <aura:attribute name="mapValue" type="Map"/>
     <div aura:id="PV_mapContainer">{#v.mapValue.fruit}</div>
+    <aura:handler name="change" value="{!v.mapValue}" action="{!c.handleMapValueChangeEvent}"/>
+    <aura:attribute name="changeEventTriggered" type="boolean" default="false"/>
+    <div aura:id="PV_mapValueChangeEventTriggered">changeEventTriggered:{!v.changeEventTriggered}</div>
     <br/>
     
     <aura:attribute name="pairAttr" type="java://org.auraframework.util.type.CustomPairType"/>

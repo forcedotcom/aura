@@ -362,9 +362,11 @@
                 !$A.util.isEmpty(component.get("v.keyword")); 
 
         var hasVisibleOption = this.hasVisibleOption(items);
-        var list = component.find("list");
-
-        $A.util.toggleClass(list, "visible", hasVisibleOption);
+        
+        // Should no longer be necessary, as the class attribute is now adds "visible" if v.visible is true.
+        //var list = component.find("list");
+        //$A.util.toggleClass(list, "visible", hasVisibleOption);
+        
         component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },
 

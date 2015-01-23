@@ -45,12 +45,15 @@
     visibleChange: function(component, event, helper) {
         var obj = {};
         var visible = component.get("v.visible");
-
-        if (visible === false) { // auto complete list is hidden.
-            var list = component.find("list");
-            $A.util.removeClass(list, "visible");
+        
+        // Should no longer be necessary. We do this in an expression now on the list
+        //var list = component.find("list");
+        //$A.util.toggleClass(list, "visible", visible);
+        
+        // auto complete list is hidden.
+        if (visible === false) { 
             // Remove loading indicator
-            obj["aria-activedescendant"] = "",
+            obj["aria-activedescendant"] = "";
             obj["aria-expanded"] = false;
             // De-register list expand/collapse events
             $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
@@ -60,6 +63,8 @@
             $A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
             $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
         }
+        
+        
 
         // Update accessibility attributes
         var updateAriaEvt = component.get("e.updateAriaAttributes");

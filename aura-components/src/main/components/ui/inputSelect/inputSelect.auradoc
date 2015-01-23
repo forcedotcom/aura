@@ -21,7 +21,7 @@
 			 A <code>ui:inputSelect</code> component is rendered as an HTML <code>select</code> element. It contains options, represented by the <code>ui:inputSelectOption</code> components. To enable multiple selections, set <code>multiple="true"</code>.
 			 To wire up any client-side logic when an input value is selected, use the <code>change</code> event. 
 		</p>
-<pre>>&lt;ui:inputSelect multiple="true">
+<pre>&lt;ui:inputSelect multiple="true">
     &lt;ui:inputSelectOption text="All Primary" label="All Contacts" value="true"/>
     &lt;ui:inputSelectOption text="All Primary" label="All Primary"/>
     &lt;ui:inputSelectOption text="All Secondary" label="All Secondary"/>

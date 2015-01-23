@@ -20,13 +20,23 @@ function (w) {
     
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
+        SUPPORT  = SCROLLER.support,
         STYLES   = SCROLLER.styles,
         HELPERS  = SCROLLER.helpers,
         RAF      = w.requestAnimationFrame,
         Logger   = SCROLLER.Logger,
         INITIAL_SURFACES = 10;
-    
+
+        
     function SurfaceManager() {}
+
+    SurfaceManager.matrixTransform = function (x, y) {
+        return 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + x +',' + y + ', 0, 1)';
+    };
+
+    SurfaceManager.translateTransform = function (x, y) {
+        return 'translate3d(' + x +'px,' + y + 'px, 0)';
+    };
 
     SurfaceManager.prototype = {
         /* Bootstrap function */
@@ -40,11 +50,26 @@ function (w) {
             this.on('destroy', this._destroySurfaceManager);
         },
         _initializeSurfaceManager: function () {
+            this._initTransformFunction();
             this._bootstrapItems();
             this._initializeSurfaces();
             this._setActiveOffset();
             this._initializePositions();
             this._setInfiniteScrollerSize();
+            this._setWrapperState();
+
+        },
+        _initTransformFunction: function () {
+            this._transformFnc = this.opts.useNativeScroller ? SurfaceManager.translateTransform : SurfaceManager.matrixTransform;
+        },
+        _setWrapperState: function () {
+            if (this.opts.useNativeScroller) {
+                var ptr = this.opts.pullToRefresh && this.opts.pullToRefreshConfig;
+                if (ptr && ptr.type === 'native') {
+                    this.scrollTo(0, -this.getPTRSize());
+                }
+            }
+
         },
         _destroySurfaceManager: function () {
             var docfrag = w.document.createDocumentFragment();
@@ -58,7 +83,8 @@ function (w) {
             this.surfacesPositioned = [];
         },
         _bootstrapItems: function () {
-            var skipPtr  = this.opts.pullToRefresh ? 1 : 0,
+            var ptr      = this.opts.pullToRefresh && this.opts.pullToRefreshConfig,
+                skipPtr  = ptr && ptr.type !== 'ios' ? 1 : 0, // this means ptr is outside the container
                 domItems = Array.prototype.slice.call(this.scroller.children, skipPtr),
                 size     = domItems.length,
                 items    = [],
@@ -95,6 +121,9 @@ function (w) {
                 sizeNotCover  = heightSum < sizeNeeded;
                 positioned[i] = surface;
             }
+
+            // TODO: do this for vertical scrolling
+            this._updateSurfaceSizeTracker(0, this.scrollVertical ? heightSum : 0);
         },
         
         _createSurfaceDOM: function (options, domContent) {
@@ -162,7 +191,7 @@ function (w) {
                 offsetX = config.preCalculateSize ?  offset - width : offset;
             }
             
-            surface.dom.style[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + offsetX +',' + offsetY + ', 0, 1)';
+            surface.dom.style[STYLES.transform] = this._transformFnc(offsetX, offsetY);
 
             surface.state       = 1;
             surface.contentIndex = index;
@@ -184,17 +213,20 @@ function (w) {
             surface.dom.removeChild(surface.dom.firstChild);
             
         },
-        _attachSurfaces: function (surfaces) {
+        _attachSurfaces: function (surfaces, ignorePool) {
             var docfrag = w.document.createDocumentFragment(),
+                target  = this.scroller,
                 surface, i;
 
             for (i = 0 ; i < surfaces.length; i++) {
                 surface = surfaces[i];
                 docfrag.appendChild(surface.dom);
-                this.surfacesPool.push(surface);
+                if (!ignorePool) {
+                    this.surfacesPool.push(surface);
+                }
             }
 
-            this.scroller.appendChild(docfrag);
+            target.appendChild(docfrag);
         },
         _getAvailableSurface: function () {
             var pool = this.surfacesPool,
@@ -216,7 +248,7 @@ function (w) {
 
         },
         _emptyScroller: function () {
-            return !(this.opts.pullToLoadMore ? this.items.length - 1 : this.items.length);
+            return !this.getNumItems();
         },
         _initializeSurfaces: function () {
             var items       = this.items,
@@ -224,6 +256,18 @@ function (w) {
                 surfaces    = this._createSurfaces(numSurfaces);
 
             this._attachSurfaces(surfaces);
+            this._attachTrackSurface();
+        },
+        _attachTrackSurface: function () {
+            var wpSurface = this._createSurface();
+                wpSurface.dom.style.cssText = 'width:100%;height:1px;opacity:0';
+                wpSurface.dom.classList.add('max-size-tracker');
+                this._sizeTrackSurface = wpSurface;
+                // Add this surface to the dom, but not to the pool for being used
+                this._attachSurfaces([wpSurface], true/*ignorePool*/);
+
+                this.lastTrackSizeX = 0;
+                this.lastTrackSizeY = 0; 
         },
         _resetSurfaces: function () {
             var surfaces      = this.surfacesPositioned,
@@ -233,6 +277,22 @@ function (w) {
             for (var i = 0; i < surfacesCount; i++) {
                 surface = surfaces.shift();
                 this._dettachItemInSurface(surface);
+            }
+        },
+        _updateOffset: function () {
+            var last     = this._positionedSurfacesLast(),
+                vertical = this.scrollVertical,
+                offset   = last.offset + (vertical ? last.height : last.width),
+                x        = vertical ? 0 : offset,
+                y        = vertical && offset;
+
+            this._updateSurfaceSizeTracker(x, y);
+        },
+        _updateSurfaceSizeTracker: function (x, y) {
+            if (this._sizeTrackSurface && (x > this.lastTrackSizeX || y > this.lastTrackSizeY )) {
+                this.lastTrackSizeX = x;
+                this.lastTrackSizeY = y; 
+                this._sizeTrackSurface.dom.style[STYLES.transform] = 'translate3d('+ x + 'px,'+ y + 'px,0)';
             }
         },
         _mod: function (index) {
@@ -343,11 +403,16 @@ function (w) {
         },
         _updateSurfaceManager: function () {
             if (this._emptyScroller() || !this.surfacesPositioned.length) {
+                if (this.getNumItems() > 0) {
+                    this._initializePositions();
+                    this._setInfiniteScrollerSize();
+                }
                 return;
             }
 
             var self             = this,
                 current          = this._getPosition(),
+                nativeScroller   = this.opts.useNativeScroller,
                 boundaries       = this._getBoundaries(current.pos, current.size),
                 itemsLeft        = this._itemsLeft('bottom'),
                 // surfaces
@@ -369,7 +434,7 @@ function (w) {
             // AND there is no more items to swap
             // AND the scroll position is beyond the scrollable area (+ 1/4 of the size)
             // THEN: RESET POSITION
-            if (this._isScrolling && !itemsLeft && current.pos < (current.maxScroll - (current.size / 4))) {
+            if (!nativeScroller && this._isScrolling && !itemsLeft && current.pos < (current.maxScroll - (current.size / 4))) {
                 this._isAnimating  = false;
                 this._isScrolling  = false;
                 this._stopMomentum();
@@ -388,6 +453,7 @@ function (w) {
                         bottomSurface    = surface;
                         bottomSurfaceEnd = bottomSurface.offset;
                         yieldTask        = true;
+                        this._updateOffset();
                     }
                 }
                 
@@ -439,15 +505,15 @@ function (w) {
                 ptlEnabled = this.opts.pullToLoadMore && this._ptlIsEnabled(),
                 lastPos    = ptlEnabled ? positioned.length - 3 : positioned.length - 1,
                 last       = positioned[lastPos],
-                itemsSize  = this.opts.pullToLoadMore ? items.length - 1 : items.length,
-                itemsLeft, offset, ptrSize;
+                itemsSize  = this.getNumItems(),
+                itemsLeft  = 0, 
+                offset     = 0, 
+                ptrSize;
 
-            if (positioned.length <= 0) {
-                return;
+            if (last) {
+                itemsLeft = last.contentIndex < itemsSize - (ptlEnabled ? 2 : 1);
+                offset    = last.offset + (this.scrollVertical ? last.height : last.width);
             }
-
-            itemsLeft = last.contentIndex < itemsSize - (ptlEnabled ? 2 : 1);
-            offset    = last.offset + (this.scrollVertical ? last.height : last.width);
 
             if (this.scrollVertical) {
                 this.maxScrollY = itemsLeft ? Number.NEGATIVE_INFINITY : size - offset;
@@ -479,7 +545,7 @@ function (w) {
 
             if (surface) {
                 diff = spaceBottom ? this.wrapperHeight : bottomOffset;
-                surface.style[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,' + diff + ', 0, 1)';
+                surface.style[STYLES.transform] = this._transformFnc(0, diff);
             }
         },
         _appendPullToLoad: function () {
@@ -538,6 +604,9 @@ function (w) {
                 this.items.push(spacer);
                 this.items.push(ptl);
             }
+        },
+        getNumItems: function () {
+            return this.opts.pullToLoadMore ? this.items.length - 2 : this.items.length;
         },
         prependItems: function (items) {
             var parsedData = HELPERS.parseDOM(items);

@@ -346,18 +346,6 @@
             wrapper          = scrollerInstance.wrapper,
             pullToRefresh    = wrapper.getElementsByClassName('pullToRefresh')[0],
             pullToLoadMore   = wrapper.getElementsByClassName('pullToLoadMore')[0];
-
-        if (pullToRefresh) {
-            pullToRefresh.addEventListener('click', function () {
-                scrollerInstance.triggerPTR();
-            }, false);
-        }
-
-        if (pullToLoadMore) {
-            pullToLoadMore.addEventListener('click', function () {
-                scrollerInstance.triggerPTL();
-            }, false);
-        }
     },
 
     /*

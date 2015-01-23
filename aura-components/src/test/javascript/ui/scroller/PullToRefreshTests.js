@@ -152,6 +152,7 @@ Test.Components.Ui.Scroller.PullToRefreshTests=function(){
 
 			windowMock(function(){
 				PTRplugin = new plugins.PullToRefresh();
+				PTRplugin.scrollTo = function () {};
 				PTRplugin.opts = {
 					pullToRefreshConfig:{labelUpdate:''},
 					onPullToRefresh: function(a,b){
@@ -188,6 +189,7 @@ Test.Components.Ui.Scroller.PullToRefreshTests=function(){
 				
 			windowMock(function(){
 				PTRplugin = new plugins.PullToRefresh();
+				PTRplugin.scrollTo = function () {};
 				PTRplugin.opts = {
 					pullToRefreshConfig:{labelUpdate:''},
 					onPullToRefresh: undefined

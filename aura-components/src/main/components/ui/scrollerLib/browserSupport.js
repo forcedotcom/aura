@@ -45,6 +45,21 @@ function (w) {
     var SCROLLER = w.__S || (w.__S = {}),
         DOCUMENT_STYLE = w.document.documentElement.style,
         VENDORS  = ['webkit', 'Moz', 'ms'],
+        NAV      = w.navigator, // For testing, we dont want to mock navigator for all tests
+        UA       = NAV && NAV.userAgent,
+
+        // Trivial UserAgent detection
+        // NOTE: This is for small scroller behaviour changes, 
+        // Use this scarcely since this will only detect a subset of devices
+        // For an accurate updated list of regex go to:
+        // https://github.com/ua-parser/uap-core/blob/master/regexes.yaml
+        WP             = UA && UA.match(/Windows Phone (?:OS[ /])?(\d+)\.(\d+)/),
+        IOS            = UA && UA.match(/iP(?:hone|ad;(?: U;)? CPU) OS (\d+)/),
+        ANDROID        = UA && UA.match(/Android/),
+        IS_WP          = !!WP,
+        IS_IOS         = !IS_WP && !!IOS,
+        IS_ANDROID     = !IS_WP && !!ANDROID,
+        IOS_SCROLL     = IOS && IOS[1] >= 8,
 
         supportTransition = false,
         supportTransform  = false,
@@ -78,13 +93,17 @@ function (w) {
     }
 
     SCROLLER.support = {
-        prefix     : prefix,
-        transition : supportTransition,
-        transform  : supportTransform,
-        matrix     : !!(w.WebKitCSSMatrix || w.MSCSSMatrix),
-        touch      : 'ontouchstart' in w,
-        pointers   : w.navigator.pointerEnabled,
-        msPointers : w.navigator.msPointerEnabled
+        prefix      : prefix,
+        transition  : supportTransition,
+        transform   : supportTransform,
+        matrix      : !!(w.WebKitCSSMatrix || w.MSCSSMatrix),
+        touch       : 'ontouchstart' in w,
+        pointers    : w.navigator.pointerEnabled,
+        msPointers  : w.navigator.msPointerEnabled,
+        touchScroll : IOS_SCROLL,
+        isWP        : IS_WP, // (See note above about accuracy)
+        isIOS       : IS_IOS, // (See note above about accuracy)
+        isAndroid   : IS_ANDROID // (See note above about accuracy)
     };
 
 }

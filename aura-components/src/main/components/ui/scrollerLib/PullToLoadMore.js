@@ -18,14 +18,24 @@ function (w) {
     'use strict';
     w || (w = window);
 
-    var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
+    var SCROLLER = w.__S || (w.__S = {}),
         RAF      = w.requestAnimationFrame,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
+        STYLES   = SCROLLER.styles,
+        HELPERS  = SCROLLER.helpers,
+        SUPPORT  = SCROLLER.support,
+
+        PTL_TYPE = {
+            'synthetic': 'synthetic', // The default PTL built in the scroller
+            'native'   : 'native', // PTL done for nativeScrolling (adds some special logic)
+            'ios'      : 'ios' // In iOS we can leverage the momentum and snap to do native PTR
+        },
 
         CONFIG_DEFAULTS = {
             labelPull     : 'Pull up to show more',
             labelRelease  : 'Release to show more',
             labelUpdate   : 'Updating...',
+            labelClick    : 'Tap to load more...',
             labelSubtitle : '',
             labelError    : 'Error on pull to load more'
         },
@@ -48,8 +58,24 @@ function (w) {
             this.on('_initialize', this._appendPullToLoad);
             this.on('scrollMove', this._onScrollMovePTL);
         },
+        _getPTLType: function () {
+            var nativeScroller = this.opts.useNativeScroller;
+            if (!nativeScroller) {
+                return PTL_TYPE.synthetic;
+            } else if (SUPPORT.isIOS) {
+                this._iosPTL = true;
+                return PTL_TYPE.ios;
+            } else {
+                this._nativePTL = true;
+                return PTL_TYPE['native'];
+            }
+        },
         _mergePullToLoadMoreConfig: function () {
-            this.opts.pullToLoadMoreConfig = this._mergeConfigOptions(CONFIG_DEFAULTS, this.opts.pullToLoadMoreConfig);
+            var ptlConfig = this._mergeConfigOptions(CONFIG_DEFAULTS, this.opts.pullToLoadMoreConfig);
+            if (ptlConfig.type === undefined) {
+                ptlConfig.type = this._getPTLType();
+            }
+            this.opts.pullToLoadMoreConfig = ptlConfig;
         },
         
         triggerPTL: function () {
@@ -60,15 +86,24 @@ function (w) {
             this._ptlExecTrigger();
         },
         _createPullToLoadMarkup: function () {
-            var ptl_container = w.document.createElement('div'),
-            pullLabel     = this.opts.pullToLoadMoreConfig.labelPull,
-            subtitleLabel = this.opts.pullToLoadMoreConfig.labelSubtitle;
+            var self          = this,
+                ptl_container = w.document.createElement('div'),
+                pullLabel     = this.opts.pullToLoadMoreConfig.labelPull,
+                clickLabel    = this.opts.pullToLoadMoreConfig.labelClick,
+                actionLabel   = this._nativePTL ? clickLabel : pullLabel,
+                subtitleLabel = this.opts.pullToLoadMoreConfig.labelSubtitle;
 
             ptl_container.innerHTML = [
                 '<span class="' + CLASS_ICON + '"></span>',
-                '<span class="' + CLASS_LABEL + '">' + pullLabel + '</span>',
+                '<span class="' + CLASS_LABEL + '">' + actionLabel + '</span>',
                 '<span class="' + CLASS_SUBTITLE + '">' + subtitleLabel + '</span>'
             ].join('');
+
+            if (this._nativePTL) {
+                ptl_container.addEventListener('click', function (e) {
+                    self.triggerPTL();
+                });
+            }
 
             ptl_container.className = CLASS_PTL;
             return ptl_container;

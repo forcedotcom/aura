@@ -23,12 +23,6 @@ function (w) {
         RAF            = w.requestAnimationFrame,
         CAF            = w.cancelAnimationFrame,
 
-    // iOS Feature detection
-        NAV            = w.navigator, // For testing, we dont want to mock navigator for all cases
-        IOS            = NAV && NAV.userAgent && NAV.userAgent.match(/iP(?:hone|ad;(?: U;)? CPU) OS (\d+)/),
-        IS_IOS         = !!IOS,
-        IOS_SCROLL     = IOS && IOS[1] >= 8,
-
     // NAMESPACES
         SCROLLER       = w.__S || {},
         PLUGINS        = SCROLLER.plugins,
@@ -37,6 +31,9 @@ function (w) {
         STYLES         = SCROLLER.styles,
         CubicBezier    = SCROLLER.CubicBezier,
         Logger         = SCROLLER.Logger,
+
+        // iOS Feature detection
+        IS_IOS         = SUPPORT.isIOS,
 
         /*
         * For the sake of simplicity, these action-string
@@ -448,10 +445,12 @@ function (w) {
             this.scroller      = this.wrapper.children[0];
             this.scrollerStyle = this.scroller.style;
 
+            var scrollDirection = this.scrollVertical ? 'scroll-vertical' : 'scroll-horizontal';
+
             // Add default classes
             this.scroller.classList.add('scroller');
             this.wrapper.classList.add('scroller-wrapper');
-            this.scroller.classList.add( this.scrollVertical ? 'scroll-vertical' : 'scroll-horizontal');
+            this.wrapper.classList.add(scrollDirection);
 
             if (this.opts.useNativeScroller) {
                 this.wrapper.classList.add('native');
@@ -466,9 +465,15 @@ function (w) {
         * @private
         */
         _setWrapperSize: function () {
+            var oldSize        = this.wrapperSize;
             this.wrapperWidth  = this.wrapper.clientWidth;
             this.wrapperHeight = this.wrapper.clientHeight;
             this.wrapperSize   = this.scrollVertical ? this.wrapperHeight : this.wrapperWidth;
+
+            if (this.opts.useNativeScroller && oldSize !== this.wrapperSize) {
+                this.scroller.style.height = this.wrapperSize + 'px';
+            }
+            
         },
         /**
         * Sets the overall sizes of the scroller.
@@ -552,8 +557,8 @@ function (w) {
         * @private
         */
         _iosScrollFixture: function (e) {
-            if (this.wrapper.scrollTop === 0) {
-                this.wrapper.scrollTop = 1;
+            if (this.scroller.scrollTop === 0) {
+                this.scroller.scrollTop = 1;
             }
         },
         /**
@@ -578,8 +583,8 @@ function (w) {
             }
 
             if (this.opts.useNativeScroller) {
-                eventType(wrapper, 'scroll', this);
-                if (IS_IOS) {
+                eventType(this.scroller, 'scroll', this);
+                if (IS_IOS && !this.opts.pullToRefresh) {
                     eventType(wrapper, 'touchstart', function (e) {self._iosScrollFixture.apply(self, arguments);});
                 }
                 return;
@@ -1344,12 +1349,15 @@ function (w) {
         * @protected
         */
         _translate: function (x, y) {
-            
-            // TODO: We use translate3d here due to a bug in compositing layers on iOS 8.1.x
-            // Revert this back once the bug is fixed.
-            // this.scrollerStyle[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + x +',' + y +', 0, 1)';
+            if (!this.opts.useNativeScroller || this.forceTranslate) {
+                // TODO: We use translate3d here due to a bug in compositing layers on iOS 8.1.x
+                // Revert this back once the bug is fixed.
+                // this.scrollerStyle[STYLES.transform] = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,' + x +',' + y +', 0, 1)';
+                this.scrollerStyle[STYLES.transform] = 'translate3d(' + x +'px,' + y +'px, 0)';    
+            } else {
+                this._wrapperScrollTo(x, y);
+            }
 
-            this.scrollerStyle[STYLES.transform] = 'translate3d(' + x +'px,' + y +'px, 0)';
             this.x = x;
             this.y = y;
         },
@@ -1480,9 +1488,9 @@ function (w) {
         _scrollTo: function (x, y, time, easing) {
             easing || (easing = EASING.regular);
 
-            if (this.opts.useNativeScroller) {
-                return this._wrapperScrollTo(x,y);
-            }
+            // if (this.opts.useNativeScroller) {
+            //     return this._wrapperScrollTo(x,y, time, easing.fn);
+            // }
 
             if (!time || this.opts.useCSSTransition) {
                 this._transitionEasing(easing.style);
@@ -1500,10 +1508,33 @@ function (w) {
             }
         },
         _nativeScroll: function (e) {
-            this.x = this.wrapper.scrollLeft;
-            this.y = this.wrapper.scrollTop;
-            this._fire(ACTION_SCROLL_MOVE, ACTION_SCROLL, this.x, this.y);
+            if (SUPPORT.isIOS) {
+                this._nativeScrollIOS(e);
+            } else {
+                this._nativeScrollRAF(e);
+            }
+        },
+        _nativeScrollIOS: function (e) {
+            if (!this._rafNativeScroll) {
+                this._rafNativeScroll = RAF(this._nativeScrollRAF.bind(this, e));
+            }
+        },
+        _nativeScrollRAF: function (e) {
+            var x = -this.scroller.scrollLeft,
+                y = -this.scroller.scrollTop;
+
+            this._fire(ACTION_SCROLL_MOVE, ACTION_SCROLL, x, y, e);
+
+            this.distX = x - this.x;
+            this.distY = y - this.y;
+
+            this._isScrolling = true;
             this._update();
+
+            this.x = x;
+            this.y = y;
+            this._isScrolling = false;
+            this._rafNativeScroll = false;
         },
 
         /**
@@ -1515,8 +1546,8 @@ function (w) {
          * TODO: Integrate with open source scroller in 196
          */
         _wrapperScrollTo: function(x, y) {
-               this.wrapper.scrollTop = this.scrollVertical ? Math.abs(y) : this.wrapper.scrollTop;
-               this.wrapper.scrollLeft = this.scrollVertical ? this.wrapper.scrollLeft : Math.abs(x);
+               this.scroller.scrollTop = this.scrollVertical ? Math.abs(y) : this.scroller.scrollTop;
+               this.scroller.scrollLeft = this.scrollVertical ? this.scroller.scrollLeft : Math.abs(x);
         },
 
         /**

@@ -1,4 +1,4 @@
-<aura:application render="client" useAppcache="true" >
+<aura:application render="client" useAppcache="true" access="global">
 
     <!-- test duplicates -->
     <aura:clientLibrary name="UIPerfCSS" type="CSS" modes="PTEST" />

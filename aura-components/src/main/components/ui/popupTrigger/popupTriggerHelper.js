@@ -33,14 +33,14 @@
                 event.preventDefault();
                 this.firePopupEvent(component, "e.popupTriggerPress");
             } else if (event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 37 || event.keyCode === 38) { // right, down, left, or up key
-            	event.preventDefault();
-            	this.firePopupEvent(component, "e.popupTargetShow"); // for key arrows, we want to only show the target since the menu should stay visible so users can interact with it 
+                event.preventDefault();
+                this.firePopupEvent(component, "e.popupTargetShow"); // for key arrows, we want to only show the target since the menu should stay visible so users can interact with it 
             } else if (event.keyCode === 9 || event.keyCode === 27) { // tab or escape 
-            	this.firePopupEvent(component, "e.popupTargetHide");
+                this.firePopupEvent(component, "e.popupTargetHide");
             }
             
             this.firePopupEvent(component, "e.popupKeyboardEvent", {
-            	event : event
+                event : event
             });
         }
     },
@@ -54,30 +54,33 @@
     },
     
     showTarget: function(component) {
-    	this.firePopupEvent(component, "e.popupTargetShow");
+        this.firePopupEvent(component, "e.popupTargetShow");
     },
     
     hideTarget: function(component) {
-    	this.firePopupEvent(component, "e.popupTargetHide");
+        this.firePopupEvent(component, "e.popupTargetHide");
     },
     
     handlePopupToggle: function(component, event) {
-    	var triggerParams = event.getParams(),
-			localTriggerDiv = component.find('popupTriggerElement').getElement(),
-			eventTriggerDiv = triggerParams.component.getElement();
-		
-		if ($A.util.contains(localTriggerDiv, eventTriggerDiv)) {
-			if (triggerParams.show) {
-				this.showTarget(component);
-			} else {
-				this.hideTarget(component);
-			}
-		}
+        var triggerParams = event.getParams(),
+            localTriggerDiv = component.find('popupTriggerElement').getElement(),
+            eventTriggerDiv = triggerParams.component.getElement();
+        
+        if (localTriggerDiv == null) {
+            return;
+        }
+        if ($A.util.contains(localTriggerDiv, eventTriggerDiv)) {
+            if (triggerParams.show) {
+                this.showTarget(component);
+            } else {
+                this.hideTarget(component);
+            }
+        }
     },
     
     firePopupEvent: function(component, eventName, params) {
-    	var event = component.getConcreteComponent().get(eventName);
-    	if (params) {
+        var event = component.getConcreteComponent().get(eventName);
+        if (params) {
             event.setParams(params);
         }
         event.fire();

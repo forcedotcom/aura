@@ -760,14 +760,17 @@ $A.ns.Aura.prototype.run = function(func, name) {
     if (name === undefined) {
         name = "$A.run()";
     }
+    var nested = $A.services.client.inAuraLoop();
 
     $A.services.client.pushStack(name);
     try {
-    	//console.log("$A.run()", name);
-
         return func();
     } catch (e) {
-        $A.error("Error while running "+name, e);
+        if (nested) {
+            throw e;
+        } else {
+            $A.error("Uncaught error in "+name, e);
+        }
     } finally {
         $A.services.client.popStack(name);
     }

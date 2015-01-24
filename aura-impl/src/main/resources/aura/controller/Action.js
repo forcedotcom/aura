@@ -536,8 +536,8 @@ Action.prototype.runDeprecated = function(evt) {
         this.state = "SUCCESS";
     } catch (e) {
         this.state = "FAILURE";
-        $A.warning("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
-                   + this.def.getName(), e);
+        this.error = e;
+        $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
         if (this.getDef().getDescriptor() !== "aura://ComponentController/ACTION$reportFailedAction") {
             // Post the action failure to the server, where we can keep track of it for bad client code.
             // But don't keep re-posting if the report of failure fails.  Do we want this to be production
@@ -555,6 +555,9 @@ Action.prototype.runDeprecated = function(evt) {
             });
             reportAction.setCallback(this, function(a) { /* do nothing */ });
             $A.clientService.enqueueAction(reportAction);
+            if ($A.clientService.inAuraLoop()) {
+                throw e;
+            }
         }
     }
 };
@@ -751,6 +754,7 @@ Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
     var clearComponents = false;
     var id = this.getId(context);
+    var error = undefined;
     try {
         if (this.cmp === undefined || this.cmp.isValid()) {
             // Add in any Action scoped components /or partial configs
@@ -761,15 +765,27 @@ Action.prototype.finishAction = function(context) {
 
             if (this.events.length > 0) {
                 for (var x = 0; x < this.events.length; x++) {
-                    this.parseAndFireEvent(this.events[x]);
+                    try {
+                        this.parseAndFireEvent(this.events[x]);
+                    } catch (e) {
+                        $A.warning("Events failed: "+(this.def?this.def.toString():""), e);
+                        error = e;
+                    }
                 }
             }
 
             // If there is a callback for the action's current state, invoke that too
             var cb = this.callbacks[this.getState()];
 
-            if (cb) {
-                cb.fn.call(cb.s, this, this.cmp);
+            try {
+                if (cb) {
+                    cb.fn.call(cb.s, this, this.cmp);
+                }
+            } catch (e) {
+                if (!error) {
+                    error = e;
+                }
+                $A.warning("Callback failed: " + (this.def?this.def.toString():""), e);
             }
             if (this.components && (cb || !this.storable || !this.getStorage())) {
                 context.finishComponentConfigs(id);
@@ -778,11 +794,22 @@ Action.prototype.finishAction = function(context) {
         } else {
             this.abort();
         }
-    } finally {
-        context.setCurrentAction(previous);
-        this.completeGroups();
-        if (clearComponents) {
-            context.clearComponentConfigs(id);
+    } catch (e) {
+        if (!error) {
+            error = e;
+        }
+        $A.warning("Action failed: " + (this.def?this.def.toString():""), e);
+    }
+    context.setCurrentAction(previous);
+    this.completeGroups();
+    if (clearComponents) {
+        context.clearComponentConfigs(id);
+    }
+    if (error) {
+        if ($A.clientService.inAuraLoop()) {
+            throw error;
+        } else {
+            $A.error("Error ", error);
         }
     }
 };
@@ -794,12 +821,21 @@ Action.prototype.finishAction = function(context) {
  */
 Action.prototype.abort = function() {
     this.state = "ABORTED";
-    var cb = this.callbacks["ABORTED"];
-    if (cb) {
-        cb.fn.call(cb.s, this, this.cmp);
+    var cb = this.callbacks[this.state];
+    try {
+        if (cb) {
+            cb.fn.call(cb.s, this, this.cmp);
+        }
+    } catch (e) {
+        if ($A.clientService.inAuraLoop()) {
+            throw e;
+        } else {
+            $A.error("Failed during aborted callback", e);
+        }
+    } finally {
+        $A.log("ABORTED: "+this.getStorageKey());
+        this.completeGroups();
     }
-    $A.log("ABORTED: "+this.getStorageKey());
-    this.completeGroups();
 };
 
 /**

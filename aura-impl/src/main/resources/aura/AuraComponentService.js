@@ -211,10 +211,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
         this.requestComponent(callbackScope, callback, config, attributeValueProvider);
     } else {
-    	var createMarker = "Creating : " + desc;
-    	$A.mark(createMarker);
         var newComp = this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
-        $A.endMark(createMarker);
         callback.call(callbackScope, newComp);
     }
 };
@@ -248,12 +245,8 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
         var auraValue = valueFactory.create(value, null, avp);
         atts[key] = this.computeValue(auraValue, avp);
     }
-    var cmpName = config["componentDef"]["descriptor"];
-    var requestMarker = "Requesting: " + cmpName;
-    var createMarker = "Creating: " + cmpName;
-    
+
     action.setCallback(this, function(a){
-    	$A.endMark(requestMarker);
         var newComp;
         if(a.getState() === "SUCCESS"){
             var returnedConfig = a.getReturnValue();
@@ -268,9 +261,8 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
                 merging[mkey] = attributes[mkey];
             }
             returnedConfig["localId"] = config["localId"];
-            $A.mark(createMarker);
+
             newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
-            $A.endMark(createMarker);
         }else{
             var errors = a.getError();
 
@@ -285,12 +277,10 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
             callback.call(callbackScope, newComp);
         }
     });
-    
     action.setParams({
-        "name" : cmpName,
+        "name" : config["componentDef"]["descriptor"],
         "attributes" : atts
     });
-    $A.mark(requestMarker);
     $A.enqueueAction(action);
 };
 

@@ -852,12 +852,34 @@ if(!this.concreteComponentId) {
             depth++;
         }
 
-        serialized.push(value);
-
         if (value){
+            var position = -1;
+            var found = false;
+            
+            // Look for value in serialized
+            if(typeof value === "object") {
+                    var length = serialized.length;
+                    for(var c=0;c<length;c++) {
+                        if(serialized[c] === value) {
+                            found = true; 
+                            position = c;
+                        }
+                    }
+
+                    if(!found) {
+                        value["$serId"] = length;
+                        serialized.push(value);
+                    }
+            }
+
             if(value.auraType) {
                 var type = value.auraType;
                 if (type === "Component") {
+                    if(found) {
+                        return {
+                            "$serRefId": position
+                        };
+                    }
                     return this.outputComponent(value, serialized, depth);
                 } else if (type === "Action") {
                     return "Action";
@@ -909,17 +931,18 @@ if(!this.concreteComponentId) {
             var ret = {
                 __proto__ : null
             };
-            ret._descriptor = cmp.getDef().getDescriptor().toString();
-            ret.globalId = cmp.getGlobalId();
-            ret.localId = cmp.getLocalId();
-            ret.rendered = cmp.isRendered();
-            ret.valid = cmp.isValid();
+            ret["descriptor"] = cmp.getDef().getDescriptor().toString();
+            ret["globalId"] = cmp.getGlobalId();
+            ret["localId"] = cmp.getLocalId();
+            ret["rendered"] = cmp.isRendered();
+            ret["valid"] = cmp.isValid();
             ret.attributes = {};
+            ret["expressions"] = {};
             var model = cmp.getModel();
             if (model) {
-                ret.model = this.output(model, cmp.getAttributeValueProvider(), serialized, depth);
+                ret["model"] = this.output(model, cmp.getAttributeValueProvider(), serialized, depth);
             }
-            ret.attributeValueProvider = this.output(cmp.getAttributeValueProvider(),
+            ret["attributeValueProvider"] = this.output(cmp.getAttributeValueProvider(),
                 cmp.getAttributeValueProvider(), serialized, depth);
 
             var superComponent = cmp.getSuper();
@@ -932,18 +955,32 @@ if(!this.concreteComponentId) {
             }
             var attributeDefs = cmp.getDef().getAttributeDefs();
             var that = this;
+            //var values = cmp.get("v").values;
+            var values = cmp.priv.attributes.values;
             attributeDefs.each(function(attributeDef) {
                 var key = attributeDef.getDescriptor().toString();
                 var val;
+                var rawValue;
                 try {
                     val = cmp.get("v."+key);
+                    rawValue = values[key];
                 } catch (e) {
                     val = undefined;
+                }
+                if($A.util.isExpression(rawValue)) {
+                    // KRIS: Also needs to output the value provider for the expression.
+                    
+                    // KRIS: This rawValue only works in non prod mode, otherwise you get "PropertyReferenceValue"
+                    ret["expressions"][key] = rawValue+"";
                 }
                 ret.attributes[key] = that.output(val, cmp.getAttributeValueProvider(), serialized, depth);
             });
 
             ret.attributes["__proto__"] = null;
+
+            if("$serId" in cmp) {
+                ret["$serId"] = cmp["$serId"];
+            }
 
             return ret;
         }

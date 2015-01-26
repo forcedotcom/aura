@@ -48,7 +48,12 @@ ControllerDef.prototype.getDescriptor = function(){
  * @returns {Object}
  */
 ControllerDef.prototype.getActionDef = function(key){
-    return this.actionDefs[key&&key.toLowerCase()];
+    var action = this.actionDefs[key&&key.toLowerCase()];
+    if (!action) {
+        $A.error("Unable to find "+key+" on "+this.descriptor);
+        throw Error("Unable to find "+key+" on "+this.descriptor);
+    }
+    return action;
 };
 
 /**

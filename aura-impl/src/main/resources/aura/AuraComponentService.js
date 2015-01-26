@@ -315,57 +315,57 @@ $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProv
  * @return {Object} {{configuration: {}, definition: ComponentDef, descriptor: String}}
  */
 $A.ns.AuraComponentService.prototype.getComponentConfigs = function(config, attributeValueProvider) {
-	var configuration, configAttributes, def, desc, configKey, attributeKey; 
-	
-	// Given a string input, expand the config to be an object.
-	if (config && $A.util.isString(config)) {
-		config = { "componentDef" : config };
+    var configuration, configAttributes, def, desc, configKey, attributeKey; 
+    
+    // Given a string input, expand the config to be an object.
+    if (config && $A.util.isString(config)) {
+        config = { "componentDef" : config };
     }
-	
+    
     // When a valueProvider is specified, perform a shallow 
     // clone of the config to preserve the original attributes. 
-	if (attributeValueProvider) {
-		configuration = {};
+    if (attributeValueProvider) {
+        configuration = {};
 
-		// Copy top-level keys to new config.
-		for (configKey in config) {
-			if (config.hasOwnProperty(configKey)) {
-				configuration[configKey] = config[configKey];
-			}
-		}
-		
-		// Prepare new 'attributes' object.
-		configAttributes = config['attributes'];
-		configuration['attributes'] = {};
-		
-		// Copy attributes to prevent 'valueProvider' from mutating the original config. 
-		if (configAttributes) {
-			for (attributeKey in configAttributes) {
-				if (configAttributes.hasOwnProperty(attributeKey)) {
-					configuration['attributes'][attributeKey] = configAttributes[attributeKey];
-				}
-			}
-		}
-		
-		// Safe to attach valueProvider reference onto new object.
-		configuration['attributes']['valueProvider'] = attributeValueProvider;
-	} else {
-		configuration = config;
-	}
-	
+        // Copy top-level keys to new config.
+        for (configKey in config) {
+            if (config.hasOwnProperty(configKey)) {
+                configuration[configKey] = config[configKey];
+            }
+        }
+        
+        // Prepare new 'attributes' object.
+        configAttributes = config['attributes'];
+        configuration['attributes'] = {};
+        
+        // Copy attributes to prevent 'valueProvider' from mutating the original config. 
+        if (configAttributes) {
+            for (attributeKey in configAttributes) {
+                if (configAttributes.hasOwnProperty(attributeKey)) {
+                    configuration['attributes'][attributeKey] = configAttributes[attributeKey];
+                }
+            }
+        }
+        
+        // Safe to attach valueProvider reference onto new object.
+        configuration['attributes']['valueProvider'] = attributeValueProvider;
+    } else {
+        configuration = config;
+    }
+    
     // Resolve the definition and descriptor.
-	def = this.getDef(configuration["componentDef"], true);
+    def = this.registry.getDef(configuration["componentDef"], true);
 
     if (def) {
         desc = def.getDescriptor().toString();
     } else {
         desc = configuration["componentDef"]["descriptor"] ? configuration["componentDef"]["descriptor"] : configuration["componentDef"];
     }
-	
+    
     return {
-        "configuration"	: configuration,
-        "definition"	: def,
-        "descriptor"	: desc
+        "configuration" : configuration,
+        "definition"    : def,
+        "descriptor"    : desc
     };
 };
 
@@ -381,13 +381,19 @@ $A.ns.AuraComponentService.prototype.index = function(component){
  * Gets the component definition from the registry.
  *
  * @param {Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
- * @param {Boolean} noInit
  * @returns {ComponentDef} The metadata of the component
  *
  * @public
  */
 $A.ns.AuraComponentService.prototype.getDef = function(config, noInit){
-    return this.registry.getDef(config, noInit);
+    var def = this.registry.getDef(config, noInit);
+    if (!noInit) {
+        if (!def) {
+            $A.error("Unknown component: "+descriptor);
+            throw new Error("Unknown component: "+descriptor);
+        }
+    }
+    return def;
 };
 
 /**

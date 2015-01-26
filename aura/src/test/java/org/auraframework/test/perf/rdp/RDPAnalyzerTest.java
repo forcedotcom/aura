@@ -27,6 +27,8 @@ import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
+//Roman TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
+@UnAdaptableTest
 public final class RDPAnalyzerTest extends AbstractPerfTestCase {
 
     public RDPAnalyzerTest(String name) {
@@ -53,8 +55,6 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         return 0; // run only the first warmup run
     }
 
-    // TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
-    @UnAdaptableTest
     public void testProtocol() throws Exception {
         // run WebDriver test
         openTotallyRaw("/ui/label.cmp?label=foo");

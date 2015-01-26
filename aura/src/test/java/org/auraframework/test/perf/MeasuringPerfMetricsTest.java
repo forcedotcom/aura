@@ -16,6 +16,7 @@
 package org.auraframework.test.perf;
 
 import org.auraframework.test.SauceUtil;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsComparator;
@@ -27,6 +28,8 @@ import org.openqa.selenium.By;
  * values in this test class and then have this test class verify that our automated ways of getting the metrics get the
  * exact same values.
  */
+//Roman TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
+@UnAdaptableTest
 public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
     public MeasuringPerfMetricsTest(String name) {

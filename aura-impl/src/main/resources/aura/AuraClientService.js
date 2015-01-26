@@ -580,16 +580,9 @@ var AuraClientService = function() {
 
                 componentConfig["localId"] = localId;
 
-                var nameForMarker = componentConfig["componentDef"];
-                var createMarker = "Inject.create : " + nameForMarker;
-                var renderMarker = "Inject.render : " + nameForMarker;
-                
                 var root = $A.getRoot();
-                
-                $A.mark(createMarker);
                 var c = $A.componentService.newComponentDeprecated(componentConfig, root);
-                $A.endMark(createMarker);
-                
+
                 if (!errors) {
                     // Wire up event handlers
                     self.addComponentHandlers(c, config["actionEventHandlers"]);
@@ -599,11 +592,9 @@ var AuraClientService = function() {
                 body.push(c);
                 // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
                 root.set("v.body",body,true);
-                
-                $A.mark(renderMarker);
+
                 $A.render(c, element);
-                $A.endMark(renderMarker);
-                
+
                 $A.afterRender(c);
             });
 

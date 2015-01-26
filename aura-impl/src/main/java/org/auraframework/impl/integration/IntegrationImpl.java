@@ -174,8 +174,7 @@ public class IntegrationImpl implements Integration {
                     }
 
                     Message message = new Message(Lists.newArrayList(action));
-                    String injectionMarker = String.format("Injecting %s", descriptor.getQualifiedName());
-                    init.append(String.format("$A.mark(\"%s\");\n", injectionMarker));
+
                     init.append("var config = ");
                     Aura.getSerializationService().write(message, null, Message.class, init);
                     init.append(";\n");
@@ -186,7 +185,7 @@ public class IntegrationImpl implements Integration {
                         init.append(";\n");
                     }
 
-                    init.append(String.format("$A.run(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\");\n$A.endMark(\"%s\"); }); ", locatorDomId, localId, injectionMarker));
+                    init.append(String.format("$A.run(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); });", locatorDomId, localId));
                 }
 
                 out.append("<script>").append(init).append("</script>");

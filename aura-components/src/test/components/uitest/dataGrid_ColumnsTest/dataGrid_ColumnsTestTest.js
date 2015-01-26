@@ -394,6 +394,7 @@
    * Test sortable header assistive text
    */
   testSortableColumns : {
+	  attributes : {"sortBy" : "id"},
 	  test : [function(cmp) {
 		  }, function(cmp) {
 			  this.fireAndWait(cmp, "goToSortedColumns", "Item Id");

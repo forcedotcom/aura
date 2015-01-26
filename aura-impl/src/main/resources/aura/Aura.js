@@ -835,40 +835,6 @@ $A.ns.Aura.prototype.logf = function() {
 };
 
 /**
- * Converts the value to a String. If value length is greater than the given size, return a String up to the size.
- * Otherwise, return a String containing the value with trailing whitespaces to fill up the size.
- *
- * @param {Object} value The object to be resolved.
- * @param {Number} size The length of the output string.
- */
-$A.ns.Aura.prototype.fitTo = function(value, size) {
-    if (typeof value != "string") {
-        if ($A.util.isUndefinedOrNull(value)) {
-            return null;
-        }
-        value = value.toString();
-    }
-    if (value.length > size) {
-        return value.slice(0, size);
-    }
-    return this.rpad(value, " ", size);
-};
-
-/**
- * Pads the string to its right and returns the new string.
- *
- * @param {String} str The string to be resolved.
- * @param {String} padString The padding to be inserted.
- * @param {Number} length The length of the padding.
- */
-$A.ns.Aura.prototype.rpad = function(str, padString, length) {
-    while (str.length < length) {
-        str = str + padString;
-    }
-    return str;
-};
-
-/**
  * Logs a stack trace. Trace calls using <code>console.trace()</code> if defined on the console implementation.
  * @public
  */

@@ -32,7 +32,6 @@ ProviderDef.prototype.auraType = "ProviderDef";
  * @param {Component} component 
  * @param {Boolean} localCreation
  * @param {Function} callback
- * @param {Object} ccc Not used currently. Will be included in next round of CCC changes - W-1961207
  */
 ProviderDef.prototype.provide = function(component, localCreation, callback) {
     var provideMethod = this.provideMethod;

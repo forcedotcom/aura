@@ -125,13 +125,13 @@ var ComponentPriv = (function() { // Scoping priv
 
         // runs component provider and replaces this component with the
         // provided one
-        this.injectComponent(config, cmp, localCreation, cmp.ccc);
+        this.injectComponent(config, cmp, localCreation);
 
         // sets up component level events
         this.setupComponentEvents(cmp, configAttributes);
 
         // instantiate super component(s)
-        this.setupSuper(cmp, configAttributes, localCreation, cmp.ccc);
+        this.setupSuper(cmp, configAttributes, localCreation);
 
         // for application type events
         this.setupApplicationEventHandlers(cmp);
@@ -293,7 +293,7 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
 
-    ComponentPriv.prototype.setupSuper = function(cmp, configAttributes, localCreation, ccc) {
+    ComponentPriv.prototype.setupSuper = function(cmp, configAttributes, localCreation) {
         var superDef = this.componentDef.getSuperDef();
         if (superDef) {
             var superConfig = {};
@@ -316,11 +316,7 @@ var ComponentPriv = (function() { // Scoping priv
             }
             superConfig["attributes"] = superAttributes;
             $A.pushCreationPath("super");
-            if (ccc) {
-                ccc.loadComponent(superConfig, null, localCreation, this.setSuperComponent.bind(this), false, false, true);
-            } else {
-                this.setSuperComponent(componentService.newComponentDeprecated(superConfig, null, localCreation, true));
-            }
+            this.setSuperComponent(componentService.newComponentDeprecated(superConfig, null, localCreation, true));
             $A.popCreationPath("super");
         }
     };
@@ -757,7 +753,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.injectComponent = function(config, cmp, localCreation, ccc) {
+    ComponentPriv.prototype.injectComponent = function(config, cmp, localCreation) {
 
         var componentDef = this.componentDef;
         if ((componentDef.isAbstract() || componentDef.getProviderDef()) && !this.concreteComponentId) {
@@ -789,7 +785,7 @@ if(!this.concreteComponentId) {
             var providerDef = componentDef.getProviderDef();
             if (providerDef) {
                 // use it
-                providerDef.provide(cmp, localCreation, setProvided, ccc);
+                providerDef.provide(cmp, localCreation, setProvided);
             } else {
                 var partialConfig = this.partialConfig;
                 $A.assert(partialConfig,

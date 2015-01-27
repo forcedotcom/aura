@@ -766,7 +766,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
     try {
         return func();
     } catch (e) {
-        if (nested) {
+        if (nested || (e.message && e.message.indexOf("Missing layout://") !== -1)) {
             throw e;
         } else {
             $A.error("Uncaught error in "+name, e);

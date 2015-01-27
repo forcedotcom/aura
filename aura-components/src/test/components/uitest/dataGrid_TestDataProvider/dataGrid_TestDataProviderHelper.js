@@ -20,24 +20,27 @@
      */
     sort: function (items, column, ascending) {
         items.sort(function (a, b) {
-            var aGtb = parseInt(a[column]) > parseInt(b[column]),
-                ret;
-
-            if (aGtb) {
-                ret = 1;
-            }
-            else if (a[column] === b[column]) {
-                ret = 0;
-            }
-            else {
-                ret = -1;
-            }
-
-            if (!ascending) {
-                ret = -ret;
-            }
-
-            return ret;
+        	var aVal = a[column];
+        	var bVal = b[column];
+        	
+        	if (!$A.util.isNumber(aVal)) {
+        		// data is a space delimited string and using 
+        		// last value (which should be an int value)
+        		// in string as basis for sort.
+        		// i.e. items = ["Foo 1", "Foo 2", "Foo 3", ...]
+        		aValArr = aVal.split(" ");
+        		bValArr = bVal.split(" ");
+        		aVal = aValArr[aValArr.length - 1];
+        		bVal = bValArr[bValArr.length - 1];
+        	}
+        	
+        	var ret = parseInt(aVal) - parseInt(bVal);
+        	
+        	if (!ascending) {
+        		ret = -ret;
+        	}
+        	
+        	return ret;
         });
     },
 

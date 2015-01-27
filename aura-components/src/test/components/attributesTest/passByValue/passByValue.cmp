@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component>
 
     <div aura:id="PV_staticLabelContainer">
         <aura:label value="{0} Members">

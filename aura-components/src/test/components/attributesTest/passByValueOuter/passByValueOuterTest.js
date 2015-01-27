@@ -16,13 +16,17 @@
 ({
 	/**
 	 * These tests are for passing attribute object as value between components.
-	 * Note that we don't really have a way to put default value for objects (map included), 
+	 * Note this is like a work-around given that we don't really have a way to put default value for objects (map included), 
 	 * init them in controller's init() does not work for #v.someObject.
 	 * 
-	 * passByValueOuter has passByValue in its markup. it pass m.data[0] as v.mapValue to passByValue.
-	 * passByValue has passByValueInner in its markup. it pass the v.mapValue to passByValueInner as value(#v.XXX).
-	 * m.data[0], v.mapValue in passByValue , v.mapValue in passByValueInner is the same javascript object
-	 */
+	 * passByValueOurter pass its m.map to passByValue as its v.mapValue in its markup
+	 * passByValue pass its v.mapValue "As Value" to passByValueInner
+	 * 
+	 * three tests here are
+	 * #1. change m.map in outer cmp
+	 * #2. change m.mapValue in middle cmp
+	 * #3. change m.mapValue in inner cmp
+	 **/
 	testMapValueChangeModel: {
 		test: [function(component) {
 			//check passByValue
@@ -33,8 +37,7 @@
             $A.test.assertEquals("apple", actual, "markup is not right in innerCmp");
 		}, function(component) {
 			//change model
-			var m = component.get("m.map");
-			m.fruit = "orange";
+			component.set("m.map.fruit","orange");
 		}, function(component) {
 			//markup doesn't change
 			var actual=component.find("passByValueCmp").find("PV_mapContainer").getElement().textContent;
@@ -45,8 +48,8 @@
             //so is v.mapValue in innerCmp
             $A.test.assertEquals("orange", component.find("passByValueCmp").find("innerCmp").get("v.mapValue.fruit"),
             		"v.mapValue in innerCmp after should get updated after we update v.mapValue in passByValueCmp");
-            //but change event didn't get triggered
-            $A.test.assertEquals(false, component.find("passByValueCmp").get("v.changeEventTriggered"), 
+            //change event in middle cmp get triggered as we pass the m.map as reference to it
+            $A.test.assertEquals(true, component.find("passByValueCmp").get("v.changeEventTriggered"), 
             		"shouldn't trigger change handler when updating model");
             //so the rerender count remains 0
             $A.test.assertEquals(0, component.find("passByValueCmp").find("innerCmp").get("v.rerenderCount"),

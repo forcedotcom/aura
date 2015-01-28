@@ -84,8 +84,7 @@
          	var expected = [
          		         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "1"},
          		         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "2"},
-         		         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"},
-         		         	];
+         		         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"}];
          	this.assertIterationCmpElements(expected, iterCmpEle);
 		}
 		]

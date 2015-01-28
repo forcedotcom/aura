@@ -14,6 +14,68 @@
  * limitations under the License.
  */
 ({
+	testClearAndReplaceWholeArrayInModel: {
+		test: [function(cmp) {
+			cmp.set("m.mapdata",{"items":[]});
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear m.mapdata." );
+    		
+         	var new_mapdata = {
+        			items: [
+        				{ "label": "1"},
+        				{ "label": "2"},
+        				{ "label": "3"},
+        				{ "label": "4"},
+        			]
+        		};
+         	cmp.set("m.mapdata",new_mapdata);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
+			var expected = [
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "1"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "2"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"}];
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+		}
+		]
+	},
+	
+	testClearAndReplaceWholeArrayInIteration: {
+		test: [function(cmp) {
+			var iter = cmp.find("iterationOnMapModelPassthrough");
+			iter.set("v.items",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
+    		
+         	var iter = cmp.find("iterationOnMapModelPassthrough");
+         	iter.set("v.items", [ {"label":1}, {"label":2}, {"label":3}, {"label":4} ]);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
+			var expected = [
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "1"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "2"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"}];
+	        this.assertIterationCmpElements(expected, iterCmpEle);
+	        
+	        var iter = cmp.find("iterationOnMapModelPassthrough");
+         	iter.set("v.items", [ {"label":3}, {"label":4}, {"label":5}, {"label":6} ]);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
+			var expected = [
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "5"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "6"}];
+	        this.assertIterationCmpElements(expected, iterCmpEle);
+		}]
+	},
+	
 	testChangeStartAndEnd: {
 		attributes: {start:0, end:26},
 		test: [function(cmp) {

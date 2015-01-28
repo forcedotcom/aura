@@ -14,6 +14,48 @@
  * limitations under the License.
  */
 ({
+	testClearAndReplaceWholeArrayInModel: {
+		test: [function(cmp) {
+			cmp.set("m.mapdata",{"items":[]});
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapModel").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear m.mapdata." );
+         	
+         	cmp.set("m.mapdata", {"items":[ {"label": 1}, {"label": 2}, {"label": 3} ]});
+		}, function(cmp) {
+			var expected = [1,2,3];
+			var iterCmpEle = cmp.find("iterationOnMapModel").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace m.mapdata." );
+         	for(var i = 0; i< expected.length; i++) {
+    			$A.test.assertEquals( i+":"+expected[i], $A.test.getText(iterCmpEle[i]), "after replace m.mapdata ,get unexpected iteration element at index#"+i );
+    		}
+		}
+		]
+	},
+	
+	testClearAndReplaceWholeArrayInIteration: {
+		test: [function(cmp) {
+			var iter = cmp.find("iterationOnMapModel");
+			iter.set("v.items",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapModel").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
+    		
+         	var iter = cmp.find("iterationOnMapModel");
+         	iter.set("v.items",[ {"label": 1}, {"label": 2}, {"label": 3} ]);
+		}, function(cmp) {
+			var expected = [1,2,3];
+			var iterCmpEle = cmp.find("iterationOnMapModel").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.items in iteration." );
+         	for(var i = 0; i< expected.length; i++) {
+    			$A.test.assertEquals( i+":"+expected[i], $A.test.getText(iterCmpEle[i]), "after replace v.itemss in iteration ,get unexpected iteration element at index#"+i );
+    		}
+		}
+		]
+	},
+	
 	testChangeStartAndEnd: {
 		attributes: {start:0, end:26},
 		test: [function(cmp) {

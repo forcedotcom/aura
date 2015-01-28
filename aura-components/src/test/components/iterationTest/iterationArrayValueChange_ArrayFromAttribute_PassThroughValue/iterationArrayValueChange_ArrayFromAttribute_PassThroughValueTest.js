@@ -14,6 +14,56 @@
  * limitations under the License.
  */
 ({
+	//two tests for clear and replace the whole array. this one replace attribute, the one below replace directly iteration items.
+	//notice the difference in re-rendering count, as replacing attribute won't trigger re-render, it just destroy & replace the whole thing
+	testClearAndReplaceWholeArrayInAttribute: {
+		test: [function(cmp) {
+			cmp.set("v.listdata",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.listdata." );
+    		
+         	cmp.set("v.listdata",[9,9,9,9,9]);
+		}, function(cmp) {
+			var expected = [
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"}];
+			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.listdata." );
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+		}
+		]
+	},
+	
+	testClearAndReplaceWholeArrayInIteration: {
+		test: [function(cmp) {
+			var iter = cmp.find("iterationOnArrayAttributePassthrough");
+			iter.set("v.items",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
+    		
+         	var iter = cmp.find("iterationOnArrayAttributePassthrough");
+         	iter.set("v.items",["9","9","9","9","9"]);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
+         	var expected = [
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"}];
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.items in iteration." );
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+		}
+		]
+	},
+	
 	//notice that changing start and end doesn't trigger rerender.
 	testChangeStartAndEnd: {
 		attributes: {start:0, end:5},

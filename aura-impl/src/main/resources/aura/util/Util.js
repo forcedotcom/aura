@@ -595,13 +595,12 @@ $A.ns.Util.prototype.removeElement = function(element) {
                     var node = trashcan.lastChild;
 
                     if (node.nodeType !== 3 && node.nodeType !== 8) {
-                    	try{
-                    		delete node["aura_deleted"];
-                    	}
-                    	catch(e){
-                    		//IE7 having issue with delete
-                    		node.removeAttribute("aura_deleted");
-                    	}
+                        try{
+                            delete node["aura_deleted"];
+                        } catch(e) {
+                            //IE7 having issue with delete
+                            node.removeAttribute("aura_deleted");
+                        }
                     }
 
                     trashcan.removeChild(node);
@@ -777,7 +776,7 @@ $A.ns.Util.prototype.createTimeoutCallback = function(callback, toleranceMillis)
 $A.ns.Util.prototype.on = (function() {
     if (window["addEventListener"]) {
         return function(element, eventName, handler, useCapture, timeout) {
-        	var originalHandler = handler;
+            var originalHandler = handler;
 
             if (timeout) {
                 handler = this.createTimeoutCallback(handler, timeout);
@@ -800,15 +799,15 @@ $A.ns.Util.prototype.on = (function() {
 
         return function(element, eventName, handler, useCapture, timeout) {
             if (!element){
-            	return;
+                return;
             }
 
-        	var originalHandler = handler;
+            var originalHandler = handler;
 
             // Eliminate registration of duplicate handlers on older browsers
             var handlerCache = element["handlerCache"];
             if (!handlerCache) {
-            	element["handlerCache"] = handlerCache = {};
+                element["handlerCache"] = handlerCache = {};
             }
 
             var handlers = handlerCache[eventName];
@@ -857,11 +856,11 @@ $A.ns.Util.prototype.on = (function() {
  * @param {Boolean} useCapture Whether to use event capturing.
  */
 $A.ns.Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
-	if (listener.registeredAuraHandler) {
-		listener = listener.registeredAuraHandler;
-	}
+    if (listener.registeredAuraHandler) {
+        listener = listener.registeredAuraHandler;
+    }
 
-	if (window["removeEventListener"]) {
+    if (window["removeEventListener"]) {
         element.removeEventListener(eventName, listener, useCapture);
     } else if (window["detachEvent"]) {
         element.detachEvent("on" + eventName, listener);
@@ -1164,7 +1163,7 @@ $A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
  * @param {String} key The data key to look up on element.
  */
 $A.ns.Util.prototype.getDataAttribute = function(element, key) {
-	if (!this.acceptsData(element) || this.isUndefined(key)) {
+    if (!this.acceptsData(element) || this.isUndefined(key)) {
         return null;
     }
 
@@ -1198,13 +1197,13 @@ $A.ns.Util.prototype.setDataAttribute = function(element, key, value) {
  * @private
  */
 $A.ns.Util.prototype.getDataAttributeName = function(key) {
-	var name = this.dataAttributeCache[key];
-	if (!name) {
-		name = "data-" + this.camelCaseToHyphens(key);
-		this.dataAttributeCache[key] = name;
-	}
+    var name = this.dataAttributeCache[key];
+    if (!name) {
+        name = "data-" + this.camelCaseToHyphens(key);
+        this.dataAttributeCache[key] = name;
+    }
 
-	return name;
+    return name;
 };
 
 /**
@@ -1214,7 +1213,7 @@ $A.ns.Util.prototype.getDataAttributeName = function(key) {
  * @returns {Boolean} true if element has data attribute
  */
 $A.ns.Util.prototype.hasDataAttribute = function(element, key) {
-	return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
+    return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
 };
 
 /**
@@ -1235,14 +1234,14 @@ $A.ns.Util.prototype.isElement = function(obj) {
  * @param {DOMElement} element
  */
 $A.ns.Util.prototype.attachToDocumentBody = function(element) {
-	if (element) {
+    if (element) {
         var body = document.getElementsByTagName("body")[0];
         body.appendChild(element);
-	}
+    }
 };
 
 $A.ns.Util.prototype.stringEndsWith = function(fullstr, substr) {
-	var lastIndex = fullstr.lastIndexOf(substr);
+    var lastIndex = fullstr.lastIndexOf(substr);
     return (lastIndex !== -1) && (lastIndex + substr.length === fullstr.length);
 };
 
@@ -1256,7 +1255,7 @@ $A.ns.Util.prototype.stringEndsWith = function(fullstr, substr) {
  */
 if (!!Array.prototype.indexOf) {
     // If we have a native indexOf, then use that.
-	$A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
+    $A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
         // Grab the relevant arguments.
         var args = Array.prototype.slice.apply(arguments, [1]);
         return Array.prototype.indexOf.apply(array, args);
@@ -1273,7 +1272,7 @@ if (!!Array.prototype.indexOf) {
      * @param {Object}
      *            searchElement The element to locate in the array.
      */
-	$A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
+    $A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
         /*jslint bitwise: true, useStrict: true */
         "use strict";
         if (array === null) {
@@ -1354,16 +1353,16 @@ if (!!Function.prototype.bind) {
  */
 if (!!(Object && Object.keys)) {
     $A.ns.Util.prototype.keys = function(object, excludeFunctions) {
-    	var allKeys = Object.keys(object);
-    	var keys = [];
-    	for (var n = 0; n < allKeys.length; n++) {
-    		var key = allKeys[n];
-    		if (!excludeFunctions || typeof (object[key]) !== "function") {
-    			keys.push(key);
-    		}
-    	}
-    	
-    	return keys;
+        var allKeys = Object.keys(object);
+        var keys = [];
+        for (var n = 0; n < allKeys.length; n++) {
+            var key = allKeys[n];
+            if (!excludeFunctions || typeof (object[key]) !== "function") {
+                keys.push(key);
+            }
+        }
+        
+        return keys;
     };
 } else {
     $A.ns.Util.prototype.keys = function(object, excludeFunctions) {
@@ -1742,7 +1741,7 @@ $A.ns.Util.prototype.emptyComponentTrash = function() {
         for (var i = 0; i < length; i++){
             var cmp = this.trashedComponentQueue[i];
             if (cmp && cmp.finishDestroy) {
-            	cmp.finishDestroy();
+                cmp.finishDestroy();
             }
         }
 
@@ -1787,15 +1786,15 @@ $A.ns.Util.prototype.contains = function(container, element) {
 $A.ns.Util.prototype.squash = function(event, preventDefault) {
     event = event || window.event;
     if(event.stopPropagation) {
-    	event.stopPropagation();
-	}
+        event.stopPropagation();
+    }
     event.cancelBubble = true;
 
     if (preventDefault) {
         if(event.preventDefault) {
-        	event.preventDefault();
-		}
-		event.returnValue = false;
+            event.preventDefault();
+        }
+        event.returnValue = false;
     }
 };
 
@@ -1944,93 +1943,93 @@ $A.ns.Util.prototype.toArray = function(collection) {
 };
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-	/**
-	 * Gets the aura debug tool component whether in an iframe or not.
-	 * @returns {Object} The debug tool component.
-	 */
-	$A.ns.Util.prototype.getDebugToolComponent = function(){
-		if (!this.isUndefinedOrNull(this.debugToolWindow)) {
-			var debugElem = this.debugToolWindow.document.getElementById('__aura_debug_tool');
-			if (!this.isUndefinedOrNull(debugElem)) {
-				return this.debugToolWindow["aura"].componentService.getAttributeProviderForElement(debugElem);
-			}
-		}
-	};
+    /**
+     * Gets the aura debug tool component whether in an iframe or not.
+     * @returns {Object} The debug tool component.
+     */
+    $A.ns.Util.prototype.getDebugToolComponent = function(){
+        if (!this.isUndefinedOrNull(this.debugToolWindow)) {
+            var debugElem = this.debugToolWindow.document.getElementById('__aura_debug_tool');
+            if (!this.isUndefinedOrNull(debugElem)) {
+                return this.debugToolWindow["aura"].componentService.getAttributeProviderForElement(debugElem);
+            }
+        }
+    };
 
-	/**
-	 * Gets the aura instance of debug tool which has been opened in a child window
-	 *
-	 * @returns {Object} Aura instance
-	 */
-	$A.ns.Util.prototype.getDebugToolsAuraInstance = function(){
-		if (!this.isUndefinedOrNull(this.debugToolWindow)) {
-			return this.debugToolWindow["aura"];
-		} else {
-			return $A;
-		}
-	};
+    /**
+     * Gets the aura instance of debug tool which has been opened in a child window
+     *
+     * @returns {Object} Aura instance
+     */
+    $A.ns.Util.prototype.getDebugToolsAuraInstance = function(){
+        if (!this.isUndefinedOrNull(this.debugToolWindow)) {
+            return this.debugToolWindow["aura"];
+        } else {
+            return $A;
+        }
+    };
 
-	/**
-	 * Set the aura debug tool handle when opened in a popup.
-	 */
-	$A.ns.Util.prototype.setDebugToolWindow = function(debugWindow){
-		if (!this.isUndefinedOrNull(debugWindow)) {
-			this.debugToolWindow = debugWindow;
-		}
-	};
+    /**
+     * Set the aura debug tool handle when opened in a popup.
+     */
+    $A.ns.Util.prototype.setDebugToolWindow = function(debugWindow){
+        if (!this.isUndefinedOrNull(debugWindow)) {
+            this.debugToolWindow = debugWindow;
+        }
+    };
 
-	/**
-	 * Grab windows url, if debug tool is a child window get url of parent
-	 *
-	 * @returns {String} URL of the window
-	 */
-	$A.ns.Util.prototype.getUrl = function(){
-	    if (this.isUndefinedOrNull(opener)) {
-			return window.location.href;
-		} else {
-			return opener.location.href;
-		}
-	};
+    /**
+     * Grab windows url, if debug tool is a child window get url of parent
+     *
+     * @returns {String} URL of the window
+     */
+    $A.ns.Util.prototype.getUrl = function(){
+        if (this.isUndefinedOrNull(opener)) {
+            return window.location.href;
+        } else {
+            return opener.location.href;
+        }
+    };
 
-	/**
-	 * Get the text content of a DOM node. Tries <code>innerText</code> followed by
-	 * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
-	 * @param {Node} node
-	 *             The node to get the text content from
-	 * @returns {String} The text content of the DOM node
-	 */
-	$A.ns.Util.prototype.getText = function(node) {
-	    var t;
-	    //text nodes
-	    if(node.nodeType === 3){
-	    	t = node.nodeValue;
-	    } else {
-	    	// chrome, safari, IE have this
-	        t = node.innerText;
-	        t = this.trim(t);
+    /**
+     * Get the text content of a DOM node. Tries <code>innerText</code> followed by
+     * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
+     * @param {Node} node
+     *             The node to get the text content from
+     * @returns {String} The text content of the DOM node
+     */
+    $A.ns.Util.prototype.getText = function(node) {
+        var t;
+        //text nodes
+        if(node.nodeType === 3){
+            t = node.nodeValue;
+        } else {
+            // chrome, safari, IE have this
+            t = node.innerText;
+            t = this.trim(t);
 
-			// FF & chrome with visibility set to false
-	        if (node.textContent !== undefined) {
-	            if(this.isEmpty(t)){
-	                t = node.textContent;
-	            }
-	        }
+            // FF & chrome with visibility set to false
+            if (node.textContent !== undefined) {
+                if(this.isEmpty(t)){
+                    t = node.textContent;
+                }
+            }
 
-	        // if its <style> innerText doesnt work so try cssText (for IE)
-	        if (node.tagName === "STYLE" && this.isEmpty(t) && !this.isUndefinedOrNull(node.styleSheet)) {
-	        	t = node.styleSheet.cssText;
-	        }
-	    }
-	    return t;
-	};
+            // if its <style> innerText doesnt work so try cssText (for IE)
+            if (node.tagName === "STYLE" && this.isEmpty(t) && !this.isUndefinedOrNull(node.styleSheet)) {
+                t = node.styleSheet.cssText;
+            }
+        }
+        return t;
+    };
 
-	$A.ns.Util.prototype.errorBasedOnMode = function(msg) {
-		$A.error(msg);
-	};
+    $A.ns.Util.prototype.errorBasedOnMode = function(msg) {
+        $A.error(msg);
+    };
 
-	$A.ns.Util.prototype.includeScript = function(url, callback) {
+    $A.ns.Util.prototype.includeScript = function(url, callback) {
         if (this.isUndefined(this.includeScript.cache)) {
-        	this.includeScript.cache = {};
+            this.includeScript.cache = {};
         }
 
         var cache = this.includeScript.cache;
@@ -2038,27 +2037,27 @@ $A.ns.Util.prototype.toArray = function(collection) {
         var script = cache[url];
 
         if (script) {
-        	if (script.state == "LOADED") {
-        		callback.call();
-        	} else {
-        		script.queue.push(callback);
-        	}
+            if (script.state == "LOADED") {
+                callback.call();
+            } else {
+                script.queue.push(callback);
+            }
         } else {
-        	cache[url] = { state: "LOADING", queue: [callback] };
+            cache[url] = { state: "LOADING", queue: [callback] };
 
-			var s = document.createElement("script");
-			s.src = url;
-			s.onload = function() {
-				cache[url].state = "LOADED";
-				var queue = cache[url].queue;
-				while(queue.length > 0) {
-					queue.shift().call();
-				}
-			}
+            var s = document.createElement("script");
+            s.src = url;
+            s.onload = function() {
+                cache[url].state = "LOADED";
+                var queue = cache[url].queue;
+                while(queue.length > 0) {
+                    queue.shift().call();
+                }
+            }
 
-			document.head.appendChild( s ).parentNode.removeChild( s );
+            document.head.appendChild( s ).parentNode.removeChild( s );
         }
-	};
+    };
 //#end
 
 //#include aura.storage.adapters.SizeEstimator

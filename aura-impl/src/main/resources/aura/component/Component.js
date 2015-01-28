@@ -28,13 +28,13 @@
  *            [localCreation] - local creation
  */
 function Component(config, localCreation) {
-	this.priv = new ComponentPriv(config, this, localCreation);
-	this._destroying =false;
+    this.priv = new ComponentPriv(config, this, localCreation);
+    this._destroying =false;
 
-	// #if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG",
-	// "AUTOTESTINGDEBUG"]}
-	this["creationPath"] = this.priv.creationPath;
-	// #end
+    // #if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG",
+    // "AUTOTESTINGDEBUG"]}
+    this["creationPath"] = this.priv.creationPath;
+    // #end
 
     this.fire("init");
 }
@@ -65,7 +65,7 @@ Component.prototype.auraType = "Component";
  * @public
  */
 Component.prototype.getDef = function() {
-	return this.priv.componentDef;
+    return this.priv.componentDef;
 };
 
 /**
@@ -80,25 +80,25 @@ Component.prototype.getDef = function() {
  * @protected
  */
 Component.prototype.index = function(localId, globalId) {
-	var priv = this.priv;
+    var priv = this.priv;
 
-	var index = priv.index;
-	if (!index) {
-		index = {};
-		priv.index = index;
-	}
+    var index = priv.index;
+    if (!index) {
+        index = {};
+        priv.index = index;
+    }
 
-	var existing = index[localId];
-	if (existing) {
-		if (!$A.util.isArray(existing)) {
-			index[localId] = [ existing, globalId ];
-		} else {
-			existing.push(globalId);
-		}
-	} else {
-		index[localId] = globalId;
-	}
-	return null;
+    var existing = index[localId];
+    if (existing) {
+        if (!$A.util.isArray(existing)) {
+            index[localId] = [ existing, globalId ];
+        } else {
+            existing.push(globalId);
+        }
+    } else {
+        index[localId] = globalId;
+    }
+    return null;
 };
 
 /**
@@ -117,46 +117,46 @@ Component.prototype.index = function(localId, globalId) {
  * @protected
  */
 Component.prototype.deIndex = function(localId, globalId) {
-	var priv = this.priv;
+    var priv = this.priv;
 
-	//
-	// Unfortunately, there are some bizarre loops with deIndex and destroy.
-	// For the moment, we don't enforce that this is a valid component until
-	// we can track down _why_ it is being called on already destroyed
-	// components
-	if (!this.priv) {
-		return null;
-	}
+    //
+    // Unfortunately, there are some bizarre loops with deIndex and destroy.
+    // For the moment, we don't enforce that this is a valid component until
+    // we can track down _why_ it is being called on already destroyed
+    // components
+    if (!this.priv) {
+        return null;
+    }
 
-	if (priv.index) {
-		if (globalId) {
-			var index = priv.index[localId];
-			if (index) {
-				if ($A.util.isArray(index)) {
-					for (var i = 0; i < index.length; i++) {
-						if (index[i] === globalId) {
-							index.splice(i, 1);
-							//
-							// If we have removed an index, we need to back up
-							// our counter to process the same index.
-							//
-							i -= 1;
-						}
-					}
-					if (index.length === 0) {
-						delete priv.index[localId];
-					}
-				} else {
-					if (index === globalId) {
-						delete priv.index[localId];
-					}
-				}
-			}
-		} else {
-			delete priv.index[localId];
-		}
-	}
-	return null;
+    if (priv.index) {
+        if (globalId) {
+            var index = priv.index[localId];
+            if (index) {
+                if ($A.util.isArray(index)) {
+                    for (var i = 0; i < index.length; i++) {
+                        if (index[i] === globalId) {
+                            index.splice(i, 1);
+                            //
+                            // If we have removed an index, we need to back up
+                            // our counter to process the same index.
+                            //
+                            i -= 1;
+                        }
+                    }
+                    if (index.length === 0) {
+                        delete priv.index[localId];
+                    }
+                } else {
+                    if (index === globalId) {
+                        delete priv.index[localId];
+                    }
+                }
+            }
+        } else {
+            delete priv.index[localId];
+        }
+    }
+    return null;
 };
 
 /**
@@ -173,31 +173,31 @@ Component.prototype.deIndex = function(localId, globalId) {
  */
 Component.prototype.find = function(name) {
     //JBUCH: HALO: TODO: I WANT TO SEPARATE THESE CONCEPTS, AND EXPOSE cmp.findInstances("foo:bar","foo:baz");
-	if ($A.util.isObject(name)) {
-		var type = name["instancesOf"];
-		var instances = [];
-		this.findInstancesOf(type, instances, this);
-		return instances;
-	} else {
-		var index = this.priv.index;
-		if (index) {
-			var globalId = index[name];
-			if (globalId) {
-				if ($A.util.isArray(globalId)) {
-					var ret = [];
-					for (var i = 0; i < globalId.length; i++) {
-						ret.push(componentService.get(globalId[i]));
-					}
-					return ret;
-				}
-				return componentService.get(globalId);
-			}
-		}
-	}
+    if ($A.util.isObject(name)) {
+        var type = name["instancesOf"];
+        var instances = [];
+        this.findInstancesOf(type, instances, this);
+        return instances;
+    } else {
+        var index = this.priv.index;
+        if (index) {
+            var globalId = index[name];
+            if (globalId) {
+                if ($A.util.isArray(globalId)) {
+                    var ret = [];
+                    for (var i = 0; i < globalId.length; i++) {
+                        ret.push(componentService.get(globalId[i]));
+                    }
+                    return ret;
+                }
+                return componentService.get(globalId);
+            }
+        }
+    }
 
-	// For non-existent objects, we return undefined so that
-	// we can distinguish between not existing and null.
-	return undefined;
+    // For non-existent objects, we return undefined so that
+    // we can distinguish between not existing and null.
+    return undefined;
 };
 
 /**
@@ -214,34 +214,34 @@ Component.prototype.find = function(name) {
  */
 Component.prototype.findInstancesOf = function(type, ret, cmp) {
     // JBUCH: HALO: TODO: CAN WE MAKE THIS PUBLIC, INSTEAD OF THE cmp.find({instancesOf:"ui:something"}) DANCE?
-	cmp = cmp || this.getSuperest();
+    cmp = cmp || this.getSuperest();
 
     var body = cmp.get("v.body");
-	if (body) {
-		for (var i = 0; i < body.length; i++) {
-			cmp = body[i];
-			if (cmp.findInstanceOf) {
-				var inst = cmp.findInstanceOf(type);
-				if (inst) {
-					ret.push(inst);
-				} else {
-					cmp.findInstancesOf(type, ret);
-				}
-			}
-		}
-	}
+    if (body) {
+        for (var i = 0; i < body.length; i++) {
+            cmp = body[i];
+            if (cmp.findInstanceOf) {
+                var inst = cmp.findInstanceOf(type);
+                if (inst) {
+                    ret.push(inst);
+                } else {
+                    cmp.findInstancesOf(type, ret);
+                }
+            }
+        }
+    }
 };
 
 /**
  * @private
  */
 Component.prototype.getSuperest = function() {
-	var superComponent = this.getSuper();
-	if (superComponent) {
-		return superComponent.getSuperest() || superComponent;
-	} else {
-		return this;
-	}
+    var superComponent = this.getSuper();
+    if (superComponent) {
+        return superComponent.getSuperest() || superComponent;
+    } else {
+        return this;
+    }
 };
 
 /**
@@ -249,17 +249,17 @@ Component.prototype.getSuperest = function() {
  * @private
  */
 Component.prototype.findInstanceOf = function(type) {
-	var descriptor = this.getDef().getDescriptor();
-	if ((descriptor.getNamespace() + ":" + descriptor.getName()) === type) {
-		return this;
-	} else {
-		var superComponent = this.getSuper();
-		if (superComponent) {
-			return superComponent.findInstanceOf(type);
-		} else {
-			return null;
-		}
-	}
+    var descriptor = this.getDef().getDescriptor();
+    if ((descriptor.getNamespace() + ":" + descriptor.getName()) === type) {
+        return this;
+    } else {
+        var superComponent = this.getSuper();
+        if (superComponent) {
+            return superComponent.findInstanceOf(type);
+        } else {
+            return null;
+        }
+    }
 };
 
 /**
@@ -272,7 +272,7 @@ Component.prototype.findInstanceOf = function(type) {
  * @returns {Boolean} true if the component is an instance, or false otherwise.
  */
 Component.prototype.isInstanceOf = function(name) {
-	return this.getDef().isInstanceOf(name);
+    return this.getDef().isInstanceOf(name);
 };
 
 /**
@@ -281,7 +281,7 @@ Component.prototype.isInstanceOf = function(name) {
  * @private
  */
 Component.prototype.implementsDirectly = function(type) {
-	return this.getDef().implementsDirectly(type);
+    return this.getDef().implementsDirectly(type);
 };
 
 /**
@@ -305,19 +305,19 @@ Component.prototype.implementsDirectly = function(type) {
  * @public
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert) {
-	var dispatcher = this.priv.getEventDispatcher(this);
+    var dispatcher = this.priv.getEventDispatcher(this);
 
-	var handlers = dispatcher[eventName];
-	if (!handlers) {
-		handlers = [];
-		dispatcher[eventName] = handlers;
-	}
+    var handlers = dispatcher[eventName];
+    if (!handlers) {
+        handlers = [];
+        dispatcher[eventName] = handlers;
+    }
 
-	if (insert === true) {
-		handlers.unshift(this.priv.getActionCaller(valueProvider, actionExpression));
-	} else {
-		handlers.push(this.priv.getActionCaller(valueProvider, actionExpression));
-	}
+    if (insert === true) {
+        handlers.unshift(this.priv.getActionCaller(valueProvider, actionExpression));
+    } else {
+        handlers.push(this.priv.getActionCaller(valueProvider, actionExpression));
+    }
 };
 
 /**
@@ -329,16 +329,16 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  * @public
  */
 Component.prototype.addValueHandler = function(config) {
-	var value = config["value"];
-	if ($A.util.isExpression(value)&&value.getExpression()==="this") {
+    var value = config["value"];
+    if ($A.util.isExpression(value)&&value.getExpression()==="this") {
         var eventQName = this.priv.componentDef.getEventDef(config["event"], true).getDescriptor().getQualifiedName();
         this.addHandler(eventQName, this, config["action"]);
         return;
-	}
+    }
     if(config["action"]&&!config["method"]){
         config["method"]=this.priv.getActionCaller(this, config["action"].getExpression());
     }
-	this.priv.addValueHandler(this,config);
+    this.priv.addValueHandler(this,config);
 };
 
 Component.prototype.removeValueHandler = function(config) {
@@ -362,14 +362,14 @@ Component.prototype.removeValueHandler = function(config) {
  * @return {Object} an object with a single visible call of setEnabled(Boolean)
  */
 Component.prototype.addDocumentLevelHandler = function(eventName, callback, autoEnable) {
-	var dlh = new $A.ns.DocLevelHandler(eventName, callback, this);
-	if (!this.priv.docLevelHandlers) {
-		this.priv.docLevelHandlers = {};
-	}
-	$A.assert(this.priv.docLevelHandlers[eventName] === undefined, "Same doc level event set twice");
-	this.priv.docLevelHandlers[eventName] = dlh;
-	dlh.setEnabled(autoEnable);
-	return dlh;
+    var dlh = new $A.ns.DocLevelHandler(eventName, callback, this);
+    if (!this.priv.docLevelHandlers) {
+        this.priv.docLevelHandlers = {};
+    }
+    $A.assert(this.priv.docLevelHandlers[eventName] === undefined, "Same doc level event set twice");
+    this.priv.docLevelHandlers[eventName] = dlh;
+    dlh.setEnabled(autoEnable);
+    return dlh;
 };
 
 /**
@@ -383,17 +383,17 @@ Component.prototype.addDocumentLevelHandler = function(eventName, callback, auto
  *            the object returned by addDocumentHandler.
  */
 Component.prototype.removeDocumentLevelHandler = function(dlh) {
-	if (dlh && dlh.setEnabled) {
-		dlh.setEnabled(false);
-		this.priv.docLevelHandlers[dlh.eventName] = undefined;
-	}
+    if (dlh && dlh.setEnabled) {
+        dlh.setEnabled(false);
+        this.priv.docLevelHandlers[dlh.eventName] = undefined;
+    }
 };
 
 /**
  * Forces the final destroy of a component (after async).
  */
 Component.prototype.finishDestroy = function() {
-	this.destroy(false);
+    this.destroy(false);
 };
 
 /**
@@ -421,62 +421,62 @@ Component.prototype.finishDestroy = function() {
 Component.prototype.destroy = function(async) {
     this.fire("destroy");
 
-	// #if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING",
-	// "AUTOTESTINGDEBUG"]}
-	async = false; // Force synchronous destroy when in testing modes
-	// #end
+    // #if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING",
+    // "AUTOTESTINGDEBUG"]}
+    async = false; // Force synchronous destroy when in testing modes
+    // #end
 
-	if (this.priv && !this._destroying) {
-		// DCHASMAN TODO W-1879487 Reverted in 188 because of hard to diagnose
-		// rerendering weirdness in a couple of tests and one:'s mru/lists view
-		// Default to async destroy
-		/*
-		 * if (async === undefined) { async = true; }
-		 */
+    if (this.priv && !this._destroying) {
+        // DCHASMAN TODO W-1879487 Reverted in 188 because of hard to diagnose
+        // rerendering weirdness in a couple of tests and one:'s mru/lists view
+        // Default to async destroy
+        /*
+         * if (async === undefined) { async = true; }
+         */
 
-		var key;
+        var key;
 
-		if (this.priv.docLevelHandlers !== undefined) {
-			for (key in this.priv.docLevelHandlers) {
-				var dlh = this.priv.docLevelHandlers[key];
-				if (dlh && dlh.setEnabled) {
-					dlh.setEnabled(false);
-				}
-			}
-		}
+        if (this.priv.docLevelHandlers !== undefined) {
+            for (key in this.priv.docLevelHandlers) {
+                var dlh = this.priv.docLevelHandlers[key];
+                if (dlh && dlh.setEnabled) {
+                    dlh.setEnabled(false);
+                }
+            }
+        }
 
-		if (async) {
-			this._scheduledForAsyncDestruction = true;
+        if (async) {
+            this._scheduledForAsyncDestruction = true;
 
-			for (var i=0;i<this.priv.elements.length;i++) {
-				var element = this.priv.elements[i];
-				if (element && element.style) {
-					element.style.display = "none";
-				}
-			}
+            for (var i=0;i<this.priv.elements.length;i++) {
+                var element = this.priv.elements[i];
+                if (element && element.style) {
+                    element.style.display = "none";
+                }
+            }
 
-			$A.util.destroyAsync(this);
+            $A.util.destroyAsync(this);
 
-			return null;
-		}
+            return null;
+        }
 
-		var priv = this.priv;
+        var priv = this.priv;
 
-		this._destroying = true;
+        this._destroying = true;
 
-		var componentDef = this.getDef();
-		var superComponent = this.getSuper();
+        var componentDef = this.getDef();
+        var superComponent = this.getSuper();
 
-		var globalId = priv.globalId;
+        var globalId = priv.globalId;
 
-		$A.renderingService.unrender(this);
+        $A.renderingService.unrender(this);
 
-		// Track some useful debugging information for InvalidComponent's use
-		// #if {"excludeModes" : ["PRODUCTION"]}
-		this._globalId = globalId;
-		this._componentDef = componentDef;
+        // Track some useful debugging information for InvalidComponent's use
+        // #if {"excludeModes" : ["PRODUCTION"]}
+        this._globalId = globalId;
+        this._componentDef = componentDef;
         if(!this._description){this.toString();}
-		// #end
+        // #end
         if (priv.attributes) {
             var expressions=priv.attributes.destroy(async);
             for(var x in expressions){
@@ -484,12 +484,12 @@ Component.prototype.destroy = function(async) {
             }
         }
 
-		priv.elements = undefined;
+        priv.elements = undefined;
 
-		priv.deIndex(this);
-		$A.componentService.deIndex(globalId);
+        priv.deIndex(this);
+        $A.componentService.deIndex(globalId);
 
-		var vp = priv.valueProviders;
+        var vp = priv.valueProviders;
         for ( var k in vp) {
             var v = vp[k];
             if (v&&v!=this) {
@@ -504,31 +504,31 @@ Component.prototype.destroy = function(async) {
         // validity checks all over the place
         $A.util.apply(this, InvalidComponent.prototype, true);
 
-		if (priv.model) {
-			priv.model.destroy(async);
-		}
+        if (priv.model) {
+            priv.model.destroy(async);
+        }
 
-		var ar = priv.actionRefs;
-		if (ar) {
-			for (k in ar) {
-				ar[k].destroy(async);
-			}
-		}
+        var ar = priv.actionRefs;
+        if (ar) {
+            for (k in ar) {
+                ar[k].destroy(async);
+            }
+        }
 
-		if (componentDef) {
-			var handlerDefs = componentDef.getAppHandlerDefs();
-			if (handlerDefs) {
-				for (i = 0; i < handlerDefs.length; i++) {
-					var handlerDef = handlerDefs[i];
-					var handlerConfig = {};
-					handlerConfig["globalId"] = globalId;
-					handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
-					$A.eventService.removeHandler(handlerConfig);
-				}
-			}
-		}
+        if (componentDef) {
+            var handlerDefs = componentDef.getAppHandlerDefs();
+            if (handlerDefs) {
+                for (i = 0; i < handlerDefs.length; i++) {
+                    var handlerDef = handlerDefs[i];
+                    var handlerConfig = {};
+                    handlerConfig["globalId"] = globalId;
+                    handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
+                    $A.eventService.removeHandler(handlerConfig);
+                }
+            }
+        }
 
-		if (superComponent) {
+        if (superComponent) {
             superComponent.destroy(async);
         }
 
@@ -540,19 +540,19 @@ Component.prototype.destroy = function(async) {
 //            }
 //        }
 
-		var eventDispatcher = priv.getEventDispatcher();
-		if (eventDispatcher) {
-			for (key in eventDispatcher) {
-				var vals = eventDispatcher[key];
-				if (vals) {
-					for (var j = 0; j < vals.length; j++) {
-						delete vals[j];
-					}
+        var eventDispatcher = priv.getEventDispatcher();
+        if (eventDispatcher) {
+            for (key in eventDispatcher) {
+                var vals = eventDispatcher[key];
+                if (vals) {
+                    for (var j = 0; j < vals.length; j++) {
+                        delete vals[j];
+                    }
 
-					delete eventDispatcher[key];
-				}
-			}
-		}
+                    delete eventDispatcher[key];
+                }
+            }
+        }
 
         this._marker=null;
         priv.superComponent = null;
@@ -569,10 +569,10 @@ Component.prototype.destroy = function(async) {
 
         this._destroying = false;
 
-		return globalId;
-	}
+        return globalId;
+    }
 
-	return null;
+    return null;
 };
 
 /**
@@ -581,7 +581,7 @@ Component.prototype.destroy = function(async) {
  * @protected
  */
 Component.prototype.isRenderedAndValid = function() {
-	return this.priv && !this._destroying && this.priv.rendered;
+    return this.priv && !this._destroying && this.priv.rendered;
 };
 
 /**
@@ -590,8 +590,8 @@ Component.prototype.isRenderedAndValid = function() {
  * @protected
  */
 Component.prototype.render = function() {
-	var renderer = this.priv.renderer;
-	return renderer.def.render(renderer.renderable) || [];
+    var renderer = this.priv.renderer;
+    return renderer.def.render(renderer.renderable) || [];
 };
 
 /**
@@ -601,7 +601,7 @@ Component.prototype.render = function() {
  * @protected
  */
 Component.prototype.isRendered = function() {
-	return this.priv.rendered;
+    return this.priv.rendered;
 };
 
 /**
@@ -611,7 +611,7 @@ Component.prototype.isRendered = function() {
  * @private
  */
 Component.prototype.setUnrendering = function(unrendering) {
-	this.priv.inUnrender = unrendering;
+    this.priv.inUnrender = unrendering;
 };
 
 /**
@@ -621,7 +621,7 @@ Component.prototype.setUnrendering = function(unrendering) {
  * @private
  */
 Component.prototype.isUnrendering = function() {
-	return this.priv.inUnrender;
+    return this.priv.inUnrender;
 };
 
 /**
@@ -632,7 +632,7 @@ Component.prototype.isUnrendering = function() {
  * @protected
  */
 Component.prototype.setRendered = function(rendered) {
-	this.priv.rendered = rendered;
+    this.priv.rendered = rendered;
 };
 
 /**
@@ -641,7 +641,7 @@ Component.prototype.setRendered = function(rendered) {
  * @protected
  */
 Component.prototype.getRenderer = function() {
-	return this.priv.renderer;
+    return this.priv.renderer;
 };
 
 /**
@@ -652,7 +652,7 @@ Component.prototype.getRenderer = function() {
  * @public
  */
 Component.prototype.getGlobalId = function() {
-	return this.priv.globalId;
+    return this.priv.globalId;
 };
 
 /**
@@ -662,7 +662,7 @@ Component.prototype.getGlobalId = function() {
  * @public
  */
 Component.prototype.getLocalId = function() {
-	return this.priv.localId;
+    return this.priv.localId;
 };
 
 /**
@@ -671,13 +671,13 @@ Component.prototype.getLocalId = function() {
  * @public
  */
 Component.prototype.getRendering = function() {
-	var concrete = this.getConcreteComponent();
+    var concrete = this.getConcreteComponent();
 
-	if (this !== concrete) {
-		return concrete.getRendering();
-	} else {
-		return this.priv.rendering;
-	}
+    if (this !== concrete) {
+        return concrete.getRendering();
+    } else {
+        return this.priv.rendering;
+    }
 };
 
 /**
@@ -686,7 +686,7 @@ Component.prototype.getRendering = function() {
  * @protected
  */
 Component.prototype.getSuper = function() {
-	return this.priv.superComponent;
+    return this.priv.superComponent;
 };
 
 /* jslint sub: true */
@@ -700,19 +700,19 @@ Component.prototype.getSuper = function() {
  * @protected
  */
 Component.prototype.associateElement = function(element) {
-	if (!this.isConcrete()) {
-		var concrete = this.getConcreteComponent();
-		concrete.associateElement(element);
-	} else {
-		var priv = this.priv;
-		if (!priv.elements) {
-			priv.elements = [];
-		}
+    if (!this.isConcrete()) {
+        var concrete = this.getConcreteComponent();
+        concrete.associateElement(element);
+    } else {
+        var priv = this.priv;
+        if (!priv.elements) {
+            priv.elements = [];
+        }
 
-		priv.elements.push(element);
+        priv.elements.push(element);
 
-		priv.associateRenderedBy(this, element);
-	}
+        priv.associateRenderedBy(this, element);
+    }
 };
 
 /**
@@ -740,12 +740,12 @@ Component.prototype.disassociateElements = function() {
  * @public
  */
 Component.prototype.getElements = function() {
-	if (!this.isConcrete()) {
-		var concrete = this.getConcreteComponent();
-		return concrete.getElements();
-	} else {
-		return (this.priv.elements && this.priv.elements.slice(0)) || [];
-	}
+    if (!this.isConcrete()) {
+        var concrete = this.getConcreteComponent();
+        return concrete.getElements();
+    } else {
+        return (this.priv.elements && this.priv.elements.slice(0)) || [];
+    }
 };
 
 /**
@@ -755,15 +755,15 @@ Component.prototype.getElements = function() {
  * @public
  */
 Component.prototype.getElement = function() {
-	var elements = this.getElements();
-	if (elements) {
+    var elements = this.getElements();
+    if (elements) {
         for (var i = 0; i<elements.length; i++) {
-			if (elements[i]){
-				return elements[i];
-			}
-		}
-	}
-	return null;
+            if (elements[i]){
+                return elements[i];
+            }
+        }
+    }
+    return null;
 };
 
 /**
@@ -812,19 +812,19 @@ Component.prototype.clearReference = function(key) {
  */
 Component.prototype.get = function(key) {
     key = $A.expressionService.normalize(key).replace(/^v\.body\b/g,"v.body."+this.priv.globalId);
-	var path = key.split('.');
-	var root = path.shift();
-	var valueProvider = this.priv.getValueProvider(root, this);
-	if (path.length) {
+    var path = key.split('.');
+    var root = path.shift();
+    var valueProvider = this.priv.getValueProvider(root, this);
+    if (path.length) {
         $A.assert(valueProvider, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
         if($A.util.isFunction(valueProvider.get)){
             return valueProvider.get(path.join('.'));
         }else{
             return $A.expressionService.resolve(path,valueProvider);
         }
-	} else {
-		return valueProvider;
-	}
+    } else {
+        return valueProvider;
+    }
 };
 
 /**
@@ -857,8 +857,8 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     key = $A.expressionService.normalize(key).replace(/^v\.body\b/g,"v.body."+this.priv.globalId);
     $A.assert(key.indexOf('.') > -1, "Unable to set value for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
 
-	var path = key.split('.');
-	var valueProvider = this.priv.getValueProvider(path.shift(), this);
+    var path = key.split('.');
+    var valueProvider = this.priv.getValueProvider(path.shift(), this);
 
     $A.assert(valueProvider, "Unknown value provider for key '" + key + "'.");
     $A.assert(valueProvider.set, "Value provider does not implement set() method.");
@@ -866,7 +866,7 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 
     var oldValue=valueProvider.get(subPath);
 
-	var returnValue=valueProvider.set(subPath, value, ignoreChanges);
+    var returnValue=valueProvider.set(subPath, value, ignoreChanges);
     if($A.util.isExpression(value)){
         value.addChangeHandler(this,key);
         if(!ignoreChanges){
@@ -941,8 +941,8 @@ Component.prototype.autoDestroy = function(destroy) {
  * @public
  */
 Component.prototype.getConcreteComponent = function() {
-	var priv = this.priv;
-	return priv.concreteComponentId ? componentService.get(priv.concreteComponentId) : this;
+    var priv = this.priv;
+    return priv.concreteComponentId ? componentService.get(priv.concreteComponentId) : this;
 };
 
 /**
@@ -951,7 +951,7 @@ Component.prototype.getConcreteComponent = function() {
  * @public
  */
 Component.prototype.isConcrete = function() {
-	return !this.priv.concreteComponentId;
+    return !this.priv.concreteComponentId;
 };
 
 /**
@@ -961,7 +961,7 @@ Component.prototype.isConcrete = function() {
  * @public
  */
 Component.prototype.getAttributeValueProvider = function() {
-	return this.priv.attributeValueProvider||this;
+    return this.priv.attributeValueProvider||this;
 };
 
 /**
@@ -999,7 +999,7 @@ Component.prototype.addValueProvider=function(key,valueProvider){
  * @public
  */
 Component.prototype.getEventDispatcher = function() {
-	return this.priv.getEventDispatcher();
+    return this.priv.getEventDispatcher();
 };
 
 /**
@@ -1009,7 +1009,7 @@ Component.prototype.getEventDispatcher = function() {
  * @public
  */
 Component.prototype.getModel = function() {
-	return this.priv.model;
+    return this.priv.model;
 };
 
 /**
@@ -1021,15 +1021,15 @@ Component.prototype.getModel = function() {
  * @public
  */
 Component.prototype.getEvent = function(name) {
-	var eventDef = this.getDef().getEventDef(name);
-	if (!eventDef) {
+    var eventDef = this.getDef().getEventDef(name);
+    if (!eventDef) {
         return null;
-	}
-	return new Event({
-		"name" : name,
-		"eventDef" : eventDef,
-		"component" : this.getConcreteComponent()
-	});
+    }
+    return new Event({
+        "name" : name,
+        "eventDef" : eventDef,
+        "component" : this.getConcreteComponent()
+    });
 };
 
 /**
@@ -1044,11 +1044,11 @@ Component.prototype.getEvent = function(name) {
  * @protected
  */
 Component.prototype.getEventByDescriptor = function(descriptor) {
-	var name = this.getDef().getEventNameByDescriptor(descriptor);
-	if (name === null) {
-		return null;
-	}
-	return this.getEvent(name);
+    var name = this.getDef().getEventNameByDescriptor(descriptor);
+    if (name === null) {
+        return null;
+    }
+    return this.getEvent(name);
 };
 
 /**
@@ -1095,9 +1095,9 @@ Component.prototype.isDirty = function(expression) {
  * @public
  */
 Component.prototype.isValid = function(expression) {
-	if (!expression) {
-		return !this._scheduledForAsyncDestruction && this.priv !== undefined;
-	}
+    if (!expression) {
+        return !this._scheduledForAsyncDestruction && this.priv !== undefined;
+    }
     return this.callOnExpression(Component.prototype.isValidCallback, expression);
 };
 
@@ -1191,14 +1191,14 @@ Component.prototype.getErrorsCallback = function(valueProvider, root, subPath) {
  * @public
  */
 Component.prototype.toString = function() {
-	if(!this._description){
+    if(!this._description){
         this._description=this.getDef() + ' {' + this.getGlobalId() + '}' + (this.getLocalId() ? ' {' + this.getLocalId() + '}' : '');
     }
     var attributesOutput = [];
-	// Debug Info
+    // Debug Info
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var attributes = this.get("v");
-	if(attributes){
+    if(attributes){
         for(var key in attributes.values) {
             attributesOutput.push(" "+ key + " = \"" + attributes.values[key] +"\"");
         }
@@ -1214,7 +1214,7 @@ Component.prototype.toString = function() {
  */
 Component.prototype.toJSON = function() {
 
-	return $A.util.json.encode(this.priv.output(this));
+    return $A.util.json.encode(this.priv.output(this));
 };
 
 /**
@@ -1222,18 +1222,18 @@ Component.prototype.toJSON = function() {
  * which this component currently has handlers.
  */
 Component.prototype.getHandledEvents = function() {
-	var ret = {};
-	var concrete = this.getConcreteComponent();
-	var eventDispatcher = concrete.getEventDispatcher();
-	if (eventDispatcher) {
-		for ( var name in eventDispatcher) {
-			if (eventDispatcher.hasOwnProperty(name) && eventDispatcher[name].length) {
-				ret[name.toLowerCase()] = true;
-			}
-		}
-	}
+    var ret = {};
+    var concrete = this.getConcreteComponent();
+    var eventDispatcher = concrete.getEventDispatcher();
+    if (eventDispatcher) {
+        for ( var name in eventDispatcher) {
+            if (eventDispatcher.hasOwnProperty(name) && eventDispatcher[name].length) {
+                ret[name.toLowerCase()] = true;
+            }
+        }
+    }
 
-	return ret;
+    return ret;
 };
 
 /**
@@ -1243,11 +1243,11 @@ Component.prototype.getHandledEvents = function() {
  *            eventName The event name associated with this component.
  */
 Component.prototype.hasEventHandler = function(eventName) {
-	if (eventName) {
-		var handledEvents = this.getHandledEvents();
-		return handledEvents[eventName.toLowerCase()];
-	}
-	return false;
+    if (eventName) {
+        var handledEvents = this.getHandledEvents();
+        return handledEvents[eventName.toLowerCase()];
+    }
+    return false;
 };
 
 /**
@@ -1255,31 +1255,31 @@ Component.prototype.hasEventHandler = function(eventName) {
  * <code>aura://Aura.Component[]</code>
  */
 Component.prototype.getFacets = function() {
-	if (!this.getFacets.cachedFacetNames) {
-		// grab the names of each of the facets from the ComponentDef
-		var facetNames = [];
-		var attributeDefs = this.getDef().getAttributeDefs();
+    if (!this.getFacets.cachedFacetNames) {
+        // grab the names of each of the facets from the ComponentDef
+        var facetNames = [];
+        var attributeDefs = this.getDef().getAttributeDefs();
 
         //JBUCH: HALO: TODO: UNNECESSARY PERF HIT WITH .each() USING NEW STACKFRAME ON *EVERY* COMPONENT THAT HAS ATTRIBUTES (MOST COMPONENTS)
-		attributeDefs.each(function(attrDef) {
-			if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
-				facetNames.push(attrDef.getDescriptor().getName());
-			}
-		});
+        attributeDefs.each(function(attrDef) {
+            if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
+                facetNames.push(attrDef.getDescriptor().getName());
+            }
+        });
 
-		// cache the names--they're not going to change
-		this.getFacets.cachedFacetNames = facetNames;
-	}
+        // cache the names--they're not going to change
+        this.getFacets.cachedFacetNames = facetNames;
+    }
 
-	// then grab each of the facets themselves
-	var names = this.getFacets.cachedFacetNames;
-	var facets = [];
+    // then grab each of the facets themselves
+    var names = this.getFacets.cachedFacetNames;
+    var facets = [];
 
-	for (var i = 0, len = names.length; i < len; i++) {
-		facets.push(this.get("v." + names[i]));
-	}
+    for (var i = 0, len = names.length; i < len; i++) {
+        facets.push(this.get("v." + names[i]));
+    }
 
-	return facets;
+    return facets;
 };
 
 /**
@@ -1296,15 +1296,15 @@ Component.prototype.getFacets = function() {
  * @private
  */
 $A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component) {
-	this.eventName = eventName;
-	this.component = component;
-	this.enabled = false;
-	var that = this;
-	this.callback = function(eventObj) {
-		if (that.component.isRenderedAndValid()) {
-			callback(eventObj);
-		}
-	};
+    this.eventName = eventName;
+    this.component = component;
+    this.enabled = false;
+    var that = this;
+    this.callback = function(eventObj) {
+        if (that.component.isRenderedAndValid()) {
+            callback(eventObj);
+        }
+    };
 };
 
 /**
@@ -1317,17 +1317,17 @@ $A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component)
  *            enable if truthy, the handler is enabled, otherwise disabled.
  */
 $A.ns.DocLevelHandler.prototype.setEnabled = function(enable) {
-	if (enable) {
-		if (!this.enabled) {
-			this.enabled = true;
-			$A.util.on(document.body, this.eventName, this.callback);
-		}
-	} else {
-		if (this.enabled) {
-			this.enabled = false;
-			$A.util.removeOn(document.body, this.eventName, this.callback);
-		}
-	}
+    if (enable) {
+        if (!this.enabled) {
+            this.enabled = true;
+            $A.util.on(document.body, this.eventName, this.callback);
+        }
+    } else {
+        if (this.enabled) {
+            this.enabled = false;
+            $A.util.removeOn(document.body, this.eventName, this.callback);
+        }
+    }
 };
 
 var dlp = $A.ns.DocLevelHandler.prototype;

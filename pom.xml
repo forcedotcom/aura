@@ -51,6 +51,7 @@
         <xunit.js.engine>rhino</xunit.js.engine>
         <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.format>xml</xunit.js.format>
+        <xunit.js.verbose>false</xunit.js.verbose>
     </properties>
     <repositories>
         <repository>
@@ -841,6 +842,7 @@
                                                 <arg value="${xunit.js.console}" />
                                                 <arg value="/output:${xunit.js.format}" />
                                                 <arg value="/strict:false" />
+                                                <arg value="/verbose:${xunit.js.verbose}" />
                                                 <arg value="/dependency:${project.build.directory}/tools/xUnit/dependencies/" />
                                                 <arg value="${project.build.directory}/xunitjs/xunitTests/${xunit.js.testPath}" />
                                             </java>

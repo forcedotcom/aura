@@ -133,7 +133,7 @@ $A.ns.Aura = function() {
     this.clientService = new AuraClientService();
     this.componentService = new $A.ns.AuraComponentService();
     this.serializationService = new AuraSerializationService();
-    this.renderingService = new AuraRenderingService();
+    this.renderingService = new $A.ns.AuraRenderingService();
     this.expressionService = new AuraExpressionService();
     this.historyService = new $A.ns.AuraHistoryService();
     this.eventService = new AuraEventService();
@@ -286,7 +286,7 @@ $A.ns.Aura = function() {
      * @param {Component|Array} cmp
      * @borrows AuraRenderingService.render
      */
-    this.render = this.renderingService.render;
+    this.render = this.renderingService.render.bind(this.renderingService);
 
     /**
      * Equivalent to <code>$A.renderingService.rerender()</code>.
@@ -296,7 +296,7 @@ $A.ns.Aura = function() {
      * @param {Component|Array} cmp
      * @borrows AuraRenderingService.rerender
      */
-    this.rerender = this.renderingService.rerender;
+    this.rerender = this.renderingService.rerender.bind(this.renderingService);
 
     /**
      * Equivalent to <code>$A.renderingService.unrender()</code>.
@@ -306,7 +306,7 @@ $A.ns.Aura = function() {
      * @param {Component|Array} cmp
      * @borrows AuraRenderingService.unrender
      */
-    this.unrender = this.renderingService.unrender;
+    this.unrender = this.renderingService.unrender.bind(this.renderingService);
 
     /**
      * Equivalent to <code>$A.renderingService.afterRender()</code>.
@@ -316,7 +316,7 @@ $A.ns.Aura = function() {
      * @param {Component|Array} cmp
      * @borrows AuraRenderingService.afterRender
      */
-    this.afterRender = this.renderingService.afterRender;
+    this.afterRender = this.renderingService.afterRender.bind(this.renderingService);
 
     /**
      * Equivalent to <code>$A.componentService.get()</code>.

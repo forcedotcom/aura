@@ -1,2 +1,2 @@
 #!/bin/sh
-mvn install -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text -DskipComponentCompile
+mvn install -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text -DskipComponentCompile -Dxunit.js.verbose=true

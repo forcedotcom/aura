@@ -243,10 +243,16 @@ Error.IsEmpty=function(error){
     return String.IsEmpty(String.Trim(error));
 };
 
-Error.prototype.toString=function(){
+Error.prototype.toString=function(verbose){
     var message=(this.hasOwnProperty("message")&&!String.IsEmpty(this.message)?this.message:this.description);
     if(message==undefined)message='';
     if(!Object.IsType(String,message))message=this+'';
+    if(verbose){
+        if(this.line)message=String.Format("{0}\n\t(line: {1})",message,this.line);
+        if(this.lineNumber)message=String.Format("{0}\n\t(line: {1})",message,this.lineNumber);
+        if(this.number)message=String.Format("{0}\n\t(number: {1})",message,this.number);
+        if(this.stackTrace||this.stack||this.getStack)message=String.Format("{0}\n\tStackTrace: {1}",message,this.stackTrace||this.stack||this.getStack());
+    }
     return message;
 }; 
  
@@ -266,7 +272,7 @@ Function.Equals=function(expected,actual,reason){
 Function.GetBody=function(method){
     if(!Object.IsType(Function,method))throw new Error("Function.GetBody: 'method' must be a valid Function pointer.");
     var body=method.toString();
-    return body.slice(body.indexOf('{')+1,body.lastIndexOf('}'));
+    return String.Trim(body.slice(body.indexOf('{')+1,body.lastIndexOf('}')));
 };
 
 Function.GetDelegate=function(method,instance){
@@ -3686,7 +3692,10 @@ System.IO.DirectoryStrategy.SpiderMonkey.Windows=function(){
     function get(path,directories){
         path=System.IO.Path.GetFullPath(path);
         var items=String.Trim(System.Environment.Execute("cmd", ["/C",String.Format("for {1}%a in (\"{0}\") do @echo %a",System.IO.Path.Combine(path,"*"),directories?"/d ":'')])).split("\n");
-        for(var i=0;i<items.length;i++)items[i]=String.Trim(items[i]);
+        for(var i=0;i<items.length;i++){
+            items[i]=String.Trim(items[i]);
+            if(!items[i])items.splice(i--,1);
+        }
         return items;
     }
 };
@@ -3770,7 +3779,10 @@ System.IO.DirectoryStrategy.V8.Windows=function(){
     function get(path,directories){
         path=System.IO.Path.GetFullPath(path);
         var items=String.Trim(System.Environment.Execute("cmd", ["/C",String.Format("for {1}%a in (\"{0}\") do @echo %a",System.IO.Path.Combine(path,"*"),directories?"/d ":'')])).split("\n");
-        for(var i=0;i<items.length;i++)items[i]=String.Trim(items[i]);
+        for(var i=0;i<items.length;i++){
+            items[i]=String.Trim(items[i]);
+            if(!items[i])items.splice(i--,1);
+        }
         return items;
     }
 };
@@ -4443,9 +4455,10 @@ xUnit.js.Console.ScriptLoader=function(){
     this.GetScriptList=function(pathList,extensions){
         if(!Object.IsType(Array,pathList))throw new Error("xUnit.js.Console.ScriptLoader.GetScriptList: 'pathList' must be an array of valid file or Directory paths.");
         if(!Object.IsType(Array,extensions))extensions=_defaultExtensions;
-        var context={Extensions:extensions,ScriptList:[]}
+        var context={Extensions:extensions,ScriptList:[],Unknown:[]};
         Array.ForEach(pathList,addDirectory,directoryPredicate,context);
         Array.ForEach(pathList,addScript,scriptPredicate,context);
+        if(context.Unknown.length)throw new Error(String.Format("xUnit.js.Console.ScriptLoader.GetScriptList: 'pathList' contained the following unknown paths: {0}",context.Unknown.join(', ')));
         return context.ScriptList;
     };
     
@@ -4457,7 +4470,7 @@ xUnit.js.Console.ScriptLoader=function(){
 
     // Private methods
     function addDirectory(path,context){
-        var directoryContext={Extensions:context.Extensions,ScriptList:context.ScriptList};
+        var directoryContext={Extensions:context.Extensions,ScriptList:context.ScriptList,Unknown:context.Unknown};
         var directories=System.IO.Directory.GetDirectories(path);
         if(directories)Array.ForEach(directories,addDirectory,null,directoryContext);
         var files=System.IO.Directory.GetFiles(path);
@@ -4489,12 +4502,20 @@ xUnit.js.Console.ScriptLoader=function(){
     
     // Predicates
     function directoryPredicate(path,context){
-        return System.IO.Directory.Exists(path);
+        return path&&System.IO.Directory.Exists(path);
     }
 
     function scriptPredicate(path,context){
-        for(var i=0;i<context.Extensions.length;i++){
-            if(String.EndsWith(path,context.Extensions[i]))return !directoryPredicate(path,context);
+        if(path){
+            for(var i=0;i<context.Extensions.length;i++){
+                if(String.EndsWith(path,context.Extensions[i])){
+                    if(directoryPredicate(path,context))continue;
+                    if(System.IO.File.Exists(path))return true;
+                }
+            }
+            if(!directoryPredicate(path)&&!System.IO.File.Exists(path)){
+                context.Unknown.push(path);
+            }
         }
         return false;
     }
@@ -4511,7 +4532,9 @@ xUnit.js.Console.Runner=function(){
     var _finished=false;
     var _globalState={};
     var _isStrict;
+    var _isVerbose;
     var _knownPollution={};
+    var _loadingDependency=false;
     var _output;
     var _scriptLoader;
     var _startTime;
@@ -4544,10 +4567,11 @@ xUnit.js.Console.Runner=function(){
         try{
             var parameters=System.Environment.GetParameters();
             _isStrict=parameters.named.strict!="false";
+            _isVerbose=parameters.named.verbose=="true";
             _engine.SingleAssert=_isStrict;
             if(parameters.unnamed.length>0){
                 loadDependency(parameters.named.dependency);
-                _output.SetLevel(_output.OutputLevels[parameters.named.verbose=="true"&&"verbose"]);
+                _output.SetLevel(_output.OutputLevels[_isVerbose&&"verbose"]);
                 _output.SetType(parameters.named.output);
                 _output.Prologue();
                 try{
@@ -4562,14 +4586,14 @@ xUnit.js.Console.Runner=function(){
                     _finished=true;
                 }catch(error){
                     _exitCode=0xBAE1; // BAIL: Runtime exception during script load or test run.
-                    completeRun(true,String.Format("\nSystem Error:\n\t{0}\n",error));
+                    completeRun(true,String.Format("\nSystem Error:\n\t{0}\n",formatError(error)));
                 }
             }else{
                 usage();
             }
         }catch(criticalError){
             _exitCode=0xDEAD; // DEAD: Game over, man.
-            completeRun(false,String.Format("\nCritical Error: {0}\n",criticalError));
+            completeRun(false,String.Format("\nCritical Error:\n\t{0}\n",formatError(criticalError)));
         }
     };
 
@@ -4639,6 +4663,10 @@ xUnit.js.Console.Runner=function(){
         return pollution;
     }
 
+    function formatError(error){
+        return error&&error.toString(_isVerbose)||"[Unknown Error]";
+    }
+
     function isPollution(key){
         var entry=Object.Global()[key];
         if(Function.IsNamespace(entry))return false;
@@ -4651,23 +4679,29 @@ xUnit.js.Console.Runner=function(){
 
     function loadDependency(dependency){
         if(dependency==undefined||String.IsEmpty(dependency))return;
-        _scriptLoader.Events.Remove("Success",ScriptLoader_Success);
-        _scriptLoader.Events.Remove("Error",ScriptLoader_Error);
+        _loadingDependency=true;
         _scriptLoader.Events.Add("Loaded",ScriptLoader_DependencyLoaded);
-        System.IO.Path.SetRoot(System.Environment.GetWorkingDirectory());
-        var dependencies=_scriptLoader.GetScriptList(dependency.split(','));
-        _scriptLoader.LoadScripts(dependencies);
+        try{
+            System.IO.Path.SetRoot(System.Environment.GetWorkingDirectory());
+            var dependencies=_scriptLoader.GetScriptList(dependency.split(','));
+            _scriptLoader.LoadScripts(dependencies);
+        }catch(e){
+            throw new Error(String.Format("Unable to load script dependencies: {0}",e.toString(_isVerbose)));
+        }
     }
 
     function loadScripts(pathList,extensions){
         var timeStamp=new Date();
         _output.BeginFileLoad();
-        System.IO.Path.SetRoot(System.Environment.GetWorkingDirectory());
-        if(extensions)extensions=extensions.split(',');
-        var scriptList=_scriptLoader.GetScriptList(pathList,extensions);
-        var errors=_scriptLoader.LoadScripts(scriptList);
+        try{
+            System.IO.Path.SetRoot(System.Environment.GetWorkingDirectory());
+            if(extensions)extensions=extensions.split(',');
+            var scriptList=_scriptLoader.GetScriptList(pathList,extensions);
+            _scriptLoader.LoadScripts(scriptList);
+        }catch(e){
+            throw new Error(String.Format("Unable to load scripts: {0}",e.toString(_isVerbose)));
+        }
         _output.CompleteFileLoad(scriptList,new Date()-timeStamp);
-        return errors;
     }
     
     function runAction(action,target,trait,negativeTrait){
@@ -4798,14 +4832,14 @@ xUnit.js.Console.Runner=function(){
     }
 
     function ScriptLoader_DependencyLoaded(){
-        _scriptLoader.Events.Remove("Loaded",ScriptLoader_DependencyLoaded);
-        _scriptLoader.Events.Add("Success",ScriptLoader_Success);
-        _scriptLoader.Events.Add("Error",ScriptLoader_Error);
+        _loadingDependency=false;
     }
 
     function ScriptLoader_Error(context){
         _exitCode=0x10AD; // LOAD: script failed to load.
-        _output.Error(String.Format("xUnit.js.Console.ScriptLoader.js: There was an error loading script '{0}'.\nError: {1}\n",context.Path,context.Error));
+        var errorMessage=String.Format("xUnit.js.Console.ScriptLoader.js: There was an error loading script {2}'{0}'.\nError: {1}\n",context.Path,context.Error,_loadingDependency?"dependency ":'');
+        if(_loadingDependency)throw new Error(errorMessage);
+        _output.Error(new Error(errorMessage));
     }
 
     function ScriptLoader_Loading(context){
@@ -4813,6 +4847,7 @@ xUnit.js.Console.Runner=function(){
     }
 
     function ScriptLoader_Success(context){
+        if(_loadingDependency)return;
         if(_isStrict){
             var pollution=findPollution();
             if(pollution.length){
@@ -5721,14 +5756,7 @@ xUnit.js.Console.Output.OutputStrategy.Text=function(){
     }
 
     function formatError(error){
-        var errorText=error+'';
-        if(error&&isVerbose()){
-            if(error.line)errorText=String.Format("\n{0} (line: {1})",errorText,error.line);
-            if(error.lineNumber)errorText=String.Format("\n{0} (line: {1})",errorText,error.lineNumber);
-            if(error.number)errorText=String.Format("\n{0} (number: {1})",errorText,error.number);
-            if(error.stackTrace||error.stack||error.getStack)errorText=String.Format("{0}\n\nStackTrace: {1}",errorText,error.stackTrace||error.stack||error.getStack());
-        }
-        return errorText||"[no message]";
+        return error&&error.toString(isVerbose())||"[No Message]";
     }
 
     function getPath(fact){

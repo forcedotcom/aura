@@ -129,6 +129,7 @@ $A.ns.Logger.prototype.error = function(msg, e){
                 }
             } catch (e2) {
                 // Ignore serialization errors
+                // We are in an error already, so we really don't want to publish this.
             }
         }
     }

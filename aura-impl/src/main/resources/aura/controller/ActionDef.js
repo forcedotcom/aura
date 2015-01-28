@@ -42,20 +42,20 @@ function ActionDef(config) {
                 this.paramDefs[param.getName()] = param;
             }
         }
-                if (config["background"]) {
-                    this.background = true;
-                }
-                if (config["caboose"]) {
-                    this.caboose = true;
-                }
+        if (config["background"]) {
+            this.background = true;
+        }
+        if (config["caboose"]) {
+            this.caboose = true;
+        }
     }
 
     if (this.actionType === "CLIENT") {
         try {
             this.meth = $A.util.json.decodeString(config["code"]);
         } catch (e) {
-            $A.log(config["code"], e);
-                        throw e;
+            $A.error(config["code"], e);
+            throw e;
         }
     }
 }

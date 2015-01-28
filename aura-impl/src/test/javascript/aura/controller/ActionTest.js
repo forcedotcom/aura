@@ -548,7 +548,7 @@ Test.Aura.Controller.ActionTest = function() {
                 }
             },
             assert : function(param) {
-            },
+            }
         });
 
         [ Fact ]
@@ -590,6 +590,45 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+
+        [ Fact ]
+        function MissingLayoutDefThrows() {
+            // Arrange
+            var expectedErrorMessage = "Missing layout://blahblah definition";
+            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+                assert : function(param) {}
+            });
+            var def = {
+                isClientAction : function() {
+                    return true;
+                }
+            };
+            var cmp = {
+                getDef : function() {
+                    return {
+                        getHelper : function() {
+                            throw new Error(expectedErrorMessage);
+                        }
+                    }
+                }
+            };
+            var target = new Action();
+            target.def = def;
+            target.cmp = cmp;
+            var actualMessage = null;
+
+            // Act
+            mockAura(function() {
+                try {
+                    target.runDeprecated();
+                } catch(e) {
+                    actualMessage = e.message;
+                }
+            })
+
+            // Assert
+            Assert.Equal(expectedErrorMessage, actualMessage);
         }
 
         [ Fact ]

@@ -14,6 +14,64 @@
  * limitations under the License.
  */
 ({
+	testClearAndReplaceWholeArrayInModel: {
+		test: [function(cmp) {
+			cmp.set("m.dataIntList",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear m.dataIntList." );
+    		
+         	cmp.set("m.dataIntList",[0,1,2]);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
+         	var expected = [];
+         	for( var i=0; i<3; i++ ) {
+         		expected.push( {render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: ""+i});
+         	}
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+		}
+		]
+	},
+	
+	testClearAndReplaceWholeArrayInIteration: {
+		test: [function(cmp) {
+			var iter = cmp.find("iterationOnArrayModelPassthrough");
+			iter.set("v.items", []);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
+    		
+         	var iter = cmp.find("iterationOnArrayModelPassthrough");
+         	iter.set("v.items", [0,1,2]);
+		 }, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
+			var expected = [];
+         	for( var i=0; i<3; i++ ) {
+         		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
+         	}
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+         	
+         	var iter = cmp.find("iterationOnArrayModelPassthrough");
+         	iter.set("v.items", [2,3,4]);
+		}
+		/* I notice that when replacing the items array, if we have same value between old and new array, the same item cmp get re-render twice.
+		 * for example, When trying out on browser console, setting v.items to [2,3,4] will actually re-render the original 3rd item 2 times, 
+		 * which give us re-render count = 3 
+		 * however, if we run this in test, it only give us 1 extra re-render (re-render count = 2)
+		 * not sure why there is a difference between the two.
+		  ,function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
+			var expected = [];
+         	for( var i=0; i<3; i++ ) {
+         		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+(i+2)});
+         	}
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+		}*/
+		]
+	},
+	
 	testChangeStartAndEnd: {
 		attributes: {start:0, end:26},
 		test: [function(cmp) {

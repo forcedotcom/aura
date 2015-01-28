@@ -14,6 +14,68 @@
  * limitations under the License.
  */
 ({
+	testClearAndReplaceWholeArrayInAttribute: {
+		test: [function(cmp) {
+			cmp.set("v.mapdata",{"items":[]});
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.mapdata." );
+    		
+         	var new_mapdata = {
+        			items: [
+        				{ "label": "4"},
+        				{ "label": "5"},
+        				{ "label": "6"},
+        				{ "label": "7"},
+        			]
+        		};
+         	cmp.set("v.mapdata",new_mapdata);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
+			var expected = [
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "5"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "6"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "7"}];
+         	this.assertIterationCmpElements(expected, iterCmpEle);
+		}
+		]
+	},
+	
+	testClearAndReplaceWholeArrayInIteration: {
+		test: [function(cmp) {
+			var iter = cmp.find("iterationOnMapAttributePassthrough");
+			iter.set("v.items",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
+    		
+         	var iter = cmp.find("iterationOnMapAttributePassthrough");
+         	iter.set("v.items", [ {"label":4}, {"label":5}, {"label":6}, {"label":7} ]);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
+			var expected = [
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "5"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "6"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "7"}];
+	        this.assertIterationCmpElements(expected, iterCmpEle);
+	        
+	        var iter = cmp.find("iterationOnMapAttributePassthrough");
+         	iter.set("v.items", [ {"label":6}, {"label":7}, {"label":8}, {"label":9} ]);
+		}, function(cmp) {
+			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
+			var expected = [
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "6"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "7"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "8"},
+				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"}];
+	        this.assertIterationCmpElements(expected, iterCmpEle);
+		}]
+	},
+	
 	//notice that changing start and end doesn't trigger rerender.
 	testChangeStartAndEnd: {
 		attributes: {start:0, end:5},

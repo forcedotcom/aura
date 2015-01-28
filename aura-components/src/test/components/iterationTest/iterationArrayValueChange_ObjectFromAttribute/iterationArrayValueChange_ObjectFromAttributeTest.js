@@ -14,6 +14,56 @@
  * limitations under the License.
  */
 ({
+	testClearAndReplaceWholeObjectInAttribute: {
+		test: [function(cmp) {
+			cmp.set("v.mapdata",{"items":[]});
+		}, function(cmp) {
+         	var iterCmpEle = cmp.find("iterationOnMapAttribute").getElements();
+         	var expected = [];
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected." );
+         	
+         	var new_mapdata = {
+        			items: [
+        				{ "label": "4"},
+        				{ "label": "5"},
+        				{ "label": "6"},
+        				{ "label": "7"},
+        			]
+        		};
+         	cmp.set("v.mapdata",new_mapdata);
+		}, function(cmp) {
+			var expected = [4,5,6,7];
+			var iterCmpEle = cmp.find("iterationOnMapAttribute").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.mapdata." );
+         	for(var i = 0; i< expected.length; i++) {
+    			$A.test.assertEquals( i+":"+expected[i], $A.test.getText(iterCmpEle[i]), "unexpected iteration element at index#"+i );
+    		}
+		}
+		]
+	},
+	
+	testClearAndReplaceWholeArrayInIteration: {
+		test: [function(cmp) {
+			var iter = cmp.find("iterationOnMapAttribute");
+			iter.set("v.items",[]);
+		}, function(cmp) {
+			var expected = [];
+			var iterCmpEle = cmp.find("iterationOnMapAttribute").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
+    		
+         	var iter = cmp.find("iterationOnMapAttribute");
+         	iter.set("v.items",[ {"label":4}, {"label":5}, {"label":6}, {"label":7} ]);
+		}, function(cmp) {
+			var expected = [4,5,6,7];
+			var iterCmpEle = cmp.find("iterationOnMapAttribute").getElements();
+         	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.items in iteration." );
+         	for(var i = 0; i< expected.length; i++) {
+    			$A.test.assertEquals( i+":"+expected[i], $A.test.getText(iterCmpEle[i]), "after replace v.itemss in iteration ,get unexpected iteration element at index#"+i );
+    		}
+		}
+		]
+	},
+	
 	testChangeStartAndEnd: {
 		attributes: {start:0, end:5},
 		test: [function(cmp) {

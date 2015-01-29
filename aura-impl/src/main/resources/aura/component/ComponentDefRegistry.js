@@ -86,6 +86,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
         }
 
         if (config === undefined) {
+            $A.error("Unknown component: "+descriptor);
             throw new Error("Unknown component: "+descriptor);
         }
 
@@ -114,7 +115,6 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
             }
         }
     }
-
     return ret;
 };
 

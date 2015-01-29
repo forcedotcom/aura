@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 ({
-	createComponent : function(cmp){
-		cmp.get('c.createComponent').runDeprecated();
-	},
-	
+    createComponent : function(cmp){
+        cmp.get('c.createComponent').runDeprecated();
+    },
+    
     getLocallyCreatedComponent:function(cmp){
         var body = cmp.get('v.body');
         $A.test.assertEquals(1, body.length);
@@ -31,9 +33,9 @@
     testClientProvidedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'ui:inputText'}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
-        	var creation = this.getLocallyCreatedComponent(cmp);
+            var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://ui:inputText", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("ui:inputText", creation.getElement().value);
         }]
@@ -45,7 +47,7 @@
     testClientProvidedDescriptorNotPreloaded:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'attributesTest:simpleValue'}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://attributesTest:simpleValue", creation.getDef().getDescriptor().getQualifiedName());
@@ -58,13 +60,14 @@
      * this is different from the test for "arrested:development" down there as attributesTest:parent does exist
      */
     testClientProvidedDescriptorNotPreloadedError:{
-    	test:function(cmp){
-    	var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'attributesTest:parent'} } };
-        try{
-            $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
-            $A.test.fail("ERROR: Expecting exception when provider return non-loaded componentDef");
-        }
-        catch (e){
+        test:function(cmp){
+            var config = { componentDef:"markup://provider:clientProvider",
+                           attributes:{ values:{ value:'attributesTest:parent'} } };
+            $A.test.expectAuraError("Unknown component: markup://attributesTest:parent");
+            try{
+                $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
+                $A.test.fail("ERROR: Expecting exception when provider return non-loaded componentDef");
+            } catch (e){
                 $A.test.assertEquals("Unknown component: markup://attributesTest:parent", e.message);
             }
         }
@@ -76,7 +79,7 @@
     testClientProvidedPrefixedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'markup://ui:outputText'}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://ui:outputText", creation.getDef().getDescriptor().getQualifiedName());
@@ -92,7 +95,7 @@
     testClientProvidedProvider:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:'provider:clientProvider'}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
@@ -106,7 +109,7 @@
     testClientProvidedConfig:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'aura:text',attributes:{value:'breadwinner'}}\"}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://aura:text", creation.getDef().getDescriptor().getQualifiedName());
@@ -120,7 +123,7 @@
     testClientProvidedConfigWithPrefixedDescriptor:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'markup://aura:expression',attributes:{value:'breadchampion'}}\"}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://aura:expression", creation.getDef().getDescriptor().getQualifiedName());
@@ -134,7 +137,7 @@
     testClientProvidedProviderConfig:{
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'provider:clientProvider',attributes:{value:'baconbringerhomer'}}\"}"},
         test : [function(cmp) {
-        	this.createComponent(cmp);
+            this.createComponent(cmp);
         }, function(cmp){
             var creation = this.getLocallyCreatedComponent(cmp);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
@@ -148,6 +151,7 @@
     testClientProvidedUnknownDescriptor:{
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'arrested:development'} } };
+            $A.test.expectAuraError("Unknown component: markup://arrested:development");
             try{
                 $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
                 $A.test.fail("Expected error to be thrown during new component creation");

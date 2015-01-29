@@ -68,11 +68,27 @@
         
         var concrete = cmp.getConcreteComponent();
     	var newData = evt.getParam("data") || [],
+    	    targetPage = evt.getParam("currentPage"),
+    	    pageSize = concrete.get("v.pageSize"),
+    	    currentPage = concrete.get("v.currentPage"),
     		actualItems = concrete.get("v.items") || [];
         
-        for (var i = 0, len = newData.length; i < len; i++) {
-            actualItems.push(newData[i]);
-        }
+    	var hasTargetPage = $A.util.isFiniteNumber(targetPage);
+    	if (hasTargetPage) {
+    	    var offset = (targetPage - 1) * pageSize;
+    	    for (var i = 0, len = newData.length; i < len; i++) {
+                actualItems[offset++] = newData[i];
+            }
+    	
+    	    // Remove left over old data (the length of new data is less than that of the old data)
+    	    if (targetPage == currentPage && offset < actualItems.length) {
+    		    actualItems.splice(offset, actualItems.length);
+    	    }
+    	} else { // If we don't know which page the data is for, just append to the end.
+    		for (var j = 0, len = newData.length; j < len; j++) {
+                actualItems.push(newData[j]);
+            }
+    	}
         
         concrete.set("v.items", actualItems);
         

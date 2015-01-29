@@ -17,4 +17,5 @@
 -->
 <aura:event type="COMPONENT" description="Event fired by dataProvider to signal to its parent list that data has changed">
     <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="currentPage" type="Integer" default="1"      description="Gets or sets the current page of the pager. The first page is 1, the last page is pageCount."/>
 </aura:event>

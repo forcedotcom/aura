@@ -205,18 +205,18 @@
             adapter.setItem("key1", {"value" : {"foo" : new Array(256).join("x")}})
                 // key: 4 chars = 8 bytes
                 // value: ~265 bytes
-                .then(function() { return adapter.getSize(); })
-                .then(function(size) { $A.test.assertEquals(273, size); })
                 .then(function() { return adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals("key1", mru.toString()); })
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(273, size); })
 
                 // key: 4 chars = 8 bytes
                 // value: ~521 bytes
                 .then(function() { return adapter.setItem("key2", { "value" : { "bar" : new Array(512).join("y")}})})
-                .then(function() { return adapter.getSize(); })
-                .then(function(size) { $A.test.assertEquals(273+529, size); })
                 .then(function() { return adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals("key1,key2", mru.toString()); })
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(273+529, size); })
 
                 // Touch key1 to move it up to the top of the MRU
                 .then(function() {return adapter.getItem("key1"); })
@@ -230,20 +230,20 @@
                 .then(function() { return adapter.setItem("key3", {"value" : {"baz" : new Array(3300).join("z")}}); })
                 .then(function() { return adapter.getItem("key2"); })
                 .then(function(item) { $A.util.isUndefined(item); })
-                .then(function() { return adapter.getSize(); })
-                .then(function(size) { $A.test.assertEquals(273+3317, size); })
                 .then(function() { return adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals("key1,key3", mru.toString()); })
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(273+3317, size); })
 
                 // Complete eviction
                 // Add a new key which would require all the current entries to be evicted
                 // key: 4 chars = 8 bytes
                 // value: ~4009 bytes
                 .then(function() { return adapter.setItem("key4", { "value" : { "buz" : new Array(4000).join("w") }}); })
-                .then(function() { return adapter.getSize(); })
-                .then(function(size) { $A.test.assertEquals(4017, size); })
                 .then(function() { return adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals("key4", mru.toString()); } )
+                .then(function() { return adapter.getSize(); })
+                .then(function(size) { $A.test.assertEquals(4017, size); })
                 .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
 
             $A.test.addWaitFor(true, function() { return completed; });

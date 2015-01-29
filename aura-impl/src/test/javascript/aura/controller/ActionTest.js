@@ -1042,7 +1042,7 @@ Test.Aura.Controller.ActionTest = function() {
     [ Fixture ]
     function GetStored() {
         [ Fact ]
-        function NullIfNotSuccessfull() {
+        function NullIfNotSuccessful() {
             // Arrange
             var target = new Action();
             target.storable = true;
@@ -1051,7 +1051,7 @@ Test.Aura.Controller.ActionTest = function() {
             target.responseState = "FAILURE";
 
             // Act
-            var stored = target.getStored("bogus");
+            var stored = target.getStored();
 
             // Assert
             Assert.Equal(null, stored);
@@ -1067,7 +1067,7 @@ Test.Aura.Controller.ActionTest = function() {
             target.responseState = "SUCCESS";
 
             // Act
-            var stored = target.getStored("bogus");
+            var stored = target.getStored();
 
             // Assert
             Assert.Equal(null, stored);
@@ -1078,20 +1078,91 @@ Test.Aura.Controller.ActionTest = function() {
             // Arrange
             var target = new Action();
             target.storable = true;
-            target.returnValue = "NONE";
+            target.returnValueUnmodified = "NONE";
             target.state = "SUCCESS";
             target.responseState = "SUCCESS";
             target.components = [];
 
             // Act
-            var stored = target.getStored("bogus");
+            var stored = target.getStored();
 
             // Assert
             Assert.Equal("NONE", stored["returnValue"]);
             Assert.Equal({}, stored["components"]);
             Assert.Equal("SUCCESS", stored["state"]);
-            Assert.Equal("bogus", stored["storage"]["name"]);
             // time is harder.
+        }
+    }
+
+    [ Fixture ]
+    function UpdateFromResponse() {
+        var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+            util : {
+                isArray : function(v) { return false; },
+                isObject : function(v) { return true; },
+                apply : function(base, obj, force, deep) {
+                    Assert.True(force);
+                    Assert.True(deep);
+                    return {foo:"bar"};
+                }
+            }
+        });
+
+        [ Fact ]
+        function ReturnValueCopied() {
+            // Arrange
+            var target = new Action();
+            target.storable = true;
+            var response = {};
+            response.state = "SUCCESS";
+            response.returnValue = {foo:"bar"};
+
+            // Act
+            mockContext(function() {
+                target.updateFromResponse(response);
+            });
+            target.returnValue.foo = "baz";
+
+            // Assert
+            Assert.Equal({foo:"bar"}, target.returnValueUnmodified);
+        }
+
+        [ Fact ]
+        function ReturnValueNotCopiedIfNotSuccessful() {
+            // Arrange
+            var target = new Action();
+            target.storable = true;
+            var response = {};
+            response.state = "ERROR";
+            response.error = [];
+            response.returnValue = {foo:"bar"};
+
+            // Act
+            mockContext(function() {
+                target.updateFromResponse(response);
+            });
+            target.returnValue.foo = "baz";
+
+            // Assert
+            Assert.Equal(undefined, target.returnValueUnmodified);
+        }
+
+        [ Fact ]
+        function ReturnValueNotCopiedIfNotStorable() {
+            // Arrange
+            var target = new Action();
+            var response = {};
+            response.state = "SUCCESS";
+            response.returnValue = {foo:"bar"};
+
+            // Act
+            mockContext(function() {
+                target.updateFromResponse(response);
+            });
+            target.returnValue.foo = "baz";
+
+            // Assert
+            Assert.Equal(undefined, target.returnValueUnmodified);
         }
     }
 
@@ -2388,7 +2459,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             Assert.Equal(expected, actual);
         }
-        
+
         [ Fact ]
         function ThrowsIfParentIsNotAnAction() {
             var target = new Action();
@@ -2412,7 +2483,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             mockContext(function() {
                 target.abortableId = true;
-                target.getStorageKey = function(){ return "PROVIDED" }; 
+                target.getStorageKey = function(){ return "PROVIDED" };
 
                 actual = Record.Exception(function() {
                     target.setParentAction({

@@ -67,7 +67,7 @@ $A.ns.ActionCollector.prototype.process = function() {
         // For cacheable actions check the storage service to see if we already have a viable cached action
         // response we can complete immediately. In this case, we get a callback, so we create a callback
         // for each one (ugh, this could have been handled via passing an additional param to the action,
-        // bue we don't have that luxury now.)
+        // but we don't have that luxury now.)
         //
         var storage = action.getStorage();
         if (action.isStorable() && storage) {
@@ -140,7 +140,7 @@ $A.ns.ActionCollector.prototype.getNum = function() {
  * Internal routine to create a callback for the storage service.
  *
  * This simply binds to both 'this' and 'action'.
- * 
+ *
  * @param {Action} action the action we will use in the call to collectAction.
  * @private
  */
@@ -196,7 +196,6 @@ $A.ns.ActionCollector.prototype.findActionAndClear = function(id) {
  */
 $A.ns.ActionCollector.prototype.collectAction = function(action, response) {
     if (response) {
-        action.updateFromResponse(response);
         this.actionsToComplete.push({
             action : action,
             response : response
@@ -226,18 +225,16 @@ $A.ns.ActionCollector.prototype.collectAction = function(action, response) {
  * @private
  */
 $A.ns.ActionCollector.prototype.finishCollection = function() {
-    var i, now, toComplete, interval, refresh, action;
+    var i, toComplete, refresh, action;
     //
     // Do the checks for up-to-date here to make our times consistent.
     // Since we are already out of order, there seems no point in trying to enforce here.
     //
     $A.assert(this.actionsToCollect === 0,
-        "Actions to collect is < 0: "+this.actionsToCollect+" actions ="+this.actionsRequested);
-    now = new Date().getTime();
+        "Actions to collect is = 0: "+this.actionsToCollect+" actions ="+this.actionsRequested);
     for (i = 0; i < this.actionsToComplete.length; i++) {
         toComplete = this.actionsToComplete[i];
         action = toComplete.action;
-        interval = now - toComplete.response["storage"]["created"];
         if (action.isChained()) {
             //
             // If this is a chained action, the execution will be via another path, and we won't be able
@@ -246,7 +243,7 @@ $A.ns.ActionCollector.prototype.finishCollection = function() {
             //
             continue;
         }
-        refresh = action.getRefreshAction(toComplete.response, interval);
+        refresh = action.getRefreshAction(toComplete.response);
         if (refresh) {
             action.fireRefreshEvent("refreshBegin");
             this.actionsToSend.push(refresh);

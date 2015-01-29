@@ -59,6 +59,9 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.abortable = false;
     this.abortableId = undefined;
 
+    this.returnValue = undefined;
+    this.returnValueUnmodified = undefined;
+
     this.pathStack = [];
     this.canCreate = true;
     // start with a body
@@ -69,7 +72,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 // Static methods:
 
 Action.getStorageKey = function(descriptor, params) {
-	return descriptor + ":" + $A.util["json"].encode(params);
+    return descriptor + ":" + $A.util["json"].encode(params);
 };
 
 Action.getStorage = function() {
@@ -93,7 +96,7 @@ Action.prototype.getId = function() {
 
 /**
  * Gets the next action scoped Id.
- * 
+ *
  * @returns {string}
  * @private
  */
@@ -112,7 +115,7 @@ Action.prototype.getNextGlobalId = function() {
  *  @private
  */
 Action.prototype.reactivatePath = function() {
-	this.canCreate = true;
+    this.canCreate = true;
 };
 
 /**
@@ -189,8 +192,8 @@ Action.prototype.pushCreationPath = function(pathPart) {
     this.canCreate = true;
 
     switch (pathPart) {
-	    case "body" : pathPart = "*"; break;
-	    case "super" : pathPart = "$"; break;
+        case "body" : pathPart = "*"; break;
+        case "super" : pathPart = "$"; break;
     }
 
     var addedPath = "/" + pathPart;
@@ -553,7 +556,7 @@ Action.prototype.runDeprecated = function(evt) {
                 "ignoreExisting" : true
             });
             reportAction.setAbortable(false);
-            reportAction.setParams({ 
+            reportAction.setParams({
                 "failedAction": this.getDef().getDescriptor(),
                 "failedId": this.getId(),
                 "clientError": e.toString(),
@@ -668,7 +671,24 @@ Action.prototype.runAfter = function(action) {
 Action.prototype.updateFromResponse = function(response) {
     this.state = response["state"];
     this.responseState = response["state"];
-    this.returnValue = response["returnValue"];
+
+    // returnValue may be modified by Action handlers. If the Action is storable
+    // then make a deep copy (which may not be cheap) so an unmodified version of the
+    // original is available for persistence.
+    if (this.storable && this.responseState === "SUCCESS") {
+        this.returnValueUnmodified = response["returnValue"];
+        // deep copy only for objects and arrays
+        if ($A.util.isArray(response["returnValue"])) {
+            this.returnValue = $A.util.apply([], this.returnValueUnmodified, true, true);
+        } else if ($A.util.isObject(response["returnValue"])) {
+            this.returnValue = $A.util.apply({}, this.returnValueUnmodified, true, true);
+        } else {
+            this.returnValue = this.returnValueUnmodified;
+        }
+    } else {
+        this.returnValue = response["returnValue"];
+    }
+
     this.error = response["error"];
     this.storage = response["storage"];
     this.components = response["components"];
@@ -722,24 +742,22 @@ Action.prototype.updateFromResponse = function(response) {
 /**
  * Gets a storable response from this action.
  *
- * WARNING: Use after finishAction() since getStored() modifies <code>this.components</code>.
+ * WARNING: must use after finishAction() which updates <code>this.components</code>.
  *
- * @param {string}
- *            storageName the name of the storage to use.
  * @private
  */
-Action.prototype.getStored = function(storageName) {
+Action.prototype.getStored = function() {
     if (this.storable && this.responseState === "SUCCESS") {
         return {
-            "returnValue" : this.returnValue,
+            "returnValue" : this.returnValueUnmodified,
             "components" : this.components,
             "state" : "SUCCESS",
             "storage" : {
-                "name" : storageName,
                 "created" : new Date().getTime()
             }
         };
     }
+
     return null;
 };
 
@@ -1092,7 +1110,7 @@ Action.prototype.getRefreshAction = function(originalResponse) {
                     : storageService.getDefaultAutoRefreshInterval();
 
     // Only auto refresh if the data we have is more than
-    // v.autoRefreshInterval seconds old
+    // autoRefreshInterval seconds old
     var now = new Date().getTime();
     if ((now - storage["created"]) >= autoRefreshInterval && this.def) {
         var refreshAction = this.def.newInstance(this.cmp);
@@ -1116,13 +1134,12 @@ Action.prototype.getRefreshAction = function(originalResponse) {
 
         return refreshAction;
     }
-
     return null;
 };
 
 /**
  * Returns an action that retries this action from storage with the server or null if the action wasn't from storage
- * 
+ *
  * @private
  * @returns {Action}
  */
@@ -1138,10 +1155,10 @@ Action.prototype.getRetryFromStorageAction = function() {
         });
 
         retryAction.abortable = this.abortable;
-    
+
         return retryAction;
     }
-	
+
     return null;
 };
 

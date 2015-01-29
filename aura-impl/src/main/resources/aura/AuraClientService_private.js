@@ -321,17 +321,17 @@ var priv = {
                 this.auraStack = [];
             }
         }
-        
+
         var stackName = "actionCallback["; 
         var actionsToSend = collector.getActionsToSend(); 
         for (var n = 0; n < actionsToSend.length; n++) { 
-        	var actionToSend = actionsToSend[n]; 
-        	if (n > 0) { 
-        		stackName += ", "; 
-    		}
+            var actionToSend = actionsToSend[n]; 
+            if (n > 0) { 
+                stackName += ", "; 
+            }
 
-        	stackName += actionToSend.getStorageKey(); 
-    	}
+            stackName += actionToSend.getStorageKey(); 
+        }
         stackName += "]";
 
         $A.run(function() {
@@ -629,13 +629,13 @@ var priv = {
         //state is null: don't need to track the state with popstate
         //title is null: don't want to set the page title.
         history.pushState(null,null,newUrl);
-        
-    	//fallback to old way : set location.href will trigger the reload right away
-    	//we need this because when AuraResourceServlet's GET request with a 'error' cookie, 
-    	//AuraServlet doesn't get to do the GET reqeust
-    	if( (location.href).indexOf("?nocache=") > -1 ) {
-    		location.href = (url + params);
-    	}
+
+        //fallback to old way : set location.href will trigger the reload right away
+        //we need this because when AuraResourceServlet's GET request with a 'error' cookie,
+        //AuraServlet doesn't get to do the GET reqeust
+        if( (location.href).indexOf("?nocache=") > -1 ) {
+            location.href = (url + params);
+        }
     },
 
     flushLoadEventQueue : function() {
@@ -672,7 +672,7 @@ var priv = {
     },
 
     handleAppcacheChecking : function(e) {
-    	document._appcacheChecking = true;
+        document._appcacheChecking = true;
         if (priv.isDevMode()) {
             // TODO IBOGDANOV Why are you checking in commented out code like
             // this???
@@ -684,7 +684,7 @@ var priv = {
     },
 
     handleAppcacheUpdateReady : function(event) {
-    	if (window.applicationCache.swapCache) {
+        if (window.applicationCache.swapCache) {
             window.applicationCache.swapCache();
         }
 
@@ -703,7 +703,7 @@ var priv = {
     },
 
     handleAppcacheError : function(e) {
-    	if (e.stopImmediatePropagation) {
+        if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
         if (window.applicationCache
@@ -771,11 +771,11 @@ var priv = {
     },
 
     handleAppcacheCached : function(e) {
-    	priv.showProgress(100);
+        priv.showProgress(100);
     },
 
     handleAppcacheObsolete : function(e) {
-    	priv.hardRefresh();
+        priv.hardRefresh();
     },
 
     showProgress : function(progress) {
@@ -818,14 +818,14 @@ var priv = {
         }
         return false;
     },
-    
+
     setConnected : function(isConnected) {
-    	var isDisconnected = !isConnected;
-    	if (isDisconnected === priv.isDisconnected) {
-    		// Already in desired state so no work to be done:
-    		return;
-    	}
-    	
+        var isDisconnected = !isConnected;
+        if (isDisconnected === priv.isDisconnected) {
+            // Already in desired state so no work to be done:
+            return;
+        }
+
         e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
         if (e) {
             priv.isDisconnected = isDisconnected;

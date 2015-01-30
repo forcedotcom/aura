@@ -22,7 +22,87 @@
  */
 var AuraLayoutService = function() {
 
-	// #include aura.AuraLayoutService_private
+    var priv = {
+
+        history : [],
+
+        push : function(layout, params, title){
+            this.history.push({
+                layout : layout,
+                params : params,
+                title : title
+            });
+        },
+
+        pop : function(){
+            return this.history.pop();
+        },
+
+        peek : function(){
+            if (this.history.length > 0) {
+                return this.history[this.history.length - 1];
+            }
+            return null;
+        },
+
+        peekLast : function(){
+            if (this.history.length > 1) {
+                return this.history[this.history.length - 2];
+            }
+            return null;
+        },
+
+        clear : function(){
+            var cur = this.pop();
+            this.history = [cur];
+        },
+
+        getTitle : function(historyItem) {
+            if (historyItem.title) {
+                // it was overridden manually, use that
+                return historyItem.title;
+            } else {
+                var title = valueFactory.create(historyItem.layout.getTitle(),null,this.cmp);
+                if (aura.util.isExpression(title)) {
+                    title = title.evaluate();
+                }
+                return title;
+            }
+        },
+
+        fireLayoutChangeEvent : function(pre){
+            var curr = this.peek();
+            var prev = this.peekLast();
+            var title = this.getTitle(curr);
+
+            var params = {
+                "layoutName" : curr.layout.getName(),
+                "title" : title
+            };
+
+            if (prev){
+                params["prevTitle"] = this.getTitle(prev);
+                params["prevLayoutName"] = prev.layout.getName();
+            }
+            var evt = pre?$A.get("e.aura:beforeLayoutChange"):$A.get("e.aura:layoutChange");
+            evt.setParams(params);
+            evt.fire();
+
+            this.fireOnload();
+        },
+
+        fireOnload : function(){
+            //#if {"modes" : ["TESTING", "AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
+            //For Selenium
+            var frame = window.frameElement;
+            if (frame && document.createEvent) {
+                var loadEvent = document.createEvent('HTMLEvents');
+                loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
+                frame.dispatchEvent(loadEvent);
+            }
+            //#end
+        }
+    };
 
 	var layoutService = {
 		/**

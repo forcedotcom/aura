@@ -18,7 +18,6 @@
  * @constructor
  */
 var AuraSerializationService = function(){
-    //#include aura.AuraSerializationService_private
 
     return {
         readComponent : function(config){

@@ -44,36 +44,38 @@ $A.ns.GlobalValueProviders = function (gvp, initCallback) {
  * @protected
  */
 $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
-    if (gvps) {
-        var storage=null;
-        var storedGvps =null;
-        if (!doNotPersist) {
-            // If persistent storage is active then write through for disconnected support
-            storage = this.getStorage();
-            storedGvps = [];
+    if (!gvps) {
+        return;
+    }
+    var valueProvider, i, storage, type, newGvp;
+    var storedGvps = [];
+
+    for ( i = 0; i < gvps.length; i++) {
+        newGvp = gvps[i];
+        type = newGvp["type"];
+        if (!this.valueProviders[type]) {
+            this.valueProviders[type] = new $A.ns.ObjectValueProvider();
         }
-
-        for ( var i = 0; i < gvps.length; i++) {
-            var newGvp = gvps[i];
-            var type = newGvp["type"];
-            if (!this.valueProviders[type]) {
-                this.valueProviders[type] = new $A.ns.ObjectValueProvider();
-            }
-            var valueProvider = this.valueProviders[type];
-            // set values into its value provider
-            valueProvider.merge(newGvp["values"]);
-
-            if (storage) {
+        valueProvider = this.valueProviders[type];
+        // set values into its value provider
+        valueProvider.merge(newGvp["values"]);
+    }
+    if (doNotPersist) {
+        return;
+    }
+    // Persist our set of valueProviders in storage.
+    storage = this.getStorage();
+    if (storage) {
+        for (type in this.valueProviders) {
+            if (this.valueProviders.hasOwnProperty(type)) {
+                valueProvider = this.valueProviders[type];
                 storedGvps.push({
                     "type" : type,
                     "values" : valueProvider.getValues()
                 });
             }
         }
-
-        if (storage) {
-            storage.put("globalValueProviders", storedGvps);
-        }
+        storage.put("globalValueProviders", storedGvps);
     }
 };
 

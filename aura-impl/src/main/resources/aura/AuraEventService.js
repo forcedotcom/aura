@@ -19,7 +19,17 @@
  * @constructor
  */
 var AuraEventService = function() {
-    // #include aura.AuraEventService_private
+    var priv = {
+        registry : new EventDefRegistry(),
+        eventDispatcher : {},
+
+        qualifyEventName : function(event) {
+            if(event.indexOf("://") == -1){
+                event = "markup://"+event;
+            }
+            return event;
+        }
+    };
 
     var eventService = {
 

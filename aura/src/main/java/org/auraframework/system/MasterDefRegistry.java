@@ -55,6 +55,20 @@ public interface MasterDefRegistry {
     <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException;
 
     /**
+     * Return the definition for this descriptor, or null if it does not exist.
+     *
+     * If the definition was not already compiled, this method will cause it to
+     * be compiled before it is returned. The difference with getDef is that it will not
+     * load all of the dependent defs, and thus will _not_ load the def into the master
+     * def registry set. Use with care.
+     *
+     * @param descriptor the descriptor to find.
+     * @return the corresponding definition, or null if it doesn't exist.
+     * @throws QuickFixException if there is a compile time error.
+     */
+    <D extends Definition> D getRawDef(DefDescriptor<D> descriptor) throws QuickFixException;
+
+    /**
      * Save the given definition back to appropriate source location.
      */
     <D extends Definition> void save(D def);

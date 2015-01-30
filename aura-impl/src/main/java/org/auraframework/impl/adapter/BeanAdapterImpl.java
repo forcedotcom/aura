@@ -123,7 +123,7 @@ public class BeanAdapterImpl implements BeanAdapter {
      */
     public static <T> T buildValidatedClass(Class<T> clazz) {
         try {
-            return (T)clazz.newInstance();
+            return clazz.newInstance();
         } catch (InstantiationException ie) {
             // This should never happen...
             throw new AuraRuntimeException(ie);

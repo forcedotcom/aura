@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -38,6 +39,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
@@ -46,6 +48,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -138,6 +141,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             }
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),
                     attributeDef);
+        } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
+        	RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<T>(this,
+        			xmlReader, source).getElement();
+        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
+        			.getDescriptor();
+        	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
+        		error("Duplicate namespace %s found on tag %s",
+        				requiredVersionDesc.getName(), tag);
+        	}	
+        	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventDefImpl regDef = new RegisterEventHandler<T>(this, xmlReader,
                     source).getElement();
@@ -164,6 +177,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         } else {
             body.add(getDefRefHandler(this).getElement());
             // if it wasn't one of the above, it must be a defref, or an error
+        }
+
+        Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = readRequiredVersionDefs();
+        if(requiredVersionDefs != null) {
+        	builder.setRequiredVersionDefs(requiredVersionDefs);
         }
     }
 

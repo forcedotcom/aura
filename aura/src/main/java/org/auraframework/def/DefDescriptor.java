@@ -120,6 +120,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         LAYOUTS(LayoutsDef.class), //
         LAYOUT(LayoutDef.class), //
         LAYOUT_ITEM(LayoutItemDef.class), //
+        REQUIRED_VERSION(RequiredVersionDef.class), //
         NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class),
         DESIGN(DesignDef.class),
@@ -132,7 +133,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
         private final Class<? extends Definition> clz;
         private final boolean definesBundle;
-
         private DefType(Class<? extends Definition> clz) {
             this(clz, false);
         }

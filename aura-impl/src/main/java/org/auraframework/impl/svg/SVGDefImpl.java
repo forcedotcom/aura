@@ -23,6 +23,7 @@ import org.auraframework.builder.SVGDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -85,6 +86,11 @@ public class SVGDefImpl extends RootDefinitionImpl<SVGDef> implements SVGDef {
     @Override
     public String getContents() {
         return this.contents;
+    }
+
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("SVGDefImpl cannot contain RequiredVersionDefs.");
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<SVGDef> implements SVGDefBuilder {

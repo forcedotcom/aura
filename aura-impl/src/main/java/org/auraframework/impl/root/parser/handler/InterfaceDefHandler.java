@@ -24,6 +24,7 @@ import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -75,6 +76,16 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             AttributeDefImpl attributeDef = new AttributeDefHandler<InterfaceDef>(this, xmlReader, source).getElement();
             builder.addAttributeDef(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
+        } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
+        	RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<InterfaceDef>(this,
+        			xmlReader, source).getElement();
+        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
+        			.getDescriptor();
+        	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
+        		error("Duplicate namespace %s found on tag %s",
+        				requiredVersionDesc.getName(), tag);
+        	}	
+        	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventDefImpl regDef = new RegisterEventHandler<InterfaceDef>(this, xmlReader, source).getElement();
             builder.events.put(regDef.getAttributeName(), regDef);

@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
@@ -22,14 +23,18 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.root.RequiredVersionDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 /**
  * Super class for the top level tags, handles some common setup
@@ -114,5 +119,24 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         
         builder.setAPIVersion(getAttributeValue(ATTRIBUTE_API_VERSION));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
+   
+    }
+
+    protected Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> readRequiredVersionDefs() {
+    	Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
+    	Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions();
+    	if (requiredVersions != null) {
+    		requiredVersionDefs = Maps.newHashMap();
+    		for (Map.Entry<String, String> entry : requiredVersions.entrySet()) {
+    			RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
+    			builder.setDescriptor(DefDescriptorImpl.getInstance(entry.getKey(), RequiredVersionDef.class));
+    			builder.setVersion(entry.getValue());
+    			RequiredVersionDefImpl requiredVersionDef = builder.build();
+    			
+    			requiredVersionDefs.put(requiredVersionDef.getDescriptor(), requiredVersionDef);
+    		}
+    	}
+    	
+    	return requiredVersionDefs;
     }
 }

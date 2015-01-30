@@ -26,6 +26,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -41,13 +42,14 @@ import com.google.common.collect.Maps;
  */
 public abstract class RootDefinitionImpl<T extends RootDefinition> extends DefinitionImpl<T> implements RootDefinition {
 
-    private static final long serialVersionUID = -3649366896204152939L;
-    protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
+	private static final long serialVersionUID = 2885495270950386878L;
+	protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
+    protected final Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
     protected final DefDescriptor<DocumentationDef> documentationDescriptor;
     private final int hashCode;
     private final SupportLevel support;
-
+    
     protected RootDefinitionImpl(Builder<T> builder) {
         super(builder);
         if (builder.attributeDefs == null || builder.attributeDefs.size() == 0) {
@@ -55,6 +57,12 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         } else {
             this.attributeDefs = Collections
                     .unmodifiableMap(new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>(builder.attributeDefs));
+        }
+        if (builder.requiredVersionDefs == null || builder.requiredVersionDefs.size() == 0) {
+            this.requiredVersionDefs = ImmutableMap.of();
+        } else {
+            this.requiredVersionDefs = Collections
+                    .unmodifiableMap(new LinkedHashMap<DefDescriptor<RequiredVersionDef>, RequiredVersionDef>(builder.requiredVersionDefs));
         }
         this.providerDescriptors = AuraUtil.immutableList(builder.providerDescriptors);
 
@@ -65,11 +73,16 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
 
         this.documentationDescriptor = builder.documentationDescriptor;
-
-        this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs);
+        
+        this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs, requiredVersionDefs);
     }
 
     @Override
+	public RequiredVersionDef getRequiredVersion(String namespace) {
+    	return requiredVersionDefs.get(DefDescriptorImpl.getInstance(namespace, RequiredVersionDef.class));
+	}
+
+	@Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
         if (providerDescriptors != null) {
@@ -87,6 +100,9 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     @Override
     public abstract Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException;
+    
+    @Override
+    public abstract Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs();
 
     @Override
     public int hashCode() {
@@ -102,6 +118,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             RootDefinitionBuilder<T> {
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
+        public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
         private List<DefDescriptor<ProviderDef>> providerDescriptors;
         private SupportLevel support;
         private DefDescriptor<DocumentationDef> documentationDescriptor;
@@ -109,6 +126,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         public Builder(Class<T> defClass) {
             super(defClass);
             this.attributeDefs = Maps.newLinkedHashMap();
+            this.requiredVersionDefs = Maps.newLinkedHashMap();
         }
 
         public void addProvider(String name) {
@@ -137,6 +155,25 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
          */
         public void addAttributeDef(DefDescriptor<AttributeDef> attrdesc, AttributeDef attributeDef) {
             this.attributeDefs.put(attrdesc, attributeDef);
+        }
+        
+        /**
+         * Sets the requiredVersionDefs for this instance.
+         */
+        public void setRequiredVersionDefs(Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs) {
+        	if(requiredVersionDefs == null) {
+        		requiredVersionDefs = Maps.newLinkedHashMap();
+        	}
+            this.requiredVersionDefs = requiredVersionDefs;
+        }
+        
+        /**
+         * Gets the requiredVersionDefs for this instance.
+         * 
+         * @return The requiredVersionDefs.
+         */
+        public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+            return this.requiredVersionDefs;
         }
 
         @Override

@@ -27,6 +27,7 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
@@ -166,7 +167,12 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
             throws QuickFixException {
         return attributeDefs;
     }
-
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("LibraryDef cannot contain RequiredVersionDefs.");
+    }
+    
     /**
      * @throws QuickFixException
      * @throws DefinitionNotFoundException Looks at an include an extracts external dependency libraries.

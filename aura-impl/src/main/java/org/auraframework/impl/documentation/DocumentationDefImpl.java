@@ -51,6 +51,11 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
     	throw new UnsupportedOperationException("DocumentationDef cannot contain AttributeDefs.");
     }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+        throw new UnsupportedOperationException("DocumentationDef cannot contain RequiredVersionDefs.");
+    }
 
     @Override
     public List<DescriptionDef> getDescriptionDefs() {

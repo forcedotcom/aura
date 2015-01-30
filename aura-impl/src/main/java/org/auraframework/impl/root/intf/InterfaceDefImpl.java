@@ -27,6 +27,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -177,6 +178,11 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         } else {
             return Collections.unmodifiableMap(ret);
         }
+    }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	throw new UnsupportedOperationException("InterfaceDef cannot contain RequiredVersionDefs.");
     }
 
     @Override

@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -91,6 +92,11 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 json.writeMapEntry("superDef", extendsDescriptor.getDef());
             }
             json.writeMapEntry("attributes", getAttributeDefs());
+            
+            Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs = getRequiredVersionDefs();
+            if(requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
+            	json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
+            }
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
@@ -167,6 +173,11 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             map.putAll(attributeDefs);
             return Collections.unmodifiableMap(map);
         }
+    }
+    
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+        return requiredVersionDefs;
     }
 
     @Override

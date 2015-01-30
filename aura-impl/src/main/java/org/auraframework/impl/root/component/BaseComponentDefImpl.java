@@ -49,6 +49,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
@@ -644,6 +645,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return Collections.unmodifiableMap(map);
         }
     }
+    
+    /**
+     * @return all the required versions for this component
+     * @throws QuickFixException
+     */
+    @Override
+    public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
+    	return requiredVersionDefs;
+    }
 
     @Override
     public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
@@ -838,6 +848,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 Collection<AttributeDef> attrDefs = getAttributeDefs().values();
                 if (!attrDefs.isEmpty()) {
                     json.writeMapEntry("attributeDefs", attrDefs);
+                }
+                
+                Collection<RequiredVersionDef> requiredVersionDefs = getRequiredVersionDefs().values();
+                if (requiredVersionDefs != null && !requiredVersionDefs.isEmpty()) {
+                    json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
                 }
 
                 Set<DefDescriptor<InterfaceDef>> allInterfaces = getAllInterfaces();

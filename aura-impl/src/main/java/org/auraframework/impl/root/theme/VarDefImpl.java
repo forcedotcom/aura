@@ -34,7 +34,6 @@ public final class VarDefImpl extends DefinitionImpl<VarDef> implements VarDef {
 
     private final Object value;
     private final int hashCode;
-
     public VarDefImpl(Builder builder) {
         super(builder);
         this.value = builder.value;
@@ -108,5 +107,6 @@ public final class VarDefImpl extends DefinitionImpl<VarDef> implements VarDef {
             this.value = value;
             return this;
         }
+      
     }
 }

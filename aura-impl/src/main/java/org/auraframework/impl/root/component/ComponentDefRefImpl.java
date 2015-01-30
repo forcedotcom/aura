@@ -30,8 +30,10 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -44,6 +46,7 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -131,7 +134,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         DefDescriptor<?> referencingDesc = context.getCurrentCallingDescriptor();
     	if (referencingDesc != null) {
 	        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-	    	registry.assertAccess(referencingDesc, getComponentDef());
+	    	registry.assertAccess(referencingDesc, rootDef);
     	}
 
         validateAttributesValues(referencingDesc);

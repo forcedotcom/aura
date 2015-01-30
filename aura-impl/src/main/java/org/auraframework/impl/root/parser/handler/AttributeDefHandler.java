@@ -105,7 +105,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         builder.setLocation(getLocation());
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
-
+      
         String type = Optional.fromNullable(getAttributeValue(ATTRIBUTE_TYPE)).or(defaultType).orNull();
         builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(type, TypeDef.class));
 

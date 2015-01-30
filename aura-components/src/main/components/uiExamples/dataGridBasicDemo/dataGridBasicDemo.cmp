@@ -24,7 +24,7 @@
 
     <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" items="{!v.items}">
         <aura:set attribute="columns">
-            <ui:dataGridColumn label="Id" name="id" editable="false" sortable="true"/>
+            <ui:dataGridColumn label="Id" name="id" sortable="true"/>
             <ui:dataGridColumn label="Name" name="name"/>
         </aura:set>
     </ui:dataGrid>

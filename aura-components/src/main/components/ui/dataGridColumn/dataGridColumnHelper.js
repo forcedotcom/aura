@@ -16,7 +16,6 @@
 ({
 	intialize: function (cmp) {
 		this.intializeDefaultOutputComponent(cmp);
-		this.intializeDefaultInputComponent(cmp);
 	},
 
 	intializeDefaultOutputComponent: function (cmp) {
@@ -25,15 +24,6 @@
 		// Wire up default outputComponent if not explicitly set.
 		if (!outputComponent.attributes) {
 			this.wireComponentDefRef(cmp, outputComponent);
-		}
-	},
-
-	intializeDefaultInputComponent: function (cmp) {
-		var inputComponent = cmp.get('v.inputComponent')[0];
-
-		// Wire up default outputComponent if not explicitly set.
-		if (!inputComponent.attributes) {
-			this.wireComponentDefRef(cmp, inputComponent);
 		}
 	},
 	

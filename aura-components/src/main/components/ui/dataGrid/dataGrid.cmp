@@ -16,8 +16,6 @@
 
 -->
 <aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
-	<aura:attribute name="initialRenderCount" type="Integer" default="200"/>
-	<aura:attribute name="batchRenderCount" type="Integer" default="100"/>
 	<aura:attribute name="summary" type="String"/>
 
 	<aura:registerevent name="updateRowAttributes" type="ui:updateGridRow"/>

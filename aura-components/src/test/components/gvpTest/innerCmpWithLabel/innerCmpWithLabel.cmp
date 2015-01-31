@@ -16,7 +16,6 @@
 
 -->
 <!--GVP -> Global Value Providers related tests-->
-<!--Test component to verify behavior of labels used by dynamically created components-->
-<aura:component>
-    <div aura:id="container" />
+<aura:component render="client">
+    <div aura:id="LabelAsExpressionComponent">{!$Label.Section1.task_mode_tomorrow}</div>
 </aura:component>

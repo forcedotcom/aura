@@ -321,15 +321,12 @@
         }
     },
 
-    //Fails in Halo due to W-2256415, Setting new Maps as model values doesn't work. At least not similar to attributes
-    _testMapSetValueRenders: {
+    testMapSetValueRenders: {
         test: [ function(component) {
             var map = component.get("m.map");
             map["subkey"] = "put";
             component.set("m.map", map);
-            // Insert a pause for re-rendering.  Put of a "new" key is CLEAN,
-            // perhaps oddly, so it doesn't re-render:
-            $A.test.addWaitFor("", function() {
+            $A.test.addWaitFor("put", function() {
             	var output = component.find("outputText");
                 return $A.test.getText(output.getElement());
             });
@@ -337,24 +334,18 @@
            var map = component.get("m.map");
             map["subkey"] = "put2";
             component.set("m.map", map);
-            // Insert a pause for re-rendering.  Put of a "old" key is DIRTY,
-            // in the usual "I've been changed" way, so it does re-render:
             $A.test.addWaitFor("put2", function() {
                 var output = component.find("outputText");
                 return $A.test.getText(output.getElement());
             });
         }, function(component) {
-            var map = {"subKey": "set"};
+            var map = {"subkey": "set"};
             component.set("m.map", map);
-            // Insert a pause for re-rendering.  SetValue leaves DIRTY child
-            // objecst (W-1678810), so it does re-render.  Note that this also
-            // tests our case-insensitivity.
             $A.test.addWaitFor("set", function() {
                 var output = component.find("outputText");
                 return $A.test.getText(output.getElement());
             });
         }, function(component) {
-            // Checks case insensitivity
             var otherMap = $A.expressionService.create(null, { 'subkey' : "second" });
             component.set("m.map", otherMap);
             $A.test.addWaitFor("second", function() {

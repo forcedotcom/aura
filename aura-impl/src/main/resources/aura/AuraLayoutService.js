@@ -22,28 +22,28 @@
  */
 var AuraLayoutService = function() {
     /* private properties and methods */
-    var _layouts = null,
+    var layouts = null,
         _cmp = null,
-        _history = [],
+        history = [],
         push = function(layout, params, title){
-            _history.push({
+            history.push({
                 layout : layout,
                 params : params,
                 title : title
             });
         },
         pop = function(){
-            return _history.pop();
+            return history.pop();
         },
         peek = function(){
-            if (_history.length > 0) {
-                return _history[_history.length - 1];
+            if (history.length > 0) {
+                return history[history.length - 1];
             }
             return null;
         },
         peekLast = function(){
-            if (_history.length > 1) {
-                return _history[_history.length - 2];
+            if (history.length > 1) {
+                return history[history.length - 2];
             }
             return null;
         },
@@ -106,7 +106,7 @@ var AuraLayoutService = function() {
 
 			var token = event.getParam("token");
 			if (!token) {
-				token = _layouts.getDefault().getName();
+				token = layouts.getDefault().getName();
 			}
 
 			// The presence of a semaphore in here makes me think a class-level
@@ -125,12 +125,12 @@ var AuraLayoutService = function() {
 
 			var curr = peek();
 
-			var layout = _layouts.getLayout(token);
+			var layout = layouts.getLayout(token);
 			if (!layout) {
-				layout = _layouts.getCatchall();
+				layout = layouts.getCatchall();
 			}
 
-			if (curr && curr.layout === layout && (layout !== _layouts.getCatchall()) && !layout.match) {
+			if (curr && curr.layout === layout && (layout !== layouts.getCatchall()) && !layout.match) {
 				// There is a current layout and it is the same as the one we're
 				// on
 				var oldParams = curr.params;
@@ -168,12 +168,12 @@ var AuraLayoutService = function() {
 		 */
 		back : function() {
 			// Is there something in the stack to go back to?
-			if (_history.length > 1) {
+			if (history.length > 1) {
 				pop();
 				this.refreshLayout();
 				historyService.back();
 			} else {
-				historyService.set(_layouts.getDefault().getName());
+				historyService.set(layouts.getDefault().getName());
 			}
 		},
 
@@ -185,7 +185,7 @@ var AuraLayoutService = function() {
 		 */
 		clearHistory : function() {
             var cur = pop();
-            _history = [cur];
+            history = [cur];
 		},
 
 		/**
@@ -203,10 +203,10 @@ var AuraLayoutService = function() {
 		 * @private
 		 */
 		layout : function(name, params, noTrack) {
-			var layout = _layouts.getLayout(name);
+			var layout = layouts.getLayout(name);
 
 			if (!layout) {
-				layout = _layouts.getCatchall();
+				layout = layouts.getCatchall();
 			}
 
 			aura.assert(layout, "Named layout '" + name + "' not found");
@@ -390,8 +390,8 @@ var AuraLayoutService = function() {
 		 */
 		init : function(cmp) {
 			if (cmp) {
-				_layouts = cmp.getDef().getLayouts();
-				if (_layouts) {
+				layouts = cmp.getDef().getLayouts();
+				if (layouts) {
 					_cmp = cmp;
 
 					$A.eventService.addHandler({

@@ -52,18 +52,18 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
         // We allow unnamed function at root, but Closure compiler doesn't.
 
         // Remove leading whitespace and comments to get to code
-        code = code.replaceFirst("(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+", "");
-        final boolean isUnnamedFunction = code.matches("(?s)^function\\s*\\(.*");
+        String codeToCheck = code.replaceFirst("(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+", "");
+        final boolean isUnnamedFunction = codeToCheck.matches("(?s)^function\\s*\\(.*");
 
         if (isUnnamedFunction) {
-            code = JS_PREFIX + code;
+            codeToCheck = JS_PREFIX + codeToCheck;
         }
 
         Writer w = new StringWriter();
         List<JavascriptProcessingError> errors;
         try {
             // strip whitespace, comments, and some unnecessary tokens
-            errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(code, w, source.getUrl());
+            errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(codeToCheck, w, source.getUrl());
         } catch (IOException e) {
             return createDefinition(new AuraRuntimeException(e, getLocation()));
         }
@@ -78,12 +78,6 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
                 errorSummary.append(error.toString());
             }
             return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
-        }
-        code = w.toString();
-
-        if (isUnnamedFunction) {
-            // strip our prefix, and a trailing semicolon that compiler added
-            code = code.substring(JS_PREFIX.length(), code.length() - 1);
         }
 
         builder.setCode(code);
@@ -108,5 +102,4 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
         // work done in getDefinition instead
         return null;
     }
-
 }

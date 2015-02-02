@@ -16,14 +16,18 @@
 package org.auraframework.def;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
-import org.auraframework.def.IncludeDefRef;
-import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl.Builder;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
 import org.mockito.Mockito;
@@ -31,6 +35,7 @@ import org.mockito.Mockito;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
@@ -207,6 +212,30 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         } catch (InvalidDefinitionException t) {
             assertExceptionMessage(t, InvalidDefinitionException.class,
                     "aura:include with duplicate name found in library: included");
+        }
+    }
+
+    public void testSerializationWithAuraProdCompression() throws Exception {
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
+                null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("uncompressed",
+                IncludeDef.class, libDesc);
+        addSourceAutoCleanup(libDesc,
+                String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
+        addSourceAutoCleanup(
+                includeDesc,
+                "function(){\n\tvar renamed = 'truth';\n\tif(window.blah)\n\t\t{renamed+=' hurts'}\n\treturn renamed}");
+
+        Aura.getContextService().endContext();
+        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+
+        Set<DefDescriptor<?>> descs = ImmutableSet.<DefDescriptor<?>> of(libDesc);
+        Writer writer = new StringWriter();
+        Aura.getServerService().writeDefinitions(descs, writer);
+        String actual = writer.toString();
+        String expected = "function(){var a=\"truth\";window.blah&&(a+=\" hurts\");return a}";
+        if (!actual.contains(expected)) {
+            fail(String.format("library code was not compressed - expected <%s> but got <%s>", expected, actual));
         }
     }
 }

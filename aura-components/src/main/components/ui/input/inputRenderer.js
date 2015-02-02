@@ -28,6 +28,7 @@
 	},
 
 	afterRender: function(component, helper) {
+		helper.lib.interactive.addDomEvents(component);
         this.superAfterRender();
 		helper.addInputClass(component);
 

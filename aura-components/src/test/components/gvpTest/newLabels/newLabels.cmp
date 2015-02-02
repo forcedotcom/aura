@@ -17,6 +17,10 @@
 -->
 <!--GVP -> Global Value Providers related tests-->
 <aura:component render="client">
+    <aura:dependency resource="markup://gvpTest:parseLabels" />
+
     <ui:outputText aura:id="LabelAsAttribute" class="{!$Label.Related_Lists.task_mode_today}" value="LabelAsAttribute"/>
     <div aura:id="LabelAsExpressionComponent">{!$Label.Related_Lists.task_mode_today_overdue}</div>
+
+    <gvpTest:innerCmpWithLabel aura:id="innerCmp"/>
 </aura:component>

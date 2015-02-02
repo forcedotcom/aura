@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 ({ 
-    fireDataChangeEvent: function (dataProvider, data) {
+    fireDataChangeEvent: function (dataProvider, data, currentPage) {
     	var dataChangeEvent = dataProvider.getEvent("onchange");
     	dataChangeEvent.setParams({
-    		data : data
+    		data : data,
+    		currentPage : currentPage
     	}).fire();
     },
 	

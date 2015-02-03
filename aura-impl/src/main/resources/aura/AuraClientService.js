@@ -26,7 +26,7 @@ var AuraClientService = function() {
     // #include aura.controller.ActionCollector
     // #include aura.model.ValueDef
 
-    $A.ns.FlightCounter = function(max) {
+    var FlightCounter = function(max) {
         this.lastStart = 0;
         this.started = 0;
         this.startCount = 0;
@@ -36,11 +36,11 @@ var AuraClientService = function() {
         this.max = max;
     };
 
-    $A.ns.FlightCounter.prototype.idle = function() {
+    FlightCounter.prototype.idle = function() {
         return this.started === 0 && this.inFlight === 0;
     };
 
-    $A.ns.FlightCounter.prototype.start = function() {
+    FlightCounter.prototype.start = function() {
         if (this.started + this.inFlight < this.max) {
             this.started += 1;
             this.startCount += 1;
@@ -50,53 +50,52 @@ var AuraClientService = function() {
         return false;
     };
 
-    $A.ns.FlightCounter.prototype.cancel = function() {
+    FlightCounter.prototype.cancel = function() {
         $A.assert(this.started > 0, "broken inFlight counter");
         this.started -= 1;
     };
 
-    $A.ns.FlightCounter.prototype.send = function() {
+    FlightCounter.prototype.send = function() {
         $A.assert(this.started > 0, "broken inFlight counter");
         this.started -= 1;
         this.sent += 1;
         this.inFlight += 1;
     };
 
-    $A.ns.FlightCounter.prototype.finish = function() {
+    FlightCounter.prototype.finish = function() {
         $A.assert(this.inFlight > 0, "broken inFlight counter");
         this.inFlight -= 1;
         this.finished += 1;
     };
 
-    var priv = {
-        token : null,
-        auraStack : [],
-        host : "",
-        loadEventQueue : [],
-        appcacheDownloadingEventFired : false,
-        isOutdated : false,
-        isUnloading : false,
-        initDefsObservers : [],
-        isDisconnected : false,
-        foreground : new $A.ns.FlightCounter(1),
-        background : new $A.ns.FlightCounter(3),
-        actionQueue : new ActionQueue(),
+    var _token = null,
+        auraStack = [],
+        _host = "",
+        loadEventQueue = [],
+        appcacheDownloadingEventFired = false,
+        isOutdated = false,
+        isUnloading = false,
+        initDefsObservers = [],
+        _isDisconnected = false,
+        foreground = new FlightCounter(1),
+        background = new FlightCounter(3),
+        actionQueue = new ActionQueue(),
 
         /**
          * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
          * 
          * @private
          */
-        checkAndDecodeResponse : function(response, noStrip) {
-            if (priv.isUnloading) {
+        checkAndDecodeResponse = function(response, noStrip) {
+            if (isUnloading) {
                 return null;
             }
 
             var e;
 
             // failure to communicate with server
-            if (priv.isDisconnectedOrCancelled(response)) {
-                priv.setConnected(false);
+            if (isDisconnectedOrCancelled(response)) {
+                _setConnected(false);
                 return null;
             }
 
@@ -105,10 +104,10 @@ var AuraClientService = function() {
             // restored event
             // now that we have a response from a server.
             //
-            if (priv.isDisconnected) {
+            if (_isDisconnected) {
                 e = $A.get("e.aura:connectionResumed");
                 if (e) {
-                    priv.isDisconnected = false;
+                    _isDisconnected = false;
                     e.fire();
                 }
             }
@@ -162,7 +161,7 @@ var AuraClientService = function() {
                     // #end
                     return null;
                 } else if (resp["exceptionEvent"] === true) {
-                    this.throwExceptionEvent(resp);
+                    _throwExceptionEvent(resp);
                     return null;
                 } else {
                     // !!!!!!!!!!HACK ALERT!!!!!!!!!!
@@ -214,7 +213,7 @@ var AuraClientService = function() {
          *
          * @param {Object} resp the response from the server.
          */
-        throwExceptionEvent : function(resp) {
+        _throwExceptionEvent = function(resp) {
             var evtObj = resp["event"];
             var descriptor = evtObj["descriptor"];
 
@@ -240,8 +239,22 @@ var AuraClientService = function() {
             }
         },
 
-        fireDoneWaiting : function() {
-            priv.fireLoadEvent("e.aura:doneWaiting");
+        fireDoneWaiting = function() {
+            _fireLoadEvent("e.aura:doneWaiting");
+        },
+
+        isDisconnectedOrCancelled = function(response) {
+            if (response && response.status) {
+                if (response.status === 0) {
+                    return true;
+                } else if (response.status >= 12000 && response.status < 13000) {
+                    // WINHTTP CONNECTION ERRORS
+                    return true;
+                }
+            } else {
+                return true;
+            }
+            return false;
         },
 
         /**
@@ -258,7 +271,7 @@ var AuraClientService = function() {
          *            actionResponse the server response.
          * @private
          */
-        singleAction : function(action, noAbort, actionResponse) {
+        singleAction = function(action, noAbort, actionResponse) {
             var key = action.getStorageKey();
 
             $A.run(function() {
@@ -316,20 +329,19 @@ var AuraClientService = function() {
          *            the abortableId associated with the set of actions.
          * @private
          */
-        actionCallback : function(response, collector, flightCounter, abortableId) {
-            var responseMessage = this.checkAndDecodeResponse(response);
-            var that = this;
-            var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
+        actionCallback = function(response, collector, flightCounter, abortableId) {
+            var responseMessage = checkAndDecodeResponse(response);
+            var noAbort = (abortableId === actionQueue.getLastAbortableTransactionId());
 
             //
             // Note that this is a very specific assertion. We can either be called back from an empty stack
             // (the normal case, after an XHR has gone to the server), or we can be called back from inside
             // the popStack protection (currently I only know this to occur in disconnected webkit).
             //
-            if (this.auraStack.length > 0) {
-                if (this.auraStack.length != 1 || this.auraStack[0] !== "$A.clientServices.popStack") {
-                    $A.error("Action callback called on non-empty stack '" + this.auraStack + "', length = "+this.auraStack.length);
-                    this.auraStack = [];
+            if (auraStack.length > 0) {
+                if (auraStack.length != 1 || auraStack[0] !== "$A.clientServices.popStack") {
+                    $A.error("Action callback called on non-empty stack '" + auraStack + "', length = "+auraStack.length);
+                    auraStack = [];
                 }
             }
 
@@ -354,8 +366,8 @@ var AuraClientService = function() {
                 if (responseMessage) {
                     var token = responseMessage["token"];
                     if (token) {
-                        priv.token = token;
-                        priv.saveTokenToStorage();
+                        _token = token;
+                        saveTokenToStorage();
                     }
 
                     $A.getContext().merge(responseMessage["context"]);
@@ -397,9 +409,9 @@ var AuraClientService = function() {
                                 $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
                             }
                         }
-                        that.singleAction(action, noAbort, actionResponse);
+                        singleAction(action, noAbort, actionResponse);
                     }
-                } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
+                } else if (isDisconnectedOrCancelled(response) && !isUnloading) {
                     var actions = collector.getActionsToSend();
 
                     for ( var m = 0; m < actions.length; m++) {
@@ -412,7 +424,7 @@ var AuraClientService = function() {
                     }
                 }
                 $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
-                priv.fireDoneWaiting();
+                fireDoneWaiting();
             }, stackName);
 
         },
@@ -424,67 +436,12 @@ var AuraClientService = function() {
          * 
          * @private
          */
-        runClientActions : function(actions) {
+        runClientActions = function(actions) {
             var action;
             for ( var i = 0; i < actions.length; i++) {
                 action = actions[i];
                 action.runDeprecated();
                 action.finishAction($A.getContext());
-            }
-        },
-
-        /**
-         * Start a request sequence for a set of actions and an 'in-flight' counter.
-         * 
-         * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
-         * no request is sent to the server, it is because the request was either a storable action without needing refresh,
-         * or all abortable actions that will be aborted (not sure if that is even possible).
-         * 
-         * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
-         * capacity in the channel).
-         * 
-         * @param {Array}
-         *            actions the list of actions to process.
-         * @param {FlightCounter}
-         *            the flight counter under which the actions should be run.
-         * @private
-         */
-        request : function(actions, flightCounter) {
-            $A.Perf.mark("AuraClientService.request");
-            $A.Perf.mark("Action Request Prepared");
-            var that = this;
-            var flightHandled = { value: false };
-            //
-            // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
-            // an abortable action while we are off waiting for storage.
-            //
-            this.flightCounterTimeoutId = window.setTimeout(function() {
-               if(!flightHandled.value) {
-                   $A.warning("Timed out waiting for ActionController to reset flight counter! Resetting the flight counter and clearing component configs of processed actions");
-                   flightCounter.cancel();
-               }
-            }, 30000);
-            try {
-                var abortableId = this.actionQueue.getLastAbortableTransactionId();
-                var collector = new $A.ns.ActionCollector(actions, function() {
-                    try {
-                        that.finishRequest(collector, flightCounter, abortableId, flightHandled);
-                    } catch (e) {
-                        if (!flightHandled.value) {
-                            flightCounter.cancel();
-                            flightHandled.value = true;
-                        }
-                        throw e;
-                    }
-                });
-                collector.process();
-                $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
-            } catch (e) {
-                if (!flightHandled.value) {
-                    flightCounter.cancel();
-                    flightHandled.value = true;
-                }
-                throw e;
             }
         },
 
@@ -496,7 +453,7 @@ var AuraClientService = function() {
          * 
          * @private
          */
-        finishRequest : function(collector, flightCounter, abortableId, flightHandled) {
+        finishRequest = function(collector, flightCounter, abortableId, flightHandled) {
             var actionsToSend = collector.getActionsToSend();
             var actionsToComplete = collector.getActionsToComplete();
 
@@ -522,7 +479,7 @@ var AuraClientService = function() {
                         }
                     }
                 }
-                this.fireDoneWaiting();
+                fireDoneWaiting();
             }
 
             if (actionsToSend.length > 0) {
@@ -551,19 +508,19 @@ var AuraClientService = function() {
 
                 // clientService.requestQueue reference is mutable
                 var requestConfig = {
-                    "url" : priv.host + "/aura",
+                    "url" : _host + "/aura",
                     "method" : "POST",
                     "scope" : this,
                     "callback" : function(response) {
                         // always finish our in-flight counter here.
                         flightCounter.finish();
-                        this.actionCallback(response, collector, flightCounter, abortableId);
+                        actionCallback(response, collector, flightCounter, abortableId);
                     },
                     "params" : {
                         "message" : $A.util.json.encode({
                             "actions" : actionsToSend
                         }),
-                        "aura.token" : priv.token,
+                        "aura.token" : _token,
                         "aura.context" : $A.getContext().encodeForServer(),
                         "aura.num" : collector.getNum()
                         // #if {"modes" : ["PTEST"]}
@@ -595,20 +552,83 @@ var AuraClientService = function() {
             }
         },
 
-        isBB10 : function() {
+        /**
+         * Start a request sequence for a set of actions and an 'in-flight' counter.
+         * 
+         * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
+         * no request is sent to the server, it is because the request was either a storable action without needing refresh,
+         * or all abortable actions that will be aborted (not sure if that is even possible).
+         * 
+         * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
+         * capacity in the channel).
+         * 
+         * @param {Array}
+         *            actions the list of actions to process.
+         * @param {FlightCounter}
+         *            the flight counter under which the actions should be run.
+         * @private
+         */
+        request = function(actions, flightCounter) {
+            $A.Perf.mark("AuraClientService.request");
+            $A.Perf.mark("Action Request Prepared");
+            var flightHandled = { value: false };
+            //
+            // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
+            // an abortable action while we are off waiting for storage.
+            //
+            this.flightCounterTimeoutId = window.setTimeout(function() {
+               if(!flightHandled.value) {
+                   $A.warning("Timed out waiting for ActionController to reset flight counter! Resetting the flight counter and clearing component configs of processed actions");
+                   flightCounter.cancel();
+               }
+            }, 30000);
+            try {
+                var abortableId = actionQueue.getLastAbortableTransactionId();
+                var collector = new $A.ns.ActionCollector(actions, function() {
+                    try {
+                        finishRequest(collector, flightCounter, abortableId, flightHandled);
+                    } catch (e) {
+                        if (!flightHandled.value) {
+                            flightCounter.cancel();
+                            flightHandled.value = true;
+                        }
+                        throw e;
+                    }
+                });
+                collector.process();
+                $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
+            } catch (e) {
+                if (!flightHandled.value) {
+                    flightCounter.cancel();
+                    flightHandled.value = true;
+                }
+                throw e;
+            }
+        },
+
+        isBB10 = function() {
             var ua = navigator.userAgent;
             return (ua.indexOf("BB10") > 0 && ua.indexOf("AppleWebKit") > 0);
         },
 
-        hardRefresh : function() {
+        getManifestURL = function() {
+            var htmlNode = document.body.parentNode;
+            return htmlNode ? htmlNode.getAttribute("manifest") : null;
+        },
+
+        isManifestPresent = function() {
+            return !!getManifestURL();
+        },
+
+        _hardRefresh = function() {
             var url = location.href;
-            if (!priv.isManifestPresent() || url.indexOf("?nocache=") > -1) {
+            if (!isManifestPresent() || url.indexOf("?nocache=") > -1) {
                 location.reload(true);
                 return;
             }
 
             // if BB10 and using application cache
-            if (priv.isBB10() && window.applicationCache
+            if (isBB10() && window.applicationCache
                 && window.applicationCache.status !== window.applicationCache.UNCACHED) {
                 url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
             }
@@ -649,52 +669,48 @@ var AuraClientService = function() {
             }
         },
 
-        flushLoadEventQueue : function() {
-            if (priv.loadEventQueue) {
-                for ( var i = 0, len = priv.loadEventQueue.length; i < len; i++) {
-                    var eventName = priv.loadEventQueue[i];
-                    $A.get(eventName).fire();
-                }
-            }
-            priv.loadEventQueue = [];
-        },
-
-        fireLoadEvent : function(eventName) {
+        _fireLoadEvent = function(eventName) {
             var e = $A.get(eventName);
             if (e) {
                 e.fire();
             } else {
-                priv.loadEventQueue.push(eventName);
+                loadEventQueue.push(eventName);
             }
         },
 
-        isDevMode : function() {
+        isDevMode = function() {
             var context = $A.getContext();
             return !$A.util.isUndefined(context) && context.getMode() === "DEV";
         },
 
-        getManifestURL : function() {
-            var htmlNode = document.body.parentNode;
-            return htmlNode ? htmlNode.getAttribute("manifest") : null;
+        showProgress = function(progress) {
+            var progressContEl = document.getElementById("auraAppcacheProgress");
+            if (progressContEl) {
+                if (progress > 0 && progress < 100) {
+                    progressContEl.style.display = "block";
+                    var progressEl = progressContEl.firstChild;
+                    progressEl.firstChild.style.width = progress + "%";
+                } else if (progress >= 100) {
+                    progressContEl.style.display = "none";
+                } else if (progress < 0) {
+                    progressContEl.className = "error";
+                }
+            }
         },
 
-        isManifestPresent : function() {
-            return !!priv.getManifestURL();
-        },
-
-        handleAppcacheChecking : function(e) {
+        handleAppcacheChecking = function(e) {
             document._appcacheChecking = true;
-            if (priv.isDevMode()) {
+            if (isDevMode()) {
                 // TODO IBOGDANOV Why are you checking in commented out code like
                 // this???
                 /*
                  * setTimeout( function(){ if(window.applicationCache.status === window.applicationCache.CHECKING){
-                 * priv.showProgress(1); } }, 2000 );
+                 * showProgress(1); } }, 2000 );
                  */
             }
         },
 
-        handleAppcacheUpdateReady : function(event) {
+        handleAppcacheUpdateReady = function(event) {
             if (window.applicationCache.swapCache) {
                 window.applicationCache.swapCache();
             }
@@ -713,7 +729,7 @@ var AuraClientService = function() {
             location.reload(true);
         },
 
-        handleAppcacheError : function(e) {
+        handleAppcacheError = function(e) {
             if (e.stopImmediatePropagation) {
                 e.stopImmediatePropagation();
             }
@@ -730,13 +746,13 @@ var AuraClientService = function() {
              * For BB10, we append cache busting param to url to force BB10 browser
              * not to use cached HTML via hardRefresh
              */
-            if (priv.isBB10()) {
-                priv.hardRefresh();
+            if (isBB10()) {
+                _hardRefresh();
             }
 
-            var manifestURL = priv.getManifestURL();
-            if (priv.isDevMode()) {
-                priv.showProgress(-1);
+            var manifestURL = getManifestURL();
+            if (isDevMode()) {
+                showProgress(-1);
             }
 
             if (manifestURL) {
@@ -753,59 +769,44 @@ var AuraClientService = function() {
                 }, 500);
             }
 
-            if (priv.appcacheDownloadingEventFired && priv.isOutdated) {
+            if (appcacheDownloadingEventFired && isOutdated) {
                 // No one should get here.
                 $A.log("Outdated.");
             }
         },
 
-        handleAppcacheDownloading : function(e) {
-            if (priv.isDevMode()) {
+        handleAppcacheDownloading = function(e) {
+            if (isDevMode()) {
                 var progress = Math.round(100 * e.loaded / e.total);
-                priv.showProgress(progress + 1);
+                showProgress(progress + 1);
             }
 
-            priv.appcacheDownloadingEventFired = true;
+            appcacheDownloadingEventFired = true;
         },
 
-        handleAppcacheProgress : function(e) {
-            if (priv.isDevMode()) {
+        handleAppcacheProgress = function(e) {
+            if (isDevMode()) {
                 var progress = Math.round(100 * e.loaded / e.total);
-                priv.showProgress(progress);
+                showProgress(progress);
             }
         },
 
-        handleAppcacheNoUpdate : function(e) {
-            if (priv.isDevMode()) {
-                priv.showProgress(100);
+        handleAppcacheNoUpdate = function(e) {
+            if (isDevMode()) {
+                showProgress(100);
             }
         },
 
-        handleAppcacheCached : function(e) {
-            priv.showProgress(100);
+        handleAppcacheCached = function(e) {
+            showProgress(100);
         },
 
-        handleAppcacheObsolete : function(e) {
-            priv.hardRefresh();
+        handleAppcacheObsolete = function(e) {
+            hardRefresh();
         },
 
-        showProgress : function(progress) {
-            var progressContEl = document.getElementById("auraAppcacheProgress");
-            if (progressContEl) {
-                if (progress > 0 && progress < 100) {
-                    progressContEl.style.display = "block";
-                    var progressEl = progressContEl.firstChild;
-                    progressEl.firstChild.style.width = progress + "%";
-                } else if (progress >= 100) {
-                    progressContEl.style.display = "none";
-                } else if (progress < 0) {
-                    progressContEl.className = "error";
-                }
-            }
-        },
-
-        setOutdated : function() {
-            priv.isOutdated = true;
+        _setOutdated = function() {
+            isOutdated = true;
             var appCache = window.applicationCache;
             if (!appCache || (appCache && appCache.status === appCache.UNCACHED)) {
                 location["reload"](true);
@@ -816,30 +817,16 @@ var AuraClientService = function() {
             }
         },
 
-        isDisconnectedOrCancelled : function(response) {
-            if (response && response.status) {
-                if (response.status === 0) {
-                    return true;
-                } else if (response.status >= 12000 && response.status < 13000) {
-                    // WINHTTP CONNECTION ERRORS
-                    return true;
-                }
-            } else {
-                return true;
-            }
-            return false;
-        },
-
-        setConnected : function(isConnected) {
+        _setConnected = function(isConnected) {
             var isDisconnected = !isConnected;
-            if (isDisconnected === priv.isDisconnected) {
+            if (isDisconnected === _isDisconnected) {
                 // Already in desired state so no work to be done:
                 return;
             }
 
             e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
             if (e) {
-                priv.isDisconnected = isDisconnected;
+                _isDisconnected = isDisconnected;
                 e.fire();
             } else {
                 // looks like no definitions loaded yet
@@ -850,12 +837,12 @@ var AuraClientService = function() {
         /**
          * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
          */
-        saveTokenToStorage : function() {
+        saveTokenToStorage = function() {
             // update the persisted CSRF token so it's accessible when the app is launched while offline.
             // fire-and-forget style, matching action response persistence.
             var storage = Action.prototype.getStorage();
-            if (storage && priv.token) {
-                var value = {token:priv.token};
+            if (storage && _token) {
+                var value = {token:_token};
                 storage.put("$AuraClientService.priv$", value).then(
                     function() { /* noop on success */ },
                     function(err){ $A.warning("AuraClientService_priv.saveTokenToStorage(): failed to persist token: " + err); }
@@ -867,19 +854,18 @@ var AuraClientService = function() {
          * Loads the CSRF token from Actions storage.
          * @return {Promise} resolves or rejects based on data loading.
          */
-        loadTokenFromStorage : function() {
+        loadTokenFromStorage = function() {
             var storage = Action.prototype.getStorage();
             if (storage) {
                 return storage.get("$AuraClientService.priv$");
             }
             return Promise.reject(new Error("no Action storage"));
-        }
-    };
+        };
 
     $A.ns.Util.prototype.on(window, "beforeunload", function(event) {
         if (!$A.util.isIE) {
-            priv.isUnloading = true;
-            priv.requestQueue = [];
+            isUnloading = true;
+            requestQueue = [];
         }
     });
 
@@ -897,14 +883,14 @@ var AuraClientService = function() {
     });
 
     if (window.applicationCache && window.applicationCache.addEventListener) {
-        window.applicationCache.addEventListener("checking", priv.handleAppcacheChecking, false);
-        window.applicationCache.addEventListener("downloading", priv.handleAppcacheDownloading, false);
-        window.applicationCache.addEventListener("updateready", priv.handleAppcacheUpdateReady, false);
-        window.applicationCache.addEventListener("error", priv.handleAppcacheError, false);
-        window.applicationCache.addEventListener("progress", priv.handleAppcacheProgress, false);
-        window.applicationCache.addEventListener("noupdate", priv.handleAppcacheNoUpdate, false);
-        window.applicationCache.addEventListener("cached", priv.handleAppcacheCached, false);
-        window.applicationCache.addEventListener("obsolete", priv.handleAppcacheObsolete, false);
+        window.applicationCache.addEventListener("checking", handleAppcacheChecking, false);
+        window.applicationCache.addEventListener("downloading", handleAppcacheDownloading, false);
+        window.applicationCache.addEventListener("updateready", handleAppcacheUpdateReady, false);
+        window.applicationCache.addEventListener("error", handleAppcacheError, false);
+        window.applicationCache.addEventListener("progress", handleAppcacheProgress, false);
+        window.applicationCache.addEventListener("noupdate", handleAppcacheNoUpdate, false);
+        window.applicationCache.addEventListener("cached", handleAppcacheCached, false);
+        window.applicationCache.addEventListener("obsolete", handleAppcacheObsolete, false);
     }
 
 
@@ -924,7 +910,7 @@ var AuraClientService = function() {
          * @public
          */
         initHost : function(host) {
-            priv.host = host || "";
+            _host = host || "";
             //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             delete this.initHost;
             //#end
@@ -958,7 +944,7 @@ var AuraClientService = function() {
                 //#end
 
                 if (token) {
-                    priv.token = token;
+                    _token = token;
                 }
 
                 // Why is this happening in the ClientService? --JT
@@ -989,7 +975,7 @@ var AuraClientService = function() {
          * @private
          */
         idle : function() {
-            return priv.foreground.idle() && priv.background.idle() && priv.actionQueue.actions.length === 0;
+            return foreground.idle() && background.idle() && actionQueue.actions.length === 0;
         },
 
         /**
@@ -1033,11 +1019,11 @@ var AuraClientService = function() {
             $A.Perf.endMark("PageStart");
 
             // Let any interested parties know that defs have been initialized
-            for ( var n = 0; n < priv.initDefsObservers.length; n++) {
-                priv.initDefsObservers[n]();
+            for ( var n = 0, olen = initDefsObservers.length; n < olen; n++) {
+                initDefsObservers[n]();
             }
 
-            priv.initDefsObservers = [];
+            initDefsObservers = [];
 
             $A.log("initDefs complete");
 
@@ -1057,7 +1043,7 @@ var AuraClientService = function() {
         runAfterInitDefs : function(callback) {
             if (this.initDefs) {
                 // Add to the list of callbacks waiting until initDefs() is done
-                priv.initDefsObservers.push(callback);
+                initDefsObservers.push(callback);
             } else {
                 // initDefs() is done and gone so just run the callback
                 callback();
@@ -1092,7 +1078,7 @@ var AuraClientService = function() {
          * @private
          */
         throwExceptionEvent : function(config) {
-            priv.thowExceptionEvent(config);
+            _throwExceptionEvent(config);
         },
 
         /**
@@ -1142,17 +1128,17 @@ var AuraClientService = function() {
 
                         if (state === "SUCCESS") {
                             // Persists the CSRF token so it's accessible when the app is launched while offline.
-                            priv.saveTokenToStorage();
+                            saveTokenToStorage();
                             callback(a.getReturnValue());
                         } else if (state === "INCOMPLETE"){
                             // Use a stored response if one exists
                             var storage = Action.prototype.getStorage();
                             if (storage) {
                                 var key = action.getStorageKey();
-                                priv.loadTokenFromStorage()
+                                loadTokenFromStorage()
                                 .then(function(value) {
                                         if (value && value.value && value.value.token) {
-                                            priv.token = value.value.token;
+                                            _token = value.value.token;
                                         }
                                     }, function(err) {
                                         // So this isn't good: we don't have the CSRF token so if we go back online the server
@@ -1208,7 +1194,7 @@ var AuraClientService = function() {
          * @private
          */
         inAuraLoop : function() {
-            return priv.auraStack.length > 0;
+            return auraStack.length > 0;
         },
 
         /**
@@ -1221,8 +1207,8 @@ var AuraClientService = function() {
          * @return {Boolean} true if the pop should be allowed.
          */
         checkPublicPop : function(name) {
-            if (priv.auraStack.length > 0) {
-                return priv.auraStack[priv.auraStack.length-1] === name;
+            if (auraStack.length > 0) {
+                return auraStack[auraStack.length-1] === name;
             }
             //
             // Allow public pop calls on an empty stack for now.
@@ -1237,7 +1223,7 @@ var AuraClientService = function() {
          * @private
          */
         pushStack : function(name) {
-            priv.auraStack.push(name);
+            auraStack.push(name);
         },
 
         /**
@@ -1255,18 +1241,18 @@ var AuraClientService = function() {
             var lastName;
             var done;
 
-            if (priv.auraStack.length > 0) {
-                lastName = priv.auraStack.pop();
+            if (auraStack.length > 0) {
+                lastName = auraStack.pop();
                 if (lastName !== name) {
-                    $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+priv.auraStack);
+                    $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+auraStack);
                 }
             } else {
                 $A.warning("Pop from empty stack");
             }
 
-            if (priv.auraStack.length === 0) {
+            if (auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
-                priv.auraStack.push(tmppush);
+                auraStack.push(tmppush);
                 clientService.processActions();
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
@@ -1281,13 +1267,13 @@ var AuraClientService = function() {
                 }
 
                 // Force our stack to nothing.
-                lastName = priv.auraStack.pop();
+                lastName = auraStack.pop();
                 if (lastName !== tmppush) {
-                    $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
+                    $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+auraStack);
                 }
 
-                priv.auraStack = [];
-                priv.actionQueue.incrementNextTransactionId();
+                auraStack = [];
+                actionQueue.incrementNextTransactionId();
             }
         },
 
@@ -1299,7 +1285,7 @@ var AuraClientService = function() {
          * @private
          */
         hardRefresh : function() {
-            return priv.hardRefresh();
+            return _hardRefresh();
         },
 
         /**
@@ -1309,7 +1295,7 @@ var AuraClientService = function() {
          * @private
          */
         setOutdated : function() {
-            return priv.setOutdated();
+            return _setOutdated();
         },
 
         /**
@@ -1339,7 +1325,7 @@ var AuraClientService = function() {
          * @private
          */
         fireLoadEvent : function(eventName) {
-            return priv.fireLoadEvent(eventName);
+            return _fireLoadEvent(eventName);
         },
 
         /**
@@ -1351,7 +1337,7 @@ var AuraClientService = function() {
          * @private
          */
         resetToken : function(newToken) {
-            priv.token = newToken;
+            _token = newToken;
         },
 
 
@@ -1401,7 +1387,7 @@ var AuraClientService = function() {
 
             clientService.makeActionGroup(actions, scope, callback);
             for (i = 0; i < actions.length; i++) {
-                priv.actionQueue.enqueue(actions[i]);
+                actionQueue.enqueue(actions[i]);
             }
             clientService.processActions();
         },
@@ -1604,7 +1590,7 @@ var AuraClientService = function() {
          * @public
          */
         isConnected : function() {
-            return !priv.isDisconnected;
+            return !_isDisconnected;
         },
 
         /**
@@ -1616,7 +1602,7 @@ var AuraClientService = function() {
          * @public
          */
         setConnected: function(isConnected) {
-            priv.setConnected(isConnected);
+            _setConnected(isConnected);
         },
 
         /**
@@ -1638,7 +1624,7 @@ var AuraClientService = function() {
                 action.setBackground();
             }
 
-            priv.actionQueue.enqueue(action);
+            actionQueue.enqueue(action);
         },
 
         /**
@@ -1768,9 +1754,9 @@ var AuraClientService = function() {
             var processedActions = false;
             var action;
 
-            actions = priv.actionQueue.getClientActions();
+            actions = actionQueue.getClientActions();
             if(actions.length > 0) {
-                priv.runClientActions(actions);
+                runClientActions(actions);
                 processedActions = true;
             }
 
@@ -1779,32 +1765,27 @@ var AuraClientService = function() {
             // needs to be sent (force boxcar will delay this)
             // FIXME: we need measures of how long this delays things.
             //
-            if (priv.actionQueue.needXHR() && priv.foreground.start()) {
-                actions = priv.actionQueue.getServerActions();
+            if (actionQueue.needXHR() && foreground.start()) {
+                actions = actionQueue.getServerActions();
                 if (actions.length > 0) {
-                    priv.request(actions, priv.foreground);
+                    request(actions, foreground);
                     processedActions = true;
                 } else {
-                    priv.foreground.cancel();
+                    foreground.cancel();
                 }
             }
 
-            if (priv.background.start()) {
-                action = priv.actionQueue.getNextBackgroundAction();
+            if (background.start()) {
+                action = actionQueue.getNextBackgroundAction();
                 if (action !== null) {
-                    priv.request([action], priv.background);
+                    request([action], background);
                     processedActions = true;
                 } else {
-                    priv.background.cancel();
+                    background.cancel();
                 }
             }
             return processedActions;
         }
-
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        ,
-        "priv" : priv
-    //#end
     };
 
     // #include aura.AuraClientService_export

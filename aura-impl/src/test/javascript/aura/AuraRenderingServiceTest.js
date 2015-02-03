@@ -51,7 +51,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
             isValid : function() { return valid; },
             getDef : function() {
                 return {
-                    getDefDescriptor : function() { return name; },
+                    getDescriptor : function() { return name; },
                 };
             },
             render : Stubs.GetMethod("xxx", "yyy", null),

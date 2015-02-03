@@ -16,7 +16,6 @@
 
 div.THIS {  
 	border: 3px solid #bbc0c4;
-    display: inline-block;
     text-align: center;
     height: 40px;
     width: 200px;
@@ -24,4 +23,8 @@ div.THIS {
 
 div.THIS.div_innerCmp {
     color: red;
+}
+
+div.THIS.div_cmpAsync {
+    color: blue;
 }

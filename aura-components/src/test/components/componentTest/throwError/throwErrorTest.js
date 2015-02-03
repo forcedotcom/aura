@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 ({
+	setUp: function() {
+        this._expectErrorReRender = 
+        	"rerender threw an error in 'markup://componentTest:throwError' : caught \"error from re-render\"";
+        this._expectErrorUnRender =
+        	"Unrender threw an error in markup://componentTest:throwError : caught \"error from un-render\"";
+        this._expectErrorReRenderInner =
+        	"rerender threw an error in 'markup://componentTest:throwErrorInner' : caught \"error from re-render[inner]\"";
+        this._expectErrorUnRenderInner =
+        	"Unrender threw an error in markup://componentTest:throwErrorInner : caught \"error from un-render[inner]\"";
+    },
+    
 	//This test check the case when we throw error from this cmp's JS re-render
     testReRenderThrowError: {
     	attributes: {"throwErrorFromReRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError("error from re-render");
+            	$A.test.expectAuraError(this._expectErrorReRender);
             	cmp.set("v.outputValue", "newValue");
             }, function(cmp) {
             	//we need to unset this, or extra error will be thrown because we re-render the cmp again when test finish
@@ -44,7 +55,7 @@
     	attributes: {"throwErrorFromUnRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError("error from un-render");
+            	$A.test.expectAuraError(this._expectErrorUnRender);
             	$A.unrender(cmp);
             }, function(cmp) {
             	cmp.set("v.throwErrorFromUnRender", false);
@@ -57,7 +68,7 @@
     	attributes: {"throwErrorInnerFromReRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError("error from re-render[inner]");
+            	$A.test.expectAuraError(this._expectErrorReRenderInner);
             	cmp.find("innerCmp").set("v.outputValue", "newValue");
             }, function(cmp) {
             	//we need to unset this, or extra error will be thrown because we re-render the cmp again when test finish
@@ -71,7 +82,7 @@
     	attributes: {"throwErrorInnerFromUnRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError("error from un-render[inner]");
+            	$A.test.expectAuraError(this._expectErrorUnRenderInner);
             	$A.unrender(cmp.find("innerCmp"));
             }, function(cmp) {
             	cmp.set("v.throwErrorInnerFromUnRender", false);
@@ -85,8 +96,8 @@
     	attributes: {"throwErrorInnerFromReRender": true, "throwErrorFromReRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError("error from re-render[inner]");
-            	$A.test.expectAuraError("error from re-render");
+            	$A.test.expectAuraError(this._expectErrorReRenderInner);
+            	$A.test.expectAuraError(this._expectErrorReRender);
             	//now force both cmp to get re-rendered
             	cmp.find("innerCmp").set("v.outputValue", "newValue");
             	cmp.set("v.outputValue", "newValue");
@@ -103,7 +114,7 @@
     	attributes: {"throwErrorInnerFromUnRender": true, "throwErrorFromUnRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError("error from un-render");
+            	$A.test.expectAuraError(this._expectErrorUnRender);
             	//now unrender this cmp
             	//we can choose to unrender innerCmp here, if we do that, the innerCmp's un-render will get hit, but the outer one won't
             	$A.unrender(cmp);
@@ -132,7 +143,7 @@
                        }
                    });
     	       }, function(cmp) {
-    	    	   $A.test.expectAuraError("error from re-render[inner]");
+    	    	   $A.test.expectAuraError(this._expectErrorReRenderInner);
     	    	   var newCmpLst = cmp.get('v.newCmp');
     	           $A.test.assertEquals(1,newCmpLst.length);
     	           var newCmp = newCmpLst[0];
@@ -164,7 +175,7 @@
                        }
                    });
     	       }, function(cmp) {
-    	    	   $A.test.expectAuraError("error from un-render[inner]");
+    	    	   $A.test.expectAuraError(this._expectErrorUnRenderInner);
     	    	   var newCmpLst = cmp.get('v.newCmp');
     	           $A.test.assertEquals(1,newCmpLst.length);
     	           var newCmp = newCmpLst[0];
@@ -206,8 +217,8 @@
     	    	   //ask the outer cmp to throw error during re-render
     	    	   cmp.set("v.throwErrorFromReRender", true);
     	    	   //we will expect two errors, one from outer, one from newCmp. we reach outer one first
-    	    	   $A.test.expectAuraError("error from re-render");
-    	    	   $A.test.expectAuraError("error from re-render[inner]");
+    	    	   $A.test.expectAuraError(this._expectErrorReRender);
+    	    	   $A.test.expectAuraError(this._expectErrorReRenderInner);
     	    	   //change outer's attribute
     	    	   cmp.set("v.outputValue", "new value from test");
     	    	   //change newCmp's attribute
@@ -244,7 +255,7 @@
                        }
                    });
     	       }, function(cmp) {
-    	    	   $A.test.expectAuraError("error from un-render");
+    	    	   $A.test.expectAuraError(this._expectErrorUnRender);
     	    	   $A.unrender(cmp);
     	       },  function(cmp) {
     	    	   cmp.set("v.throwErrorFromUnRender", false);

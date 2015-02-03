@@ -211,7 +211,7 @@
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr</artifactId>
-                <version>3.3</version>
+                <version>3.5.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -739,7 +739,7 @@
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr3-maven-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

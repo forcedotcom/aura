@@ -293,7 +293,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         verifyInvalidExpressionException("positive[+5]", "expecting a positive integer, found '+'");
         verifyInvalidExpressionException("decimal[5.5]", "expecting a positive integer, found '5.5'");
         verifyInvalidExpressionException("unclosed[5", "unexpected end of expression");
-        verifyInvalidExpressionException("unopened5]", "unexpected token: an identifier");
+        verifyInvalidExpressionException("unopened5]", "unexpected token: a right square bracket at column 10 of expression: unopened5");
         verifyInvalidExpressionException("noindex[]", "expecting a positive integer, found ']'");
         verifyInvalidExpressionException("paren[(33)]", "expecting a positive integer, found '('");
     }
@@ -453,7 +453,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         verifyInvalidExpressionException("in\\side", "unexpected token: '\\'");
         verifyInvalidExpressionException("5horsemen", "unexpected token: 'horsemen'");
         verifyInvalidExpressionException("9.1.1", "unexpected token: '.1'");
-        verifyInvalidExpressionException("in.2.u", "unexpected token: an identifier");
+        verifyInvalidExpressionException("in.2.u", "unexpected token: a floating point number at column 3 of expression: in.2.u");
         verifyInvalidExpressionException(".hidden", "unexpected token: a period");
         verifyInvalidExpressionException("ends.with.", "unexpected end of expression");
         verifyInvalidExpressionException("man...middle", "expecting an identifier, found '.'");

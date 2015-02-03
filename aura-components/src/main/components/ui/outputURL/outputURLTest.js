@@ -254,10 +254,8 @@
 
     testValueWithHttp: {
         attributes: {fixURL: true, label: "link", value: "http://www.salesforce.com:9090/home/home.jsp"},
+        browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            if (!$A.get("$Browser").isDesktop) {
-                return;
-            }
             aura.test.assertEquals("http://www.salesforce.com:9090/home/home.jsp", component.find("link").getElement().href, "href attribute not correct");
         }
     },
@@ -268,20 +266,17 @@
             label: "link",
             value: "https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top"
         },
+        browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            if (!$A.get("$Browser").isDesktop) {
-                return;
-            }
+
             aura.test.assertEquals("https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top", component.find("link").getElement().href, "href attribute not correct");
         }
     },
 
     testValueWithFtp: {
         attributes: {fixURL: true, label: "link", value: "ftp://www.salesforce.com:6060/images"},
+        browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            if (!$A.get("$Browser").isDesktop) {
-                return;
-            }
             aura.test.assertEquals("ftp://www.salesforce.com:6060/images", component.find("link").getElement().href, "href attribute not correct");
         }
     },
@@ -289,10 +284,8 @@
     // unsupported protocol
     testValueWithMailto: {
         attributes: {fixURL: true, label: "link", value: "mailto:friend@salesforce.com"},
+        browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            if (!$A.get("$Browser").isDesktop) {
-                return;
-            }
             aura.test.assertEquals("http://mailto:friend@salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     },
@@ -300,22 +293,17 @@
     // not expecting layout handling from SFDC URLs
     testValueOnlyFragment: {
         attributes: {fixURL: true, label: "link", value: "#top"},
+        browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            if (!$A.get("$Browser").isDesktop) {
-                return;
-            }
             aura.test.assertEquals("http://#top", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     },
 
     testValueDefaultHttp: {
         attributes: {fixURL: true, label: "link", value: "www.salesforce.com"},
+        browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            if (!$A.get("$Browser").isDesktop) {
-                return;
-            }
             aura.test.assertEquals("http://www.salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     }
-
 })

@@ -200,12 +200,87 @@ Test.Aura.LoggerTest = function() {
         };
 
         [Fact]
-        function LoggerUnsubscibe() {
+        function SubscriberRemoved() {
             logger.subscribe("INFO", cb);
             Assert.True(logger.hasSubscriptions("InFo"));
 
             logger.unsubscribe("INFO", cb);
             Assert.False(logger.hasSubscriptions("INFO"));
+        }
+
+        [Fact]
+        function SubscriberForLevelRemoved() {
+            logger.subscribe("INFO", cb);
+            Assert.True(logger.hasSubscriptions("InFo"));
+            logger.subscribe("WARNING", cb);
+            Assert.True(logger.hasSubscriptions("Warning"));
+
+            logger.unsubscribe("INFO", cb);
+            Assert.False(logger.hasSubscriptions("INFO"));
+            Assert.True(logger.hasSubscriptions("WARNING"));
+        }
+
+        [Fact] // splice makes iteration dependent on traversal direction
+        function OlderSubscriberRemoved() {
+            logger.subscribe("INFO", cb);
+            Assert.True(logger.hasSubscriptions("InFo"));
+            logger.subscribe("WARNING", cb);
+            Assert.True(logger.hasSubscriptions("Warning"));
+
+            logger.unsubscribe("INFO", cb);
+            Assert.False(logger.hasSubscriptions("INFO"));
+            Assert.True(logger.hasSubscriptions("WARNING"));
+        }
+
+        [Fact] // splice makes iteration dependent on traversal direction
+        function NewerSubscriberRemoved() {
+            logger.subscribe("INFO", cb);
+            Assert.True(logger.hasSubscriptions("InFo"));
+            logger.subscribe("WARNING", cb);
+            Assert.True(logger.hasSubscriptions("Warning"));
+
+            logger.unsubscribe("WARNING", cb);
+            Assert.True(logger.hasSubscriptions("INFO"));
+            Assert.False(logger.hasSubscriptions("WARNING"));
+        }
+
+        [Fact]
+        function NoOpIfNotSubscriber() {
+            logger.unsubscribe("INFO", cb);
+            Assert.False(logger.hasSubscriptions("INFO"));
+
+            logger.subscribe("INFO", cb);
+            Assert.True(logger.hasSubscriptions("InFo"));
+        }
+        
+        [Fact]
+        function NonSubscriberNotRemoved() {
+            var expectedMsg = "expectedMsg";
+            logger.subscribe("INFO", cb);
+            Assert.True(logger.hasSubscriptions("InFo"));
+
+            logger.unsubscribe("INFO", function(){});
+            Assert.True(logger.hasSubscriptions("INFO"));
+            
+            mockUtil(function() {
+                logger.info(expectedMsg);
+            });
+            Assert.Equal(expectedMsg, message);
+        }
+
+        [Fact]
+        function WrongLevelNotRemoved() {
+            var expectedMsg = "expectedMsg";
+            logger.subscribe("INFO", cb);
+            Assert.True(logger.hasSubscriptions("InFo"));
+
+            logger.unsubscribe("WARNING", cb);
+            Assert.True(logger.hasSubscriptions("INFO"));
+            
+            mockUtil(function() {
+                logger.info(expectedMsg);
+            });
+            Assert.Equal(expectedMsg, message);
         }
     }
 

@@ -259,7 +259,7 @@ $A.ns.Logger.prototype.unsubscribe = function(level, callback) {
     level = level.toUpperCase();
     if (this.isValidSubscriber(level, callback)) {
         var subsLength = this.subscribers.length;
-        for (var i = 0; i < subsLength; i++) {
+        for (var i = subsLength - 1; i >= 0; i--) {
             var sub = this.subscribers[i];
             if (sub.level === level && sub.fn === callback) {
                 this.subscribers.splice(i, 1);

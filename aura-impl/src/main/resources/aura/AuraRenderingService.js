@@ -127,7 +127,7 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
                     try {
                         rerenderedElements=renderer.def.rerender(renderer.renderable);
                     } catch (e) {
-                        $A.error("rerender threw an error in '"+cmp.getDef().getDefDescriptor()+"'", e);
+                        $A.error("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                         // we fall through here, and put whatever the component gives us in the set.
                         // This may not be ideal, but it is not clear what we should do.
                     }
@@ -194,7 +194,7 @@ $A.ns.AuraRenderingService.prototype.afterRender = function(components) {
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
-                $A.error("afterRender threw an error in '"+cmp.getDef().getDefDescriptor()+"'", e);
+                $A.error("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                 //  (b) mark the component as possibly broken.
                 //  FIXME: keep track of component stability
             }
@@ -241,7 +241,7 @@ $A.ns.AuraRenderingService.prototype.unrender = function(components) {
                     try {
                         renderer.def.unrender(renderer.renderable);
                     } catch (e) {
-                        $A.error("Unrender threw an error in "+cmp.getDef().getDefDescriptor(), e);
+                        $A.error("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
                     }
                     cmp.setRendered(false);
                     if (visited) {

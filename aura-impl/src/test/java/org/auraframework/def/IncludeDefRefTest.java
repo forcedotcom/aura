@@ -155,19 +155,19 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", function(){})}\n" +
+                        "function(define){define(\"%s:%s\", \nfunction(){}\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }
 
     public void testSerializeWithSingleComments() throws Exception {
+        String source = "//this doc should be helpful\nfunction(){\n//fix later\nreturn this;}//last word";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("singleComments",
                 IncludeDef.class, libDesc);
         Mockito.doReturn(includeDesc.getName()).when(descriptor).getName();
-        addSourceAutoCleanup(includeDesc,
-                "//this doc should be helpful\nfunction(){\n//fix later\nreturn this;}//last word");
+        addSourceAutoCleanup(includeDesc, source);
 
         StringBuffer buffer = new StringBuffer();
         Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
@@ -185,19 +185,19 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", function(){return this})}\n" +
+                        "function(define){define(\"%s:%s\", \n%s\n)}\n" +
                         "}",
-                        libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
+                        libDesc.getDescriptorName(), includeDesc.getName(), source), buffer.toString());
     }
 
     public void testSerializeWithMultiComments() throws Exception {
+        String source = "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("multiComments",
                 IncludeDef.class, libDesc);
         Mockito.doReturn(includeDesc.getName()).when(descriptor).getName();
-        addSourceAutoCleanup(includeDesc,
-                "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/");
+        addSourceAutoCleanup(includeDesc, source);
 
         StringBuffer buffer = new StringBuffer();
         Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
@@ -215,9 +215,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", function(){return this})}\n" +
+                        "function(define){define(\"%s:%s\", \n%s\n)}\n" +
                         "}",
-                        libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
+                        libDesc.getDescriptorName(), includeDesc.getName(), source), buffer.toString());
     }
 
     public void testSerializeWithImport() throws Exception {
@@ -247,8 +247,8 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \"%s\", function(){})}" +
-                        "\n}",
+                        "function(define){define(\"%s:%s\", \"%s\", \nfunction(){}\n)}\n" +
+                        "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), importDesc.getName()), buffer.toString());
     }
 
@@ -281,8 +281,8 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \"%s:%s\", function(){})}" +
-                        "\n}",
+                        "function(define){define(\"%s:%s\", \"%s:%s\", \nfunction(){}\n)}\n" +
+                        "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), extLibDesc.getDescriptorName(),
                         importDesc.getName()), buffer.toString());
     }
@@ -321,7 +321,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \"%s\", \"%s\", \"%s:%s\", function(){})}\n" +
+                        "function(define){define(\"%s:%s\", \"%s\", \"%s\", \"%s:%s\", \nfunction(){}\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), import1Desc.getName(),
                         import2Desc.getName(), extLibDesc.getDescriptorName(), import3Desc.getName()),
@@ -353,10 +353,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", function(){var myexpt=function(){return\"something\"};\n" +
+                        "function(define){define(\"%s:%s\", function(){\nvar myexpt=function(){return 'something'}\n" +
                         "return myexpt})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }
-
 }

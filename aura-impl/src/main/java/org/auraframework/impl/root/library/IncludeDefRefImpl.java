@@ -156,12 +156,20 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
         // Wrap exported libraries in a function:
         if (export != null) {
             builder.append("function(){");
+            // first newline is to preserve indentation of first line
+            builder.append("\n");
             builder.append(source);
-            builder.append("\nreturn ");
+            // next newline is to allow for single-line comments at end of source, missing semi-colons, ...
+            builder.append("\n");
+            builder.append("return ");
             builder.append(export);
             builder.append("}");
         } else {
+            // first newline is to preserve indentation of first line
+            builder.append("\n");
             builder.append(source);
+            // next newline is to allow for single-line comments at end of source, missing semi-colons, ...
+            builder.append("\n");
         }
         builder.append(")");
         return builder.toString();

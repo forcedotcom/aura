@@ -47,7 +47,7 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         def.validateDefinition();
-        assertEquals("function(){return\"anything\"}", def.getCode());
+        assertEquals(code, def.getCode());
     }
 
     public void testOtherJsButNotJson() throws Exception {
@@ -56,7 +56,7 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
         JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
         IncludeDef def = handler.getDefinition();
         def.validateDefinition();
-        assertEquals("var something=\"borrowed\";", def.getCode());
+        assertEquals(code, def.getCode());
     }
 
     public void testInvalidTryToBreakOut() throws Exception {

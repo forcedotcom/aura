@@ -41,7 +41,8 @@
         "accesskey": "accessKey",
         "maxlength": "maxLength",
         "for": "htmlFor",
-        "class": "className"
+        "class": "className",
+        "frameborder": "frameBorder"
     },
 
     // "void elements" as per http://dev.w3.org/html5/markup/syntax.html#syntax-elements

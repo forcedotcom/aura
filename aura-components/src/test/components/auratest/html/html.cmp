@@ -43,4 +43,13 @@
     <div ontouchend="{!c.handleTouchEnd}" aura:id="onlyTouchEndHandler"/>
     
     <a onclick="{!c.incrementClickCount}" aura:id="anchor">Clickable Anchor</a>
+
+    <iframe aura:id="frame"
+            height="300"
+            width="300"
+            allowtransparency="true"
+            scrolling="auto"
+            name="frame"
+            frameBorder="0" />
+
 </aura:component>

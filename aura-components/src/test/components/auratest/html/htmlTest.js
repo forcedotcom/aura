@@ -233,6 +233,14 @@
     //		    function(){$A.test.assertFalse(component._TouchEndHandler);})
     //	}
         ]
+    },
+
+    testIFrame: {
+        test: function(cmp) {
+            var frame = cmp.find("frame").getElement();
+            $A.test.assertTrue(frame.frameborder === undefined && frame.frameBorder == 0 || frame.frameBorder === "0",
+                "frameBorder attribute is case sensitive");
+        }
     }
 
 })

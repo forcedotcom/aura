@@ -314,14 +314,48 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
     }
 
-    private void writeSvg(HttpServletRequest request, AuraContext context, Writer out) throws IOException,
-            QuickFixException {
+    /**
+     * Beyond from just writing the svg to the response, this function adds an etag
+     * caching header to the response. This ensures the user has up to date version
+     * and does not keep an old version.
+     * @param request
+     * @param context
+     * @param response
+     * @throws QuickFixException
+     * @throws IOException
+     */
+    private void writeSvg(HttpServletRequest request, AuraContext context,
+                          HttpServletResponse response) throws QuickFixException, IOException {
+        //For Security and updating we require the host to validate the cache. Thus we need to overright
+        //the original caching
+        response.setHeader("Cache-Control", "no-cache");
+
         String fqn = lookup.get(request);
         if (fqn == null || fqn.isEmpty()) {
             fqn = context.getApplicationDescriptor().getQualifiedName();
         }
         DefDescriptor<SVGDef> svg = Aura.getDefinitionService().getDefDescriptor(fqn, SVGDef.class);
-        Aura.getServerService().writeAppSvg(svg, out);
+        SVGDef def = svg.getDef();
+
+        //Get the original etag if exists
+        String etag = request.getHeader("If-None-Match");
+        //generate the new etag from the definitions hash
+        String hash = def.getOwnHash();
+        //For security reasons, if the user fetches the svg from the browser directly we
+        //force the browser to download the file
+        if (request.getHeader("Referer") == null) {
+            response.setContentType(null);
+            response.setHeader("Content-Disposition", "attachment; filename=resources.svg");
+            //Otherwise check the etag, if it matches that reply with a 304, unchanged
+        } else if (etag != null && etag.equals(hash)) {
+            response.setStatus(304);
+            Aura.getContextService().endContext();
+            return;
+        }
+        //finally add the etag to the header and write the image
+        response.setHeader("Etag", hash);
+        Aura.getServerService().writeAppSvg(svg, response.getWriter());
+
     }
 
     /**
@@ -419,7 +453,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             break;
         case SVG:
             try {
-                writeSvg(request, context, response.getWriter());
+                writeSvg(request, context, response);
             } catch (Throwable t) {
                 handleServletException(t, true, context, request, response, true);
             }

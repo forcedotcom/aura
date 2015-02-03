@@ -173,6 +173,83 @@ Test.Aura.AuraClientServiceTest = function() {
 		}
 
 		[ Fact ]
+		function QueuesServerAction() {
+			var action = new MockAction();
+            var target;
+			mockGlobal(function() {
+				target = new AuraClientService();
+				target.priv.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
+
+				target.enqueueAction(action);
+			});
+
+			Assert.Equal([ {
+				Arguments : {
+					action : action
+				},
+				ReturnValue : undefined
+			} ], target.priv.actionQueue.enqueue.Calls);
+		}
+
+		[ Fact ]
+		function QueuesClientAction() {
+			var action = new MockAction("client");
+            var target;
+			mockGlobal(function() {
+				target = new AuraClientService();
+				target.priv.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
+
+				target.enqueueAction(action);
+			});
+
+			Assert.Equal([ {
+				Arguments : {
+					action : action
+				},
+				ReturnValue : undefined
+			} ], target.priv.actionQueue.enqueue.Calls);
+		}
+
+		[ Fact ]
+		function AbortableActionsAreCleared() {
+			// Arrange
+			var target;
+            var abortable = new MockAction("serverabortable");
+            var action = new MockAction("server");
+
+			mockGlobal(function() {
+				target = new AuraClientService();
+			});
+			target.processActions = function() {
+			};
+			// Act
+			mockGlobal(function() {
+				target.pushStack("AbortableActionsAreCleared.1");
+				target.enqueueAction(action, undefined, undefined);
+				target.enqueueAction(abortable, undefined, undefined); // will be pruned
+				target.enqueueAction(abortable, undefined, undefined); // will be pruned
+				target.enqueueAction(action, undefined, undefined);
+				target.popStack("AbortableActionsAreCleared.1");
+				target.pushStack("AbortableActionsAreCleared.2");
+				target.enqueueAction(action, undefined, undefined);
+				target.enqueueAction(abortable, undefined, undefined); // will be kept
+				target.enqueueAction(abortable, undefined, undefined); // will be kept
+				target.enqueueAction(action, undefined, undefined);
+				target.popStack("AbortableActionsAreCleared.2");
+			});
+			// Assert
+			Assert.Equal(6, target.priv.actionQueue.actions.length);
+			Assert.Equal(2, abortable.abort.Calls.length);
+			Assert.Equal(0, action.abort.Calls.length);
+			Assert.False(target.priv.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
+			Assert.False(target.priv.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");
+			Assert.False(target.priv.actionQueue.actions[2].isAbortable(), "Third action should not be abortable");
+			Assert.True(target.priv.actionQueue.actions[3].isAbortable(), "Fourth action should be abortable");
+			Assert.True(target.priv.actionQueue.actions[4].isAbortable(), "Fifth action should be abortable");
+			Assert.False(target.priv.actionQueue.actions[5].isAbortable(), "Sixth action should not be abortable");
+		}
+
+		[ Fact ]
 		function AssertsActionNotUndefinedOrNull() {
 			var assertStub = Stubs.GetMethod("check", "message", undefined);
 			var validateStub = Stubs.GetMethod(true);
@@ -281,19 +358,12 @@ Test.Aura.AuraClientServiceTest = function() {
 
 	[ Fixture ]
 	function ProcessActions() {
-        /*
 		[ Fact ]
 		function ReturnsFalseIfForegroundMax() {
             var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            
-            Mocks.GetMock(Object.Global(),"ActionQueue",{open:function(targetUrl){
-                    actual=targetUrl;
-            }});
-            
-            // should not modify actionQueue & foreground for test
             target.priv.actionQueue = new MockActionQueue();
             target.priv.actionQueue.serverActions = [ "action" ];
             target.priv.actionQueue.xhr = true;
@@ -324,24 +394,14 @@ Test.Aura.AuraClientServiceTest = function() {
 
 			Assert.False(actual);
 		}
-        */
+
 		[ Fact ]
 		function ReturnsFalseIfQueueEmpty() {
             var target;
-            Mocks.GetMock(Object.Global(), "ActionQueue", function() {
-                this.clientActions = [];
-                this.serverActions = [];
-                this.nextBackgroundAction = null;
-                this.xhr = false;
-                this.getClientActions = function() { return this.clientActions; };
-                this.getServerActions = function() { return this.serverActions; };
-                this.getNextBackgroundAction = function() { return this.nextBackgroundAction; };
-                this.needXHR = function() { return this.xhr; };
-            });
-
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
+            target.priv.actionQueue = new MockActionQueue();
 
 			var actual;
 			mockGlobal(function() {
@@ -350,7 +410,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
 			Assert.False(actual);
 		}
-/*
+
 		[ Fact ]
 		function CallsRequestIfServerActionsAvailable() {
 			var action = "server";
@@ -375,24 +435,17 @@ Test.Aura.AuraClientServiceTest = function() {
 				ReturnValue : undefined
 			} ], target.priv.request.Calls);
 		}
-*/
+
         [ Fact ]
         function DoesNotCallRequestIfXhrSetToFalse() {
             var action = "server";
-            Mocks.GetMock(Object.Global(), "ActionQueue", function() {
-                this.clientActions = [];
-                this.serverActions = [ action ];
-                this.nextBackgroundAction = null;
-                this.xhr = false;
-                this.getClientActions = function() { return this.clientActions; };
-                this.getServerActions = function() { return this.serverActions; };
-                this.getNextBackgroundAction = function() { return this.nextBackgroundAction; };
-                this.needXHR = function() { return this.xhr; };
-            });
             var target;
             mockGlobal(function() {
                 target = new AuraClientService();
             });
+            target.priv.actionQueue = new MockActionQueue();
+            target.priv.actionQueue.serverActions = [ action ];
+            target.priv.actionQueue.xhr = false;
 
             var actual;
             mockGlobal(function() {
@@ -401,7 +454,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             Assert.False(actual);
         }
-/*
+
 		[ Fact ]
 		function ReturnsTrueIfServerActionsSent() {
 			var action = "server";
@@ -501,7 +554,6 @@ Test.Aura.AuraClientServiceTest = function() {
 				ReturnValue : undefined
 			} ], target.priv.request.Calls);
 		}
-*/
 	}
 
     [ Fixture ]
@@ -594,10 +646,9 @@ Test.Aura.AuraClientServiceTest = function() {
             }
         }
     }
-/*
+
     [ Fixture ]
     function RunActions() {
-
         [ Fact ]
         function CallsMakeActionGroup() {
             var expectedActions = ["action"];
@@ -665,7 +716,7 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(1, target.processActions.Calls.length);
         }
     }
-*/
+
     [ Fixture ]
     function actionServices() {
 
@@ -910,7 +961,7 @@ Test.Aura.AuraClientServiceTest = function() {
             });
         }
     }
-/*
+
     [Fixture]
     function isBB10() {
         [Fact]
@@ -949,5 +1000,7 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(false, actual);
         }
     }
-*/
+    
+    
+    
 }

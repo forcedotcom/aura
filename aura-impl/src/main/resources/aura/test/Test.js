@@ -139,8 +139,8 @@ $A.ns.Test.prototype.addWaitForWithFailureMessage = function(expected, testFunct
  * queueing on the client).
  */
 $A.ns.Test.prototype.blockRequests = function () {
-    $A.clientService["priv"].foreground.inFlight += $A.clientService["priv"].foreground.max;
-    $A.clientService["priv"].background.inFlight += $A.clientService["priv"].background.max;
+    $A.clientService.foreground.inFlight += $A.clientService.foreground.max;
+    $A.clientService.background.inFlight += $A.clientService.background.max;
 };
 
 /**
@@ -150,8 +150,8 @@ $A.ns.Test.prototype.blockRequests = function () {
  */
 $A.ns.Test.prototype.releaseRequests = function () {
     $A.run(function() {
-        $A.clientService["priv"].foreground.inFlight -= $A.clientService["priv"].foreground.max;
-        $A.clientService["priv"].background.inFlight -= $A.clientService["priv"].background.max;
+        $A.clientService.foreground.inFlight -= $A.clientService.foreground.max;
+        $A.clientService.background.inFlight -= $A.clientService.background.max;
     });
 };
 
@@ -162,7 +162,7 @@ $A.ns.Test.prototype.releaseRequests = function () {
  * we are only sending the necessary amount of requests.
  */
 $A.ns.Test.prototype.getSentRequestCount = function () {
-    return $A.clientService["priv"].foreground.sent + $A.clientService["priv"].background.sent;
+    return $A.clientService.foreground.sent + $A.clientService.background.sent;
 };
 
 /**
@@ -406,11 +406,11 @@ $A.ns.Test.prototype.callServerAction = function(action, doImmediate){
     try {
         if (!!doImmediate) {
             var requestConfig = {
-                "url": $A["clientService"]["priv"].host + '/aura',
+                "url": $A["clientService"]._host + '/aura',
                 "method": 'POST',
                 "scope" : cmp,
                 "callback" :function(response) {
-                    var msg = $A["clientService"]["priv"].checkAndDecodeResponse(response);
+                    var msg = $A["clientService"].checkAndDecodeResponse(response);
                     if ($A.util.isUndefinedOrNull(msg)) {
                         for ( var k = 0; k < actions.length; k++) {
                             that.logError("Unable to execute action", actions[k]);
@@ -426,7 +426,7 @@ $A.ns.Test.prototype.callServerAction = function(action, doImmediate){
                 },
                 "params" : {
                     "message": $A.util.json.encode({"actions" : actions}),
-                    "aura.token" : $A["clientService"]["priv"].token,
+                    "aura.token" : $A["clientService"]._token,
                     "aura.context" : $A.getContext().encodeForServer(),
                     "aura.num" : 0
                 }

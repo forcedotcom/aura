@@ -897,11 +897,14 @@ var AuraClientService = function() {
     var NOOP = function() {};
 
     var clientService = {
-        // only expose following private properties for xUnit
-        //#if {"modes" : ["DOC"]}
+        // only expose following private properties for Test.js and xUnit
+        //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"]}
+        _host : _host,
+        _token : _token,
         foreground : foreground,
         background : background,
         actionQueue : actionQueue,
+        checkAndDecodeResponse : checkAndDecodeResponse,
         isBB10 : isBB10,
         //#end
 

@@ -897,6 +897,14 @@ var AuraClientService = function() {
     var NOOP = function() {};
 
     var clientService = {
+        // only expose following private properties for xUnit
+        //#if {"modes" : ["DOC"]}
+        request : request,
+        foreground : foreground,
+        background : background,
+        actionQueue : actionQueue,
+        isBB10 : isBB10,
+        //#end
 
         /**
          * Init host is used to set the host name for communications.
@@ -1277,7 +1285,6 @@ var AuraClientService = function() {
             }
         },
 
-
         /**
          * Perform a hard refresh.
          *
@@ -1339,7 +1346,6 @@ var AuraClientService = function() {
         resetToken : function(newToken) {
             _token = newToken;
         },
-
 
         /**
          * Create an action group with a callback.

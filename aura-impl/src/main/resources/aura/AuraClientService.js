@@ -845,7 +845,7 @@ var AuraClientService = function() {
                 var value = {token:_token};
                 storage.put("$AuraClientService.priv$", value).then(
                     function() { /* noop on success */ },
-                    function(err){ $A.warning("AuraClientService_priv.saveTokenToStorage(): failed to persist token: " + err); }
+                    function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }
                 );
             }
         },

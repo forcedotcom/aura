@@ -125,7 +125,7 @@ var AuraEventService = function() {
         hasHandlers : function(name) {
             name = qualifyEventName(name);
 
-            return !$A.util.isUndefined(priv.eventDispatcher[name]);
+            return !$A.util.isUndefined(eventDispatcher[name]);
         }
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,

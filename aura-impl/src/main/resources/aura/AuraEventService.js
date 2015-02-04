@@ -21,13 +21,14 @@
 var AuraEventService = function() {
     /* private properties and methods */
     var registry = new EventDefRegistry(),
-        eventDispatcher = {},
-        qualifyEventName = function(event) {
-            if(event.indexOf("://") == -1){
-                event = "markup://"+event;
-            }
-            return event;
-        };
+        eventDispatcher = {};
+
+    function qualifyEventName(event) {
+        if(event.indexOf("://") == -1){
+            event = "markup://"+event;
+        }
+        return event;
+    }
 
     var eventService = {
 

@@ -79,124 +79,80 @@ var AuraClientService = function() {
         _isDisconnected = false,
         foreground = new FlightCounter(1),
         background = new FlightCounter(3),
-        actionQueue = new ActionQueue(),
+        actionQueue = new ActionQueue();
 
-        /**
-         * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
-         * 
-         * @private
-         */
-        checkAndDecodeResponse = function(response, noStrip) {
-            if (isUnloading) {
-                return null;
+    /**
+     * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
+     * 
+     * @private
+     */
+    function checkAndDecodeResponse(response, noStrip) {
+        if (isUnloading) {
+            return null;
+        }
+
+        var e;
+
+        // failure to communicate with server
+        if (isDisconnectedOrCancelled(response)) {
+            _setConnected(false);
+            return null;
+        }
+
+        //
+        // If a disconnect event was previously fired, fire a connection
+        // restored event
+        // now that we have a response from a server.
+        //
+        if (_isDisconnected) {
+            e = $A.get("e.aura:connectionResumed");
+            if (e) {
+                _isDisconnected = false;
+                e.fire();
             }
+        }
 
-            var e;
+        var text = response["responseText"];
 
-            // failure to communicate with server
-            if (isDisconnectedOrCancelled(response)) {
-                _setConnected(false);
-                return null;
-            }
-
+        if (/^\s*</.test(text)) {
             //
-            // If a disconnect event was previously fired, fire a connection
-            // restored event
-            // now that we have a response from a server.
+            // This is what happens when someone hands us a pile of HTML
+            // instead of JSON. There is no real hope of dealing with it,
+            // so just flag an error, and carry on.
             //
-            if (_isDisconnected) {
-                e = $A.get("e.aura:connectionResumed");
-                if (e) {
-                    _isDisconnected = false;
-                    e.fire();
-                }
-            }
+            $A.error(text);
+            return null;
+        }
 
-            var text = response["responseText"];
-
-            if (/^\s*</.test(text)) {
+        //
+        // server-side explosion. The new message is one where there is an /*ERROR*/ appended.
+        // this allows us to deal with the fact that we can get errors after the send has started.
+        // Of course, we also have the problem that we might not have valid JSON at all, in which case
+        // we have further problems...
+        //
+        if ((response["status"] != 200) || (text.length > 9 && text.charAt(text.length - 9) == "/" //
+                && text.charAt(text.length - 8) == "*" //
+                && text.charAt(text.length - 7) == "E" //
+                && text.charAt(text.length - 6) == "R" //
+                && text.charAt(text.length - 5) == "R" //
+                && text.charAt(text.length - 4) == "O" //
+                && text.charAt(text.length - 3) == "R" //
+                && text.charAt(text.length - 2) == "*" && text.charAt(text.length - 1) == "/")) {
+            if (response["status"] == 200) {
+                // if we encountered an exception once the response was committed
+                // ignore the malformed JSON
+                text = "/*" + text;
+            } else if (!noStrip === true && text.charAt(0) == "w") {
                 //
-                // This is what happens when someone hands us a pile of HTML
-                // instead of JSON. There is no real hope of dealing with it,
-                // so just flag an error, and carry on.
+                // strip off the while(1) at the beginning
                 //
-                $A.error(text);
-                return null;
-            }
-
-            //
-            // server-side explosion. The new message is one where there is an /*ERROR*/ appended.
-            // this allows us to deal with the fact that we can get errors after the send has started.
-            // Of course, we also have the problem that we might not have valid JSON at all, in which case
-            // we have further problems...
-            //
-            if ((response["status"] != 200) || (text.length > 9 && text.charAt(text.length - 9) == "/" //
-                    && text.charAt(text.length - 8) == "*" //
-                    && text.charAt(text.length - 7) == "E" //
-                    && text.charAt(text.length - 6) == "R" //
-                    && text.charAt(text.length - 5) == "R" //
-                    && text.charAt(text.length - 4) == "O" //
-                    && text.charAt(text.length - 3) == "R" //
-                    && text.charAt(text.length - 2) == "*" && text.charAt(text.length - 1) == "/")) {
-                if (response["status"] == 200) {
-                    // if we encountered an exception once the response was committed
-                    // ignore the malformed JSON
-                    text = "/*" + text;
-                } else if (!noStrip === true && text.charAt(0) == "w") {
-                    //
-                    // strip off the while(1) at the beginning
-                    //
-                    text = "//" + text;
-                }
-                var resp = $A.util.json.decode(text, true);
-
-                // if the error on the server is meant to trigger a client-side
-                // event...
-                if ($A.util.isUndefinedOrNull(resp)) {
-                    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-                    $A.error("Communication error, invalid JSON: " + text);
-                    // #end
-                    // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-                    $A.error("Communication error, please retry or reload the page");
-                    // #end
-                    return null;
-                } else if (resp["exceptionEvent"] === true) {
-                    _throwExceptionEvent(resp);
-                    return null;
-                } else {
-                    // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-                    // The server side actually returns a response with 'message' and 'stack' defined
-                    // when there was a server side exception. Unfortunately, we don't really know what
-                    // we have... the code in aura.error has checks for those, but if they are not
-                    // there the error message will be meaningless. This code thu does much the same
-                    // thing, but in a different way so that we get a real error message.
-                    // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-                    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-                    if (resp["message"] && resp["stack"]) {
-                        $A.error(resp["message"] + "\n" + resp["stack"]);
-                    } else {
-                        $A.error("Communication error, invalid JSON: " + text);
-                    }
-                    // #end
-                    // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-                    if (resp["message"]) {
-                        $A.error(resp["message"]);
-                    } else {
-                        $A.error("Communication error, please retry or reload the page");
-                    }
-                    // #end
-                    return null;
-                }
-            }
-            //
-            // strip off the while(1) at the beginning
-            //
-            if (!noStrip === true && text.charAt(0) == "w") {
                 text = "//" + text;
             }
+            var resp = $A.util.json.decode(text, true);
 
-            var responseMessage = $A.util.json.decode(text, true);
-            if ($A.util.isUndefinedOrNull(responseMessage)) {
+            // if the error on the server is meant to trigger a client-side
+            // event...
+            if ($A.util.isUndefinedOrNull(resp)) {
                 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
                 $A.error("Communication error, invalid JSON: " + text);
                 // #end
@@ -204,663 +160,707 @@ var AuraClientService = function() {
                 $A.error("Communication error, please retry or reload the page");
                 // #end
                 return null;
-            }
-            return responseMessage;
-        },
-
-        /**
-         * fire an event passed back on the wire as an 'event exception'
-         *
-         * @param {Object} resp the response from the server.
-         */
-        _throwExceptionEvent = function(resp) {
-            var evtObj = resp["event"];
-            var descriptor = evtObj["descriptor"];
-
-            if (evtObj["eventDef"]) {
-                // register the event with the EventDefRegistry
-                eventService.getEventDef(evtObj["eventDef"]);
-            }
-
-            if (eventService.hasHandlers(descriptor)) {
-                var evt = $A.getEvt(descriptor);
-                if (evtObj["attributes"]) {
-                    evt.setParams(evtObj["attributes"]["values"]);
-                }
-
-                evt.fire();
+            } else if (resp["exceptionEvent"] === true) {
+                _throwExceptionEvent(resp);
+                return null;
             } else {
-                try {
-                    $A.util.json.decodeString(resp["defaultHandler"])();
-                } catch (e) {
-                    $A.error("Error in defaultHandler for event: " + descriptor, e);
-                    throw e;
+                // !!!!!!!!!!HACK ALERT!!!!!!!!!!
+                // The server side actually returns a response with 'message' and 'stack' defined
+                // when there was a server side exception. Unfortunately, we don't really know what
+                // we have... the code in aura.error has checks for those, but if they are not
+                // there the error message will be meaningless. This code thu does much the same
+                // thing, but in a different way so that we get a real error message.
+                // !!!!!!!!!!HACK ALERT!!!!!!!!!!
+                //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+                if (resp["message"] && resp["stack"]) {
+                    $A.error(resp["message"] + "\n" + resp["stack"]);
+                } else {
+                    $A.error("Communication error, invalid JSON: " + text);
                 }
+                // #end
+                // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+                if (resp["message"]) {
+                    $A.error(resp["message"]);
+                } else {
+                    $A.error("Communication error, please retry or reload the page");
+                }
+                // #end
+                return null;
             }
-        },
+        }
+        //
+        // strip off the while(1) at the beginning
+        //
+        if (!noStrip === true && text.charAt(0) == "w") {
+            text = "//" + text;
+        }
 
-        fireDoneWaiting = function() {
-            _fireLoadEvent("e.aura:doneWaiting");
-        },
+        var responseMessage = $A.util.json.decode(text, true);
+        if ($A.util.isUndefinedOrNull(responseMessage)) {
+            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            $A.error("Communication error, invalid JSON: " + text);
+            // #end
+            // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            $A.error("Communication error, please retry or reload the page");
+            // #end
+            return null;
+        }
+        return responseMessage;
+    }
 
-        isDisconnectedOrCancelled = function(response) {
-            if (response && response.status) {
-                if (response.status === 0) {
-                    return true;
-                } else if (response.status >= 12000 && response.status < 13000) {
-                    // WINHTTP CONNECTION ERRORS
-                    return true;
-                }
-            } else {
+    /**
+     * fire an event passed back on the wire as an 'event exception'
+     *
+     * @param {Object} resp the response from the server.
+     */
+    function _throwExceptionEvent(resp) {
+        var evtObj = resp["event"];
+        var descriptor = evtObj["descriptor"];
+
+        if (evtObj["eventDef"]) {
+            // register the event with the EventDefRegistry
+            eventService.getEventDef(evtObj["eventDef"]);
+        }
+
+        if (eventService.hasHandlers(descriptor)) {
+            var evt = $A.getEvt(descriptor);
+            if (evtObj["attributes"]) {
+                evt.setParams(evtObj["attributes"]["values"]);
+            }
+
+            evt.fire();
+        } else {
+            try {
+                $A.util.json.decodeString(resp["defaultHandler"])();
+            } catch (e) {
+                $A.error("Error in defaultHandler for event: " + descriptor, e);
+                throw e;
+            }
+        }
+    }
+
+    function fireDoneWaiting() {
+        _fireLoadEvent("e.aura:doneWaiting");
+    }
+
+    function isDisconnectedOrCancelled(response) {
+        if (response && response.status) {
+            if (response.status === 0) {
+                return true;
+            } else if (response.status >= 12000 && response.status < 13000) {
+                // WINHTTP CONNECTION ERRORS
                 return true;
             }
-            return false;
-        },
+        } else {
+            return true;
+        }
+        return false;
+    }
 
-        /**
-         * Process a single action/response.
-         * 
-         * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
-         * error occurs.
-         * 
-         * @param {Action}
-         *            action the action.
-         * @param {Boolean}
-         *            noAbort if false abortable actions will be aborted.
-         * @param {Object}
-         *            actionResponse the server response.
-         * @private
-         */
-        singleAction = function(action, noAbort, actionResponse) {
-            var key = action.getStorageKey();
+    /**
+     * Process a single action/response.
+     * 
+     * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
+     * error occurs.
+     * 
+     * @param {Action}
+     *            action the action.
+     * @param {Boolean}
+     *            noAbort if false abortable actions will be aborted.
+     * @param {Object}
+     *            actionResponse the server response.
+     * @private
+     */
+    function singleAction(action, noAbort, actionResponse) {
+        var key = action.getStorageKey();
 
-            $A.run(function() {
-                var storage, toStore, needUpdate, errorHandler;
+        $A.run(function() {
+            var storage, toStore, needUpdate, errorHandler;
 
-                needUpdate = action.updateFromResponse(actionResponse);
+            needUpdate = action.updateFromResponse(actionResponse);
 
-                if (noAbort || !action.isAbortable()) {
-                    if (needUpdate) {
-                        action.finishAction($A.getContext());
-                    }
-                    if (action.isRefreshAction()) {
-                        action.fireRefreshEvent("refreshEnd", needUpdate);
-                    }
-                } else {
-                    action.abort();
+            if (noAbort || !action.isAbortable()) {
+                if (needUpdate) {
+                    action.finishAction($A.getContext());
                 }
-                storage = action.getStorage();
-                if (storage) {
-                    toStore = action.getStored(storage.getName());
-                    errorHandler = action.getStorageErrorHandler();
-                
-                    if (toStore) {
-                        storage.put(key, toStore).then(
-                            function() {},
-                            function(error){
-                                $A.run(function() {
-                                    if (errorHandler && $A.util.isFunction(errorHandler)) {
-                                        errorHandler(error);
-                                    } else {
-                                        // storage problems should warn rather than the agressive error.
-                                        $A.warning(error);
-                                    }
-                                });
-                            }
-                        );
-                    }
+                if (action.isRefreshAction()) {
+                    action.fireRefreshEvent("refreshEnd", needUpdate);
                 }
-            }, key);
-        },
-
-        /**
-         * Callback for an XHR for a set of actions.
-         * 
-         * This function does all of the processing for a set of actions that come back from the server. It correctly deals
-         * with the case of interrupted communications, and handles aborts.
-         * 
-         * @param {Object}
-         *            response the response from the server.
-         * @param {ActionCollector}
-         *            the collector for the actions.
-         * @param {FlightCounter}
-         *            the in flight counter under which the actions were run
-         * @param {Scalar}
-         *            the abortableId associated with the set of actions.
-         * @private
-         */
-        actionCallback = function(response, collector, flightCounter, abortableId) {
-            var responseMessage = checkAndDecodeResponse(response);
-            var noAbort = (abortableId === actionQueue.getLastAbortableTransactionId());
-
-            //
-            // Note that this is a very specific assertion. We can either be called back from an empty stack
-            // (the normal case, after an XHR has gone to the server), or we can be called back from inside
-            // the popStack protection (currently I only know this to occur in disconnected webkit).
-            //
-            if (auraStack.length > 0) {
-                if (auraStack.length != 1 || auraStack[0] !== "$A.clientServices.popStack") {
-                    $A.error("Action callback called on non-empty stack '" + auraStack + "', length = "+auraStack.length);
-                    auraStack = [];
-                }
-            }
-
-            var stackName = "actionCallback["; 
-            var actionsToSend = collector.getActionsToSend(); 
-            for (var n = 0; n < actionsToSend.length; n++) { 
-                var actionToSend = actionsToSend[n]; 
-                if (n > 0) { 
-                    stackName += ", "; 
-                }
-
-                stackName += actionToSend.getStorageKey(); 
-            }
-            stackName += "]";
-
-            $A.run(function() {
-                var action, actionResponses;
-
-                //
-                // pre-decrement so that we correctly send the next response right after this.
-                //
-                if (responseMessage) {
-                    var token = responseMessage["token"];
-                    if (token) {
-                        _token = token;
-                        saveTokenToStorage();
-                    }
-
-                    $A.getContext().merge(responseMessage["context"]);
-
-                    // Look for any Client side event exceptions
-                    var events = responseMessage["events"];
-                    if (events) {
-                        for ( var en = 0, len = events.length; en < len; en++) {
-                            $A.clientService.parseAndFireEvent(events[en]);
-                        }
-                    }
-
-                    actionResponses = responseMessage["actions"];
-
-                    // Process each action and its response
-                    for ( var r = 0; r < actionResponses.length; r++) {
-                        var actionResponse = actionResponses[r];
-                        action = collector.findActionAndClear(actionResponse["id"]);
-
-                        if (action === null) {
-                            if (actionResponse["storable"]) {
-                                //
-                                // Hmm, we got a missing action. We allow this in the case that we have
-                                // a storable action from the server (i.e. we are faking an action from the
-                                // server to store data on the client. This is only used in priming, and is
-                                // more than a bit of a hack.
-                                //
-                                // Create a client side action instance to go with the server created action response
-                                //
-                                var descriptor = actionResponse["action"];
-                                var actionDef = $A.services.component.getActionDef({
-                                    descriptor : descriptor
-                                });
-                                action = actionDef.newInstance();
-                                action.setStorable();
-                                action.setParams(actionResponse["params"]);
-                                action.setAbortable(false);
-                            } else {
-                                $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
-                            }
-                        }
-                        singleAction(action, noAbort, actionResponse);
-                    }
-                } else if (isDisconnectedOrCancelled(response) && !isUnloading) {
-                    var actions = collector.getActionsToSend();
-
-                    for ( var m = 0; m < actions.length; m++) {
-                        action = actions[m];
-                        if (noAbort || !action.isAbortable()) {
-                            action.incomplete($A.getContext());
-                        } else {
-                            action.abort();
-                        }
-                    }
-                }
-                $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
-                fireDoneWaiting();
-            }, stackName);
-
-        },
-
-        /**
-         * Execute the list of client actions synchronously. Populate state and return values and execute the action
-         * callbacks. This method does not interact with the inFlight counter and does no throttling. All actions will be
-         * run as it is assumed abortable actions have already been pruned.
-         * 
-         * @private
-         */
-        runClientActions = function(actions) {
-            var action;
-            for ( var i = 0; i < actions.length; i++) {
-                action = actions[i];
-                action.runDeprecated();
-                action.finishAction($A.getContext());
-            }
-        },
-
-        /**
-         * The last step before sending to the server.
-         * 
-         * This routine does the actual XHR request to the server, using the collected actions to do so. In the event that
-         * there are no actions to send, it simply completes the request.
-         * 
-         * @private
-         */
-        finishRequest = function(collector, flightCounter, abortableId, flightHandled) {
-            var actionsToSend = collector.getActionsToSend();
-            var actionsToComplete = collector.getActionsToComplete();
-
-            if (actionsToComplete.length > 0) {
-                for ( var n = 0; n < actionsToComplete.length; n++) {
-                    var info = actionsToComplete[n];
-                    info.action.updateFromResponse(info.response);
-                    try {
-                        info.action.finishAction($A.getContext());
-                    } catch(e) {
-                        var retryAction = info.action.getRetryFromStorageAction();
-                        if (retryAction) {
-                            $A.log("Finishing cached action failed. Trying to refetch from server.", e);
-                        
-                            // Clear potential leftover configs
-                            $A.getContext().clearComponentConfigs(info.action.getId());
-                        
-                            // Enqueue the retry action
-                            $A.enqueueAction(retryAction);
-                        } else {
-                            // If it was not from storage, just rethrow the error and carry on as normal.
-                            throw e;
-                        }
-                    }
-                }
-                fireDoneWaiting();
-            }
-
-            if (actionsToSend.length > 0) {
-                collector.setNum($A.getContext().incrementNum());
-
-                var markDescription = undefined;
-                // #if {"modes" : ["PTEST"]}
-                markDescription = ": [";
-                for (var m = 0; m < actionsToSend.length; m++) {
-                    if (actionsToSend[m].def) {
-                        markDescription += "'" + actionsToSend[m].def.name
-                    } else {
-                        markDescription += "'undefined";
-                    }
-                    if (actionsToSend[m].background) {
-                        markDescription += "<BG>'";
-                    } else {
-                        markDescription += "'";
-                    }
-                    if (m < actionsToSend.length - 1) {
-                        markDescription += ",";
-                    }
-                }
-                markDescription += "]";
-                // #end
-
-                // clientService.requestQueue reference is mutable
-                var requestConfig = {
-                    "url" : _host + "/aura",
-                    "method" : "POST",
-                    "scope" : this,
-                    "callback" : function(response) {
-                        // always finish our in-flight counter here.
-                        flightCounter.finish();
-                        actionCallback(response, collector, flightCounter, abortableId);
-                    },
-                    "params" : {
-                        "message" : $A.util.json.encode({
-                            "actions" : actionsToSend
-                        }),
-                        "aura.token" : _token,
-                        "aura.context" : $A.getContext().encodeForServer(),
-                        "aura.num" : collector.getNum()
-                        // #if {"modes" : ["PTEST"]}
-                        ,
-                        "beaconData" : $A.Perf.getBeaconData()
-                    // #end
-                    },
-                    "markDescription" : markDescription
-                };
-                $A.Perf.endMark("Action Group " + collector.getCollectorId() + " enqueued");
-
-                // clear the beaconData
-                // #if {"modes" : ["PTEST"]}
-                $A.Perf.clearBeaconData();
-                // #end
-
-                $A.Perf.endMark("Action Request Prepared");
-                $A.util.transport.request(requestConfig);
-                flightCounter.send();
-                flightHandled.value = true;
-
-                setTimeout(function() {
-                    $A.get("e.aura:waiting").fire();
-                }, 1);
             } else {
-                // We didn't send a request, so clean up the in-flight counter.
+                action.abort();
+            }
+            storage = action.getStorage();
+            if (storage) {
+                toStore = action.getStored(storage.getName());
+                errorHandler = action.getStorageErrorHandler();
+            
+                if (toStore) {
+                    storage.put(key, toStore).then(
+                        function() {},
+                        function(error){
+                            $A.run(function() {
+                                if (errorHandler && $A.util.isFunction(errorHandler)) {
+                                    errorHandler(error);
+                                } else {
+                                    // storage problems should warn rather than the agressive error.
+                                    $A.warning(error);
+                                }
+                            });
+                        }
+                    );
+                }
+            }
+        }, key);
+    }
+
+    /**
+     * Callback for an XHR for a set of actions.
+     * 
+     * This function does all of the processing for a set of actions that come back from the server. It correctly deals
+     * with the case of interrupted communications, and handles aborts.
+     * 
+     * @param {Object}
+     *            response the response from the server.
+     * @param {ActionCollector}
+     *            the collector for the actions.
+     * @param {FlightCounter}
+     *            the in flight counter under which the actions were run
+     * @param {Scalar}
+     *            the abortableId associated with the set of actions.
+     * @private
+     */
+    function actionCallback(response, collector, flightCounter, abortableId) {
+        var responseMessage = checkAndDecodeResponse(response);
+        var noAbort = (abortableId === actionQueue.getLastAbortableTransactionId());
+
+        //
+        // Note that this is a very specific assertion. We can either be called back from an empty stack
+        // (the normal case, after an XHR has gone to the server), or we can be called back from inside
+        // the popStack protection (currently I only know this to occur in disconnected webkit).
+        //
+        if (auraStack.length > 0) {
+            if (auraStack.length != 1 || auraStack[0] !== "$A.clientServices.popStack") {
+                $A.error("Action callback called on non-empty stack '" + auraStack + "', length = "+auraStack.length);
+                auraStack = [];
+            }
+        }
+
+        var stackName = "actionCallback["; 
+        var actionsToSend = collector.getActionsToSend(); 
+        for (var n = 0; n < actionsToSend.length; n++) { 
+            var actionToSend = actionsToSend[n]; 
+            if (n > 0) { 
+                stackName += ", "; 
+            }
+
+            stackName += actionToSend.getStorageKey(); 
+        }
+        stackName += "]";
+
+        $A.run(function() {
+            var action, actionResponses;
+
+            //
+            // pre-decrement so that we correctly send the next response right after this.
+            //
+            if (responseMessage) {
+                var token = responseMessage["token"];
+                if (token) {
+                    _token = token;
+                    saveTokenToStorage();
+                }
+
+                $A.getContext().merge(responseMessage["context"]);
+
+                // Look for any Client side event exceptions
+                var events = responseMessage["events"];
+                if (events) {
+                    for ( var en = 0, len = events.length; en < len; en++) {
+                        $A.clientService.parseAndFireEvent(events[en]);
+                    }
+                }
+
+                actionResponses = responseMessage["actions"];
+
+                // Process each action and its response
+                for ( var r = 0; r < actionResponses.length; r++) {
+                    var actionResponse = actionResponses[r];
+                    action = collector.findActionAndClear(actionResponse["id"]);
+
+                    if (action === null) {
+                        if (actionResponse["storable"]) {
+                            //
+                            // Hmm, we got a missing action. We allow this in the case that we have
+                            // a storable action from the server (i.e. we are faking an action from the
+                            // server to store data on the client. This is only used in priming, and is
+                            // more than a bit of a hack.
+                            //
+                            // Create a client side action instance to go with the server created action response
+                            //
+                            var descriptor = actionResponse["action"];
+                            var actionDef = $A.services.component.getActionDef({
+                                descriptor : descriptor
+                            });
+                            action = actionDef.newInstance();
+                            action.setStorable();
+                            action.setParams(actionResponse["params"]);
+                            action.setAbortable(false);
+                        } else {
+                            $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
+                        }
+                    }
+                    singleAction(action, noAbort, actionResponse);
+                }
+            } else if (isDisconnectedOrCancelled(response) && !isUnloading) {
+                var actions = collector.getActionsToSend();
+
+                for ( var m = 0; m < actions.length; m++) {
+                    action = actions[m];
+                    if (noAbort || !action.isAbortable()) {
+                        action.incomplete($A.getContext());
+                    } else {
+                        action.abort();
+                    }
+                }
+            }
+            $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
+            fireDoneWaiting();
+        }, stackName);
+
+    }
+
+    /**
+     * Execute the list of client actions synchronously. Populate state and return values and execute the action
+     * callbacks. This method does not interact with the inFlight counter and does no throttling. All actions will be
+     * run as it is assumed abortable actions have already been pruned.
+     * 
+     * @private
+     */
+    function runClientActions(actions) {
+        var action;
+        for ( var i = 0; i < actions.length; i++) {
+            action = actions[i];
+            action.runDeprecated();
+            action.finishAction($A.getContext());
+        }
+    }
+
+    /**
+     * The last step before sending to the server.
+     * 
+     * This routine does the actual XHR request to the server, using the collected actions to do so. In the event that
+     * there are no actions to send, it simply completes the request.
+     * 
+     * @private
+     */
+    function finishRequest(collector, flightCounter, abortableId, flightHandled) {
+        var actionsToSend = collector.getActionsToSend();
+        var actionsToComplete = collector.getActionsToComplete();
+
+        if (actionsToComplete.length > 0) {
+            for ( var n = 0; n < actionsToComplete.length; n++) {
+                var info = actionsToComplete[n];
+                info.action.updateFromResponse(info.response);
+                try {
+                    info.action.finishAction($A.getContext());
+                } catch(e) {
+                    var retryAction = info.action.getRetryFromStorageAction();
+                    if (retryAction) {
+                        $A.log("Finishing cached action failed. Trying to refetch from server.", e);
+                    
+                        // Clear potential leftover configs
+                        $A.getContext().clearComponentConfigs(info.action.getId());
+                    
+                        // Enqueue the retry action
+                        $A.enqueueAction(retryAction);
+                    } else {
+                        // If it was not from storage, just rethrow the error and carry on as normal.
+                        throw e;
+                    }
+                }
+            }
+            fireDoneWaiting();
+        }
+
+        if (actionsToSend.length > 0) {
+            collector.setNum($A.getContext().incrementNum());
+
+            var markDescription = undefined;
+            // #if {"modes" : ["PTEST"]}
+            markDescription = ": [";
+            for (var m = 0; m < actionsToSend.length; m++) {
+                if (actionsToSend[m].def) {
+                    markDescription += "'" + actionsToSend[m].def.name
+                } else {
+                    markDescription += "'undefined";
+                }
+                if (actionsToSend[m].background) {
+                    markDescription += "<BG>'";
+                } else {
+                    markDescription += "'";
+                }
+                if (m < actionsToSend.length - 1) {
+                    markDescription += ",";
+                }
+            }
+            markDescription += "]";
+            // #end
+
+            // clientService.requestQueue reference is mutable
+            var requestConfig = {
+                "url" : _host + "/aura",
+                "method" : "POST",
+                "scope" : this,
+                "callback" : function(response) {
+                    // always finish our in-flight counter here.
+                    flightCounter.finish();
+                    actionCallback(response, collector, flightCounter, abortableId);
+                },
+                "params" : {
+                    "message" : $A.util.json.encode({
+                        "actions" : actionsToSend
+                    }),
+                    "aura.token" : _token,
+                    "aura.context" : $A.getContext().encodeForServer(),
+                    "aura.num" : collector.getNum()
+                    // #if {"modes" : ["PTEST"]}
+                    ,
+                    "beaconData" : $A.Perf.getBeaconData()
+                // #end
+                },
+                "markDescription" : markDescription
+            };
+            $A.Perf.endMark("Action Group " + collector.getCollectorId() + " enqueued");
+
+            // clear the beaconData
+            // #if {"modes" : ["PTEST"]}
+            $A.Perf.clearBeaconData();
+            // #end
+
+            $A.Perf.endMark("Action Request Prepared");
+            $A.util.transport.request(requestConfig);
+            flightCounter.send();
+            flightHandled.value = true;
+
+            setTimeout(function() {
+                $A.get("e.aura:waiting").fire();
+            }, 1);
+        } else {
+            // We didn't send a request, so clean up the in-flight counter.
+            flightCounter.cancel();
+            flightHandled.value = true;
+        }
+    }
+
+    /**
+     * Start a request sequence for a set of actions and an 'in-flight' counter.
+     * 
+     * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
+     * no request is sent to the server, it is because the request was either a storable action without needing refresh,
+     * or all abortable actions that will be aborted (not sure if that is even possible).
+     * 
+     * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
+     * capacity in the channel).
+     * 
+     * @param {Array}
+     *            actions the list of actions to process.
+     * @param {FlightCounter}
+     *            the flight counter under which the actions should be run.
+     * @private
+     */
+    function request(actions, flightCounter) {
+        $A.Perf.mark("AuraClientService.request");
+        $A.Perf.mark("Action Request Prepared");
+        var flightHandled = { value: false };
+        //
+        // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
+        // an abortable action while we are off waiting for storage.
+        //
+        this.flightCounterTimeoutId = window.setTimeout(function() {
+           if(!flightHandled.value) {
+               $A.warning("Timed out waiting for ActionController to reset flight counter! Resetting the flight counter and clearing component configs of processed actions");
+               flightCounter.cancel();
+           }
+        }, 30000);
+        try {
+            var abortableId = actionQueue.getLastAbortableTransactionId();
+            var collector = new $A.ns.ActionCollector(actions, function() {
+                try {
+                    finishRequest(collector, flightCounter, abortableId, flightHandled);
+                } catch (e) {
+                    if (!flightHandled.value) {
+                        flightCounter.cancel();
+                        flightHandled.value = true;
+                    }
+                    throw e;
+                }
+            });
+            collector.process();
+            $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
+        } catch (e) {
+            if (!flightHandled.value) {
                 flightCounter.cancel();
                 flightHandled.value = true;
             }
-        },
+            throw e;
+        }
+    }
+
+    function isBB10() {
+        var ua = navigator.userAgent;
+        return (ua.indexOf("BB10") > 0 && ua.indexOf("AppleWebKit") > 0);
+    }
+
+    function getManifestURL() {
+        var htmlNode = document.body.parentNode;
+        return htmlNode ? htmlNode.getAttribute("manifest") : null;
+    }
+
+    function isManifestPresent() {
+        return !!getManifestURL();
+    }
+
+    function _hardRefresh() {
+        var url = location.href;
+        if (!isManifestPresent() || url.indexOf("?nocache=") > -1) {
+            location.reload(true);
+            return;
+        }
+
+        // if BB10 and using application cache
+        if (isBB10() && window.applicationCache
+            && window.applicationCache.status !== window.applicationCache.UNCACHED) {
+            url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
+        }
+
+        var params = "?nocache=" + encodeURIComponent(url);
+        // insert nocache param here for hard refresh
+        var hIndex = url.indexOf("#");
+        var qIndex = url.indexOf("?");
+        var cutIndex = -1;
+        if (hIndex > -1 && qIndex > -1) {
+            cutIndex = (hIndex < qIndex) ? hIndex : qIndex;
+        } else if (hIndex > -1) {
+            cutIndex = hIndex;
+        } else if (qIndex > -1) {
+            cutIndex = qIndex;
+        }
+
+        if (cutIndex > -1) {
+            url = url.substring(0, cutIndex);
+        }
+
+            
+        var sIndex = url.lastIndexOf("/");
+        var appName = url.substring(sIndex+1,url.length);
+        var newUrl = appName + params;
+        //use history.pushState to change the url of current page without actually loading it.
+        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl' 
+        //after reload, someUrl will become the current url.
+        //state is null: don't need to track the state with popstate
+        //title is null: don't want to set the page title.
+        history.pushState(null,null,newUrl);
+
+        //fallback to old way : set location.href will trigger the reload right away
+        //we need this because when AuraResourceServlet's GET request with a 'error' cookie,
+        //AuraServlet doesn't get to do the GET reqeust
+        if( (location.href).indexOf("?nocache=") > -1 ) {
+            location.href = (url + params);
+        }
+    }
+
+    function _fireLoadEvent(eventName) {
+        var e = $A.get(eventName);
+        if (e) {
+            e.fire();
+        } else {
+            loadEventQueue.push(eventName);
+        }
+    }
+
+    function isDevMode() {
+        var context = $A.getContext();
+        return !$A.util.isUndefined(context) && context.getMode() === "DEV";
+    }
+
+    function showProgress(progress) {
+        var progressContEl = document.getElementById("auraAppcacheProgress");
+        if (progressContEl) {
+            if (progress > 0 && progress < 100) {
+                progressContEl.style.display = "block";
+                var progressEl = progressContEl.firstChild;
+                progressEl.firstChild.style.width = progress + "%";
+            } else if (progress >= 100) {
+                progressContEl.style.display = "none";
+            } else if (progress < 0) {
+                progressContEl.className = "error";
+            }
+        }
+    }
+
+    function handleAppcacheChecking(e) {
+        document._appcacheChecking = true;
+        if (isDevMode()) {
+            // TODO IBOGDANOV Why are you checking in commented out code like
+            // this???
+            /*
+             * setTimeout( function(){ if(window.applicationCache.status === window.applicationCache.CHECKING){
+             * showProgress(1); } }, 2000 );
+             */
+        }
+    }
+
+    function handleAppcacheUpdateReady(event) {
+        if (window.applicationCache.swapCache) {
+            window.applicationCache.swapCache();
+        }
+
+        // Clear out localStorage and sessionStorage to insure nothing that
+        // might depend
+        // on out of date stuff is left lying about
+        if (window.localStorage) {
+            window.localStorage.clear();
+        }
+
+        if (window.sessionStorage) {
+            window.sessionStorage.clear();
+        }
+
+        location.reload(true);
+    }
+
+    function handleAppcacheError(e) {
+        if (e.stopImmediatePropagation) {
+            e.stopImmediatePropagation();
+        }
+        if (window.applicationCache
+                && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
+            return;
+        }
 
         /**
-         * Start a request sequence for a set of actions and an 'in-flight' counter.
-         * 
-         * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
-         * no request is sent to the server, it is because the request was either a storable action without needing refresh,
-         * or all abortable actions that will be aborted (not sure if that is even possible).
-         * 
-         * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
-         * capacity in the channel).
-         * 
-         * @param {Array}
-         *            actions the list of actions to process.
-         * @param {FlightCounter}
-         *            the flight counter under which the actions should be run.
-         * @private
+         * BB10 triggers appcache ERROR when the current manifest is a 404.
+         * Other browsers triggers OBSOLETE and we refresh the page to get
+         * the new manifest.
+         *
+         * For BB10, we append cache busting param to url to force BB10 browser
+         * not to use cached HTML via hardRefresh
          */
-        request = function(actions, flightCounter) {
-            $A.Perf.mark("AuraClientService.request");
-            $A.Perf.mark("Action Request Prepared");
-            var flightHandled = { value: false };
-            //
-            // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
-            // an abortable action while we are off waiting for storage.
-            //
-            this.flightCounterTimeoutId = window.setTimeout(function() {
-               if(!flightHandled.value) {
-                   $A.warning("Timed out waiting for ActionController to reset flight counter! Resetting the flight counter and clearing component configs of processed actions");
-                   flightCounter.cancel();
-               }
-            }, 30000);
-            try {
-                var abortableId = actionQueue.getLastAbortableTransactionId();
-                var collector = new $A.ns.ActionCollector(actions, function() {
-                    try {
-                        finishRequest(collector, flightCounter, abortableId, flightHandled);
-                    } catch (e) {
-                        if (!flightHandled.value) {
-                            flightCounter.cancel();
-                            flightHandled.value = true;
-                        }
-                        throw e;
+        if (isBB10()) {
+            _hardRefresh();
+        }
+
+        var manifestURL = getManifestURL();
+        if (isDevMode()) {
+            showProgress(-1);
+        }
+
+        if (manifestURL) {
+            setTimeout(function() {
+                $A.util.transport.request({
+                    "url" : manifestURL,
+                    "method" : "GET",
+                    "callback" : function() {
+                    },
+                    "params" : {
+                        "aura.error" : "true"
                     }
                 });
-                collector.process();
-                $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
-            } catch (e) {
-                if (!flightHandled.value) {
-                    flightCounter.cancel();
-                    flightHandled.value = true;
-                }
-                throw e;
-            }
-        },
+            }, 500);
+        }
 
-        isBB10 = function() {
-            var ua = navigator.userAgent;
-            return (ua.indexOf("BB10") > 0 && ua.indexOf("AppleWebKit") > 0);
-        },
+        if (appcacheDownloadingEventFired && isOutdated) {
+            // No one should get here.
+            $A.log("Outdated.");
+        }
+    }
 
-        getManifestURL = function() {
-            var htmlNode = document.body.parentNode;
-            return htmlNode ? htmlNode.getAttribute("manifest") : null;
-        },
+    function handleAppcacheDownloading(e) {
+        if (isDevMode()) {
+            var progress = Math.round(100 * e.loaded / e.total);
+            showProgress(progress + 1);
+        }
 
-        isManifestPresent = function() {
-            return !!getManifestURL();
-        },
+        appcacheDownloadingEventFired = true;
+    }
 
-        _hardRefresh = function() {
-            var url = location.href;
-            if (!isManifestPresent() || url.indexOf("?nocache=") > -1) {
-                location.reload(true);
-                return;
-            }
+    function handleAppcacheProgress(e) {
+        if (isDevMode()) {
+            var progress = Math.round(100 * e.loaded / e.total);
+            showProgress(progress);
+        }
+    }
 
-            // if BB10 and using application cache
-            if (isBB10() && window.applicationCache
-                && window.applicationCache.status !== window.applicationCache.UNCACHED) {
-                url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
-            }
-
-            var params = "?nocache=" + encodeURIComponent(url);
-            // insert nocache param here for hard refresh
-            var hIndex = url.indexOf("#");
-            var qIndex = url.indexOf("?");
-            var cutIndex = -1;
-            if (hIndex > -1 && qIndex > -1) {
-                cutIndex = (hIndex < qIndex) ? hIndex : qIndex;
-            } else if (hIndex > -1) {
-                cutIndex = hIndex;
-            } else if (qIndex > -1) {
-                cutIndex = qIndex;
-            }
-
-            if (cutIndex > -1) {
-                url = url.substring(0, cutIndex);
-            }
-
-                
-            var sIndex = url.lastIndexOf("/");
-            var appName = url.substring(sIndex+1,url.length);
-            var newUrl = appName + params;
-            //use history.pushState to change the url of current page without actually loading it.
-            //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl' 
-            //after reload, someUrl will become the current url.
-            //state is null: don't need to track the state with popstate
-            //title is null: don't want to set the page title.
-            history.pushState(null,null,newUrl);
-
-            //fallback to old way : set location.href will trigger the reload right away
-            //we need this because when AuraResourceServlet's GET request with a 'error' cookie,
-            //AuraServlet doesn't get to do the GET reqeust
-            if( (location.href).indexOf("?nocache=") > -1 ) {
-                location.href = (url + params);
-            }
-        },
-
-        _fireLoadEvent = function(eventName) {
-            var e = $A.get(eventName);
-            if (e) {
-                e.fire();
-            } else {
-                loadEventQueue.push(eventName);
-            }
-        },
-
-        isDevMode = function() {
-            var context = $A.getContext();
-            return !$A.util.isUndefined(context) && context.getMode() === "DEV";
-        },
-
-        showProgress = function(progress) {
-            var progressContEl = document.getElementById("auraAppcacheProgress");
-            if (progressContEl) {
-                if (progress > 0 && progress < 100) {
-                    progressContEl.style.display = "block";
-                    var progressEl = progressContEl.firstChild;
-                    progressEl.firstChild.style.width = progress + "%";
-                } else if (progress >= 100) {
-                    progressContEl.style.display = "none";
-                } else if (progress < 0) {
-                    progressContEl.className = "error";
-                }
-            }
-        },
-
-        handleAppcacheChecking = function(e) {
-            document._appcacheChecking = true;
-            if (isDevMode()) {
-                // TODO IBOGDANOV Why are you checking in commented out code like
-                // this???
-                /*
-                 * setTimeout( function(){ if(window.applicationCache.status === window.applicationCache.CHECKING){
-                 * showProgress(1); } }, 2000 );
-                 */
-            }
-        },
-
-        handleAppcacheUpdateReady = function(event) {
-            if (window.applicationCache.swapCache) {
-                window.applicationCache.swapCache();
-            }
-
-            // Clear out localStorage and sessionStorage to insure nothing that
-            // might depend
-            // on out of date stuff is left lying about
-            if (window.localStorage) {
-                window.localStorage.clear();
-            }
-
-            if (window.sessionStorage) {
-                window.sessionStorage.clear();
-            }
-
-            location.reload(true);
-        },
-
-        handleAppcacheError = function(e) {
-            if (e.stopImmediatePropagation) {
-                e.stopImmediatePropagation();
-            }
-            if (window.applicationCache
-                    && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
-                return;
-            }
-
-            /**
-             * BB10 triggers appcache ERROR when the current manifest is a 404.
-             * Other browsers triggers OBSOLETE and we refresh the page to get
-             * the new manifest.
-             *
-             * For BB10, we append cache busting param to url to force BB10 browser
-             * not to use cached HTML via hardRefresh
-             */
-            if (isBB10()) {
-                _hardRefresh();
-            }
-
-            var manifestURL = getManifestURL();
-            if (isDevMode()) {
-                showProgress(-1);
-            }
-
-            if (manifestURL) {
-                setTimeout(function() {
-                    $A.util.transport.request({
-                        "url" : manifestURL,
-                        "method" : "GET",
-                        "callback" : function() {
-                        },
-                        "params" : {
-                            "aura.error" : "true"
-                        }
-                    });
-                }, 500);
-            }
-
-            if (appcacheDownloadingEventFired && isOutdated) {
-                // No one should get here.
-                $A.log("Outdated.");
-            }
-        },
-
-        handleAppcacheDownloading = function(e) {
-            if (isDevMode()) {
-                var progress = Math.round(100 * e.loaded / e.total);
-                showProgress(progress + 1);
-            }
-
-            appcacheDownloadingEventFired = true;
-        },
-
-        handleAppcacheProgress = function(e) {
-            if (isDevMode()) {
-                var progress = Math.round(100 * e.loaded / e.total);
-                showProgress(progress);
-            }
-        },
-
-        handleAppcacheNoUpdate = function(e) {
-            if (isDevMode()) {
-                showProgress(100);
-            }
-        },
-
-        handleAppcacheCached = function(e) {
+    function handleAppcacheNoUpdate(e) {
+        if (isDevMode()) {
             showProgress(100);
-        },
+        }
+    }
 
-        handleAppcacheObsolete = function(e) {
-            hardRefresh();
-        },
+    function handleAppcacheCached(e) {
+        showProgress(100);
+    }
 
-        _setOutdated = function() {
-            isOutdated = true;
-            var appCache = window.applicationCache;
-            if (!appCache || (appCache && appCache.status === appCache.UNCACHED)) {
-                location["reload"](true);
-            } else if (appCache.status === appCache.OBSOLETE) {
-                location.reload(true);
-            } else if (appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
-                appCache.update();
-            }
-        },
+    function handleAppcacheObsolete(e) {
+        _hardRefresh();
+    }
 
-        _setConnected = function(isConnected) {
-            var isDisconnected = !isConnected;
-            if (isDisconnected === _isDisconnected) {
-                // Already in desired state so no work to be done:
-                return;
-            }
+    function _setOutdated() {
+        isOutdated = true;
+        var appCache = window.applicationCache;
+        if (!appCache || (appCache && appCache.status === appCache.UNCACHED)) {
+            location["reload"](true);
+        } else if (appCache.status === appCache.OBSOLETE) {
+            location.reload(true);
+        } else if (appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
+            appCache.update();
+        }
+    }
 
-            e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
-            if (e) {
-                _isDisconnected = isDisconnected;
-                e.fire();
-            } else {
-                // looks like no definitions loaded yet
-                alert(isDisconnected ? "Connection lost" : "Connection resumed");
-            }
-        },
+    function _setConnected(isConnected) {
+        var isDisconnected = !isConnected;
+        if (isDisconnected === _isDisconnected) {
+            // Already in desired state so no work to be done:
+            return;
+        }
 
-        /**
-         * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
-         */
-        saveTokenToStorage = function() {
-            // update the persisted CSRF token so it's accessible when the app is launched while offline.
-            // fire-and-forget style, matching action response persistence.
-            var storage = Action.prototype.getStorage();
-            if (storage && _token) {
-                var value = {token:_token};
-                storage.put("$AuraClientService.priv$", value).then(
-                    function() { /* noop on success */ },
-                    function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }
-                );
-            }
-        },
+        e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
+        if (e) {
+            _isDisconnected = isDisconnected;
+            e.fire();
+        } else {
+            // looks like no definitions loaded yet
+            alert(isDisconnected ? "Connection lost" : "Connection resumed");
+        }
+    }
 
-        /**
-         * Loads the CSRF token from Actions storage.
-         * @return {Promise} resolves or rejects based on data loading.
-         */
-        loadTokenFromStorage = function() {
-            var storage = Action.prototype.getStorage();
-            if (storage) {
-                return storage.get("$AuraClientService.priv$");
-            }
-            return Promise.reject(new Error("no Action storage"));
-        };
+    /**
+     * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
+     */
+    function saveTokenToStorage() {
+        // update the persisted CSRF token so it's accessible when the app is launched while offline.
+        // fire-and-forget style, matching action response persistence.
+        var storage = Action.prototype.getStorage();
+        if (storage && _token) {
+            var value = {token:_token};
+            storage.put("$AuraClientService.priv$", value).then(
+                function() { /* noop on success */ },
+                function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }
+            );
+        }
+    }
+
+    /**
+     * Loads the CSRF token from Actions storage.
+     * @return {Promise} resolves or rejects based on data loading.
+     */
+    function loadTokenFromStorage() {
+        var storage = Action.prototype.getStorage();
+        if (storage) {
+            return storage.get("$AuraClientService.priv$");
+        }
+        return Promise.reject(new Error("no Action storage"));
+    }
 
     $A.ns.Util.prototype.on(window, "beforeunload", function(event) {
         if (!$A.util.isIE) {

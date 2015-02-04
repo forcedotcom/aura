@@ -23,73 +23,80 @@
 var AuraLayoutService = function() {
     /* private properties and methods */
     var layouts = null,
-        _cmp = null,
-        history = [],
-        push = function(layout, params, title){
-            history.push({
-                layout : layout,
-                params : params,
-                title : title
-            });
-        },
-        pop = function(){
-            return history.pop();
-        },
-        peek = function(){
-            if (history.length > 0) {
-                return history[history.length - 1];
-            }
-            return null;
-        },
-        peekLast = function(){
-            if (history.length > 1) {
-                return history[history.length - 2];
-            }
-            return null;
-        },
-        getTitle = function(historyItem) {
-            if (historyItem.title) {
-                // it was overridden manually, use that
-                return historyItem.title;
-            } else {
-                var title = valueFactory.create(historyItem.layout.getTitle(),null,_cmp);
-                if (aura.util.isExpression(title)) {
-                    title = title.evaluate();
-                }
-                return title;
-            }
-        },
-        fireLayoutChangeEvent = function(pre){
-            var curr = peek();
-            var prev = peekLast();
-            var title = getTitle(curr);
+        rootComponent = null,
+        history = [];
 
-            var params = {
-                "layoutName" : curr.layout.getName(),
-                "title" : title
-            };
+    function push(layout, params, title) {
+        history.push({
+            layout : layout,
+            params : params,
+            title : title
+        });
+    }
 
-            if (prev){
-                params["prevTitle"] = getTitle(prev);
-                params["prevLayoutName"] = prev.layout.getName();
-            }
-            var evt = pre?$A.get("e.aura:beforeLayoutChange"):$A.get("e.aura:layoutChange");
-            evt.setParams(params);
-            evt.fire();
+    function pop() {
+        return history.pop();
+    }
 
-            fireOnload();
-        },
-        fireOnload = function(){
-            //#if {"modes" : ["TESTING", "AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-            //For Selenium
-            var frame = window.frameElement;
-            if (frame && document.createEvent) {
-                var loadEvent = document.createEvent('HTMLEvents');
-                loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
-                frame.dispatchEvent(loadEvent);
+    function peek() {
+        if (history.length > 0) {
+            return history[history.length - 1];
+        }
+        return null;
+    }
+
+    function peekLast() {
+        if (history.length > 1) {
+            return history[history.length - 2];
+        }
+        return null;
+    }
+
+    function getTitle(historyItem) {
+        if (historyItem.title) {
+            // it was overridden manually, use that
+            return historyItem.title;
+        } else {
+            var title = valueFactory.create(historyItem.layout.getTitle(),null,rootComponent);
+            if (aura.util.isExpression(title)) {
+                title = title.evaluate();
             }
-            //#end
+            return title;
+        }
+    }
+
+    function fireLayoutChangeEvent(pre) {
+        var curr = peek();
+        var prev = peekLast();
+        var title = getTitle(curr);
+
+        var params = {
+            "layoutName" : curr.layout.getName(),
+            "title" : title
         };
+
+        if (prev){
+            params["prevTitle"] = getTitle(prev);
+            params["prevLayoutName"] = prev.layout.getName();
+        }
+        var evt = pre?$A.get("e.aura:beforeLayoutChange"):$A.get("e.aura:layoutChange");
+        evt.setParams(params);
+        evt.fire();
+
+        fireOnload();
+    }
+
+    function fireOnload() {
+        //#if {"modes" : ["TESTING", "AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
+        //For Selenium
+        var frame = window.frameElement;
+        if (frame && document.createEvent) {
+            var loadEvent = document.createEvent('HTMLEvents');
+            loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
+            frame.dispatchEvent(loadEvent);
+        }
+        //#end
+    }
 
 	var layoutService = {
 		/**
@@ -211,13 +218,13 @@ var AuraLayoutService = function() {
 
 			aura.assert(layout, "Named layout '" + name + "' not found");
 
-			var cmp = _cmp;
+			var cmp = rootComponent;
 
 			var config = [];
 			var actions = [];
 			var layoutErrorFired = false;
 			layout.each(function(item) {
-				var root = _cmp;
+				var root = rootComponent;
 				var container = root.find(item.getContainer());
 				if (container) {
 					if (item.getCache() !== "loaded" || container._layoutItem !== item) {
@@ -323,7 +330,7 @@ var AuraLayoutService = function() {
 				components = [ components ];
 			}
 
-			var root = _cmp;
+			var root = rootComponent;
 			var container = root.find(layoutItem.getContainer());
 			var body = container.get("v.body");
 			var defaultAction = function() {
@@ -392,7 +399,7 @@ var AuraLayoutService = function() {
 			if (cmp) {
 				layouts = cmp.getDef().getLayouts();
 				if (layouts) {
-					_cmp = cmp;
+					rootComponent = cmp;
 
 					$A.eventService.addHandler({
 						"event" : 'aura:locationChange',

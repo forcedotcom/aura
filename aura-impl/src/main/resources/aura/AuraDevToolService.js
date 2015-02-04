@@ -394,7 +394,7 @@ var AuraDevToolService = function() {
              * @param topPanelsCount the panels that could take over the page
              * @return all errors that are found
              */
-            findTopLevelErrors : function(panels, topPanelsCount){
+            findTopLevelErrors : function(panels, topPanelsCount, elementsCovered){
                 var errorArray = [];
                 var activePanel = null;
                 var panelObj = null;
@@ -435,8 +435,12 @@ var AuraDevToolService = function() {
                             }
                         }
                         else{
-                            if( $A.util.isEmpty(hiddenValue) || (hiddenValue.toLowerCase().indexOf("false") > -1)){
-                                errorArray.push(activePanel);
+                        	var hiddenValueParent = $A.util.getElementAttributeValue(activePanel, "aria-hidden");
+                        	if(elementsCovered && ($A.util.isEmpty(hiddenValueParent) || (hiddenValueParent.toLowerCase().indexOf("false") > -1))){
+                        		 errorArray.push(activePanel);
+                        	}
+                        	else if(!elementsCovered && ($A.util.isEmpty(hiddenValue) || (hiddenValue.toLowerCase().indexOf("false") > -1))){
+                        		errorArray.push(activePanel);
                             }
                         }
                     }
@@ -1247,9 +1251,11 @@ var AuraDevToolService = function() {
                      accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelOverlay)); 
                      accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelSlide));
                      accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelSliderOverlay), "div.body");
-                     var topPanelsCount = domElem.querySelectorAll(modalOverlay+".active").length + domElem.querySelectorAll(panelOverlay+".active").length+domElem.querySelectorAll(panelSliderOverlay+".active").length;
+                     var topPanelsCount = domElem.querySelectorAll(modalOverlay+".active").length + domElem.querySelectorAll(panelOverlay+".active").length;
+                     var elementCoveringEverythingActive = topPanelsCount > 0;
+                     topPanelsCount = topPanelsCount + domElem.querySelectorAll(panelSliderOverlay+".active").length;
 
-                     var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount);
+                     var errorArray = accessAideFuncs.findTopLevelErrors(panels, topPanelsCount, elementCoveringEverythingActive);
                      return accessAideFuncs.formatOutput(errorMsg, errorArray);                  
                 }
             },

@@ -16,11 +16,14 @@
 
 /* The adjacent sibling selector is used for cases when no "label" attribute is passed, which changes the layout
 of the component*/
+div.THIS {
+	position: relative;
+}
 
 .THIS + .datePicker-openIcon,
 .THIS .datePicker-openIcon {
     position: relative;
-    top: 1px;
+    vertical-align: middle;
     left: -22px;
     width: 12px;
     height: 15px;
@@ -30,7 +33,7 @@ of the component*/
 .THIS + .datePicker-openIcon + .clearIcon,
 .THIS .clearIcon {
     position: relative;
-    top: 2px;
+    vertical-align: middle;
     left: -22px;
     width: 15px;
     height: 15px;

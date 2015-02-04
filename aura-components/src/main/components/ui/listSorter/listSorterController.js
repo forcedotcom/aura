@@ -26,11 +26,11 @@
         	helper.initItems(cmp, data.columns, data.orderBy);
         	if (cmp._openAfterDataProvided) {
         		cmp._openAfterDataProvided = false;
-        		helper.handleOnOpen(cmp);
+        		helper.handleOnOpen(cmp, true);
         	}
 		}
 	},
-	
+
 	onOpen: function(cmp, evt, helper) {
 		var dataProvider = cmp.get('v.dataProvider');
 		if (dataProvider.length > 0 && (!cmp._dataProvided || cmp._needUpdate)) {
@@ -38,7 +38,8 @@
 			cmp._openAfterDataProvided = true;
 			helper.triggerDataProvider(cmp);
 		} else {
-			helper.handleOnOpen(cmp);
+			//force open so that cancel button is always available
+			helper.handleOnOpen(cmp, true);
 		}
 	},
 	

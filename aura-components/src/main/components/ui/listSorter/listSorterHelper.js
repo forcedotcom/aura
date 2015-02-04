@@ -93,16 +93,18 @@
 			cmp._selectedItems = sList;
 			cmp.set('v.defaultSelectedItems', selectedItems);
 			cmp.set('v.items', filteredItems);
+			//show apply button only when item is not empty
+			$A.util.removeClass(cmp.find("set").getElement(), "hidden", "visible");
 			this.refreshMenu(cmp);
 		}
 	},
 
 	
-	handleOnOpen : function(cmp) {
-		var items = cmp.get('v.items');		
-		if (cmp.get('v.visible') || !cmp.isRendered()) {
+	handleOnOpen : function(cmp, force) {
+		var items = cmp.get('v.items');	
+		if ((cmp.get('v.visible') || !cmp.isRendered()) && !force) {
 			return;
-		}		
+		}
 		this.attachEventHandler(cmp);		
 		var selected = this.getDefaultSortBy(cmp);
 		if (selected && selected.length > 0 && items && items.length > 0) {
@@ -120,7 +122,7 @@
 			var index = selected[0].index;
 			if (items[index]) {
 				cmp.find('sorterMenuList').set("v.focusItemIndex", index);
-			}			
+			}
 		}
 		cmp.set('v.visible', true);
 		this.appendElementToBody(cmp);
@@ -150,9 +152,11 @@
 			var selectedItems = this.getSelectedMenuItems(cmp);
 			for (var i=0; i < selectedItems.length; i++) {
 				// append prefix for descending order
-				order = selectedItems[i].isAscending ? '' : this.CONSTANTS.DESC_PREFIX;
+				order = selectedItems[i].ascending ? '' : this.CONSTANTS.DESC_PREFIX;
 				result.push({ sortBy: order + selectedItems[i].fieldName, label: selectedItems[i].label });
-			}			
+			}
+			//update default selected items so correct item is selected when open next time
+			cmp.set("v.defaultSelectedItems", selectedItems);
 			action.runDeprecated(result);
 		}
 	},
@@ -177,7 +181,7 @@
 		for (var i=0; i < menuItems.length; i++) {			 
 			var item = menuItems[i];
 			if (item.get('v.selected') === true) {
-				item.set('v.selected', false, true);
+				item.set('v.selected', false);
 			}
 			
 			item.set('v.isAscending', true);
@@ -232,14 +236,12 @@
     },
 	
 	setVisible : function(cmp, visible) {
+		var cssClass = "open";
 		if (cmp.get('v.modal')) {
-			$A.util[visible ? 'addClass' : 'removeClass'](cmp.find('mask').getElement(),'open');
-			var el = cmp.find('sorterContainer').getElement();
-			$A.util[visible ? 'addClass' : 'removeClass'](el,'open');
-			$A.util[visible ? 'addClass' : 'removeClass'](el,'modal');
-		} else {
-			$A.util[visible ? 'addClass' : 'removeClass'](cmp.find('sorterContainer').getElement(),'open');
+			$A.util.toggleClass(cmp.find('mask').getElement(), "open", visible);
+			cssClass += " modal";
 		}
+		$A.util.toggleClass(cmp.find('sorterContainer').getElement(), cssClass, visible);
 	},
 	
 	updateSortOrder : function(cmp) {
@@ -247,7 +249,7 @@
 		if (selectedItems && selectedItems.length > 0) {
 			var values = [];
 			for (var i=0; i<selectedItems.length; i++) {
-				cmp._sortOrderMap[selectedItems[i].fieldName].order = selectedItems[i].isAscending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
+				cmp._sortOrderMap[selectedItems[i].fieldName].order = selectedItems[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
 			}
 		}
 	},
@@ -260,7 +262,7 @@
 			for (var i = 0; i < menuItems.length; i++) {
 				var c = menuItems[i];
 			    if (c.get('v.selected') === true) {			    	
-			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i, isAscending: c.get('v.isAscending')});
+			    	values.push({fieldName: c.get('v.value'), label: c.get('v.label'), index: i, ascending: c.get('v.isAscending')});
 			    }
 			}
 	    }
@@ -336,17 +338,15 @@
      */
     updateSize : function(cmp) {
     	var containerEl = cmp.find('sorterContainer').getElement(); 
-		var isPhone = $A.get("$Browser.isPhone");
-		if (isPhone) {
+		var formfactor = $A.get("$Browser.formFactor");
+		if (formfactor !== 'DESKTOP') {
 			var viewPort = $A.util.getWindowSize(),
 				header = cmp.find('headerBar').getElement(),
 				menuListHeight = viewPort.height - header.offsetHeight;
 			
 			//fill up the whole screen
-			$A.util.addClass(cmp.find('sorterContainer').getElement(), 'phone');
-			containerEl.style.width = viewPort.width + 'px';
-			containerEl.style.height = viewPort.height + 'px';
-			
+			$A.util.addClass(cmp.find('sorterContainer').getElement(), formfactor);
+			containerEl.setAttribute("style", "width: " + viewPort.width + "px; height: " + viewPort.height + "px");
 			//update sorter menu size to fill up the rest of the screen with the menu list
 			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
 		} else {

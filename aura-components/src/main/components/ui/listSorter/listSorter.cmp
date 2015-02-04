@@ -50,7 +50,7 @@
 	    <div aura:id="sorterContainer" class="{!v.class + ' listSorterContainer'}">
 	    	<div class="body">            	           
 				<ui:menu aura:id="sorterMenu" class="sorterMenu">
-					<ui:menuList aura:id="sorterMenuList" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}" closeOnClickOutside="false">
+					<ui:menuList aura:id="sorterMenuList" manualPosition="{!modal ? false : true}" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable" menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}" closeOnClickOutside="false">
 						<aura:iteration items="{!v.items}" var="{!v.rowVar}" body="{!v.rowDef}" />
 			    	</ui:menuList>
 				</ui:menu>
@@ -60,7 +60,7 @@
 	            	{!v.cancelLabel}
 	            </a>
 	            <span aura:id="title" class="title">{!v.title}</span>
-	            <a aura:id="set" onclick="{!c.onApply}" class="apply button" href="javascript:void(0);">
+	            <a aura:id="set" onclick="{!c.onApply}" class="apply button hidden" href="javascript:void(0);">
 	            	{!v.applyLabel}
 	            </a>
 	        </div>

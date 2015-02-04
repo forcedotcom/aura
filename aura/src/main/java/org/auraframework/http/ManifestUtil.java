@@ -95,11 +95,13 @@ public abstract class ManifestUtil {
         }
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
+        DefDescriptor<? extends BaseComponentDef> desc = context.getApplicationDescriptor();
 
-        if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
+        if (desc != null && desc.getDefType().equals(DefType.APPLICATION)) {
+            @SuppressWarnings("unchecked")
+            DefDescriptor<ApplicationDef> appDefDesc = (DefDescriptor<ApplicationDef>)desc;
             try {
-                Boolean useAppcache = ((ApplicationDef) appDefDesc.getDef()).isAppcacheEnabled();
+                Boolean useAppcache = context.getDefRegistry().getRawDef(appDefDesc).isAppcacheEnabled();
                 if (useAppcache != null) {
                     return useAppcache.booleanValue();
                 }

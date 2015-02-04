@@ -61,6 +61,12 @@ public class FakeRegistry implements MasterDefRegistry {
         return (D) stuff.get(descriptor);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <D extends Definition> D getRawDef(DefDescriptor<D> descriptor) {
+        return (D) stuff.get(descriptor);
+    }
+
     @Override
     public <D extends Definition> void save(D def) {
         throw new UnsupportedOperationException();

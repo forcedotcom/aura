@@ -1087,6 +1087,55 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
+    /**
+     * Get a definition.
+     * 
+     * This does a scan of the loaded dependency entries to check if there is something to pull, otherwise, it just
+     * compiles the entry. This should log a warning somewhere, as it is a dependency that was not noted.
+     * 
+     * @param descriptor the descriptor to find.
+     * @return the corresponding definition, or null if it doesn't exist.
+     * @throws QuickFixException if there is a compile time error.
+     */
+    @Override
+    @CheckForNull
+    public <D extends Definition> D getRawDef(@CheckForNull DefDescriptor<D> descriptor) throws QuickFixException {
+        if (descriptor == null) {
+            return null;
+        }
+
+        //
+        // Always check for a local def before locking.
+        //
+        if (hasLocalDef(descriptor)) {
+            return getLocalDef(descriptor);
+        }
+
+        //
+        // If there is no local cache, we must first check to see if there is a registry, as we may not have
+        // a registry (depending on configuration). In the case that we don't find one, we are done here.
+        //
+        DefRegistry<D> registry = getRegistryFor(descriptor);
+        if (registry == null) {
+            defs.put(descriptor, null);
+            return null;
+        }
+
+        //
+        // If we think that we can cache the def, check the cache.
+        //
+        if (!registry.isStatic() && registry.isCacheable() && shouldCache(descriptor)) {
+            @SuppressWarnings("unchecked")
+            Optional<D> opt = (Optional<D>) defsCache.getIfPresent(descriptor);
+            if (opt != null) {
+                return opt.orNull();
+            }
+        }
+        D def = registry.getDef(descriptor);
+        def.validateDefinition();
+        return def;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> void save(@NonNull D def) {

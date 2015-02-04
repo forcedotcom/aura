@@ -159,7 +159,16 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     @Override
     public Boolean isAppcacheEnabled() throws QuickFixException {
-        return isAppcacheEnabled != null ? isAppcacheEnabled : getSuperDef().isAppcacheEnabled();
+        if (isAppcacheEnabled != null) {
+            return isAppcacheEnabled;
+        }
+        if (getExtendsDescriptor() != null) {
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            if (context != null) {
+                return context.getDefRegistry().getRawDef(getExtendsDescriptor()).isAppcacheEnabled();
+            }
+        }
+        return Boolean.FALSE;
     }
 
     @Override

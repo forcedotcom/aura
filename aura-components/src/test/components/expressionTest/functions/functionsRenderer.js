@@ -23,6 +23,7 @@
         cmp.set("v.Infinity", Infinity);
         cmp.set("v.NegativeInfinity", -Infinity);
         cmp.set("v.NaN", NaN);
+        cmp.set("v.object", {});
         return this.superRender();
     }
 })

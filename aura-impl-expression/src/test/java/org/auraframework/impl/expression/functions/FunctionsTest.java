@@ -32,6 +32,7 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER
 import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ import com.google.common.collect.Maps;
 
 /**
  * Basic tests of functions
- * 
+ *
  */
 public class FunctionsTest extends AuraImplExpressionTestCase {
     public FunctionsTest(String name) {
@@ -138,7 +139,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testAddTwoNulls() throws Exception {
         assertEquals(0, evaluate(ADD, null, null));
     }
-    
+
     public void testAddStringAndNegativeZero() throws Exception {
     	assertEquals("-0", evaluate(ADD, "", -0.0));
     }
@@ -1166,5 +1167,55 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testNotNaN() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(NOT, Double.NaN));
         assertEquals(Boolean.TRUE, evaluate(NOT, Float.NaN));
+    }
+
+    public void testIsEmptyNull() throws Exception {
+        assertEquals(Boolean.TRUE, evaluate(EMPTY, (Object) null));
+    }
+
+    public void testIsEmptyBooleanTrue() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, Boolean.TRUE));
+    }
+
+    public void testIsEmptyBooleanFalse() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, Boolean.FALSE));
+    }
+
+    public void testIsEmptyZero() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, 0));
+    }
+
+    public void testIsEmptyDouble() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, 0.0));
+    }
+
+    public void testIsEmptyNaN() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, Double.NaN));
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, Float.NaN));
+    }
+
+    public void testIsEmptyWithEmptyString() throws Exception {
+        assertEquals(Boolean.TRUE, evaluate(EMPTY, ""));
+    }
+
+    public void testIsEmptyWithString() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, "Random"));
+    }
+
+    public void testIsEmptyWithEmptyList() throws Exception {
+        List<Object> list = Lists.newArrayList();
+
+        assertEquals(Boolean.TRUE, evaluate(EMPTY, list));
+    }
+
+    public void testIsEmptyWithList() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        list.add("a");
+
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, list));
+    }
+
+    public void testIsEmptyObject() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EMPTY, new Object()));
     }
 }

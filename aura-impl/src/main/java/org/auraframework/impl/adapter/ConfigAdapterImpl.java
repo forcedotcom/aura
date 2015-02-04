@@ -221,6 +221,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 if (destFiles != null && destFiles.length > 0) {
                     resourceDest.mkdirs(); // If we got this far without this directory, just create it.
                     for (File f : destFiles) {
+                    	logger.info(f);
                         InputStream is = new FileInputStream(f);
                         OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
                         IOUtil.copyStream(is, os);

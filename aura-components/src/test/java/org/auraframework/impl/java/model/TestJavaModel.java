@@ -720,6 +720,11 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
+    public Object getEmptyMap() {
+        return Collections.emptyMap();
+    }
+
+    @AuraEnabled
     public Map<String, String> getMap() {
         Map<String, String> items = Maps.newHashMap();
         items.put("fruit", "apple");

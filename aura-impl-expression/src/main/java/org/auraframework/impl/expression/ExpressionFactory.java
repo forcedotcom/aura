@@ -32,6 +32,7 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER
 import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -73,6 +74,7 @@ public class ExpressionFactory {
         l.add(EQUALS);
         l.add(NOTEQUALS);
         l.add(TERNARY);
+        l.add(EMPTY);
         Builder<String, Function> b = ImmutableMap.builder();
         for (Function f : l) {
             for (String k : f.getKeys()) {

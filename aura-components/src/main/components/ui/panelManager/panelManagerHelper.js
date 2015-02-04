@@ -338,12 +338,10 @@
         var manager = this.getManager(cmp),
         	self = this,
             slider,
-            stack = manager._stack;
+            stack = manager._stack,
             containerEl = manager.getElement();
         if (panel && !panel.isValid()) {
-        	// we can get here when two components both fire hidePanel to dismiss the same panel;
-        	// this happens in some cases, as with detail.cmp and detailPanel.cmp both 
-        	// handing the force:cancelEdit event
+        	//Do nothing if panel is not valid 
         	return;
         }
         
@@ -802,14 +800,14 @@
         }
 
         manager._transitioningInstance = null;
-
-        if (manager._actionQueue.length) {
-            queuedAction = manager._actionQueue.shift();
-            setTimeout(function() {
-            	$A.run(function() {
-            		queuedAction();
-            	});
-            }, 0);
+        function executeAction(action) {
+        	$A.run(function() {
+        		action();
+        	});
+        }
+        //dequeue all the actions that got queued up while the panel is opening or closing
+        while (manager._actionQueue.length > 0) {
+            setTimeout(executeAction.bind(this, manager._actionQueue.shift()), 0);
         }
     },
 

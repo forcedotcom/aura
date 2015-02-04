@@ -364,14 +364,14 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            target.actionQueue = new MockActionQueue();
-            target.actionQueue.serverActions = [ "action" ];
-            target.actionQueue.xhr = true;
+            var actionQueue = new MockActionQueue();
+            actionQueue.serverActions = [ "action" ];
+            actionQueue.xhr = true;
 			target.foreground.started = target.foreground.max;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue);
 			});
 
 			Assert.False(actual);
@@ -383,13 +383,13 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            target.actionQueue = new MockActionQueue();
-            target.actionQueue.nextBackgroundAction = "action";
+            var actionQueue = new MockActionQueue();
+            actionQueue.nextBackgroundAction = "action";
 			target.background.started = target.background.max;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue);
 			});
 
 			Assert.False(actual);
@@ -401,11 +401,10 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            target.actionQueue = new MockActionQueue();
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(new MockActionQueue());
 			});
 
 			Assert.False(actual);
@@ -418,13 +417,13 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-            target.actionQueue = new MockActionQueue();
-			target.actionQueue.serverActions = [ action ];
-            target.actionQueue.xhr = true;
+			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            var actionQueue = new MockActionQueue();
+			actionQueue.serverActions = [ action ];
+            actionQueue.xhr = true;
 
 			mockGlobal(function() {
-				target.processActions();
+				target.processActions(actionQueue, request);
 			});
 
 			Assert.Equal([ {
@@ -433,7 +432,7 @@ Test.Aura.AuraClientServiceTest = function() {
 					flightCounter : target.foreground
 				},
 				ReturnValue : undefined
-			} ], target.request.Calls);
+			} ], request.Calls);
 		}
 
         [ Fact ]
@@ -443,13 +442,13 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new AuraClientService();
             });
-            target.actionQueue = new MockActionQueue();
-            target.actionQueue.serverActions = [ action ];
-            target.actionQueue.xhr = false;
+            var actionQueue = new MockActionQueue();
+            actionQueue.serverActions = [ action ];
+            actionQueue.xhr = false;
 
             var actual;
             mockGlobal(function() {
-                actual = target.processActions();
+                actual = target.processActions(actionQueue);
             });
 
             Assert.False(actual);
@@ -462,16 +461,15 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.request = function() {
-                Assert.Fail("target request called.");
+			var request = function() {
 			};
-            target.actionQueue = new MockActionQueue();
-			target.actionQueue.serverActions = [ action ];
-            target.actionQueue.xhr = true;
+            var actionQueue = new MockActionQueue();
+			actionQueue.serverActions = [ action ];
+            actionQueue.xhr = true;
 
 			var actual;
-			mockGlobal(function() {;
-				actual = target.processActions();
+			mockGlobal(function() {
+				actual = target.processActions(actionQueue, request);
 			});
 			Assert.True(actual);
 		}
@@ -483,13 +481,13 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-            target.actionQueue = new MockActionQueue();
-			target.actionQueue.nextBackgroundAction = action;
+			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            var actionQueue = new MockActionQueue();
+			actionQueue.nextBackgroundAction = action;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
 
 			Assert.Equal([ {
@@ -498,7 +496,7 @@ Test.Aura.AuraClientServiceTest = function() {
 					flightCounter : target.background
 				},
 				ReturnValue : undefined
-			} ], target.request.Calls);
+			} ], request.Calls);
 		}
 
 		[ Fact ]
@@ -508,14 +506,14 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.request = function() {
+			var request = function() {
 			};
-            target.actionQueue = new MockActionQueue();
-			target.actionQueue.nextBackgroundAction = action;
+            var actionQueue = new MockActionQueue();
+			actionQueue.nextBackgroundAction = action;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
 
 			Assert.True(actual);
@@ -529,15 +527,15 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-            target.actionQueue = new MockActionQueue();
-			target.actionQueue.serverActions = [ actionServer ];
-            target.actionQueue.xhr = true;
-            target.actionQueue.nextBackgroundAction = actionBackground;
+			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            var actionQueue = new MockActionQueue();
+			actionQueue.serverActions = [ actionServer ];
+            actionQueue.xhr = true;
+            actionQueue.nextBackgroundAction = actionBackground;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
 
 			Assert.Equal([ {
@@ -552,7 +550,7 @@ Test.Aura.AuraClientServiceTest = function() {
 					flightCounter : target.background
 				},
 				ReturnValue : undefined
-			} ], target.request.Calls);
+			} ], request.Calls);
 		}
 	}
 

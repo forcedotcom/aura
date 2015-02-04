@@ -899,7 +899,6 @@ var AuraClientService = function() {
     var clientService = {
         // only expose following private properties for xUnit
         //#if {"modes" : ["DOC"]}
-        request : request,
         foreground : foreground,
         background : background,
         actionQueue : actionQueue,
@@ -1261,12 +1260,12 @@ var AuraClientService = function() {
             if (auraStack.length === 0) {
                 var tmppush = "$A.clientServices.popStack";
                 auraStack.push(tmppush);
-                clientService.processActions();
+                clientService.processActions(actionQueue, request);
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
                     $A.renderingService.rerenderDirty(name);
 
-                    done = !clientService.processActions();
+                    done = !clientService.processActions(actionQueue, request);
 
                     count += 1;
                     if (count > 14) {
@@ -1395,7 +1394,7 @@ var AuraClientService = function() {
             for (i = 0; i < actions.length; i++) {
                 actionQueue.enqueue(actions[i]);
             }
-            clientService.processActions();
+            clientService.processActions(actionQueue, request);
         },
 
         /**
@@ -1755,14 +1754,13 @@ var AuraClientService = function() {
          *
          * @private
          */
-        processActions : function() {
+        processActions : function(actionQueue, request) {
             var actions;
             var processedActions = false;
             var action;
 
             actions = actionQueue.getClientActions();
             if(actions.length > 0) {
-                Assert.Fail("client action > 0");
                 runClientActions(actions);
                 processedActions = true;
             }
@@ -1772,14 +1770,9 @@ var AuraClientService = function() {
             // needs to be sent (force boxcar will delay this)
             // FIXME: we need measures of how long this delays things.
             //
-            //Assert.True(actionQueue.needXHR(), "actionQueue.needXHR()");
-            Assert.True(foreground.start(), "foreground.start()");
             if (actionQueue.needXHR() && foreground.start()) {
-                Assert.Fail("needXHR and foreground start");
                 actions = actionQueue.getServerActions();
                 if (actions.length > 0) {
-                    Assert.Fail("server action > 0");
-
                     request(actions, foreground);
                     processedActions = true;
                 } else {
@@ -1790,8 +1783,6 @@ var AuraClientService = function() {
             if (background.start()) {
                 action = actionQueue.getNextBackgroundAction();
                 if (action !== null) {
-                    Assert.Fail("background action not null");
-
                     request([action], background);
                     processedActions = true;
                 } else {

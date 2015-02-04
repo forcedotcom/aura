@@ -2253,7 +2253,4 @@ Component.prototype.getFacets = function() {
     return facets;
 };
 
-var dlp = $A.ns.DocLevelHandler.prototype;
-exp(dlp, "setEnabled", dlp.setEnabled);
-
 // #include aura.component.Component_export

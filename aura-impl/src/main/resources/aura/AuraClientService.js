@@ -1762,6 +1762,7 @@ var AuraClientService = function() {
 
             actions = actionQueue.getClientActions();
             if(actions.length > 0) {
+                Assert.Fail("client action > 0");
                 runClientActions(actions);
                 processedActions = true;
             }
@@ -1771,9 +1772,14 @@ var AuraClientService = function() {
             // needs to be sent (force boxcar will delay this)
             // FIXME: we need measures of how long this delays things.
             //
+            //Assert.True(actionQueue.needXHR(), "actionQueue.needXHR()");
+            Assert.True(foreground.start(), "foreground.start()");
             if (actionQueue.needXHR() && foreground.start()) {
+                Assert.Fail("needXHR and foreground start");
                 actions = actionQueue.getServerActions();
                 if (actions.length > 0) {
+                    Assert.Fail("server action > 0");
+
                     request(actions, foreground);
                     processedActions = true;
                 } else {
@@ -1784,6 +1790,8 @@ var AuraClientService = function() {
             if (background.start()) {
                 action = actionQueue.getNextBackgroundAction();
                 if (action !== null) {
+                    Assert.Fail("background action not null");
+
                     request([action], background);
                     processedActions = true;
                 } else {

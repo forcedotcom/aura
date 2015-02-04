@@ -63,3 +63,6 @@ $A.ns.DocLevelHandler.prototype.setEnabled = function(enable) {
         }
     }
 };
+
+var dlp = $A.ns.DocLevelHandler.prototype;
+exp(dlp, "setEnabled", dlp.setEnabled);

@@ -15,7 +15,7 @@
  */
 Function.RegisterNamespace("Test.Aura");
 
-[ Fixture, Skip ]
+[ Fixture ]
 Test.Aura.AuraClientServiceTest = function() {
 	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
 	Mocks.GetMock(Object.Global(), "exp", function() {
@@ -463,16 +463,16 @@ Test.Aura.AuraClientServiceTest = function() {
 				target = new AuraClientService();
 			});
 			target.request = function() {
+                Assert.Fail("target request called.");
 			};
             target.actionQueue = new MockActionQueue();
 			target.actionQueue.serverActions = [ action ];
             target.actionQueue.xhr = true;
 
 			var actual;
-			mockGlobal(function() {
+			mockGlobal(function() {;
 				actual = target.processActions();
 			});
-
 			Assert.True(actual);
 		}
 

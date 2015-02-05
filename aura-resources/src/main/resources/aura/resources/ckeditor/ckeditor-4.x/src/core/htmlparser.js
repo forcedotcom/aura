@@ -17,7 +17,7 @@
  */
 CKEDITOR.htmlParser = function() {
 	this._ = {
-		htmlPartsRegex: new RegExp( '<(?:(?:\\/([^>]+)>)|(?:!--([\\S|\\s]*?)-->)|(?:([^\\s>]+)\\s*((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'>])*)\\/?>))', 'g' )
+		htmlPartsRegex: /<(?:(?:\/([^>]+)>)|(?:!--([\S|\s]*?)-->)|(?:([^\/\s>]+)((?:\s+[\w\-:.]+(?:\s*=\s*?(?:(?:"[^"]*")|(?:'[^']*')|[^\s"'\/>]+))?)*)[\S\s]*?(\/?)>))/g
 	};
 };
 
@@ -129,14 +129,12 @@ CKEDITOR.htmlParser = function() {
 
 				nextIndex = this._.htmlPartsRegex.lastIndex;
 
-				/*
-				 "parts" is an array with the following items:
-					0 : The entire match for opening/closing tags and comments.
-					1 : Group filled with the tag name for closing tags.
-					2 : Group filled with the comment text.
-					3 : Group filled with the tag name for opening tags.
-					4 : Group filled with the attributes part of opening tags.
-				 */
+				// "parts" is an array with the following items:
+				//		0 : The entire match for opening/closing tags and comments.
+				//		  : Group filled with the tag name for closing tags.
+				//		2 : Group filled with the comment text.
+				//		3 : Group filled with the tag name for opening tags.
+				//		4 : Group filled with the attributes part of opening tags.
 
 				// Closing tag
 				if ( ( tagName = parts[ 1 ] ) ) {
@@ -172,7 +170,7 @@ CKEDITOR.htmlParser = function() {
 					var attribs = {},
 						attribMatch,
 						attribsPart = parts[ 4 ],
-						selfClosing = !!( attribsPart && attribsPart.charAt( attribsPart.length - 1 ) == '/' );
+						selfClosing = !!parts[ 5 ];
 
 					if ( attribsPart ) {
 						while ( ( attribMatch = attribsRegex.exec( attribsPart ) ) ) {

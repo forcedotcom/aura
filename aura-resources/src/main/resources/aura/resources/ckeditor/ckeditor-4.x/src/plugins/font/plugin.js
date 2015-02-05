@@ -27,8 +27,9 @@
 
 				styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
 				styles[ name ]._.definition.name = name;
-			} else
+			} else {
 				names.splice( i--, 1 );
+			}
 		}
 
 		editor.ui.addRichCombo( comboName, {
@@ -59,9 +60,65 @@
 				editor.focus();
 				editor.fire( 'saveSnapshot' );
 
-				var style = styles[ value ];
+				var previousValue = this.getValue(),
+					style = styles[ value ];
 
-				editor[ this.getValue() == value ? 'removeStyle' : 'applyStyle' ]( style );
+				// When applying one style over another, first remove the previous one (#12403).
+				// NOTE: This is only a temporary fix. It will be moved to the styles system (#12687).
+				if ( previousValue && value != previousValue ) {
+					var previousStyle = styles[ previousValue ],
+						range = editor.getSelection().getRanges()[ 0 ];
+
+					// If the range is collapsed we can't simply use the editor.removeStyle method
+					// because it will remove the entire element and we want to split it instead.
+					if ( range.collapsed ) {
+						var path = editor.elementPath(),
+							// Find the style element.
+							matching = path.contains( function( el ) {
+								return previousStyle.checkElementRemovable( el );
+							} );
+
+						if ( matching ) {
+							var startBoundary = range.checkBoundaryOfElement( matching, CKEDITOR.START ),
+								endBoundary = range.checkBoundaryOfElement( matching, CKEDITOR.END ),
+								node, bm;
+
+							// If we are at both boundaries it means that the element is empty.
+							// Remove it but in a way that we won't lose other empty inline elements inside it.
+							// Example: <p>x<span style="font-size:48px"><em>[]</em></span>x</p>
+							// Result: <p>x<em>[]</em>x</p>
+							if ( startBoundary && endBoundary ) {
+								bm = range.createBookmark();
+								// Replace the element with its children (TODO element.replaceWithChildren).
+								while ( ( node = matching.getFirst() ) ) {
+									node.insertBefore( matching );
+								}
+								matching.remove();
+								range.moveToBookmark( bm );
+
+							// If we are at the boundary of the style element, just move out.
+							} else if ( startBoundary ) {
+								range.moveToPosition( matching, CKEDITOR.POSITION_BEFORE_START );
+							} else if ( endBoundary ) {
+								range.moveToPosition( matching, CKEDITOR.POSITION_AFTER_END );
+							} else {
+								// Split the element and clone the elements that were in the path
+								// (between the startContainer and the matching element)
+								// into the new place.
+								range.splitElement( matching );
+								range.moveToPosition( matching, CKEDITOR.POSITION_AFTER_END );
+								cloneSubtreeIntoRange( range, path.elements.slice(), matching );
+							}
+
+							editor.getSelection().selectRanges( [ range ] );
+						}
+					} else {
+						editor.removeStyle( previousStyle );
+					}
+				}
+
+				editor[ previousValue == value ? 'removeStyle' : 'applyStyle' ]( style );
+
 				editor.fire( 'saveSnapshot' );
 			},
 
@@ -99,9 +156,35 @@
 		} );
 	}
 
+	// Clones the subtree between subtreeStart (exclusive) and the
+	// leaf (inclusive) and inserts it into the range.
+	//
+	// @param range
+	// @param {CKEDITOR.dom.element[]} elements Elements path in the standard order: leaf -> root.
+	// @param {CKEDITOR.dom.element/null} substreeStart The start of the subtree.
+	// If null, then the leaf belongs to the subtree.
+	function cloneSubtreeIntoRange( range, elements, subtreeStart ) {
+		var current = elements.pop();
+		if ( !current ) {
+			return;
+		}
+		// Rewind the elements array up to the subtreeStart and then start the real cloning.
+		if ( subtreeStart ) {
+			return cloneSubtreeIntoRange( range, elements, current.equals( subtreeStart ) ? null : subtreeStart );
+		}
+
+		var clone = current.clone();
+		range.insertNode( clone );
+		range.moveToPosition( clone, CKEDITOR.POSITION_AFTER_START );
+
+		cloneSubtreeIntoRange( range, elements );
+	}
+
 	CKEDITOR.plugins.add( 'font', {
 		requires: 'richcombo',
+		// jscs:disable maximumLineLength
 		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:enable maximumLineLength
 		init: function( editor ) {
 			var config = editor.config;
 

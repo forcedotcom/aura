@@ -54,49 +54,5 @@
     <aura:attribute name="requiredIndicator" type="aura://Aura.Component[]" description="A component that displays the indicator for the required field.">    	 
 		<span class="{!'required ' + v.requiredIndicatorClass}">*</span>    	 
     </aura:attribute>    
-    	 
-	<aura:if isTrue="{!v.label != null &amp;&amp; v.label !='' &amp;&amp; (v.labelPosition == 'top' || v.labelPosition == 'left')}">
-		<div>
-			<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}">
-				<aura:set attribute="requiredIndicator">
-					<aura:if isTrue="{!v.required}">
-						{!v.requiredIndicator}
-					</aura:if>					
-				</aura:set>
-			</ui:label>				 	
-			{!v.body}
-			{!v.errorComponent}
-		</div> 
-		  
-	<aura:set attribute="else">	   
-    	<aura:if isTrue="{!v.label != null &amp;&amp; v.label !='' &amp;&amp; (v.labelPosition == 'bottom' || v.labelPosition == 'right')}">
-			<div>
-				{!v.body}
-				<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}">
-					<aura:set attribute="requiredIndicator">
-						<aura:if isTrue="{!v.required}">
-							{!v.requiredIndicator}
-						</aura:if>					
-					</aura:set>
-				</ui:label>
-				{!v.errorComponent}
-		    </div>
-		    
-		<aura:set attribute="else">
-				<aura:if isTrue="{!v.label != null &amp;&amp; v.label !='' &amp;&amp; v.labelPosition == 'hidden'}">
-					<div>		 
-						<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="false"/>   	
-						{!v.body}						
-						{!v.errorComponent}
-					</div>
-				<aura:set attribute="else">
-					{!v.body}
-					{!v.errorComponent}
-			    </aura:set>
-			    </aura:if>
-		</aura:set>
-	    </aura:if>
-			 
-	</aura:set>
-	</aura:if>    
+    {!v.body}{!v.errorComponent}
 </aura:component>

@@ -14,6 +14,43 @@
  * limitations under the License.
  */
 ({
+
+    buildBody : function(component) {
+        var innerBody = component.get("v.body");
+        var labelAttribute = component.get("v.label");
+        if (!$A.util.isEmpty(labelAttribute)) {
+            //create label
+            var domId = component.get("v.domId");
+            if (!domId) {
+                domId = component.getConcreteComponent().getGlobalId();
+            }
+            var labelComponent = $A.componentService.newComponentDeprecated({
+                    componentDef: {descriptor: 'markup://ui:label'},
+                    attributes: {values: {
+                        'label': labelAttribute,
+                        'class': component.get("v.labelClass") + " uiLabel-" + component.get("v.labelPosition"),
+                        'for': domId,
+                        'labelDisplay': component.get("v.labelPosition") != "hidden",
+                        'requiredIndicator': component.get("v.required") ? component.get("v.requiredIndicator") : null}}}
+            );
+            var labelPositionAttribute = component.get("v.labelPosition");
+            if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
+                innerBody.unshift(labelComponent);
+            } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom' || labelPositionAttribute == 'hidden') {
+                innerBody.push(labelComponent);
+            }
+            var divComponent = $A.componentService.newComponentDeprecated({
+                    componentDef: {descriptor: 'markup://aura:html'},
+                    attributes: {values: {
+                        'body': innerBody,
+                        'tag': 'div'}}}
+            );
+            var body = [];
+            body.push(divComponent);
+            component.set("v.body", body);
+        }
+    },
+
 	/**
 	 * @Override
 	 */

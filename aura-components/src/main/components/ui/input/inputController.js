@@ -17,7 +17,7 @@
     updateDefaultError : function(component, event, helper){
         helper.setErrorComponent(component);
     },
-    init: function(cmp) {
+    init: function(cmp, event, helper) {
         var positionMap={"top":1,"right":1,"bottom":1,"left":1,"hidden":1};
         if (!positionMap[cmp.get("v.labelPosition")]) {
             // JBUCH: HALO: TODO: WAITING ON W-1419175
@@ -26,5 +26,6 @@
             //default labelPosition to 'left'
             //cmp.getDef().getHelper().setAttribute(cmp, {key: 'labelPosition', value: 'left'});
         }
+        helper.buildBody(cmp);
     }
 })

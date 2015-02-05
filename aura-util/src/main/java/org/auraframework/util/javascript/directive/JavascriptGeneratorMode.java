@@ -61,7 +61,7 @@ public enum JavascriptGeneratorMode {
     PRODUCTIONDEBUG("proddebug", false, JavascriptWriter.CLOSURE_AURA_DEBUG, true),
 
     /**
-     * mode used for documentation (jsdoc), but never served in any context
+     * mode used for documentation (jsdoc), note that the mode is also used by xUnit.
      */
     DOC("doc", true, null),
 

@@ -53,6 +53,7 @@ var clientService;
 // #include aura.polyfill.Function
 // #include aura.util.Util
 // #include aura.Logger
+// #include aura.DocLevelHandler
 // #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
 // #include aura.system.DefDescriptor
 // #include aura.polyfill.Json

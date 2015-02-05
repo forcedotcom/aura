@@ -21,88 +21,82 @@
  * @constructor
  */
 var AuraLayoutService = function() {
+    /* private properties and methods */
+    var layouts = null,
+        rootComponent = null,
+        history = [];
 
-    var priv = {
+    function push(layout, params, title) {
+        history.push({
+            layout : layout,
+            params : params,
+            title : title
+        });
+    }
 
-        history : [],
+    function pop() {
+        return history.pop();
+    }
 
-        push : function(layout, params, title){
-            this.history.push({
-                layout : layout,
-                params : params,
-                title : title
-            });
-        },
-
-        pop : function(){
-            return this.history.pop();
-        },
-
-        peek : function(){
-            if (this.history.length > 0) {
-                return this.history[this.history.length - 1];
-            }
-            return null;
-        },
-
-        peekLast : function(){
-            if (this.history.length > 1) {
-                return this.history[this.history.length - 2];
-            }
-            return null;
-        },
-
-        clear : function(){
-            var cur = this.pop();
-            this.history = [cur];
-        },
-
-        getTitle : function(historyItem) {
-            if (historyItem.title) {
-                // it was overridden manually, use that
-                return historyItem.title;
-            } else {
-                var title = valueFactory.create(historyItem.layout.getTitle(),null,this.cmp);
-                if (aura.util.isExpression(title)) {
-                    title = title.evaluate();
-                }
-                return title;
-            }
-        },
-
-        fireLayoutChangeEvent : function(pre){
-            var curr = this.peek();
-            var prev = this.peekLast();
-            var title = this.getTitle(curr);
-
-            var params = {
-                "layoutName" : curr.layout.getName(),
-                "title" : title
-            };
-
-            if (prev){
-                params["prevTitle"] = this.getTitle(prev);
-                params["prevLayoutName"] = prev.layout.getName();
-            }
-            var evt = pre?$A.get("e.aura:beforeLayoutChange"):$A.get("e.aura:layoutChange");
-            evt.setParams(params);
-            evt.fire();
-
-            this.fireOnload();
-        },
-
-        fireOnload : function(){
-            //#if {"modes" : ["TESTING", "AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-            //For Selenium
-            var frame = window.frameElement;
-            if (frame && document.createEvent) {
-                var loadEvent = document.createEvent('HTMLEvents');
-                loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
-                frame.dispatchEvent(loadEvent);
-            }
-            //#end
+    function peek() {
+        if (history.length > 0) {
+            return history[history.length - 1];
         }
-    };
+        return null;
+    }
+
+    function peekLast() {
+        if (history.length > 1) {
+            return history[history.length - 2];
+        }
+        return null;
+    }
+
+    function getTitle(historyItem) {
+        if (historyItem.title) {
+            // it was overridden manually, use that
+            return historyItem.title;
+        } else {
+            var title = valueFactory.create(historyItem.layout.getTitle(),null,rootComponent);
+            if (aura.util.isExpression(title)) {
+                title = title.evaluate();
+            }
+            return title;
+        }
+    }
+
+    function fireLayoutChangeEvent(pre) {
+        var curr = peek();
+        var prev = peekLast();
+        var title = getTitle(curr);
+
+        var params = {
+            "layoutName" : curr.layout.getName(),
+            "title" : title
+        };
+
+        if (prev){
+            params["prevTitle"] = getTitle(prev);
+            params["prevLayoutName"] = prev.layout.getName();
+        }
+        var evt = pre?$A.get("e.aura:beforeLayoutChange"):$A.get("e.aura:layoutChange");
+        evt.setParams(params);
+        evt.fire();
+
+        fireOnload();
+    }
+
+    function fireOnload() {
+        //#if {"modes" : ["TESTING", "AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
+        //For Selenium
+        var frame = window.frameElement;
+        if (frame && document.createEvent) {
+            var loadEvent = document.createEvent('HTMLEvents');
+            loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
+            frame.dispatchEvent(loadEvent);
+        }
+        //#end
+    }
 
 	var layoutService = {
 		/**
@@ -119,7 +113,7 @@ var AuraLayoutService = function() {
 
 			var token = event.getParam("token");
 			if (!token) {
-				token = priv.layouts.getDefault().getName();
+				token = layouts.getDefault().getName();
 			}
 
 			// The presence of a semaphore in here makes me think a class-level
@@ -136,14 +130,14 @@ var AuraLayoutService = function() {
 			// layoutItem.getContainer());
 			$A.Perf.mark("Container Layout Complete");
 
-			var curr = priv.peek();
+			var curr = peek();
 
-			var layout = priv.layouts.getLayout(token);
+			var layout = layouts.getLayout(token);
 			if (!layout) {
-				layout = priv.layouts.getCatchall();
+				layout = layouts.getCatchall();
 			}
 
-			if (curr && curr.layout === layout && (layout !== priv.layouts.getCatchall()) && !layout.match) {
+			if (curr && curr.layout === layout && (layout !== layouts.getCatchall()) && !layout.match) {
 				// There is a current layout and it is the same as the one we're
 				// on
 				var oldParams = curr.params;
@@ -152,7 +146,7 @@ var AuraLayoutService = function() {
 					// The params are the same - we're already where we need to
 					// be.
 					$A.finishInit();
-					priv.fireOnload();
+					fireOnload();
 					$A.Perf.endMark("LayoutService.handleLocationChange (" + token + ")");
 					return;
 				}
@@ -168,7 +162,7 @@ var AuraLayoutService = function() {
 		 * @public
 		 */
 		refreshLayout : function() {
-			var curr = priv.peek();
+			var curr = peek();
 			layoutService.layout(curr.layout.getName(), curr.params, true);
 		},
 
@@ -181,12 +175,12 @@ var AuraLayoutService = function() {
 		 */
 		back : function() {
 			// Is there something in the stack to go back to?
-			if (priv.history.length > 1) {
-				this.pop();
+			if (history.length > 1) {
+				pop();
 				this.refreshLayout();
 				historyService.back();
 			} else {
-				historyService.set(priv.layouts.getDefault().getName());
+				historyService.set(layouts.getDefault().getName());
 			}
 		},
 
@@ -197,17 +191,8 @@ var AuraLayoutService = function() {
 		 * @public
 		 */
 		clearHistory : function() {
-			priv.clear();
-		},
-
-		/**
-		 * Removes the layout from the stack.
-		 *
-		 * @memberOf AuraLayoutService
-		 * @private
-		 */
-		pop : function() {
-			priv.pop();
+            var cur = pop();
+            history = [cur];
 		},
 
 		/**
@@ -225,21 +210,21 @@ var AuraLayoutService = function() {
 		 * @private
 		 */
 		layout : function(name, params, noTrack) {
-			var layout = priv.layouts.getLayout(name);
+			var layout = layouts.getLayout(name);
 
 			if (!layout) {
-				layout = priv.layouts.getCatchall();
+				layout = layouts.getCatchall();
 			}
 
 			aura.assert(layout, "Named layout '" + name + "' not found");
 
-			var cmp = priv.cmp;
+			var cmp = rootComponent;
 
 			var config = [];
 			var actions = [];
 			var layoutErrorFired = false;
 			layout.each(function(item) {
-				var root = priv.cmp;
+				var root = rootComponent;
 				var container = root.find(item.getContainer());
 				if (container) {
 					if (item.getCache() !== "loaded" || container._layoutItem !== item) {
@@ -310,9 +295,9 @@ var AuraLayoutService = function() {
 			// Push the new layout before running actions to allow
 			// render/rerender etc to interact with the current layout
 			if (!noTrack) {
-				priv.push(layout, params);
+				push(layout, params);
 			}
-			priv.fireLayoutChangeEvent(true);
+			fireLayoutChangeEvent(true);
 
 			if (actions.length > 0 || config.length > 0) {
 				window.scrollTo(0, 0);
@@ -325,12 +310,12 @@ var AuraLayoutService = function() {
 					 * AuraClientService.runActions() refers to this function.
 					 */
 					if (!msg["errors"] || msg["errors"].length === 0) {
-						priv.fireLayoutChangeEvent();
+						fireLayoutChangeEvent();
 					}
 					$A.Perf.endMark("Layout Actions Callback Complete");
 
 					$A.finishInit();
-					priv.fireOnload();
+					fireOnload();
 				});
 			}
 		},
@@ -345,7 +330,7 @@ var AuraLayoutService = function() {
 				components = [ components ];
 			}
 
-			var root = priv.cmp;
+			var root = rootComponent;
 			var container = root.find(layoutItem.getContainer());
 			var body = container.get("v.body");
 			var defaultAction = function() {
@@ -391,9 +376,9 @@ var AuraLayoutService = function() {
 		 * @public
 		 */
 		setCurrentLayoutTitle : function(title) {
-			var current = priv.peek();
-			if (current && priv.getTitle(current) !== title) {
-				var oldTitle = priv.getTitle(current);
+			var current = peek();
+			if (current && getTitle(current) !== title) {
+				var oldTitle = getTitle(current);
 				current.title = title;
 
 				var params = {
@@ -412,9 +397,9 @@ var AuraLayoutService = function() {
 		 */
 		init : function(cmp) {
 			if (cmp) {
-				priv.layouts = cmp.getDef().getLayouts();
-				if (priv.layouts) {
-					priv.cmp = cmp;
+				layouts = cmp.getDef().getLayouts();
+				if (layouts) {
+					rootComponent = cmp;
 
 					$A.eventService.addHandler({
 						"event" : 'aura:locationChange',
@@ -426,11 +411,6 @@ var AuraLayoutService = function() {
 
 			delete this.init;
 		}
-
-		// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-		,
-		priv : priv
-	// #end
 	};
 	// #include aura.AuraLayoutService_export
 	return layoutService;

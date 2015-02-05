@@ -178,7 +178,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
-				target.priv.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
+				target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
 
 				target.enqueueAction(action);
 			});
@@ -188,7 +188,7 @@ Test.Aura.AuraClientServiceTest = function() {
 					action : action
 				},
 				ReturnValue : undefined
-			} ], target.priv.actionQueue.enqueue.Calls);
+			} ], target.actionQueue.enqueue.Calls);
 		}
 
 		[ Fact ]
@@ -197,7 +197,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var target;
 			mockGlobal(function() {
 				target = new AuraClientService();
-				target.priv.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
+				target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
 
 				target.enqueueAction(action);
 			});
@@ -207,7 +207,7 @@ Test.Aura.AuraClientServiceTest = function() {
 					action : action
 				},
 				ReturnValue : undefined
-			} ], target.priv.actionQueue.enqueue.Calls);
+			} ], target.actionQueue.enqueue.Calls);
 		}
 
 		[ Fact ]
@@ -238,15 +238,15 @@ Test.Aura.AuraClientServiceTest = function() {
 				target.popStack("AbortableActionsAreCleared.2");
 			});
 			// Assert
-			Assert.Equal(6, target.priv.actionQueue.actions.length);
+			Assert.Equal(6, target.actionQueue.actions.length);
 			Assert.Equal(2, abortable.abort.Calls.length);
 			Assert.Equal(0, action.abort.Calls.length);
-			Assert.False(target.priv.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
-			Assert.False(target.priv.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");
-			Assert.False(target.priv.actionQueue.actions[2].isAbortable(), "Third action should not be abortable");
-			Assert.True(target.priv.actionQueue.actions[3].isAbortable(), "Fourth action should be abortable");
-			Assert.True(target.priv.actionQueue.actions[4].isAbortable(), "Fifth action should be abortable");
-			Assert.False(target.priv.actionQueue.actions[5].isAbortable(), "Sixth action should not be abortable");
+			Assert.False(target.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
+			Assert.False(target.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");
+			Assert.False(target.actionQueue.actions[2].isAbortable(), "Third action should not be abortable");
+			Assert.True(target.actionQueue.actions[3].isAbortable(), "Fourth action should be abortable");
+			Assert.True(target.actionQueue.actions[4].isAbortable(), "Fifth action should be abortable");
+			Assert.False(target.actionQueue.actions[5].isAbortable(), "Sixth action should not be abortable");
 		}
 
 		[ Fact ]
@@ -364,14 +364,14 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            target.priv.actionQueue = new MockActionQueue();
-            target.priv.actionQueue.serverActions = [ "action" ];
-            target.priv.actionQueue.xhr = true;
-			target.priv.foreground.started = target.priv.foreground.max;
+            var actionQueue = new MockActionQueue();
+            actionQueue.serverActions = [ "action" ];
+            actionQueue.xhr = true;
+			target.foreground.started = target.foreground.max;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue);
 			});
 
 			Assert.False(actual);
@@ -383,13 +383,13 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            target.priv.actionQueue = new MockActionQueue();
-            target.priv.actionQueue.nextBackgroundAction = "action";
-			target.priv.background.started = target.priv.background.max;
+            var actionQueue = new MockActionQueue();
+            actionQueue.nextBackgroundAction = "action";
+			target.background.started = target.background.max;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue);
 			});
 
 			Assert.False(actual);
@@ -401,11 +401,10 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-            target.priv.actionQueue = new MockActionQueue();
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(new MockActionQueue());
 			});
 
 			Assert.False(actual);
@@ -418,22 +417,22 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-            target.priv.actionQueue = new MockActionQueue();
-			target.priv.actionQueue.serverActions = [ action ];
-            target.priv.actionQueue.xhr = true;
+			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            var actionQueue = new MockActionQueue();
+			actionQueue.serverActions = [ action ];
+            actionQueue.xhr = true;
 
 			mockGlobal(function() {
-				target.processActions();
+				target.processActions(actionQueue, request);
 			});
 
 			Assert.Equal([ {
 				Arguments : {
 					actions : [ action ],
-					flightCounter : target.priv.foreground
+					flightCounter : target.foreground
 				},
 				ReturnValue : undefined
-			} ], target.priv.request.Calls);
+			} ], request.Calls);
 		}
 
         [ Fact ]
@@ -443,13 +442,13 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new AuraClientService();
             });
-            target.priv.actionQueue = new MockActionQueue();
-            target.priv.actionQueue.serverActions = [ action ];
-            target.priv.actionQueue.xhr = false;
+            var actionQueue = new MockActionQueue();
+            actionQueue.serverActions = [ action ];
+            actionQueue.xhr = false;
 
             var actual;
             mockGlobal(function() {
-                actual = target.processActions();
+                actual = target.processActions(actionQueue);
             });
 
             Assert.False(actual);
@@ -462,17 +461,16 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.priv.request = function() {
+			var request = function() {
 			};
-            target.priv.actionQueue = new MockActionQueue();
-			target.priv.actionQueue.serverActions = [ action ];
-            target.priv.actionQueue.xhr = true;
+            var actionQueue = new MockActionQueue();
+			actionQueue.serverActions = [ action ];
+            actionQueue.xhr = true;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
-
 			Assert.True(actual);
 		}
 
@@ -483,22 +481,22 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-            target.priv.actionQueue = new MockActionQueue();
-			target.priv.actionQueue.nextBackgroundAction = action;
+			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            var actionQueue = new MockActionQueue();
+			actionQueue.nextBackgroundAction = action;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
 
 			Assert.Equal([ {
 				Arguments : {
 					actions : [ action ],
-					flightCounter : target.priv.background
+					flightCounter : target.background
 				},
 				ReturnValue : undefined
-			} ], target.priv.request.Calls);
+			} ], request.Calls);
 		}
 
 		[ Fact ]
@@ -508,14 +506,14 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.priv.request = function() {
+			var request = function() {
 			};
-            target.priv.actionQueue = new MockActionQueue();
-			target.priv.actionQueue.nextBackgroundAction = action;
+            var actionQueue = new MockActionQueue();
+			actionQueue.nextBackgroundAction = action;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
 
 			Assert.True(actual);
@@ -529,30 +527,30 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				target = new AuraClientService();
 			});
-			target.priv.request = Stubs.GetMethod("actions", "flightCounter", undefined);
-            target.priv.actionQueue = new MockActionQueue();
-			target.priv.actionQueue.serverActions = [ actionServer ];
-            target.priv.actionQueue.xhr = true;
-            target.priv.actionQueue.nextBackgroundAction = actionBackground;
+			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            var actionQueue = new MockActionQueue();
+			actionQueue.serverActions = [ actionServer ];
+            actionQueue.xhr = true;
+            actionQueue.nextBackgroundAction = actionBackground;
 
 			var actual;
 			mockGlobal(function() {
-				actual = target.processActions();
+				actual = target.processActions(actionQueue, request);
 			});
 
 			Assert.Equal([ {
 				Arguments : {
 					actions : [ actionServer ],
-					flightCounter : target.priv.foreground
+					flightCounter : target.foreground
 				},
 				ReturnValue : undefined
 			}, {
 				Arguments : {
 					actions : [ actionBackground ],
-					flightCounter : target.priv.background
+					flightCounter : target.background
 				},
 				ReturnValue : undefined
-			} ], target.priv.request.Calls);
+			} ], request.Calls);
 		}
 	}
 
@@ -658,7 +656,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new AuraClientService();
                 target.makeActionGroup = Stubs.GetMethod("actions", "scope", "callback", null);
-                target.priv.actionQueue.enqueue = function(){};
+                target.actionQueue.enqueue = function(){};
                 target.processActions = function(){};
                 target.runActions(expectedActions, expectedScope, expectedCallback);
             });
@@ -680,7 +678,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new AuraClientService();
                 target.makeActionGroup = function(){};
-                target.priv.actionQueue.enqueue = Stubs.GetMethod("param", null);
+                target.actionQueue.enqueue = Stubs.GetMethod("param", null);
                 target.processActions = function(){};
                 target.runActions(actions);
             });
@@ -696,7 +694,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 },
                 ReturnValue : null
                 }
-            ], target.priv.actionQueue.enqueue.Calls);
+            ], target.actionQueue.enqueue.Calls);
         }
 
         [ Fact ]
@@ -708,7 +706,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new AuraClientService();
                 target.makeActionGroup = function(){};
-                target.priv.actionQueue.enqueue = function(){};
+                target.actionQueue.enqueue = function(){};
                 target.processActions = Stubs.GetMethod(null);
                 target.runActions(expectedActions, expectedScope, expectedCallback);
             });
@@ -976,7 +974,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             var actual;
             mockUserAgent(function(){
-                actual = target.priv.isBB10();
+                actual = target.isBB10();
             });
 
             Assert.Equal(true, actual);
@@ -994,7 +992,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             var actual;
             mockUserAgent(function(){
-                actual = target.priv.isBB10();
+                actual = target.isBB10();
             });
 
             Assert.Equal(false, actual);

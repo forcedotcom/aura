@@ -19,17 +19,16 @@
  * @constructor
  */
 var AuraEventService = function() {
-    var priv = {
-        registry : new EventDefRegistry(),
-        eventDispatcher : {},
+    /* private properties and methods */
+    var registry = new EventDefRegistry(),
+        eventDispatcher = {};
 
-        qualifyEventName : function(event) {
-            if(event.indexOf("://") == -1){
-                event = "markup://"+event;
-            }
-            return event;
+    function qualifyEventName(event) {
+        if(event.indexOf("://") == -1){
+            event = "markup://"+event;
         }
-    };
+        return event;
+    }
 
     var eventService = {
 
@@ -46,7 +45,7 @@ var AuraEventService = function() {
         newEvent : function(name){
             aura.assert(name, "name");
 
-            name = priv.qualifyEventName(name);
+            name = qualifyEventName(name);
             var eventDef = $A.services.event.getEventDef(name);
             if (!eventDef) {
                 return null;
@@ -54,7 +53,7 @@ var AuraEventService = function() {
 
             var config = {};
             config["eventDef"] = eventDef;
-            config["eventDispatcher"] = priv.eventDispatcher;
+            config["eventDispatcher"] = eventDispatcher;
 
             return new Event(config);
 
@@ -77,12 +76,12 @@ var AuraEventService = function() {
          * @public
          */
         addHandler : function(config) {
-            config["event"] = priv.qualifyEventName(config["event"]);
+            config["event"] = qualifyEventName(config["event"]);
 
-            var handlers = priv.eventDispatcher[config["event"]];
+            var handlers = eventDispatcher[config["event"]];
             if (!handlers) {
                 handlers = {};
-                priv.eventDispatcher[config["event"]] = handlers;
+                eventDispatcher[config["event"]] = handlers;
             }
             var cmpHandlers = handlers[config["globalId"]];
             if (cmpHandlers === undefined) {
@@ -99,9 +98,9 @@ var AuraEventService = function() {
          * @public
          */
         removeHandler : function(config) {
-            config["event"] = priv.qualifyEventName(config["event"]);
+            config["event"] = qualifyEventName(config["event"]);
 
-            var handlers = priv.eventDispatcher[config["event"]];
+            var handlers = eventDispatcher[config["event"]];
             if (handlers) {
                 delete handlers[config["globalId"]];
             }
@@ -115,7 +114,7 @@ var AuraEventService = function() {
          * @public
          */
         getEventDef : function(config) {
-            return priv.registry.getEventDef(config);
+            return registry.getEventDef(config);
         },
 
         /**
@@ -125,9 +124,9 @@ var AuraEventService = function() {
          * @public
          */
         hasHandlers : function(name) {
-            name = priv.qualifyEventName(name);
+            name = qualifyEventName(name);
 
-            return !$A.util.isUndefined(priv.eventDispatcher[name]);
+            return !$A.util.isUndefined(eventDispatcher[name]);
         }
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,
@@ -139,7 +138,7 @@ var AuraEventService = function() {
          */
         getRegisteredEvents : function() {
             var ret = "";
-            for ( var event in priv.registry.eventDefs) {
+            for ( var event in registry.eventDefs) {
                 ret = ret + event;
                 ret = ret + "\n";
             }

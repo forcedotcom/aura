@@ -24,7 +24,7 @@ import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import static org.auraframework.instance.ValueProviderType.LABEL;
+import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 @Controller
 public class LabelController {
@@ -32,7 +32,7 @@ public class LabelController {
     @AuraEnabled
     public static String getLabel(@Key("section") String section, @Key("name") String name) throws QuickFixException {
         GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
-                .get(LABEL);
+                .get(LABEL.getPrefix());
         PropertyReference labelRef = new PropertyReferenceImpl(section + "." + name, null);
         return (String) labelProvider.getValue(labelRef);
     }

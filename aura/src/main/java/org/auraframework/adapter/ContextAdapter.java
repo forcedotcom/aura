@@ -53,7 +53,7 @@ public interface ContextAdapter extends AuraAdapter {
      */
     AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            Map<String, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc);
 
     /**
@@ -71,7 +71,7 @@ public interface ContextAdapter extends AuraAdapter {
      */
     AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            Map<String, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc,
             boolean isDebugToolEnabled);
     

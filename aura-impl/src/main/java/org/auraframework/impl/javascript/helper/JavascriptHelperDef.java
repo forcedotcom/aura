@@ -15,7 +15,7 @@
  */
 package org.auraframework.impl.javascript.helper;
 
-import static org.auraframework.instance.ValueProviderType.LABEL;
+import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.util.Map;
@@ -52,7 +52,7 @@ public class JavascriptHelperDef extends DefinitionImpl<HelperDef> implements He
     @Override
     public void retrieveLabels() throws QuickFixException {
         GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
-                .get(LABEL);
+                .get(LABEL.getPrefix());
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());

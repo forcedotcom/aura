@@ -32,7 +32,6 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.instance.ValueProviderType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.json.Json;
@@ -230,7 +229,7 @@ public interface AuraContext {
 
     Authentication getAccess();
 
-    Map<ValueProviderType, GlobalValueProvider> getGlobalProviders();
+    Map<String, GlobalValueProvider> getGlobalProviders();
 
     String getContextPath();
 

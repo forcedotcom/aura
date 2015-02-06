@@ -1027,7 +1027,15 @@ CKEDITOR.DIALOG_RESIZE_BOTH = 3;
 				editor.focus();
 
 				// Give a while before unlock, waiting for focus to return to the editable. (#172)
-				setTimeout( function() { editor.focusManager.unlock(); }, 0 );
+				setTimeout( function() {
+					editor.focusManager.unlock();
+
+					// Fixed iOS focus issue (#12381).
+					// Keep in mind that editor.focus() does not work in this case.
+					if ( CKEDITOR.env.iOS ) {
+						editor.window.focus();
+					}
+				}, 0 );
 
 			} else
 				CKEDITOR.dialog._.currentZIndex -= 10;
@@ -2612,7 +2620,7 @@ CKEDITOR.DIALOG_RESIZE_BOTH = 3;
 				cursor = element,
 				tabId;
 			while ( ( cursor = cursor.getParent() ) && cursor.$.className.search( 'cke_dialog_page_contents' ) == -1 ) {
-				/*jsl:pass*/
+
 			}
 
 			// Some widgets don't have parent tabs (e.g. OK and Cancel buttons).

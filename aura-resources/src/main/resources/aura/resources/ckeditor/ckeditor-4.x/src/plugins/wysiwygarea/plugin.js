@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
@@ -142,30 +142,6 @@
 		script = doc.getElementById( 'cke_basetagscrpt' );
 		script && script.parentNode.removeChild( script );
 
-		if ( CKEDITOR.env.gecko ) {
-			// Force Gecko to change contentEditable from false to true on domReady
-			// (because it's previously set to true on iframe's body creation).
-			// Otherwise del/backspace and some other editable features will be broken in Fx <4
-			// See: #107 and https://bugzilla.mozilla.org/show_bug.cgi?id=440916
-			body.contentEditable = false;
-
-			// Remove any leading <br> which is between the <body> and the comment.
-			// This one fixes Firefox 3.6 bug: the browser inserts a leading <br>
-			// on document.write if the body has contenteditable="true".
-			if ( CKEDITOR.env.version < 20000 ) {
-				body.innerHTML = body.innerHTML.replace( /^.*<!-- cke-content-start -->/, '' );
-
-				// The above hack messes up the selection in FF36.
-				// To clean this up, manually select collapsed range that
-				// starts within the body.
-				setTimeout( function() {
-					var range = new CKEDITOR.dom.range( new CKEDITOR.dom.document( doc ) );
-					range.setStart( new CKEDITOR.dom.node( body ), 0 );
-					editor.getSelection().selectRanges( [ range ] );
-				}, 0 );
-			}
-		}
-
 		body.contentEditable = true;
 
 		if ( CKEDITOR.env.ie ) {
@@ -186,6 +162,7 @@
 		doc = new CKEDITOR.dom.document( doc );
 
 		this.setup();
+		this.fixInitialSelection();
 
 		if ( CKEDITOR.env.ie ) {
 			doc.getDocumentElement().addClass( doc.$.compatMode );
@@ -286,7 +263,8 @@
 		}
 
 		var title = editor.document.getElementsByTag( 'title' ).getItem( 0 );
-		title.data( 'cke-title', editor.document.$.title );
+		// document.title is malfunctioning on Chrome, so get value from the element (#12402).
+		title.data( 'cke-title', title.getText() );
 
 		// [IE] JAWS will not recognize the aria label we used on the iframe
 		// unless the frame window title string is used as the voice label,
@@ -349,6 +327,8 @@
 
 				if ( isSnapshot ) {
 					this.setHtml( data );
+					this.fixInitialSelection();
+
 					// Fire dataReady for the consistency with inline editors
 					// and because it makes sense. (#10370)
 					editor.fire( 'dataReady' );
@@ -401,7 +381,7 @@
 
 						// The base must be the first tag in the HEAD, e.g. to get relative
 						// links on styles.
-						baseTag && ( data = data.replace( /<head>/, '$&' + baseTag ) );
+						baseTag && ( data = data.replace( /<head[^>]*?>/, '$&' + baseTag ) );
 
 						// Inject the extra stuff into <head>.
 						// Attention: do not change it before testing it well. (V2)
@@ -685,7 +665,8 @@ CKEDITOR.config.disableNativeSpellChecker = true;
  *
  * **Note:** This configuration value is ignored by [inline editor](#!/guide/dev_inline)
  * as it uses the styles that come directly from the page that CKEditor is
- * rendered on.
+ * rendered on. It is also ignored in the {@link #fullPage full page mode} in
+ * which developer has a full control over the HTML.
  *
  *		config.contentsCss = '/css/mysitestyles.css';
  *		config.contentsCss = ['/css/mysitestyles.css', '/css/anotherfile.css'];
@@ -697,7 +678,9 @@ CKEDITOR.config.contentsCss = CKEDITOR.getUrl( 'contents.css' );
 
 /**
  * Language code of  the writing language which is used to author the editor
- * content.
+ * content. This option accepts one single entry value in the format defined in the
+ * [Tags for Identifying Languages (BCP47)](http://www.ietf.org/rfc/bcp/bcp47.txt)
+ * IETF document and is used in the `lang` attribute.
  *
  *		config.contentsLanguage = 'fr';
  *
@@ -719,10 +702,12 @@ CKEDITOR.config.contentsCss = CKEDITOR.getUrl( 'contents.css' );
  * Whether to automatically create wrapping blocks around inline content inside the document body.
  * This helps to ensure the integrity of the block *Enter* mode.
  *
- * **Note:** Changing the default value might introduce unpredictable usability issues.
+ * **Note:** This option is deprecated. Changing the default value might introduce unpredictable usability issues and is
+ * highly unrecommended.
  *
  *		config.autoParagraph = false;
  *
+ * @deprecated
  * @since 3.6
  * @cfg {Boolean} [autoParagraph=true]
  * @member CKEDITOR.config

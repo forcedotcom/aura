@@ -18,7 +18,8 @@
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-
+    
+    
     <!--Testing to make sure that the utility can handle inputs with multiple ids
         Note that the ariaDescribedBy attribute is set in this components init function.-->
     <aura:if isTrue="{!v.caseToRender == 'testMultiULToOne'}">
@@ -128,6 +129,7 @@
           </tr>
        </table>
     </aura:if>
+    
      <!--Should Pass since we are using scope but don't have TD--> 
     <aura:if isTrue="{!v.caseToRender == 'testThWithScopeNoTD'}">
        <table>

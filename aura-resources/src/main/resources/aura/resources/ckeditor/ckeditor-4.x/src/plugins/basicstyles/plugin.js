@@ -147,11 +147,11 @@ CKEDITOR.config.coreStyles_italic = { element: 'em', overrides: 'i' };
 CKEDITOR.config.coreStyles_underline = { element: 'u' };
 
 /**
- * The style definition that applies the <strike>strike-through</strike> style to the text.
+ * The style definition that applies the <strike>strikethrough</strike> style to the text.
  *
  *		CKEDITOR.config.coreStyles_strike = {
  *			element: 'span',
- *			attributes: { 'class': 'StrikeThrough' },
+ *			attributes: { 'class': 'Strikethrough' },
  *			overrides: 'strike'
  *		};
  *

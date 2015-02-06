@@ -1,3 +1,5 @@
+/* jshint browser: false, node: true */
+
 'use strict';
 
 var config = {
@@ -24,18 +26,21 @@ var config = {
 			applications: [ 'ckeditor' ],
 			basePath: 'tests/',
 			paths: [
-				'adapters/',
-				'!/_'
+				'adapters/**',
+				'!**/_*/**'
 			],
-			jquery: [ '1.7', '1.7.2', '1.8.3', '1.9.1', '1.10.2', '2.0.0' ]
+			// Latest of the old API (1.8.3)
+			// Latest of the 1.* branch
+			// Latest of the 2.* branch
+			jquery: [ '1.8.3', '1.11.1', '2.1.1' ]
 		},
 
 		'Core': {
 			applications: [ 'ckeditor' ],
 			basePath: 'tests/',
 			paths: [
-				'core/',
-				'!/_'
+				'core/**',
+				'!**/_*/**'
 			],
 			regressions: {
 				// IE8 (#11242)
@@ -45,19 +50,13 @@ var config = {
 				// IE8 (fails only in testing env - window.window === window gives false)
 				'tests/core/tools#test_clone_Window': 'env.ie && env.version == 8',
 
-				// Safari (#11111)
-				'tests/core/dom/range/enlarge#test_enlarge_element12': 'env.safari',
-
 				// Safari (#11980)
 				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace #2': 'env.safari',
 				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace #3': 'env.safari',
 				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace #9': 'env.safari',
 				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace, merge #2': 'env.safari',
 				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace, merge #3': 'env.safari',
-				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace, merge #8': 'env.safari',
-
-				// Firefox (#12104)
-				'tests/core/editor/focus#test blur after setData': 'env.gecko'
+				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace, merge #8': 'env.safari'
 			}
 		},
 
@@ -65,8 +64,8 @@ var config = {
 			applications: [ 'ckeditor' ],
 			basePath: 'tests/',
 			paths: [
-				'plugins/',
-				'!/_'
+				'plugins/**',
+				'!**/_*/**'
 			],
 			regressions: {
 				// IE10
@@ -82,20 +81,33 @@ var config = {
 				// Firefox (#11399)
 				'tests/plugins/widget/nestededitables#test selection in nested editable is preserved after opening and closing dialog - inline editor': 'env.gecko',
 
-				// Firefox (#12104)
-				'tests/plugins/widget/widgetselection#test focusing widget': 'env.gecko',
-				'tests/plugins/widget/widgetselection#test focusing by click': 'env.gecko',
-				'tests/plugins/widget/widgetselection#test focus editor when focusing widget by click': 'env.gecko',
-				'tests/plugins/widget/widgetselection#test focus editor when focusing widget by method': 'env.gecko'
+				// https://bugzilla.mozilla.org/show_bug.cgi?id=911201
+				'tests/plugins/magicline/widgets#test commands[previous], first block in nested': 'env.gecko',
+				'tests/plugins/magicline/widgets#test commands[next], block after block in nested': 'env.gecko',
+				'tests/plugins/magicline/widgets#test commands[previous], block before block in nested': 'env.gecko',
+				'tests/plugins/magicline/widgets#test commands[next], last block in nested': 'env.gecko',
+
+				// Safari (#12690)
+				'tests/plugins/font/font#test apply font size over another font size (collapsed selection in empty span)': 'env.safari',
+				'tests/plugins/font/font#test apply font size over another font size (deeply nested collapsed selection)': 'env.safari'
 			}
+		},
+
+		'External Plugins': {
+			applications: [ 'ckeditor' ],
+			basePath: 'plugins/',
+			paths: [
+				'*/tests/**',
+				'!**/_*/**'
+			]
 		},
 
 		'Tickets': {
 			applications: [ 'ckeditor' ],
 			basePath: 'tests/',
 			paths: [
-				'tickets/',
-				'!/_'
+				'tickets/**',
+				'!**/_*/**'
 			],
 			regressions: {
 				// IE8 & IE9 have problems with loading iframe.
@@ -107,9 +119,13 @@ var config = {
 			applications: [ 'ckeditor' ],
 			basePath: 'tests/',
 			paths: [
-				'utils/',
-				'!/_'
-			]
+				'utils/**',
+				'!**/_*/**'
+			],
+			regressions: {
+				// Safari (#12690)
+				'tests/utils/selection/setgetwithhtml#test setSelection - in empty inline element': 'env.safari'
+			}
 		}
 	}
 };

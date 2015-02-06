@@ -327,7 +327,8 @@
 
 			var node, element, check,
 				toBeChecked = [],
-				enterTag = enterModeTags[ enterMode || ( this.editor ? this.editor.enterMode : CKEDITOR.ENTER_P ) ];
+				enterTag = enterModeTags[ enterMode || ( this.editor ? this.editor.enterMode : CKEDITOR.ENTER_P ) ],
+				parentDtd;
 
 			// Remove elements in reverse order - from leaves to root, to avoid conflicts.
 			while ( ( node = toBeRemoved.pop() ) ) {
@@ -345,6 +346,9 @@
 				if ( !element.parent )
 					continue;
 
+				// Handle custom elements as inline elements (#12683).
+				parentDtd = DTD[ element.parent.name ] || DTD.span;
+
 				switch ( check.check ) {
 					// Check if element itself is correct.
 					case 'it':
@@ -359,17 +363,13 @@
 					// Check if element is in correct context. If not - remove element.
 					case 'el-up':
 						// Check if e.g. li is a child of body after ul has been removed.
-						if ( element.parent.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT &&
-							!DTD[ element.parent.name ][ element.name ]
-						)
+						if ( element.parent.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT && !parentDtd[ element.name ] )
 							removeElement( element, enterTag, toBeChecked );
 						break;
 
 					// Check if element is in correct context. If not - remove parent.
 					case 'parent-down':
-						if ( element.parent.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT &&
-							!DTD[ element.parent.name ][ element.name ]
-						)
+						if ( element.parent.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT && !parentDtd[ element.name ] )
 							removeElement( element.parent, enterTag, toBeChecked );
 						break;
 				}
@@ -720,9 +720,10 @@
 
 				// Create test element from string.
 				element = mockElementFromString( test );
-			} else
+			} else {
 				// Create test element from CKEDITOR.style.
 				element = mockElementFromStyle( test );
+			}
 
 			// Make a deep copy.
 			var clone = CKEDITOR.tools.clone( element ),
@@ -749,13 +750,14 @@
 			} );
 
 			// Element has been marked for removal.
-			if ( toBeRemoved.length > 0 )
+			if ( toBeRemoved.length > 0 ) {
 				result = false;
 			// Compare only left to right, because clone may be only trimmed version of original element.
-			else if ( !CKEDITOR.tools.objectCompare( element.attributes, clone.attributes, true ) )
+			} else if ( !CKEDITOR.tools.objectCompare( element.attributes, clone.attributes, true ) ) {
 				result = false;
-			else
+			} else {
 				result = true;
+			}
 
 			// Cache result of this test - we can build cache only for string tests.
 			if ( typeof test == 'string' )
@@ -801,7 +803,21 @@
 
 				return CKEDITOR.ENTER_BR;
 			};
-		} )()
+		} )(),
+
+		/**
+		 * Destroys the filter instance and removes it from the global {@link CKEDITOR.filter#instances} object.
+		 *
+		 * @since 4.4.5
+		 */
+		destroy: function() {
+			delete CKEDITOR.filter.instances[ this.id ];
+			// Deleting reference to filter instance should be enough,
+			// but since these are big objects it's safe to clean them up too.
+			delete this._;
+			delete this.allowedContent;
+			delete this.disallowedContent;
+		}
 	};
 
 	function addAndOptimizeRules( that, newRules, featureName, standardizedRules, optimizedRules ) {
@@ -1207,7 +1223,7 @@
 	// Create pseudo element that will be passed through filter
 	// to check if tested string is allowed.
 	function mockElementFromString( str ) {
-		var element = parseRulesString( str )[ '$1' ],
+		var element = parseRulesString( str ).$1,
 			styles = element.styles,
 			classes = element.classes;
 
@@ -1235,8 +1251,9 @@
 		if ( styles ) {
 			styles = copy( styles );
 			attrs.style = CKEDITOR.tools.writeCssText( styles, true );
-		} else
+		} else {
 			styles = {};
+		}
 
 		var el = {
 			name: styleDef.element,
@@ -1320,7 +1337,7 @@
 	function optimizeRules( optimizedRules, rules ) {
 		var elementsRules = optimizedRules.elements,
 			genericRules = optimizedRules.generic,
-			i, l, j, rule, element, priority;
+			i, l, rule, element, priority;
 
 		for ( i = 0, l = rules.length; i < l; ++i ) {
 			// Shallow copy. Do not modify original rule.
@@ -1352,8 +1369,8 @@
 		}
 	}
 
-	//                  <   elements   ><                      styles, attributes and classes                       >< separator >
-	var rulePattern = /^([a-z0-9*\s]+)((?:\s*\{[!\w\-,\s\*]+\}\s*|\s*\[[!\w\-,\s\*]+\]\s*|\s*\([!\w\-,\s\*]+\)\s*){0,3})(?:;\s*|$)/i,
+	//                  <   elements   ><                       styles, attributes and classes                        >< separator >
+	var rulePattern = /^([a-z0-9\-*\s]+)((?:\s*\{[!\w\-,\s\*]+\}\s*|\s*\[[!\w\-,\s\*]+\]\s*|\s*\([!\w\-,\s\*]+\)\s*){0,3})(?:;\s*|$)/i,
 		groupsPatterns = {
 			styles: /{([^}]+)}/,
 			attrs: /\[([^\]]+)\]/,
@@ -1373,8 +1390,9 @@
 				styles = parseProperties( props, 'styles' );
 				attrs = parseProperties( props, 'attrs' );
 				classes = parseProperties( props, 'classes' );
-			} else
+			} else {
 				styles = attrs = classes = null;
+			}
 
 			// Add as an unnamed rule, because there can be two rules
 			// for one elements set defined in string format.
@@ -1571,8 +1589,7 @@
 	// Copy element's styles and classes back to attributes array.
 	function updateAttributes( element ) {
 		var attrs = element.attributes,
-			stylesArr = [],
-			name, styles;
+			styles;
 
 		// Will be recreated later if any of styles/classes exists.
 		delete attrs.style;
@@ -1645,8 +1662,9 @@
 			if ( stylesArr.length )
 				attrs.style = stylesArr.sort().join( '; ' );
 		}
-		else if ( origStyles )
+		else if ( origStyles ) {
 			attrs.style = origStyles;
+		}
 
 		if ( !status.allClasses || status.hadInvalidClass ) {
 			for ( i = 0; i < classes.length; ++i ) {
@@ -1660,15 +1678,14 @@
 			if ( origClasses && classesArr.length < origClasses.split( /\s+/ ).length )
 				isModified = true;
 		}
-		else if ( origClasses )
+		else if ( origClasses ) {
 			attrs[ 'class' ] = origClasses;
+		}
 
 		return isModified;
 	}
 
 	function validateElement( element ) {
-		var attrs;
-
 		switch ( element.name ) {
 			case 'a':
 				// Code borrowed from htmlDataProcessor, so ACF does the same clean up.
@@ -1703,15 +1720,6 @@
 	//
 	// REMOVE ELEMENT ---------------------------------------------------------
 	//
-
-	// Checks whether node is allowed by DTD.
-	function allowedIn( node, parentDtd ) {
-		if ( node.type == CKEDITOR.NODE_ELEMENT )
-			return parentDtd[ node.name ];
-		if ( node.type == CKEDITOR.NODE_TEXT )
-			return parentDtd[ '#' ];
-		return true;
-	}
 
 	// Check whether all children will be valid in new context.
 	// Note: it doesn't verify if text node is valid, because
@@ -1805,8 +1813,7 @@
 
 		var parent = element.parent,
 			shouldAutoP = parent.type == CKEDITOR.NODE_DOCUMENT_FRAGMENT || parent.name == 'body',
-			i, j, child, p, node,
-			toBeRemoved = [];
+			i, child, p, parentDtd;
 
 		for ( i = children.length; i > 0; ) {
 			child = children[ --i ];
@@ -1827,12 +1834,14 @@
 			// Child which doesn't need to be auto paragraphed.
 			else {
 				p = null;
+				parentDtd = DTD[ parent.name ] || DTD.span;
+
 				child.insertAfter( element );
 				// If inserted into invalid context, mark it and check
 				// after removing all elements.
 				if ( parent.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT &&
 					child.type == CKEDITOR.NODE_ELEMENT &&
-					!DTD[ parent.name ][ child.name ]
+					!parentDtd[ child.name ]
 				)
 					toBeChecked.push( { check: 'el-up', el: child } );
 			}
@@ -1847,7 +1856,7 @@
 	// isn't first/last child of its parent.
 	// Then replace element with its children.
 	// <p>a</p><p>b</p> => <p>a</p><br>b => a<br>b
-	function stripBlockBr( element, toBeChecked ) {
+	function stripBlockBr( element ) {
 		var br;
 
 		if ( element.previous && !isBrOrBlock( element.previous ) ) {
@@ -2160,8 +2169,9 @@
 							if ( existingClassesPattern.indexOf( cl ) == -1 )
 								el.classes.push( cl );
 						}
-					} else
+					} else {
 						el.attributes[ attrName ] = defAttrs[ attrName ];
+					}
 
 				}
 

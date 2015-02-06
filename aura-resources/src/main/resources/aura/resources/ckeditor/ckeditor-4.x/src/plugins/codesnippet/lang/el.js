@@ -4,9 +4,10 @@
  */
 
 CKEDITOR.plugins.setLang( 'codesnippet', 'el', {
-	button: 'Εισαγωγή τμήματος κώδικα',
+	button: 'Εισαγωγή Αποσπάσματος Κώδικα',
 	codeContents: 'Περιεχόμενο κώδικα',
 	emptySnippetError: 'Δεν γίνεται να είναι κενά τα αποσπάσματα κώδικα.',
 	language: 'Γλώσσα',
-	title: 'Απόσπασμα κώδικα'
+	title: 'Απόσπασμα κώδικα',
+	pathName: 'απόσπασμα κώδικα'
 } );

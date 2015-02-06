@@ -153,7 +153,13 @@
                 value = $A.util.getBooleanValue(value);
             }
 
-            var isHash = $A.util.isString(value) && value.indexOf("#") === 0;
+            var isString = $A.util.isString(value);
+            if (isString && value.indexOf("/auraFW") === 0) {
+                // prepend any Aura resource urls with servlet context path
+                value = $A.getContext().getContextPath() + value;
+            }
+
+            var isHash = isString && value.indexOf("#") === 0;
             if (lowerName === "href" && element.tagName === "A" && value && (isHash || $A.util.supportsTouchEvents())) {
                 var HTMLAttributes = component.get("v.HTMLAttributes");
                 var target = HTMLAttributes["target"];

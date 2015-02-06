@@ -162,7 +162,7 @@ public class AuraContextFilter implements Filter {
 
         String contextPath = request.getContextPath();
         // some appservers (like tomcat) use "/" as the root path, others ""
-        if ("/".equals(contextPath)) {
+        if (contextPath == null || "/".equals(contextPath)) {
             contextPath = "";
         }
         context.setContextPath(contextPath);

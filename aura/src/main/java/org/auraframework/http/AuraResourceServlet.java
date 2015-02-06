@@ -64,6 +64,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
     private static final String RESOURCE_URLS = "resourceURLs";
     private static final String LAST_MOD = "lastMod";
+    private static final String CONTEXT_PATH = "contextPath";
     private static final String UID = "uid";
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
@@ -252,6 +253,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
             attribs.put(LAST_MOD,
                     String.format("app=%s, FW=%s", appUid, Aura.getConfigAdapter().getAuraFrameworkNonce()));
             attribs.put(UID, appUid);
+            // prepend servlet context path to reset css
+            attribs.put(CONTEXT_PATH, context.getContextPath());
             StringWriter sw = new StringWriter();
 
             for (String s : getStyles()) {

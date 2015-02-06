@@ -16,11 +16,13 @@
 package org.auraframework.test.css;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -315,6 +317,30 @@ public class StyleParserTest extends AuraImplTestCase {
                 sb.append(errors[i]);
             }
             goldFileText(sb.toString());
+        }
+    }
+
+    /**
+     * Context path should be prepended to any /auraFW url in css url function
+     */
+    public void testUrlFunctionContextPath() throws Exception {
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
+        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor("auratest:testApplication1", ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
+                AuraContext.Authentication.AUTHENTICATED, desc);
+        String coolContext = "/cool";
+        context.setContextPath(coolContext);
+        context.setApplicationDescriptor(desc);
+        final String uid = context.getDefRegistry().getUid(null, desc);
+        context.addLoaded(desc, uid);
+        StyleDef styleDef = desc.getDef().getStyleDef();
+        String styleStr = toJson(styleDef);
+        int start = styleStr.indexOf("/auraFW");
+        String cool = styleStr.substring(start - 5, start);
+        if (!cool.equals(coolContext)) {
+            fail("Context path was not prepended to Aura url in css url function");
         }
     }
 }

@@ -52,4 +52,6 @@
             name="frame"
             frameBorder="0" />
 
+    <ui:image aura:id="img" src="/auraFW/resources/aura/s.gif" imageType="informational" alt="Aura" />
+
 </aura:component>

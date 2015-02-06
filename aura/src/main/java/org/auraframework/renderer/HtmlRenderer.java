@@ -89,11 +89,19 @@ public class HtmlRenderer implements Renderer {
                     value = ((Expression) value).evaluate(component.getAttributes().getValueProvider());
                 }
                 if (value != null) {
+
+                    String v = value.toString();
+                    String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+                    if (v.startsWith("/auraFW") && !contextPath.isEmpty()) {
+                        // prepend any Aura resource urls with servlet context path
+                        v = contextPath + v;
+                    }
+
                     out.append(' ');
                     out.append(entry.getKey().getName());
                     out.append('=');
                     out.append('"');
-                    out.append(value.toString());
+                    out.append(v);
                     out.append('"');
                 }
             }

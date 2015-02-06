@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = AuraContext.prototype;
-exp(p,
-    "getMode", p.getMode,
-    "incrementTransaction", p.incrementTransaction,
-    "getApp", p.getApp,
-    "getCurrentAction", p.getCurrentAction,
-    "setCurrentAction", p.setCurrentAction,
-    "getContextPath", p.getContextPath,
-    "clearComponentConfigs", p.clearComponentConfigs
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        ,
-        "getNum", p.getNum,
-        "getLoaded", p.getLoaded,
-        "getPreloadedNamespaces", p.getPreloadedNamespaces
-    //#end
-);
+package org.auraframework.impl.css.parser;
+
+import com.salesforce.omakase.ast.declaration.UrlFunctionValue;
+import com.salesforce.omakase.broadcast.annotation.Rework;
+import com.salesforce.omakase.plugin.Plugin;
+import org.auraframework.Aura;
+
+/**
+ * Rewrites url() CSS to prepend servlet context path
+ */
+final class UrlContextPathPlugin implements Plugin {
+    @Rework
+    public void rework(UrlFunctionValue value) {
+        if (value.url().startsWith("/auraFW")) {
+            value.url(Aura.getContextService().getCurrentContext().getContextPath() + value.url());
+        }
+    }
+}

@@ -27,6 +27,9 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.AuraTextUtil;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ApplicationDef
  * 
@@ -115,6 +118,30 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest\"";
         if (!tag.contains(expectedAttribute)) {
             fail("Did not find expected manifest attribute <" + expectedAttribute + "> in:" + tag);
+        }
+    }
+
+    /**
+     * Context path should be prepended to urls
+     */
+    public void testUrlContextPath() throws Exception {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String coolContext = "/cool";
+        context.setContextPath(coolContext);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application render='client' useAppcache='true'></aura:application>");
+        context.setApplicationDescriptor(desc);
+        final String uid = context.getDefRegistry().getUid(null, desc);
+        context.addLoaded(desc, uid);
+        String body = doWrite(desc.getDef());
+        Pattern pattern = Pattern.compile("/auraFW|/l/");
+        Matcher matcher = pattern.matcher(body);
+        while(matcher.find()) {
+            int start =  matcher.start();
+            String cool = body.substring(start - 5, start);
+            if (!cool.equals(coolContext)) {
+                fail("Context path was not prepended to Aura urls");
+            }
         }
     }
 

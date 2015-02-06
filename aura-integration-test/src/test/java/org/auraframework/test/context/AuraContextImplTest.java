@@ -378,4 +378,18 @@ public class AuraContextImplTest extends AuraImplTestCase {
         // also expect the vars hash to be present
         goldFileJson(res);
     }
+
+    /**
+     * Verify contextPath property in JSON is set when contextPath present.
+     */
+    public void testSerializeWithContextPath() throws Exception {
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+
+        AuraContext ctx = Aura.getContextService()
+                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
+        ctx.setContextPath("/cool");
+        String res = getAuraTestingUtil().getSerializedAuraContext(ctx);
+
+        assertTrue(res.contains("\"contextPath\":\"/cool\""));
+    }
 }

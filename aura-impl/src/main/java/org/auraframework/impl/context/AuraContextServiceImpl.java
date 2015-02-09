@@ -17,7 +17,7 @@ package org.auraframework.impl.context;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,22 +154,21 @@ public class AuraContextServiceImpl implements ContextService {
         return ret.toArray(new DefRegistry[ret.size()]);
     }
     
-    private Map<ValueProviderType, GlobalValueProvider> getGlobalProviders() {
+    private Map<String, GlobalValueProvider> getGlobalProviders() {
         // load any @Primary GlobalValueProviderAdatper first, to give it's
         // implementations precedence
         GlobalValueProviderAdapter primaryFactory = ServiceLocator.get().get(GlobalValueProviderAdapter.class);
-        Map<ValueProviderType, GlobalValueProvider> instances = new EnumMap<ValueProviderType, GlobalValueProvider>(
-                ValueProviderType.class);
+        Map<String, GlobalValueProvider> instances = new HashMap<String, GlobalValueProvider>();
         for (GlobalValueProvider g : primaryFactory.createValueProviders()) {
-            instances.put(g.getValueProviderKey(), g);
+            instances.put(g.getValueProviderKey().getPrefix(), g);
         }
         Collection<GlobalValueProviderAdapter> factories = ServiceLocator.get()
                 .getAll(GlobalValueProviderAdapter.class);
         for (GlobalValueProviderAdapter factory : factories) {
             if (!factory.equals(primaryFactory)) {
                 for (GlobalValueProvider g : factory.createValueProviders()) {
-                    if (!instances.containsKey(g.getValueProviderKey())) {
-                        instances.put(g.getValueProviderKey(), g);
+                    if (!instances.containsKey(g.getValueProviderKey().getPrefix())) {
+                        instances.put(g.getValueProviderKey().getPrefix(), g);
                     }
                 }
             }

@@ -25,6 +25,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.AuraTextUtil;
@@ -66,7 +67,7 @@ public class LabelValueProvider implements GlobalValueProvider {
 
     @Override
     public ValueProviderType getValueProviderKey() {
-        return ValueProviderType.LABEL;
+        return AuraValueProviderType.LABEL;
     }
 
     @Override

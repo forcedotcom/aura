@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +22,10 @@ import java.util.Set;
 import org.auraframework.adapter.GlobalValueProviderAdapter;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.ValueProviderType;
+
+import com.google.common.collect.Sets;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -50,6 +52,6 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
 
     @Override
     public Set<ValueProviderType> getKeys() {
-        return EnumSet.of(ValueProviderType.LABEL, ValueProviderType.LOCALE, ValueProviderType.BROWSER);
+        return Sets.<ValueProviderType>newHashSet(AuraValueProviderType.LABEL, AuraValueProviderType.LOCALE, AuraValueProviderType.BROWSER);
     }
 }

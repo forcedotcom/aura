@@ -24,6 +24,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
@@ -93,7 +94,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
 
     @Override
     public ValueProviderType getValueProviderKey() {
-        return ValueProviderType.BROWSER;
+        return AuraValueProviderType.BROWSER;
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package org.auraframework.impl.root.component;
 
-import static org.auraframework.instance.ValueProviderType.LABEL;
+import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -63,7 +63,7 @@ import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -414,21 +414,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (PropertyReference e : expressionRefs) {
             String root = e.getRoot();
 
-            ValueProviderType vpt = ValueProviderType.getTypeByPrefix(root);
+            AuraValueProviderType vpt = AuraValueProviderType.getTypeByPrefix(root);
             if (vpt == null) {
                 // validate that its a foreachs
-            } else if (vpt.isGlobal()) {
-                AuraContext lc = Aura.getContextService().getCurrentContext();
-                GlobalValueProvider gvp = lc.getGlobalProviders().get(vpt);
-                if (gvp != null) {
-                    PropertyReference stem = e.getStem();
-                    if (stem == null) {
-                        throw new InvalidExpressionException("Expression didn't have enough terms: " + e,
-                                e.getLocation());
-                    }
-                    gvp.validate(stem);
-                }
-            } else if (vpt == ValueProviderType.VIEW) {
+            } else if (vpt == AuraValueProviderType.VIEW) {
                 if (e.getStem() != null) { // checks for private attributes used in expressions ..
                     String stem = e.getStem().toString();
                     AttributeDef attr = getAttributeDef(stem);
@@ -438,6 +427,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                                 "Expression %s refers to a private attribute '%s' ", e, attr), e.getLocation());
                     }
                 }
+            } else {
+                AuraContext lc = Aura.getContextService().getCurrentContext();
+                GlobalValueProvider gvp = lc.getGlobalProviders().get(root);
+                if (gvp != null && gvp.getValueProviderKey().isGlobal()) {
+                    PropertyReference stem = e.getStem();
+                    if (stem == null) {
+                        throw new InvalidExpressionException("Expression didn't have enough terms: " + e,
+                                e.getLocation());
+                    }
+                    gvp.validate(stem);
+                }
             }
         }
     }
@@ -446,7 +446,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public void retrieveLabels() throws QuickFixException {
         // only get our direct labels, all others are handled by dependencies.
         GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
-                .get(LABEL);
+                .get(LABEL.getPrefix());
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());

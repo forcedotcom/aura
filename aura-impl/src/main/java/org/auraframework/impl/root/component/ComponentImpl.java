@@ -29,7 +29,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
-import org.auraframework.instance.ValueProviderType;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -118,7 +118,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                             // new component may have its own controllerdef so add that one
                             ControllerDef cd = c.getControllerDef();
                             if (cd != null) {
-                                this.valueProviders.put(ValueProviderType.CONTROLLER.getPrefix(), cd);
+                                this.valueProviders.put(AuraValueProviderType.CONTROLLER.getPrefix(), cd);
                             }
                         } catch (DefinitionNotFoundException dnfe) {
                             throw new AuraRuntimeException(String.format("%s did not provide a valid component",

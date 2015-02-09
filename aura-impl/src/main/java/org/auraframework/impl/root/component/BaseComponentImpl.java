@@ -48,7 +48,7 @@ import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Model;
 import org.auraframework.instance.ValueProvider;
-import org.auraframework.instance.ValueProviderType;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
@@ -206,7 +206,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 this.valueProviders.putAll(valueProviders);
             }
 
-            this.valueProviders.put(ValueProviderType.VIEW.getPrefix(), attributeSet);
+            this.valueProviders.put(AuraValueProviderType.VIEW.getPrefix(), attributeSet);
 
             // def can be null if a definition not found exception was thrown for that definition. Odd.
             if (def != null) {
@@ -215,7 +215,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                     // Insure that this def is allowed to create an instance of the controller
                     defRegistry.assertAccess(descriptor, cd);
 
-                    this.valueProviders.put(ValueProviderType.CONTROLLER.getPrefix(), cd);
+                    this.valueProviders.put(AuraValueProviderType.CONTROLLER.getPrefix(), cd);
                 }
             }
 
@@ -380,7 +380,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 model = modelDef.newInstance();
                 if (modelDef.hasMembers()) {
                     hasLocalDependencies = true;
-                    valueProviders.put(ValueProviderType.MODEL.getPrefix(), model);
+                    valueProviders.put(AuraValueProviderType.MODEL.getPrefix(), model);
                 }
             }
         } finally {
@@ -432,10 +432,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
             Object root = valueProviders.get(prefix);
             if (root == null) {
-                ValueProviderType vpt = ValueProviderType.getTypeByPrefix(prefix);
-                if (vpt != null) {
-                    root = context.getGlobalProviders().get(vpt);
-                }
+                root = context.getGlobalProviders().get(prefix);
             }
             if (root != null) {
                 if (stem != null) {

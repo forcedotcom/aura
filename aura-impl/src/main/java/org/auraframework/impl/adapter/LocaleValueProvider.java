@@ -30,6 +30,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -163,7 +164,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
     @Override
     public ValueProviderType getValueProviderKey() {
-        return ValueProviderType.LOCALE;
+        return AuraValueProviderType.LOCALE;
     }
 
     @Override

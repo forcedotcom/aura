@@ -50,7 +50,6 @@ import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -299,7 +298,7 @@ public class AuraContextImpl implements AuraContext {
 
     private final Format format;
 
-    private final Map<ValueProviderType, GlobalValueProvider> globalProviders;
+    private final Map<String, GlobalValueProvider> globalProviders;
 
     private final Map<DefDescriptor<?>, String> loaded = Maps.newLinkedHashMap();
     private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
@@ -335,7 +334,7 @@ public class AuraContextImpl implements AuraContext {
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<ValueProviderType, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
+            Map<String, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -437,7 +436,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Map<ValueProviderType, GlobalValueProvider> getGlobalProviders() {
+    public Map<String, GlobalValueProvider> getGlobalProviders() {
         return globalProviders;
     }
 

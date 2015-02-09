@@ -51,7 +51,7 @@ public class ContextAdapterImpl implements ContextAdapter {
     @Override
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            Map<String, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
     	return establish(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
                 globalProviders, appDesc, false);
@@ -61,7 +61,7 @@ public class ContextAdapterImpl implements ContextAdapter {
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry,
 			Map<DefType, String> defaultPrefixes, Format format, Authentication access,
 			JsonSerializationContext jsonContext,
-			Map<ValueProviderType, GlobalValueProvider> globalProviders,
+			Map<String, GlobalValueProvider> globalProviders,
 			DefDescriptor<? extends BaseComponentDef> appDesc,
 			boolean isDebugToolEnabled) {
     	AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,

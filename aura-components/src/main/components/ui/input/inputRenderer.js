@@ -36,14 +36,6 @@
         var concreteHelper = concreteCmp.getDef().getHelper();
         concreteHelper.addInputDomEvents(component);
         concreteHelper.updateErrorElement(component);
-
-        if (component.get("v.doFormat")) {
-            var value = concreteCmp.get("v.value");
-            if (!$A.util.isEmpty(value)) {
-                var el = concreteHelper.getInputElement(concreteCmp);
-                el.value = concreteHelper.formatValue(concreteCmp);
-            }
-        }
     },
 
     rerender: function(component, helper) {
@@ -54,16 +46,6 @@
         if (!component._creatingAsyncErrorCmp) {
         	concreteHelper.handleErrors(component);
             concreteHelper.updateErrorElement(component);
-        }
-
-        if (component.get("v.doFormat")) {
-            var concreteCmp = component.getConcreteComponent();
-            var concreteHelper = concreteCmp.getDef().getHelper();
-            var value = concreteCmp.get("v.value");
-            if (!$A.util.isEmpty(value)) {
-                var el = concreteHelper.getInputElement(concreteCmp);
-                el.value = concreteHelper.formatValue(concreteCmp);
-            }
         }
 
         this.superRerender();

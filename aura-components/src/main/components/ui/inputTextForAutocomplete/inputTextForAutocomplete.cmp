@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="proto"
+<aura:component extends="ui:input" implements="ui:inputTextComponent" extensible="true" support="proto"
     description="This component is used as input text in a ui:autocomplete component.">
     <aura:attribute name="autocompleteButton" type="Aura.Component[]" description="Optional button to render with this component."/>
     

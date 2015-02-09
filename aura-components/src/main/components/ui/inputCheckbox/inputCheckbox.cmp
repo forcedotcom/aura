@@ -17,11 +17,5 @@
 -->
 <aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="GA" access="GLOBAL" description="Represents a checkbox. Its behavior can be configured using events such as click and change.">
     <aura:attribute name="updateOn" type="String" access="GLOBAL" default="change,click" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change,click&quot;."/>
-
-    <aura:renderif isTrue="{!v.body.length == 0}">
-       <input aura:id="checkbox" id="{!v.domId}" class="{!v.class}" name="{!v.name}" type="checkbox" value="{!v.text}" checked="{!v.value == true}" disabled="{!v.disabled}"/>
-       <aura:set attribute="else">
-           {!v.body}
-       </aura:set>
-    </aura:renderif>
+    <input aura:id="checkbox" id="{!v.domId}" class="{!v.class}" name="{!v.name}" type="checkbox" value="{!v.text}" checked="{!v.value == true}" disabled="{!v.disabled}"/>
 </aura:component>

@@ -115,7 +115,7 @@
     getDomElementValue : function (element) {
     	return element.value;
     },
-    
+
     getHandledDOMEvents : function(component) {
     	return this.lib.interactive.getHandledDOMEvents(component);
     },
@@ -145,7 +145,7 @@
     preEventFiring : function(component, event) {
         this.handleUpdate(component, event);
     },
-    
+
     /**
      * Fire the equivalent Aura event for DOM one.
      * This can be overridden by extended component
@@ -168,7 +168,7 @@
             helper.doUpdate(component, helper.getDomElementValue(this.getInputElement(component)));
         }
     },
-    
+
     /**
      * Set event's parameters with the value from DOM event.
      * The event's parameter name should be the same as the property name in DOM event.
@@ -353,10 +353,6 @@
     hasLabel: function(cmp) {
     	var label = cmp.get('v.label');
     	return !!(label && label.length > 0);
-    },
-
-    formatValue: function(cmp) {
-        return cmp.get("v.value");
     },
     
     setDisabled: function(component, disabled, disabledCss) {

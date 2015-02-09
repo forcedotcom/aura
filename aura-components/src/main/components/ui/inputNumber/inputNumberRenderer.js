@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 ({
-    doUpdate: function(component, value) {
-        if (value) {
-            var regex = new RegExp("\\" + $A.get("$Locale.currency"), "g");
-            value = value.replace(regex, '');
-        }
-        component.set("v.value", value);
-    },
 
-    getNumber: function(cmp) {
-        return cmp.get("v.value");
+    afterRender: function(component, helper) {
+        this.superAfterRender();
+        if (component.get("v.doFormat")) {
+            helper.inputNumberLibrary.number.formatValue( component, helper, $A.localizationService.getDefaultNumberFormat());
+        }
     }
+
 })

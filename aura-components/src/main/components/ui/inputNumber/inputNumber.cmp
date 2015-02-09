@@ -15,17 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="GA" access="GLOBAL" description="An input field for entering a number, taking advantage of client input assistance and validation when available.">
-    <aura:attribute name="value" type="Decimal" access="GLOBAL" description="The input value of the number."/>
-    <aura:attribute name="max" type="Decimal" default="99999999999999" description="Specifies the maximum value allowed. Setting this higher than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
-    <aura:attribute name="min" type="Decimal" default="-99999999999999" description="Specifies the minimum value allowed. Setting this lower than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
-    <aura:attribute name="step" type="Decimal" default="1" description="Specifies the legal intervals. Decimals are allowed, but for maximum client compatibility, only set this to positive integers. Works with HTML5 only."/>
-    <aura:attribute name="format" type="String" access="GLOBAL" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the Locale default format will be used."/>
-    
-    <aura:set attribute="doFormat" value="true"/>
-
-    <aura:renderif isTrue="{!v.body.length == 0}">
-       <input type="{!v.type}" 
+<aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL" description="An input field for entering a number, taking advantage of client input assistance and validation when available.">
+    <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
+    <input type="{!v.type}"
        		  id="{!v.domId}"
        		  class="{!v.class}"
        		  value="{!v.value}"
@@ -36,8 +28,4 @@
        		  required="{!v.required}"
        		  disabled="{!v.disabled}"
        		  aria-describedby="{!v.ariaDescribedBy}"/>
-       <aura:set attribute="else">
-           {!v.body}
-       </aura:set>
-    </aura:renderif>
 </aura:component>

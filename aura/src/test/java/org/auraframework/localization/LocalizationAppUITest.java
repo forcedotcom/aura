@@ -180,7 +180,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
         // initial load
         WebElement elementInput = findDomElement(By
-                .cssSelector("span[id='MyCurrency'] > input[class~='uiInputNumber']"));
+                .cssSelector("span[id='MyCurrency'] > input[class~='uiInput']"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputCurrency']"));
         assertEquals("InputCurrency component rendered with wrong value", "$123,456.79",
                 elementInput.getAttribute("value"));

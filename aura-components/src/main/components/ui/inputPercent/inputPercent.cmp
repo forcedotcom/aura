@@ -15,6 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputNumber" extensible="true" support="GA" description="An input field for entering a percentage.">
-    <aura:attribute name="valueScale" type="Integer" default="0" description="Displays the result output, multiplying the value attribute with (10^valueScale) * 100%."/>
+<aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA" description="An input field for entering a percentage.">
+    <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
+    <input type="{!v.type}"
+           id="{!v.domId}"
+           class="{!v.class}"
+           value="{!v.value}"
+           max="{!v.max}"
+           min="{!v.min}"
+           step="{!v.step}"
+           placeholder="{!v.placeholder}"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
+           aria-describedby="{!v.ariaDescribedBy}"/>
 </aura:component>

@@ -16,3 +16,6 @@
 .auratestTestApplication1 {
     color : #000000;
 }
+.auratestTestApplication1 #mask {
+    background-image: url('/auraFW/resources/aura/s.gif');
+}

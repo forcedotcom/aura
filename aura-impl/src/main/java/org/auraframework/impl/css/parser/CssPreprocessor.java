@@ -90,6 +90,7 @@ public final class CssPreprocessor {
                 plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
             }
 
+            plugins.add(new UrlContextPathPlugin());
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true));

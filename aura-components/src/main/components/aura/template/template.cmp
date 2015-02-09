@@ -180,7 +180,7 @@
             <title>{!v.title}</title>
             <script>var pageStartTime = (new Date()).getTime();</script>
             {!v.extraMetaTags}
-            <link href="{!v.normalizeCss ? '/auraFW/resources/aura/normalize.css' : '/auraFW/resources/aura/resetCSS.css'}"  rel="stylesheet" type="text/css"/>
+            <link href="{!'/auraFW/resources/aura/' + (v.normalizeCss ? 'normalize' : 'resetCSS') + '.css'}"  rel="stylesheet" type="text/css"/>
             <style>
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}

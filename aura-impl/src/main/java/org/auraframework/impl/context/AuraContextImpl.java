@@ -130,6 +130,12 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
 
+            String contextPath = ctx.getContextPath();
+            if (!contextPath.isEmpty()) {
+                // serialize servlet context path for html component to prepend for client created components
+                json.writeMapEntry("contextPath", contextPath);
+            }
+
             if (ctx.getSerializeThemes()) {
                 ThemeList themes = ctx.getThemeList();
                 if (!themes.isEmpty()) {

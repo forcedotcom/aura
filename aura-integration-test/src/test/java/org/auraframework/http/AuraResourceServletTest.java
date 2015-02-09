@@ -29,12 +29,18 @@ import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.util.text.Hash;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -447,6 +453,54 @@ public class AuraResourceServletTest extends AuraTestCase {
         servlet.doGet(request, response);
 
         assertTrue(response.getHeader("Content-Disposition").contains("attachment; filename"));
+    }
+
+    /**
+     * Verify that context path is prepended on all Aura urls in appcache manifest
+     */
+    public void testManifestContentWithContextPath() throws Exception {
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:testApp",
+                ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.MANIFEST,
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setApplicationDescriptor(appDesc);
+        String coolContext = "/cool";
+        context.setContextPath(coolContext);
+        String uid = context.getDefRegistry().getUid(null, appDesc);
+        context.addLoaded(appDesc, uid);
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI);
+        DummyHttpServletResponse response = new DummyHttpServletResponse() {
+
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter writer = new PrintWriter(stringWriter);
+            @Override
+            public PrintWriter getWriter() throws IOException {
+                return writer;
+            }
+
+            // Hacking method to verify content of PrintWriter. This is never called in writeManifest
+            @Override
+            public String getContentType() {
+                return stringWriter.toString();
+            }
+        };
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
+
+        String content = response.getContentType();
+        Pattern pattern = Pattern.compile("/auraFW|/l/");
+        Matcher matcher = pattern.matcher(content);
+        while(matcher.find()) {
+            int start =  matcher.start();
+            String cool = content.substring(start - 5, start);
+            if (!cool.equals(coolContext)) {
+                fail("Context path was not prepended to Aura urls");
+            }
+        }
+
     }
 
 }

@@ -42,6 +42,7 @@ function AuraContext(config, initCallback) {
     this.app = config["app"];
     this.cmp = config["cmp"];
     this.test = config["test"];
+    this.contextPath = config["contextPath"] || "";
 
     var that = this;
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"], function() {
@@ -424,6 +425,15 @@ AuraContext.prototype.getStorage = function() {
 
     var config = $A.storageService.getAdapterConfig(storage.getName());
     return config["persistent"] ? storage : undefined;
+};
+
+/**
+ * Servlet container context path
+ * @return {String} Servlet container context path
+ * @private
+ */
+AuraContext.prototype.getContextPath = function() {
+    return this.contextPath;
 };
 
 //#include aura.context.AuraContext_export

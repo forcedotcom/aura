@@ -241,6 +241,22 @@
             $A.test.assertTrue(frame.frameborder === undefined && frame.frameBorder == 0 || frame.frameBorder === "0",
                 "frameBorder attribute is case sensitive");
         }
+    },
+
+    testContextPath: {
+        test: [
+        function(cmp) {
+            $A.test.overrideFunction($A.getContext(), "getContextPath", function() {
+                return "/cool";
+            });
+            var img = cmp.find("img");
+            img.set("v.src", "/auraFW/resources/aura/images/logo.png");
+        },
+        function(cmp) {
+            var el = cmp.find("img").getElement();
+            $A.test.assertTrue(el.src.indexOf("/cool/auraFW/resources/aura/images/logo.png") !== -1,
+                "Aura url should include context path");
+        }]
     }
 
 })

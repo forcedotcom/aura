@@ -47,11 +47,26 @@
 
         // actual test assertions
         var style = $A.util.style;
-        $A.test.assertEquals(this.map[color1], style.getCSSProperty(elements[0], "color"));
-        $A.test.assertEquals(this.map[color2], style.getCSSProperty(elements[1], "color"));
-        $A.test.assertEquals(this.map[color3], style.getCSSProperty(elements[2], "color"));
-        $A.test.assertEquals(this.map[color4], style.getCSSProperty(elements[3], "color"));
-        $A.test.assertEquals(this.map[color5], style.getCSSProperty(elements[4], "color"));
+        var c1 = style.getCSSProperty(elements[0], "color");
+        var c2 = style.getCSSProperty(elements[1], "color");
+        var c3 = style.getCSSProperty(elements[2], "color");
+        var c4 = style.getCSSProperty(elements[3], "color");
+        var c5 = style.getCSSProperty(elements[4], "color");
+
+        // browsers handle colors differently
+        if (c1.indexOf("rgb") > -1) {
+            $A.test.assertEquals(this.map[color1], c1);
+            $A.test.assertEquals(this.map[color2], c2);
+            $A.test.assertEquals(this.map[color3], c3);
+            $A.test.assertEquals(this.map[color4], c4);
+            $A.test.assertEquals(this.map[color5], c5);
+        } else {
+            $A.test.assertEquals(color1, c1.toUpperCase());
+            $A.test.assertEquals(color2, c2.toUpperCase());
+            $A.test.assertEquals(color3, c3.toUpperCase());
+            $A.test.assertEquals(color4, c4.toUpperCase());
+            $A.test.assertEquals(color5, c5.toUpperCase());
+        }
     },
 
     /** test applying a single theme at once */
@@ -93,7 +108,7 @@
         }
     },
 
-    /** test with multiple themes in succession, default behavior (should be equal to replaceExisting false) */
+    /** test with multiple themes in succession, default behavior (should be equal to replaceExisting true) */
     testMultipleThemesReplaceExistingDefault: {
         test: function(component) {
             var loaded = false;
@@ -108,8 +123,8 @@
             });
 
             $A.test.addWaitFor(true, function() {return loaded}, function() {
-                // first three overridden from first, last three overridden from second
-                this.assertColors(colors, "#39CCCC", "#39CCCC", "#F012BE", "#F012BE", "#F012BE");
+                // first two from default, last three overridden from second
+                this.assertColors(colors, "#DECC8C", "#DE986D", "#F012BE", "#F012BE", "#F012BE");
             });
         }
     },
@@ -229,6 +244,27 @@
             $A.test.addWaitFor(true, function() {return loaded}, function() {
                 // first three overridden, last two remain from default
                 this.assertColors(colors, "#776C8E", "#DE986D", "#AB6890", "#68AB9F", "#DEC371");
+            });
+        }
+    },
+
+    /** test customHandler */
+    testCustomHandler: {
+        test: function(component) {
+            var loaded = false;
+            var ret = null;
+            var colors = component.getElements();
+
+            $A.styleService.applyTheme("styleServiceTest:colorOverridesTheme1", {
+                customHandler: function(css) {loaded = true; ret = css;}
+            });
+
+            $A.test.addWaitFor(true, function() {return loaded}, function() {
+                // none overridden
+                this.assertColors(colors, "#DECC8C", "#DE986D", "#AB6890", "#68AB9F", "#DEC371");
+
+                // should have received some css
+                $A.test.assertNotUndefinedOrNull(ret, "didn't get return value");
             });
         }
     }

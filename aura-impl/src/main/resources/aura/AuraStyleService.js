@@ -27,8 +27,8 @@ var AuraStyleService = function() {
         /**
          * Loads CSS from the server with the given theme applied.
          * <p>
-         * The current application's CSS is loaded from the server, restricted
-         * to just the CSS that references theme vars from the given theme. This
+         * The current application's CSS is loaded from the server and only includes
+         * overrides for the CSS that reference theme vars from the specified theme. This
          * CSS is then placed into a new style element and attached to the DOM.
          * <p>
          * In addition to the application's CSS (as determined by the
@@ -49,8 +49,8 @@ var AuraStyleService = function() {
          *          The theme descriptor, e.g., <code>"myNamespace:myTheme"</code>.
          * @param {Object=} config
          *          The optional configuration object.
-         * @param {boolean} [config.replaceExisting=false]
-         *          Specify true to replace all previously applied styles.
+         * @param {boolean} [config.replaceExisting=true]
+         *          Specify true to replace all previously applied styles, false to append.
          * @param {string[]} [config.extraStyles]
          *          Specify any extra StyleDef descriptors to include.
          * @param {boolean} [config.storable=true]
@@ -59,6 +59,14 @@ var AuraStyleService = function() {
          *          may want to specify false if applying a <em>MapProvider</em> theme.
          * @param {function} [config.callback]
          *          Callback function to invoke once the style element has been appended to the page.
+         * @param {function} [config.customHandler]
+         *          Callback function that will be invoked with the themed CSS. If this function is
+         *          specified, the CSS will not be automatically appended to the page as usual.
+         *          Certain other config options may no longer be applicable. If you place the styles
+         *          into the DOM, be aware that subsequent calls to this method that do not specify this
+         *          option may not properly override everything depending on where in the DOM you placed
+         *          the styles. Also note that the <code>replaceExisting</code> param will not handle
+         *          any styles you attach to the DOM manually.
          */
         applyTheme: function(theme, config) {
             $A.assert(!$A.util.isUndefinedOrNull(theme), "applyTheme() cannot be given a null or undefined theme argument");
@@ -68,10 +76,9 @@ var AuraStyleService = function() {
         /**
          * Loads CSS from the server with the given themes applied.
          * <p>
-         * The current application's CSS is loaded from the server, restricted
-         * to just the CSS that references theme vars from the given themes.
-         * This CSS is then placed into a new style element and attached to the
-         * DOM.
+         * The current application's CSS is loaded from the server and only includes
+         * overrides for the CSS that reference theme vars from the specified themes.
+         * This CSS is then placed into a new style element and attached to the DOM.
          * <p>
          * In addition to the application's CSS (as determined by the
          * application's dependency graph), this will also include any client
@@ -91,8 +98,8 @@ var AuraStyleService = function() {
          *          The theme descriptors, e.g., <code>["myNamespace:myTheme", "myNamespace:myTheme2"]</code>.
          * @param {Object=} config
          *          The optional configuration object.
-         * @param {boolean} [config.replaceExisting=false]
-         *          Specify true to replace all previously applied styles.
+         * @param {boolean} [config.replaceExisting=true]
+         *          Specify true to replace all previously applied styles, false to append.
          * @param {string[]} [config.extraStyles]
          *          Specify any extra StyleDef descriptors to include.
          * @param {boolean} [config.storable=true]
@@ -101,6 +108,14 @@ var AuraStyleService = function() {
          *          may want to specify false if applying a <em>MapProvider</em> theme.
          * @param {function} [config.callback]
          *          Callback function to invoke once the style element has been appended to the page.
+         * @param {function} [config.customHandler]
+         *          Callback function that will be invoked with the themed CSS. If this function is
+         *          specified, the CSS will not be automatically appended to the page as usual.
+         *          Certain other config options may no longer be applicable. If you place the styles
+         *          into the DOM, be aware that subsequent calls to this method that do not specify this
+         *          option may not properly override everything depending on where in the DOM you placed
+         *          the styles. Also note that the <code>replaceExisting</code> param will not handle
+         *          any styles you attach to the DOM manually.
          */
         applyThemes: function(themes, config) {
             $A.assert($A.util.isArray(themes), "applyThemes() expects the 'themes' arg to be an array of strings");
@@ -123,10 +138,16 @@ var AuraStyleService = function() {
 
                 action.setCallback(this, function(a) {
                     if (a.getState() === "SUCCESS") {
+                        // if custom handler is specified, give it the CSS and do nothing else
+                        if ($A.util.isFunction(config["customHandler"])) {
+                            config["customHandler"](a.getReturnValue());
+                            return;
+                        }
+
                         var node = style.apply(a.getReturnValue());
 
-                        // default not to replace existing unless specified
-                        if (config["replaceExisting"]) {
+                        // default is to replace existing unless specified false
+                        if ($A.util.isUndefinedOrNull(config["replaceExisting"]) || $A.util.getBooleanValue(config["replaceExisting"]) === true) {
                             styleService.removeThemes();
                             added = [node];
                         } else {

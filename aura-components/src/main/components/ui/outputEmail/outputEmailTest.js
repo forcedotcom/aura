@@ -20,7 +20,7 @@
     testLabel: {
         attributes : {value : 'aura-test@salesforce.com', label: 'Email us'},
         test: function(component){
-        	var link = component.find("link").getElement();
+        	var link = component.find("body").getElement().getElementsByTagName("a")[0];
             aura.test.assertEquals('Email us', $A.test.getText(link), "Value attribute not correct");
             aura.test.assertTrue(aura.test.contains(link.href,'mailto:aura-test@salesforce.com'), "Value attribute not correct");
         }
@@ -32,7 +32,7 @@
     testLabelEmpty: {
         attributes : {value : 'aura-test@salesforce.com', label: ''},
         test: function(component){
-        	var link = component.find("link").getElement();
+            var link = component.find("body").getElement().getElementsByTagName("a")[0];
             aura.test.assertTrue(aura.test.contains(link.href,'mailto:aura-test@salesforce.com'), "Value attribute not correct");
             aura.test.assertEquals('aura-test@salesforce.com', $A.test.getText(link), "Label attribute not correct");
         }
@@ -44,10 +44,11 @@
     testValue: {
         attributes : {value : 'aura-test@salesforce.com', 'class' : 'myClass'},
         test: function(component){
-        	var link = component.find("link").getElement();
+            var span = component.find("body").getElement();
+            var link = span.getElementsByTagName("a")[0];
         	aura.test.assertTrue(aura.test.contains(link.href,'mailto:aura-test@salesforce.com'), "Value attribute not correct");
             aura.test.assertEquals('aura-test@salesforce.com', $A.test.getText(link), "Label attribute not correct");
-            aura.test.assertTrue($A.util.hasClass(link, "myClass"), "myClass class not correctly added");
+            aura.test.assertTrue($A.util.hasClass(span, "myClass"), "myClass class not correctly added");
         }
     },
 
@@ -58,7 +59,7 @@
     testValueInvalid: {
         attributes : {value : 'salesforce.com'},
         test: function(component){
-        	var link = component.find("link").getElement();
+            var link = component.find("body").getElement().getElementsByTagName("a")[0];
             aura.test.assertTrue(aura.test.contains(link.href,'mailto:salesforce.com'), "Value attribute not correct");
             aura.test.assertEquals('salesforce.com', $A.test.getText(link), "label attribute not correct");
         }
@@ -70,8 +71,8 @@
     testValueInvalidWithClass: {
         attributes : {value : 'salesforce.com', 'class' : 'myClass'},
         test: function(component){
-            aura.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "myClass"), "myClass class not correctly added");
-            aura.test.assertEquals('salesforce.com', $A.test.getText(component.find("link").getElement()), "label attribute not correct");
+            aura.test.assertTrue($A.util.hasClass(component.find("body").getElement(), "myClass"), "myClass class not correctly added");
+            aura.test.assertEquals('salesforce.com', $A.test.getText(component.find("body").getElement()), "label attribute not correct");
         }
     },
 
@@ -81,7 +82,7 @@
     testValueEmptyString: {
         attributes : {value : '', label : 'email me'},
         test: function(component){
-             $A.test.assertEquals(null, component.getElement(), "unexpected elements");
+             $A.test.assertEquals('', $A.test.getText(component.getElement()), "unexpected elements");
         }
     },
 

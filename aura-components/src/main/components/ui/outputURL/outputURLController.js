@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 ({
+
     click : function(cmp, event){
         if ($A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
             //IE9 & Other Browsers

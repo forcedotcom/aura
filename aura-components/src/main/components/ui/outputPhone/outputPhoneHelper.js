@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 ({
-    updateHref: function(cmp){
-    	var value = cmp.get("v.value");
+    updateValue: function (cmp) {
+        var value = cmp.get("v.value");
+
+        var linkElement = cmp.find("link").getElement();
+
+        $A.util.clearNode(linkElement);
 
         if (value) {
-            var link = cmp.find("link");
-            if (link) {
-                var element = link.getElement();
-                if (value.search("#") != -1 || value.search("\\*") != -1) {
-                    element.removeAttribute("href");
-                } else {
-                    var tel = this.removeSpaces(value);
-                    element.setAttribute("href", "tel:" + tel);
-                }
+            if (value.search("#") != -1 || value.search("\\*") != -1) {
+                linkElement.removeAttribute("href");
+            } else {
+                var tel = this.removeSpaces(value);
+                linkElement.setAttribute("href", "tel:" + tel);
             }
+            linkElement.appendChild(document.createTextNode(value));
         }
     },
     /*
      ** Remove spaces (if there is any) in value and return the no-space result.
      */
-    removeSpaces: function(value) {
+    removeSpaces: function (value) {
         return (value || "").replace(/\s/g, "");
     }
 })

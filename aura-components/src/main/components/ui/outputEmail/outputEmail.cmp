@@ -15,15 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" access="GLOBAL" description="Displays an email address in an HTML anchor (&lt;a&gt;) element. The leading and trailing space are trimmed.">
+<aura:component implements="ui:visible" extensible="true" support="GA" access="GLOBAL"
+    description="Displays an email address in an HTML anchor (&lt;a&gt;) element. The leading and trailing space are trimmed.">
+
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <aura:if isTrue="{!v.value != null &amp;&amp; v.value != ''}">
-        <aura:if isTrue="{!v.actionable}">
-            <a aura:id="link" href="{!'mailto:'+v.value}" class="{!v.class}">{!v.label == null || v.label == '' ? v.value : v.label}</a>
-            <aura:set attribute="else">
-                <ui:outputText class="{!v.class}" value="{!v.value}"/>
-            </aura:set>
-        </aura:if>
-    </aura:if>
+    <span aura:id="body" class="{!v.class}"></span>
+
 </aura:component>

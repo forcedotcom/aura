@@ -16,12 +16,17 @@
 ({
     render : function(cmp, helper){
         var ret = this.superRender();
-        helper.updateHref(cmp);
+
+        helper.updateValue(cmp);
+
         return ret;
     },
 
     rerender : function(cmp, helper){
         this.superRerender();
-        helper.updateHref(cmp);
+
+        if (cmp.isDirty("v.value")) {
+            helper.updateValue(cmp);
+        }
     }
 })

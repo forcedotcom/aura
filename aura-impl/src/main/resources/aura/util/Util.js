@@ -199,6 +199,39 @@ $A.ns.Util.prototype.getBooleanValue = function (val) {
 };
 
 /**
+ * Creates and returns an HTML element of the specified tag name and map of attributes.
+ *
+ * @param {String} tagName Tag name of the html element to create (e.g. 'a', 'img', 'div').
+ * @param {Map} attributes A map of attributes that the element will have
+ *   (e.g. {src: 'foo.img', alt: 'Some text'}
+ * @returns (HTMLElement) the newly created element
+ */
+$A.ns.Util.prototype.createHtmlElement = function (tagName, attributes) {
+    var node = document.createElement(tagName);
+
+    for (var attributeName in attributes) {
+        var value = attributes[attributeName];
+        if (value && value != "") {
+            node.setAttribute(attributeName, value);
+        }
+    }
+    return node;
+};
+
+/**
+ * Removes all children of a node, effectively clearing its body.
+ *
+ * @param {HTMLElement} node The node to be cleared.
+ */
+$A.ns.Util.prototype.clearNode = function (node) {
+    var last = node.lastChild;
+    while (last) {
+        node.removeChild(last);
+        last = node.lastChild;
+    }
+};
+
+/**
  * Gets a DOM element by its id without any leading characters (e.g. #) unless the ID contains them.
  *
  * @param {String} id The corresponding id of the DOM element.

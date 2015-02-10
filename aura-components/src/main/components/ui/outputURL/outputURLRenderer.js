@@ -21,34 +21,27 @@
 
         var ret = this.superRender();
 
-        if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
-            var link = cmp.find("link");
-            if (link) {
-                var element = link.getElement();
-                $A.util.addClass(element, "disabled");
-            }
-        }
+        helper.buildLinkBody(cmp);
+
+        helper.handleDisabled(cmp);
+
         return ret;
     },
 
     rerender: function (cmp, helper) {
-        if ($A.util.getBooleanValue(cmp.get("v.fixURL"))) {
+        if (cmp.isDirty("v.value") && $A.util.getBooleanValue(cmp.get("v.fixURL"))) {
             helper.fixURL(cmp);
         }
 
         this.superRerender();
 
-        if (cmp.isDirty("v.disabled")) {
-            var link = cmp.find("link");
-            if (link) {
-                var element = link.getElement();
-                if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
-                    $A.util.addClass(element, "disabled");
-                } else {
-                    $A.util.removeClass(element, "disabled");
-                }
+        if (cmp.isDirty("v.label") || cmp.isDirty("v.iconClass") || cmp.isDirty("v.alt")) {
+            helper.buildLinkBody(cmp);
+        }
 
-            }
+        if (cmp.isDirty("v.disabled")) {
+            helper.handleDisabled(cmp);
         }
     }
+
 })

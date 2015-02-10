@@ -19,15 +19,56 @@
 
         if (url !== undefined && url !== null && url !== "") {
             var urlLower = url.toLowerCase();
-            if (urlLower.indexOf("http://") !== 0
-                && urlLower.indexOf("https://") !== 0
-                && urlLower.indexOf("ftp://") !== 0
-                && url.indexOf("/") !== 0
-                && url.indexOf(".") !== 0) {
+            if (urlLower.indexOf("http://") !== 0 && urlLower.indexOf("https://") !== 0 && urlLower.indexOf("ftp://") !== 0
+                && url.indexOf("/") !== 0 && url.indexOf(".") !== 0) {
 
                 url = "http://" + url;
                 cmp.set("v.value", url);
             }
+        }
+    },
+
+    buildLinkBody: function (cmp) {
+        var link = cmp.find("link");
+
+        if (link) {
+            var linkElement = link.getElement();
+            $A.util.clearNode(linkElement);
+
+            var iconClass = cmp.get("v.iconClass") || '';
+            var label = cmp.get("v.label") || '';
+
+            if (!$A.util.isEmpty(iconClass)) {
+                var alt = cmp.get("v.alt") || '';
+                if (!$A.util.isEmpty(label)) {
+                    alt = '';
+                } else if ($A.util.isEmpty(alt)) {
+                    $A.warning('component: ' + (cmp.getLocalId() || cmp.getGlobalId() || '') + ' "alt" attribute should not be empty');
+                }
+
+                var imageNode = $A.util.createHtmlElement("img", {
+                    "src": "/auraFW/resources/aura/s.gif",
+                    "class": iconClass,
+                    "alt": alt
+                });
+
+                linkElement.appendChild(imageNode);
+            }
+
+            linkElement.appendChild(document.createTextNode(label));
+        }
+    },
+
+    handleDisabled: function(cmp) {
+        var link = cmp.find("link");
+        if (link) {
+            var element = link.getElement();
+            if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
+                $A.util.addClass(element, "disabled");
+            } else {
+                $A.util.removeClass(element, "disabled");
+            }
+
         }
     }
 })

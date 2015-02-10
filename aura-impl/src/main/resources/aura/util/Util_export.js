@@ -80,6 +80,8 @@ p["keys"] = p.keys;
 p["bind"] = p.bind;
 p["includeScript"] = p.includeScript;
 p["isExpression"] = p.isExpression;
+p["createHtmlElement"] = p.createHtmlElement;
+p["clearNode"] = p.clearNode;
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 p["getDebugToolComponent"] = p.getDebugToolComponent;

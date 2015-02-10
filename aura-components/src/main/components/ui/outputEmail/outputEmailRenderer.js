@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 ({
-    /**
-     * Verify undefined value renders nothing.
-     */
-    testValueUndefined: {
-        test: function(component){
-            var cmp = component.find("undefined");
-            $A.test.assertEquals(null, cmp.getElement(), "unexpected elements");
-        }
+    render: function (cmp, helper) {
+        var ret = this.superRender();
+
+        helper.buildBody(cmp);
+
+        return ret;
     },
 
-    /**
-     * Verify null value renders nothing.
-     */
-    testValueNull: {
-        test: function(component){
-            var cmp = component.find("null");
-            $A.test.assertEquals(null, cmp.getElement(), "unexpected elements");
+    rerender: function (cmp, helper) {
+        this.superRerender();
+
+        if (cmp.isDirty("v.value") || cmp.isDirty("v.label")) {
+            helper.buildBody(cmp);
         }
     }
 })

@@ -30,59 +30,6 @@
         cmp.find(targetCmpId).getElement().innerHTML = msg;
     },
     
-    // The sequential stages of testCacheExpiration
-    testCacheExpirationStage1:function(cmp){
-        $A.test.setTestTimeout(30000);
-        this.resetCounter(cmp, "testCacheExpiration");
-    },
-    testCacheExpirationStage2:function(cmp){
-        //Run the action and mark it as storable.
-        var a = cmp.get("c.fetchDataRecord");
-        a.setParams({testName : "testCacheExpiration"});
-        a.setStorable();
-        $A.test.enqueueAction(a);
-        $A.test.addWaitFor(
-            false,
-            $A.test.isActionPending,
-            function(){
-                $A.test.assertFalse(a.isFromStorage(), "Failed to execute action at server");
-                $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
-            }
-        );
-    },
-    testCacheExpirationStage3:function(cmp){
-        //Wait for atleast 5 seconds after the response has been stored
-        $A.test.addWaitFor(true, function(){
-                var now = new Date().getTime();
-                var storageModifiedCmp = cmp.find("storageModified");
-                if($A.util.isUndefinedOrNull(storageModifiedCmp)) {
-                    storageModifiedCmp = cmp.getSuper().find("storageModified");
-                }                    
-                var storageModified = $A.test.getText(storageModifiedCmp.getElement());
-                return ((now - parseInt(storageModified,10))/1000) > 5;
-            });
-    },
-    testCacheExpirationStage4:function(cmp){
-        // Run the action and verify that new response was fetched from server
-        // Cause sweep by performing get after expired time in testCacheExpirationStage3
-        $A.storageService.getStorage("actions").get("foo").then(function() {
-            var aSecond = cmp.get("c.fetchDataRecord");
-            aSecond.setParams({testName: "testCacheExpiration"});
-            aSecond.setStorable();
-            $A.test.enqueueAction(aSecond);
-            $A.test.addWaitFor(
-                "SUCCESS",
-                function () {
-                    return aSecond.getState()
-                },
-                function () {
-                    $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
-                    $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
-                }
-            );
-        });
-    },
-    
     // The sequential stages of testActionKeyOverloading
     testActionKeyOverloadingStage1:function(cmp){
         $A.test.setTestTimeout(30000);

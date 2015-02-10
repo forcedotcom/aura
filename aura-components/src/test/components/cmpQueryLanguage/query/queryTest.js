@@ -387,7 +387,7 @@
                             
             $A.test.assertEquals(1, result.groupCount);
         },
-        function(cmp){        	
+        function(cmp){
         //1. null, undefined and blank as group by clause
             var result = $A.getQueryStatement().from("component").query();
             this.verifyIdenticalResultSet(result, $A.getQueryStatement().from('component').groupBy().query());
@@ -397,10 +397,9 @@
             result = $A.getQueryStatement().field('globalId').groupBy('rendered').query();
             this.verifyQueryResultCount(result, 2);
             $A.test.assertEquals(1, result.groupCount);
-
             result = $A.getQueryStatement().field('globalId').groupBy('globalId').query();
             this.verifyQueryResultCount(result, 2);
-            $A.test.assertEquals(2, result.groupCount);
+            $A.test.assertEquals(1, result.groupCount);
         //3. Specifying unknown attribute if groupBy() clause is the same as case 2, where we use an unselected field in where clause.
         }]
     },

@@ -394,7 +394,7 @@ if(!this.concreteComponentId) {
                 // JBUCH: HALO: TODO: DEDUPE THIS AGAINST lines 462 - 467 AFTER CONFIRMING IT WORKS
                 if (attribute === "body") {
                     attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().priv.attributes.get("body"))||{};
-                    attributes[attribute][cmp.getGlobalId()] = facetStack["body"] || [];
+                    attributes[attribute][cmp.priv.globalId] = facetStack["body"] || [];
                 } else {
                     attributes[attribute] = facetStack[attribute];
                 }
@@ -441,7 +441,7 @@ if(!this.concreteComponentId) {
                 }
                 if (attribute === "body") {
                     attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().priv.attributes.get("body"))||{};
-                    attributes[attribute][cmp.getGlobalId()] = cdrs;
+                    attributes[attribute][cmp.priv.globalId] = cdrs;
                 } else {
                     attributes[attribute] = cdrs;
                 }
@@ -608,7 +608,7 @@ if(!this.concreteComponentId) {
             for (var i = 0; i < handlerDefs.length; i++) {
                 var handlerDef = handlerDefs[i];
                 var handlerConfig = {};
-                handlerConfig["globalId"] = cmp.getGlobalId();
+                handlerConfig["globalId"] = cmp.priv.globalId;
                 handlerConfig["handler"] = getHandler(cmp, handlerDef["action"]);
                 handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
                 eventService.addHandler(handlerConfig);
@@ -836,7 +836,7 @@ if(!this.concreteComponentId) {
         // attach a way to get back to the rendering component, the first time
         // we call associate on an element
         if (!$A.util.hasDataAttribute(element, $A.componentService.renderedBy)) {
-            $A.util.setDataAttribute(element, $A.componentService.renderedBy, cmp.getGlobalId());
+            $A.util.setDataAttribute(element, $A.componentService.renderedBy, cmp.priv.globalId);
         }
     };
 
@@ -928,7 +928,7 @@ if(!this.concreteComponentId) {
                 __proto__ : null
             };
             ret["descriptor"] = cmp.getDef().getDescriptor().toString();
-            ret["globalId"] = cmp.getGlobalId();
+            ret["globalId"] = cmp.priv.globalId;
             ret["localId"] = cmp.getLocalId();
             ret["rendered"] = cmp.isRendered();
             ret["valid"] = cmp.isValid();
@@ -946,7 +946,7 @@ if(!this.concreteComponentId) {
                 ret["super"] = this.output(superComponent, cmp, serialized, depth);
             } else if (superComponent) {
                 ret["super"] = {
-                        LAZY : superComponent.getGlobalId()
+                        LAZY : superComponent.priv.globalId
                 };
             }
             var attributeDefs = cmp.getDef().getAttributeDefs();
@@ -1623,7 +1623,7 @@ Component.prototype.getRenderer = function() {
  * @public
  */
 Component.prototype.getGlobalId = function() {
-    return this.priv.globalId;
+    return this.priv.concreteComponentId || this.priv.globalId;
 };
 
 /**
@@ -2163,7 +2163,7 @@ Component.prototype.getErrorsCallback = function(valueProvider, root, subPath) {
  */
 Component.prototype.toString = function() {
     if(!this._description){
-        this._description=this.getDef() + ' {' + this.getGlobalId() + '}' + (this.getLocalId() ? ' {' + this.getLocalId() + '}' : '');
+        this._description=this.getDef() + ' {' + this.priv.globalId + '}' + (this.getLocalId() ? ' {' + this.getLocalId() + '}' : '');
     }
     var attributesOutput = [];
     // Debug Info

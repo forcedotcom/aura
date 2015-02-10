@@ -374,7 +374,7 @@ $A.ns.AuraComponentService.prototype.getComponentConfigs = function(config, attr
  * @private
  */
 $A.ns.AuraComponentService.prototype.index = function(component){
-    this.indexes.globalId[component.getGlobalId()] = component;
+    this.indexes.globalId[component.priv.globalId] = component;
 };
 
 /**

@@ -1347,6 +1347,7 @@ var AuraClientService = function() {
          */
         resetToken : function(newToken) {
             _token = newToken;
+            saveTokenToStorage();
         },
 
         /**

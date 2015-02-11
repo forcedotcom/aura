@@ -19,5 +19,5 @@
                 description="Interface for components that are placed in the body of a ui:scroller that want to handle 'Pull to Refresh' and 'Load More' functionality provided by the scroller.">
 
     <aura:registerEvent name="parentScrollTo" type="ui:scrollTo" description="Requests the parent component to scroll"/>
-
+    <aura:attribute name="insideScroller" type="Boolean" description="Set to false to disable embedding in ui:scroller"/>
 </aura:interface>

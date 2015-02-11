@@ -135,5 +135,29 @@
                 $A.test.assertEquals(1, notStoredAgain.getReturnValue().Counter, 
                     "Counter value should have been incremented for unstored action");
                 });
+    },
+
+    testStorageKeyVersion: function(cmp) {
+        var key = "testingtesting123",
+            version = cmp.get("v.version"),
+            expected = "YO!",
+            storage = $A.storageService.getStorage("actions");
+        storage.put(key, expected)
+            .then(function() {
+                return storage.adapter.getItem(version + key);
+            })
+            .then(function(item) {
+                $A.test.assertEquals(expected, item["value"], "Storage with prefixed key should correct value");
+            })
+            .then(function() {
+                return storage.getAll();
+            })
+            .then(function(items) {
+                $A.test.assertEquals(1, items.length, "Storage should only have one item");
+                $A.util.forEach(items, function(item) {
+                    $A.test.assertEquals(key, item["key"], "Key should not have prefix when returned to user");
+                    $A.test.assertEquals(expected, item["value"]["value"], "Item with prefixed key should correct value");
+                })
+            });
     }
 })

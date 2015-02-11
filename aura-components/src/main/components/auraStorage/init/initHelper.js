@@ -44,7 +44,8 @@
 		var clearStorageOnInit = $A.util.getBooleanValue(cmp.get("v.clearStorageOnInit"));
 		var persistent = $A.util.getBooleanValue(cmp.get("v.persistent"));
 		var secure = $A.util.getBooleanValue(cmp.get("v.secure"));
+        var version = cmp.get("v.version");
 
-		$A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
+		$A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version);
 	}
 })

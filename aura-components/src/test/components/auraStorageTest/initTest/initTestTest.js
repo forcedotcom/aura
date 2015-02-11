@@ -269,8 +269,10 @@
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
-                        function(item){cmp._originalExpiration = item.expires});
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
+                        function(item){
+                            cmp._originalExpiration = item.expires;
+                        });
                 });
         }, function(cmp) {
             // Specify that callback should not be called in case of refresh, so callback count should be 1 (for get())
@@ -284,7 +286,7 @@
     	                $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
     	                //Once for the original action and second action which was fetched from storage. None for refresh action
     	                $A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
-    	                $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+    	                $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
     	                    function(item){
     	                		$A.test.assertEquals(1, item.value.returnValue.Counter,
     	                				"Refresh action response not stored in storage");
@@ -910,7 +912,7 @@
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){cmp._originalExpiration = item.expires});
                 });
         }, function(cmp) {
@@ -931,7 +933,7 @@
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
                     $A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){
                             if(item.expires <= cmp._originalExpiration){
                                 $A.test.fail("storage expiration was not updated after refresh "
@@ -963,7 +965,7 @@
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){cmp._originalExpiration = item.expires});
                 });
         }, function(cmp) {
@@ -976,7 +978,7 @@
                 function() {
                     $A.test.assertEquals("1", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){
                             if(item.expires <= cmp._originalExpiration){
                                 $A.test.fail("storage expiration was not updated after refresh");
@@ -1013,7 +1015,7 @@
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){cmp._originalExpiration = item.expires});
                 });
         }, function(cmp) {
@@ -1035,7 +1037,7 @@
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
                     $A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){
                             if(item.expires <= cmp._originalExpiration){
                                 $A.test.fail("storage expiration was not updated after refresh "
@@ -1070,7 +1072,7 @@
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){cmp._originalExpiration = item.expires});
                 });
         }, function(cmp) {
@@ -1090,7 +1092,7 @@
                 function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey())
+                    $A.storageService.getStorage("actions").get(a.getStorageKey())
                             .then(function(item) {
                                 if (item.expires <= cmp._originalExpiration) {
                                     $A.test.fail("storage expiration was not updated after refresh");
@@ -1142,7 +1144,7 @@
             $A.test.enqueueAction(a);
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function(){
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){cmp._originalExpiration = item.expires});
                 });
         }, function(cmp) {
@@ -1156,7 +1158,7 @@
             $A.test.enqueueAction(a);
             $A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function(){
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){
                             $A.test.assertEquals(cmp._originalExpiration, item.expires,
                                 "stored item should not have had expiration modified");
@@ -1174,7 +1176,7 @@
                 cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", newCount);
                 // first action run will be stored refresh action
                 if (newCount == 4) {
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
                         function(item){
                             $A.test.assertEquals(cmp._originalExpiration, item.expires, "Refresh action not run");
                         });
@@ -1183,7 +1185,7 @@
             $A.test.enqueueAction(a);
             $A.test.addWaitFor("5", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function(){
-                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                    $A.storageService.getStorage("actions").get(a.getStorageKey()).then(function(){},
                         function(item){
                             // after new action is run, it is stored with new expires time
                             $A.test.assertTrue(cmp._originalExpiration < item.expires,
@@ -1191,5 +1193,43 @@
                         });
                 });
         } ]
+    },
+
+    testStorageKeyVersionString: {
+        attributes : {
+            "version" : "TrustyTahr"
+        },
+        test: function(cmp) {
+            cmp.getDef().getHelper().testStorageKeyVersion(cmp);
+        }
+    },
+
+    testStorageKeyVersionNumber: {
+        attributes : {
+            "version" : 34.0
+        },
+        test: function (cmp) {
+            cmp.getDef().getHelper().testStorageKeyVersion(cmp);
+        }
+    },
+
+    testStorageKeyVersionAsPartOfKey: {
+        attributes : {
+            "version" : "testing"
+        },
+        test: function(cmp) {
+            cmp.getDef().getHelper().testStorageKeyVersion(cmp);
+        }
+    },
+
+    testSettingStorageVersion: {
+        attributes: {
+            "version": "1"
+        },
+        test: function (cmp) {
+            var storage = $A.storageService.getStorage("actions");
+            storage.setVersion("2");
+            $A.test.assertEquals("2", storage.getVersion(), "Storage version should still be 2.");
+        }
     }
 })

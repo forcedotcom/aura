@@ -26,5 +26,7 @@ exp(p,
     "put", p.put,
     "getAll", p.getAll,
     "isPersistent", p.isPersistent,
-    "isSecure", p.isSecure
+    "isSecure", p.isSecure,
+    "setVersion", p.setVersion,
+    "getVersion", p.getVersion
 );

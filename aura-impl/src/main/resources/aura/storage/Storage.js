@@ -27,6 +27,7 @@ var AuraStorage = function AuraStorage(config) {
     this.defaultAutoRefreshInterval = config["defaultAutoRefreshInterval"] * 1000;
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
     this.lastSweep = new Date().getTime();
+    this.setVersion(config["version"]);
 
     var clearStorageOnInit = config["clearStorageOnInit"];
 
@@ -108,7 +109,7 @@ AuraStorage.prototype.clear = function() {
 AuraStorage.prototype.get = function(key) {
     // This needs to also be asynchronous to map to IndexedDB, WebSQL, SmartStore that are all async worlds
     var that = this;
-    var promise = this.adapter.getItem(key).then(function(item) {
+    var promise = this.adapter.getItem(this.version + key).then(function(item) {
 
         that.log("get() - key: " + key + ", item: " + item);
 
@@ -133,7 +134,14 @@ AuraStorage.prototype.getAll = function() {
     return this.adapter.getAll().then(function(items) {
         that.log("getAll() - found " + items.length + " items");
         return $A.util.map(items, function(item) {
-            return { key: item["key"], value: item["value"], isExpired : (new Date().getTime() > item.expires) };
+            var realKey = item["key"],
+                key = realKey;
+            if (realKey.indexOf(that.version) === 0) {
+                // in case version string is part of the actual key
+                // then only replace first occurrence
+                key = item["key"].replace(that.version, "");
+            }
+            return { key: key, value: item["value"], isExpired : (new Date().getTime() > item.expires) };
         });
     });
 };
@@ -154,7 +162,7 @@ AuraStorage.prototype.put = function(key, value) {
     };
 
     var that = this;
-    var promise = this.adapter.setItem(key, item)
+    var promise = this.adapter.setItem(this.version + key, item)
         .then(function () {
             that.log("put() - key: " + key + ", item: " + item);
             $A.storageService.fireModified();
@@ -173,7 +181,7 @@ AuraStorage.prototype.put = function(key, value) {
  * @private
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
-    return this.adapter.removeItem(key)
+    return this.adapter.removeItem(this.version + key)
         .then(function(){
             if (!doNotFireModified) {
                 $A.storageService.fireModified();
@@ -270,5 +278,22 @@ AuraStorage.prototype.isPersistent = function() {
 AuraStorage.prototype.isSecure = function() {
     return this.secure;
 };
+
+/**
+ * Sets the storage version. Cannot be set unless never set.
+ */
+AuraStorage.prototype.setVersion  = function(version) {
+    // ensure string
+    this.version = (version || "") + "";
+};
+
+/**
+ * Returns the storage version.
+ * @returns {String} storage version.
+ */
+AuraStorage.prototype.getVersion  = function() {
+    return this.version;
+};
+
 
 //#include aura.storage.Storage_export

@@ -38,13 +38,18 @@ public class InitRenderer implements Renderer {
         Boolean debugLoggingEnabled = (Boolean) attributes.getValue("debugLoggingEnabled");
         Boolean persistent = (Boolean) attributes.getValue("persistent");
         Boolean secure = (Boolean) attributes.getValue("secure");
+        String version = (String) attributes.getValue("version");
+
+        if (version == null) {
+            version = "";
+        }
 
         appendable.append("<script>\n");
 
         String script = String.format(
-                "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s);\n",
+                "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s, '%s');\n",
                 name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration, defaultAutoRefreshInterval,
-                debugLoggingEnabled, clearStorageOnInit);
+                debugLoggingEnabled, clearStorageOnInit, version);
 
         Boolean onlyUseStorageIfRequested = (Boolean) attributes.getValue("requireUseStorageQueryParam");
         if (onlyUseStorageIfRequested != null && onlyUseStorageIfRequested) {

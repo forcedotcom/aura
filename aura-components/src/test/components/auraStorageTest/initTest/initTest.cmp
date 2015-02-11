@@ -8,15 +8,17 @@
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
     <aura:attribute name="requireUseStorageQueryParam" type="Boolean"/>
     <aura:attribute name="persistent" type="Boolean" default="false"/>
-        
+    <aura:attribute name="version" type="String" default=""/>
+
     <!--Control the values per test case-->
     <auraStorage:init debugLoggingEnabled="true"
     				  name="actions" secure="true" persistent="{!v.persistent}"
                       clearStorageOnInit="{!v.clearStorageOnInit}"
                       defaultExpiration="{!v.defaultExpiration}" 
                       defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}" 
-                      requireUseStorageQueryParam="{!v.requireUseStorageQueryParam}"/>
-                      
+                      requireUseStorageQueryParam="{!v.requireUseStorageQueryParam}"
+                      version="{!v.version}"/>
+
                       
     <ui:button label="Run action at Server Always" press="{!c.forceActionAtServer}" aura:id="ForceActionAtServer"/>
     <p/>

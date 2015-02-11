@@ -10,6 +10,8 @@
     <properties>
         <component.dir>components_aura_components</component.dir>
         <component.test.dir>components_aura_components_test</component.test.dir>
+        <component.compile.phase>process-classes</component.compile.phase>
+        <component.test.compile.phase>process-test-classes</component.test.compile.phase>
     </properties>
     <dependencies>
         <dependency>
@@ -105,51 +107,68 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>aura:compile-components</id>
+                        <phase>${component.compile.phase}</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>aura:compile-test-components</id>
+                        <phase>${component.test.compile.phase}</phase>
+                        <configuration>
+                            <target>
+                                <java classname="org.auraframework.tools.definition.AuraCompiler" classpathref="maven.test.classpath" fork="true" failonerror="true">
+                                    <jvmarg value="-Daura.home=${basedir}/.." />
+                                    <arg value="${basedir}/src/test/components" />
+                                    <arg value="${project.build.directory}/${component.test.dir}" />
+                                    <arg value="auratest" />
+                                    <arg value="themeProviderTest" />
+                                    <arg value="lintTest" />
+                                    <arg value="handleEventTest" />
+                                    <arg value="validationTest" />
+                                    <arg value="test" />
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
         <profile>
-            <id>componentCompile</id>
+            <id>skipComponentCompile</id>
             <activation>
                 <property>
-                   <name>!skipComponentCompile</name>
+                   <name>skipComponentCompile</name>
                 </property>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>aura:compile-components</id>
-                                <phase>process-classes</phase>
-                            </execution>
-                            <execution>
-                                <id>aura:compile-test-components</id>
-                                <phase>process-test-classes</phase>
-                                <configuration>
-                                    <target>
-                                        <java classname="org.auraframework.tools.definition.AuraCompiler" classpathref="maven.test.classpath" fork="true" failonerror="true">
-                                            <jvmarg value="-Daura.home=${basedir}/.." />
-                                            <arg value="${basedir}/src/test/components" />
-                                            <arg value="${project.build.directory}/${component.test.dir}" />
-                                            <arg value="auratest" />
-                                            <arg value="themeProviderTest" />
-                                            <arg value="lintTest" />
-                                            <arg value="handleEventTest" />
-                                            <arg value="validationTest" />
-                                            <arg value="test" />
-                                        </java>
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+            	<component.compile.phase>disabled</component.compile.phase>
+            	<component.test.compile.phase>disabled</component.test.compile.phase>
+            </properties>
+        </profile>
+        <profile>
+            <id>skipTestComponentCompile</id>
+            <activation>
+                <property>
+                   <name>maven.test.skip</name>
+                   <value>true</value>
+                </property>
+            </activation>
+            <properties>
+            	<component.test.compile.phase>disabled</component.test.compile.phase>
+            </properties>
         </profile>
         <profile>
             <id>autotest</id>

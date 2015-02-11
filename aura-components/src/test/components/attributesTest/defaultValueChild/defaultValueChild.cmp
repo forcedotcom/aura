@@ -1,0 +1,30 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<aura:component extends="attributesTest:defaultValue">
+    <aura:attribute type="Boolean" name="booleanDefaultInherit" default="{!v.booleanDefaultWithStringTrue}"/>
+    <aura:attribute type="Decimal" name="decimalDefaultInherit" default="{!v.decimalDefaultWithStringPositiveDecimal}"/>
+    <aura:attribute type="Double" name="doubleDefaultInherit" default="{!v.doubleDefaultWithStringNegativeDecimal}"/>
+    <aura:attribute type="Integer" name="integerDefaultInherit" default="{!v.integerDefaultWithStringPositiveInt}"/>
+    <aura:attribute type="Long" name="longDefaultInherit" default="{!v.longDefaultWithStringNegativeInt}"/>
+    <aura:attribute type="String" name="stringDefaultInherit" default="{!v.stringDefaultWithString}"/>
+    <aura:attribute type="Object" name="objectDefaultInherit" default="{!v.objAttributeWithDefaultValue}"/>
+    <aura:attribute type="Map" name="mapDefaultInherit" default="{!v.mapAttributeWithDefaultValue}"/>
+    <aura:attribute type="List" name="listDefaultInherit" default="{!v.listAttributeWithDefaultValue}"/>
+</aura:component>
+

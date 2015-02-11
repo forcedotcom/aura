@@ -21,8 +21,6 @@
     <!-- "undefined" in following expressions is not the literal, but from a reference to nothing -->
     <expressionTest:test expression="{!undefined}" exprText="undefined" expected="undefined"/>
     <expressionTest:test expression="{!v.isNotSet}" exprText="v.isNotSet" expected="undefined"/>
-    <expressionTest:test expression="{!$Labels.undefined.undefined}" exprText="$Labels.undefined.undefined" expected="undefined"/>
-    <expressionTest:test expression="{!$whimsy}" exprText="$whimsy" expected="undefined"/>
 
     <expressionTest:test expression="{!!undefined}" exprText="!undefined" expected="true"/>
 

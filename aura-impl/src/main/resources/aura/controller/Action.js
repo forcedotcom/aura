@@ -213,8 +213,6 @@ Action.prototype.popCreationPath = function(pathPart) {
     this.canCreate = false;
     switch (pathPart) {
     case "body" : pathPart = "*"; break;
-// JBUCH: HALO: TODO: DELETE WHEN READY
-//    case "realbody" : pathPart = "+"; break;
     case "super" : pathPart = "$"; break;
     }
     addedPath = "/"+pathPart;

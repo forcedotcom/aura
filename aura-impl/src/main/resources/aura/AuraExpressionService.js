@@ -29,14 +29,12 @@ var AuraExpressionService = function AuraExpressionService() {
 		 * @returns {Object} The normalized string, or the input parameter, if
 		 *          it was not a string.
 		 */
-		normalize : function(expression) {
-			if ($A.util.isString(expression)) {
-				expression = expression.
-                // Strip expression wrappers: {!x.x.x} -> x.x.x
-                    replace(/^\s*\{\!|\}\s*$/g, '').
-                // Normalize Array indices: x.x[2] -> x.x.2
-                    replace(/\[(\d+)\]/g,".$1");
-			}
+        normalize : function(expression) {
+            expression = (expression+'').
+            // Strip expression wrappers: {!x.x.x} -> x.x.x
+                replace(/^\s*\{\!|\}\s*$/g, '').
+            // Normalize Array indices: x.x[2] -> x.x.2
+                replace(/\[(\d+)\]/g,".$1");
 			return expression;
 		},
 

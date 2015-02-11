@@ -89,6 +89,16 @@ AuraContext.prototype.getMode = function() {
 };
 
 /**
+ * Adds a new global value provider.
+ * @param type The key to identify the valueProvider.
+ * @param valueProvider The valueProvider to add.
+ * @private
+ */
+AuraContext.prototype.addGlobalValueProvider = function(type,valueProvider) {
+    this.globalValueProviders.addValueProvider(type,valueProvider);
+};
+
+/**
  * Provides access to global value providers.
  * For example, <code>$A.get("$Label.Related_Lists.task_mode_today");</code> gets the label value.
  * 

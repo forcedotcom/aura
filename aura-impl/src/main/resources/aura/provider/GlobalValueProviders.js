@@ -23,7 +23,9 @@
  */
 $A.ns.GlobalValueProviders = function (gvp, initCallback) {
     this.valueProviders = {
-        "$Label": new $A.ns.LabelValueProvider()
+        "$Browser" : new $A.ns.ObjectValueProvider(),
+        "$Label": new $A.ns.LabelValueProvider(),
+        "$Locale": new $A.ns.ObjectValueProvider()
     };
 
     var that = this;
@@ -134,10 +136,23 @@ $A.ns.GlobalValueProviders.prototype.load = function(gvp) {
     }
 };
 
+
+/**
+ * Adds a new global value provider.
+ * @param type The key to identify the valueProvider.
+ * @param valueProvider The valueProvider to add.
+ * @private
+ */
+$A.ns.GlobalValueProviders.prototype.addValueProvider = function(type, valueProvider) {
+    if(!this.valueProviders.hasOwnProperty(type)) {
+        this.valueProviders[type] = valueProvider;
+    }
+};
+
 /**
  * Returns value provider or empty ObjectValueProvider
  *
- * @param {String} type - key for value provider
+ * @param {String} type the key to identify the valueProvider
  * @return {Object} ValueProvider
  * @private
  */

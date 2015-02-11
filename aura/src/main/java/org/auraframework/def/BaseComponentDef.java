@@ -17,6 +17,7 @@ package org.auraframework.def;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -84,6 +85,8 @@ public interface BaseComponentDef extends RootDefinition {
     StyleDef getStyleDef() throws QuickFixException;
 
     List<AttributeDefRef> getFacets();
+
+    Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;
 
     RendererDef getLocalRendererDef() throws QuickFixException;
 

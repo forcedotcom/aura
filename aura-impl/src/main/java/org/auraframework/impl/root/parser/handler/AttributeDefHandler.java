@@ -21,10 +21,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -77,11 +74,11 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      * @param xmlReader The XMLStreamReader that the handler should read from. It is expected to be queued up to the
      *            appropriate position before getElement() is invoked.
      */
-    public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         this(parentHandler, xmlReader, source, null);
     }
 
-    public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
             String defaultType) {
         super(parentHandler, xmlReader, source);
         this.defaultType = Optional.fromNullable(defaultType);
@@ -100,7 +97,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         	error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
         
-        builder.setParentDescriptor(getParentHandler().getDefDescriptor());
+        builder.setParentDescriptor(getParentDefDescriptor());
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
         builder.setLocation(getLocation());
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
@@ -169,7 +166,10 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        body.add(getDefRefHandler(getParentHandler()).getElement());
+        ContainerTagHandler parentHandler=getParentHandler();
+        if(parentHandler!=null) {
+            body.add(getDefRefHandler(getParentHandler()).getElement());
+        }
     }
 
     @Override

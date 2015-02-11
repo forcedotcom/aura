@@ -15,10 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component >
-    This component is in place just make sure that compilation fails. This is required for PreloadNameSpaceUITest.testPreloadNameSpaceWithBadComponent()
-    <aura:attribute type="String" name="dup"/>
-    <aura:attribute type="String" name="dup"/>
-</aura:component>
-<!--This component is used in PreloadNameSpaceUITest.testPreloadNameSpaceWithBadComponent()
-    and loadLevelTest.createNewCmpTest.js -->
+<aura:event type="COMPONENT" support="GA" access="GLOBAL" description="Indicates that a public method was called.">
+    <aura:attribute name="name" type="String" access="GLOBAL" description="The name of the method called."/>
+    <aura:attribute name="arguments" type="List" access="GLOBAL" description="The list of arguments passed into the public method."/>
+</aura:event>

@@ -39,11 +39,7 @@ import com.google.common.collect.Maps;
 /**
  * Super class for the top level tags, handles some common setup
  */
-public abstract class RootTagHandler<T extends RootDefinition> extends ContainerTagHandler<T> implements
-        ExpressionContainerHandler {
-
-    protected final DefDescriptor<T> defDescriptor;
-	protected final boolean isInPrivilegedNamespace;
+public abstract class RootTagHandler<T extends RootDefinition> extends ContainerTagHandler<T> {
 
     protected static final String ATTRIBUTE_SUPPORT = "support";
     protected static final String ATTRIBUTE_DESCRIPTION = "description";
@@ -54,29 +50,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     protected RootTagHandler() {
         super();
-        this.defDescriptor = null;
-        this.isInPrivilegedNamespace = true;
     }
 
     protected RootTagHandler(DefDescriptor<T> defDescriptor, Source<?> source, XMLStreamReader xmlReader) {
-        super(xmlReader, source);
-        this.defDescriptor = defDescriptor;
-        this.isInPrivilegedNamespace = defDescriptor != null ? Aura.getConfigAdapter().isPrivilegedNamespace(defDescriptor.getNamespace()) : true;
-    }
-
-    public boolean isInPrivilegedNamespace() {
-        return isInPrivilegedNamespace;
-    }
-
-    protected DefDescriptor<T> getDefDescriptor() {
-        return defDescriptor;
-    }
-
-    @Override
-    public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        // TODO: this should be a typed exception
-        throw new AuraRuntimeException("Expressions are not allowed inside a " + defDescriptor.getDefType()
-                + " definition", propRefs.iterator().next().getLocation());
+        super(defDescriptor, xmlReader, source);
     }
 
     @Override
@@ -139,4 +116,13 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     	
     	return requiredVersionDefs;
     }
+
+    protected void tagError(String message, DefDescriptor descriptor, Object... args) {
+        error(String.format(
+                String.format(message,args),
+                descriptor.getDefType().toString().toLowerCase(),
+                descriptor.getDescriptorName()
+        ));
+    }
+
 }

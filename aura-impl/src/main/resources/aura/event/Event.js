@@ -63,25 +63,37 @@ Event.prototype.getName = function(){
  */
 Event.prototype.setParams = function(config) {
     if (this.fired) {
-        $A.assert(false, "cannot modify event that has already been fired");
+        $A.assert(false, "Event.setParams(): cannot modify an event that has already been fired.");
     }
-
     if (config){
         var attributeDefs = this.eventDef.getAttributeDefs();
-
         for (var key in config){
             if (config.hasOwnProperty(key)) {
                 if (attributeDefs[key]) {
-                    var value = config[key];
-                    this.params[key] = value;
+                    this.params[key] = config[key];
                 } else {
-                    $A.warning("Attempt to set invalid property '" + key + "' on event");
+                    $A.warning("Event.setParams(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.event.getAttributeDefs()).join("', '")+"'");
                 }
             }
         }
     }
-
     return this;
+};
+
+/**
+ * Sets a parameter for the Event. Does not modify an event that has already been fired.
+ * @param {String} key The name of the parameter.
+ * @param {Object} value The value of the parameter.
+ */
+Event.prototype.setParam=function(key,value) {
+    if (this.fired) {
+        $A.assert(false, "Event.setParam(): cannot modify an event that has already been fired.");
+    }
+    if (this.eventDef.getAttributeDefs()[key]) {
+        this.params[key] = value;
+    } else {
+        $A.warning("Event.setParam(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.event.getAttributeDefs()).join("', '")+"'");
+    }
 };
 
 /**
@@ -110,8 +122,7 @@ Event.prototype.statsIndex = [];
  */
 Event.prototype.fire = function() {
     if (this.fired) {
-        // could pass around a different object instead
-        aura.assert(false, "event has already been fired, silly");
+        aura.assert(false, "Event.fire(): Unable to fire event. Event has already been fired.");
     }
 
     //#if {"modes" : ["STATS"]}

@@ -117,6 +117,9 @@ var ComponentPriv = (function() { // Scoping priv
         // initialize attributes
         this.setupAttributes(cmp, configAttributes, localCreation);
 
+        // instantiates this components methods
+        this.setupMethods(config, cmp);
+
         // instantiates this components model
         this.setupModel(config["model"], cmp);
 
@@ -503,6 +506,38 @@ if(!this.concreteComponentId) {
         }
     };
 
+    ComponentPriv.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
+        var observer=this.getActionCaller(valueProvider,action||("c."+name));
+        return function(param1,param2,paramN){
+            var eventDef = $A.get("e").getEventDef("aura:methodCall");
+            var dispatcher = {};
+            dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
+            var methodEvent = new Event({
+                "eventDef" : eventDef,
+                "eventDispatcher" : dispatcher
+            });
+            var params={
+                "name" : name,
+                "arguments": null
+            };
+            if(attributes) {
+                params["arguments"]={};
+                var counter=0;
+                for (var attribute in attributes){
+                    params["arguments"][attribute]=arguments[counter];
+                    counter++;
+                }
+                for(var i=counter;i<arguments.length;i++){
+                    params["argument_"+i]=arguments[i];
+                }
+            }else{
+                params["arguments"]=$A.util.toArray(arguments);
+            }
+            methodEvent.setParams(params);
+            methodEvent.fire();
+        };
+    };
+
     ComponentPriv.prototype.getActionCaller = function(valueProvider, actionExpression) {
         return function Component$getActionCaller(event) {
             if (valueProvider.isValid && !valueProvider.isValid()) {
@@ -712,6 +747,17 @@ if(!this.concreteComponentId) {
                 "index" : index
             });
             changeEvent.fire();
+        }
+    };
+
+    ComponentPriv.prototype.setupMethods = function(config, cmp) {
+        var defs = this.componentDef.methodDefs;
+        if (defs) {
+            var method;
+            for(var i=0;i<defs.length;i++){
+                method=defs[i];
+                cmp[method.name]=this.getMethodHandler(cmp,method.name,method.action,method.attributes);
+            }
         }
     };
 
@@ -1787,7 +1833,9 @@ Component.prototype.get = function(key) {
     var root = path.shift();
     var valueProvider = this.priv.getValueProvider(root, this);
     if (path.length) {
-        $A.assert(valueProvider, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
+        if(!valueProvider){
+            $A.assert(false, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
+        }
         if($A.util.isFunction(valueProvider.get)){
             return valueProvider.get(path.join('.'));
         }else{
@@ -1829,10 +1877,15 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     $A.assert(key.indexOf('.') > -1, "Unable to set value for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
 
     var path = key.split('.');
-    var valueProvider = this.priv.getValueProvider(path.shift(), this);
+    var root = path.shift();
+    var valueProvider = this.priv.getValueProvider(root, this);
 
-    $A.assert(valueProvider, "Unknown value provider for key '" + key + "'.");
-    $A.assert(valueProvider.set, "Value provider does not implement set() method.");
+    if(!valueProvider){
+        $A.assert(false, "Unable to set value for key '" + key + "'. No value provider was found for '" + root + "'.");
+    }
+    if(!valueProvider.set){
+        $A.assert(false, "Unable to set value for key '" + key + "'. Value provider does not implement 'set(key, value)'.");
+    }
     var subPath=path.join('.');
 
     var oldValue=valueProvider.get(subPath);

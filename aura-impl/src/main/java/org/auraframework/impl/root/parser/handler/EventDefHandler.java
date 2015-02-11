@@ -75,7 +75,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<EventDef>(this, xmlReader, source).getElement();
+            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source).getElement();
             builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {

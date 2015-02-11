@@ -32,24 +32,36 @@ import org.auraframework.util.AuraTextUtil;
  */
 public abstract class ParentedTagHandler<T extends Definition, P extends RootDefinition> extends ContainerTagHandler<T> {
 
-    private RootTagHandler<P> parentHandler;
+    private ContainerTagHandler<P> parentHandler;
 
     public ParentedTagHandler() {
         super();
     }
 
-    public ParentedTagHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(xmlReader, source);
+    public ParentedTagHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+        this(null,parentHandler,xmlReader, source);
+    }
+
+    public ParentedTagHandler(DefDescriptor<T> defDescriptor,ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+        super(defDescriptor,xmlReader, source);
         this.parentHandler = parentHandler;
         this.setWhitespaceBehavior(parentHandler == null ? WhitespaceBehavior.OPTIMIZE : parentHandler
                 .getWhitespaceBehavior());
     }
 
     protected RootTagHandler<P> getParentHandler() {
-        return parentHandler;
+        if(parentHandler instanceof RootTagHandler) {
+            return (RootTagHandler<P>) parentHandler;
+        }
+        return null;
+    }
+
+    protected DefDescriptor<P> getParentDefDescriptor(){
+        return parentHandler.getDefDescriptor();
     }
     
-    protected boolean isInPrivilegedNamespace() {
+    @Override
+    public boolean isInPrivilegedNamespace() {
     	return parentHandler.isInPrivilegedNamespace();
 	}
 

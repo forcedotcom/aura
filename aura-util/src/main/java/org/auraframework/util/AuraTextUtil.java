@@ -44,6 +44,26 @@ public class AuraTextUtil {
             "\\u003C", "\\u003E", "\\n", "\\u2029", "", "\\u002A/" };
     private static final TrieMatcher JSON_SEARCH_REPLACE = TrieMatcher.compile(JSON_IN, JSON_OUT);
 
+    private static final String[] RESERVED_METHODS = new String[]{
+            "auraType","getDef","getRendering",
+            "index","deIndex","find",
+            "getGlobalId","getLocalId",
+            "associateElement","getElements","getElement",
+            "get","set","getFacets","getModel",
+            "getReference","clearReference",
+            "getSuper","getConcreteComponent",
+            "isConcrete","isInstanceOf","isRendered",
+            "markDirty","isDirty",
+            "isValid","setValid",
+            "addErrors","clearErrors","getErrors",
+            "addHandler","addDocumentLevelHandler","removeDocumentLevelHandler",
+            "getEventDispatcher","getEvent","getHandledEvents","hasEventHandler",
+            "addValueHandler","removeValueHandler",
+            "addValueProvider","getAttributeValueProvider","getComponentValueProvider",
+            "autoDestroy","destroy",
+            "toString"
+    };
+
     //
     // Note that unicode 2028 is encoded as a raw newline. This means that putting it in a string will break,
     // but at least it will break consistently (i.e. the string will become illegal js), while putting it in code
@@ -611,14 +631,33 @@ public class AuraTextUtil {
      * Attribute Name validation: This is done here since we want to validate attribute names entered in quick fix as
      * well.
      * 
-     * @param attName is the attribute name which is being validated
+     * @param attributeName is the attribute name which is being validated
      * @return a : true if the name is valid and false if its invalid
      */
-    public static boolean validateAttributeName(String attrName) {
+    public static boolean validateAttributeName(String attributeName) {
         Pattern p = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
-        Matcher m = p.matcher(attrName);
+        Matcher m = p.matcher(attributeName);
         boolean a = m.find();
         return a;
+    }
+
+    /**
+     * Method Name validation: This is done here since we want to validate method names entered in quick fix as
+     * well.
+     *
+     * @param methodName is the method name which is being validated
+     * @return a : true if the name is valid and false if its invalid
+     */
+    public static boolean validateMethodName(String methodName) {
+        if(methodName==null){
+            return false;
+        }
+        methodName=methodName.toLowerCase();
+        for(String s: RESERVED_METHODS){
+            if(s.equals(methodName))
+                return false;
+        }
+        return true;
     }
 
     /**

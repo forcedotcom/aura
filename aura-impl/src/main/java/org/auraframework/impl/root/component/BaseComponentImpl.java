@@ -174,8 +174,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                     throw e;
                 }
 
-                DefDescriptor<InterfaceDef> intfDescriptor = DefDescriptorImpl.getInstance(
-                        descriptor.getQualifiedName(), InterfaceDef.class);
+                DefDescriptor<InterfaceDef> intfDescriptor = DefDescriptorImpl.getInstance(descriptor.getQualifiedName(), InterfaceDef.class);
                 InterfaceDef intfDef = intfDescriptor.getDef();
                 if (intfDef != null) {
                     this.intfDescriptor = intfDescriptor;

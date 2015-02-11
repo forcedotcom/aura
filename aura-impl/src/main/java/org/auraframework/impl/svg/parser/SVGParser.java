@@ -76,7 +76,7 @@ public class SVGParser implements Parser {
         // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 

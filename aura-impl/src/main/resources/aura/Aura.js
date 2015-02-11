@@ -701,22 +701,42 @@ $A.ns.Aura.prototype.message = function(msg) {
  * @param {Function} callback The method to call with the result if a server trip is expected.
  */
 $A.ns.Aura.prototype.get = function(key, callback) {
-    if($A.util.isString(key)) {
-        key = $A.expressionService.normalize(key);
-        var path = key.split('.');
-        var root = path.shift();
-        var valueProvider = $A.services[root];
-        if (!valueProvider) {
-            valueProvider = $A.getGlobalValueProvider(root);
-        }
-        if (valueProvider) {
-            if (path.length) {
-                return valueProvider.get(path.join('.'), callback);
-            }
-            return valueProvider.getValues?valueProvider.getValues():valueProvider;
+    key = $A.expressionService.normalize(key);
+    var path = key.split('.');
+    var root = path.shift();
+    var valueProvider = $A.services[root] || $A.getValueProvider(root);
+    if(!valueProvider){
+        $A.assert(false, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
+    }
+    if (path.length) {
+        if (valueProvider.get) {
+            return valueProvider.get(path.join('.'), callback);
+        } else {
+            return $A.expressionService.resolve(path, valueProvider);
         }
     }
-    return undefined;
+    return valueProvider.getValues ? valueProvider.getValues() : valueProvider;
+};
+
+/**
+ * Sets the value referenced using property syntax on the specified global value provider.
+ * @public
+ * @function
+ * @param {String} key The data key to look up on the global value provider, for example, <code>$A.get("$Label.section.key")</code>.
+ * @param {Object} value The value to set the key location to. If the global value provider does not implement .set(), this method will throw an exception.</code>.
+ */
+$A.ns.Aura.prototype.set = function(key, value) {
+    key = $A.expressionService.normalize(key);
+    var path = key.split('.');
+    var root = path.shift();
+    var valueProvider = $A.getValueProvider(root);
+    if(!valueProvider){
+        $A.assert(false, "Unable to set value for key '" + key + "'. No value provider was found for '" + root + "'.");
+    }
+    if(!valueProvider["set"]){
+        $A.assert(false, "Unable to set value for key '" + key + "'. Value provider does not implement 'set(key, value)'.");
+    }
+    return valueProvider["set"](path.join('.'), value);
 };
 
 /**
@@ -863,10 +883,27 @@ $A.ns.Aura.prototype.setMode = function(mode) {
  *
  * @private
  */
-$A.ns.Aura.prototype.getGlobalValueProvider = function(type) {
+$A.ns.Aura.prototype.getValueProvider = function(type) {
     return this.getContext().getGlobalValueProvider(type);
 };
 
+/**
+ * Add a new Global Value Provider.
+ * @param {String} type The type of global value provider to add. Types must start with a '$', and may not use reserved
+ *                      types, such as '$Label', '$Browser', or '$Locale'
+ * @param {ValueProvider} The global value provider. This can either implement a '.get(expression)' and
+ *                               optional '.set(expression, value)' method, or simply be an instance of an Object.
+ *
+ * @public
+ */
+$A.ns.Aura.prototype.addValueProvider=function(type,valueProvider){
+    $A.assert($A.util.isString(type),"$A.addValueProvider(): 'type' must be a valid String.");
+    $A.assert(type.charAt(0)==='$',"$A.addValueProvider(): 'type' must start with '$'.");
+    $A.assert(",$browser,$label,$locale,".indexOf(","+type.toLowerCase()+",")==-1,"$A.addValueProvider(): '"+type+"' is a reserved valueProvider.");
+    $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"$A.addValueProvider(): 'valueProvider' is required.");
+    $A.assert(this.getValueProvider(type)==null,"$A.addValueProvider(): '"+type+"' has already been registered.");
+    this.getContext().addGlobalValueProvider(type,valueProvider);
+};
 
 /**
  * The levels for logging performance m

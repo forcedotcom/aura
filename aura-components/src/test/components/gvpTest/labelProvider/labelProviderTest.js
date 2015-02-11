@@ -79,8 +79,16 @@
 
     testInvalidGVPExpressions: {
         test: function (cmp) {
-            var result = $A.get("v.simplevalue3");
-            $A.test.assertEquals(undefined, result, "Invalid GVP expression should return undefined");
+            var expected="Assertion Failed!: Unable to get value for key 'v.simplevalue3'. No value provider was found for 'v'. : false";
+            var actual = null;
+
+            try {
+                $A.get("v.simplevalue3");
+            }catch(e){
+                actual=e.message||e.description;
+            }
+
+            $A.test.assertEquals(expected, actual, "Invalid GVP expression should throw.");
         }
     },
 
@@ -123,17 +131,6 @@
      * General tests for Global Value Providers
      */
 
-    testNonGVP: {
-        test: function (cmp) {
-            $A.test.assertUndefinedOrNull($A.get("undefined"));
-            $A.test.assertUndefinedOrNull($A.get(""));
-            $A.test.assertUndefinedOrNull($A.get("$Foo.bar"));
-            $A.test.assertUndefinedOrNull($A.get({}));
-            $A.test.assertUndefinedOrNull($A.get([]));
-            $A.test.assertUndefinedOrNull($A.get());
-            $A.test.assertUndefinedOrNull($A.get(null));
-        }
-    },
     testGetWithCallback: {
         test: [
             //Fetch a new label from server

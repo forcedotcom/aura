@@ -320,7 +320,7 @@
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                 var errorCmp = cmp.get('v.body')[0];
                 var errorMsg = errorCmp.get("v.value");
-                $A.test.assertTrue($A.test.contains(errorMsg, 'Duplicate definitions for attribute dup on tag aura:attribute'),
+                $A.test.assertTrue($A.test.contains(errorMsg, "There is already an attribute named 'dup' on component 'test:test_Preload_BadCmp'."),
                         "Incorrect error message returned in error component when trying to create invalid component");
             });
         }

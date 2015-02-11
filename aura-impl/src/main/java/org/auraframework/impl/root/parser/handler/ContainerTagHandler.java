@@ -21,27 +21,49 @@ import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.*;
 
+import java.util.Set;
+
 
 /**
  * Abstract handler for tags that contain other tags.
  */
-public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T> {
+public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T>
+        implements ExpressionContainerHandler {
     protected Location startLocation;
     protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
+    protected DefDescriptor<T> defDescriptor;
+    protected final boolean isInPrivilegedNamespace;
     public static final String SCRIPT_TAG = "script";
     public static final String ATTRIBUTE_ACCESS = "access";
 
     public ContainerTagHandler() {
         super();
+        this.defDescriptor = null;
+        this.isInPrivilegedNamespace = true;
     }
 
     public ContainerTagHandler(XMLStreamReader xmlReader, Source<?> source) {
+        this(null, xmlReader, source);
+    }
+
+    public ContainerTagHandler(DefDescriptor<T> defDescriptor, XMLStreamReader xmlReader, Source<?> source) {
         super(xmlReader, source);
+        this.defDescriptor = defDescriptor;
+        this.isInPrivilegedNamespace = defDescriptor != null ? Aura.getConfigAdapter().isPrivilegedNamespace(defDescriptor.getNamespace()) : true;
+    }
+
+    public boolean isInPrivilegedNamespace() {
+        return isInPrivilegedNamespace;
+    }
+
+    protected DefDescriptor<T> getDefDescriptor() {
+        return defDescriptor;
     }
 
     protected void readElement() throws XMLStreamException, QuickFixException {
@@ -81,6 +103,13 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             // must have hit EOF, barf time!
             error("Didn't find an end tag");
         }
+    }
+
+    @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        // TODO: this should be a typed exception
+        throw new AuraRuntimeException("Expressions are not allowed inside a " + defDescriptor.getDefType()
+                + " definition", propRefs.iterator().next().getLocation());
     }
 
     @Override

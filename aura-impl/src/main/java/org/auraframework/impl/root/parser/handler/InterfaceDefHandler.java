@@ -24,6 +24,7 @@ import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.MethodDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
@@ -58,6 +59,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(descriptor, source, xmlReader);
         builder.events = new HashMap<String, RegisterEventDef>();
+        builder.methods = new HashMap<DefDescriptor<MethodDef>, MethodDef>();
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
@@ -73,24 +75,39 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<InterfaceDef>(this, xmlReader, source).getElement();
-            builder.addAttributeDef(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
-                    attributeDef);
+            AttributeDefHandler<InterfaceDef> handler=new AttributeDefHandler<>(this, xmlReader, source);
+            AttributeDefImpl attributeDef = handler.getElement();
+            DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
+//            if (builder.getAttributeDefs().containsKey(attributeDesc)) {
+//                tagError(
+//                        "There is already an attribute named '%s' on %s '%s'.",
+//                        handler.getParentHandler().getDefDescriptor(),
+//                        attributeDesc.getName(),
+//                        "%s", "%s"
+//                );
+//            }
+            builder.addAttributeDef(attributeDesc,attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-        	RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<InterfaceDef>(this,
-        			xmlReader, source).getElement();
-        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
-        			.getDescriptor();
-        	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
-        		error("Duplicate namespace %s found on tag %s",
-        				requiredVersionDesc.getName(), tag);
-        	}	
+            RequiredVersionDefHandler<InterfaceDef> handler = new RequiredVersionDefHandler<>(this,xmlReader, source);
+            RequiredVersionDefImpl requiredVersionDef = handler.getElement();
+            DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
+            if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
+                tagError(
+                        "There is already a namespace '%s' on %s '%s'.",
+                        handler.getParentHandler().getDefDescriptor(),
+                        requiredVersionDesc.getName(),
+                        "%s", "%s"
+                );
+            }
         	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
-            RegisterEventDefImpl regDef = new RegisterEventHandler<InterfaceDef>(this, xmlReader, source).getElement();
+            RegisterEventDefImpl regDef = new RegisterEventHandler<>(this, xmlReader, source).getElement();
             builder.events.put(regDef.getAttributeName(), regDef);
+        } else if (MethodDefHandler.TAG.equalsIgnoreCase(tag)) {
+            MethodDef methodDef = new MethodDefHandler<>(this, xmlReader, source).getElement();
+            builder.methods.put(methodDef.getDescriptor(), methodDef);
         } else {
-            error("Found unexpected tag %s", tag);
+            error("Found unexpected tag <%s>", tag);
         }
     }
 

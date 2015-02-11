@@ -98,7 +98,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class,
-                    "Duplicate definitions for attribute implNumber");
+                    "There is already an attribute named 'implNumber' on application 'test:fakeparser'.");
         }
     }
 

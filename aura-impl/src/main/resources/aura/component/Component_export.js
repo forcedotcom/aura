@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /*jslint sub: true */
+// CAUTION!
+// IF YOU MODIFY THIS LIST OF METHODS, YOU MUST ALSO MODIFY THE RESERVED_METHODS LIST IN AuraTextUtil.java
 var p = Component.prototype;
 exp(p,
     "auraType", p.auraType,

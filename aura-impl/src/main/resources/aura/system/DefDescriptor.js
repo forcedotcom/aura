@@ -21,11 +21,25 @@
 function DefDescriptor(config){
     aura.assert(config, "DefDescriptor config undefined");
 
-    var split = this.parse(config);
-    this.prefix = split[0];
-    this.namespace = split[1];
-    this.name = split[2];
-    this.qualifiedName = config;
+    var descriptor="descriptor";
+    if(config[descriptor]){
+        config=config[descriptor];
+    }
+    this.qualifiedName=config;
+    var prefix=config.split("://");
+    if(prefix.length>1){
+        this.prefix=prefix[0];
+        config=prefix[1];
+    }else{
+        this.prefix="markup";
+    }
+    var nameSpace=config.split(':');
+    if(nameSpace.length==1){
+        nameSpace=config.split('.');
+    }
+    var hasNamespace=nameSpace.length>1;
+    this.namespace=hasNamespace?nameSpace[0]:'';
+    this.name=nameSpace[hasNamespace?1:0];
 }
 
 DefDescriptor.prototype.auraType = "DefDescriptor";
@@ -77,19 +91,6 @@ DefDescriptor.prototype.toString = function(){
  * @private
  */
 DefDescriptor.prototype.parse = function(config){
-    var prefixSplit = config.split("://");
-    if(prefixSplit.length != 2){
-        prefixSplit.unshift("markup");
-    }
-    var nameSplit = prefixSplit[1].split(":");
-    if(nameSplit.length == 1){
-        nameSplit = prefixSplit[1].split(".");
-    }
-    if(nameSplit.length == 1){
-        return [prefixSplit[0], "", nameSplit[0]];
-    }else{
-        return [prefixSplit[0], nameSplit[0], nameSplit[1]];
-    }
 };
 
 //#include aura.system.DefDescriptor_export

@@ -15,39 +15,18 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.ResourceDef;
-import org.auraframework.def.SVGDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.MethodDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
@@ -62,10 +41,11 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  */
@@ -131,49 +111,79 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<T>(this,
-                    xmlReader, source).getElement();
-            DefDescriptor<AttributeDef> attributeDesc = attributeDef
-                    .getDescriptor();
+            AttributeDefHandler<T> handler = new AttributeDefHandler<>(this, xmlReader, source);
+            AttributeDefImpl attributeDef = handler.getElement();
+            DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
             if (builder.getAttributeDefs().containsKey(attributeDesc)) {
-                error("Duplicate definitions for attribute %s on tag %s",
-                        attributeDesc.getName(), tag);
+                tagError(
+                    "There is already an attribute named '%s' on %s '%s'.",
+                    handler.getParentHandler().getDefDescriptor(),
+                    attributeDesc.getName(),
+                    "%s", "%s"
+                );
             }
-            builder.getAttributeDefs().put(attributeDef.getDescriptor(),
-                    attributeDef);
+            builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-        	RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<T>(this,
-        			xmlReader, source).getElement();
-        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
-        			.getDescriptor();
+        	RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this,xmlReader, source);
+            RequiredVersionDefImpl requiredVersionDef = handler.getElement();
+        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
         	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
-        		error("Duplicate namespace %s found on tag %s",
-        				requiredVersionDesc.getName(), tag);
+        		tagError(
+                        "There is already a namespace '%s' on %s '%s'.",
+                        handler.getParentHandler().getDefDescriptor(),
+                        requiredVersionDesc.getName(),
+                        "%s", "%s"
+                );
         	}	
         	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
-            RegisterEventDefImpl regDef = new RegisterEventHandler<T>(this, xmlReader,
-                    source).getElement();
+            RegisterEventHandler<T> handler = new RegisterEventHandler<>(this, xmlReader, source);
+            RegisterEventDefImpl regDef = handler.getElement();
             if (builder.events.containsKey(regDef.getAttributeName())) {
-                error("Multiple events registered with name %s on tag %s",
-                        regDef.getAttributeName(), tag);
+                tagError("There is already an event named '%s' registered on %s '%s'.",
+                        handler.getParentHandler().getDefDescriptor(),
+                        regDef.getAttributeName(),
+                        "%s", "%s"
+                );
             }
             builder.events.put(regDef.getAttributeName(), regDef);
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.eventHandlers.add(new EventHandlerDefHandler(this,
-                    xmlReader, source).getElement());
+            builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source).getElement());
         } else if (ImportDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.imports.add(new ImportDefHandler(this,
-                    xmlReader, source).getElement());
+            builder.imports.add(new ImportDefHandler(this, xmlReader, source).getElement());
         } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.facets.add(new AttributeDefRefHandler<T>(this, xmlReader,
-                    source).getElement());
+            builder.facets.add(new AttributeDefRefHandler<>(this, xmlReader, source).getElement());
         } else if (DependencyDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addDependency(new DependencyDefHandler<T>(this, xmlReader,
-                    source).getElement());
+            builder.addDependency(new DependencyDefHandler<>(this, xmlReader, source).getElement());
         } else if (ClientLibraryDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addClientLibrary(new ClientLibraryDefHandler<T>(this, xmlReader,
-                    source).getElement());
+            builder.addClientLibrary(new ClientLibraryDefHandler<>(this, xmlReader, source).getElement());
+        } else if (MethodDefHandler.TAG.equalsIgnoreCase(tag)) {
+            MethodDefHandler<T> handler=new MethodDefHandler<>(this, xmlReader, source);
+            MethodDef methodDef = handler.getElement();
+            DefDescriptor<MethodDef> methodDesc = methodDef.getDescriptor();
+            String methodName=methodDesc.getName();
+            if (builder.getAttributeDefs().containsKey(DefDescriptorImpl.getInstance(methodName, AttributeDef.class))) {
+                tagError("The method '%s' conflicts with an attribute of the same name on %s '%s'.",
+                    handler.getParentHandler().getDefDescriptor(),
+                    methodName,
+                    "%s","%s"
+                );
+            }
+            if (builder.events.containsKey(methodName)) {
+                tagError("The method '%s' conflicts with an event of the same name on %s '%s'.",
+                    handler.getParentHandler().getDefDescriptor(),
+                    methodName,
+                    "%s", "%s"
+                );
+            }
+            if (builder.getMethodDefs().containsKey(methodDesc)) {
+                tagError("There is already a method named '%s' on %s '%s'.",
+                    handler.getParentHandler().getDefDescriptor(),
+                    methodName,
+                    "%s","%s"
+                );
+            }
+            builder.getMethodDefs().put(methodDef.getDescriptor(),methodDef);
         } else {
             body.add(getDefRefHandler(this).getElement());
             // if it wasn't one of the above, it must be a defref, or an error
@@ -364,17 +374,15 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
 
             String implementsNames = getAttributeValue(ATTRIBUTE_IMPLEMENTS);
             if (implementsNames != null) {
-                for (String implementsName : AuraTextUtil.splitSimple(",",
-                        implementsNames)) {
-                    builder.interfaces.add(DefDescriptorImpl.getInstance(
-                            implementsName.trim(), InterfaceDef.class));
+                for (String implementsName : AuraTextUtil.splitSimple(",",implementsNames)) {
+                    builder.interfaces.add(DefDescriptorImpl.getInstance(implementsName.trim(), InterfaceDef.class));
                 }
             }
 
             builder.isAbstract = getBooleanAttributeValue(ATTRIBUTE_ABSTRACT);
             // if a component is abstract, it should be extensible by default
-            if (builder.isAbstract
-                    && getAttributeValue(ATTRIBUTE_EXTENSIBLE) == null) {
+            if (builder.isAbstract && getAttributeValue(ATTRIBUTE_EXTENSIBLE) == null) {
+                // JBUCH: HALO: TODO: THEN THIS SHOULD THROW AN ERROR.
                 builder.isExtensible = true;
             } else {
                 builder.isExtensible = getBooleanAttributeValue(ATTRIBUTE_EXTENSIBLE);

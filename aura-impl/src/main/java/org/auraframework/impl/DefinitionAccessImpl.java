@@ -110,7 +110,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
             throw new InvalidAccessValueException("\"" + item + "\" is not a valid public method reference");
         }
         
-        throw new InvalidAccessValueException("Invalid access atttribute value \"" + item + "\"");
+        throw new InvalidAccessValueException("Invalid access attribute value \"" + item + "\"");
     }
 
     @Override
@@ -143,13 +143,13 @@ public class DefinitionAccessImpl implements DefinitionAccess {
             throws InvalidAccessValueException {
         boolean isPrivNamespace = Aura.getConfigAdapter().isPrivilegedNamespace(namespace);
         if (authentication != null && (!allowAuth || !isPrivNamespace)) {
-            throw new InvalidAccessValueException("Invalid access atttribute value \"" + authentication.name() + "\"");
+            throw new InvalidAccessValueException("Invalid access attribute value \"" + authentication.name() + "\"");
         }
         if (access == Access.PRIVATE  && !allowPrivate) {
-            throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
+            throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
         if (access == Access.INTERNAL && !isPrivNamespace) {
-            throw new InvalidAccessValueException("Invalid access atttribute value \"" + access.name() + "\"");
+            throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
         if (access != null && accessMethod != null) {
             throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");

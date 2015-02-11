@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = Event.prototype;
-exp(p,
-    "getSource", p.getSource,
-    "getDef", p.getDef,
-    "getName", p.getName,
-    "getParam", p.getParam,
-    "setParam", p.setParam,
-    "getParams", p.getParams,
-    "setParams", p.setParams,
-    "fire", p.fire
-);
+package org.auraframework.def;
+
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+/**
+ */
+public interface MethodDef extends RootDefinition {
+    @Override
+    DefDescriptor<MethodDef> getDescriptor();
+
+    public static enum SerializeToType {
+        SERVER, BOTH, NONE, INVALID
+    };
+
+    TypeDef getTypeDef() throws QuickFixException;
+
+    String getAction();
+
+    SerializeToType getSerializeTo();
+
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
+}

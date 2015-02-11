@@ -98,6 +98,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         HELPER(HelperDef.class), //
         INTERFACE(InterfaceDef.class, true), //
         CONTROLLER(ControllerDef.class), //
+        METHOD(MethodDef.class), //
         MODEL(ModelDef.class), //
         LIBRARY(LibraryDef.class, true), //
         INCLUDE(IncludeDef.class), //

@@ -153,8 +153,8 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         /**
          * Sets the attributeDefs for this instance.
          */
-        public void addAttributeDef(DefDescriptor<AttributeDef> attrdesc, AttributeDef attributeDef) {
-            this.attributeDefs.put(attrdesc, attributeDef);
+        public void addAttributeDef(DefDescriptor<AttributeDef> defDescriptor, AttributeDef attributeDef) {
+            this.attributeDefs.put(defDescriptor, attributeDef);
         }
         
         /**

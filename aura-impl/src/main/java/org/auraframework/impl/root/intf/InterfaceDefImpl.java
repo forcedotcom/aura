@@ -23,12 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.MasterDefRegistry;
@@ -51,6 +46,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     private static final long serialVersionUID = 2253697052585693264L;
     private final Set<DefDescriptor<InterfaceDef>> extendsDescriptors;
     private final Map<String, RegisterEventDef> events;
+    private final Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
     private final int hashCode;
 
     protected InterfaceDefImpl(Builder builder) {
@@ -58,6 +54,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
 
         this.extendsDescriptors = AuraUtil.immutableSet(builder.extendsDescriptors);
         this.events = AuraUtil.immutableMap(builder.events);
+        this.methodDefs = AuraUtil.immutableMap(builder.methods);
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptors, events);
     }
 
@@ -65,7 +62,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
         if (getDescriptor() == null) {
-            throw new InvalidDefinitionException("Descriptor cannot be null for InterfaceDef", getLocation());
+            throw new InvalidDefinitionException("Descriptor cannot be null for InterfaceDef.", getLocation());
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
@@ -166,20 +163,30 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
 
-        Map<DefDescriptor<AttributeDef>, AttributeDef> ret = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new LinkedHashMap<>();
         for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
-            InterfaceDef extendsDef = extendsDescriptor.getDef();
-            ret.putAll(extendsDef.getAttributeDefs());
-            ret.putAll(attributeDefs);
+            attributeDefs.putAll(extendsDescriptor.getDef().getAttributeDefs());
         }
-
-        if (ret.isEmpty()) {
-            return attributeDefs;
-        } else {
-            return Collections.unmodifiableMap(ret);
-        }
+        attributeDefs.putAll(this.attributeDefs);
+        return Collections.unmodifiableMap(attributeDefs);
     }
-    
+
+    /**
+     * @return all the methodDefs for this interface, including those inherited
+     *         from a super interface
+     * @throws QuickFixException
+     */
+    @Override
+    public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException {
+        Map<DefDescriptor<MethodDef>, MethodDef> methodDefs = new LinkedHashMap<>();
+        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
+            methodDefs.putAll(extendsDescriptor.getDef().getMethodDefs());
+        }
+        methodDefs.putAll(this.methodDefs);
+        return Collections.unmodifiableMap(methodDefs);
+    }
+
+
     @Override
     public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
     	throw new UnsupportedOperationException("InterfaceDef cannot contain RequiredVersionDefs.");
@@ -216,6 +223,9 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         json.writeMapBegin();
         json.writeMapEntry("descriptor", getDescriptor());
         json.writeMapEntry("attributes", attributeDefs);
+        if(methodDefs !=null&&!methodDefs.isEmpty()) {
+            json.writeMapEntry("methodDefs", methodDefs);
+        }
         json.writeMapEntry("isAbstract", true);
         json.writeMapEnd();
     }
@@ -228,6 +238,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
 
         public Set<DefDescriptor<InterfaceDef>> extendsDescriptors;
         public Map<String, RegisterEventDef> events;
+        public Map<DefDescriptor<MethodDef>, MethodDef> methods;
 
         @Override
         public InterfaceDefImpl build() {

@@ -34,7 +34,7 @@ import org.auraframework.util.json.Json;
 
 /**
  * The definition of an attribute. Holds all information about a given component's AttributeDefRef, aside from the
- * actual ValueDefRef. AttrbitueInfos are immutable. Once they are created, they can only be replaced, never changed.
+ * actual ValueDefRef. AttributeInfos are immutable. Once they are created, they can only be replaced, never changed.
  */
 public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> implements AttributeDef {
 

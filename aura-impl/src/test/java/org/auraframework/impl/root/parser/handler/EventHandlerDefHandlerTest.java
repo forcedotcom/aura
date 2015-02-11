@@ -54,7 +54,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
             fail("Should have thrown AuraRuntimeException for registering two events with the same name");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, 
-                    "Multiple events registered with name");
+                    "There is already an event named 'dupName' registered on component 'test:fakeparser'.");
         }
 
     }

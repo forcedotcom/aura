@@ -43,9 +43,9 @@ public abstract class XMLHandler<T extends Definition> {
     public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ApplicationDefHandler.TAG,
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
             EventHandlerDefHandler.TAG, ImportDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG,
-            LayoutItemDefHandler.TAG, RegisterEventHandler.TAG, AttributeDefRefHandler.TAG, DependencyDefHandler.TAG,
-            NamespaceDefHandler.TAG, ThemeDefHandler.TAG, DesignDefHandler.TAG, AttributeDesignDefHandler.TAG,
-            DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG, LibraryDefHandler.TAG,
+            LayoutItemDefHandler.TAG, MethodDefHandler.TAG,RegisterEventHandler.TAG, AttributeDefRefHandler.TAG,
+            DependencyDefHandler.TAG, NamespaceDefHandler.TAG, ThemeDefHandler.TAG, DesignDefHandler.TAG,
+            AttributeDesignDefHandler.TAG,DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG, LibraryDefHandler.TAG,
             IncludeDefRefHandler.TAG);
 
     protected final XMLStreamReader xmlReader;

@@ -20,14 +20,9 @@ import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -36,15 +31,14 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.ImportDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ImportDef;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
@@ -56,6 +50,8 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -107,6 +103,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final Map<String, RegisterEventDef> events;
     private final List<EventHandlerDef> eventHandlers;
+    private final Map<DefDescriptor<MethodDef>,MethodDef> methodDefs;
     private final List<ImportDef> imports;
     private final List<AttributeDefRef> facets;
     private final Set<PropertyReference> expressionRefs;
@@ -126,6 +123,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.modelDefDescriptor = builder.modelDefDescriptor;
         this.controllerDescriptors = AuraUtil.immutableList(builder.controllerDescriptors);
         this.interfaces = AuraUtil.immutableSet(builder.interfaces);
+        this.methodDefs = AuraUtil.immutableMap(builder.methodDefs);
 
         if (builder.extendsDescriptor != null) {
             this.extendsDescriptor = builder.extendsDescriptor;
@@ -166,7 +164,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             this.compoundControllerDescriptor = null;
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
-                extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors, resourceDescriptors,
+                extendsDescriptor, interfaces, methodDefs, rendererDescriptors, helperDescriptors, resourceDescriptors,
                 cmpThemeDescriptor, imports);
     }
 
@@ -377,12 +375,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         for (DefDescriptor<InterfaceDef> intf : interfaces) {
-            InterfaceDef interfaze = intf.getDef();
-            if (interfaze == null) {
+            InterfaceDef interfaceDef = intf.getDef();
+            if (interfaceDef == null) {
                 throw new DefinitionNotFoundException(intf, getLocation());
             }
 
-            registry.assertAccess(descriptor, interfaze);
+            registry.assertAccess(descriptor, interfaceDef);
         }
 
         for (RegisterEventDef def : events.values()) {
@@ -549,8 +547,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             supers.add(getExtendsDescriptor());
         }
 
-        for (DefDescriptor<InterfaceDef> interfaze : getInterfaces()) {
-            supers.add(interfaze);
+        for (DefDescriptor<InterfaceDef> superInterface : interfaces) {
+            supers.add(superInterface);
         }
     }
 
@@ -655,6 +653,35 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     	return requiredVersionDefs;
     }
 
+    /**
+     * @return all the methods for this component, including those inherited from a super component
+     * @throws org.auraframework.throwable.quickfix.QuickFixException
+     */
+    @Override
+    public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException {
+        Map<DefDescriptor<MethodDef>, MethodDef> methodDefs = new LinkedHashMap<>();
+        if (extendsDescriptor != null) {
+            methodDefs.putAll(getSuperDef().getMethodDefs());
+        }
+
+        for (DefDescriptor<InterfaceDef> interfaceDescriptor : interfaces) {
+            for (Map.Entry<DefDescriptor<MethodDef>, MethodDef> entry : interfaceDescriptor.getDef().getMethodDefs().entrySet()) {
+                DefDescriptor<MethodDef> desc = entry.getKey();
+                if (methodDefs.containsKey(desc)) {
+                    // JBUCH: HALO: TODO: SEE COMMENT FROM ABOVE "FIXMEDLP - do some validation #W-690040"
+                }
+                methodDefs.put(desc, entry.getValue());
+            }
+        }
+
+        if (methodDefs.isEmpty()) {
+            return this.methodDefs;
+        } else {
+            methodDefs.putAll(this.methodDefs);
+            return Collections.unmodifiableMap(methodDefs);
+        }
+    }
+
     @Override
     public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
         List<DefDescriptor<ControllerDef>> ret;
@@ -751,19 +778,19 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     private Set<DefDescriptor<InterfaceDef>> getAllInterfaces() throws QuickFixException {
-        Set<DefDescriptor<InterfaceDef>> ret = Sets.newLinkedHashSet();
-        for (DefDescriptor<InterfaceDef> intf : interfaces) {
-            addAllInterfaces(intf, ret);
+        Set<DefDescriptor<InterfaceDef>> interfaceDefs = Sets.newLinkedHashSet();
+        for (DefDescriptor<InterfaceDef> interfaceDef : interfaces) {
+            addAllInterfaces(interfaceDef, interfaceDefs);
         }
-        return ret;
+        return interfaceDefs;
     }
 
-    private void addAllInterfaces(DefDescriptor<InterfaceDef> intf, Set<DefDescriptor<InterfaceDef>> set)
+    private void addAllInterfaces(DefDescriptor<InterfaceDef> interfaceDef, Set<DefDescriptor<InterfaceDef>> set)
             throws QuickFixException {
-        set.add(intf);
-        for (DefDescriptor<InterfaceDef> zuper : intf.getDef().getExtendsDescriptors()) {
-            set.add(zuper);
-            addAllInterfaces(zuper, set);
+        set.add(interfaceDef);
+        for (DefDescriptor<InterfaceDef> superInterface : interfaceDef.getDef().getExtendsDescriptors()) {
+            set.add(superInterface);
+            addAllInterfaces(superInterface, set);
         }
     }
 
@@ -845,9 +872,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("isCSSPreloaded", preloading);
                 }
 
-                Collection<AttributeDef> attrDefs = getAttributeDefs().values();
-                if (!attrDefs.isEmpty()) {
-                    json.writeMapEntry("attributeDefs", attrDefs);
+                Collection<AttributeDef> attributeDefs = getAttributeDefs().values();
+                if (!attributeDefs.isEmpty()) {
+                    json.writeMapEntry("attributeDefs", attributeDefs);
+                }
+
+                Collection<MethodDef> methodDefs = getMethodDefs().values();
+                if (!methodDefs.isEmpty()) {
+                    json.writeMapEntry("methodDefs", methodDefs);
                 }
                 
                 Collection<RequiredVersionDef> requiredVersionDefs = getRequiredVersionDefs().values();
@@ -1032,6 +1064,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         public Builder(Class<T> defClass) {
             super(defClass);
+            methodDefs=Maps.newLinkedHashMap();
         }
 
         public boolean isAbstract;
@@ -1053,6 +1086,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         public Set<DefDescriptor<InterfaceDef>> interfaces;
         public List<DefDescriptor<ControllerDef>> controllerDescriptors;
+        public Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
         public Map<String, RegisterEventDef> events;
         public List<EventHandlerDef> eventHandlers;
         public List<ImportDef> imports;
@@ -1068,7 +1102,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             if (facets == null) {
                 facets = Lists.newArrayList();
             }
-
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
             atBuilder.setDescriptor(key);
             atBuilder.setLocation(getLocation());
@@ -1201,6 +1234,16 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             this.clientLibraries.add(clientLibrary);
             return this;
         }
+
+        /**
+         * Gets the methodDefs for this instance.
+         *
+         * @return The methodDefs.
+         */
+        public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() {
+            return this.methodDefs;
+        }
+
 
         protected void finish() {
             if (render == null) {

@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -83,6 +84,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
         assertTrue(path, new File(path).exists());
         String url = getTestServletConfig().getBaseUrl().toURI().resolve("/qa/auraValidation?path=" + path).toString();
+
         InputStream stream = new URL(url).openStream();
         List<String> errors = ValidationError.parseErrors(new InputStreamReader(stream));
 

@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.validation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -27,16 +29,22 @@ import org.auraframework.util.validation.ValidationError;
 public final class ValidationTestUtil {
 
     public static void assertError(String expectedMessage, ValidationError error) {
-        assertError(expectedMessage, error.toCommonFormat());
+        assertContains(expectedMessage, Arrays.asList(error.toCommonFormat()));
     }
 
-    public static void assertError(String expected, String error) {
-        boolean passed = error.endsWith(expected);
-        if (!passed) {
-            System.out.println("expected: " + expected);
-            System.out.println("actual  : " + error);
+    public static void assertContains(String expected, List<String> errors) {
+        boolean contains = false;
+        for(String error:errors){
+            contains=error.endsWith(expected);
+            if(contains) {
+                break;
+            }
         }
-        Assert.assertTrue(error, passed);
+        if(!contains){
+            System.out.println("expected: " + expected);
+        }
+        Assert.assertTrue(expected, contains);
+
     }
 
     public static void showErrors(List<ValidationError> errors) {
@@ -49,22 +57,17 @@ public final class ValidationTestUtil {
         boolean cssLintErrorsReported = !System.getProperty("java.version").startsWith("1.6");
 
         Assert.assertEquals(cssLintErrorsReported ? 5 : 3, errors.size());
-
-        int errorNum = 0;
-        if (cssLintErrorsReported) {
-            assertError(
-                    "basic.css [line 1, column 1] cssparser: CSS selector must begin with '.validationTestBasic' or '.THIS'",
-                    errors.get(errorNum++));
-            assertError(
-                    "basic.css [line 2, column 5] csslint @ box-sizing: The box-sizing property isn't supported in IE6 and IE7",
-                    errors.get(errorNum++));
+        ArrayList<String> expectedErrors=new ArrayList();
+        expectedErrors.add("basicController.js [line 5, column 1] js/custom: Starting '(' missing");
+        expectedErrors.add("basicController.js [line 7, column 20] jslint: Expected ';' and instead saw '}'");
+        expectedErrors.add("basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible");
+        if(cssLintErrorsReported){
+            expectedErrors.add("basic.css [line 1, column 1] cssparser: CSS selector must begin with '.validationTestBasic' or '.THIS'");
+            expectedErrors.add("basic.css [line 2, column 5] csslint @ box-sizing: The box-sizing property isn't supported in IE6 and IE7");
         }
-        assertError("basicController.js [line 5, column 1] js/custom: Starting '(' missing",
-                errors.get(errorNum++));
-        assertError("basicController.js [line 7, column 20] jslint: Expected ';' and instead saw '}'",
-                errors.get(errorNum++));
-        assertError(
-                "basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible",
-                errors.get(errorNum++));
+
+        for(String expected:expectedErrors){
+            assertContains(expected,errors);
+        }
     }
 }

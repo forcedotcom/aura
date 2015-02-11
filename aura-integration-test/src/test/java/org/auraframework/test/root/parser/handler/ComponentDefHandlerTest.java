@@ -94,6 +94,8 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
             cd.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
         } catch (InvalidDefinitionException expected) {
+            checkExceptionContains(expected, InvalidDefinitionException.class,
+                    "There is already an attribute named 'implNumber' on component 'test:fakeparser'.");
         }
     }
 

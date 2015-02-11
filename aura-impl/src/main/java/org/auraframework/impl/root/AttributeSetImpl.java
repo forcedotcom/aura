@@ -63,8 +63,7 @@ import com.google.common.collect.Maps;
  */
 @Serialization(referenceType = ReferenceType.IDENTITY)
 public class AttributeSetImpl implements AttributeSet {
-    private static final Location SUPER_PASSTHROUGH = AuraUtil
-            .getExternalLocation("super component attribute passthrough");
+    private static final Location SUPER_PASSTHROUGH = AuraUtil.getExternalLocation("super component attribute passthrough");
 
     private DefDescriptor<? extends RootDefinition> rootDefDescriptor;
     private final Map<DefDescriptor<AttributeDef>, Attribute> attributes = Maps.newHashMap();

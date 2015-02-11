@@ -22,6 +22,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.MethodDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -31,20 +32,7 @@ import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.root.library.ImportDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl;
-import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
-import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
-import org.auraframework.impl.root.parser.handler.AttributeDefRefHandler;
-import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
-import org.auraframework.impl.root.parser.handler.ComponentDefRefHandler;
-import org.auraframework.impl.root.parser.handler.DesignDefHandler;
-import org.auraframework.impl.root.parser.handler.EventDefHandler;
-import org.auraframework.impl.root.parser.handler.EventHandlerDefHandler;
-import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
-import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
-import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
-import org.auraframework.impl.root.parser.handler.ImportDefHandler;
-import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
-import org.auraframework.impl.root.parser.handler.XMLHandler;
+import org.auraframework.impl.root.parser.handler.*;
 import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -67,14 +55,15 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
         handlers.put(AttributeDefRefImpl.class, new AttributeDefRefHandler());
         handlers.put(ComponentDefImpl.class, new ComponentDefHandler());
         handlers.put(ComponentDefRefImpl.class, new ComponentDefRefHandler());
+        handlers.put(DesignDefImpl.class, new DesignDefHandler());
         handlers.put(EventDefImpl.class, new EventDefHandler());
         handlers.put(EventHandlerDefImpl.class, new EventHandlerDefHandler());
-        handlers.put(LibraryDefImpl.class, new LibraryDefHandler());
         handlers.put(ImportDefImpl.class, new ImportDefHandler());
         handlers.put(InterfaceDefImpl.class, new InterfaceDefHandler());
+        handlers.put(LibraryDefImpl.class, new LibraryDefHandler());
+        handlers.put(MethodDefImpl.class, new MethodDefHandler());
         handlers.put(RegisterEventDefImpl.class, new RegisterEventHandler());
         handlers.put(ThemeDefImpl.class, new ThemeDefHandler());
-        handlers.put(DesignDefImpl.class, new DesignDefHandler());
     }
 
     /**

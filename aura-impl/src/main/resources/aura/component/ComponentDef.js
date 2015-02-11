@@ -35,6 +35,7 @@ $A.ns.ComponentDef = function ComponentDef(config) {
 
     this.controllerDef = config["controllerDef"] ? componentService.getControllerDef(config["controllerDef"]) : undefined;
     this.modelDef = config["modelDef"] ? componentService.getModelDef(config["modelDef"]) : undefined;
+    this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
 
     this.interfaces = {};
     var intfConfig = config["interfaces"];

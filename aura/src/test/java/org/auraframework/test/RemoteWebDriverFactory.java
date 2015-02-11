@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +38,8 @@ public class RemoteWebDriverFactory implements WebDriverProvider {
     protected final int MAX_GET_RETRIES = 3;
     protected final URL serverUrl;
     private final long GETDRIVER_TIMEOUT_DEFAULT = 300;
+    private final long MAX_CONSECUTIVE_RETRY_FAILURES = 10;
+    private final AtomicLong consecutiveRetryFailureCount = new AtomicLong(0);
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -68,11 +71,18 @@ public class RemoteWebDriverFactory implements WebDriverProvider {
 
     protected <T> T retry(final Callable<T> callable, int retries, long retryTimeout, String msg) {
         for (int i = 0; i < retries; i++) {
+            if (consecutiveRetryFailureCount.get() > MAX_CONSECUTIVE_RETRY_FAILURES) {
+                // start failing fast the remaining tests
+                throw new Error("Too many consecutive failed retries: " + consecutiveRetryFailureCount.get());
+            }
             FutureTask<T> task = new FutureTask<>(callable);
             executorService.execute(task);
             try {
-                return task.get(retryTimeout, TimeUnit.SECONDS);
+                T result = task.get(retryTimeout, TimeUnit.SECONDS);
+                consecutiveRetryFailureCount.set(0);
+                return result;
             } catch (Throwable t) {
+                consecutiveRetryFailureCount.incrementAndGet();
                 task.cancel(true);
                 Logger.getLogger(getClass().getName()).log(Level.WARNING, msg, t);
             }

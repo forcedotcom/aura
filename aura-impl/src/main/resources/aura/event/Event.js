@@ -33,7 +33,7 @@ Event.prototype.auraType = "Event";
 /**
  * Gets the source component that fired this component event.
  * This method doesn't work for application events.
- * 
+ *
  * @returns {Object}
  */
 Event.prototype.getSource = function() {
@@ -72,7 +72,7 @@ Event.prototype.setParams = function(config) {
                 if (attributeDefs[key]) {
                     this.params[key] = config[key];
                 } else {
-                    $A.warning("Event.setParams(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.event.getAttributeDefs()).join("', '")+"'");
+                    $A.warning("Event.setParams(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.eventDef.getAttributeDefs()).join("', '")+"'");
                 }
             }
         }
@@ -92,7 +92,7 @@ Event.prototype.setParam=function(key,value) {
     if (this.eventDef.getAttributeDefs()[key]) {
         this.params[key] = value;
     } else {
-        $A.warning("Event.setParam(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.event.getAttributeDefs()).join("', '")+"'");
+        $A.warning("Event.setParam(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.eventDef.getAttributeDefs()).join("', '")+"'");
     }
 };
 
@@ -190,7 +190,7 @@ Event.prototype.fire = function() {
     if(!$A.util.isUndefinedOrNull(auraDebugCmp)) {
     	// event name
     	var outputName =  this.eventName ? this.eventName : this.eventDef.getDescriptor().getQualifiedName();
-    	
+
     	// event params
     	var outputParams = function(eventParams) {
             var outParams = "";
@@ -203,13 +203,13 @@ Event.prototype.fire = function() {
             }
             return " Params={ " + outParams + "}";
     	}
-    	
+
     	// output to debug tool
     	var output = "[" + this.eventDef.getEventType() + "] " + outputName + outputParams(this.getParams());
     	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
     	debugLogEvent.setParams({"type" : "event", "message" : output});
     	debugLogEvent.fire();
-    	
+
     	// listening to aura:systemError and auraStorage:modified events on debug
     	// tool in the child window. Need to fire those events in the window.
     	if ($A.util.isUndefinedOrNull(window.opener)) { // this is the parent window

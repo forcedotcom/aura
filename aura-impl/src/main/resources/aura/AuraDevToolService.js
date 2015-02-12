@@ -578,16 +578,19 @@ var AuraDevToolService = function() {
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     imgType = null;
         	     alt = null;
-        	     
-        	    // Checking for the data_aura_rendered_by attribute 
-         	    if(!$A.util.isEmpty(data_aura_rendered_by)){
-         		  imgType = $A.getCmp(data_aura_rendered_by).getAttributeValueProvider().get('v.imageType');	
-         		  alt     = $A.getCmp(data_aura_rendered_by).getAttributeValueProvider().get('v.alt');		 
+
+        	   // Checking for the data_aura_rendered_by attribute
+         	   if(!$A.util.isEmpty(data_aura_rendered_by)){
+                   var component = $A.getCmp(data_aura_rendered_by);
+                   // This is to account for <img/> created both dynamically by image.cmp as well as the ones
+                   // that are within a .cmp and are therefore created by aura through the html.cmp template.
+                   imgType = component.getAttributeValueProvider().get('v.imageType') || component.get('v.imageType');
+                   alt     = component.getAttributeValueProvider().get('v.alt') || component.get('v.alt');
          	    }
          	    
-         	    //Checking for injected image tag
+         	     //Checking for injected image tag
      		     if($A.util.isUndefinedOrNull(imgType)){
-     		    	  //Need to use the dom version so that it will return null if element is not prese
+     		    	  //Need to use the dom version so that it will return null if element is not present
      		    	  var htmlAlt = allImgTags[index].getAttribute("alt");
      		          if(!$A.util.isUndefinedOrNull(htmlAlt)){
      		        	  htmlAlt = htmlAlt.toLowerCase().replace(/[\s\t\r\n]/g,'');

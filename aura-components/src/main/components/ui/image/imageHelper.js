@@ -14,20 +14,68 @@
  * limitations under the License.
  */
 ({
-	/**
-	 * Returns the img tag in this component.
-	 */
-	getImageElement : function(cmp) {
-		var el = cmp.getElement();
+    /**
+     * Returns the img tag in this component.
+     */
+    getImageElement: function (cmp) {
+        var imageElement = cmp.find("body").getElement().firstChild;
 
-    	if (this.isAnchorImage(cmp)) {
-    		el = el.children[0];
-    	}
-    	return el;
-	},
+        if (this.isAnchorImage(cmp)) {
+            imageElement = imageElement.children[0];
+        }
+        return imageElement;
+    },
 
-	isAnchorImage : function(cmp) {
-		var href = cmp.get("v.href");
-		return !$A.util.isEmpty(href)
-	}
-})
+    isAnchorImage: function (cmp) {
+        return !$A.util.isEmpty(cmp.get("v.href"));
+    },
+
+    buildBody: function (cmp) {
+        var body = cmp.find("body");
+
+        if (body) {
+            var bodyElement = body.getElement();
+
+            $A.util.clearNode(bodyElement);
+
+            var image = this.buildImageElement(cmp);
+
+            var href = cmp.get("v.href") || '';
+
+            if (!$A.util.isEmpty(href)) {
+                var link = $A.util.createHtmlElement("a", {
+                    "href": cmp.get("v.href") || '',
+                    "class": cmp.get("v.linkClass") || '',
+                    "target": cmp.get("v.target") || ''
+                });
+
+                link.appendChild(image);
+                bodyElement.appendChild(link);
+            } else {
+                bodyElement.appendChild(image);
+            }
+        }
+
+    },
+
+    buildImageElement: function (cmp) {
+        var image = $A.util.createHtmlElement("img", {
+            "data-aura-rendered-by": cmp.getGlobalId(),
+            "src": cmp.get("v.src") || '',
+            "class": cmp.get("v.class") || '',
+            "alt": cmp.get("v.alt") || '',
+            "title": cmp.get("v.title") || ''
+        });
+
+        var onError = function () {
+            var onError = cmp.get("v.onerror");
+            if (!$A.util.isUndefinedOrNull(onError) && onError.run) {
+                onError.run();
+            }
+        };
+        image["onerror"] = onError;
+
+        return image;
+    }
+
+});

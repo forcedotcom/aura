@@ -158,7 +158,7 @@
             $A.test.assertEquals("color:blue" , styleText);
 
             var a = component.find("specialAttributes_a").getElement();
-            $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bazinga.com/"), 
+            $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bazinga.com/"),
                 "Failed to render href attribute for 'http://bazinga.com'");
 
             component.set("v.style", "color:green");
@@ -180,7 +180,7 @@
             $A.test.assertEquals("color:green" , styleText);
 
             a = component.find("specialAttributes_a").getElement();
-            $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bbt.com/"), 
+            $A.test.assertTrue($A.test.contains(a.getAttribute("href"), "http://bbt.com/"),
                 "Failed to render href attribute for 'http://bbt.com'");
         }
     },
@@ -245,18 +245,17 @@
 
     testContextPath: {
         test: [
-        function(cmp) {
-            $A.test.overrideFunction($A.getContext(), "getContextPath", function() {
-                return "/cool";
-            });
-            var img = cmp.find("img");
-            img.set("v.src", "/auraFW/resources/aura/images/logo.png");
-        },
-        function(cmp) {
-            var el = cmp.find("img").getElement();
-            $A.test.assertTrue(el.src.indexOf("/cool/auraFW/resources/aura/images/logo.png") !== -1,
-                "Aura url should include context path");
-        }]
+            function(cmp) {
+                $A.getContext().setContextPath("/cool");
+                var img = cmp.find("img");
+                img.set("v.src", "/auraFW/resources/aura/images/logo.png");
+            },
+            function(cmp) {
+                $A.getContext().setContextPath("");
+                var el = cmp.find("img").getElement().getElementsByTagName("img")[0];
+                $A.test.assertTrue(el.src.indexOf("/cool/auraFW/resources/aura/images/logo.png") !== -1,
+                    "Aura url should include context path");
+            }]
     }
 
 })

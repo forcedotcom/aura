@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 ({
-	init: function(component) {
-		var cmp = component.getConcreteComponent();
-    	var imageType = cmp.get('v.imageType'),
-    		altText = cmp.get('v.alt') || '',
-    		id = cmp.getLocalId() || cmp.getGlobalId() || '';
-    	
-    	if (imageType === 'informational' && altText.length == 0) {    		
-    		$A.warning('component: ' + id + ' "alt" attribute should not be empty for informational image');
-    	} else if (imageType === 'decorative' && altText.length > 0) {
-    		$A.warning('component: ' + id + ': "alt" attribute should be empty for decorative image');
-    	}
-    },
-    doNothing: function() {}
+    init: function (component) {
+        var cmp = component.getConcreteComponent();
+        var imageType = cmp.get('v.imageType'),
+            altText = cmp.get('v.alt') || '',
+            id = cmp.getLocalId() || cmp.getGlobalId() || '';
+
+        if (imageType === 'informational' && altText.length == 0) {
+            $A.warning('component: ' + id + ' "alt" attribute should not be empty for informational image');
+        } else if (imageType === 'decorative' && altText.length > 0) {
+            $A.warning('component: ' + id + ': "alt" attribute should be empty for decorative image');
+        }
+    }
+
 })

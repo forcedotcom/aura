@@ -81,6 +81,7 @@ public class BrowserInfo {
     private boolean isIE11;
     private boolean isWindowsPhone;
     private boolean isWindowsTablet;
+    private boolean isBlackBerry;
 
     public BrowserInfo(String userAgentString) {
         if (userAgentString == null) {
@@ -112,6 +113,9 @@ public class BrowserInfo {
 
     public boolean isAndroid() {
         return isAndroid;
+    }
+    public boolean isBlackBerry() {
+    	return isBlackBerry;
     }
 
     public boolean isWindowsPhone() {
@@ -196,6 +200,7 @@ public class BrowserInfo {
         isPhone = isSmartPhoneClient();
         isWindowsPhone = isPlatformWindowsPhone();
         isWindowsTablet = isPlatformWindowsTablet();
+        isBlackBerry = isPlatformBlackBerry();
     }
 
     private boolean isBrowserIE11() {

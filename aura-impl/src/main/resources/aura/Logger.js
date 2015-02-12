@@ -200,6 +200,11 @@ $A.ns.Logger.prototype.getStackTrace = function(e, remove) {
     if (e && e.stack) {
         stack = e.stack;
     }
+    // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.
+    var chromeStart = "Error: " + e.message;
+    if (stack && stack.indexOf(chromeStart) === 0) {
+        stack = stack.substring(chromeStart.length + 1);
+    }
     if (stack) {
         var ret = stack.replace(/(?:\n@:0)?\s+$/m, '');
         ret = ret.replace(new RegExp('^\\(', 'gm'), '{anonymous}(');

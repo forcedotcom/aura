@@ -111,15 +111,11 @@ $A.ns.Test.prototype.addWaitForAction = function(success, actionName, callback) 
  * <code>$A.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
  *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});</code>
  *
- * @param {Object} expected
- *             The value to compare against. If expected is a function,
- *             it will evaluate it before comparison.
- * @param {Object} testFunction
- *             A function to evaluate and compare against expected.
- * @param {String} failureMessage
- *			The message that is returned if the condition is not true
- * @param {Function} callback
- *             Invoked after the comparison evaluates to true
+ * @param {Object} expected The value to compare against. If expected is a function, it will evaluate it before
+ *             comparison.
+ * @param {Object} testFunction A function to evaluate and compare against expected.
+ * @param {String} failureMessage The message that is returned if the condition is not true
+ * @param {Function} callback Invoked after the comparison evaluates to true
  */
 $A.ns.Test.prototype.addWaitForWithFailureMessage = function(expected, testFunction, failureMessage, callback){
     if (!$A.util.isFunction(testFunction)) {
@@ -177,14 +173,10 @@ $A.ns.Test.prototype.addCleanup = function(cleanupFunction) {
 /**
  * Get an instance of an action based on the specified parameters and callback function.
  *
- * @param {Component} component
- *           The Component on which to search for the action
- * @param {String} name
- *           The name of the action from the component's perspective (e.g. "c.doSomething")
- * @param {Object} params
- *           The parameters to pass to the action
- * @param {Function} callback
- *           The callback function to execute for the action, or if not a function a name for the action
+ * @param {Component} component The Component on which to search for the action
+ * @param {String} name The name of the action from the component's perspective (e.g. "c.doSomething")
+ * @param {Object} params The parameters to pass to the action
+ * @param {Function} callback The callback function to execute for the action, or if not a function a name for the action
  * @returns {Action} An instance of the action
  */
 $A.ns.Test.prototype.getAction = function(component, name, params, callback){
@@ -208,9 +200,9 @@ $A.ns.Test.prototype.getAction = function(component, name, params, callback){
  * This is a wrapper around runActions allowing a test to safely run a set of actions as a
  * single transaction with a callback.
  *
- * @param {Array} actions a list of actions to run.
- * @param {Object} scope the scope for the callback.
- * @param {Function} callback the callback
+ * @param {Array} actions A list of actions to run.
+ * @param {Object} scope The scope for the callback.
+ * @param {Function} callback The callback
  */
 $A.ns.Test.prototype.runActionsAsTransaction = function(actions, scope, callback) {
     $A.assert(!$A.services.client.inAuraLoop(), "runActionsAsTransaction called from inside Aura call stack");
@@ -601,39 +593,12 @@ $A.ns.Test.prototype.expectAuraWarning = function(w) {
 };
 
 /**
- * 
- * @description Assert that if(condition) check evaluates to true.
- * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
- * 
- * @example
- * Positive: <code>assertTruthy("helloWorld")</code>,
- * Negative: <code>assertTruthy(null)</code>
- * 
- * @param {Object} condition
- *              The condition to evaluate
- * @param {String} assertMessage
- *              The message that is returned if the condition is not true
- */
-$A.ns.Test.prototype.assertTruthy = function(condition, assertMessage) {
-    if (!condition) {
-        if (assertMessage) {
-            assertMessage += " : " + condition;
-        } else {
-            assertMessage = "Assertion Failure: expected {Truthy}, but Actual : {" + condition + "}";
-        }
-        throw this.fail(assertMessage);
-    }
-};
-
-/**
  * Assert that the current component HTML is Accessibility compliant.
  *
  * @description Calls the checkAccessibilty method to verify certain tags are accessible.
  *
- * @param {String} errorMessage
- *          The message that is returned if the condition is not false
- * @throws {Error} Throws Error containing concatenated string representation of all
- *                 accessibility errors found
+ * @param {String} errorMessage The message that is returned if the condition is not false
+ * @throws {Error} Throws Error containing concatenated string representation of all accessibility errors found
  */
 $A.ns.Test.prototype.assertAccessible = function() {
     var res = aura.devToolService.checkAccessibility();
@@ -642,12 +607,29 @@ $A.ns.Test.prototype.assertAccessible = function() {
     }
 };
 
+/**
+ * 
+ * @description Assert that if(condition) check evaluates to true.
+ * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
+ * 
+ * @example
+ * Positive: <code>assertTruthy("helloWorld")</code>,
+ * Negative: <code>assertTruthy(null)</code>
+ * 
+ * @param {Object} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition is not true
+ */
+$A.ns.Test.prototype.assertTruthy = function(condition, assertMessage) {
+    if (!condition) {
+        this.fail(assertMessage, "\nExpected: {truthy} but Actual: {"+condition+"}");
+    }
+};
+
  /**
  * Assert that the if(condition) check evaluates to false.
- * @param {Object} condition
- * 				The condition to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the condition is not false
+ * 
+ * @param {Object} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition is not false
  * @description A falsey value refers to zero, an empty string, null, undefined, or false.
  * 
  * @example
@@ -656,21 +638,15 @@ $A.ns.Test.prototype.assertAccessible = function() {
  */
 $A.ns.Test.prototype.assertFalsy = function(condition, assertMessage) {
     if (condition) {
-        if (assertMessage) {
-            assertMessage += " : "+condition;
-        } else {
-            assertMessage = "Assertion Failure: expected {Falsy}, but Actual : {" + condition + "}";
-        }
-        this.fail(assertMessage);
+        this.fail(assertMessage, "\nExpected: {falsy} but Actual: {"+condition+"}");
     }
 };
 
  /**
  * Assert that if(condition) check evaluates to true.
- * @param {Object} condition
- * 				The condition to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the condition is not true
+ * 
+ * @param {Object} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition is not true
  * @description
  * Positive: assert("helloWorld"),
  * Negative: assert(null)
@@ -681,23 +657,20 @@ $A.ns.Test.prototype.assert = function(condition, assertMessage) {
 
 /**
  * Assert that the two values provided are equal.
- * @param {Object} arg1
- * 				The argument to evaluate against arg2
- * @param {Object} arg2
- * 				The argument to evaluate against arg1
- * @param {String} assertMessage
- * 				The message that is returned if the two values are not equal
+ * 
+ * @param {Object} arg1 The argument to evaluate against arg2
+ * @param {Object} arg2 The argument to evaluate against arg1
+ * @param {String} assertMessage The message that is returned if the two values are not equal
  */
 $A.ns.Test.prototype.assertEquals = function(arg1, arg2, assertMessage){
-    if(arg1!==arg2){
-        if(!assertMessage){
-            assertMessage = "Assertion Error, Values not equal, ";
-        }
-        assertMessage += "\nExpected: {"+arg1 +"} but Actual: {"+arg2+"}";
+    if(arg1 !== arg2){
+        var extraMessage = "\nExpected: {"+arg1+"} but Actual: {"+arg2+"}";
         if(typeof arg1 !== typeof arg2){
-            assertMessage += "\n. Type Mismatch.";
+            var arg1Type = (arg1 === null) ? "null" : typeof arg1;
+            var arg2Type = (arg2 === null) ? "null" : typeof arg2;
+            extraMessage += "\nType Mismatch, Expected type: {"+arg1Type+"} but Actual type: {"+arg2Type+"}";
         }
-        this.fail(assertMessage);
+        this.fail(assertMessage, extraMessage);
     }
 };
 
@@ -706,197 +679,157 @@ $A.ns.Test.prototype.assertEquals = function(arg1, arg2, assertMessage){
  *
  * This is important when checking constructed strings, as browsers may handle them differently.
  *
- * @param {string} arg1
- * 				The argument to evaluate against arg2
- * @param {string} arg2
- * 				The argument to evaluate against arg1
- * @param {String} assertMessage
- * 				The message that is returned if the two values are not equal
+ * @param {string} arg1 The argument to evaluate against arg2
+ * @param {string} arg2 The argument to evaluate against arg1
+ * @param {String} assertMessage The message that is returned if the two values are not equal
  */
 $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertMessage){
-    if (arg1 === arg2) {
-        return;
-    }
     var arg1s = arg1.replace(/\s+/gm,'').replace(/^ | $/gm,'');
     var arg2s = arg2.replace(/\s+/gm,'').replace(/^ | $/gm,'');
-    if (arg1s!==arg2s) {
-        if (!assertMessage) {
-            assertMessage = "Values not equal";
-        }
-        assertMessage += "\nExpected: {" + arg1 + "} but Actual: {" + arg2 + "}";
-        if (typeof arg1 !== typeof arg2) {
-            assertMessage += "\n. Type Mismatch.";
-        }
-        this.fail(assertMessage);
-    }
+    this.assertEquals(arg1s, arg2s, assertMessage);
 };
 
 /**
- * Assert that the a string starts with another.
- * @param {Object} start
- * 				The start string.
- * @param {Object} full
- * 				The string that is expected to start with the start string
- * @param {String} assertMessage
- * 				The message that is returned if the two values are not equal
+ * Assert that a string starts with another.
+ * 
+ * @param {Object} start The start string.
+ * @param {Object} full The string that is expected to start with the start string
+ * @param {String} assertMessage The message that is returned if the two values are not equal
  */
 $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
     if(full.indexOf(start) !== 0){
-        if(!assertMessage){
-            assertMessage = "StartsWith: ";
-        }
         var fullStart = full;
         if (fullStart.length > start.length+20) {
-            fullStart = fullStart.substring(0, start.length+20);
+            fullStart = fullStart.substring(0, start.length+20) + "...";
         }
-        assertMessage += "\nExpected: {"+start +"} but Actual: {"+fullStart+"}";
-        this.fail(assertMessage);
+        this.fail(assertMessage, "\nExpected string to start with: {"+start+"} but Actual: {"+fullStart+"}");
     }
 };
 
 /**
  * Complement of assertEquals, throws Error if arg1===arg2.
- * @param {Object} arg1
- * 				The argument to evaluate against arg2
- * @param {Object} arg2
- * 				The argument to evaluate against arg1
- * @param {String} assertMessage
- * 				The message that is returned if the two values are equal
-     */
+ * 
+ * @param {Object} arg1 The argument to evaluate against arg2
+ * @param {Object} arg2 The argument to evaluate against arg1
+ * @param {String} assertMessage The message that is returned if the two values are equal
+ */
 $A.ns.Test.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
     if (arg1 === arg2) {
-        if (!assertMessage) {
-            assertMessage = "Values are equal (via ===)";
-        }
-        assertMessage += "\nValue is: {" + arg1 + "}";
-        this.fail(assertMessage);
+        this.fail(assertMessage, "\nExpected values to not be equal but both were: {"+arg1+"}");
     }
 };
 
 /**
  * Assert that the value is not undefined.
- * @param {Object} arg1
- * 				The argument to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if arg1 is undefined
+ * 
+ * @param {Object} condition The argument to evaluate
+ * @param {String} assertMessage The message that is returned if arg1 is undefined
  */
-$A.ns.Test.prototype.assertDefined = function(arg1, assertMessage) {
-    if (!assertMessage) {
-        assertMessage = "Value is undefined";
+$A.ns.Test.prototype.assertDefined = function(condition, assertMessage) {
+    if (condition === undefined) {
+        this.fail(assertMessage, "\nExpected: {defined} but Actual: {"+condition+"}");
     }
-    this.assertNotEquals(undefined, arg1, assertMessage);
 };
 
 /**
  * Assert that the condition === true.
- * @param {Boolean} condition
- * 				The condition to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the condition !==true
+ * 
+ * @param {Boolean} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition !==true
  */
 $A.ns.Test.prototype.assertTrue = function(condition, assertMessage){
-    if(!assertMessage){
-        assertMessage = "Expected: {True}, but Actual: {False} ";
+    if (condition !== true) {
+        this.fail(assertMessage, "\nExpected: {true} but Actual: {"+condition+"}");
     }
-    this.assertEquals(true,condition,assertMessage);
 };
 
 /**
  * Assert that the condition === false.
- * @param {Boolean} condition
- * 				The condition to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the condition !==false
+ * 
+ * @param {Boolean} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition !==false
  */
 $A.ns.Test.prototype.assertFalse = function(condition, assertMessage){
-    if(!assertMessage){
-        assertMessage = "Expected: {False}, but Actual: {True} ";
+    if (condition !== false) {
+        this.fail(assertMessage, "\nExpected: {false} but Actual: {"+condition+"}");
     }
-    this.assertEquals(false,condition,assertMessage);
 };
 
 /**
  * Assert that the value passed in is undefined.
- * @param {Object} arg1
- * 				The argument to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the argument is not undefined
+ * 
+ * @param {Object} condition The argument to evaluate
+ * @param {String} assertMessage The message that is returned if the argument is not undefined
  */
-$A.ns.Test.prototype.assertUndefined = function(arg1, assertMessage) {
-    if(!assertMessage) {
-        assertMessage = "Assertion failure, Expected: {undefined}, but Actual: {" + arg1 + "} ";
+$A.ns.Test.prototype.assertUndefined = function(condition, assertMessage) {
+    if (condition !== undefined) {
+        this.fail(assertMessage, "\nExpected: {undefined} but Actual: {"+condition+"}");
     }
-    this.assertEquals(undefined, arg1, assertMessage);
 };
 
 /**
  * Assert that the value passed in is not undefined or null.
- * @param {Object} arg1
- * 				The argument to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the argument is not undefined or null
+ * 
+ * @param {Object} condition The argument to evaluate
+ * @param {String} assertMessage The message that is returned if the argument is not undefined or null
  */
-$A.ns.Test.prototype.assertNotUndefinedOrNull = function(arg1, assertMessage) {
-    if(!assertMessage){
-        assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {" + arg1 + "} ";
+$A.ns.Test.prototype.assertNotUndefinedOrNull = function(condition, assertMessage) {
+    if ($A.util.isUndefinedOrNull(condition)) {
+        this.fail(assertMessage, "\nExpected: {defined or non-null} but Actual: {"+condition+"}");
     }
-    this.assertTrue(!$A.util.isUndefinedOrNull(arg1),assertMessage);
 };
 
  /**
  * Assert that the value passed in is either undefined or null.
- * @param {Object} arg1
- * 				The argument to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the argument is not undefined or null
+ * 
+ * @param {Object} condition The argument to evaluate
+ * @param {String} assertMessage The message that is returned if the argument is not undefined or null
  */
-$A.ns.Test.prototype.assertUndefinedOrNull = function(arg1, assertMessage){
-    if(!assertMessage){
-        assertMessage = "Assertion failure, Expected: {undefined or null}, but Actual: {" + arg1 + "} ";
+$A.ns.Test.prototype.assertUndefinedOrNull = function(condition, assertMessage){
+    if (!$A.util.isUndefinedOrNull(condition)) {
+        this.fail(assertMessage, "\nExpected: {undefined or null} but Actual: {"+condition+"}");
     }
-    this.assertTrue($A.util.isUndefinedOrNull(arg1), assertMessage);
 };
-        
 
  /**
  * Assert that value === null.
- * @param {Object} arg1
- * 				The argument to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the value !==null
+ * 
+ * @param {Object} condition The argument to evaluate
+ * @param {String} assertMessage The message that is returned if the value !==null
  */
-$A.ns.Test.prototype.assertNull = function(arg1, assertMessage){
-    if (!assertMessage) {
-        assertMessage = "Assertion failure, Expected: {null}, but Actual: {" + arg1 + "} ";
+$A.ns.Test.prototype.assertNull = function(condition, assertMessage){
+    if (condition !== null) {
+        this.fail(assertMessage, "\nExpected: {null} but Actual: {"+condition+"}");
     }
-    this.assertEquals(null, arg1, assertMessage);
 };
 
 /**
  * Assert that value !== null.
- * @param {Object} arg1
- * 				The argument to evaluate
- * @param {String} assertMessage
- * 				The message that is returned if the value is null
+ * 
+ * @param {Object} condition The argument to evaluate
+ * @param {String} assertMessage The message that is returned if the value is null
  */
-$A.ns.Test.prototype.assertNotNull = function(arg1, assertMessage){
-	if (!assertMessage) {
-        assertMessage = "Assertion failure, Expected: {non-null}, but Actual:{" + arg1 + "}";
+$A.ns.Test.prototype.assertNotNull = function(condition, assertMessage){
+    if (condition === null) {
+        this.fail(assertMessage, "\nExpected: {non-null} but Actual: {"+condition+"}");
     }
-    this.assertTrue(arg1 !== null, assertMessage);
 };
 
 /**
  * Throw an Error, making a test fail with the specified message.
- * @param {String} assertMessage
- *             Defaults to "Assertion failure", if assertMessage is not provided
- * @throws {Error}
- *             Throws error with a message
+ * 
+ * @param {String} assertMessage Defaults to "Assertion failure", if assertMessage is not provided
+ * @param {String} extraInfoMessage 
+ * @throws {Error} Throws error with a message
  */
-$A.ns.Test.prototype.fail = function(assertMessage) {
-	var error = new Error(assertMessage || "Assertion failure");
-	this.failed = error;
-	throw error;
+$A.ns.Test.prototype.fail = function(assertMessage, extraInfoMessage) {
+    var msg = assertMessage || "Assertion failure";
+    if (extraInfoMessage) {
+        msg += extraInfoMessage;
+    }
+    var error = new Error(msg);
+    this.failed = error;
+    throw error;
 };
 
 /**

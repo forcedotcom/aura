@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
+    <aura:attribute name="cachedDataRows" type="Integer"/>
+    <aura:attribute name="serverDataRows" type="Integer"/>
+    <aura:attribute name="cachedTargetPage" type="Integer"/>
+    <aura:attribute name="serverTargetPage" type="Integer"/>
+
+    <ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="3" totalItems="{!v.totalItems}">
+        <aura:set attribute="dataProvider">
+            <uitest:infiniteDataProvider_StorableActions cachedDataRows="{!v.cachedDataRows}"
+                                                         serverDataRows="{!v.serverDataRows}"
+                                                         cachedTargetPage="{!v.cachedTargetPage}"
+                                                         serverTargetPage="{!v.serverTargetPage}"
+                                                         currentPage="{!v.currentPage}"
+                                                         pageSize="{!v.pageSize}"
+                                                         totalItems="{!v.totalItems}"/>
+        </aura:set>
+
+        <aura:set attribute="itemTemplate">
+            <div style="border: 1px solid black">{!row.data}</div>
+        </aura:set>
+    </ui:infiniteList>
+</aura:component>

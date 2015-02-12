@@ -99,6 +99,16 @@ function (w) {
         SCROLL_HORIZONTAL = 'horizontal',
 
         /**
+        * Identifies horizontal scrolling.
+        *
+        * @property SCROLL_BIDIRECTIONAL
+        * @type String
+        * @static
+        * @final
+        */
+        SCROLL_BIDIRECTIONAL = 'bidirectional',
+
+        /**
         * Configuration object for the MutatorObserver
         *
         * @property MUTATOR_OBSERVER_CONFIG
@@ -428,6 +438,10 @@ function (w) {
                 this.opts.pullToRefresh  = false;
                 this.opts.pullToLoadMore = false;
             }
+
+            if (this.opts.scroll === SCROLL_BIDIRECTIONAL) {
+                this.opts.debounce = false;
+            }
         },
         /**
         * Finds the DOM element where the scroller will be hosted. 
@@ -445,7 +459,8 @@ function (w) {
             this.scroller      = this.wrapper.children[0];
             this.scrollerStyle = this.scroller.style;
 
-            var scrollDirection = this.scrollVertical ? 'scroll-vertical' : 'scroll-horizontal';
+            var scrollDirection = this.scroll === SCROLL_BIDIRECTIONAL ? 'scroll-bidirectional' : 
+                                  this.scrollVertical ? 'scroll-vertical' : 'scroll-horizontal';
 
             // Add default classes
             this.scroller.classList.add('scroller');
@@ -553,6 +568,7 @@ function (w) {
         * We can't prevent default because that will break the scrolling itself,
         * so we just detect on touchStart if is on 0 and we set it to 1
         *
+    
         * @method _iosScrollFixture
         * @private
         */
@@ -564,6 +580,7 @@ function (w) {
         /**
         * Add or remove all of the neccesary event listeners, based on the provided configuration.
         *
+    
         * @method _handleEvents
         * @private
         */
@@ -642,6 +659,8 @@ function (w) {
         * The first argument is the event type and any additional arguments are passed to the listeners as parameters.
         * This is used to notify the plugins of events that occur on the scroller.
         *
+    
+    
         * @method _fire
         * @private
         */
@@ -663,6 +682,9 @@ function (w) {
         * Hook mechanism that allows plugins to run functions before or after 
         * the execution of a particular scroller function.
         *
+    
+    
+    
         * @method _hook
         * @private
         */
@@ -689,6 +711,7 @@ function (w) {
         * The browser calls this function if any of the events 
         * registered in _handleEvents are triggered.
         *
+    
         * @method handleEvent
         * @private
         */
@@ -742,6 +765,7 @@ function (w) {
         /**
         * Handles the start gesture event.
         *
+    
         * @method handleEvent
         * @private
         */
@@ -787,6 +811,7 @@ function (w) {
         * By default, it will `preventDefault()` the start event so if a link is clicked, 
         * it won't trigger browser navigation.
         *
+    
         * @method _onStopScrolling
         * @protected
         */
@@ -800,6 +825,7 @@ function (w) {
         * then it applies an exponential moving average filter to weight and smooth out the final velocity.
         * 
         *
+    
         * @method _trackVelocity
         * @protected
         */
@@ -888,6 +914,8 @@ function (w) {
         * Get the scroll direction once the gesture is bigger than a 
         * given threshold (via the `minDirectionThrehold` option).
         *
+    
+    
         * @method _getScrollDirection
         * @protected
         */
@@ -898,12 +926,19 @@ function (w) {
                 (absY > absX + treshold) ? SCROLL_VERTICAL :
                 null;
 
+            // lock one direction at the time on bidirectional mode
+            if (this.scrollDirection && this.opts.lockOnDirection && this.scroll === SCROLL_BIDIRECTIONAL) {
+                this.scrollVertical = this.scrollDirection === SCROLL_VERTICAL;
+            }
+
             return this.scrollDirection;
         },
 
         /**
         * Checks the current position. 
         *
+    
+    
         * @method _isOutOfScroll
         * @private
         */
@@ -915,21 +950,25 @@ function (w) {
         * Normalizes and sets the coordinate that is not being scrolled 
         * to 0 so it moves in one direction only.
         *
+    
+    
         * @method _setNormalizedXY
         * @private
         */
         _setNormalizedXY: function (x, y) {
-            if (this.scrollVertical) {
-                this.x = 0;
+            if (!this.opts.lockOnDirection && this.scroll === SCROLL_BIDIRECTIONAL) {
+                this.x = x;
+                this.y = y;
+            } else if (this.scrollVertical) {
                 this.y = y;
             } else {
                 this.x = x;
-                this.y = 0;
             }
         },
         /**
         * Handles move gesture event.
         *
+    
         * @method _move
         * @private
         */
@@ -1004,6 +1043,7 @@ function (w) {
         /**
         * Handles end gesture event.
         *
+    
         * @method _end
         * @private
         */
@@ -1034,16 +1074,23 @@ function (w) {
             // Calculate the momentum {destination, time} based on the gesture
             if (this.scrollVertical) {
                 momentum = this._momentum(this.y, this.startY, duration, this.maxScrollY, this.wrapperHeight);
-                this._scrollTo(0, momentum.destination, momentum.time, momentum.bounce);
+                this._scrollTo(this.x, momentum.destination, momentum.time, momentum.bounce);
+            } else if (this.scroll === SCROLL_BIDIRECTIONAL) {
+                var momentumX = this._momentum(this.x, this.startX, duration, this.maxScrollX, this.wrapperWidth);
+                var momentumY = this._momentum(this.y, this.startY, duration, this.maxScrollY, this.wrapperHeight);
+
+                this._scrollTo(momentumX.destination, momentumY.destination, Math.max(momentumX.time, momentumY.time), momentumX.bounce);
+                
             } else {
                 momentum = this._momentum(this.x, this.startX, duration, this.maxScrollX, this.wrapperWidth);
-                this._scrollTo(momentum.destination, 0, momentum.time, momentum.bounce);
+                this._scrollTo(momentum.destination, this.y, momentum.time, momentum.bounce);
             }
         },
 
         /**
         * Handles the wheel event for scrolling.
         *
+    
         * @method _wheel
         * @private
         */
@@ -1115,6 +1162,7 @@ function (w) {
         /**
         * Handles the debounce of the wheel event to decouple the event and the actual DOM update.
         *
+    
         * @method _wheelRAF
         * @private
         */
@@ -1137,6 +1185,9 @@ function (w) {
         * If `debounce:true`, the velocity has been already calculated through `_trackVelocity`.
         * Otherwise, the value is determined from the current state of the scroller.
         *
+    
+    
+    
         * @method _getVelocity
         * @return {float} Velocity of the gesture
         * @protected
@@ -1154,6 +1205,8 @@ function (w) {
         * Calculates the momentum {destination, time} based on the velocity of the gesture and on the
         * acceleration.
         *
+    
+    
         * @method _computeMomentum
         * @return {Object} An object with the destination and time where the scroller should go.
         * @protected
@@ -1178,6 +1231,10 @@ function (w) {
         * The mathematical function to get the destination is a simple ponderation 
         * of how much px to snap based on the current position and velocity.
         *
+    
+    
+    
+    
         * @method _computeSnap
         * @return {Object} An object with the destination and time where the scroller should snap to.
         * @protected
@@ -1194,6 +1251,11 @@ function (w) {
         * Calculates the momentum for the current gesture.
         * If the destination of the momentum falls outside of the scrollable region,
         * it calculate the snapping point and the new momentum related to it.
+    
+    
+    
+    
+    
         * @method _momentum
         * @return {Object} An object with the destination and time where the scroller should scroll to.
         * @protected
@@ -1268,6 +1330,7 @@ function (w) {
         * outside the boundaries.
         * Used to decouple `pullToRefresh` and `pullToLoadMore`
         * functionality as much as possible.
+    
         * @method _resetPosition
         * @protected
         */
@@ -1323,6 +1386,7 @@ function (w) {
         /**
         * Sets the transition easing function property into the scroller node.
         * 
+    
         * @method _transitionEasing
         * @private
         */
@@ -1333,6 +1397,7 @@ function (w) {
         /**
         * Sets the transition time property into the scroller node.
         * 
+    
         * @method _transitionTime
         * @private
         */
@@ -1345,6 +1410,8 @@ function (w) {
         * We use matrix3d to force GPU acceleration and to allow plugins to easily
         * manipulate the matrix later on.
         * 
+    
+    
         * @method _translate
         * @protected
         */
@@ -1365,6 +1432,7 @@ function (w) {
         * Handler invoked by the transitionEnd event when the scroller reached an end
         * (this is used when `cssTransition:true`).
         * 
+    
         * @method _transitionEnd
         * @protected
         */
@@ -1386,6 +1454,10 @@ function (w) {
         * By default the scroller uses `CubicBezier` function curves with the parameters
         * defined in the EASING static variables.
         *
+        
+        
+        
+        
         * @method _animate
             * @private
         */
@@ -1441,6 +1513,7 @@ function (w) {
         /**
         * Prepend an Array of elements into the scroller.
         * This function is overriden by SurfaceManager to allow a custom DOM manipulation.
+    
         * @method _prependData
         * @protected
         */
@@ -1463,6 +1536,7 @@ function (w) {
         /**
         * Append an Array of elements into the scroller.
         * This function is overriden by SurfaceManager to allow a custom DOM manipulation.
+    
         * @method _appendData
         * @protected
         */
@@ -1482,6 +1556,10 @@ function (w) {
         * Otherwise, an animation that interpolates
         * positions using `requestAnimationFrame` is triggered.
         *
+    
+    
+    
+    
         * @method _scrollTo
         * @private
         */
@@ -1540,6 +1618,8 @@ function (w) {
         /**
          * Scroll to a {x,y} position using the wrapper's scrollTop and scrollLeft attributes.
          *
+        
+        
          * @method _wrapperScrollTo
          * @private
          *
@@ -1553,6 +1633,9 @@ function (w) {
         /**
         * Prepend an Array of elements into the scroller.
         * This function is overriden by SurfaceManager to allow a custom DOM manipulation.
+    
+    
+    
         * @method on
         * @public
         */
@@ -1606,6 +1689,7 @@ function (w) {
         *
         * If an `init` method is provided, the scroller automatically calls it to
         * let the plugin initialize, attach custom events, and set the right state.
+    
         * @method plug
         * @public
         *
@@ -1646,6 +1730,10 @@ function (w) {
         /**
         * Scroll to a {x,y} position given a specific time and easing function.
         *
+    
+    
+    
+    
         * @method scrollTo
         * @public
         */
@@ -1665,6 +1753,8 @@ function (w) {
         /**
         * Scroll to the top of the scroller.
         *
+    
+    
         * @method scrollToTop
         * @public
         */
@@ -1675,6 +1765,8 @@ function (w) {
         /**
         * Scroll to the bottom of the scroller.
         *
+    
+    
         * @method scrollToBottom
         * @public
         */
@@ -1696,6 +1788,7 @@ function (w) {
         * instead of manually adding it to the DOM directly,
         * because the scroller will be able to optimize the rendering lifecycle depending on the configuration.
         *
+    
         * @method prependItems
         * @public
         */
@@ -1713,6 +1806,7 @@ function (w) {
         * instead of manually adding it to the DOM directly,
         * because the scroller will be able to optimize the rendering lifecycle depending on the configuration.
         *
+    
         * @method appendItems
         * @public
         */

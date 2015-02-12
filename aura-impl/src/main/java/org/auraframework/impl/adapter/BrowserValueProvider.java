@@ -43,6 +43,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
     public static final String IS_IPHONE = "isIPhone";
     public static final String IS_IPAD = "isIPad";
     public static final String IS_IOS = "isIOS";
+    public static final String IS_BLACKBERRY = "isBlackBerry";
     public static final String IS_WINDOWS_PHONE = "isWindowsPhone";
     public static final String IS_WINDOWS_TABLET = "isWindowsTablet";
 
@@ -79,6 +80,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
         m.put(IS_FIREFOX, b.isFirefox());
         m.put(IS_WINDOWS_PHONE, b.isWindowsPhone());
         m.put(IS_WINDOWS_TABLET, b.isWindowsTablet());
+        m.put(IS_BLACKBERRY, b.isBlackBerry());
 
         return m;
     }

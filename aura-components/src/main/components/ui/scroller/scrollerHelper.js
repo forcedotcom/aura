@@ -239,7 +239,7 @@
             lockOnDirection       = component.get('v.lockOnDirection'),
 
             // For now, default android and ios to use CSSTransitions
-            useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : (!gpuOptimization && (device.isIOS || device.isAndroid)),
+            useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : !gpuOptimization,
             
             snap                  = component.get('v.snapType'),
             debounce              = component.get('v.debounce'),
@@ -269,7 +269,7 @@
             debounce              : debounce,
             bindToWrapper         : bindToWrapper,
             gpuOptimization       : gpuOptimization,
-            lockOnDirection       : lockOnDirection,
+            lockOnDirection       : lockOnDirection === 'true' ? true : lockOnDirection,
             minThreshold          : minThreshold,
             minDirectionThreshold : minDirectionThreshold,
 

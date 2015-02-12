@@ -18,9 +18,8 @@
     testChecked: {
         attributes : {value : true},
         test: function(component){
-        	var expectedElem = component.find("img1").getElement();
+        	var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
         }
     },
 
@@ -28,9 +27,8 @@
     testUnchecked: {
         attributes : {value : false},
         test: function(component){
-            var expectedElem = component.find("img1").getElement();
+            var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
         }
     },
 
@@ -38,15 +36,13 @@
     testRerenderChecked: {
         attributes : {value : false},
         test: [function(component){
-        	var expectedElem = component.find("img1").getElement();
+            var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            
+
             component.set("v.value",true);
         }, function(component){
-            var expectedElem = component.find("img1").getElement();
+            var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
         }]
     },
 
@@ -54,15 +50,13 @@
     testRerenderUnchecked: {
         attributes : {value : true},
         test: [function(component){
-            var expectedElem = component.find("img1").getElement();
+            var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            
+
             component.set("v.value",false);
         }, function(component){
-            var expectedElem = component.find("img1").getElement();
+            var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
       }]
     }
 })

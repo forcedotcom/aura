@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.uiOutputCheckbox img.checked{
-    background: transparent url(/auraFW/resources/aura/images/smallcheck-checked.png) no-repeat;
-    height: 17px;
-    width: 17px;
-}
+({
+    render: function (cmp, helper) {
+        var ret = this.superRender();
 
-.uiOutputCheckbox img.unchecked{
-    background: transparent url(/auraFW/resources/aura/images/smallcheck.png) no-repeat;
-    height: 17px;
-    width: 17px;
-}
+        helper.buildBody(cmp);
+
+        return ret;
+    },
+
+    rerender: function (cmp, helper) {
+
+        this.superRerender();
+
+        helper.buildBody(cmp);
+
+    }
+
+})

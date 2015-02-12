@@ -54,7 +54,7 @@
                 "ui:message rendered with wrong severity CSS class");
 
         // verify icon alt text
-        var icon = component.find("messageIcon").getElement();
+        var icon = component.find("messageIcon").getElement().getElementsByTagName("img")[0];
         $A.test.assertEquals(severity, icon["alt"],
                 "ui:message rendered with wrong icon alt text");
 

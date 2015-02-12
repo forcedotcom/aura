@@ -24,7 +24,7 @@
 	},
 	
 	imageSrcCheck : function(cmp, expectedValue, errorMsg){
-		var imgElem = cmp.getConcreteComponent().getElement();
+		var imgElem = cmp.getConcreteComponent().getElement().getElementsByTagName("img")[0];
 		var src = $A.util.getElementAttributeValue(imgElem, "src");
     	$A.test.assertEquals(expectedValue, src, errorMsg);
 	}

@@ -16,7 +16,7 @@
  
 ({
     load: function(cmp, event, helper) {
-        var imageElement = cmp.getElement();
+        var imageElement = cmp.getElement().getElementsByTagName("img")[0];
         imageElement.src = cmp.get("v.actualImageSrc");
         // refresh default image and notify asyncComponentManager when new image is loaded.
         imageElement.onload = function() {

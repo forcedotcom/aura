@@ -446,4 +446,8 @@ AuraContext.prototype.getContextPath = function() {
     return this.contextPath;
 };
 
+AuraContext.prototype.setContextPath = function(path) {
+    this.contextPath = path;
+};
+
 //#include aura.context.AuraContext_export

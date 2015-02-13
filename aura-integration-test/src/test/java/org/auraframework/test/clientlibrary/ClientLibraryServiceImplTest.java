@@ -19,6 +19,8 @@ import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
@@ -129,6 +131,29 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
             fail("Should not be able to write to null stream");
         } catch (Exception e) {
             checkExceptionFull(e, AuraRuntimeException.class, "Output cannot be null");
+        }
+    }
+    
+    public void testContextPath() throws Exception {
+    	AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+                .getDefDescriptor("clientLibraryTest:clientLibraryTest", ApplicationDef.class);
+        context.setApplicationDescriptor(appDesc);
+        String coolContext = "/cool";
+        context.setContextPath(coolContext);
+        Aura.getDefinitionService().updateLoaded(appDesc);
+
+        Set<String> urlSet = clientLibraryService.getUrls(context, Type.JS);
+        Pattern pattern = Pattern.compile("/auraFW|/l/");
+        for(String url : urlSet) {
+            Matcher matcher = pattern.matcher(url);
+            while(matcher.find()) {
+                int start =  matcher.start();
+                String cool = url.substring(start - 5, start);
+                if (!cool.equals(coolContext)) {
+                    fail("Context path was not prepended to Aura urls");
+                }
+            }
         }
     }
 

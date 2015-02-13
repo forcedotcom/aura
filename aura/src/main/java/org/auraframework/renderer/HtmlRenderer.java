@@ -91,10 +91,12 @@ public class HtmlRenderer implements Renderer {
                 if (value != null) {
 
                     String v = value.toString();
-                    String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-                    if (v.startsWith("/auraFW") && !contextPath.isEmpty()) {
-                        // prepend any Aura resource urls with servlet context path
-                        v = contextPath + v;
+                    if (v.startsWith("/auraFW") ) {
+                    	String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+                    	if(!contextPath.isEmpty()) {
+                    		// prepend any Aura resource urls with servlet context path
+                    		v = contextPath + v;
+                    	}
                     }
 
                     out.append(' ');

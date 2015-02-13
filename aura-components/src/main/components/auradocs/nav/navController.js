@@ -25,8 +25,10 @@
             cmp._activeCmp = cmp.find('help');
         }
         
-        // Remove the active css attribute from the currently selected element.
-        cmp._activeCmp.getElement().setAttribute('active', false);
+        // Remove the active css attribute from the currently selected element if present
+        if (cmp._activeCmp && cmp._activeCmp.getElement()) {
+            cmp._activeCmp.getElement().setAttribute('active', false);
+        }
         
         // Lookup the new location.
         var token = event.getParam('token');
@@ -38,6 +40,8 @@
         // Set the attribute holder to track the active element and set its CSS
         // attribute to render as active.
         cmp._activeCmp = newLocationComp;
-        cmp._activeCmp.getElement().setAttribute('active', true);
+        if (cmp._activeCmp && cmp._activeCmp.getElement()) {
+            cmp._activeCmp.getElement().setAttribute('active', true);
+        }
     }
 })

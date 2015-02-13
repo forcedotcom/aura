@@ -1933,6 +1933,10 @@ Component.prototype.markDirty=function(reason){
     $A.renderingService.addDirtyValue(reason||"Component.markDirty()",this);
 };
 
+Component.prototype.markClean=function(value) {
+    $A.renderingService.removeDirtyValue(value, this);
+};
+
 Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
     // JBUCH: HALO: FIXME: CAT 5: WE SEEM TO BE LEAKING VALUE CHANGE EVENTHANDLERS;
     // FIND THE REAL REASON AND REMOVE THE EVENT HANDLER, AS WELL AS THIS SHORTSTOP NPE FIX

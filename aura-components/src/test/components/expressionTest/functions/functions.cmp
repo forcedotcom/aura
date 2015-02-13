@@ -370,7 +370,7 @@
         <expressionTest:test expression="{!empty(m.object)}" exprText="empty(m.object)" expected="false"/>
     -->
     <expressionTest:test expression="{!empty(m.objectNull)}" exprText="empty(m.objectNull)" expected="true"/>
-    <expressionTest:test expression="{!empty(v.object)}" exprText="empty(v.object)" expected="false"/>
+    <expressionTest:test expression="{!empty(v.object)}" exprText="empty(v.object)" expected="true"/>
 
     <!-- misc -->
     <expressionTest:test expression="{!m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)}" exprText="m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)" expected="'4.15.11'"/>

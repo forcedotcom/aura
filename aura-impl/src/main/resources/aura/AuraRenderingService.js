@@ -663,21 +663,22 @@ $A.ns.AuraRenderingService.prototype.rerenderDirty = function(stackName) {
  * @deprecated
  * @protected
  */
-$A.ns.AuraRenderingService.prototype.removeDirtyValue = function(value) {
-    var cmp = value.owner;
-    if(cmp && cmp.isValid()){
+$A.ns.AuraRenderingService.prototype.removeDirtyValue = function(value, cmp) {
+    if (cmp && cmp.isValid()) {
         var id = cmp.getConcreteComponent().getGlobalId();
-        var a = this.dirtyComponents[id];
-        if (a) {
-            for (var i = 0; i < a.length; i++) {
-                if (a[i] === value) {
-                    a.splice(i, 1);
-                    break;
-                }
+        var dirtyAttributes = this.dirtyComponents[id];
+        if (dirtyAttributes) {
+            if (dirtyAttributes[value]) {
+                delete dirtyAttributes[value];
             }
 
-            if (a.length === 0) {
+            if ($A.util.isEmpty(dirtyAttributes)) {
                 delete this.dirtyComponents[id];
+                for (var i = 0; i < this.dirtyComponentIds.length; i++) {
+                    if (this.dirtyComponentIds[i] === id) {
+                        return this.dirtyComponentIds.splice(i, 1);
+                    }
+                }
             }
         }
     }

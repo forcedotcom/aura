@@ -185,7 +185,7 @@ $A.ns.Util.prototype.isUndefinedOrNull = function(obj){
  * @returns {Boolean} True if the object is empty, or false otherwise.
  */
 $A.ns.Util.prototype.isEmpty = function(obj){
-    return this.isUndefinedOrNull(obj) || (this.isArray(obj) && obj.length === 0) || obj === '';
+    return this.isUndefinedOrNull(obj) || obj === '' || (this.isArray(obj) && obj.length === 0) || (this.isObject(obj) && this.keys(obj).length === 0);
 };
 
 /**

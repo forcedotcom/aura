@@ -23,4 +23,7 @@
     <aura:registerEvent name="load" type="ui:load"/>
     <aura:handler name="load" action="{!c.load}"/>
     
+    <aura:dependency resource="markup://ui:asyncComponentLoaded" type="EVENT"/>
+    <aura:dependency resource="markup://ui:asyncComponentRegister" type="EVENT"/>
+    
 </aura:component>

@@ -30,6 +30,8 @@
     <aura:handler name="closeTab" action="{!c.closeTab}" />
     
     <aura:dependency resource="markup://ui:tabItem" />
+    <aura:dependency resource="markup://aura:html" type="COMPONENT"/>
+    <aura:dependency resource="markup://ui:updateSize" type="EVENT"/>
     
     <div class="{!v.class}" aura:id="div" role="tablist">
 	    <ul class="tabList" aura:id="tabItemsContainer" role="presentation" onkeydown="{!c.onKeyDown}">

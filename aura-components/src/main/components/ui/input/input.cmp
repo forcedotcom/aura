@@ -21,6 +21,8 @@
     <!-- Library which holds the Aura events registration -->
     <aura:import library="ui:eventLib" property="lib"/>
     
+    <aura:dependency resource="markup://ui:inputDefaultError" type="COMPONENT"/>
+    
     <aura:attribute name="required" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
     <aura:attribute name="updateOn" type="String" access="GLOBAL" default="change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
     <aura:attribute name="value" type="String" access="GLOBAL" description="The value currently in the input field."/>

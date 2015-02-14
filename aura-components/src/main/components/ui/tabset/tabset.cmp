@@ -34,6 +34,9 @@
     <aura:handler name="removeTab" action="{!c.removeTab}" />
     <aura:handler name="activateTab" action="{!c.activateTab}" />
     <aura:handler name="getActiveTab" action="{!c.getActiveTab}" />
+    
+    <aura:dependency resource="markup://ui:tab" type="COMPONENT"/>
+    <aura:dependency resource="markup://ui:tabItem" type="COMPONENT"/>
 
     <div class="{!v.class}" aura:id="tabContainer">
         <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"

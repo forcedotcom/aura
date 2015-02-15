@@ -33,8 +33,8 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     this.superDef = this.initSuperDef(config["superDef"]);
     this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;
 
-    this.controllerDef = config["controllerDef"] ? componentService.getControllerDef(config["controllerDef"]) : undefined;
-    this.modelDef = config["modelDef"] ? componentService.getModelDef(config["modelDef"]) : undefined;
+    this.controllerDef = config["controllerDef"] ? $A.componentService.getControllerDef(config["controllerDef"]) : undefined;
+    this.modelDef = config["modelDef"] ? $A.componentService.getModelDef(config["modelDef"]) : undefined;
     this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
 
     this.interfaces = {};
@@ -116,14 +116,14 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     var subDefs = config["subDefs"];
     if (subDefs) {
         for (var k = 0; k < subDefs.length; k++) {
-            componentService.getDef(subDefs[k]);
+            $A.componentService.getDef(subDefs[k]);
         }
     }
     
     var imports = config["imports"];
     if (imports) {
         this.libraryDefs = $A.util.reduce(imports, function(libraryDefs, imported) {
-            libraryDefs[imported["property"]] = componentService.getLibraryDef(imported.name, imported["libraryDef"]);
+            libraryDefs[imported["property"]] = $A.componentService.getLibraryDef(imported.name, imported["libraryDef"]);
             return libraryDefs;
         }, {});
     }
@@ -135,14 +135,14 @@ $A.ns.ComponentDef = function ComponentDef(config) {
 
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"]);
     
-    this.rendererDef = componentService.getRendererDef(descriptor, config["rendererDef"]);
+    this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
     this.initRenderer();
     
-    this.helperDef = componentService.getHelperDef(descriptor, config["helperDef"], this, this.libraryDefs);
+    this.helperDef = $A.componentService.getHelperDef(descriptor, config["helperDef"], this, this.libraryDefs);
 
     var providerDef = config["providerDef"];
     if (providerDef) {
-        this.providerDef = componentService.getProviderDef(descriptor, providerDef);
+        this.providerDef = $A.componentService.getProviderDef(descriptor, providerDef);
     } else {
         this.providerDef = null;
     }

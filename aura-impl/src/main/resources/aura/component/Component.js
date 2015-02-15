@@ -68,7 +68,7 @@ var ComponentPriv = (function() { // Scoping priv
         // create the globally unique id for this component
         this.setupGlobalId(config["globalId"], localCreation);
 
-        var partialConfig = undefined;
+        var partialConfig;
         if (this.creationPath && this.creationPath !== "client created") {
             partialConfig = context.getComponentConfig(this.creationPath);
         }
@@ -86,7 +86,7 @@ var ComponentPriv = (function() { // Scoping priv
         }
 
         // add this component to the global index
-        componentService.index(cmp);
+        $A.componentService.index(cmp);
 
         // sets this components definition, preferring partialconfig if it exists
         this.setupComponentDef(this.partialConfig || config);
@@ -188,7 +188,7 @@ var ComponentPriv = (function() { // Scoping priv
             globalId = this.nextGlobalId(localCreation);
         }
 
-        var old = componentService.get(globalId);
+        var old = $A.componentService.get(globalId);
         if (old) {
             $A.log("ComponentPriv.setupGlobalId: globalId already in use: '"+globalId+"'.");
         }
@@ -248,7 +248,7 @@ var ComponentPriv = (function() { // Scoping priv
      * A reference to the ComponentDefinition for this instance
      */
     ComponentPriv.prototype.setupComponentDef = function(config) {
-        var componentDef = componentService.getDef(config["componentDef"]);
+        var componentDef = $A.componentService.getDef(config["componentDef"]);
         $A.assert(componentDef, "componentDef is required");
         this.componentDef = componentDef;
     };
@@ -277,7 +277,7 @@ var ComponentPriv = (function() { // Scoping priv
                     if (action) {
                         action.setCreationPathIndex(index);
                     }
-                    components.push($A.componentService.newComponentDeprecated(config, valueProvider, localCreation, true));
+                    components.push($A.componentService["newComponentDeprecated"](config, valueProvider, localCreation, true));
                 } else {
                 	// KRIS: HALO:
                 	// This is hit, when you create a newComponentDeprecated and use raw values, vs configs on the attribute values.
@@ -319,7 +319,7 @@ var ComponentPriv = (function() { // Scoping priv
             }
             superConfig["attributes"] = superAttributes;
             $A.pushCreationPath("super");
-            this.setSuperComponent(componentService.newComponentDeprecated(superConfig, null, localCreation, true));
+            this.setSuperComponent($A.componentService["newComponentDeprecated"](superConfig, null, localCreation, true));
             $A.popCreationPath("super");
         }
     };
@@ -837,7 +837,7 @@ if(!this.concreteComponentId) {
                 $A.assert(partialConfig,
                             "Abstract component without provider def cannot be instantiated : "
                             + componentDef);
-                setProvided(componentService.getDef(partialConfig["componentDef"]), null);
+                setProvided($A.componentService.getDef(partialConfig["componentDef"]), null);
             }
         }
     };
@@ -1203,11 +1203,11 @@ Component.prototype.find = function(name) {
                 if ($A.util.isArray(globalId)) {
                     var ret = [];
                     for (var i = 0; i < globalId.length; i++) {
-                        ret.push(componentService.get(globalId[i]));
+                        ret.push($A.componentService.get(globalId[i]));
                     }
                     return ret;
                 }
-                return componentService.get(globalId);
+                return $A.componentService.get(globalId);
             }
         }
     }
@@ -1970,7 +1970,7 @@ Component.prototype.autoDestroy = function(destroy) {
  */
 Component.prototype.getConcreteComponent = function() {
     var priv = this.priv;
-    return priv.concreteComponentId ? componentService.get(priv.concreteComponentId) : this;
+    return priv.concreteComponentId ? $A.componentService.get(priv.concreteComponentId) : this;
 };
 
 /**

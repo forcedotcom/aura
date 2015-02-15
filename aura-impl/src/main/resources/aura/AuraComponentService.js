@@ -82,7 +82,7 @@ $A.ns.AuraComponentService.prototype.newComponentArray = function(config, attrib
     var ret = [];
 
     for(var i=0;i<config.length;i++){
-        ret.push(this.newComponentDeprecated(config[i], attributeValueProvider, localCreation, doForce));
+        ret.push(this["newComponentDeprecated"](config[i], attributeValueProvider, localCreation, doForce));
     }
 
     return ret;
@@ -98,7 +98,7 @@ $A.ns.AuraComponentService.prototype.newComponentArray = function(config, attrib
  * @public
  */
 $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
-    return this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+    return this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
 };
 
 
@@ -218,7 +218,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
         this.requestComponent(callbackScope, callback, config, attributeValueProvider);
     } else {
-        var newComp = this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+        var newComp = this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
         callback.call(callbackScope, newComp);
     }
 };

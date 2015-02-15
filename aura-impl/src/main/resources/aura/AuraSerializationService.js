@@ -21,13 +21,16 @@ var AuraSerializationService = function(){
 
     return {
         readComponent : function(config){
+            var newCmpDeprecated = "newComponentDeprecated";
             $A.Perf.mark("resolvedRefs");
             $A.Perf.mark("constructedComponent");
             config = aura.util.json.resolveRefs(config);
 
 
             $A.Perf.endMark("resolvedRefs");
-            var ret = $A.componentService.newComponentDeprecated(config, null, false, true);
+            // we don't call the method directly in order to always 
+            // use the public componentService public funtion (in prod will be mangled so no string)
+            var ret = $A.componentService[newCmpDeprecated](config, null, false, true);
             $A.Perf.endMark("constructedComponent");
             return ret;
         }

@@ -338,7 +338,7 @@ $A.ns.Aura = function() {
      * @param {Boolean} localCreation
      */
     this.newCmp = function(config, attributeValueProvider, localCreation, doForce) {
-        return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+        return this.componentService["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
     };
     /**
      * Previously known as newComponent(). This method is replaced by newCmpAsync().
@@ -348,7 +348,7 @@ $A.ns.Aura = function() {
      * @param {Boolean} doForce
      */
     this.newCmpDeprecated = function(config, attributeValueProvider, localCreation, doForce) {
-        return this.componentService.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+        return this.componentService["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
     };
 
     /**

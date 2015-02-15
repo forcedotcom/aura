@@ -247,7 +247,7 @@ var AuraLayoutService = function() {
 								$A.Perf.endMark("Container Action Callback Initiated");
 								if (a.getState() === "SUCCESS") {
 									var ret = a.getReturnValue();
-									layoutService.layoutCallback(ret ? componentService.newComponentDeprecated(ret, null, false, true) : null, item, layout,
+									layoutService.layoutCallback(ret ? $A.componentService["newComponentDeprecated"](ret, null, false, true) : null, item, layout,
 											params, noTrack);
 								} else {
 									if (!layoutErrorFired) {

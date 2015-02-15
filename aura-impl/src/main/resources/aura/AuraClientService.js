@@ -959,7 +959,7 @@ var AuraClientService = function() {
 
                 // Why is this happening in the ClientService? --JT
                 // NOTE: no creation path here, we are at the top level
-                var component = componentService.newComponentDeprecated(config, null, false, true);
+                var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
 
                 $A.Perf.endMark("Initial Component Created");
 
@@ -1001,28 +1001,28 @@ var AuraClientService = function() {
             var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
             $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
             for ( var j = 0; j < evtConfigs.length; j++) {
-                eventService.getEventDef(evtConfigs[j]);
+                $A.eventService.getEventDef(evtConfigs[j]);
             }
             $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
 
             var libraryConfigs = aura.util.json.resolveRefs(config["libraryDefs"]);
             $A.Perf.mark("Registered Libraries [" + libraryConfigs.length + "]");
             for (j = 0; j < libraryConfigs.length; j++) {
-                componentService.getLibraryDef(libraryConfigs[j]);
+                $A.componentService.getLibraryDef(libraryConfigs[j]);
             }
             $A.Perf.endMark("Registered Libraries [" + libraryConfigs.length + "]");
 
             var controllerConfigs = aura.util.json.resolveRefs(config["controllerDefs"]);
             $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
             for (j = 0; j < controllerConfigs.length; j++) {
-                componentService.getControllerDef(controllerConfigs[j]);
+                $A.componentService.getControllerDef(controllerConfigs[j]);
             }
             $A.Perf.endMark("Registered Controllers [" + controllerConfigs.length + "]");
 
             var comConfigs = aura.util.json.resolveRefs(config["componentDefs"]);
             $A.Perf.mark("Registered Components [" + comConfigs.length + "]");
             for ( var i = 0; i < comConfigs.length; i++) {
-                componentService.getDef(comConfigs[i]);
+                $A.componentService.getDef(comConfigs[i]);
             }
             $A.Perf.endMark("Registered Components [" + comConfigs.length + "]");
 
@@ -1457,7 +1457,7 @@ var AuraClientService = function() {
                 componentConfig["localId"] = localId;
 
                 var root = $A.getRoot();
-                var c = $A.componentService.newComponentDeprecated(componentConfig, root);
+                var c = $A.componentService["newComponentDeprecated"](componentConfig, root);
 
                 if (!errors) {
                     // Wire up event handlers
@@ -1537,7 +1537,7 @@ var AuraClientService = function() {
                 // create same messaging as injectComponent
                 var errorConfig = this.createIntegrationErrorConfig(error);
                 errorConfig["localId"] = component.getLocalId();
-                component = $A.componentService.newComponentDeprecated(errorConfig, $A.getRoot());
+                component = $A.componentService["newComponentDeprecated"](errorConfig, $A.getRoot());
             }
 
             this.addComponentHandlers(component, actionEventHandlers);

@@ -53,6 +53,7 @@
     	attributes: { testScriptSource: true },
         test:[ 
             function(cmp) {
+            	$A.test.setTestTimeout(60000);
                 //test loading script from same origin
             	$A.test.addWaitForWithFailureMessage (true,
             			function() { return CodeMirror !== undefined; },
@@ -96,6 +97,7 @@
     testConnectionSource : {
     	attributes: { testConnectionSource: true },
     	test: [function(cmp) {
+    			$A.test.setTestTimeout(60000);
     			$A.test.assertFalse(cmp.get("v.xmlHttpRequestComplete"));
     			$A.test.clickOrTouch(cmp.find("uiButton_sendXHR").getElement());
     		}, function(cmp) {

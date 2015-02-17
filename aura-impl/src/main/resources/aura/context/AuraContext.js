@@ -45,6 +45,11 @@ function AuraContext(config, initCallback) {
     this.contextPath = config["contextPath"] || "";
 
     var that = this;
+    if(!config["globalValueProviders"]){
+        config["globalValueProviders"]={};
+    }
+    $A.util.apply(config["globalValueProviders"],$A.globalValueProviders);
+
     this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"], function() {
         var i, defs;
         

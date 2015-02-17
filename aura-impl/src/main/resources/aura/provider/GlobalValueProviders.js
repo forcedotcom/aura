@@ -27,6 +27,10 @@ $A.ns.GlobalValueProviders = function (gvp, initCallback) {
         "$Label": new $A.ns.LabelValueProvider(),
         "$Locale": new $A.ns.ObjectValueProvider()
     };
+    for(var type in gvp){
+        $A.assert(this.valueProviders[type]==null,"$A.globalValueProviders.ctor(): '"+type+"' has already been registered.");
+        this.valueProviders[type] = gvp[type];
+    }
 
     var that = this;
     this.loadFromStorage(function() {

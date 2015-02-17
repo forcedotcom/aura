@@ -165,7 +165,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
 
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new LinkedHashMap<>();
         for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
-            attributeDefs.putAll(extendsDescriptor.getDef().getAttributeDefs());
+            attributeDefs.putAll(Aura.getDefinitionService().getDefinition(extendsDescriptor).getAttributeDefs());
         }
         attributeDefs.putAll(this.attributeDefs);
         return Collections.unmodifiableMap(attributeDefs);
@@ -180,7 +180,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException {
         Map<DefDescriptor<MethodDef>, MethodDef> methodDefs = new LinkedHashMap<>();
         for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
-            methodDefs.putAll(extendsDescriptor.getDef().getMethodDefs());
+            methodDefs.putAll(Aura.getDefinitionService().getDefinition(extendsDescriptor).getMethodDefs());
         }
         methodDefs.putAll(this.methodDefs);
         return Collections.unmodifiableMap(methodDefs);

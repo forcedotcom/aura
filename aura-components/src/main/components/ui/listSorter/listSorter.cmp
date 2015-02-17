@@ -43,6 +43,8 @@
 	<aura:handler name="change" value="{!v.visible}" action="{!c.onVisible}" />
 	<aura:handler name="refresh" action="{!c.refresh}" />
 	
+	<aura:dependency resource="markup://ui:menuTriggerLink" type="COMPONENT"/>
+	
 	<div>
 		<div aura:id="trigger">
 	        {!v.trigger}

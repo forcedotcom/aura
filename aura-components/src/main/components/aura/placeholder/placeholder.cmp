@@ -23,5 +23,6 @@
     <aura:attribute name="attributes" type="Object"/>
     <aura:attribute name="loaded" type="Boolean" default="false"/>
     <aura:attribute name="exclusive" type="Boolean" default="false"/>
+    <aura:dependency resource="markup://aura:text" type="COMPONENT"/>
     {!v.body}
 </aura:component>

@@ -29,6 +29,7 @@
 
 	<aura:dependency resource="markup://ui:panelDialog" />
 	<aura:dependency resource="markup://ui:hidePanel" type="EVENT" />
+	<aura:dependency resource="markup://ui:button" type="COMPONENT"/>
 	
 	<div aura:id="container" class="{! 'dialog-wrapper ' + $Browser.formFactor}">
 	</div>

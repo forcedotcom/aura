@@ -44,10 +44,11 @@ var AuraStorageService = function(){
          * @param {number} defaultAutoRefreshInterval Specifies the default interval in seconds after which cached data is to be refreshed.
          * @param {Boolean} debugLoggingEnabled Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
          * @param {Boolean} clearStorageOnInit Set to true to clear storage when storage is initialized.
+         * @param {String} [version] The version to associate all storage items.
          * @memberOf AuraStorageService
          * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
          */
-        initStorage : function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
+        initStorage : function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version) {
         	if (storages[name]) {
         		$A.error("Storage named '" + name + "' already exists!");
         	}
@@ -61,7 +62,8 @@ var AuraStorageService = function(){
         		"defaultExpiration": defaultExpiration, 
         		"defaultAutoRefreshInterval": defaultAutoRefreshInterval, 
         		"debugLoggingEnabled": debugLoggingEnabled, 
-        		"clearStorageOnInit": clearStorageOnInit
+        		"clearStorageOnInit": clearStorageOnInit,
+                "version": version
         	};
         	
         	var storage = new AuraStorage(config);

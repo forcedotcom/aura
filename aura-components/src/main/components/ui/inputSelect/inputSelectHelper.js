@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 ({
-    /**
+    init: function(cmp) {
+		var currentValue = cmp.get("v.value");
+
+		if (!$A.util.isUndefined(currentValue)) {
+			// if a "value" attribute is specified on initial render, it should win over what the individual options report
+			this.updateOptionsFromValue(cmp);
+		} else {
+			// otherwise update the "value" attribute based on the options that claim to be selected
+			this.updateValueFromOptions(cmp);
+		}
+	},
+
+	/**
      * Iterates over the options in the select element and returns a semicolon-delimited string of the selected values
      */
     getDomElementValue : function (el) {
@@ -268,7 +280,7 @@
      * }
      */
     renderOptions: function(cmp) {
-    	var options = cmp.getConcreteComponent().get("v.options"),
+    	var options = cmp.get("v.options"),
 			select = cmp.find("select").getElement(),
 			optFrag, option, internalText;
 

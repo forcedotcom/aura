@@ -1,23 +1,35 @@
 {
         "manifest_version":2,
 	"name": "Aura Inspector",
-	"version": "0.4",
+	"version": "0.6",
 	"description": "For inspecting Aura apps",
 	"update_url": "http://download.auraframework.org/aura-inspector/aura-inspector-updates.xml",
 	"icons": {
-		"16": "icon16.png",
-		"48": "icon48.png",
-		"128": "icon128.png"
+		"16": "images/icon16.png",
+		"48": "images/icon48.png",
+		"128": "images/icon128.png"
 	},
 	"background": {
                 "scripts" : [ "background.js" ]
         },
+    "web_accessible_resources": [
+    	"AuraInspectorInjectedScript.js"
+    ],
 	"devtools_page": "devtools.html",
 	"content_scripts": [{
-		"matches": ["http://*/*", "https://*/*"],
+		//"matches": ["http://*/*", "https://*/*"],
+        "matches": ["*://*/*cmp*", "*://*/*app*"],
+		// "matches": [
+		// 	"http://localhost/*",
+		// 	"http://*.salesforce.com/*",
+		// 	"http://*.force.com/*"
+		// ],
 		"js": ["contentScript.js"],
 		"run_at": "document_idle",
 		"all_frames": false
 	}],
-	"permissions": ["tabs", "background"]
+	"permissions": [
+		"tabs", 
+		"background"
+	]
 }

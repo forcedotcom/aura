@@ -974,7 +974,7 @@ if(!this.concreteComponentId) {
                 __proto__ : null
             };
             ret["descriptor"] = cmp.getDef().getDescriptor().toString();
-            ret["globalId"] = cmp.priv.globalId;
+            ret["globalId"] = cmp.getGlobalId();
             ret["localId"] = cmp.getLocalId();
             ret["rendered"] = cmp.isRendered();
             ret["valid"] = cmp.isValid();
@@ -984,7 +984,9 @@ if(!this.concreteComponentId) {
             if (model) {
                 ret["model"] = this.output(model, cmp.getAttributeValueProvider(), serialized, depth);
             }
-            ret["attributeValueProvider"] = this.output(cmp.getAttributeValueProvider(),
+            var vp = cmp.getAttributeValueProvider();
+            var concrete = vp instanceof PassthroughValue ? vp : vp.getConcreteComponent();
+            ret["attributeValueProvider"] = this.output(concrete,
                 cmp.getAttributeValueProvider(), serialized, depth);
 
             var superComponent = cmp.getSuper();
@@ -992,7 +994,7 @@ if(!this.concreteComponentId) {
                 ret["super"] = this.output(superComponent, cmp, serialized, depth);
             } else if (superComponent) {
                 ret["super"] = {
-                        LAZY : superComponent.priv.globalId
+                        LAZY : superComponent.getGlobalId()
                 };
             }
             var attributeDefs = cmp.getDef().getAttributeDefs();
@@ -2241,8 +2243,7 @@ Component.prototype.toString = function() {
  * @private
  */
 Component.prototype.toJSON = function() {
-
-    return $A.util.json.encode(this.priv.output(this));
+	return $A.util.json.encode(this.priv.output(this));
 };
 
 /**

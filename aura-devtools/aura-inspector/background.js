@@ -1,84 +1,139 @@
-var AuraInspector = {
-    
-    frameStartTime : 0,
-    
-    tabs : {},
-    
-    ports : {},
+(function(global) {
 
-    subscriptions : {},
+    var backgroundPage = new AuraInspectorBackgroundPage();
+        backgroundPage.init();
 
-    connect : function(port){
-        var tab = port.sender.tab;
-        if(port.name){
-            AuraInspector.ports[port.name] = port;
-        }else if(tab){
-            var tabId = tab.id;
-            var tabInfo = AuraInspector.tabs[tabId];
-            if(!tabInfo){
-                tabInfo = {sources : {}};
-                AuraInspector.tabs[tabId] = tabInfo;
+    function AuraInspectorBackgroundPage() {
+        // Chrome Tabs
+        var tabs = new Map();
+        // Dev Tool Panels to send messages to
+        var ports = new Map();
+        // Messages we are queuing up till the dev tools panel is launched.
+        var stored = new Map();
+
+        var MAX_QUEUE_LENGTH = 100000;
+
+        this.init = function() {
+            chrome.runtime.onConnect.addListener(BackgroundPage_OnConnect.bind(this));
+            // onSuspend?
+        };
+
+        function BackgroundPage_OnConnect(port) {
+            if(port.name){
+                // Dev tool panel
+                ports.set(port.name, port);
+            } else {
+                // Chrome Tab
+                var tabId = port.sender.tab.id;
+                createTabInfo(tabId);
+
+                // chrome.tabs.executeScript(port.sender.tab.id,
+                //     { file: "injectedScript.js" }
+                // );
             }
-            tabInfo.port = port;
+
+            // I feel like this might not want to be added if we've already added it.
+            port.onMessage.addListener(BackgroundPage_OnMessage.bind(this));
+            port.onDisconnect.addListener(ConnectedPort_OnDisconnect.bind(this));
         }
-        port.onMessage.addListener(AuraInspector.handleMessage);
+
+        function ConnectedPort_OnDisconnect(port) {
+            var tab = port.sender.tab;
+
+            if(port.name){
+                // Dev Tool
+                ports.delete(port.name);
+            }
+
+            // Currently we are not deleting the tracking of the tab. We really should.
+            //  else {
+            //     // Chrome Tab
+            //     tabs.delete(tab.id); 
+            // }
+
+            // Don't just build up a bunch of messages for tabs that have been unloaded
+            if(tab) {
+                stored.delete(tab.id); 
+            }
+        }
+
+        function BackgroundPage_OnMessage(message, event) {
+            if(message.subscribe){
+                var port = typeof message.port == "string" ? ports.get(message.port) : message.port;
+                var tabId = message.tabId;
+                var tabInfo = getTabInfo(tabId);
+                    tabInfo.port = port;
+
+                for(var i=0;i<message.subscribe.length;i++){
+                    var type = message.subscribe[i];
+                    var sub = tabInfo.subscriptions.has(type);
+                    if(!sub){
+                        tabInfo.subscriptions.add(type);
+                    }
+                }
+
+                if(stored.has(tabId)) {
+                    var storedMessages = stored.get(tabId);
+                    storedMessages = storedMessages.filter(function(message) {
+                        if(tabInfo.subscriptions.has(message.action)) {
+                            passMessageToDevTools(message, tabId);
+                            // Filter out
+                            return false;
+                        }
+                        // Stay stored
+                        return true;
+                    });
+
+                    if(storedMessages.length) {
+                        stored.set(tabId, storedMessages);                        
+                    } else {
+                        stored.delete(tabId);
+                    }
+                }
+            }else{
+                passMessageToDevTools(message, event.sender.tab.id)
+            }
+        }
+
+        function passMessageToDevTools(message, tabId) {
+            var tabInfo = getTabInfo(tabId);
+
+            // Dev tools may not be open yet
+            if(!tabInfo.port) {
+                if(!stored.has(tabId)) {
+                    stored.set(tabId, []);
+                }
+                var queue = stored.get(tabId);
+                    queue.push(message);
+                if(queue.length > MAX_QUEUE_LENGTH) {
+                    queue.shift();
+                }
+
+                return;
+            }
+
+            var subscriptions = tabInfo.subscriptions.has(message.action);
+            if(tabInfo.subscriptions.has(message.action)){
+                tabInfo.port.postMessage(message);
+            }
+        }
+
+
+        function getTabInfo(tabId) {
+            return tabs.get(tabId);
+        }
+
+        // If it doesn't exist, create it
+        function createTabInfo(tabId) {
+            var tabInfo = tabs.get(tabId);
             
-    },
-    
-    handleMessage : function(message){
-        if(message.subscribe){
-            var port = message.port;
-            for(var i=0;i<message.subscribe.length;i++){
-                var type = message.subscribe[i];
-                var sub = AuraInspector.subscriptions[type];
-                if(!sub){
-                    sub = [];
-                    AuraInspector.subscriptions[type] = sub;
-                }
-                sub.push(port);
+            if(!tabInfo){
+                tabInfo = { subscriptions : new Set() };
+                tabs.set(tabId, tabInfo);
             }
-        }else{
-            var str = "";
-            for (x in message) {
-                str += x+" = "+message[x]+"\n";
-            }
-            var action = AuraInspector.actions[message.action];
-            if(action){
-                action(message.params);
-            }
-            var subscriptions = AuraInspector.subscriptions[message.action];
-            if(subscriptions){
-                for(var j=0;j<subscriptions.length;j++){
-                    var port = AuraInspector.ports[subscriptions[j]];
-                    port.postMessage(message);
-                }
-            }
+            return tabInfo;
         }
-    },
-    
-    actions : {
-        requestComponentTree : function(params){
-            chrome.tabs.getSelected(undefined, function(tab){
-                var port = AuraInspector.tabs[tab.id].port;
-                if (port) {
-                    port.postMessage({action : "getComponentTree"});
-                } else {
-                    alert("Failed to access tab="+tab.id);
-                }
-            });
-        },
 
-        highlightElements : function(globalId){
-            chrome.tabs.getSelected(undefined, function(tab){
-                var port = AuraInspector.tabs[tab.id].port;
-                if (port) {
-                    port.postMessage({action : "highlightElements", params : globalId});
-                } else {
-                    alert("Failed to access tab="+tab.id);
-                }
-            });
-        }
     }
-};
 
-chrome.extension.onConnect.addListener(AuraInspector.connect);
+})(this);

@@ -1,0 +1,134 @@
+
+/* Just some base styles not needed for example to function */
+*, html { font-family: Verdana, Arial, Helvetica, sans-serif; }
+
+body, form, ul, li, p, h1, h2, h3, h4, h5 { margin: 0; padding: 0; }
+body { background-color: #fefefe; color: #111; margin: 0; }
+img { border: none; }
+p { font-size: 1em; margin: 0 0 1em 0; }
+input, select, textarea, th, td { font-size: 1em; }
+
+/* General Structure */
+header.tabs { padding: .6em 0 0 1em; background: #F0F1F2; margin: 0; }
+header.tabs button { background: #F5F6F7; border: 1px solid #DADEE2; border-bottom: 0px none; margin-right: .2em; }
+header.tabs button:focus { outline: 1px solid #FF9F05; }
+header.tabs button.selected { background: #fff; }
+section.tab-body.selected { display: block; }
+section.tab-body { display: none; width: 100%; }
+body.sidebar-visible section.tab-body { width: 75%; }
+body .sidebar { display: none; }
+body.sidebar-visible .sidebar { display: block; }
+
+/* Generic TreeView Rules */
+.tree-view {}
+.tree-view li { cursor: pointer; }
+.tree-view li > span:hover { border-bottom: 1px solid #999;}
+
+/* General Component Styling */
+.component-property { color: maroon;}
+.component-property-value { color: #333; margin: 0 0 0 3px; }
+.component-facet-property { color: maroon; }
+.component-tagname { color: blue; }
+.component-attribute { color: purple; }
+.component-array-length { color: teal; font-size: .9em; font-style: normal; }
+
+/* Component Tree */
+.component-tree { margin: 0 0 0 1em; padding: 0}
+.component-tree li ul { margin: .1em 0 .1em 1em; }
+.component-tree li { list-style: none; }
+.component-tree-settings { border-bottom: 1px solid #F0F1F2; padding: .5em; }
+.component-tree-settings #refresh-button { border: 1px solid #DADEE2; background: #F5F6F7; }
+.component-tree-settings #refresh-button span {}
+
+/* Event Log */
+.event-log { list-style-type: none; margin: 1em 0 0 1em; padding: 0; }
+.event-log li { list-style: none; }
+.event-log-timestamp::before { content: "[";}
+.event-log-timestamp::after { content: "]"; margin: 0 3px 0 0; }
+.event-log-timestamp { color: maroon; }
+
+/* Component View */
+.component-view { position: absolute; width: 25%; top: 0; right: 0; bottom: 0; background: #fff; opacity: .8; border-left: 1px solid #efefef;}
+.component-view ul { margin: 0; padding: 0;  }
+.component-view ul li { list-style: none; padding: .1em 0 0 0; text-indent: .5em }
+.component-view ul li li { list-style: square inside; padding: 0 0 0 1em;}
+.component-view h3 { background: #DFDFDF; font-weight: bold; font-size: 1em; font-family: 'Lucida Grande', 'Consolas', 'sans-serif'; padding: .2em; margin-top: .2em; }
+
+/* Performance Tab */
+#flamechart { position: relative; width: 100%; height: 90%;}
+
+/*	
+
+.label{
+	color : #333399;
+}
+
+LI UL {
+	margin: .1em 0 .1em 1em;
+}
+
+ol.tree
+{
+	padding: 0 0 0 30px;
+	width: 900px;
+	border: 1px dashed #999;
+}
+li 
+{ 
+	position: relative; 
+	margin-left: -15px;
+	list-style: none;
+}
+li.file
+{
+	margin-left: -1px !important;
+}
+li.file a
+{
+	background: url(document.png) 0 0 no-repeat;
+	color: #fff;
+	padding-left: 21px;
+	text-decoration: none;
+	display: block;
+}
+li.file a[href *= '.pdf']	{ background: url(document.png) 0 0 no-repeat; }
+	li.file a[href *= '.html']	{ background: url(document.png) 0 0 no-repeat; }
+	li.file a[href $= '.css']	{ background: url(document.png) 0 0 no-repeat; }
+	li.file a[href $= '.js']		{ background: url(document.png) 0 0 no-repeat; }
+	li input
+{
+	position: absolute;
+	left: 0;
+	margin-left: 0;
+	opacity: 0;
+	z-index: 2;
+	cursor: pointer;
+	height: 1em;
+	width: 1em;
+	top: 0;
+}
+li input + ol
+{
+	background: url(toggle-small-expand.png) 40px 0 no-repeat;
+	margin: -0.938em 0 0 -44px; /* 15px 
+	height: 1em;
+}
+li input + ol > li { display: none; margin-left: -14px !important; padding-left: 1px; }
+li label
+{
+	cursor: pointer;
+	display: block;
+	padding-left: 11px;
+}
+
+li input:checked + ol
+{
+	background: url(toggle-small.png) 40px 5px no-repeat;
+	margin: -1.25em 0 0 -44px; /* 20px 
+	padding: 1.563em 0 0 80px;
+	height: auto;
+}
+li input:checked + ol > li { display: block; margin: 0 0 0.125em;  /* 2px }
+li input:checked + ol > li:last-child { margin: 0 0 0.063em; /* 1px  }
+*/
+

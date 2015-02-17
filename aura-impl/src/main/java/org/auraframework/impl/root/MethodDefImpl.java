@@ -17,6 +17,7 @@ package org.auraframework.impl.root;
 
 import com.google.common.collect.Lists;
 import org.auraframework.def.*;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -103,11 +104,6 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
         }
     }
 
-    @Override
-    public void validateReferences() throws QuickFixException {
-        // HALO: JBUCH: TODO: DO I VALIDATE THE ACTION HERE? EXPECTING {!c.actionName}, (OR POSSIBLE PRV EXPRESSION?)
-    }
-
     /**
      * @return Returns the parentDescriptor.
      */
@@ -140,12 +136,12 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
      */
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) {
-        return other.equals(descriptor);
+        return DefDescriptorImpl.compare(descriptor, other) == 0;
     }
 
     @Override
     public List<DefDescriptor<?>> getBundle() {
-        return Lists.newArrayList();
+        return Collections.EMPTY_LIST;
     }
 
     @Override

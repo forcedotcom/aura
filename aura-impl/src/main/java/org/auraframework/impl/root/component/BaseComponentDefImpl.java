@@ -375,7 +375,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         for (DefDescriptor<InterfaceDef> intf : interfaces) {
-            InterfaceDef interfaceDef = intf.getDef();
+            InterfaceDef interfaceDef = Aura.getDefinitionService().getDefinition(intf);
             if (interfaceDef == null) {
                 throw new DefinitionNotFoundException(intf, getLocation());
             }

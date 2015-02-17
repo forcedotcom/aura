@@ -41,7 +41,9 @@ public class ProtoComponentImpl implements Component {
     }
 
     @Override
-    public AttributeSet getAttributes() { return attributes; }
+    public AttributeSet getAttributes() {
+        return attributes;
+    }
 
     @Override
     public DefDescriptor<ComponentDef> getDescriptor() {

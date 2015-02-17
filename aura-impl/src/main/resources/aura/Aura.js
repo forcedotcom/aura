@@ -126,6 +126,7 @@ var clientService;
 $A.ns.Aura = function() {
     this.util = new $A.ns.Util();
     this["util"] = this.util;
+    this.globalValueProviders={};
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this.test = new $A.ns.Test();
     this["test"] = this.test;
@@ -618,6 +619,7 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
     if (!this["finishedInit"]) {
         $A.Perf.mark("Aura.finishInit");
         $A.util.removeClass(document.body, "loading");
+        delete $A.globalValueProviders;
 
         $A.Perf.endMark("Aura.finishInit");
         if (doNotCallUIPerfOnLoad) {
@@ -901,8 +903,14 @@ $A.ns.Aura.prototype.addValueProvider=function(type,valueProvider){
     $A.assert(type.charAt(0)==='$',"$A.addValueProvider(): 'type' must start with '$'.");
     $A.assert(",$browser,$label,$locale,".indexOf(","+type.toLowerCase()+",")==-1,"$A.addValueProvider(): '"+type+"' is a reserved valueProvider.");
     $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"$A.addValueProvider(): 'valueProvider' is required.");
-    $A.assert(this.getValueProvider(type)==null,"$A.addValueProvider(): '"+type+"' has already been registered.");
-    this.getContext().addGlobalValueProvider(type,valueProvider);
+    var context=this.getContext();
+    if(context){
+        $A.assert(this.getValueProvider(type)==null,"$A.addValueProvider(): '"+type+"' has already been registered.");
+        context.addGlobalValueProvider(type,valueProvider);
+    }else{
+        $A.assert(this.globalValueProviders[type]==null,"$A.addValueProvider(): '"+type+"' has already been registered.");
+        this.globalValueProviders[type]=valueProvider;
+    }
 };
 
 /**

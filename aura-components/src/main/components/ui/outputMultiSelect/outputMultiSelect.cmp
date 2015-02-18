@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays multiple values from a list of options.">
+<aura:component implements="ui:visible" extensible="true" support="GA" description="Displays multiple values from a list of options.">
     <aura:attribute name="value" type="String[]" required="true" description="An array of string values representing the selected options."/>
     <aura:attribute name="delimiter" type="String" default="; " description="The symbol or character used to separate the selected options. Default value is &#8220;; &#8221;."/>
     <span aura:id='span' class="{!v.class}"></span>

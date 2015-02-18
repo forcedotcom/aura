@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" support="GA"
+<aura:component implements="ui:outputDateComponent, ui:visible" extensible="true" support="GA"
     access="GLOBAL" description="Displays a date, time in a specified or default format based on the user's locale.">
       
     <aura:attribute name="timezone" type="String" default="{!$Locale.timezone}" access="GLOBAL" description="The timezone ID, for example, America/Los_Angeles."/>

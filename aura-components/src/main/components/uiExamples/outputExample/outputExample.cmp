@@ -27,13 +27,13 @@
 
 	<ui:button label="Change" press="{!c.change}" />
 	<div class="row"><ui:outputText value="{!v.myText}" label="outputText"/> </div>  
-	<div class="row"><ui:outputNumber value="{!v.myNum}" label="outputNumber" format=".00"/></div>
-	<div class="row"><ui:outputCurrency aura:id="curr" value="{!v.myCurr}" label="outputCurrency" /></div>
-	<div class="row"><ui:outputCheckbox value="{!v.myBool}" label="outputCheckbox"/></div>
-	<div class="row"><ui:outputDate value="{!v.myDate}" label="outputDate"/></div>
-	<div class="row"><ui:outputDateTime value="{!v.myDateTime}" label="outputDateTime"/></div>
+	<div class="row"><ui:outputNumber value="{!v.myNum}" format=".00"/></div>
+	<div class="row"><ui:outputCurrency aura:id="curr" value="{!v.myCurr}"/></div>
+	<div class="row"><ui:outputCheckbox value="{!v.myBool}"/></div>
+	<div class="row"><ui:outputDate value="{!v.myDate}"/></div>
+	<div class="row"><ui:outputDateTime value="{!v.myDateTime}"/></div>
 	<div class="row"><ui:outputEmail value="abc@email.com" label="abc@email.com"/></div>
-	<div class="row"><ui:outputPhone value="415-123-4567" label="outputPhone"/></div>
+	<div class="row"><ui:outputPhone value="415-123-4567"/></div>
 	<div class="row"><ui:outputTextArea value="{!v.myTextArea}" label="my output"/></div>
 	<div class="row"><ui:outputURL value="{!v.myURL}" label="{!v.myURL}"/></div>
 </aura:component>

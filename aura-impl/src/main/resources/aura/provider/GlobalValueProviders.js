@@ -29,7 +29,12 @@ $A.ns.GlobalValueProviders = function (gvp, initCallback) {
     };
     for(var type in gvp){
         $A.assert(this.valueProviders[type]==null,"$A.globalValueProviders.ctor(): '"+type+"' has already been registered.");
-        this.valueProviders[type] = gvp[type];
+        // work around the obfuscation logic to allow external GVPs
+        var valueProvider = gvp[type];
+        valueProvider.getValues = valueProvider.getValues || valueProvider["getValues"];
+        valueProvider.get       = valueProvider.get       || valueProvider["get"];
+        valueProvider.merge     = valueProvider.merge     || valueProvider["merge"];
+        this.valueProviders[type] = valueProvider;
     }
 
     var that = this;
@@ -149,6 +154,10 @@ $A.ns.GlobalValueProviders.prototype.load = function(gvp) {
  */
 $A.ns.GlobalValueProviders.prototype.addValueProvider = function(type, valueProvider) {
     if(!this.valueProviders.hasOwnProperty(type)) {
+        // work around the obfuscation logic to allow external GVPs
+        valueProvider.getValues = valueProvider.getValues || valueProvider["getValues"];
+        valueProvider.get       = valueProvider.get       || valueProvider["get"];
+        valueProvider.merge     = valueProvider.merge     || valueProvider["merge"];
         this.valueProviders[type] = valueProvider;
     }
 };

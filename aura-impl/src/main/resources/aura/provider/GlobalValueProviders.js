@@ -16,6 +16,16 @@
 /*jslint sub: true */
 /**
  * @description Global Value Provider. Holds global values: $Label, $Browser, $Locale, etc
+ *
+ * The interface required of a global value provider is:
+ * <ul>
+ *   <li>merge: merge a set of values from the server (if values come from the server)
+ *   <li>get: get a single value from the GVP
+ *   <li>getStorableValues[optional] get a storable version of the GVP values
+ *   <li>getValues: get a set of values that can be exposed.
+ *   <li>set[optional]: set a value on the provider
+ * </ul>
+ *
  * @param {Object} gvp an optional serialized GVP to load.
  * @param {Function} initCallback an optional callback invoked after the GVP has finished its
  *  asynchronous initialization.
@@ -25,7 +35,8 @@ $A.ns.GlobalValueProviders = function (gvp, initCallback) {
     this.valueProviders = {
         "$Browser" : new $A.ns.ObjectValueProvider(),
         "$Label": new $A.ns.LabelValueProvider(),
-        "$Locale": new $A.ns.ObjectValueProvider()
+        "$Locale": new $A.ns.ObjectValueProvider(),
+        "$Global": new $A.ns.ContextValueProvider()
     };
     for(var type in gvp){
         $A.assert(this.valueProviders[type]==null,"$A.globalValueProviders.ctor(): '"+type+"' has already been registered.");
@@ -58,7 +69,7 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
     if (!gvps) {
         return;
     }
-    var valueProvider, i, storage, type, newGvp;
+    var valueProvider, i, storage, type, newGvp, values;
     var storedGvps = [];
 
     for ( i = 0; i < gvps.length; i++) {
@@ -80,9 +91,10 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         for (type in this.valueProviders) {
             if (this.valueProviders.hasOwnProperty(type)) {
                 valueProvider = this.valueProviders[type];
+                values = valueProvider.getStorableValues?valueProvider.getStorableValues():valueProvider.getValues();
                 storedGvps.push({
                     "type" : type,
-                    "values" : valueProvider.getValues()
+                    "values" : values
                 });
             }
         }

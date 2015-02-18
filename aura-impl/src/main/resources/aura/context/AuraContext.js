@@ -43,6 +43,8 @@ function AuraContext(config, initCallback) {
     this.cmp = config["cmp"];
     this.test = config["test"];
     this.contextPath = config["contextPath"] || "";
+    this.allowedGlobals = config["allowedGlobals"];
+    this.globals = config["globals"];
 
     var that = this;
     if(!config["globalValueProviders"]){
@@ -81,6 +83,7 @@ function AuraContext(config, initCallback) {
             initCallback();
         }
     });
+    this.contextGlobals = this.globalValueProviders.getValueProvider("Global");
 }
 
 /**
@@ -92,6 +95,7 @@ function AuraContext(config, initCallback) {
 AuraContext.prototype.getMode = function() {
     return this.mode;
 };
+
 
 /**
  * Adds a new global value provider.
@@ -129,6 +133,7 @@ AuraContext.prototype.encodeForServer = function() {
         "cmp" : this.cmp,
         "lastmod" : this.lastmod,
         "fwuid" : this.fwuid,
+        "globals" : this.globalValueProviders.getValueProvider("$Global").serializeForServer(),
         "test" : this.test
     });
 };
@@ -172,6 +177,9 @@ AuraContext.prototype.merge = function(otherContext) {
             $A.services.event.getEventDef(defs[i]);
         }
     }
+
+    
+    
     this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
     this.joinLoaded(otherContext["loaded"]);
 };

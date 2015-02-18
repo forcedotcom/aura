@@ -192,6 +192,14 @@ public class AuraContextFilter implements Filter {
                     throw new AuraRuntimeException(e);
                 }
             }
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> gvp = (Map<String,Object>) configMap.get("globals");
+            if (gvp != null) {
+                for (Map.Entry<String,Object> entry : gvp.entrySet()) {
+                    context.setGlobal(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
         if (!isProduction) {

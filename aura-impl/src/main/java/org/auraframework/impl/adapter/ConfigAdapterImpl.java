@@ -164,7 +164,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if (!isProduction()) {
             AuraFileMonitor.start();
         }
-
+        
+        Aura.getContextService().registerGlobal("isVoiceOver", true, false);
     }
 
     protected FileGroup newAuraResourcesHashingGroup() throws IOException {

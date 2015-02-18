@@ -117,6 +117,7 @@ var clientService;
 // #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
 // #include aura.provider.ObjectValueProvider
+//#include aura.provider.ContextValueProvider
 
 /**
  * @class Aura

@@ -1,4 +1,4 @@
-<aura:component>
+<aura:component render="client">
 <pre>
 [isTablet={!$Browser.isTablet}]
 [isPhone={!$Browser.isPhone}]
@@ -7,5 +7,9 @@
 [isIPad={!$Browser.isIPad}]
 [isIPhone={!$Browser.isIPhone}]
 [isIOS={!$Browser.isIOS}]
+
+hello
+
+[isVoiceOver={!$Global.isVoiceOver}]
 </pre>
 </aura:component>

@@ -18,6 +18,7 @@
 <aura:component extensible="true" description="A panel for dialogs. Use ui:panelManager to manage your modal panels.">
 
     <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Add listener to close on click outside"/>
+    <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Add close button in top right corner"/>
     <aura:attribute name="closeAction" type="Aura.Action" default="{!c.hide}" description="Close Aura Action function"/>
     <aura:attribute name="class" type="String" default="" description="Additional css classes"/>
     <aura:attribute name="animation" type="String" default="bottom" description="Animation to apply"/>
@@ -75,11 +76,13 @@
     	    		</ui:scroller>
     	        </div>
 
-                <ui:button class="closeBtn" press="{!c.close}"
-                	label="{!$Label.Buttons.closeWindow}"
-                	buttonTitle="{!$Label.Buttons.closeWindow}"
-                	labelDisplay="false"
-                	>&times;</ui:button>
+                <aura:if isTrue="{!v.showCloseButton}">
+                    <ui:button class="closeBtn" press="{!c.close}"
+                    	label="{!$Label.Buttons.closeWindow}"
+                    	buttonTitle="{!$Label.Buttons.closeWindow}"
+                    	labelDisplay="false"
+                    	>&times;</ui:button>
+                </aura:if>
             </div>
 	    </div>
     </div>

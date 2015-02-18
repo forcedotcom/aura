@@ -196,8 +196,8 @@ public enum UserAgent {
                 flags += 10;
             }
 
-            // If a Windows laptop with Touch support, consider it a tablet.
-            boolean isTablet = (ua.contains(UA.ARM) || ua.contains(UA.TOUCH)) && !ua.contains(UA.PHONE);
+            // If a Windows ARM device, consider it a tablet.
+            boolean isTablet = ua.contains(UA.ARM) && !ua.contains(UA.PHONE);
 
             // recent IE mobile contain "iemobile" but we don't need to add this
             // since we already need to look for "mobile" for older versions

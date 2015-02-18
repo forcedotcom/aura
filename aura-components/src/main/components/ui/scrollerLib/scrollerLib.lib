@@ -36,6 +36,7 @@
 	<aura:include name="InfiniteLoading"/>
     <aura:include name="IndicatorsPlugin"/>
     <aura:include name="SnapPlugin"/>
+    <aura:include name="VoiceOver"/>
 
     <!-- Aura Specific -->
     <aura:include name="bootstrapExtendAura"/>

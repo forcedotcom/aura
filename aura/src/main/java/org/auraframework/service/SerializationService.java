@@ -90,7 +90,7 @@ public interface SerializationService extends AuraService {
      * @throws QuickFixException
      */
 
-    void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException;
+    <T> void write(T value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException;
 
     /**
      * Serialize value to the format of the current {@link AuraContext} and
@@ -100,7 +100,7 @@ public interface SerializationService extends AuraService {
      *            {@link DefType#getPrimaryInterface()}
      * @throws IOException
      */
-    <T> void write(Object value, Map<String, Object> attributes, Class<T> type, Appendable out) throws IOException,
+    <T> void write(T value, Map<String, Object> attributes, Class<T> type, Appendable out) throws IOException,
             QuickFixException;
 
     /**
@@ -110,7 +110,7 @@ public interface SerializationService extends AuraService {
      *            {@link DefType#getPrimaryInterface()}
      * @throws IOException
      */
-    <T> void write(Object value, Map<String, Object> attributes, Class<T> type, Appendable out, String format)
+    <T> void write(T value, Map<String, Object> attributes, Class<T> type, Appendable out, String format)
             throws IOException, QuickFixException;
 
     /**
@@ -121,7 +121,7 @@ public interface SerializationService extends AuraService {
      *            {@link DefType#getPrimaryInterface()}
      * @throws IOException
      */
-    <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out)
+    <T> void writeBinary(T value, Map<String, Object> attributes, Class<T> type, OutputStream out)
             throws IOException, QuickFixException;
 
     /**
@@ -131,7 +131,7 @@ public interface SerializationService extends AuraService {
      *            {@link DefType#getPrimaryInterface()}
      * @throws IOException
      */
-    <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out, String format)
+    <T> void writeBinary(T value, Map<String, Object> attributes, Class<T> type, OutputStream out, String format)
             throws IOException, QuickFixException;
 
     /**

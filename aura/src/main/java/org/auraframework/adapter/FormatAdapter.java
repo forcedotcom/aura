@@ -39,9 +39,9 @@ public interface FormatAdapter<T> extends AuraAdapter {
 
     Collection<T> readCollection(Reader in) throws IOException, QuickFixException;
 
-    void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException;
+    void write(T value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException;
 
-    void writeBinary(Object value, Map<String, Object> attributes, OutputStream out) throws IOException,
+    void writeBinary(T value, Map<String, Object> attributes, OutputStream out) throws IOException,
             QuickFixException;
 
     void writeCollection(Collection<? extends T> values, Appendable out) throws IOException, QuickFixException;

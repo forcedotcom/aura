@@ -24,10 +24,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.AuraTestLabels;
 import org.auraframework.util.json.JsonReader;
@@ -98,7 +95,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         String app = "preloadTest:test_Preload_Cmp_SameNameSpace";
         HttpPost post = new ServerAction("aura://ComponentController/ACTION$getApplication", null)
             .putParam("name", app)
-            .setContext(getAuraTestingUtil().getContext(Mode.DEV, Format.JSON, app, ApplicationDef.class, false))
+            .setApp("preloadTest:test_Preload_Cmp_SameNameSpace", ApplicationDef.class)
             .getPostMethod();
         HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
@@ -121,11 +118,9 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> attribute = Maps.newHashMap();
         Object val = "mockRecordLayout"; 
         attribute.put("whatToDo", val); 
-        String ctx = getAuraTestingUtil().getContext(Mode.DEV, Format.JSON, cmp, ComponentDef.class, false);
-        String newctx = ctx.replace("\"dn\":[]", "\"dn\":[\"rl_001_VIEW_ACCOUNT_HASH\"]");
         HttpPost post = new ServerAction("aura://ComponentController/ACTION$getComponent", null)
             .putParam("name", cmp).putParam("attributes", attribute)
-            .setContext(newctx)
+            .addDynamicName("rl_001_VIEW_ACCOUNT_HASH")
             .getPostMethod();
         HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);

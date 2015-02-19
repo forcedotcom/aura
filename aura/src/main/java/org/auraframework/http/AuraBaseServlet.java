@@ -53,7 +53,6 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
@@ -459,29 +458,17 @@ public abstract class AuraBaseServlet extends HttpServlet {
         ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
 
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-        StringBuilder sb = new StringBuilder();
 
         // add app theme to the context. we do this here so that when the context is serialized below it includes the
         // app themes. This ensures ALL applicable themes are part of the url, making client-side caching more
         // predictable
         context.addAppThemeDescriptors();
 
-        boolean originalSerializeThemes = context.getSerializeThemes();
-        context.setSerializeThemes(true);
-        try {
-            Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-        context.setSerializeThemes(originalSerializeThemes);
-
-        String contextJson = AuraTextUtil.urlencode(sb.toString());
-        defs.append(contextJson);
+        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Theme));
         defs.append("/app.css");
         ret.add(defs.toString());
 
-        return new ArrayList<String>(ret);
+        return new ArrayList<>(ret);
     }
 
     /**
@@ -516,7 +503,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         // framework js should be after other client libraries
         ret.add(config.getAuraJSURL());
 
-        return new ArrayList<String>(ret);
+        return new ArrayList<>(ret);
     }
 
     public static List<String> getNamespacesScripts(AuraContext context) throws QuickFixException {
@@ -524,16 +511,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         List<String> ret = Lists.newArrayList();
 
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-
-        String contextJson = AuraTextUtil.urlencode(sb.toString());
-        defs.append(contextJson);
+        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
         defs.append("/app.js");
 
         ret.add(defs.toString());
@@ -542,13 +520,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     @Override
-    public void init(ServletConfig config) {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
     }
 
     /**
      * Sets mandatory headers, notably for anti-clickjacking.
      */
-    protected void setBasicHeaders(DefDescriptor top, HttpServletRequest req, HttpServletResponse rsp) {
+    protected void setBasicHeaders(DefDescriptor<?> top, HttpServletRequest req, HttpServletResponse rsp) {
         ContentSecurityPolicy csp = Aura.getConfigAdapter().getContentSecurityPolicy(
                 top == null ? null : top.getQualifiedName(), req);
 

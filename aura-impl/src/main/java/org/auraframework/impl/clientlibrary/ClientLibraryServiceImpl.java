@@ -308,17 +308,7 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
     private static String getResourcesPath(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException {
         String contextPath = context.getContextPath();
         StringBuilder path = new StringBuilder(contextPath).append("/l/");
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-
-        String contextJson = AuraTextUtil.urlencode(sb.toString());
-        path.append(contextJson).append("/resources.").append(type.toString().toLowerCase());
-
+        path.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal)).append("/resources.").append(type.toString().toLowerCase());
         return path.toString();
     }
 

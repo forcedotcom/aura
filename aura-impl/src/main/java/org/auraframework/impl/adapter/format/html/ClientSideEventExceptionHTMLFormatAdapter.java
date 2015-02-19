@@ -42,7 +42,7 @@ public class ClientSideEventExceptionHTMLFormatAdapter extends HTMLFormatAdapter
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+    public void write(ClientSideEventException value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
 
         Map<String, Object> attribs = Maps.newHashMap();

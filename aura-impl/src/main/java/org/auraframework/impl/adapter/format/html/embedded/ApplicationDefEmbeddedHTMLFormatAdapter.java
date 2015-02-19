@@ -52,14 +52,13 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
     }
 
     @Override
-    public void write(Object value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
+    public void write(ApplicationDef value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         InstanceService instanceService = Aura.getInstanceService();
         RenderingService renderingService = Aura.getRenderingService();
-        ApplicationDef def = (ApplicationDef) value;
         AuraContext context = Aura.getContextService().getCurrentContext();
 
         try {
-            ComponentDef templateDef = def.getTemplateDef();
+            ComponentDef templateDef = value.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
@@ -75,7 +74,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
             attributes.put("auraScriptTags", sb.toString());
             Map<String, Object> auraInit = Maps.newHashMap();
 
-            Application instance = instanceService.getInstance(def, null);
+            Application instance = instanceService.getInstance(value, null);
 
             auraInit.put("instance", instance);
             auraInit.put("token", AuraBaseServlet.getToken());

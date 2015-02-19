@@ -51,7 +51,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -154,7 +153,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         Header[] headers = response.getHeaders("Content-Security-Policy");
         assertEquals("wrong number of CSP header lines", 1, headers.length);
         String[] split = headers[0].getValue().split(";");
-        Map<String, String> csp = new HashMap<String, String>();
+        Map<String, String> csp = new HashMap<>();
         for (String term : split) {
             term = term.trim();
             String word = term.substring(0, term.indexOf(' '));
@@ -317,16 +316,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-     * This gets a simple context string that uses a single preload.
-     */
-    protected String getSimpleContext(Format format, boolean modified)
-            throws Exception {
-        return getAuraTestingUtil().getContext(Mode.DEV, format,
-                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class,
-                modified);
-    }
-
-    /**
      * Given the a path on the api server, return a {@link HttpPost} that has the appropriate headers and server name.
      *
      * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
@@ -449,7 +438,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     .getValue()));
         }
         urlparams.add(new BasicNameValuePair("aura.context",
-                getAuraTestingUtil().getContext(mode, format, desc, false)));
+                getAuraTestingUtil().getContextURL(mode, format, desc, false)));
         String query = URLEncodedUtils.format(urlparams, "UTF-8");
 
         // final url Request to be send to server
@@ -459,39 +448,36 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     public class ServerAction implements Action {
 
         private final ArrayList<String> qualifiedName;
-        private ArrayList<Map<String, Object>> actionParams;
+        private List<Map<String, Object>> actionParams = new ArrayList<>();
         private State state = State.NEW;
         private Object returnValue;
         private List<Object> errors;
         private HttpPost post;
         private String rawResponse;
-        private String contextValue;
-        private ArrayList<State> stateList = new ArrayList<>();
-        private ArrayList<List<Object>> errorsList = new ArrayList<>();
-        private ArrayList<Object> returnValueList = new ArrayList<>();
-        
+        private List<State> stateList = new ArrayList<>();
+        private List<List<Object>> errorsList = new ArrayList<>();
+        private List<Object> returnValueList = new ArrayList<>();
+        private List<String> dn = new ArrayList<>();
+        private DefDescriptor<? extends BaseComponentDef> app;
+        private Mode mode = Mode.DEV;
 
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
             this.qualifiedName = new ArrayList<>();
             this.qualifiedName.add(qualifiedName);
-            this.actionParams = new ArrayList<>();
             if(actionParams != null) {
                 this.actionParams.add(actionParams);
             } else {
                 this.actionParams.add(null);
             }
-            
-            
         }
+
         /**
          * Constructor for Server action using two array lists
          * Note that each list must be of equal length or will throw an IllegalArgumentException
          * @param qualifiedName
          * @param actionParams
          */
-        
         public ServerAction(ArrayList<String> qualifiedName, ArrayList<Map<String,Object>> actionParams) {
-            
             this.qualifiedName = qualifiedName;
             this.actionParams = actionParams;
             if(qualifiedName == null || actionParams == null) {
@@ -509,7 +495,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
          * @param value Object of action parameter
          * @return Returns instance of Server Action
          */
-
         public ServerAction putParam(String name, Object value) {
             if (actionParams.get(0) == null) {
                 actionParams.add(0,Maps.newHashMap(new HashMap<String,Object>()));
@@ -517,6 +502,17 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             actionParams.get(0).put(name, value);
             return this;
         }
+
+        public ServerAction addDynamicName(String name) {
+            dn.add(name);
+            return this;
+        }
+
+        public ServerAction setApp(String name, Class<? extends BaseComponentDef> clazz) {
+            app = Aura.getDefinitionService().getDefDescriptor(name, clazz);
+            return this;
+        }
+
         /**
          * Will insert the given key-value pair as a parameter for the given qualified name.
          * Throws IllegalArguementException if qualified name is not found.
@@ -526,7 +522,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
          * @param value Object of the action parameter
          * @return Returns instance of Server Action
          */
-        
         public ServerAction putParamUsingQName(String qualifiedName, String name, Object value) {
             int index = this.qualifiedName.indexOf(qualifiedName);
             if(index<0){
@@ -539,14 +534,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             return this;
         }
 
-        public ServerAction setContext(String value) {
-            contextValue = value;
-            return this;
-        }
-
         public HttpPost getPostMethod() throws Exception {
             if (post == null) {
-                
                 Map<String, Object> message = Maps.newHashMap();
                 ArrayList<Map<String,Object>> actionInstanceArray = new ArrayList<>();
                 for(int i = 0;i<qualifiedName.size();i++){
@@ -557,25 +546,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     }
                     actionInstanceArray.add(actionInstance);
                 }
+                if (app == null) {
+                    app = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+                }
                 message.put("actions", actionInstanceArray.toArray());
                 String jsonMessage = Json.serialize(message);
                 Map<String, String> params = Maps.newHashMap();
                 params.put("message", jsonMessage);
                 params.put("aura.token", getTestServletConfig().getCsrfToken());
 
-                if (contextValue != null) {
-                    params.put("aura.context", contextValue);
-                } else {
-                    AuraContext context = Aura.getContextService().getCurrentContext();
-                    if (context != null) {
-                        StringBuilder sb = new StringBuilder();
-                        context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
-                        Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-                        params.put("aura.context", sb.toString());
-                    } else {
-                        params.put("aura.context", getSimpleContext(Format.JSON, false));
-                    }
-                }
+                params.put("aura.context", getAuraTestingUtil().buildContextForPost(mode, app, null, dn));
                 post = obtainPostMethod("/aura", params);
             }
             return post;
@@ -662,7 +642,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             return returnValue;
         }
         
-        public ArrayList<Object> getReturnValueList() {
+        public List<Object> getReturnValueList() {
             return returnValueList;
         }
 
@@ -671,7 +651,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             return state;
         }
         
-        public ArrayList<State> getStateList() {
+        public List<State> getStateList() {
             return stateList;
         }
 
@@ -680,7 +660,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             return errors;
         }
         
-        public ArrayList<List<Object>> getErrorsList() {
+        public List<List<Object>> getErrorsList() {
             return errorsList;
         }
 

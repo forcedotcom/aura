@@ -40,7 +40,7 @@ import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.ServiceLocatorMocker;
 import org.auraframework.test.annotation.ThreadHostileTest;
@@ -205,7 +205,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
-        params.put("aura.context", getSimpleContext(Format.JSON, false));
+
+        DefDescriptor<ApplicationDef> app = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app));
 
         HttpPost post = obtainPostMethod("/aura", params);
         HttpResponse httpResponse = perform(post);
@@ -217,8 +219,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
         }
-        new JsonReader().read(response
-                .substring(AuraBaseServlet.CSRF_PROTECT.length()));
+        new JsonReader().read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
     }
 
     /**
@@ -242,7 +243,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
-        params.put("aura.context", getSimpleContext(Format.JSON, true));
+        DefDescriptor<ApplicationDef> app = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        String fwuid = getAuraTestingUtil().modifyUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app, null, fwuid, null, null));
 
         HttpPost post = obtainPostMethod("/aura", params);
         HttpResponse httpResponse = perform(post);
@@ -255,7 +258,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                     HttpStatus.SC_OK, response));
         }
 
-        assertTrue("response not wrapped with ERROR marker",
+        assertTrue("response not wrapped with ERROR marker: "+response,
                 response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
         response = response.substring(AuraBaseServlet.CSRF_PROTECT.length() + 2,
                 response.length() - "/*ERROR*/".length());

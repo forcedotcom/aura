@@ -39,11 +39,10 @@ public class SVGFormatAdapter extends BaseFormatAdapter<SVGDef> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+    public void write(SVGDef value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
-        SVGDef def = (SVGDef) value;
-        if (def != null) {
-            out.append(def.getContents());
+        if (value != null) {
+            out.append(value.getContents());
         }
     }
 }

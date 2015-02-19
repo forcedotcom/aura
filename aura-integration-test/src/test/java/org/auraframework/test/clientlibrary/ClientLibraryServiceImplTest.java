@@ -415,8 +415,9 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(resourceUrl.startsWith("/l/"));
         assertTrue(resourceUrl.endsWith(suffix));
         resourceUrl = resourceUrl.substring("/l/".length(), resourceUrl.length() - suffix.length());
+        Object config = new JsonReader().read(resourceUrl);
         @SuppressWarnings("unchecked")
-        Map<String, Object> configMap = (Map<String, Object>) new JsonReader().read(resourceUrl);
+        Map<String, Object> configMap = (Map<String, Object>) config;
         assertEquals(desc.getDescriptorName(), configMap.get("app"));
     }
 

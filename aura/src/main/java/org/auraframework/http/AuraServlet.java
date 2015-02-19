@@ -97,7 +97,7 @@ public class AuraServlet extends AuraBaseServlet {
     private static final long serialVersionUID = 2218469644108785216L;
 
     protected final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
-    private static final EnumParam<DefType> defTypeParam = new EnumParam<DefType>(AURA_PREFIX + "deftype", false,
+    private static final EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
             DefType.class);
     private final static StringParam messageParam = new StringParam("message", 0, false);
     private final static StringParam beaconParam = new StringParam("beaconData", 0, false);
@@ -195,9 +195,13 @@ public class AuraServlet extends AuraBaseServlet {
             send404(request, response);
             return;
         }
+        String nocache = nocacheParam.get(request);
+        if (nocache != null && !nocache.isEmpty()) { 
+            handleNoCacheRedirect(nocache, request, response);
+            return;
+        }
 
         DefDescriptor<? extends BaseComponentDef> defDescriptor;
-        BaseComponentDef def;
 
         //
         // Now check and fetch parameters.
@@ -207,11 +211,6 @@ public class AuraServlet extends AuraBaseServlet {
         // I would love for a simpler way to be figured out.
         //
         try {
-            String nocache = nocacheParam.get(request);
-            if (nocache != null && !nocache.isEmpty()) { 
-                handleNoCacheRedirect(nocache, request, response);
-                return;
-            }
             tagName = tag.get(request);
             defType = defTypeParam.get(request, DefType.COMPONENT);
             if (tagName == null || tagName.isEmpty()) {
@@ -240,10 +239,19 @@ public class AuraServlet extends AuraBaseServlet {
             handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
+        // typing
+        internalGet(request, response, defDescriptor, context, definitionService);
+    }
 
+
+    protected <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
+            HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context,
+            DefinitionService definitionService)
+            throws ServletException, IOException {
         // Knowing the app, we can do the HTTP headers, so of which depend on
         // the app in play, so we couldn't do this earlier.
         setBasicHeaders(defDescriptor, request, response);
+        T def;
 
         try {
             context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
@@ -281,8 +289,9 @@ public class AuraServlet extends AuraBaseServlet {
             // Prevents Mhtml Xss exploit:
             PrintWriter out = response.getWriter();
             out.write("\n    ");
-            serializationService.write(def, getComponentAttributes(request),
-                    def.getDescriptor().getDefType().getPrimaryInterface(), out);
+            @SuppressWarnings("unchecked")
+            Class<T> clazz = (Class<T>)def.getDescriptor().getDefType().getPrimaryInterface();
+            serializationService.write(def, getComponentAttributes(request), clazz, out);
         } catch (Throwable e) {
             handleServletException(e, false, context, request, response, true);
         } finally {
@@ -305,7 +314,7 @@ public class AuraServlet extends AuraBaseServlet {
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
 
         while (attributeNames.hasMoreElements()) {
             String name = attributeNames.nextElement();
@@ -396,8 +405,7 @@ public class AuraServlet extends AuraBaseServlet {
             // Knowing the app, we can do the HTTP headers, so of which depend on
             // the app in play, so we couldn't do this 
             setBasicHeaders(applicationDescriptor, request, response);
-
-			if (applicationDescriptor != null) {
+            if (applicationDescriptor != null) {
                 // ClientOutOfSync will drop down.
                 try {
                     Aura.getDefinitionService().updateLoaded(applicationDescriptor);
@@ -409,7 +417,7 @@ public class AuraServlet extends AuraBaseServlet {
                 }
                 
                 if (!context.isTestMode() && !context.isDevMode()) {
-                	assertAccess(applicationDescriptor.getDef());
+                    assertAccess(applicationDescriptor.getDef());
                 }
             }
 

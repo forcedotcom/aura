@@ -15,16 +15,11 @@
  */
 package org.auraframework.impl.validation.http;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Maps;
 
@@ -50,54 +45,23 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
 
     @SuppressWarnings("unchecked")
     public void testLintApp() throws Exception {
-        // http://localhost:9090/auradev/lint.app?name=...
-        Map<String, Object> message = Maps.newHashMap();
-        Map<String, Object> actionInstance = Maps.newHashMap();
-        actionInstance.put("descriptor",
-                "aura://ComponentController/ACTION$getComponent");
-        Map<String, Object> actionParams = Maps.newHashMap();
-        actionParams.put("name", "markup://auradev:lintc");
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("name", "lintTest:basic");
+        Map<String, Object> actionParams = Maps.newHashMap();
+        actionParams.put("name", "markup://auradev:lintc");
         actionParams.put("attributes", attributes);
-        actionInstance.put("params", actionParams);
-        Map<?, ?>[] actions = { actionInstance };
-        message.put("actions", actions);
-        String jsonMessage = Json.serialize(message);
-        Map<String, String> params = Maps.newHashMap();
-        params.put("message", jsonMessage);
-        params.put("aura.token", getCsrfToken());
-        params.put("aura.context", getSimpleContext(Format.JSON, false));
-
-        method = obtainPostMethod("/aura", params);
-        HttpResponse httpResponse = perform(method);
-        assertEquals(200, getStatusCode(httpResponse));
-
-        String response = getResponseBody(httpResponse);
-        List<Map<String, ?>> errors = null;
-
-        try {
-            // remote starting: while(1);
-            response = response.substring(response.indexOf('{'));
-            Map<String, ?> json = (Map<String, ?>) new JsonReader().read(response);
-            Map<String, ?> value = (Map<String, ?>) ((Map<String, ?>) ((Map<String, ?>) ((ArrayList<?>) json
-                    .get("actions"))
-                    .get(0))
-                    .get("returnValue"))
-                    .get("value");
-            errors = (List<Map<String, ?>>) ((Map<String, ?>) ((Map<String, ?>) value)
-                    .get("model"))
-                    .get("errors");
-        } catch (Exception ex) {
-            fail(String.valueOf(ex) + " parsing unexpected response: " + response);
-        }
-
+        ServerAction action = new ServerAction("aura://ComponentController/ACTION$getComponent", actionParams);
+        action.run();
+        Map<String,Object> returnValue = (Map<String,Object>)action.getReturnValue();
+        Map<String,Object> value = (Map<String,Object>)returnValue.get("value");
+        Map<String,Object> model = (Map<String,Object>)value.get("model");
+        List<Object> errors = (List<Object>)model.get("errors");
         assertEquals(2, errors.size());
-        Map<String, ?> error = errors.get(0);
+        Map<String, ?> error = (Map<String,?>)errors.get(0);
         String errorMessage = (String) error.get("ErrorMessage");
         assertEquals("lintTest:basic", error.get("CompName"));
         assertTrue(errorMessage, errorMessage.contains("basicController.js (line 5, char 1) : Starting '(' missing"));
-        error = errors.get(1);
+        error = (Map<String,?>)errors.get(1);
         errorMessage = (String) error.get("ErrorMessage");
         assertEquals("lintTest:basic", error.get("CompName"));
         assertTrue(errorMessage,

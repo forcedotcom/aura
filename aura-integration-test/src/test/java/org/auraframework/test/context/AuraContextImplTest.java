@@ -41,6 +41,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Maps;
@@ -114,8 +115,26 @@ public class AuraContextImplTest extends AuraImplTestCase {
                 ApplicationDef.class);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
+        ctx.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
+    }
+
+    /**
+     * Find uid in serialized cmp.
+     *
+     * Don't use a gold file here, the nonce changes often.
+     */
+    public void testSerializeNonceWithCmp() throws Exception {
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
+                ComponentDef.class);
+
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
+        String expected = Aura.getConfigAdapter().getAuraFrameworkNonce();
+        ctx.setFrameworkUID(null);
+        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        // can't be the first character....
+        assertTrue("should find the framework nonce in the serialized context", res.indexOf(expected) > 0);
     }
 
     /**
@@ -127,6 +146,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
                 ComponentDef.class);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
+        ctx.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }
@@ -137,6 +157,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @UnAdaptableTest
     public void testSerializeWithoutApp() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }
@@ -258,6 +279,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         DefDescriptor<?> added = DefDescriptorImpl.getInstance("auratest:iwasadded", EventDef.class);
         context.addLoaded(added, "somegenerateduid");
+        context.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
     }
@@ -295,6 +317,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         DefDescriptor<?> dropped = DefDescriptorImpl.getInstance("auratest:iwasdropped", EventDef.class);
         context.dropLoaded(dropped);
+        context.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
     }
@@ -365,18 +388,34 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
-        ctx.setSerializeThemes(true);
 
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeThemeWithMapProvider", ThemeDef.class));
         ctx.addAppThemeDescriptors();
-        String res = getAuraTestingUtil().getSerializedAuraContext(ctx);
+        ctx.setFrameworkUID("#FAKEUID#");
+        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Theme);
+        res = AuraTextUtil.urldecode(res);
         // expected order
         // "test:fakeTheme" (app specified comes first)
         // "test:fakeTheme2" (explicit order)
         // "test:fakeThemeWithMapProvider" (explicit order)
         // also expect the vars hash to be present
         goldFileJson(res);
+    }
+
+    public void testSerializeWithThemesHasNonce() throws Exception {
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+
+        AuraContext ctx = Aura.getContextService()
+                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
+
+        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
+        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeThemeWithMapProvider", ThemeDef.class));
+        ctx.addAppThemeDescriptors();
+        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Theme);
+        res = AuraTextUtil.urldecode(res);
+        assertTrue("Theme encoded URL must have framework UID",
+                res.indexOf(Aura.getConfigAdapter().getAuraFrameworkNonce()) > 0);
     }
 
     /**
@@ -388,7 +427,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
         ctx.setContextPath("/cool");
-        String res = getAuraTestingUtil().getSerializedAuraContext(ctx);
+        String res = ctx.serialize(AuraContext.EncodingStyle.Full);
 
         assertTrue(res.contains("\"contextPath\":\"/cool\""));
     }

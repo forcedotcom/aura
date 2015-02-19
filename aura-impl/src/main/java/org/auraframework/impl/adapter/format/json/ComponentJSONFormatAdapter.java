@@ -40,7 +40,7 @@ public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
+    public void write(Component value, Map<String, Object> attributes, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
         Json.serialize(value, out, c.getJsonSerializationContext());
     }
@@ -48,7 +48,7 @@ public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
     @Override
     public void writeCollection(Collection<? extends Component> values, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
-        Map<String, Object> m = new LinkedHashMap<String, Object>();
+        Map<String, Object> m = new LinkedHashMap<>();
         m.put("components", values);
         m.put("context", c);
         Json.serialize(m, out, c.getJsonSerializationContext());

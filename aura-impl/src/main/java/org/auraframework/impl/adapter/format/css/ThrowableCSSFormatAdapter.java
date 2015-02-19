@@ -34,17 +34,15 @@ public class ThrowableCSSFormatAdapter extends CSSFormatAdapter<Throwable> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
-        Throwable t = (Throwable) value;
-
+    public void write(Throwable value, Map<String, Object> attributes, Appendable out) throws IOException {
         out.append("/** \nAN EXCEPTION OCCURRED WHILE PROCESSING CSS\n");
         // FIXME: this is pretty ugly.
         Mode mode = Aura.getContextService().getCurrentContext().getMode();
         if (mode != Mode.PROD && mode != Mode.PRODDEBUG && !Aura.getConfigAdapter().isProduction()) {
-            out.append(AuraExceptionUtil.getStackTrace(t));
+            out.append(AuraExceptionUtil.getStackTrace(value));
         }
 
-        String message = "\\A\\A" + t.getMessage().replaceAll("\n", "\\\\A");
+        String message = "\\A\\A" + value.getMessage().replaceAll("\n", "\\\\A");
 
         out.append("\n**/\n");
         out.append(".auraErrorBox,.auraMsgMask{display:block;}\n");

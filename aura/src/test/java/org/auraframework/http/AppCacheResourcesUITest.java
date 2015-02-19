@@ -136,8 +136,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // only expect a fetch for the manifest and the initAsync component load
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request(
-                "/auraResource", null, null, "manifest", 200));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -158,18 +157,18 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
-        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(), null, null, null, 302)); // hard refresh
+        expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
+        expectedChange.add(new Request(getUrl(), null, 302)); // hard refresh
         switch (getBrowserType()) {
         case GOOGLECHROME:
-            expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request(2, getUrl(), null, null, null, 200));
+            expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
+            expectedChange.add(new Request(2, getUrl(), null, 200));
             break;
         default:
-            expectedChange.add(new Request("/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request(getUrl(), null, null, null, 200));
-            expectedChange.add(new Request("/auraResource", null, null, "css", 200));
-            expectedChange.add(new Request("/auraResource", null, null, "js", 200));
+            expectedChange.add(new Request("/auraResource", "manifest", 200));
+            expectedChange.add(new Request(getUrl(), null, 200));
+            expectedChange.add(new Request("/auraResource", "css", 200));
+            expectedChange.add(new Request("/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -192,15 +191,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
-        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request("/auraResource", null, null, "css", 200));
-        expectedChange.add(new Request("/auraResource", null, null, "js", 200));
+        expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
+        expectedChange.add(new Request("/auraResource", "css", 200));
+        expectedChange.add(new Request("/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
-        	expectedChange.add(new Request(1, getUrl(), null, null, null, 200));
+        	expectedChange.add(new Request(1, getUrl(), null, 200));
         	break;
         default:
-        	expectedChange.add(new Request(getUrl(), null, null, null, 200));
+        	expectedChange.add(new Request(getUrl(), null, 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
@@ -227,18 +226,18 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
 
-        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(), null, null, null, 302)); // hard refresh
+        expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
+        expectedChange.add(new Request(getUrl(), null, 302)); // hard refresh
         switch (getBrowserType()) {
         case GOOGLECHROME:
-            expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request(2, getUrl(), null, null, null, 200));
+            expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
+            expectedChange.add(new Request(2, getUrl(), null, 200));
             break;
         default:
-            expectedChange.add(new Request("/auraResource", null, null, "manifest", 200));
-            expectedChange.add(new Request(getUrl(), null, null, null, 200));
-            expectedChange.add(new Request("/auraResource", null, null, "css", 200));
-            expectedChange.add(new Request("/auraResource", null, null, "js", 200));
+            expectedChange.add(new Request("/auraResource", "manifest", 200));
+            expectedChange.add(new Request(getUrl(), null, 200));
+            expectedChange.add(new Request("/auraResource", "css", 200));
+            expectedChange.add(new Request("/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -249,8 +248,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    // W-2359835 - disabled due to extra 302 being detected
-    public void _testComponentCssChange() throws Exception {
+    public void testComponentCssChange() throws Exception {
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
                 "<aura:namespace></aura:namespace>");
 
@@ -271,7 +269,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -280,8 +278,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app after namespace controller change will trigger cache update.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    // W-2359835 - disabled due to extra 302 being detected
-    public void _testComponentJsChange() throws Exception {
+    public void testComponentJsChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
@@ -299,7 +296,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -308,8 +305,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app after component markup change will trigger cache update.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    // W-2359835 - disabled due to extra 302 being detected
-    public void _testComponentMarkupChange() throws Exception {
+    public void testComponentMarkupChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
@@ -320,7 +316,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -392,7 +388,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         failed = unexpectedRequests.size() > 0 || missingRequests.size() > 0;
 
-        if (debug) {
+        if (debug || failed) {
             System.out.println(">>> assertRequests: ");
             System.out.println("EXPECTED:");
             for (Request r : expected) {
@@ -558,10 +554,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 } catch (NumberFormatException nfe) {
                 }
             }
-            Request toAdd = new Request(log.get("auraRequestURI").toString(),
-                    null, null, null, status);
-            for (String part : AuraTextUtil.urldecode(
-                    log.get("auraRequestQuery").toString()).split("&")) {
+            Request toAdd = new Request(log.get("auraRequestURI").toString(), null, status);
+            for (String part : AuraTextUtil.urldecode(log.get("auraRequestQuery").toString()).split("&")) {
                 String[] parts = part.split("=", 2);
                 String key = parts[0].substring(AURA.length() + 1);
                 String v = parts[1];
@@ -589,12 +583,13 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * css only once, but it's not stable, do see some test get them twice sometimes.
              */
             return ImmutableList.of(
-                    new Request(getUrl(), null, null, null, 302), // hard refresh
-                    new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
-                    new Request(3, "/auraResource", null, null, "manifest", 200),
-                    new Request(2, getUrl(), null, null, null, 200), // rest are cache updates
-                    new Request(2, "/auraResource", null, null, "css", 200),
-                    new Request(2, "/auraResource", null, null, "js", 200));
+                    // The manifest change causes the correct fetch, eliminating our 302 and 404
+                    //new Request(getUrl(), null, 302), // hard refresh
+                    //new Request("/auraResource", "manifest", 404), // manifest out of date
+                    new Request(3, "/auraResource", "manifest", 200),
+                    new Request(2, getUrl(), null, 200), // rest are cache updates
+                    new Request(2, "/auraResource", "css", 200),
+                    new Request(2, "/auraResource", "js", 200));
         default:
             /*
              * For iOS Get the set of expected requests on change. These are the requests that we expect for filling the
@@ -604,12 +599,13 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * initial page twice
              */
             return ImmutableList.of(
-                    new Request(getUrl(), null, null, null, 302), // hard refresh
-                    new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
-                    new Request("/auraResource", null, null, "manifest", 200),
-                    new Request(2, getUrl(), null, null, null, 200), // rest are cache updates
-                    new Request(2, "/auraResource", null, null, "css", 200),
-                    new Request(2, "/auraResource", null, null, "js", 200));
+                    // The manifest change causes the correct fetch, eliminating our 302
+                    //new Request(getUrl(), null, 302), // hard refresh
+                    //new Request("/auraResource", "manifest", 404), // manifest out of date
+                    new Request("/auraResource", "manifest", 200),
+                    new Request(2, getUrl(), null, 200), // rest are cache updates
+                    new Request(2, "/auraResource", "css", 200),
+                    new Request(2, "/auraResource", "js", 200));
         }
     }
 
@@ -629,9 +625,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * are two requests for the initial page, one as the first request, and one to fill the app cache (odd, but
              * true). There are also two manifest requests.
              */
-            return ImmutableList.of(new Request(2, getUrl(), null, null, null, 200), new Request(
-                    2, "/auraResource", null, null, "manifest", 200), new Request("/auraResource", null, null, "css",
-                    200), new Request(2, "/auraResource", null, null, "js", 200));
+            return ImmutableList.of(new Request(2, getUrl(), null, 200),
+                    new Request(2, "/auraResource", "manifest", 200),
+                    new Request("/auraResource", "css", 200),
+                    new Request(2, "/auraResource", "js", 200));
         default:
             /*
              * For iOS Get the set of expected requests on change. These are the requests that we expect for filling the
@@ -639,9 +636,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              * all three components, initial, css, and js</li> <li>Finally, the browser re-fetches the manifest to check
              * contents</li> <ul> Note that there are also two css and js request.
              */
-            return ImmutableList.of(new Request(1, getUrl(), null, null, null, 200), new Request(
-                    1, "/auraResource", null, null, "manifest", 200), new Request(2, "/auraResource", null, null,
-                    "css", 200), new Request(2, "/auraResource", null, null, "js", 200));
+            return ImmutableList.of(new Request(1, getUrl(), null, 200),
+                    new Request(1, "/auraResource", "manifest", 200),
+                    new Request(2, "/auraResource", "css", 200),
+                    new Request(2, "/auraResource", "js", 200));
         }
     }
 
@@ -653,32 +651,27 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     static class Request extends HashMap<String, String> {
         private static final long serialVersionUID = 4149738936658714181L;
-        private static final ImmutableSet<String> validKeys = ImmutableSet.of("URI", "tag", "namespaces", "format",
-                "httpStatus");
+        private static final ImmutableSet<String> validKeys = ImmutableSet.of("URI", "format", "httpStatus");
 
         private final int fudge;
         private int count = 0;
         private Map<String, String> extras = null;
         private boolean showExtras = false;
 
-        Request(int fudge, String URI, String tag, String namespaces, String format, int status) {
+        Request(int fudge, String URI, String format, int status) {
             super();
             this.fudge = fudge;
             put("URI", URI);
-            put("tag", tag);
-            put("namespaces", namespaces);
             put("format", format);
             if (status != -1) {
                 put("httpStatus", String.valueOf(status));
             }
         }
 
-        Request(String URI, String tag, String namespaces, String format, int status) {
+        Request(String URI, String format, int status) {
             super();
             this.fudge = 0;
             put("URI", URI);
-            put("tag", tag);
-            put("namespaces", namespaces);
             put("format", format);
             if (status != -1) {
                 put("httpStatus", String.valueOf(status));

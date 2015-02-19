@@ -266,7 +266,7 @@ public class IntegrationImpl implements Integration {
                 }
 
                 Aura.getSerializationService().write(appDef, null,
-                        appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
+                        ApplicationDef.class, out, "EMBEDDED_HTML");
             } catch (QuickFixException e) {
                 throw new AuraRuntimeException(e);
             } finally {

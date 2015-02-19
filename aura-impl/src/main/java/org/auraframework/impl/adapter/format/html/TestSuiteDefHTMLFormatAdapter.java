@@ -43,7 +43,7 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+    public void write(TestSuiteDef value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         Map<String, Object> attribs = Maps.newHashMap();
         attribs.put("autoInitialize", "false");

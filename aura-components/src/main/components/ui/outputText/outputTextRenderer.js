@@ -24,7 +24,12 @@
         
         return ret;     
     },
-    
+
+    afterRender: function(component, helper) {
+        helper.lib.interactive.addDomEvents(component);
+        return this.superAfterRender();
+    },
+
     rerender: function(cmp, helper) {       
         if (cmp.isDirty("v.value")) {
             var span = cmp.find('span').getElement();

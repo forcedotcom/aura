@@ -30,13 +30,13 @@
  * @param {Function}
  *            finishedCallback the callback for when the actions are collected.
  */
-$A.ns.ActionCollector = function ActionCollector(actions, finishedCallback) {
+var ActionCollector = function ActionCollector(actions, finishedCallback) {
     this.actionsToSend = [];
     this.actionsToComplete = [];
     this.actionsRefreshed = [];
     this.actionsFinished = {};
     this.finishedCallback = finishedCallback;
-    this.collectorId = $A.ns.ActionCollector.prototype.counter++;
+    this.collectorId = ActionCollector.prototype.counter++;
     this.actionsRequested = actions;
     if (actions) {
         this.actionsToCollect = actions.length;
@@ -46,9 +46,9 @@ $A.ns.ActionCollector = function ActionCollector(actions, finishedCallback) {
     this.num = -1;
 };
 
-$A.ns.ActionCollector.prototype.auraType = "ActionCollector";
+ActionCollector.prototype.auraType = "ActionCollector";
 
-$A.ns.ActionCollector.prototype.counter = 0;
+ActionCollector.prototype.counter = 0;
 
 /**
  * Run the collection of actions.
@@ -57,7 +57,7 @@ $A.ns.ActionCollector.prototype.counter = 0;
  * looking them up in the cache as it goes. Because the cache is asynchronous, the actual collection
  * is done in a callable function.
  */
-$A.ns.ActionCollector.prototype.process = function() {
+ActionCollector.prototype.process = function() {
     var i, key;
     var action;
     var that = this;
@@ -98,7 +98,7 @@ $A.ns.ActionCollector.prototype.process = function() {
  * These actions are the actions that have storage associated with them, so they
  * can be completed immediately.
  */
-$A.ns.ActionCollector.prototype.getActionsRequested = function() {
+ActionCollector.prototype.getActionsRequested = function() {
     return this.actionsRequested;
 };
 
@@ -109,42 +109,42 @@ $A.ns.ActionCollector.prototype.getActionsRequested = function() {
  * These actions are the actions that have storage associated with them, so they
  * can be completed immediately.
  */
-$A.ns.ActionCollector.prototype.getActionsToComplete = function() {
+ActionCollector.prototype.getActionsToComplete = function() {
     return this.actionsToComplete;
 };
 
 /**
  * Get the set of actions to send.
  */
-$A.ns.ActionCollector.prototype.getActionsToSend = function() {
+ActionCollector.prototype.getActionsToSend = function() {
     return this.actionsToSend;
 };
 
 /**
  * Get the action group id.
  */
-$A.ns.ActionCollector.prototype.getCollectorId = function() {
+ActionCollector.prototype.getCollectorId = function() {
     return this.collectorId;
 };
 
 /**
  * Set the 'number' for this collector.
  */
-$A.ns.ActionCollector.prototype.setNum = function(num) {
+ActionCollector.prototype.setNum = function(num) {
     this.num = num;
 };
 
 /**
  * get the 'number' for this collector.
  */
-$A.ns.ActionCollector.prototype.getNum = function() {
+ActionCollector.prototype.getNum = function() {
     return this.num;
 };
 
 /**
  * Find an action and mark it as 'completed'.
  */
-$A.ns.ActionCollector.prototype.findActionAndClear = function(id) {
+ActionCollector.prototype.findActionAndClear = function(id) {
     var action;
     var i;
 
@@ -184,7 +184,7 @@ $A.ns.ActionCollector.prototype.findActionAndClear = function(id) {
  * @param {Object} response the response to the action (if from storage).
  * @private
  */
-$A.ns.ActionCollector.prototype.collectAction = function(action, response) {
+ActionCollector.prototype.collectAction = function(action, response) {
     if (response) {
         this.actionsToComplete.push({
             action : action,
@@ -214,7 +214,7 @@ $A.ns.ActionCollector.prototype.collectAction = function(action, response) {
  *
  * @private
  */
-$A.ns.ActionCollector.prototype.finishCollection = function() {
+ActionCollector.prototype.finishCollection = function() {
     var i, toComplete, refresh, action;
     //
     // Do the checks for up-to-date here to make our times consistent.
@@ -242,3 +242,5 @@ $A.ns.ActionCollector.prototype.finishCollection = function() {
     }
     this.finishedCallback(this);
 };
+
+$A.ns.ActionCollector = ActionCollector;

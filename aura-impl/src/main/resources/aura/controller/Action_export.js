@@ -23,6 +23,7 @@ exp(p,
     "getParam", p.getParam,
     "getParams", p.getParams,
     "setCallback", p.setCallback,
+    "getCallback", p.getCallback,
     "run", p.run,
     "runDeprecated", p.runDeprecated,
     "getState", p.getState,
@@ -44,9 +45,9 @@ exp(p,
     "isCaboose", p.isCaboose,
     "setAllAboardCallback", p.setAllAboardCallback,
     "isFromStorage", p.isFromStorage,
-    "toJSON", p.toJSON
+    "toJSON", p.toJSON,
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-     ,"getId", p.getId
-     ,"getStorageKey", p.getStorageKey 
-	//#end
+     "getStorageKey", p.getStorageKey,
+    //#end
+    "getId", p.getId
 );

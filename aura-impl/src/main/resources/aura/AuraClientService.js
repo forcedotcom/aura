@@ -536,7 +536,7 @@ var AuraClientService = function() {
             // #end
 
             $A.Perf.endMark("Action Request Prepared");
-            $A.util.transport.request(requestConfig);
+            $A.util.transport["request"](requestConfig);
             flightCounter.send();
             flightHandled.value = true;
 
@@ -755,7 +755,7 @@ var AuraClientService = function() {
 
         if (manifestURL) {
             setTimeout(function() {
-                $A.util.transport.request({
+                $A.util.transport["request"]({
                     "url" : manifestURL,
                     "method" : "GET",
                     "callback" : function() {
@@ -936,10 +936,9 @@ var AuraClientService = function() {
          * @param {object} container the place to install aura (defaults to document.body).
          * @private
          */
-        init : function(config, token, callback, container) {
+        init : function(config, token, container) {
             $A.Perf.mark("Initial Component Created");
             $A.Perf.mark("Initial Component Rendered");
-            var body = document.body;
 
             //
             // not on in dev modes to preserve stacktrace in debug tools
@@ -955,17 +954,16 @@ var AuraClientService = function() {
                     _token = token;
                 }
 
-                // Why is this happening in the ClientService? --JT
-                // NOTE: no creation path here, we are at the top level
                 var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
 
                 $A.Perf.endMark("Initial Component Created");
 
-                renderingService.render(component, container || body);
+                renderingService.render(component, container || document.body);
                 renderingService.afterRender(component);
 
                 $A.Perf.endMark("Initial Component Rendered");
-                callback(component);
+
+                return component;
 
                 // not on in dev modes to preserve stacktrace in debug tools
                 //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -974,7 +972,6 @@ var AuraClientService = function() {
                 throw e;
             }
             //#end
-            delete this.init;
         },
 
         /**
@@ -1773,7 +1770,7 @@ var AuraClientService = function() {
             // FIXME: we need measures of how long this delays things.
             //
             if (actionQueue.needXHR() && foreground.start()) {
-                actions = actionQueue.getServerActions();
+                actions = actionQueue["getServerActions"]();
                 if (actions.length > 0) {
                     request(actions, foreground);
                     processedActions = true;
@@ -1796,6 +1793,9 @@ var AuraClientService = function() {
     };
 
     // #include aura.AuraClientService_export
+    clientService["Action"] = Action;
+    clientService["ActionQueue"] = ActionQueue;
+    clientService["ActionCollector"] = ActionCollector;
 
     return clientService;
 };

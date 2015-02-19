@@ -34,6 +34,7 @@ $A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;
 $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
+
 // Perf
 $A.ns.Aura.prototype["Perf"] = $A.ns.Aura.prototype.Perf;
 $A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.Perf.mark;

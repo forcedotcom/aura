@@ -65,7 +65,7 @@ var Transport = function() {
         return arr.join("");
     }
 
-    return {
+    var transport = {
 
         request : function(config) {
             /** config{url,method,callback,scope,params} */
@@ -105,4 +105,8 @@ var Transport = function() {
         }
 
     };
+
+    //#include aura.util.Transport_export
+    return transport;
 };
+

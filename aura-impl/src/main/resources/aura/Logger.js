@@ -138,7 +138,10 @@ $A.ns.Logger.prototype.error = function(msg, e){
         dispMsg = dispMsg + "\n" + stack.join("\n");
     }
     //#end
-    $A.message(dispMsg);
+    
+    if ($A.showErrors()) {
+        $A.message(dispMsg);
+    }
     if (!$A.initialized) {
         $A["hasErrors"] = true;
     }

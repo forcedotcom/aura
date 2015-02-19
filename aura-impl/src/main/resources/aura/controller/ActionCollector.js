@@ -73,7 +73,12 @@ $A.ns.ActionCollector.prototype.process = function() {
         if (action.isStorable() && storage) {
             key = action.getStorageKey();
             storage.get(key).then(
-                that.createResultCallback(action)
+                function(value) {
+                    // stored actions are async and need to be put be into aura loop
+                    $A.run(function() {
+                        that.collectAction(action, value ? value.value : null);
+                    });
+                }
             );
         } else {
             that.collectAction(action);
@@ -134,21 +139,6 @@ $A.ns.ActionCollector.prototype.setNum = function(num) {
  */
 $A.ns.ActionCollector.prototype.getNum = function() {
     return this.num;
-};
-
-/**
- * Internal routine to create a callback for the storage service.
- *
- * This simply binds to both 'this' and 'action'.
- *
- * @param {Action} action the action we will use in the call to collectAction.
- * @private
- */
-$A.ns.ActionCollector.prototype.createResultCallback = function(action) {
-    var that = this;
-    return function(response) {
-        that.collectAction(action, response ? response.value : response);
-    };
 };
 
 /**

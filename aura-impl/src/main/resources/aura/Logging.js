@@ -53,7 +53,6 @@
 
         var trace;
         if ($A.util.isError(error) || level == "ERROR") {
-            // remove some junk logger stack
             trace = $A.logger.getStackTrace(error);
         } else if (error && error.stack) {
             trace = error.stack;
@@ -107,13 +106,16 @@
      */
     function devAssertError(level, message, e) {
         $A.trace();
-        var elt = $A.util.getElement("auraErrorMessage");
-        if (elt) {
-            elt.innerHTML = message;
-            $A.util.removeClass(document.body, "loading");
-            $A.util.addClass(document.body, "auraError");
-        } else {
-            alert(message);
+        
+        if ($A.showErrors()) {
+            var elt = $A.util.getElement("auraErrorMessage");
+            if (elt) {
+                elt.innerHTML = message;
+                $A.util.removeClass(document.body, "loading");
+                $A.util.addClass(document.body, "auraError");
+            } else {
+                alert(message);
+            }
         }
         throw new Error(message);
     }

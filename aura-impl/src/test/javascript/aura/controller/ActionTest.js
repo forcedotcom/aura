@@ -32,7 +32,7 @@ Test.Aura.Controller.ActionTest = function() {
             },
             mark : function() {
             }
-        },
+        }
     });
 
     var targetNextActionId = 123;
@@ -593,45 +593,6 @@ Test.Aura.Controller.ActionTest = function() {
         }
 
         [ Fact ]
-        function MissingLayoutDefThrows() {
-            // Arrange
-            var expectedErrorMessage = "Missing layout://blahblah definition";
-            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
-                assert : function(param) {}
-            });
-            var def = {
-                isClientAction : function() {
-                    return true;
-                }
-            };
-            var cmp = {
-                getDef : function() {
-                    return {
-                        getHelper : function() {
-                            throw new Error(expectedErrorMessage);
-                        }
-                    }
-                }
-            };
-            var target = new Action();
-            target.def = def;
-            target.cmp = cmp;
-            var actualMessage = null;
-
-            // Act
-            mockAura(function() {
-                try {
-                    target.runDeprecated();
-                } catch(e) {
-                    actualMessage = e.message;
-                }
-            })
-
-            // Assert
-            Assert.Equal(expectedErrorMessage, actualMessage);
-        }
-
-        [ Fact ]
         function LogsFailMessageOnException() {
             // Arrange
             var expectedName = "expectedName";
@@ -1188,7 +1149,13 @@ Test.Aura.Controller.ActionTest = function() {
                 },
                 warning : function() {
                 },
-                error : Stubs.GetMethod("msg", "error", null)
+                error : Stubs.GetMethod("msg", "error", null),
+                showErrors: function() {},
+                util: {
+                    isUndefinedOrNull: function(obj) {
+                        return obj === undefined || obj === null;
+                    }
+                }
             });
         };
 
@@ -1223,13 +1190,15 @@ Test.Aura.Controller.ActionTest = function() {
             var actual = false;
 
             // Act
-            target.finishAction({
-                setCurrentAction : function() {
-                },
-                joinComponentConfigs : function() {
-                },
-                finishComponentConfigs : function() {
-                }
+            mockContext(false)(function() {
+                target.finishAction({
+                    setCurrentAction: function () {
+                    },
+                    joinComponentConfigs: function () {
+                    },
+                    finishComponentConfigs: function () {
+                    }
+                });
             });
 
             // Assert
@@ -1251,7 +1220,9 @@ Test.Aura.Controller.ActionTest = function() {
                 return "1";
             };
 
-            target.finishAction(context);
+            mockContext(false)(function() {
+                target.finishAction(context);
+            });
 
             Assert.Equal([ {
                 Arguments : {},
@@ -1262,7 +1233,8 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function CallsCompleteGroupsEvenOnErrorsInLoop() {
             var target = new Action();
-            var errorStub;
+            var errorStub,
+                clearConfigsActionId;
             target.completeGroups = Stubs.GetMethod(null);
             target.components = "something";
             target.getStorage = function() {
@@ -1280,6 +1252,9 @@ Test.Aura.Controller.ActionTest = function() {
                         },
                         joinComponentConfigs : function() {
                             throw new Error("intentional");
+                        },
+                        clearComponentConfigs : function (id) {
+                            clearConfigsActionId = id;
                         }
                     });
                 });
@@ -1291,13 +1266,15 @@ Test.Aura.Controller.ActionTest = function() {
             } ], target.completeGroups.Calls);
             Assert.Equal("intentional", error);
             Assert.Equal(0, errorStub.Calls.length);
+            Assert.Equal("1", clearConfigsActionId);
         }
 
         [ Fact ]
         function CallsCompleteGroupsEvenOnErrorsOutOfLoop() {
             var target = new Action();
             var errorStub = undefined;
-            var expected = new Error("intentional");
+            var expected = new Error("intentional"),
+                clearConfigsActionId;
             target.completeGroups = Stubs.GetMethod(null);
             target.components = "something";
             target.getStorage = function() {
@@ -1305,6 +1282,9 @@ Test.Aura.Controller.ActionTest = function() {
             };
             target.getId = function() {
                 return "1";
+            };
+            target.isFromStorage = function() {
+                return false;
             };
 
             mockContext(false)(function() {
@@ -1314,6 +1294,9 @@ Test.Aura.Controller.ActionTest = function() {
                     },
                     joinComponentConfigs : function() {
                         throw expected
+                    },
+                    clearComponentConfigs : function (id) {
+                        clearConfigsActionId = id;
                     }
                 });
             });
@@ -1324,6 +1307,7 @@ Test.Aura.Controller.ActionTest = function() {
             } ], target.completeGroups.Calls);
             Assert.Equal(1, errorStub.Calls.length);
             Assert.Equal(expected, errorStub.Calls[0].Arguments.error);
+            Assert.Equal("1", clearConfigsActionId);
         }
 
         [ Fact ]
@@ -1349,7 +1333,9 @@ Test.Aura.Controller.ActionTest = function() {
                 return expectedId;
             };
 
-            target.finishAction(context);
+            mockContext(false)(function() {
+                target.finishAction(context);
+            });
 
             Assert.Equal([ {
                 Arguments : {
@@ -1384,7 +1370,10 @@ Test.Aura.Controller.ActionTest = function() {
                 return expectedId;
             };
 
-            target.finishAction(context);
+            mockContext(false)(function() {
+                target.finishAction(context);
+            });
+
             Assert.Equal(JSON.stringify(context.finishComponentConfigs.Calls), "[]");
 
             Assert.Equal([], context.finishComponentConfigs.Calls);
@@ -1428,7 +1417,9 @@ Test.Aura.Controller.ActionTest = function() {
                 }
             };
 
-            target.finishAction(context);
+            mockContext(false)(function() {
+                target.finishAction(context);
+            });
 
             Assert.Equal([ {
                 Arguments : {

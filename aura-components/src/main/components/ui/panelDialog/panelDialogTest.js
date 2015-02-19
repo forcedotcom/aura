@@ -38,7 +38,11 @@
 		var ele = cmp.find("panel").getElement();
 		
 		$A.test.assertTruthy(ele.querySelector(".modalWindow"), "Element is not rendered as modal");
-		$A.test.assertTruthy(ele.querySelector(".closeBtn"), "Close button is not rendered");
+		if (cmp.get("v.showCloseButton")) {
+			$A.test.assertTruthy(ele.querySelector(".closeBtn"), "Close button is not rendered");
+		} else {
+			$A.test.assertFalsy(ele.querySelector(".closeBtn"), "Close button is rendered");
+		}
 		$A.test.assertTrue($A.util.hasClass(ele, "panel"), "Element is not rendered with panel class");
 		$A.test.assertTrue($A.util.hasClass(ele, "panelDialog"), "Element is not rendered with panelDialog class");
 		
@@ -259,6 +263,28 @@
 			title: "test title!$#%^!^%$^&@FAGFDGWAERGY$#^%&@%#^%$&amp;",
 			detail: "test detail!$#%^!^%$^&@FAGFDGWAERGY$#^%&@%#^%$&amp;",
 			isScrollable: true
+		},
+	    test : function(cmp){
+
+	    	var context = this;
+	    	$A.test.runAfterIf(
+	    		function() { return (!cmp.get("v.body").length || cmp.find("panel").getElement().querySelector(".uiButton"));},
+	    		function() {
+	    			// Assert
+	    			context.verifyModalElements(cmp);
+	    		}
+	    	);
+	    }
+	},
+
+	testModalNoCloseButton:{
+
+		attributes: {
+			isVisible:true,
+			title:"test title",
+			'class': "testClass",
+			isScrollable: false,
+			showCloseButton: false
 		},
 	    test : function(cmp){
 

@@ -124,5 +124,16 @@
     $A.logger.subscribe("ASSERT", devAssertError);
 
     //#end
+    
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    
+    /**
+     * $A.assert() will throw error in production
+     */
+    $A.logger.subscribe("ASSERT", function(level, message) {
+        throw new Error(message);
+    });
+    
+    //#end
 
 })();

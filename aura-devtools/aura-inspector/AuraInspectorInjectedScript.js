@@ -317,14 +317,17 @@
                         tmpNode._selfTime = tmpNode._totalTime - tmpNode._childrenTime;
                         tmpNode.hitCount = Math.floor(tmpNode._selfTime / sampling);
                         tmpNode._cmpId = tmp.id;
+                        tmpNode._childComponentCount += tmpNode.children.length;
 
                         //push into the parent
                         stack[0].children.push(tmpNode);
+                        stack[0]._childComponentCount += tmpNode._childComponentCount;
                         logTree(stack.length, 'close: ' + tmp.name + ' selfTime: ' + tmpNode._selfTime.toFixed(4) + '| totalTime: ' + tmpNode._totalTime.toFixed(4));
                     } else {
 
                         current = generateNode(tmp.name);
                         current._startTime = tmp.timestamp;
+                        current._childComponentCount = 0;
                         if (stack.length === 1 && ((markLength - i) > 1)) {
                             current._idleHits = Math.floor((tmp.timestamp - marks[i - 1].timestamp) / sampling);
                         }

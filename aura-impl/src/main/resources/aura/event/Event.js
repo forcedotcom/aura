@@ -119,10 +119,15 @@ Event.prototype.statsIndex = [];
  * Fires the Event. Checks if the Event has already been fired before firing.
  * Returns null if a handler has destroyed the component.
  * Maps the component handlers to the event dispatcher.
+ * @param {Object} params Optional A set of parameters for the Event. Any previous parameters of the same name will be overwritten.
  */
-Event.prototype.fire = function() {
+Event.prototype.fire = function(params) {
     if (this.fired) {
         aura.assert(false, "Event.fire(): Unable to fire event. Event has already been fired.");
+    }
+
+    if(params){
+        this.setParams(params);
     }
 
     //#if {"modes" : ["STATS"]}

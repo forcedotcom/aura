@@ -510,7 +510,7 @@
                 $A.newCmpAsync(this, function(){},'');
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
-                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: config is required in ComponentService.newComponentAsync(config)")===0);
+                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: ComponentService.newComponentAsync(): 'config' must be a valid Object.")===0);
             }
         }
     },

@@ -179,49 +179,66 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
  *
  */
 $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
-    $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
-    $A.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
+    $A.assert(config, "ComponentService.newComponentAsync(): 'config' must be a valid Object.");
+    $A.assert($A.util.isFunction(callback),"ComponentService.newComponentAsync(): 'callback' must be a Function pointer.");
 
-    //TODO - arrays are incorrectly created synchronously in all cases.
-    if ($A.util.isArray(config)){
-        return this.newComponentArray(config, attributeValueProvider, localCreation, doForce);
+    var isSingle=!$A.util.isArray(config);
+    if(isSingle){
+        config=[config];
+    }else{
+        config=config.slice();
     }
+    var components=[];
+    var componentService=this;
 
-    var configObj = this.getComponentConfigs(config, attributeValueProvider);
+    function createComponent(newComponent){
+        if(newComponent){
+            components.push(newComponent);
+        }
+        var configItem=config.shift();
+        if(configItem){
+            var configObj = componentService.getComponentConfigs(configItem, attributeValueProvider);
+            var def = configObj["definition"],
+                desc = configObj["descriptor"];
+            var forceClient = false;
 
-    var def = configObj["definition"],
-        desc = configObj["descriptor"];
-    var forceClient = false;
+            configItem = configObj["configuration"];
 
-    config = configObj["configuration"];
+            //
+            // Short circuit our check for remote dependencies, since we've
+            // been handed a partial config. This feels distinctly like a hack
+            // and will hopefully disappear with ComponentCreationContexts.
+            //
+            if (configItem["creationPath"] && !forceServer) {
+                forceClient = true;
+            }
 
-    //
-    // Short circuit our check for remote dependencies, since we've
-    // been handed a partial config. This feels distinctly like a hack
-    // and will hopefully disappear with ComponentCreationContexts.
-    //
-    if (config["creationPath"] && !forceServer) {
-        forceClient = true;
+            configItem["componentDef"] = {
+                "descriptor": desc
+            };
+
+            if (!def && desc.indexOf("layout://") == 0) {
+                // clear dynamic namespaces so that the server can send it back.
+                this.registry.dynamicNamespaces = [];
+                // throw error instead of trying to requestComponent from server which is prohibited
+                throw new Error("Missing " + desc + " definition.");
+            }
+
+            if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
+                componentService.requestComponent(callbackScope, createComponent, configItem, attributeValueProvider);
+                return;
+            } else {
+                components.push(componentService["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce));
+            }
+        }
+        if(config.length){
+            createComponent();
+        }else{
+            callback.call(callbackScope, isSingle?components[0]:components);
+        }
     }
-
-    config["componentDef"] = {
-        "descriptor": desc
-    };
-
-    if (!def && desc.indexOf("layout://") == 0) {
-        // clear dynamic namespaces so that the server can send it back.
-        this.registry.dynamicNamespaces = [];
-        // throw error instead of trying to requestComponent from server which is prohibited
-        throw new Error("Missing " + desc + " definition.");
-    }
-
-    if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
-        this.requestComponent(callbackScope, callback, config, attributeValueProvider);
-    } else {
-        var newComp = this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
-        callback.call(callbackScope, newComp);
-    }
-};
+    createComponent();
+ };
 
 /**
  * Request component from server.

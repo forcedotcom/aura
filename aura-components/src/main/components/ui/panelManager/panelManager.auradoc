@@ -29,10 +29,11 @@
     	title: 'my panel',
     	'class': 'myPanel',
         callbacks: { onCreate: function(panel){
-            	var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
-            	var overlay = cmps[3];
-        		overlay.addHandler('press', cmp, 'c.showPanel')
-        		panel.set("v.body", cmps);
+            	$A.componentService.newComponentAsync(this, function(cmps){
+                    var overlay = cmps[3];
+                    overlay.addHandler('press', cmp, 'c.showPanel')
+                    panel.set("v.body", cmps);
+            	}, helper.getConfig(cmp));
         	}
         }
     });
@@ -42,17 +43,18 @@
 	   To create a panel slider, set <code>isSlider: true</code> on the <code>ui:openPanel</code> event before you fire it.</p>
 	<p>When working with a modal overlay, you can set its body by passing in the <code>body</code> event parameter.</p>
 <pre>showModal: function(cmp, event, helper) {
-    var cmps = $A.componentService.newComponentAsync(this, function(){}, helper.getConfig(cmp));
-    var overlay = cmps[3];
-    overlay.addHandler('press', cmp, 'c.showModal')
-    var openPanelEvent = $A.get('e.ui:openPanel').setParams({
-        show: true,
-        isModal: true,
-        title: 'my panel',
-        'class': 'myClass',
-        body: cmps
-    });
-    openPanelEvent.fire();
+    $A.componentService.newComponentAsync(this, function(cmps){
+        var overlay = cmps[3];
+        overlay.addHandler('press', cmp, 'c.showModal')
+        var openPanelEvent = $A.get('e.ui:openPanel').setParams({
+            show: true,
+            isModal: true,
+            title: 'my panel',
+            'class': 'myClass',
+            body: cmps
+        });
+        openPanelEvent.fire();
+    }, helper.getConfig(cmp));
 }</pre>
   </aura:description>
  	<aura:example name="panelManagerEx" ref="uitest:panelTest" label="Using ui:panelManager">

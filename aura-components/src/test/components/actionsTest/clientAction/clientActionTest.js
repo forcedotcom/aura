@@ -62,23 +62,45 @@
 		}, function(component) {
 			$A.test.assertTrue(component._gotResponse, "Background Client Side Action was not called after enqueue.");
 		}]
-	}
+	},
 
-	/**
-	 * Framework just logs the controller error.  No visible error message.
-	 */
-        //	FIXME: uncomment when client side creation is fixed.
-//	testClientActionJavascriptError : {
-//		test : [ function(cmp) {
-//			var message, error;
-//			$A.test.addFunctionHandler($A, "warning", function(msg, err) {
-//				message = msg;
-//				error = err;
-//			});
-//			$A.run(function() {
-//				$A.enqueueAction(cmp.get("c.error"));
-//			});
-//			$A.test.assertEquals("Action failed: markup://actionsTest:clientAction -> error", message);
-//		} ]
-//	}
+    /**
+     * When trying to get a non-existent action, we should fail fast by displaying an error to the user (via $A.error),
+     * and throwing a Javascript exception, since $A.error will only display a message and does not stop execution.
+     */
+    testGetNonExistentAction: {
+        test: function(cmp) {
+            var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'";
+            $A.test.expectAuraError(errorMsg); // Expect error from explicit $A.error call when looking for actionDef
+            try {
+                var action = cmp.get("c.notHereCaptain");
+                $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");
+            } catch (e) {
+                // We also expect a javascript error to be thrown since $A.error does not stop code execution
+                $A.test.assertTrue(e.message.indexOf(errorMsg) !== -1, "Javascript error not thrown with expected " +
+                        "message. Expected <"+errorMsg+">, but got: <"+e.message+">");
+            }
+        }
+    },
+
+    /**
+     * Errors thrown while executing client-side actions should be propagated to caller, and a warning logged.
+     */
+    testClientActionJavascriptError : {
+        test : function(cmp) {
+            var message;
+            $A.test.addFunctionHandler($A, "warning", function(msg, err) {
+                message = msg;
+            });
+            try {
+                // Ideally, we would run this action with $A.enqueueAction, but due to the way our js test framework
+                // is set up we can't catch the error without failing the test.
+                cmp.get("c.error").runDeprecated();
+                $A.test.fail("Expected error when running client-side action");
+            } catch (e) {
+                $A.test.assertEquals("intentional error", e.message);
+            }
+            $A.test.assertEquals("Action failed: js://actionsTest.clientAction/ACTION$error", message);
+        }
+    }
 })

@@ -2024,6 +2024,17 @@ Component.prototype.addValueProvider=function(key,valueProvider){
 };
 
 /**
+ * Removes a custom value provider from a component
+ * @param {String} key string by which to identify the valueProvider to remove.
+ * @public
+ */
+Component.prototype.removeValueProvider=function(key){
+    $A.assert($A.util.isString(key),"Component.removeValueProvider(): 'key' must be a valid String.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,".indexOf(","+key.toLowerCase()+",")==-1,"Component.removeValueProvider(): '"+key+"' is a reserved valueProvider and can not be removed.");
+    delete this.priv.valueProviders[key];
+};
+
+/**
  * Gets the event dispatcher.
  *
  * @public

@@ -56,7 +56,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function AssertsConfigIsPresent(){
             // Arrange
-            var expected = "config is required in ComponentService.newComponentAsync(config)";
+            var expected = "ComponentService.newComponentAsync(): 'config' must be a valid Object.";
             var target;
             mockOnLoadUtil(function(){
                 target = new $A.ns.AuraComponentService();
@@ -76,7 +76,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function AssertsCallbackIsPresent(){
             // Arrange
-            var expected = "newComponentAsync requires a function as the callback parameter";
+            var expected = "ComponentService.newComponentAsync(): 'callback' must be a Function pointer.";
             var target;
             mockOnLoadUtil(function(){
                 target = new $A.ns.AuraComponentService();

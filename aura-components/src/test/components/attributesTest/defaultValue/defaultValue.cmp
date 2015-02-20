@@ -15,23 +15,96 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
+<aura:component extensible="true" render="client">
     <aura:attribute type="String" name="strAttributeWithNoDefaultValue" />
     <aura:attribute type="String" name="strAttributeWithDefaultValue" default="Aura"/>
     {!v.strAttributeWithDefaultValue}
+
     <aura:attribute type="Object" name="objAttributeWithNoDefaultValue"/>
     <aura:attribute type="Object" name="objAttributeWithDefaultValue" default="['red','green','blue']"/>
     {!v.objAttributeWithDefaultValue}
+
     <aura:attribute type="Boolean[]" name="listAttributeWithNoDefaultValue"/>
     <aura:attribute type="Boolean[]" name="listAttributeWithDefaultValue" default="true,false,true"/>
+
     <aura:attribute type="Map" name="mapAttributeWithNoDefaultValue"/>
     <aura:attribute type="Map" name="mapAttributeWithDefaultValue" default="{ a: 1, b: 2 }"/>
 
-    <aura:attribute type="Boolean" name="booleanDefault" default="true"/>
-    <aura:attribute type="long" name="longDefault" default="23"/>
-    <aura:attribute type="Date" name="dateDefault" default="2013-03-06"/>
-    <aura:attribute type="DateTime" name="dateTimeDefault" default="123456789"/>
     <aura:attribute type="Aura.Component[]" name="componentDefault">
-    	node text
+        node text
     </aura:attribute>
+
+    <aura:attribute type="Boolean" name="booleanDefaultWithNoValue"/>
+    <aura:attribute type="Boolean" name="booleanDefaultWithStringTrue" default="true"/>
+    <aura:attribute type="Boolean" name="booleanDefaultWithStringFalse" default="false"/>
+    <aura:attribute type="Boolean" name="booleanDefaultWithLiteralExpTrue" default="{!true}"/>
+    <aura:attribute type="Boolean" name="booleanDefaultWithLiteralExpFalse" default="{!false}"/>
+    <aura:attribute type="Boolean" name="booleanDefaultWithViewExpTrue" default="{!v.booleanDefaultWithStringTrue}"/>
+    <aura:attribute type="Boolean" name="booleanDefaultWithViewExpFalse" default="{!!v.booleanDefaultWithStringTrue}"/>
+
+    <aura:attribute type="Date" name="dateDefaultWithNoValue"/>
+    <aura:attribute type="Date" name="dateDefaultWithString" default="2013-03-06"/>
+    <aura:attribute type="Date" name="dateDefaultWithLiteralExp" default="{!'2013-03-06'}"/>
+    <aura:attribute type="Date" name="dateDefaultWithTimeString" default="2013-03-06T10:17:36.789Z"/>
+    <aura:attribute type="Date" name="dateDefaultWithTimeLiteralExp" default="{!'2013-03-06T10:17:36.789Z'}"/>
+
+    <aura:attribute type="DateTime" name="dateTimeDefaultWithNoValue"/>
+    <aura:attribute type="DateTime" name="dateTimeDefaultZero" default="0"/>
+    <aura:attribute type="DateTime" name="dateTimeDefaultWithString" default="123456789"/>
+    <aura:attribute type="DateTime" name="dateTimeDefaultWithLiteralExp" default="{!123456789}"/>
+
+    <aura:attribute type="Decimal" name="decimalDefaultWithNoValue"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithStringPositiveInt" default="123"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithStringNegativeInt" default="-123"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithStringPositiveDecimal" default="168.34"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithStringNegativeDecimal" default="-168.34"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithLiteralExpPositiveInt" default="{!123}"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithLiteralExpNegativeInt" default="{!-123}"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithLiteralExpPositiveDecimal" default="{!168.34}"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithLiteralExpNegativeDecimal" default="{!-168.34}"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithExpView" default="{!v.decimalDefaultWithStringPositiveDecimal}"/>
+    <aura:attribute type="Decimal" name="decimalDefaultWithExpression"
+            default="{!v.decimalDefaultWithStringPositiveDecimal + v.decimalDefaultWithLiteralExpNegativeDecimal + 0.3}"/>
+
+    <aura:attribute type="Double" name="doubleDefaultWithNoValue"/>
+    <aura:attribute type="Double" name="doubleDefaultWithStringPositiveInt" default="123"/>
+    <aura:attribute type="Double" name="doubleDefaultWithStringNegativeInt" default="-123"/>
+    <aura:attribute type="Double" name="doubleDefaultWithStringPositiveDecimal" default="168.34"/>
+    <aura:attribute type="Double" name="doubleDefaultWithStringNegativeDecimal" default="-168.34"/>
+    <aura:attribute type="Double" name="doubleDefaultWithLiteralExpPositiveInt" default="{!123}"/>
+    <aura:attribute type="Double" name="doubleDefaultWithLiteralExpNegativeInt" default="{!-123}"/>
+    <aura:attribute type="Double" name="doubleDefaultWithLiteralExpPositiveDecimal" default="{!168.34}"/>
+    <aura:attribute type="Double" name="doubleDefaultWithLiteralExpNegativeDecimal" default="{!-168.34}"/>
+    <aura:attribute type="Double" name="doubleDefaultWithExpView" default="{!v.doubleDefaultWithStringPositiveDecimal}"/>
+    <aura:attribute type="Double" name="doubleDefaultWithExpression"
+            default="{!v.doubleDefaultWithStringPositiveDecimal + v.doubleDefaultWithLiteralExpNegativeDecimal + 0.3}"/>
+
+    <aura:attribute type="Integer" name="integerDefaultWithNoValue"/>
+    <aura:attribute type="Integer" name="integerDefaultWithStringPositiveInt" default="123"/>
+    <aura:attribute type="Integer" name="integerDefaultWithStringNegativeInt" default="-123"/>
+    <aura:attribute type="Integer" name="integerDefaultWithStringPositiveDecimal" default="168.34"/>
+    <aura:attribute type="Integer" name="integerDefaultWithLiteralExpPositiveInt" default="{!123}"/>
+    <aura:attribute type="Integer" name="integerDefaultWithLiteralExpNegativeInt" default="{!-123}"/>
+    <aura:attribute type="Integer" name="integerDefaultWithExpView" default="{!v.integerDefaultWithStringPositiveInt}"/>
+    <aura:attribute type="Integer" name="integerDefaultWithExpression"
+            default="{!v.integerDefaultWithStringPositiveInt + v.integerDefaultWithLiteralExpPositiveInt + 4}"/>
+
+    <aura:attribute type="Long" name="longDefaultWithNoValue"/>
+    <aura:attribute type="Long" name="longDefaultWithStringPositiveInt" default="123"/>
+    <aura:attribute type="Long" name="longDefaultWithStringNegativeInt" default="-123"/>
+    <aura:attribute type="Long" name="longDefaultWithStringPositiveDecimal" default="168.34"/>
+    <aura:attribute type="Long" name="longDefaultWithLiteralExpPositiveInt" default="{!123}"/>
+    <aura:attribute type="Long" name="longDefaultWithLiteralExpNegativeInt" default="{!-123}"/>
+    <aura:attribute type="Long" name="longDefaultWithExpView" default="{!v.longDefaultWithStringPositiveInt}"/>
+    <aura:attribute type="Long" name="longDefaultWithExpression"
+            default="{!v.longDefaultWithStringPositiveInt + v.longDefaultWithLiteralExpPositiveInt + 4}"/>
+
+    <aura:attribute type="String" name="stringDefaultWithNoValue"/>
+    <aura:attribute type="String" name="stringDefaultWithString" default="test string"/>
+    <aura:attribute type="String" name="stringDefaultWithStringEmptyString" default=""/>
+    <aura:attribute type="String" name="stringDefaultWithLiteralExp" default="{!'test string'}"/>
+    <aura:attribute type="String" name="stringDefaultWithLiteralExpEmptyString" default=""/>
+    <aura:attribute type="String" name="stringDefaultWithExpView" default="{!v.stringDefaultWithString}"/>
+    <aura:attribute type="String" name="stringDefaultWithExpression" default="{!v.stringDefaultWithString + ' bla'}"/>
+    <aura:attribute type="String" name="stringDefaultWithExpGVP" default="{!$Label.section1.label_for_attribute_default_value_test}"/>
 </aura:component>

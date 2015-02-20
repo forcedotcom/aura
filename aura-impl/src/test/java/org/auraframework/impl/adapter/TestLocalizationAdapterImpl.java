@@ -27,6 +27,7 @@ public class TestLocalizationAdapterImpl extends LocalizationAdapterImpl {
 	private static Map<String, String> labels = new HashMap<>();
     static {
         labels.put("dynamic_label_for_test", "we have {0} members");
+        labels.put("label_for_attribute_default_value_test", "testing label");
     }
     
     public TestLocalizationAdapterImpl() {}

@@ -56,7 +56,7 @@ var ActionCallbackGroup = function ActionCallbackGroup(actions, scope, callback)
  *            the action to mark as complete.
  */
 ActionCallbackGroup.prototype.completeAction = function(action) {
-	var aidx = $A.util.arrayIndexOf(this.actions, action);
+	var aidx = this.actions.indexOf(action);
 	if (aidx != -1) {
 		this.actions.splice(aidx, 1);
 		if (this.callback && this.actions.length === 0 && !this.hold) {

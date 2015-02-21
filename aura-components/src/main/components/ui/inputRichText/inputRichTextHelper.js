@@ -46,7 +46,7 @@
 		var helper = cmp.getDef().getHelper();
         var updateOn = helper.getUpdateOn(cmp);
         // if this is an event we're supposed to update on
-        if ($A.util.arrayIndexOf(updateOn, event.name || event.type) > -1) {
+        if (updateOn.indexOf(event.name || event.type) > -1) {
         	var value = cmp.get('v.value');
         	//TODO: Do we need to compare content here?
         	var content = helper.getContent(cmp);

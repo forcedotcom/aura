@@ -55,7 +55,7 @@
 			var items = cmp.get("v.items");
 			helper.createComponentForIndex(cmp, items, this.index, function() {
 				// Remove this create op from the set of pending creates
-				var i = $A.util.arrayIndexOf(cmp._pendingCreates, that);
+				var i = cmp._pendingCreates.indexOf(that);
 				if (i >= 0) {
 					cmp._pendingCreates.splice(i, 1);
 				}

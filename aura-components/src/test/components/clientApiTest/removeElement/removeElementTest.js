@@ -130,7 +130,7 @@
 
 				$A.test.assertEquals(expected.length, log.length, "each element should have been removed only once");
 				for ( var e = 0; e < expected.length; e++) {
-					$A.test.assertTrue(-1 < $A.util.arrayIndexOf(log, expected[e]), "element was not removed: "
+					$A.test.assertTrue(-1 < log.indexOf(expected[e]), "element was not removed: "
 							+ expected[e]);
 				}
 			} catch (e) {

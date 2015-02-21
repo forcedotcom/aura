@@ -368,11 +368,11 @@
                  if (option.name) {
                      var name = this.tabNames[option.name];
                      if (name) {
-                         index = $A.util.arrayIndexOf(this.tabIds, name.tabId);
+                         index = this.tabIds.indexOf(name.tabId);
                      }
                  } else if ($A.util.isComponent(option.tab)) {
                      var gId = option.tab.getGlobalId();
-                     index = $A.util.arrayIndexOf(this.tabIds, gId);
+                     index = this.tabIds.indexOf(gId);
                  }
                  return index;
              },

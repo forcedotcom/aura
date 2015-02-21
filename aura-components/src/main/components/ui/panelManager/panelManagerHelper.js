@@ -534,37 +534,6 @@
             panels[i].setAttribute('aria-hidden', 'true');
         }
 
-        // set given panel active
-        if (panelDom) {
-            $A.util.addClass(panelDom, 'active');
-            panelDom.setAttribute('aria-hidden', 'false');
-
-        	// if we have previously stored the body scroll position for this panel, now is the time to reset it
-            if (panel._scrolled)  {
-            	document.body.scrollTop = panel._scrolled;
-            }
-            
-            if (panel.get('v.autoFocus') !== false) {
-                // if panel is being reshown because a stacked panel was hidden, reset the previously
-                // focused element, otherwise set focus to the first focusable element
-                var last = panel.get('v.lastFocusedInput');
-                if (last && !last.disabled && self.isVisible(last)) {
-                	last.focus();
-                }
-                else {
-	                setTimeout(function() {
-	                	$A.run(function() {
-	                		var focusables;
-		                    if (!panel.isValid()) {
-		                        return;
-		                    }
-		                    focusables = self.getFocusables(panel);
-		                    focusables.first && focusables.first.focus();
-	                	});
-	                }, 300); // animation is 300ms
-            	}
-            }
-        }
         var helper = cmp.getConcreteComponent().getDef().getHelper();
         helper.afterSetActiveInstance(panel);
 
@@ -791,7 +760,9 @@
         manager._transitioning = null;
         container.style.overflow = '';
 
-        if (actionDone === 'hide') {
+        if (actionDone === 'show' && currentInstance && currentInstance.isValid()) {
+        	this.setFocus(cmp, currentInstance);
+        } else if (actionDone === 'hide') {
             // transient panels get nuked
             if (isTransient) {
                 this.removeInstance(cmp, currentInstance);
@@ -808,6 +779,42 @@
         //dequeue all the actions that got queued up while the panel is opening or closing
         while (manager._actionQueue.length > 0) {
             setTimeout(executeAction.bind(this, manager._actionQueue.shift()), 0);
+        }
+    },
+    /**
+     * Set given panel active
+     */
+    setFocus: function(cmp, panel) {
+    	var me = this, panelDom = panel.getElement();
+        if (panelDom) {
+            $A.util.addClass(panelDom, 'active');
+            panelDom.setAttribute('aria-hidden', 'false');
+
+        	// if we have previously stored the body scroll position for this panel, now is the time to reset it
+            if (panel._scrolled)  {
+            	document.body.scrollTop = panel._scrolled;
+            }
+            
+            if (panel.get('v.autoFocus') !== false) {
+                // if panel is being reshown because a stacked panel was hidden, reset the previously
+                // focused element, otherwise set focus to the first focusable element
+                var last = panel.get('v.lastFocusedInput');
+                if (last && !last.disabled && self.isVisible(last)) {
+                	last.focus();
+                }
+                else {
+	                setTimeout(function() {
+	                	$A.run(function() {
+	                		var focusables;
+		                    if (!panel.isValid()) {
+		                        return;
+		                    }
+		                    focusables = me.getFocusables(panel);
+		                    focusables.first && focusables.first.focus();
+	                	});
+	                }, 0);
+            	}
+            }
         }
     },
 

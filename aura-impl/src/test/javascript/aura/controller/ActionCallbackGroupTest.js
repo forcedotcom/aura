@@ -26,19 +26,6 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 	};
 	var mockWindow = Mocks.GetMock(Object.Global(), "window", {});
 
-	var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-	    util : {
-			arrayIndexOf : function(array, searchElement) {
-			    for (var i = 0; i < array.length; i++) {
-			      if (array[i] === searchElement) {
-			        return i;
-			      }
-			    }
-			    return -1;
-			}
-	    }
-	});
-	
 	[Fixture]
 	function Constructor() {
 		[ Fact ]
@@ -220,7 +207,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var group = new ActionCallbackGroup([ action ], null, stubbedCallback);
 			var other = new MockAction("other");
 
-			mockAuraUtil(function() { group.completeAction(other) });
+			group.completeAction(other);
 
 			Assert.Equal(0, stubbedCallback.Calls.length);
 			Assert.Equal([ action ], group.actions);
@@ -234,7 +221,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			};
 			var group = new ActionCallbackGroup([ action ], scope, callback);
 
-			mockAuraUtil(function() { group.completeAction(action) });
+			group.completeAction(action);
 
 			Assert.Equal([], group.actions);
 		}
@@ -248,7 +235,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var group = new ActionCallbackGroup([ action ], scope, callback);
 			group.hold = true;
 
-			mockAuraUtil(function() { group.completeAction(action) });
+			group.completeAction(action);
 
 			Assert.Equal([], group.actions);
 		}
@@ -260,7 +247,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var stubbedCallback = Stubs.GetMethod("param", null);
 			var group = new ActionCallbackGroup([ action1, action2 ], null, stubbedCallback);
 
-			mockAuraUtil(function() { group.completeAction(action1) });
+			group.completeAction(action1);
 
 			Assert.Equal(0, stubbedCallback.Calls.length);
 		}
@@ -272,7 +259,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var group = new ActionCallbackGroup([ action ], null, stubbedCallback);
 			group.hold = true;
 
-			mockAuraUtil(function() { group.completeAction(action) });
+			group.completeAction(action);
 
 			Assert.Equal(0, stubbedCallback.Calls.length);
 		}
@@ -289,7 +276,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			
 			//Act
 			mockWindow(function(){
-				mockAuraUtil(function() { group.completeAction(action) });
+				group.completeAction(action);
 			});
 
 			//Assert
@@ -310,7 +297,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var stubbedCallback = Stubs.GetMethod("param", null);
 			var group = new ActionCallbackGroup([ action ], null);
 
-			mockAuraUtil(function() { group.completeAction(action) });
+			group.completeAction(action);
 		}
 
 		[ Fact ]
@@ -320,7 +307,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var stubbedCallback = Stubs.GetMethod("param", null);
 			var group = new ActionCallbackGroup([ action ], null, null);
 
-			mockAuraUtil(function() { group.completeAction(action) });
+			group.completeAction(action);
 		}
 
 		[ Fact ]
@@ -335,7 +322,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			};
 			var group = new ActionCallbackGroup([ action ], scope, callback);
 
-			mockAuraUtil(function() { group.completeAction(action) });
+			group.completeAction(action);
 
 			Assert.Equal(expected, scope);
 		}
@@ -351,7 +338,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var actual;
 
 			mockWindow(function() {
-				mockAuraUtil(function() { group.completeAction(action) });
+				group.completeAction(action);
 				actual = window.property;
 			});
 
@@ -369,7 +356,7 @@ Test.Aura.Controller.ActionCallbackGroupTest = function() {
 			var actual;
 
 			mockWindow(function() {
-				mockAuraUtil(function() { group.completeAction(action) });
+				group.completeAction(action);
 				actual = window.property;
 			});
 

@@ -55,7 +55,7 @@
 	 */
 	onTabActivated: function(cmp, evt, helper) {
 		var tab = evt.getSource(), 
-			index = $A.util.arrayIndexOf(cmp._tabItems, tab),
+			index = cmp._tabItems.indexOf(tab),
 			oldTab = cmp._activeTab && cmp._activeTab.isValid() ? cmp._activeTab : null,
 			e = cmp.get('e.onTabActivated');
 		
@@ -64,7 +64,7 @@
 	
 	onTabClosed: function(cmp, evt, helper) {
 		var tabItems = cmp._tabItems, item = evt.getSource(),
-			index = $A.util.arrayIndexOf(tabItems, item);
+			index = tabItems.indexOf(item);
 
 		helper.closeTab(cmp, index);
 		cmp.get("e.onTabClosed").setParams({"index": index}).fire();

@@ -117,8 +117,8 @@
 		var el = element;
 		while (el.parentNode) {
 			if (el.parentNode === container) {
-				index = $A.util.arrayIndexOf(container.children, el);
-				break;
+                index = Array.prototype.indexOf.call(container.children,el);
+                break;
 			}
 			el = el.parentNode;
 		}

@@ -58,7 +58,6 @@ p["getDataAttribute"] = p.getDataAttribute;
 p["setDataAttribute"] = p.setDataAttribute;
 p["hasDataAttribute"] = p.hasDataAttribute;
 p["createTimeoutCallback"] = p.createTimeoutCallback;
-p["arrayIndexOf"] = p.arrayIndexOf;
 p["contains"] = p.contains;
 p["squash"] = p.squash;
 p["stripTags"] = p.stripTags;

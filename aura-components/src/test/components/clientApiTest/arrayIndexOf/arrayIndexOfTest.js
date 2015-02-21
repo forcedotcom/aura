@@ -25,40 +25,31 @@
 
     testArrayIndex : {
         test : function(cmp) {
-            $A.test.assertTrue($A.util.arrayIndexOf(this.TEST_ARRAY, 'red') === 0, "Wrong index for first array element returned");
-            $A.test.assertTrue($A.util.arrayIndexOf(this.TEST_ARRAY, 'yellow') === 4, "Wrong index for last array element returned");
-            $A.test.assertTrue($A.util.arrayIndexOf(this.TEST_ARRAY, 'nonexistent') === -1, "Element not found in array should return -1");
-            $A.test.assertTrue($A.util.arrayIndexOf(this.TEST_ARRAY, '') === -1, "Index returned on search for empty string");
-            $A.test.assertTrue($A.util.arrayIndexOf(this.TEST_ARRAY, null) === -1, "Index returned on search for null");
-            $A.test.assertTrue($A.util.arrayIndexOf(this.TEST_ARRAY, undefined) === -1, "Index returned on search for undefined");
+            $A.test.assertTrue(this.TEST_ARRAY.indexOf('red') === 0, "Wrong index for first array element returned");
+            $A.test.assertTrue(this.TEST_ARRAY.indexOf('yellow') === 4, "Wrong index for last array element returned");
+            $A.test.assertTrue(this.TEST_ARRAY.indexOf('nonexistent') === -1, "Element not found in array should return -1");
+            $A.test.assertTrue(this.TEST_ARRAY.indexOf('') === -1, "Index returned on search for empty string");
+            $A.test.assertTrue(this.TEST_ARRAY.indexOf(null) === -1, "Index returned on search for null");
+            $A.test.assertTrue(this.TEST_ARRAY.indexOf(undefined) === -1, "Index returned on search for undefined");
         }
     },
 
     testArrayIndexOnEmptyArray : {
         test : function(cmp) {
-            $A.test.assertTrue($A.util.arrayIndexOf(this.EMPTY_ARRAY, 'red') === -1, "Element found in empty array");
-            $A.test.assertTrue($A.util.arrayIndexOf(this.EMPTY_ARRAY, '') === -1, "Element found in empty array");
-        }
-    },
-
-    testArrayIndexOnNullArray : {
-        test : function(cmp) {
-            try {
-                $A.util.arrayIndexOf(null, 'red');
-                $A.test.fail("Attempting to access null array should throw exception");
-            } catch (e) {}
+            $A.test.assertTrue(this.EMPTY_ARRAY.indexOf('red') === -1, "Element found in empty array");
+            $A.test.assertTrue(this.EMPTY_ARRAY.indexOf('') === -1, "Element found in empty array");
         }
     },
 
     testArrayIndexOnArrayFromComponent : {
         test : function(cmp) {
             var array = cmp.get("v.array");
-            $A.test.assertTrue($A.util.arrayIndexOf(array, 'red') === 0, "Wrong index for first array element returned");
-            $A.test.assertTrue($A.util.arrayIndexOf(array, 'yellow') === 4, "Wrong index for last array element returned");
-            $A.test.assertTrue($A.util.arrayIndexOf(array, 'nonexistent') === -1, "Element not found in array should return -1");
-            $A.test.assertTrue($A.util.arrayIndexOf(array, '') === -1, "Index returned for empty search");
-            $A.test.assertTrue($A.util.arrayIndexOf(array, null) === -1, "Index returned for null search");
-            $A.test.assertTrue($A.util.arrayIndexOf(array, undefined) === -1, "Index returned for undefined search");
+            $A.test.assertTrue(array.indexOf('red') === 0, "Wrong index for first array element returned");
+            $A.test.assertTrue(array.indexOf('yellow') === 4, "Wrong index for last array element returned");
+            $A.test.assertTrue(array.indexOf('nonexistent') === -1, "Element not found in array should return -1");
+            $A.test.assertTrue(array.indexOf('') === -1, "Index returned for empty search");
+            $A.test.assertTrue(array.indexOf(null) === -1, "Index returned for null search");
+            $A.test.assertTrue(array.indexOf(undefined) === -1, "Index returned for undefined search");
 
         }
     }

@@ -129,7 +129,7 @@ MemoryStorageAdapter.prototype.getAll = function() {
  * @param {String} key the key to update
  */
 MemoryStorageAdapter.prototype.updateMRU = function(key) {
-    var index = $A.util.arrayIndexOf(this.mru, key);
+    var index = this.mru.indexOf(key);
     if (index > -1) {
         this.mru.splice(index, 1);
         this.mru.push(key);
@@ -190,7 +190,7 @@ MemoryStorageAdapter.prototype.removeItem = function(key) {
         var value = that.backingStore[key];
 
         if (!$A.util.isUndefinedOrNull(value)) {
-            var index = $A.util.arrayIndexOf(that.mru, key);
+            var index = that.mru.indexOf(key);
             if (index >= 0) {
                 that.mru.splice(index, 1);
             }

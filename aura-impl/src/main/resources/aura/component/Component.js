@@ -1522,6 +1522,8 @@ Component.prototype.destroy = function(async) {
        // Swap in InvalidComponent prototype to keep us from having to add
         // validity checks all over the place
         $A.util.apply(this, InvalidComponent.prototype, true);
+        // Fix for <= IE8 DontEnum bug.
+        this.toString=InvalidComponent.prototype.toString;
 
         if (priv.model) {
             priv.model.destroy(async);

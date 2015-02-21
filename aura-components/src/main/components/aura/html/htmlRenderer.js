@@ -80,7 +80,7 @@
 					value = value.evaluate();
 				}
 				
-				if ($A.util.arrayIndexOf(helper.SPECIAL_BOOLEANS, lowerName) > -1) {
+				if (helper.SPECIAL_BOOLEANS.hasOwnProperty(lowerName)) {
 					value = $A.util.getBooleanValue(value);
 				}
 	

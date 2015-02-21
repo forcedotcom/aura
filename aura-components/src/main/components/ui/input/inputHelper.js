@@ -127,7 +127,7 @@
         var updateOn = helper.getUpdateOn(component);
 
         // if this is an event we're supposed to update on, call this component's update implementation
-        if ($A.util.arrayIndexOf(updateOn, event.type) > -1) {
+        if (updateOn.indexOf(event.type) > -1) {
             helper.doUpdate(component, helper.getDomElementValue(this.getInputElement(component)));
         }
     },

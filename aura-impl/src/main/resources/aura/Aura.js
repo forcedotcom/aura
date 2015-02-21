@@ -49,14 +49,15 @@ $A['ns'] = $A.ns; // TODO: use exportSymbols when available
 
 var clientService;
 
-// #include aura.polyfill.Promise
+// #include aura.polyfill.Array
 // #include aura.polyfill.Function
+// #include aura.polyfill.Json
+// #include aura.polyfill.Promise
 // #include aura.util.Util
 // #include aura.Logger
 // #include aura.DocLevelHandler
 // #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
 // #include aura.system.DefDescriptor
-// #include aura.polyfill.Json
 // #include aura.util.Transport
 // #include aura.util.Style
 // #include aura.util.Bitset

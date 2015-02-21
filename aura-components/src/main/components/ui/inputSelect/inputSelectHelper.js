@@ -144,7 +144,7 @@
     		for(var i=0;i<options.length;i++){
                 var option=options[i];
     			var val = option.value;
-    			var selectOption = (newValues.length > 1 && aura.util.arrayIndexOf(newValues, val) > -1) || newValues[0] == val.toString();
+    			var selectOption = (newValues.length > 1 && newValues.indexOf(val) > -1) || newValues[0] == val.toString();
 
     			found = found || selectOption;
                 option.selected = selectOption;
@@ -241,7 +241,7 @@
         // Update optionCmp if it exists in newValues; passes result back in result object
         updateOption : function(optionCmp, result, newValues) {
         	var text = optionCmp.get("v.text");
-			var selectOption = (newValues.length > 1 && aura.util.arrayIndexOf(newValues, text) > -1) || newValues[0] === text;
+			var selectOption = (newValues.length > 1 && newValues.indexOf(text) > -1) || newValues[0] === text;
 
 			result.found = result.found || selectOption;
 			optionCmp.set("v.value", selectOption);

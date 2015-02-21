@@ -265,7 +265,7 @@ NumberFormat.prototype.format = function(number) {
         charArray.shift();
     }
     // find the decimal place and remove it
-    var decimalPos = $A.util.arrayIndexOf(charArray, ".");
+    var decimalPos = charArray.indexOf(".");
     if (decimalPos === -1) {
         decimalPos = charArray.length;
     } else {

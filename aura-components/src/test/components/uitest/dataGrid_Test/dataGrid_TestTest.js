@@ -190,7 +190,8 @@
      * 
      * bugTracking why this is not being run in IE7/IE8: W-2327182
      */
-    testStaggeredInsertionRemove : {
+    // TODO: W-2507326
+    _testStaggeredInsertionRemove : {
     	browsers : ["-IE8", "-IE7"],
         test : function(cmp){
             this.setValue(cmp, "index", 50);

@@ -603,10 +603,11 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
                     $A.historyService.init();
                     $A.Perf.endMark("HistoryService.init");
                 }
-
+                // restore component definitions from AuraStorage into memory and localStorage
+                componentService.registry.restoreAllFromStorage();
                 $A.initialized = true;
             }
-
+            
             $A.finishInit(doNotCallUIPerfOnLoad);
         }, container ? $A.util.getElement(container) : null);
     }

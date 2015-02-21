@@ -169,7 +169,8 @@
      * Insert single item into grid
      * bugTracking why this is not being run in IE7/IE8: W-2327182
      */
-    testInsertionOfSingleItem : {
+    // TODO: W-2507326
+    _testInsertionOfSingleItem : {
     	browsers : ["-IE8", "-IE7"],
         test : function(cmp){
 

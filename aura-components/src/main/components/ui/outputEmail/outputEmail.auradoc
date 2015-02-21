@@ -23,7 +23,7 @@
 			The email output is wrapped in an HTML anchor element and <code>mailto</code> is automatically appended to it.
 			This is a simple set up of a <code>ui:outputEmail</code> component.
 		</p>
-		<pre>&lt;ui:outputEmail value="abc@email.com" label="abc@email.com"/></pre>
+		<pre>&lt;ui:outputEmail value="abc@email.com"/></pre>
 		<p>The previous example renders the following HTML.</p>
 		<pre>&lt;span>&lt;a href="mailto:abc@email.com" class="uiOutputEmail">abc@email.com&lt;/a>&lt;/span></pre>
 	</aura:description>	

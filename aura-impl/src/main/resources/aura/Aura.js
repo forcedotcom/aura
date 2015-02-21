@@ -146,6 +146,7 @@ $A.ns.Aura = function() {
     this.storageService = new AuraStorageService();
     this.styleService = new AuraStyleService();
     this.logger = new $A.ns.Logger();
+    this.displayErrors = true;
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
@@ -668,6 +669,21 @@ $A.ns.Aura.prototype.error = function(msg, e){
 };
 
 /**
+ * Optionally sets and returns whether to display error dialog
+ *
+ * @private
+ * @param {Boolean} [toggle] toggles display of error dialog
+ * @returns {Boolean} whether to display error dialog
+ */
+$A.ns.Aura.prototype.showErrors = function(toggle){
+    if (toggle !== undefined) {
+        this.displayErrors = !!toggle;
+    }
+    return this.displayErrors;
+};
+
+
+/**
  * <code>$A.warning()</code> should be used in the case where poor programming practices have been used.
  *
  * These warnings will not, in general, be displayed to the user, but they will appear in the console (if
@@ -791,7 +807,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
     try {
         return func();
     } catch (e) {
-        if (nested || (e.message && e.message.indexOf("Missing layout://") !== -1)) {
+        if (nested) {
             throw e;
         } else {
             $A.error("Uncaught error in "+name, e);

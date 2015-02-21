@@ -466,11 +466,9 @@ var AuraClientService = function() {
                 } catch(e) {
                     var retryAction = info.action.getRetryFromStorageAction();
                     if (retryAction) {
-                        $A.log("Finishing cached action failed. Trying to refetch from server.", e);
-                    
+                        $A.warning("Finishing cached action failed. Trying to refetch from server: " + retryAction.getStorageKey(), e);
                         // Clear potential leftover configs
                         $A.getContext().clearComponentConfigs(info.action.getId());
-                    
                         // Enqueue the retry action
                         $A.enqueueAction(retryAction);
                     } else {

@@ -26,6 +26,8 @@ Test.Aura.LoggerTest = function() {
         // #import aura.Logger
     });
 
+    var messageCalled = false,
+        showErrors = true;
     var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
         util: {
             isString: function (obj) {
@@ -45,7 +47,12 @@ Test.Aura.LoggerTest = function() {
             },
             objToString: Object.prototype.toString
         },
-        message: function() {}
+        message: function() {
+            messageCalled = true;
+        },
+        showErrors: function() {
+            return showErrors;
+        }
     });
 
     [Fixture]
@@ -166,6 +173,28 @@ Test.Aura.LoggerTest = function() {
             Assert.Equal(expectedMsg, message);
             Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
             Assert.Equal(undefined, error);
+            Assert.True(messageCalled);
+            messageCalled = false; // reset
+        }
+
+        [Fact]
+        function NoMessageWhenShowErrorsFalse() {
+            var expectedLevel = "ERROR",
+                expectedMsg = "expectedMsg";
+            logger.subscribe(expectedLevel, cb);
+            showErrors = false;
+            mockUtil(function() {
+                logger.error(expectedMsg);
+            });
+
+            Assert.Equal(expectedLevel, level);
+            Assert.Equal(expectedMsg, message);
+            Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
+            Assert.Equal(undefined, error);
+            Assert.False(messageCalled);
+            // reset
+            messageCalled = false;
+            showErrors = true;
         }
     }
 

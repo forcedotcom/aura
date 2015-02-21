@@ -536,12 +536,6 @@ Action.prototype.runDeprecated = function(evt) {
         this.returnValue = this.meth.call(this, this.cmp, evt, helper);
         this.state = "SUCCESS";
     } catch (e) {
-
-        // catch and throw missing layout:// definition errors
-        if (e && e.message && e.message.indexOf("Missing layout://") !== -1) {
-            throw e;
-        }
-
         this.state = "FAILURE";
         this.error = e;
         $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
@@ -777,6 +771,12 @@ Action.prototype.finishAction = function(context) {
     var clearComponents = false;
     var id = this.getId(context);
     var error = undefined;
+    var oldDisplayFlag = $A.showErrors();
+    if (this.isFromStorage()) {
+        // suppress errors dialogs while performing cached actions.
+        // allows retry without the error dialog.
+        $A.showErrors(false);
+    }
     try {
         if (this.cmp === undefined || this.cmp.isValid()) {
             // Add in any Action scoped components /or partial configs
@@ -821,6 +821,7 @@ Action.prototype.finishAction = function(context) {
             error = e;
         }
         $A.warning("Action failed: " + (this.def?this.def.toString():""), e);
+        clearComponents = true;
     }
     context.setCurrentAction(previous);
     this.completeGroups();
@@ -831,9 +832,11 @@ Action.prototype.finishAction = function(context) {
         if ($A.clientService.inAuraLoop()) {
             throw error;
         } else {
+            $A.showErrors(oldDisplayFlag);
             $A.error("Error ", error);
         }
     }
+    $A.showErrors(oldDisplayFlag);
 };
 
 /**

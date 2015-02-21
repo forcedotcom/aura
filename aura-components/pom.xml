@@ -81,19 +81,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>index-components</id>
-                        <phase>generate-resources</phase>
-                    </execution>
-                    <execution>
-                        <id>index-test-components</id>
-                        <phase>generate-test-resources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -111,14 +98,17 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>index-components</id>
+                        <phase>generate-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>index-test-components</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                    <execution>
                         <id>aura:compile-components</id>
                         <phase>${component.compile.phase}</phase>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
                     <execution>
                         <id>aura:compile-test-components</id>
                         <phase>${component.test.compile.phase}</phase>

@@ -219,7 +219,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
 
             if (!def && desc.indexOf("layout://") == 0) {
                 // clear dynamic namespaces so that the server can send it back.
-                this.registry.dynamicNamespaces = [];
+                componentService.registry.dynamicNamespaces = [];
                 // throw error instead of trying to requestComponent from server which is prohibited
                 throw new Error("Missing " + desc + " definition.");
             }

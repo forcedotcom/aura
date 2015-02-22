@@ -118,7 +118,9 @@ var clientService;
 // #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
 // #include aura.provider.ObjectValueProvider
-//#include aura.provider.ContextValueProvider
+// #include aura.provider.ContextValueProvider
+// #include aura.metrics.AuraMetricsService
+
 
 /**
  * @class Aura
@@ -147,6 +149,7 @@ $A.ns.Aura = function() {
     this.styleService = new AuraStyleService();
     this.logger = new $A.ns.Logger();
     this.displayErrors = true;
+    this.metricsService = new MetricsService();
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
@@ -253,6 +256,14 @@ $A.ns.Aura = function() {
          * @memberOf Aura.prototype
          */
         style: aura.styleService,
+        /**
+         * Metrics Service
+         *
+         * @public
+         * @type AuraMetricsService
+         * @memberOf Aura.prototype
+         */
+        metrics: aura.metricsService,
 
         get : function(key) {
             var ret = $A.services[key];
@@ -450,6 +461,7 @@ $A.ns.Aura = function() {
         "localizationService", aura.localizationService,
         "eventService", aura.eventService,
         "layoutService", aura.layoutService,
+        "metricsService", aura.metricsService,
         "storageService", aura.storageService,
         "styleService", aura.styleService,
         "services", aura.services,
@@ -484,6 +496,7 @@ $A.ns.Aura = function() {
         "history", services.history,
         "l10n", services.localization,
         "storage", services.storage,
+        "metrics", services.metrics,
         "cmp", services.cmp,
         "e", services.e,
         "c", {
@@ -530,13 +543,16 @@ $A.ns.Aura = function() {
 $A.ns.Aura.prototype.initAsync = function(config) {
     $A.Perf.mark("Component Load Complete");
     $A.Perf.mark("Component Load Initiated");
+
     //
     // we don't handle components that come back here. This is used in the case where there
     // are none.
     //
     $A.context = new AuraContext(config["context"], function() {
         clientService.initHost(config["host"]);
+        $A.metricsService.initialize();
         clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
+            $A.metricsService.bootstrapMark("metadataReady");
             $A.initPriv(resp);
             $A.Perf.endMark("Component Load Complete");
         }, config["deftype"]);
@@ -588,28 +604,25 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
 $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallUIPerfOnLoad) {
     if (!$A["hasErrors"]) {
         $A.Perf.mark("ClientService.init");
+        var cmp = clientService["init"](config, token, container ? $A.util.getElement(container) : null);
+        $A.Perf.endMark("ClientService.init");
+        $A.setRoot(cmp);
 
-        clientService.init(config, token, function(cmp) {
-            $A.Perf.endMark("ClientService.init");
-            $A.setRoot(cmp);
-
-            if (!$A.initialized) {
-                if (!doNotInitializeServices) {
-                    $A.Perf.mark("LayoutService.init");
-                    $A.layoutService.init(cmp);
-                    $A.Perf.endMark("LayoutService.init");
-
-                    $A.Perf.mark("HistoryService.init");
-                    $A.historyService.init();
-                    $A.Perf.endMark("HistoryService.init");
-                }
-                // restore component definitions from AuraStorage into memory and localStorage
-                componentService.registry.restoreAllFromStorage();
-                $A.initialized = true;
+        if (!$A.initialized) {
+            if (!doNotInitializeServices) {
+                $A.Perf.mark("LayoutService.init");
+                $A.layoutService.init(cmp);
+                $A.Perf.endMark("LayoutService.init");
             }
-            
-            $A.finishInit(doNotCallUIPerfOnLoad);
-        }, container ? $A.util.getElement(container) : null);
+
+            // restore component definitions from AuraStorage into memory and localStorage
+            componentService.registry.restoreAllFromStorage();
+            $A.initialized = true;
+        }
+        $A.finishInit(doNotCallUIPerfOnLoad);
+
+        // After App initialization is done
+        $A.historyService.init();
     }
 };
 
@@ -637,6 +650,8 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
 
         this["finishedInit"] = true;
         $A.clientService.fireLoadEvent("e.aura:initialized");
+        $A.metricsService.applicationReady();
+        
     }
 };
 
@@ -1234,6 +1249,7 @@ $A.ns.Aura.prototype.Perf = window["Perf"] ?
     window['$A'] = new ns.Aura();
     window['$A']['ns'] = ns;
     window['$A'].ns = ns;
+    $A.metricsService.bootstrapMark("frameworkReady");
 })();
 
 // shortcuts for using throughout the framework code.
@@ -1246,13 +1262,22 @@ var expressionService = $A.expressionService;
 var historyService = $A.historyService;
 var eventService = $A.eventService;
 var layoutService = $A.layoutService;
+var metricsService = $A.metricsService;
 
 var services = $A.services;
 
 // TODO(fabbott): Remove the legacy 'aura' top-level name.
 window['aura'] = window['$A'];
 
+// **** Storage Adapters ****
+// --------------------------
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
 // #include aura.storage.adapters.WebSQLAdapter
 // #include aura.Logging
+
+// **** Metrics Plugins ****
+// --------------------------
+// -Xinclude aura.metrics.plugins.TransportMetricsPlugin
+// -Xinclude aura.metrics.plugins.ServerActionsMetricsPlugin
+// -Xinclude aura.metrics.plugins.ClientServiceMetricsPlugin

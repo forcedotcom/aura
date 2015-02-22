@@ -382,7 +382,7 @@ Action.prototype.getParams = function() {
  */
 Action.prototype.getComponent = function() {
     return this.cmp;
-};
+}; 
 
 /**
  * Sets the callback function that is executed after the server-side Action returns. Call a server-side Action from a
@@ -408,16 +408,16 @@ Action.prototype.setCallback = function(scope, callback, name) {
     // If name is undefined or specified as "ALL", then apply same callback in all cases
     if (name === undefined || name === "ALL") {
         this.callbacks["SUCCESS"] = {
-            fn : callback,
-            s : scope
+            "fn" : callback,
+            "s" : scope
         };
         this.callbacks["ERROR"] = {
-            fn : callback,
-            s : scope
+            "fn" : callback,
+            "s" : scope
         };
         this.callbacks["INCOMPLETE"] = {
-            fn : callback,
-            s : scope
+            "fn" : callback,
+            "s" : scope
         };
     } else {
         if (name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE" && name !== "ABORTED") {
@@ -425,11 +425,22 @@ Action.prototype.setCallback = function(scope, callback, name) {
             return;
         }
         this.callbacks[name] = {
-            fn : callback,
+            "fn" : callback,
             s : scope
         };
     }
 };
+
+
+/**
+ * Get current callback for a give action Type
+ *
+ * @public
+ * @returns {string} the abortable id that was set for this action.
+ */
+ Action.prototype.getCallback = function (type) {
+    return this.callbacks[type];
+ };
 
 /**
  * Set an 'all aboard' callback, called just before the action is sent.
@@ -491,8 +502,8 @@ Action.prototype.wrapCallback = function(scope, callback) {
 
     this.setCallback(this, function(action, cmp) {
         var cb = nestedCallbacks[this.getState()];
-        if (cb && cb.fn) {
-            cb.fn.call(cb.s, action, cmp);
+        if (cb && cb["fn"]) {
+            cb["fn"].call(cb["s"], action, cmp);
         }
         outerCallback.call(outerScope, this, cmp);
         this.callbacks = nestedCallbacks;
@@ -801,7 +812,7 @@ Action.prototype.finishAction = function(context) {
 
             try {
                 if (cb) {
-                    cb.fn.call(cb.s, this, this.cmp);
+                    cb["fn"].call(cb["s"], this, this.cmp);
                 }
             } catch (e) {
                 if (!error) {
@@ -849,7 +860,7 @@ Action.prototype.abort = function() {
     var cb = this.callbacks[this.state];
     try {
         if (cb) {
-            cb.fn.call(cb.s, this, this.cmp);
+            cb["fn"].call(cb["s"], this, this.cmp);
         }
     } catch (e) {
         if ($A.clientService.inAuraLoop()) {
@@ -1217,4 +1228,6 @@ Action.prototype.fireRefreshEvent = function(event, responseUpdated) {
         }
     }
 };
+
+$A.ns.Action = Action;
 // #include aura.controller.Action_export

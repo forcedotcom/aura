@@ -144,6 +144,17 @@ ActionQueue.prototype.getClientActions = function() {
 };
 
 /**
+ * Return the current set of client actions. Returns [] is there are no client actions in
+ * the queue.
+ * 
+ * @protected
+ * @return {Array} the set of client actions.
+ */
+ActionQueue.prototype.getQueuedActions = function() {
+    return this.actions;
+};
+
+/**
  * Return the number of the last 'transaction' containing an abortable action.
  * 
  * @protected
@@ -204,3 +215,7 @@ ActionQueue.prototype.filterActions = function(filter) {
     this.actions = newActions;
     return requestedActions;
 };
+
+// #include aura.controller.ActionQueue_export
+
+$A.ns.ActionQueue = ActionQueue;

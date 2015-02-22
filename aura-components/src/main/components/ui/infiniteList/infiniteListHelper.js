@@ -64,7 +64,7 @@
 	 * @param {Function} callback An optional callback to invoke after 'v.items' has been replaced. 
 	 */
     handleDataChange: function(cmp, evt, callback) {
-        $A.mark("infiniteList handleDataChange " + cmp.getGlobalId());
+        $A.Perf.mark("infiniteList handleDataChange " + cmp.getGlobalId());
         
         var concrete = cmp.getConcreteComponent();
     	var newData = evt.getParam("data") || [],
@@ -96,7 +96,7 @@
         	callback();
         }
         
-        $A.endMark("infiniteList handleDataChange " + cmp.getGlobalId());
+        $A.Perf.endMark("infiniteList handleDataChange " + cmp.getGlobalId());
     },
     
     /**

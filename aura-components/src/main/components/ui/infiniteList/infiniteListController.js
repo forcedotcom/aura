@@ -22,7 +22,7 @@
     },
 
 	showMore: function(component, event, helper) {
-        $A.mark("infiniteList showMore " + component.getGlobalId());
+        $A.Perf.mark("infiniteList showMore " + component.getGlobalId());
 
 		var params = event.getParams(),
 			currentPageValue = component.get("v.currentPage"),
@@ -39,7 +39,7 @@
 	},
 
 	rerenderComplete: function(component, event, helper) {
-        $A.endMark("infiniteList showMore " + component.getGlobalId());
+        $A.Perf.endMark("infiniteList showMore " + component.getGlobalId());
 
 		helper.showLoading(component, false);
         component.getEvent("rerenderComplete").fire();

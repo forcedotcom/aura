@@ -32,10 +32,12 @@
                     }, "markup://aura:text");
                 });
                 
-                var body = cmp.get('v.body');
-                $A.test.assertEquals(1, body.length);
-                $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("0:c", body[0].getGlobalId());
+                $A.test.addWaitFor(false, $A.test.isActionPending,function(){
+                    var body = cmp.get('v.body');
+                    $A.test.assertEquals(1, body.length);
+                    $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
+                    $A.test.assertEquals("0:c", body[0].getGlobalId());
+                });
             } finally {
                 $A.test.releaseRequests();
             }

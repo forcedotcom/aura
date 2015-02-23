@@ -185,19 +185,21 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     var isSingle=!$A.util.isArray(config);
     if(isSingle){
         config=[config];
-    }else{
-        config=config.slice();
     }
     var components=[];
-    var componentService=this;
+    var collected=0;
 
-    function createComponent(newComponent){
-        if(newComponent){
-            components.push(newComponent);
+    function collectComponent(newComponent,index){
+        components[index]=newComponent;
+        if(++collected===config.length){
+            callback.call(callbackScope, isSingle?components[0]:components);
         }
-        var configItem=config.shift();
+    }
+
+    for(var i=0;i<config.length;i++){
+        var configItem=config[i];
         if(configItem){
-            var configObj = componentService.getComponentConfigs(configItem, attributeValueProvider);
+            var configObj = this.getComponentConfigs(configItem, attributeValueProvider);
             var def = configObj["definition"],
                 desc = configObj["descriptor"];
             var forceClient = false;
@@ -225,19 +227,12 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
             }
 
             if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
-                componentService.requestComponent(callbackScope, createComponent, configItem, attributeValueProvider);
-                return;
+                this.requestComponent(callbackScope, collectComponent, configItem, attributeValueProvider, i);
             } else {
-                components.push(componentService["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce));
+                collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),i);
             }
         }
-        if(config.length){
-            createComponent();
-        }else{
-            callback.call(callbackScope, isSingle?components[0]:components);
-        }
     }
-    createComponent();
  };
 
 /**
@@ -247,7 +242,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
  * @param callback
  * @private
  */
-$A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp) {
+$A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp, index) {
     var action = $A.get("c.aura://ComponentController.getComponent");
 
     // JBUCH: HALO: TODO: WHERE IS THIS COMING FROM IN MIXED FORM? WHY DO WE ALLOW THIS?
@@ -298,7 +293,7 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
             }
         }
         if ( $A.util.isFunction(callback) ) {
-            callback.call(callbackScope, newComp);
+            callback.call(callbackScope, newComp, index);
         }
     });
     action.setParams({

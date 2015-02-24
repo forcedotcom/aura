@@ -15,6 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="BETA" description="An input field for entering the time.">
-    <aura:set attribute="type" value="time"/>
+<aura:component extends="ui:input" implements="ui:inputTextComponent"  extensible="true" support="BETA" description="An input field for entering the time.">
+    <input aura:id="txt"
+           id="{!v.domId}"
+           class="{!v.class}"
+           type="time"
+           value="{!v.value}"
+           placeholder="{!v.placeholder}"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
+           maxlength="{!v.maxlength}"
+           size="{!v.size}"
+           aria-describedby="{!v.ariaDescribedBy}"/>
 </aura:component>

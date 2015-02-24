@@ -26,21 +26,15 @@
     <aura:attribute access="GLOBAL" name="maxlength" type="Integer" description="The maximum number of characters that can be typed into the input field. Corresponds to the maxlength attribute of the rendered HTML textarea element."/>
 
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
-    
-    <aura:renderif isTrue="{!v.body.length == 0}">
-        <textarea aura:id="textAreaElem"
-            id="{!v.domId}"
-            class="{!v.class+(v.resizable?'':' noresize')}"
-            cols="{!v.cols}"
-            rows="{!v.rows}"
-            disabled="{!v.disabled}"
-            readonly="{!v.readonly}"
-            maxlength="{!v.maxlength}"
-            placeholder="{!v.placeholder}"
-            aria-describedby="{!v.ariaDescribedBy}"/>
-        <aura:set attribute="else">
-            {!v.body}
-        </aura:set>
-    </aura:renderif>
 
+    <textarea aura:id="textAreaElem"
+              id="{!v.domId}"
+              class="{!v.class+(v.resizable?'':' noresize')}"
+              cols="{!v.cols}"
+              rows="{!v.rows}"
+              disabled="{!v.disabled}"
+              readonly="{!v.readonly}"
+              maxlength="{!v.maxlength}"
+              placeholder="{!v.placeholder}"
+              aria-describedby="{!v.ariaDescribedBy}"/>
 </aura:component>

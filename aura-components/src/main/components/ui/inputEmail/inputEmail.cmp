@@ -15,6 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputText" extensible="true" support="GA" access="GLOBAL" description="Represents an input field for entering an email address.">
-    <aura:set attribute="type" value="email"/>
+<aura:component extends="ui:input" implements="ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL" description="Represents an input field for entering an email address.">
+    <input aura:id="txt"
+           id="{!v.domId}"
+           class="{!v.class}"
+           type="email"
+           value="{!v.value}"
+           placeholder="{!v.placeholder}"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
+           maxlength="{!v.maxlength}"
+           size="{!v.size}"
+           aria-describedby="{!v.ariaDescribedBy}"/>
 </aura:component>

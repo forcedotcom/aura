@@ -21,16 +21,12 @@
         component.set("v.value", value);
     },
 
-    getNumber: function(cmp) {
-        var num = cmp.get("v.value");
-        var scale = cmp.get("v.valueScale");
+    getNumber: function(component) {
+        var num = component.get("v.value");
+        var scale = component.get("v.valueScale");
         if ($A.util.isFiniteNumber(num) && scale) {
             num *= Math.pow(10, scale);
         }
         return num;
-    },
-
-    getDefaultFormatter: function(cmp) {
-        return $A.localizationService.getDefaultPercentFormat();
     }
 })

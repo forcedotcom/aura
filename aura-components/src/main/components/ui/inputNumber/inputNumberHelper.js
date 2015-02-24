@@ -14,35 +14,7 @@
  * limitations under the License.
  */
 ({
-    formatValue: function(cmp) {
-    	// number fields only format the initial value
-        this.setAttribute(cmp, { key: 'doFormat', value: false, commit: true });
-        
-        var f = cmp.get("v.format");
-        var num = this.getNumber(cmp);
-        if (!$A.util.isUndefinedOrNull(num)) {
-            if (!$A.util.isEmpty(f)) {
-                var nf;
-                try {
-                    nf = $A.localizationService.getNumberFormat(f);
-                } catch (e) {
-                    return "Invalid format attribute";
-                }
-                if (nf && nf.format) {
-                	return nf.format(num);
-                }
-            } else {
-                return this.getDefaultFormatter().format(num);
-            }
-        }
-        return num;
-    },
-
     getNumber: function(cmp) {
         return cmp.get("v.value");
-    },
-
-    getDefaultFormatter: function(cmp) {
-        return $A.localizationService.getDefaultNumberFormat();
     }
 })

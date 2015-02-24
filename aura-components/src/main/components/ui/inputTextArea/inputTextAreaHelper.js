@@ -19,7 +19,7 @@
      */
     setDomElementValue : function (component) {
         var textAreaCmp = component.find("textAreaElem");
-        var elem = textAreaCmp ? textAreaCmp.getElement() : null;
+        var elem = !$A.util.isUndefinedOrNull(textAreaCmp) ? textAreaCmp.getElement() : null;
         if (elem) {
             var value = component.get("v.value");
             if ($A.util.isUndefinedOrNull(value)) {

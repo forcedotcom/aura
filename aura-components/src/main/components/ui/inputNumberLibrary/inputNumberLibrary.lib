@@ -15,16 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL" description="Represents an input field for entering a telephone number.">
-    <input aura:id="txt"
-           id="{!v.domId}"
-           class="{!v.class}"
-           type="tel"
-           value="{!v.value}"
-           placeholder="{!v.placeholder}"
-           required="{!v.required}"
-           disabled="{!v.disabled}"
-           maxlength="{!v.maxlength}"
-           size="{!v.size}"
-           aria-describedby="{!v.ariaDescribedBy}"/>
-</aura:component>
+<aura:library description="Helper functions to format numbers for inputs.">
+    <aura:include name="number"/>
+</aura:library>

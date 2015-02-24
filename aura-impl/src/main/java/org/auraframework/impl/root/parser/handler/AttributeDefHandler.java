@@ -104,7 +104,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
       
         String type = Optional.fromNullable(getAttributeValue(ATTRIBUTE_TYPE)).or(defaultType).orNull();
-        builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(type, TypeDef.class));
+		builder.setTypeDefDescriptor(getDefDescriptor(type, TypeDef.class));
 
         String serializeTo = getAttributeValue(ATTRIBUTE_SERIALIZE_TO);
         if (serializeTo != null) {

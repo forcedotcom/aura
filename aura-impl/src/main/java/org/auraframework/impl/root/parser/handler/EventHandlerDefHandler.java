@@ -69,7 +69,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
         String event = getAttributeValue(ATTRIBUTE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(event)) {
-            builder.setDescriptor(DefDescriptorImpl.getInstance(event, EventDef.class));
+            builder.setDescriptor(getDefDescriptor(event, EventDef.class));
         }
 
         builder.setName(getAttributeValue(ATTRIBUTE_NAME));

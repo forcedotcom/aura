@@ -24,8 +24,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -190,7 +192,31 @@ public abstract class XMLHandler<T extends Definition> {
         return SYSTEM_TAGS.contains(fullName.toLowerCase());
     }
 
+
     /**
+     * Gets a DefDescriptor instance based on a name with additional checks
+     * for sources that supports a default namespace
+     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
+     * @param defClass The Interface's Class for the DefDescriptor being requested.
+     * @return An instance of a AuraDescriptor for the provided tag with updated ns for sources with default namespace support
+	 */
+	protected <E extends Definition> DefDescriptor<E> getDefDescriptor(String name, Class<E> clazz) {
+		DefDescriptor<E> defDesc = DefDescriptorImpl.getInstance(name, clazz);
+
+		if (("apex".equals(defDesc.getPrefix()) || "markup".equals(defDesc.getPrefix())) // only needed for apex && markup def descriptors
+			&& (source != null && source.isDefaultNamespaceSupported()) // and default namespace is supported by the source
+	        && (AuraTextUtil.isNullEmptyOrWhitespace(defDesc.getNamespace()) // and current descriptor has no namespace
+                || source.getDefaultNamespace().equals(defDesc.getNamespace()))  // or has the default namespace 
+	        && !source.getDefaultNamespace().equals(source.getDescriptor().getNamespace())  // and the source has a different ns
+        ) {
+				String qualifiedName =  DefDescriptorImpl.buildQualifiedName(defDesc.getPrefix(), source.getDescriptor().getNamespace(), defDesc.getName());
+				defDesc = DefDescriptorImpl.getInstance(qualifiedName, clazz);
+	    }
+
+		return defDesc;
+	}
+
+	/**
      * Whether name is system "aura" prefixed
      * 
      * @param name tag or attribute name

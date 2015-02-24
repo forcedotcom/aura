@@ -25,7 +25,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl.Builder;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
@@ -72,7 +71,7 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
         }
         
         Location location = getLocation();
-        DefDescriptor<EventDef> eventDefDescriptor = DefDescriptorImpl.getInstance(type, EventDef.class);
+        DefDescriptor<EventDef> eventDefDescriptor = getDefDescriptor(type, EventDef.class);
         
         // validation on descriptor and such.
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));

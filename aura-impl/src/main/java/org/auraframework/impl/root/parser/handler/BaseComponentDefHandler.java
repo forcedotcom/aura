@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
@@ -26,7 +27,6 @@ import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.root.MethodDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
@@ -43,6 +43,7 @@ import org.auraframework.util.AuraTextUtil;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -238,8 +239,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
             DefDescriptor<ControllerDef> controllerDescriptor = null;
             if (controllerName != null) {
-                controllerDescriptor = DefDescriptorImpl.getInstance(
-                        controllerName, ControllerDef.class);
+                controllerDescriptor = getDefDescriptor(controllerName, ControllerDef.class);
             } else {
                 String apexControllerName = String.format("apex://%s.%sController",
                         defDescriptor.getNamespace(),
@@ -367,15 +367,14 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             }
             String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
             if (extendsName != null) {
-                builder.extendsDescriptor = DefDescriptorImpl.getInstance(
-                        extendsName, (Class<T>) defDescriptor.getDefType()
-                                .getPrimaryInterface());
+                builder.extendsDescriptor = getDefDescriptor(extendsName,  
+                        (Class<T>) defDescriptor.getDefType().getPrimaryInterface());
             }
 
             String implementsNames = getAttributeValue(ATTRIBUTE_IMPLEMENTS);
             if (implementsNames != null) {
                 for (String implementsName : AuraTextUtil.splitSimple(",",implementsNames)) {
-                    builder.interfaces.add(DefDescriptorImpl.getInstance(implementsName.trim(), InterfaceDef.class));
+                    builder.interfaces.add(getDefDescriptor((implementsName.trim()), InterfaceDef.class));
                 }
             }
 

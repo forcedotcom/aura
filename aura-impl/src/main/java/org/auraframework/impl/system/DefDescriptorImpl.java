@@ -63,7 +63,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     private static final Pattern CLASS_PATTERN = Pattern
             .compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
 
-    private static String buildQualifiedName(String prefix, String namespace, String name) {
+    public static String buildQualifiedName(String prefix, String namespace, String name) {
         if (namespace == null) {
             return String.format("%s://%s", prefix, name);
         }

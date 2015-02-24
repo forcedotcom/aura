@@ -1153,15 +1153,21 @@ var AuraClientService = function() {
                                 })
                                 // load getApplication() from storage
                                 .then(function() { return storage.get(key); })
-                                .then(function(value) {
-                                    if (value) {
-                                        storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, value.value]);
-                                        action.updateFromResponse(value.value);
-                                        action.finishAction($A.getContext());
-                                    } else {
+                                .then(
+                                    function(value) {
+                                        if (value) {
+                                            storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, value.value]);
+                                            $A.run(function() {
+                                                action.updateFromResponse(value.value);
+                                                action.finishAction($A.getContext());
+                                            });
+                                        } else {
+                                            $A.error("Unable to load application.");
+                                        }
+                                    }, function() {
                                         $A.error("Unable to load application.");
                                     }
-                                });
+                                );
                             }
                         } else {
                             //

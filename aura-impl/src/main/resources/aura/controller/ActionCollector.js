@@ -72,11 +72,17 @@ ActionCollector.prototype.process = function() {
         var storage = action.getStorage();
         if (action.isStorable() && storage) {
             key = action.getStorageKey();
+            // using storage so callbacks *must* be in an aura loop
             storage.get(key).then(
                 function(value) {
-                    // stored actions are async and need to be put be into aura loop
                     $A.run(function() {
                         that.collectAction(action, value ? value.value : null);
+                    });
+                },
+                function() {
+                    // error fetching from storage so go to the server
+                    $A.run(function() {
+                        that.collectAction(action);
                     });
                 }
             );

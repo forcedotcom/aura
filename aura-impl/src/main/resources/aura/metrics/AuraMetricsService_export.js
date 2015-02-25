@@ -18,7 +18,7 @@ var p = MetricsService.prototype;
 exp(p,
     "initMetrics"        , p.initMetrics,
     "instrument"         , p.instrument,
-    "uninstrument"       , p.unInstrument,
+    "unInstrument"       , p.unInstrument,
     "getBootstrapMetrics", p.getBootstrapMetrics,
     "registerBeacon"     , p.registerBeacon,
     "clearMarks"         , p.clearMarks,

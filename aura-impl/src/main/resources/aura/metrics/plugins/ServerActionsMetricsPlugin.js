@@ -20,22 +20,24 @@
  */
 var ServerActionsMetricsPlugin = function ServerActionsMetricsPlugin(config) {
     this.config = config;
+    this["enabled"] = true;
 };
 
 ServerActionsMetricsPlugin.NAME = "serverActions";
 ServerActionsMetricsPlugin.prototype = {
-    enabled: true,
     initialize: function (metricsCollector) {
         this.collector = metricsCollector;
         this.bind(metricsCollector);
     },
     enable: function () {
-        if (!this.enabled) {
+        if (!this["enabled"]) {
+            this["enabled"] = true;
             this.bind(this.collector);
         }
     },
     disable: function () {
-        if (this.enabled) {
+        if (this["enabled"]) {
+            this["enabled"] = false;
             this.unbind(this.collector);
         }
     },
@@ -93,19 +95,14 @@ ServerActionsMetricsPlugin.prototype = {
             };
 
         metricsCollector["instrument"](
-            $A.clientService["ActionQueue"].prototype,
+            $A["clientService"]["ActionQueue"].prototype,
             method, 
             ServerActionsMetricsPlugin.NAME,
             true /*async*/,
             beforeHook /*before*/
         );
     },
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"](
-            $A.util.transport,
-            'request'
-        );
-    },
+    // #if {"excludeModes" : ["PRODUCTION"]}
     postProcess: function (actionMarks) {
         var procesedMarks = [];
         var bundle = [];
@@ -149,10 +146,24 @@ ServerActionsMetricsPlugin.prototype = {
         }
 
         return bundle;
+    },
+    // #end
+    unbind: function (metricsCollector) {
+        metricsCollector["unInstrument"](
+           $A["clientService"]["ActionQueue"].prototype/*host*/, 'getServerActions'/*method*/
+        );
     }
 };
 
-ServerActionsMetricsPlugin.prototype["initialize"] = ServerActionsMetricsPlugin.prototype.initialize;
+// Exposing symbols/methods for Google Closure
+var p = ServerActionsMetricsPlugin.prototype;
+exp(p,
+   "initialize",   p.initialize,
+    "enable",      p.enable,
+    "disable",     p.disable,
+    "postProcess", p.postProcess
+);
+
 $A.metricsService.registerPlugin({
     "name"   : ServerActionsMetricsPlugin.NAME,
     "plugin" : ServerActionsMetricsPlugin

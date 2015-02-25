@@ -34,7 +34,7 @@ var MetricsService = function MetricsService(config) {
     this.doneBootstrap     = false;
 };
 
-MetricsService.TIMER   = performance ? performance.now.bind(performance) : Date.now.bind(Date);
+MetricsService.TIMER   = window.performance ? window.performance.now.bind(performance) : Date.now.bind(Date);
 MetricsService.START   = 'start';
 MetricsService.END     = 'end';
 MetricsService.STAMP   = 'stamp';
@@ -78,11 +78,11 @@ MetricsService.prototype = {
             return ret;
         };
 
-        instance[method].__original = original;
+        instance[method]["__original"] = original;
     },
     unInstrument: function (instance, method) {
-        var original = instance[method].__original;
-        delete instance[method].__original;
+        var original = instance[method]["__original"];
+        delete instance[method]["__original"];
         instance[method] = original;
     },
     initializePlugins: function () {
@@ -113,13 +113,21 @@ MetricsService.prototype = {
             this.disablePlugins();
             this.clearMarks();
         }
-        // #end
+        // #end        
     },
     inTransaction: function () {
         return !$A.util.isEmpty(this.transactions);
     },
     transaction: function (ns, name, config) {
-
+        //TODO
+    },
+    transactionUpdate: function (ns, name, config) {
+        config = config || {};
+        var id          = (ns || MetricsService.DEFAULT) + ':' + name,
+            transaction = this.transactions[id];
+        if (transaction) {
+            transaction["config"] = $A.util.apply(transaction["config"], config, true, true);
+        }
     },
     transactionStart: function (ns, name, config) {
         return this.createTransaction(ns, name, config);
@@ -129,17 +137,20 @@ MetricsService.prototype = {
         var id          = (ns || MetricsService.DEFAULT) + ':' + name,
             transaction = this.transactions[id],
             beacon      = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[MetricsService.DEFAULT],
-            postProcess = transaction && (typeof config === 'function') ? config : (config["postProcess"] || transaction.config["postProcess"]);
-
+            postProcess = transaction && (typeof config === 'function') ? config : (config["postProcess"] || transaction["config"]["postProcess"]),
+            skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"];
 
         if (transaction && (beacon || postProcess)) {
             transaction.marks = {};
             for (var plugin in this.pluginInstances) {
                 var instance = this.pluginInstances[plugin];
-                if (this.collector[plugin].length) {
-                    var offset = this.collector[plugin].length - transaction["offsets"][plugin];
-                    var tMarks = this.collector[plugin].slice(offset);
-                    var parsedMarks = instance.postProcess ? instance.postProcess(tMarks) : tMarks;
+
+                if (this.collector[plugin].length) { // If we have marks for that plugin
+                    var pluginCollector = this.collector[plugin],
+                        initialOffset   = transaction["offsets"][plugin],
+                        tMarks          = pluginCollector.slice(initialOffset),
+                        parsedMarks     = instance.postProcess && !skipPluginPostProcessing ? instance.postProcess(tMarks) : tMarks;
+
                     if (parsedMarks && parsedMarks.length) {
                         transaction.marks[plugin] = parsedMarks;
                     }
@@ -223,8 +234,9 @@ MetricsService.prototype = {
         }
     },
     getPageStartTime: function () {
-        if (performance.timing && performance.timing.navigationStart) {
-            return performance.timing.navigationStart;
+        var p = window.performance;
+        if (p && p.timing && p.timing.navigationStart) {
+            return p.timing.navigationStart;
         } else {
             return window.pageStartTime;
         }
@@ -243,7 +255,7 @@ MetricsService.prototype = {
     disablePlugin: function (name) {
         var plugin = this.pluginInstances[name];
         if (plugin && plugin.disable) {
-            plugin.disable();
+            plugin["disable"]();
         }
     },
     enablePlugins: function () {
@@ -254,7 +266,7 @@ MetricsService.prototype = {
     enablePlugin: function (name) {
         var plugin = this.pluginInstances[name];
         if (plugin && plugin.enable) {
-            plugin.enable();
+            plugin["enable"]();
         }
     },
     registerPlugin: function (pluginConfig) {

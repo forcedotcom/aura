@@ -20,22 +20,24 @@
  */
 var ClientServiceMetricsPlugin = function ClientServiceMetricsPlugin(config) {
     this.config = config;
+    this["enabled"] = true;
 };
 
 ClientServiceMetricsPlugin.NAME = "clientService";
 ClientServiceMetricsPlugin.prototype = {
-    enabled: true,
     initialize: function (metricsCollector) {
         this.collector = metricsCollector;
         this.bind(metricsCollector);
     },
     enable: function () {
-        if (!this.enabled) {
+        if (!this["enabled"]) {
+            this["enabled"] = true;
             this.bind(this.collector);
         }
     },
     disable: function () {
-        if (this.enabled) {
+        if (this["enabled"]) {
+            this["enabled"] = false;
             this.unbind(this.collector);
         }
     },
@@ -52,7 +54,7 @@ ClientServiceMetricsPlugin.prototype = {
         }
 
         metricsCollector["instrument"](
-            $A.clientService,
+            $A["clientService"],
             method, 
             ClientServiceMetricsPlugin.NAME,
             false,
@@ -61,10 +63,7 @@ ClientServiceMetricsPlugin.prototype = {
         );
     },
     unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"](
-            $A.util.transport,
-            'request'
-        );
+        metricsCollector["unInstrument"]($A["clientService"], 'init');
     },
     postProcess: function (marks) {
         // Remove them all since we already got the appCreation metrics
@@ -72,8 +71,16 @@ ClientServiceMetricsPlugin.prototype = {
     }
 };
 
-ClientServiceMetricsPlugin.prototype["initialize"] = ClientServiceMetricsPlugin.prototype.initialize;
+// Exposing symbols/methods for Google Closure
+var p = ClientServiceMetricsPlugin.prototype;
+exp(p,
+   "initialize",   p.initialize,
+    "enable",      p.enable,
+    "disable",     p.disable,
+    "postProcess", p.postProcess
+);
 
+// Register the plugin
 $A.metricsService.registerPlugin({
     "name"   : ClientServiceMetricsPlugin.NAME,
     "plugin" : ClientServiceMetricsPlugin

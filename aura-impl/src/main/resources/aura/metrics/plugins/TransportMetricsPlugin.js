@@ -20,22 +20,24 @@
  */
 var TransportMetricsPlugin = function TransportMetricsPlugin(config) {
     this.config = config;
+    this["enabled"] = true;
 };
 
 TransportMetricsPlugin.NAME = "transport";
 TransportMetricsPlugin.prototype = {
-    enabled: true,
     initialize: function (metricsCollector) {
         this.collector = metricsCollector;
         this.bind(metricsCollector);
     },
     enable: function () {
-        if (!this.enabled) {
+        if (!this["enabled"]) {
+            this["enabled"] = true;
             this.bind(this.collector);
         }
     },
     disable: function () {
-        if (this.enabled) {
+        if (this["enabled"]) {
+            this["enabled"] = false;
             this.unbind(this.collector);
         }
     },
@@ -63,19 +65,14 @@ TransportMetricsPlugin.prototype = {
             };
 
         metricsCollector["instrument"](
-            $A.util.transport,
+            $A["util"]["transport"],
             'request', 
             TransportMetricsPlugin.NAME,
             true/*async*/,
             callbackHook /*beforeHook*/
         );
     },
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"](
-            $A.util.transport,
-            'request'
-        );
-    },
+    //#if {"excludeModes" : ["PRODUCTION"]}
     postProcess: function (transportMarks) {
         var procesedMarks = [];
         var queue = {};
@@ -94,12 +91,23 @@ TransportMetricsPlugin.prototype = {
                 delete queue[id];
             }
         }
-
         return procesedMarks;
+    },
+    // #end
+    unbind: function (metricsCollector) {
+        metricsCollector["unInstrument"]($A["util"]["transport"], 'request');
     }
 };
 
-TransportMetricsPlugin.prototype["initialize"] = TransportMetricsPlugin.prototype.initialize;
+// Exposing symbols/methods for Google Closure
+var p = TransportMetricsPlugin.prototype;
+
+exp(p,
+    "initialize",  p.initialize,
+    "enable",      p.enable,
+    "disable",     p.disable,
+    "postProcess", p.postProcess
+);
 
 $A.metricsService.registerPlugin({
     "name"   : TransportMetricsPlugin.NAME,

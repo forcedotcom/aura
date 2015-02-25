@@ -24,7 +24,7 @@
 			To display a checkbox, you can use an attribute value and bind it to the <code>ui:outputCheckbox</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myBool" type="Boolean" default="true"/>
-&lt;ui:outputCheckbox value="{!v.myBool}" label="outputCheckbox"/></pre>
+&lt;ui:outputCheckbox value="{!v.myBool}"/></pre>
 	<p>The previous example renders the following HTML.</p>
 	<pre>&lt;img class="checked uiImage uiOutputCheckbox" alt="checkbox checked" src="path/to/checkbox"></pre>
 	</aura:description>	

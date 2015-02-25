@@ -24,7 +24,7 @@
 			To display a date and time, you can use an attribute value and bind it to the <code>ui:outputDateTime</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myDateTime" type="Date" default="2014-09-29T00:17:08z"/>
-&lt;ui:outputDateTime value="{!v.myDateTime}" label="outputDateTime"/></pre>
+&lt;ui:outputDateTime value="{!v.myDateTime}"/></pre>
 		<p>The previous example renders the following HTML.</p>
 		<pre>&lt;span class="uiOutputDateTime">Sep 29, 2014 12:17:08 AM&lt;/span></pre>
 	</aura:description>	

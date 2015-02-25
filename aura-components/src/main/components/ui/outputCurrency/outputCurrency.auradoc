@@ -23,7 +23,7 @@
 			To display a currency, you can use an attribute value and bind it to the <code>ui:outputCurrency</code> component. 
 		</p>
 <pre>&lt;aura:attribute name="myCurr" type="Decimal" default="50000"/>
-&lt;ui:outputCurrency aura:id="curr" value="{!v.myCurr}" label="outputCurrency"</pre>
+&lt;ui:outputCurrency aura:id="curr" value="{!v.myCurr}"/></pre>
 		<p>The previous example renders the following HTML.</p> 
 		<pre>&lt;span class="uiOutputCurrency">$50,000.00&lt;/span></pre>
 		<p>To override the browser's locale, use the <code>currencySymbol</code> attribute.</p>

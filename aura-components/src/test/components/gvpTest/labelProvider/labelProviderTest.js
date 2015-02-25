@@ -77,20 +77,6 @@
         ]
     },
 
-    testInvalidGVPExpressions: {
-        test: function (cmp) {
-            var expected="Assertion Failed!: Unable to get value for key 'v.simplevalue3'. No value provider was found for 'v'. : false";
-            var actual = null;
-
-            try {
-                $A.get("v.simplevalue3");
-            }catch(e){
-                actual=e.message||e.description;
-            }
-
-            $A.test.assertEquals(expected, actual, "Invalid GVP expression should throw.");
-        }
-    },
 
     testPartialLabelExpressions: {
         test: [
@@ -179,4 +165,5 @@
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
     	}
     }
+    
 })

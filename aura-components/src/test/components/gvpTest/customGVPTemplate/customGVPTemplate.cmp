@@ -1,0 +1,122 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+<auratest:customGVP/>
+-->
+<aura:component isTemplate="true" extensible="true" extends="aura:template">
+    <aura:attribute default="Default" type="String" name="stringValue"></aura:attribute>
+    stringValue={!v.stringValue}
+    
+    <aura:set attribute="auraPreInitBlock">
+         
+         <script>
+         
+            //define CustomGlobalVaueProvider
+            $A.log("init custom GVP");
+            
+            var CustomGlobalVaueProvider = function CustomGlobalVaueProvider() {
+                this.values = {};
+                this.requested = {};
+            };
+            
+            CustomGlobalVaueProvider.prototype.getValues = function(values) {
+                return this.values;
+            };
+            
+            CustomGlobalVaueProvider.prototype.merge = function(values) {
+                $A.util.apply(this.values, values, true, true);
+            };
+            
+            CustomGlobalVaueProvider.prototype.getRequested = function() {
+                return this.requested;
+            };
+            
+            CustomGlobalVaueProvider.prototype.get = function(expression, callback) {
+                var value = $A.expressionService.resolve(expression,this.values);
+                if (value) {
+                    if ($A.util.isFunction(callback)) {
+                        callback(value);
+                    }
+                    return value;
+                } else {
+                    this.requestFromServer(expression, callback);
+                    return "[" + expression + "]";
+                }
+            };
+            
+            CustomGlobalVaueProvider.prototype.set = function(expression, value, callback) {
+                this.values[expression] = value;
+                if( $A.util.isFunction(callback) ) {
+                    callback(value);
+                }
+            };
+            
+            CustomGlobalVaueProvider.prototype.requestFromServer = function(expression, callback) {
+                //we are actually getting Label value from server side, section is needed for the action, but its value doesn't matter
+                var section = "whatever";
+                var name = expression;
+                var requested_before = false;
+                if(this.requested[name]) {
+                    requested_before = true;
+                }
+                if(requested_before == true) {
+                    $A.log("we just request "+expression+" at "+(new Date().getTime() - this.requested[name])+" mli-second before, wait for that to finish");
+                } else {
+                    if(!this.requested[name]) {
+                        this.requested[name]={};
+                    }
+                    this.requested[name] = new Date().getTime();
+                }
+                var action = $A.get("c.aura://LabelController.getLabel");
+                        action.setParams({
+                            "name": name,
+                            "section": section
+                        });
+                var placeholder = "I am a place holder!";
+                action.setCallback(this, function(a) {
+                      var returnValue = placeholder;
+                      if(a.getState() === "SUCCESS") {
+                                returnValue = a.getReturnValue();
+                                $A.log("action return SUCCESS, returnValue = "+returnValue);
+                                this.values[name] = returnValue;
+                                if( requested_before ) {
+                                    $A.log("delete requested["+name+"]");
+                                    delete this.requested[name]; 
+                                }
+                          } else {
+                                $A.log("Error getting value from server: " + section + "." +name);
+                          }
+                          callback(returnValue);
+                       });
+                    
+                 $A.enqueueAction(action);
+                
+                 //we have this pattern in LabelValueProvider
+                 //don't need it for test as our test stage is wrapped in $A.run() already
+                 //for production, maybe we need this because some label is being rectreived outside of aura run cycle?
+                 //$A.run(function() {}, "CustomGVPProvider.requestServerLabel");
+                
+            };
+            
+            //now we can add the custom value provider. but for testing, I gonna do this in component Test.
+            //var cgvp = new CustomGlobalVaueProvider();
+            //$A.addValueProvider('$Custom', cgvp);
+            
+         </script>
+         
+         
+    </aura:set>
+    
+</aura:component>

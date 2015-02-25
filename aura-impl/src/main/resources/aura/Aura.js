@@ -758,7 +758,7 @@ $A.ns.Aura.prototype.get = function(key, callback) {
  * Sets the value referenced using property syntax on the specified global value provider.
  * @public
  * @function
- * @param {String} key The data key to look up on the global value provider, for example, <code>$A.get("$Label.section.key")</code>.
+ * @param {String} key The data key we want to change on the global value provider, for example, <code>$A.set("$Custom.something","new Value")</code>.
  * @param {Object} value The value to set the key location to. If the global value provider does not implement .set(), this method will throw an exception.</code>.
  */
 $A.ns.Aura.prototype.set = function(key, value) {

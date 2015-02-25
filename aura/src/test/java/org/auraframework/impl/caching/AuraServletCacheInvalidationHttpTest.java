@@ -24,6 +24,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -56,9 +57,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     public void testPostRequestWithDifferentUID() throws Exception {
-        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-
-        HttpPost post = getPostMethod(ctx, true);
+        HttpPost post = getPostMethod("auratest:test_TokenValidation", true);
         HttpResponse httpResponse = perform(post);                                                        // days
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
@@ -75,8 +74,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      */
     @AuraTestLabels("auraSanity")
     public void testPostRequestWithValidUID() throws Exception {
-        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        HttpPost post = getPostMethod(ctx, false);
+        HttpPost post = getPostMethod("auratest:test_TokenValidation", false);
         HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
@@ -91,15 +89,16 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
     /**
      * Convenience method to create a POST object to invoke a server side action.
+     *
      * This method is very specific to this test, please do not use it for any
      * other purpose.
      *
-     * @param ctx
-     * @param modified
+     * @param name the name of the component to load.
+     * @param modified should the UID be modified to force a out of sync.
      * @return response
      * @throws Exception
      */
-    private HttpPost getPostMethod(AuraContext ctx, boolean modified) throws Exception {
+    private HttpPost getPostMethod(String name, boolean modified) throws Exception {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
@@ -117,8 +116,15 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
 
-        String serContext = getAuraTestingUtil().getSerializedAuraContextWithModifiedUID(ctx, modified);
-
+        String serContext;
+        AuraContext ctx = startContext(name, ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
+        String uid = ctx.getDefRegistry().getUid(null, desc);
+        if (modified) {
+            uid = getAuraTestingUtil().modifyUID(uid);
+        }
+        serContext = getAuraTestingUtil().buildContextForPost(Mode.DEV, desc, uid,
+                Aura.getConfigAdapter().getAuraFrameworkNonce(), null, null);
         params.put("aura.context", serContext);
 
         return obtainPostMethod("/aura", params);
@@ -132,7 +138,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     @SuppressWarnings("unchecked")
     private void assertOutdated(String response) {
         if (!response.endsWith("/*ERROR*/")) {
-            fail("respose should end with " + "/*ERROR*/");
+            fail("response should end with /*ERROR*/ but got: "+response);
         }
 
         String jsonString = "/*" + response;

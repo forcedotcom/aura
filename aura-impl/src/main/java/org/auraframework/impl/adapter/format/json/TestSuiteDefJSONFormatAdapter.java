@@ -37,7 +37,7 @@ public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDe
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
+    public void write(TestSuiteDef value, Map<String, Object> attributes, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
         Json.serialize(value, out, c.getJsonSerializationContext());
     }

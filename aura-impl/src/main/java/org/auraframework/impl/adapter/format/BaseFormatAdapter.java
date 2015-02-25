@@ -44,14 +44,14 @@ public abstract class BaseFormatAdapter<T> implements FormatAdapter<T> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+    public void write(T value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         throw new UnsupportedOperationException(String.format("write() not implemented for '%s' in '%s' Format",
                 getType().getName(), getFormatName()));
     }
 
     @Override
-    public void writeBinary(Object value, Map<String, Object> attributes, OutputStream out) throws IOException,
+    public void writeBinary(T value, Map<String, Object> attributes, OutputStream out) throws IOException,
             QuickFixException {
         throw new UnsupportedOperationException(String.format("writeBinary() not implemented for '%s' in '%s' Format",
                 getType().getName(), getFormatName()));

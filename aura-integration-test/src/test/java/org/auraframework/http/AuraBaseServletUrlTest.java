@@ -44,7 +44,7 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
 
     /** tests that the css url includes themes explicitly added to context */
     public void testCssUrlContextSpecifiedThemes() throws Exception {
-        AuraContext ctx = setupContext();
+        AuraContext ctx = setupContext(null);
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class));
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme3", ThemeDef.class));
@@ -84,13 +84,14 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         goldFileAppCssUrl();
     }
 
-    private AuraContext setupContext() {
+    private AuraContext setupContext(DefDescriptor<ApplicationDef> defdesc) {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
         }
 
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
+        AuraContext ctx;
+        ctx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, defdesc);
+        ctx.setFrameworkUID("#FAKEUID#");
         return ctx;
     }
 
@@ -104,14 +105,7 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         String markup = "<aura:application access='unauthenticated' theme='%s'/>";
         String src = String.format(markup, Joiner.on(",").join(themes));
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
-        }
-
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
-        return ctx;
+        return setupContext(app);
     }
 
     private void goldFileAppCssUrl() throws Exception {

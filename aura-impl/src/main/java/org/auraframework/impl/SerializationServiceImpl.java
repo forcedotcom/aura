@@ -69,15 +69,17 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+    public <T> void write(T value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         Aura.getContextService().assertEstablished();
+        @SuppressWarnings("unchecked")
+        Class<T> clazz = (Class<T>)value.getClass();
 
-        getFormatAdapter(value.getClass()).write(value, attributes, out);
+        getFormatAdapter(clazz).write(value, attributes, out);
     }
 
     @Override
-    public <T> void write(Object value, Map<String, Object> attributes, Class<T> type, Appendable out)
+    public <T> void write(T value, Map<String, Object> attributes, Class<T> type, Appendable out)
             throws IOException, QuickFixException {
 
         Aura.getContextService().assertEstablished();
@@ -86,7 +88,7 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     @Override
-    public <T> void write(Object value, Map<String, Object> attributes, Class<T> type, Appendable out, String format)
+    public <T> void write(T value, Map<String, Object> attributes, Class<T> type, Appendable out, String format)
             throws IOException, QuickFixException {
 
         Aura.getContextService().assertEstablished();
@@ -95,7 +97,7 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     @Override
-    public <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out)
+    public <T> void writeBinary(T value, Map<String, Object> attributes, Class<T> type, OutputStream out)
             throws IOException, QuickFixException {
 
         Aura.getContextService().assertEstablished();
@@ -104,7 +106,7 @@ public class SerializationServiceImpl implements SerializationService {
     }
 
     @Override
-    public <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out,
+    public <T> void writeBinary(T value, Map<String, Object> attributes, Class<T> type, OutputStream out,
             String format) throws IOException, QuickFixException {
 
         Aura.getContextService().assertEstablished();

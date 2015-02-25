@@ -25,6 +25,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -54,7 +55,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      */
     @AuraTestLabels("auraSanity")
     public void testCSSOrdering_AcrossFacets() throws Exception {
-        String modeAndContext = getAuraTestingUtil().getContext(Mode.DEV, Format.CSS,
+        String modeAndContext = getAuraTestingUtil().getContextURL(Mode.DEV, Format.CSS,
                 "auratest:test_css_a", ComponentDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         HttpGet get = obtainGetMethod(url);
@@ -78,7 +79,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
     @AuraTestLabels("auraSanity")
     public void testCSSOrdering_AcrossInheritance() throws Exception {
-        String modeAndContext = getAuraTestingUtil().getContext(Mode.DEV, Format.CSS, "auratest:test_css_child",
+        String modeAndContext = getAuraTestingUtil().getContextURL(Mode.DEV, Format.CSS, "auratest:test_css_child",
                 ComponentDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         HttpGet get = obtainGetMethod(url);
@@ -268,5 +269,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertEquals(HttpStatus.SC_OK, statusCode);
         assertNotNull(response);
         assertTrue("SVG source should not have been returned.", response.isEmpty());
+    }
+
+    /**
+     * This gets a simple context string that uses a single preload.
+     */
+    private String getSimpleContext(Format format, boolean modified) throws Exception {
+        return getAuraTestingUtil().getContextURL(Mode.DEV, format,
+                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class,
+                modified);
     }
 }

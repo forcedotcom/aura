@@ -63,17 +63,14 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
     }
 
     @Override
-    public void write(Object value, Map<String, Object> args, Appendable out) throws IOException {
-
-        ApplicationDef def = (ApplicationDef) value;
-
+    public void write(ApplicationDef value, Map<String, Object> args, Appendable out) throws IOException {
         String outputPath = (String) args.get("outputPath");
         if (outputPath == null) {
             throw new AuraRuntimeException(
                     "'outputPath' directory path is required as an attribute to use this FormatAdapter");
         }
 
-        String appName = def.getDescriptor().getName();
+        String appName = value.getDescriptor().getName();
         File outputDir = new File(outputPath, appName);
         if (outputDir.exists()) {
             throw new AuraRuntimeException(String.format("%s exists.  Please select another location.",
@@ -92,10 +89,10 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
 
         Writer htmlWriter = new FileWriter(html);
         try {
-            String uid = context.getDefRegistry().getUid(null, def.getDescriptor());
+            String uid = context.getDefRegistry().getUid(null, value.getDescriptor());
             Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
 
-            ComponentDef templateDef = def.getTemplateDef();
+            ComponentDef templateDef = value.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
@@ -134,7 +131,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
                 }
             }
 
-            Application instance = instanceService.getInstance(def, null);
+            Application instance = instanceService.getInstance(value, null);
 
             // Get the preload js
             File js = new File(outputDir, String.format("%s.js", appName));
@@ -150,7 +147,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
                 auraInit.put("token", AuraServlet.getToken());
                 auraInit.put("host", context.getContextPath());
 
-                contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, def.getDescriptor());
+                contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, value.getDescriptor());
                 auraInit.put("context", contextService.getCurrentContext());
                 jsWriter.append("\n$A.initConfig($A.util.json.resolveRefs(");
                 Json.serialize(auraInit, jsWriter, context.getJsonSerializationContext());

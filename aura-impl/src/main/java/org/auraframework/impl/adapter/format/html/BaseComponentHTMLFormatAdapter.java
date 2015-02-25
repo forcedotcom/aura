@@ -21,11 +21,9 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.StyleDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.AuraBaseServlet;
@@ -51,14 +49,13 @@ import com.google.common.collect.Maps;
 public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, ?>> extends HTMLFormatAdapter<T> {
 
     @Override
-    public void write(Object value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
+    public void write(T value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         try {
 
             AuraContext context = Aura.getContextService().getCurrentContext();
             InstanceService instanceService = Aura.getInstanceService();
             RenderingService renderingService = Aura.getRenderingService();
-            BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) value;
-            BaseComponentDef def = cmp.getDescriptor().getDef();
+            BaseComponentDef def = value.getDescriptor().getDef();
 
             ComponentDef templateDef = def.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
@@ -77,14 +74,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             Mode mode = context.getMode();
 
             if (mode.allowLocalRendering() && def.isLocallyRenderable()) {
-
-                DefType defType = def.getDescriptor().getDefType();
-
-                if (defType == DefType.APPLICATION) {
-                    cmp = (BaseComponent<?, ?>) instanceService.getInstance((ApplicationDef) def, componentAttributes);
-                } else {
-                    cmp = (BaseComponent<?, ?>) instanceService.getInstance((ComponentDef) def, componentAttributes);
-                }
+                BaseComponent<?,?> cmp = (BaseComponent<?,?>)instanceService.getInstance(def, componentAttributes);
 
                 attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
                 attributes.put("bodyClass", "");
@@ -107,7 +97,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 attributes.put("autoInitialize", "false");
                 attributes.put("autoInitializeSync", "true");
 
-                auraInit.put("instance", cmp);
+                auraInit.put("instance", value);
                 auraInit.put("token", AuraBaseServlet.getToken());
 
                 StringBuilder contextWriter = new StringBuilder();

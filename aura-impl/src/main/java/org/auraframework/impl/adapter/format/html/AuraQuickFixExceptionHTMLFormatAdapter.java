@@ -44,7 +44,7 @@ public class AuraQuickFixExceptionHTMLFormatAdapter extends HTMLFormatAdapter<Qu
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+    public void write(QuickFixException value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         Mode m = Aura.getContextService().getCurrentContext().getMode();
         if (m != Mode.DEV) {
@@ -54,11 +54,10 @@ public class AuraQuickFixExceptionHTMLFormatAdapter extends HTMLFormatAdapter<Qu
 
         try {
             Map<String, Object> attribs = Maps.newHashMap();
-            Throwable t = (Throwable)value;
             attribs.put("exception", value);
-            if (t.getCause() != null) {
+            if (value.getCause() != null) {
                 StringWriter sw = new StringWriter();
-                t.getCause().printStackTrace(new PrintWriter(sw));
+                value.getCause().printStackTrace(new PrintWriter(sw));
                 attribs.put("cause", sw.toString());
             }
 

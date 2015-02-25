@@ -34,6 +34,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.service.DefinitionService;
@@ -46,8 +47,10 @@ import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AuraTestingUtil {
@@ -292,9 +295,15 @@ public class AuraTestingUtil {
      * @param type the type of descriptor.
      * @param modified break the context uid.
      */
+    public String getContextURL(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
+            boolean modified) throws QuickFixException {
+        return getContextURL(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), modified);
+    }
+    
+    @Deprecated
     public String getContext(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
             boolean modified) throws QuickFixException {
-        return getContext(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), modified);
+        return getContextURL(mode, format, desc, type, modified);
     }
 
     /**
@@ -305,7 +314,7 @@ public class AuraTestingUtil {
      * @param desc the descriptor to set as the primary object.
      * @param modified break the context uid.
      */
-    public String getContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
+    public String getContextURL(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
             boolean modified) throws QuickFixException {
         AuraContext ctxt = setupContext(mode, format, desc);
         String ctxtString;
@@ -313,41 +322,84 @@ public class AuraTestingUtil {
             String uid = modifyUID(ctxt.getLoaded().get(desc));
             ctxt.addLoaded(desc, uid);
         }
-        ctxtString = getSerializedAuraContext(ctxt);
+        ctxtString = ctxt.getEncodedURL(AuraContext.EncodingStyle.Normal);
         Aura.getContextService().endContext();
         return ctxtString;
     }
 
-    /**
-     * Get a serialized context with a possibly modified UID.
-     *
-     * FIXME: this should be cleaned out.
-     */
-    public String getSerializedAuraContextWithModifiedUID(AuraContext ctx, boolean modify) throws QuickFixException {
-        String uid = ctx.getDefRegistry().getUid(null, ctx.getApplicationDescriptor());
-        if (modify) {
-            uid = modifyUID(uid);
-        }
-        ctx.addLoaded(ctx.getApplicationDescriptor(), uid);
-        return getSerializedAuraContext(ctx);
+    public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app)
+            throws QuickFixException {
+        return buildContextForPost(mode, app, null, null, null, null);
+    }
+
+    public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app,
+            Map<DefDescriptor<?>,String> extraLoaded, List<String> dn) throws QuickFixException {
+        return buildContextForPost(mode, app, null, null, extraLoaded, dn);
     }
 
     /**
-     * Serialize a context.
+     * Serialize a context for a post.
      *
-     * This simply runs the serialization and handles exceptions.
+     * This must remain in sync with AuraContext.js
      *
-     * @param ctx the context to serialize.
-     * @return the serialized context as a string
-     * @throws QuickFixException if the serialization service does (unlikely).
+     * <code>
+     * return aura.util.json.encode({
+     *     "mode" : this.mode,
+     *     "loaded" : this.loaded,
+     *     "dn" : $A.services.component.getDynamicNamespaces(),
+     *     "app" : this.app,
+     *     "cmp" : this.cmp,
+     *     "fwuid" : this.fwuid,
+     *     "test" : this.test
+     * });
+     * </code>
      */
-    public String getSerializedAuraContext(AuraContext ctx) throws QuickFixException {
-        StringBuilder sb = new StringBuilder();
+    public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
+            String fwuid, Map<DefDescriptor<?>,String> extraLoaded, List<String> dn) throws QuickFixException {
+        StringBuffer sb = new StringBuffer();
+        Json json = new Json(sb, false, false);
+        Map<String,String> loaded = Maps.newHashMap();
+
+        if (appUid == null) {
+            AuraContext ctx = null;
+            if (!Aura.getContextService().isEstablished()) {
+                ctx = Aura.getContextService().startContext(mode, Format.JSON, Authentication.AUTHENTICATED, app);
+            }
+            appUid = Aura.getDefinitionService().getDefRegistry().getUid(null, app);
+            if (ctx != null) {
+                Aura.getContextService().endContext();
+            }
+        }
+        if (fwuid == null) {
+            fwuid = Aura.getConfigAdapter().getAuraFrameworkNonce();
+        }
+        if (dn == null) {
+            dn = Lists.newArrayList();
+        }
+        if (extraLoaded != null) {
+            for (Map.Entry<DefDescriptor<?>,String> entry : extraLoaded.entrySet()) {
+                loaded.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
+                        entry.getKey().getQualifiedName()), entry.getValue());
+            }
+        }
+        loaded.put(String.format("%s@%s", app.getDefType().toString(), app.getQualifiedName()), appUid);
+
         try {
-            Aura.getSerializationService().write(ctx, null, AuraContext.class, sb, "HTML");
-        } catch (IOException e) {
-            // This should never happen, stringbuilders don't throw IOException.
-            throw new AuraRuntimeException(e);
+            json.writeMapBegin();
+            json.writeMapEntry("mode", mode.toString());
+            json.writeMapEntry("loaded", loaded);
+            if (app.getDefType() == DefType.APPLICATION) {
+                json.writeMapEntry("app", app.getQualifiedName());
+            } else {
+                json.writeMapEntry("cmp", app.getQualifiedName());
+            }
+            json.writeMapEntry("dn", dn);
+            json.writeMapEntry("fwuid", fwuid);
+            json.writeMapEntry("test", "undefined");
+            json.writeMapEnd();
+        } catch (IOException ioe) {
+            // you can't get an io exception writing to a stringbuffer.....
+            throw new RuntimeException(ioe);
         }
         return sb.toString();
     }
@@ -355,7 +407,7 @@ public class AuraTestingUtil {
     /**
      * Make a UID be incorrect.
      */
-    protected String modifyUID(String old) {
+    public String modifyUID(String old) {
         StringBuilder sb = new StringBuilder(old);
         char flip = sb.charAt(3);
 

@@ -30,7 +30,6 @@ function AuraContext(config, initCallback) {
     if (this.loaded === undefined) {
         this.loaded = {};
     }
-    this.lastmod = config["lastmod"];
     this.fwuid = config["fwuid"];
     this.num = 0;
     // To keep track of re-rendering service call
@@ -119,7 +118,9 @@ AuraContext.prototype.getGlobalValueProvider = function(type) {
 };
 
 /**
- * JSON representation of context for server requests
+ * JSON representation of context for server requests.
+ *
+ * This must remain in sync with AuraTestingUtil so that we can accurately test.
  * 
  * @return {String} json representation
  * @private
@@ -131,7 +132,6 @@ AuraContext.prototype.encodeForServer = function() {
         "dn" : $A.services.component.getDynamicNamespaces(),
         "app" : this.app,
         "cmp" : this.cmp,
-        "lastmod" : this.lastmod,
         "fwuid" : this.fwuid,
         "globals" : this.globalValueProviders.getValueProvider("$Global").serializeForServer(),
         "test" : this.test

@@ -474,16 +474,6 @@ public interface AuraContext {
     void serializeAsPart(Json json) throws IOException;
 
     /**
-     * Sets whether theme related info is added during serialization.
-     */
-    void setSerializeThemes(boolean serializeThemes);
-
-    /**
-     * Gets whether theme-related info is added during serialization.
-     */
-    boolean getSerializeThemes();
-
-    /**
      * Prepends all app-specified themes to this context.
      * <p>
      * The themes will be prepended <em>before</em> all themes added with {@link #appendThemeDescriptor(DefDescriptor)}.
@@ -544,9 +534,30 @@ public interface AuraContext {
      * @set state of one approved Globals
      */
     void setGlobal(String approvedName, Object value);
-    
-   
-    
 
 
+    /*
+     * The encoding style for URLs.
+     */
+    enum EncodingStyle {
+        Bare,       //! Minimal context, no UIDs
+        Normal,     //! Standard encoding, include UIDs
+        Theme,      //! Theme UIDs included
+        Full        //! Everything
+    };
+
+    /**
+     * Encode the context for use in json.
+     *
+     * This allows the encoding style to be used, and returns a string, unlike the serialization
+     * service.
+     */
+    String serialize(EncodingStyle style);
+    
+    /**
+     * Encode the context for a URL.
+     *
+     * @param style the encoding style for the context that we need.
+     */
+    String getEncodedURL(EncodingStyle style);
 }

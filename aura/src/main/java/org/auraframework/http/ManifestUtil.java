@@ -15,7 +15,6 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -30,7 +29,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -287,14 +285,7 @@ public abstract class ManifestUtil {
         String ret = "";
 
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-        StringBuilder sb = new StringBuilder();
-        try {
-            Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-        String contextJson = AuraTextUtil.urlencode(sb.toString());
-        defs.append(contextJson);
+        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Bare));
         defs.append("/app.manifest");
         ret = defs.toString();
         return ret;

@@ -160,7 +160,7 @@ public class Json {
     private final Map<Object, Integer> requestMap;
     private int lastRefId = 0;
     private final Appendable out;
-    private final ArrayDeque<IndentEntry> indentStack = new ArrayDeque<IndentEntry>();
+    private final ArrayDeque<IndentEntry> indentStack = new ArrayDeque<>();
     private final DataOutputStream binaryOutput;
     private CountingOutputStream currentBinaryStream;
     private long currentBinaryStreamLength;
@@ -176,7 +176,7 @@ public class Json {
      * @param refSupport If true, any objects annotated with &#64;Serialization
      *            will be serialized using serRefIds
      */
-    protected Json(Appendable out, boolean format, boolean refSupport) {
+    public Json(Appendable out, boolean format, boolean refSupport) {
         this(out, null, new DefaultJsonSerializationContext(format, refSupport, false));
     }
 
@@ -186,8 +186,8 @@ public class Json {
 
         // No need to create the maps if we're not doing the ref stuff
         if (this.serializationContext.refSupport()) {
-            actionMap = new IdentityHashMap<Object, Integer>();
-            requestMap = new IdentityHashMap<Object, Integer>();
+            actionMap = new IdentityHashMap<>();
+            requestMap = new IdentityHashMap<>();
         } else {
             actionMap = null;
             requestMap = null;

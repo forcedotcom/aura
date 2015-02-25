@@ -74,15 +74,14 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
-        Message message = (Message) value;
+    public void write(Message value, Map<String, Object> attributes, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         if (attributes != null) {
             m.putAll(attributes);
         }
 
-        m.put("actions", message.getActions());
+        m.put("actions", value.getActions());
         m.put("context", c);
         Json.serialize(m, out, c.getJsonSerializationContext());
     }

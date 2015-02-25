@@ -35,7 +35,7 @@ public class ThrowableJSONFormatAdapter extends JSONFormatAdapter<Throwable> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
+    public void write(Throwable value, Map<String, Object> attributes, Appendable out) throws IOException {
         Json.serialize(value, out, Aura.getContextService().getCurrentContext().getJsonSerializationContext());
     }
 

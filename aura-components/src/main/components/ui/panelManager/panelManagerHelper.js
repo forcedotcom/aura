@@ -533,11 +533,15 @@
             $A.util.removeClass(panels[i], 'active');
             panels[i].setAttribute('aria-hidden', 'true');
         }
-
         var helper = cmp.getConcreteComponent().getDef().getHelper();
         helper.afterSetActiveInstance(panel);
 
         if (panel) {
+            var panelDom=panel.getElement();
+            if(panelDom) {
+                $A.util.addClass(panelDom, 'active');
+                panelDom.setAttribute('aria-hidden', 'false');
+            }
             this.bindKeyHandler(manager);
             //TODO: need to decouple the logic here
             if (panel.get("v.isModal") === false && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") == -1) {
@@ -787,9 +791,6 @@
     setFocus: function(cmp, panel) {
     	var me = this, panelDom = panel.getElement();
         if (panelDom) {
-            $A.util.addClass(panelDom, 'active');
-            panelDom.setAttribute('aria-hidden', 'false');
-
         	// if we have previously stored the body scroll position for this panel, now is the time to reset it
             if (panel._scrolled)  {
             	document.body.scrollTop = panel._scrolled;

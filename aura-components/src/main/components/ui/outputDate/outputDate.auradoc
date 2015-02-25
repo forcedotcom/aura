@@ -23,7 +23,7 @@
 			the date accordingly. To display a date, you can use an attribute value and bind it to the <code>ui:outputDate</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myDate" type="Date" default="2014-09-29"/>
-&lt;ui:outputDate value="{!v.myDate}" label="outputDate"/></pre>
+&lt;ui:outputDate value="{!v.myDate}"/></pre>
 	<p>The previous example renders the following HTML.</p>
 	<pre>&lt;span class="uiOutputDate">Sep 29, 2014&lt;/span></pre>
 	</aura:description>	

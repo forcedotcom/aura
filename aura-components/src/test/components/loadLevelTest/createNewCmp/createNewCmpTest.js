@@ -237,7 +237,7 @@
      * Verify creation of an array of components returns components in the same order. The framework should be able to
      * handle a mixture of components available on the client and server-dependent component defs.
      */
-    _testCreateArrayOfComponents:{
+    testCreateArrayOfComponents:{
         test: function(cmp){
             $A.run(function(){
                 $A.newCmpAsync(

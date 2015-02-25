@@ -426,7 +426,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
         }
         this.callbacks[name] = {
             "fn" : callback,
-            s : scope
+            "s" : scope
         };
     }
 };

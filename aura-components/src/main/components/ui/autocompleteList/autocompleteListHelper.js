@@ -396,7 +396,8 @@
 
         // Originally, no loading indicator was shown. Making it only appear when specified in the facet.
         if (!$A.util.isEmpty(component.get("v.loadingIndicator"))) {
-            $A.util.toggleClass(component, "invisible", !visible);
+            var list = component.find("list");
+            $A.util.toggleClass(list, "invisible", !visible);
         }
     }
 })

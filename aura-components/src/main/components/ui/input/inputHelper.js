@@ -31,6 +31,7 @@
                         'class': component.get("v.labelClass") + " uiLabel-" + component.get("v.labelPosition"),
                         'for': domId,
                         'labelDisplay': component.get("v.labelPosition") != "hidden",
+                        'title': component.get("v.labelTitle"),
                         'requiredIndicator': component.get("v.required") ? component.get("v.requiredIndicator") : null}}}
             );
             var labelPositionAttribute = component.get("v.labelPosition");

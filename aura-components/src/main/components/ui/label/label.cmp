@@ -16,16 +16,17 @@
 
 -->
 <aura:component extensible="true" description="The label displayed on an input component. To bind a label to an input component, use the for attribute.">
-	<aura:attribute name="label" type="String" description="The text of the label." />
-	<aura:attribute name="class" type="String" description="A CSS style to be attached to the label." />		
-	<aura:attribute name="labelDisplay" default="true" type="Boolean" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose." />
-	<aura:attribute name="for" type="Object" description="Specified to indicate a component with which the label is to be associated. This attribute can accept raw string, localId, globalId, or the component object. If the value is resolved to a component, the global id of the component will be used in the output." />
-	<aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field. " />
-	
-	<label class="{!v.class}" aura:id="labelElement" for="{!v.for}">
-		<span class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
-		{!v.body}
-		{!v.requiredIndicator}
-	</label>	
-		
+    <aura:attribute name="label" type="String" description="The text of the label."/>
+    <aura:attribute name="title" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>
+    <aura:attribute name="class" type="String" description="A CSS style to be attached to the label."/>
+    <aura:attribute name="labelDisplay" default="true" type="Boolean" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
+    <aura:attribute name="for" type="Object" description="Specified to indicate a component with which the label is to be associated. This attribute can accept raw string, localId, globalId, or the component object. If the value is resolved to a component, the global id of the component will be used in the output."/>
+    <aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field. "/>
+
+    <label class="{!v.class}" aura:id="labelElement" for="{!v.for}">
+        <span title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
+        {!v.body}
+        {!v.requiredIndicator}
+    </label>
+
 </aura:component>

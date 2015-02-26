@@ -54,6 +54,8 @@ var clientService;
 // #include aura.polyfill.Json
 // #include aura.polyfill.Promise
 // #include aura.util.Util
+// #include aura.AuraError
+// #include aura.AuraFriendlyError 
 // #include aura.Logger
 // #include aura.DocLevelHandler
 // #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
@@ -131,6 +133,8 @@ $A.ns.Aura = function() {
     this.util = new $A.ns.Util();
     this["util"] = this.util;
     this.globalValueProviders={};
+    this.auraError = $A.ns.AuraError;
+    this.auraFriendlyError = $A.ns.AuraFriendlyError;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this.test = new $A.ns.Test();
     this["test"] = this.test;
@@ -484,7 +488,9 @@ $A.ns.Aura = function() {
         "newCmp", aura.newCmp,
         "newCmpDeprecated", aura.newCmpDeprecated,
         "newCmpAsync", aura.newCmpAsync,
-        "getEvt", aura.getEvt);
+        "getEvt", aura.getEvt,
+        "auraError", aura.auraError,
+        "auraFriendlyError", aura.auraFriendlyError);
     var services = aura.services;
 
     // TODO: convert to //#exportSymbols when available
@@ -507,7 +513,6 @@ $A.ns.Aura = function() {
             }
     );
 
-
     this.eventService.addHandler({
         event : 'aura:clientRedirect',
         "globalId" : "Aura",
@@ -516,14 +521,6 @@ $A.ns.Aura = function() {
         	if (url != null) {
         		window.location = url;
         	}
-        }
-    });
-
-    this.eventService.addHandler({
-        event : 'aura:systemError',
-        "globalId" : "Aura",
-        "handler" : function(evt) {
-            aura.log(evt.getParam('message'), evt.getParam('error'));
         }
     });
 };

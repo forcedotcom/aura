@@ -604,7 +604,7 @@ Test.Aura.Controller.ActionTest = function() {
             var expectedName = "expectedName";
             var expectedQualifiedName = "expectedQN";
             var expected = "Action failed: " + expectedQualifiedName + " -> " + expectedName;
-            var sentToServer = false;
+            var reportErrorCalled = false;
 
             var mockAura = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function(param) {
@@ -627,9 +627,11 @@ Test.Aura.Controller.ActionTest = function() {
                 clientService : {
                     inAuraLoop : function() {
                         return false;
-                    },
-                    enqueueAction : function() {
-                        sentToServer = true;
+                    }
+                },
+                logger : {
+                    reportError : function() {
+                        reportErrorCalled = true;
                     }
                 }
             });
@@ -668,7 +670,7 @@ Test.Aura.Controller.ActionTest = function() {
             mockAura(function() {
                 target.runDeprecated();
             })
-            Assert.Equal(true, sentToServer);
+            Assert.Equal(true, reportErrorCalled);
 
             // Assert
             // FIXME: re-enable after client side creation fixed.
@@ -740,8 +742,10 @@ Test.Aura.Controller.ActionTest = function() {
                 clientService : {
                     inAuraLoop : function() {
                         return false;
-                    },
-                    enqueueAction : function() {
+                    }
+                },
+                logger : {
+                    reportError : function() {
                         sentToServer++;
                     }
                 }

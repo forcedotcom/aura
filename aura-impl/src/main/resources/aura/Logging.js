@@ -122,7 +122,7 @@
 
     $A.logger.subscribe("INFO", devDebugConsoleLog);
     $A.logger.subscribe("WARNING", devDebugConsoleLog);
-    $A.logger.subscribe("ERROR", devDebugConsoleLog);
+    // $A.logger.subscribe("ERROR", devDebugConsoleLog);
     $A.logger.subscribe("ASSERT", devAssertError);
 
     //#end
@@ -133,9 +133,15 @@
      * $A.assert() will throw error in production
      */
     $A.logger.subscribe("ASSERT", function(level, message) {
-        throw new Error(message);
+        throw new $A.auraError(message);
     });
-    
     //#end
 
+    $A.logger.subscribe("ERROR", function(level, message, e) {
+        if (e && e instanceof $A.auraError && !e["handled"]) {
+            var format = "Something has gone wrong. {0}. Please try again.\n{1}";
+            $A.message($A.util.format(format, e.stackTrace || e.message || e.name, e.errorCode+""));
+            e["handled"] = true;
+        }
+    });
 })();

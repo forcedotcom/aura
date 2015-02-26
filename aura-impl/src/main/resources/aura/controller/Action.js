@@ -558,22 +558,7 @@ Action.prototype.runDeprecated = function(evt) {
         this.error = e;
         $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
         if (this.getDef().getDescriptor() !== "aura://ComponentController/ACTION$reportFailedAction") {
-            // Post the action failure to the server, where we can keep track of it for bad client code.
-            // But don't keep re-posting if the report of failure fails.  Do we want this to be production
-            // mode only or similar?
-            var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
-            reportAction.setStorable({
-                "ignoreExisting" : true
-            });
-            reportAction.setAbortable(false);
-            reportAction.setParams({
-                "failedAction": this.getDef().getDescriptor(),
-                "failedId": this.getId(),
-                "clientError": e.toString(),
-                "clientStack": e.stack   // Note that stack is non-standard, and even if present, may be obfuscated
-            });
-            reportAction.setCallback(this, function(a) { /* do nothing */ });
-            $A.clientService.enqueueAction(reportAction);
+            $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
             if ($A.clientService.inAuraLoop()) {
                 throw e;
             }

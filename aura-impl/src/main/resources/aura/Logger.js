@@ -80,72 +80,125 @@ $A.ns.Logger.prototype.assert = function(condition, assertMessage) {
 $A.ns.Logger.prototype.error = function(msg, e){
     var logMsg = msg || "";
     var dispMsg;
-
-    if (!$A.util.isString(msg)) {
-        e = msg;
-        logMsg = "";
-        msg = "Unknown Error";
+    if (e && e instanceof $A.auraError) {
+        this.auraErrorHelper(e);
     }
-    if (!e) {
-        e = undefined;
-    } else if (!$A.util.isError(e)) {
-        // Somebody has thrown something bogus, or we're on IE, but either way we
-        // should do what we can...
-        if ($A.util.isObject(e) && e.message) {
-            var stk = e.stack;
-            e = new Error("caught " + e.message);
-            if (stk) {
-                e.stack = stk;
-            }
-        } else {
-            e = new Error("caught " + $A.util.json.encode(e));
+    else {
+        if (!$A.util.isString(msg)) {
+            e = msg;
+            logMsg = "";
+            msg = "Unknown Error";
         }
-    }
-    if (!logMsg.length) {
-        logMsg = "Unknown Error";
-    }
-    if (e && !$A.util.isUndefinedOrNull(e.message)) {
-        logMsg = logMsg + " : " + e.message;
-    }
-    dispMsg = logMsg;
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    //
-    // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
-    // string. Checking that the object here is not an Error object prevents the error message from being displayed
-    // multiple times.
-    //
-    if ($A.util.isObject(e) && !$A.util.isError(e)) {
-        for(var k in e) {
-            try {
-                var val = e[k];
-
-                if ($A.util.isString(val)) {
-                    if (dispMsg === "Unknown Error") {
-                        dispMsg = val;
-                    } else {
-                        dispMsg = dispMsg + '\n' + val;
-                    }
-                    msg = dispMsg;
+        if (!e) {
+            e = undefined;
+        } else if (!$A.util.isError(e)) {
+            // Somebody has thrown something bogus, or we're on IE (else block, old IE does not implement .message),
+            // but either way we should do what we can...
+            if ($A.util.isObject(e) && e.message) {
+                var stk = e.stack;
+                e = new Error("caught " + e.message);
+                if (stk) {
+                    e.stack = stk;
                 }
-            } catch (e2) {
-                // Ignore serialization errors
-                // We are in an error already, so we really don't want to publish this.
+            } else {
+                e = new Error("caught " + $A.util.json.encode(e));
             }
         }
+        if (!logMsg.length) {
+            logMsg = "Unknown Error";
+        }
+        if (e && !$A.util.isUndefinedOrNull(e.message)) {
+            logMsg = logMsg + " : " + e.message;
+        }
+        dispMsg = logMsg;
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        //
+        // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
+        // string. Checking that the object here is not an Error object prevents the error message from being displayed
+        // multiple times.
+        //
+        if ($A.util.isObject(e) && !$A.util.isError(e)) {
+            for(var k in e) {
+                try {
+                    var val = e[k];
+
+                    if ($A.util.isString(val)) {
+                        if (dispMsg === "Unknown Error") {
+                            dispMsg = val;
+                        } else {
+                            dispMsg = dispMsg + '\n' + val;
+                        }
+                        msg = dispMsg;
+                    }
+                } catch (e2) {
+                    // Ignore serialization errors
+                    // We are in an error already, so we really don't want to publish this.
+                }
+            }
+        }
+        var stack = this.getStackTrace(e);
+        if (stack) {
+            dispMsg = dispMsg + "\n" + stack.join("\n");
+        }
+        //#end
+        
+        if ($A.showErrors()) {
+            $A.message(dispMsg);
+        }
+        if (!$A.initialized) {
+            $A["hasErrors"] = true;
+        }
     }
-    var stack = this.getStackTrace(e);
-    if (stack) {
-        dispMsg = dispMsg + "\n" + stack.join("\n");
-    }
-    //#end
-    
-    if ($A.showErrors()) {
-        $A.message(dispMsg);
-    }
-    if (!$A.initialized) {
-        $A["hasErrors"] = true;
-    }
+
     this.log(this.ERROR, logMsg, e);
+};
+
+/**
+ * @private
+ * @memberOf Logger
+ *
+ * @param {String} msg error message
+ * @param {AuraError} [e] error
+ */
+$A.ns.Logger.prototype.auraErrorHelper = function(e){
+    this.handleError(e);
+    this.reportError(e);
+};
+
+/**
+ * @private
+ * @memberOf Logger
+ *
+ * @param {String} msg error message
+ * @param {AuraError} [e] error
+ */
+$A.ns.Logger.prototype.handleError = function(e){
+    if (e["handled"]) {
+        return;
+    }
+
+    if (e instanceof $A.auraFriendlyError) {
+        $A.getEvt("aura:systemError").fire({"message":e["message"],"error":e["name"],"auraError":e});
+    }
+};
+
+$A.ns.Logger.prototype.reportError = function(e, action, id){
+    // Post the action failure to the server, where we can keep track of it for bad client code.
+    // But don't keep re-posting if the report of failure fails.  Do we want this to be production
+    // mode only or similar?
+    var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
+    reportAction.setStorable({
+        "ignoreExisting" : true
+    });
+    reportAction.setAbortable(false);
+    reportAction.setParams({
+        "failedAction": action,
+        "failedId": id,
+        "clientError": e.toString(),
+        "clientStack": e.stack   // Note that stack is non-standard, and even if present, may be obfuscated
+    });
+    reportAction.setCallback(this, function(a) { /* do nothing */ });
+    $A.clientService.enqueueAction(reportAction);
 };
 
 /**

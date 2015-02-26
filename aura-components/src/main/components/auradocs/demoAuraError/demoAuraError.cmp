@@ -15,8 +15,12 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that an error has occurred.">
-    <aura:attribute name="message" type="String" access="GLOBAL" />
-    <aura:attribute name="error" type="String" access="GLOBAL" />
-    <aura:attribute name="auraError" type="Object" access="GLOBAL" />
-</aura:event>
+<aura:component extends="auradocs:demoPanel">
+    <aura:set attribute="title" value="Aura Error Demos"/>
+
+    <ui:button label="controller throw" press="{!c.controllerThrow}">
+    </ui:button>
+
+    <ui:button label="helper throw" press="{!c.helperThrow}">
+    </ui:button>
+</aura:component>

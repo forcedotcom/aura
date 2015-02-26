@@ -153,6 +153,43 @@
     animation         : spin .6s linear infinite;
 }
 
+.THIS button.scrollButton.voiceOver {
+	position: absolute;
+    z-index: 9999;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
+
+.THIS button.scrollButton.voiceOver.top {
+    top: 0px;
+    height: 30px;
+    width: 100%;
+}
+
+.THIS button.scrollButton.voiceOver.upButton {
+    display: none;
+} 
+
+.THIS button.scrollButton.voiceOver.downButton {
+    height: 30px;
+    width: 100%;
+    bottom: 0px;
+}
+
+.THIS button.scrollButton.voiceOver.rightButton {
+    width: 30px;
+    height: 100%;
+    right: 0;
+}
+
+.THIS button.scrollButton.voiceOver.leftButton {
+    width: 30px;
+    height: 100%;
+    left: 0;
+}
+
 @-webkit-keyframes spin { from { -webkit-transform: rotate(180deg); } to { -webkit-transform: rotate(540deg); } }
 @-moz-keyframes spin    { from { -moz-transform: rotate(180deg); }    to { -moz-transform: rotate(540deg); } }
 @-ms-keyframes spin     { from { -ms-transform: rotate(180deg); }     to { -ms-transform: rotate(540deg); } }

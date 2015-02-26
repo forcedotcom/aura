@@ -38,5 +38,10 @@
     handleCanRefreshChange: function (cmp, evt, hlp) {
         var newValue = evt.getParam('value');
         hlp.swapRefresh(cmp, newValue);
+    },
+    handleVoiceOverChange: function(cmp, evt, hlp) {
+        if (cmp.get('v.supportVoiceOver')) {
+            hlp.getScrollerInstance(cmp).enableVoiceOver(evt.getParam('value'));
+        }
     }
 })

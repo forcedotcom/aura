@@ -203,6 +203,16 @@
             dataProvider : dataProviderBridge
         }
     },
+    _getVoiceOverConfig: function (component) {
+        return {
+            supportVO        : component.get('v.supportVoiceOver'),
+            enable           : $A.get('$Global.isVoiceOver'),
+            labelUp          : component.get('v.scrollButtonUp'),
+            labelDown        : component.get('v.scrollButtonDown'),
+            labelLeft        : component.get('v.scrollButtonLeft'),
+            labelRight       : component.get("v.scrollButtonRight")
+    	}
+    },
     _getPlugins: function (component) {
         var rawPlugins      = component.get('v.plugins') || '',
             plugins         = (rawPlugins && rawPlugins.split(',')) || [],
@@ -210,13 +220,15 @@
             scrollbars      = component.get('v.showScrollbars'),
             snap            = component.get('v.snap'),
             endless         = component.get('v.endless'),
-            infiniteLoading = component.get('v.infiniteLoading');
+            infiniteLoading = component.get('v.infiniteLoading'),
+            supportVoiceOver = component.get('v.supportVoiceOver'); 
 
         // If the attributes are true add the core plugins to the scroller plugin array
         scrollbars      && corePlugins.push('Indicators');
         snap            && corePlugins.push('Snap');
         endless         && corePlugins.push('Endless');
         infiniteLoading && corePlugins.push('InfiniteLoading');
+        supportVoiceOver &&  corePlugins.push('VoiceOver');
 
         return corePlugins.concat(plugins);
     },
@@ -256,7 +268,8 @@
 
             pullToRefreshConfig   = this._getPullToRefreshConfig(component),
             pullToLoadMoreConfig  = this._getPullToLoadMoreConfig(component),
-            infiniteLoadingConfig = this._getInfiniteLoadingConfig(component);
+            infiniteLoadingConfig = this._getInfiniteLoadingConfig(component),
+            voiceOverConfig       = this._getVoiceOverConfig(component);
         
         return {
             enabled               : useNativeScroller ? false : enabled,
@@ -272,6 +285,7 @@
             lockOnDirection       : lockOnDirection === 'true' ? true : lockOnDirection,
             minThreshold          : minThreshold,
             minDirectionThreshold : minDirectionThreshold,
+            voiceOverConfig       :  voiceOverConfig,
 
             pullToRefresh         : pullToRefresh,
             pullToLoadMore        : pullToLoadMore,

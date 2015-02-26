@@ -75,6 +75,14 @@
     <aura:attribute name="pullToRefreshUpdating"  type="String" default="Loading..."               description="The text to display while the scroller component is updating"/>
     <aura:attribute name="pullToRefreshError"     type="String" default="Error on Pull to refresh" description="The text to display in the top cell when the user pulls and there is an error"/>
     <aura:attribute name="pullToRefreshSubtitle"  type="String" default=""                         description="The text to display in the top cell when the user pulls the scroller area to refresh the content"/>
+
+    <!--Labels Scroll Buttons -->
+    <aura:attribute name="scrollButtonUp"         type="String" default="Page Up"                  description="The text to display in the Page Up button." />
+    <aura:attribute name="scrollButtonDown"       type="String" default="Page Down"                description="The text to display in the Page Down button." />
+    <aura:attribute name="scrollButtonLeft"       type="String" default="Page Left"                  description="The text to display in the Page Left button." />
+    <aura:attribute name="scrollButtonRight"      type="String" default="Page Right"                  description="The text to display in the Page Right button." />
+    
+    <aura:attribute name="supportVoiceOver" type="Boolean" default="false" description="If set to true and Global.isVoiceOver is also true, user can scroll the content by clicking on the up or down button." />
    
     <aura:registerEvent name="scrollTo" type="ui:scrollTo"     description="The event fired when the scroller should move to a new destination"/>
     <aura:handler       name="scrollTo" action="{!c.scrollTo}" description="Catches the event fired when the scroller should move to a new destination"/>  
@@ -84,6 +92,7 @@
 
     <aura:handler       name="change" value="{!v.canRefresh}" action="{!c.handleCanRefreshChange}" description="Handler called when the canShowMore attribute changes"/>
     <aura:handler       name="change" value="{!v.canShowMore}" action="{!c.handleCanShowMoreChange}" description="Handler called when the canShowMore attribute changes"/>
+    <aura:handler       name="change" value="{!$Global.isVoiceOver}" action="{!c.handleVoiceOverChange}" description="Handler called when Global.isVoiceOver changes." />
 
     <ui:resizeObserver onresize="{!c.refresh}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>

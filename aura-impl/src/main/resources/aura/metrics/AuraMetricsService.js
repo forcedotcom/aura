@@ -42,6 +42,7 @@ MetricsService.DEFAULT = 'default';
 
 MetricsService.prototype = {
     initialize: function() {
+        this.getPageStartTime();
         this.transactionStart('bootstrap','app');
         this.initializePlugins();
     },
@@ -99,12 +100,13 @@ MetricsService.prototype = {
         }
     },
     applicationReady: function () {
-        var self = this;
         this.bootstrapMark("applicationReady");
         this.doneBootstrap = true;
 
-        this.transactionEnd('bootstrap','app', function (transaction) {
-            self.bootstrap["marks"] = transaction["marks"];
+        var bootstrap = this.getBootstrapMetrics();
+        this.transactionEnd('bootstrap','app', function (transaction, callback) {
+            transaction["marks"]["bootstrap"] = bootstrap;
+            callback();
         });
 
         // #if {"modes" : ["PRODUCTION"]}
@@ -138,10 +140,19 @@ MetricsService.prototype = {
             transaction = this.transactions[id],
             beacon      = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[MetricsService.DEFAULT],
             postProcess = transaction && (typeof config === 'function') ? config : (config["postProcess"] || transaction["config"]["postProcess"]),
-            skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"];
+            skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"],
+            context     = transaction["config"]["context"] || {};
 
         if (transaction && (beacon || postProcess)) {
-            transaction.marks = {};
+            var parsedTransaction = {
+                "id"            : id,
+                "ts"            : transaction["ts"],
+                "duration"      : this.time() - transaction["ts"],
+                "pageStartTime" : this.pageStartTime,
+                "marks"         : {},
+                "context"       : $A.util.apply(context, config["context"], true, true)
+            };
+
             for (var plugin in this.pluginInstances) {
                 var instance = this.pluginInstances[plugin];
 
@@ -152,13 +163,15 @@ MetricsService.prototype = {
                         parsedMarks     = instance.postProcess && !skipPluginPostProcessing ? instance.postProcess(tMarks) : tMarks;
 
                     if (parsedMarks && parsedMarks.length) {
-                        transaction.marks[plugin] = parsedMarks;
+                        parsedTransaction["marks"][plugin] = parsedMarks;
                     }
                 }
             }
 
             if (postProcess) {
-                postProcess(transaction, this.signalBeacon.bind(this, beacon, transaction));
+                postProcess(parsedTransaction, this.signalBeacon.bind(this, beacon, parsedTransaction));
+            } else {
+                this.signalBeacon(beacon, parsedTransaction);
             }
 
             // cleanup
@@ -168,17 +181,19 @@ MetricsService.prototype = {
             }
         }
     },
-    signalBeacon: function (beacon, transaction) {
+    signalBeacon: function (beacon, transaction, postProcessResult) {
+        var payload = postProcessResult || transaction;
         if (beacon) {
-            beacon.sendData(transaction);
+            beacon["sendData"](payload["id"], payload);
         }
     },
     createTransaction: function (ns, name, config) {
         var id = (ns || MetricsService.DEFAULT) + ':' + name,
             transaction = {
-                "id"      : id,
-                "offsets" : {},
-                "config"  : config || {}
+                "id"            : id,
+                "offsets"       : {},
+                "ts"            : this.time(),
+                "config"        : config || {}
             },
             offsets = transaction["offsets"];
 
@@ -234,12 +249,17 @@ MetricsService.prototype = {
         }
     },
     getPageStartTime: function () {
-        var p = window.performance;
-        if (p && p.timing && p.timing.navigationStart) {
-            return p.timing.navigationStart;
-        } else {
-            return window.pageStartTime;
+        if (!this.pageStartTime) {
+            var p = window.performance;
+            var pst;
+            if (p && p.timing && p.timing.navigationStart) {
+                pst = p.timing.navigationStart;
+            } else {
+                pst = window.pageStartTime;
+            }
+            this.pageStartTime = pst;
         }
+        return this.pageStartTime;
     },
     time: function () {
         return MetricsService.TIMER();
@@ -278,8 +298,8 @@ MetricsService.prototype = {
             this.initializePlugin(pluginName, PluginContructor);
         }
     },
-    registerBeacon: function (beaconConfig) {
-        this.beaconProviders[beaconConfig["name"] || MetricsService.DEFAULT] = pluginConfig["beacon"];
+    registerBeacon: function (beacon) {
+        this.beaconProviders[beacon["name"] || MetricsService.DEFAULT] = beacon["beacon"] || beacon;
     },
     getBootstrapMetrics: function () {
         var bootstrap     = this.bootstrap,

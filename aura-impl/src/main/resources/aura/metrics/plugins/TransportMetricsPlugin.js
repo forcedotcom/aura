@@ -49,7 +49,7 @@ TransportMetricsPlugin.prototype = {
                 startMark["context"] = {
                     "aura.num" : auraNum,
                     "payload"  : config["params"]["message"],
-                    "url"      : config.url
+                    "url"      : config["url"]
                 };
 
                 config["callback"] = function (xhr) {

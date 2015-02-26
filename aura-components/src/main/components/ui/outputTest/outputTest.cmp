@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" access="GLOBAL" description="Displays the phone number in a URL link format.">
+<aura:component extensible="true" access="GLOBAL" description="Displays the phone number in a URL link format.">
     <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The phone number displayed when this component is rendered."/>
     <ui:outputPhone value="123-456-7890"/>
     <ui:outputPhone value="123-456-7890"/><ui:outputPhone value="123-456-7890"/>

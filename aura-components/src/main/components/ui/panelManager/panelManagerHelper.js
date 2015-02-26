@@ -800,7 +800,7 @@
                 // if panel is being reshown because a stacked panel was hidden, reset the previously
                 // focused element, otherwise set focus to the first focusable element
                 var last = panel.get('v.lastFocusedInput');
-                if (last && !last.disabled && self.isVisible(last)) {
+                if (last && !last.disabled && me.isVisible(last)) {
                 	last.focus();
                 }
                 else {

@@ -26,20 +26,12 @@
 	 */
 	initializeCaches: function (cmp) {
 		var concrete = cmp.getConcreteComponent();
-
-		// Flat references to leaf (cell) components to cleanup later.		
-		concrete._allChildrenCmps 	= [];
 		
 		// References to data needed to render each row's components
 		concrete._rowData = [];
 		
 		// References to column and component template data
-		concrete._columnNames = [];
-		concrete._columnOrder = {};
-		concrete._columns = {};
-		concrete._outputComponents = [];
-		concrete._inputComponents = [];
-		concrete._row = [];
+		concrete._cellTemplates = [];
 		concrete._selectionData = this.createSelectionData();
 	},
 	
@@ -49,40 +41,18 @@
 	 */
 	initializeNewColumns: function (concrete) {
 		var columns 				= this.getColumns(concrete),
-			handleColumnSortChange 	= concrete.get('c.handleColumnSortChange'),
-			mode 					= concrete.get('v.mode'),
-			isEditMode				= mode.indexOf('EDIT') === 0,
-			headerRow				= concrete.find("headerRow").getElement();
+			handleColumnSortChange 	= concrete.get('c.handleColumnSortChange');
 
 		// TODO cleanup components properly
-		concrete._columnCount = columns.length;
-		concrete._outputComponents = concrete._outputComponents.slice(0, columns.length);
-		concrete._inputComponents = concrete._inputComponents.slice(0, columns.length);
-
+		concrete._cellTemplates = concrete._cellTemplates.slice(0, columns.length);
+		
 		$A.util.forEach(columns, function (c, i) {
 			var name = c.get('v.name'),
-				outputComponent = c.get('v.outputComponent'),
-				inputComponent = c.get('v.inputComponent');
+				template = c.get('v.outputComponent');
 
-			concrete._outputComponents[i] = outputComponent;
-
-			if (inputComponent && inputComponent.length > 0) {
-				concrete._inputComponents[i] = inputComponent;
-			}
-
-			// Match up the correct component to use based on the mode.
-			// Copy the references to _row for easier access later. 
-			if (isEditMode && c.get('v.editable') && inputComponent && inputComponent.length > 0) {
-				concrete._row[i] = inputComponent;
-			} else {
-				concrete._row[i] = outputComponent; 
-			}
+			concrete._cellTemplates[i] = template;
 
 			if (name) {	
-				concrete._columnNames[i] = name.split('.');			
-				concrete._columnOrder[name] = i;
-				concrete._columns[name] = c; 
-
 				c.set('v.onsortchange', handleColumnSortChange);
 			}
 
@@ -92,28 +62,16 @@
 			}
 		});
 	},
-
-	/**
-	 * Attach action delegate for easier access.
-	 */ 
-	initializeActionDelegate: function (cmp) {
-		var actionDelegate = cmp.get('v.actionDelegate');
-
-		if (actionDelegate && actionDelegate.length > 0) {
-			cmp._actionDelegate = actionDelegate[0];
-		}
-	},
     
 	/**
 	 * Create the row data for the initial items in the grid and stores them in
 	 * concrete._rowData
 	 */
     initializeRowData: function(concrete) {
-    	var self				= this,
-    		items = concrete.get("v.items") || [],
-    		isEditMode			= false; //mode.indexOf('EDIT') === 0; not yet fully supported
+    	var self = this,
+    		items = concrete.get("v.items") || [];
     	
-    	concrete._rowData = self.createRowData(concrete, items, isEditMode);
+    	concrete._rowData = self.createRowData(concrete, items);
     },
     
 	/*
@@ -124,24 +82,14 @@
 	
 	// TODO rework
 	/**
-	 * 
-	 * 
 	 * @param {Component} cmp
 	 * @param {Object} params ({index, count, last (Boolean), items, remove (Boolean)}) 
 	 * 
 	 */
 	handleAddRemove: function (cmp, params) {
-		var concrete = cmp.getConcreteComponent(),
-			mode = cmp.get('v.mode'),
-			index;
+		var concrete = cmp.getConcreteComponent();
 
-		params.index = params.last ? 'last' : parseInt(params.index);
-		if (params.last) {
-			params.index = 'last';
-		} else {
-			params.index = parseInt(params.index, 10);
-		}
-
+		params.index = params.last ? 'last' : parseInt(params.index, 10);
 		params.count = parseInt(params.count, 10);
 
 		if (params.remove) {
@@ -150,7 +98,7 @@
 			// Insert n rows of but no items?
 			this.insertRowsAndUpdateData(concrete, params.index, params.count, params.items, true);
 		}
-	},	
+	},
 	
 	/**
 	 * Respond to changed on to and within the items array.
@@ -160,8 +108,7 @@
 	// TODO rework
 	handleItemsChange: function (cmp, params) {
 		var self = this,
-			concrete = cmp.getConcreteComponent(),
-			newLength;
+			concrete = cmp.getConcreteComponent();
 		
 		// If adding or removing rows, escape.
 		if (cmp._addRemove) { 
@@ -169,9 +116,11 @@
 		}
 		
 		// Loaded once is meant to ensure the first data loaded doesn't break.
-		if (!cmp._hasDataProvider || cmp._loadedOnce) {
+		// TODO: CLEANUP cmp.isRendered might not be needed anymore
+		if (!cmp._hasDataProvider || cmp.isRendered()) {
+			// TODO: Why are we performing this check?
 			if (!params.index) {
-				newLength = (params.value ? params.value.length : 0);
+				var newLength = (params.value ? params.value.length : 0);
 				// Check for a larger or smaller list.
 				// TODO: concrete vs cmp?
 				if (cmp._rowData.length !== newLength) {
@@ -183,14 +132,6 @@
 		}
 		
 		this.selectAll(concrete, false);
-	
-		if (cmp._sorting) {
-			cmp._sorting = false;
-		}
-
-		if (!cmp._loadedOnce) {
-			cmp._loadedOnce = true;
-		}		
 	},
 
 	// TODO rework
@@ -214,6 +155,7 @@
 		// Refresh to force fetch from data provider (if available).
 		concrete.getEvent('refresh').fire();
 	},
+	
 	/**
 	 * @param {Component} cmp
 	 * @param {Object} cfg { name: String, index: number, value: String, globalId: String }
@@ -222,8 +164,7 @@
 		var name = cfg.name, 
 			index = cfg.index, 
 			value = cfg.value, 
-			globalId = cfg.globalId,
-			item;
+			globalId = cfg.globalId;
 
 		if (name === 'dataGrid:select') {
 			if (typeof value === 'string') {
@@ -234,18 +175,17 @@
 			if ($A.util.isUndefinedOrNull(index)) {
 				this.selectAll(cmp, value);
 			} else {
-				// Don't worry about calling 'selectOne'.
-				// hlp.selectOne(cmp, index, value);
 				this.setSelectedItems(cmp, value, [index]);
 			}
 		} else if (name && index && globalId) {
 
 			// Use value object incase change handlers are important.
 			// For the dataGrid implementation, we provide the internal row object.
-			item = cmp.get('v.items.' + index);
+			var item = cmp.get('v.items.' + index);
+			var actionDelegate = cmp.get("v.actionDelegate")[0];
 
-			if (item && cmp._actionDelegate) {
-				cmp._actionDelegate.getEvent('onaction').setParams({
+			if (item && actionDelegate) {
+				actionDelegate.getEvent('onaction').setParams({
 					name 		: name,
 					index 		: index,
 					item 		: item,
@@ -287,37 +227,6 @@
 		}
 
 		return ret;
-	},
-	
-	/**
-	 * Cache the [input/output] components at each cell to avoid re-creating them later.
-	 */
-	setCellComponents: function(concrete, rowIndex, columnIndex, key, value) {
-		var rowData = concrete._rowData,
-			columns, cellData;
-		
-		if (!rowData[rowIndex]) {
-			// TODO index validation
-			$A.warning("dataGrid row index out of bounds");
-		}
-		
-		cellData = rowData[rowIndex].columnData[columnIndex];
-		
-		if (!cellData.components) {
-			components = {
-					input : null,
-					output : null
-			}
-		}
-		
-		cellData.components[key] = value;
-	},
-	
-	/**
-	 * Returns a cell's specific data.
-	 */
-	getCellData: function(concrete, rowIndex, columnIndex) {
-		return concrete._rowData[rowIndex].columnData[columnIndex];
 	},
     
     /*
@@ -418,45 +327,21 @@
      * 
      * @param {Component} concrete
      * @param {Array} items
-     * @param {Boolean} isEditMode
      */
-    createRowData: function(concrete, items, isEditMode) {
-    	var self				= this,
-    		rowDataArray		= [],
-    		targetComponents 	= isEditMode ? concrete._inputComponents : concrete._outputComponents,
-        	childKey			= isEditMode ? 'input' : 'output',
-        	cellCmps, components, key;
+    createRowData: function(concrete, items) {
+    	var self			= this,
+    		rowDataArray	= [],
+    		cellTemplates 	= concrete._cellTemplates;
     	
     	for (var rowIndex = 0; rowIndex < items.length; rowIndex++) {
-    		rowData = {};
+    		var rowData = {};
     		
     		rowData.vp = self.createPassthroughValue(concrete, items[rowIndex], rowIndex);
     		rowData.classes = [];
     		rowData.columnData = [];
     		
-    		for (var colIndex = 0; colIndex < concrete._columnCount; colIndex++) {
-    			cellCmps = {};
-    			components = [];
-    			key = childKey;
-    			
-    			cdrs = targetComponents[colIndex];
-    			
-    			if (!cdrs) {
-    				// Columns do not need to define inputComponents and outputComponents.
-    				// Attempt to fallback if the target is empty (likely for action columns).
-    				cdrs = concrete._row[colIndex];
-
-    				// Swap keys to set the correct property on child.
-    				key = childKey === 'input' ? 'output' : 'input';
-    			}
-    			
-    			cellCmps[key] = components
-    			
-    			rowData.columnData[colIndex] = {
-    					elementRef 	: null,
-    					components 	: cellCmps,
-    					cellKey		: key
-    			};
+    		for (var colIndex = 0; colIndex < cellTemplates.length; colIndex++) {
+    			self.createCellData(rowData, colIndex);
     		}
     		rowDataArray[rowIndex] = rowData;
     	}
@@ -470,7 +355,7 @@
 	shiftRowData: function(concrete, index, count, remove) {
 		var rowData = concrete._rowData,
 			args = [index, remove ? count : 0],
-			columnData, cmpsToUnrender = [];
+			columnData;
 		
 		if (!remove) {
 			for (var i=0; i<count; i++) {
@@ -481,17 +366,9 @@
 				columnData = rowData[index + i].columnData;
 				for (var j=0; j<columnData.length; j++) {
 					components = columnData[j].components;
-					if (components['output']) {
-						$A.util.forEach(components['output'], function(cmp) {
-							cmp.destroy(true);
-						});
-					}
-					
-					if (components['input']) {
-						$A.util.forEach(components['input'], function(cmp) {
-							cmp.destroy(true);
-						});
-					}
+					$A.util.forEach(components, function(cmp) {
+						cmp.destroy(true);
+					});
 				}
 			}
 		}
@@ -519,7 +396,6 @@
 				tbody.removeChild(node);
 			}
 		}
-		concrete._rowItems = items;
 		concrete.set("v.items", items, true);
 	},
 	
@@ -546,11 +422,7 @@
         }
 
 		var self = this,
-			isEditMode = concrete.get("v.mode").indexOf('EDIT') === 0,
-			tbody = concrete.find('tbody').getElement(),
-			items = concrete.get('v.items') || [],
-			rowDataLength = concrete._rowData.length,
-			resolved = 0, realIndex, tr, node, item, newRowData, newRowElements;
+			realIndex;
 
 		// Create a skeleton for the new data if none are provided
 		if (!newItems) {
@@ -565,38 +437,41 @@
 		if (index === 'first') {
 			realIndex = 0;
 		} else if (index === 'last') {
-			realIndex = rowDataLength; 
+			realIndex = concrete._rowData.length; 
 		} else {
 			realIndex = index;
 		}
 
+		// TODO: Do we need this addRemove blocks anymore?
 		concrete._addRemove = true;
 		
+		// TODO: Possible refactor here
 		// Set up new row data for the new items and generate the DOM elements
-		newRowData = self.createRowData(concrete, newItems, isEditMode);
-		newRowElements = self.createAndRenderTableRows(concrete, newRowData, isEditMode);
+		var newRowData = self.createRowData(concrete, newItems);
+		var newRowElements = self.createAndRenderTableRows(concrete, newRowData);
 		
 		// Cache the new row data in the correct place and insert the DOM elements into the grid
+		var tbody = concrete.find('tbody').getElement(),
+			items = concrete.get('v.items') || [];
+		
 		if (index === 'last') {
 			if (insertItems) {
 				items = items.concat(newItems);
 			}
 			concrete._rowData = concrete._rowData.concat(newRowData);
 			tbody.appendChild(newRowElements);
-			//self.appendRowData(concrete, newRowData);
 		} else {
 			if (insertItems) {
 				Array.prototype.splice.apply(items, [realIndex, 0].concat(newItems));
 			}
 			Array.prototype.splice.apply(concrete._rowData, [realIndex, 0].concat(newRowData));
-			node = tbody.children[realIndex];
+			
+			var node = tbody.children[realIndex];
 			tbody.insertBefore(newRowElements, node);
-			//self.insertRowData(concrete, newRowData, realIndex);
 		}
 		
 		concrete._addRemove = false;
 		concrete.set("v.items", items, true);
-		concrete._rowItems = items;
 		
 		if (callback) {
 			callback();
@@ -645,16 +520,12 @@
             
             for(var j=0;j<rowData.columnData.length;j++){
                 var columnData=rowData.columnData[j];
-                var columns=columnData.components[columnData.cellKey];
+                var columns=columnData.components;
                 for(var c=0;c<columns.length;c++){
                     columns[c].markDirty("DataGrid item changed.");
                 }
             }
         }
-
-		// Set the state back to 'idle'.
-		// TODO: is this necessary? Not used anywhere else
-		//concrete.set('v.state', 'idle');
 	},
 	
 	/**
@@ -663,17 +534,11 @@
 	 * 
 	 * @param {Object} rowData
 	 * @param {Integer} colIndex
-	 * @param {Boolean} isEditMode
 	 */
-	createCellData: function(rowData, colIndex, isEditMode) {
-		var cellCmps = {},
-			ioKey = isEditMode ? 'input' : 'output';
-		
-		cellCmps[ioKey] = [];
+	createCellData: function(rowData, colIndex) {
 		rowData.columnData[colIndex] = {
 				elementRef : null,
-				components : cellCmps,
-				cellKey	   : ioKey
+				components : []
 		}
 		return rowData.columnData[colIndex];
 	},
@@ -687,21 +552,18 @@
 	 * @param {HTMLTableRowElement} parentTR
 	 */
 	destroyCellData: function(rowData, colIndex, parentTR) {
-		var colData = rowData.columnData[colIndex],
-			key;
+		var colData = rowData.columnData[colIndex];
 		
 		if (colData) {
-			key = colData.cellKey;
-			$A.util.forEach(colData.components[key], function(cmp) {
+			$A.util.forEach(colData.components, function(cmp) {
 				cmp.destroy();
 			});
 			
-			colData.components[key] = [];
+			colData.components = [];
 			parentTR.removeChild(colData.elementRef);
 			
 			rowData.columnData[colIndex] = {};
 		}
-
 	},
     
     /*
@@ -716,13 +578,10 @@
 	// TODO: optimize column iteration
 	createTableBody: function (concrete) {
 		var self = this,
-			items = concrete.get("v.items") || [],
 			doc = document.createDocumentFragment(),
-			tr, asyncParams, rowElements;
-
-		rowElements = self.createAndRenderTableRows(concrete, concrete._rowData, false);
-		doc.appendChild(rowElements);
+			rowElements = self.createAndRenderTableRows(concrete, concrete._rowData, false);
 		
+		doc.appendChild(rowElements);
 		return doc;
 	},
 	
@@ -732,19 +591,17 @@
 	 * 
 	 * @param {Component} concrete
 	 * @param {Array} rowDataArray
-	 * @param {Boolean} isEditMode
 	 */
-	createAndRenderTableRows: function (concrete, rowDataArray, isEditMode) {
+	createAndRenderTableRows: function (concrete, rowDataArray) {
 		var self = this,
 			rowElements = document.createDocumentFragment(),
-			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			tr, td, colData, components, cdrs, rowData;
+			tr, rowData;
 		
 		for (var rowIndex = 0; rowIndex < rowDataArray.length; rowIndex++) {
 			tr = document.createElement('tr');
 			rowData = rowDataArray[rowIndex];
 			
-			self.renderTableRow(concrete, rowData, tr, isEditMode, false);
+			self.renderTableRow(concrete, rowData, tr, false);
 			
 			rowElements.appendChild(tr);
 		}
@@ -762,11 +619,10 @@
 	 * @param {function (Component)} callback A callback. Not using promises due to high volume.
 	 */
 	createAndRenderCell: function (concrete, cdrs, vp, element, components, callback) {
-		var resolved = 0,
-			cdr, path, output, span;
+		var resolved = 0;
 
 		for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {
-			cdr = cdrs[cdrIndex];
+			var cdr = cdrs[cdrIndex];
 			$A.componentService.newComponentAsync(this, function (out) {
 				components.push(out);
 
@@ -781,43 +637,24 @@
 	},
 	
 	/**
-	 * Updates and rerenders the rows specified by rowDataArray, making sure to pick
-	 * up changes to column metadata
-	 */
-	rerenderRowsWithNewColumns: function (concrete, rowDataArray, isEditMode) {
-		var self = this,
-			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			rowElements = concrete.find("tbody").getElement().rows,
-			tr, td, colData, components, cdrs, rowData;
-		
-		for (var rowIndex = 0; rowIndex < rowDataArray.length; rowIndex++) {
-			tr = rowElements[rowIndex];	
-			rowData = rowDataArray[rowIndex];
-			
-			self.renderTableRow(concrete, rowData, tr, isEditMode, true);
-		}
-	},
-	
-	/**
 	 * Renders the row using the data specified in rowData in the element tr.
 	 * Optionally cleans up the component data
 	 * 
 	 * @param {Component} concrete
 	 * @param {Object} rowData
 	 * @param {HTMLTableRowElement} tr
-	 * @param {Boolean} isEditMode
 	 * @param {Booelan} cleanOldComponents
 	 */
-	renderTableRow: function(concrete, rowData, tr, isEditMode, cleanOldComponents) {
+	renderTableRow: function(concrete, rowData, tr, cleanOldComponents) {
 		var self = this,
-			targetComponents = isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			colData, td, key, components, cdrs, colIndex, largerLength, resizeRowData;
+			cellTemplates = concrete._cellTemplates,
+			td, cdrs, largerLength, resizeRowData;
 		
-		largerLength = (targetComponents.length > rowData.columnData.length) ? targetComponents.length : rowData.columnData.length;
+		largerLength = (cellTemplates.length > rowData.columnData.length) ? cellTemplates.length : rowData.columnData.length;
 		
-		for (colIndex = 0; colIndex < largerLength; colIndex++) {
-			colData = rowData.columnData[colIndex];
-			cdrs = targetComponents[colIndex];
+		for (var colIndex = 0; colIndex < largerLength; colIndex++) {
+			var colData = rowData.columnData[colIndex];
+			cdrs = cellTemplates[colIndex];
 			
 			// If no cdrs, then these columns should be destroyed
 			// TODO: collapse empty columns
@@ -826,7 +663,7 @@
 				resizeRowData = true;
 			} else {			
 				if (!colData) {
-					colData = self.createCellData(rowData, colIndex, isEditMode);
+					colData = self.createCellData(rowData, colIndex);
 				}
 				
 				if (!colData.elementRef) {
@@ -837,23 +674,36 @@
 				}
 				
 				colData.elementRef = td;
-				key = colData.cellKey;
 				
 				if (cleanOldComponents) {
-					$A.util.forEach(colData.components[key], function(cmp) {
+					$A.util.forEach(colData.components, function(cmp) {
 						cmp.destroy();
 					});
-					colData.components[key] = [];
+					colData.components = [];
 				}
-				
-				components = colData.components[key];
-				
-				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, components);
+				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, colData.components);
 			}
 		}
 		
 		if (resizeRowData) {
-			rowData.columnData = rowData.columnData.slice(0, targetComponents.length);
+			rowData.columnData = rowData.columnData.slice(0, cellTemplates.length);
+		}
+	},
+	
+	/**
+	 * Updates and rerenders the rows specified by rowDataArray, making sure to pick
+	 * up changes to column metadata
+	 */
+	rerenderRowsWithNewColumns: function (concrete, rowDataArray) {
+		var self = this,
+			rowElements = concrete.find("tbody").getElement().rows,
+			tr, rowData;
+
+		for (var rowIndex = 0; rowIndex < rowDataArray.length; rowIndex++) {
+			tr = rowElements[rowIndex];	
+			rowData = rowDataArray[rowIndex];
+
+			self.renderTableRow(concrete, rowData, tr, true);
 		}
 	},
 	
@@ -909,6 +759,20 @@
 	},
 	
 	/**
+	 * Helper function to generate the value provider for a row
+	 */
+	createPassthroughValue: function(concrete, item, rowIndex) {
+		var rowContext = {
+				item : $A.expressionService.create(null, item),
+				selected : $A.expressionService.create(null, false),
+				index : $A.expressionService.create(null, rowIndex),
+				disabled : $A.expressionService.create(null, false)
+		};
+		
+		return $A.expressionService.createPassthroughValue(rowContext, concrete);
+	},
+	
+	/**
 	 * Updates the specified attribute of all the column components with
 	 * the specified value
 	 * 
@@ -949,22 +813,16 @@
 	 */
 	selectiveMap: function (concrete, rowIndex, count, batch, op) {
 		var rowDataArray = concrete._rowData,
-			batchedCmps = [], components;
+			batchedCmps = [];
 		
 		for (var i=0; i<count; i++) {
 			columnData = rowDataArray[rowIndex + i].columnData;
 			for (var j=0; j<columnData.length; j++) {
-				components = columnData[j].components
-				if (batch) {
-					if (components.input) {
-						batchedCmps = batchedCmps.concat(components.input);
-					}
-					if (components.output) {
-						batchedCmps = batchedCmps.concat(components.output);
-					}
+				var components = columnData[j].components
+				if (batch && components) {
+					batchedCmps = batchedCmps.concat(components);
 				} else {
-					$A.util.forEach(components.input, op);
-					$A.util.forEach(components.input, op);
+					$A.util.forEach(components, op);
 				}
 			}
 		}
@@ -1001,20 +859,6 @@
 	},
 	
 	/**
-	 * Helper function to generate the value provider for a row
-	 */
-	createPassthroughValue: function(concrete, item, rowIndex) {
-		var rowContext = {
-				item : $A.expressionService.create(null, item),
-				selected : $A.expressionService.create(null, false),
-				index : $A.expressionService.create(null, rowIndex),
-				disabled : $A.expressionService.create(null, false)
-		};
-		
-		return $A.expressionService.createPassthroughValue(rowContext, concrete);
-	},
-	
-	/**
 	 * Fastest, cleanest deep clone. 
 	 * Falls back to provide a simple implementation for IE7. 
  	 * @param {Object} source
@@ -1037,211 +881,15 @@
 		} 
 	}, 
 	
-	/**
-	 * Clones a defRef (primary its attributes) so that a components constructed from 
-	 * the same template defRef do not share attribute values after creation.
-	 * Purposely not copying 'localId' to avoid confusion.	
-     * If the overriden cellTemplate has no attributes, then inject the structure.
-	 * 
-     * @param {ComponentDefRef} defRef	
-     * TODO: rework
-	 */
-	cloneDefRef: function (defRef) {
-		return {
-			attributes		: defRef.attributes ? this.clone(defRef.attributes) : { values : {} },
-			componentDef	: defRef.componentDef,
-			valueProvider	: defRef.valueProvider
-		}
-	},
-	
-	// TODO rework
-	// Used in createSummaryRow
-	inject: function (cmpDefRef, attribute, value, force) {
-		var self = this;
-
-		if (force && !cmpDefRef.attributes) {
-			cmpDefRef.attributes = { values: {} };
-		}
-
-		// If the value has not been set or force is specified, then inject. 
-		if (!cmpDefRef.attributes.values[attribute] || force) {
-			cmpDefRef.attributes.values[attribute] = {
-				descriptor 	: attribute,
-				value 		: $A.util.isArray(value) ? value : [value]
-			};	
-		}	
-	},
-	
 	// Components cannot be generated with an empty item shape 
 	// TODO: set all the data to nulls or empty objects
 	generateNewItemShape: function (concrete) {
-    	var itemShape = concrete.get('v.itemShape'),
-			items = concrete.get("v.items") || [],
-			item = items[0] || {},
-			template,
-			sub, path;
+    	var items = concrete.get("v.items") || [],
+			item = items[0] || {};
 
 		if (item) {
-			template = this.clone(item); // TODO: make empty clone rather than full clone?
+			var template = this.clone(item); // TODO: make empty clone rather than full clone?
 			concrete.set("v.itemShape", template);
 		}
-
-		concrete.set("v.itemShape", item);
-    },
-    
-    /*
-     * ================
-     * Not-fully-supported Functionality
-     * ================
-     */
-	
-	/**
-	 * @return {HTMLElement} null if no summary row is defined
-	 */
-	// TODO rework
-	createSummaryRow: function (concrete) {
-		var vp = concrete.getAttributeValueProvider(), 
-			summaryRow = concrete.get('v.summaryRow'), 
-			self = this, doc, tr, priv_rows, summaries, colspan;
-
-		// Create map to store by column name. 
-		concrete._summaryCells = {};
-	
-		if (summaryRow.length === 0) {
-			return null;
-		}
-
-		doc = document.createDocumentFragment(),
-		tr = document.createElement('tr'),
-	 	priv_rows = concrete._rowItems,//concrete.getValue('v.priv_rows'),
-		summaries = {},
-		colspan = 0;
-
-		doc.appendChild(tr);
-
-		// Build up a mapping of the summary columns and their positions.		
-		$A.util.forEach(summaryRow, function (cell, i) {
-			var column = cell.get("v.column"),
-				co = concrete._columnOrder[column];
-
-			if (!$A.util.isUndefinedOrNull(co)) {
-				// If an outputComponent has not been definited, inject one.
-				if (!cell.get("v.outputComponent") && concrete._columns[column]) {
-
-					// TODO: investigate valueProvider
-					var cdr = concrete._columns[column].get('v.outputComponent')[0];
-					delete cdr.attributes.valueProvider;
-					var clone = self.cloneDefRef(cdr);
-
-					self.inject(cell, 'outputComponent', clone);	
-				}
-
-				// Force inject the initial items.
-				// With a reference to the value object, changes should propagate.
-				self.inject(cell, 'items', priv_rows, true);
-
-				// Create component from defRef. 
-				$A.componentService.newComponentAsync(this, function (summaryCell) {
-					concrete._allChildrenCmps.push(summaryCell);
-
-					// Put into map for later awesomeness.
-					concrete._summaryCells[column] = summaryCell;
-					summaries[co] = summaryCell;
-				}, cell, cell.valueProvider || vp);
-			} else {
-				$A.error('Invalid column name: \'' + column + '\'');
-			}
-		});
-
-		// Fill the missing cells with wide cells.
-		for (var i = 0; i < concrete._columnCount; i++) {
-			if (summaries[i]) {
-				
-				if (colspan > 0) {
-					pushFiller();
-					colspan = 0;
-				}
-
-				$A.render(summaries[i], tr);
-				$A.afterRender(summaries[i]);
-			} else {
-				++colspan;
-			}
-
-			if (colspan && i === concrete._columnCount - 1) {
-				pushFiller();
-			}
-		}
-
-		function pushFiller() {
-			var td = document.createElement('td');
-			td.setAttribute('colspan', colspan);
-			tr.appendChild(td);
-		}
-
-		return doc;
-	},
-	
-	/**
-	 * TODO rework
-	 */
-	handleModeChange: function (cmp) {
-		var self 				= this,
-			concrete 			= cmp.getConcreteComponent(),
-		 	mode 				= concrete.get('v.mode'),
-		 	isEditMode 			= mode.indexOf('EDIT') === 0,
-			targetComponents 	= isEditMode ? concrete._inputComponents : concrete._outputComponents,
-			itemCount 			= concrete.get('v.items').length,
-			targetComponent, 
-			childIndex, 
-			child, 
-			el, 
-			vp, 
-			parent,
-			oldComponents,
-			newComponents, 
-			cdrs,
-			cdr; 
-
-		for (var columnIndex = 0; columnIndex < concrete._columnCount; columnIndex++) {
-			targetComponent = targetComponents[columnIndex];
-
-			if (targetComponent) {
-				for (var rowIndex = 0; rowIndex < itemCount; rowIndex++) {
-
-					// Get reference to child.
-					cellData 			= self.getCellData(concrete, rowIndex, columnIndex);
-					oldComponents 	= cellData.components[isEditMode ? 'output' : 'input'];
-					newComponents 	= cellData.components[isEditMode ? 'input' : 'output'];
-
-					// Columns do not need to define intputComponents and outputComponents.
-					if (!oldComponents) {
-						continue;
-					}
-
-					if (!newComponents || newComponents.length === 0) {
-						newComponents = [];
-					}
-
-					// Extract relevant objects.
-					el 		= cellData.elementRef;
-					vp		= concrete._rowData[rowIndex].vp;
-					cdrs 	= targetComponent;
-
-					$A.unrender(oldComponents);
-
-					// If components have already been created, use them. 
-					if (newComponents.length > 0) {
-						$A.render(newComponents, el);
-						$A.afterRender(newComponents); 
-					} else {
-						// Create and render the components (async).
-						self.createAndRenderCell(concrete, targetComponent, vp, el, newComponents);	
-
-						cellData.components[isEditMode ? 'input' : 'output'] = newComponents;
-					}
-				}
-			}
-		}
-	}
+    }
 });

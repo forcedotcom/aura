@@ -17,38 +17,16 @@
 	render: function (cmp, hlp) {
 		var concrete 	= cmp.getConcreteComponent(),
 			table 		= this.superRender(),
-			tbody 		= cmp.find('tbody').getElement(),
-			tfoot       = cmp.find('tfoot').getElement(),
-			items 		= cmp.get('v.items'),
-			summaryRow;
-
-		// TODO: this seems stupid d[-_-]b
-		cmp._loadedOnce = items.length > 0;
+			tbody 		= cmp.find('tbody').getElement();
 
 		// Build the table body. 
 		// The DOM nodes are built synchronously, but the components are built asynchronously.
 		tbody.appendChild(hlp.createTableBody(concrete));
 
-		// Attempt to create a summary row.
-		//summaryRow = hlp.createSummaryRow(concrete);
-
-		if (summaryRow) {
-			tfoot.appendChild(summaryRow);
-		}
-
 		return table;
 	},
 	
 	unrender: function (cmp) {
-		var children = cmp._allChildrenCmps,
-			child;
-
-		// Asynchronously destroy leaf (cell) components.
-		for (var i = 0; i < children.length; i++) {
-			child = children[i];
-			child.destroy(true);
-		}
-
 		this.superUnrender();
 	}
 })

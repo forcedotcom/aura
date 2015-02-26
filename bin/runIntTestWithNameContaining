@@ -6,4 +6,9 @@ while test $# -gt 1; do
     shift;
 done
 name=$1;
-mvn verify -DskipUnitTests -DskipJsDoc -DrunOnlyIntTests $MVN_ARGS -DtestNameContains=$name
+NAME_ARG=""
+if test -n "$name"; then
+    NAME_ARG="-DtestNameContains=$name";
+fi
+
+mvn verify -DskipUnitTests -DskipJsDoc -DskipComponentCompile -DrunOnlyIntTests ${MVN_ARGS} ${NAME_ARG}

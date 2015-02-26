@@ -385,8 +385,8 @@ public class AuraServlet extends AuraBaseServlet {
                 Action action = message.getActions().get(0);
                 String name = action.getDescriptor().getQualifiedName();
                 if (name.equals("aura://ComponentController/ACTION$getApplication")
-                        || (name.equals("aura://ComponentController/ACTION$getComponent") && !isProductionMode(context
-                                .getMode()))) {
+                        || (name.equals("aura://ComponentController/ACTION$getComponent")
+                            && !isProductionMode(context.getMode()))) {
                     isBootstrapAction = true;
                 }
                 Action labelAction = message.getActions().get(1);

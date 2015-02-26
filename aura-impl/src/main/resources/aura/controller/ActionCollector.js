@@ -32,6 +32,7 @@
  */
 var ActionCollector = function ActionCollector(actions, finishedCallback) {
     this.actionsToSend = [];
+    this.actionsCount = 0;
     this.actionsToComplete = [];
     this.actionsRefreshed = [];
     this.actionsFinished = {};
@@ -40,8 +41,10 @@ var ActionCollector = function ActionCollector(actions, finishedCallback) {
     this.actionsRequested = actions;
     if (actions) {
         this.actionsToCollect = actions.length;
+        this.actionsCount = actions.length;
     } else {
         this.actionsToCollect = 0;
+        this.actionsCount = 0;
     }
     this.num = -1;
 };
@@ -62,7 +65,7 @@ ActionCollector.prototype.process = function() {
     var action;
     var that = this;
 
-    var checkForCachedResponse = function(action) {
+    var checkForCachedResponse = function(action, index) {
         //
         // For cacheable actions check the storage service to see if we already have a viable cached action
         // response we can complete immediately. In this case, we get a callback, so we create a callback
@@ -76,26 +79,26 @@ ActionCollector.prototype.process = function() {
             storage.get(key).then(
                 function(value) {
                     $A.run(function() {
-                        // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-                        that.collectAction(action, value ? value.value : null);
+                        // FIXME: (from KV) - do we want to reject expired values?
+                        that.collectAction(action, value ? value.value : null, index);
                     });
                 },
                 function() {
                     // error fetching from storage so go to the server
                     $A.run(function() {
-                        that.collectAction(action);
+                        that.collectAction(action, null, index);
                     });
                 }
             );
         } else {
-            that.collectAction(action);
+            that.collectAction(action, null, index);
         }
     };
 
     for (i = 0; i < this.actionsRequested.length; i++) {
         action = this.actionsRequested[i];
         $A.assert(action.getDef().isServerAction(), "Client side action leaked through to server call.");
-        checkForCachedResponse(action);
+        checkForCachedResponse(action, i);
     }
 };
 
@@ -189,14 +192,15 @@ ActionCollector.prototype.findActionAndClear = function(id) {
  *
  * @param {Action} action the action to collect
  * @param {Object} response the response to the action (if from storage).
+ * @param {integer} index the index for the action.
  * @private
  */
-ActionCollector.prototype.collectAction = function(action, response) {
+ActionCollector.prototype.collectAction = function(action, response, index) {
     if (response) {
-        this.actionsToComplete.push({
+        this.actionsToComplete[index] = {
             action : action,
             response : response
-        });
+        };
     } else {
         //
         // If this is a chained action, the execution will be via another path, and we won't be able
@@ -204,7 +208,7 @@ ActionCollector.prototype.collectAction = function(action, response) {
         //
         action.callAllAboardCallback();
         if (!action.isChained()) {
-            this.actionsToSend.push(action);
+            this.actionsToSend[index] = action;
         }
     }
     if (--this.actionsToCollect <= 0) {
@@ -229,8 +233,14 @@ ActionCollector.prototype.finishCollection = function() {
     //
     $A.assert(this.actionsToCollect === 0,
         "Actions to collect is = 0: "+this.actionsToCollect+" actions ="+this.actionsRequested);
-    for (i = 0; i < this.actionsToComplete.length; i++) {
-        toComplete = this.actionsToComplete[i];
+    var complete = this.actionsToComplete;
+    this.actionsToComplete = [];
+    for (i = 0; i < this.actionsCount; i++) {
+        toComplete = complete[i];
+        if (!toComplete) {
+            continue;
+        }
+        this.actionsToComplete.push(toComplete);
         action = toComplete.action;
         if (action.isChained()) {
             //
@@ -243,8 +253,15 @@ ActionCollector.prototype.finishCollection = function() {
         refresh = action.getRefreshAction(toComplete.response);
         if (refresh) {
             action.fireRefreshEvent("refreshBegin");
-            this.actionsToSend.push(refresh);
+            this.actionsToSend[i] = refresh;
             this.actionsRefreshed.push(refresh);
+        }
+    }
+    var ordered = this.actionsToSend;
+    this.actionsToSend = [];
+    for (i = 0; i < this.actionsCount; i++) {
+        if (ordered[i]) {
+            this.actionsToSend.push(ordered[i]);
         }
     }
     this.finishedCallback(this);

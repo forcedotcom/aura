@@ -34,7 +34,7 @@ var MetricsService = function MetricsService(config) {
     this.doneBootstrap     = false;
 };
 
-MetricsService.TIMER   = window.performance ? performance.now.bind(performance) : Date.now.bind(Date);
+MetricsService.TIMER   = (window.performance && window.performance.now) ? window.performance.now.bind(performance) : Date.now.bind(Date);
 MetricsService.START   = 'start';
 MetricsService.END     = 'end';
 MetricsService.STAMP   = 'stamp';
@@ -336,21 +336,23 @@ MetricsService.prototype = {
                     "unloadEventStart": pt.unloadEventStart,
                     "unloadEventEnd"  : pt.unloadEventEnd
                 };
-                bootstrap["requests"] = ($A.util.filter(performance.getEntries(), 
-                    function (resource) {
-                        return resource.responseEnd < bootstrap["applicationReady"];
-                    })).map(function (resource) {
-                        return {
-                            "name"         : resource.name,
-                            "duration"     : resource.duration,
-                            "startTime"    : resource.startTime,
-                            "redirectTime" : resource.redirectEnd - resource.redirectStart,
-                            "dnsTime"      : resource.domainLookupEnd - resource.domainLookupStart,
-                            "requestStart" : resource.requestStart,
-                            "responseEnd"  : resource.responseEnd
-                        };
-                    }
-                );
+                if (performance.getEntries) {
+                    bootstrap["requests"] = ($A.util.filter(performance.getEntries(),
+                        function (resource) {
+                            return resource.responseEnd < bootstrap["applicationReady"];
+                        })).map(function (resource) {
+                            return {
+                                "name"         : resource.name,
+                                "duration"     : resource.duration,
+                                "startTime"    : resource.startTime,
+                                "redirectTime" : resource.redirectEnd - resource.redirectStart,
+                                "dnsTime"      : resource.domainLookupEnd - resource.domainLookupStart,
+                                "requestStart" : resource.requestStart,
+                                "responseEnd"  : resource.responseEnd
+                            };
+                        }
+                    );
+                }
             }
         }
         return bootstrap;

@@ -83,7 +83,7 @@ var AuraClientService = function() {
 
     /**
      * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
-     * 
+     *
      * @private
      */
     function checkAndDecodeResponse(response, noStrip) {
@@ -259,10 +259,10 @@ var AuraClientService = function() {
 
     /**
      * Process a single action/response.
-     * 
+     *
      * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
      * error occurs.
-     * 
+     *
      * @param {Action}
      *            action the action.
      * @param {Boolean}
@@ -293,7 +293,7 @@ var AuraClientService = function() {
             if (storage) {
                 toStore = action.getStored(storage.getName());
                 errorHandler = action.getStorageErrorHandler();
-            
+
                 if (toStore) {
                     storage.put(key, toStore).then(
                         function() {},
@@ -315,10 +315,10 @@ var AuraClientService = function() {
 
     /**
      * Callback for an XHR for a set of actions.
-     * 
+     *
      * This function does all of the processing for a set of actions that come back from the server. It correctly deals
      * with the case of interrupted communications, and handles aborts.
-     * 
+     *
      * @param {Object}
      *            response the response from the server.
      * @param {ActionCollector}
@@ -345,15 +345,15 @@ var AuraClientService = function() {
             }
         }
 
-        var stackName = "actionCallback["; 
-        var actionsToSend = collector.getActionsToSend(); 
-        for (var n = 0; n < actionsToSend.length; n++) { 
-            var actionToSend = actionsToSend[n]; 
-            if (n > 0) { 
-                stackName += ", "; 
+        var stackName = "actionCallback[";
+        var actionsToSend = collector.getActionsToSend();
+        for (var n = 0; n < actionsToSend.length; n++) {
+            var actionToSend = actionsToSend[n];
+            if (n > 0) {
+                stackName += ", ";
             }
 
-            stackName += actionToSend.getStorageKey(); 
+            stackName += actionToSend.getStorageKey();
         }
         stackName += "]";
 
@@ -433,7 +433,7 @@ var AuraClientService = function() {
      * Execute the list of client actions synchronously. Populate state and return values and execute the action
      * callbacks. This method does not interact with the inFlight counter and does no throttling. All actions will be
      * run as it is assumed abortable actions have already been pruned.
-     * 
+     *
      * @private
      */
     function runClientActions(actions) {
@@ -447,10 +447,10 @@ var AuraClientService = function() {
 
     /**
      * The last step before sending to the server.
-     * 
+     *
      * This routine does the actual XHR request to the server, using the collected actions to do so. In the event that
      * there are no actions to send, it simply completes the request.
-     * 
+     *
      * @private
      */
     function finishRequest(collector, flightCounter, abortableId, flightHandled) {
@@ -552,14 +552,14 @@ var AuraClientService = function() {
 
     /**
      * Start a request sequence for a set of actions and an 'in-flight' counter.
-     * 
+     *
      * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
      * no request is sent to the server, it is because the request was either a storable action without needing refresh,
      * or all abortable actions that will be aborted (not sure if that is even possible).
-     * 
+     *
      * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
      * capacity in the channel).
-     * 
+     *
      * @param {Array}
      *            actions the list of actions to process.
      * @param {FlightCounter}
@@ -648,12 +648,12 @@ var AuraClientService = function() {
             url = url.substring(0, cutIndex);
         }
 
-            
+
         var sIndex = url.lastIndexOf("/");
         var appName = url.substring(sIndex+1,url.length);
         var newUrl = appName + params;
         //use history.pushState to change the url of current page without actually loading it.
-        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl' 
+        //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl'
         //after reload, someUrl will become the current url.
         //state is null: don't need to track the state with popstate
         //title is null: don't want to set the page title.
@@ -1138,6 +1138,8 @@ var AuraClientService = function() {
                             // Use a stored response if one exists
                             var storage = Action.prototype.getStorage();
                             if (storage) {
+                                // TODO W-2512654: storage.get() returns expired items, need to check
+                                // value['isExpired'] in the multiple gets() below
                                 var key = action.getStorageKey();
                                 loadTokenFromStorage()
                                 .then(function(value) {

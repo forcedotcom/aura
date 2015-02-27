@@ -33,11 +33,11 @@
     
     <br/><br/>
     <!-- value with hash, won't change -->
-    <ui:outputURL value="#APPLE" label="hashLinkApple" aura:id="hashLinkA" linkClick="{!c.clickApple}"/><br/><br/>
+    <ui:outputURL value="#APPLE" label="hashLinkApple" aura:id="hashLinkA" click="{!c.clickApple}"/><br/><br/>
     <!-- value with hash in a broken way, won't change -->
-    <ui:outputURL value="{!'#' + BANANA}" label="hashLinkBanana" aura:id="hashLinkB" linkClick="{!c.clickBanana}"/><br/><br/>
+    <ui:outputURL value="{!'#' + BANANA}" label="hashLinkBanana" aura:id="hashLinkB" click="{!c.clickBanana}"/><br/><br/>
     <!-- value with hash, change with locationToken in click handler-->
-    <ui:outputURL value="{!'#' + v.locationTokenOrange}" label="hashLinkOrange" aura:id="hashLinkO" linkClick="{!c.clickOrange}"/><br/><br/>
+    <ui:outputURL value="{!'#' + v.locationTokenOrange}" label="hashLinkOrange" aura:id="hashLinkO" click="{!c.clickOrange}"/><br/><br/>
     <!-- value with hash, change with locationChangeCount in locationChanged handler-->
-    <ui:outputURL value="{!'#' + v.locationChangeCountPeach}" label="hashLinkPeach" aura:id="hashLinkP" linkClick="{!c.clickPeach}"/><br/><br/>
+    <ui:outputURL value="{!'#' + v.locationChangeCountPeach}" label="hashLinkPeach" aura:id="hashLinkP" click="{!c.clickPeach}"/><br/><br/>
 </aura:application>

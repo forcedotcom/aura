@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 ({
-    fixURL: function (cmp) {
-        var url = cmp.get("v.value");
+    makeAbsolute: function (url) {
+        var newUrl = url;
 
-        if (url !== undefined && url !== null && url !== "") {
+        if (!$A.util.isEmpty(url)) {
             var urlLower = url.toLowerCase();
             if (urlLower.indexOf("http://") !== 0 && urlLower.indexOf("https://") !== 0 && urlLower.indexOf("ftp://") !== 0
                 && url.indexOf("/") !== 0 && url.indexOf(".") !== 0) {
 
-                url = "http://" + url;
-                cmp.set("v.value", url);
+                newUrl = "http://" + url;
             }
         }
+        return newUrl;
     },
 
     buildLinkBody: function (cmp) {
@@ -33,13 +33,14 @@
 
         if (link) {
             var linkElement = link.getElement();
+
             $A.util.clearNode(linkElement);
 
-            var iconClass = cmp.get("v.iconClass") || '';
+            var iconClass = cmp.get("v.iconClass");
             var label = cmp.get("v.label") || '';
 
             if (!$A.util.isEmpty(iconClass)) {
-                var alt = cmp.get("v.alt") || '';
+                var alt = cmp.get("v.alt");
                 if (!$A.util.isEmpty(label)) {
                     alt = '';
                 } else if ($A.util.isEmpty(alt)) {

@@ -224,7 +224,7 @@
         test: function (component) {
             var icon = component.getElement().getElementsByTagName("img")[0];
             var alt = icon.getAttribute("alt");
-            aura.test.assertEquals(alt, null, "Alt is set incorrectly");
+            aura.test.assertEquals('', alt, "Alt is set incorrectly");
 
         }
     },
@@ -302,4 +302,5 @@
             aura.test.assertEquals("http://www.salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     }
+
 })

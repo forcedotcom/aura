@@ -16,7 +16,7 @@
 ({
     render: function (cmp, helper) {
         if ($A.util.getBooleanValue(cmp.get("v.fixURL"))) {
-            helper.fixURL(cmp);
+            cmp.set("v.value", helper.makeAbsolute(cmp.get("v.value")));
         }
 
         var ret = this.superRender();
@@ -28,9 +28,14 @@
         return ret;
     },
 
+    afterRender: function (component, helper) {
+        helper.lib.interactive.addDomHandler(component, "mouseover");
+        helper.lib.interactive.addDomHandler(component, "mouseout");
+    },
+
     rerender: function (cmp, helper) {
         if (cmp.isDirty("v.value") && $A.util.getBooleanValue(cmp.get("v.fixURL"))) {
-            helper.fixURL(cmp);
+            cmp.set("v.value", helper.makeAbsolute(cmp.get("v.value")));
         }
 
         this.superRerender();
@@ -44,4 +49,4 @@
         }
     }
 
-})
+});

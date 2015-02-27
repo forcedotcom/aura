@@ -110,14 +110,13 @@ AuraStorage.prototype.get = function(key) {
     // This needs to also be asynchronous to map to IndexedDB, WebSQL, SmartStore that are all async worlds
     var that = this;
     var promise = this.adapter.getItem(this.version + key).then(function(item) {
-
-        that.log("get() - key: " + key + ", item: " + item);
+        var hit = item && (new Date().getTime() <= item["expires"]);
+        that.log("get() " + (hit ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
 
         if (!item) {
             return undefined;
         }
-
-        return { "value" : item.value, "isExpired" : (new Date().getTime() > item.expires) };
+        return { "value" : item.value, "isExpired" : !!hit };
     });
 
     this.sweep();
@@ -164,7 +163,7 @@ AuraStorage.prototype.put = function(key, value) {
     var that = this;
     var promise = this.adapter.setItem(this.version + key, item)
         .then(function () {
-            that.log("put() - key: " + key + ", item: " + item);
+            that.log("put() - key: " + key + ", value: " + item);
             $A.storageService.fireModified();
         });
 

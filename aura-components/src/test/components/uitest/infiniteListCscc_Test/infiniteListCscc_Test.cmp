@@ -21,7 +21,7 @@
 
 	<aura:handler name="showMore" action="{!c.showMore}"/>
 
-	<ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" rerenderComplete="{!c.handleRerenderComplete}">
+	<ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" listComplete="{!c.handleListComplete}">
 		<aura:set attribute="dataProvider">
 			<uitest:infiniteDataProvider currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" getDataFromServer="{!v.isGetDataFromServer}"/>		
 		</aura:set>

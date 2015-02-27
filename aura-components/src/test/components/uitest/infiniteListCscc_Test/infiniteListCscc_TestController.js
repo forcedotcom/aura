@@ -20,7 +20,7 @@
         list.get("e.showMore").fire();
 	},
 
-	handleRerenderComplete: function(component) {
+	handleListComplete: function(component) {
 		component.set("v.isDoneRendering", true);
 	}
 })

@@ -24,14 +24,14 @@
 			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
          	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.listdata." );
     		
-         	cmp.set("v.listdata",[9,9,9,9,9]);
+         	cmp.set("v.listdata",[1,2,3,4,5]);
 		}, function(cmp) {
 			var expected = [
-				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"}];
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "1"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "2"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "5"}];
 			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
          	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.listdata." );
          	this.assertIterationCmpElements(expected, iterCmpEle);
@@ -49,15 +49,15 @@
          	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
     		
          	var iter = cmp.find("iterationOnArrayAttributePassthrough");
-         	iter.set("v.items",["9","9","9","9","9"]);
+         	iter.set("v.items",["1","2","3","4","5"]);
 		}, function(cmp) {
 			var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
          	var expected = [
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"}];
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "1"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "2"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "5"}];
          	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after replace v.items in iteration." );
          	this.assertIterationCmpElements(expected, iterCmpEle);
 		}
@@ -99,8 +99,8 @@
 			var exp = expected[i];
 			$A.test.assertTrue(eleText.indexOf("Passthrough String: "+exp.passthrough_string) > -1, "unexpected Passthrough String");
 			$A.test.assertTrue(eleText.indexOf("render count: "+exp.render_count) > -1, "unexpected render count");
-			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpeteced rerender count");
-			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpeteced unrerender count");
+			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpected rerender count");
+			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpected unrerender count");
 		}
 	},
 	
@@ -117,7 +117,7 @@
         	var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
          	var expected = 
          	[{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "0"},
-         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "999"},
+         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"},
          	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "2"},
          	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "3"},
          	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"}];
@@ -165,7 +165,7 @@
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnArrayAttributePassthrough").getElements();
          	var expected = 
-         		[{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "999"},
+         		[{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"},
          		{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "0"},
               	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "1"},
               	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "2"},
@@ -248,7 +248,7 @@
 
          	this.assertIterationCmpElements(expected, iterCmpEle);
     	}]
-    },
+    }
     
 	
 })

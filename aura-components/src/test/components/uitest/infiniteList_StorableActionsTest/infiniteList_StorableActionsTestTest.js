@@ -1,11 +1,11 @@
 ({
     /**
      * This test emulates an infiniteList using storable server actions to retrieve data for the list.
-     * 
+     *
      * When a server request for more data is made and the action is already cached, the cached response will be
      * returned immediately followed by the response from the server. This test's data provider emulates this by
      * updating data twice, first for "cached" data and again for "server" data.
-     * 
+     *
      * Setting v.cachedDataRows and v.serverDataRows tells the data provider how many rows of data to update the list
      * with, where 0 means do not try to update the list.
      */
@@ -30,10 +30,12 @@
         },
         test: function(cmp) {
             this.doShowMore(cmp);
-            
-            var expected = this.initialData() + "0server" + "1server" + "2server";
-            var output = this.getListOutput(cmp);
-            $A.test.assertEqualsIgnoreWhitespace(expected, output);
+
+            $A.test.addWaitFor(false, $A.test.isActionPending,function() {
+                var expected = this.initialData() + "0server" + "1server" + "2server";
+                var output = this.getListOutput(cmp);
+                $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            });
         }
     },
 
@@ -50,13 +52,15 @@
         },
         test: function(cmp) {
             this.doShowMore(cmp);
-            
-            var expected = this.initialData() + "0server" + "1server";
-            var output = this.getListOutput(cmp);
-            $A.test.assertEqualsIgnoreWhitespace(expected, output);
+
+            $A.test.addWaitFor(false, $A.test.isActionPending,function(){
+                var expected = this.initialData() + "0server" + "1server";
+                var output = this.getListOutput(cmp);
+                $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            });
         }
     },
-    
+
     /**
      * Verify the 2nd set of data can have more rows of data than what's on the current page.
      */
@@ -69,13 +73,15 @@
         },
         test: function(cmp) {
             this.doShowMore(cmp);
-            
-            var expected = this.initialData() + "0server" + "1server" + "2server";
-            var output = this.getListOutput(cmp);
-            $A.test.assertEqualsIgnoreWhitespace(expected, output);
+
+            $A.test.addWaitFor(false, $A.test.isActionPending,function() {
+                var expected = this.initialData() + "0server" + "1server" + "2server";
+                var output = this.getListOutput(cmp);
+                $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            });
         }
     },
-    
+
     /**
      * Show more twice should append data twice to the end of the list.
      */
@@ -87,14 +93,18 @@
         },
         test: [function(cmp) {
             this.doShowMore(cmp);
-            var expected = this.initialData() + "0server" + "1server" + "2server";
-            var output = this.getListOutput(cmp);
-            $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            $A.test.addWaitFor(false, $A.test.isActionPending,function() {
+                var expected = this.initialData() + "0server" + "1server" + "2server";
+                var output = this.getListOutput(cmp);
+                $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            });
         }, function(cmp) {
             this.doShowMore(cmp);
-            var expected = this.initialData() + "0server" + "1server" + "2server" + "0server" + "1server" + "2server";
-            var output = this.getListOutput(cmp);
-            $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            $A.test.addWaitFor(false, $A.test.isActionPending,function(){
+                var expected = this.initialData() + "0server" + "1server" + "2server" + "0server" + "1server" + "2server";
+                var output = this.getListOutput(cmp);
+                $A.test.assertEqualsIgnoreWhitespace(expected, output);
+            });
         }]
     },
 

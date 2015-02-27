@@ -57,7 +57,7 @@ listData.get("e.triggerDataProvider").fire();
 	   </aura:example>
 	   
 	   <aura:example name="infinitelist2" ref="uitest:infiniteListCscc_Test" label="Handing Events after ui:infiniteList Renders">
-	     <p>This example shows how you can handle the component using the <code>rerenderComplete</code> attribute after it renders.</p>
+	     <p>This example shows how you can handle the component using the <code>listComplete</code> event after it renders.</p>
 	   </aura:example>
 	   
 	   <aura:example name="infiniteListRow" ref="uitest:infiniteListRow_Test" label="Using Row Actions">

@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 ({
-    rangeChange: function(cmp, evt, helper) {
-        helper.updateBody(cmp);
+    rangeChange: function(component, evt, helper) {
+        helper.updateBody(component);
     },
 
-    itemsChange: function(cmp, evt, helper) {
-        helper.updateBody(cmp);
+    itemsChange: function(component, evt, helper) {
+        helper.updateBody(component);
     },
 
-    firstRender: function(component, evt, helper) {
+    init: function(component, evt, helper) {
         var bodyTemplate=component.get("v.body");
         var template=component.get("v.template");
         var items = component.get("v.items");
         if(bodyTemplate.length&&!template.length){
+            component.set("v.body",[],true);
             component.set("v.template",bodyTemplate,true);
-            var body=helper.createBodyServer(component);
-            component.set("v.body",body,true);
+            helper.createBody(component);
         }
     }
 })

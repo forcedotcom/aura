@@ -22,6 +22,10 @@
         return ret;
     },
 
+    afterRender: function (component, helper) {
+        helper.lib.interactive.addDomEvents(component);
+    },
+
     rerender: function (cmp, helper) {
         this.superRerender();
 

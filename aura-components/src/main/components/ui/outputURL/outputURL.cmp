@@ -16,6 +16,9 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays a link to a URL as specified by the value attribute, rendered on a given text (label attribute) and image, if any.">
+
+    <aura:import library="ui:eventLib" property="lib"/>
+
     <aura:attribute access="GLOBAL" name="iconClass" type="String" description="The CSS style used to display the icon or image."/>
     <aura:attribute access="GLOBAL" name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>
     <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The text displayed when this component is rendered."/>
@@ -25,12 +28,13 @@
     <aura:attribute access="GLOBAL" name="disabled" type="Boolean" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
 
     <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
+
     <aura:attribute name="fixURL" type="Boolean" default="false" description="If true prepends 'http://' to links that don't specify a protocol nor start with '/'"/>
+
     <aura:attribute name="stopNavigation" type="Boolean" default="false" description="Prevents navigation to specified URL on click if true."/>
 
-    <aura:registerevent name="linkClick" type="ui:linkClick" description="The event fired when the user clicks the link."/>
+    <aura:registerEvent name="click" type="ui:click" access="GLOBAL" description="The event fired when the user clicks on the component." />
 
-    <a aura:id="link" class="{!v.class}" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}">
-    </a>
+    <a aura:id="link" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}"></a>
 
 </aura:component>

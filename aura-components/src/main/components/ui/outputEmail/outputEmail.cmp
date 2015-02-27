@@ -17,6 +17,9 @@
 -->
 <aura:component implements="ui:visible" extensible="true" support="GA" access="GLOBAL"
     description="Displays an email address in an HTML anchor (&lt;a&gt;) element. The leading and trailing space are trimmed.">
+
+    <aura:import library="ui:eventLib" property="lib"/>
+
     <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The output value of the email"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

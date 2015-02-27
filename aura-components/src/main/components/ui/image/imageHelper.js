@@ -40,13 +40,13 @@
 
             var image = this.buildImageElement(cmp);
 
-            var href = cmp.get("v.href") || '';
+            var href = cmp.get("v.href");
 
             if (!$A.util.isEmpty(href)) {
                 var link = $A.util.createHtmlElement("a", {
-                    "href": cmp.get("v.href") || '',
-                    "class": cmp.get("v.linkClass") || '',
-                    "target": cmp.get("v.target") || ''
+                    "href": href,
+                    "class": cmp.get("v.linkClass"),
+                    "target": cmp.get("v.target")
                 });
 
                 link.appendChild(image);
@@ -61,10 +61,10 @@
     buildImageElement: function (cmp) {
         var image = $A.util.createHtmlElement("img", {
             "data-aura-rendered-by": cmp.getGlobalId(),
-            "src": cmp.get("v.src") || '',
-            "class": cmp.get("v.class") || '',
-            "alt": cmp.get("v.alt") || '',
-            "title": cmp.get("v.title") || ''
+            "src": cmp.get("v.src"),
+            "class": cmp.get("v.class"),
+            "alt": cmp.get("v.alt"),
+            "title": cmp.get("v.title")
         });
 
         var onError = function () {

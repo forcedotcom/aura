@@ -8,7 +8,7 @@
         <aura:renderIf isTrue="{!v.readonly}">
             <ui:outputText value="{!v.item}"/>
             <aura:set attribute="else">
-                <ui:outputURL label="{!v.item}" value="" linkClick="{!c.linkClick}"/>
+                <ui:outputURL label="{!v.item}" value="" click="{!c.linkClick}"/>
             </aura:set>
         </aura:renderIf>
 

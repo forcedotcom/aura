@@ -211,7 +211,7 @@ $A.ns.Util.prototype.createHtmlElement = function (tagName, attributes) {
 
     for (var attributeName in attributes) {
         var value = attributes[attributeName];
-        if (!this.isEmpty(value)) {
+        if (!this.isUndefinedOrNull(value)) {
             if (this.isString(value) && value.indexOf("/auraFW") == 0) {
                 // prepend any Aura resource urls with servlet context path
                 value = $A.getContext().getContextPath() + value;

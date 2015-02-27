@@ -32,7 +32,7 @@
             return false;
         }
 
-        var clickEvent = cmp.getEvent("linkClick");
+        var clickEvent = cmp.getEvent("click");
         clickEvent.setParams({ "domEvent" : event });
         clickEvent.fire();
 

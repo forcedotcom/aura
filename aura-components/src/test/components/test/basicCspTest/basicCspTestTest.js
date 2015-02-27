@@ -95,8 +95,9 @@
     
     //test for the whitelist url: [connect-src 'self' http://invalid.salesforce.com] 
     testConnectionSource : {
-    	attributes: { testConnectionSource: true },
-    	test: [function(cmp) {
+        browsers : [ "-IE8", "-IE9" ],
+        attributes: { testConnectionSource: true },
+        test: [function(cmp) {
     			$A.test.setTestTimeout(60000);
     			$A.test.assertFalse(cmp.get("v.xmlHttpRequestComplete"));
     			$A.test.clickOrTouch(cmp.find("uiButton_sendXHR").getElement());

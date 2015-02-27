@@ -32,10 +32,9 @@
 	<aura:attribute name="labelClass" access="GLOBAL" type="String" default="" description="The CSS class of the label component" />
 	<aura:attribute name="requiredIndicatorClass" type="String" access="GLOBAL" default="" description="The CSS class of the required indicator component" />
 	<aura:attribute name="labelPosition" type="String" default="left" description="The position in which the label should be displayed. Possible values are &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, and &quot;hidden&quot;. Default value is &quot;left&quot;." />
-	
 	<aura:attribute name="disabled" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
     <aura:attribute name="disableDoubleClicks" type="Boolean" default="false" description="Disables double clicking the component within 350ms"/>
-		
+	<aura:attribute name="labelTitle" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>
     <aura:registerEvent name="change" type="ui:change" access="GLOBAL" description="The event fired when the user changes the content of the input."/>
     <aura:registerEvent name="input" type="ui:inputEvent" description="The event fired when the user enters an input."/>
     <aura:registerEvent name="copy" type="ui:copy" access="GLOBAL" description="The event fired when the user copies content to the clipboard."/>
@@ -54,4 +53,5 @@
 		<span class="{!'required ' + v.requiredIndicatorClass}">*</span>    	 
     </aura:attribute>    
     {!v.body}{!v.errorComponent}
+
 </aura:component>

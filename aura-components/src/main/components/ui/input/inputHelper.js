@@ -250,10 +250,8 @@
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
-                    var ariaDesc = component.get("v.ariaDescribedBy");
-                    ariaDesc = this.addTokenToString(ariaDesc, errorCmp.getGlobalId());
                 	component.set("v.errorComponent", errorCmp);
-                	this.setAttribute(component, {key: "ariaDescribedBy", value: ariaDesc});
+                    concreteHelper.updateAriaDescribedBy(component, errorCmp.getGlobalId());
                 	component._creatingAsyncErrorCmp = false;
                 },
                 {
@@ -266,6 +264,12 @@
             	}
             );
         }
+    },
+
+    updateAriaDescribedBy : function(component, errorCmpId) {
+        var ariaDesc = component.get("v.ariaDescribedBy");
+        ariaDesc = this.addTokenToString(ariaDesc, errorCmpId);
+        this.setAttribute(component, {key: "ariaDescribedBy", value: ariaDesc});
     },
 
     updateErrorElement : function(component) {

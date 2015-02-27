@@ -15,4 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="The event fired when iteration completes its asynchronous rerender."/>
+<aura:event type="COMPONENT" support="GA" description="An event that can be fired when an asynchronous operation completes.">
+    <aura:attribute name="operation" type="String" description="The type of operation that has completed."/>
+    <aura:attribute name="result" type="Object" description="The result, if any, of the operation. This will depend on the type and outcome of the operation."/>
+</aura:event>

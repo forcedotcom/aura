@@ -57,10 +57,10 @@
 		}, function(cmp) {
 			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
 			var expected = [
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "1"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "2"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "3"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"}];
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "1"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "2"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"}];
 	        this.assertIterationCmpElements(expected, iterCmpEle);
 	        
 	        var iter = cmp.find("iterationOnMapModelPassthrough");
@@ -68,10 +68,10 @@
 		}, function(cmp) {
 			var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
 			var expected = [
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "3"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "5"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "6"}];
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "3"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "5"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "6"}];
 	        this.assertIterationCmpElements(expected, iterCmpEle);
 		}]
 	},
@@ -109,8 +109,8 @@
 			var exp = expected[i];
 			$A.test.assertTrue(eleText.indexOf("Passthrough Object's Label: "+exp.passthrough_string) > -1, "unexpected Passthrough String");
 			$A.test.assertTrue(eleText.indexOf("render count: "+exp.render_count) > -1, "unexpected render count");
-			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpeteced rerender count");
-			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpeteced unrerender count");
+			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpected rerender count");
+			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpected unrerender count");
 		}
 	},
 	
@@ -175,7 +175,7 @@
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnMapModelPassthrough").getElements();
          	var expected = [];
-         	expected.push({render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "999"});
+         	expected.push({render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"});
          	for( var i=0; i<26; i++ ) {
          		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
          	}
@@ -247,5 +247,5 @@
          	}
          	this.assertIterationCmpElements(expected, iterCmpEle);
     	}]
-    },
+    }
 })

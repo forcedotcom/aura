@@ -162,12 +162,14 @@
         if (tabConfigs&&tabConfigs.length > 0) {
             this.createTabsFromAttribute(cmp, tabConfigs);
         } else {
-            //iterate v.body to find instances of ui:tab
-            var result = this.getTabsFromBody(cmp);
-            cmp._activeTabIndex = result.activeIndex;
-            cmp._tabCollection.init(result.tabs, result.tabIds, result.tabNames);
-            cmp.set('v.tabItems', result.tabItemConfigs, true);
+            this.getTabsFromBody(cmp);
         }
+    },
+
+    finishInit: function(cmp, result){
+        cmp._activeTabIndex = result.activeIndex;
+        cmp._tabCollection.init(result.tabs, result.tabIds, result.tabNames);
+        cmp.set('v.tabItems', result.tabItemConfigs, true);
     },
     
     /**
@@ -215,7 +217,16 @@
     	    activeTab = 0;
     	
     	// get all instances of ui:tab in the body
-    	tabCmps = this.getTabComponents(cmp.getConcreteComponent().get('v.body'));
+        var body=cmp.getConcreteComponent().get('v.body');
+        for(var i=0;i<body.length;i++){
+            if(body[i].isInstanceOf("aura:iteration")){
+                if(!$A.util.getBooleanValue(body[i].get("v.loaded"))){
+                    body[i].addHandler("iterationComplete",cmp,"{!c.onInit}");
+                    return;
+                }
+            }
+        }
+    	tabCmps = this.getTabComponents(body);
     	for (var i=0, len=tabCmps.length; i<len; i++) {
     		var tab = tabCmps[i],
     		    id = tab.getGlobalId(),
@@ -231,8 +242,7 @@
     		tabItemConfigs.push(this.getTabItemConfig(cmp, tab));
     		tabs[id] = tab;
     	}
-    	
-    	return {"tabs": tabs, "tabIds": tabIds, "activeIndex": activeTab, "tabItemConfigs": tabItemConfigs, "tabNames": tabNames};
+    	this.finishInit(cmp, {"tabs": tabs, "tabIds": tabIds, "activeIndex": activeTab, "tabItemConfigs": tabItemConfigs, "tabNames": tabNames});
     },
     /**
      * @private

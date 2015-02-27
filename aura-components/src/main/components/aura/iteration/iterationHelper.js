@@ -14,384 +14,155 @@
  * limitations under the License.
  */
 ({
-	_initializeOperations: function (cmp) {
-		return {
-			PickOperation   : this._initializePickOperation(),
-			CreateOperation : this._initializeCreateOperation(),
-			DeleteOperation : this._initializeDeleteOperation()
-		};
-	},
-	getOperations: function () {
-		if (!this._initializedOperations) {
-			this._operations = this._initializeOperations();
-			this._initializedOperations = true;
-		}
-		return this._operations;
-	},
-	_initializeCreateOperation: function () {
-		var helper = this;
+    createBody: function (component) {
+        component._itemInfo = [];
+        this.buildBody(component,
+            function createBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
+                this.buildTemplate(component, template, item, index, itemVar, indexVar, templateValueProvider, true, forceServer, callback);
+            },
+            function createBodyComplete(component, components){
+                component.set("v.body", components, true);
+                component.set("v.loaded",true);
+                component.get("e.iterationComplete").fire({operation:"Initialize"});
+            }
+        );
+    },
 
-		function CreateOperation(index, itemval, cmp) {
-			this.index = index;
-			this.itemval = itemval;
-			
-			if (cmp._pendingCreates) {
-				cmp._pendingCreates.push(this);
-			} else {
-				cmp._pendingCreates = [this];
-			}
-		}
-
-		CreateOperation.prototype.run = function(cmp) {
-			if (this.running) {
-				// Create is mid flight just return and wait for the operation to complete
-				return;
-			} 
-			
-			this.running = true;
-			
-			var that = this;
-
-			var items = cmp.get("v.items");
-			helper.createComponentForIndex(cmp, items, this.index, function() {
-				// Remove this create op from the set of pending creates
-				var i = cmp._pendingCreates.indexOf(that);
-				if (i >= 0) {
-					cmp._pendingCreates.splice(i, 1);
-				}
-				
-				this.running = false;
-			});
-		}
-
-		CreateOperation.prototype.toString = function() {
-			return "create(" + this.index + ")";
-		}
-
-		return CreateOperation;
-	},
-	_initializePickOperation: function () {
-		var helper = this;
-
-		function PickOperation(itemval, sourceIndex, targetIndex, components, indexVar, varName) {
-			this.itemval = itemval;
-			this.sourceIndex = sourceIndex;
-			this.targetIndex = targetIndex;
-			this.components = components;
-			this.indexVar = indexVar;
-			this.varName = varName;
-		}
-
-		PickOperation.prototype.run = function(cmp) {
-			var moved = this.sourceIndex !== this.targetIndex;
-			
-			helper.trackItem(cmp, this.itemval, this.targetIndex, this.components);
-			
-			for (var n = 0; n < this.components.length; n++) {
-				var component = this.components[n];
-
-				if (moved) {
-					// Update the index to match the new position in the facet
-					//var vp = component;//.getAttributeValueProvider();
-					// Just can't see how you wouldn't want the attributeValueProvider here
-                    var vp = component.getAttributeValueProvider();
-					if (vp) {
-						vp.set(this.indexVar, this.targetIndex);
-                        //JBUCH: HALO: FIXME: THIS IS TO DEAL WITH THE CHANGE TO PTVs BELOW:
-                        // extraProviders[varName] = cmp.getReference("v.items[" + index + "]");
-                        vp.set(this.varName, cmp.getReference("v.items[" + this.targetIndex + "]"), true);
+    updateBody: function (component) {
+        if(component.get("v.loaded")===false){
+            return component._queueUpdate=true;
+        }
+        component.set("v.loaded",false);
+        var itemInfo = component._itemInfo.slice();
+        component._itemInfo.length = 0;
+        var helper=this;
+        this.buildBody(component,
+            function updateBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
+                var found = false;
+                var components = null;
+                for (var i = 0; i < itemInfo.length; i++) {
+                    if (itemInfo[i].item === item) {
+                        components = itemInfo[i].components;
+                        if (itemInfo[i].index != index) {
+                            for (var j = 0; j < components.length; j++) {
+                                var avp = components[j].getAttributeValueProvider();
+                                if (avp) {
+                                    //JBUCH: HALO: FIXME: THIS IS TO DEAL WITH THE CHANGE TO PTVs BELOW:
+                                    avp.set(indexVar, index);
+                                    avp.set(itemVar, component.getReference("v.items[" + index + "]"), true);
+                                }
+                            }
+                        }
+                        found = true;
+                        itemInfo.splice(i, 1);
+                        this.trackItem(component, item, index, components);
+                        callback(components);
+                        break;
                     }
-					
-//					$A.renderingService.requestRerender(component);
-				}
-				
-			}
-		}
+                }
+                if (!found) {
+                    this.buildTemplate(component, template, item, index, itemVar, indexVar, templateValueProvider, false, forceServer, callback);
+                }
+            },
+            function updateBodyComplete(component, components){
+            //  if (itemInfo.length) {
+            //      We have deletes. Do we even care? RenderingService and Garbage Collection should handle that.
+            //      If we do care, it will be to detach PRVs from firing.
+            //  }
+                component.set("v.body", components);
+                component.set("v.loaded",true);
+                component.get("e.iterationComplete").fire({operation:"Update"});
+                if(component._queueUpdate){
+                    helper.updateBody(component);
+                }
+                component._queueUpdate=false;
+            }
+        );
+    },
 
-		PickOperation.prototype.toString = function() {
-			return "pick(" + this.sourceIndex + ") to " + this.targetIndex;
-		}
-
-		return PickOperation;
-
-	},
-	_initializeDeleteOperation: function () {
-		var helper = this;
-
-		
-		function DeleteOperation(index, trackItems) {
-			this.index = index;
-			this.trackItems = trackItems;
-		}
-
-		DeleteOperation.prototype.run = function (cmp) {
-			var cmps = this.trackItems.components;
-
-			cmp.get("v.body").splice(this.trackItems.index, cmps.length);
-			// KRIS: HALO:
-			// Ideally we would do this
-			// $A.unrender(cmps);
-			// But if we unrender the marker for the iteration, iteration rendering blows up
-			// So until the framework supports it, we can't do this. 196ish 
-			
-		}
-
-		return DeleteOperation;
-	},
-	createComponentForIndex : function(cmp, itemsval, index, afterCreationCallback) {
-		var helper = this;
-		
-		function createCallback(collector, index) {
-			return function(newComponent) {
-				collector.components[index] = newComponent;
-
-				//$A.renderingService.requestRerender(newComponent);
-
-				if (--collector.expectedCount === 0) {
-					helper.trackItem(collector.cmp, collector.itemval, collector.targetIndex, collector.components);
-
-					var body = helper.createFacetFromTrackingInfo(collector.cmp);
-					
-					collector.cmp.set("v.body", body);
-					
-					if (afterCreationCallback) {
-						afterCreationCallback();
-					}
-				}
-			};
-		}
-
-		var itemval = itemsval[index];
-
-		// Clone the body for this row
-		var template = cmp.get("v.template");
-		
-		var forceServer = cmp.get("v.forceServer");
-		var collector = {
-			targetIndex: index,
-			itemval : itemval,
-			components : [],
-			cmp : cmp,
-			expectedCount : template.length
-		};
-		
-		this.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
-			$A.componentService.newComponentAsync(helper, createCallback(collector, n), cdr, ivp, false, false, forceServer);
-		});
-	},
-	
-	createBodyServer : function(cmp) {
-		var helper = this;
-		
-		function createComponentsForIndexFromServer(cmp, itemsval, index) {
-			var ret = [];
-			
-			$A.setCreationPathIndex(index);
-			$A.pushCreationPath("body");
-			
-			helper.createComponents(cmp, itemsval, index, function(cdr, ivp, n) {
-				ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, true));
-			});
-
-			$A.popCreationPath("body");
-
-			return ret;
-		}
-
-		var items = cmp.get("v.items");
-		if (items && items.length > 0) {
-			$A.pushCreationPath("body");
-			
-			this.resetItemTracking(cmp);
-
-			var startIndex = this.getStart(cmp);
-			var endIndex = this.getEnd(cmp);
-
-			for (var i = startIndex; i < endIndex; i++) {
-				var components = createComponentsForIndexFromServer(cmp, items, i);
-
-				this.trackItem(cmp, items[i], i, components);
-			}
-
-			$A.popCreationPath("body");
-		}
-
-		return this.getUpdatedBody(cmp);
-	},
-	
-	resetItemTracking : function(cmp) {
-		cmp._itemInfos = [];
-	},
-
-	getItemTracking : function(cmp) {
-		if (!cmp._itemInfos) {
-			this.resetItemTracking(cmp);
-		}
-		
-		return cmp._itemInfos;
-	},
-
-	trackItem : function(cmp, itemval, index, components) {
-		// Track the components associated with this item for future v.items delta calculations
-		cmp._itemInfos[index] = {
-			index : index,
-			components : components,
-			hash : itemval
-		};
-	},
-	getTransformation : function(cmp, itemsval, indexVar, varName, start, end) {
-		var OperationConstructors = this.getOperations();
-		var itemInfos = this.getItemTracking(cmp).slice();
-		var pendingCreates = cmp._pendingCreates ? cmp._pendingCreates.slice() : undefined;
-		var operations = [];
-		for (var i = start; i < end; i++) {
-			var itemval = itemsval[i];
-			var infoHash = itemval;
-			// Find existing itemInfo for this item
-			var found = false;
-			for (var j = 0; j < itemInfos.length; j++) {
-				var info = itemInfos[j];
-				if (info && infoHash === info["hash"]) {
-					operations.push(new OperationConstructors.PickOperation(itemval, j, i, info.components, indexVar, varName));
-					// Consume the item
-					itemInfos[j] = undefined;
-					found = true;
-					break;
-				}
-			}
-
-			// Check to see if we already have a pending create and update its target index
-			if (!found && pendingCreates) {
-				for (var n = 0; n < pendingCreates.length; n++) {
-					var op = pendingCreates[n];
-					if (itemval===op.itemval) {
-						op.index = i;
-						
-						operations.push(op);
-						
-						// Consume the item
-						pendingCreates.splice(n, 1);
-						found = true;
-					}
-				}
-			}
-			
-			if (!found) {
-				// Add a create to the list operations to be satisfied
-				operations.push(new OperationConstructors.CreateOperation(i, itemval, cmp));
-			}
-		}
-
-		// What is left in itemInfos, are components to remove later on
-		// we need to marked so they don't propagate events on their prvs.
-		for (i = 0; i < itemInfos.length; i++) {
-			if (itemInfos[i]) {
-				operations.push(new OperationConstructors.DeleteOperation(i, itemInfos[i]));
-			}
-		}
-
-		return operations;
-	},
-
-	updateBody : function(cmp) {
-		var body = this.getUpdatedBody(cmp);
-		cmp.set("v.body", body);
-		
-		// KRIS: HALO:
-		// Cause a rerender early, so that we remove elements appropriately
-		// before their PRV's fire.
-		// We may only need this when we have a DeleteOperation
-		if(cmp._hasCreateOrDelete && cmp.isRendered()) {
-			delete cmp._hasCreateOrDelete;
-			$A.rerender(cmp);
-		}
-		cmp.getEvent("rerenderComplete").fire();
-	},
-
-	getUpdatedBody : function(cmp) {
-        var items = cmp.get("v.items")||[];
-        var varName = cmp.get("v.var");
-		var indexVar = cmp.get("v.indexVar");
-
-        if($A.util.isExpression(items)){
-            items=items.evaluate();
+    buildBody: function (component, itemHandler, completeHandler) {
+        var items = component.get("v.items");
+        if (items && items.length) {
+            var itemVar = component.get("v.var");
+            var indexVar = component.get("v.indexVar");
+            var forceServer = component.get("v.forceServer");
+            var template = component.get("v.template");
+            var templateValueProvider = component.getComponentValueProvider();
+            var startIndex = this.getStart(component);
+            var endIndex = this.getEnd(component);
+            var expectedCalls=endIndex-startIndex;
+            var currentCall=0;
+            var collector=[];
+            function getCollector(index){
+                return function(itemComponents){
+                    collector[index]=itemComponents;
+                    if(++currentCall==expectedCalls){
+                        var components=[];
+                        for(var i=0;i<collector.length;i++){
+                            components=components.concat(collector[i]);
+                        }
+                        completeHandler(component,components);
+                        console.log("complete");
+                    }
+                }
+            }
+            $A.pushCreationPath("body");
+            for (var i = startIndex; i < endIndex; i++) {
+                $A.setCreationPathIndex(i);
+                itemHandler.bind(this)(component, template, items[i], i, itemVar, indexVar, templateValueProvider, forceServer, getCollector(i-startIndex));
+            }
+            $A.popCreationPath("body");
+        }else{
+            completeHandler(component,[]);
         }
-        if(!$A.util.isArray(items)){
-            $A.warning("ui:iteration.update: 'v.items' must be a valid Array. Found '"+items+"'. Resetting to empty Array.");
-            items=[];
+    },
+
+    buildTemplate: function (component, template, item, index, itemVar, indexVar, templateValueProvider, localCreation, forceServer, callback) {
+        $A.pushCreationPath("body");
+        var helper=this;
+        var iterationValueProvider = null;
+        function collector(templateComponents){
+            helper.trackItem(component, item, index, templateComponents);
+            callback(templateComponents);
         }
-		var operations = this.getTransformation(cmp, items, indexVar, varName, this.getStart(cmp), this.getEnd(cmp));
-				
-		this.resetItemTracking(cmp);
-		for (var n = 0, opteration; n < operations.length; n++) {
-			operation = operations[n];
-			operation.run(cmp);
-			if(operation instanceof this._operations.CreateOperation || operation instanceof this._operations.DeleteOperation) {
-				cmp._hasCreateOrDelete = true;
-			}
-		}
-		
-		return this.createFacetFromTrackingInfo(cmp);
-	},
+        for (var i = 0; i < template.length; i++) {
+            $A.setCreationPathIndex(i);
+            var componentDefRef = template[i];
+            if (!componentDefRef.valueProvider) {
+                componentDefRef.valueProvider = templateValueProvider;
+            }
+            if (!iterationValueProvider) {
+                var itemValueProviders = {};
+                itemValueProviders[itemVar] = component.getReference("v.items[" + index + "]");
+                itemValueProviders[indexVar] = index;
+                iterationValueProvider = $A.expressionService.createPassthroughValue(itemValueProviders, componentDefRef.valueProvider);
+            }
+            if(localCreation){
+                var components=$A.componentService.newComponentDeprecated(template, iterationValueProvider, false, true);
+                collector(components);
+            }else {
+                $A.componentService.newComponentAsync(this, collector, template, iterationValueProvider, localCreation, false, forceServer);
+            }
+            break;
+        }
+        $A.popCreationPath("body");
+    },
 
-	createFacetFromTrackingInfo : function(cmp) {
-		var body = [];
-		var trackingInfo = this.getItemTracking(cmp);
-		for (var n = 0; n < trackingInfo.length; n++) {
-			var info = trackingInfo[n];
-			if (info) {
-				body = body.concat(info.components);
-			}
-		}
-		
-		return body;
-	},
+    getStart: function (cmp) {
+        return Math.max(0, parseInt(cmp.get("v.start") || 0, 10));
+    },
 
-	getStart : function(cmp) {
-		var start = cmp.get("v.start");
-		return !$A.util.isEmpty(start) ? Math.max(0, this.getNumber(start)) : 0;
-	},
+    getEnd: function (cmp) {
+        var items = cmp.get("v.items");
+        return items&&items.length?Math.min(items.length, parseInt(cmp.get("v.end") || items.length, 10)):0;
+    },
 
-	getEnd : function(cmp) {
-	    var items = cmp.get("v.items");
-		var length = items && items.length || 0;
-		var end = cmp.get("v.end");
-		
-		return !$A.util.isEmpty(end) ? Math.min(length, this.getNumber(end)) : length;
-	},
-	
-	createComponents : function(cmp, items, index, behavior) {
-		function createExtraProviders(cmp, itemval, index) {
-			var varName = cmp.get("v.var");
-			var indexVar = cmp.get("v.indexVar");
-			var extraProviders = {};
-			
-			//extraProviders[varName] = $A.expressionService.create(cmp, itemval);
-			extraProviders[varName] = cmp.getReference("v.items[" + index + "]"); 
-			if (indexVar) {
-				extraProviders[indexVar] = $A.expressionService.create(cmp, index);
-			}
-
-			return extraProviders;
-		}
-
-		var ivp;
-		var body = cmp.get("v.template");
-		for (var n = 0; n < body.length; n++) {
-			var cdr = body[n];
-			if (!ivp) {
-				var extraProviders = createExtraProviders(cmp, items[index], index);
-				ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || cmp.getAttributeValueProvider());
-			}
-
-			$A.setCreationPathIndex(n);
-			
-			behavior(cdr, ivp, n);
-		}
-	},
-
-	// temp workaround when strings get passed in until typedef takes care of this for us
-	getNumber : function(value) {
-		return aura.util.isString(value) ? parseInt(value, 10) : value;
-	}
+    trackItem: function (component, item, index, components) {
+        component._itemInfo.push({
+            item: item,
+            index: index,
+            components: components //,
+//			hash : $A.util.json.encode(itemval)
+        });
+    }
 })

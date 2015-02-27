@@ -59,7 +59,6 @@
     	var cmp = component;
         $A.test.addWaitFor("" + count, function(){
         	var cntr = that.getCounter(cmp);
-        	debugger;
             return cntr;
         });
     },

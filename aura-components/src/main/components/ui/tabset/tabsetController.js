@@ -17,7 +17,7 @@
     onInit: function(cmp, evt, helper) {
     	helper.initTabs(cmp);
     },
-    
+
     closeTab: function(cmp, evt, helper) {
     	helper.closeTab(cmp, helper.getTabIndexFromEvent(cmp, evt));
     },

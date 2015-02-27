@@ -38,10 +38,10 @@
         helper.triggerDataProvider(component.getSuper());
 	},
 
-	rerenderComplete: function(component, event, helper) {
+	iterationComplete: function(component, event, helper) {
         $A.Perf.endMark("infiniteList showMore " + component.getGlobalId());
 
 		helper.showLoading(component, false);
-        component.getEvent("rerenderComplete").fire();
+        component.get("e.listComplete").fire();
 	}
 })

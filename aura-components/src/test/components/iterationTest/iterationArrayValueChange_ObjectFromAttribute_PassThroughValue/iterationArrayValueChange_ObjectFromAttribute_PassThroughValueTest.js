@@ -57,10 +57,10 @@
 		}, function(cmp) {
 			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
 			var expected = [
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "5"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "6"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "7"}];
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "4"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "5"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "6"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "7"}];
 	        this.assertIterationCmpElements(expected, iterCmpEle);
 	        
 	        var iter = cmp.find("iterationOnMapAttributePassthrough");
@@ -68,10 +68,10 @@
 		}, function(cmp) {
 			var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
 			var expected = [
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "6"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "7"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "8"},
-				         	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "9"}];
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "6"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "7"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "8"},
+				         	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "9"}];
 	        this.assertIterationCmpElements(expected, iterCmpEle);
 		}]
 	},
@@ -111,8 +111,8 @@
 			var exp = expected[i];
 			$A.test.assertTrue(eleText.indexOf("Passthrough Object's Label: "+exp.passthrough_string) > -1, "unexpected Passthrough String");
 			$A.test.assertTrue(eleText.indexOf("render count: "+exp.render_count) > -1, "unexpected render count");
-			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpeteced rerender count");
-			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpeteced unrerender count");
+			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpected rerender count");
+			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpected unrerender count");
 		}
 	},
 	
@@ -129,7 +129,7 @@
         	var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
          	var expected = 
          	[{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "0"},
-          	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "999"},
+          	{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"},
           	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "2"},
           	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "3"},
           	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "4"}];
@@ -176,7 +176,7 @@
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnMapAttributePassthrough").getElements();
          	var expected = 
-             	[{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "999"},
+             	[{render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"},
              	 {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "0"},
               	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "1"},
               	{render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "2"},
@@ -255,7 +255,7 @@
 
          	this.assertIterationCmpElements(expected, iterCmpEle);
     	}]
-    },
+    }
     
 	
 })

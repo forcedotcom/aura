@@ -49,26 +49,23 @@
 			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
 			var expected = [];
          	for( var i=0; i<3; i++ ) {
-         		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
+         		expected.push( {render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: ""+i});
          	}
          	this.assertIterationCmpElements(expected, iterCmpEle);
          	
          	var iter = cmp.find("iterationOnArrayModelPassthrough");
          	iter.set("v.items", [2,3,4]);
-		}
-		/* I notice that when replacing the items array, if we have same value between old and new array, the same item cmp get re-render twice.
-		 * for example, When trying out on browser console, setting v.items to [2,3,4] will actually re-render the original 3rd item 2 times, 
-		 * which give us re-render count = 3 
-		 * however, if we run this in test, it only give us 1 extra re-render (re-render count = 2)
-		 * not sure why there is a difference between the two.
-		  ,function(cmp) {
+		},
+        function(cmp) {
 			var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
 			var expected = [];
          	for( var i=0; i<3; i++ ) {
-         		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+(i+2)});
+         		expected.push( {render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: ""+(i+2)});
          	}
+            // Re-used value "2" gets a rerender
+            expected[0].rerender_count=1;
          	this.assertIterationCmpElements(expected, iterCmpEle);
-		}*/
+		}
 		]
 	},
 	
@@ -105,8 +102,8 @@
 			var exp = expected[i];
 			$A.test.assertTrue(eleText.indexOf("Passthrough String: "+exp.passthrough_string) > -1, "unexpected Passthrough String");
 			$A.test.assertTrue(eleText.indexOf("render count: "+exp.render_count) > -1, "unexpected render count");
-			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpeteced rerender count");
-			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpeteced unrerender count");
+			$A.test.assertTrue(eleText.indexOf("rerender count: "+exp.rerender_count) > -1, "unexpected rerender count");
+			$A.test.assertTrue(eleText.indexOf("unrender count: "+exp.unrender_count) > -1, "unexpected unrerender count");
 		}
 	},
 	
@@ -125,7 +122,9 @@
          	for( var i=0; i<26; i++ ) {
          		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
          	}
-         	expected[1].passthrough_string = "999";
+            var index = parseInt(cmp.get("v.indexToChange"), 10);
+         	expected[index].rerender_count=0;
+            expected[index].passthrough_string = "999";
 
          	this.assertIterationCmpElements(expected, iterCmpEle);
          	
@@ -169,7 +168,7 @@
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnArrayModelPassthrough").getElements();
          	var expected = [];
-         	expected.push({render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: "999"});
+         	expected.push({render_count: 1, rerender_count: 0, unrender_count:0, passthrough_string: "999"});
          	for( var i=0; i<26; i++ ) {
          		expected.push( {render_count: 1, rerender_count: 1, unrender_count:0, passthrough_string: ""+i});
          	}
@@ -243,6 +242,6 @@
 
          	this.assertIterationCmpElements(expected, iterCmpEle);
     	}]
-    },
+    }
     
 })

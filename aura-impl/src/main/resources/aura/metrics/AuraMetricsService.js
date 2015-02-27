@@ -34,7 +34,7 @@ var MetricsService = function MetricsService(config) {
     this.doneBootstrap     = false;
 };
 
-MetricsService.TIMER   = window.performance ? window.performance.now.bind(performance) : Date.now.bind(Date);
+MetricsService.TIMER   = window.performance ? performance.now.bind(performance) : Date.now.bind(Date);
 MetricsService.START   = 'start';
 MetricsService.END     = 'end';
 MetricsService.STAMP   = 'stamp';
@@ -308,7 +308,7 @@ MetricsService.prototype = {
         if (!pageStartTime) {
             pageStartTime = this.getPageStartTime();
             bootstrap["pageStartTime"] = pageStartTime;
-            if (performance && performance.timing && performance.navigation) {
+            if (window.performance && performance.timing && performance.navigation) {
                 // TODO: Eventually make this strings smaller to reduce payload
                 var pn = performance.navigation;
                 var pt = performance.timing;

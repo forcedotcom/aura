@@ -139,19 +139,19 @@ MetricsService.prototype = {
         var id          = (ns || MetricsService.DEFAULT) + ':' + name,
             transaction = this.transactions[id],
             beacon      = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[MetricsService.DEFAULT],
-            postProcess = transaction && (typeof config === 'function') ? config : (config["postProcess"] || transaction["config"]["postProcess"]),
-            skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"],
-            context     = transaction["config"]["context"] || {};
+            postProcess = transaction && (typeof config === 'function' ? config : (config["postProcess"] || transaction["config"]["postProcess"]));
 
         if (transaction && (beacon || postProcess)) {
-            var parsedTransaction = {
-                "id"            : id,
-                "ts"            : transaction["ts"],
-                "duration"      : this.time() - transaction["ts"],
-                "pageStartTime" : this.pageStartTime,
-                "marks"         : {},
-                "context"       : $A.util.apply(context, config["context"], true, true)
-            };
+            var skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"],
+                context = transaction["config"]["context"] || {},
+                parsedTransaction = {
+                    "id"            : id,
+                    "ts"            : transaction["ts"],
+                    "duration"      : this.time() - transaction["ts"],
+                    "pageStartTime" : this.pageStartTime,
+                    "marks"         : {},
+                    "context"       : $A.util.apply(context, config["context"], true, true)
+                };
 
             for (var plugin in this.pluginInstances) {
                 var instance = this.pluginInstances[plugin];

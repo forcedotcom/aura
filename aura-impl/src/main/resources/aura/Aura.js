@@ -610,9 +610,7 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
 
         if (!$A.initialized) {
             if (!doNotInitializeServices) {
-                $A.Perf.mark("LayoutService.init");
                 $A.layoutService.init(cmp);
-                $A.Perf.endMark("LayoutService.init");
             }
 
             // restore component definitions from AuraStorage into memory and localStorage
@@ -622,7 +620,9 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
         $A.finishInit(doNotCallUIPerfOnLoad);
 
         // After App initialization is done
-        $A.historyService.init();
+        if (!doNotInitializeServices) {
+            $A.historyService.init();
+        }
     }
 };
 

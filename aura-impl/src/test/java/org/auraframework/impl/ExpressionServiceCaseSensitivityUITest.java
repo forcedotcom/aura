@@ -35,7 +35,7 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      * case.
      */
     public void testGetNestedAttribute() throws Exception {
-        open("/attributesTest/caseSensitivity.cmp", Mode.DEV);
+        open("/attributesTest/caseSensitivity.app", Mode.DEV);
         auraUITestingUtil.getEval("$A.getRoot().get('v.map.Fruit');");
         auraUITestingUtil
                 .waitForElementTextContains(
@@ -49,7 +49,7 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      * case.
      */
     public void testGetNonExistentNestedAttribute() throws Exception {
-        open("/attributesTest/caseSensitivity.cmp", Mode.DEV);
+        open("/attributesTest/caseSensitivity.app", Mode.DEV);
         auraUITestingUtil.getEval("$A.getRoot().get('v.map.Fruit.blah');");
         auraUITestingUtil
                 .waitForElementTextContains(
@@ -63,7 +63,7 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      * case.
      */
     public void testSetNestedAttribute() throws Exception {
-        open("/attributesTest/caseSensitivity.cmp", Mode.DEV);
+        open("/attributesTest/caseSensitivity.app", Mode.DEV);
         auraUITestingUtil.getEval("$A.getRoot().set('v.map.Fruit', 'orange');");
         auraUITestingUtil
                 .waitForElementTextContains(
@@ -77,7 +77,7 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      * case.
      */
     public void testSetNewNestedAttribute() throws Exception {
-        open("/attributesTest/caseSensitivity.cmp", Mode.DEV);
+        open("/attributesTest/caseSensitivity.app", Mode.DEV);
         auraUITestingUtil.getEval("$A.getRoot().set('v.map.Fruit.blah', 'orange');");
         auraUITestingUtil
                 .waitForElementTextContains(
@@ -90,7 +90,7 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      * Verify we do not display the case sensitivity error message in Prod mode.
      */
     public void testGetNoErrorMessageInProdMode() throws Exception {
-        open("/attributesTest/caseSensitivity.cmp", Mode.PROD);
+        open("/attributesTest/caseSensitivity.app", Mode.PROD);
         auraUITestingUtil.getEval("$A.getRoot().get('v.map.Fruit');");
         auraUITestingUtil.assertNoAuraErrorMessage(null);
     }
@@ -99,7 +99,7 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      * Verify we do not display the case sensitivity error message in Prod mode.
      */
     public void testSetNoErrorMessageInProdMode() throws Exception {
-        open("/attributesTest/caseSensitivity.cmp", Mode.PROD);
+        open("/attributesTest/caseSensitivity.app", Mode.PROD);
         auraUITestingUtil.getEval("$A.getRoot().set('v.map.Fruit', 'orange');");
         auraUITestingUtil.assertNoAuraErrorMessage(null);
     }

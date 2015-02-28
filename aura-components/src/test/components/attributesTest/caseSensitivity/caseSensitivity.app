@@ -15,10 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:application model="java://org.auraframework.impl.java.model.TestJavaModel" access="GLOBAL">
     <aura:attribute name="attr" type="String" default="An Aura of Lightning Lumenated the Plume" />
     <aura:attribute name="map" type="Object" default="{!m.map}" />
 
     <div aura:id="attrOutput">{!v.attr}</div>
     <ui:outputText aura:id="outputText" value="{!v.map.fruit}"/>
-</aura:component>
+</aura:application>

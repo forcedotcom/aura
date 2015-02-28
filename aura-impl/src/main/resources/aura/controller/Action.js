@@ -382,7 +382,7 @@ Action.prototype.getParams = function() {
  */
 Action.prototype.getComponent = function() {
     return this.cmp;
-}; 
+};
 
 /**
  * Sets the callback function that is executed after the server-side Action returns. Call a server-side Action from a
@@ -934,8 +934,6 @@ Action.prototype.getAbortableId = function() {
 
 /**
  * Checks if this action is a refresh.
- *
- * @private
  */
 Action.prototype.isRefreshAction = function() {
     return this.originalResponse !== undefined;

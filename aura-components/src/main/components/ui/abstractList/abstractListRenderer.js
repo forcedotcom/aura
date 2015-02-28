@@ -21,14 +21,14 @@
  * the relevant helper method call in the renderer ensures that the
  * emptyListContent is handled no matter how the list is implemented.
  */
-	afterRender : function(component, helper){
-		this.superAfterRender();
-		helper.updateEmptyListContent(component);
-	},
-	rerender : function(component, helper){
-		this.superRerender();
-		if (component.getConcreteComponent().isDirty('v.items')) {
-			helper.updateEmptyListContent(component);
-		}
-	}
+    afterRender : function(component, helper){
+        this.superAfterRender();
+        helper.updateEmptyListContent(component);
+    },
+    rerender : function(component, helper){
+        this.superRerender();
+        if (component.getConcreteComponent().isDirty('v.items')) {
+            helper.updateEmptyListContent(component);
+        }
+    }
 })

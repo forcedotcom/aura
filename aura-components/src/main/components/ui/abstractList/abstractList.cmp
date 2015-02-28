@@ -15,12 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" 
-				abstract="true" 
-				implements="ui:visible, ui:pagingInterface"  
-				support="GA" 
-				description="An abstract component that provides a basic layout for the ui:list component.">
-				
+<aura:component extensible="true"
+                abstract="true"
+                implements="ui:visible, ui:pagingInterface"
+                support="GA"
+                description="An abstract component that provides a basic layout for the ui:list component.">
+
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
     <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>
     <aura:attribute name="itemVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each row."/>
@@ -29,26 +29,26 @@
     <aura:attribute name="loadingIndicator" type="Aura.Component[]" description="Content to be shown while the list is loading"/>
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
-    
+
     <aura:registerEvent name="triggerDataProvider" type="ui:dataProvide"  description="The event fired when the data provider is triggered."/>
     <aura:handler name="triggerDataProvider" action="{!c.triggerDataProvider}"/>
-    
+
     <aura:registerEvent name="refresh" type="ui:refresh" description="The event fired when the component is refreshed."/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 
-	<aura:registerEvent name="addRemove" type="ui:addRemove" description="Command event to insert or remove items"/>
-	<aura:handler name="addRemove" action="{!c.addRemove}"/>
+    <aura:registerEvent name="addRemove" type="ui:addRemove" description="Command event to insert or remove items"/>
+    <aura:handler name="addRemove" action="{!c.addRemove}"/>
 
     <aura:handler name="init" action="{!c.init}" value="{!this}"/>
-    
+
     <div class="{!v.class + (v.visible == false ? ' invisible' : '')}" role="{!v.role}">
         {!v.header}
-        
+
         <div class="listContent">
             {!v.body}
-			<div class="emptyListContent">
-				{!v.emptyListContent}
-			</div>
+            <div class="emptyListContent">
+                {!v.emptyListContent}
+            </div>
             <div class="loadingIndicator">
                 <aura:if isTrue="{!v.loadingIndicator.length == 0}">
                     <div class="background"></div>
@@ -59,7 +59,7 @@
                 </aura:if>
             </div>
         </div>
-        
+
         {!v.footer}
     </div>
 </aura:component>

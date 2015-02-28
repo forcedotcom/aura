@@ -45,6 +45,7 @@ exp(p,
     "isCaboose", p.isCaboose,
     "setAllAboardCallback", p.setAllAboardCallback,
     "isFromStorage", p.isFromStorage,
+    "isRefreshAction", p.isRefreshAction,
     "toJSON", p.toJSON,
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
      "getStorageKey", p.getStorageKey,

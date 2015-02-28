@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 ({
-	/**
-	 * Behavior when the data from one of its data providers changes
-	 * 
-	 * @param {Component} component Potentially non-concrete (ui:abstractList) component instance.
-	 * @param event ui:dataChanged.
-	 * @param {Function} callback An optional callback to invoke after 'v.items' has been replaced. 
-	 */
-	handleDataChange: function(component, event, callback) {
-		var concrete = component.getConcreteComponent();
-		
-		concrete.set("v.items", event.getParam("data"));
+    /**
+     * Behavior when the data from one of its data providers changes
+     *
+     * @param {Component} component Potentially non-concrete (ui:abstractList) component instance.
+     * @param event ui:dataChanged.
+     * @param {Function} callback An optional callback to invoke after 'v.items' has been replaced.
+     */
+    handleDataChange: function(component, event, callback) {
+        var concrete = component.getConcreteComponent();
+
+        concrete.set("v.items", event.getParam("data"));
         this.showLoading(component, false);
-        
+
         if (callback) {
-        	callback(); 
+            callback();
         }
-	},
+    },
 
-	/** Behavior to prepare the list for new data before a refresh **/
-	beforeRefresh: function(component, event) {
-		component.getConcreteComponent().set("v.items", []);
-	},
+    /** Behavior to prepare the list for new data before a refresh **/
+    beforeRefresh: function(component, event) {
+        component.getConcreteComponent().set("v.items", []);
+    },
 
-	updateEmptyListContent:function (component) {
-		// make sure we are referencing a concrete component.
-		var concrete_component = component.getConcreteComponent();
-		var items = concrete_component.get("v.items");
-		var has_items = items != null && items.length > 0;
+    updateEmptyListContent:function (component) {
+        // make sure we are referencing a concrete component.
+        var concrete_component = component.getConcreteComponent();
+        var items = concrete_component.get("v.items");
+        var has_items = items != null && items.length > 0;
         $A.util[has_items ? "removeClass" : "addClass"](concrete_component.getElement(), "showEmptyContent");
     },
 
     /** Behavior for triggering data providers on initialization **/
     initTriggerDataProviders: function(component) {
-    	this.triggerDataProvider(component);
+        this.triggerDataProvider(component);
     },
 
     init: function(component) {
@@ -62,7 +62,7 @@
             for (var i = 0; i < dataProviders.length; i++) {
                 dataProviders[i].addHandler("onchange", component, "c.handleDataChange");
             }
-            
+
             component._dataProviders = dataProviders;
         }
     },
@@ -106,7 +106,7 @@
         // cache the pagers
         component._pagers = pagers;
     },
-    
+
     /**
      * @param component {Component} ui:abstractList
      * @param param {Number/Boolean} count or boolean for last item
@@ -114,55 +114,59 @@
      * @param callback
      */
     remove: function (component, index, count, timeout, animate, callback) {
-    	var items = component.get('v.items'),
-    		array = this.exclude(items, index),
-    		helper = component.getConcreteComponent().getDef().getHelper();
-    	
-    	helper.removeItem(component, array, index, timeout, animate, callback);
+        var items = component.get('v.items'),
+            array = this.exclude(items, index),
+            helper = component.getConcreteComponent().getDef().getHelper();
+
+        helper.removeItem(component, array, index, timeout, animate, callback);
     },
-	
+
     /**
      * Provides a default implementation of row removal. Intentionally does not do anything nice.
-     * ui:infiniteList implements removal utilizing 'timeout', 'animate', and 'callback'. 
+     * ui:infiniteList implements removal utilizing 'timeout', 'animate', and 'callback'.
      * Do NOT change this function - override with custom logic instead.
      */
     removeItem: function (component, array, index, timeout, animate, callback) {
-    	component.set('v.items', array);
+        component.set('v.items', array);
     },
-    
-	exclude: function (items, index) {
-		var array = [],
-			i;
-		
-		for (i = 0; i < items.length; i++) {
-			if (i !== index) {
-				array.push(items[i]);
-			}
-		}
-		
-		return array;
-	},
-    
+
+    exclude: function (items, index) {
+        var array = [],
+            i;
+
+        for (i = 0; i < items.length; i++) {
+            if (i !== index) {
+                array.push(items[i]);
+            }
+        }
+
+        return array;
+    },
+
     showLoading:function (component, visible) {
         $A.util.toggleClass(component, "loading", !!visible);
     },
 
-    triggerDataProvider: function(component, index) {
+    triggerDataProvider: function(component, index, refresh) {
         this.showLoading(component, true);
         if (!index) {
             index = 0;
         }
 
         if (index >= 0 && index < component._dataProviders.length) {
-            component._dataProviders[index].get("e.provide").fire();
+            var e = component._dataProviders[index].get("e.provide");
+            if (refresh) {
+                e.setParams({parameters:{refresh:true}});
+            }
+            e.fire();
         } else {
-        	this.showLoading(component, false);
-        	this.handleError(component, "Index is out of bounds for list's data provider trigger.")
+            this.showLoading(component, false);
+            this.handleError(component, "Index is out of bounds for list's data provider trigger.")
         }
     },
-    
+
     handleError: function(cmp, errorMsg) {
-    	cmp.getConcreteComponent()._refreshing = false;
-    	$A.error(errorMsg);
+        cmp.getConcreteComponent()._refreshing = false;
+        $A.error(errorMsg);
     }
 })

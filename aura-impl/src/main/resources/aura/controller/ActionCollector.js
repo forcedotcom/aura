@@ -76,6 +76,7 @@ ActionCollector.prototype.process = function() {
             storage.get(key).then(
                 function(value) {
                     $A.run(function() {
+                        // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
                         that.collectAction(action, value ? value.value : null);
                     });
                 },

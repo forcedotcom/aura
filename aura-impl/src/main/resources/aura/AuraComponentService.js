@@ -492,7 +492,6 @@ $A.ns.AuraComponentService.prototype.deIndex = function(globalId){
 /**
  * Returns the descriptors of all components known to the registry.
  * @memberOf AuraComponentService
- * @private
  */
 $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
     var ret = [];
@@ -501,6 +500,14 @@ $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = functio
     var componentDefs = this.registry.componentDefs;
     for (name in componentDefs) {
         ret.push(name);
+    }
+
+    // Union in any locally cached component defs
+    var catalog = this.registry.getLocalCacheCatalog();
+    for (name in catalog) {
+        if (!componentDefs[name]) {
+            ret.push(name);
+        }
     }
 
     return ret;

@@ -26,6 +26,22 @@ function ComponentDefRegistry(){
 
 ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
 
+ComponentDefRegistry.prototype.cacheName = "componetDefRegistry.catalog";
+
+ComponentDefRegistry.prototype.isLocalStorageAvailable = (function() {
+    if (window.localStorage) {
+        // Now actually try a test write because private browsing and use of local when not authorized by the user will only fail on writes
+        try {
+            window.localStorage.setItem("test", "test");
+            window.localStorage.removeItem("test");
+            return true;
+        } catch(ignore) {
+        }
+    }
+
+    return false;
+})();
+
 /**
  * Returns a ComponentDef instance from registry, or config after adding to the registry.
  * Throws an error if config is not provided.
@@ -53,6 +69,16 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
     }
     var ret = this.componentDefs[descriptor];
     if ((!noInit) && !ret) {
+        // use localStorage as alternative if storage implementation is not available
+        var useLocalStorage = !this.useDefinitionStorage() && this.useLocalCache(descriptor);
+        if (useLocalStorage) {
+            // Try to load from cache
+            var cachedConfig = this.getConfigFromLocalCache(descriptor);
+            if (cachedConfig) {
+                config = cachedConfig;
+                useLocalStorage = false;
+            }
+        }
 
         if (config === undefined) {
             $A.error("Unknown component: "+descriptor);
@@ -61,10 +87,28 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
 
         ret = this.saveComponentDef(config);
 
-        if (this.shouldSaveToStorage(descriptor)) {
+        if (useLocalStorage) {
+            // Write through of local storage cacheable componentDefs
+            try {
+                this.writeToCache(descriptor, config);
+            } catch (e) {
+                // localStorage only throws error when it's full
+                // clear and try saving again
+                localStorage.clear();
+
+                try {
+                    this.writeToCache(descriptor, config);
+                } catch(ignore) {
+                    // Nothing we can do at this point - give up.
+                }
+            }
+        }
+
+        if (this.useDefinitionStorage() && this.shouldSaveToStorage(descriptor)) {
             this.saveToStorage(descriptor, config);
         }
     }
+
     return ret;
 };
 
@@ -83,6 +127,57 @@ ComponentDefRegistry.prototype.saveComponentDef = function(config) {
     }
 
     return def;
+};
+
+/**
+ * Use the local cache for the page session persistently when layouts are used.
+ */
+ComponentDefRegistry.prototype.useLocalCache = function(descriptor) {
+    return this.isLocalStorageAvailable && !$A.util.isUndefinedOrNull(descriptor) && descriptor.indexOf("layout://") === 0;
+};
+
+/**
+ * Returns the JSON decoded localStorage values based on the cache name,
+ * or returns null.
+ */
+ComponentDefRegistry.prototype.getLocalCacheCatalog = function() {
+    if (!this.isLocalStorageAvailable) {
+        return null;
+    }
+
+    var catalog = localStorage.getItem(this.cacheName);
+    return catalog ? $A.util.json.decode(catalog) : {};
+};
+
+/**
+ * Returns the JSON decoded localStorage value.
+ * @param {Object} descriptor The key to look up on the localStorage.
+ */
+ComponentDefRegistry.prototype.getConfigFromLocalCache = function(descriptor) {
+    if (!this.isLocalStorageAvailable) {
+        return null;
+    }
+
+    var item = localStorage.getItem(this.cacheName + "." + descriptor);
+    return item ? $A.util.json.decode(item) : null;
+};
+
+/**
+ * Updates the local cache catalog and writes out the componentDef.
+ * @param {String} descriptor
+ * @param {Object} config
+ */
+ComponentDefRegistry.prototype.writeToCache = function(descriptor, config) {
+    if (this.isLocalStorageAvailable) {
+        // Update the catalog
+        var catalog = this.getLocalCacheCatalog();
+        catalog[descriptor] = true;
+        localStorage.setItem(this.cacheName, $A.util.json.encode(catalog));
+
+        // Write out the componentDef
+        var encodedConfig = $A.util.json.encode(config);
+        localStorage.setItem(this.cacheName + "." + descriptor, encodedConfig);
+    }
 };
 
 /**
@@ -124,6 +219,7 @@ ComponentDefRegistry.prototype.setupDefinitionStorage = function() {
             false           // clearStorageOnInit
         );
         if (storage.isPersistent() && storage.isSecure()) {
+            // we only want a persistent storage that is not websql because it will be deprecated
             this.definitionStorage = storage;
             this.useDefStore = true;
         } else {
@@ -166,6 +262,7 @@ ComponentDefRegistry.prototype.saveAllToRegistry = function (items) {
     for (var i = 0; i < iLength; i++) {
         var item = items[i];
         var descriptor = item["key"];
+        // TODO W-2512654: revisit "isExpired"
         if (!item["isExpired"] && $A.util.isUndefinedOrNull(this.componentDefs[descriptor])) {
             var config = $A.util.json.decode(item["value"]);
             this.saveComponentDef(config);
@@ -180,17 +277,15 @@ ComponentDefRegistry.prototype.saveAllToRegistry = function (items) {
  * @param {Object} config config
  */
 ComponentDefRegistry.prototype.saveToStorage = function(descriptor, config) {
-    if (this.useDefinitionStorage()) {
-        var encodedConfig = $A.util.json.encode(config);
-        this.definitionStorage.put(descriptor, encodedConfig).then(
-            function () {
-                $A.log("ComponentDefRegistry: Successfully stored " + descriptor);
-            },
-            function () {
-                $A.log("ComponentDefRegistry: Error storing " + descriptor);
-            }
-        );
-    }
+    var encodedConfig = $A.util.json.encode(config);
+    this.definitionStorage.put(descriptor, encodedConfig).then(
+        function () {
+            $A.log("ComponentDefRegistry: Successfully stored " + descriptor);
+        },
+        function () {
+            $A.log("ComponentDefRegistry: Error storing " + descriptor);
+        }
+    );
 };
 
 /**

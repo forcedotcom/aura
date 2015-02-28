@@ -161,6 +161,13 @@ $A.ns.Test.prototype.getSentRequestCount = function () {
     return $A.clientService.foreground.sent + $A.clientService.background.sent;
 };
 
+/** 
+ * Get the current ActionQueue.
+ */
+$A.ns.Test.prototype.getActionQueue = function() {
+    return $A.clientService.actionQueue;
+};
+
 /**
  * Add a cleanup function that is run on teardown.
  *
@@ -716,7 +723,7 @@ $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
 $A.ns.Test.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
     if (arg1 === arg2) {
         this.fail(assertMessage, "\nExpected values to not be equal but both were: {"+arg1+"}");
-        }
+    }
 };
 
 /**

@@ -927,8 +927,7 @@ var AuraClientService = function() {
         /**
          * Initialize aura.
          *
-         * This should never be called by client code. It is exposed, but deleted after
-         * first use.
+         * This should never be called by client code.
          *
          * @param {Object} config the configuration for aura.
          * @param {string} token the XSS token.

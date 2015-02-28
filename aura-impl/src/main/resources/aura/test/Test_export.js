@@ -97,6 +97,7 @@ $A.ns.Test.prototype["enqueueAction"] = $A.ns.Test.prototype.enqueueAction;
 $A.ns.Test.prototype["runActionsAsTransaction"] = $A.ns.Test.prototype.runActionsAsTransaction;
 $A.ns.Test.prototype["clearAndAssertComponentConfigs"] = $A.ns.Test.prototype.clearAndAssertComponentConfigs;
 $A.ns.Test.prototype["setServerReachable"] = $A.ns.Test.prototype.setServerReachable;
+$A.ns.Test.prototype["getActionQueue"] = $A.ns.Test.prototype.getActionQueue;
 
 // events
 $A.ns.Test.prototype["addEventHandler"] = $A.ns.Test.prototype.addEventHandler;

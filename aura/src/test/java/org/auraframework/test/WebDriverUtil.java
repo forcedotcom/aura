@@ -21,7 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Assert;
-
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeOptions;

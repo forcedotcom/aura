@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-
-exp(transport,
-    "request", transport.request
+var p = Transport.prototype;
+exp(p,
+    // #if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
+    "createHttpRequest", p.createHttpRequest,
+    // #end
+    "request", p.request
 );
+

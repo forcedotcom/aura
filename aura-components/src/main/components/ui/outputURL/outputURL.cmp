@@ -35,6 +35,6 @@
 
     <aura:registerEvent name="click" type="ui:click" access="GLOBAL" description="The event fired when the user clicks on the component." />
 
-    <a aura:id="link" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}"></a>
+    <a aura:id="link" class="{!v.class}" dir="{!v.dir}" href="{!v.value}" title="{!v.title}" onclick="{!c.click}" target="{!v.target}"></a>
 
 </aura:component>

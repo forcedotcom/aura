@@ -104,7 +104,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         super.readAttributes();
         String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
         if (extendsName != null) {
-            builder.extendsDescriptor = DefDescriptorImpl.getInstance(extendsName, EventDef.class);
+            builder.extendsDescriptor = getDefDescriptor(extendsName, EventDef.class);
         }
         String typeString = getAttributeValue(ATTRIBUTE_TYPE);
         if (typeString == null) {

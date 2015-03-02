@@ -24,7 +24,6 @@ import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.*;
 import org.auraframework.impl.root.AttributeDefImpl;
-import org.auraframework.impl.root.MethodDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
@@ -120,7 +119,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             String extendsNames = getAttributeValue(ATTRIBUTE_EXTENDS);
             if (extendsNames != null) {
                 for (String extendsName : AuraTextUtil.splitSimple(",", extendsNames)) {
-                    builder.extendsDescriptors.add(DefDescriptorImpl.getInstance(extendsName.trim(), InterfaceDef.class));
+                    builder.extendsDescriptors.add(getDefDescriptor(extendsName.trim(), InterfaceDef.class));
                 }
             }
 

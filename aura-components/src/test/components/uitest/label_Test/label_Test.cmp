@@ -96,8 +96,6 @@
    <ui:inputEmail label="I'm a inputEmail" labelPosition="{!v.whichPosition}" value="I'm an inputEmail"/>
    <ui:inputSecret label="I'm an inputSecret" labelPosition="{!v.whichPosition}" value="I'm an inputSecret"/>
    <ui:inputURL label="I'm an inputURL" labelPosition="{!v.whichPosition}" value="I'm an inputURL"/>
-   
-   <ui:inputTime label="I'm an inputTime" labelPosition="{!v.whichPosition}" value="I'm an inputTime"/>
       
    <ui:inputPercent label="inputPercent" labelPosition="{!v.whichPosition}" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="{!v.whichPosition}" value="42"/>

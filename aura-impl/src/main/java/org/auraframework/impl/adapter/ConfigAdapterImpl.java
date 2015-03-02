@@ -242,34 +242,17 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public String getMomentJSURL() {
-        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/%s/moment/moment.js", contextPath, nonce);
-    }
-
-    @Override
-    public String getFastClickJSURL() {
-        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/%s/fastclick/fastclick.js", contextPath, nonce);
-    }
-
-    @Override
-    public List<String> getWalltimeJSURLs() {
+    public String getJSLibsURL() {
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
         String locale = al.getTimeZone().getID().replace("/", "-");
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
 
-        List<String> urls = Lists.newLinkedList();
         String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         if (!"GMT".equals(locale)) {
-            urls.add(String.format("%s/auraFW/resources/%s/walltime-js/olson/walltime-data_%s.js", contextPath,
-                    nonce, locale));
+            return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, locale);
+        } else {
+            return String.format("%s/auraFW/resources/%s/libs.js", contextPath, nonce);
         }
-
-        urls.add(String.format("%s/auraFW/resources/%s/walltime-js/walltime.js", contextPath, nonce));
-        return urls;
     }
 
     @Override
@@ -285,13 +268,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
 
         return ret;
-    }
-
-    @Override
-    public String getEs6PromiseJSURL() {
-        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format("%s/auraFW/resources/%s/es6-promise/es6-promise-2.0.1.js", contextPath, nonce);
     }
 
     @Override

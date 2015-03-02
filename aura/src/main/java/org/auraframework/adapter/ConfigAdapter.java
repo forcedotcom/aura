@@ -58,15 +58,9 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean validateCss();
 
-	String getHTML5ShivURL();
+    String getHTML5ShivURL();
 
-    String getMomentJSURL();
-
-    String getFastClickJSURL();
-
-    String getEs6PromiseJSURL();
-
-    List<String> getWalltimeJSURLs();
+    String getJSLibsURL();
 
     boolean isPrivilegedNamespace(String namespace);
     String getDefaultNamespace();

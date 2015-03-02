@@ -1,0 +1,9 @@
+{
+    "files": [
+        "es6-promise/es6-promise-2.0.1.js",
+        "fastclick/fastclick.js",
+        "moment/moment.js",
+        "walltime-js/walltime.js"
+    ],
+    "walltimeLocaleDir": "walltime-js/olson"
+}

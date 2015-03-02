@@ -494,10 +494,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
             ret.add(html5ShivURL);
         }
 
-        ret.add(config.getMomentJSURL());
-        ret.add(config.getFastClickJSURL());
-        ret.addAll(config.getWalltimeJSURLs());
-        ret.add(config.getEs6PromiseJSURL());
+        ret.add(config.getJSLibsURL());
 
         ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.JS));
         // framework js should be after other client libraries

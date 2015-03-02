@@ -33,6 +33,8 @@
     <aura:registerEvent name="triggerDataProvider" type="ui:dataProvide"  description="The event fired when the data provider is triggered."/>
     <aura:handler name="triggerDataProvider" action="{!c.triggerDataProvider}"/>
 
+    <aura:registerEvent name="listComplete" type="aura:operationComplete" description="The event fired when concrete implementations have finished their component creation."/>
+
     <aura:registerEvent name="refresh" type="ui:refresh" description="The event fired when the component is refreshed."/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 

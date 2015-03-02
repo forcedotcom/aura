@@ -21,6 +21,6 @@
     description="A list component that iterates over and displays the items in the ui:dataProvider component.">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<ul class="{!v.class}">
-    	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
+    	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}" iterationComplete="{!c.iterationComplete}"/>
 	</ul>
 </aura:component>

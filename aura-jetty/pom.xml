@@ -109,7 +109,7 @@
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
-		<additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
+		<additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura-components/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
     </properties>
     <build>
         <plugins>

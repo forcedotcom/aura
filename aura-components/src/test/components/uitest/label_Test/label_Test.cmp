@@ -19,6 +19,7 @@
 <aura:component model="java://org.auraframework.component.ui.MenuTestModel">
 <!-- Mirror default label position from input.cmp -->
 <aura:attribute default="left" type="String" name="whichPosition"/>
+<aura:attribute type="String" name="labelTitle"/>
 <h1>label separete from input with raw string id association</h1>
 	<table>
 	<tbody>
@@ -100,6 +101,8 @@
       
    <ui:inputPercent label="inputPercent" labelPosition="{!v.whichPosition}" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="{!v.whichPosition}" value="42"/>
+   <ui:inputCheckbox aura:id="inputCheckboxWithLabelTitle" labelTitle="{!v.labelTitle}" label="inputCheckboxWithLabelTitle" labelPosition="{!v.whichPosition}" value="false"/>
+	
 <hr />
 <h1>label with hidden position</h1>
 <ui:inputTextArea label="inputTextArea" labelPosition="hidden" value="I'm an inputTextArea" aura:id="hiddenPosition"/><br/> 	

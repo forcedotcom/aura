@@ -188,5 +188,27 @@
             $A.test.assertEquals(labelId, inputId, "Global Id for label and textarea in hidden positon should be the same");
             $A.test.assertEquals("assistiveText", label.children[0].className, "Class Name for Label should be assistiveText");
         }
+    },
+    
+    /**
+     * Test case W-2462881
+     * Add title attribute into ui:input
+     */
+    testLabelWithLabelTitleSet: {
+        attributes : {labelTitle : "labelTitle"},
+        test: function(component){
+            var div = component.find("inputCheckboxWithLabelTitle").getElement();
+            var label = div.getElementsByTagName('span')[0];
+            var expectedTitleLabel = "labelTitle"
+            $A.test.assertEquals(expectedTitleLabel, label.title, "Title attribute for label is incorrect");
+        }
+    },
+    
+    testLabelWithoutLabelTitle: {
+        test: function(component){
+            var div = component.find("inputCheckboxWithLabelTitle").getElement();
+            var label = div.getElementsByTagName('span')[0];
+            $A.test.assertFalsy(label.title,'Title attribute for label should not be present');
+        }
     }
 })

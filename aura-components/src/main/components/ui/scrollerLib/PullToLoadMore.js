@@ -269,6 +269,9 @@ function (w) {
                 });
             }
         },
+        _getCustomAppendedElements: function () {
+            return 2;
+        },
         /*
         * ==================================
         * PUBLIC API

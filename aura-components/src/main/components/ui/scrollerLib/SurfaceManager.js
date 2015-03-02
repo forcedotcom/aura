@@ -584,13 +584,12 @@ function (w) {
             }
         },
         _appendData: function (data) {
-            var ptl, item, i, spacer;
+            var customAppended = this._getCustomAppendedElements(),
+                queue = [],
+                ptl, item, i, spacer;
 
-            //remove pulltoLoadMoreSurface
-            if (this.opts.pullToLoadMore) {
-                ptl    = this.items.pop();
-                this._positionedSurfacesPop();
-                spacer = this.items.pop();
+            for (i = 0; i < customAppended; i++) {
+                queue.push(this.items.pop());
                 this._positionedSurfacesPop();
             }
 
@@ -599,14 +598,13 @@ function (w) {
                 this.items.push(item);
             }
 
-            if (this.opts.pullToLoadMore) {
-                //add the back as the last item again
-                this.items.push(spacer);
-                this.items.push(ptl);
+            var size = queue.length;
+            for ( i = 0; i < size; i++) {
+                this.items.push(queue.pop());
             }
         },
         getNumItems: function () {
-            return this.opts.pullToLoadMore ? this.items.length - 2 : this.items.length;
+            return this.items.length - this._getCustomAppendedElements();
         },
         prependItems: function (items) {
             var parsedData = HELPERS.parseDOM(items);

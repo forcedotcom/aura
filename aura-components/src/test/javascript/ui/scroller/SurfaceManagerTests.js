@@ -45,6 +45,8 @@ Test.Components.Ui.Scroller.SurfaceManager=function(){
 			pullToRefresh:false,
 			pullToLoadMore:false
 		};
+		surfaceManager._getCustomAppendedElements = function () {return 0};
+		
 		surfaceManager.scroller=Test.Stubs.Aura.Dom.GetNode({
 			id:'scroller',
 			_isScrolling:false

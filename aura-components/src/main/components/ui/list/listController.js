@@ -20,5 +20,10 @@
         if(dataProvider && dataProvider.getModel()) {
         	component.set("v.items", dataProvider.get("m.items"));
         }
+    },
+
+    iterationComplete:function(component,event){
+        component.get("e.listComplete").fire(event.getParams());
     }
+
 })

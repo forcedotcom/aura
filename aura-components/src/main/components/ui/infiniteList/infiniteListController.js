@@ -42,6 +42,6 @@
         $A.Perf.endMark("infiniteList showMore " + component.getGlobalId());
 
 		helper.showLoading(component, false);
-        component.get("e.listComplete").fire();
+        component.get("e.listComplete").fire(event.getParams());
 	}
 })

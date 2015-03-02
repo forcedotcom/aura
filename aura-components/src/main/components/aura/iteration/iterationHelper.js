@@ -102,7 +102,6 @@
                             components=components.concat(collector[i]);
                         }
                         completeHandler(component,components);
-                        console.log("complete");
                     }
                 }
             }

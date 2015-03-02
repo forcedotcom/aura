@@ -286,9 +286,14 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
         }
 
 
-        if(path.length>1) {
-            target=$A.expressionService.resolve(path.slice(0,path.length-1),target);
+        if (path.length > 1) {
+            target = $A.expressionService.resolve(path.slice(0, path.length - 1), target);
         }
+
+        if (!target) {
+            return; // If the passthrough value is not set with data, return to avoid errors
+        }
+
         var oldValue=target[key];
         target[key]=value;
 

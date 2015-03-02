@@ -15,7 +15,11 @@
  */
 ({
     init: function (cmp) {
-        cmp.set('v.totalItems', 25);
+    	var totalItems = cmp.get("v.totalItems");
+    	
+    	if (totalItems && totalItems == 0) {
+    		cmp.set("v.totalItems", 25);
+    	}
     },
 
     handleProvide: function (cmp, evt, hlp) {

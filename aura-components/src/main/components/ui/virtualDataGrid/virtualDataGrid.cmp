@@ -1,0 +1,55 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="PROTO" description="">
+
+    <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
+    
+    <!-- This is deprecated, used in old grid, eventually this shoul be a <method> -->
+    <aura:handler name="refresh" action="{!c.handleRefresh}"/>
+    <aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
+    <aura:method name="appendItems">
+        <aura:attribute name="items" type="Object"/>
+    </aura:method>
+
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="class"			type="String"								description=""/>
+    <aura:attribute name="items"           type="List"                                  description=""/>
+    <aura:attribute name="headerColumns"   type="Aura.Component[]"                      description=""/>
+    <aura:attribute name="columns"         type="Aura.ComponentDefRef[]"                description=""/>
+    <aura:attribute name="columnsEdit"     type="Aura.ComponentDefRef[]"                description=""/>
+    <aura:attribute name="dataModel"       type="Aura.Component[]"                      description=""/>
+    <aura:attribute name="_dirty"           type="Integer"                              description=""/>
+    <aura:attribute name="itemVar"         type="String"                 default="item" description=""/>
+    
+    <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:handler name="change" value="{!v.items}"   action="{!c.handleItemsChange}"/>
+    <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/> 
+
+    <table aura:id="table" class="{! v.class + ' ' + v.mode }">
+        <thead aura:id="thead">
+            <tr aura:id="headerRow">{!v.headerColumns}</tr>
+        </thead>
+        <tfoot aura:id="tfoot"></tfoot>
+        <tbody aura:id="tbody"></tbody>
+    </table>    
+
+</aura:component>
+

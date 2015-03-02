@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.loadLevel.GatedModel">
+<aura:component model="java://org.auraframework.component.loadLevel.GatedModel">
     <aura:attribute type="String" name="waitId"/>
     <aura:attribute type="String" name="stringAttribute" required="true"/>
 Slow server component with a required attribute.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.loadLevel;
+package org.auraframework.component.loadLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +22,9 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 
 @Model
-public class SluggishServerModel {
-
-    public SluggishServerModel() throws InterruptedException {
-        Thread.sleep(100);
+public class SleepyServerModel {
+    public SleepyServerModel() throws InterruptedException {
+        Thread.sleep(10000);
     }
 
     @AuraEnabled
@@ -36,5 +35,4 @@ public class SluggishServerModel {
         sl.add("beer");
         return sl;
     }
-
 }

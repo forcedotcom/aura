@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.1917</version>
+    <version>0.1918-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

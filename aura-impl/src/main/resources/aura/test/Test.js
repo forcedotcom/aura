@@ -135,7 +135,21 @@ $A.ns.Test.prototype.addWaitForWithFailureMessage = function(expected, testFunct
  * queueing on the client).
  */
 $A.ns.Test.prototype.blockRequests = function () {
+    this.blockForegroundRequests();
+    this.blockBackgroundRequests();
+};
+
+/**
+ * Block only foreground actions from being sent to the server.
+ */
+$A.ns.Test.prototype.blockForegroundRequests = function() {
     $A.clientService.foreground.inFlight += $A.clientService.foreground.max;
+};
+
+/**
+ * Block only background actions from being sent to the server.
+ */
+$A.ns.Test.prototype.blockBackgroundRequests = function() {
     $A.clientService.background.inFlight += $A.clientService.background.max;
 };
 
@@ -145,8 +159,30 @@ $A.ns.Test.prototype.blockRequests = function () {
  * This must be called after blockRequests, otherwise it may result in unknown consequences.
  */
 $A.ns.Test.prototype.releaseRequests = function () {
+    this.releaseForegroundRequests();
+    this.releaseBackgroundRequests();
+};
+
+/**
+ * Release only foreground requests from being sent to the server.
+ * 
+ * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
+ * unknown consequences.
+ */
+$A.ns.Test.prototype.releaseForegroundRequests = function() {
     $A.run(function() {
         $A.clientService.foreground.inFlight -= $A.clientService.foreground.max;
+    });
+};
+
+/**
+ * Release only background actions from being sent to the server.
+ * 
+ * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
+ * unknown consequences.
+ */
+$A.ns.Test.prototype.releaseBackgroundRequests = function() {
+    $A.run(function() {
         $A.clientService.background.inFlight -= $A.clientService.background.max;
     });
 };

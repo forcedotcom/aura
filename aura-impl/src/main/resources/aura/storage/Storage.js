@@ -110,13 +110,12 @@ AuraStorage.prototype.get = function(key) {
     // This needs to also be asynchronous to map to IndexedDB, WebSQL, SmartStore that are all async worlds
     var that = this;
     var promise = this.adapter.getItem(this.version + key).then(function(item) {
-        var hit = item && (new Date().getTime() <= item["expires"]);
-        that.log("get() " + (hit ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
+        that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
 
         if (!item) {
             return undefined;
         }
-        return { "value" : item.value, "isExpired" : !!hit };
+        return { "value" : item.value, "isExpired" : (new Date().getTime() > item["expires"]) };
     });
 
     this.sweep();

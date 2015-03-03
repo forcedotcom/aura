@@ -25,13 +25,18 @@ Date.now = (Date.now || function () {  // thanks IE8
  * @param {Object} config The configuration describing the characteristics of the storage to be created.
  */
 var MetricsService = function MetricsService(config) {
-    this.collector         = {"default": []};
-    this.bootstrap         = {};
-    this.registeredPlugins = {};
-    this.pluginInstances   = {};
-    this.beaconProviders   = {};
-    this.transactions      = {};
-    this.doneBootstrap     = false;
+    this.collector                 = {"default": []};
+    this.bootstrap                 = {};
+    this.registeredPlugins         = {};
+    this.pluginInstances           = {};
+    this.beaconProviders           = {};
+    this.transactions              = {};
+    this.doneBootstrap             = false;
+    this.clearCompleteTransactions = true; //In PTEST Mode this is set to false (see initialize method)
+
+    // #if {"excludeModes" : ["PRODUCTION"]}
+    this["collector"] = this.collector; // Protected API to access the raw marks
+    // #end
 };
 
 MetricsService.TIMER   = (window.performance && window.performance.now) ? window.performance.now.bind(performance) : Date.now.bind(Date);
@@ -45,6 +50,10 @@ MetricsService.prototype = {
         this.getPageStartTime();
         this.transactionStart('bootstrap','app');
         this.initializePlugins();
+        // #if {"modes" : ["PTEST"]}
+            this.setClearCompletedTransactions(false);
+        // #end
+
     },
     instrument: function (instance, method, ns, async, before, after, override) {
         var self     = this,
@@ -141,7 +150,7 @@ MetricsService.prototype = {
             beacon      = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[MetricsService.DEFAULT],
             postProcess = transaction && (typeof config === 'function' ? config : (config["postProcess"] || transaction["config"]["postProcess"]));
 
-        if (transaction && (beacon || postProcess)) {
+        if (transaction && (beacon || postProcess || !this.clearCompleteTransactions)) {
             var skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"],
                 context = transaction["config"]["context"] || {},
                 parsedTransaction = {
@@ -174,13 +183,38 @@ MetricsService.prototype = {
                 this.signalBeacon(beacon, parsedTransaction);
             }
 
-            // cleanup
-            delete this.transactions[id];
+            // Cleanup transaction
+            if (this.clearCompleteTransactions) {
+                delete this.transactions[id];
+            } else {
+                // Only for non-prod, to keep the transactions stored
+                this.transactions[id] = parsedTransaction;
+            }
+
             if (!this.inTransaction()) {
                 this.clearMarks();
             }
         }
     },
+    clearTransactions: function () {
+        this.transactions = {};
+    },
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    getTransactions: function () {
+        var transactions = [];
+        for (var i in this.transactions) {
+            transactions.push(this.transactions[i]);
+        }
+        return  transactions;
+    },
+    getTransaction: function (ns, id) {
+        var key = (ns || MetricsService.DEFAULT) + ':' + name;
+        return this.transactions[key];
+    },
+    setClearCompletedTransactions: function (value) {
+        this.clearCompleteTransactions = value;
+    },
+    //#end
     signalBeacon: function (beacon, transaction, postProcessResult) {
         var payload = postProcessResult || transaction;
         if (beacon) {
@@ -358,5 +392,4 @@ MetricsService.prototype = {
         return bootstrap;
     }
 };
-
 //#include aura.metrics.AuraMetricsService_export

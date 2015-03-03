@@ -83,9 +83,13 @@ ServerActionsMetricsPlugin.prototype = {
                         ids.push(action.getId());
                         // Most of the time the callback is the same for all the cases, but just in case...
                         if (success !== error || success !== incomplete) {
-                            action.setCallback(success["s"], actionHook.bind(success["s"], success["fn"]));
-                            action.setCallback(incomplete["s"], actionHook.bind(incomplete["s"], incomplete["fn"]));
-                            action.setCallback(error["s"], actionHook.bind(error["s"], error["fn"]));
+                            action.setCallback(success["s"], actionHook.bind(success["s"], success["fn"]), "SUCCESS");
+                            if (incomplete) {
+                                action.setCallback(incomplete["s"], actionHook.bind(incomplete["s"], incomplete["fn"]), "INCOMPLETE");
+                            }
+                            if (error) {
+                                action.setCallback(error["s"], actionHook.bind(error["s"], error["fn"]), "ERROR");
+                            }
                         } else {
                             action.setCallback(success["s"], actionHook.bind(success["s"], success["fn"]));
                         }

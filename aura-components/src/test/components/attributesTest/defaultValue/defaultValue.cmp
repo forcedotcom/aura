@@ -106,5 +106,5 @@
     <aura:attribute type="String" name="stringDefaultWithLiteralExpEmptyString" default=""/>
     <aura:attribute type="String" name="stringDefaultWithExpView" default="{!v.stringDefaultWithString}"/>
     <aura:attribute type="String" name="stringDefaultWithExpression" default="{!v.stringDefaultWithString + ' bla'}"/>
-    <aura:attribute type="String" name="stringDefaultWithExpGVP" default="{!$Label.section1.label_for_attribute_default_value_test}"/>
+    <aura:attribute type="String" name="stringDefaultWithExpGVP" default="{!$Label.AuraTestLabelSection.label_for_attribute_default_value_test}"/>
 </aura:component>

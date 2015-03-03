@@ -23,7 +23,7 @@
 
             var action = $A.get("c.aura://LabelController.getLabel"),
                 name = "dynamic_label_for_test",
-                section = "Section1";
+                section = "AuraTestLabelSection";
 
             action.setParams({
                 "name": name,

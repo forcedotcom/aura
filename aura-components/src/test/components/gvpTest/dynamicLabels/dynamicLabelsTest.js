@@ -38,7 +38,7 @@
                 this,
                 function(newCmp) {
                     // Component should be sent back from server with necessary labels
-                    $A.test.assertEquals("Tomorrow", $A.get("$Label.Section1.task_mode_tomorrow"),
+                    $A.test.assertEquals("Tomorrow", $A.get("$Label.Related_Lists.task_mode_tomorrow"),
                         "Failed to add labels from inner cmp on dynamically created component");
                     cmp.find("container").set("v.body", newCmp);
                 },

@@ -298,6 +298,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // TODO: FIXME
                 throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
                         .name()));
+            default:
+                break;
             }
             rLock.lock();
             try {

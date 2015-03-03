@@ -17,5 +17,5 @@
 -->
 <!--GVP -> Global Value Providers related tests-->
 <aura:component render="client">
-    <div aura:id="LabelAsExpressionComponent">{!$Label.Section1.task_mode_tomorrow}</div>
+    <div aura:id="LabelAsExpressionComponent">{!$Label.Related_Lists.task_mode_tomorrow}</div>
 </aura:component>

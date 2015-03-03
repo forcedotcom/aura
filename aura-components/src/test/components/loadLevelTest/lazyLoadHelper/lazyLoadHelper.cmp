@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" controller="java://org.auraframework.impl.loadLevel.GatedModelController">
+<aura:component extensible="true" controller="java://org.auraframework.component.loadLevel.GatedModelController">
     {!v.body}
 </aura:component>

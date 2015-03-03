@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.loadLevel.SluggishServerModel" render='client'>
+<aura:component model="java://org.auraframework.component.loadLevel.SluggishServerModel" render='client'>
     <aura:iteration items="{!m.stringList}" var="i">
         <forEachDefTest:forEachDefDisplay aura:id="stringValue" string="{!i}" aura:load='lazy'/>
     </aura:iteration>

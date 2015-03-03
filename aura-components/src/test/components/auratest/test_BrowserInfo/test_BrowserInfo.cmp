@@ -7,9 +7,5 @@
 [isIPad={!$Browser.isIPad}]
 [isIPhone={!$Browser.isIPhone}]
 [isIOS={!$Browser.isIOS}]
-
-hello
-
-[isVoiceOver={!$Global.isVoiceOver}]
 </pre>
 </aura:component>

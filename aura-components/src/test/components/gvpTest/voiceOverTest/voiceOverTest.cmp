@@ -1,0 +1,4 @@
+<aura:component>
+  <div aura:id="data">{!$Global.isVoiceOver}</div>
+  <div aura:id="insertion"/>
+</aura:component>

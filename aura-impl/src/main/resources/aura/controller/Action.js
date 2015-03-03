@@ -392,6 +392,12 @@ Action.prototype.getComponent = function() {
  * "SUCCESS", "ERROR", and "INCOMPLETE" (but not "ABORT" for historical compatibility. It is recommended that you
  * use an explicit name, and not the default 'undefined' to signify 'ALL'.
  *
+ * The valid names are:
+ *  * SUCCESS: if the action successfully completes.
+ *  * ERROR: if the action has an error (including javascript errors for client side actions)
+ *  * INCOMPLETE: if a server side action failed to complete because there is no connection
+ *  * ABORTED: if the action is aborted via abort()
+ *
  * @public
  * @param {Object}
  *            scope The scope in which the function is executed.
@@ -402,7 +408,12 @@ Action.prototype.getComponent = function() {
  */
 Action.prototype.setCallback = function(scope, callback, name) {
     if (!$A.util.isFunction(callback)) {
-        $A.error("Action callback should be a function");
+        $A.error("Action.setCallback(): callback for '"+name+"' must be a function");
+        return;
+    }
+    if (name !== undefined && name !== "ALL" && name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE"
+            && name !== "ABORTED") {
+        $A.error("Action.setCallback(): Invalid callback name '" + name + "'");
         return;
     }
     // If name is undefined or specified as "ALL", then apply same callback in all cases
@@ -420,10 +431,6 @@ Action.prototype.setCallback = function(scope, callback, name) {
             "s" : scope
         };
     } else {
-        if (name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE" && name !== "ABORTED") {
-            $A.error("Illegal name " + name);
-            return;
-        }
         this.callbacks[name] = {
             "fn" : callback,
             "s" : scope
@@ -658,8 +665,6 @@ Action.prototype.setBackground = function() {
  *            action The action to run.
  */
 Action.prototype.runAfter = function(action) {
-    $A.assert(action.def.isServerAction(),
-                    "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
     $A.clientService.enqueueAction(action);
 };
 
@@ -912,12 +917,15 @@ Action.prototype.setAbortableId = function(id) {
  * @param {Action} the action which is the logical parent of this action.
  */
 Action.prototype.setParentAction = function(action) {
-    if($A.util.isUndefinedOrNull(action) || $A.util.isUndefined(action.auraType) || action.auraType!=="Action"){
-        throw new Error("The provided parent action is not a valid Action: " + action);
+    if($A.util.isUndefinedOrNull(action) || $A.util.isUndefined(action.auraType) || action.auraType!=="Action"
+            || !action.abortable) {
+        throw new Error("Action.setParentAction(): The provided parent action must be a valid abortable Action: " + action);
+    }
+    if (action.abortableId === undefined) {
+        throw new Error("Action.setParentAction(): The provided parent action must be enqueued: " + action);
     }
     if (this.abortableId !== undefined) {
-        throw new Error("You may only set the parent action once, and it must be before enqueueing:"
-            +this.getStorageKey());
+        throw new Error("Action.setParentAction(): The abortable group is already set, call setParentAction before enqueueing : "+this.getStorageKey());
     }
     this.abortableId = action.abortableId;
 };
@@ -1106,6 +1114,23 @@ Action.prototype.incomplete = function(context) {
 };
 
 /**
+ * Internal routine to do the basic copy to a new refresh action.
+ */
+Action.prototype.copyToRefresh = function() {
+    var refreshAction = this.def.newInstance(this.cmp);
+    refreshAction.setParams(this.params);
+    refreshAction.setStorable({
+        "ignoreExisting" : true,
+        "errorHandler": this.getStorageErrorHandler()
+    });
+
+    refreshAction.abortable = this.abortable;
+    refreshAction.abortableId = this.abortableId;
+
+    return refreshAction;
+};
+
+/**
  * Refreshes the Action. Used with storage.
  *
  * @private
@@ -1123,24 +1148,18 @@ Action.prototype.getRefreshAction = function(originalResponse) {
     // autoRefreshInterval seconds old
     var now = new Date().getTime();
     if ((now - storage["created"]) >= autoRefreshInterval && this.def) {
-        var refreshAction = this.def.newInstance(this.cmp);
-
+        var refreshAction = this.copyToRefresh();
         storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
+        refreshAction.originalResponse = originalResponse;
 
+        //
+        // This is really ugly. We will be changing it shortly.
+        //
         var executeCallbackIfUpdated = (this.storableConfig && !$A.util.isUndefined(this.storableConfig["executeCallbackIfUpdated"]))
                 ? this.storableConfig["executeCallbackIfUpdated"] : true;
         if (executeCallbackIfUpdated !== false) {
             refreshAction.callbacks = this.callbacks;
         }
-
-        refreshAction.setParams(this.params);
-        refreshAction.setStorable({
-            "ignoreExisting" : true,
-            "errorHandler": this.getStorageErrorHandler()
-        });
-
-        refreshAction.abortable = this.abortable;
-        refreshAction.originalResponse = originalResponse;
 
         return refreshAction;
     }
@@ -1155,20 +1174,10 @@ Action.prototype.getRefreshAction = function(originalResponse) {
  */
 Action.prototype.getRetryFromStorageAction = function() {
     if(this.isFromStorage()) {
-        var retryAction = this.def.newInstance(this.cmp);
+        var retryAction = this.copyToRefresh();
         retryAction.callbacks = this.callbacks;
-
-        retryAction.setParams(this.params);
-        retryAction.setStorable({
-            "ignoreExisting" : true,
-            "errorHandler": this.getStorageErrorHandler()
-        });
-
-        retryAction.abortable = this.abortable;
-
         return retryAction;
     }
-
     return null;
 };
 

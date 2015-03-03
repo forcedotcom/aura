@@ -384,7 +384,8 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             // Assert
-            Assert.Equal("Illegal name " + name, stubbedError.Calls[0].Arguments.msg);
+            Assert.Equal("Action.setCallback(): Invalid callback name '" + name + "'",
+                stubbedError.Calls[0].Arguments.msg);
         }
 
         [ Fact ]
@@ -438,7 +439,7 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function ThrowsErrorIfCallbackNotAFunction() {
             // Arrange
-            var expected = "Action callback should be a function";
+            var expected = "Action.setCallback(): callback for 'bogus' must be a function";
             var mockContext = Mocks.GetMock(Object.Global(), "$A", {
                 error : function(msg) {
                     actual = msg;
@@ -454,7 +455,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockContext(function() {
-                target.setCallback();
+                target.setCallback(undefined, undefined, "bogus");
             });
 
             // Assert
@@ -904,41 +905,6 @@ Test.Aura.Controller.ActionTest = function() {
     [ Fixture ]
     function RunAfter() {
         [ Fact ]
-        function AssertsIsServerAction() {
-            // Arrange
-            var expected = "expected";
-            var expectedReturn = "expectedReturn";
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                assert : function(param) {
-                    if (param === expectedReturn) {
-                        actual = expected;
-                    }
-                },
-                clientService : {
-                    enqueueAction : function() {
-                    }
-                }
-            });
-            var target = new Action();
-            var action = {
-                def : {
-                    isServerAction : function() {
-                        return expectedReturn;
-                    }
-                }
-            };
-            var actual = null;
-
-            // Act
-            mockAssert(function() {
-                target.runAfter(action);
-            })
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [ Fact ]
         function AddsActionParamToQueue() {
             // Arrange
             var expectedReturn = "expectedReturn";
@@ -967,39 +933,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.Equal(action, actual);
-        }
-
-        [ Fact ]
-        function ThrowsIfActionIsNotServerAction() {
-            // Arrange
-            var expected = "RunAfter() cannot be called on a client action. Use run() on a client action instead.";
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                assert : function(condition, message) {
-                    if (!condition) {
-                        var error = new Error(message);
-                        throw error;
-                    }
-                }
-            });
-            var target = new Action();
-            var action = {
-                def : {
-                    isServerAction : function() {
-                        return false;
-                    }
-                }
-            };
-            var actual = null;
-
-            // Act
-            mockAssert(function() {
-                actual = Record.Exception(function() {
-                    target.runAfter(action);
-                })
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
         }
     }
 
@@ -2417,6 +2350,7 @@ Test.Aura.Controller.ActionTest = function() {
             mockContext(function() {
                 target.setParentAction({
                     auraType : "Action",
+                    abortable : true,
                     abortableId : expected
                 });
             });
@@ -2427,7 +2361,7 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function ThrowsIfParentIsUndefined() {
             var target = new Action();
-            var expected = "The provided parent action is not a valid Action: undefined";
+            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: undefined";
             var actual;
 
             mockContext(function() {
@@ -2442,7 +2376,7 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function ThrowsIfParentIsNull() {
             var target = new Action();
-            var expected = "The provided parent action is not a valid Action: null";
+            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: null";
             var actual;
 
             mockContext(function() {
@@ -2457,7 +2391,7 @@ Test.Aura.Controller.ActionTest = function() {
         [ Fact ]
         function ThrowsIfParentIsNotAnAction() {
             var target = new Action();
-            var expected = "The provided parent action is not a valid Action: [object Object]";
+            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: [object Object]";
             var actual;
 
             mockContext(function() {
@@ -2470,9 +2404,9 @@ Test.Aura.Controller.ActionTest = function() {
         }
 
         [ Fact ]
-        function ThrowsIfParentAlreadySet() {
+        function ThrowsIfParentNotAbortable() {
             var target = new Action();
-            var expected = "You may only set the parent action once, and it must be before enqueueing:PROVIDED";
+            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: [object Object]";
             var actual;
 
             mockContext(function() {
@@ -2481,7 +2415,50 @@ Test.Aura.Controller.ActionTest = function() {
 
                 actual = Record.Exception(function() {
                     target.setParentAction({
-                        auraType : "Action"
+                        auraType : "Action",
+                        abortable : false
+                    });
+                })
+            });
+            Assert.Equal(expected, actual);
+        }
+
+        [ Fact ]
+        function ThrowsIfParentNotEnqueued() {
+            var target = new Action();
+            var expected = "Action.setParentAction(): The provided parent action must be enqueued: [object Object]";
+            var actual;
+
+            mockContext(function() {
+                target.abortableId = true;
+                target.getStorageKey = function(){ return "PROVIDED" };
+
+                actual = Record.Exception(function() {
+                    target.setParentAction({
+                        auraType : "Action",
+                        abortable : true
+                    });
+                })
+            });
+            Assert.Equal(expected, actual);
+        }
+
+
+        [ Fact ]
+        function ThrowsIfParentAlreadySet() {
+            var target = new Action();
+            var expected = "Action.setParentAction(): The abortable group is already set, call setParentAction before enqueueing : PROVIDED";
+            var actual;
+
+            mockContext(function() {
+                target.abortableId = true;
+                target.getStorageKey = function(){ return "PROVIDED" };
+
+                actual = Record.Exception(function() {
+                    target.setParentAction({
+                        auraType : "Action",
+                        abortable : true,
+                        abortableId : "value"
                     });
                 })
             });

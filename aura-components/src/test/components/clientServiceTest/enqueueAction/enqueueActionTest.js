@@ -1435,6 +1435,45 @@
             $A.test.assertTrue(cmp._aborted4, "new parented action should have remained aborted");
         } ]
     },
+
+    /**
+     * Test for an action that is parented to a storable action that gets refreshed.
+     */
+    testParentingToStored : {
+        test : [
+            function(cmp) {
+                var a = this.getAction(cmp, "c.execute", "APPEND parent; READ;", function(a) {}, false, true);
+                a.setStorable({"refresh":0});
+                $A.enqueueAction(a);
+                // Trick our next action into returning a different value so that we get a refresh.
+                var a = this.getAction(cmp, "c.execute", "APPEND blah;", function(a) {}, false, true);
+                $A.enqueueAction(a);
+            },
+            function(cmp) {
+                var that = this;
+                // This action will load from storage first.
+                var parent = this.getAction(cmp, "c.execute", "APPEND parent; READ;", function(a) {
+                        that.log(cmp, "parent: "+a.getReturnValue());
+                        if (a.isFromStorage()) {
+                            var b = that.getAction(cmp, "c.execute", "APPEND child; READ;", function(x) {
+                                    that.log(cmp, "child: "+x.getReturnValue());
+                                }, false, true);
+                            b.setParentAction(parent);
+                            $A.enqueueAction(b);
+                        }
+                    }, false, true);
+                parent.setStorable({"refresh":0});
+                $A.enqueueAction(parent);
+
+                // From the stored action
+                this.addWaitForLog(cmp, 0, "parent: parent");
+                // From the refresh
+                this.addWaitForLog(cmp, 1, "parent: blah,parent");
+                // and the second action
+                this.addWaitForLog(cmp, 2, "child: child");
+            }
+        ]
+    },
     
     /**
      * What happens if action parented to unqueued parent?

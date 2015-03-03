@@ -62,6 +62,58 @@ public class BrowserInfo {
         DESKTOP, TABLET, PHONE
     }
 
+
+    /**
+     * Viewport form factor for browser client devices.
+     *
+     */
+    public enum ViewportFormFactor {
+        LARGE("lg", FormFactor.DESKTOP),
+        MEDIUM("md", FormFactor.TABLET),
+        SMALL("sm", FormFactor.PHONE);
+
+        private final String shortName;
+        private final FormFactor formFactor;
+
+        ViewportFormFactor(String shortName, FormFactor formFactor) {
+            this.shortName = shortName;
+            this.formFactor = formFactor;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public FormFactor getFormFactor() {
+            return formFactor;
+        }
+
+        public static ViewportFormFactor fromShortName(String shortName) {
+            for (ViewportFormFactor vff : ViewportFormFactor.values()) {
+                if (vff.getShortName().equals(shortName)) {
+                    return vff;
+                }
+            }
+            return null;
+        }
+
+        private static String FORMFACTOR_UA = "auraff/";
+
+        public static ViewportFormFactor fromUserAgent(String userAgentString) {
+            if (userAgentString!=null) {
+                int vpffIndex = userAgentString.indexOf(FORMFACTOR_UA);
+                if (vpffIndex>-1) {
+                    vpffIndex = vpffIndex + FORMFACTOR_UA.length();
+                    if (vpffIndex+1<userAgentString.length()) {
+                        String shortName = userAgentString.substring(vpffIndex, vpffIndex + 2);
+                        return fromShortName(shortName);
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
     private final String userAgentString;
     private boolean isTablet;
     private boolean isPhone;
@@ -82,6 +134,7 @@ public class BrowserInfo {
     private boolean isWindowsPhone;
     private boolean isWindowsTablet;
     private boolean isBlackBerry;
+    private ViewportFormFactor viewportFormFactor;
 
     public BrowserInfo(String userAgentString) {
         if (userAgentString == null) {
@@ -174,6 +227,7 @@ public class BrowserInfo {
         isWindowsPhone = false;
         isWindowsTablet = false;
         formFactor = FormFactor.DESKTOP.toString();
+        viewportFormFactor = ViewportFormFactor.LARGE;
         platformType = 0;
         browserType = 0;
 
@@ -195,7 +249,11 @@ public class BrowserInfo {
         isIE9 = isBrowserIE9();
         isIE10 = isBrowserIE10();
         isIE11 = isBrowserIE11();
+
+        // Calculate viewportFormFactor 1st.  It may directly override what getHardwareFormFactor() returns
+        viewportFormFactor = ViewportFormFactor.fromUserAgent(userAgentString);
         formFactor = getHardwareFormFactor().toString();
+
         isTablet = isTabletClient();
         isPhone = isSmartPhoneClient();
         isWindowsPhone = isPlatformWindowsPhone();
@@ -548,6 +606,9 @@ public class BrowserInfo {
      * @return a FormFactor value
      */
     public FormFactor getHardwareFormFactor() {
+        if (viewportFormFactor!=null) {
+            return viewportFormFactor.getFormFactor();
+        }
         if (isBrowserMobile()) {
             // iOS devices are the most common and fastest to check, so do first
             if (isPlatformIPhone()) {
@@ -568,4 +629,5 @@ public class BrowserInfo {
         // default
         return FormFactor.DESKTOP;
     }
+
 }

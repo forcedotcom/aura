@@ -16,7 +16,12 @@
 
 -->
 <aura:component access="GLOBAL" implements="ui:visible" extensible="true" support="GA" description="Displays the phone number in a URL link format.">
+
+    <aura:import library="ui:eventLib" property="lib"/>
+
     <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The phone number displayed when this component is rendered."/>
-    <a aura:id='link' class="{!v.class}" href="{!'tel:' + v.value}"></a>
+
+    <span aura:id='body' class="{!v.class}" dir="{!v.dir}"><!-- content will be added here --></span>
+
 </aura:component>
 

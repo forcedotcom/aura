@@ -16,27 +16,33 @@
 /*jslint sub: true */
 var p = MetricsService.prototype;
 exp(p,
-    "initMetrics"        , p.initMetrics,
-    "instrument"         , p.instrument,
-    "unInstrument"       , p.unInstrument,
-    "getBootstrapMetrics", p.getBootstrapMetrics,
-    "registerBeacon"     , p.registerBeacon,
-    "clearMarks"         , p.clearMarks,
+    "instrument"             , p.instrument,
+    "unInstrument"           , p.unInstrument,
+    "getBootstrapMetrics"    , p.getBootstrapMetrics,
+    "registerBeacon"         , p.registerBeacon,
+    "clearMarks"             , p.clearMarks,
 
     // plugin API
-    "registerPlugin"     , p.registerPlugin,
-    "disablePlugins"     , p.disablePlugins,
-    "disablePlugin"      , p.disablePlugin,
-    "enablePlugins"      , p.enablePlugins,
-    "enablePlugin"       , p.enablePlugin,
+    "registerPlugin"         , p.registerPlugin,
+    "disablePlugins"         , p.disablePlugins,
+    "disablePlugin"          , p.disablePlugin,
+    "enablePlugins"          , p.enablePlugins,
+    "enablePlugin"           , p.enablePlugin,
 
     // mark API
-    "mark"               , p.mark,
-    "markStart"          , p.markStart,
-    "markEnd"            , p.markEnd,
+    "mark"                   , p.mark,
+    "markStart"              , p.markStart,
+    "markEnd"                , p.markEnd,
+
     // transaction API
-    "transaction"        , p.transaction,
-    "transactionStart"   , p.transactionStart,
-    "transactionEnd"     , p.transactionEnd,
-    "inTransaction"      , p.inTransaction
+    "transaction"                  , p.transaction,
+    "transactionStart"             , p.transactionStart,
+    "transactionEnd"               , p.transactionEnd,
+    "inTransaction"                , p.inTransaction,
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    "getTransactions"              , p.getTransactions,
+    "getTransaction"               , p.getTransaction,
+    "setClearCompletedTransactions", p.setClearCompletedTransactions,
+    //#end
+    "clearTransactions"            , p.clearTransactions
 );

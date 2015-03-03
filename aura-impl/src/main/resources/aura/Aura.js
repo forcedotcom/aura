@@ -1278,6 +1278,7 @@ window['aura'] = window['$A'];
 
 // **** Metrics Plugins ****
 // --------------------------
-// -Xinclude aura.metrics.plugins.TransportMetricsPlugin
-// -Xinclude aura.metrics.plugins.ServerActionsMetricsPlugin
-// -Xinclude aura.metrics.plugins.ClientServiceMetricsPlugin
+// #include aura.metrics.plugins.TransportMetricsPlugin
+// #include aura.metrics.plugins.ServerActionsMetricsPlugin
+// #include aura.metrics.plugins.ClientServiceMetricsPlugin
+// #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}

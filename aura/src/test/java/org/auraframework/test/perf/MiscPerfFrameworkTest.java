@@ -105,7 +105,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
         // check the data is returned and has expected fields
         List<Map<String, ?>> data = perfWebDriverUtil.getResourceTimingData();
-        assertTrue("num requests: " + data.size(), data.size() >= 5);
+        assertTrue("num requests: " + data.size(), data.size() >= 2);
         Map<String, ?> entry = data.get(0);
         assertTrue(entry.containsKey("startTime"));
         assertTrue(entry.containsKey("connectStart"));

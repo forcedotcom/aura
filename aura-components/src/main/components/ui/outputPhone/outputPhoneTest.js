@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 ({
-    /**
-     * outputPhone blank value attribute results in nothing displayed.
-     */
-    testEmptyValue:{
-        attributes : {value: ''},
-        test: function(component){
-        aura.test.assertEquals("", $A.test.getText(component.find('link').getElement()), "When value is initialized to an empty string, expecting empty link");
-        //aura.test.assertTrue($A.util.isUndefinedOrNull(component.find('link').getElement()), "When value is initialized to an empty string, component should not have DOM elements.");
+    testEmptyValue: {
+        attributes: {value: ''},
+        test: function (component) {
+            aura.test.assertEquals("", $A.test.getText(component.getElement()), "When value is initialized to an empty string, expecting empty link");
+            if ($A.get("$Browser.formFactor") === "PHONE") {
+                aura.test.assertEquals(null, this.getAnchor(component), "Link not empty");
+            }
         }
     },
 
-    /**
-     * outputPhone displays basic phone number as link.
-     */
-    testValue: {
-        attributes : {value : '+1 (415) 867-5309'},
-        test: function(component){
-            aura.test.assertEquals('+1 (415) 867-5309', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
-            aura.test.assertTrue(aura.test.contains(unescape(component.find('link').getElement().href),'tel:+1(415)867-5309'), "Link not correct");
+    testNoLinkOnDesktop: {
+        attributes: {value: '+1 (415) 867-5309'},
+        test: function (component) {
+            if ($A.get("$Browser.formFactor") !== "PHONE") {
+                aura.test.assertNotEquals('a', this.getAnchor(component).tagName, "Anchor should not be present on non-phone systems");
+            }
+        }
+    },
+
+    testLinkOnPhone: {
+        attributes: {value: '+1 (415) 867-5309'},
+        test: function (component) {
+            if ($A.get("$Browser.formFactor") == "PHONE") {
+                aura.test.assertEquals('tel:+1(415)867-5309', unescape(this.getAnchor(component).href), "Link not correct");
+            }
         }
     },
 
@@ -41,10 +47,10 @@
      */
     // https://gus.soma.salesforce.com/a07B0000000FDmFIAW
     testValueContainsAsterisk: {
-        attributes : {value : '867-5309*222'},
-        test: function(component){
-            aura.test.assertEquals('867-5309*222', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
-            aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
+        attributes: {value: '867-5309*222'},
+        test: function (component) {
+            aura.test.assertEquals('867-5309*222', $A.test.getText(component.getElement()), "Visible phone number not correct");
+            aura.test.assertNotEquals('a', this.getAnchor(component).tagName, "Number with asterisk is considered uncallable");
         }
     },
 
@@ -53,10 +59,10 @@
      */
     // https://gus.soma.salesforce.com/a07B0000000FDmFIAW
     testValueStartsWithAsterisk: {
-        attributes : {value : '*69'},
-        test: function(component){
-            aura.test.assertEquals('*69', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
-            aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
+        attributes: {value: '*69'},
+        test: function (component) {
+            aura.test.assertEquals('*69', $A.test.getText(component.getElement()), "Visible phone number not correct");
+            aura.test.assertNotEquals('a', this.getAnchor(component).tagName, "Number with asterisk is considered uncallable");
         }
     },
 
@@ -65,10 +71,10 @@
      */
     // https://gus.soma.salesforce.com/a07B0000000FDmFIAW
     testValueContainsPound: {
-        attributes : {value : '867-5309 # 2222'},
-        test: function(component){
-            aura.test.assertEquals('867-5309 # 2222', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
-            aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
+        attributes: {value: '867-5309 # 2222'},
+        test: function (component) {
+            aura.test.assertEquals('867-5309 # 2222', $A.test.getText(component.getElement()), "Visible phone number not correct");
+            aura.test.assertNotEquals('a', this.getAnchor(component).tagName, "Number with # is considered uncallable");
         }
     },
 
@@ -77,22 +83,67 @@
      */
     // https://gus.soma.salesforce.com/a07B0000000FDmFIAW
     testValueStartsWithPound: {
-        attributes : {value : '#2222'},
-        test: function(component){
-            aura.test.assertEquals('#2222', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
-            aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
+        attributes: {value: '#2222'},
+        test: function (component) {
+            aura.test.assertEquals('#2222', $A.test.getText(component.getElement()), "Visible phone number not correct");
+            aura.test.assertNotEquals('a', this.getAnchor(component).tagName, "Number with # is considered uncallable");
         }
     },
-    
+
     /**
      * outputPhone with leading and trailing whitespaces
      */
     testValueWithWhitespaces: {
-        attributes : {value : '   555-1234   '},
-        test: function(component){
-            var link = component.find('link').getElement();
-            aura.test.assertTrue(aura.test.contains($A.test.getText(link), '555-1234'), "Visible phone number not correct");
-            aura.test.assertEquals('tel:555-1234', link.href, "Link not correct");
+        attributes: {value: '   555-1234   '},
+        test: function (component) {
+            if ($A.get("$Browser.formFactor") == "PHONE") {
+                var body = component.getElement();
+                aura.test.assertTrue(aura.test.contains($A.test.getText(body), '555-1234'), "Visible phone number not correct");
+                aura.test.assertEquals('tel:555-1234', this.getAnchor(component).href, "Link not correct");
+            }
         }
+    },
+    testResetValue: {
+        attributes : {value: '4154154155'},
+        test: [function(component) {
+            aura.test.assertEquals('(415) 415-4155', $A.test.getText(component.getElement()), "Visible phone number not correct");
+
+            component.set("v.value", null);
+        }, function(component){
+            aura.test.assertEquals('', $A.test.getText(component.getElement()), "Visible phone number not correct");
+        }]
+    },
+
+    testNorthAmericaPhoneFormatting: {
+        attributes : {value: '4154154155'},
+        test: function(component) {
+            aura.test.assertEquals('(415) 415-4155', $A.test.getText(component.getElement()), "Visible phone number not formatted");
+        }
+    },
+
+    testExtensionPreserved: {
+        attributes : {value: '4154154155 #123'},
+        test: function(component) {
+            aura.test.assertEquals('(415) 415-4155 #123', $A.test.getText(component.getElement()), "Visible phone number not formatted");
+        }
+    },
+
+    testNonNorthAmericanNumbersNotFormatted: {
+        attributes : {value: '+442012341234'},
+        test: function(component) {
+            aura.test.assertEquals('+442012341234', $A.test.getText(component.getElement()), "Visible phone number not formatted");
+        }
+    },
+
+    testNorthAmericaPrefixRemoved: {
+        attributes : {value: '14154154155'},
+        test: function(component) {
+            aura.test.assertEquals('(415) 415-4155', $A.test.getText(component.getElement()), "Prefix not removed, or number not formatted.");
+        }
+    },
+
+    getAnchor: function (component) {
+        return component.getElement().firstChild;
     }
+
 })

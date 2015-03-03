@@ -32,22 +32,37 @@ public enum AuraImplFiles {
     /**
      * Aura-Impl-Test Module Root dir
      */
-    AuraImplTestModuleDirectory(AuraImplModuleDirectory.getPath(), "src/test"),
+    AuraImplTestModuleDirectory(AuraImplModuleDirectory.getPath(), "src", "test"),
     /**
      * javascript source directory
      */
-    AuraJavascriptSourceDirectory(AuraImplModuleDirectory.getPath(), "src/main/resources"),
+    AuraJavascriptSourceDirectory(AuraImplModuleDirectory.getPath(), "src", "main" , "resources"),
+
+    /**
+     * aura-resources Module Root dir
+     */
+    AuraResourcesModuleDirectory(AuraFiles.Core.getPath(), "aura-resources"),
+
+    AuraResourcesSrcGenDirectory(AuraResourcesModuleDirectory.getPath(), "target", "src-gen", "main",
+            "resources", "aura"),
+
     /**
      * javascript destination directory to generate into, in the resources
      * module
      */
-    AuraResourceJavascriptDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "src-gen", "main",
-            "resources", "aura", "javascript"),
+    AuraResourceJavascriptDirectory(AuraResourcesSrcGenDirectory.getPath(), "javascript"),
+
+    /**
+     * javascript destination directory to generate into, in the resources
+     * module
+     */
+    AuraResourcesSrcGenResourcesDirectory(AuraResourcesSrcGenDirectory.getPath(), "resources"),
+
     /**
      * the other javascript destination directory that we have to regenerate
      * into, also in the resources module
      */
-    AuraResourceJavascriptClassDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "classes", "aura",
+    AuraResourceJavascriptClassDirectory(AuraResourcesModuleDirectory.getPath(), "target", "classes", "aura",
             "javascript"),
     /**
      * javascript source file directory for xUnit tests 
@@ -58,17 +73,13 @@ public enum AuraImplFiles {
      */
     AuraResourceJavascriptTestDirectory(AuraImplModuleDirectory.getPath(), "target", "xunitjs"),
 
-    /**
-     * aura-resources Module Root dir
-     */
-    AuraResourcesModuleDirectory(AuraFiles.Core.getPath(), "aura-resources"),
-
-    AuraResourcesClassDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "classes", "aura", "resources"),
+    AuraResourcesClassDirectory(AuraResourcesModuleDirectory.getPath(), "target", "classes", "aura", "resources"),
 
     /**
      * aura-resources source directory
      */
-    AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src/main/resources/aura/resources");
+    AuraResourcesSourceDirectory(AuraResourcesModuleDirectory.getPath(), "src", "main", "resources",
+            "aura", "resources");
 
     private final String path;
 

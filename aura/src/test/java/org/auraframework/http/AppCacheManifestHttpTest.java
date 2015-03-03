@@ -341,7 +341,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         
         //Verify the urls of uncombinable resources
         assertTrue("Missing UIPerf", responseString.contains("/UIPerf/UIPerf") || responseString.contains("perf/ormance.js"));
-        assertTrue("Missing Moment", responseString.contains("/moment/moment.js"));
-        assertTrue("Missing Walltime", responseString.contains("walltime-js/walltime.js"));
+        assertTrue("Missing combined libs", responseString.contains("/libs"));
     }
 }

@@ -82,6 +82,20 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>combine-libraries</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <java classname="org.auraframework.tools.javascript.CombineJavascriptLibraries" classpathref="maven.runtime.classpath" fork="true" maxmemory="512m" failonerror="true">
+                                    <jvmarg value="-Daura.home=${basedir}/.." />
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

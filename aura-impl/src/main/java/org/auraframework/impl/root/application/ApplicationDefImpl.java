@@ -27,6 +27,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
@@ -65,8 +66,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
         this.themeDescriptors = AuraUtil.immutableList(builder.themeDescriptors);
+        this.defaultFlavorsDescriptor = builder.defaultFlavorsDescriptor;
 
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptors);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptors, defaultFlavorsDescriptor);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -76,6 +78,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
         public List<DefDescriptor<ThemeDef>> themeDescriptors = Lists.newArrayList();
+        public DefDescriptor<FlavorAssortmentDef> defaultFlavorsDescriptor;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -96,6 +99,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         @Override
         public ApplicationDefBuilder appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) {
             themeDescriptors.add(themeDescriptor);
+            return this;
+        }
+
+        @Override
+        public Builder setDefaultFlavorsDescriptor(DefDescriptor<FlavorAssortmentDef> defaultFlavorsDescriptor) {
+            this.defaultFlavorsDescriptor = defaultFlavorsDescriptor;
             return this;
         }
     }
@@ -150,6 +159,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         for (DefDescriptor<ThemeDef> themeDescriptor : themeDescriptors) {
             dependencies.add(themeDescriptor);
+        }
+
+        if (defaultFlavorsDescriptor != null) {
+            dependencies.add(defaultFlavorsDescriptor);
         }
 
         if (locationChangeEventDescriptor != null) {
@@ -255,6 +268,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
+    public DefDescriptor<FlavorAssortmentDef> getDefaultFlavorsDescriptor() {
+        return defaultFlavorsDescriptor;
+    }
+
+    @Override
     public int hashCode() {
         return hashCode;
     }
@@ -265,7 +283,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             ApplicationDefImpl other = (ApplicationDefImpl) obj;
 
             return super.equals(obj)
-                    && Objects.equal(this.themeDescriptors, other.themeDescriptors);
+                    && Objects.equal(this.themeDescriptors, other.themeDescriptors)
+                    && Objects.equal(this.defaultFlavorsDescriptor,  other.defaultFlavorsDescriptor);
         }
 
         return false;
@@ -274,6 +293,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final List<DefDescriptor<ThemeDef>> themeDescriptors;
+    private final DefDescriptor<FlavorAssortmentDef> defaultFlavorsDescriptor;
     private final int hashCode;
 
     private final Boolean isAppcacheEnabled;

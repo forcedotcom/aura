@@ -19,13 +19,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
+import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.impl.css.parser.plugin.AuraFlavorPlugin;
+import org.auraframework.impl.css.parser.plugin.SelectorScopingPlugin;
+import org.auraframework.impl.css.parser.plugin.ThemeFunctionPlugin;
+import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import com.salesforce.omakase.Omakase;
 import com.salesforce.omakase.PluginRegistry;
@@ -110,7 +116,7 @@ public final class CssPreprocessor {
             return this;
         }
 
-        /** replacement class name (no dot), e.g., "uiButton" */
+        /** replacement class name (no dot), e.g., "uiButton", this enables selector scoping (.THIS enforcement) */
         public ParserConfiguration componentClass(String componentClass, boolean validate) {
             if (!runtime) {
                 plugins.add(new SelectorScopingPlugin(componentClass, validate));
@@ -119,8 +125,14 @@ public final class CssPreprocessor {
         }
 
         /** enables aura themes */
-        public ParserConfiguration themes(DefDescriptor<StyleDef> styleDef) throws QuickFixException {
-            plugins.add(runtime ? ThemeFunctionPlugin.resolving(styleDef) : ThemeFunctionPlugin.passthrough(styleDef));
+        public ParserConfiguration themes(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
+            plugins.add(runtime ? ThemeFunctionPlugin.resolving(style) : ThemeFunctionPlugin.passthrough(style));
+            return this;
+        }
+
+        /** enables aura flavors processing */
+        public ParserConfiguration flavors(DefDescriptor<FlavoredStyleDef> flavor) {
+            plugins.add(new AuraFlavorPlugin(flavor));
             return this;
         }
 
@@ -172,10 +184,20 @@ public final class CssPreprocessor {
 
             // return the results
             ParserResult result = new ParserResult();
-            result.content = writer.write();
 
-            if (registry.retrieve(ThemeFunctionPlugin.class).isPresent()) {
-                result.themeExpressions = registry.retrieve(ThemeFunctionPlugin.class).get().parsedExpressions();
+            result.content = writer.write();
+            if (mode.isDevMode()) {
+                result.content += "\n"; // in dev mode print an extra new line after each stylesheet for readability
+            }
+
+            Optional<ThemeFunctionPlugin> themeFunctionPlugin = registry.retrieve(ThemeFunctionPlugin.class);
+            if (themeFunctionPlugin.isPresent()) {
+                result.themeExpressions = themeFunctionPlugin.get().parsedExpressions();
+            }
+
+            Optional<AuraFlavorPlugin> auraFlavorPlugin = registry.retrieve(AuraFlavorPlugin.class);
+            if (auraFlavorPlugin.isPresent()) {
+                result.flavorNames = auraFlavorPlugin.get().flavorNames();
             }
 
             return result;
@@ -184,8 +206,9 @@ public final class CssPreprocessor {
 
     /** Result of calling {@link ParserConfiguration#parse()} */
     public static final class ParserResult {
-        protected String content;
-        protected Set<String> themeExpressions;
+        private String content;
+        private Set<String> themeExpressions;
+        private Set<String> flavorNames;
 
         /** parsed content */
         public String content() {
@@ -195,6 +218,11 @@ public final class CssPreprocessor {
         /** all theme references found in the source */
         public Set<String> themeExpressions() {
             return themeExpressions;
+        }
+
+        /** all flavors names found in the source */
+        public Set<String> flavorNames() {
+            return flavorNames;
         }
     }
 }

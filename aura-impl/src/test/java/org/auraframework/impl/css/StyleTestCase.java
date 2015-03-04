@@ -21,11 +21,16 @@ import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.css.util.Flavors;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -69,6 +74,16 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
     }
 
+    /** gets the name of the first namespace */
+    public String getNs1() {
+        return ns1;
+    }
+
+    /** gets the name of the second namespace */
+    public String getNs2() {
+        return ns2;
+    }
+
     /** adds a {@link StyleDef} to the namespace with the given source */
     public DefDescriptor<StyleDef> addStyleDef(CharSequence src) {
         return addStyleDefToNamespace(ns1, src);
@@ -87,13 +102,20 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         return desc;
     }
 
+    /** adds a {@link ComponentDef} to the namespace with the given source */
+    public DefDescriptor<ComponentDef> addComponentDef(CharSequence src) {
+        DefDescriptor<ComponentDef> cmp = DefDescriptorImpl.getInstance(
+                String.format("markup://%s:%s", getNs1(), getAuraTestingUtil().getNonce("testComponent")), ComponentDef.class);
+        return addSourceAutoCleanup(cmp, "<aura:component/>");
+    }
+
     /** gets the parsed output of the given style */
-    public String getParsedCss(DefDescriptor<StyleDef> styleDesc) throws QuickFixException {
+    public String getParsedCss(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
         return styleDesc.getDef().getCode();
     }
 
     /** gets the parsed output of the given style. This ensures the application explicit theme is registered */
-    public String getParsedCssUseAppTheme(DefDescriptor<StyleDef> styleDesc) throws QuickFixException {
+    public String getParsedCssUseAppTheme(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
         // ensures app's theme is added to the context
         Aura.getContextService().getCurrentContext().addAppThemeDescriptors();
         return styleDesc.getDef().getCode();
@@ -182,6 +204,41 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         String fmt = String.format("%s.%s", ns1, "testApp");
         DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService().getDefDescriptor(fmt, StyleDef.class);
         return addSourceAutoCleanup(styleDesc, src.toString());
+    }
+
+    /** adds a flavor def for the given component in the same bundle */
+    public DefDescriptor<FlavoredStyleDef> addStandardFlavor(DefDescriptor<ComponentDef> flavored, CharSequence src) {
+        DefDescriptor<FlavoredStyleDef> desc = Flavors.standardFlavorDescriptor(flavored);
+        addSourceAutoCleanup(desc, src.toString());
+        return desc;
+    }
+
+    /** adds a flavor def for the given component, but in a different namespace and within a bundle called "flavors". */
+    public DefDescriptor<FlavoredStyleDef> addCustomFlavor(DefDescriptor<ComponentDef> flavored, CharSequence src) {
+        DefDescriptor<FlavoredStyleDef> desc = Flavors.customFlavorDescriptor(flavored, ns2, "flavors");
+        addSourceAutoCleanup(desc, src.toString());
+        return desc;
+    }
+
+    /** adds a flavor def for the given component, in the same namespace and within a bundle called "flavors". */
+    public DefDescriptor<FlavoredStyleDef> addCustomFlavorSameNamespace(DefDescriptor<ComponentDef> flavored, CharSequence src) {
+        DefDescriptor<FlavoredStyleDef> desc = Flavors.customFlavorDescriptor(flavored, ns1, "flavors");
+        addSourceAutoCleanup(desc, src.toString());
+        return desc;
+    }
+
+    public DefDescriptor<FlavorAssortmentDef> addFlavorAssortment(CharSequence src) {
+        DefDescriptor<FlavorAssortmentDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                ns1 + ":" + getAuraTestingUtil().getNonce("fa_"), FlavorAssortmentDef.class);
+        addSourceAutoCleanup(desc, src.toString());
+        return desc;
+    }
+
+    public DefDescriptor<FlavorAssortmentDef> addFlavorAssortmentOtherNamespace(CharSequence src) {
+        DefDescriptor<FlavorAssortmentDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                ns2 + ":" + getAuraTestingUtil().getNonce("fa_"), FlavorAssortmentDef.class);
+        addSourceAutoCleanup(desc, src.toString());
+        return desc;
     }
 
     /** helper for building a theme string source */

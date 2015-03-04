@@ -22,6 +22,7 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DesignDef;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
@@ -60,4 +61,19 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> setFacet(String key, Object value);
 
     BaseComponentDefBuilder<T> addClientLibrary(ClientLibraryDef clientLibrary);
+
+    /**
+     * Specifies that this component has a child component def ref (e.g., html element) that has aura:flavorable.
+     *
+     * @see FlavoredStyleDef
+     */
+    BaseComponentDefBuilder<T> setHasFlavorableChild(boolean hasFlavorableChild);
+
+    /**
+     * Specifies the default flavor (the name of a flavor in the component bundle flavor def).
+     *
+     * @param defaultFlavor Name of a flavor in the component bundle {@link FlavoredStyleDef}, e.g., "primary".
+     * @see FlavoredStyleDef
+     */
+    BaseComponentDefBuilder<T> setDefaultFlavor(String defaultFlavor);
 }

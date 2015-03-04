@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -30,6 +31,7 @@ import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -98,6 +100,12 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
             if (loadVal == Load.LAZY || loadVal == Load.EXCLUSIVE) {
                 ((BaseComponentDefHandler) getParentHandler()).setRender("client");
             }
+        }
+
+        String flavor = getSystemAttributeValue("flavor");
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(flavor)) {
+            DefDescriptor<ComponentDef> flavoredCmp = builder.getDescriptor();
+            builder.setFlavor(Flavors.buildFlavorRef(flavoredCmp, flavor));
         }
     }
 
@@ -168,7 +176,11 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {
-            body.add(getDefRefHandler(getParentHandler()).getElement());
+            ComponentDefRef cdr = getDefRefHandler(getParentHandler()).getElement();
+            if (cdr.isFlavorable() || cdr.hasFlavorableChild()) {
+                builder.setHasFlavorableChild(true);
+            }
+            body.add(cdr);
         }
     }
 

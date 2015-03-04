@@ -101,7 +101,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
 
     /**
      * An attribute cannot be assigned multiple times on a System tag.
-     * 
+     *
      * @throws Exception
      */
     public void testDuplicateAttributeOnSystemTag() throws Exception {
@@ -139,5 +139,46 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(fmt, ComponentDef.class);
         addSourceAutoCleanup(cmpDesc, "<aura:component/>");
         assertEquals(themeDesc, cmpDesc.getDef().getCmpTheme());
+    }
+
+    public void testHasFlavorableChildFalse() throws Exception {
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
+                "<aura:component></aura:component>", "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
+        assertFalse(cd.hasFlavorableChild());
+    }
+
+    public void testHasFlavorableChildTrue() throws Exception {
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
+                "<aura:component><div aura:flavorable='true'></div></aura:component>", "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
+        assertTrue(cd.hasFlavorableChild());
+    }
+
+    public void testHasFlavorableChildTrueNested() throws Exception {
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
+                "<aura:component><div><div aura:flavorable='true'></div></div></aura:component>", "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
+        assertTrue(cd.hasFlavorableChild());
+    }
+
+    public void testHasFlavorableChildTrueNestedDeep() throws Exception {
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
+                "<aura:component><div><div><div><div aura:flavorable='true'></div></div></div></div></aura:component>",
+                "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
+        assertTrue(cd.hasFlavorableChild());
+    }
+
+    public void testHasDefaultFlavor() throws Exception {
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
+                "<aura:component defaultFlavor='test'></aura:component>", "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
+        assertEquals("test", cd.getDefaultFlavor());
     }
 }

@@ -34,9 +34,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.instance.Versionable;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -48,7 +46,6 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
@@ -64,11 +61,11 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
- * 
+ *
  * This 'master' definition registry is actually a single threaded, per request registry that caches certain things in
  * what is effectively a thread local cache. This means that once something is pulled into the local thread, it will not
  * change.
- * 
+ *
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
@@ -260,6 +257,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case RENDERER:
             case HELPER:
             case STYLE:
+            case FLAVORED_STYLE:
             case TYPE:
             case RESOURCE:
             case PROVIDER:
@@ -284,6 +282,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case THEME:
             case THEME_DEF_REF:
             case VAR:
+            case FLAVOR_ASSORTMENT:
+            case FLAVOR_INCLUDE:
             case DESIGN:
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:

@@ -121,4 +121,16 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("div", cd.getAttributeDefRef("tag").getValue());
     }
 
+    public void testReadFlavorable() throws Exception {
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(desc,"<div aura:flavorable='true'></div>", "myID", Format.XML);
+        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlReader.next();
+        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
+        HTMLComponentDefRefHandler<?> h = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source);
+        h.readAttributes();
+        h.readSystemAttributes();
+        ComponentDefRef cd = h.createDefinition();
+        assertTrue(cd.isFlavorable());
+    }
 }

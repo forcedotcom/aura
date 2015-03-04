@@ -17,8 +17,10 @@ package org.auraframework.adapter;
 
 import java.util.List;
 
+import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
+import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
@@ -35,29 +37,38 @@ public interface StyleAdapter extends AuraAdapter {
      * Gets a {@link ThemeValueProvider} using whatever theme overrides are set on the current {@link AuraContext}. This
      * is usually the method you want.
      *
-     * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
-     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
+     * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
+     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
+     *            (if applicable).
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor) throws QuickFixException;
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException;
+
+    /**
+     * Gets a {@link ThemeValueProvider}.
+     * <p>
+     * The given {@link ResolveStrategy} determines which overrides are automatically included. If
+     * {@link ResolveStrategy#RESOLVE_NORMAL} then this will use whatever theme overrides are set on the current
+     * {@link AuraContext}. Otherwise, no overrides will be automatically included.
+     *
+     * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
+     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
+     *            (if applicable).
+     * @param strategy An indication of how this provider is going to be used.
+     */
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy)
+            throws QuickFixException;
 
     /**
      * Gets a {@link ThemeValueProvider} using the given overrides.
      *
-     * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
-     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
-     * @param overrideThemes The {@link ThemeList} containing the override themes.
+     * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
+     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
+     *            (if applicable).
+     * @param strategy An indication of how this provider is going to be used.
+     * @param overrides The {@link ThemeList} containing the override themes.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, ThemeList overrideThemes)
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy, ThemeList overrides)
             throws QuickFixException;
-
-    /**
-     * Gets a {@link ThemeValueProvider} that doesn't use any override theme (even if one is set on the current
-     * {@link AuraContext}).
-     *
-     * @param descriptor The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
-     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use.
-     */
-    ThemeValueProvider getThemeValueProviderNoOverrides(DefDescriptor<StyleDef> descriptor) throws QuickFixException;
 
     /**
      * Gets <em>additional</em> CSS {@link Plugin}s to run during the initial preprocessing phase of {@link StyleDef}s.

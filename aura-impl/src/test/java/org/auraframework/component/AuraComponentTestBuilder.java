@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.DescriptorFileMapper;
@@ -167,6 +166,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case RENDERER:
         case HELPER:
         case STYLE:
+        case FLAVORED_STYLE:
         case RESOURCE:
         case TYPE:
         case PROVIDER:
@@ -190,6 +190,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case ATTRIBUTE_DESIGN:
         case DESIGN_TEMPLATE:
         case DESIGN_TEMPLATE_REGION:
+        case FLAVOR_INCLUDE:
             qualified = name;
             break;
         case APPLICATION:
@@ -204,6 +205,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case THEME:
         case DESIGN:
         case SVG:
+        case FLAVOR_ASSORTMENT:
             qualified = String.format("%s:%s", ns, name);
             break;
         }

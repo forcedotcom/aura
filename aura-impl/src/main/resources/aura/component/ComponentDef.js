@@ -132,7 +132,11 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     this.cmpHandlerDefs = cmpHandlerDefs || null;
     this.valueHandlerDefs = valueHandlerDefs || null;
     this.isCSSPreloaded = config["isCSSPreloaded"] || false;
-
+    
+    if (config["defaultFlavor"]) {
+        this.defaultFlavor = config["defaultFlavor"];
+    }
+    
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"]);
     
     this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
@@ -285,6 +289,15 @@ $A.ns.ComponentDef.prototype.getStyleClassName = function() {
  */
 $A.ns.ComponentDef.prototype.getStyleDef = function() {
     return this.styleDef;
+};
+
+/**
+ * Gets the default flavor name.
+ * 
+ * @returns {String}
+ */
+$A.ns.ComponentDef.prototype.getDefaultFlavor = function() {
+    return this.defaultFlavor;
 };
 
 /**

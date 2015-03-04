@@ -26,6 +26,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.HTMLDefRefBuilderImpl;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -58,6 +59,16 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
     @Override
     protected void setBody(List<ComponentDefRef> body) {
         htmlBuilder.setComponentAttribute(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, body);
+    }
+
+    @Override
+    protected void readSystemAttributes() throws QuickFixException {
+        super.readSystemAttributes();
+
+        String flavorable = getSystemAttributeValue("flavorable");
+        if (flavorable != null && !flavorable.equals("false")) {
+            builder.setIsFlavorable(true);
+        }
     }
 
     public static final Set<String> SPECIAL_BOOLEANS = ImmutableSet.of("checked", "selected", "disabled", "readonly",

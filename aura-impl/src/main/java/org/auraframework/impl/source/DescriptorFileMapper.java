@@ -18,6 +18,8 @@ package org.auraframework.impl.source;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -38,10 +40,13 @@ public class DescriptorFileMapper {
 
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
+    /** match extensions such as Renderer.js, Flavors.css */
+    private static final Pattern EXT_PATTERN = Pattern.compile("[A-Z][a-z]+\\.[a-z]+$");
+
     public enum NameFormat {
         BUNDLE, // ! A 'bundle' file like controller, component, app, helper.
         BUNDLED_EXTRA, // ! An 'extra' file e.g. library include js file
-        NAMESPACE // ! a namespace .xml file (deprecated)
+        NAMESPACE, // ! A namespace .xml file (deprecated)
     };
 
     protected static final class ExtensionInfo {
@@ -68,6 +73,7 @@ public class DescriptorFileMapper {
 
     protected final static Map<String, ExtensionInfo> byExtension = Maps.newHashMapWithExpectedSize(32);
     private final static Map<String, Map<DefType, ExtensionInfo>> byCompound = Maps.newHashMapWithExpectedSize(8);
+    private final static Map<String, Map<String, ExtensionInfo>> byExtensionCompound = Maps.newHashMapWithExpectedSize(8);
     private final static Set<DefType> defTypes = Sets.newHashSet();
     private final static Set<String> prefixes = Sets.newHashSet();
 
@@ -75,12 +81,22 @@ public class DescriptorFileMapper {
             String prefix, DefType defType, Format format) {
         ExtensionInfo ei = new ExtensionInfo(extension, nameFormat, prefix, defType, format);
         byExtension.put(ei.extension.toLowerCase(), ei);
+
         Map<DefType, ExtensionInfo> defTypeMap = byCompound.get(ei.prefix.toLowerCase());
         if (defTypeMap == null) {
             defTypeMap = Maps.newHashMap();
             byCompound.put(ei.prefix.toLowerCase(), defTypeMap);
         }
         defTypeMap.put(defType, ei);
+
+        // index by extension => { prefix => ei } for cases where the extensions are the same
+        Map<String, ExtensionInfo> extMap = byExtensionCompound.get(extension);
+        if (extMap == null) {
+            extMap = Maps.newHashMap();
+            byExtensionCompound.put(extension, extMap);
+        }
+        extMap.put(ei.prefix.toLowerCase(), ei);
+
         defTypes.add(defType);
         prefixes.add(ei.prefix);
     }
@@ -108,6 +124,7 @@ public class DescriptorFileMapper {
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);
+        addExtension("Flavors.xml", NameFormat.BUNDLE, "markup", DefType.FLAVOR_ASSORTMENT, Format.XML);
         addExtension("Layouts.xml", NameFormat.BUNDLE, "markup", DefType.LAYOUTS, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);
@@ -123,10 +140,12 @@ public class DescriptorFileMapper {
         addExtension("Resource.css", NameFormat.BUNDLE, "templateCss", DefType.RESOURCE, Format.TEMPLATE_CSS);
         addExtension(".css", NameFormat.BUNDLE, "css", DefType.STYLE, Format.CSS);
         addExtension("Resource.css", NameFormat.BUNDLE, "css", DefType.RESOURCE, Format.CSS);
+        addExtension("Flavors.css", NameFormat.BUNDLED_EXTRA, DefDescriptor.CUSTOM_FLAVOR_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
+        addExtension("Flavors.css", NameFormat.BUNDLE, DefDescriptor.CSS_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
     }
 
     protected static DefDescriptor<? extends Definition> getDescriptor(String filename) {
-    	return getDescriptor(filename, FILE_SEPARATOR);    	
+    	return getDescriptor(filename, FILE_SEPARATOR);
     }
 
     protected static DefDescriptor<? extends Definition> getDescriptor(String filename, String separator) {
@@ -151,6 +170,7 @@ public class DescriptorFileMapper {
                         String.format(format, ei.prefix, ns, name), ei.defType.getPrimaryInterface());
             }
         }
+
         List<String> ext = AuraTextUtil.splitSimple(".", last);
         if (ext != null && ext.size() == 2) {
             ei = byExtension.get(ext.get(1).toLowerCase());
@@ -162,6 +182,20 @@ public class DescriptorFileMapper {
                 }
             }
         }
+
+        Matcher matcher = EXT_PATTERN.matcher(last);
+        if (matcher.find()) {
+            Map<String, ExtensionInfo> extMap = byExtensionCompound.get(matcher.group());
+            if (extMap != null) {
+                ei = extMap.get(DefDescriptor.CUSTOM_FLAVOR_PREFIX.toLowerCase());
+                if (ei != null) {
+                    return Aura.getDefinitionService().getDefDescriptor(
+                            String.format("%s://%s.%s", ei.prefix, ns, last.substring(0, matcher.start())),
+                            ei.defType.getPrimaryInterface());
+                }
+            }
+        }
+
         return null;
     }
 
@@ -180,9 +214,9 @@ public class DescriptorFileMapper {
 
     /**
      * The magic to convert a descriptor into a path.
-     * 
+     *
      * This handles all of the odd cases, including 'bundled' files like library includes.
-     * 
+     *
      * @param descriptor the descriptor for which we want a path.
      */
     protected String getPath(DefDescriptor<?> descriptor, String separator) {
@@ -230,7 +264,7 @@ public class DescriptorFileMapper {
     protected String getPath(DefDescriptor<?> descriptor) {
     	return getPath(descriptor, FILE_SEPARATOR);
     }
-    
+
     @SuppressWarnings("unchecked")
     protected <D extends Definition> DefDescriptor<D> updateDescriptorName(DefDescriptor<D> desc, String newNamespace,
             String newName) {

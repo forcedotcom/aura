@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.VarDef;
-import org.auraframework.impl.root.theme.VarDefImpl;
+import org.auraframework.impl.css.theme.VarDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;

@@ -26,6 +26,7 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.css.ThemeList;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -33,7 +34,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
-import org.auraframework.def.StyleDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
@@ -189,9 +189,9 @@ public class ServerServiceImpl implements ServerService {
         boolean skipCache = themeList.hasDynamicVars(); // for now, skip caching css with dynamic var overrides
 
         if (cached == null || skipCache) {
-            Collection<StyleDef> orderedStyleDefs = filterAndLoad(StyleDef.class, dependencies, null);
+            Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
             StringBuffer sb = new StringBuffer();
-            Aura.getSerializationService().writeCollection(orderedStyleDefs, StyleDef.class, sb, "CSS");
+            Aura.getSerializationService().writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
             cached = sb.toString();
 
             if (!skipCache) {
@@ -338,10 +338,10 @@ public class ServerServiceImpl implements ServerService {
 
     /**
      * Provide a better way of distinguishing templates from styles..
-     * 
+     *
      * This is used to apply the style definition filter for 'templates', but is getting rather further embedded in
      * code.
-     * 
+     *
      * TODO: W-1486762
      */
     private static interface TempFilter {
@@ -382,7 +382,7 @@ public class ServerServiceImpl implements ServerService {
 
     /**
      * Loops through list of javascript errors and return commented text to display
-     * 
+     *
      * @param errors list of javascript syntax errors
      * @return commented errors
      */

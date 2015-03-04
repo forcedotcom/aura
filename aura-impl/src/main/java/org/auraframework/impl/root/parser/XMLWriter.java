@@ -19,6 +19,7 @@ import java.io.Writer;
 import java.util.Map;
 
 import org.auraframework.def.Definition;
+import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -33,7 +34,6 @@ import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.root.library.ImportDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.parser.handler.*;
-import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 

@@ -1,0 +1,59 @@
+{
+  "componentDef":{
+    "serId":1,
+    "value":{
+      "descriptor":"markup://test:fakeComponentChild",
+      "superDef":{
+        "serId":2,
+        "value":{
+          "descriptor":"markup://aura:component",
+          "rendererDef":{
+            "serId":3,
+            "value":{
+              "descriptor":"js://aura.component",
+              "render":
+function(component) {
+        var rendering = component.getRendering();
+        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
+    },
+              "afterRender":
+function(component) {
+        var body = component.get("v.body");
+        $A.afterRender(body);
+    },
+              "rerender":
+function(component) {
+        var body = component.get("v.body");
+        return $A.renderingService.rerenderFacet(component,body);
+    },
+              "unrender":
+function(component) {
+        var body = component.get("v.body");
+        $A.renderingService.unrenderFacet(component,body);
+    }
+            }
+          },
+          "attributeDefs":[
+            {
+              "serId":4,
+              "value":{
+                "name":"body",
+                "type":"aura://Aura.Component[]"
+              }
+            }
+          ],
+          "interfaces":[
+            "markup://aura:rootComponent"
+          ],
+          "isAbstract":true
+        }
+      },
+      "attributeDefs":[
+        {
+          "serRefId":4
+        }
+      ]
+    }
+  },
+  "flavorable":true
+}

@@ -15,20 +15,6 @@
  */
 package org.auraframework.impl.source;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.auraframework.Aura;
-import org.auraframework.def.*;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.Parser.Format;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
-import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener.SourceMonitorEvent;
-import org.auraframework.system.SourceLoader;
-
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,17 +23,56 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.annotation.Nullable;
+
+import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.DesignDef;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.IncludeDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.LibraryDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.NamespaceDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.SVGDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.system.Parser.Format;
+import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.auraframework.system.SourceLoader;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 /**
  * This source loader allows tests to load and unload source from strings.
- * 
+ *
  * This loader is a singleton to ensure that it can be authoritative for the "string" namespace.
- * 
+ *
  * FIXME: W-1933490!!!! The namespaces map is very dangerous here, as it is mutable in ways that aura does not expect.
  * There is a lock to ensure that the read/modify/write operations that are used by source 'put' methods are atomic, but
  * that does not guarantee coherency. In particular, we may lie to aura and say that we have namespaces that we don't,
  * or provide descriptors via find that aura will not be able to find because it has a fixed idea of the namespaces
  * represented. This could be fixed by providing a fixed view into the namespaces provided.
- * 
+ *
  */
 public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
@@ -58,12 +83,12 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     private static final String DEFAULT_NAME_PREFIX = "thing";
     private static final Set<String> PREFIXES = ImmutableSet.of(
             DefDescriptor.MARKUP_PREFIX, DefDescriptor.JAVASCRIPT_PREFIX,
-            DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
+            DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX, DefDescriptor.CUSTOM_FLAVOR_PREFIX);
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
             DefType.INCLUDE, DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
             DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
-            DefType.TESTSUITE, DefType.RESOURCE, DefType.DESIGN);
+            DefType.TESTSUITE, DefType.RESOURCE, DefType.DESIGN, DefType.FLAVORED_STYLE);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls to add a source.
@@ -406,6 +431,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         PROVIDER(ProviderDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         STYLE(StyleDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
+        FLAVOR_STYLE(FlavoredStyleDef.class, Format.CSS, DefDescriptor.CUSTOM_FLAVOR_PREFIX, "."),
+        FLAVOR_ASSORTMENT(FlavorAssortmentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),

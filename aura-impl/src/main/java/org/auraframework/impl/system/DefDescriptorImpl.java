@@ -122,6 +122,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case RENDERER:
             case HELPER:
             case STYLE:
+            case FLAVORED_STYLE:
             case RESOURCE:
             case TYPE:
             case PROVIDER:
@@ -165,6 +166,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case DESIGN_TEMPLATE:
             case DESIGN_TEMPLATE_REGION:
             case INCLUDE_REF:
+            case FLAVOR_INCLUDE:
                 name = qualifiedName;
                 break;
             case APPLICATION:
@@ -179,6 +181,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case THEME:
             case DESIGN:
             case SVG:
+            case FLAVOR_ASSORTMENT:
                 Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
                 if (tagMatcher.matches()) {
                     prefix = tagMatcher.group(1);
@@ -326,7 +329,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
     /**
      * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
-     * 
+     *
      * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
      * @param defClass The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag
@@ -372,7 +375,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
     /**
      * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
-     * 
+     *
      * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
      * @param defClass The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag
@@ -423,27 +426,27 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         if (dd1 == dd2) {
             return 0;
         }
-        
+
         if (dd1 == null) {
             return -1;
         }
-        
+
         if (dd2 == null) {
             return 1;
         }
-        
+
         int value;
 
         value = dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
         if (value != 0) {
             return value;
         }
-        
+
         value = dd1.getDefType().compareTo(dd2.getDefType());
         if (value != 0) {
             return value;
         }
-        
+
         return compare(dd1.getBundle(), dd2.getBundle());
     }
 }

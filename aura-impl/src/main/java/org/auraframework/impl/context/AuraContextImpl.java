@@ -39,7 +39,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.css.ThemeListImpl;
+import org.auraframework.impl.css.theme.ThemeListImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;

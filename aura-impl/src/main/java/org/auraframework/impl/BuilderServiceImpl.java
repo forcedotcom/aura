@@ -19,15 +19,17 @@ import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
+import org.auraframework.builder.FlavoredStyleDefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.builder.ThemeDefBuilder;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
+import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
 import org.auraframework.impl.css.style.StyleDefImpl;
+import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -63,12 +65,17 @@ public class BuilderServiceImpl implements BuilderService {
     }
 
     @Override
-    public ThemeDefBuilder getThemeDefBuilder() throws QuickFixException {
+    public FlavoredStyleDefBuilder getFlavoredStyleDefBuilder() {
+        return new FlavoredStyleDefImpl.Builder();
+    }
+
+    @Override
+    public ThemeDefBuilder getThemeDefBuilder() {
         return new ThemeDefImpl.Builder();
     }
 
     @Override
-	public <K, V> CacheBuilder<K, V> getCacheBuilder() throws QuickFixException {
-		return new CacheImpl.Builder<K, V>();
-	}
+    public <K, V> CacheBuilder<K, V> getCacheBuilder() throws QuickFixException {
+        return new CacheImpl.Builder<K, V>();
+    }
 }

@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDefRef;
-import org.auraframework.impl.root.theme.ThemeDefRefImpl;
+import org.auraframework.impl.css.theme.ThemeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;

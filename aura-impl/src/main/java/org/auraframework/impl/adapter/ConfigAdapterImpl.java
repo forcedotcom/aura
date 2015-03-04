@@ -166,6 +166,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         
         Aura.getContextService().registerGlobal("isVoiceOver", true, false);
+        Aura.getContextService().registerGlobal("dynamicTypeSize", true, "");
     }
 
     protected FileGroup newAuraResourcesHashingGroup() throws IOException {

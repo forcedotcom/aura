@@ -22,6 +22,10 @@
         helper.updateBody(component);
     },
 
+    templateChange:function(component, evt, helper){
+        helper.createBody(component);
+    },
+
     init: function(component, evt, helper) {
         var bodyTemplate=component.get("v.body");
         var template=component.get("v.template");
@@ -29,7 +33,7 @@
         if(bodyTemplate.length&&!template.length){
             component.set("v.body",[],true);
             component.set("v.template",bodyTemplate,true);
-            helper.createBody(component);
         }
+        helper.createBody(component);
     }
 })

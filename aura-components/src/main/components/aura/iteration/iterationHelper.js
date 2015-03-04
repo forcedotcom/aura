@@ -82,11 +82,11 @@
 
     buildBody: function (component, itemHandler, completeHandler) {
         var items = component.get("v.items");
-        if (items && items.length) {
+        var template = component.get("v.template");
+        if (items && items.length && template && template.length) {
             var itemVar = component.get("v.var");
             var indexVar = component.get("v.indexVar");
             var forceServer = component.get("v.forceServer");
-            var template = component.get("v.template");
             var templateValueProvider = component.getComponentValueProvider();
             var startIndex = this.getStart(component);
             var endIndex = this.getEnd(component);

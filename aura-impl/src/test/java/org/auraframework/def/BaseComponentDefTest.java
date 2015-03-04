@@ -28,11 +28,13 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
@@ -1821,12 +1823,92 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testAppendsCmpThemeToDependencies() throws Exception {
         DefDescriptor<ThemeDef> themeDesc = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
         String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
-        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(fmt, ComponentDef.class);
-        addSourceAutoCleanup(cmpDesc, "<aura:component/>");
-        assertEquals(themeDesc, cmpDesc.getDef().getCmpTheme());
+        DefDescriptor<T> desc = DefDescriptorImpl.getInstance(fmt, getDefClass());
+        addSourceAutoCleanup(desc, String.format(baseTag, "",""));
+        assertEquals(themeDesc, desc.getDef().getCmpTheme());
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        cmpDesc.getDef().appendDependencies(deps);
+        desc.getDef().appendDependencies(deps);
         assertTrue(deps.contains(themeDesc));
+    }
+
+    public void testAppendsStandardFlavorToDependencies() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
+        DefDescriptor<FlavoredStyleDef> flavor = addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor test; .test{}");
+
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        desc.getDef().appendDependencies(dependencies);
+        assertTrue(dependencies.contains(flavor));
+    }
+
+    public void testValidatesDefaultFlavorName() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "defaultFlavor='tesst'", "<div aura:flavorable='true'></div>"));
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor test; .test{}");
+
+        try {
+            desc.getDef().validateReferences();
+            fail("expected to get an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
+        }
+    }
+
+    public void testValidatesComponentIsFlavorableWhenDefaultSpecified() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "defaultFlavor='test'", "<div></div>"));
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor test; .test{}");
+
+        try {
+            desc.getDef().validateReferences();
+            fail("expected to get an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "no flavorable children");
+        }
+    }
+
+    /**
+     * The implicit default flavor is "default", but only when an explicit default isn't specified, the component has a
+     * flavorable child, a bundle flavor exists, and the bundle flavor defines a flavor named "default".
+     */
+    public void testImplicitDefaultFlavor() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<div aura:flavorable='true'></div>"));
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor default; .default{}");
+        assertEquals("default", desc.getDef().getDefaultFlavorOrImplicit());
+    }
+
+    /** see comments on {@link #testImplicitDefaultFlavor()} */
+    public void testImplicitDefaultFlavorNoFlavoredStyleDef() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<div aura:flavorable='true'></div>"));
+        assertNull(desc.getDef().getDefaultFlavorOrImplicit());
+    }
+
+    /** see comments on {@link #testImplicitDefaultFlavor()} */
+    public void testImplicitDefaultFlavorDifferentName() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<div aura:flavorable='true'></div>"));
+        // flavor name is "test", not "default"
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor test; .test{}");
+        assertNull(desc.getDef().getDefaultFlavorOrImplicit());
+    }
+
+    /** see comments on {@link #testImplicitDefaultFlavor()} */
+    public void testImplicitDefaultFlavorWithoutFlavorable() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<div></div>"));
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor default; .default{}");
+        assertNull(desc.getDef().getDefaultFlavorOrImplicit());
+    }
+
+    /** see comments on {@link #testImplicitDefaultFlavor()} */
+    public void testExplicitAndImplicitDefaultFlavor() throws Exception {
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "defaultFlavor='test'", "<div aura:flavorable='true'></div>"));
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc),
+                "@flavor default; .default{}" +
+                "@flavor test; .test{}");
+        assertEquals("test", desc.getDef().getDefaultFlavorOrImplicit());
     }
 }

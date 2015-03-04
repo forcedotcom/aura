@@ -92,10 +92,10 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "controller", 
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "controller",
             		"model", "apiVersion", "abstract", "extensible", "extends");
             expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "additionalAppCacheURLs", "isOnePageApp",
-                    "theme", "render", "template", "provider", "isTemplate", "style", "helper", "renderer", "whitespace", "support");
+                    "theme", "render", "template", "provider", "isTemplate", "style", "helper", "renderer", "whitespace", "support", "defaultFlavor", "defaultFlavors");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ApplicationDef.class;
         }
@@ -107,10 +107,10 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller", 
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller",
             		"model", "apiVersion", "abstract", "extensible", "extends");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider", "isTemplate", 
-                    "style", "helper", "renderer", "whitespace", "support");
+            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider", "isTemplate",
+                    "style", "helper", "renderer", "whitespace", "support", "defaultFlavor");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ComponentDef.class;
         }

@@ -15,16 +15,40 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DesignDef;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.MethodDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.ResourceDef;
+import org.auraframework.def.SVGDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
@@ -41,12 +65,10 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -66,6 +88,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     private static final String ATTRIBUTE_MODEL = "model";
     private static final String ATTRIBUTE_CONTROLLER = "controller";
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
+    private static final String ATTRIBUTE_DEFAULT_FLAVOR = "defaultFlavor";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER, ATTRIBUTE_EXTENDS,
@@ -75,7 +98,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
     protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_ISTEMPLATE, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
-            ATTRIBUTE_WHITESPACE).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            ATTRIBUTE_WHITESPACE, ATTRIBUTE_DEFAULT_FLAVOR).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();
 
     private int innerCount = 0;
@@ -135,7 +158,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                         requiredVersionDesc.getName(),
                         "%s", "%s"
                 );
-        	}	
+        	}
         	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventHandler<T> handler = new RegisterEventHandler<>(this, xmlReader, source);
@@ -186,8 +209,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             }
             builder.getMethodDefs().put(methodDef.getDescriptor(),methodDef);
         } else {
-            body.add(getDefRefHandler(this).getElement());
             // if it wasn't one of the above, it must be a defref, or an error
+            ComponentDefRef cdr = getDefRefHandler(this).getElement();
+            if (cdr.isFlavorable() || cdr.hasFlavorableChild()) {
+                builder.setHasFlavorableChild(true);
+            }
+            body.add(cdr);
         }
 
         Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = readRequiredVersionDefs();
@@ -218,7 +245,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
 
     /**
      * Bases the decision for allowing embedded scripts on the system attribute isTemplate
-     * 
+     *
      * @return - returns true is isTemplate is true
      */
     @Override
@@ -356,6 +383,18 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                 builder.cmpThemeDescriptor = themeDesc;
             }
 
+            // see if there is a flavors def
+            DefDescriptor<FlavoredStyleDef> flavorDesc = Flavors.standardFlavorDescriptor(defDescriptor);
+            if (mdr.exists(flavorDesc)) {
+                builder.flavorDescriptor = flavorDesc;
+            }
+
+            // default flavor attribute
+            String defaultFlavor = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVOR);
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavor)) {
+                builder.setDefaultFlavor(defaultFlavor);
+            }
+
             // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
             if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
                 // See if there is a test suite that has the same qname.
@@ -367,7 +406,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             }
             String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
             if (extendsName != null) {
-                builder.extendsDescriptor = getDefDescriptor(extendsName,  
+                builder.extendsDescriptor = getDefDescriptor(extendsName,
                         (Class<T>) defDescriptor.getDefType().getPrimaryInterface());
             }
 

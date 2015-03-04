@@ -20,9 +20,14 @@ import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -31,13 +36,16 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DesignDef;
 import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ImportDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
@@ -50,28 +58,27 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
@@ -90,6 +97,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final DefDescriptor<ComponentDef> templateDefDescriptor;
     private final DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
     private final DefDescriptor<StyleDef> styleDescriptor;
+    private final DefDescriptor<FlavoredStyleDef> flavorDescriptor;
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
@@ -113,6 +121,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final List<DependencyDef> dependencies;
     private final List<ClientLibraryDef> clientLibraries;
+    private final boolean hasFlavorableChild;
+    private final String defaultFlavor;
 
     private final int hashCode;
 
@@ -140,6 +150,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.eventHandlers = AuraUtil.immutableList(builder.eventHandlers);
         this.imports = AuraUtil.immutableList(builder.imports);
         this.styleDescriptor = builder.styleDescriptor;
+        this.flavorDescriptor = builder.flavorDescriptor;
         this.rendererDescriptors = builder.rendererDescriptors;
         this.helperDescriptors = builder.helperDescriptors;
         this.resourceDescriptors = builder.resourceDescriptors;
@@ -155,6 +166,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.cmpThemeDescriptor = builder.cmpThemeDescriptor;
         this.designDefDescriptor = builder.designDefDescriptor;
         this.svgDefDescriptor = builder.svgDefDescriptor;
+        this.hasFlavorableChild = builder.hasFlavorableChild;
+        this.defaultFlavor = builder.defaultFlavor;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         if (getDescriptor() != null) {
@@ -179,7 +192,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (DependencyDef def : dependencies) {
             def.validateDefinition();
         }
-        
+
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateDefinition();
             if (events.containsKey(att.getName())) {
@@ -188,7 +201,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         getLocation());
             }
         }
-        
+
         MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
         if (modelDefDescriptor != null) {
         	mdr.assertAccess(this.descriptor, modelDefDescriptor.getDef());
@@ -201,15 +214,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (AttributeDefRef facet : this.facets) {
             facet.validateDefinition();
         }
-        
+
         for (RegisterEventDef def : events.values()) {
             def.validateDefinition();
         }
-        
+
         for (EventHandlerDef def : eventHandlers) {
             def.validateDefinition();
         }
-        
+
         for (ImportDef def : imports) {
             def.validateDefinition();
         }
@@ -256,7 +269,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * Computes the local (server) dependencies.
-     * 
+     *
      * Terminology: "remote" - a JavaScript provider or renderer "local" - a Java/Apex/server provider, renderer, or
      * model
      */
@@ -403,6 +416,20 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             def.validateReferences();
             registry.assertAccess(descriptor, def);
         }
+
+        if (defaultFlavor != null) {
+            // flavor name must exist on the flavor descriptor
+            if (!flavorDescriptor.getDef().getFlavorNames().contains(defaultFlavor)) {
+                throw new FlavorNameNotFoundException(defaultFlavor, flavorDescriptor);
+            }
+
+            // component must be flavorable
+            if (!hasFlavorableChild()) {
+                throw new InvalidDefinitionException(
+                        "The 'defaultFlavor' attribute cannot be specified on a component with no flavorable children",
+                        location);
+            }
+        }
     }
 
     /**
@@ -461,7 +488,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
      * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
      * from source.
-     * 
+     *
      * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this
      *            ComponentDef imports
      * @throws QuickFixException
@@ -512,6 +539,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         if (styleDescriptor != null) {
             dependencies.add(styleDescriptor);
+        }
+
+        if (flavorDescriptor  != null) {
+            dependencies.add(flavorDescriptor);
         }
 
         if (templateDefDescriptor != null) {
@@ -571,7 +602,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * This is used to validate by the compiler to validate EventDefRefs.
-     * 
+     *
      * @return all the events this component can fire, including those inherited
      * @throws QuickFixException
      */
@@ -643,7 +674,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return Collections.unmodifiableMap(map);
         }
     }
-    
+
     /**
      * @return all the required versions for this component
      * @throws QuickFixException
@@ -712,7 +743,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public ControllerDef getDeclaredControllerDef() throws QuickFixException {
         return !this.controllerDescriptors.isEmpty() && compoundControllerDescriptor != null ? compoundControllerDescriptor.getDef() : null;
     }
-    
+
     @Override
     public StyleDef getStyleDef() throws QuickFixException {
         return styleDescriptor == null ? null : styleDescriptor.getDef();
@@ -881,7 +912,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (!methodDefs.isEmpty()) {
                     json.writeMapEntry("methodDefs", methodDefs);
                 }
-                
+
                 Collection<RequiredVersionDef> requiredVersionDefs = getRequiredVersionDefs().values();
                 if (requiredVersionDefs != null && !requiredVersionDefs.isEmpty()) {
                     json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
@@ -931,6 +962,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
                 if (mode.equals(Mode.AUTOJSTEST)) {
                     json.writeMapEntry("testSuiteDef", getTestSuiteDef());
+                }
+
+                String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
+                if (defaultFlavorToSerialize != null) {
+                    json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);
                 }
 
                 serializeFields(json);
@@ -1059,6 +1095,28 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return clientLibraries;
     }
 
+    @Override
+    public boolean hasFlavorableChild() {
+        return hasFlavorableChild;
+    }
+
+    @Override
+    public String getDefaultFlavor() {
+        return defaultFlavor;
+    }
+
+    @Override
+    public String getDefaultFlavorOrImplicit() throws QuickFixException {
+        if (defaultFlavor == null
+                && flavorDescriptor != null
+                && flavorDescriptor.getDef().getFlavorNames().contains("default")
+                && hasFlavorableChild()) {
+            return "default";
+        }
+
+        return defaultFlavor;
+    }
+
     public static abstract class Builder<T extends BaseComponentDef> extends
             RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
@@ -1077,6 +1135,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
         public DefDescriptor<ThemeDef> cmpThemeDescriptor;
+        public DefDescriptor<FlavoredStyleDef> flavorDescriptor;
         public DefDescriptor<DesignDef> designDefDescriptor;
         public DefDescriptor<SVGDef> svgDefDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
@@ -1096,6 +1155,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
+        private boolean hasFlavorableChild;
+        private String defaultFlavor;
 
         @Override
         public Builder<T> setFacet(String key, Object value) {
@@ -1235,6 +1296,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return this;
         }
 
+        @Override
+        public Builder<T> setHasFlavorableChild(boolean hasFlavorableChild) {
+            this.hasFlavorableChild = hasFlavorableChild;
+            return this;
+        }
+
+        @Override
+        public Builder<T> setDefaultFlavor(String defaultFlavor) {
+            this.defaultFlavor = defaultFlavor;
+            return this;
+        }
+
         /**
          * Gets the methodDefs for this instance.
          *
@@ -1326,7 +1399,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * Helper routine for public call. DIE! please?
-     * 
+     *
      * @param already the set of processed descriptors.
      */
     private boolean isLocallyRenderable(Set<DefDescriptor<?>> already) throws QuickFixException {

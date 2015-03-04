@@ -142,4 +142,33 @@ public interface BaseComponentDef extends RootDefinition {
      * Gets the {@link ThemeDef} that's part of the component (or app) bundle.
      */
     DefDescriptor<ThemeDef> getCmpTheme();
+
+    /**
+     * Returns true if this component has a child component def ref (e.g., html element) that has aura:flavorable.
+     *
+     * @see FlavoredStyleDef
+     */
+    boolean hasFlavorableChild();
+
+    /**
+     * Returns the default flavor name.
+     *
+     * @see FlavoredStyleDef
+     *
+     * @return The default flavor, or null if none specified.
+     */
+    String getDefaultFlavor();
+
+    /**
+     * The same as {@link #getDefaultFlavor()}, except if an explicit defaultFlavor is not specified, and a
+     * {@link FlavoredStyleDef} exists in the bundle with a flavor named "default", then "default" will be returned.
+     * <p>
+     * WARNING: This method may potentially load a {@link FlavoredStyleDef}. Do not call in places where loading a definition
+     * may be inappropriate (e.g., in a validateDefinition impl).
+     *
+     * @return The default flavor if specified, or the implicit default flavor "default" if defined, or null if neither
+     *         apply.
+     * @throws QuickFixException If there is a problem loading the flavor def.
+     */
+    String getDefaultFlavorOrImplicit() throws QuickFixException;
 }

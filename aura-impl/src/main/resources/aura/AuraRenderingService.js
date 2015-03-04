@@ -50,7 +50,7 @@ $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
 
     components = this.getArray(components);
     var elements = [];
-     
+
     for (var i=0; i < components.length; i++){
         var cmp = components[i];
         //JBUCH: HALO: FIXME: WE SHOULD REFUSE TO RENDER THINGS THAT AREN'T COMPONENTS
@@ -84,7 +84,7 @@ $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
         'endTime' : (new Date()).getTime()
     });
     //#end
-    
+
     return elements;
 };
 
@@ -401,25 +401,25 @@ $A.ns.AuraRenderingService.prototype.rerenderFacet = function(component, facet, 
                 }else{
                     renderedElements=info.component.getElements();
                 }
-                // KRIS: HALO: 
+                // KRIS: HALO:
                 // I anticipate this code going away when JohnBuch refactors the markers
                 // to support nested renderIf.
-                // The reason it is necessary is because when we rerender something like an iteration, it 
-                // can have it's original marker unrendered, and thus it moves to the next element. Which 
+                // The reason it is necessary is because when we rerender something like an iteration, it
+                // can have it's original marker unrendered, and thus it moves to the next element. Which
                 // can then be unrendered too, and so on and so on. Eventually the marker moves to the last element
                 // but there may at this point be new elements in the iteration. So if you unrender the last element
                 // and you rerender it's sub-components resulting in new elements, change its marker to the new elements
                 //if(renderedElements.length && this.isMarker(component._marker)) {
                         // KRIS: HALO:
-                        // We can't do this, some components share markers, and this can potentially 
+                        // We can't do this, some components share markers, and this can potentially
                         // remove the marker for another component.
                     //$A.util.removeElement(component._marker);
-                        
-                        // KRIS: HALO: 
+
+                        // KRIS: HALO:
                         // Still failing things. Bleh.
                     //component._marker = renderedElements[0];
                 //}
-                
+
                 info.component.disassociateElements();
                 this.associateElements(info.component, renderedElements);
                 ret = ret.concat(renderedElements);
@@ -573,7 +573,7 @@ $A.ns.AuraRenderingService.prototype.rerenderDirty = function(stackName) {
             var dirty = [];
             this.needsCleaning = false;
             maxiterations--;
-                                
+
             while(this.dirtyComponentIds.length) {
                 var id = this.dirtyComponentIds.shift();
                 var cmp = $A.componentService.get(id);
@@ -761,9 +761,15 @@ $A.ns.AuraRenderingService.prototype.insertElements = function(elements, refNode
 };
 
 $A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
-    var className = cmp.getConcreteComponent().getDef().getStyleClassName();
+    var concrete = cmp.getConcreteComponent();
+    var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
 
     if (className) {
+        // add the instance-specific flavor class name if a flavor is specified and this element is flavorable
+        if (!$A.util.isUndefinedOrNull(concrete.getFlavorName()) && $A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
+            className = className + $A.util.buildFlavorClass(concrete.getFlavorName(), concrete.getFlavorNamespace());
+        }
+
         $A.util.addClass(element, className);
         if (element["tagName"]) {
             element["auraClass"] = $A.util.buildClass(element["auraClass"],className);

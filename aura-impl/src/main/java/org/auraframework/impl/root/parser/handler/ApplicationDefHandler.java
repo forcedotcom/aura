@@ -27,11 +27,12 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.css.util.Themes;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
-import org.auraframework.impl.root.theme.Themes;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
@@ -78,7 +79,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     /**
      * Allows embedded script tags by default in applications
-     * 
+     *
      * @return - return true if your instance should allow embedded script tags in HTML
      */
     @Override
@@ -151,9 +152,22 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             }
         } else {
             // the implicit theme override for an app is the namespace-default theme, if it exists
-            DefDescriptor<ThemeDef> namespaceTheme = Themes.getNamespaceDefaultTheme(defDescriptor);
+            DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(defDescriptor);
             if (namespaceTheme.exists()) {
                 appBuilder.appendThemeDescriptor(namespaceTheme);
+            }
+        }
+
+        String defaultFlavors = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVORS);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavors)) {
+            DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getInstance(defaultFlavors, FlavorAssortmentDef.class);
+            appBuilder.setDefaultFlavorsDescriptor(flavors);
+        } else {
+            // see if there is a flavor assortment file in the app bundle
+            DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getAssociateDescriptor(appBuilder.getDescriptor(),
+                    FlavorAssortmentDef.class, DefDescriptor.MARKUP_PREFIX);
+            if (flavors.exists()) {
+                appBuilder.setDefaultFlavorsDescriptor(flavors);
             }
         }
     }
@@ -186,6 +200,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
     private static final String ATTRIBUTE_THEME = "theme";
+    private static final String ATTRIBUTE_DEFAULT_FLAVORS = "defaultFlavors";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_APPCACHE_ENABLED)
@@ -193,7 +208,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT,
-            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME)
+            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME, ATTRIBUTE_DEFAULT_FLAVORS)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();

@@ -15,6 +15,14 @@
  */
 package org.auraframework.impl.source.file;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.nio.file.FileSystems;
 
 import org.auraframework.def.DefDescriptor;
@@ -25,14 +33,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link FileSourceListener}
@@ -133,6 +133,26 @@ public class FileSourceListenerTest extends UnitTestCase {
                 "/some/awesome/ui/inputSearch/inputSearch.css");
     }
 
+    public void testSourceChangedStandardFlavor() throws Exception {
+        assertSourceChangedCalled("css", "ui", "inputSearch", DefDescriptor.DefType.FLAVORED_STYLE,
+                "/some/awesome/ui/inputSearch/inputSearchFlavors.css");
+    }
+
+    public void testSourceChangedCustomFlavor() throws Exception {
+        assertSourceChangedCalled(DefDescriptor.CUSTOM_FLAVOR_PREFIX, "foo", "ui_button", DefDescriptor.DefType.FLAVORED_STYLE,
+                "/some/awesome/foo/flavors/ui_buttonFlavors.css");
+    }
+
+    public void testSourceChangedFlavorAssortment() throws Exception {
+        assertSourceChangedCalled("markup", "ui", "flavors", DefDescriptor.DefType.FLAVOR_ASSORTMENT,
+                "/some/awesome/ui/flavors/flavorsFlavors.xml");
+    }
+
+    public void testSourceChangedTheme() throws Exception {
+        assertSourceChangedCalled("markup", "ui", "uiTheme", DefDescriptor.DefType.THEME,
+                "/some/awesome/ui/uiTheme/uiTheme.theme");
+    }
+
     public void testSourceChangedLayouts() throws Exception {
         assertSourceChangedCalled("markup", "test", "layouts", DefDescriptor.DefType.LAYOUTS,
                 "/some/awesome/test/layouts/layoutsLayouts.xml");
@@ -175,7 +195,7 @@ public class FileSourceListenerTest extends UnitTestCase {
 
     private void assertSourceChangedCalled(String prefix, String namespace, String name, DefDescriptor.DefType defType,
             String filePath) throws Exception {
-        
+
         when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath(filePath));
 
         listener.fileChanged(fileChangeEvent);

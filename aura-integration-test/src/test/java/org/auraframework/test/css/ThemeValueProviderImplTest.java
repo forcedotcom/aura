@@ -17,14 +17,15 @@ package org.auraframework.test.css;
 
 import java.util.List;
 
+import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.ThemeDescriptorProvider;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.css.ThemeListImpl;
-import org.auraframework.impl.css.ThemeValueProviderImpl;
+import org.auraframework.impl.css.theme.ThemeListImpl;
+import org.auraframework.impl.css.theme.ThemeValueProviderImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -231,7 +232,7 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
 
     /** tvp = theme value provider */
     private ThemeValueProvider setup(DefDescriptor<StyleDef> def) throws QuickFixException {
-        return new ThemeValueProviderImpl(def, null);
+        return new ThemeValueProviderImpl(def, null, ResolveStrategy.RESOLVE_NORMAL);
     }
 
     private ThemeValueProvider setupOverride(DefDescriptor<ThemeDef> override) throws QuickFixException {
@@ -249,6 +250,6 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
 
     private ThemeValueProvider setupOverride(DefDescriptor<StyleDef> def, List<DefDescriptor<ThemeDef>> overrides)
             throws QuickFixException {
-        return new ThemeValueProviderImpl(def, new ThemeListImpl(overrides));
+        return new ThemeValueProviderImpl(def, new ThemeListImpl(overrides), ResolveStrategy.RESOLVE_NORMAL);
     }
 }

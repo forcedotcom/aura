@@ -120,6 +120,7 @@
                                     <arg value="${project.build.directory}/${component.test.dir}" />
                                     <arg value="auratest" />
                                     <arg value="themeProviderTest" />
+                                    <arg value="flavorTest"/>
                                     <arg value="lintTest" />
                                     <arg value="handleEventTest" />
                                     <arg value="validationTest" />

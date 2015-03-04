@@ -24,16 +24,15 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
+import org.auraframework.css.FlavorRef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -46,7 +45,8 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidReferenceException;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -72,6 +72,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     private final int hashCode;
     private final String localId;
     protected final Load load;
+    private final boolean isFlavorable;
+    private final boolean hasFlavorableChild;
+    private final FlavorRef flavor;
 
     protected ComponentDefRefImpl(Builder builder) {
         super(builder);
@@ -80,6 +83,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         this.hashCode = AuraUtil.hashCode(descriptor, location);
         this.localId = builder.localId;
         this.load = builder.load;
+        this.isFlavorable = builder.isFlavorable;
+        this.hasFlavorableChild = builder.hasFlavorableChild;
+        this.flavor = builder.flavor;
     }
 
     @Override
@@ -105,7 +111,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * ComponentDef's children to the provided set. The set may then be used to
      * analyze freshness of all of those types to see if any of them should be
      * recompiled from source.
-     * 
+     *
      * @param dependencies A Set that this method will append RootDescriptors to
      *            for every RootDef that this ComponentDefDef requires
      * @throws QuickFixException
@@ -121,6 +127,10 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         for (AttributeDefRef attributeDefRef : attributeValues.values()) {
             attributeDefRef.appendDependencies(dependencies);
         }
+
+        if (flavor != null) {
+            dependencies.add(flavor.getFlavoredStyleDescriptor());
+        }
     }
 
     @Override
@@ -129,13 +139,31 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         if (rootDef == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
-        
+
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<?> referencingDesc = context.getCurrentCallingDescriptor();
     	if (referencingDesc != null) {
 	        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
 	    	registry.assertAccess(referencingDesc, rootDef);
     	}
+
+        if (flavor != null) {
+            // flavor name must exist on the flavor descriptor
+            if (!flavor.getFlavoredStyleDescriptor().getDef().getFlavorNames().contains(flavor.getFlavorName())) {
+                throw new FlavorNameNotFoundException(flavor.getFlavorName(), flavor.getFlavoredStyleDescriptor());
+            }
+
+            // component must be flavorable (and by implication can't be an interface then)
+            if (intfDescriptor == null) {
+                if (!descriptor.getDef().hasFlavorableChild()) {
+                    throw new InvalidDefinitionException(String.format("%s does not have any flavorable children", descriptor),
+                            location);
+                }
+            } else {
+                throw new InvalidDefinitionException(String.format(
+                        "the aura:flavor attribute cannot be specified on an interface", descriptor), location);
+            }
+        }
 
         validateAttributesValues(referencingDesc);
 
@@ -149,7 +177,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * Does not validate missing attributes. Example: in the component
      * instantiation of myMS:widget validates the specified attributes foo and
      * bar <myNS:uberWidget foo="123" bar="blah"/>
-     * 
+     *
      * @param rootDef the element being instantiated
      * @param specifiedAttributes the attributes specified in the comp
      */
@@ -169,18 +197,18 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                     throw new AttributeNotFoundException(rootDef.getDescriptor(), attributeDefDesc.getName(),
                             getLocation());
                 }
-                
+
             	registry.assertAccess(referencingDesc, registeredEvent);
             } else {
             	if (referencingDesc != null) {
 	            	// Validate that the referencing component has access to the attribute
 	            	registry.assertAccess(referencingDesc, attributeDef);
             	}
-            	
+
                 // so it was an attribute, make sure to parse it
                 entry.getValue().parseValue(attributeDef.getTypeDef());
             }
-            
+
             entry.getValue().validateReferences();
             // heres where some type validation would go
         }
@@ -225,6 +253,18 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                 json.writeMapEntry("load", load);
             }
 
+            if (isFlavorable) {
+                json.writeMapEntry("flavorable", isFlavorable);
+            }
+
+            if (flavor != null) {
+                json.writeMapEntry("flavorName", flavor.getFlavorName());
+
+                if (!flavor.isStandardFlavor()) {
+                    json.writeMapEntry("flavorNs", flavor.getFlavoredStyleDescriptor().getNamespace());
+                }
+            }
+
             if (!attributeValues.isEmpty()) {
                 json.writeMapKey("attributes");
 
@@ -266,17 +306,35 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     @Override
+    public boolean isFlavorable() {
+        return isFlavorable;
+    }
+
+    @Override
+    public boolean hasFlavorableChild() {
+        return hasFlavorableChild;
+    }
+
+    @Override
+    public FlavorRef getFlavor() {
+        return flavor;
+    }
+
+    @Override
     public Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
         return new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId);
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<ComponentDef, ComponentDefRef> implements
-    ComponentDefRefBuilder {
+            ComponentDefRefBuilder {
 
         private Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
         private String localId;
         private DefDescriptor<InterfaceDef> intfDescriptor;
         private Load load = Load.DEFAULT;
+        private boolean isFlavorable;
+        private boolean hasFlavorableChild;
+        private FlavorRef flavor;
 
         public Builder() {
             super(ComponentDef.class);
@@ -320,7 +378,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
         /**
          * Gets the attributeValues for this instance.
-         * 
+         *
          * @return The attributeValues.
          */
         @Override
@@ -342,7 +400,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
         /**
          * Gets the localId for this instance.
-         * 
+         *
          * @return The localId.
          */
         public String getLocalId() {
@@ -351,7 +409,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
         /**
          * Sets the intfDescriptor for this instance.
-         * 
+         *
          * @param intfDescriptor The intfDescriptor.
          */
         public ComponentDefRefBuilder setIntfDescriptor(DefDescriptor<InterfaceDef> intfDescriptor) {
@@ -365,5 +423,22 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             return this;
         }
 
+        @Override
+        public ComponentDefRefBuilder setIsFlavorable(boolean isFlavorable) {
+            this.isFlavorable = isFlavorable;
+            return this;
+        }
+
+        @Override
+        public ComponentDefRefBuilder setHasFlavorableChild(boolean hasFlavorableChild) {
+            this.hasFlavorableChild = hasFlavorableChild;
+            return this;
+        }
+
+        @Override
+        public ComponentDefRefBuilder setFlavor(FlavorRef flavor) {
+            this.flavor = flavor;
+            return this;
+        }
     }
 }

@@ -38,5 +38,6 @@ exp(p,
     "getCmpHandlerDefs", p.getCmpHandlerDefs,
     "isInstanceOf", p.isInstanceOf,
     "getAllEvents", p.getAllEvents,
-    "getStyleClassName", p.getStyleClassName
+    "getStyleClassName", p.getStyleClassName,
+    "getDefaultFlavor", p.getDefaultFlavor
 );

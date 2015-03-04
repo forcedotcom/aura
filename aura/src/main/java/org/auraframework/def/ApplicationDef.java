@@ -47,8 +47,13 @@ public interface ApplicationDef extends BaseComponentDef {
      * value.
      * <p>
      * In other words, this is the value from the "theme" attribute on the app tag.
-     * 
+     *
      * @return The list of override themes, or an empty list if none specified.
      */
     List<DefDescriptor<ThemeDef>> getThemeDescriptors();
+
+    /**
+     * Gets the {@link FlavorAssortmentDef} representing the default flavor overrides.
+     */
+    DefDescriptor<FlavorAssortmentDef> getDefaultFlavorsDescriptor();
 }

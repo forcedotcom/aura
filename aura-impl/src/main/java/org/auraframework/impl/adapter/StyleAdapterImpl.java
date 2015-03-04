@@ -20,13 +20,14 @@ import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
+import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.impl.css.ThemeValueProviderImpl;
-import org.auraframework.impl.css.parser.DuplicateFontFacePlugin;
+import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
+import org.auraframework.impl.css.theme.ThemeValueProviderImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableList;
@@ -34,33 +35,42 @@ import com.salesforce.omakase.plugin.Plugin;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component (provide=AuraServiceProvider.class)
+@Component(provide = AuraServiceProvider.class)
 public class StyleAdapterImpl implements StyleAdapter {
+
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor) throws QuickFixException {
-        return getThemeValueProvider(descriptor, Aura.getContextService().getCurrentContext().getThemeList());
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
+        return getThemeValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<StyleDef> descriptor, ThemeList overrideThemes)
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy)
             throws QuickFixException {
-        return new ThemeValueProviderImpl(descriptor, overrideThemes);
+        switch (strategy) {
+        case RESOLVE_NORMAL:
+            return getThemeValueProvider(style, strategy, Aura.getContextService().getCurrentContext().getThemeList());
+        case RESOLVE_DEFAULTS:
+        case PASSTHROUGH:
+            return getThemeValueProvider(style, strategy, null);
+        }
+
+        return null;
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProviderNoOverrides(DefDescriptor<StyleDef> descriptor)
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy, ThemeList overrides)
             throws QuickFixException {
-        return new ThemeValueProviderImpl(descriptor, null);
+        return new ThemeValueProviderImpl(style, overrides, strategy);
     }
 
     @Override
     public List<Plugin> getCompilationPlugins() {
-        return ImmutableList.<Plugin>of();
+        return ImmutableList.<Plugin> of();
     }
 
     @Override
     public List<Plugin> getRuntimePlugins() {
-        return ImmutableList.<Plugin>of();
+        return ImmutableList.<Plugin> of();
     }
 
     @Override

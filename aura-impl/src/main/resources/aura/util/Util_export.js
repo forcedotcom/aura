@@ -35,6 +35,7 @@ p["addClass"] = p.addClass;
 p["removeClass"] = p.removeClass;
 p["toggleClass"] = p.toggleClass;
 p["swapClass"] = p.swapClass;
+p["buildFlavorClass"] = p.buildFlavorClass;
 p["createElementsFromMarkup"]= p.createElementsFromMarkup;
 p["insertFirst"] = p.insertFirst;
 p["insertBefore"] = p.insertBefore;

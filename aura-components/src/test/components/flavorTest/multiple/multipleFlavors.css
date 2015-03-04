@@ -1,0 +1,7 @@
+@flavor default;
+@flavor minimal;
+@flavor extravagant;
+
+.default, .minimal, .extravagant {
+  color: #333;
+}

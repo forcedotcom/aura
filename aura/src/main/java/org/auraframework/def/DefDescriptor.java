@@ -36,6 +36,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
     public static final String MARKUP_PREFIX = "markup";
     public static final String CSS_PREFIX = "css";
     public static final String TEMPLATE_CSS_PREFIX = "templateCss";
+    public static final String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
     public static final String JAVASCRIPT_PREFIX = "js";
     public static final String COMPOUND_PREFIX = "compound";
     public static final String JAVA_PREFIX = "java";
@@ -107,6 +108,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         ACTION(ActionDef.class), //
         TYPE(TypeDef.class), //
         STYLE(StyleDef.class), //
+        FLAVORED_STYLE(FlavoredStyleDef.class), //
+        FLAVOR_ASSORTMENT(FlavorAssortmentDef.class), //
+        FLAVOR_INCLUDE(FlavorIncludeDef.class), //
         THEME(ThemeDef.class, true), //
         THEME_DEF_REF(ThemeDefRef.class), //
         THEME_PROVIDER(ThemeDescriptorProviderDef.class), //

@@ -32,6 +32,19 @@ var ComponentPriv = (function() { // Scoping priv
         this.references={};
         this.handlers = {};
 
+        // flavor data
+        if (config["flavorable"]) {
+            this.flavorable = true;
+        }
+
+        if (config["flavorName"]) {
+            this.flavorName = config["flavorName"];
+        }
+
+        if (config["flavorNs"]) {
+            this.flavorNamespace = config["flavorNs"];
+        }
+
         var context = $A.getContext();
 
         // allows components to skip creation path checks if it's doing something weird
@@ -897,13 +910,13 @@ if(!this.concreteComponentId) {
         if (value){
             var position = -1;
             var found = false;
-            
+
             // Look for value in serialized
             if(typeof value === "object") {
                     var length = serialized.length;
                     for(var c=0;c<length;c++) {
                         if(serialized[c] === value) {
-                            found = true; 
+                            found = true;
                             position = c;
                         }
                     }
@@ -1013,7 +1026,7 @@ if(!this.concreteComponentId) {
                 }
                 if($A.util.isExpression(rawValue)) {
                     // KRIS: Also needs to output the value provider for the expression.
-                    
+
                     // KRIS: This rawValue only works in non prod mode, otherwise you get "PropertyReferenceValue"
                     ret["expressions"][key] = rawValue+"";
                 }
@@ -1733,6 +1746,12 @@ Component.prototype.associateElement = function(element) {
         priv.elements.push(element);
 
         priv.associateRenderedBy(this, element);
+
+        if (priv.flavorable) {
+            if (!$A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
+        		$A.util.setDataAttribute(element, $A.componentService.flavorable, true);
+        	}
+        }
     }
 };
 
@@ -2322,6 +2341,27 @@ Component.prototype.getFacets = function() {
     }
 
     return facets;
+};
+
+/**
+ * Returns true if this component instance has at least one flavorable element.
+ */
+Component.prototype.isFlavorable = function() {
+	return this.priv.flavorable;
+};
+
+/**
+ * Returns the name of the flavor specified or assumed for this component instance.
+ */
+Component.prototype.getFlavorName = function() {
+	return this.priv.flavorName || this.getDef().getDefaultFlavor();
+};
+
+/**
+ * Returns the namespace of the flavor specified or assumed for this component instance (usually only applicable to namespace flavors).
+ */
+Component.prototype.getFlavorNamespace = function() {
+	return this.priv.flavorNamespace;
 };
 
 // #include aura.component.Component_export

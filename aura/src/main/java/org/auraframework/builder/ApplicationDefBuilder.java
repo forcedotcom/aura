@@ -17,6 +17,7 @@ package org.auraframework.builder;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ThemeDef;
 
@@ -29,7 +30,12 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
     /**
      * Specifies a {@link ThemeDef} as an override across the whole application. Vars specified in this theme will
      * override default var values throughout all components used in the application.
-     * 
+     *
      */
     ApplicationDefBuilder appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor);
+
+    /**
+     * Specifies the {@link FlavorAssortmentDef} containing the flavors to use as defaults.
+     */
+    ApplicationDefBuilder setDefaultFlavorsDescriptor(DefDescriptor<FlavorAssortmentDef> defaultFlavors);
 }

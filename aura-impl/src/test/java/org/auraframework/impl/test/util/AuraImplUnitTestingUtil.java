@@ -43,6 +43,7 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.EventType;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
@@ -55,6 +56,8 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
+import org.auraframework.impl.css.theme.ThemeDefImpl;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.AttributeImpl;
@@ -69,7 +72,6 @@ import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
-import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
@@ -150,6 +152,14 @@ public class AuraImplUnitTestingUtil {
 
     public DefDescriptor<ThemeDef> getThemeDefDescriptor() {
             return DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class);
+    }
+
+    public DefDescriptor<ComponentDef> getFlavorableComponentDescriptor() {
+        return DefDescriptorImpl.getInstance("test:flavorableFakeComponent", ComponentDef.class);
+    }
+
+    public DefDescriptor<FlavoredStyleDef> getFlavoredStyleDescriptor() {
+        return Flavors.standardFlavorDescriptor(getFlavorableComponentDescriptor());
     }
 
     public String getComponentName() {

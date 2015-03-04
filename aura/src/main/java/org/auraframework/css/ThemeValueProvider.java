@@ -30,13 +30,21 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public interface ThemeValueProvider extends ValueProvider {
     /**
      * Use this to resolve an expression from a String.
-     * 
+     *
      * @param expression The expression to evaluate.
      * @param location The location of the expression in the source.
-     * 
+     *
      * @return The value, same as from {@link #getValue(PropertyReference)}
-     * 
+     *
      * @throws QuickFixException
      */
     Object getValue(String expression, Location location) throws QuickFixException;
+
+    /**
+     * Gets the specified indication of how this theme value provider is planned to be used.
+     * <p>
+     * Note that this is merely an <em>indication</em> and doesn't necessarily dictate how this provider itself will
+     * behave (but other classes utilizing this provider may make decisions based on what this method returns).
+     */
+    ResolveStrategy getResolveStrategy();
 }

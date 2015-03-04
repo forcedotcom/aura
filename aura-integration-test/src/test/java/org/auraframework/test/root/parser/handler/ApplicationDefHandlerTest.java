@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
@@ -52,10 +53,9 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
 
         @Override
         public ApplicationDefImpl createDefinition() throws QuickFixException {
-            return (ApplicationDefImpl)super.createDefinition();
+            return (ApplicationDefImpl) super.createDefinition();
         }
     };
-
 
     @Override
     public void setUp() throws Exception {
@@ -126,5 +126,25 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         assertEquals(t1, app.getDef().getThemeDescriptors().get(0));
         assertEquals(t2, app.getDef().getThemeDescriptors().get(1));
         assertEquals(t3, app.getDef().getThemeDescriptors().get(2));
+    }
+
+    public void testReadDefaultFlavorsAttribute() throws QuickFixException {
+        DefDescriptor<FlavorAssortmentDef> fa = addSourceAutoCleanup(FlavorAssortmentDef.class, "<aura:flavors></aura:flavors>");
+
+        String src = String.format("<aura:application defaultFlavors=\"%s\"></aura:application>",
+                fa.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
+
+        assertEquals(fa, app.getDef().getDefaultFlavorsDescriptor());
+    }
+
+    public void testFindsDefaultFlavorsInBundleNoAttributeSpecified() throws QuickFixException {
+        DefDescriptor<FlavorAssortmentDef> fa = addSourceAutoCleanup(FlavorAssortmentDef.class, "<aura:flavors></aura:flavors>");
+
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getAssociateDescriptor(fa, ApplicationDef.class,
+                DefDescriptor.MARKUP_PREFIX);
+        addSourceAutoCleanup(app, String.format("<aura:application></aura:application>"));
+
+        assertEquals(fa, app.getDef().getDefaultFlavorsDescriptor());
     }
 }

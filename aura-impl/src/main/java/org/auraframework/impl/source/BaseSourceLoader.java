@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.SourceLoader;
-
 /**
  * Abstract superclass to {@link SourceLoader} implementations, providing common descriptor and filename utilities.
  */

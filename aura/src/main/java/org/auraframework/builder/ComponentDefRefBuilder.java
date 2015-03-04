@@ -15,12 +15,14 @@
  */
 package org.auraframework.builder;
 
+import org.auraframework.css.FlavorRef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.FlavoredStyleDef;
 
 /**
  * A builder for a {@link ComponentDef} reference.
@@ -51,4 +53,25 @@ public interface ComponentDefRefBuilder extends DefBuilder<ComponentDef, Compone
      * set whether the component is lazy loadable or not.
      */
     ComponentDefRefBuilder setLoad(Load load);
+
+    /**
+     * Mark that this element can be flavored.
+     *
+     * @see FlavoredStyleDef
+     */
+    ComponentDefRefBuilder setIsFlavorable(boolean isFlavorElement);
+
+    /**
+     * Mark that this element has a flavorable child def ref.
+     *
+     * @see FlavoredStyleDef
+     */
+    ComponentDefRefBuilder setHasFlavorableChild(boolean hasFlavorableChild);
+
+    /**
+     * Sets the flavor.
+     *
+     * @see FlavoredStyleDef
+     */
+    ComponentDefRefBuilder setFlavor(FlavorRef flavor);
 }

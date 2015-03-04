@@ -17,6 +17,7 @@ package org.auraframework.def;
 
 import java.util.Map;
 
+import org.auraframework.css.FlavorRef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -31,9 +32,9 @@ public interface ComponentDefRef extends Definition {
 
     /**
      * FIXME: W-1328556 this method violates the contract with DefDescriptor.
-     * 
+     *
      * These two calls should be used instead, but they cause other bugs.
-     * 
+     *
      * DefDescriptor<ComponentDefRef> getDescriptor();
      * DefDescriptor<ComponentDef> getComponentDescriptor();
      */
@@ -50,4 +51,18 @@ public interface ComponentDefRef extends Definition {
 
     Load getLoad();
 
+    /**
+     * Returns true if this ref was marked with aura:flavorable. See {@link FlavoredStyleDef}.
+     */
+    boolean isFlavorable();
+
+    /**
+     * Returns true if a child ComponentDefRef was marked with aura:flavorable. Most common with nested html tags.
+     */
+    boolean hasFlavorableChild();
+
+    /**
+     * Gets the flavor.
+     */
+    FlavorRef getFlavor();
 }

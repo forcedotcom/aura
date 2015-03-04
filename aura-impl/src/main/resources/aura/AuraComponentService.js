@@ -30,6 +30,7 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
     this.libraryDefRegistry = new $A.ns.LibraryDefRegistry();
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
+    this.flavorable = "auraFlavorable";
 };
 
 /**

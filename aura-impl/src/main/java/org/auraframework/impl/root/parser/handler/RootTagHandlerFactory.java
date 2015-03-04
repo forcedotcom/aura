@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.LibraryDef;
@@ -68,6 +69,9 @@ public class RootTagHandlerFactory {
         case DESIGN:
             return (RootTagHandler<T>) new DesignDefHandler((DefDescriptor<DesignDef>) defDescriptor,
                     (Source<DesignDef>) source, xmlReader);
+        case FLAVOR_ASSORTMENT:
+            return (RootTagHandler<T>) new FlavorAssortmentDefHandler((DefDescriptor<FlavorAssortmentDef>) defDescriptor,
+                    (Source<FlavorAssortmentDef>) source, xmlReader);
         default:
             throw new UnsupportedOperationException();
         }

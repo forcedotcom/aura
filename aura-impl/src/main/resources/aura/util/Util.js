@@ -34,6 +34,7 @@ $A.ns.Util = function() {
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};
+    this.flavorClassCache = {};
     this.debugToolWindow = undefined;
     this.sizeEstimator = new SizeEstimator();
 };
@@ -465,6 +466,38 @@ $A.ns.Util.prototype.buildClass=function(oldClass, newClass, remove){
             return newClass;
         }
     }
+};
+
+/**
+ * Builds the appropriate css class name for a flavor with the given name and (optional) namespace.
+ *
+ * @param {String} name The name of the flavor.
+ * @param {String} [namespace] The namespace of the flavor. Only specified for namespace flavors.
+ * @returns The flavor css class name for usage on an element.
+ */
+$A.ns.Util.prototype.buildFlavorClass = function(name, namespace){
+    var namespaceKey = namespace || "__bundle";
+
+    if (this.flavorClassCache[namespaceKey] && this.flavorClassCache[namespaceKey][name]) {
+        return this.flavorClassCache[namespaceKey][name];
+    }
+
+    if (!this.flavorClassCache[namespaceKey]) {
+        this.flavorClassCache[namespaceKey] = {};
+    }
+
+    // this should follow the same logic as Flavors#scopeClassName
+    var  clz = "";
+    if (namespace) {
+        clz += namespace;
+        clz += name.charAt(0).toUpperCase() + name.slice(1);
+    } else {
+        clz += name;
+    }
+    clz += "-f";
+
+    this.flavorClassCache[namespaceKey][name] = clz;
+	return clz;
 };
 
 /**

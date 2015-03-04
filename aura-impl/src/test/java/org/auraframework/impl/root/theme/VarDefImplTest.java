@@ -17,7 +17,8 @@ package org.auraframework.impl.root.theme;
 
 import org.auraframework.Aura;
 import org.auraframework.def.VarDef;
-import org.auraframework.impl.root.theme.VarDefImpl.Builder;
+import org.auraframework.impl.css.theme.VarDefImpl;
+import org.auraframework.impl.css.theme.VarDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;

@@ -16,15 +16,10 @@
 package org.auraframework.impl.source.file;
 
 import java.nio.file.Path;
-import java.util.EnumMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.def.LibraryDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;

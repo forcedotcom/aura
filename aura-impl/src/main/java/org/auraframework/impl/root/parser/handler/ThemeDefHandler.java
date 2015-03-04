@@ -33,7 +33,7 @@ import org.auraframework.def.ThemeDescriptorProviderDef;
 import org.auraframework.def.ThemeMapProviderDef;
 import org.auraframework.def.VarDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.root.theme.ThemeDefImpl;
+import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;

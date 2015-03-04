@@ -35,6 +35,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.ModelDef;
@@ -90,7 +91,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
     private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
             DefType.INTERFACE, DefType.EVENT, DefType.LIBRARY, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME,
-            DefType.DOCUMENTATION, DefType.INCLUDE, DefType.DESIGN, DefType.SVG);
+            DefType.DOCUMENTATION, DefType.INCLUDE, DefType.DESIGN, DefType.SVG, DefType.FLAVOR_ASSORTMENT);
 
     private static class SourceLocationInfo {
         public final List<DefRegistry<?>> staticLocationRegistries;
@@ -312,8 +313,11 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                 regBuild.add(AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory,
                         DefType.INCLUDE));
                 regBuild.add(createDefRegistry(new StyleDefFactory(markupSourceFactory),
-                        Sets.newHashSet(DefType.STYLE, DefType.RESOURCE),
+                        EnumSet.of(DefType.STYLE, DefType.RESOURCE),
                         Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)));
+                regBuild.add(createDefRegistry(new CacheableDefFactoryImpl<FlavoredStyleDef>(markupSourceFactory),
+                        EnumSet.of(DefType.FLAVORED_STYLE),
+                        Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.CUSTOM_FLAVOR_PREFIX)));
             }
 
             regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(),

@@ -67,15 +67,22 @@
             "title": cmp.get("v.title")
         });
 
-        var onError = function () {
-            var onError = cmp.get("v.onerror");
-            if (!$A.util.isUndefinedOrNull(onError) && onError.run) {
-                onError.run();
-            }
-        };
-        image["onerror"] = onError;
+        image["onerror"] = this.wrapAction(cmp.get("v.onerror"));
+        var onLoad = cmp.get("v.onload");
+        if (!$A.util.isUndefinedOrNull(onLoad)) {
+            image["onload"] = this.wrapAction(onLoad, image);
+        }
 
         return image;
+    },
+
+    wrapAction: function(action, parameter) {
+        var wrappedMethod = function () {
+            if (!$A.util.isUndefinedOrNull(action) && action.run) {
+                action.run(parameter);
+            }
+        };
+        return wrappedMethod;
     }
 
 });

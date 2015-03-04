@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			<code>ui:inputDefaultError</code> is the default error handling for your input components. This component displays as a list of errors below the field.
-			Field-level error messages can be added using <code>addErrors()</code>. You can use the default error handling by setting the input value to false and adding the error message. 
+			Field-level error messages can be added using <code>set("v.errors")</code>. You can use the error atribute to show the error message.
 			For example, this component validates if the input is a number.
 		</p>
 <pre>&lt;aura:component>
@@ -31,11 +31,10 @@
     var inputCmp = cmp.find("inputCmp");
     var value = inputCmp.get("v.value");
     if (isNaN(value)) {
-        inputCmp.setValue("v.value", false);
-        inputCmp.addErrors("v.value", [{message:"Input not a number: " + value}]);
+        inputCmp.set("v.errors", [{message:"Input not a number: " + value}]);
     } else {
         //clear error
-        inputCmp.setValid("v.value", true);
+        inputCmp.set("v.errors", null);
     }
 }</pre>
 		<p>Alternatively, you can provide your own <code>ui:inputDefaultError</code> component. This example returns an error message if
@@ -58,11 +57,11 @@
        // clear error
        component.set("v.warnings", null);
     }
-}</pre>		
+}</pre>
 
-	</aura:description>	
+	</aura:description>
 		<aura:example name="inputDefaultError" ref="uiExamples:inputTextExample" label="Using Field-Level Errors">
     	<p>This example shows a <code>ui:inputText</code> component with the default error handling, and a corresponding <code>ui:outputText</code> component for text rendering.</p>
 	</aura:example>
-	
+
 </aura:documentation>

@@ -1,11 +1,11 @@
 ({
     afterRender : function(cmp, hlp){
-      hlp.injectCmp(cmp);
-      this.superAfterRender();
+        hlp.injectCmp(cmp);
+        this.superAfterRender();
     },
-    
+
     rerender : function(cmp, hlp){
-	hlp.injectCmp(cmp);
-	this.superRerender();
+        hlp.injectCmp(cmp);
+        this.superRerender();
     }
 })

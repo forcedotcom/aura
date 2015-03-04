@@ -16,37 +16,36 @@
 ({
 
 	render: function(component, helper) {
-        var domId = component.get('v.domId'),
-			globalId = component.getConcreteComponent().getGlobalId();
-
+        var domId = component.get('v.domId');
 		if (!domId) {
+            var globalId = component.getConcreteComponent().getGlobalId();
 			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
 
-		helper.handleErrors(component);
 		return this.superRender();
 	},
 
 	afterRender: function(component, helper) {
-		helper.lib.interactive.addDomEvents(component);
+        helper.lib.interactive.addDomEvents(component);
         this.superAfterRender();
-		helper.addInputClass(component);
+        helper.addInputClass(component);
 
+        // Allow override of helper methods.
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
+
         concreteHelper.addInputDomEvents(component);
         concreteHelper.updateErrorElement(component);
     },
 
     rerender: function(component, helper) {
+
+        // Allow override of helper methods.
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();
-        concreteHelper.addInputDomEvents(component);
 
-        if (!component._creatingAsyncErrorCmp) {
-        	concreteHelper.handleErrors(component);
-            concreteHelper.updateErrorElement(component);
-        }
+        concreteHelper.addInputDomEvents(component);
+        concreteHelper.updateErrorElement(component);
 
         this.superRerender();
         helper.addInputClass(component);

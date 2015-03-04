@@ -15,51 +15,52 @@
  */
 ({
  	doServerError : function(component, event) {
-		var a = component.get("c.throwsException");
-		a.setParams({
+		var action = component.get("c.throwsException");
+		action.setParams({
             errorMsg : "Error Happens!"
         });
-		
-        a.setCallback(component, function(action){
+
+        action.setCallback(component, function(response){
         	if (action.getState() === "SUCCESS") {
-        		var retValue = action.getReturnValue();
+        		var retValue = response.getReturnValue();
 	        	component.find("outputStatus").set("v.value", "EXPECTED ERROR but got: " + retValue);
+
+                var inputCmp = component.find("inputCmp");
+                inputCmp.set("v.errors", null);
 	        } else {
-	        	var errors = action.getError();
+	        	var errors = response.getError();
 	        	var inputCmp = component.find("inputCmp");
-	    		inputCmp.setValid("v.value", false);
-                inputCmp.addErrors("v.value", errors);
-                
+	    		inputCmp.set("v.errors", errors);
+
                 component.find("outputStatus").set("v.value", "Got Error");
 	        }
         });
-        
-        $A.enqueueAction(a);
+
+        $A.enqueueAction(action);
 	},
-	
+
 	doErrorNoEventFire : function(component) {
 		var inputCmp = component.find("inputCmp");
-		inputCmp.setValid("v.value", false);
-		inputCmp.addErrors("v.value", [{message:"Error Happens!"}]);
+		inputCmp.set("v.errors", [{message:"Error Happens!"}]);
 		component.find("outputStatus").set("v.value", "Got Error");
 	},
-	
+
 	clearErrorNoEventFire : function(component) {
 		var inputCmp = component.find("inputCmp");
-		inputCmp.clearErrors("v.value");
+		inputCmp.set("v.errors", null);
 		component.find("outputStatus").set("v.value", "Cleared error");
 	},
-	
+
 	doErrorNoErrorMsg : function(component) {
 		var inputCmp = component.find("inputCmp");
-		inputCmp.setValid("v.value", false);
+		inputCmp.set("v.errors", true);
 		component.find("outputStatus").set("v.value", "Got Error");
 	},
 
 	// TODO(tbliss): Adding a null error here still adds an entry to the errors object so the error is not cleared.
 	clearErrorNullErrorMsg : function(component) {
 		var inputCmp = component.find("inputCmp");
-		inputCmp.clearErrors("v.value");
+        inputCmp.set("v.errors", null);
 	   	component.find("outputStatus").set("v.value", "Cleared error");
 	}
 })

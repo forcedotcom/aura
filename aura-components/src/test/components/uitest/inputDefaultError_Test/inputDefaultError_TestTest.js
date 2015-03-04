@@ -58,7 +58,7 @@
      * Fire validation on component and verify that it is there
      */
     fireErrorValidation : function(butn, ulIsNotPresent){
-        butn.getEvent("press").fire({});
+        butn.getEvent("press").fire();
         $A.test.addWaitFor(ulIsNotPresent, function (){
             return $A.util.isUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"));
         });

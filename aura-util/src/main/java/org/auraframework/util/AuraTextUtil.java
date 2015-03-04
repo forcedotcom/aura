@@ -54,8 +54,7 @@ public class AuraTextUtil {
             "getSuper","getConcreteComponent",
             "isConcrete","isInstanceOf","isRendered",
             "markDirty","isDirty",
-            "isValid","setValid",
-            "addErrors","clearErrors","getErrors",
+            "isValid",
             "addHandler","addDocumentLevelHandler","removeDocumentLevelHandler",
             "getEventDispatcher","getEvent","getHandledEvents","hasEventHandler",
             "addValueHandler","removeValueHandler",
@@ -218,10 +217,10 @@ public class AuraTextUtil {
 
     /**
      * Properly escapes string for JSON Function.
-     * 
+     *
      * This ensures that a very few sequences are not present, the most important of which is the end comment string, as
      * that causes severe breakage when used in a broken JSON string that is commented out by the error handling.
-     * 
+     *
      * @param in the incoming (unsafe) string
      * @return a string with the sequences replaced appropriately
      */
@@ -242,7 +241,7 @@ public class AuraTextUtil {
      * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string splitting
      * methods. Be absolutely sure that you get the str and delimiter parameter arguments correct. This may eventually
      * be fixed with a refactoring.
-     * 
+     *
      * @param delimiter The delimiter to split the string using
      * @param str The string to split
      * @return String list or, if str was null, then null
@@ -264,7 +263,7 @@ public class AuraTextUtil {
      * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string splitting
      * methods. Be absolutely sure that you get the str and delimiter parameter arguments correct. This may eventually
      * be fixed with a refactoring.
-     * 
+     *
      * @param delimiter The delimiter to split the string using
      * @param str The string to split
      * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
@@ -402,7 +401,7 @@ public class AuraTextUtil {
     /**
      * Properly decode a URL according to the standard. This is a convenience method users don't have to catch this
      * exception everywhere (the exception should never be thrown anyway), or worry about the encoding string.
-     * 
+     *
      * @see URLDecoder#decode(java.lang.String, java.lang.String)
      */
     public static String urldecode(String url) {
@@ -417,10 +416,10 @@ public class AuraTextUtil {
 
     /**
      * Properly encode a URL according to the standard.
-     * 
+     *
      * This is a convenience method users don't have to catch this exception everywhere (the exception should never be
      * thrown anyway).
-     * 
+     *
      * @see URLEncoder#encode(java.lang.String, java.lang.String)
      */
     public static String urlencode(String url) {
@@ -467,7 +466,7 @@ public class AuraTextUtil {
      * LinkedList instead of an ArrayList.<br>
      * <br>
      * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.
-     * 
+     *
      * @param str The string to split
      * @param delimiter The delimiter to split the string using
      * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
@@ -482,7 +481,7 @@ public class AuraTextUtil {
     /**
      * Note, if you are going to search/replace for the same set of source and target many times, you can get a
      * performance win by using the form of this call that takes a TrieMatcher instead.
-     * 
+     *
      * @return the replacement of all occurrences of src[i] with target[i] in s. Src and target are not regex's so this
      *         uses simple searching with indexOf()
      * @see TrieMatcher#replaceMultiple(String, TrieMatcher)
@@ -570,11 +569,11 @@ public class AuraTextUtil {
 
     /**
      * Escape given unescaped text to make it safe for HTML.
-     * 
+     *
      * Note that this routine will only escape a string for use at the 'top' level of html. You MUST NOT use this for
      * attributes, or inside a script tag, as in that case it does not escape a sufficient set of characters. This IS
      * safe for escaping arbitrary text into UTF-8 encoded HTML.
-     * 
+     *
      * @param input the input text string.
      * @return escaped text
      */
@@ -584,7 +583,7 @@ public class AuraTextUtil {
 
     /**
      * Unescape given escaped HTML.
-     * 
+     *
      * @param input
      * @param includeHtmlTags - true includes HTML tags
      * @return unescaped text
@@ -632,7 +631,7 @@ public class AuraTextUtil {
     /**
      * Attribute Name validation: This is done here since we want to validate attribute names entered in quick fix as
      * well.
-     * 
+     *
      * @param attributeName is the attribute name which is being validated
      * @return a : true if the name is valid and false if its invalid
      */
@@ -664,7 +663,7 @@ public class AuraTextUtil {
 
     /**
      * case insensitive string search over a collection of strings
-     * 
+     *
      * @param input the string to search for
      * @param collection the strings to search in
      * @return true iff collection contains a string that equalsIgnoreCase input
@@ -695,7 +694,7 @@ public class AuraTextUtil {
 
     /**
      * Checks whether input is valid js identifier. Currently ASCII only and doesn't include javascript reserved words.
-     * 
+     *
      * @param input String to match
      * @return true if identifier is valid
      */

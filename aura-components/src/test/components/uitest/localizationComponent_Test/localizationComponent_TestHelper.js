@@ -21,31 +21,32 @@
             submitCount = 0
         }
         component.find("outSubmitCount").set("v.value", ++submitCount);
-        
+
         component.set("v.submitCount", submitCount);
     },
 
     goToServer : function(controller, component, event, cmpName, inValue) {
         $A.log("Calling server side echo api:"+"c.echo" + cmpName);
-        var a = component.get("c.echo" + cmpName);
-        a.setParams({
+        var action = component.get("c.echo" + cmpName);
+
+        action.setParams({
             inVar : inValue
         });
 
         $A.log("Going to server...")
-        a.setCallback(component, function(action){
-            if (action.getState() === "SUCCESS") {
-                var retValue = action.getReturnValue();
+        action.setCallback(component, function(response){
+            if (response.getState() === "SUCCESS") {
+                var retValue = response.getReturnValue();
                 var outputCmpName = "out" + cmpName;
                 $A.log("Success! Value from server:"+retValue+" typeof(value):"+typeof(retValue));
 
                 component.find(outputCmpName).set("v.value", retValue);
 
             } else {
-                $A.test.fail("Fail: " + action.getError().message);
+                $A.test.fail("Fail: " + response.getError().message);
             }
         });
 
-        $A.enqueueAction(a);
+        $A.enqueueAction(action);
     }
 })

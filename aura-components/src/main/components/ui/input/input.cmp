@@ -17,21 +17,23 @@
 -->
 <aura:component extensible="true" abstract="true" implements="ui:visible, ui:uiEvents"
     description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA">
-    
+
     <!-- Library which holds the Aura events registration -->
     <aura:import library="ui:eventLib" property="lib"/>
-    
+
     <aura:dependency resource="markup://ui:label"             type="COMPONENT"/>
     <aura:dependency resource="markup://ui:inputDefaultError" type="COMPONENT"/>
-    
+
     <aura:attribute name="disableDoubleClicks"    type="Boolean"          default="false"                   description="Disables double clicking the component within 350ms"/>
+    <aura:attribute name="showErrors"             type="Boolean"          default="true"                    description="Show the error component"/>
+    <aura:attribute name="errors"                 type="Object[]"                                           description="The list of errors to be displayed."/>
     <aura:attribute name="errorComponent"         type="Aura.Component[]"                                   description="A component that displays any error messages, such as validation errors, associated with the input field."/>
     <aura:attribute name="type"                   type="String"                                             description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
-      
+
     <aura:attribute name="required"               type="Boolean"           default="false"  access="GLOBAL" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
     <aura:attribute name="updateOn"               type="String"            default="change" access="GLOBAL" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
     <aura:attribute name="value"                  type="String"                             access="GLOBAL" description="The value currently in the input field."/>
-   
+
     <aura:attribute name="label"                  type="String"                             access="GLOBAL" description="The text of the label component" />
     <aura:attribute name="labelClass"             type="String"            default=""       access="GLOBAL" description="The CSS class of the label component" />
     <aura:attribute name="labelPosition"          type="String"            default="left"                   description="The position in which the label should be displayed. Possible values are &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, and &quot;hidden&quot;. Default value is &quot;left&quot;." />
@@ -42,23 +44,23 @@
     <aura:attribute name="requiredIndicator"      type="Aura.Component[]"                                   description="A component that displays the indicator for the required field.">
 		<span class="{!'required ' + v.requiredIndicatorClass}">*</span>
     </aura:attribute>
-    
+
     <aura:registerEvent name="change"             type="ui:change"                          access="GLOBAL" description="The event fired when the user changes the content of the input."/>
     <aura:registerEvent name="copy"               type="ui:copy"                            access="GLOBAL" description="The event fired when the user copies content to the clipboard."/>
     <aura:registerEvent name="cut"                type="ui:cut"                             access="GLOBAL" description="The event fired when the user cuts content to the clipboard."/>
     <aura:registerEvent name="paste"              type="ui:paste"                           access="GLOBAL" description="The event fired when the user pastes content from the clipboard."/>
     <aura:registerEvent name="onError"            type="ui:validationError"                 access="GLOBAL" description="The event fired when there are any validation errors on the component."/>
     <aura:registerEvent name="onClearErrors"      type="ui:clearErrors"                     access="GLOBAL" description="The event fired when any validation errors should be cleared."/>
-    <aura:registerEvent name="updateError"        type="ui:updateError"                                     description="The event fired to trigger the default error component and messages."/>
+    <aura:registerEvent name="updateError"        type="ui:updateError"                                     description="The event fired to trigger the default error component and messages (deprecated)."/>
     <aura:registerEvent name="input"              type="ui:inputEvent"                                      description="The event fired when the user enters an input."/>
-    
-    
-    <aura:handler name="updateError"                            action="{!c.updateDefaultError}"/>
-    <aura:handler name="init"        value="{!this}"            action="{!c.init}" />
+
+
+    <aura:handler name="updateError"                            action="{!c.updateError}"/>
+    <aura:handler name="init"        value="{!this}"            action="{!c.init}"/>
+
+    <aura:handler name="change"      value="{!v.errors}"        action="{!c.updateError}"/>
     <aura:handler name="change"      value="{!v.label}"         action="{!c.handleLabelChange}"/>
     <aura:handler name="change"      value="{!v.labelPosition}" action="{!c.handleLabelPositionChange}"/>
-
- 
 
     {!v.body}{!v.errorComponent}
 </aura:component>

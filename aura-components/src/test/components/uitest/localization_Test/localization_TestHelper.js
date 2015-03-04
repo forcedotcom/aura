@@ -20,43 +20,45 @@
         if (!submitCount) {
             submitCount = 0
         }
-        
+
         component.find("outSubmitCount").set("v.value", ++submitCount);
-        
+
         component.set("v.submitCount", submitCount);
     },
 
     goToServer : function(controller, component, event, cmpName, inValue) {
-        var a = component.get("c.echo" + cmpName);
+        var action = component.get("c.echo" + cmpName);
 
-        a.setParams({
+        action.setParams({
             inVar : inValue
         });
 
         $A.log("Going to server...")
-        a.setCallback(component, function(action){
-            if (action.getState() === "SUCCESS") {
+        action.setCallback(component, function(response){
+            if (response.getState() === "SUCCESS") {
                 $A.log("Success!\nValue from server:");
-                var retValue = action.getReturnValue();
+                var retValue = response.getReturnValue();
                 $A.log(retValue);
                 component.find("out" + cmpName).set("v.value", retValue);
 
-                component.find("in" + cmpName).setValid("v.value", true);
+                var inCmp = component.find("in" + cmpName);
+                inCmp.set("v.errors", null);
+
                 var cleanErrorEvent = component.find("in" + cmpName).getEvent("onClearErrors");
                 cleanErrorEvent.fire();
             } else {
-                $A.log("Fail: " + action.getError()[0].message);
+                $A.log("Fail: " + response.getError()[0].message);
 
                 var inCmp = component.find("in" + cmpName);
-                var errors = action.getError()
-                inCmp.setValid("v.value", false);
-                inCmp.addErrors("v.value", errors);
+                var errors = response.getError();
+                inCmp.set("v.errors", errors);
+
                 var errorEvent = inCmp.getEvent("onError");
                 errorEvent.setParams({ "errors" : errors});
                 errorEvent.fire();
             }
         });
 
-        $A.enqueueAction(a);
+        $A.enqueueAction(action);
     }
 })

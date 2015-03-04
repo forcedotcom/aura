@@ -38,7 +38,7 @@
                         title: component.get("v.labelTitle"),
                         requiredIndicator: requiredIndicator}}},
                     component );
-           
+
             if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
                 innerBody.unshift(labelComponent);
             } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom' || labelPositionAttribute == 'hidden') {
@@ -60,19 +60,19 @@
      * Otherwise it defaults to left
      */
     checkValidPosition : function(passedInPosition){
-    	var positionMap={"top":1,"right":1,"bottom":1,"left":1,"hidden":1};
-        return positionMap[passedInPosition] ? passedInPosition : "left"; 	
+        var positionMap={"top":1,"right":1,"bottom":1,"left":1,"hidden":1};
+        return positionMap[passedInPosition] ? passedInPosition : "left";
     },
 
-	/**
-	 * @Override
-	 */
-	addDomHandler : function(component, event) {
+    /**
+     * @Override
+     */
+    addDomHandler : function(component, event) {
         var el = this.getInputElement(component);
         $A.util.on(el, event, this.lib.interactive.domEventHandler);
-	},
+    },
 
-	/**
+    /**
      * Adds an event handler for input specific DOM event for which this input has a Aura-equivalent handler
      */
     addInputDomEvents : function(component) {
@@ -82,16 +82,16 @@
             if (component.hasEventHandler(events[i])) {
                 this.addDomHandler(component, events[i]);
             }
-    	}
+        }
 
         var updateOn = this.getUpdateOn(component);
         if (updateOn) {
-        	var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
-        	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
-	            if (handledEvents[updateOn[j]] !== true) {
-	                this.addDomHandler(component, updateOn[j]);
-	            }
-        	}
+            var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
+            for (var j=0, lenj=updateOn.length; j < lenj; j++) {
+                if (handledEvents[updateOn[j]] !== true) {
+                    this.addDomHandler(component, updateOn[j]);
+                }
+            }
 
         }
     },
@@ -100,21 +100,21 @@
      * Returns the array of lower-case event names on which this input should update its bound value object
      */
     getUpdateOn : function(component) {
-    	var ret = [];
+        var ret = [];
         var updateOn = component.get("v.updateOn");
 
         if(!updateOn) {
-        	return ret;
-    	}
+            return ret;
+        }
 
         updateOn = updateOn.toLowerCase().split(/[\W,]+/); // split on whitespace or commas
 
         var domEvents = this.lib.interactive.getDomEvents(component);
         for(var i=0, len=domEvents.length; i < len; i++){
-        	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
-		        if(domEvents[i].toLowerCase()===updateOn[j]){
-		            ret.push(updateOn[j]);
-	            }
+            for (var j=0, lenj=updateOn.length; j < lenj; j++) {
+                if(domEvents[i].toLowerCase()===updateOn[j]){
+                    ret.push(updateOn[j]);
+                }
             }
         }
 
@@ -126,11 +126,11 @@
      * Obtains the current value from the DOM element.  May be overridden by extensions.
      */
     getDomElementValue : function (element) {
-    	return element.value;
+        return element.value;
     },
 
     getHandledDOMEvents : function(component) {
-    	return this.lib.interactive.getHandledDOMEvents(component);
+        return this.lib.interactive.getHandledDOMEvents(component);
     },
 
     /**
@@ -140,16 +140,6 @@
      */
     doUpdate : function(component, value) {
         component.set("v.value", value);
-    },
-
-    /**
-     * Display the validation error if there is any.
-     *
-     */
-    handleErrors : function(component) {
-        if (!component.hasEventHandler("onError")) { // no onError event handler attached, use default error component
-            this.setErrorComponent(component);
-        }
     },
 
     /**
@@ -166,7 +156,7 @@
      * @param event must be a DOM event
      */
      fireEvent : function (component, event, helper) {
-    	 this.lib.interactive.fireEvent(component, event, helper);
+         this.lib.interactive.fireEvent(component, event, helper);
      },
 
     /**
@@ -195,85 +185,53 @@
      * Returns the input dom element in the component. If there are multiple input elements, only the first one is return.
      */
     getInputElement : function(component) {
-    	var element;
+        var element;
 
-    	if (this.hasLabel(component)) {
-    		var el = component.getElement();
-    		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] ||  el.getElementsByTagName('textarea')[0] || el;
-    	} else {
-    		element = component.getElement();
-    	}
-
-    	return element;
-    },
-
-    /**
-     * Set a default error component.
-     */
-    setErrorComponent : function(component) {
-        if (component.isValid("v.value")) {
-            this.validate(component);
+        if (this.hasLabel(component)) {
+            var el = component.getElement();
+            element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] ||  el.getElementsByTagName('textarea')[0] || el;
         } else {
-            this.invalidate(component);
+            element = component.getElement();
         }
+
+        return element;
     },
 
     /**
-     * Dismiss the error messages and restore the component to the normal state.
+     * Show or update the error messages.
      */
-    validate : function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var concreteHelper = concreteCmp.getDef().getHelper();
-        concreteHelper.updateErrorElement(component);
+    updateError : function(component) {
 
+        var errors = component.get("v.errors");
         var errorCmp = component.get("v.errorComponent")[0];
 
-        // Remove errors
-        if (errorCmp && errorCmp.get("v.value.length") > 0) {
-            errorCmp.set("v.value", []);
-        }
-    },
-
-    /**
-     * Show up the the error messages and put the component in the error state.
-     */
-    invalidate : function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var concreteHelper = concreteCmp.getDef().getHelper();
-        concreteHelper.updateErrorElement(component);
-
-        var valueErr = component.getErrors("v.value");
-
-        if (!$A.util.isArray(valueErr)) {
-            return;
-        }
-
-        var m = [];
-        for (var i = 0; i < valueErr.length; i++) {
-            m.push(valueErr[i].message);
-        }
-
-        // Update error component
-        var errorCmp = component.get("v.errorComponent")[0];
         if (errorCmp) {
-            errorCmp.set("v.value", m);
+            // Update error component.
+            errorCmp.set("v.errors", errors);
         } else {
-            component._creatingAsyncErrorCmp = true;
+            // Do nothing if no error component AND no error.
+            if ($A.util.isEmpty(errors)) {
+                return;
+            }
+
+            // Create error component.
             $A.componentService.newComponentAsync(
                 this,
                 function(errorCmp) {
-                	component.set("v.errorComponent", errorCmp);
+                    component.set("v.errorComponent", errorCmp);
+
+                    var concreteCmp = component.getConcreteComponent();
+                    var concreteHelper = concreteCmp.getDef().getHelper();
                     concreteHelper.updateAriaDescribedBy(component, errorCmp.getGlobalId());
-                	component._creatingAsyncErrorCmp = false;
                 },
                 {
-                "componentDef": "markup://ui:inputDefaultError",
-                "attributes": {
+                    "componentDef": "markup://ui:inputDefaultError",
+                    "attributes": {
                         "values": {
-                            "value" : m
+                            "errors" : errors
                         }
-                	}
-            	}
+                    }
+                }
             );
         }
     },
@@ -285,7 +243,8 @@
     },
 
     updateErrorElement : function(component) {
-        $A.util.toggleClass(component, "inputError", !component.isValid("v.value"));
+        var errors = component.get("v.errors");
+        $A.util.toggleClass(component, "inputError", !$A.util.isEmpty(errors));
     },
 
     addClass: function(component, className) {
@@ -293,7 +252,7 @@
     },
 
     removeClass: function(component, className) {
-        $A.util.removeClass(component,className);
+        $A.util.removeClass(component, className);
     },
 
     /**
@@ -347,16 +306,16 @@
     },
 
     addTokenToString: function(str, token) {
-    	token = $A.util.trim(token);
-    	str = $A.util.trim(str);
-    	if (str) {
+        token = $A.util.trim(token);
+        str = $A.util.trim(str);
+        if (str) {
             if ((' ' + str + ' ').indexOf(' ' + token + ' ') === -1) {
-    			str += ' ' + token;
-    		}
-    	} else {
-    		str = token;
-    	}
-    	return str
+                str += ' ' + token;
+            }
+        } else {
+            str = token;
+        }
+        return str;
     },
 
     addInputClass: function(component) {
@@ -364,23 +323,23 @@
     		var inputEl = this.getInputElement(component);
     		$A.util.addClass(inputEl, component.getConcreteComponent().getDef().getStyleClassName());
 //            $A.util.addClass(component, component.getConcreteComponent().getDef().getStyleClassName())
-    	}
+        }
     },
 
     hasLabel: function(cmp) {
-    	var label = cmp.get('v.label');
-    	return !!(label && label.length > 0);
+        var label = cmp.get('v.label');
+        return !!(label && label.length > 0);
     },
-    
+
     setDisabled: function(component, disabled, disabledCss) {
-    	this.lib.interactive.setEventParams(component, disabled, disabledCss);
+        this.lib.interactive.setEventParams(component, disabled, disabledCss);
     },
-    
+
     getDomEvents : function(component) {
         return this.lib.interactive.getDomEvents(component);
     },
-    
+
     domEventHandler : function (event) {
-    	this.lib.interactive.domEventHandler(event);
+        this.lib.interactive.domEventHandler(event);
     }
 })

@@ -15,10 +15,10 @@
  */
 ({
     "addError": function(cmp) {
-        cmp.addErrors("v.inputText1", { "message" : "I'm an error" });
+        cmp.find("inputText1").set("v.errors", [{ "message" : "I'm an error" }]);
     },
 
     "clearErrors": function(cmp) {
-        cmp.clearErrors("v.inputText1");
+        cmp.find("inputText1").set("v.errors", null);
     }
 })

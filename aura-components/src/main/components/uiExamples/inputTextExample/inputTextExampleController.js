@@ -15,22 +15,19 @@
  */
 
 ({
-    checkInput : function(cmp, evt) {
+    checkInput : function(cmp) {
     	var colorCmp = cmp.find("color");
         var myColor = colorCmp.get("v.value");
+
         var myOutput = cmp.find("outColor");
         var greet = "You entered: " + myColor;
         myOutput.set("v.value", greet);
 
         if (!myColor) {
-            colorCmp.setValid("v.value", false);
-            colorCmp.addErrors("v.value", [{message:"Enter some text"}]);
+            colorCmp.set("v.errors", [{message:"Enter some text"}]);
         }
         else {
-            //clear error
-            if(!colorCmp.isValid("v.value")){
-                colorCmp.setValid("v.value", true);
-            }
+            colorCmp.set("v.errors", null);
         }
     }
 })

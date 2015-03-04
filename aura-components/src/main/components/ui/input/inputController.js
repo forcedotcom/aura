@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 ({
-    updateDefaultError : function(component, event, helper){
-        helper.setErrorComponent(component);
+    updateError : function(component, event, helper){
+        var showErrors = component.get("v.showErrors");
+        if (showErrors) {
+            helper.updateError(component);
+        }
     },
 
     init : function(component, event, helper) {

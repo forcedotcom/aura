@@ -31,6 +31,7 @@ import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -39,11 +40,15 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.test.util.AuraPrivateAccessor;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -52,7 +57,6 @@ import com.google.common.collect.Sets;
  * 
  * @hierarchy Aura.Basic
  * @priority high
- * @userStory a07B0000000DfxB
  */
 public class AuraContextImplTest extends AuraImplTestCase {
     public AuraContextImplTest(String name) {
@@ -114,7 +118,8 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:appname",
                 ApplicationDef.class);
 
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
+                desc);
         ctx.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
@@ -122,14 +127,15 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * Find uid in serialized cmp.
-     *
+     * 
      * Don't use a gold file here, the nonce changes often.
      */
     public void testSerializeNonceWithCmp() throws Exception {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
+                desc);
         String expected = Aura.getConfigAdapter().getAuraFrameworkNonce();
         ctx.setFrameworkUID(null);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
@@ -145,7 +151,8 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
-        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, desc);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
+                desc);
         ctx.setFrameworkUID("#FAKEUID#");
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
@@ -430,5 +437,162 @@ public class AuraContextImplTest extends AuraImplTestCase {
         String res = ctx.serialize(AuraContext.EncodingStyle.Full);
 
         assertTrue(res.contains("\"contextPath\":\"/cool\""));
+    }
+
+    private void registerGlobal(final String name, boolean writable, Object defaultValue) {
+        addTearDownStep(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, GlobalValue> values = AuraPrivateAccessor.get(AuraContextImpl.class, "allowedGlobalValues");
+                    values.remove(name);
+                } catch (Exception e) {
+                    throw new Error(String.format("Failed to unregister the global value '%s'", name), e);
+                }
+            }
+        });
+        Aura.getContextService().registerGlobal(name, writable, defaultValue);
+    }
+
+    public void testSerializeWithRegisteredGlobal() throws Exception {
+        final String name = "someNewValue";
+        registerGlobal(name, true, "some default value");
+
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setFrameworkUID("#FAKEUID#");
+        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        goldFileJson(res);
+    }
+
+    public void testValidateGlobalRegistered() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        assertEquals(true, ctx.validateGlobal("isVoiceOver"));
+    }
+
+    public void testValidateGlobalUnregistered() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        assertEquals(false, ctx.validateGlobal("unknown"));
+    }
+
+    public void testValidateGlobalNull() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        assertEquals(false, ctx.validateGlobal(null));
+    }
+
+    public void testSetGlobalUnregistered() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        try {
+            ctx.setGlobal("unknown", "irrelevant");
+            fail("expected to throw if global unregistered");
+        } catch (Throwable t) {
+            this.assertExceptionMessage(t, AuraRuntimeException.class,
+                    "Attempt to set unknown $Global variable: unknown");
+        }
+    }
+    
+    public void testSetGlobalNullName() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        try {
+            ctx.setGlobal(null, "irrelevant");
+            fail("expected to throw if global unregistered");
+        } catch (Throwable t) {
+            this.assertExceptionMessage(t, AuraRuntimeException.class,
+                    "Attempt to set unknown $Global variable: null");
+        }
+    }
+    
+    public void testSetGlobal() throws Exception {
+        final String name = getName();
+        registerGlobal(name, true, "some default value");
+        Object expected = new Object();
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setGlobal(name, expected);
+        assertEquals(expected, ctx.getGlobal(name));
+    }
+    
+    public void testSetGlobalNullValue() throws Exception {
+        final String name = getName();
+        registerGlobal(name, true, "some default value");
+        Object expected = null;
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setGlobal(name, expected);
+        assertEquals(expected, ctx.getGlobal(name));
+    }
+    
+    public void testGetGlobalUnregistered() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        try {
+            ctx.getGlobal("unknown");
+            fail("expected to throw if global unregistered");
+        } catch (Throwable t) {
+            this.assertExceptionMessage(t, AuraRuntimeException.class,
+                    "Attempt to retrieve unknown $Global variable: unknown");
+        }
+    }
+
+    public void testGetGlobalNull() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        try {
+            ctx.getGlobal(null);
+            fail("expected to throw if global null");
+        } catch (Throwable t) {
+            this.assertExceptionMessage(t, AuraRuntimeException.class,
+                    "Attempt to retrieve unknown $Global variable: null");
+        }
+    }
+
+    public void testGetGlobalDefault() throws Exception {
+        final String name = getName();
+        Object expected = new Object();
+        registerGlobal(name, true, expected);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        assertEquals(expected, ctx.getGlobal(name));
+    }
+
+    public void testGetGlobalDefaultNull() throws Exception {
+        final String name = getName();
+        Object expected = null;
+        registerGlobal(name, true, expected);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        assertEquals(expected, ctx.getGlobal(name));
+    }
+
+    public void testGetGlobalSetValue() throws Exception {
+        final String name = getName();
+        Object defaultValue = new Object();
+        Object expected = new Object();
+        registerGlobal(name, true, defaultValue);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setGlobal(name, expected);
+        assertEquals(expected, ctx.getGlobal(name));
+    }
+
+    public void testGetGlobalSetNull() throws Exception {
+        final String name = getName();
+        Object defaultValue = new Object();
+        Object expected = null;
+        registerGlobal(name, true, defaultValue);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setGlobal(name, expected);
+        assertEquals(expected, ctx.getGlobal(name));
+    }
+    
+    public void testGetGlobals() throws Exception {
+        String name1 = getName() + "first";
+        String name2 = getName() + "second";
+        Object defaultValue = new Object();
+        Object setValue = new Object();
+        registerGlobal(name1, true, defaultValue);
+        registerGlobal(name2, true, defaultValue);
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setGlobal(name2, setValue);
+        
+        ImmutableMap<String, GlobalValue> globals = ctx.getGlobals();
+        assertEquals("missing first registered value", true, globals.containsKey(name1));
+        assertEquals("missing second registered value", true, globals.containsKey(name2));
+        assertEquals("unexpected first default value", defaultValue, globals.get(name1).defaultValue);
+        assertEquals("unexpected second default value", defaultValue, globals.get(name2).defaultValue);
+        assertEquals("unexpected first value", null, globals.get(name1).value);
+        assertEquals("unexpected second value", setValue, globals.get(name2).value);
     }
 }

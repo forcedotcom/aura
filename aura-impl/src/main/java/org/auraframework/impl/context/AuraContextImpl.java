@@ -69,7 +69,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AuraContextImpl implements AuraContext {
-
     private static final Logger logger = Logger.getLogger(AuraContextImpl.class);
 
     private static class DefSorter implements Comparator<Definition> {
@@ -82,7 +81,8 @@ public class AuraContextImpl implements AuraContext {
     private static final DefSorter DEFSORTER = new DefSorter();
 
     private static class Serializer extends NoneSerializer<AuraContext> {
-        private Serializer() { }
+        private Serializer() {
+        }
 
         public static final String DELETED = "deleted";
 
@@ -282,16 +282,16 @@ public class AuraContextImpl implements AuraContext {
 
     private Deque<DefDescriptor<?>> callingDescriptorStack = Lists.newLinkedList();
 
-    private static final int MAX_COMPONENT_COUNT        = 10000;
+    private static final int MAX_COMPONENT_COUNT = 10000;
     private int componentCount;
 
-    public static Map<String, GlobalValue> allowedGlobalValues;
-    private Map<String,AuraContext.GlobalValue> globalValues;
+    private static final Map<String, GlobalValue> allowedGlobalValues;
+    private Map<String, AuraContext.GlobalValue> globalValues;
 
     static {
         allowedGlobalValues = new HashMap<>();
     }
-    
+
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
@@ -491,7 +491,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void popCallingDescriptor() {
-        if (callingDescriptorStack.size()>0) {
+        if (callingDescriptorStack.size() > 0) {
             callingDescriptorStack.pop();
         } else {
             logger.warn("Trying to pop a calling descriptor from an empty stack");
@@ -642,7 +642,7 @@ public class AuraContextImpl implements AuraContext {
                 } else {
                     sb.append("request");
                 }
-                throw new SystemErrorException("Too many components for "+sb.toString());
+                throw new SystemErrorException("Too many components for " + sb.toString());
             }
         }
         iStack.registerComponent(component);
@@ -660,7 +660,7 @@ public class AuraContextImpl implements AuraContext {
         DefDescriptor<? extends BaseComponentDef> desc = getLoadingApplicationDescriptor();
         if (desc != null && desc.getDefType() == DefType.APPLICATION) {
             @SuppressWarnings("unchecked")
-            DefDescriptor<ApplicationDef> appDesc = (DefDescriptor<ApplicationDef>)desc;
+            DefDescriptor<ApplicationDef> appDesc = (DefDescriptor<ApplicationDef>) desc;
             try {
                 ApplicationDef app = Aura.getDefinitionService().getDefinition(appDesc);
                 if (app != null) {
@@ -714,8 +714,8 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public ImmutableMap<String, AuraContext.GlobalValue> getGlobals() {
         Map<String, AuraContext.GlobalValue> result = new HashMap<>();
-        for (String key :allowedGlobalValues.keySet()) {
-            result.put(key,getGlobalValue(key)); // add registered defaults
+        for (String key : allowedGlobalValues.keySet()) {
+            result.put(key, getGlobalValue(key)); // add registered defaults
         }
         return (ImmutableMap<String, GlobalValue>) AuraUtil.immutableMap(result);
     }
@@ -746,18 +746,18 @@ public class AuraContextImpl implements AuraContext {
         if (!validateGlobal(approvedName)) {
             throw new AuraRuntimeException("Attempt to set unknown $Global variable: " + approvedName);
         }
-        
+
         if (globalValues.containsKey(approvedName)) {
             (globalValues.get(approvedName)).value = value;
         }
         else {
-            //copy the registered record to globals, replacing value with supplied value
+            // copy the registered record to globals, replacing value with supplied value
             GlobalValue temp = allowedGlobalValues.get(approvedName);
 
-            // You could add "if (temp.defaultValue.equals(value)) return;" 
+            // You could add "if (temp.defaultValue.equals(value)) return;"
             // if you wished to store values sparsely (not re-storing default even if explicitly set)
             // But you would lose the ability to test whether the value was explicitly set
-            globalValues.put(approvedName, new GlobalValue(temp.writable,temp.defaultValue,value));
+            globalValues.put(approvedName, new GlobalValue(temp.writable, temp.defaultValue, value));
         }
     }
 
@@ -765,15 +765,21 @@ public class AuraContextImpl implements AuraContext {
     public boolean validateGlobal(String approvedName) {
         return (allowedGlobalValues.containsKey(approvedName));
     }
-    
+
     static ImmutableMap<String, AuraContext.GlobalValue> getAllowedGlobals() {
         Map<String, AuraContext.GlobalValue> result = new HashMap<>();
-        allowedGlobalValues.putAll(result); // add registered defaults
+        result.putAll(allowedGlobalValues); // add registered defaults
         return (ImmutableMap<String, GlobalValue>) AuraUtil.immutableMap(result);
     }
 
     static void registerGlobal(String approvedName, boolean publicallyWritable, Object defaultValue) {
-        allowedGlobalValues.put(approvedName, new GlobalValue(publicallyWritable,defaultValue,null));
+        if (approvedName == null || !AuraTextUtil.isValidJsIdentifier(approvedName)) {
+            throw new AuraRuntimeException(
+                    String.format(
+                            "Invalid name for $Global value: '%s'. The name must be valid for serialization as a key to the client.",
+                            approvedName));
+        }
+        allowedGlobalValues.put(approvedName, new GlobalValue(publicallyWritable, defaultValue, null));
     }
 
     @Override

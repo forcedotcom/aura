@@ -143,7 +143,7 @@ public class AuraContextServiceImpl implements ContextService {
     }
 
     private DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> loaders) {
-        List<DefRegistry<?>> ret = new ArrayList<DefRegistry<?>>();
+        List<DefRegistry<?>> ret = new ArrayList<>();
         Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
         for (RegistryAdapter provider : providers) {
             DefRegistry<?>[] registries = provider.getRegistries(mode, access, loaders);
@@ -160,7 +160,7 @@ public class AuraContextServiceImpl implements ContextService {
         // load any @Primary GlobalValueProviderAdatper first, to give it's
         // implementations precedence
         GlobalValueProviderAdapter primaryFactory = ServiceLocator.get().get(GlobalValueProviderAdapter.class);
-        Map<String, GlobalValueProvider> instances = new HashMap<String, GlobalValueProvider>();
+        Map<String, GlobalValueProvider> instances = new HashMap<>();
         for (GlobalValueProvider g : primaryFactory.createValueProviders()) {
             instances.put(g.getValueProviderKey().getPrefix(), g);
         }

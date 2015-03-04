@@ -41,11 +41,11 @@ import aQute.bnd.annotation.component.Component;
 @Component (provide=AuraServiceProvider.class)
 public class ContextAdapterImpl implements ContextAdapter {
 
-    private static ThreadLocal<AuraContext> currentContext = new ThreadLocal<AuraContext>();
+    private static ThreadLocal<AuraContext> currentContext = new ThreadLocal<>();
     
-    private static ThreadLocal<AuraContext> systemContext = new ThreadLocal<AuraContext>();
+    private static ThreadLocal<AuraContext> systemContext = new ThreadLocal<>();
 
-    private static ThreadLocal<MutableInteger> systemDepth = new ThreadLocal<MutableInteger>();
+    private static ThreadLocal<MutableInteger> systemDepth = new ThreadLocal<>();
 
     @Override
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,

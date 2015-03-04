@@ -31,7 +31,7 @@
 	<ul aura:id="ul" class="{!v.class}">
 		<aura:iteration items="{!v.items}"
 						var="{!v.itemVar}"
-						body="{!v.itemTemplate}"
+						template="{!v.itemTemplate}"
 						iterationComplete="{!c.iterationComplete}"/>
 	</ul>
 </aura:component>

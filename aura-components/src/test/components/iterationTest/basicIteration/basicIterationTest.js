@@ -179,6 +179,15 @@
         }
     },
 
+    testEndZero:{
+        attributes:{ items:"a,b,c,d,e", end:0 },
+        test:function(cmp){
+            this.assertTemplateComponentDefRef(cmp);
+            var body = cmp.find("iteration").get("v.body");
+            $A.test.assertEquals(0, body.length);
+        }
+    },
+
     /**
      * Iteration starts with first item and ends before end, without start
      */
@@ -212,7 +221,6 @@
     },
  
     /** Iteration rerender stays stable */
-    //TODO: Test fails because iteration's body is not rerendered
     testEmptyAndFill:{
         attributes:{ items:"alpha,beta" },
         test:[function(cmp) {
@@ -250,5 +258,34 @@
             $A.test.assertEquals("BODY", parent.tagName,
                     "Reference parent isn't right component");
         }]
+    },
+
+    testChangeTemplate:{
+        attributes:{items:"a,b,c,d,e"},
+        test:[
+            function assertInitialState(cmp){
+                var expected="0:a,1:b,2:c,3:d,4:e,";
+
+                var actual=$A.test.getTextByComponent(cmp.find("iteration"));
+
+                $A.test.assertEquals(expected,actual);
+            },
+            function changeTemplate(cmp){
+                var iteration=cmp.find("iteration");
+                var expected="a:0,b:1,c:2,d:3,e:4,";
+                iteration.set("v.template",[
+                    {attributes:{values:{value:"{!var}"}},componentDef:{descriptor:"aura:expression"}},
+                    {attributes:{values:{value:":"}},componentDef:{descriptor:"aura:text"}},
+                    {attributes:{values:{value:"{!idx}"}},componentDef:{descriptor:"aura:expression"}},
+                    {attributes:{values:{value:","}},componentDef:{descriptor:"aura:text"}}
+                ]);
+
+                $A.test.addWaitFor(true,function(){return iteration.get("v.loaded");},function(){
+                    var actual=$A.test.getTextByComponent(iteration);
+
+                    $A.test.assertEquals(expected,actual);
+                })
+            }
+        ]
     }
 })

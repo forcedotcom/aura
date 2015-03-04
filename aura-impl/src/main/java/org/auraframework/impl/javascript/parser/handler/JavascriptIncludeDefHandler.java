@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.expression.PropertyReference;
@@ -68,8 +69,15 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
             return createDefinition(new AuraRuntimeException(e, getLocation()));
         }
         if (!errors.isEmpty()) {
+            Logger logger = Logger.getLogger(getClass());
             StringBuilder errorSummary = new StringBuilder();
             for (JavascriptProcessingError error : errors) {
+                if (JavascriptProcessingError.Level.Warning.equals(error.getLevel())) {
+                    // will need to surface these warnings externally
+                    // perhaps report them as part of the serialized library in dev modes
+                    logger.warn("Library warning for " + descriptor + " : " + error.toString());
+                    continue;
+                }
                 errorSummary.append('\n');
                 if (isUnnamedFunction && error.getLine() == 1) {
                     // adjust for prefix
@@ -77,7 +85,9 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
                 }
                 errorSummary.append(error.toString());
             }
-            return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
+            if (errorSummary.length() > 0) {
+                return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
+            }
         }
 
         builder.setCode(code);

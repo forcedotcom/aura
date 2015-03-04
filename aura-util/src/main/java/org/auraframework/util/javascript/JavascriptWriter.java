@@ -28,12 +28,10 @@ import java.util.logging.Level;
 import org.auraframework.util.IOUtil;
 
 import com.google.common.collect.Lists;
-import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
 import com.google.javascript.jscomp.Result;
@@ -155,13 +153,13 @@ public enum JavascriptWriter {
         @Override
         public List<JavascriptProcessingError> compress(String in, Writer out, String filename) throws IOException {
             out.append(in);
-            return new ArrayList<JavascriptProcessingError>();
+            return new ArrayList<>();
         }
 
         @Override
         public List<JavascriptProcessingError> compress(InputStream in, Writer out, String filename) throws IOException {
             IOUtil.copyStream(new InputStreamReader(in), out);
-            return new ArrayList<JavascriptProcessingError>();
+            return new ArrayList<>();
         }
     };
 
@@ -234,7 +232,7 @@ public enum JavascriptWriter {
      * Does the actual compression work.
      */
     private List<JavascriptProcessingError> compress(SourceFile in, Writer out, Writer sourceMapWriter, String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
-        List<JavascriptProcessingError> msgs = new ArrayList<JavascriptProcessingError>();
+        List<JavascriptProcessingError> msgs = new ArrayList<>();
         // Do some actual closure variation:
         Compiler c = new Compiler();
 
@@ -247,7 +245,7 @@ public enum JavascriptWriter {
 
         //Add source file mapping, useful for relocating source files on a server or removing repeated values in the “sources” entry
         if(sourceMapLocationMapping != null && !sourceMapLocationMapping.isEmpty()) {
-            options.sourceMapLocationMappings = new ArrayList<SourceMap.LocationMapping>();
+            options.sourceMapLocationMappings = new ArrayList<>();
             for(Map.Entry<String, String> entry : sourceMapLocationMapping.entrySet()) {
                 options.sourceMapLocationMappings.add(new SourceMap.LocationMapping(entry.getKey(), entry.getValue()));
             }

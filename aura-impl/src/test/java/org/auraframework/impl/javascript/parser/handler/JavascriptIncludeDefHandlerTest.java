@@ -107,4 +107,13 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
                             filename, code.length() - 1));
         }
     }
+
+    public void testWarningIgnoredForNonStandardJsDoc() throws Exception {
+        String code = "function(){return 'x'}\n/*!\n * @version 1\n */";
+        StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
+        JavascriptIncludeDefHandler handler = new JavascriptIncludeDefHandler(descriptor, source);
+        IncludeDef def = handler.getDefinition();
+        def.validateDefinition();
+        assertEquals(code, def.getCode());
+    }
 }

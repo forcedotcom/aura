@@ -142,6 +142,8 @@
     },
 
     getListOutput: function(cmp) {
-        return $A.test.getText(cmp.find("list").getElement());
+        var text = $A.test.getText(cmp.find("list").getElement());
+        // infiniteList.cmp has a hidden loading message that we don't care about
+        return text.replace("Loading...","");
     }
 })

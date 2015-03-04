@@ -37,9 +37,6 @@
     position: relative;
     top: 0;
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     cursor: pointer;
 }
@@ -47,16 +44,9 @@
 .THIS > .scroller {
     position: absolute;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-transform: translateZ(0);
-    -moz-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    -o-transform: translateZ(0);
     transform: translateZ(0);
 
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 
     -webkit-text-size-adjust: none;
@@ -68,9 +58,6 @@
 
 .THIS.native > .scroller {
     -webkit-touch-callout: default;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
     user-select: text;
 }
 
@@ -83,22 +70,15 @@
 
 .THIS .surface {
     position: absolute;
-    -webkit-transform-origin: center center;
     transform-origin: center center;
-    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-transform-style: flat;
     transform-style: flat;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
     pointer-events: auto;
+    box-sizing: border-box;
 }
 
 .THIS .pullToRefresh {
-    -webkit-transform : translate3d(0,0,0);
-    -moz-transform    : translate3d(0,0,0);
-    -ms-transform     : translate3d(0,0,0);
     transform         : translate3d(0,0,0);
     position: absolute;
     width: 100%;
@@ -108,9 +88,6 @@
     line-height: 50px;
 }
 .THIS .pullToLoadMore {
-    -webkit-transform : translate3d(0,0,0);
-    -moz-transform    : translate3d(0,0,0);
-    -ms-transform     : translate3d(0,0,0);
     transform         : translate3d(0,0,0);
     height: 50px;
     text-align: center;
@@ -124,32 +101,19 @@
     background-position: 50%;
     background-repeat: no-repeat;
     border-radius: 5px; 
-
-    -webkit-transition : -webkit-transform 300ms;
-    -moz-transition    : -moz-transform 300ms;
-    -ms-transition     : -ms-transform 300ms;
     transition         : transform 300ms;
-
-    -webkit-transform : translate3d(0,0,0);
-    -moz-transform    : translate3d(0,0,0);
-    -ms-transform     : translate3d(0,0,0);
     transform         : translate3d(0,0,0);
     padding: 0 5px;
+    box-sizing: content-box;
 }
 
 .THIS .pullToRefresh.pull  > .icon, 
 .THIS .pullToLoadMore.pull > .icon {
-    -webkit-transform : translate3d(0,0,0) rotate(180deg);
-    -moz-transform    : translate3d(0,0,0) rotate(180deg);
-    -ms-transform     : translate3d(0,0,0) rotate(180deg);
     transform         : translate3d(0,0,0) rotate(180deg);
 }
 
 .THIS .pullToRefresh.update > .icon,
 .THIS .pullToLoadMore.update > .icon {
-    -webkit-animation : spin .6s linear infinite;
-    -moz-animation    : spin .6s linear infinite;
-    -ms-animation     : spin .6s linear infinite;
     animation         : spin .6s linear infinite;
 }
 
@@ -190,7 +154,4 @@
     left: 0;
 }
 
-@-webkit-keyframes spin { from { -webkit-transform: rotate(180deg); } to { -webkit-transform: rotate(540deg); } }
-@-moz-keyframes spin    { from { -moz-transform: rotate(180deg); }    to { -moz-transform: rotate(540deg); } }
-@-ms-keyframes spin     { from { -ms-transform: rotate(180deg); }     to { -ms-transform: rotate(540deg); } }
 @keyframes spin         { from { transform: rotate(180deg); }         to { transform: rotate(540deg); } }

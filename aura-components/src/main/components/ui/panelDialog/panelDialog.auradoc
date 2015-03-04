@@ -71,7 +71,7 @@
    openPanelEvent.fire();
 }</pre>    
 	<h4>Providing a Dynamically Created Component</h4>
-    <p>If you're creating a component dynamically for the dialog body, pass in the component configuration using <code>$A.newComponentAsync()</code>. Specify the component definition and attributes in a helper function.
+    <p>If you're creating a component dynamically for the dialog body, pass in the component configuration using <code>$A.componentService.newComponentAsync()</code>. Specify the component definition and attributes in a helper function.
     For example, you want to add an event handler to the fourth element in the component you created dynamically.</p>
 <pre>showModal: function(cmp, event, helper) {
     $A.componentService.newComponentAsync(this, function(cmps){

@@ -119,7 +119,7 @@
     
     
      <aura:if isTrue="{!v.caseToRender == 'text' || v.caseToRender == 'all'}">
- 	   <ui:label label="Test for inputEmail, inputPhone, inputSecret, inputTime InputURL"/>
+ 	   <ui:label label="Test for inputEmail, inputPhone, inputSecret, InputURL"/>
        <ui:label for="textInvalid" label="testingInvalidInput"/>
        <ui:inputText aura:id="textInvalid"/>
        <br/>

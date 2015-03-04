@@ -83,21 +83,6 @@
     </aura:iteration>
     <br/>
 
-
-    <!-- Input Time -->
-    <div class="container">
-        <div class="title">Input Time</div>
-
-        <span class="bText">Enter Time: <ui:inputTime aura:id="inTime" value="{!m.time}"/></span>
-        <ui:button buttonTitle="Time" label="Submit" class="custom" press="{!c.submitCmp}"/><br/>
-
-        <div class="bText">Your Localized Time value:
-            <div aura:id="cmpCtrTime" class="bText opt">- -</div>
-        </div>
-
-        <div class="bText">Your Non-Localized Time value: <ui:outputText aura:id="outTime" value=""/></div>
-    </div>
-
     <!-- Output Time -->
     <!-- Here we are actually using outputDateTime component -->
     <ui:message severity="info">{!v.hardCoded}</ui:message>

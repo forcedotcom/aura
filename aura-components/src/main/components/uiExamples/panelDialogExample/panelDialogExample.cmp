@@ -1,0 +1,7 @@
+<aura:component>    
+    <div class="container">
+       <ui:button press="{!c.showNonModal}" aura:id="detailTrigger" label="Show Non-Modal Dialog"/>
+       <ui:button press="{!c.showModal}" aura:id="forModal" label="Show Modal Dialog"/>
+    </div>
+    <ui:panelManager />
+</aura:component>

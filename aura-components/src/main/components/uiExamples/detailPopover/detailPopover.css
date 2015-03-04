@@ -1,0 +1,11 @@
+.THIS ol {
+  padding: 0;
+  margin: 0;
+  margin-left: 20px;
+  list-style-type: none;
+}
+
+.THIS li span {
+  display: block;
+}
+

@@ -1,0 +1,9 @@
+<aura:component>
+	<ui:block>
+		<aura:set attribute="left">My Account Name</aura:set>
+		<aura:set attribute="right">LTV: $1,100,000</aura:set>
+	</ui:block>
+	<p>
+		This component can be displayed in both non-modal and modal dialogs.
+	</p>
+</aura:component>

@@ -15,21 +15,21 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" description="A panel for dialogs. Use ui:panelManager to manage your modal panels.">
+<aura:component extensible="true" description="A panel for dialogs. Use only one instance of ui:panelManager to manage your modal or non-modal dialogs.">
 
-    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Add listener to close on click outside"/>
-    <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Add close button in top right corner"/>
+    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Adds a listener to close the dialog when a user clicks outside the dialog"/>
+    <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog"/>
     <aura:attribute name="closeAction" type="Aura.Action" default="{!c.hide}" description="Close Aura Action function"/>
-    <aura:attribute name="class" type="String" default="" description="Additional css classes"/>
-    <aura:attribute name="animation" type="String" default="bottom" description="Animation to apply"/>
-	<aura:attribute name="title" type="String" description="the title of the window"/>
-    <aura:attribute name="detail" type="String" description="the description of the window"/>
-    <aura:attribute name="icon" type="Aura.Component[]" description="the icon for the panel"/>
-    <aura:attribute name="isVisible" type="Boolean" default="false" description="Should show on render?"/>
-    <aura:attribute name="autoFocus" type="Boolean" default="true" description="Automatically focus on the first focusable element"/>
+    <aura:attribute name="class" type="String" default="" description="Adds CSS classes to the dialog"/>
+    <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog"/>
+	<aura:attribute name="title" type="String" description="The title of the dialog window"/>
+    <aura:attribute name="detail" type="String" description="The description of the dialog window"/>
+    <aura:attribute name="icon" type="Aura.Component[]" description="The icon for the dialog"/>
+    <aura:attribute name="isVisible" type="Boolean" default="false" description="Displays dialog on render"/>
+    <aura:attribute name="autoFocus" type="Boolean" default="true" description="Focuses automatically on the first focusable element"/>
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility"/>
-    <aura:attribute name="isScrollable" type="Boolean" default="true" description="Flag to create a scroller inside"/>
-    <aura:attribute name="isTransient" type="Boolean" default="true" description="Flag to indicate if dialog is one-time use and should be destroyed when hidden"/>
+    <aura:attribute name="isScrollable" type="Boolean" default="true" description="Indicates if a scroller should be created in the dialog"/>
+    <aura:attribute name="isTransient" type="Boolean" default="true" description="Indicates if the dialog is one-time use and should be destroyed when hidden"/>
     <aura:attribute name="isModal" type="Boolean" default="false" description="Indicates if this dialog is modal"/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
 

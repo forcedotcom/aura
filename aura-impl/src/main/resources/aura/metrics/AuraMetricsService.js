@@ -104,9 +104,7 @@ MetricsService.prototype = {
         var pluginInstance = typeof PluginContructor === 'function' ? new PluginContructor() : PluginContructor;
         this.pluginInstances[pluginName] = pluginInstance;
         this.collector[pluginName] = [];
-        if (pluginInstance["enabled"]) {
-            pluginInstance["initialize"](this);
-        }
+        pluginInstance["initialize"](this);
     },
     applicationReady: function () {
         this.bootstrapMark("applicationReady");

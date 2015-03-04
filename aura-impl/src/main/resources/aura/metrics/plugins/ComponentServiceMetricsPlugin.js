@@ -20,16 +20,19 @@
  */
 var ComponentServiceMetricsPlugin = function ComponentServiceMetricsPlugin(config) {
     this.config = config;
-    this["enabled"] = true;
+    // #if {"modes" : ["PTEST"]}
+    this["enabled"] = true; // Do not enable it automatically unless PTEST
+    // #end
 };
 
 ComponentServiceMetricsPlugin.NAME = "componentService";
 ComponentServiceMetricsPlugin.prototype = {
     initialize: function (metricsCollector) {
         this.collector = metricsCollector;
-        // #if {"modes" : ["PTEST"]}
-            this.bind(metricsCollector); // Only enabled it automatically in PTEST mode
-        // #end 
+
+        if (this["enabled"]) {
+            this.bind(metricsCollector);
+        }
     },
     enable: function () {
         if (!this["enabled"]) {
@@ -46,7 +49,7 @@ ComponentServiceMetricsPlugin.prototype = {
     bind: function (metricsCollector) {
         var method      = 'newComponentDeprecated',
             beforeHook  = function (startMark, config, avp, lc, f) {
-                startMark["context"]= {
+                startMark["context"] = {
                     "descriptor" :(config["componentDef"]["descriptor"] || config["componentDef"]) + ''
                 };
             };
@@ -65,7 +68,7 @@ ComponentServiceMetricsPlugin.prototype = {
     },
     // #end
     unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"]($A["util"]["transport"], 'newComponentDeprecated');
+        metricsCollector["unInstrument"]($A.componentService, 'newComponentDeprecated');
     }
 };
 

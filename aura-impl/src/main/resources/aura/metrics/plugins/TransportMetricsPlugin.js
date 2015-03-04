@@ -27,7 +27,9 @@ TransportMetricsPlugin.NAME = "transport";
 TransportMetricsPlugin.prototype = {
     initialize: function (metricsCollector) {
         this.collector = metricsCollector;
-        this.bind(metricsCollector);
+        if (this["enabled"]) {
+            this.bind(metricsCollector);
+        }
     },
     enable: function () {
         if (!this["enabled"]) {

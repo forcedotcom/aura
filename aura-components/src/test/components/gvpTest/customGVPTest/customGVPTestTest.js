@@ -25,7 +25,7 @@
         					component.set("v.stringValue","callback passed to get, value="+value);
         				} ); 
             		},
-        			"fail to get the correct valaue from Custom Global Value Provider",
+        			"fail to get the correct value from Custom Global Value Provider",
         			function() {
         						$A.test.addWaitForWithFailureMessage("callback passed to get, value=Today",
         							function() {

@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
@@ -26,17 +30,15 @@ import org.auraframework.util.AuraLocale;
 
 import aQute.bnd.annotation.component.Component;
 
-/**
- */
 @Component (provide=AuraServiceProvider.class)
 public class LocalizationAdapterImpl implements LocalizationAdapter {
 
     /**
-     * Temporary workaround for localized labels for Aura Standalone
+     * Temporary workaround for localized labels
      */
-    private static Map<String, Map<String, String>> labels = new HashMap<String, Map<String, String>>();
+    private static Map<String, Map<String, String>> labels = new HashMap<>();
     static {
-        Map<String, String> todayLabels = new HashMap<String, String>();
+        Map<String, String> todayLabels = new HashMap<>();
         todayLabels.put("ar", "اليوم");
         todayLabels.put("cs", "Dnes");
         todayLabels.put("de", "Heute");
@@ -50,7 +52,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         todayLabels.put("zh_TW", "今天");
         labels.put("task_mode_today", todayLabels);
 
-        todayLabels = new HashMap<String, String>();
+        todayLabels = new HashMap<>();
         todayLabels.put("ar", "اليوم + المتأخرة");
         todayLabels.put("cs", "Dnes + splatnosti");
         todayLabels.put("de", "Heute + Überfällig");
@@ -64,26 +66,9 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         todayLabels.put("zh_TW", "今天+逾期");
         labels.put("task_mode_today_overdue", todayLabels);
         
-        Map<String, String> tomorrowLabels = new HashMap<String, String>();
+        Map<String, String> tomorrowLabels = new HashMap<>();
         tomorrowLabels.put("en_US", "Tomorrow");
         labels.put("task_mode_tomorrow", tomorrowLabels);
-        
-        Map<String, String> yesterdayLabels = new HashMap<String, String>();
-        yesterdayLabels.put("en_US", "Yesterday");
-        labels.put("yesterday", yesterdayLabels);
-        
-        Map<String, String> controllerLabels = new HashMap<String, String>();
-        controllerLabels.put("en_US", "Controller");
-        labels.put("controller", controllerLabels);
-        Map<String, String> helperLabels = new HashMap<String, String>();
-        helperLabels.put("en_US", "Helper");
-        labels.put("helper", helperLabels);
-        Map<String, String> rendererLabels = new HashMap<String, String>();
-        rendererLabels.put("en_US", "Renderer");
-        labels.put("renderer", rendererLabels);
-        Map<String, String> providerLabels = new HashMap<String, String>();
-        providerLabels.put("en_US", "Provider");
-        labels.put("provider", providerLabels);
     }
 
     public LocalizationAdapterImpl() {
@@ -111,8 +96,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
     @Override
     public AuraLocale getAuraLocale() {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        // check for nulls - this happens when AuraContextFilter has not been
-        // run
+        // check for nulls - this happens when AuraContextFilter has not been run
         if (context != null) {
             List<Locale> locales = context.getRequestedLocales();
             if (locales != null && locales.size() > 0) {

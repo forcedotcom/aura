@@ -208,6 +208,8 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case FLAVOR_ASSORTMENT:
             qualified = String.format("%s:%s", ns, name);
             break;
+        default:
+            break;
         }
         DefDescriptor<T> desc = Aura.getDefinitionService().getDefDescriptor(qualified, clazz);
         createFile(desc, contents);

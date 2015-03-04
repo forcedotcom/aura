@@ -15,7 +15,6 @@
  */
 /**
  * This controller depicts a real world controller that can have multiple label expressions.
- * In stanalone Aura, sections are not important. The last part of the label 
  */
 ({
 	someDummyControllerFunction1:function(cmp){

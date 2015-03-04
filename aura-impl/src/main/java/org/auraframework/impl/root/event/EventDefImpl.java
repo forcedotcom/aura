@@ -93,7 +93,6 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             }
             json.writeMapEntry("attributes", getAttributeDefs());
             
-            Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs = getRequiredVersionDefs();
             if(requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
             	json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
             }

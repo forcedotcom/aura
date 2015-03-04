@@ -30,7 +30,7 @@
         </aura:label>
     </div>
     <div aura:id="dynamicLabelContainer">
-        <aura:label value="{!$Label.does_not_matter.dynamic_label_for_test}">
+        <aura:label value="{!$Label.AuraTestLabelSection.dynamic_label_for_test}">
             {!v.intByReference}
         </aura:label>
     </div>

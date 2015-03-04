@@ -20,9 +20,6 @@
  * $A.get("$Label.Section1.controller") to $A.get("$Label.Section1."+"controller") to avoid the labels in test resulting in false positives.
  */
 ({
-    // W-2312761: This test references labels only available on Aura standalone
-    labels : ["UnAdaptableTest"],
-
 	/**
 	 * Verify that labels are parsed from Javascript Controller and loaded in the client.
 	 * No additional server roundtrip should be required to fetch such labels.

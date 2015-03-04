@@ -15,7 +15,7 @@
         test: function(cmp) {
             $A.test.assertEquals("Tomorrow", $A.test.getTextByComponent(cmp.find("innerCmp")),
                     "Label on inner component not properly displayed");
-            $A.test.assertEquals("Tomorrow", $A.get("$Label.Section1.task_mode_tomorrow"));
+            $A.test.assertEquals("Tomorrow", $A.get("$Label.Related_Lists.task_mode_tomorrow"));
         }
     },
 

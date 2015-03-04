@@ -24,8 +24,6 @@ import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 
-/**
- */
 @AuraConfiguration
 public class AuraImplTestConfig {
 

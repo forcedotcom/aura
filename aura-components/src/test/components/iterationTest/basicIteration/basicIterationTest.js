@@ -287,5 +287,99 @@
                 })
             }
         ]
+    },
+
+    /**
+     * Verify iterationComplete event is fired as expected.
+     */
+    testIterationCompleteEvent_onLoad: {
+        attributes: {
+            items: "a,b,c,d,e"
+        },
+        test: function(cmp) {
+            // Initialize operation fired on load
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                        return cmp.get("v.iterationCompleteFired");
+                    }, 
+                    "Iteration's iterationComplete event not fired on cmp load",
+                    function() {
+                        $A.test.assertEquals("Initialize", cmp.get("v.iterationCompleteOperation"),
+                            "Unexpected operation param on iterationComplete event");
+                    }
+            );
+
+        }
+    },
+
+    testIterationCompleteEvent_listChange: {
+        attributes: {
+            items: "a,b,c,d,e"
+        },
+        test: function(cmp) {
+            // Clear any attribute changes from loading component
+            cmp.set("v.iterationCompleteFired", false);
+            cmp.set("v.iterationCompleteOperation", "");
+            cmp.set("v.items", "a,b,Z,d,e");
+
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                        return cmp.get("v.iterationCompleteFired");
+                    }, 
+                    "Iteration's iterationComplete event not fired when modifying items in iteration",
+                    function() {
+                        $A.test.assertEquals("Update", cmp.get("v.iterationCompleteOperation"));
+                    }
+            );
+        }
+    },
+
+    testIterationCompleteEventList_setSameValues: {
+        attributes: {
+            items: "a,b,c,d,e"
+        },
+        test: function(cmp) {
+            // Clear any attribute changes from loading component
+            cmp.set("v.iterationCompleteFired", false);
+            cmp.set("v.iterationCompleteOperation", "");
+            cmp.set("v.items", cmp.get("v.items"));
+
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                        return cmp.get("v.iterationCompleteFired");
+                    }, 
+                    "Iteration's iterationComplete event not fired when setting items to current values",
+                    function() {
+                        $A.test.assertEquals("Update", cmp.get("v.iterationCompleteOperation"));
+                    }
+            );
+        }
+    },
+
+    testIterationCompleteEventList_changeTemplate: {
+        attributes: {
+            items: "a,b,c,d,e"
+        },
+        test: function(cmp) {
+            // Clear any attribute changes from loading component
+            cmp.set("v.iterationCompleteFired", false);
+            cmp.set("v.iterationCompleteOperation", "");
+            cmp.find("iteration").set("v.template",[
+                {attributes:{values:{value:"{!var}"}},componentDef:{descriptor:"aura:expression"}},
+                {attributes:{values:{value:":"}},componentDef:{descriptor:"aura:text"}},
+                {attributes:{values:{value:"{!idx}"}},componentDef:{descriptor:"aura:expression"}},
+                {attributes:{values:{value:","}},componentDef:{descriptor:"aura:text"}}
+            ]);
+
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                        return cmp.get("v.iterationCompleteFired");
+                    }, 
+                    "Iteration's iterationComplete event not fired when changing template",
+                    function() {
+                        $A.test.assertEquals("Initialize", cmp.get("v.iterationCompleteOperation"));
+                    }
+            );
+        }
     }
 })

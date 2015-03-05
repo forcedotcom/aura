@@ -28,5 +28,18 @@
             var hrefValue = link.getElement().href;
             $A.test.assertEquals("javascript:void(0/*#anchor*/);", hrefValue); //in test mode we incldue original href value 
         }
+    },
+    
+    testOnMouseOverMouseOutEventFiring: {
+    	test: function(component){
+    		var anchorA = component.find("testAnchorA");
+    		
+    		$A.test.fireDomEvent(anchorA.getElement(), "mouseover");
+    		$A.test.assertEquals("true", component.get("v.mouseOverEvent"), "onmouseover event did not get fired.");
+    		
+    		$A.test.fireDomEvent(anchorA.getElement(), "mouseout");
+    		$A.test.assertEquals("false", component.get("v.mouseOutEvent"), "onmouseout event did not get fired.");
+    	}
     }
+
 })

@@ -519,7 +519,6 @@
     },
 
     // set the currently visible panel, update classes and aria-hidden attr on all panels 
-    //TODO: Need to look at this again since this function call is in the animation path
     setActiveInstance: function(cmp, panel) {
         var self = this,
             manager = this.getManager(cmp),
@@ -544,7 +543,7 @@
             }
             this.bindKeyHandler(manager);
             //TODO: need to decouple the logic here
-            if (panel.get("v.isModal") === false && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") == -1) {
+            if (panel.get("v.isModal") === false && panel.get("v.closeOnClickOut") && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") == -1) {
                 this.bindClickHandler(manager);
             }
         } else {

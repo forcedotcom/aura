@@ -150,6 +150,7 @@
         $A.get('e.ui:panelTransitionBegin').setParams({ panel: cmp, isOpening: true }).fire();
 
         panel.addEventListener(animEnd, finishHandler, false);
+        cmp.getElement().style.display = '';
         $A.util.addClass(panel, 'sliding');
         panel.style.visibility = 'hidden';
         panel.style.display = 'block';

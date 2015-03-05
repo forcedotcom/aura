@@ -16,6 +16,11 @@
 
 -->
 <aura:component>
+	<aura:attribute name="mouseOverEvent" type="Boolean" default="false" />
+    <aura:attribute name="mouseOutEvent" type="Boolean" default="true" />
+    
 	<a aura:id="testLink" href="#">link</a>
 	<a aura:id="testAnchor" href="#anchor">anchor</a>
+	<br/>
+	<a aura:id="testAnchorA" href="javascript:void(0);" onmouseover="{!c.handleOnMouseOver}" onmouseout="{!c.handleOnMouseOut}">Anchor A</a>
 </aura:component>

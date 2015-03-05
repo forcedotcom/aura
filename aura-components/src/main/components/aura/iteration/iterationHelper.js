@@ -153,7 +153,11 @@
 
     getEnd: function (cmp) {
         var items = cmp.get("v.items");
-        return items&&items.length?Math.min(items.length, parseInt(cmp.get("v.end") || items.length, 10)):0;
+        if(items&&items.length){
+            var end=parseInt(cmp.get("v.end"), 10);
+            return isNaN(end)?items.length:Math.min(items.length, end);
+        }
+        return 0;
     },
 
     trackItem: function (component, item, index, components) {

@@ -250,8 +250,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
             //
             Map<String, Object> attribs = Maps.newHashMap();
             String appUid = getContextAppUid();
-            attribs.put(LAST_MOD,
-                    String.format("app=%s, FW=%s", appUid, Aura.getConfigAdapter().getAuraFrameworkNonce()));
+            String nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
+            // Since we don't get the UID from our URL, we set it here.
+            context.setFrameworkUID(nonce);
+            attribs.put(LAST_MOD, String.format("app=%s, FW=%s", appUid, nonce));
             attribs.put(UID, appUid);
             // prepend servlet context path to reset css
             attribs.put(CONTEXT_PATH, context.getContextPath());

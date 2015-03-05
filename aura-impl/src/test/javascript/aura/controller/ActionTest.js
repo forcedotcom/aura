@@ -39,7 +39,9 @@ Test.Aura.Controller.ActionTest = function() {
     });
 
     var targetNextActionId = 123;
-    var mockActionId = Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId);
+    var mockActionId = function(during){
+        Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId)(during);
+    }
 
     [ Fixture ]
     function Constructor() {

@@ -136,7 +136,7 @@ $A.ns.Aura = function() {
     this["test"] = this.test;
     //#end
 
-    this.clientService = new AuraClientService();
+    this.clientService = new $A.ns.AuraClientService();
     this.componentService = new $A.ns.AuraComponentService();
     this.serializationService = new AuraSerializationService();
     this.renderingService = new $A.ns.AuraRenderingService();
@@ -282,7 +282,7 @@ $A.ns.Aura = function() {
      * @param {Action} action
      * @borrows AuraClientService.enqueueAction
      */
-    this.enqueueAction = this.clientService.enqueueAction;
+    this.enqueueAction = this.clientService.enqueueAction.bind(this.clientService);
 
     /**
      * Equivalent to <code>$A.clientService.deferAction()</code>.
@@ -292,7 +292,7 @@ $A.ns.Aura = function() {
      * @param {Action} action
      * @borrows AuraClientService.deferAction
      */
-    this.deferAction = this.clientService.deferAction;
+    this.deferAction = this.clientService.deferAction.bind(this.clientService);
 
     /**
      * Equivalent to <code>$A.renderingService.render()</code>.

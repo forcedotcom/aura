@@ -15,47 +15,36 @@
  */
 Function.RegisterNamespace("Test.Aura");
 
-[ Fixture ]
+[Fixture, Skip("Rewrite for prototype class structure and $A.ns")]
 Test.Aura.AuraClientServiceTest = function() {
-	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-	Mocks.GetMock(Object.Global(), "exp", function() {
-	})(function() {
-		// #import aura.AuraClientService
+
+    var $A = {
+        ns : {}
+    };
+
+    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+    Mocks.GetMocks(Object.Global(), {
+        "exp": function(){},
+        "$A": $A
+    })(function(){
+        // #import aura.AuraClientService
     });
 
-	var mockGlobal = Mocks.GetMocks(Object.Global(), {
-		"$A" : {
-			ns : {
-				Util : {
-					prototype : {
-						on : function() {
-						}
-					}
-				}
-			},
-			log : function() {
-                        },
-			assert : function() {
-			},
-			util : {
-				isUndefinedOrNull : function() {
-				},
-				isUndefined : function() {
-				},
-				isArray : function() {
-				},
-				json : {
-					encode :function(errorText) {
-						return "mockedJson:"+errorText;
-					}
-				}
-			},
-			mark : function() {
-			}
-		},
-		"window" : {},
-		"exp" : function() {
-		}
+	var mockGlobal = Mocks.GetMock(Object.Global(), "$A", {
+        log : function() {},
+        assert : function() {},
+        util : {
+            on: function() {},
+            isUndefinedOrNull : function() {},
+            isUndefined : function() {},
+            isArray : function() {},
+            json : {
+                encode :function(errorText) {
+                    return "mockedJson:"+errorText;
+                }
+            }
+        },
+        mark : function() {}
 	});
 	
 	[Fixture]
@@ -65,7 +54,7 @@ Test.Aura.AuraClientServiceTest = function() {
         	// Arrange
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
             });
             var errorMsg = "Test Error Message";
             // Act
@@ -166,7 +155,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction();
 
 			mockGlobal(function() {
-				new AuraClientService().enqueueAction(action);
+				new $A.ns.AuraClientService().enqueueAction(action);
 			});
 
 			Assert.Equal(0, action.runDeprecated.Calls.length);
@@ -177,7 +166,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction();
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 				target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
 
 				target.enqueueAction(action);
@@ -196,7 +185,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction("client");
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 				target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
 
 				target.enqueueAction(action);
@@ -218,7 +207,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var action = new MockAction("server");
 
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 			target.processActions = function() {
 			};
@@ -257,7 +246,7 @@ Test.Aura.AuraClientServiceTest = function() {
 				$A.assert = assertStub;
 				$A.util.isUndefinedOrNull = validateStub;
 
-				new AuraClientService().enqueueAction(new MockAction());
+				new $A.ns.AuraClientService().enqueueAction(new MockAction());
 			});
 
 			Assert.Equal(1, validateStub.Calls.length);
@@ -278,7 +267,7 @@ Test.Aura.AuraClientServiceTest = function() {
 				$A.assert = assertStub;
 				$A.util.isUndefined = validateStub;
 
-				new AuraClientService().enqueueAction(new MockAction());
+				new $A.ns.AuraClientService().enqueueAction(new MockAction());
 			});
 
 			Assert.Equal(1, validateStub.Calls.length);
@@ -299,7 +288,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			mockGlobal(function() {
 				$A.assert = assertStub;
 
-				new AuraClientService().enqueueAction(action);
+				new $A.ns.AuraClientService().enqueueAction(action);
 			});
 
 			Assert.Equal({
@@ -316,7 +305,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction();
 
 			mockGlobal(function() {
-				new AuraClientService().enqueueAction(action, true);
+				new $A.ns.AuraClientService().enqueueAction(action, true);
 			});
 
 			Assert.Equal(1, action.setBackground.Calls.length);
@@ -327,7 +316,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction();
 
 			mockGlobal(function() {
-				new AuraClientService().enqueueAction(action);
+				new $A.ns.AuraClientService().enqueueAction(action);
 			});
 
 			Assert.Equal(0, action.setBackground.Calls.length);
@@ -338,7 +327,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction();
 
 			mockGlobal(function() {
-				new AuraClientService().enqueueAction(action, null);
+				new $A.ns.AuraClientService().enqueueAction(action, null);
 			});
 
 			Assert.Equal(0, action.setBackground.Calls.length);
@@ -349,7 +338,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = new MockAction();
 
 			mockGlobal(function() {
-				new AuraClientService().enqueueAction(action, false);
+				new $A.ns.AuraClientService().enqueueAction(action, false);
 			});
 
 			Assert.Equal(0, action.setBackground.Calls.length);
@@ -362,7 +351,7 @@ Test.Aura.AuraClientServiceTest = function() {
 		function ReturnsFalseIfForegroundMax() {
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
             var actionQueue = new MockActionQueue();
             actionQueue.serverActions = [ "action" ];
@@ -381,7 +370,7 @@ Test.Aura.AuraClientServiceTest = function() {
 		function ReturnsFalseIfBackgroundMax() {
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
             var actionQueue = new MockActionQueue();
             actionQueue.nextBackgroundAction = "action";
@@ -399,7 +388,7 @@ Test.Aura.AuraClientServiceTest = function() {
 		function ReturnsFalseIfQueueEmpty() {
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 
 			var actual;
@@ -415,7 +404,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = "server";
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
             var actionQueue = new MockActionQueue();
@@ -440,7 +429,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var action = "server";
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
             });
             var actionQueue = new MockActionQueue();
             actionQueue.serverActions = [ action ];
@@ -459,7 +448,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = "server";
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 			var request = function() {
 			};
@@ -479,7 +468,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = "background";
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
             var actionQueue = new MockActionQueue();
@@ -504,7 +493,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var action = "background";
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 			var request = function() {
 			};
@@ -525,7 +514,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			var actionBackground = "background";
             var target;
 			mockGlobal(function() {
-				target = new AuraClientService();
+				target = new $A.ns.AuraClientService();
 			});
 			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
             var actionQueue = new MockActionQueue();
@@ -565,7 +554,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 $A.assert = stubbedAssert;
                 $A.util.isArray = stubbedIsArray;
-                var target = new AuraClientService();
+                var target = new $A.ns.AuraClientService();
 
                 try {
                     target.makeActionGroup(expected);
@@ -605,7 +594,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 };
                 $A.assert = stubbedAssert;
                 $A.util.isFunction = stubbedIsFunction;
-                var target = new AuraClientService();
+                var target = new $A.ns.AuraClientService();
                 target.makeActionGroup([action], undefined, expected);
             });
 
@@ -633,7 +622,7 @@ Test.Aura.AuraClientServiceTest = function() {
                     return true;
                 };
                 $A.assert = stubbedAssert;
-                var target = new AuraClientService();
+                var target = new $A.ns.AuraClientService();
                 target.makeActionGroup([action], undefined, undefined);
             });
 
@@ -654,7 +643,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var expectedCallback = "callback";
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
                 target.makeActionGroup = Stubs.GetMethod("actions", "scope", "callback", null);
                 target.actionQueue.enqueue = function(){};
                 target.processActions = function(){};
@@ -676,7 +665,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var actions = ["action1", "action2"];
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
                 target.makeActionGroup = function(){};
                 target.actionQueue.enqueue = Stubs.GetMethod("param", null);
                 target.processActions = function(){};
@@ -704,7 +693,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var expectedCallback = "callback";
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
                 target.makeActionGroup = function(){};
                 target.actionQueue.enqueue = function(){};
                 target.processActions = Stubs.GetMethod(null);
@@ -840,7 +829,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 // #import aura.AuraClientService
         		// #import aura.controller.Action
                 mockActionStorage.clear()
-                    .then(function() { delegate(new AuraClientService(), mockActionStorage); });
+                    .then(function() { delegate(new $A.ns.AuraClientService(), mockActionStorage); });
             });
         };
 
@@ -966,7 +955,7 @@ Test.Aura.AuraClientServiceTest = function() {
         function ReturnsTrueForZ10() {
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
             });
             var mockUserAgent = Mocks.GetMock(Object.Global(), "navigator", {
                 userAgent: "Mozilla/5.0 (BB10; Touch) AppleWebKit/537.10+ (KHTML, like Gecko) Version/10.0.9.2372 Mobile Safari/537.10+"
@@ -984,7 +973,7 @@ Test.Aura.AuraClientServiceTest = function() {
         function ReturnsFalseForNonBB10Blackberry() {
             var target;
             mockGlobal(function() {
-                target = new AuraClientService();
+                target = new $A.ns.AuraClientService();
             });
             var mockUserAgent = Mocks.GetMock(Object.Global(), "navigator", {
                 userAgent: "Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.0.0 Mobile Safari/534.11+"

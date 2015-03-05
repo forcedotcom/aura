@@ -36,5 +36,9 @@
                 }
             }
         }).fire();
+    },
+
+    listComplete:function(component){
+        component.set("v.loaded",true);
     }
 })

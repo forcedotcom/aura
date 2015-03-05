@@ -428,7 +428,7 @@ if(!this.concreteComponentId) {
                 	// which could and should be a ComponentDefRef[]
                 	var reference = valueFactory.create(value, attributeDef, config["valueProvider"]);
                 	if($A.util.isExpression(reference)) {
-                        reference.addChangeHandler(cmp,"v."+attribute);
+                        reference.addChangeHandler(cmp,"v."+attribute,null,true);
                         value = reference.evaluate();
                 	}
                 	// KRIS

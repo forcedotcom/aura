@@ -49,7 +49,7 @@ PropertyReferenceValue.prototype.set = function(value) {
     this.valueProvider.set(this.expression,value);
 };
 
-PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
+PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, rebind) {
     var valueProvider=this.valueProvider;
     var expression = this.expression;
     // while(valueProvider instanceof PassthroughValue){
@@ -62,6 +62,9 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method) {
             	// If not valid, don't fire change events
             	if(!cmp.isValid()) { return; }
                 $A.renderingService.addDirtyValue(key, cmp);
+                if(rebind){
+                    cmp.set(key,event.getParam("value"),true);
+                }
                 cmp.fireChangeEvent(key, event.getParam("oldValue"), event.getParam("value"), event.getParam("index"));
             };
         }

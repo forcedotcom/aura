@@ -77,9 +77,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         Object UIPerfData = auraUITestingUtil.getEval("return $A.Perf.toJson()");
         assertNotNull(UIPerfData);
 
-        Boolean UIPerfUI = (Boolean)auraUITestingUtil.getEval("return !!$A.Perf.ui");
-        assertTrue(UIPerfUI);
-
         // Mode independent resources
         Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
         assertNotNull(minuteThruMoment);

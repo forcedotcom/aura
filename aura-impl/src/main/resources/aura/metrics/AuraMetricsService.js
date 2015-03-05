@@ -128,7 +128,10 @@ MetricsService.prototype = {
         return !$A.util.isEmpty(this.transactions);
     },
     transaction: function (ns, name, config) {
-        //TODO
+        this.createTransaction(ns, name, config);
+        return this.transactionEnd(ns, name, function (t) {
+            t["duration"] = 0; // STAMP so no duration
+        });
     },
     transactionUpdate: function (ns, name, config) {
         config = config || {};

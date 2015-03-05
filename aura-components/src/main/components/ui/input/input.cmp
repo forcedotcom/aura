@@ -20,7 +20,7 @@
     
     <!-- Library which holds the Aura events registration -->
     <aura:import library="ui:eventLib" property="lib"/>
-    
+    <aura:dependency resource="markup://ui:label" type="COMPONENT"/>
     <aura:dependency resource="markup://ui:inputDefaultError" type="COMPONENT"/>
     
     <aura:attribute name="required" type="Boolean" access="GLOBAL" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>

@@ -24,27 +24,28 @@
             if (!domId) {
                 domId = component.getConcreteComponent().getGlobalId();
             }
-            var labelComponent = $A.componentService.newComponentDeprecated({
+            var labelComponent = $A.newCmp({
                     componentDef: {descriptor: 'markup://ui:label'},
+                    localId: 'inputLabel',
                     attributes: {values: {
                         'label': labelAttribute,
                         'class': component.get("v.labelClass") + " uiLabel-" + component.get("v.labelPosition"),
                         'for': domId,
                         'labelDisplay': component.get("v.labelPosition") != "hidden",
                         'title': component.get("v.labelTitle"),
-                        'requiredIndicator': component.get("v.required") ? component.get("v.requiredIndicator") : null}}}
-            );
+                        'requiredIndicator': component.get("v.required") ? component.get("v.requiredIndicator") : null}}},
+                    component );
             var labelPositionAttribute = component.get("v.labelPosition");
             if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
                 innerBody.unshift(labelComponent);
             } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom' || labelPositionAttribute == 'hidden') {
                 innerBody.push(labelComponent);
             }
-            var divComponent = $A.componentService.newComponentDeprecated({
+            var divComponent = $A.newCmp({
                     componentDef: {descriptor: 'markup://aura:html'},
                     attributes: {values: {
-                        'body': innerBody,
-                        'tag': 'div'}}}
+                        body: innerBody,
+                        tag: 'div'}}}
             );
             var body = [];
             body.push(divComponent);

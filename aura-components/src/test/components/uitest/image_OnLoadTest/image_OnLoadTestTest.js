@@ -17,9 +17,9 @@
 	checkImageMatches: function(cmp, expectedSrc){
 		var imgElement = cmp.find("image").getElement().firstChild;
 		var imgSrcOutput = cmp.find("outputStatus").get("v.value");
-    	$A.test.assertTrue($A.util.stringEndsWith(imgElement.src, expectedSrc), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
+    	$A.test.assertTrue($A.util.stringEndsWith(imgElement.src, expectedSrc), "Expected src should be "+ expectedSrc +" by default");
     	//check image was passed as a parameter to the action
-    	$A.test.assertTrue($A.util.stringEndsWith(imgSrcOutput, expectedSrc), "Expected src to be '/auraFW/resources/aura/s.gif' by default after onload is fired");
+    	$A.test.assertTrue($A.util.stringEndsWith(imgSrcOutput, expectedSrc), "Expected src should be "+ expectedSrc +" by default after onload is fired");
     },
     
     /**
@@ -30,10 +30,12 @@
     testImageOnLoadPassesParams:{
     	 test: [function(cmp) {
         	var defaultSrc = "/auraFW/resources/aura/s.gif";
+        	expectedSrc = "/auraFW/resources/aura/auralogo.png";
         	this.checkImageMatches(cmp, defaultSrc);
         	$A.test.clickOrTouch(cmp.find("loadButton").getElement());
-        }, function(cmp){
-            this.checkImageMatches(cmp, '/auraFW/resources/aura/auralogo.png');
+        	$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.stringEndsWith(cmp.find("outputStatus").get("v.value"), expectedSrc);}, "Expected image src should be "+ expectedSrc +" after pressing button");
+		}, function(cmp){
+            this.checkImageMatches(cmp, expectedSrc);
         }]
     }
 })

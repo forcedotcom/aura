@@ -24,16 +24,19 @@
             if (!domId) {
                 domId = component.getConcreteComponent().getGlobalId();
             }
+            var labelClass = component.get("v.labelClass") + " uiLabel-" + component.get("v.labelPosition");
+            var labelDisplay = component.get("v.labelPosition") != "hidden";
+            var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
             var labelComponent = $A.newCmp({
                     componentDef: {descriptor: 'markup://ui:label'},
                     localId: 'inputLabel',
                     attributes: {values: {
-                        'label': labelAttribute,
-                        'class': component.get("v.labelClass") + " uiLabel-" + component.get("v.labelPosition"),
-                        'for': domId,
-                        'labelDisplay': component.get("v.labelPosition") != "hidden",
-                        'title': component.get("v.labelTitle"),
-                        'requiredIndicator': component.get("v.required") ? component.get("v.requiredIndicator") : null}}},
+                        label: labelAttribute,
+                        class: labelClass,
+                        for: domId,
+                        labelDisplay: labelDisplay,
+                        title: component.get("v.labelTitle"),
+                        requiredIndicator: requiredIndicator}}},
                     component );
             var labelPositionAttribute = component.get("v.labelPosition");
             if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {

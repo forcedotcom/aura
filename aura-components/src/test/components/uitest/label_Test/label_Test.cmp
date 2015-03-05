@@ -96,7 +96,7 @@
    <ui:inputEmail label="I'm a inputEmail" labelPosition="{!v.whichPosition}" value="I'm an inputEmail"/>
    <ui:inputSecret label="I'm an inputSecret" labelPosition="{!v.whichPosition}" value="I'm an inputSecret"/>
    <ui:inputURL label="I'm an inputURL" labelPosition="{!v.whichPosition}" value="I'm an inputURL"/>
-      
+
    <ui:inputPercent label="inputPercent" labelPosition="{!v.whichPosition}" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="{!v.whichPosition}" value="42"/>
    <ui:inputCheckbox aura:id="inputCheckboxWithLabelTitle" labelTitle="{!v.labelTitle}" label="inputCheckboxWithLabelTitle" labelPosition="{!v.whichPosition}" value="false"/>

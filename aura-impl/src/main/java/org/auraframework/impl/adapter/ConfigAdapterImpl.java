@@ -27,7 +27,6 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -256,6 +255,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         String locale = tz.replace("/", "-");
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
+
         String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         if (!"GMT".equals(locale)) {
             return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, locale);

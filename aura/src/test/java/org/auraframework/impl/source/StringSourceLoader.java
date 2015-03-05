@@ -79,6 +79,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     public static final String OTHER_NAMESPACE = "string1";
     public static final String DEFAULT_CUSTOM_NAMESPACE = "cstring";
     public static final String OTHER_CUSTOM_NAMESPACE = "cstring1";
+    public static final String ANOTHER_CUSTOM_NAMESPACE = "cstring2";
 
     private static final String DEFAULT_NAME_PREFIX = "thing";
     private static final Set<String> PREFIXES = ImmutableSet.of(
@@ -123,6 +124,8 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         customNamespaces.put(DEFAULT_CUSTOM_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
         customNamespaces.put(OTHER_CUSTOM_NAMESPACE,
+                new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+        customNamespaces.put(ANOTHER_CUSTOM_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
     }
 
@@ -303,7 +306,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
                 Preconditions.checkState(sourceMap != null);
                 Preconditions.checkState(sourceMap.remove(descriptor) != null);
                 if (!DEFAULT_CUSTOM_NAMESPACE.equals(namespace) && !OTHER_CUSTOM_NAMESPACE.equals(namespace)
-                        && sourceMap.isEmpty()) {
+                        && !ANOTHER_CUSTOM_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
                     customNamespaces.remove(namespace);
                 }
             }

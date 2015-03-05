@@ -1013,9 +1013,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         libDefs = mdr.getClientLibraries(cntx.getUid(appDesc));
 
-        // 13 from clientLibraryTest:testDependencies and its dependencies + 4 from aura:component
+        // 13 from clientLibraryTest:testDependencies and its dependencies + 1 from aura:component
         // Update this number when you add new aura:clientLibrary tags to these components
-        assertEquals(16, libDefs.size());
+        assertEquals(14, libDefs.size());
     }
 
     public void testAssertAccess_IfGlobalAccessThenPassesCheck() throws Exception {

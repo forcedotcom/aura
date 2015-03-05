@@ -38,10 +38,7 @@ public enum ClientLibraryResolverRegistryImpl implements ClientLibraryResolverRe
     ClientLibraryResolverRegistryImpl() {
 
         this.resolvers = new HashMap<String, ClientLibraryResolver>();
-
-        register(new AuraResourceResolver("UIPerfCSS", ClientLibraryDef.Type.CSS, "UIPerf/UIPerf.css", "UIPerf/UIPerf.css"));
         register(new AuraResourceResolver("UIPerf", ClientLibraryDef.Type.JS, "UIPerf/UIPerf.js", "UIPerf/UIPerf.js"));
-        register(new AuraResourceResolver("UIPerfUi", ClientLibraryDef.Type.JS, "UIPerf/UIPerfUi.js", "UIPerf/UIPerfUi.js"));
         register(new AuraResourceResolver("CkEditor", ClientLibraryDef.Type.JS, "ckeditor/ckeditor-4.x/rel/ckeditor.js", "ckeditor/ckeditor-4.x/rel/ckeditor.js"));
 
     }

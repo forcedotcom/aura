@@ -89,29 +89,11 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     // SFDC uses UIPerf
     @UnAdaptableTest
-    public void testUIPerfCSS() throws Exception {
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfCSS", null, ClientLibraryDef.Type.CSS,
-                null, false, null, null);
-        String url = clientLibraryService.getResolvedUrl(clientLibrary);
-        assertTrue(url.contains("UIPerf.css"));
-    }
-
-    // SFDC uses UIPerf
-    @UnAdaptableTest
     public void testUIPerfJS() throws Exception {
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerf", null, ClientLibraryDef.Type.JS,
                 null, false, null, null);
         String url = clientLibraryService.getResolvedUrl(clientLibrary);
         assertTrue(url.contains("UIPerf.js"));
-    }
-
-    // SFDC uses UIPerf
-    @UnAdaptableTest
-    public void testUIPerfUiJS() throws Exception {
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerfUi", null, ClientLibraryDef.Type.JS,
-                null, false, null, null);
-        String url = clientLibraryService.getResolvedUrl(clientLibrary);
-        assertTrue(url.contains("UIPerfUi.js"));
     }
 
     public void testWriteResourcesCSS() throws Exception {
@@ -326,10 +308,9 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
-        assertEquals(4, jsUrls.size());
+        assertEquals(3, jsUrls.size());
         Iterator<String> it = jsUrls.iterator();
-        assertEquals(getResolver("UIPerf", Type.JS).getUrl(), it.next());
-        assertEquals(getResolver("UIPerfUi", Type.JS).getUrl(), it.next());
+        assertEquals(getResolver("UIPerf", Type.JS      ).getUrl(), it.next());
         assertEquals(getResolver("CkEditor", Type.JS).getUrl(), it.next());
         String resourceUrl = it.next();
         assertRootComponentResourceUrl(appDesc, resourceUrl, Type.JS);

@@ -286,6 +286,10 @@ public class AuraContextFilter implements Filter {
         Map<String, Object> configMap = null;
         String config = contextConfig.get(request);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(config)) {
+            if (config.startsWith(AuraTextUtil.urlencode("{"))) {
+                // Decode encoded context json. Serialized AuraContext json always starts with "{"
+                config = AuraTextUtil.urldecode(config);
+            }
             configMap = (Map<String, Object>) new JsonReader().read(config);
         }
         return configMap;

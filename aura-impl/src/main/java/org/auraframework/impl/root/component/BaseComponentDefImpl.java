@@ -20,6 +20,7 @@ import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
@@ -75,7 +77,11 @@ import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -123,6 +129,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<ClientLibraryDef> clientLibraries;
     private final boolean hasFlavorableChild;
     private final String defaultFlavor;
+    
+    private String clientComponentClass;
 
     private final int hashCode;
 
@@ -865,6 +873,38 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
+     * Gets all the component class definitions for this component definition.
+     * Returns a string of all the client component classes wrapped in a closure for later execution.
+     */
+    public String getComponentClass() throws DefinitionNotFoundException, QuickFixException, IOException {
+    	
+    	if(this.clientComponentClass == null) {
+			final StringBuilder sb = new StringBuilder();
+			BaseComponentDef descriptor = this;
+			String name = null;			
+			ClientComponentClass clientClass;
+			
+	    	sb.append("function(){");
+	    	while(descriptor != null && !"markup://aura:component".equals(name)) {
+	    		clientClass = new ClientComponentClass(descriptor);
+	    		clientClass.writeComponentClass(sb);
+	    		
+	    		if(descriptor.getExtendsDescriptor() == null) {
+	    			break;
+	    		}
+	    		
+        		descriptor = descriptor.getExtendsDescriptor().getDef(); 
+        		name = descriptor.getDescriptor().getQualifiedName();
+	    	}
+	        sb.append('}');
+	        
+	        this.clientComponentClass = sb.toString();
+    	}
+    	
+        return this.clientComponentClass;
+    }
+
+    /**
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
      */
@@ -872,10 +912,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public void serialize(Json json) throws IOException {
         try {
             AuraContext context = Aura.getContextService().getCurrentContext();
-            Mode mode = context.getMode();
             boolean preloaded = context.isPreloaded(getDescriptor());
             boolean preloading = context.isPreloading();
-
+            final String uid = context.getUid(context.getApplicationDescriptor());
+            final Mode mode = context.getMode();
+            final boolean minify = !mode.prettyPrint();
+            final String mKey = minify ? "MIN:" : "DEV:";
+            final String key = "JS:" + mKey + uid;
+            
             if (preloaded) {
                 json.writeValue(descriptor);
             } else {
@@ -889,11 +933,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     }
                 } finally {
                     context.popCallingDescriptor();
-                }
-                HelperDef helperDef = getHelperDef();
-                if (helperDef != null && !helperDef.isLocal()) {
-                    json.writeMapEntry("helperDef", helperDef);
-                }
+            	}
+//                HelperDef helperDef = getHelperDef();
+//                if (helperDef != null && !helperDef.isLocal()) {
+//                    json.writeMapEntry("helperDef", helperDef);
+//                }
 
                 json.writeMapEntry("styleDef", getStyleDef());
                 json.writeMapEntry("controllerDef", getControllerDef());
@@ -964,9 +1008,19 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("testSuiteDef", getTestSuiteDef());
                 }
 
+
                 String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
                 if (defaultFlavorToSerialize != null) {
                     json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);
+                }
+
+                if(context.getDefRegistry().getComponentClassLoaded(descriptor) == false) {
+                    // KRIS:
+                    // This needs to be conditional. We can't just return the component class each time.
+                    // We do still return this componentdef object even if we already have the component class.
+                    // This is because this still has a lot of logic not genereated as part of the component class.
+                    // I see no reason we can't do that, but we just haven't yet.
+                    json.writeMapEntry("componentClass", getComponentClass());
                 }
 
                 serializeFields(json);

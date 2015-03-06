@@ -836,6 +836,21 @@ if(!this.concreteComponentId) {
                 // JBUCH: HALO: TODO: FIND BETTER WAY TO RESET THESE AFTER PROVIDER INJECTION
                 self.componentDef = realComponentDef;
                 self.attributes.merge(attributes, realComponentDef.getAttributeDefs());
+
+                 // KRIS: IN THE MIDDLE OF THIS FOR PROVIDED COMPONENTS
+                var classConstructor =  $A.componentService.getComponentClass(realComponentDef.getDescriptor().getQualifiedName()) || Component;
+                if (classConstructor && cmp["constructor"] != classConstructor) {
+                    // Doesn't do a whole lot, but good for debugging, not sure what the stack trace looks like.
+                    cmp["constructor"] = classConstructor;
+
+                    // Reassign important members. Assign to both external reference, and internal reference.
+                    cmp.helper = cmp["helper"] = classConstructor.prototype["helper"];
+                    cmp.render = cmp["render"] = classConstructor.prototype["render"];
+                    cmp.rerender = cmp["rerender"] = classConstructor.prototype["rerender"];
+                    cmp.afterRender = cmp["afterRender"] = classConstructor.prototype["afterRender"];
+                    cmp.unrender = cmp["unrender"] = classConstructor.prototype["unrender"];
+                }
+                
                 self.setupModel(config["model"],cmp);
                 self.valueProviders["m"]=self.model;
                 self.valueProviders["c"]=self.createActionValueProvider(cmp);
@@ -1058,10 +1073,15 @@ if(!this.concreteComponentId) {
  *            config - component configuration
  * @param {Boolean}
  *            [localCreation] - local creation
+ * @param {Boolean} [creatingPrototype] - creating a prototype only
  */
-function Component(config, localCreation) {
+function Component(config, localCreation, creatingPrototype) {
+    if(creatingPrototype) {
+        return;
+    }
+      
     this.priv = new ComponentPriv(config, this, localCreation);
-    this._destroying =false;
+    this._destroying = false;
 
     // #if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG",
     // "AUTOTESTINGDEBUG"]}
@@ -1522,13 +1542,15 @@ Component.prototype.destroy = function(async) {
         $A.componentService.deIndex(globalId);
 
         var vp = priv.valueProviders;
-        for ( var k in vp) {
-            var v = vp[k];
-            if (v&&v!=this) {
-                if ($A.util.isFunction(v.destroy)) {
-                    v.destroy(async);
+        if(vp) {
+            for ( var k in vp) {
+                var v = vp[k];
+                if (v&&v!=this) {
+                    if ($A.util.isFunction(v.destroy)) {
+                        v.destroy(async);
+                    }
+                    delete vp[k];
                 }
-                delete vp[k];
             }
         }
 
@@ -1629,6 +1651,65 @@ Component.prototype.render = function() {
 };
 
 /**
+ * Rerender this component
+ * @protected
+ */
+Component.prototype.rerender = function() {
+    var renderer = this.priv.renderer;
+    renderer.def.rerender(renderer.renderable);
+};
+
+/**
+ * afterRender for this this component
+ * @protected
+ */
+Component.prototype.afterRender = function() {
+    var renderer = this.priv.renderer;
+    renderer.def.afterRender(renderer.renderable);
+};
+
+/**
+ * Unrerender this component
+ * @protected
+ */
+Component.prototype.unrender = function() {
+    var renderer = this.priv.renderer;
+    renderer.def.unrender(renderer.renderable);
+};
+
+/**
+ * Execute the super components render method.
+ * @protected
+ */
+Component.prototype.superRender = function() {
+    return this.getSuper().render();
+};
+
+/**
+ * Execute the super components rerender method. 
+ * @protected
+ */
+Component.prototype.superRerender = function() {
+    return this.getSuper().rerender();
+};
+
+/**
+ * Execute the super components afterRender method.
+ * @protected
+ */
+Component.prototype.superAfterRender = function() {
+    return this.getSuper().afterRender();
+};
+
+/**
+ * Execute the super components superUnrender method.
+ * @protected
+ */
+Component.prototype.superUnrender = function() {
+    return this.getSuper().unrender();
+};
+
+/**
  * Returns true if this component has been rendered but not unrendered (does not
  * necessarily mean component is in the dom tree).
  *
@@ -1676,6 +1757,14 @@ Component.prototype.setRendered = function(rendered) {
  */
 Component.prototype.getRenderer = function() {
     return this.priv.renderer;
+};
+
+/**
+ * Returns the renderable instance for this component.
+ * @protected
+ */
+Component.prototype.getRenderable = function() {
+    return this.priv.renderer.renderable;
 };
 
 /**
@@ -2341,6 +2430,38 @@ Component.prototype.getFacets = function() {
     }
 
     return facets;
+};
+
+
+/**
+ * You should never need to call this directly.
+ * When we create a component class, it doesn't have a mapping between friendly names like cmp.render() and the minified version of the cmp.render() function which is like cmp.aA().
+ * This MAY only be necessary because of our internal framework references to .render(), .afterRender() etc. If we switched to cmp["render"]() in the framework, this might not be necessary. 
+ * Would save a lot of function calls which would be nice.
+ * For now, we do this...
+ * @param {Object} componentClass The class constructor for a component class.
+ */
+Component.registerMethods = function(componentClass) {
+    var proto = componentClass.prototype;
+    if (proto["render"]) {
+        proto.render = proto["render"];
+    }
+
+    if (proto["afterRender"]) {
+        proto.afterRender = proto["afterRender"];
+    }
+    
+    if (proto["rerender"]) {
+        proto.rerender = proto["rerender"];
+    }
+    
+    if (proto["unrender"]) {
+        proto.unrender = proto["unrender"];
+    }
+
+    if (proto["helper"]) {
+        proto.helper = proto["helper"];
+    }
 };
 
 /**

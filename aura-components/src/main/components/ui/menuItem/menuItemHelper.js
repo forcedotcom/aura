@@ -62,7 +62,7 @@
      *
      */
     handleSpacekeydown: function(component, event) {
-        if (component.get("v.disabled") === true) {
+    	if (component.get("v.disabled") === true) {
             return;
         }
         var e = component.getEvent("click");

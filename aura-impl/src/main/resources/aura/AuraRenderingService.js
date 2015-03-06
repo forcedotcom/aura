@@ -122,10 +122,9 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
             var addExistingElements=visited[id];
             if(!visited[id]) {
                 if (cmp.isRendered()) {
-                    var renderer = cmp.getRenderer();
                     var rerenderedElements = undefined;
                     try {
-                        rerenderedElements=renderer.def.rerender(renderer.renderable);
+                        rerenderedElements=cmp.rerender();
                     } catch (e) {
                         $A.error("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                         // we fall through here, and put whatever the component gives us in the set.
@@ -149,7 +148,6 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
         }
         this.cleanComponent(id);
     }
-
     //#if {"modes" : ["STATS"]}
     this.statsIndex["rerender"].push({
         'component' : components,
@@ -188,9 +186,8 @@ $A.ns.AuraRenderingService.prototype.afterRender = function(components) {
             continue;
         }
         if(cmp.isValid()) {
-            var renderer = cmp.getRenderer();
             try {
-                renderer.def.afterRender(renderer.renderable);
+                cmp.afterRender();
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
@@ -240,6 +237,10 @@ $A.ns.AuraRenderingService.prototype.unrender = function(components) {
                 if(cmp.isValid()&&cmp.isRendered()) {
                     try {
                         renderer.def.unrender(renderer.renderable);
+						// KRIS:
+                        // The Stub generated for unrender seems to not work
+                        // when used for one of the base components. (aura:text in this case)
+				        //cmp.unrender(renderer.renderable);
                     } catch (e) {
                         $A.error("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
                     }
@@ -735,7 +736,7 @@ $A.ns.AuraRenderingService.prototype.finishRender = function(cmp, elements) {
 
     return elements;
 };
-
+                    
 /**
  * Insert elements to the DOM, relative to a reference node,
  * by default as its last child.

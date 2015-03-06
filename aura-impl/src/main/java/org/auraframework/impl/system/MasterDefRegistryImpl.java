@@ -102,7 +102,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final Cache<String, String> stringsCache;
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
     private final Cache<String, String> accessCheckCache;
-
+    
+    private final Map<String, Boolean> componentClassesLoaded; 
+    
     /**
      * A local dependencies cache.
      * 
@@ -151,6 +153,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         this.defs = Maps.newHashMap();
         this.localDescs = null;
         this.currentCC = null;
+        this.componentClassesLoaded = Maps.newHashMap();
     }
 
     /**
@@ -1536,6 +1539,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
         return cacheable;
     }
+    
+    /**
+     * Track if the component class was already added to the pay load for this request.
+     */
+    public void setComponentClassLoaded(DefDescriptor<?> componentClass, Boolean isLoaded) {
+    	componentClassesLoaded.put(componentClass.getQualifiedName(), isLoaded);
+    }
+
+    /**
+     * Check if the component class has already been added to the request pay load.
+     */
+    public Boolean getComponentClassLoaded(DefDescriptor<?> componentClass) {
+    	if(componentClassesLoaded.containsKey(componentClass.getQualifiedName())) {
+    		return componentClassesLoaded.get(componentClass.getQualifiedName());
+    	}
+    	return false;
+    }
+    
 
     // TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
     // a least-common-denominator implementation

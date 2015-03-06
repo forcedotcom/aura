@@ -303,7 +303,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     public AttributeSet getAttributes() {
         return attributeSet;
     }
-
+    
+    
     /**
      * this is only to serialize the general shape and ids, to ensure that we generate the same stuff in the client
      */
@@ -314,7 +315,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
         try {
             BaseComponentDef def = getComponentDef();
-
+            
             json.writeMapBegin();
             //
             // Be very careful here. descriptor != def.getDescriptor().
@@ -346,6 +347,14 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 json.writeMapEntry("model", model);
             }
 
+            // KRIS: COMPONENT CLASSES
+            // We need to return the definitions here since the client doesn't have them.
+            // Do we know if it doesn't have them? This can be a getComponent action call, but is it just 
+            // wanting the instance and not the def? 
+            // I know it does not have it in some instances, but now that I think about it, it probably
+            // also has the def sometimes too so this will be redundant.
+            json.writeMapEntry("componentClass", def.getComponentClass());
+            
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);

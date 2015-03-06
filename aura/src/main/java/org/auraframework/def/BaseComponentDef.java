@@ -15,11 +15,13 @@
  */
 package org.auraframework.def;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -171,4 +173,17 @@ public interface BaseComponentDef extends RootDefinition {
      * @throws QuickFixException If there is a problem loading the flavor def.
      */
     String getDefaultFlavorOrImplicit() throws QuickFixException;
+    
+    /**
+     * Get the generated JavaScript class for this component.
+     * This class includes setting up its inheritance, its render methods and its helper methods. 
+     * The rest of the definition of the class comes back as meta data in a JSON object. 
+     * Which further configures the generated JavaScript class.
+     * If not provided, will use the base Component() constructor, but won't have a valid helper, so this is pretty much required now.
+     * 
+     * @throws DefinitionNotFoundException
+     * @throws QuickFixException
+     * @throws IOException
+     */
+    String getComponentClass() throws DefinitionNotFoundException, QuickFixException, IOException;
 }

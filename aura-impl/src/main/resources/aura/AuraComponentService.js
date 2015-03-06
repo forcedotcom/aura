@@ -31,6 +31,17 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
     this.flavorable = "auraFlavorable";
+
+    // KRIS: 
+    // We delay the creation of the definition of a class till it's requested.
+    // The function that creates the component class is a classConstructorProvider
+    this.classConstructorProvider={};
+    
+    // KRIS: 
+    // Collection of all the component classes we generate for
+    // proper stack traces and proper use of prototypical inheritance
+    this.classConstructors={};
+    
 };
 
 /**
@@ -162,9 +173,71 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
         };
     }
 
-    return new Component(config, localCreation);
+    return this.createComponentInstance(config, localCreation);
 };
 
+/**
+ * Takes a config for a component, and creates an instance of the component using the component class of that component. 
+ * @param {Object} config Config is the same object you would pass to the constructor $A.Component to create a component. This method will use that information to further configure the component class that is created.
+ * @param {Boolean} localCreation See documentation on Component.js constructor for documentation on the localCreation property.
+ */
+$A.ns.AuraComponentService.prototype.createComponentInstance = function(config, localCreation) {
+	// See if there is a component specific class
+    var def = config["componentDef"];
+    var desc = def["descriptor"] || def;
+    if (desc.getQualifiedName) {
+    	desc = desc.getQualifiedName();
+    }
+
+    // KRIS:
+    // config["componentClass"] - Result of a getComponent() action
+    // config["componentDef"]["componentClass"] - Result of sending component defs back from the server.
+    // Always comes back as a function to execute, which defines the component classes.
+    var componentClassDef = config["componentClass"] || config["componentDef"]["componentClass"];
+    if(componentClassDef && !$A.componentService.getComponentClass(desc)) {
+        componentClassDef = $A.util.json.decode(componentClassDef);
+        componentClassDef();
+    }
+
+    var classConstructor = this.getComponentClass(desc) || Component;
+
+    return new classConstructor(config, localCreation);
+};
+
+/**
+ * Use the specified constructor as the definition of the class descriptor. 
+ * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
+ * @param {String} descriptor Uses the pattern of namespace:componentName.  
+ * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
+ */
+$A.ns.AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
+    if(descriptor in this.classConstructorProvider) {
+        return;
+    }
+
+    this.classConstructorProvider[descriptor] = classConstructor;
+};
+
+/**
+ * Get the class constructor for the specified component. 
+ * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
+ * @returns Either the class that defines the component you are requesting, or null if not found.
+ */
+$A.ns.AuraComponentService.prototype.getComponentClass = function(descriptor) {
+	descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$");
+    
+    var storedConstructor = this.classConstructors[descriptor];
+
+    if(!storedConstructor) {
+        var provider = this.classConstructorProvider[descriptor];
+        if(provider) {
+            storedConstructor = provider();
+            this.classConstructors[descriptor] = storedConstructor;
+        }
+    }
+
+    return storedConstructor;
+};
 
 /**
  * Asynchronous version of newComponent(). Creates a new component and
@@ -562,7 +635,9 @@ $A.ns.AuraComponentService.prototype.isConfigDescriptor = function(config) {
 };
 
 exp($A.ns.AuraComponentService.prototype,
+    "addComponentClass", $A.ns.AuraComponentService.prototype.addComponentClass,
     "get", $A.ns.AuraComponentService.prototype.get,
+    "getComponentClass", $A.ns.AuraComponentService.prototype.getComponentClass,
     "getRenderingComponentForElement", $A.ns.AuraComponentService.prototype.getRenderingComponentForElement,
     "getAttributeProviderForElement", $A.ns.AuraComponentService.prototype.getAttributeProviderForElement,
     "newComponent", $A.ns.AuraComponentService.prototype.newComponent,

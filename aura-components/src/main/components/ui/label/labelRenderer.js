@@ -16,9 +16,8 @@
 ({
     afterRender : function(component, helper) {     
     	this.superAfterRender();
-    	//need to update attribute in afterRender lifecycle so that it can reference other components from it's valueProvider
-    	var helper = component.getDef().getHelper();
-    	helper.updateAttribute(component);    	
     	
+    	// need to update attribute in afterRender lifecycle so that it can reference other components from it's valueProvider
+    	helper.updateAttribute(component);    	
     }
 })

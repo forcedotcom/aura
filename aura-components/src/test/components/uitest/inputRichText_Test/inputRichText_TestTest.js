@@ -33,15 +33,20 @@
     	attributes : {testContent: "<b>some content</b></html>"},
     	test : [function(component) {
     		this.assertRichTextInitalized(component.find("Text"));
-    	}, function(component) {
-    		$A.test.clickOrTouch(component.find("base").find("submitBtn").getElement());
-    		var cmp = component.find("base").find("outputValue");
-    		$A.test.addWaitFor(false, function(){
-    			var content = cmp.get("v.value");
-    			return content === "<b>some content</b></html>";
-			});
-    	}, function(component) {
-    		var rtValue = component.find("Text").get("v.value");
+    	}, 
+        // KRIS: This test flaps.
+        // It passes usually because content is "" when this thing first runs. If the value does have a chance to get set
+        // then it will fail. Why are we validating that the value is not what it actually should be?
+        // Bad test, commenting out until someone has any idea what we are hoping to test here.
+   //      function(component) {
+   //  		component.find("base").find("submitBtn").get("e.press").fire();
+   //  		$A.test.addWaitFor(false, function(){
+   //  			var content = component.find("base").find("outputValue").get("v.value");
+   //  			return content === "<b>some content</b></html>";
+			// });
+   //  	},
+        function(component) {
+    		var rtValue = component.find("Text").get("v.value");  
     		$A.test.assertEquals("<b>some content</b></html>", rtValue, 
     			"Rich text value expected is incorrect");
     	}]

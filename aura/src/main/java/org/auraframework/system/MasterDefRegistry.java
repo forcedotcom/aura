@@ -198,4 +198,23 @@ public interface MasterDefRegistry {
      * @return list of client libraries for uid
      */
     List<ClientLibraryDef> getClientLibraries(String uid);
+    
+    /**
+     * Set that the current component was or was not loaded in the current context.
+     * Primarily for App.js. We'll include a component class for each component in 
+     * app.js, we don't want the JSON definition for each component in app.js to 
+     * also include the component class, this would be duplicate information.
+     * 
+     * @param componentClassDef The component to indicate we have loaded.
+     * @param isLoaded Was the class included in the current request or not. There is no reason to set this to false at this point.
+     */
+    void setComponentClassLoaded(DefDescriptor<?> componentClassDef, Boolean isLoaded);
+    
+    /**
+     * Has the current component class already been output in the current request? 
+     * Prevents us from duplicating output of the component class definition in a single request.
+     * @param componentClassDef
+     * @return
+     */
+    Boolean getComponentClassLoaded(DefDescriptor<?> componentClassDef);
 }

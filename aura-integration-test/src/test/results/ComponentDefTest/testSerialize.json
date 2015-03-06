@@ -44,7 +44,8 @@ function(component) {
         "interfaces":[
           "markup://aura:rootComponent"
         ],
-        "isAbstract":true
+        "isAbstract":true,
+        "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$component\", function() {\n\n    \n\n    var aura$component = function aura$component(config, localCreation, creatingPrototype) {\n        $A.Component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$component.prototype = new $A.Component(null, null, true);\n    aura$component.prototype.constructor = aura$component;\n\n    aura$component.Helper = function() {};\n\n    aura$component.prototype.helper = new aura$component.Helper();\n\n\n    aura$component.prototype.render = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    \n    };\n\n    aura$component.prototype.rerender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    \n    };\n\n    aura$component.prototype.afterRender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    \n    };\n\n    aura$component.prototype.unrender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    \n    };\n\n    \n\n    $A.Component.registerMethods(aura$component);\n\n    return aura$component;\n});\n\n\n}"
       }
     },
     "attributeDefs":[
@@ -59,6 +60,7 @@ function(component) {
           "default":"testValue"
         }
       }
-    ]
+    ],
+    "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$test\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var aura$test = function aura$test(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$test.prototype = new aura$component(null, null, true);\n    aura$test.prototype.constructor = aura$test;\n\n    aura$test.Helper = function() {};\n\n    aura$test.Helper.prototype = new aura$component.Helper();\n    aura$test.Helper.prototype.constructor = aura$test.Helper;\n    aura$test.prototype.helper = new aura$test.Helper();\n\n\n    \n\n    $A.Component.registerMethods(aura$test);\n\n    return aura$test;\n});\n\n\n}"
   }
 }

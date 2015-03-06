@@ -430,7 +430,7 @@
             var expected = 3;
             var actual = 0;
 
-            var helper = component.getDef().getHelper();
+            var helper = component.helper;
 
             // Mock fireEvent to do something we can use to test logic in fireEvents (its caller)
             $A.test.overrideFunction(helper, "fireEvent",
@@ -619,7 +619,8 @@
      * Verifier method for tests that validate DOM-level triggering a call to helper-fireEvents()
      */
     verifyDomEventFiresListViewEvents: function(component, eventName, failureMessage) {
-        var helper = component.getDef().getHelper();
+        //var helper = component.getDef().getHelper();
+        var helper = component.helper;
         var fireEventsCalled = false;
 
         $A.test.overrideFunction(helper, "fireEvents",
@@ -638,7 +639,8 @@
      */
     verifyListViewEventSourceComponents : function(component, expectedComponents, mockDomEvent, failureMessage) {
         var actualComponents = [];
-        var helper = component.getDef().getHelper();
+        //var helper = component.getDef().getHelper();
+        var helper = component.helper;
 
         // Mock fireEvent to do something we can use to test logic in fireEvents (its caller)
         $A.test.overrideFunction(helper, "fireEvent",

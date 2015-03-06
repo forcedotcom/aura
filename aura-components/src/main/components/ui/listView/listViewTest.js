@@ -2268,7 +2268,7 @@
 
     // INSTRUMENTATION
     getHelper:function (component) {
-        return component.getDef().getHelperDef().getFunctions();
+		return component.helper;
     },
 
     getHelperMock:function (component, name, mock) {

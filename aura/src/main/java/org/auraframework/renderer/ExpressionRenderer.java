@@ -47,7 +47,16 @@ public class ExpressionRenderer implements Renderer {
             // deny them from users.
             boolean inTemplate = component.getAttributes().getValueProvider()
                     .getDescriptor().getDef().isTemplate();
-            if (!inTemplate) {
+
+            // KRIS: 
+            // Nasty hack. Done to allow script generation in the componentClass component.
+            // We don't a way to prevent escaping explicitly on server generated components. This 
+            // seems fine until we use one to do exactly what we are doing here. Soo... besides setting
+            // a global flag to toggle this, I'm doing this ugly little hack. 
+            boolean isClientComponentClass = component.getAttributes().getValueProvider()
+                    .getDescriptor().getQualifiedName().equals("markup://auradev:componentClass");
+
+            if (!inTemplate && !isClientComponentClass) {
                 // We don't escape all the HTML characters, because quotes in particular
                 // would cause problems.
                 escaped = escaped.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");

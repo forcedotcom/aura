@@ -45,7 +45,8 @@ function(component) {
           "interfaces":[
             "markup://aura:rootComponent"
           ],
-          "isAbstract":true
+          "isAbstract":true,
+          "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$component\", function() {\n\n    \n\n    var aura$component = function aura$component(config, localCreation, creatingPrototype) {\n        $A.Component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$component.prototype = new $A.Component(null, null, true);\n    aura$component.prototype.constructor = aura$component;\n\n    aura$component.Helper = function() {};\n\n    aura$component.prototype.helper = new aura$component.Helper();\n\n\n    aura$component.prototype.render = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    \n    };\n\n    aura$component.prototype.rerender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    \n    };\n\n    aura$component.prototype.afterRender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    \n    };\n\n    aura$component.prototype.unrender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    \n    };\n\n    \n\n    $A.Component.registerMethods(aura$component);\n\n    return aura$component;\n});\n\n\n}"
         }
       },
       "attributeDefs":[
@@ -136,7 +137,8 @@ function(component) {
                   ],
                   "interfaces":[
                     "markup://aura:rootComponent"
-                  ]
+                  ],
+                  "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$text\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var aura$text = function aura$text(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$text.prototype = new aura$component(null, null, true);\n    aura$text.prototype.constructor = aura$text;\n\n    aura$text.Helper = function() {};\n\n    aura$text.Helper.prototype = new aura$component.Helper();\n    aura$text.Helper.prototype.constructor = aura$text.Helper;\n    aura$text.prototype.helper = new aura$text.Helper();\n\n\n    aura$text.prototype.render = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var value = component.get(\"v.value\");\n        \n        var trunc = component.get(\"v.truncate\");\n        var truncateByWord = $A.util.getBooleanValue(component.get(\"v.truncateByWord\"));\n        var ellipsis = $A.util.getBooleanValue(component.get(\"v.ellipsis\"));\n        \n        if(trunc){\n            trunc = 1 * trunc;\n            value = aura.util.truncate(value, trunc, ellipsis, truncateByWord);\n        }\n        return [document.createTextNode($A.util.isUndefinedOrNull(value)?'':value)];\n    \n    };\n\n    aura$text.prototype.rerender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var element=component.getElement();\n        \n        if (element && element.parentNode) {\n        \tvar textValue = component.get(\"v.value\");\n            textValue = $A.util.isUndefinedOrNull(textValue) ? '' : textValue;\n            \n            if (element.nodeValue !== textValue) {\n                element.nodeValue = textValue;\n            }\n        }\n    \n    };\n\n    aura$text.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    aura$text.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(aura$text);\n\n    return aura$text;\n});\n\n\n}"
                 }
               },
               "attributes":{
@@ -286,26 +288,9 @@ function(component, helper) {
 	}
                                             }
                                           },
-                                          "helperDef":{
-                                            "serId":22,
-                                            "value":{
-                                              "descriptor":"js://aura.expression",
-                                              "functions":{
-                                                "setupReferenceNode":
-function(component, ret) {
-		if (!ret || ret.length === 0) {
-			
-			component._referenceNode = document.createComment("render expression: " + component);
-		} else {
-			component._referenceNode = ret[0];
-		}
-	}
-                                              }
-                                            }
-                                          },
                                           "attributeDefs":[
                                             {
-                                              "serId":23,
+                                              "serId":22,
                                               "value":{
                                                 "name":"value",
                                                 "type":"aura://String"
@@ -314,7 +299,8 @@ function(component, ret) {
                                           ],
                                           "interfaces":[
                                             "markup://aura:rootComponent"
-                                          ]
+                                          ],
+                                          "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$expression\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var aura$expression = function aura$expression(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$expression.prototype = new aura$component(null, null, true);\n    aura$expression.prototype.constructor = aura$expression;\n\n    aura$expression.Helper = function() {};\n\n    aura$expression.Helper.prototype = new aura$component.Helper();\n    aura$expression.Helper.prototype.constructor = aura$expression.Helper;\n    aura$expression.prototype.helper = new aura$expression.Helper();\n\n\n    aura$expression.prototype.render = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        var helper = renderable.helper;\n        \n\t\tvar value = component.get(\"v.value\");\n        if($A.util.isUndefinedOrNull(value)){\n            value = \"\";\n        }\n        if(!($A.util.isComponent(value)||$A.util.isArray(value))){\n            \n            component._lastRenderedValue=value=$A.newCmp({componentDef:'aura:text', attributes:{values:{value:value}}});\n        }\n        return $A.renderingService.renderFacet(component,value);\n\t\n    };\n\n    aura$expression.prototype.rerender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        var helper = renderable.helper;\n        \n        var ret=[];\n\t\tif (component.isRendered()) {\n            var value = component.get(\"v.value\");\n            if(!($A.util.isComponent(value)||$A.util.isArray(value))){\n                if($A.util.isUndefinedOrNull(value)){\n                    value = \"\";\n                }\n                if(component._lastRenderedValue && component._lastRenderedValue.isValid()){\n                    \n                    component._lastRenderedValue.set(\"v.value\",value,true);\n                    value=component._lastRenderedValue;\n                    return $A.rerender(value);\n                }else {\n                    value = $A.newCmp({componentDef: 'aura:text', attributes: {values: {value: value}}});\n                }\n            }\n            ret=$A.renderingService.rerenderFacet(component, value);\n        }\n        return ret;\n    \n    };\n\n    aura$expression.prototype.afterRender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        var helper = renderable.helper;\n        \n\t\tvar value = component.get(\"v.value\");\n\t\tif ($A.util.isComponent(value)||$A.util.isArray(value)) {\n\t\t\t$A.afterRender(value);\n\t\t}\n\t\n    };\n\n    aura$expression.prototype.unrender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        var helper = renderable.helper;\n        \n        $A.renderingService.unrenderFacet(component);\n        if (component._lastRenderedValue) {\n            component._lastRenderedValue.destroy();\n            component._lastRenderedValue = null;\n        }\n\t\n    };\n\n    \n\n    $A.Component.registerMethods(aura$expression);\n\n    return aura$expression;\n});\n\n\n}"
                                         }
                                       },
                                       "attributes":{
@@ -328,7 +314,7 @@ function(component, ret) {
                                     },
                                     {
                                       "componentDef":{
-                                        "serId":24,
+                                        "serId":23,
                                         "value":{
                                           "descriptor":"markup://test:child2",
                                           "superDef":{
@@ -338,14 +324,16 @@ function(component, ret) {
                                             {
                                               "serRefId":4
                                             }
-                                          ]
+                                          ],
+                                          "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$child2\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$child2 = function test$child2(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$child2.prototype = new aura$component(null, null, true);\n    test$child2.prototype.constructor = test$child2;\n\n    test$child2.Helper = function() {};\n\n    test$child2.Helper.prototype = new aura$component.Helper();\n    test$child2.Helper.prototype.constructor = test$child2.Helper;\n    test$child2.prototype.helper = new test$child2.Helper();\n\n\n    \n\n    $A.Component.registerMethods(test$child2);\n\n    return test$child2;\n});\n\n\n}"
                                         }
                                       }
                                     }
                                   ]
                                 }
                               ],
-                              "hasServerDeps":true
+                              "hasServerDeps":true,
+                              "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$child1\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$child1 = function test$child1(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$child1.prototype = new aura$component(null, null, true);\n    test$child1.prototype.constructor = test$child1;\n\n    test$child1.Helper = function() {};\n\n    test$child1.Helper.prototype = new aura$component.Helper();\n    test$child1.Helper.prototype.constructor = test$child1.Helper;\n    test$child1.prototype.helper = new test$child1.Helper();\n\n\n    \n\n    $A.Component.registerMethods(test$child1);\n\n    return test$child1;\n});\n\n\n}"
                             }
                           },
                           "attributes":{
@@ -359,7 +347,8 @@ function(component, ret) {
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$parent\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$parent = function test$parent(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$parent.prototype = new aura$component(null, null, true);\n    test$parent.prototype.constructor = test$parent;\n\n    test$parent.Helper = function() {};\n\n    test$parent.Helper.prototype = new aura$component.Helper();\n    test$parent.Helper.prototype.constructor = test$parent.Helper;\n    test$parent.prototype.helper = new test$parent.Helper();\n\n\n    \n\n    $A.Component.registerMethods(test$parent);\n\n    return test$parent;\n});\n\n\n}"
                 }
               }
             },
@@ -418,7 +407,8 @@ function(component, ret) {
             }
           ]
         }
-      ]
+      ],
+      "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$text\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$text = function test$text(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$text.prototype = new aura$component(null, null, true);\n    test$text.prototype.constructor = test$text;\n\n    test$text.Helper = function() {};\n\n    test$text.Helper.prototype = new aura$component.Helper();\n    test$text.Helper.prototype.constructor = test$text.Helper;\n    test$text.prototype.helper = new test$text.Helper();\n\n\n    \n\n    $A.Component.registerMethods(test$text);\n\n    return test$text;\n});\n\n\n}"
     }
   },
   "attributes":{

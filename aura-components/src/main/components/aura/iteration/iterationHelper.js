@@ -15,6 +15,7 @@
  */
 ({
     createBody: function (component) {
+        component.set("v.loaded",false);
         component._itemInfo = [];
         this.buildBody(component,
             function createBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {

@@ -135,4 +135,15 @@ public class FakeRegistry implements MasterDefRegistry {
 			DefDescriptor<?> referencingDescriptor, D def) {
 		return null;
 	}
+	
+	@Override
+    public void setComponentClassLoaded(DefDescriptor<?> componentClass, Boolean isLoaded) {
+		
+    }
+    
+	@Override
+    public Boolean getComponentClassLoaded(DefDescriptor<?> componentClass) {
+    	return false;
+    }
+    
 }

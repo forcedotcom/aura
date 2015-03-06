@@ -20,7 +20,8 @@
     addDomEvents : function(component) {
         var events = this.getHandledDOMEvents(component);
         //work around for bug W-1744442
-        var helper = component.getConcreteComponent().getDef().getHelper() || this;
+        var concrete = component.getConcreteComponent();
+        var helper = concrete.helper || this;
         for (var event in events) {
             helper.addDomHandler(component, event);
         }
@@ -46,7 +47,7 @@
         var element = event.target;
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
         var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
-        var helper = component.getDef().getHelper();
+        var helper = component.helper;
 
         if (!helper || component._recentlyClicked) {
             return;
@@ -62,7 +63,7 @@
             helper.fireEvent(component, event, helper);
         }
 
-        if (event.type == "click" && component.get("v.disableDoubleClicks")) {
+        if (event.type === "click" && component.get("v.disableDoubleClicks")) {
         	component._recentlyClicked = true;
         	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
         }

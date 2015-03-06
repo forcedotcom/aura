@@ -26,8 +26,10 @@ exp(p,
     "destroy", p.destroy,
     "getGlobalId", p.getGlobalId,
     "getLocalId", p.getLocalId,
+    "getRenderable", p.getRenderable,
     "getRendering", p.getRendering,
     "isRendered", p.isRendered,
+    "getHelper", p.getHelper,
     "getSuper", p.getSuper,
     "associateElement", p.associateElement,
     "getElements", p.getElements,
@@ -61,11 +63,32 @@ exp(p,
     "addValueHandler", p.addValueHandler,
     "removeValueHandler", p.removeValueHandler,
     "getFacets", p.getFacets,
+
     "isFlavorable", p.isFlavorable,
     "getFlavorName", p.getFlavorName,
     "getFlavorNamespace", p.getFlavorNamespace,
     
+
+    "render", p.render,
+    "afterRender", p.afterRender,
+    "rerender", p.rerender,
+    "unrender", p.unrender,
+    "superRender", p.superRender,
+    "superAfterRender", p.superAfterRender,
+    "superRerender", p.superRerender,
+    "superUnrender", p.superUnrender,
+
     // DCHASMAN TODO Kill these once we figure out how to replace them in Halo
     "getAttributeValueProvider", p.getAttributeValueProvider,
-    "getComponentValueProvider", p.getComponentValueProvider
+    "getComponentValueProvider", p.getComponentValueProvider,
+    "mergeAttributes", p.mergeAttributes,
+    
+    "getRenderable", p.getRenderable
 );
+
+exp(Component,
+	"registerMethods", Component.registerMethods);
+
+$A["Component"] = Component;
+
+

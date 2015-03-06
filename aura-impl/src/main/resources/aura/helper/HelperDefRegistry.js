@@ -33,19 +33,12 @@ HelperDefRegistry.prototype.auraType = "HelperDefRegistry";
  * @param {Object} mapping of imports to library definitions.
  * @returns {HelperDef} HelperDef instance or config after adding to the registry
  */
-HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, config, componentDef, libraries){
+HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, componentDef, libraries){
     aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");
     var ret = this.helperDefs[componentDefDescriptor];
-    if(!ret && componentDef){
-        var superHelper;
-        var superComponent = componentDef.getSuperDef();
-        if(superComponent){
-            superHelper = superComponent.getHelper();
-        }
-        if (config || superHelper) {
-            ret = new HelperDef(config || {}, superHelper, libraries);
-            this.helperDefs[componentDefDescriptor] = ret;
-        }
+    if(!ret){
+    	ret = new HelperDef(componentDef, libraries);
+        this.helperDefs[componentDefDescriptor] = ret;
     }
     return ret;
 };

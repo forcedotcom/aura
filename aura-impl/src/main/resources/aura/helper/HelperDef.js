@@ -19,31 +19,26 @@
  * @constructor
  * @private
  */
-function HelperDef(config, superComponent, libraries){
-    var functions = config["functions"] || {};
-    for(var k in functions){
-        functions[k] = aura.util.json.decodeString(functions[k]);
+function HelperDef(componentDef, libraries){
+    var functions = [];
+    var descriptor = componentDef.getDescriptor().getQualifiedName();
+    var _constructor = $A.componentService.getComponentClass(descriptor);
+    if(_constructor && _constructor.prototype["helper"]) {
+        functions = _constructor.prototype["helper"];
     }
-    this.functions = functions;
 
-    if(superComponent){
-        for(var key in superComponent){
-            if(!functions[key]){
-                functions[key] = superComponent[key];
-            }
-        }
-    }
-    
     if (libraries) {
         $A.util.forEach($A.util.keys(libraries), function(importName) {
             var definition = libraries[importName];
-            functions[importName] = {};
+            functions.constructor.prototype[importName] = {};
             
             $A.util.forEach($A.util.keys(definition || []), function(key) {
-                functions[importName][key] = definition[key];
+                functions.constructor.prototype[importName][key] = definition[key];
             });
         });
     }
+
+    this.functions = functions;
 }
 
 HelperDef.prototype.auraType = "HelperDef";

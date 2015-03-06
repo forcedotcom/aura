@@ -37,6 +37,13 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     this.modelDef = config["modelDef"] ? $A.componentService.getModelDef(config["modelDef"]) : undefined;
     this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
 
+    // Initialize the concrete component class if provided
+    var componentClassDef = config["componentClass"];
+    if(componentClassDef && !$A.componentService.getComponentClass(config["descriptor"])) {
+    	componentClassDef = $A.util.json.decode(config["componentClass"]);
+    	componentClassDef();
+    }
+    
     this.interfaces = {};
     var intfConfig = config["interfaces"];
     if (intfConfig) {
@@ -142,7 +149,7 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
     this.initRenderer();
     
-    this.helperDef = $A.componentService.getHelperDef(descriptor, config["helperDef"], this, this.libraryDefs);
+    this.helperDef = $A.componentService.getHelperDef(descriptor, this, this.libraryDefs);
 
     var providerDef = config["providerDef"];
     if (providerDef) {

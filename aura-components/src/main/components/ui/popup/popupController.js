@@ -20,7 +20,8 @@
     },
 
     onTriggerPress: function(component, event, helper) {
-        helper = component.getConcreteComponent().getDef().getHelper();
+        //helper = component.getConcreteComponent().getDef().getHelper();
+        helper = component.getConcreteComponent().helper;
         helper.handleTriggerPress(component, event);
     },
 

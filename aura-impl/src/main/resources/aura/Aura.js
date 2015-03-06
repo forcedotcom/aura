@@ -453,6 +453,8 @@ $A.ns.Aura = function() {
      * @borrows AuraEventService.newEvent
      */
     this.getEvt = this.eventService.newEvent;
+    
+    this.Component = Component;
 
     // TODO: convert to //#exportSymbols when available
     exp(aura,
@@ -489,6 +491,8 @@ $A.ns.Aura = function() {
         "newCmpDeprecated", aura.newCmpDeprecated,
         "newCmpAsync", aura.newCmpAsync,
         "getEvt", aura.getEvt,
+        "Component", aura.Component,
+    
         "auraError", aura.auraError,
         "auraFriendlyError", aura.auraFriendlyError);
     var services = aura.services;

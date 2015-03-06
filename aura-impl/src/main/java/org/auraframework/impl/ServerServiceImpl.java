@@ -19,24 +19,31 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.css.ThemeList;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.impl.root.component.ClientComponentClass;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
@@ -47,10 +54,16 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
+import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
@@ -62,7 +75,7 @@ public class ServerServiceImpl implements ServerService {
     private static final long serialVersionUID = -2779745160285710414L;
 
     @Override
-    public void run(Message message, AuraContext context, Writer out, Map<?, ?> extras) throws IOException {
+    public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
         if (message == null) {
             return;
@@ -72,7 +85,7 @@ public class ServerServiceImpl implements ServerService {
         try {
             json.writeMapBegin();
             if (extras != null && extras.size() > 0) {
-                for (Map.Entry<?, ?> entry : extras.entrySet()) {
+                for (Map.Entry<?,?> entry : extras.entrySet()) {
                     json.writeMapEntry(entry.getKey(), entry.getValue());
                 }
             }
@@ -264,15 +277,38 @@ public class ServerServiceImpl implements ServerService {
         final String key = "JS:" + mKey + uid;
         String cached = context.getDefRegistry().getCachedString(uid, applicationDescriptor, key);
 
+        // DCHASMAN TODO Remove this temp testing hack before committing the mods!!!!
+        //cached = null;
+        
         if (cached == null) {
 
+            Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
+            
             StringBuilder sb = new StringBuilder();
+            
+            // Now write the component shape specific classes
+            BaseComponentDef componentComponentDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
+            
+            final ClientComponentClass auraComponentCientClass = new ClientComponentClass(componentComponentDef);
+            auraComponentCientClass.writeComponentClass(sb);
 
+            //String classOutput;
+            ClientComponentClass clientComponentClass;
+            MasterDefRegistry masterDefRegistry = Aura.getContextService().getCurrentContext().getDefRegistry();
+        	for (BaseComponentDef def : defs) {
+        		if (def != componentComponentDef) {
+        			clientComponentClass = new ClientComponentClass(def);
+        			clientComponentClass.writeComponentClass(sb);
+        			
+        	    	// We've generated this class component, do not output it as part of the component def.
+        	    	masterDefRegistry.setComponentClassLoaded(def.getDescriptor(), true);       			
+        		}
+        	}
+        	
             sb.append("$A.clientService.initDefs({");
 
             // append component definitions
             sb.append("componentDefs:");
-            Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
             Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
             sb.append(",");
 
@@ -298,9 +334,10 @@ public class ServerServiceImpl implements ServerService {
             Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
             Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
 
-            sb.append("});");
-
+            sb.append("});\n\n");
+            
             cached = sb.toString();
+            
             // only use closure compiler in prod mode, due to compile cost
             if (minify) {
                 StringWriter sw = new StringWriter();
@@ -314,7 +351,7 @@ public class ServerServiceImpl implements ServerService {
                     // ONLY if not production instance
                     if (!Aura.getConfigAdapter().isProduction()) {
                         sb.append(commentedJavascriptErrors(errors));
-                    }
+                }
                     cached = sb.toString();
                 }
             }
@@ -364,14 +401,14 @@ public class ServerServiceImpl implements ServerService {
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
 
         try {
-            for (DefDescriptor<?> descriptor : dependencies) {
-                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
-                        && (extraFilter == null || extraFilter.apply(descriptor))) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                    out.add(mdr.getDef(dd));
-                }
+        for (DefDescriptor<?> descriptor : dependencies) {
+            if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
+                    && (extraFilter == null || extraFilter.apply(descriptor))) {
+                @SuppressWarnings("unchecked")
+                DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
+                out.add(mdr.getDef(dd));
             }
+        }
         } catch (QuickFixException qfe) {
             // This should never happen here, by the time we are filtering our set, all dependencies
             // MUST be loaded. If not, we have a serious bug that must be addressed.
@@ -402,4 +439,5 @@ public class ServerServiceImpl implements ServerService {
         }
         return errorMsgs;
     }
+
 }

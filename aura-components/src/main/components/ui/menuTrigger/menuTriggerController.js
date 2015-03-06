@@ -16,7 +16,8 @@
 ({
     focus: function(component, event, helper) {
         var concreteCmp = component.getConcreteComponent();
-        var concreteHelper = concreteCmp.getDef().getHelper();
+        //var concreteHelper = concreteCmp.helper || concreteCmp.getDef().getHelper();
+        var concreteHelper = concreteCmp.helper;
         concreteHelper.focus(concreteCmp);
     }
 })

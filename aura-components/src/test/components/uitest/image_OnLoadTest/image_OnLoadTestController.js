@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 ({
-	callOnLoad: function(cmp, event, helper) {
-		$A.run(function(){
-			cmp.find("outputStatus").set("v.value", event.src);
-		});
-	},
-	
-    loadNewImage: function(cmp, event, helper) {
-    	cmp.find("image").set("v.src", "/auraFW/resources/aura/auralogo.png");
+    callOnLoad: function (cmp, event, helper) {
+        var loadedImageElement = event.getParam("value");
+        cmp.find("outputStatus").set("v.value", loadedImageElement.src);
+    },
+
+    loadNewImage: function (cmp, event, helper) {
+        cmp.find("image").set("v.src", "/auraFW/resources/aura/auralogo.png");
     }
-})
+});

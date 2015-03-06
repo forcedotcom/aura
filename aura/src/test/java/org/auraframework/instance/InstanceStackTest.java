@@ -382,5 +382,58 @@ public class InstanceStackTest extends UnitTestCase {
         assertFalse("topUnprivileged should be unchanged(null) after poping out instance1", iStack.isUnprivileged());
     }
 
+    public void testPeekAtEmptyStackReturnsNull() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        assertEquals("Expecting null at top of empty stack", null, iStack.peek());
+    }
+    
+    public void testPeekAtStackWithOneReturnsTop() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti = new TestInstance();
+        iStack.pushInstance(ti, ti.getDescriptor());
+        assertEquals("Expecting top of stack", ti, iStack.peek());
+    }
+    
+    public void testPeekAtStackWithTwoReturnsTop() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+
+        Instance<?> ti1 = new TestInstance();
+        iStack.pushInstance(ti1, ti1.getDescriptor());
+        
+        Instance<?> ti2 = new TestInstance();
+        iStack.pushInstance(ti2, ti2.getDescriptor());
+
+        assertEquals("Expecting top of stack", ti2, iStack.peek());
+    }
+    
+    public void testPeekAtStackAfterPopReturnsTop() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+
+        Instance<?> ti1 = new TestInstance();
+        iStack.pushInstance(ti1, ti1.getDescriptor());
+        
+        Instance<?> ti2 = new TestInstance();
+        iStack.pushInstance(ti2, ti2.getDescriptor());
+
+        iStack.popInstance(ti2);
+        
+        assertEquals("Expecting top of stack", ti1, iStack.peek());
+    }
+    
+    public void testPeekAtEmptiedStackReturnsNull() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+
+        Instance<?> ti1 = new TestInstance();
+        iStack.pushInstance(ti1, ti1.getDescriptor());
+        
+        Instance<?> ti2 = new TestInstance();
+        iStack.pushInstance(ti2, ti2.getDescriptor());
+
+        iStack.popInstance(ti2);
+        iStack.popInstance(ti1);
+        
+        assertEquals("Expecting null at top of empty stack", null, iStack.peek());
+    }
+    
     private ConfigAdapter mci;
 }

@@ -42,6 +42,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -337,6 +338,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 // that this is still a bit dangerous, as we seem to have a lot
                 // of magic in the serializer.
                 //
+                // Clear the InstanceStack before trying to serialize the exception since the Throwable has likely
+                // rendered the stack inaccurate, and may falsely trigger NoAccessExceptions.
+                InstanceStack stack = Aura.getContextService().getCurrentContext().getInstanceStack();
+                List<String> list = stack.getStackInfo();
+                for (int count = list.size(); count > 0; count--) {
+                    stack.popInstance(stack.peek());
+                }
+
                 Aura.getSerializationService().write(mappedEx, null, out);
                 if (format == Format.JSON) {
                     out.write("/*ERROR*/");

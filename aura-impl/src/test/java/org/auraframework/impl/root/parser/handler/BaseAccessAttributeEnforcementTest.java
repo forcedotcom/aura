@@ -29,6 +29,9 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -144,7 +147,12 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	}
 
 	protected void runTestCase() throws Exception {								
-		String resourceSource;
+        if(Aura.getContextService().isEstablished()){
+            Aura.getContextService().endContext();
+        }
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+
+        String resourceSource;
 		
 		if(testResource == TestResource.RegisterEvent){		
 			String eventSource = getResourceSource(TestResource.Event, "GLOBAL");
@@ -194,7 +202,12 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	}
 	
 	protected void runSimpleTestCase(String resourceSource) throws Exception {								
-		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testResource), resourceSource,
+        if(Aura.getContextService().isEstablished()){
+            Aura.getContextService().endContext();
+        }
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testResource), resourceSource,
 				getDefDescriptorName(testResource, true),
 				(testResourceNamespace == TestNamespace.System || testResourceNamespace == TestNamespace.SystemOther ? true : false));
 		
@@ -210,8 +223,13 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		}
 	}
 	
-	protected void runExtensionTestCase(String attribute, String attributeValue) throws Exception {								
-		// target
+	protected void runExtensionTestCase(String attribute, String attributeValue) throws Exception {
+	    if(Aura.getContextService().isEstablished()){
+	        Aura.getContextService().endContext();
+	    }
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+
+        // target
 		String resourceSource;
 		if(attribute.equals("abstract")){
 			resourceSource =  getAbstractResourceSource(testResource, attributeValue);

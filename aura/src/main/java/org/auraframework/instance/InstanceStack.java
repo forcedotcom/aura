@@ -199,8 +199,11 @@ public class InstanceStack {
      * get the top of the stack.
      */
     public Instance<?> peek() {
-        int size = stack.size();
-		return size > 0 ? stack.get(size - 1).instance : null;
+        if (current != null) {
+            return current.instance;
+        } else {
+            return null;
+        }
     }
 
     /** Get the next 'id' for a component.
@@ -330,6 +333,11 @@ public class InstanceStack {
         }
         return info;
     }
+    
+    @Override
+    public String toString() {
+        return String.format("InstanceStack(path=%s)", getPath());
+    }
 
     private static class Entry {
         public final Instance<?> instance;
@@ -348,6 +356,11 @@ public class InstanceStack {
             this.count = 0;
             this.top = false;
             this.index = -1;
+        }
+
+        @Override
+        public String toString() {
+            return "" + this.instance + " @ " + this.index;
         }
     };
 

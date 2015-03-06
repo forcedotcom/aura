@@ -144,5 +144,101 @@
                 $A.test.addWaitFor(false, $A.test.isActionPending, function(){ });
             });
         }
+    },
+
+    /**
+     * When a stored action fails in Action.js#finishAction we enqueue a retry action. Verify the following:
+     * 1. We get a warning saying the cached action failed and we're retrying from server.
+     * 2. The error message box is not displayed to users when the stored action fails.
+     * 3. The server action is enqueued and ran successfully.
+     */
+    testStorableRetry: {
+        test : [ function(cmp) {
+            // prime storage
+            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, "prime");
+            a.setStorable();
+            $A.enqueueAction(a);
+            $A.test.addWaitForAction(true, "prime");
+        }, function(cmp) {
+            var errorMsg = "Action callback error from test",
+                warningMsg = "Finishing cached action failed. Trying to refetch from server",
+                errorThrown = false,
+                that = this;
+
+            // Actions from storage will log a warning instead of displaying error box
+            $A.test.expectAuraWarning(warningMsg);
+            $A.test.expectAuraError(errorMsg);
+            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
+                if (!errorThrown) {
+                    // First callback is action from storage
+                    $A.test.assertTrue(a.isFromStorage(), "First action callback should be from storage");
+                    errorThrown = true;
+                    $A.error(errorMsg);
+                    throw new Error("Thrown by test");
+                } else {
+                    // Second callback is retry action from server. Error from stored action should not be present.
+                    $A.test.assertFalse(a.isFromStorage(), "Second action callback should be from server");
+                    $A.test.assertFalse(that.isAuraErrorDivVisible());
+                }
+            });
+            a.setStorable();
+            $A.test.markForCompletion(a, "action1");
+            $A.enqueueAction(a);
+            $A.test.addWaitForAction(true, "action1");
+        }]
+    },
+
+    /**
+     * Verify when a retry action from the server fails the error is properly displayed to the user.
+     */
+    testStorableRetry_errorOnRetry: {
+        test : [ function(cmp) {
+            // prime storage
+            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, "prime");
+            a.setStorable();
+            $A.enqueueAction(a);
+            $A.test.addWaitForAction(true, "prime");
+        }, function(cmp) {
+            var errorMsg = "Action callback error from test",
+                warningMsg = "Finishing cached action failed. Trying to refetch from server",
+                thrownErrorMsg = "Thrown by test",
+                that = this;
+
+            // Actions from storage log a warning instead of displaying error box
+            $A.test.expectAuraWarning(warningMsg);
+            // Expect 3 errors in the test. 2 from our $A.error calls in the action callback below, and 1 for the
+            // error thrown in the callback of the retry action. We only see the error once because the first
+            // error thrown on the action from storage is intentionally swallowed.
+            $A.test.expectAuraError(errorMsg);
+            $A.test.expectAuraError(errorMsg);
+            $A.test.expectAuraError(thrownErrorMsg);
+            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
+                $A.error(errorMsg);
+                if (a.isFromStorage()) {
+                    // Verify no error message displayed on action from storage
+                    $A.test.assertFalse(that.isAuraErrorDivVisible());
+                } else {
+                    // Verify error message displayed from retry action
+                    $A.test.assertTrue(that.isAuraErrorDivVisible());
+                    var error = $A.test.getAuraErrorMessage();
+                    $A.test.assertTrue(error.indexOf(errorMsg) !== -1);
+                }
+                throw new Error(thrownErrorMsg);
+            });
+            a.setStorable();
+            $A.enqueueAction(a);
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                        var error = $A.test.getAuraErrorMessage();
+                        return error.indexOf(thrownErrorMsg) !== -1;
+                    },
+                    "Error div never displayed error thrown from retry action callback"
+            );
+        }]
+    },
+
+    isAuraErrorDivVisible: function() {
+        var element = $A.util.getElement("auraErrorMessage");
+        return element.offsetWidth > 0 && element.offsetHeight > 0;
     }
 })

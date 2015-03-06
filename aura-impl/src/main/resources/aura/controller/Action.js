@@ -829,15 +829,15 @@ Action.prototype.finishAction = function(context) {
     if (clearComponents) {
         context.clearComponentConfigs(id);
     }
+    // reset before potential throw
+    $A.showErrors(oldDisplayFlag);
     if (error) {
         if ($A.clientService.inAuraLoop()) {
             throw error;
         } else {
-            $A.showErrors(oldDisplayFlag);
             $A.error("Error ", error);
         }
     }
-    $A.showErrors(oldDisplayFlag);
 };
 
 /**

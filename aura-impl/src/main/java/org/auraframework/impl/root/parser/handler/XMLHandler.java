@@ -199,24 +199,28 @@ public abstract class XMLHandler<T extends Definition> {
      * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
      * @param defClass The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag with updated ns for sources with default namespace support
-	 */
-	protected <E extends Definition> DefDescriptor<E> getDefDescriptor(String name, Class<E> clazz) {
-		DefDescriptor<E> defDesc = DefDescriptorImpl.getInstance(name, clazz);
+     */
+    protected <E extends Definition> DefDescriptor<E> getDefDescriptor(String name, Class<E> clazz) {
+        DefDescriptor<E> defDesc = DefDescriptorImpl.getInstance(name, clazz);
 
-		if (("apex".equals(defDesc.getPrefix()) || "markup".equals(defDesc.getPrefix())) // only needed for apex && markup def descriptors
-			&& (source != null && source.isDefaultNamespaceSupported()) // and default namespace is supported by the source
-	        && (AuraTextUtil.isNullEmptyOrWhitespace(defDesc.getNamespace()) // and current descriptor has no namespace
-                || source.getDefaultNamespace().equals(defDesc.getNamespace()))  // or has the default namespace 
-	        && !source.getDefaultNamespace().equals(source.getDescriptor().getNamespace())  // and the source has a different ns
-        ) {
-				String qualifiedName =  DefDescriptorImpl.buildQualifiedName(defDesc.getPrefix(), source.getDescriptor().getNamespace(), defDesc.getName());
-				defDesc = DefDescriptorImpl.getInstance(qualifiedName, clazz);
-	    }
+        if (("apex".equals(defDesc.getPrefix()) || "markup".equals(defDesc.getPrefix())) // only needed for apex && markup def descriptors
+            && isDefaultNamespaceUsed(defDesc.getNamespace())) {  // and default ns is used
+            String qualifiedName =  DefDescriptorImpl.buildQualifiedName(defDesc.getPrefix(), source.getDescriptor().getNamespace(), defDesc.getName());
+            defDesc = DefDescriptorImpl.getInstance(qualifiedName, clazz);
+        }
 
-		return defDesc;
-	}
+        return defDesc;
+    }
 
-	/**
+    protected boolean isDefaultNamespaceUsed(String ns) {
+        return source != null 
+                && source.isDefaultNamespaceSupported() // default namespace is supported by the source
+                && (AuraTextUtil.isNullEmptyOrWhitespace(ns) // and (the namespace is empty
+                    || source.getDefaultNamespace().equals(ns)) // or has the default namespace) 
+                && !source.getDefaultNamespace().equals(source.getDescriptor().getNamespace()); // and the source has a different ns from the default
+    }
+
+    /**
      * Whether name is system "aura" prefixed
      * 
      * @param name tag or attribute name

@@ -249,11 +249,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     protected final String getTagName() {
         String tagName = super.getTagName();
         
-        if ((source != null // if we have the source
-            && source.isDefaultNamespaceSupported()) // and it supports a default namespace, say 'c'
-            && tagName.startsWith(source.getDefaultNamespace() + ':') // and current tag has the default ns ex: <c:blurg/>
-            && !source.getDefaultNamespace().equals(source.getDescriptor().getNamespace())) { // and the source has a different ns
-
+        if (tagName.indexOf(':') != -1 && isDefaultNamespaceUsed(tagName.substring(0, tagName.indexOf(':')))) {
             // use parent ns for the child
             tagName = source.getDescriptor().getNamespace() + tagName.substring(source.getDefaultNamespace().length()); 
         }

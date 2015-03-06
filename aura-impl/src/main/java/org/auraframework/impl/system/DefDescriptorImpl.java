@@ -16,8 +16,6 @@
 package org.auraframework.impl.system;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
@@ -26,6 +24,8 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.impl.util.TypeParser;
+import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -49,19 +49,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     private final int hashCode;
 
     private static CachingService cSrv = Aura.getCachingService();
-
-    /**
-     * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
-     * 3 = name = bar prefix = null
-     */
-    private static final Pattern TAG_PATTERN = Pattern.compile("(?:([\\w\\*]+)://)?(?:([\\w\\-\\*]+):)?([\\w\\$\\*]+)");
-
-    /**
-     * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
-     * Group 2 = namespace = foo.bar Group 3 = name = baz
-     */
-    private static final Pattern CLASS_PATTERN = Pattern
-            .compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
 
     public static String buildQualifiedName(String prefix, String namespace, String name) {
         if (namespace == null) {
@@ -129,20 +116,16 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case THEME_PROVIDER:
             case THEME_MAP_PROVIDER:
             case INCLUDE:
-                Matcher matcher = CLASS_PATTERN.matcher(qualifiedName);
-                if (matcher.matches()) {
-                    prefix = matcher.group(1);
-                    namespace = matcher.group(2);
-                    if (namespace.isEmpty()) {
-                        namespace = null;
-                    }
-                    name = matcher.group(3);
-                    if (matcher.group(4) != null) {
-                        // combine name with <generic params> if available
-                        name += matcher.group(4);
-                        if (defType == org.auraframework.def.DefDescriptor.DefType.TYPE) {
-                            nameParameters = matcher.group(4);
-                        }
+                Type clazz = TypeParser.parseClass(qualifiedName);
+                if (clazz != null) {
+                    prefix = clazz.prefix;
+                    namespace = clazz.namespace;
+                    name = clazz.name;
+                    
+                    if (clazz.nameParameters != null 
+                        && defType == org.auraframework.def.DefDescriptor.DefType.TYPE) {
+
+                        nameParameters = clazz.nameParameters;
                     }
                 } else {
                     throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));
@@ -182,18 +165,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case DESIGN:
             case SVG:
             case FLAVOR_ASSORTMENT:
-                Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
-                if (tagMatcher.matches()) {
-                    prefix = tagMatcher.group(1);
-                    if (prefix == null) {
-                        prefix = MARKUP_PREFIX;
-                    }
-                    namespace = tagMatcher.group(2);
-                    name = tagMatcher.group(3);
-                    if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-                        name = namespace;
-                        namespace = null;
-                    }
+                Type tag = TypeParser.parseTag(qualifiedName);
+                if (tag != null) {
+                    // default the prefix to 'markup'
+                    prefix = tag.prefix != null ? tag.prefix : MARKUP_PREFIX;
+                    namespace = tag.namespace;
+                    name = tag.name;
                     qualifiedName = buildQualifiedName(prefix, namespace, name);
                 } else {
                     throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));

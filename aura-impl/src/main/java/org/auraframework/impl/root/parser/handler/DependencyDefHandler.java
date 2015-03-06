@@ -20,11 +20,11 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
+import org.auraframework.impl.util.TypeParser;
+import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -64,7 +64,14 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
 
     @Override
     protected void readAttributes() {
-        builder.setResource(getAttributeValue(ATTRIBUTE_RESOURCE));
+        // make sure we handle default namespace for [resource]
+        String resource = getAttributeValue(ATTRIBUTE_RESOURCE);
+        Type tag = TypeParser.parseTag(resource);
+        if (tag != null && isDefaultNamespaceUsed(tag.namespace)) {
+            resource = String.format("%s://%s:%s", tag.prefix, source.getDescriptor().getNamespace(), tag.name);
+        }
+
+        builder.setResource(resource);
         builder.setType(getAttributeValue(ATTRIBUTE_TYPE));
     }
 

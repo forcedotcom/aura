@@ -199,6 +199,10 @@ Test.Aura.LoggerTest = function() {
     }
 
     [Fixture]
+    function auraError() {
+    }
+
+    [Fixture]
     function subscribe() {
 
         var logger = new $A.ns.Logger(),

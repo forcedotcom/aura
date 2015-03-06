@@ -55,14 +55,17 @@ public class ComponentController {
         public AuraClientException(String desc, String id, String message, String jsStack) {
             super(message);
             JavascriptPseudoAction action = null;
-            try {
-                action = (JavascriptPseudoAction) Aura.getInstanceService().getInstance(desc,
-                        ActionDef.class);
-                action.setId(id);
-                action.addError(this);
-            } catch (QuickFixException e) {
-                // Uh... okay, we fell over running an action we now can't even define.
+            if (desc != null && id != null) {
+                try {
+                    action = (JavascriptPseudoAction) Aura.getInstanceService().getInstance(desc,
+                            ActionDef.class);
+                    action.setId(id);
+                    action.addError(this);
+                } catch (QuickFixException e) {
+                    // Uh... okay, we fell over running an action we now can't even define.
+                }
             }
+
             this.action = action;
             this.jsStack = jsStack;
         }

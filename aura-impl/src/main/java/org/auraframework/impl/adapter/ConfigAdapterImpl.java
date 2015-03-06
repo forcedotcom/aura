@@ -248,20 +248,25 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getJSLibsURL() {
+        String tz = getAvailableTimezone();
+        tz = tz.replace("/", "-");
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String contextPath = context.getContextPath();
+        String nonce = context.getFrameworkUID();
+        return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, tz);
+    }
+
+    /**
+     * Return WalltimeJS available timezone
+     * @return available walltimejs timezone
+     */
+    private String getAvailableTimezone() {
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
         String tz = al.getTimeZone().getID();
         if (!isAvailableTimezone(tz)) {
             tz = getEquivalentTimezone(tz);
         }
-        String locale = tz.replace("/", "-");
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-
-        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
-        if (!"GMT".equals(locale)) {
-            return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, locale);
-        } else {
-            return String.format("%s/auraFW/resources/%s/libs.js", contextPath, nonce);
-        }
+        return tz;
     }
 
     /**
@@ -307,9 +312,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getAuraJSURL() {
-        String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
-        String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String contextPath = context.getContextPath();
+        String suffix = context.getMode().getJavascriptMode().getSuffix();
+        String nonce = context.getFrameworkUID();
         return String.format("%s/auraFW/javascript/%s/aura_%s.js", contextPath, nonce, suffix);
     }
 

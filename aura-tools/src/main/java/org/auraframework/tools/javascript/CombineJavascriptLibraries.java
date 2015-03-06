@@ -135,8 +135,8 @@ public class CombineJavascriptLibraries {
         }
 
         // write versions without timezone code for "GMT"
-        Files.write(destDir.resolve("libs.js"), outputDev.toString().getBytes());
-        Files.write(destDir.resolve("libs.min.js"), outputMin.toString().getBytes());
+        Files.write(destDir.resolve("libs_GMT.js"), outputDev.toString().getBytes());
+        Files.write(destDir.resolve("libs_GMT.min.js"), outputMin.toString().getBytes());
 
         LOG.info("Finished generating resource files in " + destDir.toString());
     }

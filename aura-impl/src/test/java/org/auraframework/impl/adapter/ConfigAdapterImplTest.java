@@ -230,4 +230,29 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         impl.addPrivilegedNamespace("");
         assertFalse(impl.isPrivilegedNamespace(""));
     }
+
+    public void testGetEquivalentTimezones() throws Exception {
+        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        String tz = impl.getEquivalentTimezone("US/Pacific");
+        assertEquals("US/Pacific should return America/Los_Angeles as available equivalent",
+                "America/Los_Angeles", tz);
+        tz = impl.getEquivalentTimezone("Zulu");
+        assertEquals("Zulu should return Etc/UTC as available equivalent",
+                "Etc/UTC", tz);
+        tz = impl.getEquivalentTimezone("US/Central");
+        assertEquals("US/Central should return America/Chicago as available equivalent",
+                "America/Chicago", tz);
+        tz = impl.getEquivalentTimezone("Canada/Newfoundland");
+        assertEquals("Canada/Newfoundland should return America/St_Johns as available equivalent",
+                "America/St_Johns", tz);
+        tz = impl.getEquivalentTimezone("Cuba");
+        assertEquals("Cuba should return America/Havana as available equivalent",
+                "America/Havana", tz);
+        tz = impl.getEquivalentTimezone("America/Los_Angeles");
+        assertEquals("America/Los_Angeles should be the same",
+                "America/Los_Angeles", tz);
+        tz = impl.getEquivalentTimezone("WOOHOO");
+        assertEquals("Default GMT timezone should be return if no matches",
+                "GMT", tz);
+    }
 }

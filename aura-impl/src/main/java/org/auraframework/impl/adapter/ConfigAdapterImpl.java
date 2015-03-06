@@ -27,7 +27,7 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -60,7 +60,6 @@ import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import aQute.bnd.annotation.component.Component;
@@ -80,6 +79,12 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
     
     private static final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
+
+    // Available timezone regions provided by walltimejs data
+    private static final Set<String> AVAILABLE_TIMEZONE_REGIONS = Sets.newHashSet(
+            "Africa", "America", "Antarctica", "Asia", "Atlantic", "Australia", "CET", "CST6CDT", "EET", "EST",
+            "EST5EDT", "Etc", "Europe", "Factory", "HST", "Indian", "MET", "MST", "MST7MDT", "Pacific", "PST8PDT", "WET"
+    );
     
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
@@ -245,15 +250,44 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getJSLibsURL() {
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
-        String locale = al.getTimeZone().getID().replace("/", "-");
+        String tz = al.getTimeZone().getID();
+        if (!isAvailableTimezone(tz)) {
+            tz = getEquivalentTimezone(tz);
+        }
+        String locale = tz.replace("/", "-");
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-
         String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         if (!"GMT".equals(locale)) {
             return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, locale);
         } else {
             return String.format("%s/auraFW/resources/%s/libs.js", contextPath, nonce);
         }
+    }
+
+    /**
+     * walltimejs data does not provide all timezones due to duplicate so we have the
+     * one that is equivalent and available.
+     *
+     * @param timezoneId timezone
+     * @return available equivalent timezone
+     */
+    String getEquivalentTimezone(String timezoneId) {
+        Set<String> allTz = Sets.newHashSet(com.ibm.icu.util.TimeZone.getAvailableIDs());
+        if (allTz.contains(timezoneId)) {
+            int equivalentCount = com.ibm.icu.util.TimeZone.countEquivalentIDs(timezoneId);
+            for (int i = 0; i < equivalentCount; i++) {
+                String timezone = com.ibm.icu.util.TimeZone.getEquivalentID(timezoneId, i);
+                if (isAvailableTimezone(timezone)) {
+                    return timezone;
+                }
+            }
+        }
+        // return default if no matches
+        return "GMT";
+    }
+
+    private boolean isAvailableTimezone(String timezone) {
+        return AVAILABLE_TIMEZONE_REGIONS.contains(timezone.split("/")[0]);
     }
 
     @Override
@@ -473,7 +507,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * This default implementation of {@link ConfigAdapter#getContentSecurityPolicy(String)}
+     * This default implementation of {@link ConfigAdapter#getContentSecurityPolicy}
      * will return a default ContentSecurityPolicy object.
      */
     @Override

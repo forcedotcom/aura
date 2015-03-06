@@ -72,7 +72,7 @@ Event.prototype.setParams = function(config) {
                 if (attributeDefs[key]) {
                     this.params[key] = config[key];
                 } else {
-                    $A.warning("Event.setParams(): '"+key+"' is not a valid property. Valid properties are '"+$A.util.keys(this.eventDef.getAttributeDefs()).join("', '")+"'");
+                    $A.warning("Event.setParams(): '"+key+"'('"+config[key]+"') is not a valid parameter. Valid parameter are '"+$A.util.keys(this.eventDef.getAttributeDefs()).join("', '")+"'");
                 }
             }
         }

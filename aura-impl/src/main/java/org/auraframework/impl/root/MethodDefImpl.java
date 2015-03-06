@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root;
 
-import com.google.common.collect.Lists;
 import org.auraframework.def.*;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;

@@ -4,8 +4,10 @@
     <div class="container">
         <div class="footer">
             <div aura:id="content">content to show inside panel</div>
-            <ui:button class="panelDialogModalButton" press="{!c.showModal}" label="Show Panel Dialog Modal"></ui:button>
-            <ui:button class="panelDialogNonModalButton" press="{!c.showNonModal}" label="Show Panel Dialog Non-Modal" aura:id="nonModalButton"></ui:button>
+            <ui:button class="panelDialogModalButton" press="{!c.showModal}" label="Show Modal Panel Dialog"></ui:button>
+            <ui:button class="panelDialogNonModalButton" press="{!c.showNonModal}" label="Show Non-Modal Panel Dialog" aura:id="nonModalButton"></ui:button>
+			<ui:button class="panelDialogNonModalNonTransientButton" press="{!c.showNonModalNonTransient}" label="Show NonTransient,Non-Modal Panel Dialog" aura:id="nonModalNonTransientButton"></ui:button>
+        	<ui:inputText class="inputText" aura:id="inText" value="TestingCloseOnClickOutFeature" maxlength="10"/> <br/>
         </div>
     </div>
     <ui:panelManager />

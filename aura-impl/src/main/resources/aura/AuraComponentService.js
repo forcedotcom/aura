@@ -185,6 +185,10 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
 	// See if there is a component specific class
     var def = config["componentDef"];
     var desc = def["descriptor"] || def;
+    // Not sure why you would pass in the ComponentDef as the descriptor, but it's being done.
+    if(desc.getDescriptor) {
+    	desc = desc.getDescriptor();
+    }
     if (desc.getQualifiedName) {
     	desc = desc.getQualifiedName();
     }
@@ -275,7 +279,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
         if(configItem){
             var configObj = this.getComponentConfigs(configItem, attributeValueProvider);
             var def = configObj["definition"],
-                desc = configObj["descriptor"];
+                desc = configObj["descriptor"]["descriptor"] || configObj["descriptor"];
             var forceClient = false;
 
             configItem = configObj["configuration"];

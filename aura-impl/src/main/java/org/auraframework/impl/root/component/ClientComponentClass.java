@@ -18,24 +18,16 @@ package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.auraframework.Aura;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.RendererDef;
+import org.auraframework.def.*;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.JsFunction;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.*;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
 import com.google.common.collect.Lists;
@@ -97,11 +89,17 @@ public class ClientComponentClass {
     public void writeComponentClass(Appendable out) throws QuickFixException, IOException {
     	writeComponentClass(this.componentDef, out);
     }
+    
+    private static final String escapeStringForScript(final String namespace) {
+        if(namespace == null) { return ""; }
+        
+        return namespace.replaceAll("-", "_");
+    }
  
     private void writeComponentClass(BaseComponentDef def, Appendable out) throws IOException, QuickFixException {
     	DefDescriptor<? extends BaseComponentDef> descriptor = def.getDescriptor();
     	DefDescriptor<? extends BaseComponentDef> extendsDescriptor = def.getExtendsDescriptor();
-		String className = String.format("%s$%s", descriptor.getNamespace(), descriptor.getName());
+		String className = escapeStringForScript(String.format("%s$%s", descriptor.getNamespace(), descriptor.getName()));
 		BaseComponentDef superDef = null;
 		
 		if(extendsDescriptor != null) {
@@ -111,7 +109,7 @@ public class ClientComponentClass {
 		}
 		
     	DefDescriptor<? extends BaseComponentDef> superDescriptor = superDef != null ? superDef.getDescriptor() : null;
-		String superClassName = superDescriptor != null ? String.format("%s$%s", superDescriptor.getNamespace(), superDescriptor.getName()) : "$A.Component";
+		String superClassName = superDescriptor != null ? escapeStringForScript(String.format("%s$%s", superDescriptor.getNamespace(), superDescriptor.getName())) : "$A.Component";
 		
 		// DCHASMAN TODO Find the closest non-empty implementation of each method and jump directly to that to reduce call stack depth 
 		

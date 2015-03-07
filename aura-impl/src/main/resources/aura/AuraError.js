@@ -30,25 +30,32 @@ $A.ns.AuraError = function() {
     this.errorCode="";
 
     function AuraError(message) {
-        var getStack = function(error) {
+        // for IE8
+        function getName(method){
+            var funcStr=method.toString();
+            var name=null;
+            var matches = funcStr.match(/\bfunction\s?([^(]*)\(/);
+            if (matches && matches.length == 2) {
+                name=matches[1];
+            }
+            return name||"[anonymous]";
+        }
+
+        function getStack(error){
             var map = {};
-            var stack = [ String.Format("{0}: {1}",error.name,error.message) ];
+            var stack = [error.name + ": " + error.message];
             var caller = getStack.caller && getStack.caller.caller;
             while (caller) {
                 if (map[caller]) {
-                    stack.push(String.Format("{0} (Recursion Entry Point)",Function.GetName(caller)));
+                    stack.push(getName(caller) + " (Recursion Entry Point)");
                     break;
                 }
-                if (caller.caller == System.Script.Attributes.DecoratedFunction) {
-                    stack.push(Function.GetName(caller.arguments[0]));
-                } else {
-                    stack.push(Function.GetName(caller));
-                }
-                map[caller] = true;
-                caller = caller.caller;
+                stack.push(getName(caller));
+                map[caller]=true;
+                caller=caller.caller;
             }
             return stack.join('\n\tat ');
-        };
+        }
 
         if (message == null) {
             message = '';

@@ -52,7 +52,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     @ThreadHostileTest("disables AppCache")
     public void testWriteManifestWithConfigDisabled() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        ServletConfigController.setAppCacheDisabled(true);
+        ServletConfigController.setAppCacheDisabled(Boolean.TRUE);
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
@@ -163,7 +163,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String templateCss = String.format("%s://%s.%s", DefDescriptor.TEMPLATE_CSS_PREFIX, styleDef.getNamespace(),
                 styleDef.getName());
         String templateMarkup = String.format(baseComponentTag, "style='" + templateCss
-                + "'  isTemplate='false'  extends='aura:template' ", "");
+                + "'  isTemplate='true'  extends='aura:template' ", "");
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateMarkup);
 
         DefDescriptor<ApplicationDef> testApp = addSourceAutoCleanup(ApplicationDef.class,

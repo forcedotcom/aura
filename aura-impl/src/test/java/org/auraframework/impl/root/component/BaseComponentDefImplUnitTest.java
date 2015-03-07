@@ -53,6 +53,7 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -71,6 +72,8 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     protected DefDescriptor<D> extendsDescriptor;
     @Mock
     protected DefDescriptor<ComponentDef> templateDefDescriptor;
+    @Mock
+    protected ComponentDef templateDef;
     @Mock
     protected DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
     @Mock
@@ -91,17 +94,18 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     protected static DefinitionAccess GLOBAL_ACCESS;
     
     static {
-    	try {
-			GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "GLOBAL");
-		} catch (InvalidAccessValueException x) {
-			throw new AuraRuntimeException(x);
-		}
+        try {
+            GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "GLOBAL");
+        } catch (InvalidAccessValueException x) {
+            throw new AuraRuntimeException(x);
+        }
     }
 
 
     public BaseComponentDefImplUnitTest(String name) {
         super(name);
     }
+
 
     public void testAppendDependenciesDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
@@ -112,6 +116,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     public void testValidateReferences() throws Exception {
         setupValidateReferences();
         this.extendsDescriptor = null;
+        setupTemplate(true);
         buildDefinition().validateReferences();
     }
 
@@ -122,7 +127,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         AttributeDef attrDef = Mockito.mock(AttributeDef.class);
         Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
         Mockito.doReturn(Visibility.PRIVATE).when(attrDef).getVisibility();
-		Mockito.doReturn(GLOBAL_ACCESS).when(attrDef).getAccess();
+        Mockito.doReturn(GLOBAL_ACCESS).when(attrDef).getAccess();
 
         @SuppressWarnings("unchecked")
         D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
@@ -137,6 +142,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.expressionRefs = Sets.newHashSet();
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
         this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);
+        setupTemplate(true);
 
         buildDefinition().validateReferences();
     }
@@ -164,6 +170,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.expressionRefs = Sets.newHashSet();
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", exprLocation));
         this.attributeDefs = ImmutableMap.of();
+        setupTemplate(true);
 
         try {
             buildDefinition().validateReferences();
@@ -172,6 +179,19 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
             assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
                     "Expression v.privateAttribute refers to a private attribute");
             assertEquals(exprLocation, ((InvalidDefinitionException) t).getLocation());
+        }
+    }
+
+    public void testTemplateMustBeTemplate() throws Exception {
+        setupValidateReferences();
+        this.extendsDescriptor = null;
+        setupTemplate(false);
+        try {
+            buildDefinition().validateReferences();
+            fail("Expected an exception when using a template that is not a template");
+        } catch (Throwable t) {
+            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
+                    String.format("Template %s must be marked as a template", templateDefDescriptor));
         }
     }
 
@@ -197,6 +217,8 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.expressionRefs = Sets.newHashSet();
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
         this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);
+
+        setupTemplate(true);
 
         buildDefinition().validateReferences();
     }
@@ -232,5 +254,11 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         builder.setWhitespaceBehavior(this.whitespaceBehavior);
         builder.dependencies = this.dependencies;
         return super.buildDefinition(builder);
+    }
+
+    protected void setupTemplate(boolean isTemplate) throws QuickFixException {
+        Mockito.doReturn(this.templateDef).when(this.templateDefDescriptor).getDef();
+        Mockito.doReturn(this.templateDefDescriptor).when(this.templateDef).getDescriptor();
+        Mockito.doReturn(isTemplate).when(this.templateDef).isTemplate();
     }
 }

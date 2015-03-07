@@ -54,6 +54,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -164,6 +165,10 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         if (def == null) {
             try {
                 def = descriptor.getDef();
+                if (extender == null && def.isAbstract() && def.getProviderDescriptor() == null) {
+                    throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
+                        descriptor), def.getLocation());
+                }
                 if (extender == null && (def.isAbstract() || def.getLocalProviderDef() != null)) {
                     this.intfDescriptor = def.getDescriptor();
                 }

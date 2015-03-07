@@ -105,6 +105,7 @@
                         <id>index-test-components</id>
                         <phase>generate-test-resources</phase>
                     </execution>
+                    <!--
                     <execution>
                         <id>aura:compile-components</id>
                         <phase>${component.compile.phase}</phase>
@@ -132,8 +133,60 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
+                -->
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <id>compile-components</id>
+                    <goals>
+                      <goal>exec</goal>
+                    </goals>
+                    <phase>${component.compile.phase}</phase>
+                    <configuration>
+                      <executable>${java.home}/bin/java</executable>
+                      <classpathScope>runtime</classpathScope>
+                      <arguments>
+                        <argument>-Daura.home=${basedir}/..</argument>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                        <argument>${basedir}/src/main/components</argument>
+                        <argument>${project.build.directory}/${component.dir}</argument>
+                      </arguments>
+                    </configuration>
+                  </execution>
+                  <execution>
+                    <id>compile-test-components</id>
+                    <goals>
+                      <goal>exec</goal>
+                    </goals>
+                    <phase>${component.test.compile.phase}</phase>
+                    <configuration>
+                      <executable>${java.home}/bin/java</executable>
+                      <classpathScope>test</classpathScope>
+                      <arguments>
+                        <argument>-Daura.home=${basedir}/..</argument>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                        <argument>${basedir}/src/test/components</argument>
+                        <argument>${project.build.directory}/${component.test.dir}</argument>
+                        <argument>auratest</argument>
+                        <argument>themeProviderTest</argument>
+                        <argument>flavorTest</argument>
+                        <argument>lintTest</argument>
+                        <argument>handleEventTest</argument>
+                        <argument>validationTest</argument>
+                        <argument>test</argument>
+                      </arguments>
+                    </configuration>
+                  </execution>
+              </executions>
+          </plugin>
         </plugins>
     </build>
     <profiles>

@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -24,7 +25,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
@@ -33,13 +33,21 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 /**
  */
-public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
+public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, ComponentDefImpl.Builder> {
 
     public static final String TAG = "aura:component";
+
+    private static final String ATTRIBUTE_ISTEMPLATE = "isTemplate";
+
+    private static final Set<String> CMP_PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+        .addAll(PRIVILEGED_ALLOWED_ATTRIBUTES)
+        .add(ATTRIBUTE_ISTEMPLATE)
+        .build();
 
     public ComponentDefHandler() {
         super();
@@ -51,13 +59,24 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
     }
 
     @Override
-    protected Builder<ComponentDef> createBuilder() {
+    protected ComponentDefImpl.Builder createBuilder() {
         return new ComponentDefImpl.Builder();
     }
 
     @Override
     public String getHandledTag() {
         return TAG;
+    }
+
+    @Override
+    public Set<String> getAllowedAttributes() {
+        return isInPrivilegedNamespace ? CMP_PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+    }
+
+    @Override
+    protected void readAttributes() throws QuickFixException {
+        super.readAttributes();
+        builder.isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
     }
 
     @Override

@@ -72,14 +72,13 @@ import com.google.common.collect.Sets;
 
 /**
  */
-public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extends RootTagHandler<T> {
+public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B extends Builder<T>> extends RootTagHandler<T> {
 
     private static final String ATTRIBUTE_RENDER = "render";
     private static final String ATTRIBUTE_TEMPLATE = "template";
     private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_EXTENSIBLE = "extensible";
     private static final String ATTRIBUTE_ABSTRACT = "abstract";
-    private static final String ATTRIBUTE_ISTEMPLATE = "isTemplate";
     private static final String ATTRIBUTE_IMPLEMENTS = "implements";
     private static final String ATTRIBUTE_EXTENDS = "extends";
     private static final String ATTRIBUTE_STYLE = "style";
@@ -97,13 +96,13 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
 
     protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
-            ATTRIBUTE_ISTEMPLATE, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
+            ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
             ATTRIBUTE_WHITESPACE, ATTRIBUTE_DEFAULT_FLAVOR).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();
 
     private int innerCount = 0;
     private final List<ComponentDefRef> body = Lists.newArrayList();
-    protected Builder<T> builder;
+    protected B builder;
 
     public BaseComponentDefHandler() {
         super();
@@ -243,7 +242,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         }
     }
 
-    protected abstract Builder<T> createBuilder();
+    protected abstract B createBuilder();
 
     @Override
     protected RootDefinitionBuilder<T> getBuilder() {
@@ -497,8 +496,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             String whitespaceVal = getAttributeValue(ATTRIBUTE_WHITESPACE);
             builder.whitespaceBehavior = whitespaceVal == null ? WhitespaceBehavior.OPTIMIZE
                     : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
-
-            builder.isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
 
             builder.setAccess(readAccessAttribute());
         } finally {

@@ -121,6 +121,7 @@ ServerActionsMetricsPlugin.prototype = {
             var id = action["context"]["id"];
             var phase = action["phase"];
             if (phase === 'stamp') {
+                action = $A.util.apply({}, action, true, true);
                 bundle.push(action);
                 action["context"]["children"] = {};
                 var children = action["context"]["children"];
@@ -129,7 +130,7 @@ ServerActionsMetricsPlugin.prototype = {
                     children[ids[j]] = ' ';
                 }
                 
-            } else if (phase === 'start') {
+            } else if (phase === 'start' && actionMarks[i]["duration"] === undefined) {
                 queue[id] = actionMarks[i];
             } else if (phase === 'end' && queue[id]) {
                 mark = queue[id];

@@ -152,9 +152,11 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // Uses the minified version if in production mode.
             if (resStr.startsWith("/aura/resources/") && Aura.getConfigAdapter().isProduction()) {
                 int extIndex = resStr.lastIndexOf(".");
-                String minFile = resStr.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + resStr.substring(extIndex);
-                if (resourceLoader.getResource(minFile) != null) {
-                    resStr = minFile;
+                if (extIndex > 0) {
+                    String minFile = resStr.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + resStr.substring(extIndex);
+                    if (resourceLoader.getResource(minFile) != null) {
+                        resStr = minFile;
+                    }
                 }
             }
 

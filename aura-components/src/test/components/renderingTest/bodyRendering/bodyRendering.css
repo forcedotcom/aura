@@ -1,0 +1,9 @@
+.THIS th {
+    border: 1px solid gray;
+    background-color: silver;
+    text-align: center;
+}
+.THIS td {
+    border: 1px solid gray;
+    text-align: center;
+}

@@ -22,7 +22,7 @@
         var renderEvent = $A.get("e.auratest:renderEvent");
         renderEvent.setParams({ "event" : "render " + component.getGlobalId() });
         renderEvent.fire();
-        
+
         return this.superRender();
 	},
 

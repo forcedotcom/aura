@@ -137,13 +137,9 @@ var AuraEventService = function() {
          * @public
          */
         getRegisteredEvents : function() {
-            var ret = "";
-            for ( var event in registry.eventDefs) {
-                ret = ret + event;
-                ret = ret + "\n";
-            }
-            return ret;
+            return $A.util.keys(registry.eventDefs);
         },
+        
         hasPendingEvents : function() {
             return $A.clientService.inAuraLoop();
         }

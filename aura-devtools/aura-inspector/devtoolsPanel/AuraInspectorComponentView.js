@@ -11,10 +11,16 @@ function AuraInspectorComponentView(devtoolsPanel) {
     var _items = {};
     var _isDirty = false;
 
-    this.init = function(){
-        container = document.getElementById("component-view");
+    this.init = function(tabBody){
+        container = document.createElement("DIV");
+        container.className="component-view";
+        container.id="component-view";
+        tabBody.appendChild(container);
+
+        tabBody.classList.add("sidebar");
 
         treeComponent = new AuraInspectorTreeView();
+        treeComponent.attach("ondblselect", TreeComponent_OnDblSelect.bind(this));
     };
 
     this.setData = function(items) {
@@ -32,8 +38,15 @@ function AuraInspectorComponentView(devtoolsPanel) {
             treeComponent.clearChildren();
 
             var current = _items;
+            var bodies = current.attributes && current.attributes.body || {};
             var attributeValueProvider;
             var attributeNodesContainer;
+
+            if(!current.attributes) {
+                current.attributes = {};
+            }
+
+
             while(current) {
                 // Add Header for Super Levels
                 if(current != _items) {
@@ -53,13 +66,14 @@ function AuraInspectorComponentView(devtoolsPanel) {
                 if(current === _items) {
                     treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
 
+                    current.attributes.body = bodies[current.globalId] || [];
                     attributeNodesContainer = TreeNode.create();
                     generateNodes(current.attributes, attributeNodesContainer);
                     treeComponent.addChildren(attributeNodesContainer.getChildren());
                 } else {
                     // We still want to inspect the body at the super levels,
                     // since they get composted together and output.
-                    var body = current.attributes && current.attributes.body || [];
+                    var body = bodies[current.globalId] || [];
                     attributeNodesContainer = TreeNode.create({ key: "body", value: body }, "", "keyvalue");
                     generateNodes(body, attributeNodesContainer);
                     treeComponent.addChild(attributeNodesContainer);
@@ -73,6 +87,21 @@ function AuraInspectorComponentView(devtoolsPanel) {
             alert([e.message, e.stack]);
         }
     };
+
+
+    function TreeComponent_OnDblSelect(event) {
+        if(event && event.data) {
+            var domNode = event.data.domNode;
+            var treeNode = event.data.treeNode;
+            var globalId = treeNode && treeNode.getRawLabel().globalId;
+            
+            if(globalId) {
+                var command = "$auraTemp = $A.getCmp('" + globalId + "'); console.log('$auraTemp = ', $auraTemp);";
+                chrome.devtools.inspectedWindow.eval(command);
+            }
+        }
+    }
+    
 
     function generateNodes(json, parentNode) {
         var node;

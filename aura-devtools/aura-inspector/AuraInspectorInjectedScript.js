@@ -2,23 +2,6 @@
 // This is injected in the DOM directly via <script> injection
 (function(){
     var actions = {
-        "AuraDevToolService.RequestComponentTree" : function (event) {
-            var globalId = event.data && event.data["globalId"];
-            var component = globalId ? $A.getCmp(globalId) : $A.getRoot();
-            var treeJSON = component.toJSON();
-
-            if(globalId) {
-                event.source.postMessage({
-                    action: "AuraDevToolService.RequestComponentViewResponse",
-                    responseText: treeJSON
-                }, "*");    
-            } else {
-                event.source.postMessage({
-                    action: "AuraDevToolService.RequestComponentTreeResponse",
-                    responseText: treeJSON
-                }, "*");   
-            }
-        },
         "AuraDevToolService.HighlightElement": function(event) {
             // Ensure the classes are present that HighlightElement depends on.
             if(!actions["AuraDevToolService.AddStyleRules"].addedStyleRules) {
@@ -96,6 +79,14 @@
                 element.classList.remove(removeClassName);
                 element.classList.remove(addClassName);
             });
+        },
+        "AuraDevToolService.Bootstrap": function(event) {
+            if (typeof $A != "undefined" && $A.initAsync) {
+                bootstrapPerfDevTools();
+                $A.PerfDevTools.init();
+            } else {
+                console.log('Could not attach AuraDevTools Extension.');
+            }
         }
     };
 
@@ -218,6 +209,8 @@
                 };
             },
             _generateCPUProfilerDataFromMarks: function (marks) {
+                if(!marks || !marks.length) { return {}; }
+                
                 //global stuff for the id
                 var id = 0;
                 function nextId () {return ++id;}
@@ -352,51 +345,7 @@
     };
 
 
-    (function boostrap() {
-        if (typeof $A != "undefined" && $A.initAsync) {
-            bootstrapPerfDevTools();
-            $A.PerfDevTools.init();
-        } else {
-            console.log('Could not attach AuraDevTools Extension.');
-        }
-    }());
+    
 
-
-    // TODO: KGRAY: Probably garbage to remove:
-    //
-    // var evt = $A.get("e.aura:valueChange");
-    // var fire = evt.constructor.prototype.fire;
-
-    // // Override Events, not sure why this doesn't cover things like aura:valueChange
-    // evt.constructor.prototype.fire = function () {
-    //     var text;
-    //     var eventName = this.getDef().getDescriptor().getQualifiedName().replace("markup://", "");
-    //     if(this.source) {
-    //         text = "Component: {" + this.source.getGlobalId() + "} fired event " + eventName;// + " with parameter data: " + JSON.stringify(this.getParams());
-    //     } else {
-    //         text = "Fired event " + eventName;// + " with parameter data: " + JSON.stringify(this.getParams());
-    //     }
-    //     logText(text);
-    //     fire.apply(this, arguments);
-    // };
-
-    // var oldEnqueueAction = $A.clientService.enqueueAction;
-    // $A.clientService.enqueueAction = function() {
-    //     logText("$A.clientService.enqueueAction");
-    //     oldEnqueueAction.apply(this, arguments);
-    // };
-
-    // var oldEnqueueAction2 = $A.enqueueAction;
-    // $A.enqueueAction = function() {
-    //     logText("$A.enqueueAction");
-    //     oldEnqueueAction2.apply(this, arguments);
-    // };
-
-    // function logText(text) {
-    //     window.postMessage({
-    //         action: "AuraDevToolService.OnError",
-    //         text: text
-    //     }, "*");
-    // }
 })();
     

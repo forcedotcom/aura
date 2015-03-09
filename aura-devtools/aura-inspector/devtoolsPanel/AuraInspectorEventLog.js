@@ -1,8 +1,12 @@
 /* Listens for events and shows them in the event log */
 function AuraInspectorEventLog(devtoolsPanel) {
     var ol;
-    this.init = function() {
-        ol = document.getElementById("event-log");
+
+    this.init = function(tabBody) {
+        ol = document.createElement("ol");
+        ol.className = "event-log";
+        ol.id = "event-log";
+        tabBody.appendChild(ol);
 
         // Start listening for events to draw
         devtoolsPanel.attach("onevent", DevToolsPanel_OnEvent.bind(this));

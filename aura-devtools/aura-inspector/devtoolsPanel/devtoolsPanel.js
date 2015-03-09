@@ -4,7 +4,10 @@
         panel.init();
 
     // Probably the default we want
-    panel.showPanel("component-tree");
+    AuraInspectorOptions.getAll({ "activePanel": "component-tree" }, function(options) {
+        panel.showPanel(options["activePanel"]);
+    });
+
     //panel.showPanel("event-log");
 
     // devtools.js has a reference to window.refresh()
@@ -20,7 +23,7 @@
         var nodeId = 0; 
         var events = new Map();
         var panels = new Map();
-        var _name = "AuraInspectorDevtoolsPanel" + Date.now() 
+        var _name = "AuraInspectorDevtoolsPanel" + Date.now();
 
         this.connect = function(){
             if(runtime) { return; }
@@ -31,8 +34,6 @@
 
             // Subscribe to these events from the content script
             var events = [
-                "AuraInspector.DevToolsPanel.PublishComponentTree", 
-                "AuraInspector.DevToolsPanel.PublishComponentView", 
                 "AuraInspector.DevToolsPanel.OnEvent",
                 "AuraInspector.DevToolsPanel.OnTransactionEnd"
             ];
@@ -55,32 +56,30 @@
         this.init = function() {
             this.connect();
 
-            actions.set("AuraInspector.DevToolsPanel.PublishComponentTree", new PublishComponentTree(this));
-            actions.set("AuraInspector.DevToolsPanel.PublishComponentView", new PublishComponentView(this));
-            actions.set("AuraInspector.DevToolsPanel.HighlightElement", new HighlightElement(this));
-            actions.set("AuraInspector.DevToolsPanel.GetComponentTree", new GetComponentTree(this));
             actions.set("AuraInspector.DevToolsPanel.OnEvent", new GeneralNotify(this, "onevent"));
             actions.set("AuraInspector.DevToolsPanel.OnTransactionEnd", new TransactionEnd(this));
 
             //-- Attach Event Listeners
+
             var header = document.querySelector("header.tabs");
             header.addEventListener("click", HeaderActions_OnClick.bind(this));
 
             // Initialize Panels
             var eventLog = new AuraInspectorEventLog(this);
-            this.addPanel("event-log", eventLog);
-
             var tree = new AuraInspectorComponentTree(this);
-            this.addPanel("component-tree", tree);
+            var definitions = new AuraInspectorDefinitionsList(this);
+            var perf = new AuraInspectorPerformanceView(this);
+            var transaction = new AuraInspectorTransactionView(this);
 
+            this.addPanel("component-tree", tree, "Component Tree");
+            this.addPanel("definitions-list", definitions, "Definitions");
+            this.addPanel("performance", perf, "Performance");
+            this.addPanel("transaction", transaction, "Transactions");
+            this.addPanel("event-log", eventLog, "Event Log")
+
+            // Sidebar Panels. Have to be after the primary panels
             var view = new AuraInspectorComponentView(this);
             this.addPanel("component-view", view);
-
-            var perf = new AuraInspectorPerformanceView(this);
-            this.addPanel("performance", perf);
-
-            var transaction = new AuraInspectorTransactionView(this);
-            this.addPanel("transaction", transaction);
         };
 
         this.attach = function(eventName, eventHandler) {
@@ -99,13 +98,30 @@
              }
         };
 
-        this.addPanel = function(key, component) {
+        this.addPanel = function(key, component, title) {
             if(!panels.has(key)) {
-                component.init();
+                // Create Tab Body and Header
+                var tabBody = document.createElement("section");
+                    tabBody.className="tab-body";
+                    tabBody.id = "tab-body-" + key;
+
+                if(title) {
+                    var tabHeader = document.createElement("button");
+                        tabHeader.appendChild(document.createTextNode(title));
+                        tabHeader.id = "tabs-" + key;                    
+
+                    var tabs = document.querySelector("header.tabs");
+                        tabs.appendChild(tabHeader);
+                }
+
+                // Initialize component with new body
+                component.init(tabBody);
                 panels.set(key, component);
+
+                document.body.appendChild(tabBody);
             }
         };
-
+        
         /*
          * Which panel to show to the user in the dev tools.
          * Currently: Component Tree (component-tree), and Event Log (event-log)
@@ -117,7 +133,7 @@
             var panelKey = key.indexOf("tabs-")==0?key.substring(5):key;
             var buttonKey = "tabs-"+panelKey;
 
-            for(var c=0;c<buttons.length;c++){ 
+            for(var c=0;c<buttons.length;c++){
                 if(buttons[c].id===buttonKey) {
                     buttons[c].classList.add("selected");
                     sections[c].classList.add("selected");
@@ -132,6 +148,8 @@
             if(current) {
                 current.render();
             }
+
+            AuraInspectorOptions.set("activePanel", panelKey);
         };
 
         /**
@@ -158,36 +176,62 @@
         };
 
         this.addLogMessage = function(msg) {
+            if(!panels.get("event-log")) {
+                alert("Event log msg added before event log was available. Fix that this isn't possible.");
+            }
+            panels.get("event-log").addLogItem(msg);
+        };
+
+        /**
+         * Should show a message of a different type obviously. 
+         */
+        this.addErrorMessage = function(msg) {
             panels.get("event-log").addLogItem(msg);
         };
         
+        this.showLoading = function() {
+            document.getElementById("loading").style.display="block";
+        };
+
+        this.hideLoading = function() {
+            document.getElementById("loading").style.display="none";
+        };
+        
         this.updateComponentTree = function(json) {
-            if(json) {
-                var tree = JSON.parse(json);
+            this.addLogMessage("Updating Component Tree");
+            this.showLoading();
+            var command = "$A.getRoot().toJSON()";
+            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(!response) { return; }
+                var tree = JSON.parse(response);
                 
                 // RESOLVE REFERENCES
                 tree = ResolveJSONReferences(tree);
 
                 panels.get("component-tree").setData(tree);
-                panels.get("event-log").addLogItem("Component Tree Updated");
-            } else {
-                chrome.devtools.inspectedWindow.eval("AuraInspector.ContentScript.updateComponentTree()", { useContentScriptContext: true} );
-            }
+                this.addLogMessage("Component Tree Updated");
+                this.hideLoading();
+            }.bind(this));
         };
 
-        this.updateComponentView = function(globalId, json) {
-            if(json) {
-                var tree = JSON.parse(json);
+        this.updateComponentView = function(globalId) {
+            var command = [
+                "var component = $A.getComponent('" + globalId + "')", 
+                "if(component) {component.toJSON();}"
+            ].join(";")
+
+            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(!response) { return; }
+                var tree = JSON.parse(response);
                 
                 // RESOLVE REFERENCES
                 tree = ResolveJSONReferences(tree);
 
                 panels.get("component-view").setData(tree);
-            } else {
-                chrome.devtools.inspectedWindow.eval("AuraInspector.ContentScript.updateComponentView('" + globalId + "')", { useContentScriptContext: true} );
-            }
+            }.bind(this));
         };
-
 
         /* Event Handlers */
         function HeaderActions_OnClick(event){
@@ -196,7 +240,6 @@
             this.showPanel(target.id);
         }
 
-        /* PRIVATE */
         function DevToolsPanel_OnMessage(message) {
             //alert(JSON.stringify(message));
             var action = actions.get(message.action);
@@ -207,6 +250,14 @@
             action.run(message.params);
         }
 
+        /* PRIVATE */
+        function stripDescriptorProtocol(descriptor) {
+            if(typeof descriptor != 'string') { return descriptor; }
+            if(descriptor.indexOf("://") === -1) { 
+                return descriptor;
+            }
+            return descriptor.split("://")[1];
+        }
 
 
         function ResolveJSONReferences(object) {
@@ -259,45 +310,10 @@
         }
 
         /* Actions */
-        function PublishComponentTree(service){
-
-            this.run = function(params) {
-                // Uncomment to see how many times this is called. 
-                // it's to much, should only be done once
-                //alert("PublishComponentTree");
-                service.updateComponentTree(params);
-            };
-        }
-
-        function PublishComponentView(service){
-
-            this.run = function(params) {
-                service.updateComponentView(null, params);
-            };
-        }
-
         function TransactionEnd(service)  {
             this.run = function (data) {
                 var transaction = panels.get('transaction');
-                transaction.update(data);
-            };
-        }
-
-        function HighlightElement(service){
-
-            this.run = function(globalId) {
-                //AuraInspectorDevtoolsPanel.port.postMessage({action : "highlightElements", params : globalId});
-                service.highlightElement(globalId);
-            };
-        }
-
-        function GetComponentTree(service){
-
-            this.run = function() {
-                // Initiates a request to the content script to request the new component tree.
-                // This gets returned and the PublishComponentTree action handles the return value
-                service.updateComponentTree();
-                //AuraInspectorDevtoolsPanel.port.postMessage({action : "requestComponentTree"});
+                    transaction.addTransactions(data);
             };
         }
 

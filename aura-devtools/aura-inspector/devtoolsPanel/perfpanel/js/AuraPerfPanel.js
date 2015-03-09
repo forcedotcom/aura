@@ -26,9 +26,11 @@ AuraPerfPanel.prototype = {
 
         // Probably there is a way to do this without the setTimeout, 
         // but reverse engineer the hole WebInspector is painful...
-        setTimeout(function(){
-            this._setWebInspectorData(data);
-        }.bind(this), 100);
+        if(data) {
+            setTimeout(function(){
+                this._setWebInspectorData(data);
+            }.bind(this), 100);
+        }
     },
     _setWebInspectorData: function (data) {
         var type    = new WebInspector.CPUProfileType();

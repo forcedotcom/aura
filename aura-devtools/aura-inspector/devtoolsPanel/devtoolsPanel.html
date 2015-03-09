@@ -4,81 +4,15 @@
 
 	</head>
 	<body>
-		<header class="tabs">
-			<button id="tabs-component-tree">
-				Component Tree
-			</button>
-			<button id="tabs-event-log">
-				Log
-			</button>
-			<button id="tabs-performance">
-				Performance
-			</button>
-			<button id="tabs-transaction">
-				Transactions
-			</button>
-		</header>
-
-
-		<section id="tab-body-component-tree" class="tab-body">
-			<div class="component-tree-settings">
-				<button id="refresh-button"><span>Refresh</span></button>
-				<input type="checkbox" id="showglobalids-checkbox"> Show Global IDs
+		<div id="loading">
+			<div class="spinner">
+			  <div class="cube1"></div>
+			  <div class="cube2"></div>
 			</div>
-			<div class="component-tree" id="tree"></div>
-		</section>
+			<div class="opaque"></div>
+		</div>
 
-		<section id="tab-body-event-log" class="tab-body">
-			<ol class="event-log" id="event-log"></ol>
-		</section>
-
-		<section id="tab-body-performance" class="perf-tab tab-body">
-			<div class="aura-panel panel-status-bar">
-				<button class="record-profile-status-bar-item status-bar-item" title="Record">
-					<div class="glyph"></div><div class="glyph shadow"></div>
-				</button>
-				<button class="clear-status-bar-item status-bar-item" title="Clear">
-					<div class="glyph"></div><div class="glyph shadow"></div>
-				</button>
-				<button class="timeline-frames-status-bar-item status-bar-item" title="Show current collected">
-					<div class="glyph"></div><div class="glyph shadow"></div>
-				</button>
-				<div class="status-bar-item"></div>
-			</div>
-			<div class="flamechart" id="flamechart"></div>
-		</section>
-
-		<section id="tab-body-transaction" class="tab-body trans-panel">
-			<div class="aura-panel panel-status-bar">
-			<!-- 
-				<button class="record-profile-status-bar-item status-bar-item" title="Record">
-					<div class="glyph"></div><div class="glyph shadow"></div>
-				</button>
-			-->
-				<button class="clear-status-bar-item status-bar-item" title="Clear">
-					<div class="glyph"></div><div class="glyph shadow"></div>
-				</button> 
-			</div>
-			<div class="transactions" id="trs">
-				<div>
-					<table>
-						<thead>
-							<th>Id</th>
-							<th>StartTime</th>
-							<th>Duration(ms)</th>
-							<th>Context</th>
-							<th>InTransaction</th>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</section>
-
-		<section id="tab-body-component-view" class="sidebar">
-			<div class="component-view" id="component-view"></div>
-		</section>
+		<header class="tabs"></header>
 
 		<!-- Perf Tools from Deigo -->
 		<link rel="stylesheet" type="text/css" href="perfpanel/css/inspector.css">
@@ -87,8 +21,6 @@
 		<link rel="stylesheet" type="text/css" href="perfpanel/css/dataGrid.css">
 		<link rel="stylesheet" type="text/css" href="perfpanel/css/splitView.css">
 		<link rel="stylesheet" type="text/css" href="perfpanel/css/custom.css">
-
-		<link rel="stylesheet" type="text/css" href="transactionPanel/css/custom.css">
 
 		<script type="text/javascript" src="perfpanel/js/Main.js"></script>
 		<script type="text/javascript" src="perfpanel/js/ProfilesPanel.js"></script>
@@ -102,6 +34,7 @@
 		<script src="AuraInspectorComponentView.js"></script>
 		<script src="AuraInspectorTransactionView.js"></script>
 		<script src="AuraInspectorEventLog.js"></script>
+		<script src="AuraInspectorDefinitionsList.js"></script>
 
 		<script src="devtoolsPanel.js"></script>
 	</body>

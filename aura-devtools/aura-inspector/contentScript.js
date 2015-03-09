@@ -8,7 +8,7 @@
     global.AuraInspector = global.AuraInspector || {};
     global.AuraInspector.ContentScript = inspector;
 
-
+    
     function AuraInspectorContentScript(){
         var actions = new Map();
         var runtime = null;
@@ -48,16 +48,11 @@
 
         this.init = function(){
             this.connect();
-
+            this.injectBootstrap();
+            
             // Initialize Actions which map messages to commands that get run
             // After running, we should get this response, and need to handle the response
             window.addEventListener("message", function AuraInspectorContent$Response(event){
-                if(event.data.action === "AuraDevToolService.RequestComponentTreeResponse") {
-                    return this.updateComponentTree(event.data.responseText);
-                }
-                if(event.data.action === "AuraDevToolService.RequestComponentViewResponse") {
-                    return this.updateComponentView(null, event.data.responseText);
-                }
                 if(event.data.action === "AuraDevToolService.OnError") {
                     return this.addEventLogMessage(event.data.text);
                 }
@@ -66,11 +61,42 @@
                 }
 
             }.bind(this));
+        };
 
-            // Comment this til Kris fixes the problem
-            // We shouldnt call timeout but instead hook a function 
-            // in the framework once the app is ready
-            // setTimeout(this.updateComponentTree, 1500);
+        this.injectBootstrap = function() {
+            var script = document.createElement("script");
+            script.textContent = script.text = `
+                /**  Aura Inspector Script, ties into $A.initAsync and $A.initConfig to initialize the inspector as soon as possible. **/
+                (function(){
+                    function wrap(obj, original, before) {
+                        return function() {
+                            before.apply(obj, arguments);
+                            return original.apply(obj, arguments);
+                        }
+                    }
+                    function callBootstrap() {
+                        window.postMessage({
+                            action  : "AuraDevToolService.Bootstrap"
+                        }, '*');
+                    }
+                    var _$A;
+                    Object.defineProperty(window, "$A", {
+                        enumerable: true,
+                        configurable: true,
+                        get: function() { return _$A; },
+                        set: function(val) {
+                            if(val && val.initAsync) {
+                                val.initAsync = wrap(val, val.initAsync, callBootstrap);
+                            }
+                            if(val && val.initConfig) {
+                                val.initConfig = wrap(val, val.initConfig, callBootstrap);
+                            }
+                            _$A = val;
+                        }
+                    });
+                })();
+            `;
+            document.documentElement.appendChild(script);
         };
 
         this.highlightElement = function(globalId) {
@@ -96,39 +122,6 @@
                 params: payload
             });
         },
-
-        this.updateComponentTree = function(json) {
-            if(json) {
-                // With the new result, notify the Background Page
-                // So it can tell the DevToolsPanel to draw the tree.
-                runtime.postMessage({
-                    action: "AuraInspector.DevToolsPanel.PublishComponentTree",
-                    params: json
-                });
-            } else {
-                //actions.get("AuraInspector.ContentScript.GetComponentTree").run();
-                window.postMessage({
-                    action: "AuraDevToolService.RequestComponentTree"
-                }, "*");
-            }
-        };
-
-        this.updateComponentView = function(globalId, json) {
-            if(json) {
-                // With the new result, notify the Background Page
-                // So it can tell the DevToolsPanel to draw the tree.
-                runtime.postMessage({
-                    action: "AuraInspector.DevToolsPanel.PublishComponentView",
-                    params: json
-                });
-            } else {
-                //actions.get("AuraInspector.ContentScript.GetComponentTree").run(globalId);
-                window.postMessage({
-                    action: "AuraDevToolService.RequestComponentTree",
-                    globalId: globalId
-                }, "*");
-            }
-        };
 
         this.addEventLogMessage = function(msg) {
             if(!msg) { return; }

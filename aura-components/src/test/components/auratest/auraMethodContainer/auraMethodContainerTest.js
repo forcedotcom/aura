@@ -51,8 +51,7 @@
     
     //Test pass two parameters to a function that only expect one
     //We throw warnings.
-    _testHasAttrWithExtraPassInParameter:{
-    	failOnWarning: true,
+    testHasAttrWithExtraPassInParameter:{
         test:[ 
             function(cmp){
             	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameter are 'name', 'arguments'");
@@ -204,8 +203,7 @@
     
     //Test pass two parameters to a function that only expect one
     //We throw warnings.
-    _testHasAttrWithExtraPassInParameter_Child:{
-    	failOnWarning: true,
+    testHasAttrWithExtraPassInParameter_Child:{
         test:[ 
             function(cmp){
             	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameter are 'name', 'arguments'");

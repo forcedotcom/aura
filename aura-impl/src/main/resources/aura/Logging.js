@@ -42,7 +42,6 @@
      * Prints log to both the console (if available), and to the aura debug component unless in production
      */
     function devDebugConsoleLog(level, message, error) {
-
         var stringVersion = null;
         if (!$A.util.isUndefinedOrNull(message)) {
             stringVersion = level + ": " + message;
@@ -52,12 +51,9 @@
         }
 
         var trace;
-        if ($A.util.isError(error) || level == "ERROR") {
+        if (error || level == "ERROR") {
             trace = $A.logger.getStackTrace(error);
-        } else if (error && error.stack) {
-            trace = error.stack;
         }
-
         var logMsg = level + ": " + (!$A.util.isUndefinedOrNull(message) ? message : "");
 
         if (window["console"]) {

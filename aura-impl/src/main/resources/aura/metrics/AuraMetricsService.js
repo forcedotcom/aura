@@ -26,6 +26,7 @@ Date.now = (Date.now || function () {  // thanks IE8
  */
 var MetricsService = function MetricsService(config) {
     this.collector                 = {"default": []};
+    this.globalHandlers            = {"transactionEnd": []};
     this.bootstrap                 = {};
     this.registeredPlugins         = {};
     this.pluginInstances           = {};
@@ -124,6 +125,10 @@ MetricsService.prototype = {
         }
         // #end        
     },
+    onTransactionEnd: function (callback) {
+        this.globalHandlers["transactionEnd"].push(callback);
+        this.hasGlobalHandlers = true;
+    },
     inTransaction: function () {
         return !$A.util.isEmpty(this.transactions);
     },
@@ -146,14 +151,15 @@ MetricsService.prototype = {
     },
     transactionEnd: function (ns, name, config) {
         config = config || {};
-        var id          = (ns || MetricsService.DEFAULT) + ':' + name,
-            transaction = this.transactions[id],
-            beacon      = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[MetricsService.DEFAULT],
-            postProcess = transaction && (typeof config === 'function' ? config : (config["postProcess"] || transaction["config"]["postProcess"]));
+        var id             = (ns || MetricsService.DEFAULT) + ':' + name,
+            transaction    = this.transactions[id],
+            transactionCfg = (transaction && transaction["config"]) || {},
+            beacon         = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[MetricsService.DEFAULT],
+            postProcess    = typeof config === 'function' ? config : (config["postProcess"] || transactionCfg["postProcess"]);
 
         if (transaction && (beacon || postProcess || !this.clearCompleteTransactions)) {
-            var skipPluginPostProcessing = config["skipPluginPostProcessing"] || transaction["config"]["skipPluginPostProcessing"],
-                context = transaction["config"]["context"] || {},
+            var skipPluginPostProcessing = config["skipPluginPostProcessing"] || transactionCfg["skipPluginPostProcessing"],
+                context = transactionCfg["context"] || {},
                 parsedTransaction = {
                     "id"            : id,
                     "ts"            : transaction["ts"],
@@ -184,6 +190,12 @@ MetricsService.prototype = {
                 this.signalBeacon(beacon, parsedTransaction);
             }
 
+            //#if {"excludeModes" : ["PRODUCTION"]}
+                if (this.hasGlobalHandlers) {
+                    this.callHandlers("transactionEnd", parsedTransaction);
+                }
+            //#end
+
             // Cleanup transaction
             if (this.clearCompleteTransactions) {
                 delete this.transactions[id];
@@ -195,12 +207,24 @@ MetricsService.prototype = {
             if (!this.inTransaction()) {
                 this.clearMarks();
             }
+        } else {
+            // If there is nobody to process the transaction, we just need to clean it up.
+            delete this.transactions[id];
         }
+
     },
     clearTransactions: function () {
         this.transactions = {};
     },
     //#if {"excludeModes" : ["PRODUCTION"]}
+    callHandlers: function (type, t) {
+        var handlers = this.globalHandlers[type];
+        if (handlers) {
+            for (var i = 0; i < handlers.length; i++) {
+                handlers[i](t);
+            }
+        }
+    },
     getTransactions: function () {
         var transactions = [];
         for (var i in this.transactions) {
@@ -209,7 +233,8 @@ MetricsService.prototype = {
         return  transactions;
     },
     getTransaction: function (ns, id) {
-        var key = (ns || MetricsService.DEFAULT) + ':' + name;
+        if (!id) {id = ns;ns = MetricsService.DEFAULT;}
+        var key = id.indexOf(':') === -1  ? (ns + ':' + name) : id;
         return this.transactions[key];
     },
     setClearCompletedTransactions: function (value) {

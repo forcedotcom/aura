@@ -14,6 +14,9 @@
 			<button id="tabs-performance">
 				Performance
 			</button>
+			<button id="tabs-transaction">
+				Transactions
+			</button>
 		</header>
 
 
@@ -29,7 +32,7 @@
 			<ol class="event-log" id="event-log"></ol>
 		</section>
 
-		<section id="tab-body-performance" class="tab-body">
+		<section id="tab-body-performance" class="perf-tab tab-body">
 			<div class="aura-panel panel-status-bar">
 				<button class="record-profile-status-bar-item status-bar-item" title="Record">
 					<div class="glyph"></div><div class="glyph shadow"></div>
@@ -45,6 +48,34 @@
 			<div class="flamechart" id="flamechart"></div>
 		</section>
 
+		<section id="tab-body-transaction" class="tab-body trans-panel">
+			<div class="aura-panel panel-status-bar">
+			<!-- 
+				<button class="record-profile-status-bar-item status-bar-item" title="Record">
+					<div class="glyph"></div><div class="glyph shadow"></div>
+				</button>
+			-->
+				<button class="clear-status-bar-item status-bar-item" title="Clear">
+					<div class="glyph"></div><div class="glyph shadow"></div>
+				</button> 
+			</div>
+			<div class="transactions" id="trs">
+				<div>
+					<table>
+						<thead>
+							<th>Id</th>
+							<th>StartTime</th>
+							<th>Duration(ms)</th>
+							<th>Context</th>
+							<th>InTransaction</th>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
 		<section id="tab-body-component-view" class="sidebar">
 			<div class="component-view" id="component-view"></div>
 		</section>
@@ -57,6 +88,8 @@
 		<link rel="stylesheet" type="text/css" href="perfpanel/css/splitView.css">
 		<link rel="stylesheet" type="text/css" href="perfpanel/css/custom.css">
 
+		<link rel="stylesheet" type="text/css" href="transactionPanel/css/custom.css">
+
 		<script type="text/javascript" src="perfpanel/js/Main.js"></script>
 		<script type="text/javascript" src="perfpanel/js/ProfilesPanel.js"></script>
 		<script type="text/javascript" src="perfpanel/js/AuraPerfPanel.js"></script>
@@ -67,7 +100,9 @@
 		<script src="AuraInspectorPerformanceView.js"></script>
 		<script src="AuraInspectorComponentTree.js"></script>
 		<script src="AuraInspectorComponentView.js"></script>
+		<script src="AuraInspectorTransactionView.js"></script>
 		<script src="AuraInspectorEventLog.js"></script>
+
 		<script src="devtoolsPanel.js"></script>
 	</body>
 </html>

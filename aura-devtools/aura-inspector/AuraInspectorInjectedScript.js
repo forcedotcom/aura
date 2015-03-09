@@ -116,14 +116,15 @@
         $A.$initPriv$ = function() {
             $A.PerfDevTools.init();
             tempHook.apply(this, arguments);
-        }
+        };
     }
 
     function __auraPerfDevTools() {
         var OPTIONS = {
-                componentCreation: true,
-                componentRendering: true,
-                timelineMarks : false,
+                componentCreation  : true,
+                componentRendering : true,
+                timelineMarks      : false,
+                transactions       : true,
             },
             CMP_CREATE_MARK   = 'componentCreation',
             START_SUFIX       = 'Start',
@@ -150,12 +151,16 @@
                 this.opts = {
                     componentCreation  : cfg.componentCreation  || OPTIONS.componentCreation,
                     componentRendering : cfg.componentRendering || OPTIONS.componentRendering,
-                    timelineMarks      : typeof cfg.timelineMarks === 'boolean' ? cfg.timelineMarks : OPTIONS.timelineMarks
+                    timelineMarks      : typeof cfg.timelineMarks === 'boolean' ? cfg.timelineMarks : OPTIONS.timelineMarks,
+                    transactions       : cfg.transactions || OPTIONS.transactions
                 };
             },
             _initializeHooks: function () {
                 if (this.opts.componentCreation) {
                     this._initializeHooksComponentCreation();
+                }
+                if (this.opts.transactions) {
+                    this._initializeHooksTransactions();
                 }
             },
             _createNode: function (name, mark, id) {
@@ -175,6 +180,17 @@
                 for (var i in this.collector) {
                     this.collector[i] = [];
                 }
+            },
+            _initializeHooksTransactions: function () {
+                $A.metricsService.setClearCompletedTransactions(false);
+                $A.metricsService.onTransactionEnd(this._onTransactionEnd.bind(this));
+            },
+
+            _onTransactionEnd: function (t) {
+                window.postMessage({
+                    action  : "AuraDevToolService.OnTransactionEnd", 
+                    payload : t
+                }, '*');
             },
 
             _initializeHooksComponentCreation: function () {

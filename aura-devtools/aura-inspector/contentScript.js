@@ -61,6 +61,10 @@
                 if(event.data.action === "AuraDevToolService.OnError") {
                     return this.addEventLogMessage(event.data.text);
                 }
+                if (event.data.action === 'AuraDevToolService.OnTransactionEnd') {
+                    this.updateTransaction(event.data.payload);
+                }
+
             }.bind(this));
 
             setTimeout(this.updateComponentTree, 1500);
@@ -82,6 +86,13 @@
         this.isConnected = function() {
             return !!runtime;
         };
+
+        this.updateTransaction = function (payload) {
+            runtime.postMessage({
+                action: "AuraInspector.DevToolsPanel.OnTransactionEnd",
+                params: payload
+            });
+        },
 
         this.updateComponentTree = function(json) {
             if(json) {

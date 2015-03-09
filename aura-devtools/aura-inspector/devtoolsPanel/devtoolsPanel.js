@@ -33,7 +33,8 @@
             var events = [
                 "AuraInspector.DevToolsPanel.PublishComponentTree", 
                 "AuraInspector.DevToolsPanel.PublishComponentView", 
-                "AuraInspector.DevToolsPanel.OnEvent"
+                "AuraInspector.DevToolsPanel.OnEvent",
+                "AuraInspector.DevToolsPanel.OnTransactionEnd"
             ];
             runtime.postMessage({subscribe : events, port: runtime.name, tabId: tabId });
         };
@@ -59,6 +60,7 @@
             actions.set("AuraInspector.DevToolsPanel.HighlightElement", new HighlightElement(this));
             actions.set("AuraInspector.DevToolsPanel.GetComponentTree", new GetComponentTree(this));
             actions.set("AuraInspector.DevToolsPanel.OnEvent", new GeneralNotify(this, "onevent"));
+            actions.set("AuraInspector.DevToolsPanel.OnTransactionEnd", new TransactionEnd(this));
 
             //-- Attach Event Listeners
             var header = document.querySelector("header.tabs");
@@ -76,6 +78,9 @@
 
             var perf = new AuraInspectorPerformanceView(this);
             this.addPanel("performance", perf);
+
+            var transaction = new AuraInspectorTransactionView(this);
+            this.addPanel("transaction", transaction);
         };
 
         this.attach = function(eventName, eventHandler) {
@@ -268,6 +273,13 @@
 
             this.run = function(params) {
                 service.updateComponentView(null, params);
+            };
+        }
+
+        function TransactionEnd(service)  {
+            this.run = function (data) {
+                var transaction = panels.get('transaction');
+                transaction.update(data);
             };
         }
 

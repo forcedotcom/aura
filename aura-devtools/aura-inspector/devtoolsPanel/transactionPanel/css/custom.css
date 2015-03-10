@@ -1,0 +1,28 @@
+#trs {
+
+}
+
+#trs table {
+    width: 100%;
+    font-size: 12px;
+}
+
+#trs thead {
+text-align: left;
+}
+
+#trs th {
+
+}
+
+#trs tbody {
+
+}
+
+#trs tr {
+
+}
+
+#trs td {
+    max-width: 200px
+}

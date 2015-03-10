@@ -45,9 +45,9 @@ AuraPerfPanel.prototype = {
         }
     },
     _bind: function () {
-        this.recordButton = document.querySelector('.record-profile-status-bar-item');
-        this.clearButton  = document.querySelector('.clear-status-bar-item');
-        this.statsButton  = document.querySelector('.timeline-frames-status-bar-item');
+        this.recordButton = document.querySelector('.perf-tab .record-profile-status-bar-item');
+        this.clearButton  = document.querySelector('.perf-tab .clear-status-bar-item');
+        this.statsButton  = document.querySelector('.perf-tab .timeline-frames-status-bar-item');
 
         this.recordButton.addEventListener('click', this._toggleRecord.bind(this), false);
         this.clearButton.addEventListener('click', this._clearCPUProfile.bind(this), false);

@@ -169,14 +169,14 @@ MetricsService.prototype = {
                     "context"       : $A.util.apply(context, config["context"], true, true)
                 };
 
-            for (var plugin in this.pluginInstances) {
+            for (var plugin in this.collector) {
                 var instance = this.pluginInstances[plugin];
 
                 if (this.collector[plugin].length) { // If we have marks for that plugin
                     var pluginCollector = this.collector[plugin],
-                        initialOffset   = transaction["offsets"][plugin],
+                        initialOffset   = transaction["offsets"][plugin] || 0,
                         tMarks          = pluginCollector.slice(initialOffset),
-                        parsedMarks     = instance.postProcess && !skipPluginPostProcessing ? instance.postProcess(tMarks) : tMarks;
+                        parsedMarks     = (instance && instance.postProcess && !skipPluginPostProcessing) ? instance.postProcess(tMarks) : tMarks;
 
                     if (parsedMarks && parsedMarks.length) {
                         parsedTransaction["marks"][plugin] = parsedMarks;

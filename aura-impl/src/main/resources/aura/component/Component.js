@@ -552,6 +552,9 @@ if(!this.concreteComponentId) {
     };
 
     ComponentPriv.prototype.getActionCaller = function(valueProvider, actionExpression) {
+        if(!valueProvider&&$A.util.isExpression(actionExpression)){
+            valueProvider=actionExpression.valueProvider;
+        }
         return function Component$getActionCaller(event) {
             if (valueProvider.isValid && !valueProvider.isValid()) {
                 return;
@@ -619,7 +622,7 @@ if(!this.concreteComponentId) {
                                     "Event handler for " + key
                                     + " defined on super component "
                                     + this.globalId);
-                        cmp.addHandler(key, valueProvider, eventValue["value"]);
+                        cmp.addHandler(key, valueProvider, eventValue["value"]||eventValue);
                     }
                 }
             }

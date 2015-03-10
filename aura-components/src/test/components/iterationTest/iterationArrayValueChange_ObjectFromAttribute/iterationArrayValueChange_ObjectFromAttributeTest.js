@@ -28,7 +28,7 @@
         				{ "label": "4"},
         				{ "label": "5"},
         				{ "label": "6"},
-        				{ "label": "7"},
+        				{ "label": "7"}
         			]
         		};
          	cmp.set("v.mapdata",new_mapdata);

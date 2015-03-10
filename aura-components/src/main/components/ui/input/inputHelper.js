@@ -32,8 +32,8 @@
                     localId: 'inputLabel',
                     attributes: {values: {
                         label: labelAttribute,
-                        class: labelClass,
-                        for: domId,
+                        "class": labelClass,
+                        "for": domId,
                         labelDisplay: labelDisplay,
                         title: component.get("v.labelTitle"),
                         requiredIndicator: requiredIndicator}}},

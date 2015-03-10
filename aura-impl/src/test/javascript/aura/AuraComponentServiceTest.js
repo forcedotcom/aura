@@ -54,8 +54,73 @@ Test.Aura.AuraComponentServiceTest = function(){
         "Components": function(){}
     });
 
+    var targetService;
+    mockOnLoadUtil(function(){
+        targetService = new $A.ns.AuraComponentService();
+    });
+
+
     [Fixture]
-    function NewComponentAsync(){
+    function createComponent(){
+        var $Amock=Mocks.GetMock(Object.Global(),"$A",{
+            assert:function(condition,message){
+                if(!condition)throw message;
+            },
+            util:{
+                isString:function(obj){
+                    return typeof obj === 'string';
+                },
+                isObject:function(obj){
+                    return typeof obj === "object" && obj !== null && !this.isArray(obj);
+                },
+                isFunction:function(obj){
+                    return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
+                }
+            }
+        });
+
+        [Fact]
+        function ThrowsIfTypeDoesNotImplementToString(){
+            var expected="ComponentService.createComponent(): 'type' must be a valid String.";
+
+            var actual=Record.Exception(function(){
+                $Amock(function(){
+                    targetService.createComponent(null);
+                })
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function ThrowsIfAttributesIsNotNullAndNotAnOjbect(){
+            var expected="ComponentService.createComponent(): 'attributes' must be a valid Object.";
+
+            var actual=Record.Exception(function(){
+                $Amock(function(){
+                    targetService.createComponent("test",7357);
+                })
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function ThrowsIfCallbackisNotAValidFunctionPointer(){
+            var expected="ComponentService.createComponent(): 'callback' must be a Function pointer.";
+
+            var actual=Record.Exception(function(){
+                $Amock(function(){
+                    targetService.createComponent("test",null,{});
+                })
+            });
+
+            Assert.Equal(expected,actual);
+        }
+    }
+
+    [Fixture]
+    function newComponentAsync(){
         [Fact]
         function AssertsConfigIsPresent(){
             // Arrange

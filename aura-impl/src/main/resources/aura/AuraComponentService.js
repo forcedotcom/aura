@@ -101,13 +101,86 @@ $A.ns.AuraComponentService.prototype.newComponentArray = function(config, attrib
 };
 
 /**
- * @deprecated use newComponentAsync instead
+ * createComponent is used to create components in javascript. It accepts the name of a type of component, a map of attributes,
+ * and a callback to notify callers.
+ * @param {String} type The type of component to create, e.g. "ui:button".
+ * @param {Object} attributes A map of attributes to send to the component. These take the same form as on the markup,
+ * including events </code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.
+ * @param {Function} callback The method to call, to which it returns the newly created component.
  *
+ * @public
+ */
+$A.ns.AuraComponentService.prototype.createComponent = function(type, attributes, callback){
+    $A.assert($A.util.isString(type), "ComponentService.createComponent(): 'type' must be a valid String.");
+    $A.assert(!attributes||$A.util.isObject(attributes),"ComponentService.createComponent(): 'attributes' must be a valid Object.");
+    $A.assert($A.util.isFunction(callback),"ComponentService.createComponent(): 'callback' must be a Function pointer.");
+
+    var configItem={
+        "componentDef": type.toString(),
+        "attributes":{
+            "values": attributes||null
+        },
+        "localId":(attributes&&attributes["aura:id"])||null
+    };
+    var configObj = this.getComponentConfigs(configItem);
+    var def = configObj["definition"];
+    var desc = configObj["descriptor"];
+    configItem = configObj["configuration"];
+
+    configItem["componentDef"] = {
+        "descriptor": desc
+    };
+
+    if (!def && desc.indexOf("layout://") == 0) {
+        // clear dynamic namespaces so that the server can send it back.
+        this.registry.dynamicNamespaces = [];
+        // throw error instead of trying to requestComponent from server which is prohibited
+        throw new Error("Missing " + desc + " definition.");
+    }
+
+    if (!def || def.hasRemoteDependencies()) {
+        this.requestComponent(null, callback, configItem);
+    } else {
+        callback(new Component(configItem, true));
+    }
+};
+
+/**
+ * createComponents is used to create an array of components. It accepts a list of component names and attribute maps, and a callback
+ * to notify callers.
+ * @param {Array} components The list of components to create, e.g. ["ui:button",{"press":component.getReference("c.handlePress")}]
+ * @param {Function} callback The method to call, to which it returns the newly created components.
+ *
+ * @public
+ */
+$A.ns.AuraComponentService.prototype.createComponents = function(components, callback) {
+    $A.assert($A.util.isArray(components), "ComponentService.createComponents(): 'components' must be a valid Array.");
+    $A.assert($A.util.isFunction(callback),"ComponentService.createComponents(): 'callback' must be a Function pointer.");
+
+    var created=[];
+    var collected=0;
+
+    function getCollector(index){
+        return function(component) {
+            created[index] = component;
+            if (++collected === created.length) {
+                callback(created);
+            }
+        };
+    }
+
+    for(var i=0;i<components.length;i++){
+        this.createComponent(components[i][0],components[i][1],getCollector(i));
+    }
+};
+
+/**
  * newComponent() calls newComponentDeprecated().
  * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
  * @param {Object} attributeValueProvider The value provider for the attributes
  *
  * @public
+ * @deprecated use createComponent instead
  */
 $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
     return this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
@@ -115,13 +188,12 @@ $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeVa
 
 
 /**
- * @deprecated use newComponentAsync instead
- *
  * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
  * creates a <code>ui:inputText</code> component.
  * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
  * @param {Object} attributeValueProvider The value provider for the attributes
  *
+ * @deprecated use createComponent instead
  */
 $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
@@ -255,6 +327,7 @@ $A.ns.AuraComponentService.prototype.getComponentClass = function(descriptor) {
  * @param {Boolean} [doForce] Whether to force client side creation
  * @param {Boolean} [forceServer] Whether to force server side creation
  *
+ * @deprecated use createComponent instead
  */
 $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
     $A.assert(config, "ComponentService.newComponentAsync(): 'config' must be a valid Object.");
@@ -644,9 +717,14 @@ exp($A.ns.AuraComponentService.prototype,
     "getComponentClass", $A.ns.AuraComponentService.prototype.getComponentClass,
     "getRenderingComponentForElement", $A.ns.AuraComponentService.prototype.getRenderingComponentForElement,
     "getAttributeProviderForElement", $A.ns.AuraComponentService.prototype.getAttributeProviderForElement,
+
+    "createComponent", $A.ns.AuraComponentService.prototype.createComponent,
+    "createComponents", $A.ns.AuraComponentService.prototype.createComponents,
+
     "newComponent", $A.ns.AuraComponentService.prototype.newComponent,
     "newComponentDeprecated", $A.ns.AuraComponentService.prototype.newComponentDeprecated,
     "newComponentAsync", $A.ns.AuraComponentService.prototype.newComponentAsync,
+
     "getDef", $A.ns.AuraComponentService.prototype.getDef,
     "getRegisteredComponentDescriptors", $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors,
     "getIndex", $A.ns.AuraComponentService.prototype.getIndex,

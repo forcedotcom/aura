@@ -351,24 +351,35 @@ $A.ns.Aura = function() {
     };
 
     /**
+     * Create a component from a type and a set of attributes.
+     * @borrows AuraComponentService.createComponent
+     */
+    this.createComponent = this.componentService.createComponent.bind(this.componentService);
+
+    /**
+     * Create an array of components from a list of types and attributes.
+     * @borrows AuraComponentService.createComponents
+     */
+    this.createComponents = this.componentService.createComponents.bind(this.componentService);
+
+    /**
      * Client-side component creation. This method is replaced by newCmpAsync().
      * @param {Object} config
      * @param {Object} attributeValueProvider
      * @param {Boolean} localCreation
+     * @deprecated Use createComponent instead.
      */
-    this.newCmp = function(config, attributeValueProvider, localCreation, doForce) {
-        return this.componentService["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
-    };
+    this.newCmp = this.componentService.newComponentDeprecated.bind(this.componentService);
+
     /**
      * Previously known as newComponent(). This method is replaced by newCmpAsync().
      * @param {Object} config
      * @param {Object} attributeValueProvider
      * @param {Boolean} localCreation
      * @param {Boolean} doForce
+     * @deprecated Use createComponent instead.
      */
-    this.newCmpDeprecated = function(config, attributeValueProvider, localCreation, doForce) {
-        return this.componentService["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
-    };
+    this.newCmpDeprecated = this.componentService.newComponentDeprecated.bind(this.componentService);
 
     /**
      * Creates components from a client-side controller or helper. Equivalent to <code>$A.newCmpAsync()</code>.
@@ -381,13 +392,10 @@ $A.ns.Aura = function() {
      * @param {Boolean} localCreation For internal use only. localCreation determines if the global id is used and defaults to false.
      * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
      * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
+     * @deprecated Use createComponent instead.
      */
 
-    this.newCmpAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer){
-        return this.componentService.newComponentAsync(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer);
-    };
-
-
+    this.newCmpAsync = this.componentService.newComponentAsync.bind(this.componentService);
 
     /**
      * Pushes current portion of attribute's creationPath onto stack
@@ -487,6 +495,8 @@ $A.ns.Aura = function() {
             "getQueryStatement", aura.devToolService.newStatement,
             "qhelp", function() { return aura.devToolService.help() },
         //#end
+        "createComponent", aura.createComponent,
+        "createComponents", aura.createComponents,
         "newCmp", aura.newCmp,
         "newCmpDeprecated", aura.newCmpDeprecated,
         "newCmpAsync", aura.newCmpAsync,

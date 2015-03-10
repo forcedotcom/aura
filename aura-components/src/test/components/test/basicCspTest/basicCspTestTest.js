@@ -50,15 +50,16 @@
     //test for [script-src 'self' chrome-extension: 'unsafe-eval' 'unsafe-inline';]
     _testScriptSource : {
         browsers : [ "-IE8", "-IE7" ],
-    	attributes: { testScriptSource: true },
+        attributes: { testScriptSource: true },
         test:[ 
             function(cmp) {
-            	$A.test.setTestTimeout(60000);
                 //test loading script from same origin
-            	$A.test.addWaitForWithFailureMessage (true,
-            			function() { return CodeMirror !== undefined; },
-            			"fail to load script from same origin : codemirror.js"
-            			);
+                $A.test.addWaitForWithFailureMessage (true,
+                        function() { 
+                            return typeof CodeMirror !== "undefined";
+                        },
+                        "fail to load script from same origin : codemirror.js"
+                );
             },function(cmp){
                 //test loading script , with eval() on top level application
                 /*test loading script , with eval() on child cmp --  this doesn't work
@@ -98,7 +99,6 @@
         browsers : [ "-IE8", "-IE9" ],
         attributes: { testConnectionSource: true },
         test: [function(cmp) {
-    			$A.test.setTestTimeout(60000);
     			$A.test.assertFalse(cmp.get("v.xmlHttpRequestComplete"));
     			$A.test.clickOrTouch(cmp.find("uiButton_sendXHR").getElement());
     		}, function(cmp) {

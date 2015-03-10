@@ -29,16 +29,16 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ClassMapJsonSerializationContext extends BaseJsonSerializationContext {
 
-    private final Map<String, JsonSerializer<?>> mappyFasty;
-    private final Map<Class<?>, JsonSerializer<?>> mappySlowly;
+    private final Map<String, JsonSerializer<?>> serializersLookupMap;
+    private final Map<Class<?>, JsonSerializer<?>> serializersInstanceMap;
     private final ConcurrentMap<String, JsonSerializer<?>> cache;
 
-    public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> mappyFasty,
-            Map<Class<?>, JsonSerializer<?>> mappySlowly, ConcurrentMap<String, JsonSerializer<?>> cache,
+    public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> serializersLookupMap,
+            Map<Class<?>, JsonSerializer<?>> serializersInstanceMap, ConcurrentMap<String, JsonSerializer<?>> cache,
             boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit) {
         super(format, refSupport, dataSizeLimit, collectionSizeLimit, false);
-        this.mappyFasty = mappyFasty;
-        this.mappySlowly = mappySlowly;
+        this.serializersLookupMap = serializersLookupMap;
+        this.serializersInstanceMap = serializersInstanceMap;
         this.cache = cache;
     }
 
@@ -62,13 +62,13 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
         }
 
         String className = c.getName();
-        s = (JsonSerializer<T>) mappyFasty.get(className);
+        s = (JsonSerializer<T>) serializersLookupMap.get(className);
         if (s != null) {
             cache.putIfAbsent(className, s);
             return s;
         }
 
-        for (Entry<Class<?>, JsonSerializer<?>> e : mappySlowly.entrySet()) {
+        for (Entry<Class<?>, JsonSerializer<?>> e : serializersInstanceMap.entrySet()) {
             if (e.getKey().isAssignableFrom(c)) {
                 s = (JsonSerializer<T>) e.getValue();
                 cache.putIfAbsent(className, s);

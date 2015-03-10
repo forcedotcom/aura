@@ -120,6 +120,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
 
             // cleanup domain cookies (hopefully you're not on an external site)
             manage().deleteAllCookies();
+            super.get("about:blank");
 
             synchronized (PooledRemoteWebDriverFactory.this) {
                 // return to pool

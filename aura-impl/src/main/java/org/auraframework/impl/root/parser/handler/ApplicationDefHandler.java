@@ -46,11 +46,9 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
-public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef> {
+public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef, ApplicationDefImpl.Builder> {
 
     public static final String TAG = "aura:application";
-
-    public ApplicationDefImpl.Builder appBuilder;
 
     public ApplicationDefHandler() {
         super();
@@ -59,7 +57,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     public ApplicationDefHandler(DefDescriptor<ApplicationDef> applicationDefDescriptor, Source<ApplicationDef> source,
             XMLStreamReader xmlReader) {
         super(applicationDefDescriptor, source, xmlReader);
-        appBuilder = (ApplicationDefImpl.Builder) builder;
     }
 
     @Override
@@ -93,7 +90,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
-            appBuilder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent,
+            builder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent,
                     EventDef.class);
         }
 
@@ -109,7 +106,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         } else if (!AuraTextUtil.isNullEmptyOrWhitespace(layouts)) {
             layoutsDefDescriptor = DefDescriptorImpl.getInstance(layouts, LayoutsDef.class);
         }
-        appBuilder.layoutsDefDescriptor = layoutsDefDescriptor;
+        builder.layoutsDefDescriptor = layoutsDefDescriptor;
 
         String preloadNames = getAttributeValue(ATTRIBUTE_PRELOAD);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)) {
@@ -120,25 +117,25 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
                 ddb.setLocation(getLocation());
                 ddb.setResource(preload);
                 ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                appBuilder.addDependency(ddb.build());
+                builder.addDependency(ddb.build());
             }
         }
 
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)) {
-            appBuilder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
+            builder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
         }
 
         String additionalAppCacheURLs = getAttributeValue(ATTRIBUTE_ADDITIONAL_APPCACHE_URLS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(additionalAppCacheURLs)) {
-            appBuilder.additionalAppCacheURLs = additionalAppCacheURLs;
+            builder.additionalAppCacheURLs = additionalAppCacheURLs;
         }
 
         String isOnePageApp = getAttributeValue(ATTRIBUTE_IS_ONE_PAGE_APP);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isOnePageApp)) {
-            appBuilder.isOnePageApp = Boolean.parseBoolean(isOnePageApp);
+            builder.isOnePageApp = Boolean.parseBoolean(isOnePageApp);
         } else {
-            appBuilder.isOnePageApp = false;
+            builder.isOnePageApp = false;
         }
 
         String themeNames = getAttributeValue(ATTRIBUTE_THEME);
@@ -147,27 +144,27 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             // this is a way to opt-out of the implicit default (below)
             if (!AuraTextUtil.isNullEmptyOrWhitespace(themeNames)) {
                 for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(themeNames)) {
-                    appBuilder.appendThemeDescriptor(DefDescriptorImpl.getInstance(name, ThemeDef.class));
+                    builder.appendThemeDescriptor(DefDescriptorImpl.getInstance(name, ThemeDef.class));
                 }
             }
         } else {
             // the implicit theme override for an app is the namespace-default theme, if it exists
             DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(defDescriptor);
             if (namespaceTheme.exists()) {
-                appBuilder.appendThemeDescriptor(namespaceTheme);
+                builder.appendThemeDescriptor(namespaceTheme);
             }
         }
 
         String defaultFlavors = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVORS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavors)) {
             DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getInstance(defaultFlavors, FlavorAssortmentDef.class);
-            appBuilder.setDefaultFlavorsDescriptor(flavors);
+            builder.setDefaultFlavorsDescriptor(flavors);
         } else {
             // see if there is a flavor assortment file in the app bundle
-            DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getAssociateDescriptor(appBuilder.getDescriptor(),
+            DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(),
                     FlavorAssortmentDef.class, DefDescriptor.MARKUP_PREFIX);
             if (flavors.exists()) {
-                appBuilder.setDefaultFlavorsDescriptor(flavors);
+                builder.setDefaultFlavorsDescriptor(flavors);
             }
         }
     }

@@ -80,18 +80,14 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
             try {
                 RootDefinition root = intfDescriptor.getDef();
                 ProviderDef providerDef = root.getLocalProviderDef();
-                if (providerDef == null) {
-                    providerDef = root.getProviderDef();
-                    if (providerDef != null) {
-                        // In this case, we have a 'remote' provider (i.e. client side) and we simply
-                        // continue on as if nothing happened.
-                    } else {
-                    	throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
-                            descriptor), root.getLocation());
-                    }
+                if (providerDef == null && root.getProviderDef() == null) {
+                    // In this case, we have no provider anywhere. This should have been
+                    // caught at compile time.
+                    throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
+                        descriptor), root.getLocation());
                 } 
 
-                if (providerDef.isLocal()) {
+                if (providerDef != null && providerDef.isLocal()) {
                     ComponentConfig config = providerDef.provide(intfDescriptor);
                     if (config != null) {
                         ProviderDef remoteProviderDef = root.getProviderDef();

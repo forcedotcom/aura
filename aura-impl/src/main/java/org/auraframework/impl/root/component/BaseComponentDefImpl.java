@@ -20,7 +20,6 @@ import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
@@ -77,11 +75,7 @@ import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonReader;
-import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -358,11 +352,24 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             facet.validateReferences();
         }
 
-        // TODO: lots more validation an stuff!!!!!!! #W-689596
+        if (templateDefDescriptor != null) {
+            BaseComponentDef template = templateDefDescriptor.getDef();
+            if (!template.isTemplate()) {
+                throw new InvalidDefinitionException(String.format(
+                        "Template %s must be marked as a template", templateDefDescriptor), getLocation());
+            }
+            if (template.isAbstract()) {
+                throw new InvalidDefinitionException(String.format(
+                        "Template %s must not be abstract", templateDefDescriptor), getLocation());
+            }
+        }
+
+
         MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         if (extendsDescriptor != null) {
             T parentDef = extendsDescriptor.getDef();
 
+            // This should never happen.
             if (parentDef == null) {
                 throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
             }
@@ -376,6 +383,22 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 throw new InvalidDefinitionException(String.format(
                         "%s cannot extend non-extensible component %s", getDescriptor(), extendsDescriptor),
                         getLocation());
+            }
+
+            //
+            // GO - This is a bit of a hack. We should probably have a better way of telling.
+            //
+            if (isTemplate() && !parentDef.isTemplate()
+                    && !extendsDescriptor.getQualifiedName().equals("markup://aura:component")) {
+                throw new InvalidDefinitionException(String.format(
+                        "Template %s cannot extend non-template %s", getDescriptor(),
+                        extendsDescriptor), getLocation());
+            }
+
+            if (!isTemplate() && parentDef.isTemplate()) {
+                throw new InvalidDefinitionException(String.format(
+                        "Non-template %s cannot extend template %s", getDescriptor(),
+                        extendsDescriptor), getLocation());
             }
 
             registry.assertAccess(descriptor, parentDef);

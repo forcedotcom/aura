@@ -66,7 +66,11 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
      */
     public MethodDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
-        this.defDescriptor=DefDescriptorImpl.getInstance(getAttributeValue(ATTRIBUTE_NAME),MethodDef.class);
+        String name = getAttributeValue(ATTRIBUTE_NAME);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
+        }
+        this.defDescriptor=DefDescriptorImpl.getInstance(name,MethodDef.class);
     }
 
     @Override

@@ -19,8 +19,7 @@
      */
 	
 	//Test the function without passed in parameter
-	//Now we won't use the default attribute value W-2517610
-    _testHasAttributeNoPassInParameter:{
+    testHasAttributeNoPassInParameter:{
         test:[ 
             function(cmp){
             	var cmpME = cmp.find("auraMethod");
@@ -65,7 +64,7 @@
             } 
         ]
     },
-    
+
     //Test function with pass in parameter while the function is not expecting any -- it has no attribute
     //We don't check how many arguments are there
     testNoAttributeWithPassInParameter:{
@@ -99,9 +98,8 @@
     
     
     //Function with pass in action name -- instead of the default one c.$methodName
-    //this method has one attribute, we don't pass in parameter. now this won't give us the default value of attribute
-    //W-2517610
-    _testWithActionHasAttr : {
+    //this method has one attribute, we don't pass in parameter.
+    testWithActionHasAttr : {
     	test:[ 
               function(cmp){
               	var cmpME = cmp.find("auraMethod");
@@ -149,8 +147,7 @@
     
     //1. we define the method in interface(auraMethodInterface.intf), then in auraMethod.cmp, we 'over-write' it
     //by defining the method AGAIN. 
-    //2. this test is disabled because the default value of attribute is not being used W-2517610
-    _testMethodFromInterface : {
+    testMethodFromInterface : {
     	test:[ 
               function(cmp){
               	var cmpME = cmp.find("auraMethod");
@@ -171,8 +168,7 @@
      */
     
     //Test the function without passed in parameter
-	//Now we won't use the default attribute value W-2517610
-    _testHasAttributeNoPassInParameter_Child:{
+    testHasAttributeNoPassInParameter_Child:{
         test:[ 
             function(cmp){
             	var cmpME = cmp.find("auraMethodChild");
@@ -251,9 +247,7 @@
     
     
     //Function with pass in action name -- instead of the default one c.$methodName
-    //this method has one attribute, we don't pass in parameter. now this won't give us the default value of attribute
-    //W-2517610
-    _testWithActionHasAttr_Child : {
+    testWithActionHasAttr_Child : {
     	test:[ 
               function(cmp){
               	var cmpME = cmp.find("auraMethodChild");
@@ -299,10 +293,9 @@
           ]
     },
     
-    //1. we define the method in interface(auraMethodInterface.intf), then in auraMethod.cmp, we 'over-write' it
+    //we define the method in interface(auraMethodInterface.intf), then in auraMethod.cmp, we 'over-write' it
     //by defining the method AGAIN. 
-    //2. this test is disabled because the default value of attribute is not being used W-2517610
-    _testMethodFromInterface_Child : {
+    testMethodFromInterface_Child : {
     	test:[ 
               function(cmp){
               	var cmpME = cmp.find("auraMethodChild");

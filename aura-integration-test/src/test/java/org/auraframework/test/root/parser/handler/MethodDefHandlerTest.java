@@ -43,7 +43,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 			desc.getDef();
 			fail("Expect to fail with method without name");
 		} catch (Exception e) {
-			checkExceptionContains(e, InvalidDefinitionException.class, "descriptor is null");
+			checkExceptionContains(e, InvalidDefinitionException.class, "The attribute 'name' is required on '<aura:method>'.");
 		}
 	}
 	

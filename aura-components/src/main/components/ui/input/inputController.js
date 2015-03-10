@@ -17,15 +17,31 @@
     updateDefaultError : function(component, event, helper){
         helper.setErrorComponent(component);
     },
-    init: function(cmp, event, helper) {
+
+    init : function(component, event, helper) {
         var positionMap={"top":1,"right":1,"bottom":1,"left":1,"hidden":1};
-        if (!positionMap[cmp.get("v.labelPosition")]) {
+        if (!positionMap[component.get("v.labelPosition")]) {
             // JBUCH: HALO: TODO: WAITING ON W-1419175
             //once W-1419175 is fixed, then we can set default labelPosition instead of throwing error
             $A.error("labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'");
             //default labelPosition to 'left'
             //cmp.getDef().getHelper().setAttribute(cmp, {key: 'labelPosition', value: 'left'});
         }
-        helper.buildBody(cmp);
+        helper.buildBody(component);
+    },
+
+    handleLabelChange : function (component) {
+        var labelComponent = component.find("inputLabel");
+        if (!$A.util.isUndefinedOrNull(labelComponent)) {
+            labelComponent.set("v.label",component.get("v.label"));
+        }
+    },
+
+    handleLabelPositionChange : function (component) {
+        // Currently only handle labelDisplay to avoid rearranging the DOM
+        var labelComponent = component.find("inputLabel");
+        if (!$A.util.isUndefinedOrNull(labelComponent)) {
+            labelComponent.set("v.labelDisplay", component.get("v.labelPosition") != "hidden");
+        }
     }
 })

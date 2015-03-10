@@ -46,7 +46,10 @@
 
     <aura:registerEvent name="updateError" type="ui:updateError" description="The event fired to trigger the default error component and messages."/>
     <aura:handler name="updateError" action="{!c.updateDefaultError}"/>
-    <aura:handler name="init" value="{!this}" action="{!c.init}" />	
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="change" value="{!v.label}" action="{!c.handleLabelChange}"/>
+    <aura:handler name="change" value="{!v.labelPosition}" action="{!c.handleLabelPositionChange}"/>
+
     <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
 
     <aura:attribute name="requiredIndicator" type="aura://Aura.Component[]" description="A component that displays the indicator for the required field.">    	 

@@ -26,6 +26,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
 /**
@@ -178,7 +179,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                         "<aura:attribute name='default' type='String' default='innie'/><aura:attribute name='both' type='String' default='outie' serializeTo='BOTH'/><aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         Component cmp = Aura.getInstanceService().getInstance(desc);
         Map<?, ?> attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
-        Map<?, ?> attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get("value")).get("values");
+        Map<?, ?> attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get(Json.ApplicationKey.VALUE.toString())).get("values");
         assertEquals(2, attSetValues.size());
         assertEquals("innie", attSetValues.get("default"));
         assertEquals("outie", attSetValues.get("both"));
@@ -192,7 +193,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                         "<aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         cmp = Aura.getInstanceService().getInstance(desc);
         attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
-        attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get("value")).get("values");
+        attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get(Json.ApplicationKey.VALUE.toString())).get("values");
         assertEquals(0, attSetValues.size());
     }
 }

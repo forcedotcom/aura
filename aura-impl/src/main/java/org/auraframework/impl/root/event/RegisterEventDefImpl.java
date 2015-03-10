@@ -75,7 +75,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
             json.writeMapBegin();
             json.writeMapEntry("eventDef", eventDef);
             json.writeMapEntry("attributeName", attName);
-            json.writeMapEntry("isGlobal", isGlobal);
+            json.writeValue(getAccess());
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);

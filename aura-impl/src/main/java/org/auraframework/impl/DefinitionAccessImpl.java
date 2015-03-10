@@ -28,6 +28,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
 
 public class DefinitionAccessImpl implements DefinitionAccess {
     private static final long serialVersionUID = 8409052764733035151L;
@@ -158,6 +159,14 @@ public class DefinitionAccessImpl implements DefinitionAccess {
             throw new InvalidAccessValueException("Access attribute may not use a static method");
         }
         
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException{
+        if(this.isGlobal()||this.isPrivate()){
+            // "G" - GLOBAL, "P" - PRIVATE, " " - DEFAULT
+            json.writeMapEntry(Json.ApplicationKey.ACCESS,getAccess().name().charAt(0));
+        }
     }
 
     protected void defaultAccess(boolean sysNamespace) {

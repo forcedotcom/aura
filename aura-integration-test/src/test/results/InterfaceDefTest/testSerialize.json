@@ -1,11 +1,11 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "descriptor":"markup://aura:testinterfacechild",
     "attributes":{
       "Fake Attribute":{
-        "serId":2,
-        "value":{
+        "s":2,
+        "v":{
           "name":"Fake Attribute"
         }
       }

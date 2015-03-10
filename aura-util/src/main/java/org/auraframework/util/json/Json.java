@@ -87,9 +87,90 @@ public class Json {
 
     public static final String MIME_TYPE = "application/json";
 
-    private final static String REF_INDICATOR = "serRefId";
-    private final static String ID_INDICATOR = "serId";
-    private final static String VALUE = "value";
+    /*
+    * JBUCH: HALO: TODO:
+    *
+    * ApplicationKey Enum to provide key based minification while serializing json
+    * Ideally, we will replace all uses of pure strings on the Server and Client; and be able to use
+    * the shortName in non-dev scenarios (resulting in 10-40% app.js size reduction).
+    *
+    * *sigh* I had it mostly working, but had to abandon branch due to large code change conflicts
+    * with other team members. Because of that, I can only afford to change these four right now,
+    * since they are used directly in this file for the structure of the frame, or net new:
+    * ACCESS (access), SERIAL_ID (serId), SERIAL_REFID (serRefId), VALUE (value)
+    *
+    * While these three don't buy us much, my current hope is only to offset the additional cost
+    * of access="G|P" values in the definitions.
+    *
+    * */
+    public enum ApplicationKey {
+        ABSTRACT("isAbstract","ab"),
+        ACCESS("xs" /*"access"*/,"xs"),
+        ACTION("action","x"),
+        ACTIONS("action","xx"),
+        ACTIONDEFS("actionDefs","ac"),
+        ACTIONTYPE("actionType","at"),
+        ATTRIBUTES("attributes","a"),
+        ATTRIBUTEDEFS("attributeDefs","ad"),
+        COMPONENTDEF("componentDef","c"),
+        CONTROLLERDEF("controllerDef","cd"),
+        CREATIONPATH("creationPath","cp"),
+        CSSPRELOADED("isCSSPreloaded","css"),
+        DEFAULT("default","d"),
+        DEFTYPE("defType","dt"),
+        DESCRIPTOR("descriptor","de"),
+        EVENTDEF("eventDef","ed"),
+        EVENTS("events","e"),
+        FACETS("facets","fa"),
+        FUNCTIONS("functions","f"),
+        HANDLERS("handlers","eh"),
+        HASSERVERDEPENDENCIES("hasServerDeps","hs"),
+        HELPERDEF("helperDef","h"),
+        INCLUDES("includes","ic"),
+        INTERFACES("interfaces","i"),
+        LOCALID("localId","lid"),
+        MEMBERS("members","mm"),
+        MODEL("model","m"),
+        MODELDEF("modelDef","md"),
+        METHODS("methods","me"),
+        NAME("name","n"),
+        ORIGINAL("original","o"),
+        PARAMS("params","pa"),
+        PROVIDE("provide","p"),
+        PROVIDERDEF("providerDef","pd"),
+        REGISTEREVENTDEFS("registerEventDefs","re"),
+        RENDERERDEF("rendererDef","rd"),
+        REQUIRED("required","rq"),
+        REQUIREDVERSIONDEFS("requiredVersionDefs","rv"),
+        RETURNTYPE("returnType","rt"),
+        SERIAL_ID("s"/*"serId"*/,"sid"),
+        SERIAL_REFID("r"/*"serRefId"*/,"rid"),
+        STYLEDEF("styleDef","st"),
+        SUBDEFS("subDefs","sb"),
+        SUPERDEF("superDef","su"),
+        TYPE("type","t"),
+        VALUE("v"/*"value"*/,"v"),
+        VALUES("values","vv"),
+        VALUEPROVIDER("valueProvider","vp");
+
+        private String name;
+        private String shortName;
+
+        private ApplicationKey(String name, String shortName){
+            this.name=name;
+            this.shortName=shortName;
+        }
+
+        @Override
+        public String toString(){
+            return useShortName?this.shortName:this.name;
+        }
+
+        private static Boolean useShortName=false;
+        public static void useShortKey(Boolean useShortKey){
+            useShortName=useShortKey;
+        }
+    }
 
     public enum IndentType {
         BRACE(true, "  "), SQUARE(true, "  "), PARAM(true, ""), COMMENT(false, " * ");
@@ -406,7 +487,6 @@ public class Json {
     /**
      * If refSupport is on, clear a set of objects from the references.
      * 
-     * @param values the values to remove.
      */
     public void clearReferences() {
         if (!serializationContext.refSupport()) {
@@ -652,14 +732,14 @@ public class Json {
             if ((refId = getRefId(serializer.getReferenceScope(value), value)) != null) {
                 // Output a simple reference
                 writeMapBegin();
-                writeMapEntry(REF_INDICATOR, refId);
+                writeMapEntry(ApplicationKey.SERIAL_REFID, refId);
                 writeMapEnd();
             } else {
                 refId = addReference(serializer.getReferenceScope(value), value);
                 // Now manually output this 2-element map to avoid loop
                 writeMapBegin();
-                writeMapEntry(ID_INDICATOR, refId);
-                writeMapKey(VALUE);
+                writeMapEntry(ApplicationKey.SERIAL_ID, refId);
+                writeMapKey(ApplicationKey.VALUE);
                 serializer.serialize(this, value);
                 writeMapEnd();
             }
@@ -980,16 +1060,16 @@ public class Json {
             return result;
         } else if (config instanceof Map) {
             Map<String, Object> m = (Map<String, Object>) config;
-            BigDecimal serId = (BigDecimal) m.get(ID_INDICATOR);
+            BigDecimal serId = (BigDecimal) m.get(ApplicationKey.SERIAL_ID);
             if (serId != null) {
-                Object value = m.get(VALUE);
+                Object value = m.get(ApplicationKey.VALUE);
                 Object result = value instanceof List ? Lists.newArrayList() : Maps.newHashMap();
                 // We must cache the new item first because we could loop back
                 // to this serId internally
                 cache.put(serId.intValue(), result);
                 return resolveRefs(value, cache, result);
             }
-            BigDecimal serRefId = (BigDecimal) m.get(REF_INDICATOR);
+            BigDecimal serRefId = (BigDecimal) m.get(ApplicationKey.SERIAL_REFID);
             if (serRefId != null) {
                 Object value = cache.get(serRefId.intValue());
                 // if there is no value we could throw here

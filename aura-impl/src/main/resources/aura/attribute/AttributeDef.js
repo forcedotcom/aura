@@ -22,6 +22,7 @@
 function AttributeDef(config){
     this.descriptor = new DefDescriptor(config["name"]);
     this.typeDefDescriptor = config["type"];
+    this.access=config[Json.ApplicationKey.ACCESS];
     this.defaultValue = config["default"];
     if(this.defaultValue === undefined){
         // KRIS: So if you specify any data type as an array (Boolean[], String[]) and then don't specify a defaultValue, it should be array.

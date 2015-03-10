@@ -78,9 +78,9 @@ public class RendererDefTest extends AuraImplTestCase {
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);
         assertNotNull("Component Instance of components which use java renderers should have a rendering section",
-                ((Map<?, ?>) ((Map<?, ?>) defObj).get("value")).get("rendering"));
+                ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
         assertEquals("Component markup seen in Component instance does not match the markup in Java Renderer",
-                TestSimpleRenderer.htmlOutput, ((Map<?, ?>) ((Map<?, ?>) defObj).get("value")).get("rendering"));
+                TestSimpleRenderer.htmlOutput, ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
     }
 
     /**

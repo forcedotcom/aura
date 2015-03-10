@@ -21,6 +21,10 @@
 function Json() {
 }
 
+Json.ApplicationKey={
+    //#json.applicationKeys
+};
+
 /**
  * Decode a JSON string into an object, optionally using ref support to resolve
  * duplicate object references.
@@ -99,17 +103,17 @@ Json.prototype._resolveRefs = function(config, cache, parent, property) {
                 }
             }
         } else {
-            var serRefId = config["serRefId"];
+            var serRefId = config[Json.ApplicationKey.SERIAL_REFID];
             if (serRefId !== undefined) {
                 // Replace with the referenced object
                 parent[property] = cache[serRefId];
             } else {
-                var serId = config["serId"];
+                var serId = config[Json.ApplicationKey.SERIAL_ID];
                 if (serId !== undefined) {
-                    value = config["value"];
+                    value = config[Json.ApplicationKey.VALUE];
 
                     if (typeof value === "object" && value !== null
-                            && (value["serId"] || value["serRefId"])) {
+                            && (value[Json.ApplicationKey.SERIAL_ID] || value[Json.ApplicationKey.SERIAL_REFID])) {
                         this._resolveRefs(value, cache, parent, property);
                         value = parent[property];
                     } else {

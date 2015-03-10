@@ -1,11 +1,11 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "descriptor":"js://test.testJSTestSuite",
     "cases":[
       {
-        "serId":2,
-        "value":{
+        "s":2,
+        "v":{
           "name":"testHelloWorld",
           "descriptor":"js://test.testJSTestSuite/TESTCASE$testHelloWorld",
           "attributes":{
@@ -26,8 +26,8 @@
         }
       },
       {
-        "serId":3,
-        "value":{
+        "s":3,
+        "v":{
           "name":"testHelloWorld2",
           "descriptor":"js://test.testJSTestSuite/TESTCASE$testHelloWorld2",
           "attributes":{
@@ -48,8 +48,8 @@
         }
       },
       {
-        "serId":4,
-        "value":{
+        "s":4,
+        "v":{
           "name":"testHelloWorld3",
           "descriptor":"js://test.testJSTestSuite/TESTCASE$testHelloWorld3",
           "attributes":{

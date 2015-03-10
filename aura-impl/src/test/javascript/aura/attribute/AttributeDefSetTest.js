@@ -26,7 +26,7 @@ Test.Aura.Attribute.AttributeDefSetTest = function(){
         return {
             getDescriptor: function(){
                 return {
-                    getQualifiedName: function(){
+                    getName: function(){
                         return param;
                     }
                 }

@@ -155,12 +155,12 @@ public class JsonTest extends UnitTestCase {
         JsonIdentitySerializableTest obj2 = new JsonIdentitySerializableTest(1);
         JsonIdentitySerializableTest[] objArray = { obj1, obj1 };
         // Testing with objects that have same memory reference
-        assertEquals("[{\"serId\":1,\"value\":\"JsonIdentitySerializableTest serialized string\"},{\"serRefId\":1}]",
+        assertEquals(String.format("[{\"%s\":1,\"%s\":\"JsonIdentitySerializableTest serialized string\"},{\"%s\":1}]",Json.ApplicationKey.SERIAL_ID,Json.ApplicationKey.VALUE,Json.ApplicationKey.SERIAL_REFID),
                 Json.serialize(objArray, false, true));
         JsonIdentitySerializableTest[] objArray2 = { obj1, obj2 };
         // Testing with objects that have same different memory references
         assertEquals(
-                "[{\"serId\":1,\"value\":\"JsonIdentitySerializableTest serialized string\"},{\"serId\":2,\"value\":\"JsonIdentitySerializableTest serialized string\"}]",
+                String.format("[{\"%1$s\":1,\"%2$s\":\"JsonIdentitySerializableTest serialized string\"},{\"%1$s\":2,\"%2$s\":\"JsonIdentitySerializableTest serialized string\"}]",Json.ApplicationKey.SERIAL_ID,Json.ApplicationKey.VALUE),
                 Json.serialize(objArray2, false, true));
     }
 

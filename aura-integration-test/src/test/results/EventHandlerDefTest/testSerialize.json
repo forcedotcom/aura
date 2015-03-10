@@ -1,32 +1,33 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "eventDef":{
-      "serId":2,
-      "value":{
+      "s":2,
+      "v":{
         "descriptor":"markup://auratest:testEvent",
         "type":"COMPONENT",
         "superDef":{
-          "serId":3,
-          "value":{
+          "s":3,
+          "v":{
             "descriptor":"markup://aura:componentEvent",
             "type":"COMPONENT",
             "attributes":{
 
-            }
+            },
+            "xs":"G"
           }
         },
         "attributes":{
           "att1":{
-            "serId":4,
-            "value":{
+            "s":4,
+            "v":{
               "name":"att1",
               "type":"aura://String"
             }
           },
           "att2":{
-            "serId":5,
-            "value":{
+            "s":5,
+            "v":{
               "name":"att2",
               "type":"aura://Boolean",
               "required":true

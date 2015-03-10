@@ -1,6 +1,6 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "descriptor":"js://test.testJSController/ACTION$functionName2",
     "name":"functionName2",
     "code":

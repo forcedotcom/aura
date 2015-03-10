@@ -127,7 +127,7 @@ public class ClientComponentClass {
 			        @SuppressWarnings("unchecked")
 					Map<String, Object> defObj = (Map<String, Object>) new JsonReader().read(defInJson);
 			        @SuppressWarnings("unchecked")
-					Map<String, Object> value = (Map<String, Object>) defObj.get("value"); 
+					Map<String, Object> value = (Map<String, Object>) defObj.get(Json.ApplicationKey.VALUE.toString());
 			        
 			        for (String methodName : methodNames) {
 			            JsFunction renderMethod = (JsFunction) value.get(methodName);
@@ -157,7 +157,7 @@ public class ClientComponentClass {
 		        @SuppressWarnings("unchecked")
 				Map<String, Object> defObj = (Map<String, Object>) new JsonReader().read(defInJson);
 		        @SuppressWarnings("unchecked")
-				Map<String, Object> value = (Map<String, Object>) defObj.get("value"); 
+				Map<String, Object> value = (Map<String, Object>) defObj.get(Json.ApplicationKey.VALUE.toString());
 		        @SuppressWarnings("unchecked")
 				Map<String, Object> properties = (Map<String, Object>) value.get("functions");
 		        

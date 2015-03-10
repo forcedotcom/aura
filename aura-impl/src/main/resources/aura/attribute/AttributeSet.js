@@ -395,7 +395,7 @@ AttributeSet.prototype.initialize = function(attributes) {
     // Create known attributes and assign values or defaults
 	for (var i = 0; i < attributeNames.length; i++) {
 		var attributeDef = attributeDefs[attributeNames[i]];
-		var name = attributeDef.getDescriptor().getQualifiedName();
+		var name = attributeDef.getDescriptor().getName();
 		var hasAttribute = this.hasAttribute(name);
 		var hasValue = configValues.hasOwnProperty(name);
 		var value = configValues[name];

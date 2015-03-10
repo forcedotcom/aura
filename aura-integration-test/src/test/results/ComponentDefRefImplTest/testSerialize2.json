@@ -1,15 +1,16 @@
 {
   "componentDef":{
-    "serId":1,
-    "value":{
+    "s":1,
+    "v":{
       "descriptor":"markup://test:text",
       "superDef":{
-        "serId":2,
-        "value":{
+        "s":2,
+        "v":{
+          "xs":"G",
           "descriptor":"markup://aura:component",
           "rendererDef":{
-            "serId":3,
-            "value":{
+            "s":3,
+            "v":{
               "descriptor":"js://aura.component",
               "render":
 function(component) {
@@ -35,10 +36,11 @@ function(component) {
           },
           "attributeDefs":[
             {
-              "serId":4,
-              "value":{
+              "s":4,
+              "v":{
                 "name":"body",
-                "type":"aura://Aura.Component[]"
+                "type":"aura://Aura.Component[]",
+                "xs":"G"
               }
             }
           ],
@@ -51,11 +53,11 @@ function(component) {
       },
       "attributeDefs":[
         {
-          "serRefId":4
+          "r":4
         },
         {
-          "serId":5,
-          "value":{
+          "s":5,
+          "v":{
             "name":"value",
             "type":"aura://String"
           }
@@ -67,12 +69,13 @@ function(component) {
           "value":[
             {
               "componentDef":{
-                "serId":6,
-                "value":{
+                "s":6,
+                "v":{
+                  "xs":"G",
                   "descriptor":"markup://aura:text",
                   "rendererDef":{
-                    "serId":7,
-                    "value":{
+                    "s":7,
+                    "v":{
                       "descriptor":"js://aura.text",
                       "render":
 function(component) {
@@ -105,30 +108,31 @@ function(component) {
                   },
                   "attributeDefs":[
                     {
-                      "serId":8,
-                      "value":{
+                      "s":8,
+                      "v":{
                         "name":"value",
-                        "type":"aura://String"
+                        "type":"aura://String",
+                        "xs":"G"
                       }
                     },
                     {
-                      "serId":9,
-                      "value":{
+                      "s":9,
+                      "v":{
                         "name":"truncate",
                         "type":"aura://Integer"
                       }
                     },
                     {
-                      "serId":10,
-                      "value":{
+                      "s":10,
+                      "v":{
                         "name":"truncateByWord",
                         "type":"aura://Boolean",
                         "default":false
                       }
                     },
                     {
-                      "serId":11,
-                      "value":{
+                      "s":11,
+                      "v":{
                         "name":"ellipsis",
                         "type":"aura://Boolean",
                         "default":true
@@ -152,23 +156,23 @@ function(component) {
             },
             {
               "componentDef":{
-                "serId":12,
-                "value":{
+                "s":12,
+                "v":{
                   "descriptor":"markup://test:parent",
                   "styleDef":{
-                    "serId":13,
-                    "value":{
+                    "s":13,
+                    "v":{
                       "descriptor":"css://test.parent",
                       "code":"",
                       "className":"testParent"
                     }
                   },
                   "superDef":{
-                    "serRefId":2
+                    "r":2
                   },
                   "attributeDefs":[
                     {
-                      "serRefId":4
+                      "r":4
                     }
                   ],
                   "facets":[
@@ -177,31 +181,31 @@ function(component) {
                       "value":[
                         {
                           "componentDef":{
-                            "serId":14,
-                            "value":{
+                            "s":14,
+                            "v":{
                               "descriptor":"markup://test:child1",
                               "modelDef":{
-                                "serId":15,
-                                "value":{
+                                "s":15,
+                                "v":{
                                   "descriptor":"java://test.model.TestReinitializeModel",
                                   "members":[
                                     {
-                                      "serId":16,
-                                      "value":{
+                                      "s":16,
+                                      "v":{
                                         "name":"itemList",
                                         "type":"java://java.util.ArrayList"
                                       }
                                     },
                                     {
-                                      "serId":17,
-                                      "value":{
+                                      "s":17,
+                                      "v":{
                                         "name":"value",
                                         "type":"java://java.lang.String"
                                       }
                                     },
                                     {
-                                      "serId":18,
-                                      "value":{
+                                      "s":18,
+                                      "v":{
                                         "name":"valueParent",
                                         "type":"java://java.lang.String"
                                       }
@@ -210,15 +214,15 @@ function(component) {
                                 }
                               },
                               "superDef":{
-                                "serRefId":2
+                                "r":2
                               },
                               "attributeDefs":[
                                 {
-                                  "serRefId":4
+                                  "r":4
                                 },
                                 {
-                                  "serId":19,
-                                  "value":{
+                                  "s":19,
+                                  "v":{
                                     "name":"attr",
                                     "type":"aura://String"
                                   }
@@ -230,12 +234,13 @@ function(component) {
                                   "value":[
                                     {
                                       "componentDef":{
-                                        "serId":20,
-                                        "value":{
+                                        "s":20,
+                                        "v":{
+                                          "xs":"G",
                                           "descriptor":"markup://aura:expression",
                                           "rendererDef":{
-                                            "serId":21,
-                                            "value":{
+                                            "s":21,
+                                            "v":{
                                               "descriptor":"js://aura.expression",
                                               "render":
 function(component, helper) {
@@ -290,10 +295,11 @@ function(component, helper) {
                                           },
                                           "attributeDefs":[
                                             {
-                                              "serId":22,
-                                              "value":{
+                                              "s":22,
+                                              "v":{
                                                 "name":"value",
-                                                "type":"aura://String"
+                                                "type":"aura://String",
+                                                "xs":"G"
                                               }
                                             }
                                           ],
@@ -314,15 +320,15 @@ function(component, helper) {
                                     },
                                     {
                                       "componentDef":{
-                                        "serId":23,
-                                        "value":{
+                                        "s":23,
+                                        "v":{
                                           "descriptor":"markup://test:child2",
                                           "superDef":{
-                                            "serRefId":2
+                                            "r":2
                                           },
                                           "attributeDefs":[
                                             {
-                                              "serRefId":4
+                                              "r":4
                                             }
                                           ],
                                           "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$child2\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$child2 = function test$child2(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$child2.prototype = new aura$component(null, null, true);\n    test$child2.prototype.constructor = test$child2;\n\n    test$child2.Helper = function() {};\n\n    test$child2.Helper.prototype = new aura$component.Helper();\n    test$child2.Helper.prototype.constructor = test$child2.Helper;\n    test$child2.prototype.helper = new test$child2.Helper();\n\n\n    test$child2.prototype.render = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.render() : undefined;\n    };\n    test$child2.prototype.rerender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.rerender() : undefined;\n    };\n    test$child2.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    test$child2.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(test$child2);\n\n    return test$child2;\n});\n\n\n}"
@@ -354,7 +360,7 @@ function(component, helper) {
             },
             {
               "componentDef":{
-                "serRefId":6
+                "r":6
               },
               "attributes":{
                 "values":{
@@ -367,7 +373,7 @@ function(component, helper) {
             },
             {
               "componentDef":{
-                "serRefId":12
+                "r":12
               },
               "attributes":{
                 "values":{
@@ -376,7 +382,7 @@ function(component, helper) {
                     "value":[
                       {
                         "componentDef":{
-                          "serRefId":6
+                          "r":6
                         },
                         "attributes":{
                           "values":{
@@ -394,7 +400,7 @@ function(component, helper) {
             },
             {
               "componentDef":{
-                "serRefId":6
+                "r":6
               },
               "attributes":{
                 "values":{

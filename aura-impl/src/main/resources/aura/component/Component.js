@@ -366,10 +366,10 @@ if(!this.concreteComponentId) {
             var defaultValue = defaultDef.getDefault();
             if (defaultValue && defaultValue.length) {
                 if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
-                    configValues[defaultDef.getDescriptor().getQualifiedName()] = defaultValue;
+                    configValues[defaultDef.getDescriptor().getName()] = defaultValue;
                 }else{
                     //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                    configValues[defaultDef.getDescriptor().getQualifiedName()]=valueFactory.create(defaultValue,null,cmp);
+                    configValues[defaultDef.getDescriptor().getName()]=valueFactory.create(defaultValue,null,cmp);
                 }
             }
         }

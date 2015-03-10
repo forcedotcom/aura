@@ -354,13 +354,13 @@ $A.ns.Aura = function() {
      * Create a component from a type and a set of attributes.
      * @borrows AuraComponentService.createComponent
      */
-    this.createComponent = this.componentService.createComponent.bind(this.componentService);
+    this.createComponent = this.componentService["createComponent"].bind(this.componentService);
 
     /**
      * Create an array of components from a list of types and attributes.
      * @borrows AuraComponentService.createComponents
      */
-    this.createComponents = this.componentService.createComponents.bind(this.componentService);
+    this.createComponents = this.componentService["createComponents"].bind(this.componentService);
 
     /**
      * Client-side component creation. This method is replaced by newCmpAsync().
@@ -369,7 +369,7 @@ $A.ns.Aura = function() {
      * @param {Boolean} localCreation
      * @deprecated Use createComponent instead.
      */
-    this.newCmp = this.componentService.newComponentDeprecated.bind(this.componentService);
+    this.newCmp = this.componentService["newComponentDeprecated"].bind(this.componentService);
 
     /**
      * Previously known as newComponent(). This method is replaced by newCmpAsync().
@@ -379,7 +379,7 @@ $A.ns.Aura = function() {
      * @param {Boolean} doForce
      * @deprecated Use createComponent instead.
      */
-    this.newCmpDeprecated = this.componentService.newComponentDeprecated.bind(this.componentService);
+    this.newCmpDeprecated = this.componentService["newComponentDeprecated"].bind(this.componentService);
 
     /**
      * Creates components from a client-side controller or helper. Equivalent to <code>$A.newCmpAsync()</code>.
@@ -395,7 +395,7 @@ $A.ns.Aura = function() {
      * @deprecated Use createComponent instead.
      */
 
-    this.newCmpAsync = this.componentService.newComponentAsync.bind(this.componentService);
+    this.newCmpAsync = this.componentService["newComponentAsync"].bind(this.componentService);
 
     /**
      * Pushes current portion of attribute's creationPath onto stack

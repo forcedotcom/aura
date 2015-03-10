@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.1982-SNAPSHOT</version>
+        <version>0.1982</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
@@ -152,7 +152,7 @@
                       <arguments>
                         <argument>-Daura.home=${basedir}/..</argument>
                         <argument>-classpath</argument>
-                        <classpath/>
+                        <classpath />
                         <argument>org.auraframework.tools.definition.AuraCompiler</argument>
                         <argument>${basedir}/src/main/components</argument>
                         <argument>${project.build.directory}/${component.dir}</argument>
@@ -171,7 +171,7 @@
                       <arguments>
                         <argument>-Daura.home=${basedir}/..</argument>
                         <argument>-classpath</argument>
-                        <classpath/>
+                        <classpath />
                         <argument>org.auraframework.tools.definition.AuraCompiler</argument>
                         <argument>${basedir}/src/test/components</argument>
                         <argument>${project.build.directory}/${component.test.dir}</argument>

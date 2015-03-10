@@ -91,7 +91,7 @@ public class ServerServiceImpl implements ServerService {
             }
             json.writeMapKey("actions");
             json.writeArrayBegin();
-            run(actions, json);
+            run(actions, json, 0);
             json.writeArrayEnd();
 
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
@@ -112,7 +112,7 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-    private void run(List<Action> actions, Json json) throws IOException {
+    private int run(List<Action> actions, Json json, int idx) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
         AuraContext context = Aura.getContextService().getCurrentContext();
         for (Action action : actions) {
@@ -121,7 +121,7 @@ public class ServerServiceImpl implements ServerService {
             if (logger != null) {
                 action.logParams(logger);
             }
-            String aap = actionAndParams.toString();
+            String aap = String.valueOf(++idx)+"$"+actionAndParams.toString();
             loggingService.startAction(aap);
             Action oldAction = context.setCurrentAction(action);
             try {
@@ -153,9 +153,10 @@ public class ServerServiceImpl implements ServerService {
             // Recursively process any additional actions created by the
             // action
             if (additionalActions != null && !additionalActions.isEmpty()) {
-                run(additionalActions, json);
+                idx = run(additionalActions, json, idx);
             }
         }
+        return idx;
     }
 
     @Override

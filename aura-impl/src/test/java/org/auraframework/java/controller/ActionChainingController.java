@@ -35,9 +35,11 @@ public class ActionChainingController {
     public static int add(@Key("a") Integer a, @Key("b") Integer b, @Key("actions") String chainedActions)
             throws Exception {
         Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        Collection<Action> actions = Aura.getSerializationService().readCollection(new StringReader(chainedActions),
-                Action.class);
-        currentAction.add(Lists.newArrayList(actions));
+        if (chainedActions != null && chainedActions.length() > 0) {
+            Collection<Action> actions = Aura.getSerializationService().readCollection(new StringReader(chainedActions),
+                    Action.class);
+            currentAction.add(Lists.newArrayList(actions));
+        }
         i = a + b;
         return i;
     }

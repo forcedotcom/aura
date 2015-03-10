@@ -20,22 +20,6 @@
     },
 
     /**
-     * Negative case: Verify that specifying null to a controller that is expecting a chain of actions to call post its completion works fine.
-     */
-    testNullSpecifiedForChaining:{
-        test:function(cmp){
-            var a = $A.test.getAction(cmp,"c.add", { "a" : 1, "b" : 99,actions : null});
-            this.enqueueServerActionAndFireEvent(cmp, a);
-            //"Expected the server to flag an error."
-            $A.test.addWaitFor("ERROR",
-                       function(){return a.getState()},
-                       function(){
-                            $A.test.assertTrue(a.getError()[0].message.indexOf("java.lang.NullPointerException") !== -1)
-                       });
-        }
-    },
-
-    /**
      *
      * Negative case: Verify that exceptions caused in chained controller are surfaced as part of only that controller and does not affect others.
      */
@@ -109,36 +93,6 @@
                                 function(){
                                     $A.test.assertEquals("ERROR", infiniteChain.getState(), "Server failed to detect an infinite chain.");
                                 });
-        }
-    },
-
-    /**
-     * Setting a chained action to be exclusive has no effect.
-     * setChained() takes precedence over setExclusive()
-     */
-    // TODO: W-1347322
-    _testSettingChainedActionToBeExclusive:{
-        test:function(cmp){
-            var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2},
-                function(action){
-                    $A.test.assertEquals(200, action.getReturnValue(), "Exclusive action should not be executed before parent action.");
-                    //If the call backs are in order, then this attribute will have value set by c.add's call back
-                    $A.test.assertEquals("1", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                    cmp.set('v.responseOrder', "2");
-                });
-            multiply.setChained();
-            multiply.setExclusive(true);
-
-            var add = $A.test.getAction(cmp,"c.add",
-                {"a" : 1, "b" : 99, "actions": $A.util.json.encode({ actions: [multiply] })},
-                function(action){
-                        $A.test.assertEquals(100, action.getReturnValue(), "Chained action was executed before parent action.");
-                        //If the call backs are in order, then this attribute will have the default value
-                        $A.test.assertEquals("", cmp.get('v.responseOrder'), "Action chaining did not preserve order at client.");
-                        cmp.set('v.responseOrder', "1");
-                });
-            this.enqueueServerActionAndFireEvent(cmp, add);
-            $A.test.addWaitFor("2", function(){return cmp.get('v.responseOrder');});
         }
     },
 

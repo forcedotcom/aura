@@ -97,9 +97,9 @@ public class ClientComponentClass {
     }
  
     private void writeComponentClass(BaseComponentDef def, Appendable out) throws IOException, QuickFixException {
-    	DefDescriptor<? extends BaseComponentDef> descriptor = def.getDescriptor();
-    	DefDescriptor<? extends BaseComponentDef> extendsDescriptor = def.getExtendsDescriptor();
-		String className = escapeStringForScript(String.format("%s$%s", descriptor.getNamespace(), descriptor.getName()));
+    	final DefDescriptor<? extends BaseComponentDef> descriptor = def.getDescriptor();
+    	final DefDescriptor<? extends BaseComponentDef> extendsDescriptor = def.getExtendsDescriptor();
+		final String className = escapeStringForScript(String.format("%s$%s", descriptor.getNamespace(), descriptor.getName()));
 		BaseComponentDef superDef = null;
 		
 		if(extendsDescriptor != null) {
@@ -112,11 +112,13 @@ public class ClientComponentClass {
 		String superClassName = superDescriptor != null ? escapeStringForScript(String.format("%s$%s", superDescriptor.getNamespace(), superDescriptor.getName())) : "$A.Component";
 		
 		// DCHASMAN TODO Find the closest non-empty implementation of each method and jump directly to that to reduce call stack depth 
-		
-		List<JsFunction> renderMethods = Lists.newArrayList();
-		List<String> renderMethodStubs = Lists.newArrayList();
+
+        final String[] methodNames = new String[] { "render", "rerender", "afterRender", "unrender" };
+		final List<JsFunction> renderMethods = Lists.newArrayList();
+		final List<String> renderMethodStubs;
     	DefDescriptor<RendererDef> rendererDescriptor = def.getRendererDescriptor();
     	if (rendererDescriptor != null) {
+    		renderMethodStubs = Lists.newArrayList();
 			RendererDef rendererDef = rendererDescriptor.getDef();
 	    	if (rendererDef != null && !rendererDef.isLocal()) {
 				String defInJson = Json.serialize(rendererDef, false, true);
@@ -127,7 +129,6 @@ public class ClientComponentClass {
 			        @SuppressWarnings("unchecked")
 					Map<String, Object> value = (Map<String, Object>) defObj.get("value"); 
 			        
-			        String[] methodNames = new String[] { "render", "rerender", "afterRender", "unrender" };
 			        for (String methodName : methodNames) {
 			            JsFunction renderMethod = (JsFunction) value.get(methodName);
 			            if (renderMethod != null) {
@@ -141,6 +142,9 @@ public class ClientComponentClass {
 		        	// Ignore these
 		        }
 	    	}
+    	} else {
+    		// If they don't have a renderer, specify all stubs.
+    		renderMethodStubs = Lists.newArrayList(methodNames);
     	}
     	
     	// Emit the helper

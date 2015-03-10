@@ -1,14 +1,15 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "descriptor":"markup://aura:test",
     "superDef":{
-      "serId":2,
-      "value":{
+      "s":2,
+      "v":{
+        "xs":"G",
         "descriptor":"markup://aura:component",
         "rendererDef":{
-          "serId":3,
-          "value":{
+          "s":3,
+          "v":{
             "descriptor":"js://aura.component",
             "render":
 function(component) {
@@ -34,10 +35,11 @@ function(component) {
         },
         "attributeDefs":[
           {
-            "serId":4,
-            "value":{
+            "s":4,
+            "v":{
               "name":"body",
-              "type":"aura://Aura.Component[]"
+              "type":"aura://Aura.Component[]",
+              "xs":"G"
             }
           }
         ],
@@ -50,11 +52,11 @@ function(component) {
     },
     "attributeDefs":[
       {
-        "serRefId":4
+        "r":4
       },
       {
-        "serId":5,
-        "value":{
+        "s":5,
+        "v":{
           "name":"testAttributeDescriptorName",
           "type":"aura://String",
           "default":"testValue"

@@ -24,6 +24,7 @@ function EventDef(config) {
     this.superDef = this.initSuperDef(config);
     this.attributeDefs = config["attributes"];   // TODO: real defs
     this.type = config["type"];
+    this.access=config[Json.ApplicationKey.ACCESS];
 }
 
 EventDef.prototype.auraType = "EventDef";

@@ -16,32 +16,37 @@
 /**
  * @description Creates a new DefDescriptor (definition descriptor) instance, including the prefix and namespace.
  * @constructor
- * @param {Object} config Throws an error if config is null or undefined.
+ * @param {Object} descriptor Throws an error if descriptor is null or undefined.
  */
-function DefDescriptor(config){
-    aura.assert(config, "DefDescriptor config undefined");
+function DefDescriptor(descriptor){
+    var prefix=DefDescriptor.normalize(descriptor).split("://");
+    var namespace=prefix[1].split(/[:.]/);
+    var hasNamespace=namespace.length>1;
+    var separator=hasNamespace?prefix[1].indexOf(':')>-1?':':'.':'';
 
-    var descriptor="descriptor";
-    if(config[descriptor]){
-        config=config[descriptor];
-    }
-    this.qualifiedName=config;
-    var prefix=config.split("://");
-    if(prefix.length>1){
-        this.prefix=prefix[0];
-        config=prefix[1];
-    }else{
-        this.prefix="markup";
-    }
-    var nameSpace=config.split(':');
-    if(nameSpace.length==1){
-        nameSpace=config.split('.');
-    }
-    var hasNamespace=nameSpace.length>1;
-    this.namespace=hasNamespace?nameSpace[0]:'';
-    this.name=nameSpace[hasNamespace?1:0];
+    this.prefix=prefix[0];
+    this.namespace=hasNamespace?namespace[0]:'';
+    this.name=namespace[hasNamespace?1:0];
+    this.qualifiedName=$A.util.format("{0}://{1}{2}{3}",this.prefix,this.namespace,separator,this.name);
 }
 
+// Static Members
+DefDescriptor.DESCRIPTOR="descriptor";
+
+DefDescriptor.normalize=function(descriptor){
+    if(descriptor&&descriptor.hasOwnProperty(DefDescriptor.DESCRIPTOR)){
+        descriptor=descriptor[DefDescriptor.DESCRIPTOR];
+    }
+    if(!descriptor){
+        throw new Error("DefDescriptor.normalize(): 'descriptor' must be a valid config Object or String.");
+    }
+    if((descriptor+'').indexOf("://")<0){
+        descriptor="markup://"+descriptor;
+    }
+    return descriptor;
+};
+
+// Prototype Members
 DefDescriptor.prototype.auraType = "DefDescriptor";
 
 /**
@@ -82,15 +87,6 @@ DefDescriptor.prototype.getPrefix = function(){
  */
 DefDescriptor.prototype.toString = function(){
     return this.getQualifiedName();
-};
-
-/**
- * Parses a definition descriptor to be split into prefix and names.
- * Not public.
- * @returns {Array}
- * @private
- */
-DefDescriptor.prototype.parse = function(config){
 };
 
 //#include aura.system.DefDescriptor_export

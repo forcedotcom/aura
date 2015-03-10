@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -112,6 +112,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         json.writeMapBegin();
         json.writeMapEntry("name", descriptor);
         json.writeMapEntry("type", typeDefDescriptor);
+        json.writeValue(getAccess());
 
         if (defaultValue != null) {
             json.writeMapEntry("default", defaultValue.getValue());

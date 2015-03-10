@@ -27,9 +27,9 @@ function AttributeDefSet(configs) {
         this.valuesOrder = [];
         for (var i = 0; i < configs.length; i++) {
             var attributeDef = new AttributeDef(configs[i]);
-            var qname = attributeDef.getDescriptor().getQualifiedName();
-            this.values[qname] = attributeDef;
-            this.valuesOrder.push(qname);
+            var name = attributeDef.getDescriptor().getName();
+            this.values[name] = attributeDef;
+            this.valuesOrder.push(name);
         }
     }
 }

@@ -1,14 +1,15 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "descriptor":"markup://fake:component",
     "superDef":{
-      "serId":2,
-      "value":{
+      "s":2,
+      "v":{
+        "xs":"G",
         "descriptor":"markup://aura:component",
         "rendererDef":{
-          "serId":3,
-          "value":{
+          "s":3,
+          "v":{
             "descriptor":"js://aura.component",
             "render":
 function(component) {
@@ -34,10 +35,11 @@ function(component) {
         },
         "attributeDefs":[
           {
-            "serId":4,
-            "value":{
+            "s":4,
+            "v":{
               "name":"body",
-              "type":"aura://Aura.Component[]"
+              "type":"aura://Aura.Component[]",
+              "xs":"G"
             }
           }
         ],
@@ -50,7 +52,7 @@ function(component) {
     },
     "attributeDefs":[
       {
-        "serRefId":4
+        "r":4
       }
     ],
     "componentClass":"function(){\n$A.componentService.addComponentClass(\"fake$component\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var fake$component = function fake$component(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    fake$component.prototype = new aura$component(null, null, true);\n    fake$component.prototype.constructor = fake$component;\n\n    fake$component.Helper = function() {};\n\n    fake$component.Helper.prototype = new aura$component.Helper();\n    fake$component.Helper.prototype.constructor = fake$component.Helper;\n    fake$component.prototype.helper = new fake$component.Helper();\n\n\n    fake$component.prototype.render = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.render() : undefined;\n    };\n    fake$component.prototype.rerender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.rerender() : undefined;\n    };\n    fake$component.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    fake$component.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(fake$component);\n\n    return fake$component;\n});\n\n\n}"

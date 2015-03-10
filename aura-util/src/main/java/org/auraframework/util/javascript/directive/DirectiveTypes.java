@@ -15,6 +15,7 @@
  */
 package org.auraframework.util.javascript.directive;
 
+import org.auraframework.util.javascript.directive.impl.ApplicationKeyDirectiveType;
 import org.auraframework.util.javascript.directive.impl.DebuggerDirectiveType;
 import org.auraframework.util.javascript.directive.impl.IfDirectiveType;
 import org.auraframework.util.javascript.directive.impl.IncludeDirectiveType;
@@ -26,10 +27,11 @@ import com.google.common.collect.ImmutableList;
  */
 public class DirectiveTypes {
 
+    public static final DirectiveType<?> applicationKeyType = new ApplicationKeyDirectiveType();
     public static final DirectiveType<?> includeType = new IncludeDirectiveType();
     public static final DirectiveType<?> ifType = new IfDirectiveType();
     public static final DirectiveType<?> debuggerType = new DebuggerDirectiveType();
 
-    public static final ImmutableList<DirectiveType<?>> DEFAULT_TYPES = ImmutableList.of(includeType, ifType,
+    public static final ImmutableList<DirectiveType<?>> DEFAULT_TYPES = ImmutableList.of(applicationKeyType,includeType, ifType,
             debuggerType);
 }

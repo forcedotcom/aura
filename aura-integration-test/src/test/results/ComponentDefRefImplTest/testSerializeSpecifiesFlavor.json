@@ -1,15 +1,16 @@
 {
   "componentDef":{
-    "serId":1,
-    "value":{
+    "s":1,
+    "v":{
       "descriptor":"markup://test:flavorableFakeComponent",
       "superDef":{
-        "serId":2,
-        "value":{
+        "s":2,
+        "v":{
+          "xs":"G",
           "descriptor":"markup://aura:component",
           "rendererDef":{
-            "serId":3,
-            "value":{
+            "s":3,
+            "v":{
               "descriptor":"js://aura.component",
               "render":
 function(component) {
@@ -35,10 +36,11 @@ function(component) {
           },
           "attributeDefs":[
             {
-              "serId":4,
-              "value":{
+              "s":4,
+              "v":{
                 "name":"body",
-                "type":"aura://Aura.Component[]"
+                "type":"aura://Aura.Component[]",
+                "xs":"G"
               }
             }
           ],
@@ -51,7 +53,7 @@ function(component) {
       },
       "attributeDefs":[
         {
-          "serRefId":4
+          "r":4
         }
       ],
       "facets":[
@@ -60,12 +62,13 @@ function(component) {
           "value":[
             {
               "componentDef":{
-                "serId":5,
-                "value":{
+                "s":5,
+                "v":{
+                  "xs":"G",
                   "descriptor":"markup://aura:html",
                   "rendererDef":{
-                    "serId":6,
-                    "value":{
+                    "s":6,
+                    "v":{
                       "descriptor":"js://aura.html",
                       "render":
 function(component, helper) {
@@ -188,24 +191,27 @@ function(component, helper) {
                   },
                   "attributeDefs":[
                     {
-                      "serId":7,
-                      "value":{
+                      "s":7,
+                      "v":{
                         "name":"body",
-                        "type":"aura://Aura.Component[]"
+                        "type":"aura://Aura.Component[]",
+                        "xs":"G"
                       }
                     },
                     {
-                      "serId":8,
-                      "value":{
+                      "s":8,
+                      "v":{
                         "name":"tag",
-                        "type":"aura://String"
+                        "type":"aura://String",
+                        "xs":"G"
                       }
                     },
                     {
-                      "serId":9,
-                      "value":{
+                      "s":9,
+                      "v":{
                         "name":"HTMLAttributes",
-                        "type":"aura://Map"
+                        "type":"aura://Map",
+                        "xs":"G"
                       }
                     }
                   ],
@@ -223,12 +229,13 @@ function(component, helper) {
                     "value":[
                       {
                         "componentDef":{
-                          "serId":10,
-                          "value":{
+                          "s":10,
+                          "v":{
+                            "xs":"G",
                             "descriptor":"markup://aura:text",
                             "rendererDef":{
-                              "serId":11,
-                              "value":{
+                              "s":11,
+                              "v":{
                                 "descriptor":"js://aura.text",
                                 "render":
 function(component) {
@@ -261,30 +268,31 @@ function(component) {
                             },
                             "attributeDefs":[
                               {
-                                "serId":12,
-                                "value":{
+                                "s":12,
+                                "v":{
                                   "name":"value",
-                                  "type":"aura://String"
+                                  "type":"aura://String",
+                                  "xs":"G"
                                 }
                               },
                               {
-                                "serId":13,
-                                "value":{
+                                "s":13,
+                                "v":{
                                   "name":"truncate",
                                   "type":"aura://Integer"
                                 }
                               },
                               {
-                                "serId":14,
-                                "value":{
+                                "s":14,
+                                "v":{
                                   "name":"truncateByWord",
                                   "type":"aura://Boolean",
                                   "default":false
                                 }
                               },
                               {
-                                "serId":15,
-                                "value":{
+                                "s":15,
+                                "v":{
                                   "name":"ellipsis",
                                   "type":"aura://Boolean",
                                   "default":true

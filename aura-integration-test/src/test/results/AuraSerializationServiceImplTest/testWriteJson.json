@@ -1,11 +1,11 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "componentDef":"markup://test:child1",
     "creationPath":"/*[0]",
     "attributes":{
-      "serId":2,
-      "value":{
+      "s":2,
+      "v":{
         "values":{
           "attr":"yo"
         }

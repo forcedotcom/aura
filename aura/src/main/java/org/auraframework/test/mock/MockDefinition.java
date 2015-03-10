@@ -141,6 +141,11 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         }
 
         @Override
+        public void serialize(Json json) throws IOException{
+            json.writeString("FAKE_ACCESS");
+        }
+
+        @Override
         public void validate(String namespace, boolean allowAuth,
                 boolean allowPrivate) throws InvalidAccessValueException {
         }

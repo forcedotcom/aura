@@ -1,11 +1,11 @@
 {
-  "serId":1,
-  "value":{
+  "s":1,
+  "v":{
     "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController",
     "actionDefs":[
       {
-        "serId":2,
-        "value":{
+        "s":2,
+        "v":{
           "name":"errorInForeground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$errorInForeground",
           "actionType":"SERVER",
@@ -18,8 +18,8 @@
         }
       },
       {
-        "serId":3,
-        "value":{
+        "s":3,
+        "v":{
           "name":"executeInBackground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackground",
           "actionType":"SERVER",
@@ -32,8 +32,8 @@
         }
       },
       {
-        "serId":4,
-        "value":{
+        "s":4,
+        "v":{
           "name":"executeInBackgroundWithReturn",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackgroundWithReturn",
           "actionType":"SERVER",
@@ -42,8 +42,8 @@
           "caboose":false,
           "params":[
             {
-              "serId":5,
-              "value":{
+              "s":5,
+              "v":{
                 "name":"i",
                 "type":"java://int"
               }
@@ -52,8 +52,8 @@
         }
       },
       {
-        "serId":6,
-        "value":{
+        "s":6,
+        "v":{
           "name":"executeInForeground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground",
           "actionType":"SERVER",
@@ -66,8 +66,8 @@
         }
       },
       {
-        "serId":7,
-        "value":{
+        "s":7,
+        "v":{
           "name":"executeInForegroundWithReturn",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithReturn",
           "actionType":"SERVER",
@@ -76,8 +76,8 @@
           "caboose":false,
           "params":[
             {
-              "serId":8,
-              "value":{
+              "s":8,
+              "v":{
                 "name":"i",
                 "type":"java://int"
               }

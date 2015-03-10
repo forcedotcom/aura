@@ -924,6 +924,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeValue(descriptor);
             } else {
                 json.writeMapBegin();
+                json.writeValue(getAccess());
                 json.writeMapEntry("descriptor", descriptor);
                 context.pushCallingDescriptor(descriptor);
                 try {

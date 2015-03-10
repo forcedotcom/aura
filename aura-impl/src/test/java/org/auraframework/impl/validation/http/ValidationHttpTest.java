@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.auraframework.test.AuraHttpTestCase;
 
 import com.google.common.collect.Maps;
+import org.auraframework.util.json.Json;
 
 public final class ValidationHttpTest extends AuraHttpTestCase {
 
@@ -53,7 +54,7 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
         ServerAction action = new ServerAction("aura://ComponentController/ACTION$getComponent", actionParams);
         action.run();
         Map<String,Object> returnValue = (Map<String,Object>)action.getReturnValue();
-        Map<String,Object> value = (Map<String,Object>)returnValue.get("value");
+        Map<String,Object> value = (Map<String,Object>)returnValue.get(Json.ApplicationKey.VALUE.toString());
         Map<String,Object> model = (Map<String,Object>)value.get("model");
         List<Object> errors = (List<Object>)model.get("errors");
         assertEquals(2, errors.size());

@@ -20,9 +20,10 @@ package org.auraframework.def;
 import java.io.Serializable;
 
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.auraframework.util.json.JsonSerializable;
 
 // Holds compiled value of ACCESS attribute. 
-public interface DefinitionAccess extends Serializable {
+public interface DefinitionAccess extends JsonSerializable,Serializable {
 	
     // Authentication
     boolean requiresAuthentication();

@@ -48,7 +48,7 @@
     },
     
     //test for [script-src 'self' chrome-extension: 'unsafe-eval' 'unsafe-inline';]
-    testScriptSource : {
+    _testScriptSource : {
         browsers : [ "-IE8", "-IE7" ],
     	attributes: { testScriptSource: true },
         test:[ 

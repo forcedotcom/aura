@@ -138,6 +138,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             AttributeDefHandler<T> handler = new AttributeDefHandler<>(this, xmlReader, source);
             AttributeDefImpl attributeDef = handler.getElement();
             DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
+            DefDescriptor<MethodDef> methodDef = DefDescriptorImpl.getInstance(attributeDesc.getName(), MethodDef.class);
             if (builder.getAttributeDefs().containsKey(attributeDesc)) {
                 tagError(
                     "There is already an attribute named '%s' on %s '%s'.",
@@ -146,6 +147,15 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                     "%s", "%s"
                 );
             }
+
+            if (builder.getMethodDefs().containsKey(methodDef)) {
+                tagError("The attribute '%s' conflicts with a method of the same name on %s '%s'.",
+                    handler.getParentHandler().getDefDescriptor(),
+                    attributeDesc.getName(),
+                    "%s","%s"
+                );
+            }
+
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
         	RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this,xmlReader, source);
@@ -163,6 +173,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventHandler<T> handler = new RegisterEventHandler<>(this, xmlReader, source);
             RegisterEventDefImpl regDef = handler.getElement();
+            DefDescriptor<MethodDef> methodDef = DefDescriptorImpl.getInstance(regDef.getAttributeName(), MethodDef.class);
             if (builder.events.containsKey(regDef.getAttributeName())) {
                 tagError("There is already an event named '%s' registered on %s '%s'.",
                         handler.getParentHandler().getDefDescriptor(),
@@ -170,6 +181,15 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
                         "%s", "%s"
                 );
             }
+
+            if (builder.getMethodDefs().containsKey(methodDef)) {
+                tagError("The event '%s' conflicts with a method of the same name on %s '%s'.",
+                    handler.getParentHandler().getDefDescriptor(),
+                    regDef.getAttributeName(),
+                    "%s","%s"
+                );
+            }
+
             builder.events.put(regDef.getAttributeName(), regDef);
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source).getElement());

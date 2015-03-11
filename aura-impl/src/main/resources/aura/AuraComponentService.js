@@ -139,9 +139,9 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
     }
 
     if (!def || def.hasRemoteDependencies()) {
-        this.requestComponent(null, callback, configItem);
+        this.requestComponent(null, callback, configItem, null, 0, true);
     } else {
-        callback(new Component(configItem, true));
+        callback(new Component(configItem, true),"SUCCESS");
     }
 };
 
@@ -158,13 +158,19 @@ $A.ns.AuraComponentService.prototype.createComponents = function(components, cal
     $A.assert($A.util.isFunction(callback),"ComponentService.createComponents(): 'callback' must be a Function pointer.");
 
     var created=[];
+    var overallStatus="SUCCESS";
+    var statusList=[];
     var collected=0;
 
     function getCollector(index){
-        return function(component) {
+        return function(component, status) {
             created[index] = component;
+            statusList[index] = status;
+            if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!="ERROR")) {
+                overallStatus = status;
+            }
             if (++collected === components.length) {
-                callback(created);
+                callback(created,overallStatus,statusList);
             }
         };
     }
@@ -340,10 +346,10 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     var components=[];
     var collected=0;
 
-    function collectComponent(newComponent,index){
+    function collectComponent(newComponent,status,index){
         components[index]=newComponent;
         if(++collected===config.length){
-            callback.call(callbackScope, isSingle?components[0]:components);
+            callback.call(callbackScope, isSingle?components[0]:components, status);
         }
     }
 
@@ -380,7 +386,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
             if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
                 this.requestComponent(callbackScope, collectComponent, configItem, attributeValueProvider, i);
             } else {
-                collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),i);
+                collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS",i);
             }
         }
     }
@@ -393,7 +399,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
  * @param callback
  * @private
  */
-$A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp, index) {
+$A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp, index, returnNullOnError) {
     var action = $A.get("c.aura://ComponentController.getComponent");
 
     // JBUCH: HALO: TODO: WHERE IS THIS COMING FROM IN MIXED FORM? WHY DO WE ALLOW THIS?
@@ -417,8 +423,9 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
     }
 
     action.setCallback(this, function(a){
-        var newComp;
-        if(a.getState() === "SUCCESS"){
+        var newComp = null;
+        var status= a.getState();
+        if(status === "SUCCESS"){
             var returnedConfig = a.getReturnValue();
             if (!returnedConfig["attributes"]) {
                 returnedConfig["attributes"] = {};
@@ -433,7 +440,7 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
             returnedConfig["localId"] = config["localId"];
 
             newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
-        }else{
+        }else if(!returnNullOnError){
             var errors = a.getError();
 
             newComp = $A.newCmpDeprecated("markup://aura:text");
@@ -444,7 +451,7 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
             }
         }
         if ( $A.util.isFunction(callback) ) {
-            callback.call(callbackScope, newComp, index);
+            callback.call(callbackScope, newComp, status, index);
         }
     });
     action.setParams({

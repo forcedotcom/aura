@@ -56,10 +56,23 @@
         }
     },
 
+    testReturnsSUCCESSStateForLocalComponentType:{
+        test:function(){
+            var expected="SUCCESS";
+            var actual=null;
+
+            $A.createComponent("aura:text",null,function(component,state){
+                actual=state;
+
+                $A.test.assertEquals(expected,actual);
+            })
+        }
+    },
+
     testCreatesButtonComponentFromServer:{
-        test:function(component){
+        test:function(){
             $A.test.assertUndefinedOrNull($A.componentService.getDef("ui:button",true));
-            $A.createComponent("ui:button",{label:"label"},function(targetComponent){
+            $A.createComponent("ui:button",{label:"label"},function(){
                 $A.test.assertNotNull($A.componentService.getDef("ui:button"));
             })
         }
@@ -75,6 +88,7 @@
                 $A.test.addWaitFor(true,function(){return targetComponent.isRendered()},function(){
                     targetComponent.getElement().click();
                     actual=component.get("v.handledEvent");
+
                     $A.test.assertTrue(actual);
                 });
 
@@ -99,6 +113,33 @@
         }
     },
 
+    testReturnsNullForUnknownComponentType:{
+        test:function(){
+            // Set actual to non null to verify accidental negatives.
+            var actual={};
+
+            $A.createComponent("bogus:bogus",null,function(component){
+                actual=component;
+
+                $A.test.assertNull(actual);
+            })
+        }
+    },
+
+    testReturnsActionStateForUnknownComponentType:{
+        test:function(){
+            var expected="ERROR";
+            var actual=null;
+
+            $A.createComponent("bogus:bogus",null,function(component,state){
+                actual=state;
+
+                $A.test.assertEquals(expected,actual);
+            })
+        }
+    },
+
+
     testCreatesMultipleComponents:{
         test:function(component){
             var expected="12345";
@@ -114,6 +155,7 @@
                 component.find("createdComponents").set("v.body",components);
                 $A.test.addWaitFor(true,function(){return components[4].isRendered()},function(){
                     actual=$A.test.getTextByComponent(component.find("createdComponents"));
+
                     $A.test.assertEquals(expected, actual);
                 });
             })
@@ -136,6 +178,7 @@
                 component.find("createdComponents").set("v.body",components);
                 $A.test.addWaitFor(true,function(){return components[4].isRendered()},function(){
                     actual=$A.test.getTextByComponent(component.find("createdComponents"));
+
                     $A.test.assertEquals(expected, actual);
                 });
             })
@@ -143,7 +186,7 @@
     },
 
     testOnlyCallsCallbackOnceWhenCreatingMultipleComponents:{
-        test:function(component){
+        test:function(){
             var expected=1;
             var actual=0;
 
@@ -153,11 +196,94 @@
                 ["aura:text",{value:3}],
                 ["aura:text",{value:4}],
                 ["aura:text",{value:5}]
-            ],function(components){
+            ],function(){
                 actual++;
+
+                $A.test.assertEquals(expected, actual);
+            })
+        }
+    },
+
+    testPassesSUCCESSIfNoErrorsWhenCreatingMultipleComponents:{
+        test:function(){
+            var expected="SUCCESS";
+            var actual;
+
+            $A.createComponents([
+                ["aura:text",{value:1}],
+                ["aura:text",{value:2}],
+                ["aura:text",{value:3}],
+                ["aura:text",{value:4}],
+                ["aura:text",{value:5}]
+            ],function(components,overallStatus){
+                actual=overallStatus;
+
+                $A.test.assertEquals(expected, actual);
+            })
+        }
+    },
+
+    // Fails because CSP fails to set server reachable:
+    // Test error: Failed to execute 'open' on 'XMLHttpRequest': Refused to connect to 'http://offline/aura'
+    // because it violates the document's Content Security Policy.
+    _testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents:{
+        test:function(){
+            var expected="INCOMPLETE";
+            var actual;
+            $A.test.setServerReachable(false);
+
+            $A.createComponents([
+                ["aura:text",{value:1}],
+                ["ui:button",{value:2}],
+                ["aura:text",{value:3}],
+                ["aura:text",{value:4}],
+                ["aura:text",{value:5}]
+            ],function(components,overallStatus){
+                actual=overallStatus;
+                $A.test.setServerReachable(true);
+
+                $A.test.assertEquals(expected, actual);
+            })
+        }
+    },
+
+    testPassesERRORIfOneComponentErrorsWhenCreatingMultipleComponents:{
+        test:function(){
+            var expected="ERROR";
+            var actual;
+
+            $A.createComponents([
+                ["aura:text",{value:1}],
+                ["ui:button",{label:2}],
+                ["aura:text",{value:3}],
+                ["bogus:bogus",{value:4}],
+                ["aura:text",{value:5}]
+            ],function(components,overallStatus){
+                actual=overallStatus;
+
+                $A.test.assertEquals(expected, actual);
+            })
+        }
+    },
+
+    testPassesStatusListWithDetailedInfoWhenCreatingMultipleComponents:{
+        test:function(){
+            var expected="SUCCESS,SUCCESS,SUCCESS,ERROR,SUCCESS";
+            var actual;
+
+            $A.createComponents([
+                ["aura:text",{value:1}],
+                ["ui:button",{label:2}],
+                ["aura:text",{value:3}],
+                ["bogus:bogus",{value:4}],
+                ["aura:text",{value:5}]
+            ],function(components,overallStatus,statusList){
+                actual=statusList.join(',');
+
                 $A.test.assertEquals(expected, actual);
             })
         }
     }
+
 
 })

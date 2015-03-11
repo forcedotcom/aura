@@ -346,9 +346,7 @@ $A.ns.Aura = function() {
      * @param {Component|Array} cmp
      * @borrows AuraComponentService.get
      */
-    this.getCmp = function(globalId) {
-        return this.componentService.get(globalId);
-    };
+    this.getCmp = this.componentService.get.bind(this.componentService);
 
     /**
      * Create a component from a type and a set of attributes.

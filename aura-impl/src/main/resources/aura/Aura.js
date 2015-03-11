@@ -342,11 +342,22 @@ $A.ns.Aura = function() {
      * Equivalent to <code>$A.componentService.get()</code>.
      * <p>See Also: <a href="#reference?topic="AuraComponentService">AuraComponentService</a></p>
      * @public
+     * @deprecated use getComponent instead
      * @function
      * @param {Component|Array} cmp
      * @borrows AuraComponentService.get
      */
     this.getCmp = this.componentService.get.bind(this.componentService);
+
+    /**
+     * Equivalent to <code>$A.componentService.getComponent()</code>.
+     * <p>See Also: <a href="#reference?topic="AuraComponentService">AuraComponentService</a></p>
+     * @public
+     * @function
+     * @param {Component|Array} cmp
+     * @borrows AuraComponentService.getComponent
+     */
+    this.getComponent = this.componentService.getComponent.bind(this.componentService);
 
     /**
      * Create a component from a type and a set of attributes.
@@ -485,6 +496,7 @@ $A.ns.Aura = function() {
         "afterRender", aura.afterRender,
         "logger", aura.logger,
         "getCmp", aura.getCmp,
+        "getComponent", aura.getComponent,
         "pushCreationPath", aura.pushCreationPath,
         "popCreationPath", aura.popCreationPath,
         "setCreationPathIndex", aura.setCreationPathIndex,

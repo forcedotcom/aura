@@ -49,10 +49,21 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
  * @param {String} globalId The generated globally unique Id of the component that changes across pageloads.
  *
  * @public
+ * @deprecated use getComponent instead
  */
 $A.ns.AuraComponentService.prototype.get =  function(globalId) {
     var ret = this.indexes.globalId[globalId];
     return ret;
+};
+
+/**
+ * Gets an instance of a component.
+ * @param {Object} identifier that is either a globalId or an element.
+ *
+ * @public
+ */
+$A.ns.AuraComponentService.prototype.getComponent = function(identifier) {
+    return this.get(identifier) || this.getRenderingComponentForElement(identifier);
 };
 
 /**
@@ -721,6 +732,7 @@ $A.ns.AuraComponentService.prototype.isConfigDescriptor = function(config) {
 exp($A.ns.AuraComponentService.prototype,
     "addComponentClass", $A.ns.AuraComponentService.prototype.addComponentClass,
     "get", $A.ns.AuraComponentService.prototype.get,
+    "getComponent", $A.ns.AuraComponentService.prototype.getComponent,
     "getComponentClass", $A.ns.AuraComponentService.prototype.getComponentClass,
     "getRenderingComponentForElement", $A.ns.AuraComponentService.prototype.getRenderingComponentForElement,
     "getAttributeProviderForElement", $A.ns.AuraComponentService.prototype.getAttributeProviderForElement,

@@ -18,10 +18,15 @@
      * exercises Storage Service's get() and put(), and the Action Service.
      */
     testStorableAction : {
-        test : [ function(cmp) {
+        test : [
+           function(cmp) {
+        	   var a = cmp.get("c.setCounter");
+               a.setParams({ testName : "testStorableAction", value : 0 });
+               $A.test.enqueueAction(a);
+           }, function(cmp) {
             // sets the server-side counter to 0
             var a = cmp.get("c.string");
-            a.setParams({ testName : "testStorableAction", param1 : 1 /* ignored */ });
+            a.setParams({ testName : "testStorableAction", param1 : 1  });
             a.setStorable();
 
             $A.test.addWaitForWithFailureMessage(
@@ -38,7 +43,7 @@
         }, function(cmp) {
             // increment the server-side counter (to 1)
             var a = cmp.get("c.string");
-            a.setParams({ testName : "testStorableAction", param1 : 1 /* ignored */ });
+            a.setParams({ testName : "testStorableAction", param1 : 1  });
             a.setStorable();
 
             $A.test.addWaitForWithFailureMessage(

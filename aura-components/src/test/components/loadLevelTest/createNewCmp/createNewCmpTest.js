@@ -301,6 +301,79 @@
         }
     },
 
+    
+    
+    
+    /**
+     * Verify creation of an array of components returns components in the same order. The framework should be able to
+     * handle a mixture of components available on the client and server-dependent component defs.
+     */
+    testCreateArrayOfComponents2:{
+        test: function(cmp){
+            $A.run(function(){
+                $A.newCmpAsync(
+                        this,
+                        function(newCmps) {
+                            $A.test.assertTrue($A.util.isArray(newCmps) && newCmps.length === 4,
+                                'Should be array of components of length 4');
+                            var body = cmp.get("v.body");
+                            body = body.concat(newCmps);
+                            cmp.set("v.body", body);
+                        },
+                        [{
+                            componentDef: "markup://aura:text",
+                            attributes:{
+                                values:{
+                                    value:"TextComponent"
+                                }
+                            }
+                        },
+                        // Component not available on the client, must go to server
+                        {
+                            componentDef: "markup://loadLevelTest:displayNumber",
+                            attributes: {
+                                values: {
+                                    number: 99
+                                }
+                            }
+                        },
+                        {
+                            componentDef: "markup://aura:text",
+                            attributes:{
+                                values:{
+                                    value:"TextComponent2"
+                                }
+                            }
+                        },
+                        // Component not available on the client, must go to server
+                        {
+                            componentDef: "markup://loadLevelTest:displayNumber",
+                            attributes: {
+                                values: {
+                                    number: 100
+                                }
+                            }
+                        }]
+                );
+            });
+
+            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(4,body.length);
+                $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("TextComponent",$A.test.getTextByComponent(body[0]));
+                $A.test.assertEquals("markup://loadLevelTest:displayNumber", body[1].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("99",$A.test.getTextByComponent(body[1]));
+                $A.test.assertEquals("markup://aura:text", body[2].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("TextComponent2",$A.test.getTextByComponent(body[2]));
+                $A.test.assertEquals("markup://loadLevelTest:displayNumber", body[3].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("100",$A.test.getTextByComponent(body[3]));
+            });
+        }
+    },
+    
+    
+    
     /**
      * Test to verify creating an invalid component returns proper error.
      * test:test_Preload_BadCmp has two attributes with the same name.

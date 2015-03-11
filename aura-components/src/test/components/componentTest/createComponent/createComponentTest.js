@@ -71,58 +71,71 @@
 
     testCreatesButtonComponentFromServer:{
         test:function(){
+            var actual;
+            var actionComplete = false;
+
             $A.test.assertUndefinedOrNull($A.componentService.getDef("ui:button",true));
             $A.createComponent("ui:button",{label:"label"},function(){
-                $A.test.assertNotNull($A.componentService.getDef("ui:button"));
-            })
+                actual = $A.componentService.getDef("ui:button", true);
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertNotUndefinedOrNull(actual);
+            });
         }
     },
 
     testCreatesButtonComponentWithPressEvent:{
-        test:function(component){
+        test:[function(component){
+            var actionComplete = false;
             component.set("v.handledEvent",false);
-            var actual=false;
 
             $A.createComponent("ui:button",{label:"label",press:component.getReference("c.handlePress")},function(targetComponent){
                 component.find("createdComponents").set("v.body",targetComponent);
-                $A.test.addWaitFor(true,function(){return targetComponent.isRendered()},function(){
-                    targetComponent.getElement().click();
-                    actual=component.get("v.handledEvent");
+                actionComplete = true;
+            });
 
-                    $A.test.assertTrue(actual);
-                });
-
-            })
-        }
+            $A.test.addWaitFor(true, function(){return actionComplete});
+        }, function(component) {
+            var createdCmp = component.find("createdComponents").get("v.body")[0].getElement();
+            createdCmp.click();
+            $A.test.assertTrue(component.get("v.handledEvent"));
+        }]
     },
 
     testCreatesButtonWithLocalId:{
-        test:function(component){
-            var expected=null;
-            var actual=null;
+        test:[function(component){
             var targetId="testButton";
+            var actionComplete = false;
 
             $A.createComponent("ui:button",{"aura:id":targetId,label:"label"},function(targetComponent){
-                expected=targetComponent;
+                component.__createdCmp = targetComponent;
                 component.find("createdComponents").set("v.body",targetComponent);
-                $A.test.addWaitFor(true,function(){return targetComponent.isRendered()},function(){
-                actual=component.find(targetId);
-                    $A.test.assertEquals(expected, actual);
-                });
-            })
-        }
+                actionComplete = true;
+            });
+        }, function(component) {
+            var targetId="testButton";
+            var actual = component.find(targetId);
+            $A.test.assertEquals(component.__createdCmp, actual);
+        }]
     },
 
     testReturnsNullForUnknownComponentType:{
         test:function(){
             // Set actual to non null to verify accidental negatives.
             var actual={};
+            var actionComplete = false;
 
             $A.createComponent("bogus:bogus",null,function(component){
                 actual=component;
+                actionComplete = true;
+                
+            });
 
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
                 $A.test.assertNull(actual);
-            })
+            });
         }
     },
 
@@ -130,12 +143,16 @@
         test:function(){
             var expected="ERROR";
             var actual=null;
+            var actionComplete = false;
 
             $A.createComponent("bogus:bogus",null,function(component,state){
                 actual=state;
+                actionComplete = true;
+            });
 
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
                 $A.test.assertEquals(expected,actual);
-            })
+            });
         }
     },
 
@@ -163,10 +180,9 @@
     },
 
     testCreatesMultipleServerComponents:{
-        test:function(component){
+        test:[function(component){
             $A.test.assertUndefinedOrNull($A.componentService.getDef("ui:button",true));
-            var expected="12345";
-            var actual;
+            var actionComplete = false;
 
             $A.createComponents([
                 ["ui:button",{label:1}],
@@ -176,13 +192,16 @@
                 ["ui:button",{label:5}]
             ],function(components){
                 component.find("createdComponents").set("v.body",components);
-                $A.test.addWaitFor(true,function(){return components[4].isRendered()},function(){
-                    actual=$A.test.getTextByComponent(component.find("createdComponents"));
+                actionComplete = true;
+            });
 
-                    $A.test.assertEquals(expected, actual);
-                });
-            })
-        }
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }, function(component) {
+            var expected="12345";
+            var actual=$A.test.getTextByComponent(component.find("createdComponents"));
+
+            $A.test.assertEqualsIgnoreWhitespace(expected, actual);
+        }]
     },
 
     testOnlyCallsCallbackOnceWhenCreatingMultipleComponents:{
@@ -230,6 +249,7 @@
         test:function(){
             var expected="INCOMPLETE";
             var actual;
+            var actionComplete = false;
             $A.test.setServerReachable(false);
 
             $A.createComponents([
@@ -241,9 +261,12 @@
             ],function(components,overallStatus){
                 actual=overallStatus;
                 $A.test.setServerReachable(true);
-
-                $A.test.assertEquals(expected, actual);
-            })
+                actionComplete = true;
+            });
+            
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertEquals(expected,actual);
+            });
         }
     },
 
@@ -251,6 +274,7 @@
         test:function(){
             var expected="ERROR";
             var actual;
+            var actionComplete = false;
 
             $A.createComponents([
                 ["aura:text",{value:1}],
@@ -260,9 +284,12 @@
                 ["aura:text",{value:5}]
             ],function(components,overallStatus){
                 actual=overallStatus;
+                actionComplete = true;
+            });
 
-                $A.test.assertEquals(expected, actual);
-            })
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertEquals(expected,actual);
+            });
         }
     },
 
@@ -270,6 +297,7 @@
         test:function(){
             var expected="SUCCESS,SUCCESS,SUCCESS,ERROR,SUCCESS";
             var actual;
+            var actionComplete = false;
 
             $A.createComponents([
                 ["aura:text",{value:1}],
@@ -279,11 +307,12 @@
                 ["aura:text",{value:5}]
             ],function(components,overallStatus,statusList){
                 actual=statusList.join(',');
+                actionComplete = true;
+            });
 
-                $A.test.assertEquals(expected, actual);
-            })
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertEquals(expected,actual);
+            });
         }
     }
-
-
 })

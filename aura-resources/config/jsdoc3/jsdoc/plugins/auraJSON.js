@@ -14,6 +14,10 @@ exports.handlers = {
     }
 }
 
+exports.defineTags = function(dictionary) {
+    dictionary.defineTag("platform", {});
+};
+
 /**
  * Aura's encode function
  *

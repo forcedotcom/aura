@@ -138,6 +138,9 @@
                     <name>!skipJsDoc</name>
                 </property>
             </activation>
+            <properties>
+                <jsDoc.mode>internal</jsDoc.mode>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -152,7 +155,7 @@
                                         <sourceFile>${basedir}/target/src-gen/main/resources/aura/javascript/aura_doc.js</sourceFile>
                                     </sourceFiles>
                                     <outputDirectory>${basedir}/target/src-gen/main/resources/jsdoc</outputDirectory>
-                                    <configFile>${basedir}/config/jsdoc3/conf.json</configFile>
+                                    <configFile>${basedir}/config/jsdoc3/${jsDoc.mode}.json</configFile>
                                 </configuration>
                                 <goals>
                                     <goal>jsdoc3</goal>

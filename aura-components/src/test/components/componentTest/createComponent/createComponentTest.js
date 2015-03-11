@@ -140,6 +140,24 @@
                 });
             })
         }
+    },
+
+    testOnlyCallsCallbackOnceWhenCreatingMultipleComponents:{
+        test:function(component){
+            var expected=1;
+            var actual=0;
+
+            $A.createComponents([
+                ["aura:text",{value:1}],
+                ["aura:text",{value:2}],
+                ["aura:text",{value:3}],
+                ["aura:text",{value:4}],
+                ["aura:text",{value:5}]
+            ],function(components){
+                actual++;
+                $A.test.assertEquals(expected, actual);
+            })
+        }
     }
 
 })

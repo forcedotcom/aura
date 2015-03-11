@@ -15,11 +15,17 @@
  */
 Function.RegisterNamespace("Test.Aura");
 
-[Fixture, Skip("Rewrite for prototype class structure and $A.ns")]
+[Fixture]
 Test.Aura.AuraClientServiceTest = function() {
 
     var $A = {
-        ns : {}
+        ns : {
+            Util:{
+                prototype:{
+                    on:function(){}
+                }
+            }
+        }
     };
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
@@ -30,21 +36,32 @@ Test.Aura.AuraClientServiceTest = function() {
         // #import aura.AuraClientService
     });
 
-	var mockGlobal = Mocks.GetMock(Object.Global(), "$A", {
-        log : function() {},
-        assert : function() {},
-        util : {
-            on: function() {},
-            isUndefinedOrNull : function() {},
-            isUndefined : function() {},
-            isArray : function() {},
-            json : {
-                encode :function(errorText) {
-                    return "mockedJson:"+errorText;
+	var mockGlobal = Mocks.GetMocks(Object.Global(), {
+        "$A": {
+            ns:$A.ns,
+            log : function() {},
+            assert : function(condition, message) {
+                if(!condition){
+                    throw message;
                 }
-            }
+            },
+            util : {
+                on: function() {},
+                isUndefinedOrNull : function(obj){
+                    return obj === undefined || obj === null;
+                },
+                isUndefined : function() {},
+                isArray : function() {},
+                json : {
+                    encode :function(errorText) {
+                        return "mockedJson:"+errorText;
+                    }
+                }
+            },
+            mark : function() {}
         },
-        mark : function() {}
+        window:{},
+        document:{}
 	});
 	
 	[Fixture]
@@ -240,64 +257,31 @@ Test.Aura.AuraClientServiceTest = function() {
 
 		[ Fact ]
 		function AssertsActionNotUndefinedOrNull() {
-			var assertStub = Stubs.GetMethod("check", "message", undefined);
-			var validateStub = Stubs.GetMethod(true);
-			mockGlobal(function() {
-				$A.assert = assertStub;
-				$A.util.isUndefinedOrNull = validateStub;
+            var expected="EnqueueAction() cannot be called on an undefined or null action.";
 
-				new $A.ns.AuraClientService().enqueueAction(new MockAction());
-			});
+            var actual=Record.Exception(function(){
+                mockGlobal(function() {
+                    new $A.ns.AuraClientService().enqueueAction();
+                });
+            });
 
-			Assert.Equal(1, validateStub.Calls.length);
-			Assert.Equal({
-				Arguments : {
-					check : false,
-					message : "EnqueueAction() cannot be called on an undefined or null action."
-				},
-				ReturnValue : undefined
-			}, assertStub.Calls[0]);
-		}
-
-		[ Fact ]
-		function AssertsActionAuraTypeDefined() {
-			var assertStub = Stubs.GetMethod("check", "message", undefined);
-			var validateStub = Stubs.GetMethod(true);
-			mockGlobal(function() {
-				$A.assert = assertStub;
-				$A.util.isUndefined = validateStub;
-
-				new $A.ns.AuraClientService().enqueueAction(new MockAction());
-			});
-
-			Assert.Equal(1, validateStub.Calls.length);
-			Assert.Equal({
-				Arguments : {
-					check : false,
-					message : "Cannot call EnqueueAction() with a non Action parameter."
-				},
-				ReturnValue : undefined
-			}, assertStub.Calls[1]);
+            Assert.Equal(expected,actual);
 		}
 
 		[ Fact ]
 		function AssertsActionAuraTypeIsAction() {
-			var assertStub = Stubs.GetMethod("check", "message", undefined);
 			var action = new MockAction();
 			action.auraType = "unexpected";
-			mockGlobal(function() {
-				$A.assert = assertStub;
+            var expected="Cannot call EnqueueAction() with a non Action parameter.";
 
-				new $A.ns.AuraClientService().enqueueAction(action);
-			});
+            var actual=Record.Exception(function(){
+                mockGlobal(function() {
+                    new $A.ns.AuraClientService().enqueueAction(action);
+                });
 
-			Assert.Equal({
-				Arguments : {
-					check : false,
-					message : "Cannot call EnqueueAction() with a non Action parameter."
-				},
-				ReturnValue : undefined
-			}, assertStub.Calls[1]);
+            })
+
+			Assert.Equal(expected,actual);
 		}
 
 		[ Fact ]
@@ -399,7 +383,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			Assert.False(actual);
 		}
 
-		[ Fact ]
+		[ Fact, Skip ]
 		function CallsRequestIfServerActionsAvailable() {
 			var action = "server";
             var target;
@@ -443,7 +427,7 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.False(actual);
         }
 
-		[ Fact ]
+		[ Fact, Skip ]
 		function ReturnsTrueIfServerActionsSent() {
 			var action = "server";
             var target;
@@ -463,7 +447,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			Assert.True(actual);
 		}
 
-		[ Fact ]
+		[ Fact, Skip ]
 		function CallsRequestIfBackgroundActionAvailable() {
 			var action = "background";
             var target;
@@ -488,7 +472,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			} ], request.Calls);
 		}
 
-		[ Fact ]
+		[ Fact, Skip ]
 		function ReturnsTrueIfBackgroundActionSent() {
 			var action = "background";
             var target;
@@ -508,7 +492,7 @@ Test.Aura.AuraClientServiceTest = function() {
 			Assert.True(actual);
 		}
 
-		[ Fact ]
+		[ Fact, Skip ]
 		function CallsRequestForBothServerAndBackgroundActions() {
 			var actionServer = "server";
 			var actionBackground = "background";
@@ -545,7 +529,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
     [ Fixture ]
     function MakeActionGroup() {
-        [ Fact ]
+        [ Fact, Skip ]
         function AssertsActionsIsArray() {
             var expectedArrayCheck = "checked";
             var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
@@ -579,7 +563,7 @@ Test.Aura.AuraClientServiceTest = function() {
             } ], stubbedAssert.Calls);
         }
 
-        [ Fact ]
+        [ Fact, Skip ]
         function AssertsCallbackIsFunction() {
             var expectedArrayCheck = "checked";
             var action = new MockAction();
@@ -613,7 +597,7 @@ Test.Aura.AuraClientServiceTest = function() {
             }, stubbedAssert.Calls[1]);
         }
 
-        [ Fact ]
+        [ Fact, Skip ]
         function DoesNotAssertCallbackIsFunctionIfCallbackUndefined() {
             var stubbedAssert = Stubs.GetMethod("condition", "msg", null);
             var action = new MockAction();

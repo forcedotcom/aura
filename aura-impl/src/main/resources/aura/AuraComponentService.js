@@ -163,7 +163,7 @@ $A.ns.AuraComponentService.prototype.createComponents = function(components, cal
     function getCollector(index){
         return function(component) {
             created[index] = component;
-            if (++collected === created.length) {
+            if (++collected === components.length) {
                 callback(created);
             }
         };

@@ -79,8 +79,10 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
             this.valueProviders[type] = new $A.ns.ObjectValueProvider();
         }
         valueProvider = this.valueProviders[type];
-        // set values into its value provider
-        valueProvider.merge(newGvp["values"]);
+        if (valueProvider.merge) {
+            // set values into its value provider
+            valueProvider.merge(newGvp["values"]);
+        }
     }
     if (doNotPersist) {
         return;
@@ -91,7 +93,7 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         for (type in this.valueProviders) {
             if (this.valueProviders.hasOwnProperty(type)) {
                 valueProvider = this.valueProviders[type];
-                values = valueProvider.getStorableValues?valueProvider.getStorableValues():valueProvider.getValues();
+                values = valueProvider.getStorableValues ? valueProvider.getStorableValues() : (valueProvider.getValues ? valueProvider.getValues() : valueProvider);
                 storedGvps.push({
                     "type" : type,
                     "values" : values
@@ -203,7 +205,7 @@ $A.ns.GlobalValueProviders.prototype.get = function(expression, callback) {
     var type=expression.shift();
     var valueProvider=this.valueProviders[type];
     $A.assert(valueProvider,"Unknown value provider: '"+type+"'.");
-    return valueProvider.get(expression, callback);
+    return (valueProvider.get ? valueProvider.get(expression, callback) : $A.expressionService.resolve(expression, valueProvider));
 };
 
 //#include aura.provider.GlobalValueProviders_export

@@ -1137,7 +1137,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
         D def = registry.getDef(descriptor);
-        def.validateDefinition();
+        if (def != null) {
+            def.validateDefinition();
+        }
         return def;
     }
 

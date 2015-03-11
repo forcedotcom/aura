@@ -643,6 +643,31 @@ public class AuraUITestingUtil {
     }
 
     /**
+     * @param timeoutSecs number of seconds to wait for test to finish
+     */
+    public void waitForAuraTestComplete(int timeoutSecs) {
+        waitUntilWithCallback(
+                new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver d) {
+                        return getBooleanEval("return window.aura.test.isComplete();");
+                    }
+                },
+                new ExpectedCondition<String>() {
+                    @Override
+                    public String apply(WebDriver d) {
+                        String dump = (String) getRawEval("return (window.$A && $A.test && $A.test.getDump())||'';");
+                        if (dump.isEmpty()) {
+                            dump = "no test dump available.";
+                        }
+                        return "Test dump - " + dump;
+                    }
+                },
+                timeoutSecs,
+                "Test did not complete within " + timeoutSecs);
+    }
+
+    /**
      * @param function function we will apply again and again until timeout
      * @param callbackWhenTimeout function we will run when timeout happens, the return will be append to other output
      *            message, start with "Extra message from callback". we can pass in function to evaluate the client side

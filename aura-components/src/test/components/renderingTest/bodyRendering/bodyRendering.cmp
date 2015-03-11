@@ -16,10 +16,22 @@
 
 -->
 <aura:component>
-    <div aura:id="me">
-        <div aura:id="value1">Value 1</div>
-        <div aura:id="value2">Value 2</div>
-        <div aura:id="value3">Value 3</div>
-        <div aura:id="value3">Value 4</div>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Label</th>
+                <th>Render</th>
+                <th>Rerender</th>
+                <th>Unrender</th>
+                <th>onLoad</th>
+                <th>iFrame</th>
+            </tr>
+        </thead>
+        <tbody aura:id="content">
+            <renderingTest:renderCounter index="1"/>
+            <renderingTest:renderCounter index="2"/>
+            <renderingTest:renderCounter index="3"/>
+            <renderingTest:renderCounter index="4"/>
+        </tbody>
+    </table>
 </aura:component>

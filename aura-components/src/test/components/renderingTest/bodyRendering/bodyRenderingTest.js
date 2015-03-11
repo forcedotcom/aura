@@ -57,7 +57,6 @@
         for(var i = 0; i < iframeList.length; i++) {
             var iframe = iframeList.item(i);
             var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-            console.log(iframeDocument.readyState);
             if (iframeDocument.readyState !== "complete") {
                 return false;
             }
@@ -66,6 +65,7 @@
     },
 
     assertComponents: function(component, values, message) {
+        $A.rerender(component);
         $A.test.addWaitFor(true,
             this.iframesLoaded,
             function() {
@@ -75,12 +75,12 @@
 
                 for (var n = 0; n < nodes.length; n++) {
                     //
-                    // If only a number is given, we assume render=1, rerender=0, unrender=0, onload=0
-                    // which is the normal case.
+                    // If only a number is given, we assume render=1, rerender=onload=1, unrender=0, onload=1
+                    // which is the normal case (updating onload will cause a rerender).
                     //
-                    var expected = "#" + values[n] + (values[n] > 0 ? " 1 0 0 1" : "");
+                    var expected = "#" + values[n] + (values[n] > 0 ? " 1 1 0 1" : "");
                     var actual = $A.test.getText(nodes[n]).replace(/\t/g," ");
-                    $A.test.assertEquals(expected, actual, message + ": invalid row #" + (n + 1));
+                    $A.test.assertEquals(expected, actual, message + ": invalid row #" + (n + 1) + "( " + expected + "vs " + actual + ")");
                 }
             }
         );
@@ -130,7 +130,7 @@
                 });
             },
             function(component) {
-                this.assertComponents(component, [1,"5 1 1 0 1","6 1 1 0 1",4], "Rerender 2nd and 3rd components");
+                this.assertComponents(component, [1,"5 1 2 0 1","6 1 2 0 1",4], "Rerender 2nd and 3rd components");
             }
         ]
     },
@@ -163,7 +163,7 @@
         ]
     },
 
-    _testInsertFourWithOverlap: {
+    testInsertFourWithOverlap: {
         test: [
             function(component) {
                 this.createComponents(component, 4, function(body, newCmp) {
@@ -191,7 +191,7 @@
         ]
     },
 
-    _testDeleteLast: {
+    testDeleteLast: {
         test: [
             function(component) {
                 this.changeBody(component, function(body) {
@@ -219,7 +219,7 @@
         ]
     },
 
-    _testDeleteFirst: {
+    testDeleteFirst: {
         test: [
             function(component) {
                 this.changeBody(component, function(body) {
@@ -247,7 +247,7 @@
         ]
     },
 
-    _testDeleteOne: {
+    testDeleteOne: {
         test: [
             function(component) {
                 this.changeBody(component, function(body) {
@@ -261,7 +261,7 @@
         ]
     },
 
-    _testReplaceOne: {
+    testReplaceOne: {
         test: [
             function(component) {
                 this.createComponents(component, 1, function(body, newCmp) {

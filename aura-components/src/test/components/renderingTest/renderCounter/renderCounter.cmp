@@ -22,24 +22,27 @@
     <aura:attribute name="renderCount" type="integer" default="0"/>
     <aura:attribute name="rerenderCount" type="integer" default="0"/>
     <aura:attribute name="unrenderCount" type="integer" default="0"/>
+    <aura:attribute name="onloadCount" type="integer" default="0"/>
 
     <!--
 
         Here we check how often Aura processes a component, but we also
         check side effects such as reloading iframes.
 
-    -->
+        IMPORTANT: iframes don't need to have a resource to trigged an onload event.
 
+    -->
 
     <tr>
         <td>#{!v.index}</td>
         <td>{!v.renderCount}</td>
         <td>{!v.rerenderCount}</td>
         <td>{!v.unrenderCount}</td>
-        <td aura:id="onloadCount">0</td>
-        <td><iframe
-            aura:id="iframe"
-            src="/auraFW/resources/aura/resetCSS.css"
+        <td>{!v.onloadCount}</td>
+        <td>
+            <iframe
+                aura:id="iframe"
+                onload="{!c.onload}"
             />
         </td>
     </tr>

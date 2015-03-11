@@ -306,6 +306,7 @@ $A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, f
     };
     var renderCount=0;
     if(component._facetInfo) {
+        var jmax = 0;
         for (var i = 0; i < facet.length; i++) {
             var child = facet[i];
             // Guard against undefined/null facets, as these will cause troubles later.
@@ -314,9 +315,11 @@ $A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, f
                 for (var j = 0; j < component._facetInfo.length; j++) {
                     if (child === component._facetInfo[j]) {
                         updatedFacet.components.push({action:"rerender",component: child, oldIndex: j, newIndex: i});
-                        if(j!=(i-renderCount)){
+                        // If the child is in a different position AND the order is different
+                        if((j!=(i-renderCount)) && (j < jmax)){
                             updatedFacet.useFragment=true;
                         }
+                        jmax = j;
                         found = true;
                         component._facetInfo[j] = undefined;
                         break;
@@ -736,7 +739,7 @@ $A.ns.AuraRenderingService.prototype.finishRender = function(cmp, elements) {
 
     return elements;
 };
-                    
+
 /**
  * Insert elements to the DOM, relative to a reference node,
  * by default as its last child.

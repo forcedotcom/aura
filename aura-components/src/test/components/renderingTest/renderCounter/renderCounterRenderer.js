@@ -19,14 +19,6 @@
         return this.superRender();
     },
 
-    afterRender: function(component){
-        component.getElement().querySelector("iframe").onload = function onload() {
-            var el = this.parentNode.previousSibling;
-            el.innerHTML = parseInt(el.innerHTML,10) + 1;
-        };
-        return this.superAfterRender();
-    },
-
     rerender : function(component, helper){
         helper.updateMetrics(component, "v.rerenderCount");
         return this.superRerender();

@@ -537,7 +537,7 @@ if(!this.concreteComponentId) {
                 params["arguments"]={};
                 var counter=0;
                 for (var attribute in attributes){
-                    params["arguments"][attribute]=arguments[counter];
+                    params["arguments"][attribute]=(arguments[counter] == undefined ? attributes[attribute]["default"] : arguments[counter]) ;
                     counter++;
                 }
                 for(var i=counter;i<arguments.length;i++){

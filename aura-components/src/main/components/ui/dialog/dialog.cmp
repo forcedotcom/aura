@@ -48,7 +48,7 @@
     </aura:if>
 
     <!-- dialog container -->
-    <div aura:id="outer" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width +' '+ v.theme}" role="{!v.ariaRole}" aria-live="assertive" aria-atomic="true" aria-labelledby="{!globalId + '-title'}">
+    <div aura:id="outer" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width +' '+ v.theme}" role="{!v.ariaRole}" aria-live="assertive" aria-labelledby="{!globalId + '-title'}">
 
         <!-- header -->
         <h2 aura:id="title" id="{!globalId + '-title'}" class="title">{!v.title}<span class="assistiveText"> {!v.description}</span></h2>

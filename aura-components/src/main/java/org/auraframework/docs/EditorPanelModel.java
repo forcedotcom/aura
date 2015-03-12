@@ -43,34 +43,22 @@ public class EditorPanelModel {
 
         String desc = (String) component.getAttributes().getValue("descriptor");
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
-        
-        DefDescriptor<? extends Definition> descriptor = null;
-        if (defType != DefType.INCLUDE) {
-            // Nominal case:
-            descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
-        } else {
-            // Include case: since included .js files load source differently we have to manually
-            // look up the include defs. If there is a usecase for looking up the defs in a non-doc 
-            // setting, a lookup method should be added to the includeDef class.
-            String name = (String) component.getAttributes().getValue("includeDefName");
-            DefDescriptor<? extends LibraryDef> library = Aura.getDefinitionService().getDefDescriptor(
-                desc, LibraryDef.class
-            );
-            
-            for (IncludeDefRef includeDef : library.getDef().getIncludes()) {
-               if (includeDef.getName().equals(name)) {
-                   descriptor = includeDef.getDescriptor();
-               }
-            }
-        }
 
-        Source<?> source = context.getDefRegistry().getSource(descriptor);
-        if (source != null && source.exists()) {
-            code = source.getContents();
-            format = String.valueOf(source.getFormat());
-        } else {
+        // TODO descriptor for js files in libraries needs to be changed to include its parent
+        if (defType == DefType.INCLUDE) {
             code = null;
             format = null;
+        } else {
+            // Nominal case:
+            DefDescriptor<? extends Definition> descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
+            Source<?> source = context.getDefRegistry().getSource(descriptor);
+            if (source != null && source.exists()) {
+                code = source.getContents();
+                format = String.valueOf(source.getFormat());
+            } else {
+                code = null;
+                format = null;
+            }
         }
     }
 

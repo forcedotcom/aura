@@ -968,7 +968,8 @@ function (w) {
         * @private
         */
         _move: function (e) {
-            if (!this.enabled || (EVENT_TYPE[e.type] !== this._initiated)) {
+            // If an element captures onTouchMove and sets "cancelScrolling" to true, Scroller will cancel scrolling.
+            if (!this.enabled || (EVENT_TYPE[e.type] !== this._initiated) || e.cancelScrolling) {
                 e.scrollDirection = this.scrollDirection; // keep bubbling up the direction if is defined
                 return;
             }

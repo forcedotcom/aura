@@ -100,7 +100,9 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                 });
             }
         }
-        storage.put("globalValueProviders", storedGvps);
+        storage.put("globalValueProviders", storedGvps).then(function() {}, function(err) {
+            $A.warning("GlobalValueProvider.merge(), failed to put, error:" + err);
+          });
     }
 };
 

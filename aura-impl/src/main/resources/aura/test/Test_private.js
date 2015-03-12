@@ -16,6 +16,9 @@
 /*jslint sub:true */
 
 $A.ns.Test.prototype.putMessage = function(pre, expected, msg) {
+	if (typeof msg !== "string") {
+		msg = ""+msg;
+	}
     for (var i = 0; i < expected.length; i++) {
         if (expected[i] === undefined) {
             continue;

@@ -1504,21 +1504,24 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
                 });
             }
         }
-    }catch(e){
-        this.logError("Error during setUp", e);
-        this.doTearDown();
-    }
-
+    
     // Fail now if we got any unexpected errors or warnings during test initialization/setup
     this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
+    
     this.logErrors(true, "Received unexpected error: ",this.preErrors);
     this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
     this.preErrors = null;
-
+    
     this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
+    
     this.logErrors(this.failOnWarning, "Received unexpected warning: ",this.preWarnings);
     this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ", auraWarningsExpectedDuringInit);
     this.preWarnings = null;
+    
+	}catch(e){
+	    this.logError("Error during setUp", e);
+	    this.doTearDown();
+	}
 
     this.continueWhenReady();
 };

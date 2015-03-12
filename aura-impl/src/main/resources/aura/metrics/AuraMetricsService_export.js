@@ -15,6 +15,7 @@
  */
 /*jslint sub: true */
 var p = MetricsService.prototype;
+
 exp(p,
     "instrument"             , p.instrument,
     "unInstrument"           , p.unInstrument,
@@ -30,7 +31,7 @@ exp(p,
     "enablePlugin"           , p.enablePlugin,
 
     // mark API
-    "mark"                   , p.mark,
+    "mark"                   , p.markStamp,
     "markStart"              , p.markStart,
     "markEnd"                , p.markEnd,
 

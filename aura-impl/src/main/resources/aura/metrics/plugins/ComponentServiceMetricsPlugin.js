@@ -20,9 +20,7 @@
  */
 var ComponentServiceMetricsPlugin = function ComponentServiceMetricsPlugin(config) {
     this.config = config;
-    // #if {"modes" : ["PTEST"]}
-    this["enabled"] = true; // Do not enable it automatically unless PTEST
-    // #end
+    this["enabled"] = false; // Do not enable it automatically
 };
 
 ComponentServiceMetricsPlugin.NAME = "componentService";

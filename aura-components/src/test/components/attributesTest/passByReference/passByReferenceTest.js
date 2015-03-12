@@ -84,21 +84,23 @@
             $A.test.assertEquals("5565", this.getTextNoWhitespaces(cmp.find("innerCmp").find("intOutput")));
         }]
     },
-    
+
     testPassingFunctionCall: {
-    	test: [function(cmp) {
-    		var expected="default string"+" FCV CONCAT";
-            var actual=cmp.find("functionCallOutput").getElement().textContent;
+        test: [function(cmp) {
+            var expected = "default string FCV CONCAT";
+            var element = cmp.find("functionCallOutput").getElement();
+            var actual = $A.test.getText(element);
             $A.test.assertEquals(expected,actual,"FunctionCallValue did not match attribute.");
             //change attribute
             cmp.set("v.stringByReference","CHANGED string value");
-    	}, function(cmp) {
-    		//what it evaluate to also get changed
-    		var expected="CHANGED string value FCV CONCAT";
-            var actual=cmp.find("functionCallOutput").getElement().textContent;
+        }, function(cmp) {
+            //what it evaluate to also get changed
+            var expected = "CHANGED string value FCV CONCAT";
+            var element = cmp.find("functionCallOutput").getElement()
+            var actual = $A.test.getText(element);
             $A.test.assertEquals(expected,actual,"FunctionCallValue did not match attribute.");
-    	}
-    	]
+        }
+        ]
     },
 
     verifyInitialList: function(cmp) {

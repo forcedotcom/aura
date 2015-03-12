@@ -174,7 +174,7 @@ MetricsService.prototype = {
 
                 if (this.collector[plugin].length) { // If we have marks for that plugin
                     var pluginCollector = this.collector[plugin],
-                        initialOffset   = transaction["offsets"][plugin] || 0,
+                        initialOffset   = transaction["offsets"] && (transaction["offsets"][plugin] || 0),
                         tMarks          = pluginCollector.slice(initialOffset),
                         parsedMarks     = (instance && instance.postProcess && !skipPluginPostProcessing) ? instance.postProcess(tMarks) : tMarks;
 
@@ -197,12 +197,13 @@ MetricsService.prototype = {
             //#end
 
             // Cleanup transaction
-            if (this.clearCompleteTransactions) {
-                delete this.transactions[id];
-            } else {
+            if (!this.clearCompleteTransactions) {
                 // Only for non-prod, to keep the transactions stored
-                this.transactions[id] = parsedTransaction;
+                var newId = id + ':' + Math.floor(parsedTransaction["ts"]);
+                this.transactions[newId] = parsedTransaction;
+                parsedTransaction["id"] = newId;
             }
+            delete this.transactions[id];
 
             if (!this.inTransaction()) {
                 this.clearMarks();

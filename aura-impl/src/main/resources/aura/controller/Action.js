@@ -550,7 +550,7 @@ Action.prototype.runDeprecated = function(evt) {
              "run() cannot be called on a server action. Use $A.enqueueAction() instead.");
     this.state = "RUNNING";
     try {
-        this.returnValue = this.meth.call(this, this.cmp, evt, this.cmp.helper);
+        this.returnValue = this.meth.call(this, this.cmp, evt, this.cmp['helper']);
         this.state = "SUCCESS";
     } catch (e) {
         this.state = "FAILURE";

@@ -16,6 +16,8 @@
 package org.auraframework.impl.adapter.format.html;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -61,6 +63,9 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
+            writeHtmlStyles(new ArrayList<>(Arrays.asList(Aura.getConfigAdapter().getResetCssURL())), sb);
+            attributes.put("auraResetCss", sb.toString());
+            sb.setLength(0);
             writeHtmlStyles(AuraServlet.getStyles(), sb);
             attributes.put("auraStyleTags", sb.toString());
             sb.setLength(0);

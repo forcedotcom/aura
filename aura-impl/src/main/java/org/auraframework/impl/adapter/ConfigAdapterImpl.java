@@ -38,16 +38,20 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
@@ -244,6 +248,53 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
             }
         }
+    }
+
+    /**
+     * Determines whether to use normalize.css or resetCSS.css by looking at template attribute "normalizeCss"
+     *
+     * @return URL to reset css file
+     */
+    @Override
+    public String getResetCssURL() {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String contextPath = context.getContextPath();
+        String uid = context.getFrameworkUID();
+        String resetCss = "resetCSS";
+
+        try {
+            DefDescriptor appDesc = context.getApplicationDescriptor();
+            if (appDesc != null) {
+                BaseComponentDef templateDef = ((BaseComponentDef) appDesc.getDef()).getTemplateDef();
+                if (templateDef.isTemplate()) {
+                    BaseComponent template = Aura.getInstanceService().getInstance(templateDef);
+                    if (useNormalizeCss(template)) {
+                        resetCss = "normalize";
+                    }
+                }
+            }
+        } catch (QuickFixException qfe) {
+            // ignore and use default resetCSS.css
+        }
+
+        return String.format("%s/auraFW/resources/%s/aura/%s.css", contextPath, uid, resetCss);
+    }
+
+    /**
+     * The normalizeCss attribute value is found on the base aura:template component
+     * so recursively get the super component of the template until it's found and
+     * get the attribute value
+     *
+     * @param template template component
+     * @return whether normalizeCss attribute is set to true
+     * @throws QuickFixException
+     */
+    private boolean useNormalizeCss(BaseComponent template) throws QuickFixException {
+        DefDescriptor templateDescriptor = template.getDescriptor();
+        if (!(templateDescriptor.getNamespace().equals("aura") && templateDescriptor.getName().equals("template"))) {
+            return useNormalizeCss(template.getSuper());
+        }
+        return (Boolean) template.getAttributes().getValue("normalizeCss");
     }
 
     @Override

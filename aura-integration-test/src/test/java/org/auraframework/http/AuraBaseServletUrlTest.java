@@ -20,6 +20,7 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -82,6 +83,32 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         AuraContext ctx = setupContextWithAppReferencingThemes(theme.getDescriptorName());
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme3", ThemeDef.class));
         goldFileAppCssUrl();
+    }
+
+    public void testNormalizeCssUrl() throws Exception {
+        String templateMarkup = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
+        String templateSrc = String.format(templateMarkup, "true");
+        DefDescriptor<ComponentDef> templateDefDesc = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String markup = "<aura:application access='unauthenticated' template='%s:%s'></aura:application>";
+        String src = String.format(markup, templateDefDesc.getNamespace(), templateDefDesc.getName());
+
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be normalize.css when normalizeCss attribute set",
+            Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
+    }
+
+    public void testResetCssUrl() throws Exception {
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> templateDefDesc = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String markup = "<aura:application access='unauthenticated' template='%s:%s'></aura:application>";
+        String src = String.format(markup, templateDefDesc.getNamespace(), templateDefDesc.getName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be default resetCSS.css",
+            Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
     }
 
     private AuraContext setupContext(DefDescriptor<ApplicationDef> defdesc) {

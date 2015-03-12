@@ -271,15 +271,61 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
  * @param {Boolean} localCreation See documentation on Component.js constructor for documentation on the localCreation property.
  */
 $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, localCreation) {
-	// See if there is a component specific class
+
+
+    if(!config["skipCreationPath"]) {
+
+        var context = $A.getContext();
+        var creationPath;
+        var action;
+        // allows components to skip creation path checks if it's doing something weird
+        // such as wrapping server created components in client created one
+        action = context.getCurrentAction();
+        if (action) {
+            var newConfig;
+            var currentPath = action.topPath();
+
+            if (config["creationPath"]) {
+                //
+                // This is a server side config, so we need to sync ourselves with it.
+                // The use case here is that the caller has gotten a returned array of
+                // components, and is instantiating them independently. We can warn the
+                // user when they do the wrong thing, but we'd actually like it to work
+                // for most cases.
+                //
+                creationPath = action.forceCreationPath(config["creationPath"]);
+                action.releaseCreationPath(creationPath);
+            } else if (!context.containsComponentConfig(currentPath) && !!localCreation) {
+                // skip creation path if the current top path is not in server returned
+                // componentConfigs and localCreation
+                // KRIS: Not necessary to set this to anything, since if it's null we don't use it.
+                //creationPath = "client created";
+            } else {
+                creationPath = action.getCurrentPath();
+            }
+
+            if (creationPath) {
+                newConfig = context.getComponentConfig(creationPath);
+                if(newConfig) {
+                    // save attributes value provider
+                    var valueProvider = config["attributes"] && config["attributes"]["valueProvider"];
+                    $A.util.apply(config, newConfig, true);
+                    if(valueProvider && config["attributes"]) {
+                        config["attributes"]["valueProvider"] = valueProvider;
+                    }
+                }
+            }
+        }
+    }
+
+    // See if there is a component specific class
     var def = config["componentDef"];
     var desc = def["descriptor"] || def;
     // Not sure why you would pass in the ComponentDef as the descriptor, but it's being done.
     if(desc.getDescriptor) {
-    	desc = desc.getDescriptor();
-    }
-    if (desc.getQualifiedName) {
-    	desc = desc.getQualifiedName();
+        desc = desc.getDescriptor().getQualifiedName();
+    } else if (desc.getQualifiedName) {
+        desc = desc.getQualifiedName();
     }
 
     // KRIS:
@@ -292,9 +338,13 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
         componentClassDef();
     }
 
-    var classConstructor = this.getComponentClass(desc) || Component;
+    var classConstructor = this.getComponentClass(desc);
 
-    return new classConstructor(config, localCreation);
+    var instance = new classConstructor(config, localCreation);
+
+
+
+    return instance;
 };
 
 /**

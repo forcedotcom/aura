@@ -84,6 +84,9 @@ var ComponentPriv = (function() { // Scoping priv
         var partialConfig;
         if (this.creationPath && this.creationPath !== "client created") {
             partialConfig = context.getComponentConfig(this.creationPath);
+            
+            // Done with it in the context, it's now safe to remove so we don't process it again later.
+            context.removeComponentConfig(this.creationPath);
         }
 
         if (partialConfig) {
@@ -164,7 +167,7 @@ var ComponentPriv = (function() { // Scoping priv
         // clean up refs to partial config
         this.partialConfig = undefined;
 
-        if (forcedPath && act) {
+        if (forcedPath && act && this.creationPath) {
             act.releaseCreationPath(this.creationPath);
         }
     };

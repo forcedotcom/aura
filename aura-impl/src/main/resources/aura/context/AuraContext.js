@@ -278,8 +278,19 @@ AuraContext.prototype.containsComponentConfig = function(creationPath) {
 AuraContext.prototype.getComponentConfig = function(creationPath) {
     var componentConfigs = this.componentConfigs;
     var ret = componentConfigs[creationPath];
-    delete componentConfigs[creationPath];
     return ret;
+};
+
+/**
+ * When we have consumed the component config from the context, its worth removing it to narrow down
+ * the list of pending configs left to handle.
+ * @param {String} creationPath is the components creationPath that we are operating on.
+ * @private
+ */
+AuraContext.prototype.removeComponentConfig = function(creationPath) {
+    if(creationPath in this.componentConfigs) {
+        delete this.componentConfigs[creationPath];
+    }
 };
 
 /**

@@ -1,0 +1,102 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client">
+	<!-- let's only load the component we want to test -->
+	<aura:attribute name="testParent" type="Boolean" default="false"/>
+	<aura:attribute name="testParentInIteration" type="Boolean" default="false"/>
+	<aura:attribute name="testChild" type="Boolean" default="false"/>
+	<aura:attribute name="testChildInIteration" type="Boolean" default="false"/>
+	<aura:attribute name="testGrandChildServer" type="Boolean" default="false"/>
+    <aura:attribute name="testGrandChildServerInIteration" type="Boolean" default="false"/>
+    <aura:attribute name="testServerProviderGrandChildServerProvider" type="Boolean" default="false"/>
+    <aura:attribute name="testGrandChildClient" type="Boolean" default="false"/>
+    <aura:attribute name="testGrandChildClientInIteration" type="Boolean" default="false"/>
+    <aura:attribute name="testServerProviderGrandChildClientProvider" type="Boolean" default="false"/>
+	
+	<aura:attribute name="testOthers" type="Boolean" default="false"/>
+	
+	<!-- other attributes controls render etc -->
+	<aura:attribute name="shouldRender" type="Boolean" default="true"/>
+	<aura:attribute name="shouldCreate" type="Boolean" default="true"/>
+	<aura:attribute name="iterationItems" type="List" default=""/>
+	<aura:attribute name="iterationForceServer" type="Boolean" default="false"/>
+	<aura:attribute name="logFilter" type="String"/>
+
+	<div class="logPanel">
+		<auratest:logPanel aura:id="logPanel" filter="{!v.logFilter}"/>
+	</div>	
+	<div aura:id="testPanel" class="testPanel">
+
+		<aura:if isTrue="{!v.shouldCreate}">
+			<aura:renderIf isTrue="{!v.shouldRender}">
+				<aura:if isTrue="{!v.testParent}">
+					<auratest:componentClassParent aura:id="Parent" id="Parent"/><br/>
+				</aura:if>
+				<aura:if isTrue="{!v.testChild}">
+				    <auratest:componentClassChild aura:id="Child" id="Child"/><br/>
+				</aura:if>
+				<aura:if isTrue="{!v.testGrandChildServer}">
+				    <auratest:componentClassGrandChildServerProvider aura:id="GrandChildServerProvider" id="GrandChildServerProvider"/><br/>
+				</aura:if>
+				<aura:if isTrue="{!v.testServerProviderGrandChildServerProvider}">
+				    <auratest:componentClassServerProvider aura:id="ServerProviderGrandChildServerProvider" requestDescriptor="auratest:componentClassGrandChildServerProvider" requestAttributes="{'id':'ServerProviderGrandChildServerProvider'}"/><br/>
+                </aura:if>
+                <aura:if isTrue="{!v.testGrandChildClient}">
+                    <auratest:componentClassGrandChildClientProvider aura:id="GrandChildClientProvider" id="GrandChildClientProvider"/><br/>
+                </aura:if>
+                <aura:if isTrue="{!v.testServerProviderGrandChildClientProvider}">
+                    <auratest:componentClassServerProvider aura:id="ServerProviderGrandChildClientProvider" requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'ServerProviderGrandChildClientProvider'}"/><br/>
+                </aura:if>
+				<aura:if isTrue="{!v.testOthers}">
+					<auratest:componentClassClientProvider aura:id="CPBS" requestDescriptor="auratest:componentClassGrandChildServerProvider" requestAttributes="{'id':'CPBS'}"/><br/>
+					<auratest:componentClassClientProvider aura:id="CPBC" requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'CPBC'}"/><br/>
+					<auratest:componentClassServerProvider aura:id="SPCPBS" requestDescriptor="auratest:componentClassClientProvider" requestAttributes="{'requestDescriptor':'auratest:componentClassGrandChildServerProvider','requestAttributes':{'id':'SPCPBS'}}"/><br/>
+					<auratest:componentClassServerProvider aura:id="SPCPBC" requestDescriptor="auratest:componentClassClientProvider" requestAttributes="{'requestDescriptor':'auratest:componentClassGrandChildClientProvider','requestAttributes':{'id':'SPCPBC'}}"/><br/>
+				</aura:if>
+				
+				<aura:iteration items="{!v.iterationItems}" var="x" forceServer="{!v.iterationForceServer}">
+					<aura:if isTrue="{!v.testParentInIteration}">
+						<auratest:componentClassParent aura:id="ParentInIteration" id="ParentInIteration"/><br/>
+					</aura:if>
+					<aura:if isTrue="{!v.testChildInIteration}">
+					   <auratest:componentClassChild aura:id="ChildInIteration" id="ChildInIteration"/><br/>
+					</aura:if>
+					<aura:if isTrue="{!v.testGrandChildServerInIteration}">
+					   <auratest:componentClassGrandChildServerProvider aura:id="GrandChildServerProviderInIteration" id="GrandChildServerProviderInIteration"/><br/>
+					</aura:if>
+					<aura:if isTrue="{!v.testGrandChildClientInIteration}">
+					   <auratest:componentClassGrandChildClientProvider aura:id="GrandChildClientProviderInIteration" id="GrandChildClientProviderInIteration"/><br/>
+					</aura:if>
+					
+					<aura:if isTrue="{!v.testOthers}">
+						
+						<auratest:componentClassServerProvider aura:id="ISPBS" requestDescriptor="auratest:componentClassGrandChildServerProvider" requestAttributes="{'id':'ISPBS'}"/><br/>
+						<auratest:componentClassServerProvider aura:id="ServerProviderGrandChildClientProviderInIteration" requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'ServerProviderGrandChildClientProviderInIteration'}"/><br/>
+						<auratest:componentClassClientProvider aura:id="ICPBS" requestDescriptor="auratest:componentClassGrandChildServerProvider" requestAttributes="{'id':'ICPBS'}"/><br/>
+						<auratest:componentClassClientProvider aura:id="ICPBC" requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'ICPBC'}"/><br/>
+						<auratest:componentClassServerProvider aura:id="ISPCPBS" requestDescriptor="auratest:componentClassClientProvider" requestAttributes="{'requestDescriptor':'auratest:componentClassGrandChildServerProvider','requestAttributes':{'id':'ISPCPBS'}}"/><br/>
+						<auratest:componentClassServerProvider aura:id="ISPCPBC" requestDescriptor="auratest:componentClassClientProvider" requestAttributes="{'requestDescriptor':'auratest:componentClassGrandChildClientProvider','requestAttributes':{'id':'ISPCPBC'}}"/><br/>
+					</aura:if>
+				</aura:iteration>
+				
+				<div aura:id="client"></div>
+				
+			</aura:renderIf>
+		</aura:if>
+	</div>	
+</aura:component>

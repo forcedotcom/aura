@@ -22,19 +22,23 @@
      */
     testPreloadedDef: {
         test: function(cmp) {
+            var actionComplete = false;
             // block server requests to ensure this is run entirely on the client
             $A.test.blockRequests();
             $A.test.addCleanup(function(){ $A.test.releaseRequests() });
             $A.newCmpAsync(this, function(newCmp){
-            	var body = cmp.get("v.body");
+                var body = cmp.get("v.body");
                 body.push(newCmp);
                 cmp.set("v.body", body);
+                actionComplete = true;
             }, "markup://aura:text");
 
-            var body = cmp.get('v.body');
-            $A.test.assertEquals(1, body.length);
-            $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("0:c", body[0].getGlobalId());
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(1, body.length);
+                $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("0:c", body[0].getGlobalId());
+            });
         }
     },
 
@@ -44,6 +48,7 @@
      */
     testCreateDependencyDef: {
         test: function(cmp) {
+            var actionComplete = false;
              // block server requests to ensure this is run entirely on the client
             $A.test.blockRequests();
             $A.test.addCleanup(function(){ $A.test.releaseRequests() });
@@ -52,12 +57,15 @@
                 var body = cmp.get("v.body");
                 body.push(newCmp);
                 cmp.set("v.body", body);
+                actionComplete = true;
             }, "markup://loadLevelTest:clientComponent");
 
-            var body = cmp.get('v.body');
-            $A.test.assertEquals(1, body.length);
-            $A.test.assertEquals("markup://loadLevelTest:clientComponent", body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("0:c", body[0].getGlobalId());
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
+                var body = cmp.get('v.body');
+                $A.test.assertEquals(1, body.length);
+                $A.test.assertEquals("markup://loadLevelTest:clientComponent", body[0].getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("0:c", body[0].getGlobalId());
+            });
         }
     },
 
@@ -92,21 +100,24 @@
             });
         },
         function(cmp) {
+            var actionComplete = false;
             // After retrieving the cmp from the server, it should be saved on the client in the def registry
             $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
             $A.test.addCleanup(function(){ $A.test.releaseRequests() });
             $A.newCmpAsync(
                 this,
                 function(newCmp) {
-                	var body = cmp.get("v.body");
+                    var body = cmp.get("v.body");
                     body.push(newCmp);
                     cmp.set("v.body", body);
+                    actionComplete = true;
                 },
                 {
                     componentDef: "markup://loadLevelTest:displayNumber",
                     attributes: { values: { number: 100 } }
                 }
             );
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
         },
         function(cmp){
         	 var textCmp = cmp.get('v.body')[1];
@@ -279,13 +290,13 @@
         test: function(cmp){
             var expected="SUCCESS";
             var actual=null;
+            var actionComplete = false
 
             $A.newCmpAsync(
                     this,
                     function(newCmps, status) {
                         actual = status;
-
-                        $A.test.assertEquals(expected,actual);
+                        actionComplete = true;
                     },
                     {
                         componentDef: "markup://aura:text",
@@ -296,6 +307,10 @@
                         }
                     }
             );
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
+                $A.test.assertEquals(expected, actual);
+            });
         }
     },
 
@@ -303,12 +318,13 @@
         test: function(cmp) {
             var expected="SUCCESS";
             var actual;
+            var actionComplete = false;
 
             $A.newCmpAsync(
                     this,
                     function(newCmps, overallStatus) {
-                        var actual = overallStatus;
-                        $A.test.assertEquals(expected, actual);
+                        actual = overallStatus;
+                        actionComplete = true;
                     },
                     [{
                         componentDef: "markup://aura:text",
@@ -327,9 +343,13 @@
                         attributes:{ values:{ value:"TextComponent4" } }
                     }]
             );
+            
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
+                $A.test.assertEquals(expected, actual);
+            });
         }
     },
-    
+
     testPassesERRORIfOneComponentErrorsWhenCreatingMultipleComponents: {
         test: function(cmp) {
             var expected="ERROR";
@@ -361,6 +381,48 @@
                     {
                         componentDef: "markup://aura:text",
                         attributes:{ values:{ value:"TextComponent3" } }
+                    }]
+            );
+            
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertEquals(expected,actual);
+            });
+        }
+    },
+    
+    testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents: {
+        test: function(cmp) {
+            var expected="INCOMPLETE";
+            var actual;
+            var actionComplete = false;
+            $A.test.setServerReachable(false);
+            
+            $A.newCmpAsync(
+                    this,
+                    function(newCmps, overallStatus) {
+                        actual = overallStatus;
+                        $A.test.setServerReachable(true);
+                        actionComplete = true;
+                    },
+                    [{
+                        componentDef: "markup://aura:text",
+                        attributes:{ values:{ value:"TextComponent1" } }
+                    },
+                    {
+                        componentDef: "markup://ui:button",
+                        attributes:{ values:{ label: "Button1" } }
+                    },
+                    {
+                        componentDef: "markup://aura:text",
+                        attributes:{ values:{ value:"TextComponent2" } }
+                    },
+                    {
+                        componentDef: "markup://aura:text",
+                        attributes:{ values:{ value:"TextComponent3" } }
+                    },
+                    {
+                        componentDef: "markup://aura:text",
+                        attributes:{ values:{ value:"TextComponent4" } }
                     }]
             );
             
@@ -471,23 +533,27 @@
      */
     testCreateComponentWithSimpleAttributes:{
         test: [function(cmp){
-                $A.newCmpAsync(
-                        this,
-                        function(newCmp) {
-                            var body = cmp.get("v.body");
-                            body.push(newCmp);
-                            cmp.set("v.body", body);
-                        },
-                        {
-                            componentDef: "markup://aura:text",
-                            attributes: {
-                                values: {
-                                    truncate: 6,
-                                    value: "TextComponent"
-                                }
+            var actionComplete = false;
+            $A.newCmpAsync(
+                    this,
+                    function(newCmp) {
+                        var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
+                        actionComplete = true;
+                    },
+                    {
+                        componentDef: "markup://aura:text",
+                        attributes: {
+                            values: {
+                                truncate: 6,
+                                value: "TextComponent"
                             }
                         }
-                );
+                    }
+            );
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
         }, function(cmp){
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
@@ -698,24 +764,28 @@
 
     testSetLocalId:{
         test: [function(cmp){
-                $A.newCmpAsync(
-                        this,
-                        function(newCmp){
-                        	var body = cmp.get("v.body");
-                            body.push(newCmp);
-                            cmp.set("v.body", body);
-                        },
-                        {
-                            componentDef: "markup://aura:text",
-                            localId: "userLocalId",
-                            attributes: {
-                                values: {
-                                    truncate: 6,
-                                    value:"TextComponent"
-                                }
+            var actionComplete = false;
+            $A.newCmpAsync(
+                    this,
+                    function(newCmp){
+                    	var body = cmp.get("v.body");
+                        body.push(newCmp);
+                        cmp.set("v.body", body);
+                        actionComplete = true;
+                    },
+                    {
+                        componentDef: "markup://aura:text",
+                        localId: "userLocalId",
+                        attributes: {
+                            values: {
+                                truncate: 6,
+                                value:"TextComponent"
                             }
                         }
-                );
+                    }
+            );
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
         }, function(cmp){
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);

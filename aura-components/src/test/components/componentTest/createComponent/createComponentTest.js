@@ -242,10 +242,7 @@
         }
     },
 
-    // Fails because CSP fails to set server reachable:
-    // Test error: Failed to execute 'open' on 'XMLHttpRequest': Refused to connect to 'http://offline/aura'
-    // because it violates the document's Content Security Policy.
-    _testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents:{
+    testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents:{
         test:function(){
             var expected="INCOMPLETE";
             var actual;

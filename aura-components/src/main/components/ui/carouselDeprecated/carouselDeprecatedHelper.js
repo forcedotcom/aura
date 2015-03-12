@@ -287,6 +287,7 @@
 			var e = pages[i].get('e.updateSize');
 			//page width always same as carousel width
 			e.setParams({pageSize: {width: carouselSize.width, height: pageSize.height}});
+			e.setComponentEvent();
 			e.fire();
 		}
 	},
@@ -554,6 +555,7 @@
 				e = pageIndicator.get('e.pageSelected');
 
 			e.setParams({pageIndex : selectedPage, pageId: pageId});
+			e.setComponentEvent();
 			e.fire();
 		}
 	},

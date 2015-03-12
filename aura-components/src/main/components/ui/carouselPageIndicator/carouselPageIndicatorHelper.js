@@ -27,7 +27,8 @@
         if (pages && pages.length == 1) {
         	//fire event to target indicator item
         	e = pageItems.get("e.pageSelected");
-			e.setParams(evt.getParams())
+			e.setParams(evt.getParams());
+            e.setComponentEvent();
 			e.fire();
 			cmp.set('v.currentPage', targetPage);
         }
@@ -35,12 +36,14 @@
     		if (typeof currentPage != 'undefined') {
     			//fire event to previous selected indicator item
     			e = pageItems[currentPage].get("e.pageSelected");
-    			e.setParams(evt.getParams())
+    			e.setParams(evt.getParams());
+                e.setComponentEvent();
     			e.fire();
     		}
         	//fire event to target indicator item
         	e = pageItems[targetPage].get("e.pageSelected");
 			e.setParams(evt.getParams())
+            e.setComponentEvent();
 			e.fire();
 
         	cmp.set('v.currentPage', targetPage);

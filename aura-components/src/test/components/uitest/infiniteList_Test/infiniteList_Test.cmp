@@ -16,7 +16,6 @@
 
 -->
 <aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
-    <aura:handler name="showMore" action="{!c.showMore}"/>
     <aura:handler name="refresh" action="{!c.refresh}"/>
 	<aura:attribute name="showMoreCallback" type="boolean" default="false"/>
 	<aura:attribute name="refreshCallBack" type="boolean" default="false"/>

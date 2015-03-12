@@ -33,11 +33,11 @@
          if (tab && this.fireBeforeActiveEvent(cmp, {"tab": tab, "oldTab": this.getActiveTab(cmp)}, tab)) {
             // set active tabItem
             var e = cmp.find('tabBar').get('e.setActive');
-            e.setParams({"index": index, "active": active, "focus": option.focus}).fire();
+            e.setParams({"index": index, "active": active, "focus": option.focus}).setComponentEvent().fire();
             // activate body
             this.setActiveTabBody(cmp, {"index":index, "active": active, "tab": tab});
             //fire tabset onActivate event
-            cmp.get("e.onActivate").setParams({"tab": tab}).fire();
+            cmp.get("e.onActivate").setParams({"tab": tab}).setComponentEvent().fire();
          }
     },
     /**
@@ -56,7 +56,7 @@
     		// add tab into tabBar
     	    var active = newTab.get("v.active");
         	var e = cmp.find("tabBar").get("e.addTab");
-        	e.setParams({"index": index, "active": active, "tab": self.getTabItemConfig(cmp, newTab)}).fire();
+        	e.setParams({"index": index, "active": active, "tab": self.getTabItemConfig(cmp, newTab)}).setComponentEvent().fire();
         	if (newTab.get("v.active")) {
         	    this.setActiveTabBody(cmp, {"index": index, "tab": newTab, "active": true});
         	}
@@ -77,7 +77,7 @@
                 self.removeTabBody(cmp, index);
             }
         }
-        e.setParams({"index": index, "callback": callback}).fire();
+        e.setParams({"index": index, "callback": callback}).setComponentEvent().fire();
     },
     /**
      * Returns the active tab
@@ -95,7 +95,7 @@
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
         var oldTab = typeof params.oldTab === "number" ? cmp._tabCollection.getTab(params.oldTab) : params.oldTab;
         
-        target.get("e.beforeActivate").setParams({"tab": tab, "oldTab": oldTab, "callback": callback}).fire();
+        target.get("e.beforeActivate").setParams({"tab": tab, "oldTab": oldTab, "callback": callback}).setComponentEvent().fire();
 
         return activate;
     },
@@ -127,15 +127,15 @@
             //deactivate current tabBody
             if (cmp._activeTab && cmp._activeTab.isValid()) {
                 evt = cmp._activeTab.get("e.setActive");
-                evt.setParams({"active": false}).fire();
+                evt.setParams({"active": false}).setComponentEvent().fire();
             }
             //fire event to curent tab to update status 
-            tab.get('e.setActive').setParams({active: true}).fire();
+            tab.get('e.setActive').setParams({active: true}).setComponentEvent().fire();
             //save current active tab
             cmp._activeTab = tab;
         } else if (option.active === false && cmp._activeTab === tab){
             //deactivate tab
-            tab.get('e.setActive').setParams({active: false}).fire();
+            tab.get('e.setActive').setParams({active: false}).setComponentEvent().fire();
             cmp._activeTab = null;
         }
     },

@@ -15,12 +15,17 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.*;
+import org.auraframework.adapter.ContentSecurityPolicy;
+import org.auraframework.adapter.DefaultContentSecurityPolicy;
+import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
@@ -42,7 +47,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
      */
     public static class DefaultTestSecurityPolicy implements ContentSecurityPolicy {
 
-        private ContentSecurityPolicy baseline;
+        private final ContentSecurityPolicy baseline;
 
         public DefaultTestSecurityPolicy(ContentSecurityPolicy baseline) {
             this.baseline = baseline;
@@ -80,9 +85,11 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         @Override
         public Collection<String> getConnectSources() {
-            List<String> list = new ArrayList<String>(baseline.getConnectSources());
+            List<String> list = new ArrayList<>(baseline.getConnectSources());
             // Various tests expect extra connect permission
             list.add("http://invalid.salesforce.com");
+            list.add("http://offline");
+            list.add("https://offline");
             return list;
         }
 
@@ -112,13 +119,16 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         }
     }
 
-    private static final Set<String> SYSTEM_TEST_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add(
-    		"auratest", "actionsTest", "attributesTest", "auraStorageTest", "gvpTest", "preloadTest", "clientLibraryTest", "clientApiTest", 
-    	"clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest", "handleEventTest", "ifTest", "iterationTest", 
-    	"layoutServiceTest", "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest", "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest",
-    	"updateTest", "whitespaceBehaviorTest", "appCache").build();
+    private static final Set<String> SYSTEM_TEST_NAMESPACES = new ImmutableSortedSet.Builder<>(
+            String.CASE_INSENSITIVE_ORDER).add(
+            "auratest", "actionsTest", "attributesTest", "auraStorageTest", "gvpTest", "preloadTest",
+            "clientLibraryTest", "clientApiTest",
+            "clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest",
+            "handleEventTest", "ifTest", "iterationTest",
+            "layoutServiceTest", "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest",
+            "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest",
+            "updateTest", "whitespaceBehaviorTest", "appCache").build();
 
-    
     private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
     private Boolean isAuraJSStatic = null;
@@ -128,7 +138,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public MockConfigAdapterImpl() {
         super();
     }
-    
+
     public MockConfigAdapterImpl(String resourceCacheDir) {
         super(resourceCacheDir);
     }
@@ -194,13 +204,14 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         ContentSecurityPolicy baseline = super.getContentSecurityPolicy(app, request);
         return new DefaultTestSecurityPolicy(baseline);
     }
-    
-	@Override
-	public boolean isPrivilegedNamespace(String namespace) {
-		if (StringSourceLoader.getInstance().isPrivilegedNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace)) {
-			return true;
-		}
-		
+
+    @Override
+    public boolean isPrivilegedNamespace(String namespace) {
+        if (StringSourceLoader.getInstance().isPrivilegedNamespace(namespace)
+                || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace)) {
+            return true;
+        }
+
         // Check for any local defs with this namespace and consider that as an indicator that we have a privileged
         // namespace
         if (namespace != null) {
@@ -210,25 +221,25 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                 if (testContext != null) {
                     Set<Definition> localDefs = testContext.getLocalDefs();
                     for (Definition def : localDefs) {
-                    	DefDescriptor<? extends Definition> defDescriptor = def.getDescriptor();
-                    	if(defDescriptor!=null) {
-	                        String ns = defDescriptor.getNamespace();
-	                        if (namespace.equalsIgnoreCase(ns)) {
-	                            return true;
-	                        }
-                    	}
+                        DefDescriptor<? extends Definition> defDescriptor = def.getDescriptor();
+                        if (defDescriptor != null) {
+                            String ns = defDescriptor.getNamespace();
+                            if (namespace.equalsIgnoreCase(ns)) {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
         }
-        
+
         return false;
-	}
-	
-	@Override
-	public boolean isUnsecuredNamespace(String namespace) {
-		return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);
-	}
+    }
+
+    @Override
+    public boolean isUnsecuredNamespace(String namespace) {
+        return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);
+    }
 
     @Override
     public void setValidateCSRFTokenException(RuntimeException exception) {

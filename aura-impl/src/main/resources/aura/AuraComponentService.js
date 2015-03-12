@@ -355,12 +355,18 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
         config=[config];
     }
     var components=[];
+    var overallStatus="SUCCESS";
+    var statusList=[];
     var collected=0;
 
     function collectComponent(newComponent,status,index){
         components[index]=newComponent;
+        statusList[index] = status;
+        if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!="ERROR")) {
+            overallStatus = status;
+        }
         if(++collected===config.length){
-            callback.call(callbackScope, isSingle?components[0]:components, status);
+            callback.call(callbackScope, isSingle?components[0]:components, overallStatus, statusList);
         }
     }
 

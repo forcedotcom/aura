@@ -20,37 +20,42 @@
     testInitialPropertyValues: {
         test:[
             function valueSetInInitHandlerIsNotDisplayed(component){
-                var expected=component.get("v.initValue");
+                var expected = component.get("v.initValue");
 
-                var actual=component.find("PV_initContainer").getElement().textContent;
+                var element = component.find("PV_initContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertNotEquals(expected,actual,"Value set in init was displayed.");
             },
             function booleanValueMatchesAttribute(component){
-                var expected=component.get("v.booleanValue")+'';
+                var expected = component.get("v.booleanValue")+'';
 
-                var actual=component.find("PV_booleanContainer").getElement().textContent;
+                var element = component.find("PV_booleanContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Boolean value did not match attribute.");
             },
             function numberValueMatchesAttribute(component){
-                var expected=component.get("v.numberValue")+'';
+                var expected = component.get("v.numberValue")+'';
 
-                var actual=component.find("PV_numberContainer").getElement().textContent;
+                var element = component.find("PV_numberContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Number value did not match attribute.");
             },
             function stringValueMatchesAttribute(component){
-                var expected=component.get("v.stringValue");
+                var expected = component.get("v.stringValue");
 
-                var actual=component.find("PV_stringContainer").getElement().textContent;
+                var element = component.find("PV_stringContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"String value did not match attribute.");
             },
             function fcvValueMatchesAttribute(component){
-                var expected=component.get("v.stringValue")+" FCV CONCAT";
+                var expected = component.get("v.stringValue")+" FCV CONCAT";
 
-                var actual=component.find("PV_fcvContainer").getElement().textContent;
+                var element = component.find("PV_fcvContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"FunctionCallValue did not match attribute.");
             }
@@ -62,37 +67,42 @@
     testInitialPropertyReferenceValues: {
         test:[
             function referenceSetInInitHandlerIsDisplayed(component){
-                var expected=component.get("v.initValue");
+                var expected = component.get("v.initValue");
 
-                var actual=component.find("PRV_initContainer").getElement().textContent;
+                var element = component.find("PRV_initContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Value set in init was not displayed.");
             },
             function booleanReferenceMatchesAttribute(component){
-                var expected=component.get("v.booleanValue")+'';
+                var expected = component.get("v.booleanValue")+'';
 
-                var actual=component.find("PRV_booleanContainer").getElement().textContent;
+                var element = component.find("PRV_booleanContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Boolean value did not match attribute.");
             },
             function numberReferenceMatchesAttribute(component){
                 var expected=component.get("v.numberValue")+'';
 
-                var actual=component.find("PRV_numberContainer").getElement().textContent;
+                var element = component.find("PRV_numberContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Number value did not match attribute.");
             },
             function stringReferenceMatchesAttribute(component){
-                var expected=component.get("v.stringValue");
+                var expected = component.get("v.stringValue");
 
-                var actual=component.find("PRV_stringContainer").getElement().textContent;
+                var element = component.find("PRV_stringContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"String value did not match attribute.");
             },
             function fcvReferenceMatchesAttribute(component){
                 var expected=component.get("v.stringValue")+" FCV CONCAT";
 
-                var actual=component.find("PRV_fcvContainer").getElement().textContent;
+                var element=component.find("PRV_fcvContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"FunctionCallValue did not match attribute.");
             }
@@ -109,35 +119,40 @@
             function valueSetInInitHandlerIsStillEmpty(component){
                 var expected='';
 
-                var actual=component.find("PV_initContainer").getElement().textContent;
+                var element = component.find("PV_initContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Value set in init was not empty.");
             },
             function booleanValueMatchesAttribute(component){
                 var expected="true";
 
-                var actual=component.find("PV_booleanContainer").getElement().textContent;
+                var element = component.find("PV_booleanContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Boolean value did not match attribute.");
             },
             function numberValueMatchesAttribute(component){
                 var expected="7357";
 
-                var actual=component.find("PV_numberContainer").getElement().textContent;
+                var element = component.find("PV_numberContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Number value did not match attribute.");
             },
             function stringValueMatchesAttribute(component){
-                var expected="default string value";
+                var expected = "default string value";
 
-                var actual=component.find("PV_stringContainer").getElement().textContent;
+                var element = component.find("PV_stringContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"String value did not match attribute.");
             },
             function fcvValueMatchesAttribute(component){
-                var expected="default string value FCV CONCAT";
+                var expected = "default string value FCV CONCAT";
 
-                var actual=component.find("PV_fcvContainer").getElement().textContent;
+                var element = component.find("PV_fcvContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"FunctionCallValue did not match attribute.");
             }
@@ -154,35 +169,40 @@
             function valueSetInInitHandlerIsStillEmpty(component){
                 var expected='CHANGED init value';
 
-                var actual=component.find("PRV_initContainer").getElement().textContent;
+                var element = component.find("PRV_initContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Value set in init was not empty.");
             },
             function booleanValueMatchesAttribute(component){
                 var expected="false";
 
-                var actual=component.find("PRV_booleanContainer").getElement().textContent;
+                var element = component.find("PRV_booleanContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Boolean value did not match attribute.");
             },
             function numberValueMatchesAttribute(component){
                 var expected="8335";
 
-                var actual=component.find("PRV_numberContainer").getElement().textContent;
+                var element = component.find("PRV_numberContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"Number value did not match attribute.");
             },
             function stringValueMatchesAttribute(component){
                 var expected="CHANGED string value";
 
-                var actual=component.find("PRV_stringContainer").getElement().textContent;
+                var element = component.find("PRV_stringContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"String value did not match attribute.");
             },
             function fcvValueMatchesAttribute(component){
                 var expected="CHANGED string value FCV CONCAT";
 
-                var actual=component.find("PRV_fcvContainer").getElement().textContent;
+                var element = component.find("PRV_fcvContainer").getElement();
+                var actual = $A.test.getText(element);
 
                 aura.test.assertEquals(expected,actual,"FunctionCallValue did not match attribute.");
             }

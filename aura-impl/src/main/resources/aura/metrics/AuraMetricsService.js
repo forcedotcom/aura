@@ -33,7 +33,7 @@ var MetricsService = function MetricsService(config) {
     this.beaconProviders           = {};
     this.transactions              = {};
     this.doneBootstrap             = false;
-    this.clearCompleteTransactions = true; //In PTEST Mode this is set to false (see initialize method)
+    this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
 
     // #if {"excludeModes" : ["PRODUCTION"]}
     this["collector"] = this.collector; // Protected API to access the raw marks
@@ -265,7 +265,7 @@ MetricsService.prototype = {
         this.transactions[id] = transaction;
         return id;
     },
-    mark: function (ns, name) {
+    markStamp: function (ns, name) {
         if (!name) {name = ns; ns = MetricsService.DEFAULT;}
         var mark        = this.createMarkNode(ns, name, MetricsService.STAMP),
             nsCollector = this.collector[ns], 

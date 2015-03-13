@@ -693,6 +693,17 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNull(defNext);
     }
 
+    public void testGetRawDefReturnsNullForRemovedDefinition() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>", null);
+        MasterDefRegistryImplOverride registry = getDefRegistry(false);
+        ComponentDef def = registry.getRawDef(cmpDesc);
+        assertNotNull(def);
+
+        getAuraTestingUtil().removeSource(cmpDesc);
+        def = registry.getRawDef(cmpDesc);
+        assertNull(def);
+    }
+
     /**
      * Circular dependencies case 1: A has inner component B, and B has an explicit dependency on A (via aura:dependency
      * tag)

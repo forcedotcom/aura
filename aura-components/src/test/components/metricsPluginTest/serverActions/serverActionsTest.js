@@ -64,5 +64,52 @@
             }
             $A.test.assertTrue(found, "Enqueued action not found in ActionQueue via ActionQueue.getQueuedActions()");
         }
+    },
+
+    /**
+     * Verify plugin handles only success callback being set. Error and incomplete callbacks will be undefined.
+     */
+    testOnlySuccessCallbackSet: {
+        test: function(cmp) {
+            var action = $A.get("c.aura://LabelController.getLabel"),
+                name = "dynamic_label_for_test",
+                section = "Section1",
+                callbackCalled = false;
+
+            action.setParams({
+                "name": name,
+                "section": section
+            });
+            action.setCallback(this, function(){ callbackCalled = true;}, "SUCCESS");
+            $A.enqueueAction(action);
+            
+            $A.test.addWaitForWithFailureMessage(true, function() {return callbackCalled;},
+                    "Server action fails through MetricsService when only success callback set");
+        }
+    },
+
+    /**
+     * Verify we can override the default callback with a callback for a specific state (SUCCESS in this case).
+     */
+    testOverrideCallback: {
+        test: function(cmp) {
+            var action = $A.get("c.aura://LabelController.getLabel"),
+                name = "dynamic_label_for_test",
+                section = "Section1",
+                callbackCalled = false;
+
+            action.setParams({
+                "name": name,
+                "section": section
+            });
+            // Set default callback, which should include SUCCESS, ERROR, and INCOMPLETE
+            action.setCallback(this, function(){});
+            // Now override SUCCESS to something new and verify this one gets called
+            action.setCallback(this, function(){ callbackCalled = true;}, "SUCCESS");
+            $A.enqueueAction(action);
+
+            $A.test.addWaitForWithFailureMessage(true, function() {return callbackCalled;},
+                    "Success callback not called after overriding default action callbacks");
+        }
     }
 })

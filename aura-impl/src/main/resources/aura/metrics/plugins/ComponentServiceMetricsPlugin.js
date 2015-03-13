@@ -47,8 +47,14 @@ ComponentServiceMetricsPlugin.prototype = {
     bind: function (metricsCollector) {
         var method      = 'newComponentDeprecated',
             beforeHook  = function (startMark, config, avp, lc, f) {
+                var descriptor;
+                if ($A.util.isString(config)) {
+                    descriptor = config;
+                } else {
+                    descriptor = (config["componentDef"]["descriptor"] || config["componentDef"]) + '';
+                }
                 startMark["context"] = {
-                    "descriptor" :(config["componentDef"]["descriptor"] || config["componentDef"]) + ''
+                    "descriptor": descriptor
                 };
             };
 

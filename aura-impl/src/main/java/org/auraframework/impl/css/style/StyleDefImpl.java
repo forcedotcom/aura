@@ -67,6 +67,11 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
         json.writeMapEntry("descriptor", descriptor);
 
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
+            // TODONM: revisit this after removing theme from aura context
+            if (context.getThemeList().isEmpty()) {
+                context.addAppThemeDescriptors();
+            }
+
             // Note that if this starts to depend on anything beside the name of
             // the type, StyleDefCSSFormatAdapter needs to know to restructure its cache
             // keys

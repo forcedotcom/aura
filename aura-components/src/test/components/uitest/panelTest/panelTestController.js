@@ -18,7 +18,9 @@
     //            }}
             });
             openPanelEvent.fire();
-        }, helper.getConfig(cmp));
+        }, 
+        // TODO(W-2528400): Cannot do helper.getConfig(cmp)) here because helper references wrong file
+        cmp.getDef().getHelper().getConfig(cmp));
 	},
 
     showNonModal: function(cmp, event, helper) {
@@ -41,7 +43,9 @@
     //            }}
             });
             openPanelEvent.fire();
-        }, helper.getConfig(cmp));
+        },
+        // TODO(W-2528400): Cannot do helper.getConfig(cmp)) here because helper references wrong file
+        cmp.getDef().getHelper().getConfig(cmp));
     },
     
     showNonModalNonTransient: function(cmp, event, helper) {
@@ -64,7 +68,9 @@
               }}
           });
           openPanelEvent.fire();
-      }, helper.getConfig(cmp));
+      }, 
+      // TODO(W-2528400): Cannot do helper.getConfig(cmp)) here because helper references wrong file
+      cmp.getDef().getHelper().getConfig(cmp));
         } else if (cmp._panel && cmp._panel.isValid()){
           var openPanelEvent = $A.get('e.ui:openPanel').setParams({
             show: true,

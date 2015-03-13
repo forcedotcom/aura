@@ -25,7 +25,8 @@
     },
 
     handleAddRow: function (cmp, evt, hlp) {
-        hlp.fireAddRemove(cmp, {
+        // TODO(W-2528400): Helper parameter is incorrect here
+        cmp.getDef().getHelper().fireAddRemove(cmp, {
             last: true,
             count: 1
         }); 
@@ -55,7 +56,8 @@
         }
 
         if (!$A.util.isUndefinedOrNull(index)) {
-            hlp.fireAddRemove(cmp, {
+            // TODO(W-2528400): Helper parameter is incorrect here
+            cmp.getDef().getHelper().fireAddRemove(cmp, {
                 index : index,
                 count : count,
                 items : items
@@ -68,7 +70,8 @@
             count = cmp.get('v.count') || 1;
 
         if (!$A.util.isUndefinedOrNull(index)) {
-            hlp.fireAddRemove(cmp, {
+            // TODO(W-2528400): Helper parameter is incorrect here
+            cmp.getDef().getHelper().fireAddRemove(cmp, {
                 index  : index,
                 count  : count,
                 remove : true
@@ -76,18 +79,19 @@
         }
     },
 
+    // TODO(W-2528400): Helper parameter is incorrect here
     handleAction: function (cmp, evt, hlp) {
         var name = evt.getParam('name');
 
         switch (name) {
             case 'disable': 
-                hlp.changeRowDisabled(cmp, evt.getParam('index'), true);
+                cmp.getDef().getHelper().changeRowDisabled(cmp, evt.getParam('index'), true);
                 break;
             case 'enable':
-            	hlp.changeRowDisabled(cmp, evt.getParam('index'), false);
+            	cmp.getDef().getHelper().changeRowDisabled(cmp, evt.getParam('index'), false);
             	break;
             case 'toggleClass':
-            	hlp.changeRowClass(cmp, evt.getParam('index'), "error", "toggle");
+            	cmp.getDef().getHelper().changeRowClass(cmp, evt.getParam('index'), "error", "toggle");
         }
     },
     

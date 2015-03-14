@@ -87,6 +87,13 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
 
         ret = this.saveComponentDef(config);
 
+        // Execute the Component Class before returning
+        var componentClassDef = config["componentClass"];
+        if(componentClassDef) {
+            componentClassDef = $A.util.json.decode(componentClassDef);
+            componentClassDef();
+        }
+
         if (useLocalStorage) {
             // Write through of local storage cacheable componentDefs
             try {

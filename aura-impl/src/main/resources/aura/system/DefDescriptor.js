@@ -27,7 +27,8 @@ function DefDescriptor(descriptor){
     this.prefix=prefix[0];
     this.namespace=hasNamespace?namespace[0]:'';
     this.name=namespace[hasNamespace?1:0];
-    this.qualifiedName=$A.util.format("{0}://{1}{2}{3}",this.prefix,this.namespace,separator,this.name);
+    //this.qualifiedName=$A.util.format("{0}://{1}{2}{3}",this.prefix,this.namespace,separator,this.name);
+    this.qualifiedName = this.prefix+"://"+this.namespace+separator+this.name;
 }
 
 // Static Members

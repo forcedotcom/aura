@@ -40,11 +40,12 @@ var MetricsService = function MetricsService(config) {
     // #end
 };
 
-MetricsService.TIMER   = (window.performance && window.performance.now) ? window.performance.now.bind(performance) : Date.now.bind(Date);
-MetricsService.START   = 'start';
-MetricsService.END     = 'end';
-MetricsService.STAMP   = 'stamp';
-MetricsService.DEFAULT = 'default';
+MetricsService.PERFTIME = window.performance && window.performance.now;
+MetricsService.TIMER    = MetricsService.PERFTIME ? window.performance.now.bind(performance) : Date.now.bind(Date);
+MetricsService.START    = 'start';
+MetricsService.END      = 'end';
+MetricsService.STAMP    = 'stamp';
+MetricsService.DEFAULT  = 'default';
 
 MetricsService.prototype = {
     initialize: function() {
@@ -133,9 +134,15 @@ MetricsService.prototype = {
         return !$A.util.isEmpty(this.transactions);
     },
     transaction: function (ns, name, config) {
+        config = config || {};
+        var postProcess = typeof config === 'function' ? config : config["postProcess"];
+
         this.createTransaction(ns, name, config);
-        return this.transactionEnd(ns, name, function (t) {
+        this.transactionEnd(ns, name, function (t) {
             t["duration"] = 0; // STAMP so no duration
+            if (postProcess) {
+                postProcess(t);
+            }
         });
     },
     transactionUpdate: function (ns, name, config) {
@@ -168,6 +175,12 @@ MetricsService.prototype = {
                     "marks"         : {},
                     "context"       : $A.util.apply(context, config["context"], true, true)
                 };
+
+            // If the browser does not support performance API, all transactions will be Unix Timestamps
+            // Add that info into the transaction for postProcessing
+            if (MetricsService.PERFTIME) {
+                parsedTransaction["unixTS"] = true;
+            }
 
             for (var plugin in this.collector) {
                 var instance = this.pluginInstances[plugin];
@@ -365,10 +378,12 @@ MetricsService.prototype = {
     getBootstrapMetrics: function () {
         var bootstrap     = this.bootstrap,
             pageStartTime = bootstrap["pageStartTime"];
-        // We will cache it after the first call
+        
+        // We cache it after the first call
         if (!pageStartTime) {
             pageStartTime = this.getPageStartTime();
             bootstrap["pageStartTime"] = pageStartTime;
+
             if (window.performance && performance.timing && performance.navigation) {
                 // TODO: Eventually make this strings smaller to reduce payload
                 var pn = performance.navigation;
@@ -397,6 +412,7 @@ MetricsService.prototype = {
                     "unloadEventStart": pt.unloadEventStart,
                     "unloadEventEnd"  : pt.unloadEventEnd
                 };
+
                 if (performance.getEntries) {
                     bootstrap["requests"] = ($A.util.filter(performance.getEntries(),
                         function (resource) {

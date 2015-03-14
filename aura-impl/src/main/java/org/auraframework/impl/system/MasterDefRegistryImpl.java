@@ -993,7 +993,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
             for (CompilingDef<?> compiling : currentCC.compiled.values()) {
                 if (compiling.def == null && !fillCompilingDef(compiling, currentCC.context)) {
-                    throw new DefinitionNotFoundException(descriptor);
+                    throw new DefinitionNotFoundException(compiling.descriptor);
                 }
             }
             finishValidation();

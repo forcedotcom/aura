@@ -48,6 +48,7 @@ $A.ns.Aura.prototype["getBeaconData"] = $A.ns.Aura.prototype.Perf.getBeaconData;
 $A.ns.Aura.prototype["clearBeaconData"] = $A.ns.Aura.prototype.Perf.clearBeaconData;
 $A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.Perf.removeStats;
 $A.ns.Aura.prototype["isLoadFired"] = $A.ns.Aura.prototype.Perf.isLoadFired;
+
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

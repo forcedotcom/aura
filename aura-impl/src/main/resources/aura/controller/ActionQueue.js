@@ -21,6 +21,11 @@
  * action, all previous abortable actions will be aborted if they have not yet executed..
  * 
  * This object is not intended to be public.
+ *
+ * Abortable actions are handled via three variables:
+ *  (1) lastAbortableTransactionId - The abortable transaction that should be executed
+ *  (2) nextTransactionId - used to track the next abortable group to be created.
+ *  (3) currentTransactionId - if we are executing in context of an abortable group, this is the group to use.
  * 
  * @name ActionQueue
  * @constructor
@@ -28,8 +33,9 @@
  */
 
 var ActionQueue = function ActionQueue() {
-    this.nextTransactionId = -1;
-    this.lastAbortableTransactionId = -1;
+    this.nextTransactionId = 1;
+    this.lastAbortableTransactionId = 1;
+    this.currentTransactionId = undefined;
     this.actions = [];
     this.xhr = false;
 };
@@ -48,13 +54,15 @@ ActionQueue.prototype.auraType = "ActionQueue";
  */
 ActionQueue.prototype.enqueue = function(action) {
     if (action.isAbortable()) {
-        if (action.getAbortableId() == undefined) {
-            if (this.lastAbortableTransactionId !== this.nextTransactionId) {
+        if (action.getAbortableId() === undefined) {
+            action.setAbortableId(this.getCurrentAbortableId());
+            if (action.getAbortableId() === this.nextTransactionId
+                    && this.lastAbortableTransactionId !== this.nextTransactionId) {
                 this.actions = this.clearPreviousAbortableActions(this.actions);
                 this.lastAbortableTransactionId = this.nextTransactionId;
             }
-            action.setAbortableId(this.nextTransactionId);
-        } else if (action.getAbortableId() !== this.lastAbortableTransactionId) {
+        }
+        if (action.getAbortableId() !== this.lastAbortableTransactionId) {
             // whoops, action is already aborted.
             action.abort();
             return;
@@ -65,6 +73,52 @@ ActionQueue.prototype.enqueue = function(action) {
         this.xhr = true;
     }
     this.actions.push(action);
+};
+
+/**
+ * Get the current abortable ID.
+ *
+ * Abortable actions are handled via three variables:
+ *  (1) lastAbortableTransactionId - The abortable transaction that should be executed
+ *  (2) nextTransactionId - used to track the next abortable group to be created.
+ *  (3) currentTransactionId - if we are executing in context of an abortable group, this is the group to use.
+ *
+ * This routine selects the abortable id that should be assigned by first selecting currentTransactionId if it
+ * is defined, otherwise, we fall back to using nextTransactionId.
+ *
+ * @private
+ */
+ActionQueue.prototype.getCurrentAbortableId = function() {
+    if (this.currentTransactionId !== undefined) {
+        return this.currentTransactionId;
+    }
+    return this.nextTransactionId;
+};
+
+/**
+ * Set the current abortable ID.
+ *
+ * Abortable actions are handled via three variables:
+ *  (1) lastAbortableTransactionId - The abortable transaction that should be executed
+ *  (2) nextTransactionId - used to track the next abortable group to be created.
+ *  (3) currentTransactionId - if we are executing in context of an abortable group, this is the group to use.
+ *
+ * This routine sets the currentTransactionId, and it should always be a previous transaction ID, or things
+ * may well go very wrong.
+ *
+ * @private
+ */
+ActionQueue.prototype.setCurrentAbortableId = function(abortableId) {
+    var tid = parseInt(abortableId, 10);
+    
+    if (tid > this.nextTransactionId) {
+        $A.error("ActionQueue.setCurrentAbortableAction(): invalid transaction id: "+tid);
+        return;
+    }
+    if (tid > this.lastAbortableTransactionId) {
+        this.lastAbortableTransactionId = tid;
+    }
+    this.currentTransactionId = abortableId;
 };
 
 /**

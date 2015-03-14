@@ -887,17 +887,21 @@ Action.prototype.setAbortable = function(value) {
  * @param {string} id the abortable ID.
  */
 Action.prototype.setAbortableId = function(id) {
-    this.abortableId = id;
+    if (this.abortableId === undefined) {
+        this.abortableId = id;
+    } else {
+        throw new Error("Action.setAbortableId(): abortable ID may only be set once: " + this);
+    }
 };
 
 /**
- * Set a parent action for this action.
+ * [Deprecated - Never AOTP] Set a parent action for this action.
  *
  * This function can be used to group actions for the purposes of 'abortable' when Aura cannot
  * reasonably be expected to do the grouping for you. This should be used in callbacks for actions
  * or in setTimeout functions when enqueing a new action to update/continue a display.
  *
- * @public
+ * @private
  * @param {Action} the action which is the logical parent of this action.
  */
 Action.prototype.setParentAction = function(action) {

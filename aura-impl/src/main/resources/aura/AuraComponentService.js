@@ -307,13 +307,7 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
             if (creationPath) {
                 newConfig = context.getComponentConfig(creationPath);
                 if(newConfig) {
-                    // save attributes valueProvider
-                    // We want to merge most items, but the value provider is not one of those.
-                    var valueProvider = config["attributes"] && config["attributes"]["valueProvider"];
-                    $A.util.apply(config, newConfig, true);
-                    if(valueProvider && config["attributes"]) {
-                        config["attributes"]["valueProvider"] = valueProvider;
-                    }
+                    config["componentDef"] = newConfig["componentDef"];
                 }
             }
         }

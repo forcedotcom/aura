@@ -34,8 +34,8 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
 
     // KRIS: 
     // We delay the creation of the definition of a class till it's requested.
-    // The function that creates the component class is a classConstructorProvider
-    this.classConstructorProvider={};
+    // The function that creates the component class is a classConstructorExporter
+    this.classConstructorExporter={};
     
     // KRIS: 
     // Collection of all the component classes we generate for
@@ -340,9 +340,9 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
 
     var classConstructor = this.getComponentClass(desc);
 
+    //KRIS: Probably worth a null check on classConstructor here
+
     var instance = new classConstructor(config, localCreation);
-
-
 
     return instance;
 };
@@ -354,11 +354,11 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
  * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
  */
 $A.ns.AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
-    if(descriptor in this.classConstructorProvider) {
+    if(descriptor in this.classConstructorExporter) {
         return;
     }
 
-    this.classConstructorProvider[descriptor] = classConstructor;
+    this.classConstructorExporter[descriptor] = classConstructor;
 };
 
 /**
@@ -367,14 +367,14 @@ $A.ns.AuraComponentService.prototype.addComponentClass = function(descriptor, cl
  * @returns Either the class that defines the component you are requesting, or null if not found.
  */
 $A.ns.AuraComponentService.prototype.getComponentClass = function(descriptor) {
-	descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$");
+	descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
     
     var storedConstructor = this.classConstructors[descriptor];
 
     if(!storedConstructor) {
-        var provider = this.classConstructorProvider[descriptor];
-        if(provider) {
-            storedConstructor = provider();
+        var exporter = this.classConstructorExporter[descriptor];
+        if(exporter) {
+            storedConstructor = exporter();
             this.classConstructors[descriptor] = storedConstructor;
         }
     }

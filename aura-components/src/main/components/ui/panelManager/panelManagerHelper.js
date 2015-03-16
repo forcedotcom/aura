@@ -106,7 +106,7 @@
     			$A.run(function() {
 	    			if (panel.isValid()) {
 	    				focusables = self.getFocusables(panel);
-	    				focusables.first && focusables.first.focus();
+	    				focusables.initial && focusables.initial.focus();
 	    			}
     			});
     		},100);
@@ -619,18 +619,27 @@
     	return el && !el.disabled && !/hidden/i.test(el.type) && this.isVisible(el);
     },
 
-    // returns the first and last focusable in the given panel
+    // returns the initial, first and last focusable in the given panel
     getFocusables: function(panel) {
         var panelEl = panel.getElement(),
             els = panelEl.querySelectorAll('input,button,a,textarea,select'),
             len = els.length,
-            i, el, first, last;
+            i, el;
+
+        // The 'initial' element is the first non-button focusable element (see W-2512261)
+        // whereas the 'first' element is the first (button or non-button) focusable element
+        var initial, first, last;
 
         for (i = 0; i < len; i++) {
             el = els[i];
-            if (!first && this.focusAllowed(el)) {
-                first = el;
-                break;
+            if (this.focusAllowed(el)) {
+                if (!first) {
+                    first = el;
+                }
+                if (!/button/i.test(el.type)) {
+                    initial = el;
+                    break;
+                }
             }
         }
 
@@ -643,7 +652,8 @@
         }
 
         return {
-            first: first ? first : last,
+            initial: initial ? initial : first,
+            first: first,
             last: last
         };
     },
@@ -810,7 +820,7 @@
 		                        return;
 		                    }
 		                    focusables = me.getFocusables(panel);
-		                    focusables.first && focusables.first.focus();
+		                    focusables.initial && focusables.initial.focus();
 	                	});
 	                }, 0);
             	}

@@ -307,7 +307,8 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
             if (creationPath) {
                 newConfig = context.getComponentConfig(creationPath);
                 if(newConfig) {
-                    // save attributes value provider
+                    // save attributes valueProvider
+                    // We want to merge most items, but the value provider is not one of those.
                     var valueProvider = config["attributes"] && config["attributes"]["valueProvider"];
                     $A.util.apply(config, newConfig, true);
                     if(valueProvider && config["attributes"]) {
@@ -340,7 +341,10 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
 
     var classConstructor = this.getComponentClass(desc);
 
-    //KRIS: Probably worth a null check on classConstructor here
+    if(!classConstructor) {
+        $A.error("Could not find component class for component " + desc);
+        return;
+    }
 
     var instance = new classConstructor(config, localCreation);
 

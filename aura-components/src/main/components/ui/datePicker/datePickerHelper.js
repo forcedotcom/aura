@@ -349,6 +349,7 @@
         var yearTitleCmp = component.find("yearTitle");
         var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
         if (selectElem) {
+        	selectElem.setAttribute("id", yearTitleCmp.getGlobalId());
             for (var i = minY; i <= maxY; i++) {
                 selectElem.options[selectElem.options.length] = new Option(i+"", i+"");
             }

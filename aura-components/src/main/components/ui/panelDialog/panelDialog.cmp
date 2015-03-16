@@ -46,7 +46,7 @@
 
 		<!-- Full screen grey glass behind the modal -->
         <aura:if isTrue="{!v.isModal}">
-	        <div aura:id='modal-glass' class="modal-glass" style="display:none"></div>
+	        <div aura:id='modal-glass' class="modal-glass" style="display:none" tabindex="-1"></div>
         </aura:if>
 	    
 	    <div aura:id='panel'

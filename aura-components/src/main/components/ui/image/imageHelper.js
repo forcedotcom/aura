@@ -68,11 +68,15 @@
         });
 
         image["onerror"] = function () {
-            cmp.get("e.onerror").fire();
-        }
+            if (cmp.isValid()) {
+                cmp.get("e.onerror").fire();
+            }
+        };
 
         image["onload"] = function () {
-            cmp.get("e.onload").setParams({"value": image}).fire()
+            if (cmp.isValid()) {
+                cmp.get("e.onload").setParams({"value": image}).fire()
+            }
         };
 
         return image;

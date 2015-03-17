@@ -121,31 +121,28 @@
     /*
      * Verify using getComponent to get a dynamically created component by using its
      * global ID
-     *
-     * Temporarily diable it, since the component created by $A.createComponent() is NOT
-     * reachable by cmp.find().
-     * TODO: W-2529066
      */
-    _testGetComponentWithCreatedCmp : {
+    testGetComponentWithCreatedCmp : {
         test : [
             function(cmp) {
+                var localId = "auraButton";
                 var createdComponent;
                 $A.createComponent("ui:button", {
-                        "aura:id" : "auraButton",
+                        "aura:id" : localId,
                         "label" : "button"
                     }, function(component) {
                             createdComponent = component;
-                            var globalId = component.getGlobalId();
-                            cmp.set("v.cmpGlobalId", globalId);
+                            cmp.set("v.cmpGlobalId", component.getGlobalId());
                         });
 
                 $A.test.addWaitFor(true, function() {
                         return typeof createdComponent !== "undefined";
                     }, function() {
-                        cmp.find("createdComponents").set("v.body", createdComponent);
+                        cmp.index(localId, createdComponent.getGlobalId());
                     });
             }, function(cmp) {
-                var expected = cmp.find("auraButton");
+                var localId = "auraButton";
+                var expected = cmp.find(localId);
                 var globalId = cmp.get("v.cmpGlobalId");
 
                 var actual = $A.getComponent(globalId);

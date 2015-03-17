@@ -165,7 +165,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     public void serialize(Json json) throws IOException{
         if(this.isGlobal()||this.isPrivate()){
             // "G" - GLOBAL, "P" - PRIVATE, " " - DEFAULT
-            json.writeMapEntry(Json.ApplicationKey.ACCESS,getAccess().name().charAt(0));
+            json.writeMapEntry(Json.ApplicationKey.ACCESS.toString(), getAccess().name().charAt(0));
         }
     }
 

@@ -85,7 +85,7 @@
         <p/>
         <ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/>
         <p/>
-        <ui:outputText class="result" aura:id="result" value="Which items get selected"/>
+        <ui:outputText class="checkboxMenuResult" aura:id="checkboxMenuResult" value="Which items get selected"/>
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Checkbox menu source codes:</h2>
@@ -130,7 +130,7 @@
         <p/>
         <ui:button class="radioButton" aura:id="radioButton" press="{!c.getRadioMenuSelected}" label="Check the selected menu items"/>
         <p/>
-        <ui:outputText class="radioResult" aura:id="radioResult" value="Which items get selected"/> 
+        <ui:outputText class="radioMenuResult" aura:id="radioMenuResult" value="Which items get selected"/> 
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Radio menu source codes:</h2>
@@ -175,7 +175,7 @@
         	<p/>
         <ui:button class="radioIterationButton" aura:id="radioIterationButton" press="{!c.getRadioIterationMenuSelected}" label="Check the selected menu items"/>
         <p/>
-        <ui:outputText class="radioIterationResult" aura:id="radioIterationResult" value="Which items get selected"/> 
+        <ui:outputText class="iterationRadioMenuResult" aura:id="iterationRadioMenuResult" value="Which items get selected"/> 
    	</div>
    	<div style="display:inline-block;width:50%;">
         <h2>Radio menu using Iteration source codes:</h2>
@@ -278,6 +278,21 @@
 				<ui:actionMenuItem class="extendList4" aura:id="extendList4" label="Manchester United"/>
 				</uitest:menuList_Extend>
 		</ui:menu> 
+</div>
+<hr/>
+<div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2>ui:Image as menuTrigger</h2>
+        <ui:menu aura:id="uiMenuImage" class="uiMenuImage">
+            <ui:menuTriggerLink class="triggerImage" aura:id="triggerImage" >
+            	<ui:image aura:id="image" src="/auraFW/resources/aura/auralogo.png" imageType="decorative"/>
+            </ui:menuTriggerLink>
+            <ui:menuList class="actionMenuImage" aura:id="actionMenuImage">
+                <ui:actionMenuItem class="actionItem1Image" aura:id="actionItem1Image" label="Bayern München" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                <ui:actionMenuItem class="actionItem2Image" aura:id="actionItem2Image" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                <ui:actionMenuItem class="actionItem3Image" aura:id="actionItem3Image" label="Inter Milan" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                <ui:actionMenuItem class="actionItem4Image" aura:id="actionItem4Image" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+            </ui:menuList>
+        </ui:menu> 
 </div>
 <hr/>
 </aura:application>

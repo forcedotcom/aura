@@ -47,13 +47,13 @@ public class MenuUITest extends WebDriverTestCase {
         super(name);
     }
 
-    private void testActionMenuForApp(String appName) throws MalformedURLException, URISyntaxException {
+    private void testActionMenuForApp(String appName, String appendId) throws MalformedURLException, URISyntaxException {
         open(appName);
         WebDriver driver = this.getDriver();
-        String label = "trigger";
-        String menuName = "actionMenu";
-        String menuItem2 = "actionItem2";
-        String menuItem3 = "actionItem3";
+        String label = "trigger" + appendId;
+        String menuName = "actionMenu" + appendId;
+        String menuItem2 = "actionItem2" + appendId;
+        String menuItem3 = "actionItem3" + appendId;
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem2 = driver.findElement(By.className(menuItem2));
@@ -99,15 +99,15 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Item3 not selected", "Inter Milan", menuLabel.getText());
     }
 
-    private void testActionMenuViaKeyboardInteractionForApp(String appName) throws MalformedURLException,
+    private void testActionMenuViaKeyboardInteractionForApp(String appName, String appendString) throws MalformedURLException,
             URISyntaxException {
         open(appName);
         WebDriver driver = this.getDriver();
-        String label = "trigger";
-        String menuName = "actionMenu";
-        String menuItem1 = "actionItem1";
-        String menuItem3 = "actionItem3";
-        String menuItem4 = "actionItem4";
+        String label = "trigger" + appendString;
+        String menuName = "actionMenu" + appendString;
+        String menuItem1 = "actionItem1" + appendString;
+        String menuItem3 = "actionItem3" + appendString;
+        String menuItem4 = "actionItem4" + appendString;
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem1 = driver.findElement(By.className(menuItem1));
@@ -166,32 +166,54 @@ public class MenuUITest extends WebDriverTestCase {
      * @throws URISyntaxException
      */
     public void testActionMenu() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_APP);
+        testActionMenuForApp(MENUTEST_APP, "");
+    }
+    
+    /**
+     * Test that verify's interaction with Action Menu with image is trigger link
+     * Test case: W-2515040
+     * Excluding Ipad and iphone as hover wont work for touch devices
+     * 
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     * Uncomment test once W-2515040 is fixed
+     */
+    public void _testActionMenuWithImageTrigger() throws MalformedURLException, URISyntaxException {
+    	testActionMenuForApp(MENUTEST_APP, "Image");
+    }
+    
+    /**
+     * Uncomment test once W-2515040 is fixed
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public void _testActionMenuWithImageTriggerViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
+    	testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "Image");
     }
 
     // Test case for W-2181713
     public void testActionMenuAttachToBodySet() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP);
+        testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP, "");
     }
 
     public void testActionMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_METADATA_APP);
+        testActionMenuForApp(MENUTEST_METADATA_APP, "");
     }
 
     public void testActionMenuViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP);
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "");
     }
 
     // Test case for W-2234265
     // TODO: Uncomment test once W-2234265 is fixed
     public void testActionMenuAttachToBodySetViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP);
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP, "");
     }
 
     // TODO: W-2406307: remaining Halo test failure
     public void _testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws MalformedURLException,
             URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP);
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP, "");
     }
 
     // TODO: W-2479332, disabled due to flapper
@@ -224,7 +246,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement item4 = driver.findElement(By.className(menuItem4));
         WebElement item4Element = item4.findElement(By.tagName("a"));
         WebElement button = driver.findElement(By.className("checkboxButton"));
-        WebElement result = driver.findElement(By.className("result"));
+        WebElement result = driver.findElement(By.className("checkboxMenuResult"));
 
         // check for default label present
         assertEquals("label is wrong", "NFC West Teams", menuLabel.getText());
@@ -316,7 +338,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement item5 = driver.findElement(By.className(menuItem5));
         WebElement item5Element = item5.findElement(By.tagName("a"));
         WebElement button = driver.findElement(By.className("radioButton"));
-        WebElement result = driver.findElement(By.className("radioResult"));
+        WebElement result = driver.findElement(By.className("radioMenuResult"));
 
         // check for default label present
         assertEquals("label is wrong", "National League West", menuLabel.getText());

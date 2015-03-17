@@ -72,10 +72,11 @@
 				menuLabel = cmp.find("checkboxMenuLabel");
 				checkboxMenu = cmp.find("checkboxMenu");
 				ouptutButton = cmp.find("checkboxButton");
+				outputText = "checkboxMenuResult";
 				
 				ouptutButton.get('e.press').fire();
 				//check if default value is checked
-				$A.test.addWaitForWithFailureMessage(cmp.find("checkboxItem4").get('v.label'), function(){return cmp.find("result").get('v.value')}, "Ouput Label should be updated to " + cmp.find("checkboxItem4").get('v.label'));
+				$A.test.addWaitForWithFailureMessage(cmp.find("checkboxItem4").get('v.label'), function(){return cmp.find(outputText).get('v.value')}, "Ouput Label should be updated to " + cmp.find("checkboxItem4").get('v.label'));
 			},function(cmp){
 				menuLabel.get("e.click").fire();
 	            //Check if menu is visible
@@ -94,7 +95,7 @@
 				ouptutButton.get('e.press').fire();
 				
 				var expectedOutputText = cmp.find("checkboxItem1").get('v.label') + "," + cmp.find("checkboxItem4").get('v.label');
-				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find("result").get('v.value')}, "Checkbox Menu Default value is not correct");
+				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find(outputText).get('v.value')}, "Checkbox Menu Default value is not correct");
 			},function(cmp){
 				//uncheck item1 from the list
 				cmp.find("checkboxItem1").get('e.click').fire();
@@ -105,7 +106,7 @@
 				ouptutButton.get('e.press').fire();
 				
 				var expectedOutputText = cmp.find("checkboxItem4").get('v.label');
-				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find("result").get('v.value')}, "Checkbox Menu output text did not get updated");
+				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find(outputText).get('v.value')}, "Checkbox Menu output text did not get updated");
 			}
         ]
     },
@@ -119,8 +120,9 @@
 				menuLabel = cmp.find("radioMenuLabel");
 				radioMenu = cmp.find("radioMenu");
 				ouptutButton = cmp.find("radioButton");
-				item1 = cmp.find("radioItem1")
-				item2 = cmp.find("radioItem2")
+				item1 = cmp.find("radioItem1");
+				item2 = cmp.find("radioItem2");
+				outputText = "radioMenuResult";
 
 				menuLabel.get("e.click").fire();
 				//check if menu is visible
@@ -142,7 +144,7 @@
 	    	}, function(cmp){
 	    		ouptutButton.get('e.press').fire();
 				var expectedOutputText = item2.get('v.label');
-				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find("radioResult").get('v.value')}, "Radio Menu output text did not get updated");
+				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find(outputText).get('v.value')}, "Radio Menu output text did not get updated");
 		  }
 	    
         ]
@@ -161,6 +163,7 @@
 				menuItems = radioMenu.get("v.childMenuItems");
 				item1 = menuItems[1];
 				item2 = menuItems[2];
+				outputText = "iterationRadioMenuResult"
 				menuLabel.get("e.click").fire();
 				//check if menu is visible
 				$A.test.addWaitForWithFailureMessage(true, 
@@ -198,7 +201,7 @@
 				var expectedOutputText = item2.get('v.label');
 				$A.test.addWaitForWithFailureMessage(expectedOutputText, 
 						function(){
-							return cmp.find("radioIterationResult").get('v.value')
+							return cmp.find(outputText).get('v.value')
 						}, "Output text did not get updated for Menu created by iteration");
 		  }
 	    
@@ -341,5 +344,51 @@
 			$A.test.assertEquals(1, cmp.get("v.menuSelectFireCount"),"menuSelect event should be fired only once");
 		}
 	]
-  }
+  },
+  
+  /**
+   * Test to verify Clicking on a ui:image does trigger menu item list
+   * Test case for W-2515040
+   * Uncomment test once W-2515040 is fixed
+   */
+  _testActionMenuWithImageTrigger:{
+		test: [function(cmp) {
+				actionMenu = cmp.find("actionMenuImage");
+	        	menuLabel = cmp.find("triggerImage");
+	        	
+	        	//check menu is default to hidden by using AURA API
+	        	$A.test.assertFalse(actionMenu.get('v.visible'),"Action Menu should not be visible");
+	            
+	        	//check menu is default to hidden by using DOM API
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
+	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
+	        	menuLabel.get("e.click").fire();
+
+	            //Check if secondItem in the menu is disabled
+	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find("actionItem2Image").get("v.disabled");}, "Check if Item2 in the menu is disabled");
+			}, function(cmp) {
+				//make sure menuItem is not attached to body directly and its attached to uiMenu instead
+				//Test case for W-2181713
+				var actionMenuParentClassName = actionMenu.getElement().parentNode.className;
+				$A.test.assertTrue($A.test.contains(actionMenuParentClassName,"uiMenu"), "Menu Item List not attached to correct uiMenu");
+	    		
+				var disableAttrValue = cmp.find("actionItem1Image").get("v.disabled");
+				$A.test.assertFalse(disableAttrValue,"Menu item 1 should be clickable");
+				
+				//check menu is visible by using AURA API
+	        	$A.test.assertTrue(actionMenu.get('v.visible'),"Menu should be visible");
+	            
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should be uiMenuList visible");
+	        	
+	        	//disable ActionItem1
+	        	cmp.find("actionItem1Image").set("v.disabled", true);
+	        	var disableAttrValue = cmp.find("actionItem1Image").get("v.disabled");
+	            $A.test.assertTrue(disableAttrValue,"Menu item 1 should not be clickable");
+	            
+	            //click actionItem3 and check if label is updated
+	            cmp.find("actionItem3Image").get("e.click").fire();
+	            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3Image").get('v.label'), function(){return menuLabel.get('v.label')}, "Label should be updated to "+ cmp.find("actionItem3Image").get('v.label'));
+	        }
+      ]
+  },
 })

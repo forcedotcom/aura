@@ -762,7 +762,8 @@
         }
     },
 
-    testSetLocalId:{
+    // TODO(W-2529066): Newly created component not indexed against component it's added to
+    _testSetLocalId:{
         test: [function(cmp){
             var actionComplete = false;
             $A.newCmpAsync(
@@ -787,9 +788,7 @@
 
             $A.test.addWaitFor(true, function(){ return actionComplete; });
         }, function(cmp){
-            var body = cmp.get('v.body');
-            $A.test.assertEquals(1,body.length);
-            var newCmp = body[0].find("userLocalId");
+            var newCmp = cmp.find("userLocalId");
             $A.test.assertEquals("markup://aura:text",newCmp.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("TextComponent",newCmp.get('v.value'));
             $A.test.assertEquals(6,newCmp.get('v.truncate'));

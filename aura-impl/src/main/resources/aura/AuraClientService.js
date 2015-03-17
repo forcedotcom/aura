@@ -356,7 +356,7 @@ $A.ns.AuraClientService.prototype.singleAction = function(action, noAbort, actio
                                 errorHandler(error);
                             } else {
                                 // storage problems should warn rather than the agressive error.
-                                $A.warning(error);
+                                $A.warning("AuraClientService.singleAction, problem when putting "+key+" into storage, error:"+error);
                             }
                         });
                     }

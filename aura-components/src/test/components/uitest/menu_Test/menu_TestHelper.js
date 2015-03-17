@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 ({
-    updateTriggerLabel: function(cmp, event, helper) {
-        helper.handleUpdateTriggerLabel(cmp, event, "trigger");
+	handleUpdateTriggerLabel: function(cmp, event,triggerId) {
+		var triggerCmp = cmp.find(triggerId);
+        if (triggerCmp) {
+            var source = event.getSource();
+            var label = source.get("v.label");
+            triggerCmp.set("v.label", label);
+        }
     },
-    updateLabel: function(cmp, event, helper) {
-        helper.handleUpdateTriggerLabel(cmp, event, "mytrigger");
-    },
-    clickMenu: function(cmp, event) {
-        var source = event.getSource();
-        var label = source.get("v.label");
-        console.log("click menu item " + label);
-    },
-    pickPlace: function(cmp, event, helper) {
-        helper.menuSelect(cmp, event, "trigger");
-    },
-    pickTiger: function(cmp, event, helper) {
-        helper.menuSelect(cmp, event, "imageTrigger");
-    },
-    getMenuSelected: function(cmp, event) {
-        var menuCmp = cmp.find("checkboxMenu");
+    menuSelect: function(cmp, event,triggerId) {
+    	var menuCmp = cmp.find(triggerId);
         var menuItems = menuCmp.get("v.childMenuItems");
         var values = [];
         for (var i = 0; i < menuItems.length; i++) {
@@ -41,7 +32,7 @@
                 values.push(c.get("v.label"));
             }
         }
-        var resultCmp = cmp.find("checkboxMenuResult");
+        var resultCmp = cmp.find(triggerId + "Result");
         resultCmp.set("v.value", values.join(","));
     }
 })

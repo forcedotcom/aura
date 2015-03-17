@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 ({
-    updateTriggerLabel: function(cmp, event) {
-        var triggerCmp = cmp.find("trigger");
-        if (triggerCmp) {
-            var source = event.getSource();
-            var label = source.get("v.label");
-            triggerCmp.set("v.label", label);
-        }
+    updateTriggerLabel: function(cmp, event, helper) {
+        helper.handleUpdateTriggerLabel(cmp, event, "trigger");
     },
-    updateLabel: function(cmp, event) {
-        var triggerCmp = cmp.find("mytrigger");
-        if (triggerCmp) {
-            var source = event.getSource();
-            var label = source.get("v.label");
-            triggerCmp.set("v.label", label);
-        }
+    updateLabel: function(cmp, event, helper) {
+        helper.handleUpdateTriggerLabel(cmp, event, "mytrigger");
     },
     clickMenu: function(cmp, event) {
         var source = event.getSource();
@@ -43,44 +33,14 @@
             triggerCmp.set("v.label", label);
         }
     },
-    getMenuSelected: function(cmp, event) {
-        var menuCmp = cmp.find("checkboxMenu");
-        var menuItems = menuCmp.get("v.childMenuItems");
-        var values = [];
-        for (var i = 0; i < menuItems.length; i++) {
-            var c = menuItems[i];
-            if (c.get("v.selected") === true) {
-                values.push(c.get("v.label"));
-            }
-        }
-        var resultCmp = cmp.find("result");
-        resultCmp.set("v.value", values.join(","));
+    getMenuSelected: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "checkboxMenu");
     },
-    getRadioMenuSelected: function(cmp, event) {
-        var menuCmp = cmp.find("radioMenu");
-        var menuItems = menuCmp.get("v.childMenuItems");
-        var values = [];
-        for (var i = 0; i < menuItems.length; i++) {
-            var c = menuItems[i];
-            if (c.get("v.selected") === true) {
-                values.push(c.get("v.label"));
-            }
-        }
-        var resultCmp = cmp.find("radioResult");
-        resultCmp.set("v.value", values.join(","));
+    getRadioMenuSelected: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "radioMenu");
     },
-    getRadioIterationMenuSelected: function(cmp, event) {
-        var menuCmp = cmp.find("iterationRadioMenu");
-        var menuItems = menuCmp.get("v.childMenuItems");
-        var values = [];
-        for (var i = 0; i < menuItems.length; i++) {
-            var c = menuItems[i];
-            if (c.get("v.selected") === true) {
-                values.push(c.get("v.label"));
-            }
-        }
-        var resultCmp = cmp.find("radioIterationResult");
-        resultCmp.set("v.value", values.join(","));
+    getRadioIterationMenuSelected: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "iterationRadioMenu");
     },
     menuCollapse: function(cmp){
     	 cmp.set("v.collapseEventFired", true);

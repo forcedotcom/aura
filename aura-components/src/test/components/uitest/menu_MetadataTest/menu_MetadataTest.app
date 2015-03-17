@@ -69,7 +69,7 @@
         <p/>
         <ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/>
         <p/>
-        <ui:outputText class="result" aura:id="result" value="Which items get selected"/>
+        <ui:outputText class="checkboxMenuResult" aura:id="checkboxMenuResult" value="Which items get selected"/>
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Source codes:</h2>

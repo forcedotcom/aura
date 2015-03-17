@@ -25,8 +25,6 @@
         <aura:text aura:id="innerText" value="inner text"/>
     </div>
 
-    <div aura:id="createdComponents">{!v.body}</div>
-
     <aura:text aura:id="destroyedComponent" value="value"/>
 
 </aura:component>

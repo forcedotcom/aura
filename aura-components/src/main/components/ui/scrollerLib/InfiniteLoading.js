@@ -119,24 +119,22 @@ function (w) {
                 this._infiniteLoadingTriggerCallback('noop');
             }
         },
-        _infiniteLoadingTriggerCallback: function (err, payload) {
-            if (!err && payload) {
-                // the payload returns an array, append it.
-                if (payload instanceof Array && payload.length) {
-                    Logger.log('Data fetched!');
+        _infiniteLoadingTriggerCallback: function (payload) {
+            if (payload) {
+                var data = payload instanceof Array ? payload: payload.data;
+                if (data && data.length) {
                     this.appendItems(payload);
+                }
 
-                // the user manually added the dom elements (wrong thing, but we support it..)
-                } else if (payload === 'refresh') {
-                    Logger.log('InfiniteLoading: refresh!');
+                if (payload === 'refresh' || payload.refresh) {
                     this.refresh();
+                }
 
-                // If the payload is not "refresh" or an Array, we assume there is no more data.
-                } else {
-                    this._ilNoMoreData = true;
-                    Logger.log('No More data!');
+                if (payload === 'nomoredata' || payload.noMoreData) {
+                    this.lockFetchData();
                 }
             }
+
             this._setState(false/*loading*/);
             this._ilFetchingData = false;
         },
@@ -166,14 +164,14 @@ function (w) {
             x || (x = this.x);
             y || (y = this.y);
 
-            if (this.scrollVertical) {
-                pos     = y;
-                size    = this.scrollerHeight;
-                wrapper = this.wrapperHeight;
-            } else {
+            if (this.scrollHorizontal) {
                 pos     = x;
                 size    = this.scrollerWidth;
                 wrapper = this.wrapperWidth;
+            } else {
+                pos     = y;
+                size    = this.scrollerHeight;
+                wrapper = this.wrapperHeight;
             }
 
             var scrollable = size - wrapper; // Total scrollable pixels
@@ -187,7 +185,7 @@ function (w) {
 
             // If we have pixels to scroll 
             // and less than the threshold trigger provider.
-            if (left >= 0 && left <= threshold) {
+            if (!this._isScrolling && left >= 0 && left <= threshold) {
                 Logger.log('triggerDataProvider');
                 this._triggerInfiniteLoadingDataProvider();
             }

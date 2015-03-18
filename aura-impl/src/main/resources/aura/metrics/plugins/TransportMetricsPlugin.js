@@ -50,7 +50,9 @@ TransportMetricsPlugin.prototype = {
                     auraNum  = config["params"]["aura.num"];
                 startMark["context"] = {
                     "aura.num" : auraNum,
-                    "payload"  : config["params"]["message"],
+                    // NOTE: See AuraClientService.prototype.finishRequest (the message encoding part)
+                    // Eventually XHRs in Aura should be all send as JSON
+                    "payload"  : JSON.parse(config["params"]["message"]), // We shouldnt spend any cycle encoding/decoding
                     "url"      : config["url"]
                 };
 

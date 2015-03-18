@@ -142,11 +142,12 @@ public class AuraServlet extends AuraBaseServlet {
             final StringBuffer sb = request.getRequestURL();
             String defaultUriScheme = "http";
             String secureUriScheme = "https";
-            int schemeIndex = sb.indexOf(defaultUriScheme);
+            int dIndex = sb.indexOf(defaultUriScheme);
+            int sIndex = sb.indexOf(secureUriScheme);
 
-            // check and modify sb if https
-            if (request.isSecure() && schemeIndex != -1) {
-            	sb.replace(schemeIndex, schemeIndex + defaultUriScheme.length(), secureUriScheme);
+            // check and modify sb if URL is http but request is secure
+            if (request.isSecure() && sIndex == -1 && dIndex != -1) {
+            	sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
             }
 
             int index = sb.indexOf("//");

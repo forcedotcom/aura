@@ -11,12 +11,18 @@
         //clearStorageOnInit set to false
         $A.storageService.initStorage("actions", false, true, 1024, 200, 300, true, false);
     },
-
+    
+    tearDown : function(cmp) {
+    	//back to normal
+    	$A.test.setServerReachable(true);
+    },
+    
     /**
      * Verify that GVPs are stored in aura storage named "actions" when available and persist across apps.
+     * add step3 for W-2486716
      */
     testGvpsPersistInStorage:{
-        test: function(cmp) {
+        test: [function(cmp) {
             //Fetch the label using gvp, which causes a server action
             $A.test.setTestTimeout(15000);
 
@@ -36,8 +42,13 @@
                     storage.get("globalValueProviders")
                         .then(function(item) {
                         cmp._foundGvps = true;
-                        //Setup for step 2, change one of the labels
-                        item.value[0].values["Related_Lists"]["task_mode_today"] = "Yesterday";
+                        //Setup for stage 3, change one of the labels
+                        for(var i=0; i<item.value.length; i++) {
+                        	var vi = item.value[i];
+                        	if(vi.values && vi.values["Related_Lists"] && vi.values["Related_Lists"]["task_mode_today"]) {
+                        		vi.values["Related_Lists"]["task_mode_today"] = "Yesterday";
+                        	}
+                        }
                         storage.put("globalValueProviders", item.value);
                     });
                 }
@@ -47,6 +58,40 @@
                 function(){return cmp._foundGvps},
                 "Failed to store global value providers in storage"
             );
+        }, function(cmp) {
+        	//$A.test.setTestTimeout(600000);
+        	//go offline
+        	$A.test.setServerReachable(false);
+        	//now we should still be able to get the label from globalValueProvider
+        	$A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"),
+                "Failed to fetch label from aura context");
+        }, function(cmp) {
+        	//TODO: W-2497478. This blockRequests is work-around.
+        	//even with CSP allow http://offline, there is still issue where aura GET blocking 
+        	//persist storage from updating the value. this doesn't happen everytime though.
+        	$A.test.blockRequests();
+        	//if we don't pull what's in storage into globalValueProvider
+        	$A.getContext().clearGlobalValueProvider(false);
+        	//label is not available
+        	$A.test.assertEquals("[Related_Lists.task_mode_today]", 
+        			$A.get("$Label.Related_Lists.task_mode_today"),
+        			"we shouldn't have label in globalValueProvider");
+        //},function(cmp) {
+        	//now let's update globalValueProvider with what storage has
+        	$A.getContext().clearGlobalValueProvider(true);
+        	//we should still be able to get the label from storage
+        	//getting storage is async, we need to wait on it 
+        	$A.test.addWaitForWithFailureMessage(
+        		"Yesterday",
+        		function() { return $A.get("$Label.Related_Lists.task_mode_today"); },
+        		"fail to get Label from storage",
+        		function() {
+        			$A.test.setServerReachable(true);
+        			//TODO: W-2497478. remove this when it's solved
+        			$A.test.releaseRequests();
+        		}
+		     );
         }
+        ]
     }
 })

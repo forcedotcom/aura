@@ -66,14 +66,14 @@
     },
 
     //Test function with pass in parameter while the function is not expecting any -- it has no attribute
-    //We don't check how many arguments are there
+    //we actually ok with this, in noAttr I concact these parameter into a string,hence the output there
     testNoAttributeWithPassInParameter:{
         test:[ 
             function(cmp){
             	var cmpME = cmp.find("auraMethod");
             	cmpME.noAttr("pass in string","second pass in string");
             	var res = cmpME.get("v.outputStringAttr");
-            	$A.test.addWaitForWithFailureMessage("pass in string,second pass in string, return from noAttr",
+            	$A.test.addWaitForWithFailureMessage("paramArray: pass in string,second pass in string, return from noAttr",
             			function() { return cmpME.get("v.outputStringAttr"); },
             			"fail to change outputStringAttr"
             	);
@@ -88,7 +88,7 @@
             	var cmpME = cmp.find("auraMethod");
             	cmpME.noAttr();
             	var res = cmpME.get("v.outputStringAttr");
-            	$A.test.addWaitForWithFailureMessage("return from noAttr",
+            	$A.test.addWaitForWithFailureMessage("paramArray: , return from noAttr",
             			function() { return cmpME.get("v.outputStringAttr"); },
             			"fail to change outputStringAttr"
             	);
@@ -222,7 +222,7 @@
             	var cmpME = cmp.find("auraMethodChild");
             	cmpME.noAttr("pass in string","second pass in string");
             	var res = cmpME.get("v.outputStringAttr");
-            	$A.test.addWaitForWithFailureMessage("pass in string,second pass in string, return from noAttr",
+            	$A.test.addWaitForWithFailureMessage("paramArray: pass in string,second pass in string, return from noAttr",
             			function() { return cmpME.get("v.outputStringAttr"); },
             			"fail to change outputStringAttr"
             	);
@@ -237,7 +237,7 @@
             	var cmpME = cmp.find("auraMethodChild");
             	cmpME.noAttr();
             	var res = cmpME.get("v.outputStringAttr");
-            	$A.test.addWaitForWithFailureMessage("return from noAttr",
+            	$A.test.addWaitForWithFailureMessage("paramArray: , return from noAttr",
             			function() { return cmpME.get("v.outputStringAttr"); },
             			"fail to change outputStringAttr"
             	);

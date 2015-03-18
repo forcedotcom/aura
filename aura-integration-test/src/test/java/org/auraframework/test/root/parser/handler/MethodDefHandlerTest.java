@@ -36,7 +36,6 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     }
 	
 	//method missing name should throw error
-	//better error message: W-2518506
 	public void testMethodMissingName() throws Exception {
 		try {
 			DefDescriptor<ComponentDef> desc = getSimpleCmpDesc("<aura:method> </aura:method>");

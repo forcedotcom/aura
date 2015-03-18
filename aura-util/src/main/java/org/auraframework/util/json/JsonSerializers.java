@@ -218,14 +218,14 @@ public class JsonSerializers {
 
         @Override
         public void serialize(Json json, Object value) throws IOException {
-            if (json.getSerializationContext().getVariableDataSizeLimit() > -1
-                    && ((String) value).length() > json.getSerializationContext().getVariableDataSizeLimit()) {
-                value = ((String) value).substring(0, json.getSerializationContext().getVariableDataSizeLimit())
-                        + " ("
-                        + Integer.toString(((String) value).length()
-                                - json.getSerializationContext().getVariableDataSizeLimit()) + " more) ...";
+            String valueStr = value.toString();
+            int strLength = valueStr.length();
+            int dataSizeLimit = json.getSerializationContext().getVariableDataSizeLimit();
+            if (dataSizeLimit > -1 && (strLength > dataSizeLimit)) {
+                valueStr = valueStr.substring(0, dataSizeLimit)
+                        + " (" + Integer.toString(strLength - dataSizeLimit) + " more) ...";
             }
-            json.writeString(value);
+            json.writeString(valueStr);
         }
 
     }

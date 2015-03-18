@@ -104,7 +104,8 @@
         }]
     },
 
-    testCreatesButtonWithLocalId:{
+    // TODO(W-2529066): Newly created component not indexed against component it's added to
+    _testCreatesButtonWithLocalId:{
         test:[function(component){
             var targetId="testButton";
             var actionComplete = false;
@@ -114,6 +115,8 @@
                 component.find("createdComponents").set("v.body",targetComponent);
                 actionComplete = true;
             });
+
+            $A.test.addWaitFor(true, function(){return actionComplete});
         }, function(component) {
             var targetId="testButton";
             var actual = component.find(targetId);

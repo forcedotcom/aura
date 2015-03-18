@@ -24,6 +24,7 @@
 
 .THIS .footer {
 	height: 10%;
+	overflow: auto;
 }
  
 .THIS table{
@@ -79,5 +80,13 @@
 
 .THIS a.disabled {
 	color: gray;
+}
+
+.THIS table th.descending a{
+	color: red;
+}
+
+.THIS table th.ascending a{
+	color: green;
 }
 

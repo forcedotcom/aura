@@ -19,26 +19,10 @@
      * ascending - b is greater than a.
      */
     sort: function (items, column, descending) {
-        items.sort(function (a, b) {
-            var aGtb = parseInt(a[column]) > parseInt(b[column]),
-                ret;
-
-            if (aGtb) {
-                ret = 1;
-            }
-            else if (a[column] === b[column]) {
-                ret = 0;
-            }
-            else {
-                ret = -1;
-            }
-
-            if (descending) {
-                ret = -ret;
-            }
-
-            return ret;
-        });
+    	var items = items.sort();
+    	if (descending) {
+    		items.reverse();
+    	}
     },
     
     applyPagination: function(tasks, currentPage, pageSize) {

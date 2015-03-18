@@ -15,11 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:dataProvider">
-    <aura:attribute name="sortBy" type="String"/>
-    <aura:attribute name="empty" type="Boolean" default="false"/>
-    <aura:attribute name="throwError" type="Boolean" default="false"/>
-    
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler name="provide" action="{!c.handleProvide}"/>
-</aura:component>
+<aura:event type="COMPONENT" description="Notification event for a sort">
+	<aura:attribute name="sortBy"		type="String"/>
+	<aura:attribute name="callback"		type="Object"/>
+</aura:event>

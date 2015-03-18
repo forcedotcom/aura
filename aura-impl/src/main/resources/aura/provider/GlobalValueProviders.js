@@ -137,7 +137,7 @@ $A.ns.GlobalValueProviders.prototype.loadFromStorage = function(callback) {
                     // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
                     that.merge(item.value, true);
                 }
-                callback(!!item);
+                if(callback) { callback(!!item); }
             });
         }, function() {
             // error retrieving from storage
@@ -148,7 +148,7 @@ $A.ns.GlobalValueProviders.prototype.loadFromStorage = function(callback) {
     } else {
         // nothing loaded from persistent storage
         $A.run(function() {
-            callback(false);
+            if(callback) { callback(false); }
         });
     }
 };
@@ -193,6 +193,23 @@ $A.ns.GlobalValueProviders.prototype.addValueProvider = function(type, valueProv
  */
 $A.ns.GlobalValueProviders.prototype.getValueProvider = function(type) {
     return this.valueProviders[type];
+};
+
+/**
+ * This function is for test only. Call this to simulate offline situation:
+ * when we start the app offline, the server is not avalable, 
+ * all we have is whatever we get from persist storage.
+ */
+$A.ns.GlobalValueProviders.prototype.clearValueProvider = function(loadFromStorage) {
+	this.valueProviders = {
+	        "$Browser" : new $A.ns.ObjectValueProvider(),
+	        "$Label": new $A.ns.LabelValueProvider(),
+	        "$Locale": new $A.ns.ObjectValueProvider(),
+	        "$Global": new $A.ns.ContextValueProvider()
+	};
+	if(loadFromStorage) {
+		this.loadFromStorage();
+	}
 };
 
 /**

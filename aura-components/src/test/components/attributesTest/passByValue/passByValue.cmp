@@ -23,7 +23,7 @@
         </aura:label>
     </div>
     <!-- This is just to show #$ also works. but please notice #$Label.xxx or !$Label.xxx doesn't matter here, 
-    as we cannot change dynamic_label_for_test which is defined in TestLabelProvider. -->
+    as we cannot change dynamic_label_for_test which is defined in TestLocalizationAdapterImpl. -->
     <div aura:id="PV_dynamicLabelContainer">
         <aura:label value="{#$Label.AuraTestLabelSection.dynamic_label_for_test}">
             {#v.numberValue}

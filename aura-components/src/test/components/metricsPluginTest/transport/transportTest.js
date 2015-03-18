@@ -81,8 +81,8 @@
                         callbackFlag = true;
                     },
                     "params": {
-                        // We need aura.num for perf marks, when those are removed we can remove this
-                        "aura.num": "13371337"
+                        "aura.num": "13371337",
+                        "message" : '{"foo":123}'
                     }
                 };
 

@@ -82,6 +82,10 @@
             <artifactId>icu4j</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.salesforce</groupId>
             <artifactId>omakase</artifactId>
         </dependency>

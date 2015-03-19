@@ -64,9 +64,6 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     public void setUp() throws Exception {
         super.setUp();
         if (shouldSetupContext) {
-            if (Aura.getContextService().isEstablished()) {
-                Aura.getContextService().endContext();
-            }
             Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         }
     }

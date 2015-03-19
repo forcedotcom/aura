@@ -22,7 +22,6 @@
     <aura:attribute name="auraScriptTags" type="String" description="Loads the js framework, preloads the definitions of all preload namespaces, and any other script that is needed by the framework."/>
     <aura:attribute name="auraBaseScriptTags" type="String"/>
     <aura:attribute name="auraNamespacesScriptTags" type="String"/>
-    <aura:attribute name="auraResetCss" type="String" />
     <aura:attribute name="auraInlineStyle" type="String" description="Loads Aura inline style from template.css."/>
     <aura:attribute name="auraInit" type="String" description="Creates an XMLHttpRequest object and retrieves the components from the server without reloading the page. Preferred over auraInitSync."/>
     <aura:attribute name="auraInitSync" type="String" description="Denotes synchronous initialization of Aura. Returns the same value as auraInit."/>
@@ -181,7 +180,7 @@
             <title>{!v.title}</title>
             <script>var pageStartTime = (new Date()).getTime();</script>
             {!v.extraMetaTags}
-            {!v.auraResetCss}
+            <link href="{!'/auraFW/resources/aura/' + (v.normalizeCss ? 'normalize' : 'resetCSS') + '.css'}"  rel="stylesheet" type="text/css"/>
             <style>
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}

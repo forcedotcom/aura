@@ -43,7 +43,7 @@ $A.ns.AuraError = function() {
 
         function getStack(error){
             var map = {};
-            var stack = [error.name + ": " + error.message];
+            var stack = [];
             var caller = getStack.caller && getStack.caller.caller;
             while (caller) {
                 if (map[caller]) {
@@ -57,6 +57,21 @@ $A.ns.AuraError = function() {
             return stack.join('\n\tat ');
         }
 
+        function getStackTrace(error) {
+            var stack;
+            if (error.stack) {
+                stack = error.stack;
+                // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.
+                var chromeStart = error.name + ": " + error.message;
+                if (stack && stack.indexOf(chromeStart) === 0) {
+                    stack = stack.substring(chromeStart.length + 1);
+                }
+            } else {
+                stack = getStack(this);
+            }
+            return stack;
+        }
+
         if (message == null) {
             message = '';
         }
@@ -65,7 +80,7 @@ $A.ns.AuraError = function() {
         this.lineNumber = error.lineNumber;
         this.number = error.number;
         this.message = message;
-        this.stackTrace = error.stack || (error.getStack && error.getStack()) || getStack(this);
+        this.stackTrace = getStackTrace(error);
     }
 
     AuraError.apply(this,arguments);
@@ -75,6 +90,7 @@ $A.ns.AuraError = function() {
     this["stackTrace"] = this.stackTrace;
     this["errorCode"] = this.errorCode;
     this["handled"] = false;
+    this["reported"] = false;
     this["data"] = null;
 };
 

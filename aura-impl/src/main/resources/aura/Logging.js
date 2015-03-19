@@ -135,8 +135,12 @@
 
     $A.logger.subscribe("ERROR", function(level, message, e) {
         if (e && e instanceof $A.auraError && !e["handled"]) {
-            var format = "Something has gone wrong. {0}. Please try again.\n{1}";
-            $A.message($A.util.format(format, e.stackTrace || e.message || e.name, e.errorCode+""));
+            var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
+            var displayMessage = e.message || e.name;
+            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            displayMessage += "\n" + e.stackTrace;
+            //#end
+            $A.message($A.util.format(format, displayMessage, e.errorCode+""));
             e["handled"] = true;
         }
     });

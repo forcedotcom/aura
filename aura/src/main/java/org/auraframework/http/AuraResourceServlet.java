@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -65,6 +64,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
     private static final String RESOURCE_URLS = "resourceURLs";
     private static final String LAST_MOD = "lastMod";
+    private static final String CONTEXT_PATH = "contextPath";
     private static final String UID = "uid";
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
@@ -250,16 +250,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
             //
             Map<String, Object> attribs = Maps.newHashMap();
             String appUid = getContextAppUid();
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
-            String nonce = configAdapter.getAuraFrameworkNonce();
+            String nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
             // Since we don't get the UID from our URL, we set it here.
             context.setFrameworkUID(nonce);
             attribs.put(LAST_MOD, String.format("app=%s, FW=%s", appUid, nonce));
             attribs.put(UID, appUid);
+            // prepend servlet context path to reset css
+            attribs.put(CONTEXT_PATH, context.getContextPath());
             StringWriter sw = new StringWriter();
-
-            sw.write(configAdapter.getResetCssURL());
-            sw.write('\n');
 
             for (String s : getStyles()) {
                 sw.write(s);

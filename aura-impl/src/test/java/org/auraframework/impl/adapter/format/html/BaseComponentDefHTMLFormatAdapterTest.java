@@ -15,10 +15,7 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.FormatAdapter;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
@@ -38,7 +35,6 @@ public abstract class BaseComponentDefHTMLFormatAdapterTest<T extends Definition
     public abstract Class<T> getDefClass();
 
     protected String doWrite(T def) throws Exception {
-        Aura.getContextService().getCurrentContext().setApplicationDescriptor((DefDescriptor<? extends BaseComponentDef>) def.getDescriptor());
         FormatAdapter<T> adapter = AuraImpl.getFormatAdapter(Format.HTML.name(), getDefClass());
         adapter.getClass().asSubclass(BaseComponentDefHTMLFormatAdapter.class);
         StringBuffer out = new StringBuffer();

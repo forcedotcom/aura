@@ -49,11 +49,8 @@ TransportMetricsPlugin.prototype = {
                 var original = config["callback"],
                     auraNum  = config["params"]["aura.num"];
                 startMark["context"] = {
-                    "aura.num" : auraNum,
-                    // NOTE: See AuraClientService.prototype.finishRequest (the message encoding part)
-                    // Eventually XHRs in Aura should be all send as JSON
-                    "payload"  : JSON.parse(config["params"]["message"]), // We shouldnt spend any cycle encoding/decoding
-                    "url"      : config["url"]
+                    "aura.num"      : auraNum,
+                    "requestLength" : config["params"]["message"] && config["params"]["message"].length
                 };
 
                 config["callback"] = function (xhr) {

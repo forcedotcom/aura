@@ -75,11 +75,13 @@
 
                 for (var n = 0; n < nodes.length; n++) {
                     //
-                    // If only a number is given, we assume render=1, rerender=onload=1, unrender=0, onload=1
-                    // which is the normal case (updating onload will cause a rerender).
+                    // If a string is provided, we use it to validate the values in each column.
                     //
-                    var expected = "#" + values[n] + (values[n] > 0 ? " 1 1 0 1" : "");
-                    var actual = $A.test.getText(nodes[n]).replace(/\t/g," ");
+                    // If a number is privided for a row, we assume render=1, rerender=onload=1, unrender=0, onload=1
+                    // which is the normal case (and the onload will cause a rerender).
+                    //
+                    var expected = "#" + values[n] + (values[n].length ? "" : "1101");
+                    var actual = $A.test.getText(nodes[n]).replace(/[\t\s]/g,"");
                     $A.test.assertEquals(expected, actual, message + ": invalid row #" + (n + 1) + "( " + expected + "vs " + actual + ")");
                 }
             }
@@ -130,7 +132,8 @@
                 });
             },
             function(component) {
-                this.assertComponents(component, [1,"5 1 2 0 1","6 1 2 0 1",4], "Rerender 2nd and 3rd components");
+                // Here we have force rerendering of the two middle components.
+                this.assertComponents(component, [1,"51201","61201",4], "Rerender 2nd and 3rd components");
             }
         ]
     },
@@ -275,7 +278,7 @@
         ]
     },
 
-    _testSwapEnds: {
+    testSwapEnds: {
         test: [
             function(component) {
                 this.createComponents(component, 1, function(body, newCmp) {
@@ -288,12 +291,13 @@
                 });
             },
             function(component) {
-                this.assertComponents(component, [1,3,2,4], "Swapped 1st and 4rd components");
+                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
+                this.assertComponents(component, ["41202","21202","31202","11202"], "Swapped 1st and 4rd components");
             }
         ]
     },
 
-    _testSwapMiddleTwo: {
+    testSwapMiddleTwo: {
         test: [
             function(component) {
                 this.createComponents(component, 1, function(body, newCmp) {
@@ -306,12 +310,13 @@
                 });
             },
             function(component) {
-                this.assertComponents(component, [1,3,2,4], "Swapped 2nd and 3rd components");
+                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
+                this.assertComponents(component, ["11202","31202","21202","41202"], "Swapped 2nd and 3rd components");
             }
         ]
     },
 
-    _testSwapFirstTwo: {
+    testSwapFirstTwo: {
         test: [
             function(component) {
                 this.createComponents(component, 1, function(body, newCmp) {
@@ -324,12 +329,13 @@
                 });
             },
             function(component) {
-                this.assertComponents(component, [1,3,2,4], "Swapped 1st and 2nd components");
+                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
+                this.assertComponents(component, ["21202","11202","31202","41202"], "Swapped 1st and 2nd components");
             }
         ]
     },
 
-    _testSwapLastTwo: {
+    testSwapLastTwo: {
         test: [
             function(component) {
                 this.createComponents(component, 1, function(body, newCmp) {
@@ -342,12 +348,13 @@
                 });
             },
             function(component) {
-                this.assertComponents(component, [1,3,2,4], "Swapped 3rd and 4th components");
+                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
+                this.assertComponents(component, ["11202","21202","41202","31202"], "Swapped 3rd and 4th components");
             }
         ]
     },
 
-    _testMultiChange: {
+    testMultiChange: {
         test: [
             function(component) {
                 this.createComponents(component, 1, function(body, newCmp) {

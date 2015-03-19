@@ -23,12 +23,13 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 	};
 
 	this._onTransactionClick = function (e) {
-		var command = "console.log($A.metricsService.getTransaction('bootstrap:app'))";
-	        chrome.devtools.inspectedWindow.eval(command, function (payload, exception) {
-	            if (exception) {
-	            	console.log('ERROR, CMD:', command, exception);
-	            }
-	        });
+		var id = e.target.dataset.id;
+		var command = "console.log($A.metricsService.getTransaction('" + id + "'))";
+        chrome.devtools.inspectedWindow.eval(command, function (payload, exception) {
+            if (exception) {
+            	console.log('ERROR, CMD:', command, exception);
+            }
+        });
 	};
 
 	this.update = function (t) {
@@ -54,7 +55,7 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 		// <th>Context</th>
 		// <th>Marks</th>
 		tr.innerHTML = [
-			'<td class="id"><a href="javascript:void(0)">' + t.id + '</a></td>',
+			'<td class="id"><a href="javascript:void(0)" data-id="'+t.id + ':' + Math.floor(t.ts) +'">' + t.id + '</a></td>',
 			'<td class="ts">' + Math.floor(t.ts * 1000) / 1000 +'</td>',
 			'<td class="dur">' + Math.floor(t.duration * 1000) / 1000 +'</td>',
 			'<td class="ctx">' + JSON.stringify(t.context, null, '\t') + '</td>',

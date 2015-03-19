@@ -94,8 +94,8 @@
 
             var toApply = [
                 "styleServiceTest:colorOverridesTheme1",
-                "styleServiceTest:colorOverridesTheme2",
-            ]
+                "styleServiceTest:colorOverridesTheme2"
+            ];
 
             $A.styleService.applyThemes(toApply, {
                 callback: function() {loaded = true}
@@ -203,7 +203,8 @@
                 // we are testing that a client loaded cmp's styles are included in what css
                 // comes back from the server, when applicable
                 var toTest = addedCmp.getElement();
-                $A.test.assertEquals(this.map["#39CCCC"], $A.util.style.getCSSProperty(toTest, "color"));
+                var expected = $A.util.isIE? "#39cccc" : this.map["#39CCCC"];
+                $A.test.assertEquals($A.util.style.getCSSProperty(toTest, "color"), expected );
             });
         }
     },

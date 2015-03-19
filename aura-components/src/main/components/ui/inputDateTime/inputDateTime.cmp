@@ -17,23 +17,23 @@
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent" extensible="true"
     controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
-    description="An input field for entering a date and time.">    
+    description="An input field for entering a date and time.">
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
     <aura:attribute name="placeholder" type="String" description="The text that is displayed by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
-        
+
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker"/>
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
-    
+
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
-        <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}"/>
+        <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
         <aura:set attribute="else">
-            <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}"/>
+            <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
         </aura:set>
     </aura:if>
     
-    <aura:if isTrue="{!v.displayDatePicker}">
+    <aura:if isTrue="{!and(v.displayDatePicker, !v.disabled)}">
         <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
             <span class="assistiveText">Date Picker</span>
         </a>

@@ -67,7 +67,10 @@
 
             }.bind(this));
 
-            setTimeout(this.updateComponentTree, 1500);
+            // Comment this til Kris fixes the problem
+            // We shouldnt call timeout but instead hook a function 
+            // in the framework once the app is ready
+            // setTimeout(this.updateComponentTree, 1500);
         };
 
         this.highlightElement = function(globalId) {

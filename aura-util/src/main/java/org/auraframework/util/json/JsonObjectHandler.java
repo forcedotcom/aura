@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
  */
 public class JsonObjectHandler implements JsonHandler {
 
-    private final Map<String, Object> map = Maps.newHashMap();
+    private final Map<String, Object> map = Maps.newLinkedHashMap();
 
     public void put(String key, Object value) throws JsonValidationException {
         map.put(key, value);

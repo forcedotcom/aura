@@ -285,7 +285,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * The normalizeCss attribute value is found on the base aura:template component
+     * The normalizeCss attribute value is found on the base template
      * so recursively get the super component of the template until it's found and
      * get the attribute value
      *
@@ -294,11 +294,12 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * @throws QuickFixException
      */
     private boolean useNormalizeCss(BaseComponent template) throws QuickFixException {
-        DefDescriptor templateDescriptor = template.getDescriptor();
-        if (!(templateDescriptor.getNamespace().equals("aura") && templateDescriptor.getName().equals("template"))) {
+        // get the base template
+        if (template.getSuper() != null && ((BaseComponentDef) template.getSuper().getDescriptor().getDef()).isTemplate()) {
             return useNormalizeCss(template.getSuper());
         }
-        return (Boolean) template.getAttributes().getValue("normalizeCss");
+        return template.getAttributes().getValue("normalizeCss") != null &&
+                (Boolean) template.getAttributes().getValue("normalizeCss");
     }
 
     @Override

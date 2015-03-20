@@ -187,9 +187,6 @@ $A.ns.Logger.prototype.reportError = function(e, action, id){
     // But don't keep re-posting if the report of failure fails.  Do we want this to be production
     // mode only or similar?
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
-    reportAction.setStorable({
-        "ignoreExisting" : true
-    });
     reportAction.setAbortable(false);
     reportAction.setParams({
         "failedAction": action,

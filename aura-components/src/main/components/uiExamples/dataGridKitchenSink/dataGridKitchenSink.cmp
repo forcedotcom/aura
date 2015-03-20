@@ -20,7 +20,7 @@
     <aura:attribute name="sortBy" type="String"/>
     <aura:attribute name="pageSize" type="Integer" default="10"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
-    <aura:attribute name="totalItems" type="Integer"/>
+    <aura:attribute name="totalItems" type="Integer" default="100"/>
     <aura:attribute name="index" type="Integer"/>
     <aura:attribute name="count" type="Integer"/>
     <aura:attribute name="className" type="String"/>

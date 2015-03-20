@@ -56,22 +56,50 @@
     	cmp.set("v.items", evt.getParam("data"), cmp._initializing);
     },
     
+    
     /*
-     *  We need to redesign the sorting logic. Right now it's stupid.
+     * =========================
+     * SORTING
+     * =========================
      */
     handleSortTrigger: function(cmp, evt, helper) {
     	// TODO: Refactor how dataGridColumn handles triggering a sort
-    	var name = evt;
+    	var sortBy = evt;
     	
-    	if (name) {
-    		var dataModel = cmp.get("v.dataModel")[0];
-    		cmp.set("v.sortBy", name);
+    	if (sortBy) {
+    		// Hack to undo UI changes in dataGridColumn
+    		helper.updateSortData(cmp, cmp.get('v._sortBy'));
+    		
+    		var dataModel = cmp.get('v.dataModel')[0];
+    		
+    		cmp.getEvent('onsort').setParams({
+				sortBy 	 : sortBy,
+				callback : helper.sortCallback.bind(helper, cmp)
+			}).fire();
     		
     		if (dataModel) {
-    			dataModel.getEvent("provide").fire();
+    			dataModel.set('v.sortBy', sortBy);
+    			
+    			// TODO: determine how to attach callback for when we get data back
+    			dataModel.getEvent('provide').fire();
+    			// TODO: Assume synchronous provide & success (previous behavior) for now
+    			helper.updateSortData(cmp, sortBy);
     		}
     	}
     },
+    
+    /**
+     * Direct method to call when we want the grid to sort its data.
+     * Currently only updates the UI based on the given sortBy
+     */
+    sort: function(cmp, event, helper) {
+    	var sortBy = event.getParam('arguments').sortBy;
+    	
+    	if (sortBy) {
+    		helper.updateSortData(cmp, sortBy);
+    	}
+    },
+    
     /*
     * DEPRECATED FROM OLD GRID
     */

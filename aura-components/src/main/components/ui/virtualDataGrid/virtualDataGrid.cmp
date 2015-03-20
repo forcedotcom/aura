@@ -25,6 +25,10 @@
     <aura:method name="appendItems">
         <aura:attribute name="items" type="Object"/>
     </aura:method>
+    
+    <aura:method name="sort">
+    	<aura:attribute name="sortBy" type="String"/>
+    </aura:method>
 
     <!-- ATTRIBUTES -->
     <aura:attribute name="class"			type="String"								description=""/>
@@ -36,12 +40,16 @@
     <aura:attribute name="_dirty"           type="Integer"                              description=""/>
     <aura:attribute name="itemVar"         type="String"                 default="item" description=""/>
     
+    <aura:attribute name="_sortBy" 		type="String" default="" description="Sort order of the data in the grid. Name of column, predicated by a '-' for descending."/>
+    
     <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description=""/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <aura:handler name="change" value="{!v.items}"   action="{!c.handleItemsChange}"/>
     <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/> 
+
+	<aura:registerEvent name="onsort" type="ui:sort"/>
 
     <table aura:id="table" class="{! v.class + ' ' + v.mode }">
         <thead aura:id="thead">

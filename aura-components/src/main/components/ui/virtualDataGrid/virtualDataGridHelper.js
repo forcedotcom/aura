@@ -39,7 +39,6 @@
         var dataModel = cmp.get("v.dataModel")[0];
         if (dataModel) {
         	dataModel.addHandler("onchange", cmp, "c.handleDataChange");
-            cmp.set("v.dataModel", dataModel);
         }
     },
     initializeItems: function (cmp) {
@@ -78,23 +77,6 @@
             value  : itemVar,
             method : this.onItemChange.bind(this, ptv)
         });
-    },
-    initializeSorting: function (cmp) {
-    	var headers = cmp.get("v.headerColumns"),
-    		handleSortTrigger = cmp.get("c.handleSortTrigger");
-    	
-    	if (!headers) {
-    		return;
-    	}
-    	
-    	for (var i = 0; i < headers.length; i++) {
-    		var headerColumn = headers[i],
-    			name = headerColumn.get("v.name");
-    		
-    		if (headerColumn.get("v.sortable")) {
-    			headerColumn.set("v.onsortchange", handleSortTrigger);
-    		}
-    	}
     },
     initializeFixedHeader: function (cmp) {
     	if (cmp.get("v.fixedHeader")) {
@@ -285,5 +267,73 @@
                 cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i]));
             }
         }        
-    }
+    },
+    
+    /*
+     * =========================
+     * SORTING
+     * =========================
+     */
+    
+    initializeSorting: function (cmp) {
+    	var headers = cmp.get('v.headerColumns'),
+    		handleSortTrigger = cmp.get('c.handleSortTrigger');
+    	
+    	if (!headers) {
+    		return;
+    	}
+    	
+    	for (var i = 0; i < headers.length; i++) {
+    		var headerColumn = headers[i],
+    			name = headerColumn.get('v.name');
+    		
+    		if (headerColumn.get('v.sortable')) {
+    			headerColumn.set('v.onsortchange', handleSortTrigger);
+    		}
+    	}
+    },
+    
+    updateSortData: function (cmp, sortBy) {
+    	var headers  = cmp.get('v.headerColumns'),
+    		isDesc   = (sortBy[0] === '-'),
+    		name 	 = isDesc ? sortBy.slice(1, sortBy.length) : sortBy,
+    		sortText = isDesc ? 'descending' : 'ascending';
+    		
+    		for (var i = 0; i < headers.length; i++) {
+    			var header 	  = headers[i],
+    				direction = (header.get('v.name') === name) ? sortText : '';
+    			header.set('v.direction', direction);
+    		}
+    		
+    	cmp.set('v._sortBy', sortBy);
+    },
+    
+    /**
+     * Default callback to handle the results of a sort.
+     * When this callback is sent through the onsort event, the virtualDataGrid
+     * component object is bound to the first parameter. If the callback is
+     * then retrieved from the event, it can simply be called with callback(response)
+     * 
+     * @param {Component} cmp virtualDataGrid component bound to the function.
+     * @param {Object} response Response from the sort. Can either be an Array or an Object
+     */
+    sortCallback: function(cmp, response) {
+		if (response && Array.isArray(response)) {
+			cmp.set('v.items', response);
+			
+			this.updateSortData(cmp, '');
+		} else if (response) {
+			// TODO: handle responses of the following object signature
+			// { data : Array, sortBy : String, state : String, error : Object }
+			if (response.state === 'SUCCESS') {
+				var data   = response.data || [];
+				var sortBy = response.sortBy || '';
+				
+				cmp.set('v.items', data);
+				this.updateSortData(cmp, sortBy);
+			}
+			
+		}
+	}
+    
 })

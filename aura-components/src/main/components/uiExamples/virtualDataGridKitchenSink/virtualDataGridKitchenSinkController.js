@@ -51,5 +51,15 @@
 		);
 		columns[colIndex] = config.column;
 		grid.set("v.columns", columns);
+	},
+	
+	onsort : function(cmp, evt, helper) {
+		var params = evt.getParams();
+
+		params.callback({
+			data : ["hi", "bye"],
+			state : "State",
+			error : {}
+		});
 	}
 })

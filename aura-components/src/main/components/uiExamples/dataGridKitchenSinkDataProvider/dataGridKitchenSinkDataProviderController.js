@@ -23,6 +23,11 @@
     },
 
     handleProvide: function (cmp, evt, hlp) {
+    	if (cmp.get('v.throwError')) {
+    		cmp.getEvent("error").setParams({error: {throwError: true}}).fire();
+    		return;
+    	}
+    	
         var currentPage = cmp.get('v.currentPage'),
             pageSize = cmp.get('v.pageSize'),
             sortBy = cmp.get('v.sortBy'),

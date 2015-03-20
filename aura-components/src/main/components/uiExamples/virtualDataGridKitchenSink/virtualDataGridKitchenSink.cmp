@@ -26,6 +26,8 @@
     <aura:attribute name="rowIndex" type="Integer"/>
     <aura:attribute name="gridItems" type="List"/>
     <aura:attribute name="gridSelectedItems" type="List"/>
+    
+    <aura:attribute name="provideNoData" type="Boolean"/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
@@ -36,13 +38,14 @@
 			<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
 		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
 			<br/>
+			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
 			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
 		</div>
 	
-		<ui:virtualDataGrid aura:id="grid" sortBy="{!v.sortBy}" fixedHeader="true">
+		<ui:virtualDataGrid aura:id="grid" onsort="{!c.onsort}" fixedHeader="true">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
-				<ui:dataGridColumn name="subject" 		label="Subject"/>
+				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>
 				<ui:dataGridColumn name="who.name" 		label="Name"/>
 				<ui:dataGridColumn name="what.name" 	label="Related To"/>
 				<ui:dataGridColumn name="activityDate" 	label="Due Date"/>
@@ -60,51 +63,15 @@
 				<uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
 															sortBy="{!v.sortBy}"
 															totalItems="2000"
-															pageSize="2000"/>
+															pageSize="2000"
+															throwError="{!v.provideNoData}"/>
 			</aura:set>
 		</ui:virtualDataGrid>
-	<!--
-	    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" summary="Assorted Data for testing">
-	        <aura:set attribute="columns">
-	            <ui:dataGridSelectionColumn/>
-	
-	            <ui:dataGridColumn label="Id" name="id" editable="false" sortable="true" ascLabel="ASC" descLabel="DSC"/>             
-	            <ui:dataGridColumn label="Subject" name="subject"/>
-	            <ui:dataGridColumn label="Name" name="who.name"/>
-	            <ui:dataGridColumn label="Related To" name="what.name"/>
-	            <ui:dataGridColumn label="Due Date" name="activityDate"/>
-	
-	            <ui:dataGridActionColumn label="Actions">
-	                <ui:actionButton name="disable" label="Disable" index="{!index}" disabled="{!disabled}"/>
-	                <ui:actionButton name="enable" label="Enable" index="{!index}" disabled="{!!disabled}"/>
-	                <ui:actionButton name="toggleClass" label="Toggle Class" index="{!index}" disabled="{!disabled}"/>
-	            </ui:dataGridActionColumn>
-	
-	        </aura:set>
-	       <aura:set attribute="dataProvider">
-	            <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
-	            									   sortBy="{!v.sortBy}"
-	                                                   pageSize="{!v.pageSize}"
-	                                                   currentPage="{!v.currentPage}"
-	                                                   totalItems="{!v.totalItems}"/>
-	        </aura:set>
-	
-	    </ui:dataGrid>--> 
-	    <ui:block class="footer">
-	    	<aura:set attribute="left">
-	    		<ui:button label="Spit Out Items" press="{!c.spit}"/><br/>
-	    		<h2>DataGrid's Internal v.items</h2>
-			    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
-			    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
-			    </aura:iteration>
-			</aura:set>
-			<aura:set attribute="right">
-				<ui:button label="Grab Selected" press="{!c.getSelected}"/><br/>
-				<h2>DataGrid's Selected Items</h2>
-				<aura:iteration aura:id="selectedItems" var="item" items="{!v.gridSelectedItems}">
-					<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
-				</aura:iteration>
-			</aura:set>
-	    </ui:block>
+
+		<ui:button label="Spit Out Items" press="{!c.spit}"/><br/>
+		<h2>VirtualDataGrid's Internal v.items</h2>
+	    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
+	    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
+	    </aura:iteration>
 	</div>
 </aura:component>

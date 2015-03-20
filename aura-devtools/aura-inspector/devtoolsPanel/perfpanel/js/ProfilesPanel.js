@@ -2097,6 +2097,7 @@ WebInspector.CPUFlameChartDataProvider.prototype = {
         }
         pushEntryInfoRow(WebInspector.UIString("Name"), node.functionName);
         pushEntryInfoRow(WebInspector.UIString("Component Id:"), node._cmpId);
+        pushEntryInfoRow(WebInspector.UIString("Child Components:"), node._childComponentCount);
         var selfTime = this._millisecondsToString(this._entrySelfTimes[entryIndex]);
         var totalTime = this._millisecondsToString(timelineData.entryTotalTimes[entryIndex]);
         pushEntryInfoRow(WebInspector.UIString("Self time"), selfTime);

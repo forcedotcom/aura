@@ -60,7 +60,6 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     }
 	
 	//test method with same name as an event
-	//method needs to be behind the event for the check to work W-2520943
 	public void testMethodDuplicateAsEvent() throws Exception {
 		String basicMethod = "<aura:method name='myMethod'> </aura:method>";
 		String basicEvent = "<aura:registerEvent name='myMethod' type='aura:operationComplete'/>";
@@ -74,8 +73,22 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		}
     }
 	
+	//test method with same name as an attribute, method is defined before attribute : test added for W-2520943
+	//the error is actually being throw from handling event tag, but we don't have a eventDefHandlerTest.java 
+	public void testMethodDuplicateAsEvent2() throws Exception {
+		String basicMethod = "<aura:method name='myMethod'> </aura:method>";
+		String basicEvent = "<aura:registerEvent name='myMethod' type='aura:operationComplete'/>";
+        try {
+        	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicMethod+basicEvent);
+			desc.getDef();
+			fail("Expect to fail with method with duplicate name as an event");
+		} catch (Exception e) {
+			 checkExceptionContains(e, InvalidDefinitionException.class,
+                     "The event 'myMethod' conflicts with a method of the same name on component");
+		}
+    }
+	
 	//test method with same name as an attribute
-	//method needs to be behind the event for the check to work W-2520943
 	public void testMethodDuplicateAsAttrite() throws Exception {
 		String basicMethod = "<aura:method name='myMethod'> </aura:method>";
 		String basicAttribute = "<aura:attribute name='myMethod' type='String'/>";
@@ -86,6 +99,22 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		} catch (Exception e) {
 			 checkExceptionContains(e, InvalidDefinitionException.class,
                      "The method 'myMethod' conflicts with an attribute of the same name on component");
+		}
+    }
+	
+	//test method with same name as an attribute, method is defined before attribute : test added for W-2520943
+	//one can move this test to AttributeDefHandlerTest, as the error is being throw from handing attribute Tag
+	//but they have a different setup there. so i just leave this one here.
+	public void testMethodDuplicateAsAttrite2() throws Exception {
+		String basicMethod = "<aura:method name='myMethod'> </aura:method>";
+		String basicAttribute = "<aura:attribute name='myMethod' type='String'/>";
+        try {
+        	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicMethod+basicAttribute);
+			desc.getDef();
+			fail("Expect to fail with method with duplicate name as an attribute");
+		} catch (Exception e) {
+			 checkExceptionContains(e, InvalidDefinitionException.class,
+                     "The attribute 'myMethod' conflicts with a method of the same name on component");
 		}
     }
 	

@@ -43,6 +43,10 @@
     		e.stopPropagation();
     		e.preventDefault();
     	};
+
+		cmp._ontouchcancel = function(e) {
+			self.ontouchcancel(cmp, e);
+		};
     	
     	cmp._onInfiniteListRowOpen = function (e) {
     		// 1. close the open row if it exists 
@@ -106,7 +110,8 @@
     	var ul = cmp.getElement();
     	ul.addEventListener(this.getEventNames().move, cmp._ontouchmove, false);
         ul.addEventListener(this.getEventNames().end, cmp._ontouchend, true);
-        ul.addEventListener("dragstart", cmp._preventEvent, true);
+		ul.addEventListener(this.getEventNames().cancel, cmp._ontouchcancel, false);
+		ul.addEventListener("dragstart", cmp._preventEvent, true);
     },
    
     /**
@@ -116,7 +121,8 @@
     	var ul = cmp.getElement();
     	ul.removeEventListener(this.getEventNames().move, cmp._ontouchmove);
     	ul.removeEventListener(this.getEventNames().end, cmp._ontouchend, true);
-    	ul.removeEventListener("dragstart", cmp._preventEvent, true);
+		ul.removeEventListener(this.getEventNames().cancel, cmp._ontouchcancel, false);
+		ul.removeEventListener("dragstart", cmp._preventEvent, true);
     },
     
     /**
@@ -124,15 +130,15 @@
      *  Attempts to resolve the actionable row and  
      *  attaches 'move' and 'end' listeners if a valid row was found.
      */
-    ontouchstart: function (cmp, e) {  
-    	var touch, rootClassName, ul, row, openRowSwipe, 
+    ontouchstart: function (cmp, e) {
+    	var touch, rootClassName, ul, row, openRowSwipe,
     		initialPosition = 0;
 
         // Cancel when blocking is needed.
         if (cmp._isClosing || cmp._isSnapping || this.isBlocked(cmp)) {
             e.stopPropagation();
-            e.preventDefault();    
-            return;     
+            e.preventDefault();
+            return;
         }
         
     	if ((e.touches && e.touches.length == 1) || (e.pageX !== undefined)) {
@@ -178,12 +184,18 @@
     		}
     	}
     },
+
+	ontouchcancel: function(cmp, event) {
+		if (cmp._swipe) {
+			this.closeRowBlockAndReset(cmp, cmp._swipe);
+		}
+	},
     
     /**
      * 'move' handler. 
      * Records the touch/pointer interaction. 
      */
-    ontouchmove: function (cmp, e) {   
+    ontouchmove: function (cmp, e) {
     	var point = null, // must be explicitly null
             swipe, axis, percentage;
 
@@ -191,8 +203,8 @@
     	// bounce the event and return.
         if (cmp._isClosing || cmp._isSnapping || this.isBlocked(cmp)) {
             e.stopPropagation();
-            e.preventDefault();    
-            return;  
+            e.preventDefault();
+            return;
         }
 
     	// Continue tracking the swipe if the an associated row was found.
@@ -213,10 +225,10 @@
             axis = cmp._direction || this.getScrollAxis(swipe.absX, swipe.absY);
             
             if (axis === 'x') {
-                // If a greater gesture occurred horizontally than vertically, 
-                // then prevent event bubbling to keep the scroller from moving.
-                e.stopPropagation();
-                e.preventDefault();
+                // If a greater gesture occurred horizontally than vertically,
+                // then prevent prevent the scroller from moving.
+				// Tells all scrollers to cancel scrolling (see ScrollerJS.js)
+				event.cancelScrolling = true;
                 
                 // Positive displacement is a 'open' gesture.
             	// Negative displacement is an 'close' gesture.
@@ -352,7 +364,7 @@
     onInfiniteListRowClose: function (cmp, e) {
     	e.preventDefault();
     	e.stopPropagation();
-    	
+
     	var target 		  = e.target,
     		body 		  = target.querySelector('div.body'),
     		useTransition = e.detail && e.detail.useTransition;
@@ -392,10 +404,13 @@
         // Use two variables to cancel all touch events.
         cmp._isClosing = true;
         this.block(cmp);
-        
+
+		var self = this;
+
         this.setCheckedTimeout(cmp, function () {
             cmp._isClosing = false;
             swipe.body.style.transition = '';
+			self.unblock(cmp);
         }, this.CLOSE_TIMEOUT);
     },
     
@@ -457,25 +472,28 @@
     	
 		if (window["navigator"]["pointerEnabled"]) {
 		    eventNames = {
-		        start : 'pointerdown',
-		        move  : 'pointermove',
-		        end   : 'pointerup' 
+		        start  : 'pointerdown',
+		        move   : 'pointermove',
+		        end    : 'pointerup',
+		        cancel : 'pointercancel'
 		    };
 		
 		} 
 		else if (window["navigator"]["msPointerEnabled"]) {
 		    eventNames = {
-		        start : 'MSPointerDown',
-		        move  : 'MSPointerMove',
-		        end   : 'MSPointerUp' 
+		        start  : 'MSPointerDown',
+		        move   : 'MSPointerMove',
+		        end    : 'MSPointerUp',
+		        cancel : 'MSPointerCancel',
 		    };
 		     
 		} 
 		else {
 		    eventNames = {
-		        start : 'touchstart',
-		        move  : 'touchmove',
-		        end   : 'touchend'
+		        start  : 'touchstart',
+		        move   : 'touchmove',
+		        end    : 'touchend',
+				cancel : 'touchcancel'
 		    };
 		}
 		 

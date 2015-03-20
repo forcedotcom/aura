@@ -15,11 +15,9 @@
  */
 /*jslint sub: true */
 
-// #include aura.controller.Action
 // #include aura.controller.ActionCallbackGroup
 // #include aura.controller.ActionQueue
 // #include aura.controller.ActionCollector
-// #include aura.model.ValueDef
 
 /**
  * @description Counter for in flight actions

@@ -129,6 +129,7 @@
 .THIS .panelDialog .body {
 	padding-top: 0;
 	background-color: inherit;
+	overflow: hidden;
 }
 
 .THIS .panelDialog .body.scrollbox > div.uiScrollerDeprecated > div {

@@ -140,6 +140,16 @@ public class AuraServlet extends AuraBaseServlet {
             final String fragment = uri.getFragment();
             final String query = uri.getQuery();
             final StringBuffer sb = request.getRequestURL();
+            String httpProtocol = "http://";
+            String defaultUriScheme = "http";
+            String secureUriScheme = "https";
+            int dIndex = sb.indexOf(httpProtocol);
+
+            // check and modify sb if URL is http but request is secure
+            if (request.isSecure() && dIndex == 0) {
+            	sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
+            }
+
             int index = sb.indexOf("//");
             index = sb.indexOf("/", index + 2);  // find the 3rd slash, start of path
             sb.setLength(index);

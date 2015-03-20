@@ -26,3 +26,6 @@ text-align: left;
 #trs td {
     max-width: 200px
 }
+
+#trs tr:nth-child(even) {background: #DDD}
+#trs tr:nth-child(odd) {background: #FFF}

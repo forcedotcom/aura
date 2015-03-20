@@ -17,7 +17,6 @@
 -->
 <aura:component template="auradev:blankTemplate" extensible="true">
 <aura:attribute name="lastMod" type="String" default=""/>
-<aura:attribute name="contextPath" type="String" default=""/>
 <aura:attribute name="resourceURLs" type="String" default=""/>CACHE MANIFEST
 
 
@@ -28,8 +27,6 @@ NETWORK:
 *
 
 CACHE:
-{!v.contextPath}/auraFW/resources/aura/resetCSS.css
-{!v.contextPath}/auraFW/resources/aura/normalize.css
 {!v.resourceURLs}
 
 

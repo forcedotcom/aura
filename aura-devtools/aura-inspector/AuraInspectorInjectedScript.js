@@ -1,4 +1,5 @@
 //*** Used by Aura Inspector
+// This is injected in the DOM directly via <script> injection
 (function(){
     var actions = {
         "AuraDevToolService.RequestComponentTree" : function (event) {
@@ -106,20 +107,12 @@
         if(actions.hasOwnProperty(action)) {
             actions[action](event);
         }
-
     });
 
-    if(typeof $A != "undefined" && $A.getContext().mode === "DEV") {
-        $A.PerfDevToolsEnabled = true;
-        __auraPerfDevTools();
-        var tempHook = $A.$initPriv$;
-        $A.$initPriv$ = function() {
-            $A.PerfDevTools.init();
-            tempHook.apply(this, arguments);
-        };
-    }
 
-    function __auraPerfDevTools() {
+    var bootstrapPerfDevTools = function () {
+        $A.PerfDevToolsEnabled = true;
+
         var OPTIONS = {
                 componentCreation  : true,
                 componentRendering : true,
@@ -156,10 +149,11 @@
                 };
             },
             _initializeHooks: function () {
-                if (this.opts.componentCreation) {
+                if (this.opts.componentCreation && $A.getContext().mode !== 'PROD') {
                     this._initializeHooksComponentCreation();
                 }
-                if (this.opts.transactions) {
+
+                if (this.opts.transactions && $A.getContext().mode !== 'PROD') {
                     this._initializeHooksTransactions();
                 }
             },
@@ -195,7 +189,6 @@
 
             _initializeHooksComponentCreation: function () {
                 this._hookMethod($A.componentService, 'newComponentDeprecated', CMP_CREATE_MARK);
-                this._hookMethod($A.componentService, '$newComponentDeprecated$', CMP_CREATE_MARK);
             },
             getComponentCreationProfile: function () {
                 return this._generateCPUProfilerDataFromMarks(this.collector.componentCreation);
@@ -229,8 +222,9 @@
                 var id = 0;
                 function nextId () {return ++id;}
                 function logTree(stack, mark) {
-                    //var d = '||| ';
-                    //console.log(Array.apply(0, Array(stack)).map(function(){return d;}).join(''), mark);
+                    // UNCOMMENT THIS FOR DEBUGGING PURPOSES:
+                    // var d = '||| ';
+                    // console.log(Array.apply(0, Array(stack)).map(function(){return d;}).join(''), mark);
                 }
 
                 function hashCode(name) {
@@ -352,10 +346,22 @@
                 };
             }
         };
-    }
+    };
 
+
+    (function boostrap() {
+        if (typeof $A != "undefined" && $A.initAsync) {
+            bootstrapPerfDevTools();
+            $A.PerfDevTools.init();
+        } else {
+            console.log('Could not attach AuraDevTools Extension.');
+        }
+    }());
+
+
+    // TODO: KGRAY: Probably garbage to remove:
+    //
     // var evt = $A.get("e.aura:valueChange");
-    
     // var fire = evt.constructor.prototype.fire;
 
     // // Override Events, not sure why this doesn't cover things like aura:valueChange

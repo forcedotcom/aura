@@ -117,6 +117,176 @@ Test.Aura.AuraComponentServiceTest = function(){
 
             Assert.Equal(expected,actual);
         }
+
+        [Fact]
+        function ThrowsIfNoDefAndLayoutDescriptor() {
+            var desc = "layout://blah";
+            var expected="Missing " + desc + " definition.";
+            targetService.getComponentConfigs = function(config) {
+                return {
+                    "definition": null,
+                    "descriptor": desc,
+                    "configuration": config
+                }
+            };
+
+            var actual=Record.Exception(function(){
+                $Amock(function(){
+                    targetService.createComponent("test",null,function(){});
+                })
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function ClearsDynamicNamespacesIfNoDefAndLayoutDescriptor() {
+            var actual;
+            var expected = [];
+            var desc = "layout://blah";
+            targetService.getComponentConfigs = function(config) {
+                return {
+                    "definition": null,
+                    "descriptor": desc,
+                    "configuration": config
+                }
+            };
+            targetService.registry.dynamicNamespaces = ["to be cleared"];
+
+            try {
+                $Amock(function(){
+                    targetService.createComponent("test",null,function(){});
+                });
+            } catch(e){} 
+            actual = targetService.registry.dynamicNamespaces;
+
+            Assert.Equal(expected,actual);
+        }
+        
+        [Fact]
+        function GetsComponentFromServerWhenNoDef() {
+            var actual = false;
+            targetService.getComponentConfigs = function(config) {
+                return {
+                    "definition": null,
+                    "descriptor": "blah",
+                    "configuration": config
+                }
+            };
+            targetService.requestComponent = function() {
+                actual = true;
+            }
+
+            $Amock(function(){
+                targetService.createComponent("test",null,function(){});
+            });
+
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        function GetsComponentFromServerWhenDefHasRemoteDependencies() {
+            var actual = false;
+            var def = {
+                    hasRemoteDependencies: function() { return true;}
+            };
+            targetService.getComponentConfigs = function(config) {
+                return {
+                    "definition": def,
+                    "descriptor": "blah",
+                    "configuration": config
+                }
+            };
+            targetService.requestComponent = function() {
+                actual = true;
+            }
+
+            $Amock(function(){
+                targetService.createComponent("test",null,function(){});
+            });
+
+            Assert.True(actual);
+        }
+    }
+
+    [Fixture]
+    function createComponents(){
+        var $Amock=Mocks.GetMock(Object.Global(),"$A",{
+            assert:function(condition,message){
+                if(!condition)throw message;
+            },
+            util:{
+                isArray:function(obj){
+                    return obj instanceof Array;
+                },
+                isFunction:function(obj){
+                    return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
+                }
+            }
+        });
+
+        [Fact]
+        function ThrowsIfCallbackIsNotAValidFunctionPointer(){
+            var expected="ComponentService.createComponents(): 'callback' must be a Function pointer.";
+
+            var actual=Record.Exception(function(){
+                $Amock(function(){
+                    targetService.createComponents([], null);
+                })
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function ThrowsIfComponentsToCreateIsNotArray() {
+            var expected = "ComponentService.createComponents(): 'components' must be a valid Array.";
+            
+            var actual = Record.Exception(function() {
+                $Amock(function() {
+                    targetService.createComponents("ui:button",function(){});
+                });
+            });
+
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function CallsCreateComponentApiOncePerComponent() {
+            var actual = 0;
+            var expected = 3;
+            targetService.createComponent = function() {
+                actual++;
+            }
+
+            $Amock(function() {
+                targetService.createComponents([["test1"],["test2"],["test3"]],function(){});
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function PassesERRORWhenIncompleteActionFollowsError() {
+            var actual;
+            var expected = "ERROR";
+            targetService.createComponent = function(type, attributes, callback) {
+                if (type === "last") {
+                    callback(null, "INCOMPLETE");
+                } else {
+                    callback(null, "ERROR");
+                }
+            }
+            var callback = function(created, overallStatus, statusList) {
+                actual = overallStatus;
+            };
+
+            $Amock(function() {
+                targetService.createComponents([["test1"],["test2"],["last"]], callback);
+            });
+
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fixture]

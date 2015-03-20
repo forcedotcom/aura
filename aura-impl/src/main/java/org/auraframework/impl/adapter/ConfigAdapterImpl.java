@@ -21,33 +21,43 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
@@ -59,6 +69,7 @@ import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import aQute.bnd.annotation.component.Component;
@@ -79,12 +90,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     
     private static final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
 
-    // Available timezone regions provided by walltimejs data
-    private static final Set<String> AVAILABLE_TIMEZONE_REGIONS = Sets.newHashSet(
-            "Africa", "America", "Antarctica", "Asia", "Atlantic", "Australia", "CET", "CST6CDT", "EET", "EST",
-            "EST5EDT", "Etc", "Europe", "Factory", "HST", "Indian", "MET", "MST", "MST7MDT", "Pacific", "PST8PDT", "WET"
-    );
-    
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final JavascriptGroup jsGroup;
     private final FileGroup resourcesGroup;
@@ -96,6 +101,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private String auraVersionString;
     private boolean lastGenerationHadCompilationErrors = false;
     private final boolean validateCss;
+    private final Map<String, String> effectiveTimezones;
 
     public ConfigAdapterImpl() {
         this(getDefaultCacheDir());
@@ -165,6 +171,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
                 || Boolean.parseBoolean(validateCssString.trim());
 
+        effectiveTimezones = readEquivalentTimezones();
+        
         if (!isProduction()) {
             AuraFileMonitor.start();
         }
@@ -246,9 +254,58 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
     }
 
+    /**
+     * Determines whether to use normalize.css or resetCSS.css by looking at template attribute "normalizeCss"
+     *
+     * @return URL to reset css file
+     */
+    @Override
+    public String getResetCssURL() {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String contextPath = context.getContextPath();
+        String uid = context.getFrameworkUID();
+        String resetCss = "resetCSS";
+
+        try {
+            DefDescriptor appDesc = context.getApplicationDescriptor();
+            if (appDesc != null) {
+                BaseComponentDef templateDef = ((BaseComponentDef) appDesc.getDef()).getTemplateDef();
+                if (templateDef.isTemplate()) {
+                    BaseComponent template = Aura.getInstanceService().getInstance(templateDef);
+                    if (useNormalizeCss(template)) {
+                        resetCss = "normalize";
+                    }
+                }
+            }
+        } catch (QuickFixException qfe) {
+            // ignore and use default resetCSS.css
+        }
+
+        return String.format("%s/auraFW/resources/%s/aura/%s.css", contextPath, uid, resetCss);
+    }
+
+    /**
+     * The normalizeCss attribute value is found on the base aura:template component
+     * so recursively get the super component of the template until it's found and
+     * get the attribute value
+     *
+     * @param template template component
+     * @return whether normalizeCss attribute is set to true
+     * @throws QuickFixException
+     */
+    private boolean useNormalizeCss(BaseComponent template) throws QuickFixException {
+        DefDescriptor templateDescriptor = template.getDescriptor();
+        if (!(templateDescriptor.getNamespace().equals("aura") && templateDescriptor.getName().equals("template"))) {
+            return useNormalizeCss(template.getSuper());
+        }
+        return (Boolean) template.getAttributes().getValue("normalizeCss");
+    }
+
     @Override
     public String getJSLibsURL() {
-        String tz = getAvailableTimezone();
+        AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+        String tz = al.getTimeZone().getID();
+        tz = getAvailableTimezone(tz);
         tz = tz.replace("/", "-");
         AuraContext context = Aura.getContextService().getCurrentContext();
         String contextPath = context.getContextPath();
@@ -257,44 +314,40 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * Return WalltimeJS available timezone
-     * @return available walltimejs timezone
-     */
-    private String getAvailableTimezone() {
-        AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
-        String tz = al.getTimeZone().getID();
-        if (!isAvailableTimezone(tz)) {
-            tz = getEquivalentTimezone(tz);
-        }
-        return tz;
-    }
-
-    /**
-     * walltimejs data does not provide all timezones due to duplicate so we have the
+     * walltimejs data does not provide all timezones due to duplicates so we have the
      * one that is equivalent and available.
      *
      * @param timezoneId timezone
      * @return available equivalent timezone
      */
-    String getEquivalentTimezone(String timezoneId) {
-        Set<String> allTz = Sets.newHashSet(com.ibm.icu.util.TimeZone.getAvailableIDs());
-        if (allTz.contains(timezoneId)) {
-            int equivalentCount = com.ibm.icu.util.TimeZone.countEquivalentIDs(timezoneId);
-            for (int i = 0; i < equivalentCount; i++) {
-                String timezone = com.ibm.icu.util.TimeZone.getEquivalentID(timezoneId, i);
-                if (isAvailableTimezone(timezone)) {
-                    return timezone;
-                }
-            }
+    String getAvailableTimezone(String timezoneId) {
+        String effectiveTimezone = effectiveTimezones.get(timezoneId);
+        if (effectiveTimezone != null) {
+            return effectiveTimezone;
         }
         // return default if no matches
         return "GMT";
     }
 
-    private boolean isAvailableTimezone(String timezone) {
-        return AVAILABLE_TIMEZONE_REGIONS.contains(timezone.split("/")[0]);
-    }
+    /**
+     * Reads timezones json that contains all timezones and its available equivalents
+     *
+     * @return map of all timezones with its available equivalent
+     */
+    Map<String, String> readEquivalentTimezones() {
+        String timezonesJsonPath = "/aura/resources/timezones.json";
+        Map<String, String> equivalents = Maps.newHashMap();
 
+        if (resourceLoader.getResource(timezonesJsonPath) != null) {
+            Gson gson = new Gson();
+            Type mapType = new TypeToken<Map<String, String>>() {}.getType();
+            InputStream is = resourceLoader.getResourceAsStream(timezonesJsonPath);
+            Reader reader = new InputStreamReader(is);
+            equivalents = gson.fromJson(reader, mapType);
+        }
+        return equivalents;
+    }
+    
     @Override
     public String getHTML5ShivURL() {
         String ret = null;

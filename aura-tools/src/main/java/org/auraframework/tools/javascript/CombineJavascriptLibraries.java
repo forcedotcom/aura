@@ -16,7 +16,9 @@
 package org.auraframework.tools.javascript;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.ibm.icu.util.TimeZone;
 import org.auraframework.impl.util.AuraImplFiles;
 
 import java.io.BufferedReader;
@@ -28,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class CombineJavascriptLibraries {
@@ -41,11 +44,10 @@ public class CombineJavascriptLibraries {
     }
 
     /**
-     * Combines files specified in resources config json and creates a non-minified
-     * and minified version for every walltime timezone.
-     *
-     * Third party libraries should include "min" version along with non-minified in
-     * its directory in aura-resources.
+     * Combines files specified in resources config json and creates a non-minified and minified version for every
+     * walltime timezone.
+     * 
+     * Third party libraries should include "min" version along with non-minified in its directory in aura-resources.
      */
     public void generate() throws IOException {
 
@@ -115,13 +117,15 @@ public class CombineJavascriptLibraries {
 
         LOG.info(logging.toString());
 
+        List<String> existingTimezones = Lists.newArrayList();
+
         Path walltimeLocaleDirectory = resourcesSourceDir.resolve(config.walltimeLocaleDir);
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(walltimeLocaleDirectory)) {
             for (Path path : directoryStream) {
                 String fileName = path.getFileName().toString();
                 String ending = fileName.substring(fileName.indexOf("_"), fileName.length());
                 int extIndex = ending.lastIndexOf(".");
-                String timezone = ending.substring(0, extIndex);
+                String timezone = ending.substring(1, extIndex);
                 String tzContent = readFile(path);
                 // include timezone code and with cached output
                 StringBuilder dev = new StringBuilder(tzContent);
@@ -129,8 +133,9 @@ public class CombineJavascriptLibraries {
                 dev.append(System.lineSeparator()).append(";").append(outputDev);
                 min.append(System.lineSeparator()).append(";").append(outputMin);
                 // write both non-minified and minified files
-                Files.write(destDir.resolve("libs" + timezone + ".js"), dev.toString().getBytes());
-                Files.write(destDir.resolve("libs" + timezone + ".min.js"), min.toString().getBytes());
+                Files.write(destDir.resolve("libs_" + timezone + ".js"), dev.toString().getBytes());
+                Files.write(destDir.resolve("libs_" + timezone + ".min.js"), min.toString().getBytes());
+                existingTimezones.add(timezone.replace("-", "/"));
             }
         }
 
@@ -138,12 +143,37 @@ public class CombineJavascriptLibraries {
         Files.write(destDir.resolve("libs_GMT.js"), outputDev.toString().getBytes());
         Files.write(destDir.resolve("libs_GMT.min.js"), outputMin.toString().getBytes());
 
+        LOG.info("Generating equivalent timezones json");
+        String timezonesJson = generateEquivalentTimezonesJson(existingTimezones, gson);
+        Files.write(destDir.resolve("timezones.json"), timezonesJson.getBytes());
         LOG.info("Finished generating resource files in " + destDir.toString());
+    }
+
+    private String generateEquivalentTimezonesJson(List<String> existingTimezones, Gson gson) {
+        Map<String, String> mapped = Maps.newHashMap();
+        for (String existingTimezone : existingTimezones) {
+            mapped.put(existingTimezone, existingTimezone);
+        }
+        // map equivalents
+        for (String timezone : TimeZone.getAvailableIDs()) {
+            if (!existingTimezones.contains(timezone)) {
+                continue;
+            }
+            int equivalentCount = TimeZone.countEquivalentIDs(timezone);
+            for (int i = 0; i < equivalentCount; i++) {
+                String alternateId = TimeZone.getEquivalentID(timezone, i);
+                if (!mapped.containsKey(alternateId)) {
+                    mapped.put(alternateId, timezone);
+                }
+            }
+        }
+        mapped.put("GMT", "GMT");
+        return gson.toJson(mapped);
     }
 
     /**
      * Reads file to String
-     *
+     * 
      * @param file Path to file
      * @return string contents
      * @throws IOException
@@ -163,7 +193,7 @@ public class CombineJavascriptLibraries {
 
     /**
      * Returns minified file name given non-minified file name
-     *
+     * 
      * @param original file name
      * @return minified file name
      */

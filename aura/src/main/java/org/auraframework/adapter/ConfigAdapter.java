@@ -15,7 +15,6 @@
  */
 package org.auraframework.adapter;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,6 +60,8 @@ public interface ConfigAdapter extends AuraAdapter {
     String getHTML5ShivURL();
 
     String getJSLibsURL();
+
+    String getResetCssURL();
 
     boolean isPrivilegedNamespace(String namespace);
     String getDefaultNamespace();

@@ -15,6 +15,18 @@
  */
 package org.auraframework.http;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,18 +41,6 @@ import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.util.text.Hash;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -472,21 +472,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI);
-        DummyHttpServletResponse response = new DummyHttpServletResponse() {
-
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter writer = new PrintWriter(stringWriter);
-            @Override
-            public PrintWriter getWriter() throws IOException {
-                return writer;
-            }
-
-            // Hacking method to verify content of PrintWriter. This is never called in writeManifest
-            @Override
-            public String getContentType() {
-                return stringWriter.toString();
-            }
-        };
+        DummyHttpServletResponse response = new MyDummyHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
 
@@ -503,4 +489,56 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     }
 
+    /**
+     * Verify framework UID exists in auraFW javascript urls in appcache manifest
+     */
+    public void testManifestFwJsUrlContainsFWId() throws Exception {
+        // Arrange
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:testApp",
+                ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV,
+                AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        String uid = context.getDefRegistry().getUid(null, appDesc);
+        context.addLoaded(appDesc, uid);
+        DummyHttpServletRequest request = new DummyHttpServletRequest(RESOURCE_URI);
+        DummyHttpServletResponse response = new MyDummyHttpServletResponse();
+        AuraResourceServlet servlet = new AuraResourceServlet();
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        String content = response.getContentType();
+        Pattern pattern = Pattern.compile("FW=(.*)\n");
+        Matcher matcher = pattern.matcher(content);
+        if(matcher.find()) {
+            String fwId = matcher.group(1);
+            Pattern p = Pattern.compile("/auraFW/.*\\.js\n");
+            Matcher m = p.matcher(content);
+            while(m.find()) {
+                String url = m.group(0);
+                if(!url.contains(fwId)) {
+                    fail("AuraFW JS url does not contain FW UID: " + url);
+                }
+            }
+        }
+    }
+
+    private static class MyDummyHttpServletResponse extends DummyHttpServletResponse {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        @Override
+        public PrintWriter getWriter() throws IOException {
+            return writer;
+        }
+
+        // Hacking method to verify content of PrintWriter. This is never called in writeManifest
+        @Override
+        public String getContentType() {
+            return stringWriter.toString();
+        }
+    }
 }

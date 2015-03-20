@@ -25,10 +25,14 @@
 	
 	noAttr : function(cmp, event, helper) {
 		var paramArray = event.getParam('arguments');
-		if(paramArray && paramArray.length > 0) {
-			cmp.set("v.outputStringAttr",paramArray.join()+", return from noAttr");
-		} else {
-			cmp.set("v.outputStringAttr","return from noAttr");
+		if(paramArray) {
+			if(paramArray.length >= 0) {//array
+				cmp.set("v.outputStringAttr","paramArray: "+paramArray.join()+", return from noAttr");
+			} else {//object
+				$A.error("This should not happen as we don't have attributes at all");
+			}
+		} else {//undefined
+			$A.error("Did not get the argument");//cmp.set("v.outputStringAttr", "return from noAttr")
 		}
 	},
 	

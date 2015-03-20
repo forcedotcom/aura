@@ -732,14 +732,14 @@ public class Json {
             if ((refId = getRefId(serializer.getReferenceScope(value), value)) != null) {
                 // Output a simple reference
                 writeMapBegin();
-                writeMapEntry(ApplicationKey.SERIAL_REFID, refId);
+                writeMapEntry(ApplicationKey.SERIAL_REFID.toString(), refId);
                 writeMapEnd();
             } else {
                 refId = addReference(serializer.getReferenceScope(value), value);
                 // Now manually output this 2-element map to avoid loop
                 writeMapBegin();
-                writeMapEntry(ApplicationKey.SERIAL_ID, refId);
-                writeMapKey(ApplicationKey.VALUE);
+                writeMapEntry(ApplicationKey.SERIAL_ID.toString(), refId);
+                writeMapKey(ApplicationKey.VALUE.toString());
                 serializer.serialize(this, value);
                 writeMapEnd();
             }
@@ -1060,16 +1060,16 @@ public class Json {
             return result;
         } else if (config instanceof Map) {
             Map<String, Object> m = (Map<String, Object>) config;
-            BigDecimal serId = (BigDecimal) m.get(ApplicationKey.SERIAL_ID);
+            BigDecimal serId = (BigDecimal) m.get(ApplicationKey.SERIAL_ID.toString());
             if (serId != null) {
-                Object value = m.get(ApplicationKey.VALUE);
+                Object value = m.get(ApplicationKey.VALUE.toString());
                 Object result = value instanceof List ? Lists.newArrayList() : Maps.newHashMap();
                 // We must cache the new item first because we could loop back
                 // to this serId internally
                 cache.put(serId.intValue(), result);
                 return resolveRefs(value, cache, result);
             }
-            BigDecimal serRefId = (BigDecimal) m.get(ApplicationKey.SERIAL_REFID);
+            BigDecimal serRefId = (BigDecimal) m.get(ApplicationKey.SERIAL_REFID.toString());
             if (serRefId != null) {
                 Object value = cache.get(serRefId.intValue());
                 // if there is no value we could throw here

@@ -39,7 +39,6 @@
         var dataModel = cmp.get("v.dataModel")[0];
         if (dataModel) {
         	dataModel.addHandler("onchange", cmp, "c.handleDataChange");
-            cmp.set("v.dataModel", dataModel);
         }
     },
     initializeItems: function (cmp) {
@@ -309,6 +308,15 @@
     	cmp.set('v._sortBy', sortBy);
     },
     
+    /**
+     * Default callback to handle the results of a sort.
+     * When this callback is sent through the onsort event, the virtualDataGrid
+     * component object is bound to the first parameter. If the callback is
+     * then retrieved from the event, it can simply be called with callback(response)
+     * 
+     * @param {Component} cmp virtualDataGrid component bound to the function.
+     * @param {Object} response Response from the sort. Can either be an Array or an Object
+     */
     sortCallback: function(cmp, response) {
 		if (response && Array.isArray(response)) {
 			cmp.set('v.items', response);

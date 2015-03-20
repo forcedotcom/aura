@@ -88,8 +88,9 @@
     	}
     },
     
-    /*
-	 *
+    /**
+     * Direct method to call when we want the grid to sort its data.
+     * Currently only updates the UI based on the given sortBy
      */
     sort: function(cmp, event, helper) {
     	var sortBy = event.getParam('arguments').sortBy;

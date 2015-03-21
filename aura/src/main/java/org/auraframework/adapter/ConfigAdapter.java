@@ -90,4 +90,6 @@ public interface ConfigAdapter extends AuraAdapter {
 	 *    actual policy desired.
 	 */
 	ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request);
+
+	String getAvailableTimezone(String timezoneId);
 }

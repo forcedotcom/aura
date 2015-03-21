@@ -16,6 +16,7 @@
 package org.auraframework.http;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -29,6 +30,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.base.Joiner;
@@ -109,6 +111,26 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
 
         assertTrue("Reset CSS should be default resetCSS.css",
             Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    }
+    
+    //test added for W-2514624, we combine external Js Libraries into one request
+    public void testCombinedJSUrlAPPGMT() throws Exception {
+    	AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+    	String tz = al.getTimeZone().getID();
+        tz = Aura.getConfigAdapter().getAvailableTimezone(tz);
+        tz = tz.replace("/", "-");
+        assertTrue("We expect the test get run on a GMT timezone server, but instead we have timezone="+tz, tz.equals("GMT"));
+        String markup = "<aura:application></aura:application>";
+        String expect = String.format("/auraFW/resources/#FAKEUID#/libs_%s.js", tz);
+        
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, markup);
+    	setupContext(app);
+        assertTrue("expect to get combined JavascriptLibs url(lib_[TimeZone].js), but get "+Aura.getConfigAdapter().getJSLibsURL()+" instead", 
+        		Aura.getConfigAdapter().getJSLibsURL().contains(expect));
+    }
+    
+    public void runTestCombinedJSUrl(String markup, String expect) throws Exception {
+        
     }
 
     private AuraContext setupContext(DefDescriptor<ApplicationDef> defdesc) {

@@ -27,21 +27,5 @@
     		$A.test.expectAuraError("Unable to set value for key '$Bla.whatever.anything'. No value provider was found for '$Bla'. : false");
     		$A.set("$Bla.whatever.anything","new value");
     	}
-    },
-    
-
-    testInvalidGVPExpressions: {
-        test: function (cmp) {
-            var expected="Assertion Failed!: Unable to get value for key 'v.simplevalue3'. No value provider was found for 'v'. : false";
-            var actual = null;
-
-            try {
-                $A.get("v.simplevalue3");
-            }catch(e){
-                actual=e.message||e.description;
-            }
-
-            $A.test.assertEquals(expected, actual, "Invalid GVP expression should throw.");
-        }
-    },
+    }
 })

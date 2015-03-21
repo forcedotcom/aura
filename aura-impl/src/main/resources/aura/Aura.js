@@ -762,17 +762,17 @@ $A.ns.Aura.prototype.get = function(key, callback) {
     var path = key.split('.');
     var root = path.shift();
     var valueProvider = $A.services[root] || $A.getValueProvider(root);
-    if(!valueProvider){
-        $A.assert(false, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
-    }
-    if (path.length) {
-        if (valueProvider.get) {
-            return valueProvider.get(path.join('.'), callback);
-        } else {
-            return $A.expressionService.resolve(path, valueProvider);
+    if (valueProvider) {
+        if (path.length) {
+            if (valueProvider.get) {
+                return valueProvider.get(path.join('.'), callback);
+            } else {
+                return $A.expressionService.resolve(path, valueProvider);
+            }
         }
+        return valueProvider.getValues ? valueProvider.getValues() : valueProvider;   
     }
-    return valueProvider.getValues ? valueProvider.getValues() : valueProvider;
+    
 };
 
 /**

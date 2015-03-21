@@ -382,7 +382,7 @@ public class AuraConversionTest extends AuraImplTestCase {
 
         out.put("a", "b");
         out.put("c", "d");
-        runPassPairs(HashMap.class, new Object[] { "{ 'a': 'b' , 'c':'d'}", out }, true);
+        runPassPairs(HashMap.class, new Object[] { "{ 'a': 'b' , 'c':'d'}", out }, false);
     }
 
     /**

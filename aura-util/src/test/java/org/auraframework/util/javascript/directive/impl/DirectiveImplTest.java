@@ -124,7 +124,7 @@ public class DirectiveImplTest extends UnitTestCase {
         // 2. When two values are specified for the same key value, the right
         // most assignment will be used
         d = new TestDirective(4, sample[7]);
-        assertTrue(d.getConfig().toString().equals("{modes=[MOCK2], blah=son of a diddly}"));
+        assertTrue(d.getConfig().toString().equals("{blah=son of a diddly, modes=[MOCK2]}"));
 
         d = new TestDirective(4, sample[8]);
         assertTrue(d.getModes().equals(EnumSet.allOf(JavascriptGeneratorMode.class)));

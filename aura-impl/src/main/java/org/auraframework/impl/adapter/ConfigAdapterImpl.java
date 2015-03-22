@@ -321,7 +321,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * @param timezoneId timezone
      * @return available equivalent timezone
      */
-    String getAvailableTimezone(String timezoneId) {
+    @Override
+    public String getAvailableTimezone(String timezoneId) {
         String effectiveTimezone = effectiveTimezones.get(timezoneId);
         if (effectiveTimezone != null) {
             return effectiveTimezone;

@@ -152,6 +152,25 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         assertEquals(expected, action.getReturnValue());
     }
 
+    /** if a var is an alias, references to the aliased var should be included */
+    public void testCrossReference() throws Exception {
+        // color2 points to color1
+        addNsTheme(theme().var("color1", "red").var("color2", "{!color1}").var("color3", "yellow"));
+
+        // theme overrides color1
+        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color1", "green"));
+
+        // style points to color2, it should be included because color1 is overridden
+        DefDescriptor<StyleDef> style = addContextAppBundleStyle(".THIS{color: t(color2); background: t(color3);}");
+        addContextApp("<aura:application/>");
+
+        Action action = runAction(toApply.getDescriptorName());
+        assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
+
+        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        assertEquals(expected, action.getReturnValue());
+    }
+
     private Action runAction(String theme) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("themes", Lists.newArrayList(theme));

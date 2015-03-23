@@ -15,6 +15,8 @@
  */
 package org.auraframework.css;
 
+import java.util.Set;
+
 import org.auraframework.def.ThemeDescriptorProvider;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
@@ -36,9 +38,21 @@ public interface ThemeValueProvider extends ValueProvider {
      *
      * @return The value, same as from {@link #getValue(PropertyReference)}
      *
-     * @throws QuickFixException
+     * @throws QuickFixException A number of reasons, including an invalid ThemeDef.
      */
     Object getValue(String expression, Location location) throws QuickFixException;
+
+    /**
+     * Extracts the set of var names referenced in the given string expression.
+     *
+     * @param expression The string containing references to vars (and potentially other literals).
+     * @param followCrossReferences If true, this will include any cross referenced var names. For example, with
+     *            {@code var1='A'} and {@code var2=var1}, for the expression "var2", if this param is specified as true
+     *            then this method will return {@code var2} and {@code var1}.
+     * @return The names of referenced vars.
+     * @throws QuickFixException A number of reasons, including an invalid ThemeDef.
+     */
+    Set<String> extractVarNames(String expression, boolean followCrossReferences) throws QuickFixException;
 
     /**
      * Gets the specified indication of how this theme value provider is planned to be used.

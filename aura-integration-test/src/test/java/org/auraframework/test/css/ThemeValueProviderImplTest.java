@@ -16,6 +16,7 @@
 package org.auraframework.test.css;
 
 import java.util.List;
+import java.util.Set;
 
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.ThemeValueProvider;
@@ -223,6 +224,60 @@ public class ThemeValueProviderImplTest extends StyleTestCase {
         } catch (Exception e) {
             checkExceptionContains(e, ThemeValueNotFoundException.class, "was not found");
         }
+    }
+
+    public void testExtractVarNamesNoCrossRef() throws QuickFixException {
+        addNsTheme(theme().var("color1", "red"));
+        Set<String> names = setup().extractVarNames("color1", true);
+        assertEquals("didn't get expected size", 1, names.size());
+        assertTrue(names.contains("color1"));
+    }
+
+    public void testExtractVarNamesFollowCrossRefsFalse() throws QuickFixException {
+        addNsTheme(theme().var("color1", "red").var("color2", "{!color1}"));
+        Set<String> names = setup().extractVarNames("color2", false);
+        assertEquals("didn't get expected size", 1, names.size());
+        assertTrue(names.contains("color2"));
+    }
+
+    public void testExtractVarNamesCrossRefSelf() throws QuickFixException {
+        addNsTheme(theme().var("color1", "red").var("color2", "{!color1}"));
+        Set<String> names = setup().extractVarNames("color2", true);
+        assertEquals("didn't get expected size", 2, names.size());
+        assertTrue(names.contains("color1"));
+        assertTrue(names.contains("color2"));
+    }
+
+    public void testExtractVarNamesCrossRefParent() throws QuickFixException {
+        DefDescriptor<ThemeDef> parent = addSeparateTheme(theme().var("color1", "red"));
+        addNsTheme(theme().parent(parent).var("color2", "{!color1}"));
+        Set<String> names = setup().extractVarNames("color2", true);
+        assertEquals("didn't get expected size", 2, names.size());
+        assertTrue(names.contains("color1"));
+        assertTrue(names.contains("color2"));
+    }
+
+    public void testExtractVarNamesCrossRefMultiple() throws QuickFixException {
+        addNsTheme(theme()
+                .var("color1", "red")
+                .var("color2", "{!color1}")
+                .var("color3", "{!color2}")
+                .var("color4", "{!color3}")
+                .var("color5", "{!color4}")
+                .var("colorA", "{!color1}")
+                .var("colorB", "{!colorA}")
+                .var("colorC", "{!colorB}")
+                );
+        Set<String> names = setup().extractVarNames("color5 + colorB", true);
+        assertEquals("didn't get expected size", 7, names.size());
+        assertTrue(names.contains("color1"));
+        assertTrue(names.contains("color2"));
+        assertTrue(names.contains("color3"));
+        assertTrue(names.contains("color4"));
+        assertTrue(names.contains("color5"));
+        assertTrue(names.contains("colorA"));
+        assertTrue(names.contains("colorB"));
+        assertFalse(names.contains("colorC"));
     }
 
     /** tvp = theme value provider */

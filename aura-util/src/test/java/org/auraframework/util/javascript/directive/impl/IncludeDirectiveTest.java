@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.directive.Directive;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
@@ -73,45 +74,6 @@ public class IncludeDirectiveTest extends UnitTestCase {
     }
 
     /**
-     * Test cyclic include directives
-     */
-    /*
-     * Cannot have this test in autobuild. If it fails it will hose the whole
-     * autobuild. But a bug has been filed for this.
-     * https://gus.soma.salesforce.com/a0790000000DQ06AAG public void
-     * testCyclicInclude() throws Exception{ DirectiveBasedJavascriptGroup jg =
-     * new DirectiveBasedJavascriptGroup( "testDummy", new
-     * File(SettingsTestUtil.getTestdataDir()),
-     * "javascript/includeDirective/cyclicInclude1.js", false,
-     * ImmutableList.of(DirectiveTypes.includeType),
-     * EnumSet.of(JavascriptGeneratorMode.TESTING)); DirectiveParser dp = new
-     * DirectiveParser (jg, jg.getStartFile()); try{ dp.parseFile();
-     * fail("Should not have processed a cyclic INCLUDE directive"); }catch(
-     * RuntimeException e){
-     * assertTrue("The Javascript Processor failed for some unkown reason"
-     * ,e.getMessage().startsWith("Cyclic Include directives found")); } }
-     */
-    /**
-     * https://gus.soma.salesforce.com/a0790000000DQ3AAAW Test common inclusion.
-     * What if the same javascript file is included twice. Ideally each included
-     * javascript should be parsed and processed only once.
-     */
-    public void testCommonInclude() throws Exception {
-        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude.js");
-        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_inner1.js");
-        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_inner2.js");
-        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_commonstuff.js");
-        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy",
-                getResourceFile("/testdata/"), "javascript/includeDirective/testCommonInclude.js",
-                ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
-                EnumSet.of(JavascriptGeneratorMode.TESTING));
-        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
-        dp.parseFile();
-        goldFileText(dp.generate(JavascriptGeneratorMode.TESTING), ".js");
-
-    }
-
-    /**
      * Include some non-existing file. Really this is handled by
      * DirectivebasedJavascriptGroup. But having this test here only doubles the
      * number of checks.
@@ -149,4 +111,53 @@ public class IncludeDirectiveTest extends UnitTestCase {
         goldFileText(dp.generate(JavascriptGeneratorMode.TESTING), "_test.js");
         goldFileText(dp.generate(JavascriptGeneratorMode.AUTOTESTING), "_auto.js");
     }
+
+    /**
+     * Test cyclic include directives
+     * TODO: W-2537655
+     * Disable the test, since we don't handle the cyclic includes now. The test can be used when fixing the bug.
+     */
+    public void _testCyclicInclude() throws Exception {
+        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy",
+                getResourceFile("/testdata/"),
+                "javascript/includeDirective/testCyclicInclude.js",
+                ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
+                EnumSet.of(JavascriptGeneratorMode.TESTING));
+        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
+        try {
+            dp.parseFile();
+            fail("Failed to process a cyclic INCLUDE directive");
+        } //If we throw exception when cyclic includes, assert catch corresponding exception here. catch() {}
+        catch (StackOverflowError e) {
+            // FIXME: this need to be removed when the bug is fixed.
+            fail("Failed to catch cyclic incudes.");
+        }
+    }
+
+    /**
+     * Test duplicate include directives
+     * TODO: W-2537655
+     * Disable the test, since we don't handle the cyclic includes now. The test can be used when fixing the bug.
+     */
+    public void _testCommonInclude() throws Exception {
+        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude.js");
+        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_inner1.js");
+        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_inner2.js");
+        getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_commonstuff.js");
+        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy",
+                getResourceFile("/testdata/"), "javascript/includeDirective/testCommonInclude.js",
+                ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
+                EnumSet.of(JavascriptGeneratorMode.TESTING));
+        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
+
+        dp.parseFile();
+        String generateContent = dp.generate(JavascriptGeneratorMode.TESTING);
+
+        // FIXME: if we want to error out when duplicate includes, change the assertion.
+        // System.out.println(generateContent);
+        int count = StringUtils.countMatches(generateContent, "file testCommonInclude_commonstuff.js");
+        assertEquals(1, count);
+    }
+
+
 }

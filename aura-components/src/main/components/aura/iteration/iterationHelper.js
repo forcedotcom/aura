@@ -84,14 +84,14 @@
     buildBody: function (component, itemHandler, completeHandler) {
         var items = component.get("v.items");
         var template = component.get("v.template");
-        if (items && items.length && template && template.length) {
+        var startIndex = this.getStart(component);
+        var endIndex = this.getEnd(component);
+        var expectedCalls=endIndex-startIndex;
+        if (items && items.length && template && template.length && expectedCalls > 0) {
             var itemVar = component.get("v.var");
             var indexVar = component.get("v.indexVar");
             var forceServer = component.get("v.forceServer");
             var templateValueProvider = component.getComponentValueProvider();
-            var startIndex = this.getStart(component);
-            var endIndex = this.getEnd(component);
-            var expectedCalls=endIndex-startIndex;
             var currentCall=0;
             var collector=[];
             function getCollector(index){

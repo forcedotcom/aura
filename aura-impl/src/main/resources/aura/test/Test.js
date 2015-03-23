@@ -485,6 +485,9 @@ $A.ns.Test.prototype.callServerAction = function(action, doImmediate){
 
 /**
  * Set whether the server is reachable, to mimick being offline.
+ * 
+ * Note that this will not work with IE < 10 (see W-2537764).
+ * 
  * @param {Boolean} reachable True or absent to make the server reachable; otherwise the server is made unreachable.
  */
 $A.ns.Test.prototype.setServerReachable = function(reachable) {

@@ -391,6 +391,8 @@
     },
     
     testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents: {
+        // TODO(W-2537764): IE < 10 gives Access Denied error when trying to send XHRs after setServerReachable(false)
+        browsers: ["-IE7", "-IE8", "-IE9"],
         test: function(cmp) {
             var expected="INCOMPLETE";
             var actual;

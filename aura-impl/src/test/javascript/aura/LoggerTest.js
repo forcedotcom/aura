@@ -344,4 +344,56 @@ Test.Aura.LoggerTest = function() {
             }
         }
     }
+
+    [Fixture]
+    function reportError() {
+        var logger = new $A.ns.Logger();
+        var called = false;
+        var mockAction = {
+                setAbortable: function() {},
+                setParams: function() {},
+                setCallback: function() {}
+            };
+
+        var mockDeps = Mocks.GetMock(Object.Global(), "$A", {
+                get: function() { return mockAction; },
+                clientService: {
+                    enqueueAction: function() {called = true;}
+                }
+            });
+
+        [Fact]
+        function earlyReturnsIfReported() {
+            var target = new Error();
+            target["reported"] = true;
+
+            mockDeps(function() {
+                logger.reportError(target, "testAction", "testId");
+            });
+
+            Assert.False(called);
+        }
+
+        [Fact]
+        function enqueuesAction() {
+            var target = new Error();
+
+            mockDeps(function() {
+                logger.reportError(target, "testAction", "testId");
+            });
+
+            Assert.True(called);
+        }
+
+        [Fact]
+        function setsErrorReported() {
+            var target = new Error();
+
+            mockDeps(function() {
+                logger.reportError(target, "testAction", "testId");
+            });
+
+            Assert.True(target["reported"]);
+        }
+    }
 };

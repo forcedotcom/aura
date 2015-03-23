@@ -25,13 +25,15 @@
             if ($A.util.isUndefinedOrNull(value)) {
                 elem.value = "";
             } else {
-                if (document.activeElement == elem) {
-                    var selectionStart = elem.selectionStart;
-                    var selectionEnd = elem.selectionEnd;
-                    elem.value = value;
-                    elem.setSelectionRange(selectionStart,selectionEnd);
-                } else {
-                    elem.value = value;
+                if (value !== elem.value) {
+                    if (document.activeElement == elem) {
+                        var selectionStart = elem.selectionStart;
+                        var selectionEnd = elem.selectionEnd;
+                        elem.value = value;
+                        elem.setSelectionRange(selectionStart,selectionEnd);
+                    } else {
+                        elem.value = value;
+                    }
                 }
 
                 // carriage returns are added for new lines to match form encoded textarea behavior

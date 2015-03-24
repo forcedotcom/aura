@@ -21,7 +21,7 @@
     <aura:import library="ui:scrollerLib" property="lib" />
 
     <!-- Exposed attributes -->
-    <aura:attribute name="scroll"                type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal or vertical"/>
+    <aura:attribute name="scroll"                type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal, vertical or bidirectional"/>
     <aura:attribute name="enabled"               type="Boolean" default="true"     description="Sets the default state of the scroller"/>
     <aura:attribute name="useCSSTransition"      type="Boolean"                    description="Denotes whether to use css transitions. By default scroller will decide depending on the platform"/>
     <aura:attribute name="useNativeScroller"     type="Boolean" default="false"    description="Leverage native scrolling"/>

@@ -1,0 +1,454 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<aura:attribute name="scrollerId"      type="String" default="horizontalScroll"/>
+	
+	<div class="controlButtons">
+		<ui:button aura:id="toTop" label="Scroll to Top" press="{!c.scrollToTop}"/>
+		<ui:button aura:id="toBottom" label="Scroll to Bottom" press="{!c.scrollToBottom}"/>
+		<ui:button aura:id="toRight" label="Scroll to Right" press="{!c.scrollToRight}"/>
+		<ui:button aura:id="toLeft" label="Scroll to Left" press="{!c.scrollToLeft}"/> <br/>
+		<ui:button aura:id="byUp" label="Scroll Up" press="{!c.scrollUp}"/>
+		<ui:button aura:id="byDown" label="Scroll Down" press="{!c.scrollDown}"/>
+		<ui:button aura:id="byRight" label="Scroll Right" press="{!c.scrollRight}"/>
+		<ui:button aura:id="byLeft" label="Scroll Left" press="{!c.scrollLeft}"/> <br/>
+	
+		Enter scroller you want to test: <ui:inputText aura:id="newScrollerId" value="{!v.scrollerId}"/> <br/>
+	</div>
+	<br/><br/><br/><br/>
+	
+	<ui:outputText value="bidirectional"/>
+	<div class="test">
+		<ui:scroller aura:id="bidirectional" scroll="bidirectional">
+			I let it fall, my heart 
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+			<br/><br/>
+			
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+			<br/><br/>
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+			<br/><br/>
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+			<br/><br/>
+
+			But I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name!
+			<br/><br/>
+
+			I set fire to the rain
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time!
+			<br/><br/>
+
+			Sometimes I wake up by the door,
+			That heart you caught must be waiting for you
+			Even now when we're already over
+			I can't help myself from looking for you.
+			<br/><br/>
+
+			I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+			I set fire to the rain,
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time, ohhhh!
+			<br/><br/>
+
+			Oh noooo
+			Let it burn, oh
+			Let it burn
+			Let it burn
+		</ui:scroller>
+	</div>
+	<br/><br/>
+	
+	<ui:outputText value="lockVertical"/>
+	<div class="test">
+		<ui:scroller aura:id="lockVertical" lockOnDirection="vertical">
+			I let it fall, my heart 
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+			<br/><br/>
+			
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+			<br/><br/>
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+			<br/><br/>
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+			<br/><br/>
+
+			But I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name!
+			<br/><br/>
+
+			I set fire to the rain
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time!
+			<br/><br/>
+
+			Sometimes I wake up by the door,
+			That heart you caught must be waiting for you
+			Even now when we're already over
+			I can't help myself from looking for you.
+			<br/><br/>
+
+			I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+			I set fire to the rain,
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time, ohhhh!
+			<br/><br/>
+
+			Oh noooo
+			Let it burn, oh
+			Let it burn
+			Let it burn
+		</ui:scroller>
+	</div>
+	<br/><br/>
+	
+	<ui:outputText value="lockHorizontal"/>
+	<div class="test">
+		<ui:scroller aura:id="lockHorizontal" lockOnDirection="horizontal">
+			I let it fall, my heart 
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+			<br/><br/>
+			
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+			<br/><br/>
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+			<br/><br/>
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+			<br/><br/>
+
+			But I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name!
+			<br/><br/>
+
+			I set fire to the rain
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time!
+			<br/><br/>
+
+			Sometimes I wake up by the door,
+			That heart you caught must be waiting for you
+			Even now when we're already over
+			I can't help myself from looking for you.
+			<br/><br/>
+
+			I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+			I set fire to the rain,
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time, ohhhh!
+			<br/><br/>
+
+			Oh noooo
+			Let it burn, oh
+			Let it burn
+			Let it burn
+		</ui:scroller>
+	</div>
+	<br/><br/>
+	
+	<ui:outputText value="invalidDirection"/>
+	<div class="test">
+		<ui:scroller aura:id="invalidDirection" scroll="overtherainbow">
+			I let it fall, my heart 
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+			<br/><br/>
+			
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+			<br/><br/>
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+			<br/><br/>
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+			<br/><br/>
+
+			But I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name!
+			<br/><br/>
+
+			I set fire to the rain
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time!
+			<br/><br/>
+
+			Sometimes I wake up by the door,
+			That heart you caught must be waiting for you
+			Even now when we're already over
+			I can't help myself from looking for you.
+			<br/><br/>
+
+			I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+			I set fire to the rain,
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time, ohhhh!
+			<br/><br/>
+
+			Oh noooo
+			Let it burn, oh
+			Let it burn
+			Let it burn
+		</ui:scroller>
+	</div>
+	<br/><br/>
+	
+	<ui:outputText value="verticalSroll"/>
+	<div class="test">
+		<ui:scroller aura:id="verticalSroll" scroll="vertical">
+			I let it fall, my heart 
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+			<br/><br/>
+			
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+			<br/><br/>
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+			<br/><br/>
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+			<br/><br/>
+
+			But I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name!
+			<br/><br/>
+
+			I set fire to the rain
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time!
+			<br/><br/>
+
+			Sometimes I wake up by the door,
+			That heart you caught must be waiting for you
+			Even now when we're already over
+			I can't help myself from looking for you.
+			<br/><br/>
+
+			I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+			I set fire to the rain,
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time, ohhhh!
+			<br/><br/>
+
+			Oh noooo
+			Let it burn, oh
+			Let it burn
+			Let it burn
+		</ui:scroller>
+	</div>
+	<br/><br/>
+	
+	<ui:outputText value="horizontalScroll"/>
+	<div class="test">
+		<ui:scroller aura:id="horizontalScroll" scroll="horizontal">
+			I let it fall, my heart 
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+			<br/><br/>
+			
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+			<br/><br/>
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+			<br/><br/>
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+			<br/><br/>
+
+			But I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name!
+			<br/><br/>
+
+			I set fire to the rain
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time!
+			<br/><br/>
+
+			Sometimes I wake up by the door,
+			That heart you caught must be waiting for you
+			Even now when we're already over
+			I can't help myself from looking for you.
+			<br/><br/>
+
+			I set fire to the rain,
+			Watched it pour as I touched your face,
+			Well, it burned while I cried
+			'Cause I heard it screaming out your name, your name
+			<br/><br/>
+
+			I set fire to the rain,
+			And I threw us into the flames
+			When it fell, something died
+			'Cause I knew that that was the last time, the last time, ohhhh!
+			<br/><br/>
+
+			Oh noooo
+			Let it burn, oh
+			Let it burn
+			Let it burn
+		</ui:scroller>
+	</div>
+	<br/><br/>
+</aura:component>

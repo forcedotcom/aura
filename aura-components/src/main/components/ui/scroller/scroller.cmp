@@ -82,7 +82,7 @@
     <aura:attribute name="scrollButtonLeft"       type="String" default="Page Left"                  description="The text to display in the Page Left button." />
     <aura:attribute name="scrollButtonRight"      type="String" default="Page Right"                  description="The text to display in the Page Right button." />
     
-    <aura:attribute name="supportVoiceOver" type="Boolean" default="false" description="If set to true and Global.isVoiceOver is also true, user can scroll the content by clicking on the up or down button." />
+    <aura:attribute name="supportVoiceOver" type="Boolean" default="true" description="If set to true and Global.isVoiceOver is also true, user can scroll the content by clicking on the up or down button." />
    
     <aura:registerEvent name="scrollTo" type="ui:scrollTo"     description="The event fired when the scroller should move to a new destination"/>
     <aura:handler       name="scrollTo" action="{!c.scrollTo}" description="Catches the event fired when the scroller should move to a new destination"/>  

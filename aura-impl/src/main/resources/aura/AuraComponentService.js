@@ -152,7 +152,7 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
     if (!def || def.hasRemoteDependencies()) {
         this.requestComponent(null, callback, configItem, null, 0, true);
     } else {
-        callback(new Component(configItem, true),"SUCCESS");
+        callback(this.createComponentInstance(configItem, true),"SUCCESS");
     }
 };
 

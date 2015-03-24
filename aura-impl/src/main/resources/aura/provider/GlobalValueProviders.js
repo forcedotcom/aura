@@ -82,6 +82,8 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         if (valueProvider.merge) {
             // set values into its value provider
             valueProvider.merge(newGvp["values"]);
+        }else{
+            $A.util.apply(valueProvider,newGvp["values"],true);
         }
     }
     if (doNotPersist) {

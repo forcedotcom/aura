@@ -20,7 +20,6 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -29,7 +28,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.base.Joiner;
@@ -84,96 +82,6 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         AuraContext ctx = setupContextWithAppReferencingThemes(theme.getDescriptorName());
         ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme3", ThemeDef.class));
         goldFileAppCssUrl();
-    }
-
-    public void testNormalizeCssUrl() throws Exception {
-        getAppWithNestedTemplates(true);
-        assertTrue("Reset CSS should be normalize.css when normalizeCss attribute set",
-            Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    public void testResetCssUrl() throws Exception {
-        getAppWithNestedTemplates();
-        assertTrue("Reset CSS should be default resetCSS.css",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    public void testResetCssNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(true, false);
-        assertTrue("Reset CSS should be resetCSS.css for nested template with normalizeCss false",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    public void testNormalizeCssNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(false, true);
-        assertTrue("Reset CSS should be normalize.css for nested template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    public void testNormalizeCssNestedTemplateWithSuper() throws Exception {
-        getAppWithNestedTemplates(true, true);
-        assertTrue("Reset CSS should be normalize.css for nested template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-
-    public void testResetCssThirdNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(true, true, false);
-        assertTrue("Reset CSS should be resetCSS.css for third nested template with normalizeCss false",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    public void testNormalizeCssThirdNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(true, false, true);
-        assertTrue("Reset CSS should be normalize.css for third nested template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    /**
-     * Last boolean value is actual used by active template of app
-     *
-     * @param normalizes normalizeCss boolean varargs
-     * @return
-     */
-    private DefDescriptor<ApplicationDef> getAppWithNestedTemplates(boolean... normalizes) {
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-        String extendsTemplate = "aura:template";
-        if (normalizes.length == 0) {
-            normalizes = new boolean[]{ false };
-        }
-        DefDescriptor<ComponentDef> template = null;
-        for (boolean normalize : normalizes) {
-            String nString = normalize ? "true" : "false";
-            String templateSrc = String.format(templateMarkup, extendsTemplate, nString);
-            template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-            extendsTemplate = template.getDescriptorName();
-        }
-
-        String markup = "<aura:application access='unauthenticated' template='%s:%s'></aura:application>";
-        String appSrc = String.format(markup, template.getNamespace(), template.getName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-        return app;
-    }
-    
-    //test added for W-2514624, we combine external Js Libraries into one request
-    public void testCombinedJSUrlAPPGMT() throws Exception {
-    	AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
-    	String tz = al.getTimeZone().getID();
-        tz = Aura.getConfigAdapter().getAvailableTimezone(tz);
-        tz = tz.replace("/", "-");
-        assertTrue("We expect the test get run on a GMT timezone server, but instead we have timezone="+tz, tz.equals("GMT"));
-        String markup = "<aura:application></aura:application>";
-        String expect = String.format("/auraFW/resources/#FAKEUID#/libs_%s.js", tz);
-        
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, markup);
-    	setupContext(app);
-        assertTrue("expect to get combined JavascriptLibs url(lib_[TimeZone].js), but get "+Aura.getConfigAdapter().getJSLibsURL()+" instead", 
-        		Aura.getConfigAdapter().getJSLibsURL().contains(expect));
-    }
-    
-    public void runTestCombinedJSUrl(String markup, String expect) throws Exception {
-        
     }
 
     private AuraContext setupContext(DefDescriptor<ApplicationDef> defdesc) {

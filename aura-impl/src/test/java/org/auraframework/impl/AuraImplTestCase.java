@@ -71,6 +71,14 @@ public abstract class AuraImplTestCase extends AuraTestCase {
         }
     }
 
+    @Override
+    public void tearDown() throws Exception {
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
+        super.tearDown();
+    }
+
     protected FakeRegistry createFakeRegistry() {
         return new FakeRegistry();
     }

@@ -285,21 +285,21 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * The normalizeCss attribute value is found on the base template
-     * so recursively get the super component of the template until it's found and
-     * get the attribute value
+     * Whether the current template normalizeCss attribute value is true. The attribute value provider is its
+     * super is it extends another template.
      *
      * @param template template component
      * @return whether normalizeCss attribute is set to true
      * @throws QuickFixException
      */
     private boolean useNormalizeCss(BaseComponent template) throws QuickFixException {
-        // get the base template
+        BaseComponent valueProviderTemplate = template;
         if (template.getSuper() != null && ((BaseComponentDef) template.getSuper().getDescriptor().getDef()).isTemplate()) {
-            return useNormalizeCss(template.getSuper());
+            // super template is the value provider for the attribute
+            valueProviderTemplate = template.getSuper();
         }
-        return template.getAttributes().getValue("normalizeCss") != null &&
-                (Boolean) template.getAttributes().getValue("normalizeCss");
+        return valueProviderTemplate.getAttributes().getValue("normalizeCss") != null &&
+                (Boolean) valueProviderTemplate.getAttributes().getValue("normalizeCss");
     }
 
     @Override

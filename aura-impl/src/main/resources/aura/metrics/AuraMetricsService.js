@@ -186,10 +186,17 @@ MetricsService.prototype = {
                 var instance = this.pluginInstances[plugin];
 
                 if (this.collector[plugin].length) { // If we have marks for that plugin
-                    var pluginCollector = this.collector[plugin],
-                        initialOffset   = transaction["offsets"] && (transaction["offsets"][plugin] || 0),
-                        tMarks          = pluginCollector.slice(initialOffset),
-                        parsedMarks     = (instance && instance.postProcess && !skipPluginPostProcessing) ? instance.postProcess(tMarks) : tMarks;
+                    var pluginCollector   = this.collector[plugin],
+                        initialOffset     = transaction["offsets"] && (transaction["offsets"][plugin] || 0),
+                        tMarks            = pluginCollector.slice(initialOffset),
+                        pluginPostProcess = instance && instance.postProcess,
+                        parsedMarks       = !skipPluginPostProcessing && pluginPostProcess ? instance.postProcess(tMarks) : tMarks;
+
+                    //#if {"excludeModes" : ["PRODUCTION"]}
+                    if (!skipPluginPostProcessing && !pluginPostProcess && this.defaultPostProcessing) {
+                        parsedMarks = this.defaultPostProcessing(tMarks);
+                    }
+                    //#end
 
                     if (parsedMarks && parsedMarks.length) {
                         parsedTransaction["marks"][plugin] = parsedMarks;
@@ -225,12 +232,32 @@ MetricsService.prototype = {
             // If there is nobody to process the transaction, we just need to clean it up.
             delete this.transactions[id];
         }
-
     },
     clearTransactions: function () {
         this.transactions = {};
     },
     //#if {"excludeModes" : ["PRODUCTION"]}
+    defaultPostProcessing: function (customMarks) {
+        var procesedMarks = [];
+        var queue = {};
+        for (var i = 0; i < customMarks.length; i++) {
+            var id = customMarks[i]["ns"] + customMarks[i]["name"];
+            var phase = customMarks[i]["phase"];
+            if (phase === 'stamp') {
+                procesedMarks.push(customMarks[i]);
+            } else if (phase === 'start') {
+                queue[id] = customMarks[i];
+            } else if (phase === 'end' && queue[id]) {
+                var mark = queue[id];
+                mark["context"]  = $A.util.apply(mark["context"], customMarks[i]["context"]);
+                mark["duration"] = customMarks[i]["ts"] - mark["ts"];
+                procesedMarks.push(mark);
+                delete mark["phase"];
+                delete queue[id];
+            }
+        }
+        return procesedMarks;
+    },
     callHandlers: function (type, t) {
         var handlers = this.globalHandlers[type];
         if (handlers) {
@@ -247,9 +274,21 @@ MetricsService.prototype = {
         return  transactions;
     },
     getTransaction: function (ns, id) {
-        if (!id) {id = ns;ns = MetricsService.DEFAULT;}
+        if (!id) {
+            id = ns;
+            ns = MetricsService.DEFAULT; // if no ns is defined -> default
+        }
+        // Loop, dont do a direct match on the object key.
+        // Because we augment the id with the timestamp ex: s1:foo:123
+        // so consecuent transactions dont collision
         var key = id.indexOf(':') === -1  ? (ns + ':' + name) : id;
-        return this.transactions[key];
+        for (var i in this.transactions) {
+            var t = this.transactions[i];
+            if (t["id"].indexOf(key) === 0) {
+                return t;
+            }
+        }
+        
     },
     setClearCompletedTransactions: function (value) {
         this.clearCompleteTransactions = value;
@@ -287,28 +326,28 @@ MetricsService.prototype = {
         collector.push(mark);
         return mark;
     },
-    markStart: function (ns, name) {
+    markStart: function (ns, name, context) {
         if (!name) {name = ns; ns = MetricsService.DEFAULT;}
-        var mark        = this.createMarkNode(ns, name, MetricsService.START),
+        var mark        = this.createMarkNode(ns, name, MetricsService.START, context),
             nsCollector = this.collector[ns], 
             collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
 
         collector.push(mark);
         return mark;
     },
-    markEnd: function (ns, name) {
+    markEnd: function (ns, name, context) {
         if (!name) {name = ns; ns = MetricsService.DEFAULT;}
-        var mark = this.createMarkNode(ns, name, MetricsService.END);
+        var mark = this.createMarkNode(ns, name, MetricsService.END, context);
         this.collector[ns].push(mark);
         return mark;
     },
-    createMarkNode: function (ns, name, eventType) {
+    createMarkNode: function (ns, name, eventType, context) {
         return {
             "ns"      : ns, 
             "name"    : name,
             "phase"   : eventType,
             "ts"      : MetricsService.TIMER(),
-            "context" : null /*keep the shape of the object for perf*/
+            "context" : context || null /*keep the shape of the object for perf*/
         };
     },
     clearMarks: function (ns) {

@@ -769,16 +769,8 @@ $A.ns.AuraClientService.prototype.handleAppCache = function() {
             window.applicationCache.swapCache();
         }
 
-        // Clear out localStorage and sessionStorage to insure nothing that
-        // might depend
-        // on out of date stuff is left lying about
-        if (window.localStorage) {
-            window.localStorage.clear();
-        }
-
-        if (window.sessionStorage) {
-            window.sessionStorage.clear();
-        }
+        // Clear out our componentDefs in localStorage
+        $A.componentService.registry.clearCache();
 
         location.reload(true);
     }

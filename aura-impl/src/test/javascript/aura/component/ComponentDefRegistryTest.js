@@ -50,7 +50,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         [Fact]
         function HasCorrectCacheName() {
             // Arrange
-            var expected = "componetDefRegistry.catalog";
+            var expected = "componentDefRegistry.catalog";
 
             // Act
             var target = new ComponentDefRegistry();
@@ -570,7 +570,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
                     getItem: function (obj) {
                         // Return a good answer only if cache name
                         // is correct
-                        return (!!obj && obj === "componetDefRegistry.catalog") ? expected
+                        return (!!obj && obj === "componentDefRegistry.catalog") ? expected
                             : null;
                     }
                 });
@@ -653,7 +653,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
                     getItem: function (obj) {
                         // Return a good answer only if descriptor
                         // is correct
-                        return (!!obj && obj === ("componetDefRegistry.catalog"
+                        return (!!obj && obj === ("componentDefRegistry.catalog"
                             + "." + descriptor)) ? expected
                             : null;
                     }
@@ -731,7 +731,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
                 });
             var target = new ComponentDefRegistry();
             target.isLocalStorageAvailable = true;
-            target.cacheName = "componetDefRegistry.catalog";
+            target.cacheName = "componentDefRegistry.catalog";
             target.useDefStore = false;
             target.getLocalCacheCatalog = function () {
                 return {};
@@ -781,7 +781,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
                 });
             var target = new ComponentDefRegistry();
             target.isLocalStorageAvailable = true;
-            target.cacheName = "componetDefRegistry.catalog";
+            target.cacheName = "componentDefRegistry.catalog";
             target.useDefStore = false;
             target.getLocalCacheCatalog = function () {
                 return {};

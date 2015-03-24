@@ -26,7 +26,7 @@ function ComponentDefRegistry(){
 
 ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
 
-ComponentDefRegistry.prototype.cacheName = "componetDefRegistry.catalog";
+ComponentDefRegistry.prototype.cacheName = "componentDefRegistry.catalog";
 
 ComponentDefRegistry.prototype.isLocalStorageAvailable = (function() {
     if (window.localStorage) {
@@ -98,16 +98,8 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
             // Write through of local storage cacheable componentDefs
             try {
                 this.writeToCache(descriptor, config);
-            } catch (e) {
-                // localStorage only throws error when it's full
-                // clear and try saving again
-                localStorage.clear();
-
-                try {
-                    this.writeToCache(descriptor, config);
-                } catch(ignore) {
-                    // Nothing we can do at this point - give up.
-                }
+            } catch (ignore) {
+                // This fails when localStorage is full. Carry on.
             }
         }
 
@@ -184,6 +176,20 @@ ComponentDefRegistry.prototype.writeToCache = function(descriptor, config) {
         // Write out the componentDef
         var encodedConfig = $A.util.json.encode(config);
         localStorage.setItem(this.cacheName + "." + descriptor, encodedConfig);
+    }
+};
+
+/**
+ * Clears all component definitions from localStorage
+ *
+ */
+ComponentDefRegistry.prototype.clearCache = function() {
+    var catalog=this.getLocalCacheCatalog();
+    if(catalog){
+        for(var descriptor in catalog){
+            localStorage.removeItem(this.cacheName + "." +descriptor);
+        }
+        localStorage.removeItem(this.cacheName);
     }
 };
 
@@ -311,4 +317,3 @@ ComponentDefRegistry.prototype.removeDef = function(descriptor) {
         this.definitionStorage.remove(descriptor, true);
     }
 };
-

@@ -15,8 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component>	
-	<ui:inputNumber aura:id="inputCmp" label="Enter a number: "/> <br/>
-    <ui:button label="Submit" press="{!c.validate}"/>
-    <ui:outputNumber aura:id="outNum" value=""/>
+<aura:component>
+	<aura:attribute name="myBool" type="Boolean" default="true"/>
+	<ui:inputCheckbox aura:id="checkbox" label="Select?" change="{!c.onCheck}"/>
+	<p>Selected:</p>
+	<p><ui:outputText class="result" aura:id="checkResult" value="false" /></p>
+	<p>The following checkbox uses a component attribute to bind its value.</p>
+	<ui:outputCheckbox aura:id="output" value="{!v.myBool}"/>
 </aura:component>

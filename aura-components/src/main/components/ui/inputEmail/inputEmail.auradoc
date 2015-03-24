@@ -24,14 +24,14 @@
 		<p>This is a basic set up of an email field.</p>
 		<pre>&lt;ui:inputEmail aura:id="email" label="Email" placeholder="abc@email.com"/></pre>
 		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputText uiInputEmail">
+		<pre>&lt;div class="uiInput uiInputEmail">
   &lt;label class="uiLabel-left uiLabel">
     &lt;span>Email&lt;/span>
   &lt;/label>
-  &lt;input aria-describedby placeholder="abc@email.com" type="email" class="uiInput uiInputText uiInputEmail">
+  &lt;input placeholder="abc@email.com" type="email" class="uiInput uiInputEmail">
 &lt;/div></pre>
 	</aura:description>	
-	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputEmail">
-    		This example shows how you can use <code>ui:inputEmail</code> to get user input.
+	<aura:example name="email" ref="uiExamples:email" label="Using ui:inputEmail">
+    		This example retrieves the value of a <code>ui:inputEmail</code> component and displays it using <code>ui:outputEmail</code>.
     </aura:example>	
 </aura:documentation>

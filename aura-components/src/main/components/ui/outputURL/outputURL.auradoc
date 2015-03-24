@@ -28,8 +28,8 @@
 		<pre>&lt;a href="http://www.google.com" dir="ltr" class="uiOutputURL">http://www.google.com&lt;/a></pre>
 		
 	</aura:description>	
-		<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
-    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+		<aura:example name="url" ref="uiExamples:url" label="Using ui:outputURL">
+    	<p>This example shows how you can bind data from a <code>ui:inputURL</code> component.</p>
 	</aura:example>
 	
 </aura:documentation>

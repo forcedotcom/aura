@@ -24,12 +24,12 @@
 			<pre>&lt;aura:attribute name="num" type="integer" default="10"/>
 &lt;ui:inputNumber aura:id="num" label="Age" value="{!v.num}"/></pre>
 			<p>The previous example results in the following HTML.</p>
-			<pre>&lt;div class="uiInput uiInputText uiInputNumber">
+			<pre>&lt;div class="uiInput uiInputNumber">
 &lt;label class="uiLabel-left uiLabel">
     &lt;span>Age&lt;/span>
 &lt;/label>
-&lt;input aria-describedby="" max="99999999999999" step="1" placeholder="" type="text" 
-        min="-99999999999999" class="uiInput uiInputText uiInputNumber">
+&lt;input max="99999999999999" step="1" type="text" 
+        min="-99999999999999" class="uiInput uiInputNumber">
 &lt;/div></pre>
 			
 			<p>To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.
@@ -46,6 +46,6 @@
 &lt;ui:inputNumber aura:id="costField" format="#,##0,000.00#" value="10000"/></pre>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:inputNumberExample" label="Using ui:inputNumber">
-    		This example shows how you can use <code>ui:inputNumber</code> to validate user input.
+    		This example retrieves the value of a <code>ui:inputNumber</code> component, validates the input, and displays it using <code>ui:outputNumber</code>.
     </aura:example>
 </aura:documentation>

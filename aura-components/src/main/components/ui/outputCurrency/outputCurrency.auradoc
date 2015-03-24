@@ -32,8 +32,8 @@
 <pre>var curr = cmp.find("curr");
 curr.set("v.format", '£#,###.00');</pre>	    
 	</aura:description>	
-		<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
-    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+		<aura:example name="currency" ref="uiExamples:currency" label="Using the ui:outputCurrency Component">
+    	<p>This example shows how you can bind data from a <code>ui:inputCurrency</code> component.</p>
 	</aura:example>
 	
 </aura:documentation>

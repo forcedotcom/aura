@@ -15,8 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component>	
-	<ui:inputNumber aura:id="inputCmp" label="Enter a number: "/> <br/>
-    <ui:button label="Submit" press="{!c.validate}"/>
-    <ui:outputNumber aura:id="outNum" value=""/>
+<aura:component>
+	<aura:attribute name="display" type="Boolean" default="false"/>
+    <ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/>
+    <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
+
+    <b>You entered: </b>
+	<aura:if isTrue="{!v.display}">
+		<ui:outputCurrency aura:id="oCurrency" value=""/>
+		<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
+	</aura:if>
 </aura:component>

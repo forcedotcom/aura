@@ -22,7 +22,7 @@
 			To render the output from a <code>ui:inputCheckbox</code> component, use the <code>ui:outputCheckbox</code> component. 
 		</p>
 		<p>This is a basic set up of a checkbox.</p>		
-		<pre>&lt;ui:inputCheckbox aura:id="reimbursed" label="Reimbursed?"/></pre>
+		<pre>&lt;ui:inputCheckbox label="Reimbursed?"/></pre>
 		<p>This example results in the following HTML.</p>
 		<pre>&lt;div class="uiInput uiInputCheckbox">
   &lt;label class="uiLabel-left uiLabel">
@@ -40,7 +40,7 @@ update : function (cmp, event) {
   $A.util.toggleClass(elem, "red");
 }</pre>
 	</aura:description>
-	<aura:example name="inputExample" ref="auradocs:demoSelect" label="Using ui:inputCheckbox">
-    		This example shows how you can retrieve the value of an <code>ui:inputCheckbox</code> component.
+	<aura:example name="checkbox" ref="uiExamples:checkbox" label="Using ui:inputCheckbox">
+    		This example retrieves the value of a <code>ui:inputCheckbox</code> component.
     </aura:example>		
 </aura:documentation>

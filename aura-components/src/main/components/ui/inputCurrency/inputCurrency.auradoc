@@ -22,21 +22,21 @@
 			The browser's locale is used by default. To render the output from a <code>ui:inputCurrency</code> component, use the <code>ui:outputCurrency</code> component.
 		</p>
 		<p>This is a basic set up of a <code>ui:inputCurrency</code> component, which renders an input field with the value <code>$50.00</code> when the browser's currency locale is <code>$</code>.</p>
-		<pre>&lt;ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/></pre>
+		<pre>&lt;ui:inputCurrency label="Amount" class="field" value="50"/></pre>
 		<p>This example results in the following HTML.</p>
-<pre>&lt;div class="uiInput uiInputText uiInputNumber">
+<pre>&lt;div class="uiInput">
     &lt;label class="uiLabel-left uiLabel">
         &lt;span>Amount&lt;/span>
     &lt;/label>
-    &lt;input class="field" aria-describedby="" max="99999999999999" step="1" placeholder="" type="text" min="-99999999999999">
+    &lt;input class="field" max="99999999999999" step="1" type="text" min="-99999999999999">
 &lt;/div></pre>
 		<p>To override the browser's locale, set the new format on the <code>v.format</code> attribute of the <code>ui:inputCurrency</code> component.
 		   This example renders an input field with the value <code>£50.00</code>.</p>
 <pre>var curr = component.find("amount");
 curr.set("v.format", '£#,###.00');</pre>
 	</aura:description>	
-		<aura:example name="inputTextExample" ref="uiExamples:inputExample" label="Using ui:inputCurrency">
-    	<p>This example shows a <code>ui:inputCurrency</code> component and a corresponding <code>ui:outputCurrency</code> component.</p>
+		<aura:example name="currency" ref="uiExamples:currency" label="Using ui:inputCurrency">
+    	<p>This example retrieves the value of a <code>ui:inputCurrency</code> component and displays it using <code>ui:outputCurrency</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

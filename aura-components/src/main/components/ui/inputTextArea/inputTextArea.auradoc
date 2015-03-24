@@ -28,12 +28,12 @@
     &lt;label class="uiLabel-left uiLabel">
         &lt;span>Comments&lt;/span>
     &lt;/label>
-    &lt;textarea cols="20" rows="5" aria-describedby placeholder>
+    &lt;textarea cols="20" rows="5">
     &lt;/textarea>
 &lt;/div></pre>
 	</aura:description>	
-		<aura:example name="inputTextExample" ref="uiExamples:inputExample" label="Using ui:inputTextArea">
-    	<p>This example shows a <code>ui:inputTextArea</code> component and a corresponding <code>ui:outputTextArea</code> component for text rendering.</p>
+		<aura:example name="textarea" ref="uiExamples:textarea" label="Using ui:inputTextArea">
+    	<p>This example retrieves the value of a <code>ui:inputTextArea</code> component and displays it using <code>ui:outputTextArea</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

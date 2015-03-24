@@ -29,7 +29,7 @@
 	<pre>&lt;img class="checked uiImage uiOutputCheckbox" alt="checkbox checked" src="path/to/checkbox"></pre>
 	</aura:description>	
 	
-	<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
-    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	<aura:example name="checkbox" ref="uiExamples:checkbox" label="Using ui:outputCheckbox">
+    	<p>This example shows how you can use the <code>ui:inputCheckbox</code> component.</p>
 	</aura:example>
 </aura:documentation>

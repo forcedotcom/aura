@@ -18,20 +18,18 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputSecret</code> component represents a password field, which is rendered as an HTML <code>input</code> tag of type <code>password</code>.
+		  A <code>ui:outputRichText</code> component represents rich text and can be used to display input from a <code>ui:inputRichText</code> component.
 		</p>
-		<p>This is a basic set up of a password field.</p>
-		<pre>&lt;ui:inputSecret aura:id="secret" label="Pin" class="field" value="123456"/></pre>
-		<p>This example results in the following HTML.</p>
-<pre>&lt;div class="uiInput uiInputSecret">
-    &lt;label class="uiLabel-left uiLabel">
-        &lt;span>Pin&lt;/span>
-    &lt;/label>
-    &lt;input class="field" type="password">
+		<p>
+		  For example, you can enter bold or colored text via a <code>ui:inputRichText</code> component and bind its value to a <code>ui:outputRichText</code> component, which results in the following HTML. 
+		</p>
+<pre>&lt;div class="uiOutputRichText">
+    &lt;b>Aura&lt;/b>, &lt;span style="color:red">input rich text demo&lt;/span>
 &lt;/div></pre>
 	</aura:description>	
-		<aura:example name="secret" ref="uiExamples:secret" label="Using ui:inputSecret">
-    	<p>This example displays a <code>ui:inputSecret</code> component with a default value.</p>
-	</aura:example>
+		<aura:example name="richtext" ref="auradocs:demoInputRT" label="Using ui:outputRichText">
+    	<p>This example shows how you can bind data from a <code>ui:inputRichText</code> component.</p>
+	   </aura:example>
+	   
 	
 </aura:documentation>

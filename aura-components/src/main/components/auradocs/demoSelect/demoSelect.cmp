@@ -15,16 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component access="global">
+<aura:component>
 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-<aura:attribute name="stages" type="String[]" default="Any,Open,Closed,Closed Won"/>
-
-<div class="row">
-	<p class="title">Checkbox</p>
-	<ui:inputCheckbox aura:id="checkbox" label="Suscribe?" change="{!c.onCheck}"/>
-	<p>Selected:</p>
-	<p><ui:outputText class="result" aura:id="checkResult" value="false" /></p>
-</div>
 
 <div class="row">
 <p class="title">Single Selection</p>
@@ -66,26 +58,6 @@
    <ui:inputSelect label="Select me: " class="dynamic" aura:id="InputSelectDynamic" change="{!c.onChange}" />
    <p>Selected Items:</p>
    <p><ui:outputText class="result" aura:id="dynamicResult" value="" /></p>
-</div>
-
-<div class="row">     
-   <p class="title">Radio Buttons</p>
-   <aura:iteration items="{!v.stages}" var="stage">
-   		<ui:inputRadio label="{!stage}" change="{!c.onRadio}" />
-   </aura:iteration>
-   
-   <p>Selected Items:</p>
-   <p><ui:outputText class="result" aura:id="radioResult" value="" /></p>
-</div>
-
-<div class="row">
-	<p class="title">Radio Buttons - Group</p>
-   <ui:inputRadio aura:id="r0" name="others" label="Prospecting" change="{!c.onGroup}"/>
-   <ui:inputRadio aura:id="r1" name="others" label="Qualification" change="{!c.onGroup}" value="true"/>
-   <ui:inputRadio aura:id="r2" name="others" label="Needs Analysis" change="{!c.onGroup}"/>
-   <ui:inputRadio aura:id="r3" name="others" label="Closed Lost" change="{!c.onGroup}"/>
-   <p>Selected Items:</p>
-   <p><ui:outputText class="result" aura:id="radioGroupResult" value="" /></p>
 </div>
   
 </aura:component>

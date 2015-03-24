@@ -22,18 +22,18 @@
 			To render the output from a <code>ui:inputText</code> component, use the <code>ui:outputText</code> component.
 		</p>
 		<p>This is a basic set up of a text field.</p>
-		<pre>&lt;ui:inputText aura:id="expname" label="Expense Name" value="My Expense" required="true"/></pre>
+		<pre>&lt;ui:inputText label="Expense Name" value="My Expense" required="true"/></pre>
 		<p>This example results in the following HTML.</p>
 		<pre>&lt;div class="uiInput uiInputText">
   &lt;label class="uiLabel-left uiLabel">
     &lt;span>Expense Name&lt;/span>
     &lt;span class="required">*&lt;/span>
   &lt;/label>
-  &lt;input required="required" class="uiInput uiInputText" aria-describedby placeholder type="text">
+  &lt;input required="required" class="uiInput uiInputText" type="text">
 &lt;/div></pre>
 	</aura:description>	
-		<aura:example name="inputTextExample" ref="uiExamples:inputTextExample" label="Using ui:inputText">
-    	<p>This example shows a <code>ui:inputText</code> component with the default error handling, and a corresponding <code>ui:outputText</code> component for text rendering.</p>
+		<aura:example name="text" ref="uiExamples:text" label="Using ui:inputText">
+    	<p>This example retrieves the value of a <code>ui:inputText</code> component and displays it using <code>ui:outputText</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

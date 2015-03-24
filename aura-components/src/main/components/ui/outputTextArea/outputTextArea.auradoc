@@ -28,8 +28,8 @@
 		<pre>&lt;span class="uiOutputTextArea">some string&lt;/span></pre>
 		
 	</aura:description>	
-		<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
-    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+		<aura:example name="textarea" ref="uiExamples:textarea" label="Using ui:outputTextArea">
+    	<p>This example shows how you can bind data from the <code>ui:inputTextArea</code> component.</p>
 	</aura:example>
 	
 </aura:documentation>

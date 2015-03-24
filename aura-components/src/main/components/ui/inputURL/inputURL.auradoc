@@ -26,13 +26,13 @@
 		<p>This example results in the following HTML.</p>
 <pre>&lt;div class="uiInput uiInputText uiInputURL">
     &lt;label class="uiLabel-left uiLabel">
-        &lt;span class="">Venue URL&lt;/span>
+        &lt;span>Venue URL&lt;/span>
     &lt;/label>
-    &lt;input class="field" aria-describedby="" placeholder="" type="url">
+    &lt;input class="field" type="url">
 &lt;/div></pre>
 	</aura:description>	
-		<aura:example name="inputTextExample" ref="uiExamples:inputExample" label="Using ui:inputURL">
-    	<p>This example shows a <code>ui:inputURL</code> component and a corresponding <code>ui:outputURL</code> component.</p>
+		<aura:example name="url" ref="uiExamples:url" label="Using ui:inputURL">
+    	<p>This example retrieves the value of a <code>ui:inputURL</code> component and displays it using <code>ui:outputURL</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

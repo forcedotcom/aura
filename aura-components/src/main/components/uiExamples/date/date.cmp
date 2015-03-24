@@ -15,8 +15,18 @@
     limitations under the License.
 
 -->
-<aura:component>	
-	<ui:inputNumber aura:id="inputCmp" label="Enter a number: "/> <br/>
-    <ui:button label="Submit" press="{!c.validate}"/>
-    <ui:outputNumber aura:id="outNum" value=""/>
+<aura:component>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="today" type="Date" default=""/>
+	<aura:attribute name="display" type="Boolean" default="false"/>
+	
+    <ui:inputDate aura:id="expdate" label="Today's Date" class="field" value="{!v.today}" displayDatePicker="true" />
+       
+        <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
+
+		<b>You entered: </b>
+		<aura:if isTrue="{!v.display}">
+			<ui:outputDate aura:id="oDate" value="" />
+			<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
+		</aura:if>
 </aura:component>

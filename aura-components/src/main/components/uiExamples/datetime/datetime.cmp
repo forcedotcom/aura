@@ -16,7 +16,17 @@
 
 -->
 <aura:component>
-	<ui:inputRichText aura:id="inputRT" label="Rich Text Demo" labelPosition="hidden" cols="50" rows="5" value="&lt;b&gt;Aura&lt;/b&gt;, &lt;span style='color:red'&gt;input rich text demo&lt;/span&gt;"/>
-	<ui:button aura:id="outputButton" buttonTitle="Click to see what you put into the rich text field" label="Display" press="{!c.getInput}"/>
-    <ui:outputRichText aura:id="outputRT" value=" "/> 
+<!--	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="today" type="Date" default=""/>
+	<aura:attribute name="deadline" type="Date" /> -->
+	<aura:attribute name="display" type="Boolean" default="false"/>
+	
+    <ui:inputDateTime aura:id="deadline" label="Deadline" class="field" value="" displayDatePicker="true" />
+    <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
+	
+    <b>You entered:</b>
+		<aura:if isTrue="{!v.display}">
+		    <ui:outputDateTime aura:id="oDateTime" value=""  />
+		<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
+		</aura:if>
 </aura:component>

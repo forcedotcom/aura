@@ -302,6 +302,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 (Boolean) valueProviderTemplate.getAttributes().getValue("normalizeCss");
     }
 
+    /**
+     * Combined js libs filename will contain timezone for walltime.js
+     * @return url of combined js libs file
+     */
     @Override
     public String getJSLibsURL() {
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
@@ -315,13 +319,12 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * walltimejs data does not provide all timezones due to duplicates so we have the
+     * walltime.js data does not provide all timezones due to duplicates so we return the
      * one that is equivalent and available.
      *
      * @param timezoneId timezone
      * @return available equivalent timezone
      */
-    @Override
     public String getAvailableTimezone(String timezoneId) {
         String effectiveTimezone = effectiveTimezones.get(timezoneId);
         if (effectiveTimezone != null) {

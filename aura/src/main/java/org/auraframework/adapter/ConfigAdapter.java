@@ -59,8 +59,16 @@ public interface ConfigAdapter extends AuraAdapter {
 
     String getHTML5ShivURL();
 
+    /**
+     * Returns js libs file url
+     * @return url of js libs file
+     */
     String getJSLibsURL();
 
+    /**
+     * Returns reset css file url
+     * @return URL to reset css file
+     */
     String getResetCssURL();
 
     boolean isPrivilegedNamespace(String namespace);
@@ -90,6 +98,4 @@ public interface ConfigAdapter extends AuraAdapter {
 	 *    actual policy desired.
 	 */
 	ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request);
-
-	String getAvailableTimezone(String timezoneId);
 }

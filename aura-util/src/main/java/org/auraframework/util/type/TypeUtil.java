@@ -15,6 +15,7 @@
  */
 package org.auraframework.util.type;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -182,7 +183,11 @@ public class TypeUtil {
     private static <F, T> Converter<F, T> getConverter(Class<F> from, Class<T> to, String of) {
         TypeUtil typeUtil = get();
         if (of == null) {
-            Map<String, Converter<?, ?>> map = typeUtil.converters.get(from.getName());
+            String className = from.getName();
+            if (HashMap.class.isAssignableFrom(from)) {
+                className = HashMap.class.getName();
+            }
+            Map<String, Converter<?, ?>> map = typeUtil.converters.get(className);
             if (map != null) {
                 return (Converter<F, T>) map.get(to.getName());
             }

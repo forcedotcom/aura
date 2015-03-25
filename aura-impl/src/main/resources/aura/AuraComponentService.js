@@ -488,6 +488,11 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
     }
 
     action.setCallback(this, function(a){
+        // because this is an async callback, we need to make sure value provider is still valid
+        if (avp && avp.isValid && !avp.isValid()) {
+            return;
+        }
+
         var newComp = null;
         var status= a.getState();
         if(status === "SUCCESS"){

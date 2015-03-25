@@ -51,6 +51,13 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
     Object getValue(@NonNull String s) throws QuickFixException;
 
     /**
+     * gets the raw value of an attribute by name, no expressions allowed
+     *
+     * @throws QuickFixException
+     */
+    Object getRawValue(@NonNull String s) throws QuickFixException;
+
+    /**
      * gets the typed value of an attribute by name, no expressions allowed
      * 
      * @throws QuickFixException

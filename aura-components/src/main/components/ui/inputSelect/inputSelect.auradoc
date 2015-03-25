@@ -74,7 +74,7 @@
 		
 	</aura:description>	
 		<aura:example name="inputselect" ref="auradocs:demoSelect" label="Using ui:inputSelect">
-    	<p>This example shows several ways to implement <code>ui:inputSelect</code>.</p>
+    	<p>This example displays a drop-down list with single and multiple selection enabled, and another with dynamically generated list options. It retrieves the selected value of a <code>ui:inputSelect</code> component.</p>
     	
 	</aura:example>
 	

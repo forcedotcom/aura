@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="stages" type="String[]" default="Any,Open,Closed,Closed Won"/>
+    <aura:iteration items="{!v.stages}" var="stage">
+   		<ui:inputRadio label="{!stage}" change="{!c.onRadio}" />
+    </aura:iteration>
+   
+   <b>Selected Item:</b>
+   <p><ui:outputText class="result" aura:id="radioResult" value="" /></p>
+
+   <b>Radio Buttons - Group</b>
+   <ui:inputRadio aura:id="r0" name="others" label="Prospecting" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r1" name="others" label="Qualification" change="{!c.onGroup}" value="true"/>
+   <ui:inputRadio aura:id="r2" name="others" label="Needs Analysis" change="{!c.onGroup}"/>
+   <ui:inputRadio aura:id="r3" name="others" label="Closed Lost" change="{!c.onGroup}"/>
+   <b>Selected Items:</b>
+   <p><ui:outputText class="result" aura:id="radioGroupResult" value="" /></p>
+
+</aura:component>

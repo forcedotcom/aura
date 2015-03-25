@@ -15,10 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component access="global">
-	<ui:inputRichText isRichText="false" aura:id="inputRT" label="Rich Text Demo" labelPosition="hidden" cols="50" rows="5" value="&lt;b&gt;Aura&lt;/b&gt;, &lt;span style='color:red'&gt;input rich text demo&lt;/span&gt;"/>
+<aura:component>
+	<ui:inputRichText aura:id="inputRT" label="Rich Text Demo" labelPosition="hidden" cols="50" rows="5" value="&lt;b&gt;Aura&lt;/b&gt;, &lt;span style='color:red'&gt;input rich text demo&lt;/span&gt;"/>
 	<ui:button aura:id="outputButton" buttonTitle="Click to see what you put into the rich text field" label="Display" press="{!c.getInput}"/>
     <ui:outputRichText aura:id="outputRT" value=" "/> 
-    
-    <ui:inputRichText />
 </aura:component>

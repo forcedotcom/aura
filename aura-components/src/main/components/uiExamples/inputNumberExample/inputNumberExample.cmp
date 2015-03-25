@@ -16,7 +16,7 @@
 
 -->
 <aura:component>	
-	 Enter a number: <ui:inputNumber aura:id="inputCmp"/> <br/>
+	<ui:inputNumber aura:id="inputCmp" label="Enter a number: "/> <br/>
     <ui:button label="Submit" press="{!c.validate}"/>
     <ui:outputNumber aura:id="outNum" value=""/>
 </aura:component>

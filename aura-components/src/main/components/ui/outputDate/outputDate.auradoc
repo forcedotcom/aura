@@ -27,7 +27,7 @@
 	<p>The previous example renders the following HTML.</p>
 	<pre>&lt;span class="uiOutputDate">Sep 29, 2014&lt;/span></pre>
 	</aura:description>	
-	<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
-    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+	<aura:example name="outputExample" ref="uiExamples:date" label="Using ui:outputDate">
+    	This example shows how you can bind data from the <code>ui:inputDate</code> component.
 	</aura:example>
 </aura:documentation>

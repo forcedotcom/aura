@@ -24,6 +24,13 @@
 		</p>
 		<pre>&lt;ui:outputPhone value="415-123-4567"/></pre>
 		<p>The previous example renders the following HTML.</p>
-		<pre>&lt;a href="tel:415-123-4567" class="uiOutputPhone">415-123-4567&lt;/a></pre>
+		<pre>&lt;span class="uiOutputPhone">415-123-4567&lt;/span></pre>
+		<p>When viewed on a mobile device, the example renders as an actionable link.</p>
+<pre>&lt;span class="uiOutputPhone">
+    &lt;a href="tel:415-123-4567">415-123-4567&lt;/a>
+&lt;/span></pre>
 	</aura:description>	
+	<aura:example name="phone" ref="uiExamples:phone" label="Using ui:outputPhone">
+    	This example shows how you can bind data from a <code>ui:inputPhone</code> component.
+	</aura:example>
 </aura:documentation>

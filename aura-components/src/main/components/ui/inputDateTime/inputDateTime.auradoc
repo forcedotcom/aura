@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputDateTime</code> component represents a date and time input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			The value is displayed in the default format specified language locale of the browser. 
+			The value is displayed in the default format specified by the language locale of the browser. 
 		</p>
 		<p>This is a basic set up of a date and time field with a date picker, which displays the current date and time in the format <code>7/29/2014 1:11 PM</code>.</p>
 		<pre>&lt;!-- Component markup -->
@@ -35,7 +35,7 @@ component.set("v.today", today);</pre>
 &lt;label class="uiLabel-left uiLabel">
     &lt;span>Expense Date&lt;/span>
 &lt;/label>
-&lt;input class="form-control uiInput uiInputDateTime" aria-describedby="" placeholder="M/d/yyyy h:mm a" type="text">
+&lt;input class="form-control uiInput uiInputDateTime" placeholder="M/d/yyyy h:mm a" type="text">
 &lt;a class="datePicker-openIcon" aria-haspopup="true">
     &lt;span class="assistiveText">Date Picker&lt;/span>
 &lt;/a>
@@ -47,7 +47,7 @@ component.set("v.today", today);</pre>
 &lt;/div></pre>
 	
 	</aura:description>		
-	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputDate">
-    		This example shows how you can use <code>ui:inputDate</code> to get user input.
+	<aura:example name="datetime" ref="uiExamples:datetime" label="Using ui:inputDateTime">
+    	This example retrieves the value of a <code>ui:inputDateTime</code> component and displays it using <code>ui:outputDateTime</code>.
     </aura:example>
 </aura:documentation>

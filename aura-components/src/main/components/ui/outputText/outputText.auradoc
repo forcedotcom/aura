@@ -30,8 +30,8 @@
 &lt;/span></pre>
 		
 	</aura:description>	
-		<aura:example name="outputExample" ref="uiExamples:outputExample" label="Using the Output Components">
-    	<p>This example shows how you can bind data to the output components by using component attributes.</p>
+		<aura:example name="text" ref="uiExamples:text" label="Using the ui:outputText Component">
+    	<p>This example shows how you can bind data from an <code>ui:inputText</code> component.</p>
 	</aura:example>
 	
 </aura:documentation>

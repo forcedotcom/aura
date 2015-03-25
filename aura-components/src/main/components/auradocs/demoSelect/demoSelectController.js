@@ -15,7 +15,7 @@
  */
 ({
     doInit : function(cmp) {
-    	// Initialize input select options for dynamic generation
+    	// Initialize input select options
         var opts = [
             { "class": "optionClass", label: "Option1", value: "opt1", selected: "true" },
             { "class": "optionClass", label: "Option2", value: "opt2" },
@@ -26,12 +26,6 @@
         
     },
 
-	 onCheck: function(cmp, evt) {
-		 var checkCmp = cmp.find("checkbox");
-		 resultCmp = cmp.find("checkResult");
-		 resultCmp.set("v.value", ""+checkCmp.get("v.value"));
-	 },
-	 
 	onSingleSelectChange: function(cmp, evt) {
          var selectCmp = cmp.find("InputSelectSingle");
          resultCmp = cmp.find("singleResult");
@@ -48,20 +42,6 @@
 		 var dynamicCmp = cmp.find("InputSelectDynamic");
 		 resultCmp = cmp.find("dynamicResult");
 		 resultCmp.set("v.value", dynamicCmp.get("v.value"));
-	 },
-	 
-	 onRadio: function(cmp, evt) {
-		 var elem = evt.getSource().getElement();
-		 var selected = elem.textContent;
-		 resultCmp = cmp.find("radioResult");
-		 resultCmp.set("v.value", selected);		 
-	 },
-	 
-	 onGroup: function(cmp, evt) {
-		 var elem = evt.getSource().getElement();
-		 var selected = elem.textContent;
-		 resultCmp = cmp.find("radioGroupResult");
-		 resultCmp.set("v.value", selected);
 	 }
 	 
 })

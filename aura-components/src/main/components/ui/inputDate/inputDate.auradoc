@@ -39,25 +39,8 @@
     &lt;!--Date picker set to visible when icon is clicked-->
   &lt;/div>
 &lt;/div></pre>
-
-	<h4>Setting a Default Date</h4>
-	<p>This example sets today's date on the date field.</p>
-	<pre>&lt;!-- Component Markup -->
-&lt;aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-&lt;aura:attribute name="today" type="Date" default=""/>
-&lt;ui:inputDate label="Today's Date" value="{!v.today}" /></pre>
-
-	<p>During initialization, the client-side controller <code>doInit</code> sets today's date on the <code>v.today</code> attribute by passing in a default value.</p>
-<pre>/** Client-side Controller **/
-({
-    doInit : function(component, event, helper) {
-        var today = new Date();
-        component.set('v.today', today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate());
-        component.set('v.deadline', today);
-    }
-})</pre>
 	</aura:description>		
-	<aura:example name="inputExample" ref="uiExamples:inputExample" label="Using ui:inputDate">
-    		This example shows how you can use <code>ui:inputDate</code> to get user input.
+	<aura:example name="inputExample" ref="uiExamples:date" label="Using ui:inputDate">
+    		This example sets today's date on a <code>ui:inputDate</code> component, retrieves its value, and displays it using <code>ui:outputDate</code>. The <code>init</code> handler initializes and sets the date on the component.
     </aura:example>
 </aura:documentation>

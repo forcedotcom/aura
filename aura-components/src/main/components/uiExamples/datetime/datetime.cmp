@@ -16,11 +16,10 @@
 
 -->
 <aura:component>
-<!--	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 	<aura:attribute name="today" type="Date" default=""/>
-	<aura:attribute name="deadline" type="Date" /> -->
 	
-    <ui:inputDateTime aura:id="deadline" label="Deadline" class="field" value="" displayDatePicker="true" />
+    <ui:inputDateTime aura:id="today" label="Time" class="field" value="" displayDatePicker="true" />
     <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
 	
     <div aura:id="msg" class="hide">

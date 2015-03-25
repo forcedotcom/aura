@@ -26,4 +26,5 @@
     <aura:attribute name="headerActions" type="Aura.Component[]" description="Buttons to add to the header of the panel."/>
     <aura:attribute name="body" type="Object" description="The main content of the panel."/>
     <aura:attribute name="onCreate" type="Object" description="Callback function"/>
+    <aura:attribute name="onUpdate" type="Object" description="Callback function"/>
 </aura:event>

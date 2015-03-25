@@ -36,7 +36,7 @@ Test.Aura.AuraClientServiceTest = function() {
         // #import aura.AuraClientService
     });
 
-	var mockGlobal = Mocks.GetMocks(Object.Global(), {
+    var mockGlobal = Mocks.GetMocks(Object.Global(), {
         "$A": {
             ns:$A.ns,
             log : function() {},
@@ -62,13 +62,13 @@ Test.Aura.AuraClientServiceTest = function() {
         },
         window:{},
         document:{}
-	});
-	
-	[Fixture]
+    });
+    
+    [Fixture]
     function testCreateIntegrationErrorConfig() {
         [Fact]
         function ReturnsErrorConfig() {
-        	// Arrange
+            // Arrange
             var target;
             mockGlobal(function() {
                 target = new $A.ns.AuraClientService();
@@ -77,12 +77,12 @@ Test.Aura.AuraClientServiceTest = function() {
             // Act
             var actual;
             mockGlobal(function() {
-            	actual = target.createIntegrationErrorConfig(errorMsg);
-			});
+                actual = target.createIntegrationErrorConfig(errorMsg);
+            });
             // Assert
             var expected;
             expected = {
-            		"componentDef" : {
+                    "componentDef" : {
                         "descriptor" : "markup://ui:message"
                     },
 
@@ -111,9 +111,12 @@ Test.Aura.AuraClientServiceTest = function() {
 
     }
 
-	var MockAction = function(type) {
+    var id = 0;
+
+    var MockAction = function(type) {
         this.auraType = "Action";
         this.setBackground = Stubs.GetMethod();
+        this.id = ++id;
         if (type === undefined) {
             type = "server";
         }
@@ -122,8 +125,9 @@ Test.Aura.AuraClientServiceTest = function() {
         this.isBackground = Stubs.GetMethod(false);
         this.runDeprecated = Stubs.GetMethod();
         this.addCallbackGroup = Stubs.GetMethod();
-        this.getAbortableId = Stubs.GetMethod();
-        this.setAbortableId = Stubs.GetMethod();
+        this.abortableId = undefined;
+        this.getAbortableId = function () { return this.abortableId; };
+        this.setAbortableId = function (nid) { this.abortableId = nid; };
         this.abort = Stubs.GetMethod();
         this.getDef = Stubs.GetMethod({
             isClientAction : Stubs.GetMethod(true),
@@ -147,6 +151,7 @@ Test.Aura.AuraClientServiceTest = function() {
             this.getDef = sdef;
             this.isCaboose = Stubs.GetMethod(true);
         }
+        this.toString = function() { return this.id+":"+type; };
     };
 
     var MockActionQueue = function() {
@@ -160,103 +165,100 @@ Test.Aura.AuraClientServiceTest = function() {
         this.needXHR = function() { return this.xhr; };
     };
 
-	//
-	// FIXME: most of the enqueue action stuff should be removed, and
-	// we should just ensure that they call ActionQueue.enqueue.
-	//
-	[Fixture]
-	function EnqueueAction() {
+    //
+    // FIXME: most of the enqueue action stuff should be removed, and
+    // we should just ensure that they call ActionQueue.enqueue.
+    //
+    [Fixture]
+    function EnqueueAction() {
 
-		[ Fact ]
-		function DoesNotRunServerAction() {
-			var action = new MockAction();
+        [ Fact ]
+        function DoesNotRunServerAction() {
+            var action = new MockAction();
 
-			mockGlobal(function() {
-				new $A.ns.AuraClientService().enqueueAction(action);
-			});
+            mockGlobal(function() {
+                new $A.ns.AuraClientService().enqueueAction(action);
+            });
 
-			Assert.Equal(0, action.runDeprecated.Calls.length);
-		}
+            Assert.Equal(0, action.runDeprecated.Calls.length);
+        }
 
-		[ Fact ]
-		function QueuesServerAction() {
-			var action = new MockAction();
+        [ Fact ]
+        function QueuesServerAction() {
+            var action = new MockAction();
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-				target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+                target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
 
-				target.enqueueAction(action);
-			});
+                target.enqueueAction(action);
+            });
 
-			Assert.Equal([ {
-				Arguments : {
-					action : action
-				},
-				ReturnValue : undefined
-			} ], target.actionQueue.enqueue.Calls);
-		}
+            Assert.Equal([ {
+                Arguments : {
+                    action : action
+                },
+                ReturnValue : undefined
+            } ], target.actionQueue.enqueue.Calls);
+        }
 
-		[ Fact ]
-		function QueuesClientAction() {
-			var action = new MockAction("client");
+        [ Fact ]
+        function QueuesClientAction() {
+            var action = new MockAction("client");
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-				target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+                target.actionQueue.enqueue = Stubs.GetMethod("action", undefined);
 
-				target.enqueueAction(action);
-			});
+                target.enqueueAction(action);
+            });
 
-			Assert.Equal([ {
-				Arguments : {
-					action : action
-				},
-				ReturnValue : undefined
-			} ], target.actionQueue.enqueue.Calls);
-		}
+            Assert.Equal([ {
+                Arguments : {
+                    action : action
+                },
+                ReturnValue : undefined
+            } ], target.actionQueue.enqueue.Calls);
+        }
 
-		[ Fact ]
-		function AbortableActionsAreCleared() {
-			// Arrange
-			var target;
-            var abortable = new MockAction("serverabortable");
-            var action = new MockAction("server");
+        [ Fact ]
+        function AbortableActionsAreCleared() {
+            // Arrange
+            var target;
 
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
-			target.processActions = function() {
-			};
-			// Act
-			mockGlobal(function() {
-				target.pushStack("AbortableActionsAreCleared.1");
-				target.enqueueAction(action, undefined, undefined);
-				target.enqueueAction(abortable, undefined, undefined); // will be pruned
-				target.enqueueAction(abortable, undefined, undefined); // will be pruned
-				target.enqueueAction(action, undefined, undefined);
-				target.popStack("AbortableActionsAreCleared.1");
-				target.pushStack("AbortableActionsAreCleared.2");
-				target.enqueueAction(action, undefined, undefined);
-				target.enqueueAction(abortable, undefined, undefined); // will be kept
-				target.enqueueAction(abortable, undefined, undefined); // will be kept
-				target.enqueueAction(action, undefined, undefined);
-				target.popStack("AbortableActionsAreCleared.2");
-			});
-			// Assert
-			Assert.Equal(6, target.actionQueue.actions.length);
-			Assert.Equal(2, abortable.abort.Calls.length);
-			Assert.Equal(0, action.abort.Calls.length);
-			Assert.False(target.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
-			Assert.False(target.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");
-			Assert.False(target.actionQueue.actions[2].isAbortable(), "Third action should not be abortable");
-			Assert.True(target.actionQueue.actions[3].isAbortable(), "Fourth action should be abortable");
-			Assert.True(target.actionQueue.actions[4].isAbortable(), "Fifth action should be abortable");
-			Assert.False(target.actionQueue.actions[5].isAbortable(), "Sixth action should not be abortable");
-		}
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+            target.processActions = function() {
+            };
+            // Act
+            mockGlobal(function() {
+                target.pushStack("AbortableActionsAreCleared.1");
+                target.enqueueAction(new MockAction("server"), undefined, undefined);
+                target.enqueueAction(new MockAction("serverabortable"), undefined, undefined); // will be pruned
+                target.enqueueAction(new MockAction("serverabortable"), undefined, undefined); // will be pruned
+                target.enqueueAction(new MockAction("server"), undefined, undefined);
+                target.popStack("AbortableActionsAreCleared.1");
+                target.pushStack("AbortableActionsAreCleared.2");
+                target.enqueueAction(new MockAction("server"), undefined, undefined);
+                target.enqueueAction(new MockAction("serverabortable"), undefined, undefined); // will be kept
+                target.enqueueAction(new MockAction("serverabortable"), undefined, undefined); // will be kept
+                target.enqueueAction(new MockAction("server"), undefined, undefined);
+                target.popStack("AbortableActionsAreCleared.2");
+            });
+            // Assert
+            System.Environment.Write(target.actionQueue.actions);
+            Assert.Equal(6, target.actionQueue.actions.length);
+            Assert.False(target.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
+            Assert.False(target.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");
+            Assert.False(target.actionQueue.actions[2].isAbortable(), "Third action should not be abortable");
+            Assert.True(target.actionQueue.actions[3].isAbortable(), "Fourth action should be abortable");
+            Assert.True(target.actionQueue.actions[4].isAbortable(), "Fifth action should be abortable");
+            Assert.False(target.actionQueue.actions[5].isAbortable(), "Sixth action should not be abortable");
+        }
 
-		[ Fact ]
-		function AssertsActionNotUndefinedOrNull() {
+        [ Fact ]
+        function AssertsActionNotUndefinedOrNull() {
             var expected="EnqueueAction() cannot be called on an undefined or null action.";
 
             var actual=Record.Exception(function(){
@@ -266,12 +268,12 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             Assert.Equal(expected,actual);
-		}
+        }
 
-		[ Fact ]
-		function AssertsActionAuraTypeIsAction() {
-			var action = new MockAction();
-			action.auraType = "unexpected";
+        [ Fact ]
+        function AssertsActionAuraTypeIsAction() {
+            var action = new MockAction();
+            action.auraType = "unexpected";
             var expected="Cannot call EnqueueAction() with a non Action parameter.";
 
             var actual=Record.Exception(function(){
@@ -281,132 +283,132 @@ Test.Aura.AuraClientServiceTest = function() {
 
             })
 
-			Assert.Equal(expected,actual);
-		}
+            Assert.Equal(expected,actual);
+        }
 
-		[ Fact ]
-		function SetBackgroundActionIfTruthy() {
-			var action = new MockAction();
+        [ Fact ]
+        function SetBackgroundActionIfTruthy() {
+            var action = new MockAction();
 
-			mockGlobal(function() {
-				new $A.ns.AuraClientService().enqueueAction(action, true);
-			});
+            mockGlobal(function() {
+                new $A.ns.AuraClientService().enqueueAction(action, true);
+            });
 
-			Assert.Equal(1, action.setBackground.Calls.length);
-		}
+            Assert.Equal(1, action.setBackground.Calls.length);
+        }
 
-		[ Fact ]
-		function DoesNotSetBackgroundActionIfUndefined() {
-			var action = new MockAction();
+        [ Fact ]
+        function DoesNotSetBackgroundActionIfUndefined() {
+            var action = new MockAction();
 
-			mockGlobal(function() {
-				new $A.ns.AuraClientService().enqueueAction(action);
-			});
+            mockGlobal(function() {
+                new $A.ns.AuraClientService().enqueueAction(action);
+            });
 
-			Assert.Equal(0, action.setBackground.Calls.length);
-		}
+            Assert.Equal(0, action.setBackground.Calls.length);
+        }
 
-		[ Fact ]
-		function DoesNotSetBackgroundActionIfNull() {
-			var action = new MockAction();
+        [ Fact ]
+        function DoesNotSetBackgroundActionIfNull() {
+            var action = new MockAction();
 
-			mockGlobal(function() {
-				new $A.ns.AuraClientService().enqueueAction(action, null);
-			});
+            mockGlobal(function() {
+                new $A.ns.AuraClientService().enqueueAction(action, null);
+            });
 
-			Assert.Equal(0, action.setBackground.Calls.length);
-		}
+            Assert.Equal(0, action.setBackground.Calls.length);
+        }
 
-		[ Fact ]
-		function DoesNotSetBackgroundActionIfFalsy() {
-			var action = new MockAction();
+        [ Fact ]
+        function DoesNotSetBackgroundActionIfFalsy() {
+            var action = new MockAction();
 
-			mockGlobal(function() {
-				new $A.ns.AuraClientService().enqueueAction(action, false);
-			});
+            mockGlobal(function() {
+                new $A.ns.AuraClientService().enqueueAction(action, false);
+            });
 
-			Assert.Equal(0, action.setBackground.Calls.length);
-		}
-	}
+            Assert.Equal(0, action.setBackground.Calls.length);
+        }
+    }
 
-	[ Fixture ]
-	function ProcessActions() {
-		[ Fact ]
-		function ReturnsFalseIfForegroundMax() {
+    [ Fixture ]
+    function ProcessActions() {
+        [ Fact ]
+        function ReturnsFalseIfForegroundMax() {
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
             var actionQueue = new MockActionQueue();
             actionQueue.serverActions = [ "action" ];
             actionQueue.xhr = true;
-			target.foreground.started = target.foreground.max;
+            target.foreground.started = target.foreground.max;
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(actionQueue);
-			});
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(actionQueue);
+            });
 
-			Assert.False(actual);
-		}
+            Assert.False(actual);
+        }
 
-		[ Fact ]
-		function ReturnsFalseIfBackgroundMax() {
+        [ Fact ]
+        function ReturnsFalseIfBackgroundMax() {
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
             var actionQueue = new MockActionQueue();
             actionQueue.nextBackgroundAction = "action";
-			target.background.started = target.background.max;
+            target.background.started = target.background.max;
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(actionQueue);
-			});
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(actionQueue);
+            });
 
-			Assert.False(actual);
-		}
+            Assert.False(actual);
+        }
 
-		[ Fact ]
-		function ReturnsFalseIfQueueEmpty() {
+        [ Fact ]
+        function ReturnsFalseIfQueueEmpty() {
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(new MockActionQueue());
-			});
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(new MockActionQueue());
+            });
 
-			Assert.False(actual);
-		}
+            Assert.False(actual);
+        }
 
-		[ Fact, Skip ]
-		function CallsRequestIfServerActionsAvailable() {
-			var action = "server";
+        [ Fact, Skip ]
+        function CallsRequestIfServerActionsAvailable() {
+            var action = "server";
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
-			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+            var request = Stubs.GetMethod("actions", "flightCounter", undefined);
             var actionQueue = new MockActionQueue();
-			actionQueue.serverActions = [ action ];
+            actionQueue.serverActions = [ action ];
             actionQueue.xhr = true;
 
-			mockGlobal(function() {
-				target.processActions(actionQueue, request);
-			});
+            mockGlobal(function() {
+                target.processActions(actionQueue, request);
+            });
 
-			Assert.Equal([ {
-				Arguments : {
-					actions : [ action ],
-					flightCounter : target.foreground
-				},
-				ReturnValue : undefined
-			} ], request.Calls);
-		}
+            Assert.Equal([ {
+                Arguments : {
+                    actions : [ action ],
+                    flightCounter : target.foreground
+                },
+                ReturnValue : undefined
+            } ], request.Calls);
+        }
 
         [ Fact ]
         function DoesNotCallRequestIfXhrSetToFalse() {
@@ -427,105 +429,105 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.False(actual);
         }
 
-		[ Fact, Skip ]
-		function ReturnsTrueIfServerActionsSent() {
-			var action = "server";
+        [ Fact, Skip ]
+        function ReturnsTrueIfServerActionsSent() {
+            var action = "server";
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
-			var request = function() {
-			};
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+            var request = function() {
+            };
             var actionQueue = new MockActionQueue();
-			actionQueue.serverActions = [ action ];
+            actionQueue.serverActions = [ action ];
             actionQueue.xhr = true;
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(actionQueue, request);
-			});
-			Assert.True(actual);
-		}
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(actionQueue, request);
+            });
+            Assert.True(actual);
+        }
 
-		[ Fact, Skip ]
-		function CallsRequestIfBackgroundActionAvailable() {
-			var action = "background";
+        [ Fact, Skip ]
+        function CallsRequestIfBackgroundActionAvailable() {
+            var action = "background";
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
-			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+            var request = Stubs.GetMethod("actions", "flightCounter", undefined);
             var actionQueue = new MockActionQueue();
-			actionQueue.nextBackgroundAction = action;
+            actionQueue.nextBackgroundAction = action;
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(actionQueue, request);
-			});
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(actionQueue, request);
+            });
 
-			Assert.Equal([ {
-				Arguments : {
-					actions : [ action ],
-					flightCounter : target.background
-				},
-				ReturnValue : undefined
-			} ], request.Calls);
-		}
+            Assert.Equal([ {
+                Arguments : {
+                    actions : [ action ],
+                    flightCounter : target.background
+                },
+                ReturnValue : undefined
+            } ], request.Calls);
+        }
 
-		[ Fact, Skip ]
-		function ReturnsTrueIfBackgroundActionSent() {
-			var action = "background";
+        [ Fact, Skip ]
+        function ReturnsTrueIfBackgroundActionSent() {
+            var action = "background";
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
-			var request = function() {
-			};
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+            var request = function() {
+            };
             var actionQueue = new MockActionQueue();
-			actionQueue.nextBackgroundAction = action;
+            actionQueue.nextBackgroundAction = action;
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(actionQueue, request);
-			});
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(actionQueue, request);
+            });
 
-			Assert.True(actual);
-		}
+            Assert.True(actual);
+        }
 
-		[ Fact, Skip ]
-		function CallsRequestForBothServerAndBackgroundActions() {
-			var actionServer = "server";
-			var actionBackground = "background";
+        [ Fact, Skip ]
+        function CallsRequestForBothServerAndBackgroundActions() {
+            var actionServer = "server";
+            var actionBackground = "background";
             var target;
-			mockGlobal(function() {
-				target = new $A.ns.AuraClientService();
-			});
-			var request = Stubs.GetMethod("actions", "flightCounter", undefined);
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+            var request = Stubs.GetMethod("actions", "flightCounter", undefined);
             var actionQueue = new MockActionQueue();
-			actionQueue.serverActions = [ actionServer ];
+            actionQueue.serverActions = [ actionServer ];
             actionQueue.xhr = true;
             actionQueue.nextBackgroundAction = actionBackground;
 
-			var actual;
-			mockGlobal(function() {
-				actual = target.processActions(actionQueue, request);
-			});
+            var actual;
+            mockGlobal(function() {
+                actual = target.processActions(actionQueue, request);
+            });
 
-			Assert.Equal([ {
-				Arguments : {
-					actions : [ actionServer ],
-					flightCounter : target.foreground
-				},
-				ReturnValue : undefined
-			}, {
-				Arguments : {
-					actions : [ actionBackground ],
-					flightCounter : target.background
-				},
-				ReturnValue : undefined
-			} ], request.Calls);
-		}
-	}
+            Assert.Equal([ {
+                Arguments : {
+                    actions : [ actionServer ],
+                    flightCounter : target.foreground
+                },
+                ReturnValue : undefined
+            }, {
+                Arguments : {
+                    actions : [ actionBackground ],
+                    flightCounter : target.background
+                },
+                ReturnValue : undefined
+            } ], request.Calls);
+        }
+    }
 
     [ Fixture ]
     function MakeActionGroup() {
@@ -811,7 +813,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 window: Object.Global()
             })(function() {
                 // #import aura.AuraClientService
-        		// #import aura.controller.Action
+                // #import aura.controller.Action
                 mockActionStorage.clear()
                     .then(function() { delegate(new $A.ns.AuraClientService(), mockActionStorage); });
             });

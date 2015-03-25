@@ -96,25 +96,12 @@ Test.Aura.Controller.ActionQueueTest = function() {
     [ Fixture ]
     function Constructor() {
         [ Fact ]
-        function SetsTransactionId() {
+        function SetsTransactionIdAndLastAbortableTransactionId() {
             // Arrange
-            var expected = -1;
-            var target = new ActionQueue();
 
             // Act
-            var actual = target.nextTransactionId;
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [ Fact ]
-        function SetsLastAbortableTransactionId() {
-            // Arrange
-            var expected = -1;
             var target = new ActionQueue();
-
-            // Act
+            var expected = target.nextTransactionId;
             var actual = target.lastAbortableTransactionId;
 
             // Assert
@@ -243,6 +230,24 @@ Test.Aura.Controller.ActionQueueTest = function() {
                 // abortable not returned but pushed onto returned list
                 ReturnValue : [ abortable ]
             } ], target.clearPreviousAbortableActions.Calls);
+        }
+
+        [ Fact ]
+        function DoesNotCallClearPreviousAbortableActionsWhenAbortableActionWithIdSetEnqueuedOnNewTransaction() {
+            var expected = [ "lastTransaction" ];
+            var abortable = new Action(serverDef);
+            var target = new ActionQueue();
+            target.currentTransactionId = target.nextTransactionId;
+            target.incrementNextTransactionId();
+            target.clearPreviousAbortableActions = Stubs.GetMethod("queue", []);
+            target.actions = expected;
+
+            mockGlobal(function() {
+                abortable.setAbortable(true);
+                target.enqueue(abortable);
+            });
+
+            Assert.Equal(0, target.clearPreviousAbortableActions.Calls.length);
         }
 
         [ Fact ]

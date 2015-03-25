@@ -29,7 +29,7 @@
     testEnqueuedCallbackJavascriptError : {
         test : function(cmp) {
             $A.test.expectAuraWarning("Callback failed: java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground");
-            $A.test.expectAuraError("Uncaught error in actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : this is intentional");
+            $A.test.expectAuraError("Uncaught error in actionCallback : this is intentional");
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
                 throw new Error("this is intentional");
             });
@@ -41,7 +41,7 @@
 
     testRunActionsCallbackJavascriptError : {
         test : function(cmp) {
-            $A.test.expectAuraError("Uncaught error in actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : this is intentional");
+            $A.test.expectAuraError("Uncaught error in actionCallback : this is intentional");
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
                 throw new Error("this is intentional");
             });
@@ -53,7 +53,7 @@
 
     testRunActionsGroupCallbackJavascriptError : {
         test : function(cmp) {
-            $A.test.expectAuraError("Uncaught error in actionCallback[java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground:{}] : this is intentional");
+            $A.test.expectAuraError("Uncaught error in actionCallback : this is intentional");
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() { });
             $A.clientService.runActions([ a ], cmp, function() {
                 throw new Error("this is intentional");

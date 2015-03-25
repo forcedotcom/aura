@@ -309,6 +309,32 @@ $A.ns.AuraClientService.prototype.isDisconnectedOrCancelled = function(response)
 };
 
 /**
+ * Get the abortable ID that is currently in force.
+ *
+ * @private
+ */
+$A.ns.AuraClientService.prototype.getCurrentTransasctionId = function() {
+    if (!this.inAuraLoop()) {
+        $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get abortable ID outside of aura loop");
+        return;
+    }
+    return this.actionQueue.getCurrentAbortableId();
+};
+
+/**
+ * Get the abortable ID that is currently in force.
+ *
+ * @private
+ */
+$A.ns.AuraClientService.prototype.setCurrentTransasctionId = function(abortableId) {
+    if (!this.inAuraLoop()) {
+        $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get abortable ID outside of aura loop");
+        return;
+    }
+    return this.actionQueue.setCurrentAbortableId(abortableId);
+};
+
+/**
  * Process a single action/response.
  *
  * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
@@ -381,10 +407,6 @@ $A.ns.AuraClientService.prototype.singleAction = function(action, noAbort, actio
  * @private
  */
 $A.ns.AuraClientService.prototype.actionCallback = function(response, collector, flightCounter, abortableId) {
-    var responseMessage = this.checkAndDecodeResponse(response);
-    var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
-    var acs = this;
-
     //
     // Note that this is a very specific assertion. We can either be called back from an empty stack
     // (the normal case, after an XHR has gone to the server), or we can be called back from inside
@@ -397,88 +419,90 @@ $A.ns.AuraClientService.prototype.actionCallback = function(response, collector,
         }
     }
 
-    var stackName = "actionCallback[";
-    var actionsToSend = collector.getActionsToSend();
-    for (var n = 0; n < actionsToSend.length; n++) {
-        var actionToSend = actionsToSend[n];
-        if (n > 0) {
-            stackName += ", ";
-        }
 
-        stackName += actionToSend.getStorageKey();
+    if (abortableId) {
+        this.actionQueue.setCurrentAbortableId(abortableId);
     }
-    stackName += "]";
+    var that = this;
+    try {
+        $A.run(function() { that.doActionCallback(response, collector, flightCounter, abortableId); }, "actionCallback");
+    } catch (e) {
+        throw e;
+    } finally {
+        this.actionQueue.setCurrentAbortableId(undefined);
+    }
+};
 
-    $A.run(function() {
-        var action, actionResponses;
+$A.ns.AuraClientService.prototype.doActionCallback = function(response, collector, flightCounter, abortableId) {
+    var action, actionResponses;
+    var responseMessage = this.checkAndDecodeResponse(response);
+    var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
 
-        //
-        // pre-decrement so that we correctly send the next response right after this.
-        //
-        if (responseMessage) {
-            var token = responseMessage["token"];
-            if (token) {
-                acs._token = token;
-                acs.saveTokenToStorage();
-            }
+    //
+    // pre-decrement so that we correctly send the next response right after this.
+    //
+    if (responseMessage) {
+        var token = responseMessage["token"];
+        if (token) {
+            this._token = token;
+            this.saveTokenToStorage();
+        }
 
-            $A.getContext().merge(responseMessage["context"]);
+        $A.getContext().merge(responseMessage["context"]);
 
-            // Look for any Client side event exceptions
-            var events = responseMessage["events"];
-            if (events) {
-                for ( var en = 0, len = events.length; en < len; en++) {
-                    acs.parseAndFireEvent(events[en]);
-                }
-            }
-
-            actionResponses = responseMessage["actions"];
-
-            // Process each action and its response
-            for ( var r = 0; r < actionResponses.length; r++) {
-                var actionResponse = actionResponses[r];
-                action = collector.findActionAndClear(actionResponse["id"]);
-
-                if (action === null) {
-                    if (actionResponse["storable"]) {
-                        //
-                        // Hmm, we got a missing action. We allow this in the case that we have
-                        // a storable action from the server (i.e. we are faking an action from the
-                        // server to store data on the client. This is only used in priming, and is
-                        // more than a bit of a hack.
-                        //
-                        // Create a client side action instance to go with the server created action response
-                        //
-                        var descriptor = actionResponse["action"];
-                        var actionDef = $A.services.component.getActionDef({
-                            descriptor : descriptor
-                        });
-                        action = actionDef.newInstance();
-                        action.setStorable();
-                        action.setParams(actionResponse["params"]);
-                        action.setAbortable(false);
-                    } else {
-                        $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
-                    }
-                }
-                acs.singleAction(action, noAbort, actionResponse);
-            }
-        } else if (acs.isDisconnectedOrCancelled(response) && !acs.isUnloading) {
-            var actions = collector.getActionsToSend();
-
-            for ( var m = 0; m < actions.length; m++) {
-                action = actions[m];
-                if (noAbort || !action.isAbortable()) {
-                    action.incomplete($A.getContext());
-                } else {
-                    action.abort();
-                }
+        // Look for any Client side event exceptions
+        var events = responseMessage["events"];
+        if (events) {
+            for ( var en = 0, len = events.length; en < len; en++) {
+                this.parseAndFireEvent(events[en]);
             }
         }
-        $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
-        acs.fireDoneWaiting();
-    }, stackName);
 
+        actionResponses = responseMessage["actions"];
+
+        // Process each action and its response
+        for ( var r = 0; r < actionResponses.length; r++) {
+            var actionResponse = actionResponses[r];
+            action = collector.findActionAndClear(actionResponse["id"]);
+
+            if (action === null) {
+                if (actionResponse["storable"]) {
+                    //
+                    // Hmm, we got a missing action. We allow this in the case that we have
+                    // a storable action from the server (i.e. we are faking an action from the
+                    // server to store data on the client. This is only used in priming, and is
+                    // more than a bit of a hack.
+                    //
+                    // Create a client side action instance to go with the server created action response
+                    //
+                    var descriptor = actionResponse["action"];
+                    var actionDef = $A.services.component.getActionDef({
+                        descriptor : descriptor
+                    });
+                    action = actionDef.newInstance();
+                    action.setStorable();
+                    action.setParams(actionResponse["params"]);
+                    action.setAbortable(false);
+                } else {
+                    $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
+                }
+            }
+            this.singleAction(action, noAbort, actionResponse);
+        }
+    } else if (this.isDisconnectedOrCancelled(response) && !this.isUnloading) {
+        var actions = collector.getActionsToSend();
+
+        for ( var m = 0; m < actions.length; m++) {
+            action = actions[m];
+            if (noAbort || !action.isAbortable()) {
+                action.incomplete($A.getContext());
+            } else {
+                action.abort();
+            }
+        }
+    }
+    $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
+    this.fireDoneWaiting();
 };
 
 /**
@@ -1264,9 +1288,7 @@ $A.ns.AuraClientService.prototype.pushStack = function(name) {
  * @private
  */
 $A.ns.AuraClientService.prototype.popStack = function(name) {
-    var count = 0;
     var lastName;
-    var done;
 
     if (this.auraStack.length > 0) {
         lastName = this.auraStack.pop();
@@ -1278,29 +1300,43 @@ $A.ns.AuraClientService.prototype.popStack = function(name) {
     }
 
     if (this.auraStack.length === 0) {
-        var tmppush = "$A.clientServices.popStack";
-        this.auraStack.push(tmppush);
-        this.processActions();
-        done = !$A["finishedInit"];
-        while (!done && count <= 15) {
-            $A.renderingService.rerenderDirty(name);
-
-            done = !this.processActions();
-
-            count += 1;
-            if (count > 14) {
-                $A.error("popStack has not completed after 15 loops");
-            }
+        try {
+            this.handleProcessing(name);
+        } catch (e) {
+            // this should be very unlikely, but we need to finish processing here.
+            $A.error("AuraClientService.popStack(): Failed during processing", e);
+        } finally {
+            this.auraStack = [];
+            this.actionQueue.incrementNextTransactionId();
+            this.actionQueue.setCurrentAbortableId(undefined);
         }
+    }
+};
 
-        // Force our stack to nothing.
-        lastName = this.auraStack.pop();
-        if (lastName !== tmppush) {
-            $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+auraStack);
+$A.ns.AuraClientService.prototype.handleProcessing = function(name) {
+    var tmppush = "$A.clientServices.popStack";
+    var lastName;
+    var count = 0;
+    var done;
+
+    this.auraStack.push(tmppush);
+    this.processActions();
+    done = !$A["finishedInit"];
+    while (!done && count <= 15) {
+        $A.renderingService.rerenderDirty(name);
+
+        done = !this.processActions();
+
+        count += 1;
+        if (count > 14) {
+            $A.error("popStack has not completed after 15 loops");
         }
+    }
 
-        this.auraStack = [];
-        this.actionQueue.incrementNextTransactionId();
+    // Force our stack to nothing.
+    lastName = this.auraStack.pop();
+    if (lastName !== tmppush) {
+        $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+auraStack);
     }
 };
 
@@ -1622,26 +1658,26 @@ $A.ns.AuraClientService.prototype.enqueueAction = function(action, background) {
  * @param {Action} action - target action
  * @return {Promise} a promise which is resolved or rejected depending on the state of the action
  */
-    $A.ns.AuraClientService.prototype.deferAction = function (action) {
-        var acs = this;
-        var promise = new Promise(function(success, error) {
+$A.ns.AuraClientService.prototype.deferAction = function (action) {
+    var acs = this;
+    var promise = new Promise(function(success, error) {
 
-            action.wrapCallback(acs, function (a) {
-                if (a.getState() === 'SUCCESS') {
-                    success(a.getReturnValue());
-                }
-                else {
-                    // Reject the promise as it was not successful.
-                    // Give the user a somewhat useful object to use on reject.
-                    error({ state: a.getState(), action: a });
-                }
-            });
-
-            acs.enqueueAction(action);
+        action.wrapCallback(acs, function (a) {
+            if (a.getState() === 'SUCCESS') {
+                success(a.getReturnValue());
+            }
+            else {
+                // Reject the promise as it was not successful.
+                // Give the user a somewhat useful object to use on reject.
+                error({ state: a.getState(), action: a });
+            }
         });
 
-        return promise;
-    };
+        acs.enqueueAction(action);
+    });
+
+    return promise;
+};
 
 /**
  * Gets whether or not the Aura "actions" cache exists.

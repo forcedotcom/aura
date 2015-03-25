@@ -425,6 +425,20 @@ $A.ns.Aura = function() {
     };
 
     /**
+     * Get the current abortable transaction ID.
+     *
+     * @public
+     */
+    this.getCurrentTransactionId = this.clientService.getCurrentTransasctionId.bind(this.clientService);
+
+    /**
+     * Set the current abortable transaction ID.
+     *
+     * @public
+     */
+    this.setCurrentTransactionId = this.clientService.setCurrentTransasctionId.bind(this.clientService);
+
+    /**
      * pops current portion of attribute's creationPath from stack
      * @param {String} creationPath
      *
@@ -475,6 +489,8 @@ $A.ns.Aura = function() {
 
     // TODO: convert to //#exportSymbols when available
     exp(aura,
+        "getCurrentTransactionId", aura.getCurrentTransactionId,
+        "setCurrentTransactionId", aura.setCurrentTransactionId,
         "clientService", aura.clientService,
         "componentService", aura.componentService,
         "serializationService", aura.serializationService,

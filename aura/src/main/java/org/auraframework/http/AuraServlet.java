@@ -139,14 +139,16 @@ public class AuraServlet extends AuraBaseServlet {
             final URI uri = new URI(nocache);
             final String fragment = uri.getFragment();
             final String query = uri.getQuery();
+            final String scheme = uri.getScheme();
             final StringBuffer sb = request.getRequestURL();
             String httpProtocol = "http://";
             String defaultUriScheme = "http";
             String secureUriScheme = "https";
             int dIndex = sb.indexOf(httpProtocol);
 
-            // check and modify sb if URL is http but request is secure
-            if (request.isSecure() && dIndex == 0) {
+            // if nocache has https specified, or the request is secure,
+            // modify sb if it's http
+            if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {
             	sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
             }
 

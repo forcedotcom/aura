@@ -30,6 +30,11 @@
         	}
 		}
 	},
+	
+	handleDataError: function(cmp, evt, helper) {
+	    //still needs to show the cancel button when dataprovider failed to retrive data
+	    helper.handleOnOpen(cmp, true);
+	},
 
 	onOpen: function(cmp, evt, helper) {
 		var dataProvider = cmp.get('v.dataProvider');

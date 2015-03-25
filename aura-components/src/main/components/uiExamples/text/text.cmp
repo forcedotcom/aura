@@ -16,13 +16,10 @@
 
 -->
 <aura:component>
-	<aura:attribute name="display" type="Boolean" default="false"/>
 	<ui:inputText aura:id="name" label="Enter some text" class="field" value="My Text"/>
     <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
 
-	<b>You entered:</b>	
-	<aura:if isTrue="{!v.display}">
-		<ui:outputText aura:id="oName" value=""/>	
-		<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
-	</aura:if>
+	<div aura:id="msg" class="hide">
+		You entered: <ui:outputText aura:id="oName" value=""/>	
+	</div>
 </aura:component>

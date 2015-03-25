@@ -21,7 +21,9 @@
     },
     
     setOutput : function(component, event, helper) {
-        component.set("v.display", true);
+    	var el = component.find("msg");
+    	$A.util.removeClass(el.getElement(), 'hide');
+    	
         var deadline = component.find("deadline").get("v.value");
         var oDateTime = component.find("oDateTime");
         oDateTime.set("v.value", deadline);

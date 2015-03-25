@@ -16,7 +16,8 @@
 ({
    
     setOutput : function(component, event, helper) {
-        component.set("v.display", true);
+    	var el = component.find("msg");
+    	$A.util.removeClass(el.getElement(), 'hide');
        
         var phone = component.find("phone").get("v.value");
         var oPhone = component.find("oPhone");

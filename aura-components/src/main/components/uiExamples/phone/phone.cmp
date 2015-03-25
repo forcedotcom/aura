@@ -19,9 +19,7 @@
     <ui:inputPhone aura:id="phone" label="Phone Number" class="field" value="415-123-4567" />
     <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
 
-	<b>You entered:</b>
-	<aura:if isTrue="{!v.display}">
-		<ui:outputPhone aura:id="oPhone" value="" />
-		<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
-	</aura:if>
+	<div aura:id="msg" class="hide">
+		You entered: <ui:outputPhone aura:id="oPhone" value="" />
+	</div>
 </aura:component>

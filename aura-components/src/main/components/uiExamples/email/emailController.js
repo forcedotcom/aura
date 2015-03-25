@@ -15,7 +15,9 @@
  */
 ({
     setOutput : function(component, event, helper) {
-        component.set("v.display", true);  
+    	var el = component.find("msg");
+    	$A.util.removeClass(el.getElement(), 'hide');
+    	
         var email = component.find("email").get("v.value"); 
         var oEmail = component.find("oEmail");
         oEmail.set("v.value", email);

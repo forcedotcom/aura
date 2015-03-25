@@ -15,7 +15,9 @@
  */
 ({
     setOutput : function(component, event, helper) {
-        component.set("v.display", true);
+    	var el = component.find("msg");
+    	$A.util.removeClass(el.getElement(), 'hide');
+    	
         var url = component.find("url").get("v.value");
         var oURL = component.find("oURL");
         oURL.set("v.value", url);

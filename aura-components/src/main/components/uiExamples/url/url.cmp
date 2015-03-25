@@ -18,8 +18,7 @@
 <aura:component>
     <ui:inputURL aura:id="url" label="Venue URL" class="field" value="http://www.myURL.com"/>
     <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
-	<b>You entered:</b>
-		<aura:if isTrue="{!v.display}">
-			<ui:outputURL aura:id="oURL" value=""/>
-		</aura:if>
+	<div aura:id="msg" class="hide">
+		You entered: <ui:outputURL aura:id="oURL" value=""/>
+	</div>
 </aura:component>

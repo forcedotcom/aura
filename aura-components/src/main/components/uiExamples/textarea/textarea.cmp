@@ -18,10 +18,8 @@
 <aura:component>
      <ui:inputTextArea aura:id="comments" label="Comments"  value="My comments" rows="5"/>
      <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
-     <b>You entered:</b>
-		
-		<aura:if isTrue="{!v.display}">
-			<ui:outputTextArea aura:id="oTextarea" value=""/>
-			<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
-		</aura:if>
+     
+     <div aura:id="msg" class="hide">
+		You entered: <ui:outputTextArea aura:id="oTextarea" value=""/>
+	</div>
 </aura:component>

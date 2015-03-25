@@ -16,16 +16,11 @@
 
 -->
 <aura:component>
-	<aura:attribute name="display" type="Boolean" default="false"/>
-    <ui:inputEmail aura:id="email" label="Email" class="field" value="manager@email.com"/>
-   
+    <ui:inputEmail aura:id="email" label="Email" class="field" value="manager@email.com"/>  
     <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
 
-	<b>You entered: </b>
-	
-	<aura:if isTrue="{!v.display}">
-	    <ui:outputEmail aura:id="oEmail" value="Email" />
-		<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
-	</aura:if>
+	<div aura:id="msg" class="hide">
+	    You entered: <ui:outputEmail aura:id="oEmail" value="Email" />
+	</div>
 
 </aura:component>

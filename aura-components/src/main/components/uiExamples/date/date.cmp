@@ -18,15 +18,11 @@
 <aura:component>
 	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 	<aura:attribute name="today" type="Date" default=""/>
-	<aura:attribute name="display" type="Boolean" default="false"/>
 	
-    <ui:inputDate aura:id="expdate" label="Today's Date" class="field" value="{!v.today}" displayDatePicker="true" />
-       
-        <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
+    <ui:inputDate aura:id="expdate" label="Today's Date" class="field" value="{!v.today}" displayDatePicker="true" />      
+    <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
 
-		<b>You entered: </b>
-		<aura:if isTrue="{!v.display}">
-			<ui:outputDate aura:id="oDate" value="" />
-			<aura:set attribute="else"> Click the Submit button to see user input.</aura:set>
-		</aura:if>
+	<div aura:id="msg" class="hide">
+		You entered: <ui:outputDate aura:id="oDate" value="" />
+	</div>
 </aura:component>

@@ -117,7 +117,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         assertTrue(ManifestUtil.isManifestEnabled());
         String url = ManifestUtil.getManifestUrl();
-        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%7D/app.manifest", url);
+        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%2C%22test%22%3A%22org.auraframework.http.AuraServletIntegrationTest.testGetManifestWithoutPreloads%22%7D/app.manifest", url);
     }
 
     /**
@@ -129,6 +129,6 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "appCache:withpreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         String url = ManifestUtil.getManifestUrl();
-        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Awithpreload%22%7D/app.manifest", url);
+        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Awithpreload%22%2C%22test%22%3A%22org.auraframework.http.AuraServletIntegrationTest.testGetManifestWithPreloads%22%7D/app.manifest", url);
     }
 }

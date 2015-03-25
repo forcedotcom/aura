@@ -851,13 +851,12 @@ public class AuraContextImpl implements AuraContext {
                     // serialize servlet context path for html component to prepend for client created components
                     json.writeMapEntry("contextPath", contextPath);
                 }
-
-                TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
-                if (testContextAdapter != null) {
-                    TestContext testContext = testContextAdapter.getTestContext();
-                    if (testContext != null) {
-                        json.writeMapEntry("test", testContext.getName());
-                    }
+            }
+            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+            if (testContextAdapter != null) {
+                TestContext testContext = testContextAdapter.getTestContext();
+                if (testContext != null) {
+                    json.writeMapEntry("test", testContext.getName());
                 }
             }
             json.writeMapEnd();

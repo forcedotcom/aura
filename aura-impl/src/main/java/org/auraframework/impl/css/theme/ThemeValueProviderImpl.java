@@ -17,6 +17,9 @@ package org.auraframework.impl.css.theme;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
@@ -54,11 +57,10 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
      * @param style Provide vars for this {@link BaseStyleDef}.
      * @param overrides The list of themes that override the default var values. Null is ok.
      * @param strategy The indication of how theme variable resolution is being handled (if in doubt about this, use
-     *            {@link ResolveStrategy#RESOLVE_NORMAL}. This is for informative purposes only, and doesn't influence the
-     *            behavior of this class directly).
+     *            {@link ResolveStrategy#RESOLVE_NORMAL}. This is for informative purposes only, and doesn't influence
+     *            the behavior of this class directly).
      */
-    public ThemeValueProviderImpl(DefDescriptor<?> style, ThemeList overrides, ResolveStrategy strategy)
-            throws QuickFixException {
+    public ThemeValueProviderImpl(DefDescriptor<?> style, ThemeList overrides, ResolveStrategy strategy) {
         checkNotNull(style, "scope cannot be null");
 
         DefDescriptor<ThemeDef> cmpTheme = Themes.cmpThemeDescriptor(style);
@@ -129,18 +131,44 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
         return value;
     }
 
+    @Override
+    public Set<String> extractVarNames(String expression, boolean followCrossReferences) throws QuickFixException {
+        checkNotNull(expression, "expression cannot be null");
+
+        Set<PropertyReference> propRefs = new HashSet<>();
+        getExpression(expression, null).gatherPropertyReferences(propRefs);
+
+        Set<String> names = new HashSet<>();
+        for (PropertyReference ref : propRefs) {
+            // add the name itself
+            names.add(ref.getRoot());
+
+            // add cross references (aliases)
+            if (followCrossReferences) {
+                Optional<Object> value = getGlobalVar(ref);
+                while (value.isPresent() && value.get() instanceof PropertyReference) {
+                    PropertyReference aliased = (PropertyReference) value.get();
+                    names.add(aliased.getRoot());
+                    value = getGlobalVar(aliased);
+                }
+            }
+        }
+
+        return names;
+    }
+
     /**
      * Gets an expression representing the given reference. If simply trying to evaluate a string reference, prefer
      * {@link #getValue(String, Location)} instead.
      *
-     * @param reference The string input source (should not be quoted).
+     * @param expression The string input source (should not be quoted).
      * @param location The location of the reference in the source code.
      *
      * @return A new expression representing the given reference.
      *
      * @throws AuraValidationException
      */
-    private static Expression getExpression(String reference, Location location) throws AuraValidationException {
-        return AuraImpl.getExpressionAdapter().buildExpression(reference, location);
+    private static Expression getExpression(String expression, Location location) throws AuraValidationException {
+        return AuraImpl.getExpressionAdapter().buildExpression(expression, location);
     }
 }

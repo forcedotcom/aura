@@ -25,7 +25,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.salesforce.omakase.plugin.Plugin;
 
@@ -41,7 +40,7 @@ public interface StyleAdapter extends AuraAdapter {
      *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
      *            (if applicable).
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException;
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style);
 
     /**
      * Gets a {@link ThemeValueProvider}.
@@ -55,8 +54,7 @@ public interface StyleAdapter extends AuraAdapter {
      *            (if applicable).
      * @param strategy An indication of how this provider is going to be used.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy)
-            throws QuickFixException;
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy);
 
     /**
      * Gets a {@link ThemeValueProvider} using the given overrides.
@@ -67,8 +65,7 @@ public interface StyleAdapter extends AuraAdapter {
      * @param strategy An indication of how this provider is going to be used.
      * @param overrides The {@link ThemeList} containing the override themes.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy, ThemeList overrides)
-            throws QuickFixException;
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy, ThemeList overrides);
 
     /**
      * Gets <em>additional</em> CSS {@link Plugin}s to run during the initial preprocessing phase of {@link StyleDef}s.

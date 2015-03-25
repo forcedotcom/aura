@@ -28,7 +28,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.impl.css.theme.ThemeValueProviderImpl;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableList;
 import com.salesforce.omakase.plugin.Plugin;
@@ -39,13 +38,12 @@ import aQute.bnd.annotation.component.Component;
 public class StyleAdapterImpl implements StyleAdapter {
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style) {
         return getThemeValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy)
-            throws QuickFixException {
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy) {
         switch (strategy) {
         case RESOLVE_NORMAL:
             return getThemeValueProvider(style, strategy, Aura.getContextService().getCurrentContext().getThemeList());
@@ -58,19 +56,19 @@ public class StyleAdapterImpl implements StyleAdapter {
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy, ThemeList overrides)
-            throws QuickFixException {
+    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
+            ThemeList overrides) {
         return new ThemeValueProviderImpl(style, overrides, strategy);
     }
 
     @Override
     public List<Plugin> getCompilationPlugins() {
-        return ImmutableList.<Plugin> of();
+        return ImmutableList.<Plugin>of();
     }
 
     @Override
     public List<Plugin> getRuntimePlugins() {
-        return ImmutableList.<Plugin> of();
+        return ImmutableList.<Plugin>of();
     }
 
     @Override

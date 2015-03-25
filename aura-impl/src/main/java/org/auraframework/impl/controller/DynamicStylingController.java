@@ -19,18 +19,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.expression.Expression;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.css.parser.plugin.ThemeExpression;
 import org.auraframework.impl.css.parser.plugin.ThemeFunction;
@@ -39,11 +37,9 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import com.salesforce.omakase.ast.CssAnnotation;
 import com.salesforce.omakase.ast.atrule.AtRule;
 import com.salesforce.omakase.ast.declaration.Declaration;
@@ -103,7 +99,7 @@ public final class DynamicStylingController {
         // add any client-loaded style defs (todo-- check for dupes?)
         for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
             DefDescriptor<StyleDef> style = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
-            if (style.exists()) {
+            if (style.exists() && !styles.contains(style)) {
                 styles.add(style);
             }
         }
@@ -122,7 +118,7 @@ public final class DynamicStylingController {
             Iterable<DefDescriptor<StyleDef>> styles)
             throws QuickFixException {
 
-        // give the context all of the themes to apply. These are the *only* themes that should be in the context
+        // give the context all of the themes to apply.
         AuraContext context = Aura.getContextService().getCurrentContext();
         checkState(context.getThemeList().isEmpty(), "Did not expect any themes to be in the context yet");
 
@@ -133,22 +129,23 @@ public final class DynamicStylingController {
         // figure out which vars we will be utilizing
         Set<String> vars = context.getThemeList().getVarNames();
 
+        // the app may specify themes other than the namespace default, and if so we need to make sure it's in the
+        // context so that css token resolve will use it. but we don't want the token names from this in the list above.
+        context.addAppThemeDescriptors();
+
         // pre-filter style defs
         // 1: skip over any styles without expressions
-        // 2: skip any styles not using a relevant var
+        // 2: skip any styles not using a relevant var (removed... todo?)
         List<StyleDef> filtered = new ArrayList<>();
         for (DefDescriptor<StyleDef> style : styles) {
             StyleDef def = style.getDef();
             if (!def.getExpressions().isEmpty()) {
-                if (!Sets.intersection(def.getVarNames(), vars).isEmpty()) {
-                    filtered.add(def);
-                }
+                filtered.add(def);
             }
         }
 
         // process css
         StringBuilder out = new StringBuilder(512);
-        MagicEraser magicEraser = new MagicEraser(vars);
         ConditionalsValidator conditionalsValidator = new ConditionalsValidator();
 
         for (StyleDef style : filtered) {
@@ -156,6 +153,8 @@ public final class DynamicStylingController {
             if (context.isDevMode()) {
                 out.append(String.format("/* %s */\n", style.getDescriptor()));
             }
+
+            MagicEraser magicEraser = new MagicEraser(vars, style.getDescriptor());
 
             // first pass reduces the css to the stuff that utilizes a relevant var.
             // we run this in a separate pass so that our MagicEraser plugin gets ThemeFunctions delivered
@@ -195,25 +194,18 @@ public final class DynamicStylingController {
     private static final class MagicEraser implements Plugin {
         private static final CssAnnotation ANNOTATION = new CssAnnotation("keep");
         private final Set<String> vars;
+        private final ThemeValueProvider tvp;
 
         /** creates a new instance scoped to the specified set of theme var names */
-        public MagicEraser(Set<String> vars) {
+        public MagicEraser(Set<String> vars, DefDescriptor<StyleDef> style) {
             this.vars = vars;
+            this.tvp = Aura.getStyleAdapter().getThemeValueProvider(style);
         }
 
         /** determines if the given string contains reference to one of the specified vars */
-        private boolean hasMatchingVar(String expression) throws AuraValidationException {
-            Set<PropertyReference> set = new HashSet<>(3);
-            Expression expr = AuraImpl.getExpressionAdapter().buildExpression(expression, null);
-            expr.gatherPropertyReferences(set);
-
-            for (PropertyReference ref : set) {
-                if (vars.contains(ref.getRoot())) {
-                    return true;
-                }
-            }
-
-            return false;
+        private boolean hasMatchingVar(String expression) throws QuickFixException {
+            Set<String> references = tvp.extractVarNames(expression, true);
+            return !Collections.disjoint(vars, references);
         }
 
         /**
@@ -221,7 +213,7 @@ public final class DynamicStylingController {
          * declaration, indicating that it should not be removed.
          */
         @Rework
-        public void annotate(ThemeFunction function) throws AuraValidationException {
+        public void annotate(ThemeFunction function) throws QuickFixException {
             Declaration declaration = function.declaration();
             if (hasMatchingVar(function.args())) {
                 declaration.annotate(ANNOTATION);
@@ -235,7 +227,7 @@ public final class DynamicStylingController {
         }
 
         @Rework
-        public void annotate(ThemeExpression expression) throws AuraValidationException {
+        public void annotate(ThemeExpression expression) throws QuickFixException {
             if (hasMatchingVar(Args.extract(expression.expression()))) {
                 expression.parent().annotateUnlessPresent(ANNOTATION);
             }

@@ -30,6 +30,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -92,7 +93,7 @@ public final class ThemeListImpl implements MutableThemeList {
             }
 
             if (def.getMapProvider() != null) {
-                value = Optional.<Object>fromNullable(dynamicVars.get(name, theme));
+                value = Optional.<Object> fromNullable(dynamicVars.get(name, theme));
             }
             if (value.isPresent()) {
                 return value;
@@ -214,4 +215,11 @@ public final class ThemeListImpl implements MutableThemeList {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("themes", themes).add("dynamicVars", activeDynamicVars())
+                .toString();
+    }
+
 }

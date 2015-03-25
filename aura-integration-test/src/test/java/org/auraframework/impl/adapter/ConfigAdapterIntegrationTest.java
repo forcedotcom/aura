@@ -176,6 +176,217 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     }
 
     /**
+     * Tests normalizeCss set to false by ancestor and not set afterwards.
+     */
+    public void testResetCssSetByAncestor() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateMarkup, superTemplate.getDescriptorName(), "false");
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be resetCSS.css with normalizeCss false set by ancestor",
+                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    }
+
+    /**
+     * Tests normalizeCss set to true by ancestor and not set by descendants.
+     */
+    public void testNormalizeCssSetByAncestor() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateMarkup, superTemplate.getDescriptorName(), "true");
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be normalize.css with normalizeCss true set by ancestor",
+                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
+    }
+
+    /**
+     * Tests normalizeCss set to true by super and not set by template.
+     */
+    public void testNormalizeCssSetBySuper() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateMarkup, templateA.getDescriptorName(), "true");
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be normalize.css with normalizeCss true set by super",
+                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
+    }
+
+    /**
+     * Tests normalizeCss set to false by super and not set by template
+     */
+    public void testResetCssSetBySuper() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateMarkup, templateA.getDescriptorName(), "false");
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be resetCSS.css for template with normalizeCss false set by super",
+                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    }
+
+    /**
+     * Tests normalizeCss not set on any template
+     */
+    public void testResetCssNotSetBySuper() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be resetCSS.css for template with normalizeCss not set by super",
+                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    }
+
+    /**
+     * Tests normalizeCss set to true by ancestor from another base template and not set by descendants.
+     */
+    public void testNormalizeCssDifferentBaseTemplate() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true'>" +
+                "<aura:attribute name='normalizeCss' type='Boolean' default='false'/>" +
+                "</aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateMarkup, superTemplate.getDescriptorName(), "true");
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be normalize.css for different template with normalizeCss true",
+                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
+    }
+
+    /**
+     * Tests normalizeCss not set from another base template
+     */
+    public void testResetCssDifferentBaseTemplateNormalizeNotSet() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true'>" +
+                "<aura:attribute name='normalizeCss' type='Boolean' default='false'/>" +
+                "</aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
+        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
+        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
+
+        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
+        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, templateC.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should be resetCSS.css for different template with normalizeCss not set",
+                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    }
+
+    /**
+     * Test different base template with no normalizeCss attribute defined
+     */
+    public void testResetCssDifferentBaseTemplateNoAttribute() throws Exception {
+        String superMarkup = "<aura:component isTemplate='true' extensible='true'></aura:component>";
+        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
+
+        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
+        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
+        String appSrc = String.format(markup, template.getDescriptorName());
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
+        setupContext(app);
+
+        assertTrue("Reset CSS should use default resetCSS.css for different template with no normalizeCss attribute",
+                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    }
+
+    /**
      * Last boolean value is actual used by active template of app
      *
      * @param normalizes normalizeCss boolean varargs

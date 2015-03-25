@@ -206,12 +206,21 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public Object getValue(String name) throws QuickFixException {
-        PropertyReference expr = new PropertyReferenceImpl(name,
-                AuraUtil.getExternalLocation("direct attributeset access"));
-        if (expr.size() != 1) {
-            throw new InvalidDefinitionException("No dots allowed", expr.getLocation());
-        }
+        PropertyReference expr = getPropertyReferenceByName(name);
         return getValue(expr);
+    }
+
+    /**
+     * Returns raw object instead of evaluated value of attribute
+     *
+     * @param name
+     * @return Raw Object from attributes map
+     * @throws QuickFixException
+     */
+    @Override
+    public Object getRawValue(String name) throws QuickFixException {
+        PropertyReference expr = getPropertyReferenceByName(name);
+        return getExpression(expr.getRoot());
     }
 
     @Override
@@ -377,5 +386,14 @@ public class AttributeSetImpl implements AttributeSet {
         }
 
         return missingAttributes;
+    }
+
+    private PropertyReference getPropertyReferenceByName(String name) throws InvalidDefinitionException {
+        PropertyReference expr = new PropertyReferenceImpl(name,
+                AuraUtil.getExternalLocation("direct attributeset access"));
+        if (expr.size() != 1) {
+            throw new InvalidDefinitionException("No dots allowed", expr.getLocation());
+        }
+        return expr;
     }
 }

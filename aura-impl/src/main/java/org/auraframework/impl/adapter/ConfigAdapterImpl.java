@@ -47,6 +47,7 @@ import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.source.file.AuraFileMonitor;
@@ -294,12 +295,37 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     private boolean useNormalizeCss(BaseComponent template) throws QuickFixException {
         BaseComponent valueProviderTemplate = template;
+        boolean baseTemplate = true;
         if (template.getSuper() != null && ((BaseComponentDef) template.getSuper().getDescriptor().getDef()).isTemplate()) {
             // super template is the value provider for the attribute
+            // template only has the default value
             valueProviderTemplate = template.getSuper();
+            baseTemplate = false;
         }
-        return valueProviderTemplate.getAttributes().getValue("normalizeCss") != null &&
-                (Boolean) valueProviderTemplate.getAttributes().getValue("normalizeCss");
+        /**
+         * TODO: W-2540157
+         *
+         * The evaluated value for attribute "normalizeCss" returns the default value (false) if current
+         * template does not <aura:set attribute="normalizeCss" /> itself. This is incorrect if
+         * the current template extends a template that has normalizeCss set to true.
+         *
+         * This workaround recurses through PropertyReference values until a value provider template
+         * provides a set value or it reaches the base component which we will use the default value.
+         */
+        Object normalizeCssValue;
+        if (baseTemplate) {
+            normalizeCssValue = valueProviderTemplate.getAttributes().getValue("normalizeCss");
+        } else {
+            normalizeCssValue = valueProviderTemplate.getAttributes().getRawValue("normalizeCss");
+        }
+        if (normalizeCssValue != null) {
+            if (normalizeCssValue instanceof PropertyReference) {
+                return useNormalizeCss(valueProviderTemplate);
+            } else {
+                return (Boolean) normalizeCssValue;
+            }
+        }
+        return false;
     }
 
     /**

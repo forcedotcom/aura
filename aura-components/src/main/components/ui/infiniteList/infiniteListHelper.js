@@ -191,8 +191,11 @@
     },
 
 	ontouchcancel: function(cmp, event) {
-		if (cmp._swipe) {
-			this.closeRowBlockAndReset(cmp, cmp._swipe);
+		var swipe = cmp._swipe;
+		
+		if (swipe) {
+			var body = swipe.body || swipe.row.querySelector('.body');
+			this.closeRowBlockAndReset(cmp, body, true);
 		}
 	},
     
@@ -255,13 +258,9 @@
                 }
             }
             else if (cmp._isInteractionOnOpenRow) {
-  
-                // Movement along the y direction on the current row will force the row closed. 
-            	// Cancel all further events.
+            	// Cancel all further events if we have movement on the y-axis.
                 e.stopPropagation();
                 e.preventDefault();
-
-            	this.closeRowBlockAndReset(cmp, swipe.body, true);
             }
     	}
     },

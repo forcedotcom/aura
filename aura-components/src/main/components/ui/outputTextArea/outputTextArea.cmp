@@ -16,5 +16,9 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays the text area as specified by the value attribute.">
+
+    <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The text to display."/>
+
     <span aura:id='span' class="{!v.class}">{!v.value}</span>
+
 </aura:component>

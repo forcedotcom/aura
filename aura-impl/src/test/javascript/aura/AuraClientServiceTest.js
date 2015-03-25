@@ -799,6 +799,7 @@ Test.Aura.AuraClientServiceTest = function() {
                     error : function (err) {
                         throw err;
                     },
+                    warning : function (warn) {},
                     log : function (msg) {}
                 },
                 setTimeout : function(cb, time) {
@@ -931,6 +932,23 @@ Test.Aura.AuraClientServiceTest = function() {
                 service.invalidateAction(descriptor, null, assertBool(false, "Null params."));
                 service.invalidateAction(descriptor, true, assertBool(false, "Boolean params."));
                 service.invalidateAction(descriptor, [], assertBool(false, "Array params."));
+            });
+        }
+
+        [Fact]
+        function testResetToken() {
+            mockActionService(function(service, storage) {
+                storage.setup({
+                    put: function(){}
+                });
+
+                // Act
+                service.resetToken("myToken");
+
+                // Assert
+                var expected = "myToken";
+                actual = service._token;
+                Assert.Equal(expected, actual);
             });
         }
     }

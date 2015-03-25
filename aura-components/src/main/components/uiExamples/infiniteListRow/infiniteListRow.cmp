@@ -29,7 +29,7 @@
 	</a>
 
 	<aura:set attribute="swipeBody">
-		<ui:button label="Edit"/>
+		<ui:button label="Edit" press="{!c.handleEdit}"/>
 		<ui:button label="Delete"/>
 	</aura:set>
 </aura:component>		

@@ -54,6 +54,7 @@
             for (var i = 0; i < dataProviders.length; i++) {
             	//add handler
                 dataProviders[i].addHandler("onchange", cmp, "c.handleDataChange");
+                dataProviders[i].addHandler("error", cmp, "c.handleDataError");
             }
         }
     },
@@ -298,15 +299,11 @@
 	
 	attachEventHandler : function(cmp) {
 		$A.util.on(document, 'keydown', this.getKeydownHandler(cmp));
-		$A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(cmp));
-        $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp));
         $A.util.on(window, 'orientationchange', this.getOrientationChangeHandler(cmp));
 	},
 	
 	removeEventHandler : function(cmp) {
 		$A.util.removeOn(document, 'keydown', this.getKeydownHandler(cmp));
-		$A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(cmp));
-        $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(cmp));
         $A.util.removeOn(window, 'orientationchange', this.getOrientationChangeHandler(cmp));
 	},
 	
@@ -392,87 +389,7 @@
     	}
     	return cmp._keydownHandler;
     },
-	
-	getOnClickStartFunction: function(component) {
-        if ($A.util.isUndefined(component._onClickStartFunc)) {
-            var helper = this;
-            var f = function(event) {
-                if (helper.getOnClickEventProp("isTouchDevice")) {
-                    var touch = event.changedTouches[0];
-                    // record the ID to ensure it's the same finger on a
-					// multi-touch device
-                    component._onStartId = touch.identifier;
-                    component._onStartX = touch.clientX;
-                    component._onStartY = touch.clientY;
-                } else {
-                    component._onStartX = event.clientX;
-                    component._onStartY = event.clientY;
-                }
-            };
-            component._onClickStartFunc = f;
-        }
-        return component._onClickStartFunc;
-    },
-    
-    getOnClickEndFunction : function(component) {
-        if ($A.util.isUndefined(component._onClickEndFunc)) {
-            var helper = this;
-            var f = function(event) {            	
-                // ignore gestures/swipes; only run the click handler if it's a
-				// click or tap
-                var clickEndEvent;
-                if (helper.getOnClickEventProp("isTouchDevice")) {
-                    var touchIdFound = false;
-                    for (var i = 0; i < event.changedTouches.length; i++) {
-                        clickEndEvent = event.changedTouches[i];
-                        if (clickEndEvent.identifier === component._onStartId) {
-                            touchIdFound = true;
-                            break;
-                        }
-                    }
-                    if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
-                        return;
-                    }
-                } else {
-                    clickEndEvent = event;
-                }
-                var startX = component._onStartX, startY = component._onStartY;
-                var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
-                if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
-                    return;
-                }
-                if (!helper.isElementInComponent(component.find('sorterContainer'), event.target)) {                	
-                    // Collapse the sorter
-                	helper.handleOnCancel(component);
-                }
-            };
-            component._onClickEndFunc = f;
-        }
-        return component._onClickEndFunc;
-    },
-    
-    getOnClickEventProp: function(prop) {
-        // create the cache
-        if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
-            this.getOnClickEventProp.cache = {};
-        }
-        // check the cache
-        var cached = this.getOnClickEventProp.cache[prop];
-        if (!$A.util.isUndefined(cached)) {
-            return cached;
-        }
-        // fill the cache
-        this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
-        if (this.getOnClickEventProp.cache["isTouchDevice"]) {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
-        } else {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
-        }
-        return this.getOnClickEventProp.cache[prop];
-    },
-	
+ 
     isElementInComponent : function(component, targetElem) {
 		if (!component || !targetElem) {
 			return false;

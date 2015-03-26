@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    testToggleCanShowMore: {
+	testToggleCanShowMore: {
         browsers: ["-IE7","-IE8"],
         test: [
             function(component) {
@@ -52,5 +52,60 @@
                 $A.test.assertFalse(displayNone, "There should be a 'pullUp' div");
             }
         ]
+    },
+    
+    /**
+     * When scroller is set to horizontal scroll user should NOT be 
+     * able to scroll vertically. 
+     */
+    testVerticalScrollInHorizontalScroller: {
+    	browsers: ["-IE7", "-IE8"],
+    	test: [function(component) {
+    		// record inital height of scroller
+    		var scroller = component.find("horizontalScrollBottom").getElement()
+    			.getElementsByClassName("scroller")[0];
+    		horizontalScrollerTopOffset = scroller.getBoundingClientRect().top;
+    		
+    		// hit scroll button
+    		component.find("hztlScrollButton").get("e.press").fire();
+    		
+    		// wait 3 seconds
+    		setTimeout(function () {/* do nothing */ }, 3000);
+    	}, function(component) {
+    		// verify didnt scroll
+    		var scroller = component.find("horizontalScrollBottom").getElement()
+				.getElementsByClassName("scroller")[0];
+    		var newOffset = scroller.getBoundingClientRect().top;
+    		$A.test.assertEquals(horizontalScrollerTopOffset, newOffset, 
+    				"Scroller should not have scrolled.")
+    	}]
+    },
+    
+    /**
+     * When scroller is set to vertical scroll user should be able 
+     * to scroll vertically. 
+     */
+    testVerticalScrollInVerticalScroller: {
+    	browsers: ["-IE7", "-IE8"],
+    	test: [function(component) {
+    		// record inital height of scroller
+    		var scroller = component.find("verticalScrollBottom").getElement()
+    			.getElementsByClassName("scroller")[0];
+    		verticalScrollerTopOffset = scroller.getBoundingClientRect().top;
+    		
+    		// hit scroll button
+    		component.find("vrtScrollButton").get("e.press").fire();
+    		
+    		// wait 3 seconds
+    		setTimeout(function () {/* do nothing */ }, 3000);
+    	}, function(component) {
+    		// verify scroll happened. Current position should be less that initial.
+    		var scroller = component.find("verticalScrollBottom").getElement()
+				.getElementsByClassName("scroller")[0];
+    		var newOffset = scroller.getBoundingClientRect().top;
+    		$A.test.assertTrue(verticalScrollerTopOffset > newOffset, 
+    				"Scroller should not have scrolled. Moved from " 
+    				+ verticalScrollerTopOffset + " to " + newOffset);
+    	}]
     }
 })

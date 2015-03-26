@@ -41,5 +41,15 @@
     handleScrollToBottomUpdate : function (cmp) {
     	var count = cmp.get("v.scrollToBottomCount") + 1;
     	cmp.set("v.scrollToBottomCount", count);
+    },
+    
+    hztlScrollToBottom : function(cmp, event, helper) {
+    	var scrollEvt = cmp.find("horizontalScrollBottom").getEvent("scrollTo");
+    	helper.handleScrollTo(scrollEvt, "bottom", 0);
+    },
+    
+    vrtScrollToBottom : function(cmp, event, helper) {
+    	var scrollEvt = cmp.find("verticalScrollBottom").getEvent("scrollTo");
+    	helper.handleScrollTo(scrollEvt, "bottom", 0);
     }
 })

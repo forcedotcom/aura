@@ -16,7 +16,9 @@
 
 -->
 <aura:component>
-    <ui:virtualDataGrid aura:id="grid">      
+	<aura:attribute name="testFixedHeader" type="Boolean" default="false"/>
+	
+    <ui:virtualDataGrid aura:id="grid" fixedHeader="{!v.testFixedHeader}">      
         <aura:set attribute="headerColumns">
             <ui:dataGridColumn name="Name"    label="Name"/>
             <ui:dataGridColumn name="Phone"   label="Phone"/>

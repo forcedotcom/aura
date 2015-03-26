@@ -1439,116 +1439,61 @@
     /**
      * Test for an action that is parented to a storable action that gets refreshed.
      */
-    testParentingToStored : {
+    testNoAbortIfParentIsRefresh : {
         test : [
             function(cmp) {
-                var a = this.getAction(cmp, "c.execute", "APPEND parent; READ;", function(a) {}, false, true);
-                a.setStorable({"refresh":0});
-                $A.enqueueAction(a);
+                // Put initial value into storage
+                var initial = this.getAction(cmp, "c.execute", "APPEND parent; READ; RESUME testNoAbortIfParentIsRefreshRelease; WAIT testNoAbortIfParentIsRefresh;", function() {}, false, true);
+                initial.setStorable({"refresh":0});
+                $A.enqueueAction(initial);
+
                 // Trick our next action into returning a different value so that we get a refresh.
-                var a = this.getAction(cmp, "c.execute", "APPEND blah;", function(a) {}, false, true);
-                $A.enqueueAction(a);
-            },
-            function(cmp) {
+                var done = false;
+                var release = this.getAction(cmp, "c.execute", "WAIT testNoAbortIfParentIsRefreshRelease; RESUME testNoAbortIfParentIsRefresh; APPEND blah;", function() {
+                    done = true;
+                }, true);
+                $A.enqueueAction(release);
+                $A.test.addWaitFor(true, function() {
+                    return done;
+                });
+            }, function(cmp) {
+                var counter = 0;
                 var that = this;
                 // This action will load from storage first.
-                var parent = this.getAction(cmp, "c.execute", "APPEND parent; READ;", function(a) {
-                        that.log(cmp, "parent: "+a.getReturnValue());
-                        if (a.isFromStorage()) {
-                            var b = that.getAction(cmp, "c.execute", "APPEND child; READ;", function(x) {
-                                    that.log(cmp, "child: "+x.getReturnValue());
-                                }, false, true);
-                            b.setParentAction(parent);
-                            $A.enqueueAction(b);
+                var isChildQueued = false;
+                var parent = this.getAction(cmp, "c.execute", "APPEND parent; READ; RESUME testNoAbortIfParentIsRefreshRelease; WAIT testNoAbortIfParentIsRefresh;", function(response) {
+                        that.log(cmp, "parent" + counter++ + ": "+response.getReturnValue());
+                        if (response.isFromStorage()) {
+                            var child = that.getAction(cmp, "c.execute", "APPEND child; READ", function(childResponse) {
+                                that.log(cmp, "child: " + childResponse.getReturnValue());
+                            }, false, true);
+                            child.setParentAction(response);
+                            $A.run(function(){
+                                $A.enqueueAction(child);
+                            });
+                            isChildQueued = true;
                         }
                     }, false, true);
+                parent.setCallback(cmp, function() {
+                    that.log(cmp, "parent" + counter++ + ": ABORTED");
+                }, "ABORTED");
                 parent.setStorable({"refresh":0});
                 $A.enqueueAction(parent);
-
+                $A.test.addWaitFor(true, function() {
+                    return isChildQueued;
+                });
+            }, function(cmp) {
+                // Release refresh action
+                var release = this.getAction(cmp, "c.execute", "RESUME testNoAbortIfParentIsRefresh; RESUME testNoAbortIfParentIsRefreshChild;", function() {}, true);
+                $A.enqueueAction(release);
+            
                 // From the stored action
-                this.addWaitForLog(cmp, 0, "parent: parent");
+                this.addWaitForLog(cmp, 0, "parent0: parent");
                 // From the refresh
-                this.addWaitForLog(cmp, 1, "parent: blah,parent");
+                this.addWaitForLog(cmp, 1, "parent1: blah,parent");
                 // and the second action
                 this.addWaitForLog(cmp, 2, "child: child");
             }
         ]
-    },
-    
-    /**
-     * What happens if action parented to unqueued parent?
-     * Currently grandchild is aborted
-     */
-    _testParentingBeforeEnqueuing : {
-        test : [ function(cmp) {
-            // lock queue & prime abortable id
-            var a = this.getAction(cmp, "c.execute", "WAIT testParentingBeforeEnqueuing;")
-            a.setAbortable();
-            $A.enqueueAction(a);
-        }, function(cmp) {
-            // create parent
-            var a = this.getActionAndLog(cmp, "c.execute", "APPEND parent;READ;", "first: ");
-            cmp._first_a = a;
-            a.setAbortable();
-            cmp._aborted1 = false;
-            a.setCallback(this, function (a) { cmp._aborted1 = true; }, "ABORTED");
-            
-            // create child
-            var b = this.getActionAndLog(cmp, "c.execute", "APPEND child;READ;", "second: ");
-            cmp._second_a = b;
-            b.setAbortable();
-            b.setParentAction(a);
-            cmp._aborted2 = false;
-            b.setCallback(this, function (a) { cmp._aborted2 = true; }, "ABORTED");
-            
-            $A.enqueueAction(a);
-            $A.enqueueAction(b);
-            
-            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
-            $A.test.assertFalse(cmp._aborted2, "child should not have been aborted");
-
-            // release held action
-            var c = this.getAction(cmp, "c.executeBackground", "RESUME testParentingBeforeEnqueuing;");
-            $A.enqueueAction(c);
-            
-            this.addWaitForLog(cmp, 0, "first: parent");
-            this.addWaitForLog(cmp, 1, "second: child");
-        }, function(cmp) {
-            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
-            $A.test.assertFalse(cmp._aborted2, "child should not have been aborted");
-        }, function(cmp) {
-            $A.test.blockRequests();
-            try{
-                // create another child
-                var a = this.getActionAndLog(cmp, "c.execute", "APPEND adopted;READ;", "third: ");
-                cmp._first_a = a;
-                a.setAbortable();
-                a.setParentAction(cmp._first_a);
-                cmp._aborted3 = false;
-                a.setCallback(this, function (a) { cmp._aborted3 = true; }, "ABORTED");
-                
-                // create grandchild
-                var b = this.getActionAndLog(cmp, "c.execute", "APPEND grandchild;READ;", "fourth: ");
-                b.setAbortable();
-                b.setParentAction(cmp._second_a);
-                cmp._aborted4 = false;
-                b.setCallback(this, function (a) { cmp._aborted4 = true; }, "ABORTED");
-
-                $A.enqueueAction(a);
-                $A.enqueueAction(b);
-            } catch (e) {
-                throw e;
-            } finally {
-                $A.test.releaseRequests();
-            }
-
-            this.addWaitForLog(cmp, 2, "third: adopted");
-            this.addWaitForLog(cmp, 3, "fourth: grandchild");
-        }, function(cmp) {
-            $A.test.assertFalse(cmp._aborted1, "parent should not have been aborted");
-            $A.test.assertFalse(cmp._aborted2, "child should not have been aborted");
-            $A.test.assertFalse(cmp._aborted3, "adopted should not have been aborted");
-            $A.test.assertFalse(cmp._aborted4, "grandchild should not have been aborted");
-        } ]
-    }
+    }    
 })

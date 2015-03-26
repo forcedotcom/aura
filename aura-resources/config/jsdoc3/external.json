@@ -1,3 +1,6 @@
 {
-    "plugins":["plugins/auraExternalOnly"]
+    "plugins":[
+    	"plugins/auraExternalOnly",
+    	"plugins/auraExternalOnlyXml"
+   	]
 }

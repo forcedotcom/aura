@@ -117,8 +117,6 @@ $A.ns.AuraClientService = function() {
 
     // only expose following private properties for Test.js and xUnit
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"]}
-    this["_host"] = this._host;
-    this["_token"] = this._token;
     this["foreground"] = this.foreground;
     this["background"] = this.background;
     this["actionQueue"] = this.actionQueue;
@@ -938,7 +936,7 @@ $A.ns.AuraClientService.prototype.saveTokenToStorage = function() {
     // fire-and-forget style, matching action response persistence.
     var storage = Action.prototype.getStorage();
     if (storage && this._token) {
-        var value = { token: this._token };
+        var value = { "token": this._token };
         storage.put("$AuraClientService.priv$", value).then(
             this.NOOP,
             function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }

@@ -15,13 +15,10 @@
  */
 package org.auraframework.impl.javascript.controller;
 
-import static org.auraframework.instance.AuraValueProviderType.LABEL;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -30,7 +27,6 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
-import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -99,13 +95,7 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
-                .get(LABEL.getPrefix());
-        for (PropertyReference e : expressionRefs) {
-            if (e.getRoot().equals(LABEL.getPrefix())) {
-                labelProvider.getValue(e.getStem());
-            }
-        }
+        retrieveLabels(expressionRefs);
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef> {

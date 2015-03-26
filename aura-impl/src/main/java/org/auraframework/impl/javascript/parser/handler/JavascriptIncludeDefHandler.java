@@ -27,6 +27,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.library.IncludeDefImpl;
+import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -46,58 +47,65 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
 
     @Override
     public IncludeDef getDefinition() {
-        String code = source.getContents();
-
-        // Check for well-formed js before storing code in definition.
-
-        // We allow unnamed function at root, but Closure compiler doesn't.
-
-        // Remove leading whitespace and comments to get to code
-        String codeToCheck = code.replaceFirst("(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+", "");
-        final boolean isUnnamedFunction = codeToCheck.matches("(?s)^function\\s*\\(.*");
-
-        if (isUnnamedFunction) {
-            codeToCheck = JS_PREFIX + codeToCheck;
-        }
-
-        Writer w = new StringWriter();
-        List<JavascriptProcessingError> errors;
         try {
-            // strip whitespace, comments, and some unnecessary tokens
-            errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(codeToCheck, w, source.getUrl());
-        } catch (IOException e) {
-            return createDefinition(new AuraRuntimeException(e, getLocation()));
-        }
-        if (!errors.isEmpty()) {
-            Logger logger = Logger.getLogger(getClass());
-            StringBuilder errorSummary = new StringBuilder();
-            for (JavascriptProcessingError error : errors) {
-                if (JavascriptProcessingError.Level.Warning.equals(error.getLevel())) {
-                    // will need to surface these warnings externally
-                    // perhaps report them as part of the serialized library in dev modes
-                    logger.warn("Library warning for " + descriptor + " : " + error.toString());
-                    continue;
-                }
-                errorSummary.append('\n');
-                if (isUnnamedFunction && error.getLine() == 1) {
-                    // adjust for prefix
-                    error.setStartColumn(error.getStartColumn() - JS_PREFIX.length());
-                }
-                errorSummary.append(error.toString());
-            }
-            if (errorSummary.length() > 0) {
-                return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
-            }
-        }
+            String code = source.getContents();
 
-        builder.setCode(code);
-        setDefBuilderFields(builder);
+            // Check for well-formed js before storing code in definition.
+
+            // We allow unnamed function at root, but Closure compiler doesn't.
+
+            // Remove leading whitespace and comments to get to code
+            String codeToCheck = code.replaceFirst("(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+", "");
+            final boolean isUnnamedFunction = codeToCheck.matches("(?s)^function\\s*\\(.*");
+
+            if (isUnnamedFunction) {
+                codeToCheck = JS_PREFIX + codeToCheck;
+            }
+
+            Writer w = new StringWriter();
+            List<JavascriptProcessingError> errors;
+            try {
+                // strip whitespace, comments, and some unnecessary tokens
+                errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(codeToCheck, w, source.getUrl());
+            } catch (IOException e) {
+                return createDefinition(new AuraRuntimeException(e, getLocation()));
+            }
+            if (!errors.isEmpty()) {
+                Logger logger = Logger.getLogger(getClass());
+                StringBuilder errorSummary = new StringBuilder();
+                for (JavascriptProcessingError error : errors) {
+                    if (JavascriptProcessingError.Level.Warning.equals(error.getLevel())) {
+                        // will need to surface these warnings externally
+                        // perhaps report them as part of the serialized library in dev modes
+                        logger.warn("Library warning for " + descriptor + " : " + error.toString());
+                        continue;
+                    }
+                    errorSummary.append('\n');
+                    if (isUnnamedFunction && error.getLine() == 1) {
+                        // adjust for prefix
+                        error.setStartColumn(error.getStartColumn() - JS_PREFIX.length());
+                    }
+                    errorSummary.append(error.toString());
+                }
+                if (errorSummary.length() > 0) {
+                    return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
+                }
+            }
+
+            TextTokenizer tt = TextTokenizer.tokenize(code, getLocation());
+            tt.addExpressionRefs(this);
+
+            builder.setCode(code);
+            setDefBuilderFields(builder);
+        } catch (QuickFixException qfe) {
+            return createDefinition(qfe);
+        }
         return builder.build();
     }
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        // no expressions supported
+        builder.addExpressionReferences(propRefs);
     }
 
     @Override

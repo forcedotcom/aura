@@ -62,6 +62,13 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     }
 
     @Override
+    public void retrieveLabels() throws QuickFixException {
+        for (IncludeDefRef idr : includeRefs) {
+            idr.retrieveLabels();
+        }
+    }
+
+    @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("descriptor", getDescriptor());

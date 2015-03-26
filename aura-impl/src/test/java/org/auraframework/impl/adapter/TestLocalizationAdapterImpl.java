@@ -44,6 +44,8 @@ public class TestLocalizationAdapterImpl extends LocalizationAdapterImpl {
         setTestLabel("Section1", "renderer", "Renderer");
         setTestLabel("Section2", "renderer", "Renderer");
         setTestLabel("Section3", "renderer", "Renderer");
+        setTestLabel("Section1", "library", "Library1");
+        setTestLabel("Section2", "library", "Library2");
     }
 
     private Object getLabelKey(String section, String name) {

@@ -123,6 +123,12 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
         return hashCode;
     }
 
+    @Override
+    public void retrieveLabels() throws QuickFixException {
+        IncludeDef includeDef = includeDescriptor.getDef();
+        includeDef.retrieveLabels();
+    }
+
     private String prepareCode() {
         String source;
         try {

@@ -106,5 +106,20 @@
 			$A.test.assertEquals("Provider", $A.get("$Label.Section3.provider"), 
                     "All label expressions in provider not parsed and loaded in client.");
 		}
+	},
+
+	/**
+	 * Verify that labels are parsed from Javascript library and loaded in the client.
+	 * No additional server roundtrip should be required to fetch such labels.
+	 */
+	testLabelsInLibraryAreParsed:{
+		test:function(cmp){
+			//Block server requests to make sure the labels were not fetched from the server by the test script.
+			$A.test.blockRequests();
+			$A.test.assertEquals("Library1", $A.get("$Label.Section1.library"), 
+					"Label expression in provider not parsed and loaded in client.");
+			$A.test.assertEquals("Library2", $A.get("$Label.Section2.library"), 
+					"All label expressions in provider not parsed and loaded in client.");
+		}
 	}
 })

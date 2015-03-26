@@ -16,14 +16,20 @@
 package org.auraframework.impl.system;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import static org.auraframework.instance.AuraValueProviderType.LABEL;
+
+import org.auraframework.Aura;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraExceptionInfo;
@@ -357,6 +363,25 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public void retrieveLabels() throws QuickFixException {
 
+    }
+
+    /**
+     * A utility routine to get the full set of labels out of a set of property references.
+     *
+     * This is used everywhere that we parse javascript to get property references and want to
+     * process them. But can be applied to literally anything.
+     *
+     * @param props the collection of properties to scan.
+     */
+    protected void retrieveLabels(Collection<PropertyReference> props) throws QuickFixException {
+        GlobalValueProvider labelProvider;
+        
+        labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL.getPrefix());
+        for (PropertyReference e : props) {
+            if (e.getRoot().equals(LABEL.getPrefix())) {
+                labelProvider.getValue(e.getStem());
+            }
+        }
     }
 
     @Override

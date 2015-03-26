@@ -19,6 +19,7 @@
 <aura:component provider="js://gvpTest.parseLabels">
     <aura:attribute name="xxx" type="String" default="none" />
     <aura:attribute name="yyy" type="String" default="none" />
+    <aura:import library="gvpTest:parseLabelsLibrary" property="pll" />
     {!v.xxx}<br />
     {!v.yyy}<br />
 </aura:component>

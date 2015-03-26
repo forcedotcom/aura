@@ -16,19 +16,31 @@
 package org.auraframework.impl.root.library;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 import org.auraframework.def.IncludeDef;
-
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Sets;
 
 public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements IncludeDef {
     private static final long serialVersionUID = 8478482051480999239L;
     private final String code;
+    private final Set<PropertyReference> expressionRefs;
 
     protected IncludeDefImpl(Builder builder) {
         super(builder);
         this.code = builder.code;
+        this.expressionRefs = builder.expressionRefs;
+    }
+
+    @Override
+    public void retrieveLabels() throws QuickFixException {
+        retrieveLabels(expressionRefs);
     }
 
     @Override
@@ -43,9 +55,14 @@ public class IncludeDefImpl extends DefinitionImpl<IncludeDef> implements Includ
 
     public static class Builder extends DefinitionImpl.BuilderImpl<IncludeDef> {
         private String code;
+        private Set<PropertyReference> expressionRefs = Sets.newHashSet();
 
         public Builder() {
             super(IncludeDef.class);
+        }
+
+        public void addExpressionReferences(Collection<PropertyReference> refs) {
+            this.expressionRefs.addAll(refs);
         }
 
         /**

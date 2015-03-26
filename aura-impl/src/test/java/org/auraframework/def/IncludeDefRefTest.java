@@ -155,7 +155,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \nfunction(){}\n)}\n" +
+                        "function(){arguments[0](\"%s:%s\", \nfunction(){}\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());
     }
@@ -185,7 +185,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \n%s\n)}\n" +
+                        "function(){arguments[0](\"%s:%s\", \n%s\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), source), buffer.toString());
     }
@@ -215,7 +215,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \n%s\n)}\n" +
+                        "function(){arguments[0](\"%s:%s\", \n%s\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), source), buffer.toString());
     }
@@ -247,7 +247,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \"%s\", \nfunction(){}\n)}\n" +
+                        "function(){arguments[0](\"%s:%s\", \"%s\", \nfunction(){}\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), importDesc.getName()), buffer.toString());
     }
@@ -281,7 +281,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \"%s:%s\", \nfunction(){}\n)}\n" +
+                        "function(){arguments[0](\"%s:%s\", \"%s:%s\", \nfunction(){}\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), extLibDesc.getDescriptorName(),
                         importDesc.getName()), buffer.toString());
@@ -321,7 +321,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", \"%s\", \"%s\", \"%s:%s\", \nfunction(){}\n)}\n" +
+                        "function(){arguments[0](\"%s:%s\", \"%s\", \"%s\", \"%s:%s\", \nfunction(){}\n)}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName(), import1Desc.getName(),
                         import2Desc.getName(), extLibDesc.getDescriptorName(), import3Desc.getName()),
@@ -353,7 +353,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 
         assertEquals(
                 String.format("{\n" +
-                        "function(define){define(\"%s:%s\", function(){\nvar myexpt=function(){return 'something'}\n" +
+                        "function(){arguments[0](\"%s:%s\", function(){\nvar myexpt=function(){return 'something'}\n" +
                         "return myexpt})}\n" +
                         "}",
                         libDesc.getDescriptorName(), includeDesc.getName()), buffer.toString());

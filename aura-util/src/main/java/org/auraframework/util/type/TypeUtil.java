@@ -182,17 +182,14 @@ public class TypeUtil {
     @SuppressWarnings("unchecked")
     private static <F, T> Converter<F, T> getConverter(Class<F> from, Class<T> to, String of) {
         TypeUtil typeUtil = get();
+        String className = getAssignableHashMapClassName(from);
         if (of == null) {
-            String className = from.getName();
-            if (HashMap.class.isAssignableFrom(from)) {
-                className = HashMap.class.getName();
-            }
             Map<String, Converter<?, ?>> map = typeUtil.converters.get(className);
             if (map != null) {
                 return (Converter<F, T>) map.get(to.getName());
             }
         } else {
-            Map<String, Map<String, Converter<?, ?>>> converters = typeUtil.parameterizedConverters.get(from.getName());
+            Map<String, Map<String, Converter<?, ?>>> converters = typeUtil.parameterizedConverters.get(className);
             if (converters != null) {
                 Map<String, Converter<?, ?>> paramConverters = converters.get(to.getName());
                 if (paramConverters != null) {
@@ -204,14 +201,30 @@ public class TypeUtil {
     }
 
     @SuppressWarnings("unchecked")
-	private static <T> MultiConverter<T> getMultiConverter(Class<?> from, Class<T> to) {
-    	TypeUtil typeUtil = get();
-        Map<String, MultiConverter<?>> map = typeUtil.multiConverters.get(from.getName());
+    private static <T> MultiConverter<T> getMultiConverter(Class<?> from, Class<T> to) {
+        TypeUtil typeUtil = get();
+        String className = getAssignableHashMapClassName(from);
+        Map<String, MultiConverter<?>> map = typeUtil.multiConverters.get(className);
         if (map != null) {
             return (MultiConverter<T>)map.get(to.getName());
         }
 
         return null;
+    }
+
+    /**
+     * Checks whether Class is assignable to HashMap (LinkedHashMap).
+     * If so, return HashMap to find all existing HashMap converters.
+     *
+     * @param clz Class to find
+     * @return class name
+     */
+    private static String getAssignableHashMapClassName(Class clz) {
+        String className = clz.getName();
+        if (HashMap.class.isAssignableFrom(clz)) {
+            className = HashMap.class.getName();
+        }
+        return className;
     }
     
     public static boolean hasConverter(Class<?> from, Class<?> to, String of) {

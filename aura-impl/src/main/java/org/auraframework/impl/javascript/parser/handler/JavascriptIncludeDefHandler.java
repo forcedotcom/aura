@@ -31,6 +31,7 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
@@ -85,8 +86,13 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
                 }
             }
 
-            TextTokenizer tt = TextTokenizer.tokenize(code, getLocation());
-            tt.addExpressionRefs(this);
+            try {
+                TextTokenizer tt = TextTokenizer.tokenize(code, getLocation());
+                tt.addExpressionRefs(this);
+            } catch (InvalidExpressionException iee) {
+                // completely ignore we don't know what is in libraries, and until the TextTokenizer is smarter,
+                // we'll just bomb out here.
+            }
 
             builder.setCode(code);
             setDefBuilderFields(builder);

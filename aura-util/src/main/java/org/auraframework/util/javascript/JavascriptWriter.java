@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import org.auraframework.util.IOUtil;
 
 import com.google.common.collect.Lists;
+import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
@@ -38,6 +39,7 @@ import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import com.google.javascript.jscomp.VariableRenamingPolicy;
+import com.google.javascript.jscomp.WarningsGuard;
 
 /**
  * Util for compressing and writing javascript.
@@ -253,6 +255,10 @@ public enum JavascriptWriter {
 
         setClosureOptions(options);
 
+        // Disable reporting non-standard jsdoc comments as warnings. Should have been able to do:
+        // options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
+        options.addWarningsGuard(NON_STANDARD_JSDOC_GUARD);
+        
         Result result = c.compile(externs, Lists.<SourceFile> newArrayList(in), options);
 
         if (isSelfScoping()) {
@@ -288,6 +294,21 @@ public enum JavascriptWriter {
         return msgs;
     }
 
+    // Diagnostic type appears to be inconsistent with DiagnosticGroups.NON_STANDARD_JSDOC -
+    // https://code.google.com/p/closure-compiler/issues/detail?id=1156
+    private static final WarningsGuard NON_STANDARD_JSDOC_GUARD = new WarningsGuard() {
+        private static final long serialVersionUID = 4797480123361380748L;
+
+        @Override
+        public CheckLevel level(JSError error) {
+            if ("Parse error. Non-JSDoc comment has annotations. Did you mean to start it with '/**'?"
+                    .equals(error.description)) {
+                return CheckLevel.OFF;
+            }
+            return error.getDefaultLevel();
+        }
+    };
+    
     private static final List<SourceFile> externs;
 
     static {

@@ -15,7 +15,10 @@
  */
 ({
     init: function (component) {
-        var cmp = component.getConcreteComponent();
+        if (!component || !component.isValid()) {
+            return;
+        }
+    	var cmp = component.getConcreteComponent();
         var imageType = cmp.get('v.imageType'),
             altText = cmp.get('v.alt') || '',
             id = cmp.getLocalId() || cmp.getGlobalId() || '';

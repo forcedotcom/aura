@@ -69,7 +69,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeLiteral(String.format("function(define){%s}", prepareCode()));
+        json.writeLiteral(String.format("function(){%s}", prepareCode()));
     }
 
     @Override
@@ -140,7 +140,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
         DefDescriptor<?> localBundle = includeDescriptor.getBundle();
 
         StringBuilder builder = new StringBuilder();
-        builder.append("define(\"");
+        builder.append("arguments[0](\"");
         builder.append(localBundle.getDescriptorName());
         builder.append(":");
         builder.append(getName());

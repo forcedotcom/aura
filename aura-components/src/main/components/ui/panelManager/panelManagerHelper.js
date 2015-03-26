@@ -108,8 +108,12 @@
 	    				focusables = self.getFocusables(panel);
 	    				focusables.initial && focusables.initial.focus();
 	    			}
+
+                    if (config.onUpdate && $A.util.isFunction(config.onUpdate)) {
+                        config.onUpdate(panel);
+                    }
     			});
-    		},100);
+    		}, 100);
     	}
         
         // updatePanel event supports onCreate callback (passed through by showPanel in centerStage)

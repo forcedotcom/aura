@@ -486,7 +486,7 @@ function (w) {
             this.wrapperHeight = this.wrapper.clientHeight;
             this.wrapperSize   = this.scrollVertical ? this.wrapperHeight : this.wrapperWidth;
 
-            if (this.opts.useNativeScroller && oldSize !== this.wrapperSize) {
+            if (this.opts.gpuOptimization && this.opts.useNativeScroller && oldSize !== this.wrapperSize) {
                 this.scroller.style.height = this.wrapperSize + 'px';
             }
             
@@ -613,7 +613,8 @@ function (w) {
             }
 
             if (this.opts.useNativeScroller) {
-                eventType(this.scroller, 'scroll', this);
+                var scrollTarget = this.opts.gpuOptimization ? this.scroller : this.wrapper;
+                eventType(scrollTarget, 'scroll', this);
                 if (IS_IOS && !this.opts.pullToRefresh) {
                     eventType(wrapper, 'touchstart', function (e) {self._iosScrollFixture.apply(self, arguments);});
                 }
@@ -1610,8 +1611,9 @@ function (w) {
             }
         },
         _nativeScrollRAF: function (e) {
-            var x = -this.scroller.scrollLeft,
-                y = -this.scroller.scrollTop;
+            var scrollTarget = this.opts.gpuOptimization ? this.scroller : this.wrapper,
+                x = -scrollTarget.scrollLeft,
+                y = -scrollTarget.scrollTop;
 
             this._fire(ACTION_SCROLL_MOVE, ACTION_SCROLL, x, y, e);
 

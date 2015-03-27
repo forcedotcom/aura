@@ -30,7 +30,7 @@
 	
 		Enter scroller you want to test: <ui:inputText aura:id="newScrollerId" value="{!v.scrollerId}"/> <br/>
 	</div>
-	<br/><br/><br/><br/>
+	<br/><br/><br/><br/><br/><br/>
 	
 	<ui:outputText value="bidirectional"/>
 	<div class="test">

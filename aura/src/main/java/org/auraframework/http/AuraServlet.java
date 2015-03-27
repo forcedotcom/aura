@@ -59,7 +59,7 @@ import com.google.common.collect.Maps;
 
 /**
  * The servlet for initialization and actions in Aura.
- *
+ * 
  * The sequence of requests is:
  * <ol>
  * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
@@ -84,11 +84,11 @@ import com.google.common.collect.Maps;
  * </ul>
  * </li>
  * </ol>
- *
+ * 
  * Run from aura-jetty project. Pass in these vmargs: <code>
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
  * </code>
- *
+ * 
  * Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
  * exceptions are caught. This routine will use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
  * log and rewrite exceptions as necessary.
@@ -112,19 +112,19 @@ public class AuraServlet extends AuraBaseServlet {
 
     /**
      * Check for the nocache parameter and redirect as necessary.
-     *
+     * 
      * Not entirely sure what this is used for (need doco). It is part of the appcache refresh, forcing a reload while
      * avoiding the appcache.
-     *
+     * 
      * It maybe should be done differently (e.g. a nonce).
-     *
+     * 
      * @param request The request to retrieve the parameter.
      * @param response the response (for setting the location header.
      * @returns true if we are finished with the request.
      */
     private void handleNoCacheRedirect(String nocache, HttpServletRequest request,
-    		HttpServletResponse response) throws IOException {
-    	//
+            HttpServletResponse response) throws IOException {
+        //
         // FIXME:!!!
         // This is part of the appcache refresh, forcing a reload while
         // avoiding the appcache. It is here because (fill in the blank).
@@ -149,14 +149,14 @@ public class AuraServlet extends AuraBaseServlet {
             // if nocache has https specified, or the request is secure,
             // modify sb if it's http
             if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {
-            	sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
+                sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
             }
 
             int index = sb.indexOf("//");
-            index = sb.indexOf("/", index + 2);  // find the 3rd slash, start of path
+            index = sb.indexOf("/", index + 2); // find the 3rd slash, start of path
             sb.setLength(index);
             sb.append(uri.getPath());
-            if(query != null && !query.isEmpty()) {
+            if (query != null && !query.isEmpty()) {
                 sb.append("?").append(query);
             }
             if (fragment != null && !fragment.isEmpty()) {
@@ -175,10 +175,10 @@ public class AuraServlet extends AuraBaseServlet {
 
     /**
      * Handle an HTTP GET operation.
-     *
+     * 
      * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this purpose,
      * where POST is used for actions.
-     *
+     * 
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
@@ -208,7 +208,7 @@ public class AuraServlet extends AuraBaseServlet {
             return;
         }
         String nocache = nocacheParam.get(request);
-        if (nocache != null && !nocache.isEmpty()) { 
+        if (nocache != null && !nocache.isEmpty()) {
             handleNoCacheRedirect(nocache, request, response);
             return;
         }
@@ -255,7 +255,6 @@ public class AuraServlet extends AuraBaseServlet {
         internalGet(request, response, defDescriptor, context, definitionService);
     }
 
-
     protected <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
             HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context,
             DefinitionService definitionService)
@@ -271,9 +270,9 @@ public class AuraServlet extends AuraBaseServlet {
             context.setApplicationDescriptor(defDescriptor);
             definitionService.updateLoaded(defDescriptor);
             def = definitionService.getDefinition(defDescriptor);
-            
+
             if (!context.isTestMode() && !context.isDevMode()) {
-            	assertAccess(def);
+                assertAccess(def);
             }
         } catch (QuickFixException qfe) {
             //
@@ -302,7 +301,7 @@ public class AuraServlet extends AuraBaseServlet {
             PrintWriter out = response.getWriter();
             out.write("\n    ");
             @SuppressWarnings("unchecked")
-            Class<T> clazz = (Class<T>)def.getDescriptor().getDefType().getPrimaryInterface();
+            Class<T> clazz = (Class<T>) def.getDescriptor().getDefType().getPrimaryInterface();
             serializationService.write(def, getComponentAttributes(request), clazz, out);
         } catch (Throwable e) {
             handleServletException(e, false, context, request, response, true);
@@ -314,8 +313,9 @@ public class AuraServlet extends AuraBaseServlet {
 
     private void assertAccess(BaseComponentDef def) throws QuickFixException {
         String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
-        DefDescriptor<?> referencingDescriptor = (defaultNamespace != null && !defaultNamespace.isEmpty()) 
-                ? Aura.getDefinitionService().getDefDescriptor(String.format("%s:servletAccess", defaultNamespace), ApplicationDef.class) 
+        DefDescriptor<?> referencingDescriptor = (defaultNamespace != null && !defaultNamespace.isEmpty())
+                ? Aura.getDefinitionService().getDefDescriptor(String.format("%s:servletAccess", defaultNamespace),
+                        ApplicationDef.class)
                 : null;
         Aura.getDefinitionService().getDefRegistry().assertAccess(referencingDescriptor, def);
     }
@@ -374,7 +374,6 @@ public class AuraServlet extends AuraBaseServlet {
                 loggingService.setValue(LoggingService.BEACON_DATA, new JsonReader().read(beaconData));
             }
 
-
             String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
             if (!fwUID.equals(context.getFrameworkUID())) {
                 throw new ClientOutOfSyncException("Framework has been updated");
@@ -398,7 +397,7 @@ public class AuraServlet extends AuraBaseServlet {
                 String name = action.getDescriptor().getQualifiedName();
                 if (name.equals("aura://ComponentController/ACTION$getApplication")
                         || (name.equals("aura://ComponentController/ACTION$getComponent")
-                            && !isProductionMode(context.getMode()))) {
+                        && !isProductionMode(context.getMode()))) {
                     isBootstrapAction = true;
                 }
                 Action labelAction = message.getActions().get(1);
@@ -415,7 +414,7 @@ public class AuraServlet extends AuraBaseServlet {
             DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
 
             // Knowing the app, we can do the HTTP headers, so of which depend on
-            // the app in play, so we couldn't do this 
+            // the app in play, so we couldn't do this
             setBasicHeaders(applicationDescriptor, request, response);
             if (applicationDescriptor != null) {
                 // ClientOutOfSync will drop down.
@@ -427,7 +426,7 @@ public class AuraServlet extends AuraBaseServlet {
                     // a client out of sync exception, since the UID will not match.
                     //
                 }
-                
+
                 if (!context.isTestMode() && !context.isDevMode()) {
                     assertAccess(applicationDescriptor.getDef());
                 }
@@ -438,7 +437,7 @@ public class AuraServlet extends AuraBaseServlet {
                 attributes = Maps.newHashMap();
                 attributes.put("token", getToken());
             }
-            
+
             PrintWriter out = response.getWriter();
             written = true;
             out.write(CSRF_PROTECT);

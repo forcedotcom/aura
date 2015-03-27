@@ -1615,16 +1615,17 @@ function (w) {
                 x = -scrollTarget.scrollLeft,
                 y = -scrollTarget.scrollTop;
 
-            this._fire(ACTION_SCROLL_MOVE, ACTION_SCROLL, x, y, e);
-
+            this._isScrolling = true;
+            
             this.distX = x - this.x;
             this.distY = y - this.y;
-
-            this._isScrolling = true;
-            this._update();
-
+            
             this.x = x;
             this.y = y;
+            
+            this._update();
+            this._fire(ACTION_SCROLL_MOVE, ACTION_SCROLL, x, y, e);
+
             this._isScrolling = false;
             this._rafNativeScroll = false;
         },

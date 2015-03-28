@@ -57,11 +57,10 @@ import org.auraframework.util.json.JsonReader;
  * @since 0.0.139
  */
 public class AuraServletHttpTest extends AuraHttpTestCase {
-   
 
     private static class MockCsp implements ContentSecurityPolicy {
-        private String[] ancestors;
-        
+        private final String[] ancestors;
+
         public MockCsp(String... ancestors) {
             this.ancestors = ancestors;
         }
@@ -163,26 +162,27 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Integer posContex = rawRes.indexOf("context");
         assertTrue(posActions < posContex);
     }
-    
-    public void testMulitpleActionsInOnePost() {
-    	ArrayList<String> qNameList = new ArrayList<>();
-    	ArrayList<Map<String,Object>> actionParamsArrayList = new ArrayList<>();
 
-		Map<String, Object> actionParams = new HashMap<>();
+    public void testMulitpleActionsInOnePost() {
+        ArrayList<String> qNameList = new ArrayList<>();
+        ArrayList<Map<String, Object>> actionParamsArrayList = new ArrayList<>();
+
+        Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         qNameList.add("java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
         actionParamsArrayList.add(actionParams);
-        
+
         Map<String, Object> actionParams1 = new HashMap<>();
         actionParams1.put("param", 6);
         qNameList.add("java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getInt");
         actionParamsArrayList.add(actionParams1);
 
-    	ServerAction a = new ServerAction(qNameList,actionParamsArrayList);
-    	a.run();
-    	assertTrue("The response does not have the expected number of actions", a.getReturnValueList().size() == 2);
-    	assertTrue(a.getReturnValueList().get(0).equals("some string") && a.getReturnValueList().get(1).equals(new BigDecimal(6)));
-    	
+        ServerAction a = new ServerAction(qNameList, actionParamsArrayList);
+        a.run();
+        assertTrue("The response does not have the expected number of actions", a.getReturnValueList().size() == 2);
+        assertTrue(a.getReturnValueList().get(0).equals("some string")
+                && a.getReturnValueList().get(1).equals(new BigDecimal(6)));
+
     }
 
     /**
@@ -206,7 +206,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
 
-        DefDescriptor<ApplicationDef> app = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> app = Aura.getDefinitionService().getDefDescriptor(
+                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
         params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app));
 
         HttpPost post = obtainPostMethod("/aura", params);
@@ -243,7 +244,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
-        DefDescriptor<ApplicationDef> app = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> app = Aura.getDefinitionService().getDefDescriptor(
+                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
         String fwuid = getAuraTestingUtil().modifyUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
         params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app, null, fwuid, null, null));
 
@@ -258,7 +260,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                     HttpStatus.SC_OK, response));
         }
 
-        assertTrue("response not wrapped with ERROR marker: "+response,
+        assertTrue("response not wrapped with ERROR marker: " + response,
                 response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
         response = response.substring(AuraBaseServlet.CSRF_PROTECT.length() + 2,
                 response.length() - "/*ERROR*/".length());
@@ -282,16 +284,17 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, getStatusCode(response));
         String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
-        assertTrue("Location is not absolute (but should be by spec): " + location, location.matches("^https?://[a-zA-Z0-9_\\-.]*:[0-9]*(/.*)?$"));
+        assertTrue("Location is not absolute (but should be by spec): " + location,
+                location.matches("^https?://[a-zA-Z0-9_\\-.]*:[0-9]*(/.*)?$"));
         int index = location.indexOf(':');
-        index = location.indexOf(':', index + 1) + 1;  // find the port-separating colon
+        index = location.indexOf(':', index + 1) + 1; // find the port-separating colon
         while (location.charAt(index) >= '0' && location.charAt(index) <= '9') {
-        	index++;
+            index++;
         }
         assertEquals("Wrong URI path", expectedRedirect, location.substring(index));
         assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
         assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
-        assertDefaultAntiClickjacking(response, false, false);  // Redirects don't have XFO/CSP guarding
+        assertDefaultAntiClickjacking(response, false, false); // Redirects don't have XFO/CSP guarding
     }
 
     /**
@@ -304,14 +307,14 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * This handles a Chrome (or maybe WebKit) bug where a Location semi-correctly beginning
-     * with a double or more slash is taken as a hostname (i.e. as if it were http: + the location),
+     * This handles a Chrome (or maybe WebKit) bug where a Location semi-correctly beginning with a double or more slash
+     * is taken as a hostname (i.e. as if it were http: + the location),
      * 
      */
     public void testNoCacheDoubleSlash() throws Exception {
         assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s",
-        		URLEncoder.encode("http://any.host//www.badnews.com", "UTF-8")),
-        		"//www.badnews.com");
+                URLEncoder.encode("http://any.host//www.badnews.com", "UTF-8")),
+                "//www.badnews.com");
         assertNoCacheRequest("/aura?aura.tag&nocache=/", "/");
     }
 
@@ -336,6 +339,36 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertTrue("Expected tag error in: " + responseText,
                 responseText.contains("Invalid request, tag must not be empty"));
         get.releaseConnection();
+    }
+
+    /**
+     * Verify https is preserved in the nocache redirect
+     */
+    public void testNoCacheHttpsRedirect() throws Exception {
+        String inputUrl = String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "https://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8"));
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+
+        assertTrue("Location should start with https but was: " + location, location.startsWith("https:"));
+    }
+
+    /**
+     * Verify http is preserved in the nocache redirect
+     */
+    public void testNoCacheHttpRedirect() throws Exception {
+        String inputUrl = String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "http://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8"));
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+
+        assertTrue("Location should start with https but was: " + location, location.startsWith("http:"));
     }
 
     public void testHTMLTemplateCaching() throws Exception {
@@ -365,11 +398,12 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertResponseSetToLongCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
     }
 
-    //following 5 tests are mainly for mapping between custom CSP to X-FRAME-OPTIONS
-    //the logic is in AuraBaseServlet.setBasicHeaders()
-    //note these tests are for aura stand alone only, when running in core, it has different CSP (with more script-src etc)
-    
-    //1.if we set ancestor resources with more than one url('self' counts as url), we won't change X-FRAME-OPTIONS
+    // following 5 tests are mainly for mapping between custom CSP to X-FRAME-OPTIONS
+    // the logic is in AuraBaseServlet.setBasicHeaders()
+    // note these tests are for aura stand alone only, when running in core, it has different CSP (with more script-src
+    // etc)
+
+    // 1.if we set ancestor resources with more than one url('self' counts as url), we won't change X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspMultipleAncestors() throws Exception {
@@ -379,7 +413,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("ALLOWALL", headers[0].getValue());
     }
 
-    //2.if we set ancestor resources with one url (without wildcard), that url will get written into X-FRAME-OPTIONS
+    // 2.if we set ancestor resources with one url (without wildcard), that url will get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspSingleAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("www.itrustu.com/frame", "www.itrustu.com/frame");
@@ -387,7 +421,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("ALLOW-FROM www.itrustu.com/frame", headers[0].getValue());
     }
 
-    //3.if we set ancestor resources with protocal like url, we set ALLOWALL for X-FRAME-OPTIONS
+    // 3.if we set ancestor resources with protocal like url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspProtocolAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https:", "https:");
@@ -395,7 +429,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("ALLOWALL", headers[0].getValue());
     }
 
-    //4.if we set ancestor with one wildcard url, we set ALLOWALL for X-FRAME-OPTIONS
+    // 4.if we set ancestor with one wildcard url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspWildcardAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https://*.foo.com", "https://*.foo.com");
@@ -403,7 +437,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("ALLOWALL", headers[0].getValue());
     }
 
-    //5.if we set ancestor resources with null, DENY get written into X-FRAME-OPTIONS
+    // 5.if we set ancestor resources with null, DENY get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspDeniedAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'none'");
@@ -411,21 +445,21 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("DENY", headers[0].getValue());
     }
 
-    //6.if we set ancestor resources with [null], SAMEORIGIN get written into X-FRAME-OPTIONS
+    // 6.if we set ancestor resources with [null], SAMEORIGIN get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspSameOriginAncestor() throws Exception {
-        Header[] headers = doSpecialCspTest("'self'", (String)null);
+        Header[] headers = doSpecialCspTest("'self'", (String) null);
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
         assertEquals("SAMEORIGIN", headers[0].getValue());
     }
 
-    //7.if we set ancestor resources with null [], we won't change X-FRAME-OPTIONS
+    // 7.if we set ancestor resources with null [], we won't change X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     public void testSpecialCspAnyAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("*", (String[]) null);
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
     }
-    
+
     public void testHTMLTemplateCachingWhenAppCacheIsEnable() throws Exception {
         setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
 
@@ -557,6 +591,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         }
 
     }
+
     /**
      * Verify the Script tag to fetch the Aura Framework JS has nonce. The initial get request for an application gets a
      * template as response. Part of the template response should be a script tag which fetches the Aura FW JS. The URL

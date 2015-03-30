@@ -93,7 +93,6 @@
             },
             localId:"map_Id"
         };
-
         helper.createComponentAndPushToBody(cmp, config, cmp);
     },
 

@@ -1,0 +1,78 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="currentPage" type="Integer" default="1"/>
+    <aura:attribute name="totalItems" type="Integer"/>
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="count" type="Integer"/>
+    <aura:attribute name="className" type="String"/>
+    <aura:attribute name="rowIndex" type="Integer"/>
+    <aura:attribute name="gridItems" type="List"/>
+    <aura:attribute name="gridSelectedItems" type="List"/>
+    
+    <aura:attribute name="provideNoData" type="Boolean"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
+
+	<div class="container">
+		<div class="header">
+		    <ui:button class="kitchenButton" label="Change Columns" press="{!c.switchColumn}"/>
+			<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
+		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
+			<br/>
+			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
+			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
+		</div>
+		<ui:virtualDataGrid aura:id="grid" onsort="{!c.onsort}" fixedHeader="true">
+			<aura:set attribute="headerColumns">
+				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
+				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>
+				<ui:dataGridColumn name="date" 		label="date" />
+				<ui:dataGridColumn name="name" 	label="name" />
+				<ui:dataGridColumn name="relatedTo" 	label="related to" />
+			</aura:set>
+			
+			<aura:set attribute="columns">
+				<ui:outputText value="{!item.id}"/>
+				<ui:outputText value="{!item.subject}"/>
+				<ui:outputText value="{!item.date}"/>
+				<ui:outputText value="{!item.name}"/>
+				<ui:outputText value="{!item.relatedTo}"/>
+			</aura:set>
+			
+			<aura:set attribute="dataModel">
+				<uitest:dataGrid_TestDataProvider      aura:id="provider"
+	                                                   sortBy="{!v.sortBy}"
+	                                                   pageSize="{!v.pageSize}"
+	                                                   currentPage="{!v.currentPage}"
+	                                                   totalPages="{!v.totalPages}"
+	                                                   totalItems="{!v.totalItems}"
+	                                                   />
+			</aura:set>
+		</ui:virtualDataGrid>
+
+		<ui:button label="Spit Out Items" press="{!c.spit}"/><br/>
+		<h2>VirtualDataGrid's Internal v.items</h2>
+	    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
+	    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
+	    </aura:iteration>
+	</div>
+</aura:component>

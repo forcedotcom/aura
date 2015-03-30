@@ -1,0 +1,92 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+.THIS.container {
+	height: 100%;
+}
+
+.THIS .header {
+	height: 10%;
+}
+
+.THIS .footer {
+	height: 10%;
+	overflow: auto;
+}
+ 
+.THIS table{
+	border-radius: 7px;
+	margin-bottom: 20px;
+	background-color: #fff;
+	text-align: left;
+	height: 80%;
+	display: block;
+}
+
+.THIS table tr {
+	cursor: pointer;
+}
+
+.THIS table tr.error {
+	outline:5px solid #427BD6;
+}
+
+.THIS table tr.disabled {
+	color: #CCC;
+}
+
+.THIS table tbody tr:hover {
+	background-color: #f0f1f2;
+}
+
+.THIS table td,
+.THIS table th {
+	padding: 16px;
+}
+
+.THIS table th {
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	text-align: left;
+	vertical-align: middle;
+}
+
+.THIS table td {
+	font-size: 14px;
+	border-collapse: collapse;
+}
+
+.THIS button.kitchenButton {
+	background : transparent;
+	border : 1px solid #F0F1F2;
+	box-shadow : none;
+	font-weight: normal;
+	font-size: inherit;
+}
+
+.THIS a.disabled {
+	color: gray;
+}
+
+.THIS table th.descending a{
+	color: red;
+}
+
+.THIS table th.ascending a{
+	color: green;
+}
+

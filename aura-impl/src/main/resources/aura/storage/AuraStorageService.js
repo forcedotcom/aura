@@ -44,7 +44,7 @@ var AuraStorageService = function(){
          * @param {number} defaultAutoRefreshInterval Specifies the default interval in seconds after which cached data is to be refreshed.
          * @param {Boolean} debugLoggingEnabled Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
          * @param {Boolean} clearStorageOnInit Set to true to clear storage when storage is initialized.
-         * @param {String} [version] The version to associate all storage items.
+         * @param {String} version The version for any item in the storage. This is useful if you want to avoid retrieving stale cached items for a newer version of your application.
          * @memberOf AuraStorageService
          * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
          */

@@ -15,15 +15,15 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-
-import org.auraframework.builder.AttributeDesignDefBuilder;
-import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.builder.design.DesignAttributeDefBuilder;
+import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> implements AttributeDesignDef {
+import java.io.IOException;
+
+public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> implements DesignAttributeDef {
     private static final long serialVersionUID = 3290806856269872853L;
     private final Boolean required;
     private final Boolean readonly;
@@ -36,8 +36,14 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     private final String label;
     private final String placeholder;
     private final String description;
+    private final String defaultValue;
+    //Privledged
+    private final String minApi;
+    private final String maxApi;
+    private final boolean translatable;
 
-    protected AttributeDesignDefImpl(Builder builder) {
+
+    protected DesignAttributeDefImpl(Builder builder) {
         super(builder);
         this.required = builder.required;
         this.readonly = builder.readonly;
@@ -50,6 +56,10 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         this.label = builder.label;
         this.placeholder = builder.placeholder;
         this.description = builder.description;
+        this.defaultValue = builder.defaultValue;
+        this.minApi = builder.minApi;
+        this.maxApi = builder.maxApi;
+        this.translatable = builder.translatable;
     }
 
     @Override
@@ -103,6 +113,26 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     }
 
     @Override
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    @Override
+    public String getMinApi() {
+        return minApi;
+    }
+
+    @Override
+    public String getMaxApi() {
+        return maxApi;
+    }
+
+    @Override
+    public boolean isTranslatable() {
+        return translatable;
+    }
+
+    @Override
     public String getDescription() {
         return description;
     }
@@ -116,8 +146,8 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
     public void serialize(Json json) throws IOException {
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDesignDef> implements
-            AttributeDesignDefBuilder {
+    public static class Builder extends DefinitionImpl.BuilderImpl<DesignAttributeDef> implements
+            DesignAttributeDefBuilder {
         private boolean required;
         private boolean readonly;
         private String name;
@@ -128,76 +158,104 @@ public class AttributeDesignDefImpl extends DefinitionImpl<AttributeDesignDef> i
         private String min;
         private String max;
         private String placeholder;
+        private String defaultValue;
+        private String minApi;
+        private String maxApi;
+        private boolean translatable;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
          */
         public Builder() {
-            super(AttributeDesignDef.class);
+            super(DesignAttributeDef.class);
         }
 
         @Override
-        public AttributeDesignDef build() throws QuickFixException {
-            return new AttributeDesignDefImpl(this);
+        public DesignAttributeDef build() throws QuickFixException {
+            return new DesignAttributeDefImpl(this);
         }
 
         @Override
-        public AttributeDesignDefBuilder setName(String name) {
+        public DesignAttributeDefBuilder setName(String name) {
             this.name = name;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setLabel(String label) {
+        public DesignAttributeDefBuilder setLabel(String label) {
             this.label = label;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setType(String type) {
+        public DesignAttributeDefBuilder setType(String type) {
             this.type = type;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setRequired(boolean required) {
+        public DesignAttributeDefBuilder setRequired(boolean required) {
             this.required = required;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setReadOnly(boolean readonly) {
+        public DesignAttributeDefBuilder setReadOnly(boolean readonly) {
             this.readonly = readonly;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setDependsOn(String dependency) {
+        public DesignAttributeDefBuilder setDependsOn(String dependency) {
             this.dependency = dependency;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setDataSource(String datasource) {
+        public DesignAttributeDefBuilder setDataSource(String datasource) {
             this.datasource = datasource;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setMin(String min) {
+        public DesignAttributeDefBuilder setMin(String min) {
             this.min = min;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setMax(String max) {
+        public DesignAttributeDefBuilder setMax(String max) {
             this.max = max;
             return this;
         }
 
         @Override
-        public AttributeDesignDefBuilder setPlaceholderText(String placeholder) {
+        public DesignAttributeDefBuilder setPlaceholderText(String placeholder) {
             this.placeholder = placeholder;
+            return this;
+        }
+
+        @Override
+        public DesignAttributeDefBuilder setDefault(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        @Override
+        public DesignAttributeDefBuilder setMinApi(String minApi) {
+            this.minApi = minApi;
+            return this;
+        }
+
+        @Override
+        public DesignAttributeDefBuilder setMaxApi(String maxApi) {
+            this.maxApi = maxApi;
+            return this;
+        }
+
+        @Override
+        public DesignAttributeDefBuilder setTranslatable(boolean translatable) {
+            this.translatable = translatable;
             return this;
         }
 

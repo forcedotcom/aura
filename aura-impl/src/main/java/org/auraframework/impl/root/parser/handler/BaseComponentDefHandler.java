@@ -32,7 +32,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;

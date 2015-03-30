@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.def.design;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignTemplateRegionDef;
-import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.Definition;
 
-public interface DesignTemplateRegionDefBuilder extends DefBuilder<DesignTemplateRegionDef, DesignTemplateRegionDef> {
-    public DesignTemplateRegionDefBuilder setName(String name);
+import java.util.Set;
 
-    public DesignTemplateRegionDefBuilder addAllowedInterface(DefDescriptor<InterfaceDef> intf);
+public interface DesignItemsDef extends Definition {
+    /**
+     * Returns a set of sections, each section contains a set of items.
+     * @return a set of designItem
+     */
+    public Set<DesignLayoutItemDef> getItems();
 }

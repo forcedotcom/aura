@@ -33,7 +33,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorAssortmentDef;

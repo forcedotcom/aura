@@ -21,7 +21,7 @@ import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;

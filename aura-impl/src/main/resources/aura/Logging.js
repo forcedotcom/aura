@@ -113,7 +113,7 @@
                 alert(message);
             }
         }
-        throw new Error(message);
+        throw new $A.auraError(message);
     }
 
     $A.logger.subscribe("INFO", devDebugConsoleLog);

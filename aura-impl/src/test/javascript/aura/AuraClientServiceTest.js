@@ -991,7 +991,106 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(false, actual);
         }
     }
-    
-    
-    
+
+    [Fixture]
+    function handleAppCache() {
+        var storageClearCalled = false;
+        var componentDefsClearCalled = false;
+        var evtCallbacks = {};
+        var mockApplicationCache = {
+            "addEventListener": function(evt, callback) {
+                evtCallbacks[evt] = callback;
+            }
+        };
+
+        var mockStorage = {
+            clear: function() {
+                storageClearCalled = true;
+            }
+        };
+
+        var mockLocation = { reload: function() {} };
+
+        var mockComponentService = {
+            registry: {
+                clearCache: function() {
+                    componentDefsClearCalled = true;
+                }
+            }
+        };
+
+        var mockDeps = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                ns:$A.ns,
+                log : function() {},
+                assert : function(condition, message) {
+                    if(!condition){
+                        throw message;
+                    }
+                },
+                util : {
+                    on: function() {},
+                    isUndefinedOrNull : function(obj){
+                        return obj === undefined || obj === null;
+                    },
+                    isUndefined : function() {},
+                    isArray : function() {},
+                    json : {
+                        encode :function(errorText) {
+                            return "mockedJson:"+errorText;
+                        }
+                    }
+                },
+                mark : function() {},
+                componentService: mockComponentService
+            },
+            window:{
+                "applicationCache": mockApplicationCache,
+                "localStorage": mockStorage,
+                "sessionStorage": mockStorage,
+            },
+            location: mockLocation
+        });
+
+        var targetService;
+        mockDeps(function() {
+            targetService = new $A.ns.AuraClientService();
+        });
+
+        [Fact]
+        function doesNotCallLocalStorageClearWhenUpdateReady() {
+            storageClearCalled = false;
+            componentDefsClearCalled = false;
+
+            mockDeps(function() {
+                evtCallbacks["updateready"]();
+            });
+
+            Assert.False(storageClearCalled);
+        }
+
+        [Fact]
+        function doesNotCallSessionStorageClearWhenUpdateReady() {
+            storageClearCalled = false;
+            componentDefsClearCalled = false;
+
+            mockDeps(function() {
+                evtCallbacks["updateready"]();
+            });
+
+            Assert.False(storageClearCalled);
+        }
+
+        [Fact]
+        function callsComponentRegistryClearWhenUpdateReady() {
+            storageClearCalled = false;
+            componentDefsClearCalled = false;
+
+            mockDeps(function() {
+                evtCallbacks["updateready"]();
+            });
+
+            Assert.True(componentDefsClearCalled);
+        }
+    }
 }

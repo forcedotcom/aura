@@ -19,8 +19,8 @@
     <!-- 
         we gonna create this receiverCmp in test setUp, then in our test, receiverCmp will create a new cmp.
         then before the new cmp get back to receiverCmp, we  in-validate receiverCmp.
-        This is what happens when people navigate to some page(like MyDay), create something (like a new Event),
-        then navigate away from the page before the new Event page load.
+        This is what happens when people navigate to some page, create something,
+        then navigate away from the page before the new thing is loaded.
     -->
     <aura:attribute name="receiverCmp" type="String" default="loadLevelTest:newCmpWithValueProvider"/>
     <aura:attribute name="receiverCmpAuraId" type="String" default="receiverCmp"/>

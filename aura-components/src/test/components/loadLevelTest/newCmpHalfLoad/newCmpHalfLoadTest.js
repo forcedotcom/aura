@@ -53,8 +53,8 @@
 	
 	/**
      * ask receiverCmp to create a new Cmp whose definition is not available at the client.
-     * This definition would be fetched from the server by an action
-     * kill receiverCmp before action do its callback
+     * This definition would be fetched from the server by a server action
+     * kill receiverCmp before server action does its callback
      */
     testCmpCreatedByFetchingDefFromServer:{
     	attributes:{ 
@@ -63,7 +63,7 @@
     		controllerFuncToCreateCmp: "c.createCmpByFetchingDefFromServer"
     	},
         test:[ function(cmp) {
-        	$A.test.setTestTimeout(6000000);//for stepping through
+        	//$A.test.setTestTimeout(6000000);//for stepping through
         	this.waitForReceiverCmpCreated(cmp);
         },
         function(cmp){
@@ -93,7 +93,9 @@
         ]
     },
     
-    //not working because of W-2545808
+    //TODO: not working because of W-2547251 . also I'm working on a different solution
+    //now we have no control over when the request with the server action (getComponent) is send, also when the response is back
+    //this means receiver cmp could got destroyed before request is send. that's ok for the first test in this file, but blow up at this test
     _testCmpCreatedByFetchingMapFromServer:{
     	attributes:{ 
     		receiverCmp: "loadLevelTest:newCmpWithValueProvider",
@@ -101,32 +103,22 @@
     		controllerFuncToCreateCmp: "c.createCmpWithMapValuePropRefValueFromServer"
     	},
         test:[ function(cmp) {
-        	$A.test.setTestTimeout(6000000);//for stepping through
+        	//$A.test.setTestTimeout(6000000);//for stepping through
         	this.waitForReceiverCmpCreated(cmp);
         },
         function(cmp){
         	$A.test.blockRequests();
         	//ask server for new cmp
         	var receiverCmp = cmp.find("receiverCmp");
-        	receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp")).runDeprecated();//c.createCmpByFetchingDefFromServer
+        	var actionToCreateNewCmp = receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp"));
+        	
+        	actionToCreateNewCmp.runDeprecated();//c.createCmpByFetchingDefFromServer
         	//kill the receiver cmp
         	$A.test.releaseRequests();
-        	$A.log("$A.test.isActionPending() = "+$A.test.isActionPending());
         	receiverCmp.destroy();
+        	
         	$A.test.addWaitFor(false, function() { return $A.test.isActionPending(); }, 
         		function(){
-        		debugger;
-        			/* we can create a new cmp put it to v.body. but that's not necessary, as long as we wait until
-        			 * actions are finished, inValid cmp will get removed, and re-rendering happens after the this 
-        			 * test stage won't cause any problems. 
-        			var receiverCmp = "markup://"+cmp.get("v.receiverCmp");
-        			var receiverCmpAuraId = cmp.get("v.receiverCmpAuraId")+"_new";
-        	    	var config = {
-        	            componentDef:receiverCmp,
-        	            localId:receiverCmpAuraId
-        	        };
-        			this.pushNewCmpToBody(cmp, config, true);
-        			*/
         		}
         	);
         }

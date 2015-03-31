@@ -26,7 +26,8 @@
                 isDialog: true,
                 title: 'Dialog Title',
                 'class': 'myClass',
-                body: cmps
+                body: cmps,
+                autoFocus: cmp.get("v.autoFocus")
             });
             openPanelEvent.fire();
         }, 

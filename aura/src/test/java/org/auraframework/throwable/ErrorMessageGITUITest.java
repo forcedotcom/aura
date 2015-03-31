@@ -53,48 +53,48 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
     }
 
     public void testFriendlyErrorFiresSystemError() throws Exception {
-        open("/clientApiTest/auraError.cmp");
+        open("/clientApiTest/auraError.app");
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
         waitForCondition("return $A.getRoot().get('v.systemErrorHandled')");
     }
 
     public void testFriendlyErrorDisplaysErrorIfNotHandled_DevMode() throws Exception {
-        open("/clientApiTest/auraError.cmp?setFriendlyErrorHandled=false", Mode.DEV);
+        open("/clientApiTest/auraError.app?setFriendlyErrorHandled=false", Mode.DEV);
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
         assertDisplayedErrorMessage("Friendly Error Test");
         assertStacktracePresent();
     }
 
     public void testFriendlyErrorDisplaysErrorIfNotHandled_ProdMode() throws Exception {
-        open("/clientApiTest/auraError.cmp?setFriendlyErrorHandled=false", Mode.PROD);
+        open("/clientApiTest/auraError.app?setFriendlyErrorHandled=false", Mode.PROD);
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
         assertDisplayedErrorMessage("Friendly Error Test");
         assertNoStacktracePresent();
     }
 
     public void testAuraError_DevMode() throws Exception {
-        open("/clientApiTest/auraError.cmp", Mode.DEV);
+        open("/clientApiTest/auraError.app", Mode.DEV);
         findDomElement(By.cssSelector(".auraErrorButton")).click();
         assertDisplayedErrorMessage("Controller Error Test");
         assertStacktracePresent();
     }
 
     public void testAuraError_ProdMode() throws Exception {
-        open("/clientApiTest/auraError.cmp", Mode.PROD);
+        open("/clientApiTest/auraError.app", Mode.PROD);
         findDomElement(By.cssSelector(".auraErrorButton")).click();
         assertDisplayedErrorMessage("Controller Error Test");
         assertNoStacktracePresent();
     }
 
     public void testAuraAssert_DevMode() throws Exception {
-        open("/clientApiTest/auraError.cmp", Mode.DEV);
+        open("/clientApiTest/auraError.app", Mode.DEV);
         findDomElement(By.cssSelector(".assertButton")).click();
         assertDisplayedErrorMessage("Controller Assert Test");
         assertStacktracePresent();
     }
 
     public void testAuraAssert_ProdMode() throws Exception {
-        open("/clientApiTest/auraError.cmp", Mode.PROD);
+        open("/clientApiTest/auraError.app", Mode.PROD);
         findDomElement(By.cssSelector(".assertButton")).click();
         assertDisplayedErrorMessage("Controller Assert Test");
         assertNoStacktracePresent();
@@ -103,7 +103,7 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
     // TODO(W-2520024): Update this test when we know exactly how we set the errorCode on AuraError
     public void _testAuraErrorWithErrorCode() throws Exception {
         String errorCode = "111222333444";
-        open("/clientApiTest/auraError.cmp?errorCode=" + errorCode);
+        open("/clientApiTest/auraError.app?errorCode=" + errorCode);
         findDomElement(By.cssSelector(".errorCodeButton")).click();
         assertDisplayedErrorMessage(errorCode);
     }

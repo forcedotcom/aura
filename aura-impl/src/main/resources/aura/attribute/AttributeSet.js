@@ -366,7 +366,7 @@ AttributeSet.prototype.destroy = function(async) {
             value = v[i];
             if($A.util.isExpression(value)){
                 expressions[k]=value;
-            } else if (value && value.destroy) {
+            } else if (value && value.destroy && typeof value.destroy == 'function') {
                 value.destroy(async);
             }
         }

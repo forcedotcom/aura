@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:application access="unauthenticated">
     <aura:attribute name="systemErrorHandled" type="Boolean" default="false"/>
     <aura:attribute name="setFriendlyErrorHandled" type="Boolean" default="true" />
     <aura:attribute name="errorCode" type="String" default="8675309" />
@@ -26,4 +26,4 @@
     <ui:button label="Failing Assert" press="{!c.failAssert}" class="assertButton" />
     <ui:button label="Throw Friendly Error" press="{!c.throwFriendlyError}" class="friendlyErrorButton" />
     <ui:button label="Throw Aura Error with errorCode" press="{!c.throwErrorWithCode}" class="errorCodeButton" />
-</aura:component>
+</aura:application>

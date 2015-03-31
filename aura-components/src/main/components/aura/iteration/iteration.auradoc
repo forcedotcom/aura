@@ -18,7 +18,7 @@
 <aura:documentation>
 	<aura:description>
 		<p><code>aura:iteration</code> iterates over a collection of items and renders the body of the tag for each item.
-		   Data changes in the collection are rerendered automatically on the page. It also supports iterations containing components that are created exlusively on the client-side or components that have server-side dependencies.
+		   Data changes in the collection are rerendered automatically on the page. It also supports iterations containing components that are created exclusively on the client-side or components that have server-side dependencies.
 	 	</p>
 	</aura:description>	
 	<aura:example name="iterationExample" ref="uiExamples:iterationExample" label="Using aura:iteration">

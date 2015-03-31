@@ -1,5 +1,6 @@
 <aura:component>
     <aura:dependency resource="markup://ui:button" />
+    <aura:attribute name="autoFocus" type="Boolean" default="true"/>
     
     <div class="container">
         <div class="footer">

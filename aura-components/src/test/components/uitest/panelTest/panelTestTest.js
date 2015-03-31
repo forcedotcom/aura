@@ -34,5 +34,23 @@
             }, "First input element should be focused.");
         }
     ]
-  }
+  },
+  
+  /**
+   * Test to verify firstElement is not focused when autoFocus is set to false
+   * Bug: W-2536456
+   */
+  _testPanelNotFocusOnFirstInputWhenAutoFocusIsNotSet: {
+	  	attributes : {"autoFocus" : false},
+	    test: [function(cmp) {
+	            cmp.find("modalButton").get("e.press").fire();
+	        },
+	        function(cmp) {
+	        	$A.test.addWaitForWithFailureMessage(true, function(){
+	                var activeElement = document.activeElement;
+	                return $A.util.hasClass(activeElement,"panelDialogModalButton");
+	            }, "First input element should not be focused.");
+	        }
+	    ]
+	  }
 })

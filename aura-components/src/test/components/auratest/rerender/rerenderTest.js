@@ -313,7 +313,7 @@
      * Add component to empty array.
      */
     testAddComponentToEmptyArray: {
-        attributes : { whichArray: "v.emptyArray" },
+        attributes : { __layout: "#def", whichArray: "v.emptyArray" },
         test: [
             function (component) {
 	    		this.addWaitForLayoutItem(component, "def layout item");
@@ -340,7 +340,7 @@
      * Clear an array.
      */
     testClearArray: {
-        attributes : { whichArray: "v.emptyArray" },
+        attributes : { __layout: "#def", whichArray: "v.emptyArray" },
         test: [function(component){
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){

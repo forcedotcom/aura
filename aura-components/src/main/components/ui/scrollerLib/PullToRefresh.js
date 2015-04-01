@@ -62,6 +62,7 @@ function (w) {
             this.on('scrollMove', this._onScrollMovePTR);
             this.on('_customResetPosition', this._onResetPositionPTR);
             this.on('destroy', this._destroyPTR);
+            //this.on('_refresh', this._onRefreshPTR); //this is done conditionally on initializePTR
         },
         _getPTRType: function () {
             var nativeScroller = this.opts.useNativeScroller;
@@ -170,8 +171,12 @@ function (w) {
             this._ptrSnapTime = PULL_TO_SNAP_TIME;
 
             if (this._nativePTR) {
+                var ptrSize = this.getPTRSize();
                 this.ptrDOM.style.position = 'relative';
-                this.scrollTo(0, this.getPTRSize());
+                if (this.scrollerHeight <= this.wrapperHeight) {
+                    this.ptrDOM.style[STYLES.transform] = 'translate3d(0,' + ptrSize + 'px,0)';
+                }
+                this.scrollTo(0, ptrSize);
             }
 
             this.togglePullToRefresh(this.opts.pullToRefresh, true);
@@ -187,7 +192,14 @@ function (w) {
             }
         },
         _onRefreshPTR: function () {
-            var pos = this.y;
+            var pos = this.y,
+                scrollTarget;
+            if (this._nativePTR) {
+                scrollTarget = this.opts.gpuOptimization ? this.scroller : this.wrapper;
+                pos = scrollTarget.scrollTop;
+                this.y = -pos;
+            }
+            
             if (pos === 0 && !this._ptrLoading) {
                 this.scrollTo(0, -this.getPTRSize());
             }

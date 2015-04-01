@@ -117,9 +117,29 @@
 			//Block server requests to make sure the labels were not fetched from the server by the test script.
 			$A.test.blockRequests();
 			$A.test.assertEquals("Library1", $A.get("$Label.Section1.library"), 
-					"Label expression in provider not parsed and loaded in client.");
+					"Label expression in library not parsed and loaded in client.");
 			$A.test.assertEquals("Library2", $A.get("$Label.Section2.library"), 
-					"All label expressions in provider not parsed and loaded in client.");
+					"Label reference in comment in library not parsed and loaded in client.");
 		}
-	}
+	},
+
+    /**
+     * Verify that labels not parsed from Javascript library can still be loaded async.
+     */
+    testLabelsInUnparseableLibraryAreStillRetrievable:{
+        test:function(cmp){
+            //Block server requests to make sure the labels were not fetched from the server by the test script.
+            $A.test.blockRequests();
+            $A.test.assertEquals("[Section1.badlibrary]", $A.get("$Label.Section1.badlibrary"), 
+                    "Label expression in library should not have been parsed and loaded in client.");
+            $A.test.assertEquals("[Section2.badlibrary]", $A.get("$Label.Section2.badlibrary"), 
+                    "Label reference in comment in library should not have been parsed and loaded in client.");
+            
+            // Resume normal operation and check that unparsed labels are now retrieved.
+            $A.test.releaseRequests();
+            $A.test.addWaitFor("BadLibrary2", function(){
+                return cmp.helper.pll.badlabel();
+            });
+        }
+    }
 })

@@ -41,10 +41,6 @@
                 "waiting for output length to increment after adding component");
     },
     
-    setUp: function(cmp) {
-        this.waitForLayoutChange(cmp);
-    },
-    
     testRoot : {
         test : function(cmp) {
             this.assertCreationPath(cmp, "/*[0]", "root is only body");
@@ -78,23 +74,32 @@
     },
     
     testDefaultLayoutItem : {
-        test : function(cmp) {
+    	browsers: ["-IE10", "-IE11"],
+        test : [function(cmp) {
+        	this.waitForLayoutChange(cmp); //move this from setUp and disable the test as layout issue with IE10&11 : W-2375142
+        }, function(cmp) {
             $A.test.assertEquals("fromDefaultLayout", $A.test.getText(cmp.find("layoutTarget").getElement()));
             this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
-        }
+        }]
     },
     
-    testActionLayoutItem : {
+   testActionLayoutItem : {
+	    browsers: ["-IE10", "-IE11"],
         attributes : { __layout : "#action" },
-        test : function(cmp) {
+        test : [function(cmp) {
+        	this.waitForLayoutChange(cmp); //move this from setUp and disable the test as layout issue with IE10&11 : W-2375142
+        }, function(cmp) {
             $A.test.assertEquals("action:java:0", $A.test.getText(cmp.find("layoutTarget").getElement()));
             this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
-        }
+        }]
     },
     
     testChangeLayoutItem : {
+    	browsers: ["-IE10", "-IE11"],
         attributes : { __layout : "#action" },
         test : [ function(cmp) {
+        	this.waitForLayoutChange(cmp); //move this from setUp and disable the test as layout issue with IE10&11 : W-2375142
+        }, function(cmp) {
             $A.test.assertEquals("action:java:0", $A.test.getText(cmp.find("layoutTarget").getElement()));
             $A.layoutService.layout("default");
             this.waitForLayoutChange(cmp);

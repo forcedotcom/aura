@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    createComponentAndPushToBody:function(cmp, config, attributeValueProvider){
+    createComponentAndPushToBody:function(cmp, config, attributeValueProvider, localCreation, doForce, forceServer){
         $A.componentService.newComponentAsync(
             this,
             function(newCmp){
@@ -23,7 +23,10 @@
                 cmp.set("v.body", body);
             },
             config,
-            attributeValueProvider
+            attributeValueProvider,
+            localCreation,
+            doForce,
+            forceServer
         );
     }
 })

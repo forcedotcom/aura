@@ -23,5 +23,5 @@
     <loadLevelTest:serverComponent/>
 
 
-    <ui:button press="{!c.createCmpWithEmptyValueProvider}" label="Push for component"/>
+    <ui:button press="{!c.createCmpWithMapValuePropRefValueFromServer}" label="Push for component" aura:id="button_createCmp"/>
 </aura:component>

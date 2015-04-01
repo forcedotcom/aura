@@ -90,6 +90,10 @@
     height: 100%;
 }
 
+.THIS ul.list-hidden { 
+    display: none;
+}
+
 .THIS ul {
     margin: 0;
     padding: 0;

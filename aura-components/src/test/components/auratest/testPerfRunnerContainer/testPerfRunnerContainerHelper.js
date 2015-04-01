@@ -17,7 +17,7 @@
     },
     createRow: function (t) {
         return [
-            '<li data-testid="' + t.name + '"' + (t.isInteg ? ' data-integ="true"' : ' ') + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">',
+            '<li class="list-test-item" data-testid="' + t.name + '"' + (t.isInteg ? ' data-integ="true"' : ' ') + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">',
                 '<div class="parts">',
                     '<div class="checkbox">',
                     '<input type="checkbox" data-testid="' + t.name + '"/></div>',
@@ -49,13 +49,44 @@
         placeholder.innerHTML = tmp;
         return placeholder.firstChild;
     },
+    renderTests: function(testArray, parent){
+        var testsPerBlock = 100;
+        var container = document.createElement("div");
+            container.className = "test-container";
+
+        var list = document.createElement("ul");
+            list.className = "list";
+
+        var items = [];
+        var length = testArray.length;
+        for(var c=0;c<length;c++){
+            items.push(this.createRow(testArray[c]));
+        }
+
+        while(items.length) {
+            list.innerHTML = items.splice(0, testsPerBlock).join('');
+            container.appendChild(list);
+
+            list = document.createElement("ul");
+            list.className = "list list-hidden";
+        }
+
+        var spacer = document.createElement("div");
+        spacer.className="spacer";
+        spacer.style.height = 5000 * container.childNodes.length + "px";
+        container.appendChild(spacer);
+
+        parent.appendChild(container);
+    },
+
     attachEvents: function (cmp, dom) {
         var self        = this,
             inputSearch = dom.getElementsByClassName('search')[0],
             selectAll   = dom.getElementsByClassName('select')[0],
             runButton   = dom.getElementsByClassName('run')[0],
             integButton = dom.getElementsByClassName('integ')[0],
-            failButton  = dom.getElementsByClassName('failed')[0];
+            failButton  = dom.getElementsByClassName('failed')[0],
+            testContainer = dom.getElementsByClassName("test-container")[0];
 
         integButton.addEventListener('click', function (e) {
             self.toggleIntegrationTests(integButton, dom, e);
@@ -76,7 +107,32 @@
         runButton.addEventListener('click', function (e) {
             self.runTests(cmp, dom, e);
         });
+
+        testContainer.addEventListener("scroll", function TestContainer_OnScroll(e) {
+            var spacer = testContainer.getElementsByClassName("spacer")[0];
+            var hiddenLists = testContainer.getElementsByClassName("list-hidden");
+
+            // Are we more than half way down the list?
+            while(testContainer.scrollTop > spacer.offsetTop  / 2) {
+                var hidden = hiddenLists[0];
+                if(!hidden) {
+                    spacer.parentNode.removeChild(spacer);
+                    testContainer.removeEventListener("scroll", TestContainer_OnScroll);
+                    return;
+                }
+                $A.util.removeClass(hidden, "list-hidden");
+                spacer.style.height = (5000 * hiddenLists.length) + "px";
+            }
+        });
     },
+
+    showAllSections: function() {
+        var lists = document.getElementsByClassName("list-hidden");
+        for(var c=0,length=lists.length;c<length;c++) {
+            lists[0].classList.remove("list-hidden");
+        }
+    },
+
     toggleIntegrationTests: function (button, dom, e) {
         var children   = dom.querySelectorAll('li[data-integ]'),
             selected   = $A.util.getDataAttribute(button, 'selected') !== "true",
@@ -89,6 +145,7 @@
             }
             button.firstChild.checked = selected;
             $A.util.setDataAttribute(button, 'selected', selected);
+            this.showAllSections();
     },
     toggleFailTests: function (cmp, button, dom, e) {
         var children   = dom.querySelectorAll('li:not([data-state="failed"])'),
@@ -105,6 +162,7 @@
             }
             $A.util.setDataAttribute(button, 'selected', selected);
             button.firstChild.checked = false;
+            this.showAllSections();
     },
     toggleSelection: function (button, dom, e) {
         var filtered   = dom.querySelectorAll('li:not([data-visible="hidden"]) input[type="checkbox"]'),
@@ -129,8 +187,7 @@
 
     },
     filterTests: function (dom, query) {
-        var container = dom.getElementsByClassName('list')[0],
-            children  = container.children,
+        var children  = dom.getElementsByClassName("list-test-item"),
             matches   = [],
             regexp, li, name, i;
 
@@ -149,6 +206,7 @@
                 
             }
         }
+        this.showAllSections();
     },
     _getLiFromInput: function (input) {
         return input.parentElement.parentElement.parentElement;

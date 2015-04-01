@@ -22,7 +22,8 @@
 .THIS .emptyListContent {
     display: none;
 }
-.THIS.showEmptyContent .emptyListContent {
+
+.THIS.showEmptyContent:not(.loading) .emptyListContent {
     display: block;
 }
 

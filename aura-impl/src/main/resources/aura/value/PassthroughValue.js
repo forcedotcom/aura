@@ -327,8 +327,22 @@ PassthroughValue.prototype.hasExpression = function(expression) {
 };
 
 PassthroughValue.prototype.isValid = function(expression) {
-    return !this.errors.hasOwnProperty(expression);
+    if (expression) {
+        return !this.errors.hasOwnProperty(expression);
+    }
+    var valueProvider = this.getComponent();
+
+    // Potentially nested PassthroughValue objects.
+    while (valueProvider instanceof PassthroughValue) {
+        valueProvider = valueProvider.getComponent();
+    }
+
+    if (!valueProvider || !valueProvider.isValid) {
+        return false;
+    }
+    return valueProvider.isValid();
 };
+
 PassthroughValue.prototype.addErrors = function(expression, errors) {
     if (!this.errors[expression]) {
         this.errors[expression] = [];

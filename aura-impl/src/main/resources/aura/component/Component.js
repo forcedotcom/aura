@@ -2253,7 +2253,9 @@ Component.prototype.isDirty = function(expression) {
  */
 Component.prototype.isValid = function(expression) {
     if (!expression) {
-        return !this._scheduledForAsyncDestruction && this.priv !== undefined;
+        return !this._scheduledForAsyncDestruction && this.priv !== undefined
+            && (!this.priv.attributeValueProvider || !this.priv.attributeValueProvider.isValid
+                || this.priv.attributeValueProvider.isValid());
     }
     return this.callOnExpression(Component.prototype.isValidCallback, expression);
 };

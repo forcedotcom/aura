@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!--
+This component fails as you click through the various options.
+
+There are not yet explicit tests for this.
+-->
+<aura:component>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="data" type="Object"></aura:attribute>
+    <aura:attribute name="blip" type="String" default="foo"></aura:attribute>
+    <aura:attribute name="_initialized" type="Boolean" default="false"/>
+
+    <aura:if isTrue="{! v._initialized == true &amp;&amp; v.blip != 'blech!'}">
+        <aura:iteration items="{!v.data.elements}" var="foo" >
+            <iterationTest:nestedChanges data="{!foo.changes}" blip="{!v.blip}" />
+        </aura:iteration>
+        <aura:set attribute="else">
+            Click 'Change value' again to continue.
+        </aura:set>
+    </aura:if>
+    <ui:button press="{!c.resetIter}" buttonTitle="Reset iteration" label="Reset iteration"></ui:button><br/>
+    <ui:button press="{!c.changeValue}" buttonTitle="Change value" label="Change value"></ui:button><br/>
+</aura:component>

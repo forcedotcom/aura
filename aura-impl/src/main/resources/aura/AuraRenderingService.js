@@ -382,6 +382,9 @@ $A.ns.AuraRenderingService.prototype.rerenderFacet = function(component, facet, 
     for(var i=0;i<components.length;i++){
         var info=components[i];
         var renderedElements=null;
+        if (!info.component.isValid() && info.action !== 'unrender') {
+            continue;
+        }
         switch(info.action){
             case "render":
                 renderedElements=this.render(info.component);
@@ -506,7 +509,7 @@ $A.ns.AuraRenderingService.prototype.getMarker = function(cmp){
 $A.ns.AuraRenderingService.prototype.addDirtyValue = function(expression, cmp) {
     this.needsCleaning = true;
     if (cmp && cmp.isValid() && cmp.isRendered()) {
-        var id = cmp.getConcreteComponent().getGlobalId();
+        var id = cmp.getGlobalId();
         var list = this.dirtyComponents[id];
         if (!list) {
             list = this.dirtyComponents[id] = {};

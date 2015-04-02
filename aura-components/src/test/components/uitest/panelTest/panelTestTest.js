@@ -40,10 +40,12 @@
    * Test to verify firstElement is not focused when autoFocus is set to false
    * Bug: W-2536456
    */
-  _testPanelNotFocusOnFirstInputWhenAutoFocusIsNotSet: {
+  testPanelNotFocusOnFirstInputWhenAutoFocusIsNotSet: {
 	  	attributes : {"autoFocus" : false},
 	    test: [function(cmp) {
-	            cmp.find("modalButton").get("e.press").fire();
+            var button = cmp.find("modalButton");
+            button.getElement().focus();
+            button.get("e.press").fire();
 	        },
 	        function(cmp) {
 	        	$A.test.addWaitForWithFailureMessage(true, function(){

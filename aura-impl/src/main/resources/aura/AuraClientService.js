@@ -713,7 +713,8 @@ $A.ns.AuraClientService.prototype.hardRefresh = function() {
         url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
     }
 
-    var params = "?nocache=" + encodeURIComponent(url);
+    // replace encoding of spaces (%20) with encoding of '+' (%2b) so that when request.getParameter is called in the server, it will decode back to '+'.
+    var params = "?nocache=" + encodeURIComponent(url).replace(/\%20/g,"%2b");
     // insert nocache param here for hard refresh
     var hIndex = url.indexOf("#");
     var qIndex = url.indexOf("?");

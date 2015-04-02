@@ -167,7 +167,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraRenderingService
-         * @memberOf Aura
+         * @memberOf $A.ns.Aura
          */
         rendering : aura.renderingService,
         /**
@@ -175,7 +175,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraEventService
-         * @memberOf Aura
+         * @memberOf $A.ns.Aura
          */
         event : aura.eventService,
         /**
@@ -183,7 +183,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraComponentService
-         * @memberOf Aura
+         * @memberOf $A.ns.Aura
          */
         component : aura.componentService,
         /**
@@ -191,7 +191,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraClientService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          */
         client : aura.clientService,
 
@@ -200,7 +200,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraHistoryService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          */
         history : aura.historyService,
 
@@ -209,7 +209,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraLocalizationService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          */
         localization : aura.localizationService,
 
@@ -218,7 +218,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraStorageService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          */
         storage : aura.storageService,
 
@@ -227,7 +227,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraComponentService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          * @see Aura#services.component
          */
         cmp : aura.componentService,
@@ -237,7 +237,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraEventService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          * @see Aura#services.event
          */
         e : aura.eventService,
@@ -247,7 +247,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraLocalizationService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          * @see Aura#service.localization
          */
         l10n : aura.localizationService,
@@ -257,7 +257,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraStyleService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          */
         style: aura.styleService,
         /**
@@ -265,7 +265,7 @@ $A.ns.Aura = function() {
          *
          * @public
          * @type AuraMetricsService
-         * @memberOf Aura.prototype
+         * @memberOf $A.ns.Aura.prototype
          */
         metrics: aura.metricsService,
 

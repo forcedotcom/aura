@@ -39,6 +39,7 @@
     <aura:attribute name="show" type="Boolean" description="True if panel should be made visible after creation (default is false)."/>
     <aura:attribute name="instance" type="Aura.Component[]" description="Existing panel instance to be displayed."/>
     <aura:attribute name="isFullScreen" type="Boolean" default="true" description="Indicates whether full screen is used on non-phone devices"/>
+    <aura:attribute name="autoFocus" type="Boolean" default="true" description="Automatically focus on the first focusable element"/>
 
     <!-- slider options -->
 	<aura:attribute name="isVisible" type="Boolean" description="panel is visible or not"/>

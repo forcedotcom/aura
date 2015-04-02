@@ -40,7 +40,7 @@ $A.ns.AuraRenderingService = function() {
  *            components The component or component array to be rendered
  * @param {Component}
  *            parent Optional. The component's parent
- * @memberOf AuraRenderingService
+ * @memberOf $A.ns.AuraRenderingService
  * @public
  */
 $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
@@ -95,7 +95,7 @@ $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
  *
  * @param {Component}
  *            components The component or component array to be rerendered
- * @memberOf AuraRenderingService
+ * @memberOf $A.ns.AuraRenderingService
  * @public
  */
 $A.ns.AuraRenderingService.prototype.rerender = function(components) {
@@ -170,7 +170,7 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
  *
  * @param {component}
  *            components The component or component array that has finished rendering
- * @memberOf AuraRenderingService
+ * @memberOf $A.ns.AuraRenderingService
  * @public
  */
 $A.ns.AuraRenderingService.prototype.afterRender = function(components) {
@@ -214,7 +214,7 @@ $A.ns.AuraRenderingService.prototype.afterRender = function(components) {
  *
  * @param {Component}
  *            components The component or component array to be unrendered
- * @memberOf AuraRenderingService
+ * @memberOf $A.ns.AuraRenderingService
  * @public
  */
 $A.ns.AuraRenderingService.prototype.unrender = function(components) {
@@ -266,7 +266,7 @@ $A.ns.AuraRenderingService.prototype.unrender = function(components) {
 
 /**
  * @private
- * @memberOf AuraRenderingService
+ * @memberOf $A.ns.AuraRenderingService
  *
  * @param {Component} component the component for which we are storing the facet.
  * @param {Object} facet the component or array of components to store.
@@ -286,7 +286,7 @@ $A.ns.AuraRenderingService.prototype.storeFacetInfo = function(component, facet)
 
 /**
  * @private
- * @memberOf AuraRenderingService
+ * @memberOf $A.ns.AuraRenderingService
  */
 $A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {

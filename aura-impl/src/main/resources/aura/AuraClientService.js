@@ -259,7 +259,7 @@ $A.ns.AuraClientService.prototype.checkAndDecodeResponse = function(response, no
  * not sure if this is important.
  *
  * @param {Object} config The data for the exception event
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @private
  */
 $A.ns.AuraClientService.prototype.throwExceptionEvent = function(resp) {
@@ -698,7 +698,7 @@ $A.ns.AuraClientService.prototype.isManifestPresent = function() {
 /**
  * Perform a hard refresh.
  *
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  */
 $A.ns.AuraClientService.prototype.hardRefresh = function() {
     var url = location.href;
@@ -890,7 +890,7 @@ $A.ns.AuraClientService.prototype.handleAppCache = function() {
 /**
  * Marks the application as outdated.
  *
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  */
 $A.ns.AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
@@ -909,7 +909,7 @@ $A.ns.AuraClientService.prototype.setOutdated = function() {
  *
  * @param {Boolean} isConnected Set to true to run Aura in online mode,
  * or false to run Aura in offline mode.
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @public
  */
 $A.ns.AuraClientService.prototype.setConnected = function(isConnected) {
@@ -1116,7 +1116,7 @@ $A.ns.AuraClientService.prototype.runAfterInitDefs = function(callback) {
  *            attributes The configuration data to use in the app
  * @param {function}
  *            callback The callback function to run
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @private
  */
 $A.ns.AuraClientService.prototype.loadApplication = function(descriptor, attributes, callback) {
@@ -1136,7 +1136,7 @@ $A.ns.AuraClientService.prototype.loadApplication = function(descriptor, attribu
  *            callback The callback function to run
  * @param {String}
  *            defType Sets the defType to "COMPONENT"
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @private
  */
 $A.ns.AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback, defType) {
@@ -1365,7 +1365,7 @@ $A.ns.AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
  *
  * @param {Object}
  *            newToken Refresh the current token with a new one.
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @private
  */
 $A.ns.AuraClientService.prototype.resetToken = function(newToken) {
@@ -1411,7 +1411,7 @@ $A.ns.AuraClientService.prototype.makeActionGroup = function(actions, scope, cal
  *            scope The scope in which the function is executed
  * @param {function}
  *            callback The callback function to run
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @public
  */
 $A.ns.AuraClientService.prototype.runActions = function(actions, scope, callback) {
@@ -1433,7 +1433,7 @@ $A.ns.AuraClientService.prototype.runActions = function(actions, scope, callback
  * @param {Object} rawConfig the config for the component to be injected
  * @param {String} locatorDomId the DOM id where we should place our element.
  * @param {String} localId the local id for the component to be created.
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @public
  */
 $A.ns.AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
@@ -1618,7 +1618,7 @@ $A.ns.AuraClientService.prototype.addComponentHandlers = function(component, act
 /**
  * Return whether Aura believes it is online.
  * Immediate and future communication with the server may fail.
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @return {Boolean} Returns true if Aura believes it is online; false otherwise.
  * @public
  */
@@ -1633,7 +1633,7 @@ $A.ns.AuraClientService.prototype.isConnected = function() {
  *
  * @param {Action} action the action to enqueue
  * @param {Boolean} background Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
- * @memberOf AuraClientService
+ * @memberOf $A.ns.AuraClientService
  * @public
  */
 // TODO: remove boolean trap http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html

@@ -157,7 +157,7 @@ $A.ns.Logger.prototype.error = function(msg, e){
 
 /**
  * @private
- * @memberOf Logger
+ * @memberOf $A.ns.Logger
  *
  * @param {String} msg error message
  * @param {AuraError} [e] error
@@ -169,7 +169,7 @@ $A.ns.Logger.prototype.auraErrorHelper = function(e){
 
 /**
  * @private
- * @memberOf Logger
+ * @memberOf $A.ns.Logger
  *
  * @param {String} msg error message
  * @param {AuraError} [e] error

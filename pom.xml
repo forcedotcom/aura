@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.2119-SNAPSHOT</version>
+    <version>0.2119</version>
     <packaging>pom</packaging>
     <organization>
         <url>http://www.auraframework.org</url>
@@ -99,7 +99,7 @@
         <connection>scm:git:git@github.com:forcedotcom/aura.git</connection>
         <url>scm:git:git@github.com:forcedotcom/aura.git</url>
         <developerConnection>scm:git:git@github.com:forcedotcom/aura.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>aura-framework-0.2119</tag>
     </scm>
     <dependencies>
         <dependency>

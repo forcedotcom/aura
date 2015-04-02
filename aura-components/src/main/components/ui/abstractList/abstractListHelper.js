@@ -72,16 +72,16 @@
         var pagers = [];
 
         // walk each facet looking for instances of ui:pager
-        for (var i=0, len=facets.length; i<len; i++) {
+        for (var i = 0, len = facets.length; i < len; i++) {
             var facet = facets[i];
 
-            for (var n = 0; n < facet.len; n++) {
+            for (var n = 0; n < facet.length; n++) {
                 var c = facet[n];
                 if (c.getDef().getDescriptor().getQualifiedName() != "markup://aura:unescapedHtml") {
                     if (c.isInstanceOf("ui:pager")) {
                         pagers.push(c);
                     } else {
-                        pagers = pagers.concat(c.find({instancesOf:"ui:pager"}));
+                        pagers = pagers.concat(c.find({instancesOf: "ui:pager"}));
                     }
                 }
             }

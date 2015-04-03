@@ -69,7 +69,7 @@ $A.ns.AuraComponentService.prototype.getComponent = function(identifier) {
 /**
  * Gets the rendering component for the provided element recursively.
  * @param {Object} element The element that is used to find the rendering component
- * @memberOf AuraComponentService
+ * @memberOf $A.ns.AuraComponentService
  * @private
  */
 $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(element) {
@@ -90,7 +90,7 @@ $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(
 /**
  * Gets the attribute provider for the provided element.
  * @param {Object} element The element whose attribute provider is to be returned
- * @memberOf AuraComponentService
+ * @memberOf $A.ns.AuraComponentService
  * @private
  */
 $A.ns.AuraComponentService.prototype.getAttributeProviderForElement = function(element) {
@@ -719,7 +719,7 @@ $A.ns.AuraComponentService.prototype.deIndex = function(globalId){
 
 /**
  * Returns the descriptors of all components known to the registry.
- * @memberOf AuraComponentService
+ * @memberOf $A.ns.AuraComponentService
  */
 $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
     var ret = [];
@@ -749,7 +749,7 @@ $A.ns.AuraComponentService.prototype.getDynamicNamespaces = function(){
 };
 
 /**
- * @memberOf AuraComponentService
+ * @memberOf $A.ns.AuraComponentService
  * @private
  */
 $A.ns.AuraComponentService.prototype.getIndex = function(){
@@ -773,7 +773,7 @@ $A.ns.AuraComponentService.prototype.getIndex = function(){
 };
 
 /**
- * @memberOf AuraComponentService
+ * @memberOf $A.ns.AuraComponentService
  * @private
  */
 $A.ns.AuraComponentService.prototype.isConfigDescriptor = function(config) {

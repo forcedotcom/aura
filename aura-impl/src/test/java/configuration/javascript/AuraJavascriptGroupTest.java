@@ -23,6 +23,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.javascript.directive.DirectiveParser;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
@@ -82,7 +83,9 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
                 List<JavascriptProcessingError> errors = mode.getJavascriptWriter().compress(jsContents,
                         new StringWriter(), js.getStartFile().getName());
                 for (JavascriptProcessingError e : errors) {
-                    errorTxt.append(e.toString());
+                    if (e.getLevel() == Level.Error) {
+                        errorTxt.append(e.toString());
+                    }
                 }
             }
         }

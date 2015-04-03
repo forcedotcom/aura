@@ -33,7 +33,7 @@ $A.ns.AuraHistoryService = function() {
  * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
  *
  * @param {Object} token The provided token set to the current location hash
- * @memberOf AuraHistoryService
+ * @memberOf $A.ns.AuraHistoryService
  * @public
  */
 $A.ns.AuraHistoryService.prototype.set = function(token) {
@@ -68,7 +68,7 @@ $A.ns.AuraHistoryService.prototype.set = function(token) {
  * <p>Example:</p> 
  * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>
  * 
- * @memberOf AuraHistoryService
+ * @memberOf $A.ns.AuraHistoryService
  * @public
  */
 $A.ns.AuraHistoryService.prototype.get = function() {
@@ -83,7 +83,7 @@ $A.ns.AuraHistoryService.prototype.get = function() {
 /**
  * Loads the previous URL in the history list. Standard JavaScript <code>history.go()</code> method.
  *
- * @memberOf AuraHistoryService
+ * @memberOf $A.ns.AuraHistoryService
  * @public
  */
 $A.ns.AuraHistoryService.prototype.back = function() {
@@ -109,7 +109,7 @@ $A.ns.AuraHistoryService.prototype.back = function() {
  * Sets the title of the document.
  * 
  * @param {String} title The new title
- * @memberOf AuraHistoryService
+ * @memberOf $A.ns.AuraHistoryService
  * @public
  */
 $A.ns.AuraHistoryService.prototype.setTitle = function(title) {
@@ -119,7 +119,7 @@ $A.ns.AuraHistoryService.prototype.setTitle = function(title) {
 /**
  * Loads the next URL in the history list. Standard JavaScript <code>history.go()</code> method.
  * 
- * @memberOf AuraHistoryService
+ * @memberOf $A.ns.AuraHistoryService
  * @public
  */
 $A.ns.AuraHistoryService.prototype.forward = function() {

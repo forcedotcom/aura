@@ -1093,4 +1093,44 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.True(componentDefsClearCalled);
         }
     }
+
+    [Fixture]
+    function hardRefresh() {
+        [Fact]
+        function replacesSpaceInUrlWithPlus() {
+            var target, expected, actual;
+            var mockDeps = Mocks.GetMocks(Object.Global(), {
+                document: {
+                    body: {
+                        parentNode: {
+                            getAttribute: function() {return true;}
+                        }
+                    }
+                },
+                navigator: {
+                    userAgent: ""
+                },
+                window: {},
+                history: {
+                    pushState: function(state, title, url) {
+                        actual = url;
+                    }
+                },
+                location: {
+                    href: "http://localhost:9090/auratest/testPerfRunner.app?foo=bar bar"
+                }
+            });
+
+            expected = "testPerfRunner.app?nocache=http%3A%2F%2Flocalhost%3A9090%2Fauratest%2FtestPerfRunner.app%3Ffoo%3Dbar%2bbar";
+            mockGlobal(function() {
+                target = new $A.ns.AuraClientService();
+            });
+
+            mockDeps(function() {
+                target.hardRefresh();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }

@@ -368,7 +368,23 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
         String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
 
-        assertTrue("Location should start with https but was: " + location, location.startsWith("http:"));
+        assertTrue("Location should start with http but was: " + location, location.startsWith("http:"));
+    }
+
+    /**
+     * Verify http redirect URL with plus can be correctly decoded
+     */
+    public void testRedirectUrlWithPlus() throws Exception {
+        String inputUrl = String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "http://any.host/m?foo=bar+bar", "UTF-8"));
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+
+        String actual = location.substring(location.indexOf('?') + 1);
+        assertEquals("foo=bar+bar", actual);
     }
 
     public void testHTMLTemplateCaching() throws Exception {

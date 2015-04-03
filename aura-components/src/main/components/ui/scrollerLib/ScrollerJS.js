@@ -894,6 +894,7 @@ function (w) {
         * @private
         */
         _update: function () {
+            //TODO: Standarize when we call this (and align with scrollMove and scrollEnd events)
             this._fire('_update');
         },
 

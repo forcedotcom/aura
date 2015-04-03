@@ -102,6 +102,12 @@
                 </includes>
             </resource>
         </resources>
+        <testResources>
+        	<testResource>
+        		<directory>src/test/resources/aura/resources</directory>
+        		<targetPath>aura/resources</targetPath>
+        	</testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

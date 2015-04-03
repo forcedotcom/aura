@@ -51,6 +51,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.system.AuraContext.EncodingStyle;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -340,6 +341,44 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             post.setEntity(new UrlEncodedFormEntity(nvps, CharEncoding.UTF_8));
 
         }
+        return post;
+    }
+
+    /**
+     * Convenience method for executing an Action
+     * 
+     * @param descriptor fully qualified descriptor string for the action - e.g. java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString
+     * @param params a set of name value string pairs to use as parameters to the post call.
+     * @return a {@link HttpPost}
+     * @throws Exception
+     */
+    protected HttpPost executeAuraAction(Class<?> serverControllerClass, String methodName,
+            Map<String, String> actionParams, Map<String, String> postParams) throws Exception {
+        Map<String, Object> message = new HashMap<>();
+        Map<String, Object> actionInstance = new HashMap<>();
+        String descriptor = "java://" + serverControllerClass.getCanonicalName() + "/ACTION$" + methodName;
+        actionInstance.put("descriptor", descriptor);
+        if (actionParams != null) {
+            actionInstance.put("params", actionParams);
+        }
+        Map<?, ?>[] actions = { actionInstance };
+        message.put("actions", actions);
+        String jsonMessage = Json.serialize(message);
+        
+        if (postParams == null) {
+            postParams = Maps.newHashMap();
+        }
+        postParams.put("message", jsonMessage);
+        if(!postParams.containsKey("aura.token")){
+            postParams.put("aura.token", getCsrfToken());
+        }
+        if (!postParams.containsKey("aura.context")) {
+            postParams
+                    .put("aura.context", Aura.getContextService().getCurrentContext().serialize(EncodingStyle.Normal));
+        }
+        HttpPost post = obtainPostMethod("/aura", postParams);
+        perform(post);
+        post.releaseConnection();
         return post;
     }
 

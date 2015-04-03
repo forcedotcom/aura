@@ -26,12 +26,19 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
+import org.auraframework.controller.java.ServletConfigController;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
@@ -401,6 +408,21 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         checkExpired(httpResponse, "text/javascript");
         assertTrue(response.contains("function setDefaults("));
+        assertDefaultAntiClickjacking(httpResponse, true, false);
+
+        get.releaseConnection();
+    }
+
+    @ThreadHostileTest("PRODUCTION")
+    public void testResourceNameWithoutPeriod() throws Exception {
+        getMockConfigAdapter().setIsProduction(true);
+
+        HttpGet get = obtainGetMethod("/auraFW/resources/nosuffix");
+        HttpResponse httpResponse = perform(get);
+        String response = getResponseBody(httpResponse);
+
+        checkExpired(httpResponse, "text/javascript");
+        assertTrue(response.equals("this file has no suffix"));
         assertDefaultAntiClickjacking(httpResponse, true, false);
 
         get.releaseConnection();

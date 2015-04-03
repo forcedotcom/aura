@@ -368,7 +368,7 @@ MetricsService.prototype = {
             if (p && p.timing && p.timing.navigationStart) {
                 pst = p.timing.navigationStart;
             } else {
-                pst = window.pageStartTime;
+                pst = window["pageStartTime"];
             }
             this.pageStartTime = pst;
         }

@@ -154,7 +154,16 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
         $A.enqueueAction(action);
         return action;
     } else {
-        callback(this.createComponentInstance(configItem, true),"SUCCESS","");
+        var component;
+        var status = "SUCCESS";
+        var message = "";
+        try {
+            component = this.createComponentInstance(configItem, true);
+        } catch(e) {
+            status = "ERROR";
+            message = e.message;
+        }
+        callback(component, status, message);
     }
     return null;
 };
@@ -528,7 +537,12 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
             }
             returnedConfig["localId"] = config["localId"];
 
-            newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
+            try {
+                newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
+            } catch(e) {
+                status = "ERROR";
+                statusMessage = e.message;
+            }
         }else{
             var errors = a.getError();
             statusMessage=errors?errors[0].message:"Unknown Error.";

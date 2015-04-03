@@ -129,9 +129,6 @@ var ComponentPriv = (function() { // Scoping priv
         // initialize attributes
         this.setupAttributes(cmp, configAttributes, localCreation);
 
-        // instantiates this components methods
-        this.setupMethods(config, cmp);
-
         // instantiates this components model
         this.setupModel(config["model"], cmp);
 
@@ -141,6 +138,9 @@ var ComponentPriv = (function() { // Scoping priv
         // runs component provider and replaces this component with the
         // provided one
         this.injectComponent(config, cmp, localCreation);
+
+        // instantiates this components methods
+        this.setupMethods(config, cmp);
 
         // sets up component level events
         this.setupComponentEvents(cmp, configAttributes);

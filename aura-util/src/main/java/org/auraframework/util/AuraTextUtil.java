@@ -61,7 +61,9 @@ public class AuraTextUtil {
             "addValueHandler","removeValueHandler",
             "addValueProvider","getAttributeValueProvider","getComponentValueProvider",
             "autoDestroy","destroy",
-            "toString"
+            "toString",
+            "render", "rerender", "unrender", "afterRender",
+            "superRender", "superRerender", "superUnrender", "superAfterRender"
     };
 
     //

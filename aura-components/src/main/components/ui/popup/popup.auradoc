@@ -27,6 +27,8 @@
         This displays in a popup.
     &lt;/ui:popupTarget>
 &lt;/ui:popup></pre>
+		<p>To close a popup, retrieve the popup and fire the <code>popupTargetHide</code> event. Display the popup by firing the <code>popupTargetShow</code> event.</p>
+		<pre>cmp.find("popup").getEvent("popupTargetHide").fire();</pre>
 		<p>To toggle the popup using a custom trigger, fire the <code>ui:popupTargetToggle</code> event and set <code>show</code> to <code>true</code> or <code>false</code>.</p>
 		<pre>({
     hideTarget : function(component) {

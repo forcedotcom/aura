@@ -92,9 +92,9 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "controller",
-            		"model", "apiVersion", "abstract", "extensible", "extends");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "additionalAppCacheURLs", "isOnePageApp",
+            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache", "additionalAppCacheURLs", "controller",
+            		"model", "apiVersion", "abstract", "extensible", "extends", "template");
+            expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "isOnePageApp",
                     "theme", "render", "template", "provider", "style", "helper", "renderer", "whitespace", "support", "defaultFlavor", "defaultFlavors");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ApplicationDef.class;
@@ -108,9 +108,9 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public void setUp() throws Exception {
             super.setUp();
             expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller",
-            		"model", "apiVersion", "abstract", "extensible", "extends");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider", "isTemplate",
-                    "style", "helper", "renderer", "whitespace", "support", "defaultFlavor");
+            		"model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
+            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider",
+                    "style", "helper", "renderer", "whitespace", "support", "defaultFlavor", "isTemplate");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ComponentDef.class;
         }

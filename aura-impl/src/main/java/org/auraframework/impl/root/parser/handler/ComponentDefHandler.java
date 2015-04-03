@@ -44,11 +44,15 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
 
     private static final String ATTRIBUTE_ISTEMPLATE = "isTemplate";
 
-    private static final Set<String> CMP_PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-        .addAll(PRIVILEGED_ALLOWED_ATTRIBUTES)
-        .add(ATTRIBUTE_ISTEMPLATE)
-        .build();
+    private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_ISTEMPLATE)
+            .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
+    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .addAll(ALLOWED_ATTRIBUTES)
+            .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .build();
+    
     public ComponentDefHandler() {
         super();
     }
@@ -70,7 +74,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace ? CMP_PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override

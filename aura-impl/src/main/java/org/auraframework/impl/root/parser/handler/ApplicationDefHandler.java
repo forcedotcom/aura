@@ -200,12 +200,12 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_DEFAULT_FLAVORS = "defaultFlavors";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_APPCACHE_ENABLED)
+            .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS).add(ATTRIBUTE_TEMPLATE)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT,
-            ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME, ATTRIBUTE_DEFAULT_FLAVORS)
+            ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME, ATTRIBUTE_DEFAULT_FLAVORS)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();

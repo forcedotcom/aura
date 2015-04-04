@@ -69,7 +69,7 @@ $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
             continue;
         }
         if (cmp.isValid()) {
-            var renderedElements = cmp.render();
+            var renderedElements = cmp["render"]();
             renderedElements=this.finishRender(cmp, renderedElements);
             elements=elements.concat(renderedElements);
         }
@@ -124,7 +124,7 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
                 if (cmp.isRendered()) {
                     var rerenderedElements = undefined;
                     try {
-                        rerenderedElements=cmp.rerender();
+                        rerenderedElements=cmp["rerender"]();
                     } catch (e) {
                         $A.error("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                         // we fall through here, and put whatever the component gives us in the set.
@@ -187,7 +187,7 @@ $A.ns.AuraRenderingService.prototype.afterRender = function(components) {
         }
         if(cmp.isValid()) {
             try {
-                cmp.afterRender();
+                cmp["afterRender"]();
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
@@ -231,16 +231,16 @@ $A.ns.AuraRenderingService.prototype.unrender = function(components) {
     for (var i = 0; i < components.length; i++){
         var cmp = components[i];
         if (cmp.isValid() && cmp.isRendered()) {
-            var renderer = cmp.getRenderer();
+            //var renderer = cmp.getRenderer();
             cmp.setUnrendering(true);
             try {
                 if(cmp.isValid()&&cmp.isRendered()) {
                     try {
-                        renderer.def.unrender(renderer.renderable);
+                        //renderer.def.unrender(renderer.renderable);
 						// KRIS:
                         // The Stub generated for unrender seems to not work
                         // when used for one of the base components. (aura:text in this case)
-				        //cmp.unrender(renderer.renderable);
+				        cmp["unrender"]();
                     } catch (e) {
                         $A.error("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
                     }

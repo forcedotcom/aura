@@ -16,7 +16,6 @@
 
       ],
       "value":"yo"
-    },
-    "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$child1\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$child1 = function test$child1(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$child1.prototype = new aura$component(null, null, true);\n    test$child1.prototype.constructor = test$child1;\n\n    test$child1.Helper = function() {};\n\n    test$child1.Helper.prototype = new aura$component.Helper();\n    test$child1.Helper.prototype.constructor = test$child1.Helper;\n    test$child1.prototype.helper = new test$child1.Helper();\n\n\n    test$child1.prototype.render = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.render() : undefined;\n    };\n    test$child1.prototype.rerender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.rerender() : undefined;\n    };\n    test$child1.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    test$child1.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(test$child1);\n\n    return test$child1;\n});\n\n\n}"
+    }
   }
 }

@@ -2,7 +2,6 @@
   "s":1,
   "v":{
     "componentDef":"markup://test:parent",
-    "creationPath":"/*[0]",
-    "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$parent\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$parent = function test$parent(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$parent.prototype = new aura$component(null, null, true);\n    test$parent.prototype.constructor = test$parent;\n\n    test$parent.Helper = function() {};\n\n    test$parent.Helper.prototype = new aura$component.Helper();\n    test$parent.Helper.prototype.constructor = test$parent.Helper;\n    test$parent.prototype.helper = new test$parent.Helper();\n\n\n    test$parent.prototype.render = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.render() : undefined;\n    };\n    test$parent.prototype.rerender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.rerender() : undefined;\n    };\n    test$parent.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    test$parent.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(test$parent);\n\n    return test$parent;\n});\n\n\n}"
+    "creationPath":"/*[0]"
   }
 }

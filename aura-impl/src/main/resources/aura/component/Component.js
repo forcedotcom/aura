@@ -850,11 +850,11 @@ if(!this.concreteComponentId) {
                     cmp["constructor"] = classConstructor;
 
                     // Reassign important members. Assign to both external reference, and internal reference.
-                    cmp.helper = cmp["helper"] = classConstructor.prototype["helper"];
-                    cmp.render = cmp["render"] = classConstructor.prototype["render"];
-                    cmp.rerender = cmp["rerender"] = classConstructor.prototype["rerender"];
-                    cmp.afterRender = cmp["afterRender"] = classConstructor.prototype["afterRender"];
-                    cmp.unrender = cmp["unrender"] = classConstructor.prototype["unrender"];
+                    cmp["helper"] = classConstructor.prototype["helper"];
+                    cmp["render"] = classConstructor.prototype["render"];
+                    cmp["rerender"] = classConstructor.prototype["rerender"];
+                    cmp["afterRender"] = classConstructor.prototype["afterRender"];
+                    cmp["unrender"] = classConstructor.prototype["unrender"];
                 }
                 
                 self.setupModel(config["model"],cmp);
@@ -1648,49 +1648,13 @@ Component.prototype.isRenderedAndValid = function() {
     return this.priv && !this._destroying && this.priv.rendered;
 };
 
-/**
- * Render this component
- *
- * @protected
- */
-Component.prototype.render = function() {
-    var renderer = this.priv.renderer;
-    return renderer.def.render(renderer.renderable) || [];
-};
-
-/**
- * Rerender this component
- * @protected
- */
-Component.prototype.rerender = function() {
-    var renderer = this.priv.renderer;
-    renderer.def.rerender(renderer.renderable);
-};
-
-/**
- * afterRender for this this component
- * @protected
- */
-Component.prototype.afterRender = function() {
-    var renderer = this.priv.renderer;
-    renderer.def.afterRender(renderer.renderable);
-};
-
-/**
- * Unrerender this component
- * @protected
- */
-Component.prototype.unrender = function() {
-    var renderer = this.priv.renderer;
-    renderer.def.unrender(renderer.renderable);
-};
 
 /**
  * Execute the super components render method.
  * @protected
  */
 Component.prototype.superRender = function() {
-    return this.getSuper().render();
+    return this.getSuper()["render"]();
 };
 
 /**
@@ -1698,7 +1662,7 @@ Component.prototype.superRender = function() {
  * @protected
  */
 Component.prototype.superRerender = function() {
-    return this.getSuper().rerender();
+    return this.getSuper()["rerender"]();
 };
 
 /**
@@ -1706,7 +1670,7 @@ Component.prototype.superRerender = function() {
  * @protected
  */
 Component.prototype.superAfterRender = function() {
-    return this.getSuper().afterRender();
+    return this.getSuper()["afterRender"]();
 };
 
 /**
@@ -1714,7 +1678,7 @@ Component.prototype.superAfterRender = function() {
  * @protected
  */
 Component.prototype.superUnrender = function() {
-    return this.getSuper().unrender();
+    return this.getSuper()["unrender"]();
 };
 
 /**
@@ -2442,37 +2406,6 @@ Component.prototype.getFacets = function() {
     return facets;
 };
 
-
-/**
- * You should never need to call this directly.
- * When we create a component class, it doesn't have a mapping between friendly names like cmp.render() and the minified version of the cmp.render() function which is like cmp.aA().
- * This MAY only be necessary because of our internal framework references to .render(), .afterRender() etc. If we switched to cmp["render"]() in the framework, this might not be necessary. 
- * Would save a lot of function calls which would be nice.
- * For now, we do this...
- * @param {Object} componentClass The class constructor for a component class.
- */
-Component.registerMethods = function(componentClass) {
-    var proto = componentClass.prototype;
-    if (proto["render"]) {
-        proto.render = proto["render"];
-    }
-
-    if (proto["afterRender"]) {
-        proto.afterRender = proto["afterRender"];
-    }
-    
-    if (proto["rerender"]) {
-        proto.rerender = proto["rerender"];
-    }
-    
-    if (proto["unrender"]) {
-        proto.unrender = proto["unrender"];
-    }
-
-    if (proto["helper"]) {
-        proto.helper = proto["helper"];
-    }
-};
 
 /**
  * Returns true if this component instance has at least one flavorable element.

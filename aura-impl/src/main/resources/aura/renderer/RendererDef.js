@@ -19,23 +19,28 @@
  * @constructor
  * @protected
  */
-function RendererDef(config){
-    if (config["code"]) {
-        //only used by aura-j
-        config = eval("false||" +config["code"]);
+function RendererDef(descriptor){
+    var componentClass = $A.componentService.getComponentClass(descriptor);
+    
+    if(componentClass) {
+        this.renderMethod = componentClass.prototype.render;
+        this.afterRenderMethod  = componentClass.prototype.afterRender;
+        this.rerenderMethod = componentClass.prototype.rerender;
+        this.unrenderMethod = componentClass.prototype.unrender;
+
+        // this.renderMethod = aura.util.json.decodeString(config["render"]);
+        // this.afterRenderMethod  = aura.util.json.decodeString(config["afterRender"]);
+        // this.rerenderMethod = aura.util.json.decodeString(config["rerender"]);
+        // this.unrenderMethod = aura.util.json.decodeString(config["unrender"]);
+
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        this["renderMethod"] = this.renderMethod;
+        this["afterRenderMethod"] = this.afterRenderMethod;
+        this["rerenderMethod"] = this.rerenderMethod;
+        this["unrenderMethod"] = this.unrenderMethod;
+        //#end
     }
-    this.renderMethod = aura.util.json.decodeString(config["render"]);
-    this.afterRenderMethod  = aura.util.json.decodeString(config["afterRender"]);
-    this.rerenderMethod = aura.util.json.decodeString(config["rerender"]);
-    this.unrenderMethod = aura.util.json.decodeString(config["unrender"]);
-
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    this["renderMethod"] = this.renderMethod;
-    this["afterRenderMethod"] = this.afterRenderMethod;
-    this["rerenderMethod"] = this.rerenderMethod;
-    this["unrenderMethod"] = this.unrenderMethod;
-    //#end
-
+    
     if (RendererDef["initializeDef"]) {
         RendererDef["initializeDef"](this);
     }
@@ -51,8 +56,7 @@ RendererDef.prototype["auraType"] = RendererDef.prototype.auraType;
 RendererDef.prototype.render = function RendererDef$Render(component) {
     var renderer = component.getRenderer();
     if (this.renderMethod) {
-        var helper = component.getDef().getHelper();
-        return this.renderMethod.call(renderer, component, helper);
+        return this.renderMethod.call(component);
     }
     if (renderer["superRender"]) {
         return renderer["superRender"]();
@@ -67,8 +71,7 @@ RendererDef.prototype.render = function RendererDef$Render(component) {
 RendererDef.prototype.afterRender = function RendererDef$AfterRender(component) {
     var renderer = component.getRenderer();
     if (this.afterRenderMethod) {
-        var helper = component.getDef().getHelper();
-        this.afterRenderMethod.call(renderer, component, helper);
+        this.afterRenderMethod.call(component);
     } else if (renderer["superAfterRender"]) {
         renderer["superAfterRender"]();
     }
@@ -81,8 +84,7 @@ RendererDef.prototype.afterRender = function RendererDef$AfterRender(component) 
 RendererDef.prototype.rerender = function RendererDef$Rerender(component) {
     var renderer = component.getRenderer();
     if (this.rerenderMethod) {
-        var helper = component.getDef().getHelper();
-        return this.rerenderMethod.call(renderer, component, helper);
+        return this.rerenderMethod.call(component);
     } else if (renderer["superRerender"]) {
         return renderer["superRerender"]();
     }
@@ -95,8 +97,7 @@ RendererDef.prototype.rerender = function RendererDef$Rerender(component) {
 RendererDef.prototype.unrender = function RendererDef$Unrender(component) {
     var renderer = component.getRenderer();
     if (this.unrenderMethod) {
-        var helper = component.getDef().getHelper();
-        this.unrenderMethod.call(renderer, component, helper);
+        this.unrenderMethod.call(component);
     } else if (renderer["superUnrender"]) {
         renderer["superUnrender"]();
     } else {

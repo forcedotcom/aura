@@ -949,15 +949,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeMapBegin();
                 json.writeValue(getAccess());
                 json.writeMapEntry("descriptor", descriptor);
-                context.pushCallingDescriptor(descriptor);
-                try {
-                    RendererDef rendererDef = getRendererDef();
-                    if (rendererDef != null && !rendererDef.isLocal()) {
-                        json.writeMapEntry("rendererDef", rendererDef);
-                    }
-                } finally {
-                    context.popCallingDescriptor();
-            	}
+             //    context.pushCallingDescriptor(descriptor);
+             //    try {
+             //        RendererDef rendererDef = getRendererDef();
+             //        if (rendererDef != null && !rendererDef.isLocal()) {
+             //            json.writeMapEntry("rendererDef", rendererDef);
+             //        }
+             //    } finally {
+             //        context.popCallingDescriptor();
+            	// }
 //                HelperDef helperDef = getHelperDef();
 //                if (helperDef != null && !helperDef.isLocal()) {
 //                    json.writeMapEntry("helperDef", helperDef);

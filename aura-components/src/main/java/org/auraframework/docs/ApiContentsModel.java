@@ -121,7 +121,7 @@ public class ApiContentsModel {
                         Collections.sort(l, SYMBOL_COMPARATOR);
                     }
                     String name = (String) map.get("name");
-                    if (name != null) {
+                    if (name != null && !map.containsKey("undocumented")) {
                         symbols.put(name, map);
                     }
                 }

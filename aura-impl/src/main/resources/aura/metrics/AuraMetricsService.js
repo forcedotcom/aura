@@ -40,7 +40,7 @@ var MetricsService = function MetricsService(config) {
     // #end
 };
 
-MetricsService.PERFTIME = window.performance && window.performance.now;
+MetricsService.PERFTIME = !!(window.performance && window.performance.now);
 MetricsService.TIMER    = MetricsService.PERFTIME ? window.performance.now.bind(performance) : Date.now.bind(Date);
 MetricsService.START    = 'start';
 MetricsService.END      = 'end';
@@ -173,14 +173,9 @@ MetricsService.prototype = {
                     "duration"      : this.time() - transaction["ts"],
                     "pageStartTime" : this.pageStartTime,
                     "marks"         : {},
+                    "unixTS"        : !MetricsService.PERFTIME, // If the browser does not support performance API, all transactions will be Unix Timestamps
                     "context"       : $A.util.apply(context, config["context"], true, true)
                 };
-
-            // If the browser does not support performance API, all transactions will be Unix Timestamps
-            // Add that info into the transaction for postProcessing
-            if (MetricsService.PERFTIME) {
-                parsedTransaction["unixTS"] = true;
-            }
 
             for (var plugin in this.collector) {
                 var instance = this.pluginInstances[plugin];

@@ -779,27 +779,28 @@ public class AuraUITestingUtil {
      * @param message Message to display to user on timeout.
      * @param looking for exact match or just partial
      */
-    public void waitForElementText(final By locator, final String text, final boolean toBePresent, String message, final Boolean matchFullText) {
+    public void waitForElementText(final By locator, final String text, final boolean toBePresent, String message,
+            final Boolean matchFullText) {
         waitForElementFunction(locator, new Function<WebElement, Boolean>() {
             @Override
             public Boolean apply(WebElement element) {
-            	if(matchFullText == true) {
-            		return toBePresent == element.getText().equals(text);
-            	} else {
-            		return toBePresent == element.getText().contains(text);
-            	}
+                if (matchFullText == true) {
+                    return toBePresent == element.getText().equals(text);
+                } else {
+                    return toBePresent == element.getText().contains(text);
+                }
             }
         }, message);
     }
-    
+
     public void waitForElementText(final By locator, final String text, final boolean toBePresent, String message) {
-    	waitForElementText(locator, text, toBePresent, message, true);
+        waitForElementText(locator, text, toBePresent, message, true);
     }
-        
+
     public void waitForElementText(final By locator, final String text, final boolean toBePresent) {
         waitForElementText(locator, text, toBePresent, "Timeout looking for element with text: " + text);
     }
-    
+
     public void waitForElementTextContains(final By locator, final String text, final boolean toBePresent) {
         waitForElementText(locator, text, toBePresent, "Timeout looking for element with text: " + text, false);
     }

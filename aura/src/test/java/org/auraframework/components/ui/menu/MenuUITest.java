@@ -73,9 +73,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
                 auraUITestingUtil.getActiveElementText());
 
-        String globalIdItem2 = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuItem2);
-        Double item2TopValue = Double.parseDouble(auraUITestingUtil.getBoundingRectPropOfElement(globalIdItem2, "top"));
-        assertTrue("Item 2 in the menu List is should be visible on the page", item2TopValue > 0);
+        assertTrue("Item 2 in the menu List is should be visible on the page", actionItem2.isDisplayed());
 
         // use send key("f") to move to actionItem2
         actionItem3Element.sendKeys("f");
@@ -99,7 +97,8 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Item3 not selected", "Inter Milan", menuLabel.getText());
     }
 
-    private void testActionMenuViaKeyboardInteractionForApp(String appName, String appendString) throws MalformedURLException,
+    private void testActionMenuViaKeyboardInteractionForApp(String appName, String appendString)
+            throws MalformedURLException,
             URISyntaxException {
         open(appName);
         WebDriver driver = this.getDriver();
@@ -168,27 +167,27 @@ public class MenuUITest extends WebDriverTestCase {
     public void testActionMenu() throws MalformedURLException, URISyntaxException {
         testActionMenuForApp(MENUTEST_APP, "");
     }
-    
+
     /**
-     * Test that verify's interaction with Action Menu with image is trigger link
-     * Test case: W-2515040
-     * Excluding Ipad and iphone as hover wont work for touch devices
+     * Test that verify's interaction with Action Menu with image is trigger link Test case: W-2515040 Excluding Ipad
+     * and iphone as hover wont work for touch devices
+     * 
+     * @throws MalformedURLException
+     * @throws URISyntaxException Uncomment test once W-2515040 is fixed
+     */
+    public void _testActionMenuWithImageTrigger() throws MalformedURLException, URISyntaxException {
+        testActionMenuForApp(MENUTEST_APP, "Image");
+    }
+
+    /**
+     * Uncomment test once W-2515040 is fixed
      * 
      * @throws MalformedURLException
      * @throws URISyntaxException
-     * Uncomment test once W-2515040 is fixed
      */
-    public void _testActionMenuWithImageTrigger() throws MalformedURLException, URISyntaxException {
-    	testActionMenuForApp(MENUTEST_APP, "Image");
-    }
-    
-    /**
-     * Uncomment test once W-2515040 is fixed
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     */
-    public void _testActionMenuWithImageTriggerViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
-    	testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "Image");
+    public void _testActionMenuWithImageTriggerViaKeyboardInteraction() throws MalformedURLException,
+            URISyntaxException {
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "Image");
     }
 
     // Test case for W-2181713
@@ -287,7 +286,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Item3 should be Selected after the click", (Boolean) auraUITestingUtil.getEval(selectedValueM3Exp));
 
         // click on item3 again
-        //Keys.Enter does not work with chrome v40.0.2214.91
+        // Keys.Enter does not work with chrome v40.0.2214.91
         item3Element.sendKeys(Keys.SPACE);
         // verify not selected
         assertFalse("Item3 aria attribute should be Uncheked after Pressing Enter",

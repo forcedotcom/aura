@@ -15,25 +15,14 @@
     limitations under the License.
 
 -->
-<!--
-This component fails as you click through the various options.
-
-There are not yet explicit tests for this.
--->
 <aura:component>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="data" type="Object"></aura:attribute>
-    <aura:attribute name="blip" type="String" default="foo"></aura:attribute>
-    <aura:attribute name="_initialized" type="Boolean" default="false"/>
+    <aura:attribute name="innerClassName" type="String"/>
 
-    <aura:if isTrue="{! v._initialized == true &amp;&amp; v.blip != 'blech!'}">
-        <aura:iteration items="{!v.data.elements}" var="foo" >
-            <iterationTest:nestedChanges data="{!foo.changes}" blip="{!v.blip}" />
+    <aura:if isTrue="{!v._initialized}">
+        <aura:iteration items="{!v.data.elements}" var="item">
+            <iterationTest:iterationWithLabelInside data="{!item.changes}" className="{!v.innerClassName}" aura:id="innerCmp"/>
         </aura:iteration>
-        <aura:set attribute="else">
-            Click 'Change value' again to continue.
-        </aura:set>
     </aura:if>
-    <ui:button press="{!c.resetIter}" buttonTitle="Reset iteration" label="Reset iteration"></ui:button><br/>
-    <ui:button press="{!c.changeValue}" buttonTitle="Change value" label="Change value"></ui:button><br/>
 </aura:component>

@@ -78,7 +78,7 @@
    * Verify sortable headers
    */
   verifySortableHeaders : function(expectedSortableHeaders) {
-	  var sortableHeadersRendered = $A.test.getElementByClass("toggle");;
+	  var sortableHeadersRendered = $A.test.getElementByClass("toggle");
 	  
 	  for (var i=0; i<sortableHeadersRendered.length; i++) {
 		  var header = sortableHeadersRendered[i];
@@ -87,7 +87,7 @@
 		  
 		  for (var j=0; j<expectedSortableHeaders.length; j++) {
 			  var expectedHeader = expectedSortableHeaders[j].name;
-			  if (headerText.indexOf(expectedHeader) >= 0) {
+			  if (headerText.toUpperCase().indexOf(expectedHeader) >= 0) {
 				  foundColIndex = j;
 				  break;
 			  }
@@ -98,7 +98,7 @@
 			  
 			  if (expectedHeader.isEnabled) {
 				  var expectedSort = expectedHeader.sort;
-				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[0]);
+				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[0]).toUpperCase();
 				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
 			  } else {
 				  var headerClass = $A.util.getElementAttributeValue(header, "class");
@@ -159,7 +159,7 @@
 	  {
 		  length = allSortedElements.length;	
 		  // assert that the correct element is sorted
-		  $A.test.assertEquals(0, $A.test.getText(allSortedElements[0]).indexOf(expectedElementToBeSorted), "Wrong element is sorted");
+		  $A.test.assertEquals(0, $A.test.getText(allSortedElements[0]).toUpperCase().indexOf(expectedElementToBeSorted), "Wrong element is sorted");
 	  }			  
 	  else //when no element is sorted (initial case when page loads)
 		  length = 0;

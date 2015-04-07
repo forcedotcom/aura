@@ -53,7 +53,7 @@ public class JettyTestServletConfig implements TestServletConfig {
             host = connector.getHost();
             if (host == null) {
                 try {
-                    host = InetAddress.getLocalHost().getHostName();
+                    host = InetAddress.getLocalHost().getCanonicalHostName();
                 } catch (UnknownHostException e) {
                     LOG.log(Level.WARNING, e.toString(), e);
                     host = "localhost";
@@ -66,7 +66,7 @@ public class JettyTestServletConfig implements TestServletConfig {
             host = System.getProperty("jetty.host");
             if (host == null) {
                 try {
-                    host = InetAddress.getLocalHost().getHostName();
+                    host = InetAddress.getLocalHost().getCanonicalHostName();
                 } catch (UnknownHostException e) {
                     LOG.log(Level.WARNING, e.toString(), e);
                     host = "localhost";

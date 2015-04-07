@@ -137,7 +137,7 @@ public final class SauceUtil {
         String host = System.getProperty("jetty.host");
         if (host == null) {
             try {
-                host = InetAddress.getLocalHost().getHostName();
+                host = InetAddress.getLocalHost().getCanonicalHostName();
             } catch (UnknownHostException e) {
                 host = "localhost";
             }

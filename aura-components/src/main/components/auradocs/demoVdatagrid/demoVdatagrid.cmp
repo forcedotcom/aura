@@ -16,16 +16,22 @@
 
 -->
 <aura:component>
-    <aura:attribute name="mode" type="String" default="VIEW"/>
-    <aura:attribute name="sortBy" type="String"/>
-    <aura:attribute name="items" type="List"/>
-    
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
-    <ui:dataGrid aura:id="grid" mode="{!v.mode}" sortBy="{!v.sortBy}" items="{!v.items}">
-        <aura:set attribute="columns">
-            <ui:dataGridColumn label="Id" name="id" sortable="true"/>
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<ui:button label="Add row" press="{!c.addRow}"/>
+	
+	<aura:attribute name="sortBy" type="String"/>
+	<aura:attribute name="data" type="List"/>
+    <ui:virtualDataGrid aura:id="myData" items="{!v.data}" sortBy="{!v.sortBy}">
+        <aura:set attribute="headerColumns">
+            <ui:dataGridColumn label="Id" name="id" sortable="true" />
             <ui:dataGridColumn label="Name" name="name"/>
         </aura:set>
-    </ui:dataGrid>
+       
+        <aura:set attribute="columns">
+            {!item.id}
+            {!item.name}
+        </aura:set>
+        
+    </ui:virtualDataGrid>
 </aura:component>
+	

@@ -14,7 +14,21 @@
  * limitations under the License.
  */
 ({
-	init: function (cmp, evt, hlp) {
-		cmp.set("v.items", [{id: 1, name: "name1"}, {id: 2, name: "name1"}, {id: 3, name: "name1"}, {id: 4, name: "name1"}]);
+	init : function(cmp, evt) {
+		
+		var rowData = [{id: 1, name: "name1"}, 
+		                   {id: 2, name: "name2"},
+		                   {id: 3, name: "name3"}, 
+		                   {id: 4, name: "name4"}
+		                  ];
+		cmp.set("v.data", rowData);
+	},
+	
+	addRow : function(cmp, evt) {
+		var currData = cmp.get("v.data");
+		var newId = currData.length + 1;
+		var rowData = [{id: newId, name: "name" + newId}];
+		var datagrid = cmp.find("myData");
+		datagrid.appendItems(rowData);
 	}
 })

@@ -661,6 +661,7 @@ $A.ns.AuraClientService.prototype.request = function(actions, flightCounter) {
         var abortableId = this.actionQueue.getLastAbortableTransactionId();
         var collector = new $A.ns.ActionCollector(actions, function() {
             try {
+                acs.actionQueue.setCurrentAbortableId(abortableId);
                 acs.finishRequest(collector, flightCounter, abortableId, flightHandled);
             } catch (e) {
                 if (!flightHandled.value) {

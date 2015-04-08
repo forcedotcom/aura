@@ -435,6 +435,57 @@
                 } ]
     },
 
+    /*
+     * when enqueuing actions from a callback, they should never abort the abortable group of the
+     * source actions.
+     */
+    testStoredActionCallbackDoesntAbortOthers : {
+        test : [
+            function(cmp) {
+                var that = this;
+                // Set up a stored action
+                var a = this.getAction(cmp, "c.execute", "APPEND first; READ;",
+                                 function(a) {
+                                     that.log(cmp, "first:" + a.getReturnValue());
+                                 });
+                a.setStorable();
+                $A.enqueueAction(a);
+                this.addWaitForLog(cmp, 0, "first:first");
+            },
+            function(cmp) {
+                var that = this;
+                //
+                // Run the stored action followed by a new one. and make sure that
+                // our stored action callback queues up the 'breaking' action.
+                // In bug W-2550458, the 'confirm' action was aborted by the 'break'
+                // action, because the callback for the stored action did not have the
+                // correct transaction id.
+                //
+                var a = this.getAction(cmp, "c.execute", "APPEND first; READ;",
+                                 function(a) {
+                                     that.log(cmp, "first:" + a.getReturnValue());
+                                     var b = that.getAction(cmp, "c.execute", "APPEND break; READ;",
+                                         function(a) {
+                                             that.log(cmp, "break:" + a.getReturnValue());
+                                         });
+                                     b.setStorable();
+                                     $A.enqueueAction(b);
+                                 });
+                a.setStorable();
+                $A.enqueueAction(a);
+                var c = this.getAction(cmp, "c.execute", "APPEND confirm; READ;",
+                                 function(a) {
+                                     that.log(cmp, "confirm:" + a.getReturnValue());
+                                 });
+                c.setStorable();
+                $A.enqueueAction(c);
+                this.addWaitForLog(cmp, 1, "first:first");
+                this.addWaitForLog(cmp, 2, "confirm:confirm");
+                this.addWaitForLog(cmp, 3, "break:break");
+            }
+        ]
+    },
+
     /* currently only 1 foreground action can be in-flight */
     testMaxNumForegroundServerAction : {
         test : [

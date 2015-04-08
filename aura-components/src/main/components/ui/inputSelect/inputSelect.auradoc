@@ -29,17 +29,11 @@
 
                 <h4>Generating Options with <code>aura:iteration</code></h4>
                  <p>You can use <code>aura:iteration</code> to iterate over a list of items to generate options. 
-                 This example iterates over a list of items and conditionally renders the options.</p>
-<pre>&lt;aura:attribute name="contacts" type="String[]" default="All Contacts,Others"/>
+                 This example iterates over a list of items.</p>
+<pre>&lt;aura:attribute name="contacts" type="String[]" default="Primary Contact, Secondary Contact, Other"/>
 &lt;ui:inputSelect>
     &lt;aura:iteration items="{!v.contacts}" var="contact">
-        &lt;aura:if isTrue="{!contact == 'All Contacts'}"> 
-            &lt;ui:inputSelectOption text="{!contact}" label="{!contact}"/>
-            &lt;aura:set attribute="else">
-                &lt;ui:inputSelectOption text="All Primary" label="All Primary"/>
-                &lt;ui:inputSelectOption text="All Secondary" label="All Secondary"/>
-            &lt;/aura:set>
-        &lt;/aura:if>
+         &lt;ui:inputSelectOption text="{!contact}" label="{!contact}"/>
     &lt;/aura:iteration>
 &lt;/ui:inputSelect></pre>
 		<h4>Generating Options Dynamically</h4>

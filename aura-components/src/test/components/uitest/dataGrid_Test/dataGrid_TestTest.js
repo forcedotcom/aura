@@ -4,15 +4,19 @@
     BASIC_ROW_ARRAY  : ["Foo", "John Doe", "Acme", "2014-01-01"],
     INSERT_ROW_ARRAY : ["Bar", "New John", "SFDC", "2014-11-11"],
     doNotWrapInAuraRun : true,
+    
 	/**
      * Test verifying that when there is no data present dataGrid does not fail
-     * bug tracking: 2327176
      */
-    _testNoDataPresent : {
+    testNoDataPresent : {
         attributes : {"pageSize" : 0},
-        test : function(cmp){
-            this.verifyDataGridUsingPager(cmp, [true,true,true,true],"0 - 0 of 0");
-        }
+        test : [function(cmp){
+        	this.waitForDataGridInit(cmp);
+        }, function(cmp) {
+            this.verifyDataGridUsingPager(cmp, [true,true,false,false],0,"0 - 0 of 0");
+            // note the "Next" and "Last" pager links are not disabled however clicking on
+            // the links does not break anything; behaves as no-op.
+        }]
     },
     
     testGridWithUndefinedItems : {
@@ -27,9 +31,8 @@
 
     /**
      * Start at last possible page, then verify that last paging elements acknowledge the change
-     * bug tracking: 2327175
      */
-    _testWithLargeData : {
+    testWithLargeData : {
     	browsers : ["-IE8", "-IE7"],
         attributes : {"pageSize" : 3000, "currentPage" : 1},
         test : function(cmp){
@@ -128,7 +131,7 @@
     /**
      * Add multiple items asynchronously and make sure that basic functionality still works (add/remove in v.items)
      */
-    _testAddingElementsInAsyncly : {
+    testAddingElementsInAsyncly : {
         attributes : {"pageSize" : 0, "numItems2Create" : 20},
         test : [function(cmp){
         	//Verify the page is empty
@@ -154,6 +157,7 @@
                                            this.createOutputArray(6000, 6000,  this.ADD_ROW_ARRAY), 22, 20);
         	}]
     },
+    
     /**
      * Basic test validating that what is being displayed through the grid is there
      */
@@ -165,12 +169,12 @@
             		["20", "Foo 20", "John Doe 20", "Acme 20", "2014-01-01 20"], 20, [0, 9, 19]);
         }
     },
+    
     /**
      * Insert single item into grid
      * bugTracking why this is not being run in IE7/IE8: W-2327182
      */
-    // TODO: W-2507326
-    _testInsertionOfSingleItem : {
+    testInsertionOfSingleItem : {
     	browsers : ["-IE8", "-IE7"],
         test : function(cmp){
 
@@ -191,8 +195,7 @@
      * 
      * bugTracking why this is not being run in IE7/IE8: W-2327182
      */
-    // TODO: W-2507326
-    _testStaggeredInsertionRemove : {
+    testStaggeredInsertionRemove : {
     	browsers : ["-IE8", "-IE7"],
         test : function(cmp){
             this.setValue(cmp, "index", 50);
@@ -297,6 +300,14 @@
     /***************************************************************************************************
      * Helper functions              
      **************************************************************************************************/
+    waitForDataGridInit : function(cmp) {
+    	$A.test.addWaitForWithFailureMessage(false, function() {
+    	//$A.test.addWaitForWithFailureMessage(true, function() {
+    		//return cmp.find("grid").getElement().getElementsByTagName("tbody").length > 0;
+			return $A.util.isEmpty($A.test.getElementByClass("uiDataGrid"));
+		}, "Data grid was not initialized");
+    },
+    
     /**
      * Basic check used in multiple places
      */ 
@@ -310,6 +321,7 @@
         this.verifyRow(trs[positionsToCheck[1]].children, itemsInBody[positionsToCheck[1]], midRow);
         this.verifyRow(trs[positionsToCheck[2]].children, itemsInBody[positionsToCheck[2]], lastRow);
     },
+    
     /**
      * function that will only get the elements that are not comments
      */
@@ -503,7 +515,7 @@
      * Verifying that the pager we expect to be disabled is disabled
      */ 
     verifyElementDisabled : function(cmp, pagerIds, disabled){
-        var pagerText = "", 
+    	var pagerText = "", 
             assertValue = "",
             message = "";
         

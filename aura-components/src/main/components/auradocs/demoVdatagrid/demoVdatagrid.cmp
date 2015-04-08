@@ -19,11 +19,10 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<ui:button label="Add row" press="{!c.addRow}"/>
 	
-	<aura:attribute name="sortBy" type="String"/>
 	<aura:attribute name="data" type="List"/>
-    <ui:virtualDataGrid aura:id="myData" items="{!v.data}" sortBy="{!v.sortBy}">
+    <ui:virtualDataGrid aura:id="myData" items="{!v.data}">
         <aura:set attribute="headerColumns">
-            <ui:dataGridColumn label="Id" name="id" sortable="true" />
+            <ui:dataGridColumn label="Id" name="id"/>
             <ui:dataGridColumn label="Name" name="name"/>
         </aura:set>
        

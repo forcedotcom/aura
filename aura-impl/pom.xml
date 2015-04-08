@@ -223,21 +223,21 @@
             <id>xunit.js</id>
             <activation>
                 <property>
-                   <name>!skipUnitTests</name>
+                    <name>!skipUnitTests</name>
                 </property>
             </activation>
             <build>
-               <plugins>
-                   <plugin>
-                       <artifactId>maven-antrun-plugin</artifactId>
-                       <executions>
-                           <execution>
-                               <id>xunit.js</id>
-                               <phase>test</phase>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>xunit.js</id>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
@@ -255,6 +255,20 @@
                             <execution>
                                 <id>copy-xunit</id>
                                 <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${aura.home}/aura-util/src/test</directory>
+                                            <includes>
+                                                <include>tools/*</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

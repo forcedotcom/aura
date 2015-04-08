@@ -67,14 +67,54 @@
                     <execution>
                         <id>copy-components</id>
                         <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
                         <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/components</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <directory>target/src-gen/main/components</directory>
+                                    <includes>
+                                        <include>.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                             <outputDirectory>target/classes/components_aura_components</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
                         <id>copy-test-components</id>
                         <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
                         <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/components</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <directory>target/src-gen/test/components</directory>
+                                    <includes>
+                                        <include>.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                             <outputDirectory>target/classes/components_aura_components_test</outputDirectory>
                         </configuration>
                     </execution>
@@ -100,93 +140,113 @@
                     <execution>
                         <id>index-components</id>
                         <phase>generate-resources</phase>
-                    </execution>
-                    <execution>
-                        <id>index-test-components</id>
-                        <phase>generate-test-resources</phase>
-                    </execution>
-                    <!--
-                    <execution>
-                        <id>aura:compile-components</id>
-                        <phase>${component.compile.phase}</phase>
-                    </execution>
-                    <execution>
-                        <id>aura:compile-test-components</id>
-                        <phase>${component.test.compile.phase}</phase>
                         <configuration>
                             <target>
-                                <java classname="org.auraframework.tools.definition.AuraCompiler" classpathref="maven.test.classpath" fork="true" failonerror="true">
-                                    <jvmarg value="-Daura.home=${basedir}/.." />
-                                    <arg value="${basedir}/src/test/components" />
-                                    <arg value="${project.build.directory}/${component.test.dir}" />
-                                    <arg value="auratest" />
-                                    <arg value="themeProviderTest" />
-                                    <arg value="flavorTest" />
-                                    <arg value="lintTest" />
-                                    <arg value="handleEventTest" />
-                                    <arg value="validationTest" />
-                                    <arg value="test" />
-                                </java>
+                                <path id="definitions">
+                                    <fileset dir="src/main/components">
+                                        <include name="**/*.cmp" />
+                                        <include name="**/*.intf" />
+                                        <include name="**/*.evt" />
+                                        <include name="**/*.lib" />
+                                        <include name="**/*.app" />
+                                        <include name="**/*.css" />
+                                        <include name="**/*.theme" />
+                                        <include name="**/*Test.js" />
+                                        <include name="**/*.auradoc" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                    <!-- Allow either slash (Windows actually uses both) -->
+                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
+                                </pathconvert>
+                                <echo file="target/src-gen/main/components/.index">${definitionList}</echo>
                             </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
                         </goals>
                     </execution>
-                -->
+                    <execution>
+                        <id>index-test-components</id>
+                        <phase>generate-test-resources</phase>
+                        <configuration>
+                            <target>
+                                <path id="definitions">
+                                    <fileset dir="src/test/components">
+                                        <include name="**/*.cmp" />
+                                        <include name="**/*.intf" />
+                                        <include name="**/*.evt" />
+                                        <include name="**/*.app" />
+                                        <include name="**/*.css" />
+                                        <include name="**/*.theme" />
+                                        <include name="**/*Test.js" />
+                                        <include name="**/*.auradoc" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                    <!-- Allow either slashes (Windows actually uses both) -->
+                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
+                                </pathconvert>
+                                <echo file="target/src-gen/test/components/.index">${definitionList}</echo>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
-                  <execution>
-                    <id>compile-components</id>
-                    <goals>
-                      <goal>exec</goal>
-                    </goals>
-                    <phase>${component.compile.phase}</phase>
-                    <configuration>
-                      <executable>${java.home}/bin/java</executable>
-                      <classpathScope>runtime</classpathScope>
-                      <arguments>
-                        <argument>-Daura.home=${basedir}/..</argument>
-                        <argument>-classpath</argument>
-                        <classpath />
-                        <argument>org.auraframework.tools.definition.AuraCompiler</argument>
-                        <argument>${basedir}/src/main/components</argument>
-                        <argument>${project.build.directory}/${component.dir}</argument>
-                      </arguments>
-                    </configuration>
-                  </execution>
-                  <execution>
-                    <id>compile-test-components</id>
-                    <goals>
-                      <goal>exec</goal>
-                    </goals>
-                    <phase>${component.test.compile.phase}</phase>
-                    <configuration>
-                      <executable>${java.home}/bin/java</executable>
-                      <classpathScope>test</classpathScope>
-                      <arguments>
-                        <argument>-Daura.home=${basedir}/..</argument>
-                        <argument>-classpath</argument>
-                        <classpath />
-                        <argument>org.auraframework.tools.definition.AuraCompiler</argument>
-                        <argument>${basedir}/src/test/components</argument>
-                        <argument>${project.build.directory}/${component.test.dir}</argument>
-                        <argument>auratest</argument>
-                        <argument>themeProviderTest</argument>
-                        <argument>flavorTest</argument>
-                        <argument>lintTest</argument>
-                        <argument>handleEventTest</argument>
-                        <argument>validationTest</argument>
-                        <argument>test</argument>
-                      </arguments>
-                    </configuration>
-                  </execution>
-              </executions>
-          </plugin>
+                    <execution>
+                        <id>compile-components</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>runtime</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/main/components</argument>
+                                <argument>${project.build.directory}/${component.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-test-components</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.test.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/test/components</argument>
+                                <argument>${project.build.directory}/${component.test.dir}</argument>
+                                <argument>auratest</argument>
+                                <argument>themeProviderTest</argument>
+                                <argument>flavorTest</argument>
+                                <argument>lintTest</argument>
+                                <argument>handleEventTest</argument>
+                                <argument>validationTest</argument>
+                                <argument>test</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -194,24 +254,24 @@
             <id>skipComponentCompile</id>
             <activation>
                 <property>
-                   <name>skipComponentCompile</name>
+                    <name>skipComponentCompile</name>
                 </property>
             </activation>
             <properties>
-            	<component.compile.phase>disabled</component.compile.phase>
-            	<component.test.compile.phase>disabled</component.test.compile.phase>
+                <component.compile.phase>disabled</component.compile.phase>
+                <component.test.compile.phase>disabled</component.test.compile.phase>
             </properties>
         </profile>
         <profile>
             <id>skipTestComponentCompile</id>
             <activation>
                 <property>
-                   <name>maven.test.skip</name>
-                   <value>true</value>
+                    <name>maven.test.skip</name>
+                    <value>true</value>
                 </property>
             </activation>
             <properties>
-            	<component.test.compile.phase>disabled</component.test.compile.phase>
+                <component.test.compile.phase>disabled</component.test.compile.phase>
             </properties>
         </profile>
         <profile>
@@ -239,21 +299,21 @@
             <id>xunit.js</id>
             <activation>
                 <property>
-                   <name>!skipUnitTests</name>
+                    <name>!skipUnitTests</name>
                 </property>
             </activation>
             <build>
-               <plugins>
-                   <plugin>
-                       <artifactId>maven-antrun-plugin</artifactId>
-                       <executions>
-                           <execution>
-                               <id>xunit.js</id>
-                               <phase>verify</phase>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>xunit.js</id>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
     </profiles>

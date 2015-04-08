@@ -1,0 +1,6 @@
+{
+  "version": "${project.version}",
+  "git-sha": "${buildNumber}",
+  "branch": "${scmBranch}",
+  "timestamp": "${timestamp}"
+}

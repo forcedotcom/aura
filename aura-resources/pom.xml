@@ -44,10 +44,25 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-jsdoc3</id>
                         <!-- here the phase you need -->
                         <phase>validate</phase>
                         <goals>
@@ -55,13 +70,29 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${basedir}/target/jsdoc3/jsdoc</outputDirectory>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>config/jsdoc3/jsdoc</directory>
                                     <filtering>true</filtering>
                                 </resource>
-                            </resources>              
-                        </configuration>            
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>aura-version</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/classes/aura/resources/version</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/aura/resources/version</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

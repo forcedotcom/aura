@@ -19,20 +19,19 @@
 	<aura:description>
 		<p>
 			<code>aura:if</code> evaluates the <code>isTrue</code> expression on the server and instantiates components in either its
-			<code>body</code> or <code>else</code> attribute.
+			<code>body</code> or <code>else</code> attribute. Only one branch is created and rendered. Switching condition unrenders and destroys the current branch and generates the other
 		</p>
-		<p>
-			This example renders the body  since <code>isTrue</code> evaluates to true.
 <pre>
-&lt;aura:attribute name="display" type="Boolean" default="true"/>
-&lt;aura:if isTrue="{!v.display}">
-  Show this if true
-  &lt;aura:set attribute="else">
-    Show this if false
-  &lt;/aura:set>
-&lt;/aura:if> 
+&lt;aura:component>
+    &lt;aura:if isTrue="{!v.truthy}">
+    True
+    &lt;aura:set attribute="else">
+      False
+    &lt;/aura:set>
+  &lt;/aura:if> 
+&lt;/aura:component>
 </pre>
-		</p>
+		
 	</aura:description>	
 		
 	

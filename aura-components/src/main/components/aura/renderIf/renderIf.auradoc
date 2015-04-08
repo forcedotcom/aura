@@ -18,11 +18,18 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			The expression in <code>isTrue</code> is re-evaluated every time any value used in the expression changes. When the results of the expression change, it triggers a re-rendering of the component.
-		     Use <code>aura:if</code> instead if you want to instantiate the components in either its body or the else attribute, but not both. Otherwise, use <code>aura:renderIf</code> if you expect to show the components for both the true and false states, and it would require a server round trip to instantiate the components that aren't initially rendered.
+		The expression in <code>isTrue</code> is re-evaluated every time any value used in the expression changes. When the results of the expression change, it triggers a re-rendering of the component.
+		Use <code>aura:renderIf</code> if you expect to show the components for both the true and false states, and it would require a server round trip to instantiate the components that aren't initially rendered.
+                Switching condition unrenders current branch and renders the other.     
+		Otherwise, use <code>aura:if</code> instead if you want to instantiate the components in either its body or the else attribute, but not both.
 		</p>
-		
-	</aura:description>	
-		
-	
+<pre>&lt;aura:component>
+    &lt;aura:renderIf isTrue="{!v.truthy}">
+    True
+    &lt;aura:set attribute="else">
+      False
+    &lt;/aura:set>
+  &lt;/aura:renderIf> 
+&lt;/aura:component></pre>
+	</aura:description>
 </aura:documentation>

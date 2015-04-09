@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+	setUp : function(testCmp) {
+		testCmp._target = undefined;
+	},
+	
     // set target only once, for test reuse 
     setTargetCmp: function(testCmp, targetCmp) {
         testCmp._target = testCmp._target || targetCmp;
@@ -466,6 +470,9 @@
      * so we have a grandChildServerProvider component via a server provided cmp.
      * 
      * This test verify that the behavior is the same as loading the grandChildServerProvider component directly
+     * 
+     * notice that componentClassServerProvider actually has a js provider, we didn't use it in the component's mark-up,
+     * and it's not being called.
     */
     testServerProvidedGrandChildServerProvider : {
     	attributes : { testServerProviderGrandChildServerProvider : true },
@@ -476,6 +483,94 @@
         	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderGrandChildServerProvider");
         }, function(testCmp) {
         	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderGrandChildServerProvider");
+        }]
+    },
+    
+    /*
+     * see what we did for testServerProvidedGrandChildServerProvider above
+     * this test put that in iteration, and verify it behaves the same 
+     * 
+     * This is not working as expected. W-2559712
+     * componentClassServerProvider actually has a js provider file, though we didn't use it in the component's mark-up, 
+     * but it's still being called. somehow the componentClassServerProvider component itself is being served. that's
+     * not what we expected.
+     * there are warnings being thrown about "unused config"
+     */
+    _testIteratedServerProvidedGrandChildServerProvider : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildServerProviderInIteration")[0]);
+            this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
+        }]
+    },
+    
+    
+    /*
+     * componentClassClientProvider will call its js provider to create a component
+     * in this case we pass in componentClassGrandChildServerProvider as requestDescriptor
+     * so we have a grandChildServerProvider component via a server provided cmp
+     * 
+     * This test verify the bahavior is similar as loading the grandChildServerProvider component directly (expect the js provider is called first)
+     */
+    testClientProvidedGrandChildServerProvider : {
+    	attributes : { testClientProviderGrandChildServerProvider : true },
+        test : [function(testCmp, expectedId) {
+            this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProvider"));
+            testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+                this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProvider"));
+                this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ClientProviderGrandChildServerProvider");
+            }, function(testCmp) {
+            	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ClientProviderGrandChildServerProvider");
+            }, function(testCmp) {
+            	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ClientProviderGrandChildServerProvider");
+            }
+        ]
+    },
+    
+    /*
+     * see what we did for testClientProvidedGrandChildServerProvider above
+     * this test put that in iteration, and verify it behaves the same 
+     */
+    testIteratedClientProvidedGrandChildServerProvider : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testClientProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+        	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+            this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProviderInIteration")[0]);
+            this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ClientProviderGrandChildServerProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ClientProviderGrandChildServerProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ClientProviderGrandChildServerProviderInIteration");
         }]
     },
     
@@ -554,11 +649,42 @@
         }]
     },
     
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testClientProvidedGrandChildServerProvider : {
-        test : function(testCmp, expectedId) {
-            this.setTargetCmp(testCmp, testCmp.find("CPBS"));
-            testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+    /*
+     * remember what we did in testClientProvidedGrandChildServerProvider above? we create GrandChildServerProvider component
+     * by pass it as requestDescriptor to a component with js(client) provider.
+     * 
+     * Here we verify we can do above dynamically, and it behave similar to the GrandChildServerProvider component we created statically
+     * the only difference is during initial load, the js(client) provider is called before anything else
+     * 
+     * TODO: why the string(which is{!v.id}) is missing before the buttons
+     */
+    testClientCreatedClientProvidedGrandChildServerProvider : {
+        test : [function(testCmp) {
+            var componentConfig = {
+                componentDef : "markup://auratest:componentClassClientProvider",
+                attributes : {
+                    values : {
+                        requestDescriptor : "markup://auratest:componentClassGrandChildServerProvider",
+                        id : "ClientCreatedClientProvidedGrandChildServerProvider"
+                    }
+                }
+            };
+            var that = this;
+			var cmpCreated = false;
+			$A.componentService.newComponentAsync(that, function(newCmp) {
+			    var output = testCmp.find("client");
+			    var body = output.get("v.body");
+			    body.push(newCmp);
+			    output.set("v.body", body);
+			    that.setTargetCmp(testCmp, newCmp);
+			    cmpCreated = true;
+			}, componentConfig, null, true, true);
+			$A.test.addWaitFor(true, function() {
+			    return cmpCreated;
+			});
+        },function(testCmp) {
+        	this.setTargetCmp(testCmp, testCmp.find("ClientCreatedClientProvidedGrandChildServerProvider"));
+        	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
                                          "RootHelperRootInit",
                                          "ChildHelperChildInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderInit",
@@ -568,60 +694,84 @@
                                          "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                          "ChildHelperChildAfterrender",
                                          "RootHelperRootAfterrender" ];
-            this.testStaticGrandChildServerProvider.test.call(this, testCmp, expectedId || "CPBS");
-        }
+        	this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildServerProvider");
+        },function(testCmp) {
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildServerProvider");
+        },function(testCmp) {
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildServerProvider");
+        }]
     },
     
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testClientCreatedClientProvidedGrandChildServerProvider : {
-        test : function(testCmp) {
-            this.clientCreateAndTest(testCmp, {
-                componentDef : "markup://auratest:componentClassClientProvider",
-                attributes : {
-                    values : {
-                        requestDescriptor : "markup://auratest:componentClassGrandChildServerProvider",
-                        id : "CCPBS"
-                    }
-                }
-            }, this.testClientProvidedGrandChildServerProvider.test, "CCPBS");
-        }
+    /*
+     * k, this is getting little complecated, hold your breath :)
+     * componentClassServerProvider has a server provider, we ask it to provide componentClassClientProvider.cmp
+     * componentClassClientProvider has a client provider, we ask it to provide componentClassGrandChildServerProvider.cmp
+     * 
+     * This test verify componentClassGrandChildServerProvider we got behave similar as loading it statically
+     */
+    testServerProvidedClientProvidingGrandChildServerProvider : {
+    	attributes : {
+    		testServerProviderClientProviderGrandChildServerProvider : true
+    	},
+        test : [function(testCmp) {
+        	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildServerProvider"));
+            this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProvider");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProvider");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProvider");
+        }]
     },
     
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testIteratedClientProvidedGrandChildServerProvider : {
+    /*
+     * see what we did for testServerProvidedClientProvidingGrandChildServerProvider above
+     * this test put that in iteration, and verify it behaves the same 
+     * 
+     * this is not working. W-2559712
+     * once we put componentClassServerProvider.cmp inside an iteration, it start to use its client provider file,
+     * igoring what we ask it to use the server provider in its markup
+     */
+    _testIteratedServerProvidedClientProvidingGrandChildServerProvider : {
         attributes : {
             iterationItems : "ONE,TWO",
-            iterationForceServer : true
+            iterationForceServer : true,
+            testServerProviderClientProviderGrandChildServerProviderInIteration : true
         },
-        test : function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("ICPBS")[0]);
-            this.testClientProvidedGrandChildServerProvider.test.call(this, testCmp, "ICPBS");
+        test : [function(testCmp) {
+        	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderInit",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildServerProviderInIteration")[0]);
+            this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
         }
-    },
-    
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testServerProvidedClientProvidingGrandChildServerProvider : {
-        test : function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("SPCPBS"));
-            this.testClientProvidedGrandChildServerProvider.test.call(this, testCmp, "SPCPBS");
-        }
-    },
-    
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testIteratedServerProvidedGrandChildServerProvider : {
-        attributes : {
-            iterationItems : "ONE,TWO",
-            iterationForceServer : true
-        },
-        test : function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("ISPBS")[0]);
-            this.testStaticGrandChildServerProvider.test.call(this, testCmp, "ISPBS");
-        }
+        ]
     },
     
     
     
-///////////////////////////////////////   tests with componentClassGrandChildClinetProvider.cmp begin   /////////////////////////////////////////
+    
+///////////////////////////////////////   tests with componentClassGrandChildClientProvider.cmp begin   /////////////////////////////////////////
 
     /* 
      * make sure you set targetCmp before calling this function !!!
@@ -727,6 +877,22 @@
     	}
     },
     
+    //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
+    testIteratedGrandChildClientProvider : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            testGrandChildClientInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("GrandChildClientProviderInIteration")[0]);
+            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "GrandChildClientProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "GrandChildClientProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "GrandChildClientProviderInIteration");
+        }]
+    },
+    
     /*
      * componentClassServerProvider will call its java provider to create a component (desc=requestDescriptor)
      * in this case we pass in componentClassGrandChildClientProvider as requestDescriptor
@@ -746,21 +912,92 @@
         }]
     },
     
-    //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
-    testIteratedGrandChildClientProvider : {
+    /*
+     * see testServerProvidedGrandChildClientProvider above? 
+     * we are doing it in an iteration and verify GrandChildClientProvider behaves the same like loading it individually
+     * 
+     * This is not working as expected. W-2559712
+     * componentClassServerProvider actually has a js provider file, though we didn't use it in the component's mark-up, 
+     * but it's still being called. somehow the componentClassServerProvider component itself is being served. that's
+     * not what we expected.
+     * there are warnings being thrown about "unused config"
+     */
+    _testIteratedServerProvidedGrandChildClientProvider : {
         attributes : {
             iterationItems : "ONE,TWO",
-            testGrandChildClientInIteration : true
+            iterationForceServer : true,
+            testServerProviderGrandChildClientProviderInIteration : true
         },
         test : [function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("GrandChildClientProviderInIteration")[0]);
-            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "GrandChildClientProviderInIteration");
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildClientProviderInIteration")[0]);
+            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
         }, function(testCmp) {
-        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "GrandChildClientProviderInIteration");
+        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
         }, function(testCmp) {
-        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "GrandChildClientProviderInIteration");
+        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
+        }
+        ]
+    },
+    
+    /*
+     * componentClassClientProvider will call its js(client) provider to create a component (desc=requestDescriptor)
+     * in this case we pass in componentClassGrandChildClientProvider as requestDescriptor
+     * so now we have a grandChildClientProvider component via a js(client) provided cmp.
+     * 
+     * This test verify that the behavior is similar as loading the grandChildClientProvider component directly
+     * except we call js provider goes first during the initial load
+    */ 
+    testClientProvidedGrandChildClientProvider : {
+    	attributes: { testClientProviderGrandChildClientProvider: true},
+        test : [function(testCmp, expectedId) {
+            this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildClientProvider"));
+            testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderInit",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+                this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ClientProviderGrandChildClientProvider");
+            }, function(testCmp) {
+            	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientProviderGrandChildClientProvider");
+            }, function(testCmp) {
+            	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ClientProviderGrandChildClientProvider");
         }]
     },
+    
+    /*
+     * look at what we did in testClientProvidedGrandChildClientProvider above
+     * this test do that in an iteration, and verify it behaves the same as  loading indivisually
+     */
+    testIteratedClientProvidedGrandChildClientProvider : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            testClientProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+        	this.setTargetCmp(testCmp, testCmp.find("ClientProvidedGrandChildClientProviderInIteration")[0]);
+	        testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+	                                         "RootHelperRootInit",
+	                                         "ChildHelperChildInit",
+	                                         "GrandChildClientProviderHelperGrandChildClientProviderInit",
+	                                         "GrandChildClientProviderHelperGrandChildClientProviderRender",
+	                                         "ChildHelperChildRender",
+	                                         "RootHelperRootRender",
+	                                         "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
+	                                         "ChildHelperChildAfterrender",
+	                                         "RootHelperRootAfterrender" ];
+	            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
+	        }, function(testCmp) {
+	        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
+	        }, function(testCmp) {
+	        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
+        }]
+    },
+    
     
     //we create GrandChildClientProvider component dynamically, then verify it behave just like the one we load statically
     testClientCreatedGrandChildClientProvider : {
@@ -836,10 +1073,72 @@
     },
     
     
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testClientProvidedGrandChildClientProvider : {
-        test : function(testCmp, expectedId) {
-            this.setTargetCmp(testCmp, testCmp.find("CPBC"));
+    
+    /*
+     * remember what we did in testClientProvidedGrandChildClientProvider ? 
+     * we create GrandChildClientProvider cmp by feeding it as desc to a component with client provider.
+     * here we create the component with client provider dynamically, verify GrandChildClientProvider behaves the same as loading statically
+     * notice the client provider call happens before anything else
+     * 
+     * TODO: why {!v.id} is missing before the buttons
+    */
+    testClientCreatedClientProvidedGrandChildClientProvider : {
+        test : [function(testCmp) {
+            var componentConfig = {
+                componentDef : "markup://auratest:componentClassClientProvider",
+                attributes : {
+                    values : {
+                        requestDescriptor : "markup://auratest:componentClassGrandChildClientProvider",
+                        id : "ClientCreatedClientProvidedGrandChildClientProvider"
+                    }
+                }
+            };
+            var that = this;
+			var cmpCreated = false;
+			$A.componentService.newComponentAsync(that, function(newCmp) {
+			    var output = testCmp.find("client");
+			    var body = output.get("v.body");
+			    body.push(newCmp);
+			    output.set("v.body", body);
+			    that.setTargetCmp(testCmp, newCmp);
+			    cmpCreated = true;
+			}, componentConfig, null, true, true);
+			$A.test.addWaitFor(true, function() {
+			    return cmpCreated;
+			});
+        }, function(testCmp) {
+        	this.setTargetCmp(testCmp, testCmp.find("ClientCreatedClientProvidedGrandChildClientProvider"));
+        	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderInit",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildClientProvider");
+        }, function(testCmp) {
+        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildClientProvider");
+        }, function(testCmp) {
+        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildClientProvider");
+        }]
+    },
+    
+    
+    /*
+     * k, this is getting little complecated, hold your breath :)
+     * componentClassServerProvider has a server provider, we ask it to provide componentClassClientProvider.cmp
+     * componentClassClientProvider has a client provider, we ask it to provide componentClassGrandChildClientProvider.cmp
+     * 
+     * This test verify componentClassGrandChildClientProvider we got behave similar as loading it statically
+     * Notice the call to client provider goes before anything else
+     */
+    testServerProvidedClientProvidingGrandChildClientProvider : {
+    	attributes : { testServerProviderClientProviderGrandChildClientProvider : true },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildClientProvider"));
             testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
                                          "RootHelperRootInit",
                                          "ChildHelperChildInit",
@@ -850,57 +1149,47 @@
                                          "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
                                          "ChildHelperChildAfterrender",
                                          "RootHelperRootAfterrender" ];
-            this.testStaticGrandChildClientProvider.test.call(this, testCmp, expectedId || "CPBC");
-        }
+            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProvider");
+        }, function(testCmp) {
+        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProvider");
+        }, function(testCmp) {
+        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProvider");
+        }]
     },
     
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testIteratedClientProvidedGrandChildClientProvider : {
-        attributes : {
-            iterationItems : "ONE,TWO"
-        },
-        test : function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("ICPBC")[0]);
-            this.testClientProvidedGrandChildClientProvider.test.call(this, testCmp, "ICPBC");
-        }
-    },
-    
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testClientCreatedClientProvidedGrandChildClientProvider : {
-        test : function(testCmp) {
-            this.clientCreateAndTest(testCmp, {
-                componentDef : "markup://auratest:componentClassClientProvider",
-                attributes : {
-                    values : {
-                        requestDescriptor : "markup://auratest:componentClassGrandChildClientProvider",
-                        id : "CCPBC"
-                    }
-                }
-            }, this.testClientProvidedGrandChildClientProvider.test, "CCPBC");
-        }
-    },
-    
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testServerProvidedClientProvidingGrandChildClientProvider : {
-        test : function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("SPCPBC"));
-            this.testClientProvidedGrandChildClientProvider.test.call(this, testCmp, "SPCPBC");
-        }
-    },
-    
-    //this doesn't work when i start working on Gerald's branch, check it out later
-    _testIteratedServerProvidedGrandChildClientProvider : {
+    /*
+     * see what we did for testServerProvidedClientProvidingGrandChildClientProvider above
+     * this test put that in iteration, and verify it behaves the same 
+     * 
+     * this is not working. W-2559712
+     * once we put componentClassServerProvider.cmp inside an iteration, it start to use its client provider file,
+     * igoring that we ask it to use the server provider in its markup
+     */
+    _testIteratedServerProvidedClientProvidingGrandChildClientProvider : {
         attributes : {
             iterationItems : "ONE,TWO",
-            iterationForceServer : true
+            iterationForceServer : true,
+            testServerProviderClientProviderGrandChildClientProviderInIteration : true
         },
-        test : function(testCmp) {
-            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildClientProviderInIteration")[0]);
-            this.testStaticGrandChildClientProvider.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
+        test : [function(testCmp) {
+        	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
+                                         "RootHelperRootInit",
+                                         "ChildHelperChildInit",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderInit",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderRender",
+                                         "ChildHelperChildRender",
+                                         "RootHelperRootRender",
+                                         "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
+                                         "ChildHelperChildAfterrender",
+                                         "RootHelperRootAfterrender" ];
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildClientProviderInIteration")[0]);
+            this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProviderInIteration");
+        }, function(testCmp) {
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProviderInIteration");
         }
+        ]
     }
-    
-    
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
 })

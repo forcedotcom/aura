@@ -21,6 +21,8 @@
         var desc = cmp.get("v.requestDescriptor");
         if (desc) {
             config["componentDef"] = desc;
+        } else {
+        	$A.error("we requestDescriptor to create component from client provider");
         }
         var attrs = cmp.get("v.requestAttributes");
         if (attrs) {

@@ -46,8 +46,14 @@ public class TimeZoneInfoController {
         }
         String info = cache.get(timezoneId);
         if (info == null) {
-            info = helper.readTZInfoFromFile(timezoneId);
+            String availableTimezoneId = Aura.getConfigAdapter().getAvailableTimezone(timezoneId);
+            if (availableTimezoneId == null || "GMT".equalsIgnoreCase(availableTimezoneId)) {
+            	return null;
+            }
+            info = helper.readTZInfoFromFile(availableTimezoneId);
             if (info != null) {
+            	info = timezoneId.equalsIgnoreCase(availableTimezoneId) ? info : 
+            		info.replaceAll(availableTimezoneId, timezoneId);
                 cache.put(timezoneId, info);
             }
         }

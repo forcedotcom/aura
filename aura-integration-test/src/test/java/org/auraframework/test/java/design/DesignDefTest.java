@@ -27,6 +27,7 @@ import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class DesignDefTest extends AuraImplTestCase {
 
@@ -142,4 +143,43 @@ public class DesignDefTest extends AuraImplTestCase {
                     "No INTERFACE named markup://this:doesNotExist found");
         }
     }
+    
+    public void testDesignFileWithInvalidAttributeTypesExposed() throws Exception {
+    	String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"String[]\" />";
+    	String design = "<design:component label=\"some label\"><design:attribute name=\"invalidAttribute\" /> </design:component>";
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design);
+        
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("String[] attribute should not be allowed to be exposed in the design file.");
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
+                    "Only Boolean, Integer or String attributes may be exposed in design files.");
+        }
+    }
+    
+    public void testDesignFileWithInvalidAttributeTypeForDataSource() throws Exception {
+    	String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"Integer\" />";
+    	String design = "<design:component label=\"some label\"><design:attribute name=\"invalidAttribute\" datasource=\"1,2,3\" /> </design:component>";
+    	DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design);
+         
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Integer attribute should not allow to have a Datasource");
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
+                    "Only String attributes may have a datasource in the design file.");
+        }
+    }
+
+	private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource) {
+		DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                ComponentDef.class, null);
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes));
+        DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+       		 DesignDef.class);
+        addSourceAutoCleanup(desc, designSource);
+		return cmpDesc;
+	}
+
 }

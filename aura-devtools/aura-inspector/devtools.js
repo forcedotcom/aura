@@ -21,7 +21,7 @@ chrome.devtools.panels.create("Aura",
                               "icon24.png",
                               "devtoolsPanel/devtoolsPanel.html",
                               function(panel) {
-                                panel.onShown.addListener(function(win){
-                                  win.refresh();
-                                });
+                                // panel.onShown.addListener(function(win){
+                                //   win.refresh();
+                                // });
                               });

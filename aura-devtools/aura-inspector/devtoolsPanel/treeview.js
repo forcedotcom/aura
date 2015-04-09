@@ -83,7 +83,7 @@ function TreeNode(text, id) {
             }
 
             pattern.push("&gt;");
-            return format(pattern.join(''), value);
+            return String$format(pattern.join(''), value);
         },
         HtmlComponentFormatter: function(value) {
             value.tagName = value.attributes.tag;
@@ -91,13 +91,6 @@ function TreeNode(text, id) {
             var pattern = [
                 '<span class="component-tagname">&lt;{tagName}</span>'
             ];
-
-            var defaultOptions = {showGlobalIds: false};
-            AuraInspectorOptions.getAll(defaultOptions, function(options){
-                if(options.showGlobalIds) {
-                    pattern.push(' <span class="component-attribute">globalId</span>="{globalId}"');
-                }
-            });
 
             var defaultOptions = {showGlobalIds: false};
             AuraInspectorOptions.getAll(defaultOptions, function(options){
@@ -114,7 +107,7 @@ function TreeNode(text, id) {
             }
 
             pattern.push("&gt;");
-            return format(pattern.join(''), value);
+            return String$format(pattern.join(''), value);
         },
         TextComponentFormatter: function(value) {
             var text = value.attributes.value;
@@ -148,7 +141,7 @@ function TreeNode(text, id) {
 
             config.value = value+"";
 
-            return format('<span class="component-property">{key}</span>:<span class="component-property-value">{value}</span>', config);
+            return String$format('<span class="component-property">{key}</span>:<span class="component-property-value">{value}</span>', config);
         },
         PropertyFormatter: function(value){ 
             return '<span class="component-property">' + value + '</span>';
@@ -161,18 +154,11 @@ function TreeNode(text, id) {
         },
         Header: function(value) {
             return '<h3>' + value + '</h3>';
+        },
+        DescriptorFormatter: function(value) {
+            return value.replace( /markup:\/\/(\w+):(\w+)/, '<span class="component-prefix">$1</span>:<span class="component-tagname">$2</span>');
         }
     };
-
-    function format(str, o) {
-        return str.replace(
-            /\{([^{}]*)\}/g,
-            function (a, b) {
-                var r = o[b];
-                return typeof r === 'string' || typeof r === 'number' ? r : a;
-            }
-        );
-    }
 
     // Factory for creating known types of TreeNodes with their known formatters.
     TreeNode.create = function(data, id, format) {
@@ -199,6 +185,9 @@ function TreeNode(text, id) {
                 break;
             case "keyvalue":
                 node.setFormatter(formatters.KeyValueFormatter);
+                break;
+            case "descriptor":
+                node.setFormatter(formatters.DescriptorFormatter);
                 break;
         }
 
@@ -261,13 +250,30 @@ function TreeNode(text, id) {
         return node;
     };
 
+    function String$format(str, o) {
+        if(typeof str != "string") {
+            throw new Error("String$format(str, o), you pass an invalid value as the str parameter, must be of type string.");
+        }
+        return str.replace(
+            /\{([^{}]*)\}/g,
+            function (a, b) {
+                var r = o[b];
+                return typeof r === 'string' || typeof r === 'number' ? r : a;
+            }
+        );
+    };
+
 })();
 
 function AuraInspectorTreeView() {
     var _children = [];
-    var _childrenIndex = new Map();
+    //var _childrenIndex = new Map();
     var events = new Map();
     var htmlToTreeNode = new WeakMap();
+
+    // Constants
+    var AUTO_EXPAND_LEVEL = 3;
+    var AUTO_EXPAND_CHILD_COUNT = 2;
 
     this.addChild = function(child) {
         _children.push(child);
@@ -283,17 +289,23 @@ function AuraInspectorTreeView() {
 
     this.clearChildren = function() {
         _children = [];
-        _childrenIndex = new Map();
+        //_childrenIndex = new Map();
     };
 
-    this.render = function(div) {
+    this.render = function(div, options) {
         var container = document.createElement("ul");
             container.className = "tree-view";
         div.innerHTML = "";
+        // Configurable rendering options
+        options = options || { 
+            "collapsable": false 
+        };
         
         try {
             for(var c=0;c<_children.length;c++) {
-                container.appendChild(renderNode(_children[c]));
+                if(_children[c]) {
+                    container.appendChild(renderNode(_children[c]));
+                }
             }
 
             if(div) {
@@ -304,8 +316,13 @@ function AuraInspectorTreeView() {
             container.addEventListener("mouseout", Container_MouseOut.bind(this));
             container.addEventListener("mouseover", Container_MouseOver.bind(this));
             container.addEventListener("click", Container_Click.bind(this));
+            container.addEventListener("dblclick", Container_DblClick.bind(this));
         } catch(e) {
             alert([e.message, e.stack]);
+        }
+
+        if(options.collapsable === true) {
+            container.classList.add("collapsable");
         }
 
         return container;
@@ -335,10 +352,10 @@ function AuraInspectorTreeView() {
     }
 
     function Container_MouseOver(event) {
-        // LI?s2d
+        // SPAN?
         var nodeClass = "tree-view-node";
         var target = event.target;
-        while(target && target.parentNode && target.className != nodeClass) {
+        while(target && target.parentNode && !target.classList.contains(nodeClass)) {
             target = target.parentNode;
         }
         // We hovered a list item
@@ -348,58 +365,91 @@ function AuraInspectorTreeView() {
         }
     }
 
-    function Container_Click(event) {
-        // LI?
+    function Container_Click(event) {        
+        var spanClass = "tree-view-node";
+        var target = event.target;
+
+        // Did we click the expand/collapse arrow?
+        toggleExpandCollapse(event);
+
+        while(target && target.parentNode) {
+            // Did we click on the span?
+            if(target.classList.contains(spanClass)) {
+                var li = target.parentNode;
+                this.notify("onselect", { domNode: li, treeNode: htmlToTreeNode.get(li) });
+                return;
+            }
+            target = target.parentNode;
+        }
+    }
+
+    function Container_DblClick(event) {
         var nodeClass = "tree-view-node";
         var target = event.target;
-        while(target && target.parentNode && target.className != nodeClass) {
+        while(target && target.parentNode && !target.classList.contains(nodeClass)) {
             target = target.parentNode;
         }
         // We hovered a list item
         if(target && target.parentNode && target.classList.contains(nodeClass)) {
             var li = target.parentNode;
-            this.notify("onselect", { domNode: li, treeNode: htmlToTreeNode.get(li) });
+            this.notify("ondblselect", { domNode: li, treeNode: htmlToTreeNode.get(li) });
         }
     }
 
     /* Private Methods */
-    function renderNode(node) {
+    function renderNode(node, autoExpandCounter) {
+        autoExpandCounter = autoExpandCounter || 1;
         var span = document.createElement("span");
             span.className = "tree-view-node";
         var li = document.createElement("li");
             li.appendChild(span);
+        var isAutoExpanded = autoExpandCounter < AUTO_EXPAND_LEVEL;
 
-        // if(node.getId() && _childrenIndex.has(node.getId())) {
-        //     // Circular Reference
-        //     var label = node.getLabel() + " [[ReferenceTo]]";
-        //     if(node.hasFormatter()) {
-        //         span.innerHTML = label;
-        //     } else {
-        //         span.appendChild(document.createTextNode(label));
-        //     }
-        // } else {
-            if(node.hasFormatter()) {
-                span.innerHTML = node.getLabel();
-            } else {
-                span.appendChild(document.createTextNode(node.getLabel()));
+        if(node.hasFormatter()) {
+            span.innerHTML = node.getLabel();
+        } else {
+            span.appendChild(document.createTextNode(node.getLabel()));
+        }
+        if(autoExpandCounter === AUTO_EXPAND_LEVEL && node.getChildren().length <= AUTO_EXPAND_CHILD_COUNT) {
+            autoExpandCounter--;
+            isAutoExpanded = true;
+        }
+        //_childrenIndex.set(node.getId(), node);
+
+        if(node.hasChildren()) {
+            // Add Expand box
+            li.classList.add("tree-view-parent");
+            if(isAutoExpanded) {
+                li.classList.add("tree-view-expanded");
             }
-            _childrenIndex.set(node.getId(), node);
 
-            if(node.hasChildren()) {
-                // Add Expand box
-                var ul = document.createElement("ul");
+            var ul = document.createElement("ul");
 
-                var children = node.getChildren();
-                for(var c=0;c<children.length;c++) {
-                    ul.appendChild(renderNode(children[c]));
+            var children = node.getChildren();
+            for(var c=0;c<children.length;c++) {
+                if(children[c]) {
+                    ul.appendChild(renderNode(children[c], autoExpandCounter+1));
                 }
-
-                li.appendChild(ul);
             }
 
-        // }
+            li.appendChild(ul);
+        }
 
         htmlToTreeNode.set(li, node);
         return li;
     }
+
+    function toggleExpandCollapse(event) {
+        var liClass = "tree-view-parent";
+        var expanded = "tree-view-expanded";
+
+        // Are we on the LI     
+        if(event.target.classList.contains(liClass)) {
+            // Inside the ::before boundry box?
+            if(event.offsetX < 14 && event.offsetY < 14) {
+                event.target.classList.toggle(expanded);
+            }
+        }
+    }
+
 }

@@ -17,7 +17,6 @@
     ],
 	"devtools_page": "devtools.html",
 	"content_scripts": [{
-		//"matches": ["http://*/*", "https://*/*"],
         "matches": ["*://*/*cmp*", "*://*/*app*"],
 		// "matches": [
 		// 	"http://localhost/*",
@@ -25,7 +24,7 @@
 		// 	"http://*.force.com/*"
 		// ],
 		"js": ["contentScript.js"],
-		"run_at": "document_idle",
+		"run_at": "document_start",
 		"all_frames": false
 	}],
 	"permissions": [

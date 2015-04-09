@@ -51,4 +51,15 @@ HelperDef.prototype.auraType = "HelperDef";
 HelperDef.prototype.getFunctions = function HelperDef$getFunctions(){
     return this.functions;
 };
+
+HelperDef.prototype.toJSON = function() {
+    var output = {};
+    for(var method in this.functions) {
+        if(method !== "constructor"){
+            output[method] = this.functions[method];
+        }
+    }
+    return output;
+};
+
 //#include aura.helper.HelperDef_export

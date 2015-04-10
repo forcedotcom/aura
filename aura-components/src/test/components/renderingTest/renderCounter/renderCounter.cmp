@@ -41,7 +41,7 @@
         <td>{!v.onloadCount}</td>
         <td>
             <iframe
-                aura:id="iframe"
+                src="about:blank"
                 onload="{!c.onload}"
             />
         </td>

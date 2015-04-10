@@ -477,9 +477,12 @@ $A.ns.AuraRenderingService.prototype.rerenderFacet = function(component, facet, 
  * @param {Component} facet the facet to unrender.
  */
 $A.ns.AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
-    this.unrender(cmp._facetInfo);
+    if (cmp._facetInfo) {
+        this.unrender(cmp._facetInfo);
+        cmp._facetInfo = null;
+    }
+
     this.unrender(facet);
-    this.storeFacetInfo(cmp, []);
 
     var elements = cmp.getElements();
     if(elements) {

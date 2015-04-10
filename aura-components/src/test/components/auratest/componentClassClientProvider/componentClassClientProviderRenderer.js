@@ -15,22 +15,22 @@
  */
 ({
     render : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ClientProviderRender' );
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ClientProviderRender' );
         return this.superRender();
     },
 
     afterRender : function(cmp, helper) {
         this.superAfterRender();
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ClientProviderAfterrender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ClientProviderAfterrender');
     },
 
     rerender : function(cmp, helper) {
         this.superRerender();
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ClientProviderRerender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ClientProviderRerender');
     },
 
     unrender : function(cmp, helper) {
         this.superUnrender();
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ClientProviderUnrender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ClientProviderUnrender');
     }
 })

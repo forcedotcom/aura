@@ -15,7 +15,7 @@
  */
 ({
     provide : function(cmp) {
-        $A.logger.info(cmp.getGlobalId() + ":" + cmp.helper.getDelimiter() + 'ClientProviderProvide');
+        $A.logger.info(cmp.getGlobalId() + ":" + cmp.helper.getDelimiter(cmp) + 'ClientProviderProvide');
 
         var config = {};
         var desc = cmp.get("v.requestDescriptor");

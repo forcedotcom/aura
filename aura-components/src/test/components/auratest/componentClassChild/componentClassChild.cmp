@@ -16,6 +16,13 @@
 
 -->
 <aura:component extensible="true" extends="auratest:componentClassParent" provider="js://auratest.componentClassChild">
+	<!-- for error stack test -->
+	<aura:attribute name="errorOutFromHelper_Child" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromRender_Child" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromAfterRender_Child" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromReRender_Child" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromUnRender_Child" type="Boolean" default="false"/>
+	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
 	
@@ -23,6 +30,6 @@
 		<aura:attribute name="value" type="String"/>
 	</aura:method>
 	
-	<ui:button label="ChildButton" aura:id="button" press="{!c.clientAction}"/>
+	<ui:button label="ChildButton" aura:id="button" press="{!c.clientAction}" class="uiButtonChild"/>
 	{!v.body}
 </aura:component>

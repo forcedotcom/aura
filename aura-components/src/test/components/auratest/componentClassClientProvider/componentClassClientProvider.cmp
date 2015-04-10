@@ -18,6 +18,8 @@ This is similar to componentClassParent, in the way we have a client provider, b
 <aura:component implements="auratest:componentClassProvidable" provider="js://auratest.componentClassClientProvider">
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	
+	<aura:dependency resource="markup://auratest:componentClassGrandChildServerProvider" type="COMPONENT"/>
+	
 	<ui:button label="{!v.id+'ClientProviderButton'}" aura:id="button" press="{!c.clientAction}"/>
 	{!v.body}
 </aura:component>

@@ -19,6 +19,13 @@
 	<aura:attribute name="id" type="String"/>
 	<aura:attribute name="value" type="String" default=""/>
 	
+	<!-- for error stack test -->
+	<aura:attribute name="errorOutFromHelper_Parent" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromRender_Parent" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromAfterRender_Parent" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromReRender_Parent" type="Boolean" default="false"/>
+    <aura:attribute name="errorOutFromUnRender_Parent" type="Boolean" default="false"/>
+    
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
 	
@@ -27,7 +34,7 @@
 	</aura:method>
 	
 	{!v.id}:
-	<ui:button label="RootButton" aura:id="button" press="{!c.clientAction}"/>
+	<ui:button label="RootButton" aura:id="button" press="{!c.clientAction}" class="uiButtonParent"/>
 	{!v.body}
 	<aura:text value="{!v.value}"/>
 </aura:component>

@@ -26,4 +26,5 @@ public class CCController {
     public static String echo(@Key("input") String input) throws Exception {
         return "[" + input + "]";
     }
+    
 }

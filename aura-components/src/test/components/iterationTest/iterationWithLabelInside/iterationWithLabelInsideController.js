@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 ({
-    init : function (cmp) {
-        var value = cmp.get("v.data");
-        cmp.set("v.data2", value);
-    },
     dataChange : function (cmp) {
-        console.log("cmpC data change "+cmp.getGlobalId());
+        $A.logf("cmp data change "+cmp.getGlobalId());
     },
     onDestroy : function (cmp) {
-        console.log("cmpC destroy"+cmp.getGlobalId());
+        $A.logf("cmp destroy"+cmp.getGlobalId());
     }
 })

@@ -1521,16 +1521,15 @@ Component.prototype.destroy = function(async) {
             return null;
         }
 
-        var priv = this.priv;
-
+        // call unrender before setting _destroying
+        // so that _destroying could be used for isValid check.
+        $A.renderingService.unrender(this);
         this._destroying = true;
 
+        var priv = this.priv;
         var componentDef = this.getDef();
         var superComponent = this.getSuper();
-
         var globalId = priv.globalId;
-
-        $A.renderingService.unrender(this);
 
         // Track some useful debugging information for InvalidComponent's use
         // #if {"excludeModes" : ["PRODUCTION"]}
@@ -2256,7 +2255,7 @@ Component.prototype.isDirty = function(expression) {
  */
 Component.prototype.isValid = function(expression) {
     if (!expression) {
-        return !this._scheduledForAsyncDestruction && this.priv !== undefined
+        return !this._scheduledForAsyncDestruction && !this._destroying && this.priv !== undefined
             && (!this.priv.attributeValueProvider || !this.priv.attributeValueProvider.isValid
                 || this.priv.attributeValueProvider.isValid());
     }

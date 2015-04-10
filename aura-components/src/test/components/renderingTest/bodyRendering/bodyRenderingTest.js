@@ -49,6 +49,19 @@
         content.set("v.body", newBody, ignoreChanges);
     },
 
+    isIframeReloaded: function() {
+        // Some tests are aware that we are sub-optimal: facet reordering causes a reload of all
+        // iframes because the reinsertion of DOM elements will create a reload. Both IE7/IE8 had
+        // the right behavior, and this will probably be fixed in FF soon, so we expect different
+        // results on diffewrent browsers. The specs are ambiguous:
+        //
+        // "When an iframe element is inserted into a document that has a browsing context, the user
+        // agent must create a nested browsing context, and then process the iframe attributes for the "first time".
+        // https://html.spec.whatwg.org/multipage/embedded-content.html#the-iframe-element
+
+        return ! $A.get("$Browser.isIE8");
+    },
+
     /**
      * Check that all iFrames are done loading.
      */
@@ -74,14 +87,16 @@
                 $A.test.assertEquals(values.length, nodes.length, message + ": invalid component count");
 
                 for (var n = 0; n < nodes.length; n++) {
+
+                    //
+                    // If a number is provided for a row, we assume render=1, rerender=onload=1, unrender=0, onload=1
+                    // which is the normal case.
                     //
                     // If a string is provided, we use it to validate the values in each column.
                     //
-                    // If a number is privided for a row, we assume render=1, rerender=onload=1, unrender=0, onload=1
-                    // which is the normal case (and the onload will cause a rerender).
-                    //
-                    var expected = "#" + values[n] + (values[n].length ? "" : "1101");
-                    var actual = $A.test.getText(nodes[n]).replace(/[\t\s]/g,"");
+
+                    var expected = "#" + values[n] + ((typeof values[n] == "number")? "1101" : "");
+                    var actual = $A.test.getText(nodes[n]).replace(/[\t\s]/g, "");
                     $A.test.assertEquals(expected, actual, message + ": invalid row #" + (n + 1) + "( " + expected + "vs " + actual + ")");
                 }
             }
@@ -291,8 +306,8 @@
                 });
             },
             function(component) {
-                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
-                this.assertComponents(component, ["41202","21202","31202","11202"], "Swapped 1st and 4rd components");
+                var expected = this.isIframeReloaded() ? ["41202","21202","31202","11202"] : ["41101","21101","31101","11101"];
+                this.assertComponents(component, expected, "Swapped 1st and 4rd components");
             }
         ]
     },
@@ -310,8 +325,8 @@
                 });
             },
             function(component) {
-                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
-                this.assertComponents(component, ["11202","31202","21202","41202"], "Swapped 2nd and 3rd components");
+                var expected = this.isIframeReloaded() ? ["11202","31202","21202","41202"] : ["11101","31101","21101","41101"];
+                this.assertComponents(component, expected, "Swapped 2nd and 3rd components");
             }
         ]
     },
@@ -329,8 +344,8 @@
                 });
             },
             function(component) {
-                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
-                this.assertComponents(component, ["21202","11202","31202","41202"], "Swapped 1st and 2nd components");
+                var expected = this.isIframeReloaded() ? ["21202","11202","31202","41202"] : ["21101","11101","31101","41101"];
+                this.assertComponents(component, expected, "Swapped 1st and 2nd components");
             }
         ]
     },
@@ -348,8 +363,8 @@
                 });
             },
             function(component) {
-                // This test is aware that we are sub-optimal: facet reredering causes a reload of all iframes.
-                this.assertComponents(component, ["11202","21202","41202","31202"], "Swapped 3rd and 4th components");
+                var expected = this.isIframeReloaded() ? ["11202","21202","41202","31202"] : ["11101","21101","41101","31101"];
+                this.assertComponents(component, expected, "Swapped 3rd and 4th components");
             }
         ]
     },

@@ -26,26 +26,21 @@
 	},
 	
     /**
-     * Test html content. Disabled because of flappyness: W-2431773
+     * Test html content.
      */
-    _testRichTextHtmlContent:{
+    testRichTextHtmlContent:{
     	browsers:["-ANDROID_PHONE","-ANDROID_TABLET"],
     	attributes : {testContent: "<b>some content</b></html>"},
     	test : [function(component) {
     		this.assertRichTextInitalized(component.find("Text"));
-    	}, 
-        // KRIS: This test flaps.
-        // It passes usually because content is "" when this thing first runs. If the value does have a chance to get set
-        // then it will fail. Why are we validating that the value is not what it actually should be?
-        // Bad test, commenting out until someone has any idea what we are hoping to test here.
-   //      function(component) {
-   //  		component.find("base").find("submitBtn").get("e.press").fire();
-   //  		$A.test.addWaitFor(false, function(){
-   //  			var content = component.find("base").find("outputValue").get("v.value");
-   //  			return content === "<b>some content</b></html>";
-			// });
-   //  	},
-        function(component) {
+    		this.waitForBaseComponentInitialized(component);
+    	}, function(component) {
+     		component.find("base").find("submitBtn").get("e.press").fire();
+     		$A.test.addWaitForWithFailureMessage(true, function(){
+     			var content = component.find("base").find("outputValue").get("v.value");
+     			return content === "<b>some content</b></html>";
+			 }, "Error with going to server.");
+     	}, function(component) {
     		var rtValue = component.find("Text").get("v.value");  
     		$A.test.assertEquals("<b>some content</b></html>", rtValue, 
     			"Rich text value expected is incorrect");
@@ -53,7 +48,13 @@
     },
 	
 	assertRichTextInitalized : function(rtCmp) {
-    	var textArea = rtCmp.find("textAreaElem");
-    	$A.test.assertNotNull(textArea, "Component did not initialize correctly");	
+		var textArea = rtCmp.find("textAreaElem");
+    	$A.test.assertNotNull(textArea, "Component did not initialize correctly");
+    },
+    
+    waitForBaseComponentInitialized : function(cmp) {
+    	$A.test.addWaitForWithFailureMessage(false, function(){
+ 			return $A.util.isUndefinedOrNull(cmp.find("base"));
+		 }, "Error loading base test component.");
     }
 })

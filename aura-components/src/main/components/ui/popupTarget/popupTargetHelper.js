@@ -126,37 +126,41 @@
             	$A.util.attachToDocumentBody(component.getElement());
             	
             	if (!manualPosition) {
-	            	triggerElementRect = elements.triggerElement.getBoundingClientRect();
+            		triggerElementRect = elements.triggerElement.getBoundingClientRect();
 	                elemRect = elements.targetDiv.getBoundingClientRect();
 	                viewPort = $A.util.getWindowSize();
-	                
-	                // Vertical alignment
+	                // Position menuList.
+		    		// Using scrollTop & scrollLeft for IE support; avoid window.scrollY & window.scrollX.
+	                scrollTop = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop,
+	    			scrollLeft = (document.documentElement && document.documentElement.scrollLeft) || document.body.scrollLeft;
+
+	    		    // Vertical alignment
 	                // getBoundingClientRect method does not return height and width in IE7 and Ie8
 	                height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
 	                if ((viewPort.height - triggerElementRect.bottom) < height) { // no enough space below
 	                	if (triggerElementRect.top < height) { // no enough space above either. Put it in the middle then
-	                		elements.targetDiv.style.top = window.scrollY + "px";
+	                		elements.targetDiv.style.top = scrollTop + "px";
 	                	} else { // put it above
-	                		elements.targetDiv.style.top = (triggerElementRect.top - height) + window.scrollY + "px";
+	                		elements.targetDiv.style.top = (triggerElementRect.top - height) + scrollTop + "px";
 	                	}
 	                } else { // put it below
-	                    elements.targetDiv.style.top = triggerElementRect.bottom + window.scrollY + "px";
+	                    elements.targetDiv.style.top = triggerElementRect.bottom + scrollTop + "px";
 	                }
 	                
 	                // Horizontal alignment
 	                // getBoundingClientRect method does not return height and width in IE7 and Ie8
 	                width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
 	                if (triggerElementRect.left < 0) {
-	                	elements.targetDiv.style.left = window.scrollX + "px";
+	                	elements.targetDiv.style.left = scrollLeft + "px";
 	                } else {
 	                    if ((viewPort.width - triggerElementRect.left) < width) { // no enough space to the right
 	                	    if (triggerElementRect.right < width) { // no enough space to the left either. Put it in the middle then.
-	                		    elements.targetDiv.style.left = (viewPort.width - width) + window.scrollX + "px";
+	                		    elements.targetDiv.style.left = (viewPort.width - width) + scrollLeft + "px";
 	                	    } else { // align at the right
-	                		    elements.targetDiv.style.left = triggerElementRect.right - width + window.scrollX + "px";
+	                		    elements.targetDiv.style.left = triggerElementRect.right - width + scrollLeft + "px";
 	                	    }
 	                    } else { // align at the left
-	                        elements.targetDiv.style.left = triggerElementRect.left + window.scrollX + "px";
+	                        elements.targetDiv.style.left = triggerElementRect.left + scrollLeft + "px";
 	                    }
 	                }
             	}

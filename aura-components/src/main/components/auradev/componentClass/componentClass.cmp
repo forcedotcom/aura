@@ -15,13 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component description="Renders the concrete javascript class for a component.">
+<aura:component description="Renders the concrete javascript class for a component." isTemplate="true">
     <aura:attribute name="className" type="String" required="true"/>
     <aura:attribute name="superClassName" type="String" required="true"/>
     <aura:attribute name="helperProperties" type="java://List&lt;org.auraframework.impl.ServerServiceImpl.HelperInfo&gt;" required="true"/>
     <aura:attribute name="renderMethods" type="java://List&lt;org.auraframework.util.json.JsFunction&gt;" required="true"/>
     <aura:attribute name="renderMethodStubs" type="String[]" required="true"/>
     <aura:attribute name="superRenderMethodNames" type="java://List&lt;org.auraframework.impl.ServerServiceImpl.RerenderInfo&gt;" required="true"/>
+    <aura:attribute name="rootComponent" type="Boolean" required="true"/>
 
 <!-- Emit the component class -->
 $A.componentService.addComponentClass("{!v.className}", function() {
@@ -66,15 +67,26 @@ $A.componentService.addComponentClass("{!v.className}", function() {
 
     </aura:iteration>
 
-    <!-- Doesn't work for unrender -->
-    <aura:iteration items="{!v.renderMethodStubs}" var="name">
-    {!v.className}.prototype.{!name} = function() {
-        var zuper = this.getSuper();
-        return zuper ? zuper.{!name}() : undefined;
-    };
-    </aura:iteration>
 
-    $A.Component.registerMethods({!v.className});
+    <aura:iteration items="{!v.renderMethodStubs}" var="name">
+        <aura:if isTrue="{!v.rootComponent == true &amp;&amp; name == 'unrender'}">
+            {!v.className}.prototype.unrender = function() {
+                var elements = this.getElements();
+                if(elements) {
+                    while(elements.length){
+                        $A.util.removeElement(elements.pop());
+                    }
+                }
+                this.disassociateElements();
+            };
+        <aura:set attribute="else">
+            {!v.className}.prototype.{!name} = function() {
+                var zuper = this.getSuper();
+                return zuper ? zuper.{!name}() : undefined;
+            };
+        </aura:set>
+        </aura:if>
+    </aura:iteration>
 
     return {!v.className};
 });

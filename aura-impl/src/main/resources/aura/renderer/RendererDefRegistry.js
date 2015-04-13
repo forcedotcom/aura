@@ -18,6 +18,7 @@
  * @constructor
  * @protected
  */
+/*jslint sub: true*/
 function RendererDefRegistry(){
     this.rendererDefs = {};
 }
@@ -30,11 +31,11 @@ RendererDefRegistry.prototype.auraType = "RendererDefRegistry";
  * @param {Object} componentDefDescriptor Required. The component definition descriptor to lookup on the providerDefs.
  * @param {Object} config Passes in a config, ComponentDef, or the name of a ComponentDef.
  */
-RendererDefRegistry.prototype.getDef = function(componentDefDescriptor, config){
+RendererDefRegistry.prototype.getDef = function(componentDefDescriptor){
     aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");
     var ret = this.rendererDefs[componentDefDescriptor];
-    if(!ret && config){
-        ret = new RendererDef(config);
+    if(!ret){
+        ret = new RendererDef(componentDefDescriptor.getQualifiedName());
         this.rendererDefs[componentDefDescriptor] = ret;
     }
     return ret;

@@ -358,8 +358,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
             // wanting the instance and not the def? 
             // I know it does not have it in some instances, but now that I think about it, it probably
             // also has the def sometimes too so this will be redundant.
-            // KRIS: REMOVE THIS! WE DO NOT NEED TO SEND THIS DOWN HERE! BAD!
-            json.writeMapEntry("componentClass", def.getComponentClass());
+            //json.writeMapEntry("componentClass", def.getComponentClass());
             
             json.writeMapEnd();
         } catch (QuickFixException e) {

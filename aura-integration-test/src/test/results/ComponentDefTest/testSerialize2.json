@@ -7,35 +7,9 @@
       "v":{
         "xs":"G",
         "descriptor":"markup://aura:component",
-        "rendererDef":{
-          "s":3,
-          "v":{
-            "descriptor":"js://aura.component",
-            "render":
-function(component) {
-        var rendering = component.getRendering();
-        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
-    },
-            "afterRender":
-function(component) {
-        var body = component.get("v.body");
-        $A.afterRender(body);
-    },
-            "rerender":
-function(component) {
-        var body = component.get("v.body");
-        return $A.renderingService.rerenderFacet(component,body);
-    },
-            "unrender":
-function(component) {
-        var body = component.get("v.body");
-        $A.renderingService.unrenderFacet(component,body);
-    }
-          }
-        },
         "attributeDefs":[
           {
-            "s":4,
+            "s":3,
             "v":{
               "name":"body",
               "type":"aura://Aura.Component[]",
@@ -47,14 +21,14 @@ function(component) {
           "markup://aura:rootComponent"
         ],
         "isAbstract":true,
-        "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$component\", function() {\n\n    \n\n    var aura$component = function aura$component(config, localCreation, creatingPrototype) {\n        $A.Component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$component.prototype = new $A.Component(null, null, true);\n    aura$component.prototype.constructor = aura$component;\n\n    aura$component.Helper = function() {};\n\n    aura$component.prototype.helper = new aura$component.Helper();\n\n\n    aura$component.prototype.render = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    \n    };\n\n    aura$component.prototype.rerender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    \n    };\n\n    aura$component.prototype.afterRender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    \n    };\n\n    aura$component.prototype.unrender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    \n    };\n\n    \n\n    $A.Component.registerMethods(aura$component);\n\n    return aura$component;\n});\n\n\n}"
+        "componentClass":"function(){\n$A.componentService.addComponentClass(\"aura$component\", function() {\n\n    \n\n    var aura$component = function aura$component(config, localCreation, creatingPrototype) {\n        $A.Component.call(this, config, localCreation, creatingPrototype); \n    };\n    aura$component.prototype = new $A.Component(null, null, true);\n    aura$component.prototype.constructor = aura$component;\n\n    aura$component.Helper = function() {};\n\n    aura$component.prototype.helper = new aura$component.Helper();\n\n\n    aura$component.prototype.render = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    \n    };\n\n    aura$component.prototype.rerender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    \n    };\n\n    aura$component.prototype.afterRender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    \n    };\n\n    aura$component.prototype.unrender = function() {\n        var renderable = this.getRenderable();\n        var component = renderable;\n        \n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    \n    };\n\n    \n\n    return aura$component;\n});\n\n\n}"
       }
     },
     "attributeDefs":[
       {
-        "r":4
+        "r":3
       }
     ],
-    "componentClass":"function(){\n$A.componentService.addComponentClass(\"fake$component\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var fake$component = function fake$component(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    fake$component.prototype = new aura$component(null, null, true);\n    fake$component.prototype.constructor = fake$component;\n\n    fake$component.Helper = function() {};\n\n    fake$component.Helper.prototype = new aura$component.Helper();\n    fake$component.Helper.prototype.constructor = fake$component.Helper;\n    fake$component.prototype.helper = new fake$component.Helper();\n\n\n    fake$component.prototype.render = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.render() : undefined;\n    };\n    fake$component.prototype.rerender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.rerender() : undefined;\n    };\n    fake$component.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    fake$component.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(fake$component);\n\n    return fake$component;\n});\n\n\n}"
+    "componentClass":"function(){\n$A.componentService.addComponentClass(\"fake$component\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var fake$component = function fake$component(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    fake$component.prototype = new aura$component(null, null, true);\n    fake$component.prototype.constructor = fake$component;\n\n    fake$component.Helper = function() {};\n\n    fake$component.Helper.prototype = new aura$component.Helper();\n    fake$component.Helper.prototype.constructor = fake$component.Helper;\n    fake$component.prototype.helper = new fake$component.Helper();\n\n\n    fake$component.prototype.render = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.render() : undefined;\n            };\n        fake$component.prototype.rerender = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.rerender() : undefined;\n            };\n        fake$component.prototype.afterRender = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.afterRender() : undefined;\n            };\n        fake$component.prototype.unrender = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.unrender() : undefined;\n            };\n        \n\n    return fake$component;\n});\n\n\n}"
   }
 }

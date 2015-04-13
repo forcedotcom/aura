@@ -3,7 +3,7 @@
   "v":{
     "componentDef":"markup://test:test_Provider_providerImpl1",
     "original":"markup://test:test_Provider_Interface",
-    "creationPath":"/*[2]",
+    "creationPath":"/*[1]",
     "attributes":{
       "s":2,
       "v":{
@@ -13,7 +13,6 @@
           "implNumber":"1"
         }
       }
-    },
-    "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$test_Provider_providerImpl1\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$test_Provider_providerImpl1 = function test$test_Provider_providerImpl1(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$test_Provider_providerImpl1.prototype = new aura$component(null, null, true);\n    test$test_Provider_providerImpl1.prototype.constructor = test$test_Provider_providerImpl1;\n\n    test$test_Provider_providerImpl1.Helper = function() {};\n\n    test$test_Provider_providerImpl1.Helper.prototype = new aura$component.Helper();\n    test$test_Provider_providerImpl1.Helper.prototype.constructor = test$test_Provider_providerImpl1.Helper;\n    test$test_Provider_providerImpl1.prototype.helper = new test$test_Provider_providerImpl1.Helper();\n\n\n    test$test_Provider_providerImpl1.prototype.render = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.render() : undefined;\n    };\n    test$test_Provider_providerImpl1.prototype.rerender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.rerender() : undefined;\n    };\n    test$test_Provider_providerImpl1.prototype.afterRender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.afterRender() : undefined;\n    };\n    test$test_Provider_providerImpl1.prototype.unrender = function() {\n        var zuper = this.getSuper();\n        return zuper ? zuper.unrender() : undefined;\n    };\n    \n\n    $A.Component.registerMethods(test$test_Provider_providerImpl1);\n\n    return test$test_Provider_providerImpl1;\n});\n\n\n}"
+    }
   }
 }

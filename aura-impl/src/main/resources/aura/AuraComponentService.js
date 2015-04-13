@@ -328,17 +328,12 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
     // config["componentDef"]["componentClass"] - Result of sending component defs back from the server.
     // Always comes back as a function to execute, which defines the component classes.
     var componentClassDef = config["componentClass"] || config["componentDef"]["componentClass"];
-    if(componentClassDef && !$A.componentService.getComponentClass(desc)) {
+    if(componentClassDef && !$A.componentService.hasComponentClass(desc)) {
         componentClassDef = $A.util.json.decode(componentClassDef);
         componentClassDef();
     }
 
-    var classConstructor = this.getComponentClass(desc);
-
-    if(!classConstructor) {
-        $A.error("Could not find component class for component " + desc);
-        return;
-    }
+    var classConstructor = this.getComponentClass(desc) || Component;
 
     var instance = new classConstructor(config, localCreation);
 
@@ -352,7 +347,7 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
  * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
  */
 $A.ns.AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
-    if(descriptor in this.classConstructorExporter) {
+    if(descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
         return;
     }
 
@@ -374,10 +369,29 @@ $A.ns.AuraComponentService.prototype.getComponentClass = function(descriptor) {
         if(exporter) {
             storedConstructor = exporter();
             this.classConstructors[descriptor] = storedConstructor;
+            // No need to keep all these extra functions.
+            delete this.classConstructorExporter[descriptor];
         }
     }
 
     return storedConstructor;
+};
+
+/**
+ * Detects of the component class has been already defined without actually defining it.
+ * hasComponentClass is more performant that running getComponentClass() since if the class
+ * hasn't been built yet, we don't want it to be forcably built if not requested.
+ * 
+ * @param {String} descriptor The qualified name of the component to check in the form prefix:componentname or protocol://prefix:componentname
+ */
+$A.ns.AuraComponentService.prototype.hasComponentClass = function(descriptor) {
+    descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
+
+    if(descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
+        return true;
+    }
+
+    return false;
 };
 
 /**

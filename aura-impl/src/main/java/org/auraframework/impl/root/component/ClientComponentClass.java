@@ -184,6 +184,8 @@ public class ClientComponentClass {
         attributes.put("renderMethods", renderMethods);
         attributes.put("renderMethodStubs", renderMethodStubs);
         attributes.put("superRenderMethodNames", superDef != null ? SUPER_INFOS : Collections.emptyList());
+        attributes.put("rootComponent", def.getInterfaces().contains(org.auraframework.impl.root.component.BaseComponentDefImpl.ROOT_MARKER));
+        
         
         org.auraframework.instance.Component component = Aura.getInstanceService().getInstance(desc, attributes);
         

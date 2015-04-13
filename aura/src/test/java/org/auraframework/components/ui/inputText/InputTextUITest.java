@@ -240,10 +240,7 @@ public class InputTextUITest extends WebDriverTestCase {
         assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         String expected = value + eventName;
-        // When we click the input on Firefox the cursor is at the beginning of the text.
-        if (BrowserType.FIREFOX.equals(getBrowserType())) {
-            expected = eventName + value;
-        }
+
         assertModelValue(expected);
         assertDomEventSet();
     }

@@ -16,9 +16,10 @@
 ({
     /**
      * Verify css from template is properly injected and present on loaded DOM.
+     * known issue with IE11 and layout : W-2375142
      */
     testStyleCssInjectedIntoDom : {
-        browsers : ["-IE7", "-IE8"],
+        browsers : ["-IE7", "-IE8", "-IE11", "-IE10"],
         test : function(cmp) {
             var found = false;
             var cssText = "";

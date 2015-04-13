@@ -33,6 +33,8 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -275,7 +277,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("body"), "secret", true);
     }
 
+    
     @ThreadHostileTest("LayoutsDef modification affects namespace")
+    @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
+    //known issue with IE11 and layout : W-2375142
     public void testGetClientRenderingAfterLayoutChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", "<div aura:id='xspot'/>"));

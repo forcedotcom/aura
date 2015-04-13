@@ -48,7 +48,7 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
         Long callCount = 0L;
         boolean isLabelControllerCalled = false;
         for (Map<String, Object> log : TestLoggingAdapterController.endCapture()) {
-            if(log.containsKey("action_aura://LabelController/ACTION$getLabel")) {
+            if(log.containsKey("action_1$aura://LabelController/ACTION$getLabel")) {
                 callCount = (Long) log.get("JavaCallCount");
                 isLabelControllerCalled = true;
                 break;

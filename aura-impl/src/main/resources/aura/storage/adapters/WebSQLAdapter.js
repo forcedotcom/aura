@@ -96,10 +96,10 @@ WebSQLStorageAdapter.prototype.getAll = function() {
                             var row = rows.item(i);
 
                             values.push({
-                                key: row["key"],
-                                value: $A.util["json"].decode(row["value"]),
-                                created: row["created"],
-                                expires: row["expires"]
+                                "key": row["key"],
+                                "value": $A.util["json"].decode(row["value"]),
+                                "created": row["created"],
+                                "expires": row["expires"]
                             });
                         }
 

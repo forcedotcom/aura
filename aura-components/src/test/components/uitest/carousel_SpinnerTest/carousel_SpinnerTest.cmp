@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->    	
-<aura:component extends="ui:carousel">
+<aura:component extends="ui:carouselDeprecated">
 	
 	<aura:handler name="loadPage" action="{!c.loadPage}"/>
 	

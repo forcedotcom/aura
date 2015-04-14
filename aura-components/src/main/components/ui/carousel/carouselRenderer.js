@@ -14,32 +14,15 @@
  * limitations under the License.
  */
 ({
-	afterRender: function(cmp, helper) {
-		//update size in case carousel width is not specified
-		helper.updateSize(cmp);
-		this.superAfterRender();
-		helper.attachEvents(cmp);
-		helper.selectDefaultPage(cmp);
-	},
-	
-	rerender: function(cmp, helper) {
-		var shouldRerender = false;
-		var forceUpdate = cmp.isDirty("v.pageComponents");
-		if (cmp.isDirty("v.width") || cmp.isDirty("v.height") || cmp.isDirty("v.priv_carouselStyle") || cmp.isDirty("v.pageComponents")) {
-			helper.updateSize(cmp, forceUpdate);
-			shouldRerender = true;
-		}
-		
-		if (shouldRerender) {
-			this.superRerender();
-			if (forceUpdate) {
-				helper.selectDefaultPage(cmp);
-			}			
-		}
-	},
-	
-	unrender: function(cmp, helper) {
-		helper.unrender(cmp);
-		this.superUnrender();
-	}
+    render: function (cmp, hlp) {
+        var dom = this.superRender();
+        return dom;
+    },
+    afterRender: function (cmp, hlp) {
+        this.superAfterRender();
+        hlp.afterRenderCarousel(cmp);
+    },
+    unrender: function (cmp, hlp) {
+        this.superUnrender();
+    }
 })

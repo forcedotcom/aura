@@ -316,5 +316,55 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>eslint</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-eslint-grunt</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/node-npm</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/eslint</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}/node-npm</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install-node-npm</id>
+                                <phase>process-test-resources</phase>
+                            </execution>
+                            <execution>
+                                <id>npm-install</id>
+                                <phase>process-test-resources</phase>
+                            </execution>
+                            <execution>
+                                <id>grunt-build</id>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

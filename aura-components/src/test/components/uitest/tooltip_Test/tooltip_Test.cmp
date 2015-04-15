@@ -1,0 +1,51 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="renderItem" type="String" default="all"/>
+    <aura:if isTrue="{! v.renderItem == 'triggers' || v.renderItem == 'all'}">
+        <div class="block">
+            <ui:tooltip aura:id="trigger1" advanced="true" trigger="click">
+                <p aura:id="trigger1-trigger">click me</p>
+            </ui:tooltip>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{! v.renderItem == 'advancedPositioning' || v.renderItem == 'all'}">
+        <div>
+            <div class="block">
+                <h1>Basic</h1>
+                    <ui:tooltip aura:id="tooltip1" advanced="true" trigger="focus" tooltipBody="Hello world"><p aura:id="tooltip1-trigger" tabindex="0">Trigger</p></ui:tooltip> 
+            </div>
+            <div class="block near-left-edge">
+                <h1>Near Left edge</h1>
+                <ui:tooltip aura:id="tooltip2" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">TT?</ui:tooltip>
+            </div>
+            <div class="block left-edge">
+                <h1>Left edge</h1>
+                <ui:tooltip aura:id="tooltip3" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">?</ui:tooltip>
+            </div>
+            <div class="block near-right-edge">
+                <h1>Near Right edge</h1>
+                <ui:tooltip aura:id="tooltip4" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">TT?</ui:tooltip>
+            </div>
+            <div class="block right-edge">
+                <h1>Right edge</h1>
+                <ui:tooltip aura:id="tooltip5" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">?</ui:tooltip>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

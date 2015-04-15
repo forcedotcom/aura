@@ -67,9 +67,13 @@
 
     /**
      * Default layout fires change events with undefined prevTitle.
+     * Excluding tests for IE10 and IE11 since default layout does not
+     * work as expected in these browsers
+     * Refer: W-2375142
      */
     testDefaultTitle: {
-        test: function(component){
+        browsers: ["-IE10","-IE11"],
+        test: function(component){      	
             var t = this;
             t.waitForLayoutChange(t, component, function(){
                 t.assertBothEventTitles(t, component, undefined, 'this is the default');

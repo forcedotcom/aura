@@ -241,6 +241,8 @@ public class PopupUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
+    // needs to be investigated/updated after Chrome upgrade
+    @ExcludeBrowsers({ BrowserType.GOOGLECHROME })
     public void testPopupManualPosition() throws Exception {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);

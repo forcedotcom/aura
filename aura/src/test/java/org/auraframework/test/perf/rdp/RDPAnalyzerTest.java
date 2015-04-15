@@ -26,9 +26,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
+import org.junit.Ignore;
 
 //Roman TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
 @UnAdaptableTest
+@Ignore("W-2565715")
 public final class RDPAnalyzerTest extends AbstractPerfTestCase {
 
     public RDPAnalyzerTest(String name) {

@@ -163,6 +163,30 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertTrue(posActions < posContex);
     }
 
+    /**
+     * When we request a component from the server we should get back it's component class, but only a single occurrence
+     * of it to minimize payload.
+     */
+    public void testGetComponentActionReturnsSingleComponentClass() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component></aura:component>");
+
+        Map<String, Object> actionParams = new HashMap<>();
+        actionParams.put("name", cmpDesc.getQualifiedName());
+        ServerAction a = new ServerAction(
+                "java://org.auraframework.impl.controller.ComponentController/ACTION$getComponent",
+                actionParams);
+        a.run();
+        String rawRes = a.getrawResponse();
+
+        int firstOccurrence = rawRes.indexOf("componentClass");
+        int lastOccurrence = rawRes.lastIndexOf("componentClass");
+        assertTrue("Component class should be returned in server response when requesting component",
+                firstOccurrence != -1);
+        assertTrue("Server response should only return a single componentClass for a component, but got <" + rawRes
+                + ">", firstOccurrence == lastOccurrence);
+    }
+
     public void testMulitpleActionsInOnePost() {
         ArrayList<String> qNameList = new ArrayList<>();
         ArrayList<Map<String, Object>> actionParamsArrayList = new ArrayList<>();

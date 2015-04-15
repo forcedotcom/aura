@@ -23,10 +23,10 @@ function RendererDef(descriptor){
     var componentClass = $A.componentService.getComponentClass(descriptor);
     
     if(componentClass) {
-        this.renderMethod = componentClass.prototype.render;
-        this.afterRenderMethod  = componentClass.prototype.afterRender;
-        this.rerenderMethod = componentClass.prototype.rerender;
-        this.unrenderMethod = componentClass.prototype.unrender;
+        this.renderMethod = componentClass.prototype["render"];
+        this.afterRenderMethod  = componentClass.prototype["afterRender"];
+        this.rerenderMethod = componentClass.prototype["rerender"];
+        this.unrenderMethod = componentClass.prototype["unrender"];
 
         // this.renderMethod = aura.util.json.decodeString(config["render"]);
         // this.afterRenderMethod  = aura.util.json.decodeString(config["afterRender"]);

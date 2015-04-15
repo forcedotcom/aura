@@ -25,11 +25,13 @@ import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.test.perf.metrics.PerfRunsCollector;
 import org.json.JSONObject;
+import org.junit.Ignore;
 
 /**
  * Miscellaneous tests for the perf framework.
  */
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPHONE })
+@Ignore("W-2565715")
 public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
     public MiscPerfFrameworkTest(String name) {

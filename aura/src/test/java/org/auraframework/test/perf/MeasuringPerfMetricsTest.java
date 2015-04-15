@@ -21,6 +21,7 @@ import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.AuraTextUtil;
+import org.junit.Ignore;
 import org.openqa.selenium.By;
 
 /**
@@ -30,6 +31,7 @@ import org.openqa.selenium.By;
  */
 //Roman TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
 @UnAdaptableTest
+@Ignore("W-2565715")
 public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
     public MeasuringPerfMetricsTest(String name) {
@@ -71,6 +73,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
     private void verifyButton(PerfMetrics actual) {
         PerfMetrics expected = new PerfMetrics();
+
         // Timeline metrics
         expected.setMetric("Timeline.Rendering.Layout", 2);
         expected.setMetric("Timeline.Painting.Paint", 2); // button + image

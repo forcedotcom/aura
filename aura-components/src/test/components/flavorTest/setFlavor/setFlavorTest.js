@@ -26,7 +26,7 @@
     testCustom: {
         test: function(cmp) {
             var el = cmp.find("custom").getElement();
-            var expected = $A.util.buildFlavorClass("test2", "flavorTestB");
+            var expected = $A.util.buildFlavorClass("flavorTestB:test2");
             $A.test.assertTrue($A.util.hasClass(el, expected));
         }
     }

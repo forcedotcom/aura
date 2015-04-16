@@ -21,7 +21,6 @@ import java.util.List;
  * Represents a flavor assortment def, usually used for app-level overrides of default flavors.
  * <p>
  * These are {@code <aura:flavors>} tags that contain {@code <aura:flavor>} inner tags.
- *
  */
 public interface FlavorAssortmentDef extends RootDefinition {
     @Override

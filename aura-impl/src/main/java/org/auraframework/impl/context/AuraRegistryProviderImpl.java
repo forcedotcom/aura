@@ -91,7 +91,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
     private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
             DefType.INTERFACE, DefType.EVENT, DefType.LIBRARY, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME,
-            DefType.DOCUMENTATION, DefType.INCLUDE, DefType.DESIGN, DefType.SVG, DefType.FLAVOR_ASSORTMENT);
+            DefType.DOCUMENTATION, DefType.INCLUDE, DefType.DESIGN, DefType.SVG, DefType.FLAVORS, DefType.FLAVOR_ASSORTMENT);
 
     private static class SourceLocationInfo {
         public final List<DefRegistry<?>> staticLocationRegistries;

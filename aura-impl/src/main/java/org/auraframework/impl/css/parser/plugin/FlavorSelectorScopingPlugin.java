@@ -59,16 +59,16 @@ public final class FlavorSelectorScopingPlugin implements DependentPlugin {
     /** class name of the component being flavored */
     private final String componentClassName;
 
-    public FlavorSelectorScopingPlugin(DefDescriptor<FlavoredStyleDef> flavor, Set<String> knownFlavorNames) {
+    public FlavorSelectorScopingPlugin(DefDescriptor<FlavoredStyleDef> flavoredStyle, Set<String> knownFlavorNames) {
         this.knownFlavorNames = knownFlavorNames;
         this.validClassNames = Sets.newHashSet();
 
-        if (flavor.getPrefix().equals(DefDescriptor.CUSTOM_FLAVOR_PREFIX)) {
-            this.componentClassName = Flavors.flavoredStyleToComponentClass(flavor.getName());
-            this.flavorNamespace = flavor.getNamespace();
+        if (flavoredStyle.getPrefix().equals(DefDescriptor.CUSTOM_FLAVOR_PREFIX)) {
+            this.componentClassName = Flavors.toComponentClassName(flavoredStyle);
+            this.flavorNamespace = flavoredStyle.getNamespace();
 
         } else {
-            this.componentClassName = Styles.buildClassName(flavor);
+            this.componentClassName = Styles.buildClassName(flavoredStyle);
             this.flavorNamespace = null;
         }
     }

@@ -150,8 +150,9 @@
           ]
         }
       ],
+      "hasFlavorableChild":true,
       "componentClass":"function(){\n$A.componentService.addComponentClass(\"test$flavorableFakeComponent\", function() {\n\n    \n    var aura$component = $A.componentService.getComponentClass(\"aura$component\");\n    \n\n    var test$flavorableFakeComponent = function test$flavorableFakeComponent(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$flavorableFakeComponent.prototype = new aura$component(null, null, true);\n    test$flavorableFakeComponent.prototype.constructor = test$flavorableFakeComponent;\n\n    test$flavorableFakeComponent.Helper = function() {};\n\n    test$flavorableFakeComponent.Helper.prototype = new aura$component.Helper();\n    test$flavorableFakeComponent.Helper.prototype.constructor = test$flavorableFakeComponent.Helper;\n    test$flavorableFakeComponent.prototype.helper = new test$flavorableFakeComponent.Helper();\n\n\n    test$flavorableFakeComponent.prototype.render = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.render() : undefined;\n            };\n        test$flavorableFakeComponent.prototype.rerender = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.rerender() : undefined;\n            };\n        test$flavorableFakeComponent.prototype.afterRender = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.afterRender() : undefined;\n            };\n        test$flavorableFakeComponent.prototype.unrender = function() {\n                var zuper = this.getSuper();\n                return zuper ? zuper.unrender() : undefined;\n            };\n        \n\n    return test$flavorableFakeComponent;\n});\n\n\n}"
     }
   },
-  "flavorName":"test"
+  "flavorReference":"test"
 }

@@ -22,7 +22,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavorIncludeDef;
-import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.FlavorAssortmentDefHandler;
@@ -37,42 +36,17 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         super(name);
     }
 
-    public void testReadsNamedAttribute() throws Exception {
-        addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor named='test'/>");
-        assertEquals("test", def.getFilteredName());
-    }
-
-    public void testReadsNamespaceAttribute() throws Exception {
-        addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor named='test' namespace='tmp'/>");
-        assertEquals("tmp", def.getFilter().getNamespaceMatch().toString());
-    }
-
-    public void testReadsBundleFlavor() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
+    public void testReadsAttributes() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
         addStandardFlavor(cmp, "@flavor test;");
-        FlavorIncludeDef def = source(String.format("<aura:flavor component='%s' flavor='test' />", cmp.getDescriptorName()));
-        assertNull("filter should not be set", def.getFilter());
-        assertEquals("didn't set right component descriptor", cmp, def.getComponentDescriptor());
-        assertEquals("didn't set right flavor name", "test", def.getFlavor().getFlavorName());
-    }
-
-    public void testReadsNamespaceFlavor() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
-        addStandardFlavor(cmp, "@flavor test;");
-        DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, "@flavor test2");
-
-        FlavorIncludeDef def = source(String.format("<aura:flavor component='%s' flavor='%s.test2' />", cmp.getDescriptorName(),
-                custom.getNamespace()));
-        assertNull("filter should not be set", def.getFilter());
-        assertEquals("didn't set right component descriptor", cmp, def.getComponentDescriptor());
-        assertEquals("didn't set right flavor name", "test2", def.getFlavor().getFlavorName());
+        String fmt = String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName());
+        FlavorIncludeDef def = source(fmt);
+        assertFalse(def.computeFilterMatches().isEmpty());
     }
 
     public void testDescription() throws Exception {
         addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor component='x' flavor='test' description='testdesc'/>");
+        FlavorIncludeDef def = source("<aura:flavor component='*' flavor='x' description='testdesc'/>");
         assertEquals("testdesc", def.getDescription());
     }
 

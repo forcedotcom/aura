@@ -285,6 +285,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case THEME:
             case THEME_DEF_REF:
             case VAR:
+            case FLAVORS:
             case FLAVOR_ASSORTMENT:
             case FLAVOR_INCLUDE:
             case DESIGN:

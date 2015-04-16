@@ -140,16 +140,26 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     this.cmpHandlerDefs = cmpHandlerDefs || null;
     this.valueHandlerDefs = valueHandlerDefs || null;
     this.isCSSPreloaded = config["isCSSPreloaded"] || false;
-    
+
     if (config["defaultFlavor"]) {
         this.defaultFlavor = config["defaultFlavor"];
     }
-    
+
+    if (config["hasFlavorableChild"]) {
+        this.flavorableChild = true;
+    }
+
+    if (config["defaultFlavors"]) { // for applications
+        this.defaultFlavors = new FlavorAssortmentDef(config["defaultFlavors"]);
+    } else {
+        this.defaultFlavors = null;
+    }
+
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"]);
-    
+
     this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
     this.initRenderer();
-    
+
     this.helperDef = $A.componentService.getHelperDef(descriptor, this, this.libraryDefs);
 
     var providerDef = config["providerDef"];
@@ -300,17 +310,51 @@ $A.ns.ComponentDef.prototype.getStyleDef = function() {
 };
 
 /**
- * Gets the default flavor name.
- * 
- * @returns {String}
+ * Gets the default flavor name, either from app-specified overrides or the
+ * default specified on the component def.
+ *
+ * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
  */
 $A.ns.ComponentDef.prototype.getDefaultFlavor = function() {
-    return this.defaultFlavor;
+    if ($A.util.isUndefined(this.overriddenDefault)) {
+        var override = null;
+
+        var appDesc = $A.getContext().getApp();
+        if (appDesc) {
+            var appDef = $A.componentService.getDef(appDesc);
+            var overrides = appDef && appDef.getDefaultFlavors();
+            if (overrides) {
+                override = overrides.getFlavor(this.descriptor);
+            }
+        }
+
+        this.overriddenDefault = $A.util.isUndefinedOrNull(override) ? null : override;
+    }
+
+    return this.overriddenDefault || this.defaultFlavor;
+};
+
+/**
+ * Gets whether this def has at least one flavorable child element.
+ *
+ * @returns {Boolean}
+ */
+$A.ns.ComponentDef.prototype.hasFlavorableChild = function() {
+    return !!this.flavorableChild;
+};
+
+/**
+ * Gets the set of default flavor overrides.
+ *
+ * @returns {FlavorAssortmentDef}
+ */
+$A.ns.ComponentDef.prototype.getDefaultFlavors = function() {
+    return this.defaultFlavors;
 };
 
 /**
  * Gets all the attribute definitions. Returns an AttributeDef object.
- * 
+ *
  * @returns {AttributeDefSet}
  */
 $A.ns.ComponentDef.prototype.getAttributeDefs = function() {

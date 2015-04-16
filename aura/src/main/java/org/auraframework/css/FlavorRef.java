@@ -19,29 +19,33 @@ import java.io.Serializable;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonSerializable;
 
 /**
- * Represents a reference to a specific named flavor within a {@link FlavoredStyleDef}.
+ * Represents a reference to a specific, named flavor within a {@link FlavoredStyleDef}.
  * <p>
- * Flavor bundles include one or more flavor CSS files (*Flavors.css), with each file providing flavors for a particular
- * component, e.g., uiButtonFlavors.css. Inside of this file are one or more flavor declarations ({@code @}flavor xyz)
+ * Flavor bundles include one or more flavor CSS files (e.g., ui-button.css), with each file providing flavors for a
+ * particular component (e.g., ui:button). Inside of this file are one or more flavor declarations ({@code @}flavor xyz)
  * and matching CSS rules.
  * <p>
- * In addition to flavor bundles, flavor CSS files can also be placed in a component bundle. These are known are
- * "Standard" flavors, while flavors that exist in distinct flavor bundles are called "Custom" flavors. Custom flavors
- * may exist outside of the namespace of the flavored component. While standard flavors provide a mechanism for the
- * component author to make several stylistic variations available by default, custom flavors allow any other consumer
- * to provide additional flavors within their own namespaces (provided the original component is flavorable).
+ * In addition to flavor bundles, flavor CSS files can also be placed in a component bundle (e.g.,
+ * ui/button/buttonFlavors.css). These are known are "Standard" flavors, while flavors that exist in separate flavor
+ * bundles are called "Custom" flavors (e.g., one/flavors/ui-button.css). Custom flavors may exist outside of the
+ * namespace of the flavored component. While standard flavors provide a mechanism for the component author to make
+ * several stylistic variations available by default, custom flavors allow any other consumer to provide additional
+ * flavors within their own namespaces (provided the original component is flavorable).
  * <p>
  *
  * Referencing a specific flavor from code usually has three options: 1) when referencing a standard flavor, just refer
  * to the name, e.g., {@code flavor='simple'}. 2) When referencing a custom flavor, you can refer to the namespace and
- * flavor name, e.g., {@code flavor='one.simple'}. In this case 'one' is the namespace, 'simple' is the flavor name and
- * we infer the file name based on the component being flavored. This also assumes that this flavor file is placed in a
- * bundle called "flavors". 3) explicitly refer to a custom flavor in a bundle other than "flavors", e.g.,
- * {@code flavor='one.otherFlavors.simple'}.
+ * flavor name, e.g., {@code flavor='one:simple'}. In this case 'one' is the namespace, 'simple' is the flavor name and
+ * we infer the file name based on the component being flavored (namely, this assumes that this flavor file is placed in
+ * a bundle/folder called "flavors"). 3) explicitly refer to a custom flavor in a bundle other than "flavors", e.g.,
+ * {@code flavor='one:otherFlavors:simple'}.
  */
-public interface FlavorRef extends Serializable {
+public interface FlavorRef extends Serializable, JsonSerializable {
     /**
      * Gets the {@link FlavoredStyleDef}.
      */
@@ -53,8 +57,23 @@ public interface FlavorRef extends Serializable {
     String getFlavorName();
 
     /**
+     * Convert to the string, "." (dot) notation of this reference, e.g., <code>one.flavors.default</code>.
+     * <p>
+     * See Flavors#buildFlavorRef for more information.
+     */
+    String toStringReference();
+
+    /**
      * Returns true if the {@link FlavoredStyleDef} is a standard flavor, e.g., lives within the same bundle as the
      * component being flavored.
      */
     boolean isStandardFlavor();
+
+    /**
+     * Checks that the flavor name is defined in the {@link FlavoredStyleDef}.
+     *
+     * @throws FlavorNameNotFoundException If the name is not found.
+     * @throws QuickFixException If there was a problem loading the {@link FlavoredStyleDef}.
+     */
+    void verifyReference() throws FlavorNameNotFoundException, QuickFixException;
 }

@@ -24,6 +24,8 @@ import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
+import com.google.common.collect.Iterables;
+
 public class FlavorAssortmentDefHandlerTest extends StyleTestCase {
 
     public FlavorAssortmentDefHandlerTest(String name) {
@@ -63,7 +65,7 @@ public class FlavorAssortmentDefHandlerTest extends StyleTestCase {
 
         List<FlavorIncludeDef> flavorIncludes = fa.getDef().getFlavorIncludeDefs();
         assertEquals("did not find the right number of flavors", 2, flavorIncludes.size());
-        assertEquals("test", flavorIncludes.get(0).getFlavor().getFlavorName());
-        assertEquals("test2", flavorIncludes.get(1).getFlavor().getFlavorName());
+        assertEquals("test", Iterables.getOnlyElement(flavorIncludes.get(0).computeFilterMatches().values()).getFlavorName());
+        assertEquals("test2", Iterables.getOnlyElement(flavorIncludes.get(1).computeFilterMatches().values()).getFlavorName());
     }
 }

@@ -90,6 +90,8 @@ var clientService;
 // #include aura.attribute.AttributeDefSet
 // #include aura.renderer.RendererDefRegistry
 // #include aura.style.StyleDef
+// #include aura.flavors.FlavorIncludeDef
+// #include aura.flavors.FlavorAssortmentDef
 // #include aura.component.ComponentDef
 // #include aura.controller.ControllerDef
 // #include aura.controller.ControllerDefRegistry

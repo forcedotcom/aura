@@ -37,12 +37,8 @@ var ComponentPriv = (function() { // Scoping priv
             this.flavorable = true;
         }
 
-        if (config["flavorName"]) {
-            this.flavorName = config["flavorName"];
-        }
-
-        if (config["flavorNs"]) {
-            this.flavorNamespace = config["flavorNs"];
+        if (config["flavorReference"]) {
+            this.flavorReference = config["flavorReference"];
         }
 
         var context = $A.getContext();
@@ -84,7 +80,7 @@ var ComponentPriv = (function() { // Scoping priv
         var partialConfig;
         if (this.creationPath && this.creationPath !== "client created") {
             partialConfig = context.getComponentConfig(this.creationPath);
-            
+
             // Done with it in the context, it's now safe to remove so we don't process it again later.
             context.removeComponentConfig(this.creationPath);
         }
@@ -856,7 +852,7 @@ if(!this.concreteComponentId) {
                     cmp["afterRender"] = classConstructor.prototype["afterRender"];
                     cmp["unrender"] = classConstructor.prototype["unrender"];
                 }
-                
+
                 self.setupModel(config["model"],cmp);
                 self.valueProviders["m"]=self.model;
                 self.valueProviders["c"]=self.createActionValueProvider(cmp);
@@ -1088,7 +1084,7 @@ function Component(config, localCreation, creatingPrototype) {
     if(creatingPrototype) {
         return;
     }
-      
+
     this.priv = new ComponentPriv(config, this, localCreation);
     this._destroying = false;
 
@@ -1658,7 +1654,7 @@ Component.prototype.superRender = function() {
 };
 
 /**
- * Execute the super components rerender method. 
+ * Execute the super components rerender method.
  * @protected
  */
 Component.prototype.superRerender = function() {
@@ -2408,24 +2404,21 @@ Component.prototype.getFacets = function() {
 
 
 /**
- * Returns true if this component instance has at least one flavorable element.
+ * Returns true if this is a flavorable html element.
  */
 Component.prototype.isFlavorable = function() {
 	return this.priv.flavorable;
 };
 
 /**
- * Returns the name of the flavor specified or assumed for this component instance.
+ * Gets the flavor reference. This is either the flavor explicitly set on the
+ * component instance (component def ref) or it is the default flavor of the
+ * component, if a default (or app override) exists.
+ *
+ * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
  */
-Component.prototype.getFlavorName = function() {
-	return this.priv.flavorName || this.getDef().getDefaultFlavor();
-};
-
-/**
- * Returns the namespace of the flavor specified or assumed for this component instance (usually only applicable to namespace flavors).
- */
-Component.prototype.getFlavorNamespace = function() {
-	return this.priv.flavorNamespace;
+Component.prototype.getFlavor = function() {
+	return this.priv.flavorReference || this.getDef().getDefaultFlavor();
 };
 
 // #include aura.component.Component_export

@@ -36,14 +36,15 @@ public class TypeParser {
      * Group 2 = namespace = foo.bar Group 3 = name = baz
      */
     private static final Pattern CLASS_PATTERN = Pattern
-            .compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
-    
+            .compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*-]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
+
     /**
      * Parses a type that is a tag. See TAG_PATTERN above
      * @param qualifiedName
      * @return a Type instance or null
      */
     public static Type parseTag(String qualifiedName) {
+
     	Type type = null;
         Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
         if (tagMatcher.matches()) {

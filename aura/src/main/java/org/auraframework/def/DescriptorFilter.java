@@ -40,6 +40,10 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         this(matcher, "*");
     }
 
+    public DescriptorFilter(String matcher, DefType defType) {
+        this(matcher, defType.toString());
+    }
+
     public DescriptorFilter(String matcher, String typeStr) {
         String prefix = "*", namespace = "*", name = "*";
         String remainder = matcher;

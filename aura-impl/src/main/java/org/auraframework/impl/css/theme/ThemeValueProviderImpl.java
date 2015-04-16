@@ -25,6 +25,7 @@ import org.auraframework.css.ThemeList;
 import org.auraframework.css.ThemeValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
@@ -60,11 +61,16 @@ public final class ThemeValueProviderImpl implements ThemeValueProvider {
      *            {@link ResolveStrategy#RESOLVE_NORMAL}. This is for informative purposes only, and doesn't influence
      *            the behavior of this class directly).
      */
-    public ThemeValueProviderImpl(DefDescriptor<?> style, ThemeList overrides, ResolveStrategy strategy) {
+    public ThemeValueProviderImpl(DefDescriptor<? extends BaseStyleDef> style, ThemeList overrides, ResolveStrategy strategy) {
         checkNotNull(style, "scope cannot be null");
 
-        DefDescriptor<ThemeDef> cmpTheme = Themes.cmpThemeDescriptor(style);
-        this.cmpTheme = cmpTheme.exists() ? cmpTheme : null; // so we don't have to keep checking
+        if (style.getDefType() == DefType.STYLE) { // not supported by custom flavors for now
+            DefDescriptor<ThemeDef> cmpTheme = Themes.cmpThemeDescriptor(style);
+            this.cmpTheme = cmpTheme.exists() ? cmpTheme : null;
+        } else {
+            this.cmpTheme = null;
+        }
+
         this.namespaceTheme = Themes.namespaceThemeDescriptor(style);
         this.overrides = overrides;
         this.strategy = strategy;

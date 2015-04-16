@@ -17,10 +17,15 @@ package org.auraframework.impl.css.flavor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
+
 import org.auraframework.css.FlavorRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
 
@@ -51,6 +56,21 @@ public final class FlavorRefImpl implements FlavorRef {
     }
 
     @Override
+    public void verifyReference() throws FlavorNameNotFoundException, QuickFixException {
+        if (!flavorDescriptor.getDef().getFlavorNames().contains(name)) {
+            throw new FlavorNameNotFoundException(name, flavorDescriptor);
+        }
+    }
+
+    @Override
+    public String toStringReference() {
+        if (isStandardFlavor()) {
+            return name;
+        }
+        return String.format("%s:%s:%s", flavorDescriptor.getNamespace(), flavorDescriptor.getBundle().getName(), name);
+    }
+
+    @Override
     public boolean isStandardFlavor() {
         return flavorDescriptor.getPrefix().equals(DefDescriptor.CSS_PREFIX);
     }
@@ -69,5 +89,15 @@ public final class FlavorRefImpl implements FlavorRef {
         }
 
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return toStringReference();
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeMapEntry("ref", toStringReference());
     }
 }

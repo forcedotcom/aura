@@ -29,6 +29,7 @@ import com.salesforce.omakase.parser.Source;
 import com.salesforce.omakase.parser.refiner.AtRuleRefiner;
 import com.salesforce.omakase.parser.refiner.MasterRefiner;
 import com.salesforce.omakase.parser.refiner.Refinement;
+import com.salesforce.omakase.parser.token.Tokens;
 
 /**
  * Parses {@code @flavor} custom at-rules.
@@ -50,15 +51,16 @@ public final class AuraFlavorRefiner implements AtRuleRefiner {
 
         String flavorName = expression.get().content();
 
-        // the name should be a valid identifier
+        // comma-separated list of names
         Source source = new Source(flavorName, expression.get().line(), expression.get().column());
-        if (!source.readIdent().isPresent()) {
-            throw new ParserException(source, Message.EXPECTED_VALID_ID);
-        } else if (!source.eof()) {
-            throw new ParserException(source, "Expected to find only one identifier");
-        }
 
-        flavorNames.add(flavorName);
+        do {
+            Optional<String> ident = source.skipWhitepace().readIdent();
+            if (!ident.isPresent()) {
+                throw new ParserException(source, Message.EXPECTED_VALID_ID);
+            }
+            flavorNames.add(ident.get());
+        } while (source.skipWhitepace().optional(Tokens.COMMA).isPresent());
 
         atRule.markAsMetadataRule();
         return Refinement.FULL;

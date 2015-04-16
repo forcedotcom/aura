@@ -79,7 +79,7 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
-            error("No literal text allowed in theme definition");
+            error("No literal text allowed in %s tag", TAG);
         }
     }
 
@@ -89,5 +89,6 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     }
 
     @Override
-    public void writeElement(FlavorAssortmentDef def, Appendable out) throws IOException {}
+    public void writeElement(FlavorAssortmentDef def, Appendable out) throws IOException {
+    }
 }

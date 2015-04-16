@@ -15,45 +15,67 @@
  */
 package org.auraframework.impl.css.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 
+import org.auraframework.Aura;
 import org.auraframework.css.FlavorRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.flavor.FlavorRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 
 /**
  * Utilities for working with flavors.
  */
 public final class Flavors {
-    private Flavors() {} // do not construct
+    private Flavors() {
+    } // do not construct
 
-    public static FlavorRef buildFlavorRef(DefDescriptor<ComponentDef> flavored, String reference) {
-        Preconditions.checkNotNull(flavored, "the flavored param must must not be null");
-        Preconditions.checkNotNull(reference, "the reference param must not be null");
+    /**
+     * Builds a {@link FlavorRef} instance for a flavor of the given {@link ComponentDef}, as described by the given
+     * string reference.
+     * <p>
+     * The string reference is delimited by ":"s and can have from 1-3 parts:
+     * <ul>
+     * <li>1 part, e.g., "primary" represents a standard flavor called <code>primary</code> within the component's own
+     * bundle.</li>
+     * <li>2 parts, e.g., "one:primary", represents a custom flavor in the <code>one</code> namespace, in a bundle
+     * assumed to be called <code>flavors</code>, and for a flavor called <code>primary</code>.
+     * <li>3 parts, e.g., "one:otherFlavors:primary", represents a custom flavor in the <code>one</code> namespace, in a
+     * bundle called <code>otherFlavors</code>, and for a flavor called <code>primary</code>
+     * </ul>
+     *
+     * @param flavored The original component being flavored, e.g, ui:button.
+     * @param reference The reference to a specific flavor.
+     */
+    public static FlavorRef buildFlavorRef(DefDescriptor<? extends BaseComponentDef> flavored, String reference) {
+        checkNotNull(flavored, "the flavored param must must not be null");
+        checkNotNull(reference, "the reference param must not be null");
 
-        List<String> split = AuraTextUtil.splitSimpleAndTrim(reference, ".", 3);
+        List<String> split = AuraTextUtil.splitSimpleAndTrim(reference, ":", 3);
 
         if (split.size() == 1) {
             // standard flavor <ui:blah aura:flavor='primary'/>
             // split = [flavorName]
-            return new FlavorRefImpl(Flavors.standardFlavorDescriptor(flavored), split.get(0));
+            return new FlavorRefImpl(standardFlavorDescriptor(flavored), split.get(0));
         } else if (split.size() == 2) {
-            // custom flavor, bundle named implied as flavors <ui:blah aura:flavor='sfdc.primary'/>
+            // custom flavor, bundle named implied as flavors <ui:blah aura:flavor='sfdc:primary'/>
             // split = [namespace, flavorName]
-            return new FlavorRefImpl(Flavors.customFlavorDescriptor(flavored, split.get(0), "flavors"), split.get(1));
+            return new FlavorRefImpl(customFlavorDescriptor(flavored, split.get(0), "flavors"), split.get(1));
         } else if (split.size() == 3) {
-            // custom flavor, explicit bundle name <ui:blah aura:flavor='sfdc.flavors.primary'/>
+            // custom flavor, explicit bundle name <ui:blah aura:flavor='sfdc:flavors:primary'/>
             // split = [namespace, bundle, flavorName]
-            return new FlavorRefImpl(Flavors.customFlavorDescriptor(flavored, split.get(0), split.get(1)), split.get(2));
+            return new FlavorRefImpl(customFlavorDescriptor(flavored, split.get(0), split.get(1)), split.get(2));
         } else {
             throw new IllegalArgumentException("unable to parse flavor reference: " + reference);
         }
@@ -66,9 +88,8 @@ public final class Flavors {
      * @param descriptor The def descriptor of the component bundle, e.g., ui:button.
      */
     public static DefDescriptor<FlavoredStyleDef> standardFlavorDescriptor(DefDescriptor<? extends BaseComponentDef> descriptor) {
-        String fmt = String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, descriptor.getNamespace(),
-                descriptor.getName());
-        return DefDescriptorImpl.getInstance(fmt, FlavoredStyleDef.class);
+        String fmt = String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, descriptor.getNamespace(), descriptor.getName());
+        return Aura.getDefinitionService().getDefDescriptor(fmt, FlavoredStyleDef.class);
     }
 
     /**
@@ -81,44 +102,50 @@ public final class Flavors {
      */
     public static DefDescriptor<FlavoredStyleDef> customFlavorDescriptor(DefDescriptor<? extends BaseComponentDef> flavored,
             String namespace, String bundle) {
-        // find the bundle. Using FlavorAssortment here not because the file is there (although it could be), but
-        // primarily just to get at a specific bundle (e.g., folder) name.
+        // find the bundle (this file doesn't have to exist, we just need the marker)
         String fmt = String.format("markup://%s:%s", namespace, bundle);
-        DefDescriptor<FlavorAssortmentDef> bundleDesc = DefDescriptorImpl.getInstance(fmt, FlavorAssortmentDef.class);
+        DefDescriptor<FlavorsDef> bundleDesc = DefDescriptorImpl.getInstance(fmt, FlavorsDef.class);
 
         // find the flavored style file
-        // using an underscore here so that we can infer the component descriptor in FlavorIncludeDefImpl
-        String file = flavored.getNamespace() + "_" + flavored.getName();
+        // the dash is expected to be in the name, so that we can infer the component descriptor in FlavorIncludeDefImpl
+        String file = flavored.getNamespace() + "-" + flavored.getName();
         fmt = String.format("%s://%s.%s", DefDescriptor.CUSTOM_FLAVOR_PREFIX, namespace, file);
-        return DefDescriptorImpl.getInstance(fmt, FlavoredStyleDef.class, bundleDesc);
+        return Aura.getDefinitionService().getDefDescriptor(fmt, FlavoredStyleDef.class, bundleDesc);
     }
 
     /**
-     * Builds a CSS class name based on the given original class name. Use this for standard flavors.
+     * Builds the CSS class name for the given raw flavor reference.
      *
-     * @param original The original class name.
+     * @param flavorReference The flavor reference, e.g., "someNs:someFlavor"
+     * @return The CSS class name.
      */
-    public static String buildFlavorClassName(String original) {
-        return buildFlavorClassName(original, null);
+    public static String buildFlavorClassName(String flavorReference) {
+        if (flavorReference.contains(".")) {
+            List<String> split = AuraTextUtil.splitSimpleAndTrim(flavorReference, ":", 3);
+            return buildFlavorClassName(split.get(0), Iterables.getLast(split));
+        } else {
+            return buildFlavorClassName(flavorReference, null);
+        }
     }
 
     /**
-     * Builds a CSS class name based on the given original class name.
+     * Builds the CSS class name for the given flavor and namespace.
      *
-     * @param original The original class name.
-     * @param namespace The namespace the flavor lives in. Pass in null for standard flavors.
+     * @param name Name of the flavor.
+     * @param namespace The namespace the flavor file lives in, or null for standard flavors.
+     * @return The CSS class name.
      */
-    public static String buildFlavorClassName(String original, String namespace) {
+    public static String buildFlavorClassName(String name, String namespace) {
         StringBuilder builder = new StringBuilder();
 
         if (namespace != null) {
             builder.append(namespace);
-            builder.append(AuraTextUtil.initCap(original));
+            builder.append(AuraTextUtil.initCap(name));
         } else {
-            builder.append(original);
+            builder.append(name); // standard flavor
         }
 
-        builder.append("-f");
+        builder.append("-f"); // suffix used to denote a flavor and prevent conflicts with user-created class names
 
         return builder.toString();
     }
@@ -126,22 +153,34 @@ public final class Flavors {
     /**
      * Builds the correct CSS class name for a {@link FlavoredStyleDef}, based on the given flavor name.
      * <p>
-     * Specifically, this converts a flavor name such as ui_button (e.g., from ui_buttonFlavors.css) to the appropriate
-     * CSS class name of the flavored component (e.g., uiButton), as it would be built by
-     * {@link Styles#buildClassName(DefDescriptor)}. This is necessary for custom flavors because the naming convention
-     * separates the namespace from the component name using an underscore instead of camel-casing. See
-     * {@link Flavors#customFlavorDescriptor(DefDescriptor, String, String)} as to why the underscore is used in this
-     * way (basically so that we can infer the flavored component descriptor name from the flavored style descriptor
-     * name).
+     * Specifically this converts a {@link FlavoredStyleDef}'s descriptor name, such as ui-button (e.g., from
+     * flavors/ui-button.css), to the appropriate CSS class name of the flavored component (e.g., uiButton), as it would
+     * be built by {@link Styles#buildClassName(DefDescriptor)}. This is necessary for custom flavors because the naming
+     * convention separates the namespace from the component name using a dash instead of camel-casing. See
+     * {@link Flavors#customFlavorDescriptor(DefDescriptor, String, String)} as to why the dash is used in this way
+     * (basically so that we can infer the component descriptor name from the flavored style descriptor name).
      *
-     * @param flavorName The name of the flavored style.
+     * @param flavoredStyle The flavored style def descriptor.
      * @return The CSS class name.
      */
-    public static String flavoredStyleToComponentClass(String flavorName) {
-        if (!flavorName.contains("_")) {
-            return flavorName;
+    public static String toComponentClassName(DefDescriptor<FlavoredStyleDef> flavoredStyle) {
+        if (!flavoredStyle.getName().contains("-")) {
+            return flavoredStyle.getName();
         }
 
-        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, flavorName);
+        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, flavoredStyle.getName());
+    }
+
+    /**
+     * Returns the {@link ComponentDef} descriptor for the component being flavored by the given
+     * {@link FlavoredStyleDef}. Only call this on custom flavors.
+     *
+     * @param flavoredStyle The flavored style def descriptor. Must be for a custom flavor.
+     */
+    public static DefDescriptor<ComponentDef> toComponentDescriptor(DefDescriptor<FlavoredStyleDef> flavoredStyle) {
+        checkArgument(flavoredStyle.getPrefix().equals(DefDescriptor.CUSTOM_FLAVOR_PREFIX), "Expected a custom flavor descriptor");
+
+        String[] split = flavoredStyle.getName().split("-");
+        return Aura.getDefinitionService().getDefDescriptor(String.format("%s:%s", split[0], split[1]), ComponentDef.class);
     }
 }

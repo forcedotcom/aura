@@ -446,10 +446,6 @@
         if (pos !== -1) {
             auraContainer.splice(pos, 1);
             container.set("v.body", auraContainer);
-            // aura needs to run its life cycle before lets us touch anything else...
-            $A.run(function() {
-            	panel.destroy(true);
-            });
         }
 
         manager._panels[panelId] = null;

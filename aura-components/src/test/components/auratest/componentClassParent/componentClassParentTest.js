@@ -68,18 +68,7 @@
 		}
 	},
 	
-	/*
-	 * Tests with CSCC interface 
-	 * $A.componentService.createComponent(type, attributes, callback) returns a component of instanceof type
-	 * $A.componentService.createComponents(components, callback) returns an array of components of instanceof type
-	 * $A.componentService.newComponent(config, avp, localCreation, doForce) returns a component of instanceof type
-	 * $A.componentService.newComponentDeprecated(config, avp, localCreation, doForce) returns a component of instanceof type
-	 * $A.componentService.newComponentAsync(callbackScope, callback, config, avp) returns a component of instanceof type
-	 * $A.componentService.requestComponent(callbackScope, callback, config, avp, index, returnNullOnError) returns a component of instanceof type
-	 * 
-	 * the last one is not public, hence, no test
-	 */
-	//$A.ns.AuraComponentService.prototype.createComponent = function(type, attributes, callback){
+	//check component from $A.createComponent is instanceof what we get from componentClass
 	testCreateComponentReturnCorrectType : {
 		test: function(testCmp) {
 			var type="aura:text";
@@ -91,15 +80,28 @@
 		}
 	},
 	
-	//get a component with server dependency
+	//get a component with server dependency via $A.createComponent
 	testCreateComponentServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
 			var type="auradev:quickFixButton"; 
 			var attributes = null;
-            $A.createComponent(type, attributes, function(targetComponent){
-            	var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-            	$A.test.assertTrue(targetComponent instanceof cmpFromComponentClass);
-            })
+			var done = false;
+			var newComponent;
+			$A.createComponent(type, attributes, function(targetComponent){
+				newComponent = targetComponent;
+            	done = true;
+            });
+			$A.test.addWaitForWithFailureMessage(true,
+        			function() { 
+						return done;
+					},
+					"createComponent fail to get us a new component",
+					function() {
+						var cmpFromComponentClass = $A.componentService.getComponentClass(type);
+						$A.test.assertTrue(newComponent instanceof cmpFromComponentClass);
+					}
+			);
+            
 		}
 	},
 	
@@ -123,7 +125,6 @@
 		}
 	},
 	
-	//$A.ns.AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
 	testNewComponentReturnCorrectType : {
 		test: function(testCmp) {
 			var type="aura:text";
@@ -141,28 +142,35 @@
 		}
 	},
 	
-	//W-2567017
-	_testNewComponentServerDependencyReturnCorrectType : {
+	testNewComponentServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
 			var type="auradev:quickFixButton";
 			var config = {
 	                componentDef: type,
 	            }
 			var newCmp = $A.componentService.newComponent(config);
-			debugger;
+			testCmp.find("serverInParent").set("v.body", [newCmp]);
+			var cmpFromComponentClass = $A.componentService.getComponentClass(type);
 			//for newCmp, first we will get a place holder, once the response from server arrived, we will get a real one
-        	$A.test.addWaitForWithFailureMessage(true,
-        			function() {
-        		debugger;
-        				var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-        				return (newCmp instanceof cmpFromComponentClass);
-        			},
-        			"component created by server via newComponentDeprecated should be instance of those created by component Class"
-        	);
+			$A.test.addWaitForWithFailureMessage(true,
+        			function() { 
+						var placeholderBody = newCmp.get("v.body")[0];
+						if(placeholderBody) {
+							var qname = placeholderBody.getDef().getDescriptor().getQualifiedName();
+							return $A.test.contains(qname, type);
+						} else {
+							return false;
+						}
+					},
+					"placeholder didn't get replaced with real component we want",
+					function() {
+						var cmpFromComponentClass = $A.componentService.getComponentClass(type);
+						$A.test.assertTrue(newCmp.get("v.body")[0] instanceof cmpFromComponentClass);
+					}
+			);
 		}
 	},
 	
-	//$A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce)
 	testNewComponentDeprecatedReturnCorrectType : {
 		test: function(testCmp) {
 			var type="aura:text";
@@ -180,24 +188,35 @@
 		}
 	},
 	
-	//W-2567017
-	_testNewComponentDeprecatedServerDependencyReturnCorrectType : {
+	testNewComponentDeprecatedServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="auradev:quickFixButton";
+        	var type="auradev:quickFixButton";
 			var config = {
 	                componentDef: type,
 	            }
 			var newCmp = $A.componentService.newComponentDeprecated(config);
+			testCmp.find("serverInParent").set("v.body", [newCmp]);
 			var cmpFromComponentClass = $A.componentService.getComponentClass(type);
 			//for newCmp, first we will get a place holder, once the response from server arrived, we will get a real one
-        	$A.test.addWaitForWithFailureMessage(true,
-        			function() { return (newCmp instanceof cmpFromComponentClass) },
-        			"component created by server via newComponentDeprecated should be instance of those created by component Class"
-        	);
+			$A.test.addWaitForWithFailureMessage(true,
+        			function() { 
+						var placeholderBody = newCmp.get("v.body")[0];
+						if(placeholderBody) {
+							var qname = placeholderBody.getDef().getDescriptor().getQualifiedName();
+							return $A.test.contains(qname, type);
+						} else {
+							return false;
+						}
+					},
+					"placeholder didn't get replaced with real component we want",
+					function() {
+						var cmpFromComponentClass = $A.componentService.getComponentClass(type);
+						$A.test.assertTrue(newCmp.get("v.body")[0] instanceof cmpFromComponentClass);
+					}
+			);
 		}
 	},
 	
-	//$A.componentService.newComponentAsync(callbackScope, callback, config, avp)
 	testNewComponentAsyncReturnCorrectType : {
 		test: function(testCmp) {
 			var type="aura:text";
@@ -215,18 +234,26 @@
 	testNewComponentAsyncServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
 			var type="auradev:quickFixButton";
+			var done = false;
+			var newComponent;
+			$A.test.addWaitForWithFailureMessage(true,
+        			function() { 
+						return done;
+					},
+					"createComponent fail to get us a new component",
+					function() {
+						var cmpFromComponentClass = $A.componentService.getComponentClass(type);
+						$A.test.assertTrue(newComponent instanceof cmpFromComponentClass);
+					}
+			);
 			$A.componentService.newComponentAsync(
 	                this,
 	                function(newCmp){
-	                	var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-	                	//for newCmp, first we will get a place holder, once the response from server arrived, we will get a real one
-	                	$A.test.addWaitForWithFailureMessage(true,
-	                			function() { return (newCmp instanceof cmpFromComponentClass) },
-	                			"component created by server via newComponentAsync should be instance of those created by component Class"
-	                	);
+	                	newComponent = newCmp;
+	                	done = true;
 	                },
 	                type
-	            );
+	        );
 		}
 	}
 	

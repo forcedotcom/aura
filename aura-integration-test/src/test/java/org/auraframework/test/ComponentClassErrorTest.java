@@ -61,7 +61,7 @@ public class ComponentClassErrorTest extends WebDriverTestCase {
 	
 	//load componentClassParent.cmp, error out from its re-render
 	public void testParentErrorOutFromReRender() throws Exception {
-		String expectLocation = "auratest$componentClassParent.reRender";
+		String expectLocation = "auratest$componentClassParent.rerender";
 		String expectErrorMessage = "ReferenceError: blahFromParentReRerender is not defined";
 		runTestParentErrorOutFrom("errorOutFromReRender_Parent", ".uiButtonParent", expectErrorMessage, expectLocation);
 	}

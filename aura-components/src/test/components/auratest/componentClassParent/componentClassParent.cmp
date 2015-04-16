@@ -37,4 +37,8 @@
 	<ui:button label="RootButton" aura:id="button" press="{!c.clientAction}" class="uiButtonParent"/>
 	{!v.body}
 	<aura:text value="{!v.value}"/>
+	
+	<!-- this div is here so we can create component and push it to here, in test -->
+	<div aura:id="serverInParent"></div>
+                
 </aura:component>

@@ -194,10 +194,8 @@
         for (i = 0; i < children.length; i++) {
             $A.util.setDataAttribute(children[i], 'visible', "visible");
         }
-$A.log("filterTests with query:"+query,query);
         if (query) {
             regexp = new RegExp(query,'i');
-            $A.log("try to find in list-test-item,length:"+children.length,children);
             for (i = 0; i < children.length; i++) {
                 li = children[i];
                 if (li.getElementsByTagName("input")[0].checked) {
@@ -206,9 +204,7 @@ $A.log("filterTests with query:"+query,query);
                 name = li.getElementsByClassName('ns')[0].textContent;
                 if (!regexp.test(name)) {
                     $A.util.setDataAttribute(li, 'visible', "hidden");
-                } else {
-                	$A.log("found one:"+name);
-                }
+                } 
                 
             }
         }

@@ -61,19 +61,19 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     }
 
     private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions");
-    
+
     // Do not test for null message, it cannot legally be null.
     private static class EmptyActionDef implements ActionDef {
-		private static final long serialVersionUID = 1L;
-		StringWriter sw;
-		String name;
-		
-		protected EmptyActionDef(StringWriter sw,String name) {
-			this.sw = sw;
-			this.name = name;
-		}
+        private static final long serialVersionUID = 1L;
+        StringWriter sw;
+        String name;
 
-		@Override
+        protected EmptyActionDef(StringWriter sw, String name) {
+            this.sw = sw;
+            this.name = name;
+        }
+
+        @Override
         public void validateDefinition() throws QuickFixException {
         }
 
@@ -171,55 +171,54 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             return Lists.newArrayList();
         }
     }
-    
-   
 
     private static class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
-        private String returnValue="";
-        private Integer count=0;
-        private String parameter="";
-        
-        public EmptyAction(StringWriter sw, String name) {
-            super(null, new EmptyActionDef(sw,name), null);
-        }
-		
-		public EmptyAction() {
-            super(null, new EmptyActionDef(null,"simpleaction"), null);
-        }
-		
-		public Integer getCount() {
-			return this.count;
-		}
+        private String returnValue = "";
+        private Integer count = 0;
+        private String parameter = "";
 
-		public String getName() {
-			return this.actionDef.getName();
-		}
-		
+        public EmptyAction(StringWriter sw, String name) {
+            super(null, new EmptyActionDef(sw, name), null);
+        }
+
+        public EmptyAction() {
+            super(null, new EmptyActionDef(null, "simpleaction"), null);
+        }
+
+        public Integer getCount() {
+            return this.count;
+        }
+
+        public String getName() {
+            return this.actionDef.getName();
+        }
+
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
-            return Aura.getDefinitionService().getDefDescriptor("java://aura.empty/ACTION$emptyAction", ActionDef.class);
+            return Aura.getDefinitionService()
+                    .getDefDescriptor("java://aura.empty/ACTION$emptyAction", ActionDef.class);
         }
 
         @Override
         public void run() throws AuraExecutionException {
-        	this.count++;
-        	if(this.actionDef.sw!=null) {
-        		this.returnValue = this.actionDef.sw.toString();
-        	} else {
-        		//do nothing
-        	}
-        	if(this.count>1) {
-        		setParameter("#"+this.count);
-        	}
+            this.count++;
+            if (this.actionDef.sw != null) {
+                this.returnValue = this.actionDef.sw.toString();
+            } else {
+                // do nothing
+            }
+            if (this.count > 1) {
+                setParameter("#" + this.count);
+            }
         }
 
         @Override
         public Object getReturnValue() {
             return this.returnValue;
         }
-        
+
         private void setParameter(String parameter) {
-        	this.parameter = parameter;
+            this.parameter = parameter;
         }
 
         @Override
@@ -229,9 +228,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public void serialize(Json json) throws IOException {
-            Map<String,String> value = Maps.newHashMap();
-            String res=this.getName();
-            if(this.parameter!="") { res=res.concat("{"+this.parameter+"}"); }
+            Map<String, String> value = Maps.newHashMap();
+            String res = this.getName();
+            if (this.parameter != "") {
+                res = res.concat("{" + this.parameter + "}");
+            }
             value.put("action", res);
             json.writeValue(value);
         }
@@ -239,196 +240,193 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     private static class ShareCmpAction extends ActionDelegate {
 
-    	private Map<String,Object> componentAttributes = null;
-    	private Component sharedCmp = null;
-    	private Object returnValue = null;
-    	private String name="ShareCmpAction";
-    	
-    	public ShareCmpAction(String name, Action originalAction, Component sharedCmp, Map<String,Object> componentAttributes) {
+        private Map<String, Object> componentAttributes = null;
+        private Component sharedCmp = null;
+        private Object returnValue = null;
+        private String name = "ShareCmpAction";
+
+        public ShareCmpAction(String name, Action originalAction, Component sharedCmp,
+                Map<String, Object> componentAttributes) {
             super(originalAction);
             this.sharedCmp = sharedCmp;
             this.componentAttributes = componentAttributes;
             this.name = name;
         }
-    	
-		@Override
-		public void run() throws AuraExecutionException {
-			try {
-				sharedCmp.getAttributes().set(componentAttributes); 
-			} catch (QuickFixException e) {
-				throw new AuraExecutionException(e.getMessage(), e.getLocation());
-			}
-			super.run();
-			String whatIsInResponse = (String) super.getReturnValue();
-			int startPos = whatIsInResponse.lastIndexOf("shared_component");
-			if(startPos >=0 ) {
-				this.returnValue = whatIsInResponse.substring(startPos);
-			}
-		}
 
-		@Override
-		public Object getReturnValue() {
-			return this.returnValue;
-		}
-		
-		@Override
-		public void serialize(Json json) throws IOException {
-			Map<String,Object> value = Maps.newHashMap();
-			value.put("shared_component", this.sharedCmp);
-			value.put("action", this.name);
+        @Override
+        public void run() throws AuraExecutionException {
+            try {
+                sharedCmp.getAttributes().set(componentAttributes);
+            } catch (QuickFixException e) {
+                throw new AuraExecutionException(e.getMessage(), e.getLocation());
+            }
+            super.run();
+            String whatIsInResponse = (String) super.getReturnValue();
+            int startPos = whatIsInResponse.lastIndexOf("shared_component");
+            if (startPos >= 0) {
+                this.returnValue = whatIsInResponse.substring(startPos);
+            }
+        }
+
+        @Override
+        public Object getReturnValue() {
+            return this.returnValue;
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+            Map<String, Object> value = Maps.newHashMap();
+            value.put("shared_component", this.sharedCmp);
+            value.put("action", this.name);
             json.writeValue(value);
-		}
+        }
     }
 
     /**
-     * Test for W-2085617
-     * This test is to verify when we have shared component between actions, they get serialized into response correctly.
+     * Test for W-2085617 This test is to verify when we have shared component between actions, they get serialized into
+     * response correctly.
      * 
-     * Test Setup: 
-     * EmptyAction a,b,c : when it run, it put whatever response has into their return value
-     * ShareCmpAction d,e,f: when it run, it update the attribute of shared component, run its delegate action(a,b orc),
-     * then get the latest shared_component(in Json format) from its delegate action's return value as its return value.
+     * Test Setup: EmptyAction a,b,c : when it run, it put whatever response has into their return value ShareCmpAction
+     * d,e,f: when it run, it update the attribute of shared component, run its delegate action(a,b orc), then get the
+     * latest shared_component(in Json format) from its delegate action's return value as its return value.
      * 
-     * when b runs, a has finish running, so b will have shared_component of a
-     * e will have shared_component of a in its return value (with attrA)
-     * when c runs, b has finish running, so c will have shared_components of a & b
-     * e will have shared_component of b in its return value (with attrB)
+     * when b runs, a has finish running, so b will have shared_component of a e will have shared_component of a in its
+     * return value (with attrA) when c runs, b has finish running, so c will have shared_components of a & b e will
+     * have shared_component of b in its return value (with attrB)
+     * 
      * @throws Exception
      */
     public void testSharedCmp() throws Exception {
-    	Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-    	Map<String, Object> attributes = Maps.newHashMap();
-    	Map<String, Object> attributesA = Maps.newHashMap();
-    	attributesA.put("attr", "attrA");
-    	Map<String, Object> attributesB = Maps.newHashMap();
-    	attributesB.put("attr", "attrB");
-    	Map<String, Object> attributesC = Maps.newHashMap();
-    	attributesC.put("attr", "attrC");
-		Component sharedCmp = Aura.getInstanceService().getInstance("ifTest:testIfWithModel", ComponentDef.class,
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        Map<String, Object> attributes = Maps.newHashMap();
+        Map<String, Object> attributesA = Maps.newHashMap();
+        attributesA.put("attr", "attrA");
+        Map<String, Object> attributesB = Maps.newHashMap();
+        attributesB.put("attr", "attrB");
+        Map<String, Object> attributesC = Maps.newHashMap();
+        attributesC.put("attr", "attrC");
+        Component sharedCmp = Aura.getInstanceService().getInstance("ifTest:testIfWithModel", ComponentDef.class,
                 attributes);
-    	StringWriter sw = new StringWriter();
+        StringWriter sw = new StringWriter();
         ServerService ss = Aura.getServerService();
-        Action a = new EmptyAction(sw,"first action");
-        Action b = new EmptyAction(sw,"second action");
-        Action c = new EmptyAction(sw,"third action");
-        Action d = new ShareCmpAction("d",a,sharedCmp,attributesA);
-        Action e = new ShareCmpAction("e",b,sharedCmp,attributesB);
-        Action f = new ShareCmpAction("f",c,sharedCmp,attributesC);
-        List<Action> actions = Lists.newArrayList(d,e,f);
+        Action a = new EmptyAction(sw, "first action");
+        Action b = new EmptyAction(sw, "second action");
+        Action c = new EmptyAction(sw, "third action");
+        Action d = new ShareCmpAction("d", a, sharedCmp, attributesA);
+        Action e = new ShareCmpAction("e", b, sharedCmp, attributesB);
+        Action f = new ShareCmpAction("f", c, sharedCmp, attributesC);
+        List<Action> actions = Lists.newArrayList(d, e, f);
         Message message = new Message(actions);
-        //run the list of actions. 
+        // run the list of actions.
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
-        
-        //sanity check, sharedCmp should have the latest attribute value. 
-        //this has nothing to do with the fix though
-        assertEquals("attrC",sharedCmp.getAttributes().getValue("attr"));
-        //Here are the checks for fix
-        //returnValue of action e is going to have shared component from action d in Json format
+
+        // sanity check, sharedCmp should have the latest attribute value.
+        // this has nothing to do with the fix though
+        assertEquals("attrC", sharedCmp.getAttributes().getValue("attr"));
+        // Here are the checks for fix
+        // returnValue of action e is going to have shared component from action d in Json format
         String returne = (String) e.getReturnValue();
         assertTrue(returne.contains("markup://ifTest:testIfWithModel"));
         assertTrue(returne.contains("\"attr\":\"attrA\""));
-        //returnValue of action f is going to have shared component from action e in Json format
+        // returnValue of action f is going to have shared component from action e in Json format
         String returnf = (String) f.getReturnValue();
         assertTrue(returnf.contains("markup://ifTest:testIfWithModel"));
         assertTrue(returnf.contains("\"attr\":\"attrB\""));
-        
+
     }
 
     /**
      * Check that our EmptyAction is properly serialized.
-     *
+     * 
      * This does a positive and negative test, ensuring that we only serialize what we should.
      */
     @SuppressWarnings("unchecked")
-    private Map<String,Object> validateEmptyActionSerialization(String serialized, Set<String> ignore, 
-    		List<String> actionNameList) {
-    	int actionNumber = actionNameList.size();
+    private Map<String, Object> validateEmptyActionSerialization(String serialized, Set<String> ignore,
+            List<String> actionNameList) {
+        int actionNumber = actionNameList.size();
         Set<String> extras = Sets.newHashSet();
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(serialized);
         List<Object> actions = (List<Object>) json.get("actions");
         assertTrue(actions != null);
-        assertTrue("expected "+actionNumber+" action, but get "+actions.size(), actions.size() == actionNumber);
-        for(int i=0;i<actionNumber;i++) {
+        assertTrue("expected " + actionNumber + " action, but get " + actions.size(), actions.size() == actionNumber);
+        for (int i = 0; i < actionNumber; i++) {
             Map<String, Object> action = (Map<String, Object>) actions.get(i);
-        	assertEquals("didn't get expecting action on i:"+i, 
-        			actionNameList.get(i), action.get("action"));
+            assertEquals("didn't get expecting action on i:" + i,
+                    actionNameList.get(i), action.get("action"));
         }
         for (String key : json.keySet()) {
             if (!GLOBAL_IGNORE.contains(key) && (ignore == null || !ignore.contains(key))) {
                 extras.add(key);
             }
         }
-        assertTrue("Expected no extra keys, found: "+extras+", in: "+json, extras.isEmpty());
+        assertTrue("Expected no extra keys, found: " + extras + ", in: " + json, extras.isEmpty());
         return json;
     }
-    
+
     /**
-     * This test is for W-2063110
-     * Test a list of actions.
-     * New Way : in ServerService, we serialize each action and write it into response (via a string writer) 
-     * right after it finish running. 
-     * in the SimpleAction above, we put whatever we have in the string writer as returnValue of the current action
-     * so when Action2 is running, we should have Action1 in string writer, 
-     * when Action3 is running, we should have both Action1 and Action2, ....
-     * Old Way: We used to run all actions, store the result in Message, then write them into response at once,
-     * in the old way we won't have anything in string writer/response until Action3 is finished.
+     * This test is for W-2063110 Test a list of actions. New Way : in ServerService, we serialize each action and write
+     * it into response (via a string writer) right after it finish running. in the SimpleAction above, we put whatever
+     * we have in the string writer as returnValue of the current action so when Action2 is running, we should have
+     * Action1 in string writer, when Action3 is running, we should have both Action1 and Action2, .... Old Way: We used
+     * to run all actions, store the result in Message, then write them into response at once, in the old way we won't
+     * have anything in string writer/response until Action3 is finished.
      */
     public void testMultipleActions() throws Exception {
-    	Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-    	StringWriter sw = new StringWriter();
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        StringWriter sw = new StringWriter();
         ServerService ss = Aura.getServerService();
-        Action a = new EmptyAction(sw,"first action");
-        Action b = new EmptyAction(sw,"second action");
-        Action c = new EmptyAction(sw,"third action");
-        List<Action> actions = Lists.newArrayList(a,b,c);
+        Action a = new EmptyAction(sw, "first action");
+        Action b = new EmptyAction(sw, "second action");
+        Action c = new EmptyAction(sw, "third action");
+        List<Action> actions = Lists.newArrayList(a, b, c);
         Message message = new Message(actions);
-        //run the list of actions. 
+        // run the list of actions.
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
         String returnValuea = "{\"actions\":[";
-        String returnValueb = returnValuea+"{\"action\":\"firstaction\"}";
-        String returnValuec = returnValueb+",{\"action\":\"secondaction\"}";
-        
-        List<String> returnValueList = Arrays.asList(returnValuea,returnValueb,returnValuec);
-        for(int i=0;i<actions.size();i++) {
-        	Action act = actions.get(i);
-        	assertEquals("get different action return on i:"+i,
-        			returnValueList.get(i),((String)act.getReturnValue()).replaceAll("\\s+", ""));
+        String returnValueb = returnValuea + "{\"action\":\"firstaction\"}";
+        String returnValuec = returnValueb + ",{\"action\":\"secondaction\"}";
+
+        List<String> returnValueList = Arrays.asList(returnValuea, returnValueb, returnValuec);
+        for (int i = 0; i < actions.size(); i++) {
+            Action act = actions.get(i);
+            assertEquals("get different action return on i:" + i,
+                    returnValueList.get(i), ((String) act.getReturnValue()).replaceAll("\\s+", ""));
         }
-        
-        validateEmptyActionSerialization(sw.toString(), null, Arrays.asList("first action","second action","third action"));
+
+        validateEmptyActionSerialization(sw.toString(), null,
+                Arrays.asList("first action", "second action", "third action"));
     }
-    
-    
+
     /**
-     * This test is for W-2063110
-     * Running the same action twice in a list
-     * since we output right after the run, we can reuse the action. 
-     * the second run will over-write the previous run's returnValue(unless we change the run()), 
-     * but response keep the info from previous run, so we are good
+     * This test is for W-2063110 Running the same action twice in a list since we output right after the run, we can
+     * reuse the action. the second run will over-write the previous run's returnValue(unless we change the run()), but
+     * response keep the info from previous run, so we are good
      */
     public void testSameActionTwice() throws Exception {
-    	Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-    	StringWriter sw = new StringWriter();
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        StringWriter sw = new StringWriter();
         ServerService ss = Aura.getServerService();
-        Action a = new EmptyAction(sw,"first action");
-        Action b = new EmptyAction(sw,"second action");
-        List<Action> actions = Lists.newArrayList(a,b,a,b);
+        Action a = new EmptyAction(sw, "first action");
+        Action b = new EmptyAction(sw, "second action");
+        List<Action> actions = Lists.newArrayList(a, b, a, b);
         Message message = new Message(actions);
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, null);
-        assertTrue(((EmptyAction)a).getCount()==2);
-        assertTrue(((EmptyAction)b).getCount()==2);
-        //in the old way since we output action info into response after all actions finish running, the previous run's info will get overwrited
-        //but this is not the case now
-        //we need to verify when same action run twice, and something about the action changed between the two runs --like the parameter, 
-        //the response has the action info for both times.
-        validateEmptyActionSerialization(sw.toString(), null, 
-        		Arrays.asList("first action","second action","first action{#2}","second action{#2}"));
-  
+        assertTrue(((EmptyAction) a).getCount() == 2);
+        assertTrue(((EmptyAction) b).getCount() == 2);
+        // in the old way since we output action info into response after all actions finish running, the previous run's
+        // info will get overwrited
+        // but this is not the case now
+        // we need to verify when same action run twice, and something about the action changed between the two runs
+        // --like the parameter,
+        // the response has the action info for both times.
+        validateEmptyActionSerialization(sw.toString(), null,
+                Arrays.asList("first action", "second action", "first action{#2}", "second action{#2}"));
+
     }
 
     /**
      * Test a simple action that serializes a specific value.
-     *
+     * 
      * We carefully test only the parts that we care about for ServerService.
      */
     public void testSimpleAction() throws Exception {
@@ -445,24 +443,26 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     /**
      * Test a simple action that serializes a specific value.
-     *
+     * 
      * We carefully test only the parts that we care about for ServerService.
      */
     public void testSimpleActionWithExtras() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-    	
+
         ServerService ss = Aura.getServerService();
         Action a = new EmptyAction();
         List<Action> actions = Lists.newArrayList(a);
-        Map<String,String> extras = Maps.newHashMap();
+        Map<String, String> extras = Maps.newHashMap();
         Message message = new Message(actions);
         StringWriter sw = new StringWriter();
         extras.put("this", "that");
         ss.run(message, Aura.getContextService().getCurrentContext(), sw, extras);
 
-        Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Sets.newHashSet("this"),Arrays.asList("simpleaction"));
-        assertEquals("Expected extras to be in "+json, "that", json.get("this"));
+        Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Sets.newHashSet("this"),
+                Arrays.asList("simpleaction"));
+        assertEquals("Expected extras to be in " + json, "that", json.get("this"));
     }
+
     /**
      * Sanity check to make sure that app.css does not have duplicate copy of component CSS. Component CSS was being
      * added twice, once because they were part of preload namespace and a second time because of component dependency.
@@ -478,7 +478,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         context.addLoaded(appDesc, uid);
 
         Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
-        
+
         StringWriter output = new StringWriter();
         ss.writeAppCss(dependencies, output);
 
@@ -525,12 +525,12 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         //
         // order should be exactly that above.
         // child1, grandparent, parent, child2
-        // 
-        assertTrue("parent CSS should be written before child CSS in: "+css,
+        //
+        assertTrue("parent CSS should be written before child CSS in: " + css,
                 css.indexOf(".setAttributesTestChild") < css.indexOf(".setAttributesTestGrandparent"));
-        assertTrue("grandparent CSS should be written before parent CSS in: "+css,
+        assertTrue("grandparent CSS should be written before parent CSS in: " + css,
                 css.indexOf(".setAttributesTestGrandparent") < css.indexOf(".setAttributesTestParent"));
-        assertTrue("parent CSS should be written before another child CSS in: "+css,
+        assertTrue("parent CSS should be written before another child CSS in: " + css,
                 css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestAnotherChild"));
     }
 
@@ -551,8 +551,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
         String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";
         String preloaded2 = ".testTestValidCSS{color:#1797c0";
-        assertTrue("Does not have preloaded css (1) in "+output, sourceNoWhitespace.contains(preloaded1));
-        assertTrue("Does not have preloaded css (2) in "+output, sourceNoWhitespace.contains(preloaded2));
+        assertTrue("Does not have preloaded css (1) in " + output, sourceNoWhitespace.contains(preloaded1));
+        assertTrue("Does not have preloaded css (2) in " + output, sourceNoWhitespace.contains(preloaded2));
     }
 
     /**
@@ -603,7 +603,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
 
-        String[] preloads = new String[]{
+        String[] preloads = new String[] {
                 "\"descriptor\":\"markup://aura:placeholder\"",
                 "\"descriptor\":\"markup://ui:input\"",
                 "\"descriptor\":\"markup://ui:inputText\"",
@@ -612,7 +612,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         };
 
         for (String preload : preloads) {
-            assertTrue("Does not have preloaded component: (" + preload + ")" , sourceNoWhitespace.contains(preload));
+            assertTrue("Does not have preloaded component: (" + preload + ")", sourceNoWhitespace.contains(preload));
         }
     }
 
@@ -620,32 +620,115 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * Tests aura definitions has no syntax errors and can be compressed
      */
     public void testNoAppJSCompressionErrors() throws Exception {
-
         // check js compression on main aura namespaces
-        String[] namespaces = new String[] {
-            "aura", "ui", "auraadmin", "auradev", "auradocs", "auraStorage"
-        };
+        String[] namespaces = new String[] { "aura", "ui", "auraadmin",
+                "auradev", "auradocs", "auraStorage" };
 
         StringBuilder source = new StringBuilder();
         source.append("<aura:application>");
         for (String ns : namespaces) {
-            source.append(String.format("<aura:dependency resource=\"%s:*\" type=\"*\" />", ns));
+            source.append(String.format(
+                    "<aura:dependency resource=\"%s:*\" type=\"*\" />", ns));
         }
         source.append("</aura:application>");
 
-        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, source.toString());
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.PROD, AuraContext.Format.JS,
+        String js = getDefinitionsOutput(source.toString(),
+                AuraContext.Mode.PROD);
+        assertFalse(
+                "There are syntax errors preventing compression of application javascript",
+                js.contains("There are errors preventing this file from being minimized!"));
+    }
+
+    /**
+     * If a component extends the root component and doesn't implement it's own unrender function it should get a
+     * special default unrender function in it's component class.
+     */
+    public void testComponentClassUnrenderWhenExtendsRootComponent()
+            throws Exception {
+        String defaultUnrender = "if(elements){while(elements.length){$A.util.removeElement(elements.pop());}}this.disassociateElements();";
+
+        String js = getDefinitionsOutput(
+                "<aura:application></aura:application>", AuraContext.Mode.DEV);
+        int index = js.indexOf("aura$text.prototype.unrender");
+        String unrenderFunction = js.substring(index, index + 500).replaceAll(
+                "\\s+", "");
+
+        assertTrue(
+                "Default unrender function should be used when component extends the root component but was <"
+                        + unrenderFunction + ">",
+                unrenderFunction.contains(defaultUnrender));
+    }
+
+    /**
+     * Verify when a component implements its own unrender function, that function overrides the default.
+     */
+    public void testComponentClassUnrenderDefaultOverriden() throws Exception {
+        String defaultUnrender = "if(elements){while(elements.length){$A.util.removeElement(elements.pop());}}this.disassociateElements();";
+
+        String js = getDefinitionsOutput(
+                "<aura:application></aura:application>", AuraContext.Mode.DEV);
+        int index = js.indexOf("aura$html.prototype.unrender");
+        String unrenderFunction = js.substring(index, index + 500).replaceAll(
+                "\\s+", "");
+
+        assertFalse(
+                "Default unrender function should be overriden if component defines its own unrender",
+                unrenderFunction.contains(defaultUnrender));
+    }
+
+    /**
+     * When we write out the application javascript we should only include component classes once per component.
+     */
+    public void testNoComponentClassDuplicate() throws Exception {
+        Object componentClass = null;
+        Boolean found = false;
+        String js = getDefinitionsOutput(
+                "<aura:application></aura:application>", AuraContext.Mode.DEV);
+
+        assertTrue("aura:html component class not included in app js",
+                js.contains("addComponentClass(\"aura$html"));
+
+        String start = "$A.clientService.initDefs(";
+        int index = js.indexOf(start);
+        String componentDefs = js.substring(index + start.length(),
+                js.length() - 4);
+        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(componentDefs);
+        List<?> defs = (List<?>) json.get("componentDefs");
+
+        for (Object def : defs) {
+            Map<?, ?> value = ((Map<?, ?>) ((Map<?, ?>) def)
+                    .get(Json.ApplicationKey.VALUE.toString()));
+            if (value != null) {
+                String desc = (String) value.get("descriptor");
+                if (desc.equals("markup://aura:html")) {
+                    componentClass = value.get("componentClass");
+                    found = true;
+                }
+            }
+        }
+
+        assertTrue("No aura:html componentDef entry found", found);
+        assertNull(
+                "Duplicate component class entires for aura:html in application javascript",
+                componentClass);
+    }
+
+    private String getDefinitionsOutput(String source, AuraContext.Mode mode)
+            throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
+                ApplicationDef.class, source);
+        AuraContext context = Aura.getContextService().startContext(mode,
+                AuraContext.Format.JS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+        Set<DefDescriptor<?>> dependencies = context.getDefRegistry()
+                .getDependencies(uid);
 
         ServerService ss = Aura.getServerService();
         StringWriter output = new StringWriter();
         ss.writeDefinitions(dependencies, output);
 
-        String js = output.toString();
-        assertFalse("There are syntax errors preventing compression of application javascript",
-            js.contains("There are errors preventing this file from being minimized!"));
+        return output.toString();
     }
 }

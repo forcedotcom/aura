@@ -40,6 +40,7 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 
 import com.google.common.base.Function;
@@ -225,6 +226,61 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "fake:component", null, null, null, vendor.makeLocation("filename2", 10, 10, 0), null,
                 null, null, null, null, null, null, false, false));
+    }
+
+    /**
+     * RendererDefs are sent to client as part of component classes so do not need to be serialized as part of the
+     * ComponentDef
+     */
+    public void testRendererDefsNotSerialized() throws Exception {
+        List<DefDescriptor<RendererDef>> rendererList = new ArrayList<>();
+        DefDescriptor<RendererDef> renderer = DefDescriptorImpl.getInstance(
+                "js://aura.html", RendererDef.class);
+        rendererList.add(renderer);
+        Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
+                "aura:if", null, null, null, null, null, null, null, null,
+                rendererList, null, null, false, false);
+
+        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
+        Map<?, ?> rendererDef = (Map<?, ?>) ((Map<?, ?>) json
+                .get(Json.ApplicationKey.VALUE.toString())).get("rendererDef");
+
+        assertNull("RendererDef should not be serialized with ComponentDef",
+                rendererDef);
+    }
+
+    /**
+     * HeleprDefs are sent to client as part of component classes so do not need to be serialized as part of the
+     * ComponentDef
+     */
+    public void testHelperDefNotSerialized() throws Exception {
+        List<DefDescriptor<HelperDef>> helperList = new ArrayList<>();
+        DefDescriptor<HelperDef> helper = DefDescriptorImpl.getInstance(
+                "js://aura.html", HelperDef.class);
+        helperList.add(helper);
+        Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
+                "aura:if", null, null, null, null, null, null, null, null,
+                null, helperList, null, false, false);
+
+        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
+        Map<?, ?> helperDef = (Map<?, ?>) ((Map<?, ?>) json
+                .get(Json.ApplicationKey.VALUE.toString())).get("helperDef");
+
+        assertNull("HelperDef should not be serialized with ComponentDef",
+                helperDef);
+    }
+
+    public void testComponentClassSerialized() throws Exception {
+        Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
+                "aura:text", null, null, null, null, null, null, null, null,
+                null, null, null, false, false);
+
+        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
+        String componentClass = (String) ((Map<?, ?>) json
+                .get(Json.ApplicationKey.VALUE.toString()))
+                .get("componentClass");
+
+        assertNotNull(componentClass);
     }
 
     public void testGetAttributeDefsSpidered() throws Exception {
@@ -663,7 +719,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 return input.getQualifiedName();
             }
         });
-        assertTrue(names.containsAll(ImmutableSet.of("java://org.auraframework.component.test.java.controller.TestController",
+        assertTrue(names.containsAll(ImmutableSet.of(
+                "java://org.auraframework.component.test.java.controller.TestController",
                 "java://org.auraframework.impl.java.controller.TestController2")));
     }
 
@@ -1004,7 +1061,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testDependencyNonExistent() {
         try {
-        	define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
+            define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
             fail("Should not be able to load non-existant resource as dependency");
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency *://idontexist:*[COMPONENT]");
@@ -1014,10 +1071,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     /**
      * InvalidDefinitionException for invalid dependency.
      */
-    public void testDependencyInvalid()  {
+    public void testDependencyInvalid() {
         // Invalid descriptor pattern
         try {
-        	define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
+            define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Illegal namespace in *://auratest.*");
@@ -1032,7 +1089,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }
     }
 
-    public void testLabelUnspecificed()  {
+    public void testLabelUnspecificed() {
         // Invalid descriptor pattern
         try {
             define(baseTag, "", "{!$Label}");
@@ -1238,8 +1295,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
     public void testHasLocalDependenciesInheritedServersideRenderer() throws QuickFixException {
-        String parentContent = String.format(baseTag,
-                "extensible='true' renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'", "");
+        String parentContent = String
+                .format(baseTag,
+                        "extensible='true' renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'",
+                        "");
         DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
 
         DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
@@ -1254,8 +1313,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
     public void testHasLocalDependenciesInheritedClientsideAndServersideRenderers() throws QuickFixException {
-        String parentContent = String.format(baseTag,
-                "extensible='true' renderer='js://aura.html,java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'", "");
+        String parentContent = String
+                .format(baseTag,
+                        "extensible='true' renderer='js://aura.html,java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'",
+                        "");
         DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
 
         DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
@@ -1271,7 +1332,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testHasLocalDependenciesInheritedServersideProvider() throws QuickFixException {
         String parentContent = String.format(baseTag,
-                "extensible='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'", "");
+                "extensible='true' provider='java://org.auraframework.impl.java.provider.TestProviderAbstractBasic'",
+                "");
         DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
 
         DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
@@ -1341,7 +1403,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             fail(defType + " should throw Exception when extending non-existent component");
         } catch (QuickFixException e) {
             checkExceptionFull(e, DefinitionNotFoundException.class,
-                    "No " + defType + " named markup://aura:iDontExist found : [" + cmp.getQualifiedName()+"]",
+                    "No " + defType + " named markup://aura:iDontExist found : [" + cmp.getQualifiedName() + "]",
                     cmp.getQualifiedName());
         }
     }
@@ -1824,7 +1886,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<ThemeDef> themeDesc = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
         String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
         DefDescriptor<T> desc = DefDescriptorImpl.getInstance(fmt, getDefClass());
-        addSourceAutoCleanup(desc, String.format(baseTag, "",""));
+        addSourceAutoCleanup(desc, String.format(baseTag, "", ""));
         assertEquals(themeDesc, desc.getDef().getCmpTheme());
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
@@ -1834,7 +1896,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testAppendsStandardFlavorToDependencies() throws Exception {
         DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
-        DefDescriptor<FlavoredStyleDef> flavor = addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), "@flavor test; .test{}");
+        DefDescriptor<FlavoredStyleDef> flavor = addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc),
+                "@flavor test; .test{}");
 
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         desc.getDef().appendDependencies(dependencies);
@@ -1908,7 +1971,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "defaultFlavor='test'", "<div aura:flavorable='true'></div>"));
         addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc),
                 "@flavor default; .default{}" +
-                "@flavor test; .test{}");
+                        "@flavor test; .test{}");
         assertEquals("test", desc.getDef().getDefaultFlavorOrImplicit());
     }
 }

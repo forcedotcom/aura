@@ -16,6 +16,7 @@
 package org.auraframework.test.root.component;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -25,6 +26,8 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
 
 public class ComponentImplTest extends AuraImplTestCase {
 
@@ -56,28 +59,41 @@ public class ComponentImplTest extends AuraImplTestCase {
         testComponent.getClass();
         serializeAndGoldFile(testComponent);
     }
-    
+
+    /**
+     * Component classes will be serialized with the ComponentDef instead of on the Component.
+     */
+    public void testComponentClassesNotSerialized() throws Exception {
+        Object cmp = vendor.makeComponent("test:parent", "foo");
+
+        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmp));
+        String componentClass = (String) ((Map<?, ?>) json.get(Json.ApplicationKey.VALUE.toString()))
+                .get("componentClass");
+
+        assertNull(componentClass);
+    }
+
     public void testReinitializeModel() throws Exception {
         Component cmp = vendor.makeComponent("test:child1", "meh");
 
         PropertyReferenceImpl propRef = new PropertyReferenceImpl("value", null);
-		assertEquals(null, cmp.getModel().getValue(propRef));
-        
+        assertEquals(null, cmp.getModel().getValue(propRef));
+
         setAttribute(cmp, "attr", "some value");
 
-		assertEquals(null, cmp.getModel().getValue(propRef));
-		
-		cmp.reinitializeModel();
+        assertEquals(null, cmp.getModel().getValue(propRef));
+
+        cmp.reinitializeModel();
         assertEquals("some value", cmp.getModel().getValue(propRef));
-        
+
         setAttribute(cmp, "attr", "some other value");
-		cmp.reinitializeModel();
+        cmp.reinitializeModel();
         assertEquals("some other value", cmp.getModel().getValue(propRef));
     }
 
-	private void setAttribute(Component cmp, String name, String value) throws QuickFixException {
-		AttributeDefRef adr = vendor.makeAttributeDefRef(name, value, new Location("meh", 0));
+    private void setAttribute(Component cmp, String name, String value) throws QuickFixException {
+        AttributeDefRef adr = vendor.makeAttributeDefRef(name, value, new Location("meh", 0));
         AttributeSet attributes = cmp.getAttributes();
-		attributes.set(Collections.singleton(adr));
-	}
+        attributes.set(Collections.singleton(adr));
+    }
 }

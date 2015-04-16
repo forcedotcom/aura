@@ -139,13 +139,13 @@ public class FileSourceListenerTest extends UnitTestCase {
     }
 
     public void testSourceChangedCustomFlavor() throws Exception {
-        assertSourceChangedCalled(DefDescriptor.CUSTOM_FLAVOR_PREFIX, "foo", "ui_button", DefDescriptor.DefType.FLAVORED_STYLE,
-                "/some/awesome/foo/flavors/ui_buttonFlavors.css");
+        assertSourceChangedCalled(DefDescriptor.CUSTOM_FLAVOR_PREFIX, "foo", "ui-button", DefDescriptor.DefType.FLAVORED_STYLE,
+                "/some/awesome/foo/flavors/ui-button.css");
     }
 
     public void testSourceChangedFlavorAssortment() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "flavors", DefDescriptor.DefType.FLAVOR_ASSORTMENT,
-                "/some/awesome/ui/flavors/flavorsFlavors.xml");
+        assertSourceChangedCalled("markup", "ui", "baseFlavors", DefDescriptor.DefType.FLAVOR_ASSORTMENT,
+                "/some/awesome/ui/baseFlavors/baseFlavors.flavors");
     }
 
     public void testSourceChangedTheme() throws Exception {

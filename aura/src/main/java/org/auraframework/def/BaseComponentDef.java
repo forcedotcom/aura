@@ -146,7 +146,7 @@ public interface BaseComponentDef extends RootDefinition {
     DefDescriptor<ThemeDef> getCmpTheme();
 
     /**
-     * Returns true if this component has a child component def ref (e.g., html element) that has aura:flavorable.
+     * Returns true if this component has a child component def ref html element that has aura:flavorable.
      *
      * @see FlavoredStyleDef
      */

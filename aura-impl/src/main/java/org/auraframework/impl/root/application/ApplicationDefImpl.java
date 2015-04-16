@@ -147,6 +147,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (layoutsDefDescriptor != null) {
             json.writeMapEntry("layouts", getLayoutsDefDescriptor().getDef());
         }
+
+        if (defaultFlavorsDescriptor != null) {
+            json.writeMapEntry("defaultFlavors", getDefaultFlavorsDescriptor().getDef());
+        }
     }
 
     @Override

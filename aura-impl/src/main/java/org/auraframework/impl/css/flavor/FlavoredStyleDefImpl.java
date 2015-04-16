@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.style.AbstractStyleDef;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Themes;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -55,11 +56,14 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
                 dependencies.add(namespaceTheme);
             }
         }
+
+        if (getDescriptor().getPrefix().equals(DefDescriptor.CUSTOM_FLAVOR_PREFIX)) {
+            dependencies.add(Flavors.toComponentDescriptor(getDescriptor()));
+        }
     }
 
     @Override
-    public void serialize(Json json) throws IOException {
-    }
+    public void serialize(Json json) throws IOException {}
 
     public static class Builder extends AbstractStyleDef.Builder<FlavoredStyleDef> implements FlavoredStyleDefBuilder {
         public Builder() {

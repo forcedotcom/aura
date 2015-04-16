@@ -164,6 +164,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case THEME:
             case DESIGN:
             case SVG:
+            case FLAVORS:
             case FLAVOR_ASSORTMENT:
                 Type tag = TypeParser.parseTag(qualifiedName);
                 if (tag != null) {

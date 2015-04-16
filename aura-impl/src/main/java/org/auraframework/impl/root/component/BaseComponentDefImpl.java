@@ -1038,6 +1038,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);
                 }
 
+                if (hasFlavorableChild) {
+                    json.writeMapEntry("hasFlavorableChild", true);
+                }
+
                 if(context.getDefRegistry().getComponentClassLoaded(descriptor) == false) {
                     // KRIS:
                     // This needs to be conditional. We can't just return the component class each time.

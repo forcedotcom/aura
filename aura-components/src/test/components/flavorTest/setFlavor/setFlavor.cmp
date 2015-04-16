@@ -17,5 +17,5 @@
 -->
 <aura:component>
     <flavorTest:setFlavorHelper aura:id="standard" aura:flavor="test">standard</flavorTest:setFlavorHelper>
-    <flavorTest:setFlavorHelper aura:id="custom" aura:flavor="flavorTestB.test2">custom</flavorTest:setFlavorHelper>
+    <flavorTest:setFlavorHelper aura:id="custom" aura:flavor="flavorTestB:test2">custom</flavorTest:setFlavorHelper>
 </aura:component>

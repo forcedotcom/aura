@@ -76,6 +76,18 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         assertTrue(flavorNames.contains("publisher"));
     }
 
+    /** test that flavor names are found in the css file and stored */
+    public void testGetFlavorNamesShorthand() throws Exception {
+        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:shorthand", ComponentDef.class);
+        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
+        Set<String> flavorNames = flavor.getDef().getFlavorNames();
+
+        assertEquals(3, flavorNames.size());
+        assertTrue(flavorNames.contains("one"));
+        assertTrue(flavorNames.contains("two"));
+        assertTrue(flavorNames.contains("three"));
+    }
+
     /** references to a theme var add the namespace theme to the deps */
     public void testThemeDependencies() throws QuickFixException {
         DefDescriptor<ThemeDef> theme = addNsTheme(theme().var("color", "red"));
@@ -85,6 +97,22 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         flavor.getDef().appendDependencies(dependencies);
         assertTrue(dependencies.contains(theme));
+    }
+
+    /** custom flavors have a dependency on the component, standard flavors do not */
+    public void testFlavorDependencies() throws QuickFixException {
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
+        DefDescriptor<FlavoredStyleDef> standard = addStandardFlavor(cmp, "@flavor test; .test {color:red}");
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        standard.getDef().appendDependencies(dependencies);
+        assertTrue("did not expect standard flavor to have dependencies", dependencies.isEmpty());
+
+        DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, "@flavor test");
+        dependencies = Sets.newHashSet();
+        custom.getDef().appendDependencies(dependencies);
+        assertEquals("didn't get expected dependencies for custom flavor", 1, dependencies.size());
+        assertTrue(dependencies.contains(cmp));
     }
 
     /** keeps track of var names */

@@ -258,11 +258,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             }
 
             if (flavor != null) {
-                json.writeMapEntry("flavorName", flavor.getFlavorName());
-
-                if (!flavor.isStandardFlavor()) {
-                    json.writeMapEntry("flavorNs", flavor.getFlavoredStyleDescriptor().getNamespace());
-                }
+                json.writeMapEntry("flavorReference", flavor.toStringReference());
             }
 
             if (!attributeValues.isEmpty()) {

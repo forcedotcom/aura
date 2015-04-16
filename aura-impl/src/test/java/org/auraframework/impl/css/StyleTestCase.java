@@ -18,6 +18,7 @@ package org.auraframework.impl.css;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -30,7 +31,6 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -42,9 +42,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
- * for testing stuff that needs StyleDef or ThemeDef sources.
+ * for testing stuff that needs StyleDef, ThemeDef sources.
  */
 public abstract class StyleTestCase extends AuraImplTestCase {
+    private static AtomicLong counter = new AtomicLong();
     private String ns1;
     private String ns2;
 
@@ -55,8 +56,9 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        this.ns1 = getAuraTestingUtil().getNonce("ns1_");
-        this.ns2 = getAuraTestingUtil().getNonce("ns2_");
+        long num = counter.incrementAndGet();
+        this.ns1 = "nsA" + num;
+        this.ns2 = "nsB" + num;
 
         // make sure the registry is aware of the new namespaces
         String desc = ns1 + ":dummy";
@@ -86,27 +88,23 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /** adds a {@link StyleDef} to the namespace with the given source */
     public DefDescriptor<StyleDef> addStyleDef(CharSequence src) {
-        return addStyleDefToNamespace(ns1, src);
-
+        return addSourceAutoCleanup(StyleDef.class, src.toString(), getNs1() + "." + "style");
     }
 
     /** adds a {@link StyleDef} in the "other" namespace with the given source */
     public DefDescriptor<StyleDef> addStyleDefOtherNamespace(CharSequence src) {
-        return addStyleDefToNamespace(ns2, src);
-    }
-
-    private DefDescriptor<StyleDef> addStyleDefToNamespace(String ns, CharSequence src) {
-        String name = String.format("%s.%s", ns, getAuraTestingUtil().getNonce("testStyle"));
-        DefDescriptor<StyleDef> desc = Aura.getDefinitionService().getDefDescriptor(name, StyleDef.class);
-        addSourceAutoCleanup(desc, src.toString());
-        return desc;
+        return addSourceAutoCleanup(StyleDef.class, src.toString(), getNs2() + "." + "style");
     }
 
     /** adds a {@link ComponentDef} to the namespace with the given source */
     public DefDescriptor<ComponentDef> addComponentDef(CharSequence src) {
-        DefDescriptor<ComponentDef> cmp = DefDescriptorImpl.getInstance(
-                String.format("markup://%s:%s", getNs1(), getAuraTestingUtil().getNonce("testComponent")), ComponentDef.class);
-        return addSourceAutoCleanup(cmp, "<aura:component/>");
+        return addSourceAutoCleanup(ComponentDef.class, src.toString(), getNs1() + ":" + "cmp");
+    }
+
+    /** adds a {@link ComponentDef} to the namespace with the given source */
+    public DefDescriptor<ComponentDef> addComponentDefOtherNamespace(CharSequence src) {
+        return addSourceAutoCleanup(ComponentDef.class, src.toString(), getNs2() + ":" + "cmp");
+
     }
 
     /** gets the parsed output of the given style */
@@ -123,16 +121,15 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /** adds the namespace-default {@link ThemeDef} to the namespace with the given source */
     public DefDescriptor<ThemeDef> addNsTheme(CharSequence src) {
-        return addNsThemeToNamespace(ns1, src);
+        String fmt = String.format("%s:%sTheme", ns1, ns1);
+        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
+        addSourceAutoCleanup(themeDesc, src.toString());
+        return themeDesc;
     }
 
     /** adds the namespace-default {@link ThemeDef} to the "other" namespace with the given source */
     public DefDescriptor<ThemeDef> addNsThemeOtherNamespace(CharSequence src) {
-        return addNsThemeToNamespace(ns2, src);
-    }
-
-    private DefDescriptor<ThemeDef> addNsThemeToNamespace(String ns, CharSequence src) {
-        String fmt = String.format("%s:%sTheme", ns, ns);
+        String fmt = String.format("%s:%sTheme", ns2, ns2);
         DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
         addSourceAutoCleanup(themeDesc, src.toString());
         return themeDesc;
@@ -140,16 +137,15 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /** adds an extra {@link ThemeDef} to the namespace */
     public DefDescriptor<ThemeDef> addSeparateTheme(CharSequence src) {
-        return addExtraThemeToNamespace(ns1, src);
+        String fmt = String.format("%s:%s", ns1, getAuraTestingUtil().getNonce("testTheme"));
+        DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
+        addSourceAutoCleanup(desc, src.toString());
+        return desc;
     }
 
     /** adds an extra {@link ThemeDef} to the "other" namespace */
-    public DefDescriptor<ThemeDef> addExtraThemeOtherNamespace(CharSequence src) {
-        return addExtraThemeToNamespace(ns2, src);
-    }
-
-    private DefDescriptor<ThemeDef> addExtraThemeToNamespace(String ns, CharSequence src) {
-        String fmt = String.format("%s:%s", ns, getAuraTestingUtil().getNonce("testTheme"));
+    public DefDescriptor<ThemeDef> addSeparateThemeOtherNamespace(CharSequence src) {
+        String fmt = String.format("%s:%s", ns2, getAuraTestingUtil().getNonce("testTheme"));
         DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
         addSourceAutoCleanup(desc, src.toString());
         return desc;
@@ -221,24 +217,20 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     }
 
     /** adds a flavor def for the given component, in the same namespace and within a bundle called "flavors". */
-    public DefDescriptor<FlavoredStyleDef> addCustomFlavorSameNamespace(DefDescriptor<ComponentDef> flavored, CharSequence src) {
+    public DefDescriptor<FlavoredStyleDef> addCustomFlavorToFirstNamespace(DefDescriptor<ComponentDef> flavored, CharSequence src) {
         DefDescriptor<FlavoredStyleDef> desc = Flavors.customFlavorDescriptor(flavored, ns1, "flavors");
         addSourceAutoCleanup(desc, src.toString());
         return desc;
     }
 
+    /** adds a flavor assortment def */
     public DefDescriptor<FlavorAssortmentDef> addFlavorAssortment(CharSequence src) {
-        DefDescriptor<FlavorAssortmentDef> desc = Aura.getDefinitionService().getDefDescriptor(
-                ns1 + ":" + getAuraTestingUtil().getNonce("fa_"), FlavorAssortmentDef.class);
-        addSourceAutoCleanup(desc, src.toString());
-        return desc;
+        return addSourceAutoCleanup(FlavorAssortmentDef.class, src.toString(), getNs1() + ":" + "fa");
     }
 
+    /** adds a flavor assortment def to the "other" namespace */
     public DefDescriptor<FlavorAssortmentDef> addFlavorAssortmentOtherNamespace(CharSequence src) {
-        DefDescriptor<FlavorAssortmentDef> desc = Aura.getDefinitionService().getDefDescriptor(
-                ns2 + ":" + getAuraTestingUtil().getNonce("fa_"), FlavorAssortmentDef.class);
-        addSourceAutoCleanup(desc, src.toString());
-        return desc;
+        return addSourceAutoCleanup(FlavorAssortmentDef.class, src.toString(), getNs2() + ":" + "fa");
     }
 
     /** helper for building a theme string source */

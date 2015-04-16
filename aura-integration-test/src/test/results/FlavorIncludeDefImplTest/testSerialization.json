@@ -1,0 +1,7 @@
+{
+  "s":1,
+  "v":{
+    "markup://flavorTestA:serializationTestA":"flavorTest:flavors:foo",
+    "markup://flavorTestA:serializationTestB":"flavorTest:flavors:foo"
+  }
+}

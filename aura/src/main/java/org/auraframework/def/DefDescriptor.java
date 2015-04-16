@@ -111,6 +111,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         FLAVORED_STYLE(FlavoredStyleDef.class), //
         FLAVOR_ASSORTMENT(FlavorAssortmentDef.class), //
         FLAVOR_INCLUDE(FlavorIncludeDef.class), //
+        FLAVORS(FlavorsDef.class), //
         THEME(ThemeDef.class, true), //
         THEME_DEF_REF(ThemeDefRef.class), //
         THEME_PROVIDER(ThemeDescriptorProviderDef.class), //

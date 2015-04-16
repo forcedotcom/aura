@@ -770,14 +770,16 @@ $A.ns.AuraRenderingService.prototype.insertElements = function(elements, refNode
     }
 };
 
-$A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
+$A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element, skipFlavorCheck){
     var concrete = cmp.getConcreteComponent();
     var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
 
     if (className) {
         // add the instance-specific flavor class name if a flavor is specified and this element is flavorable
-        if (!$A.util.isUndefinedOrNull(concrete.getFlavorName()) && $A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
-            className = className + $A.util.buildFlavorClass(concrete.getFlavorName(), concrete.getFlavorNamespace());
+        if (!skipFlavorCheck
+                && !$A.util.isUndefinedOrNull(concrete.getFlavor())
+                && $A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
+            className = className + $A.util.buildFlavorClass(concrete.getFlavor());
         }
 
         $A.util.addClass(element, className);
@@ -796,13 +798,16 @@ $A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
 $A.ns.AuraRenderingService.prototype.associateElements = function(cmp, elements) {
     elements = this.getArray(elements);
 
+    // so we don't check for a flavor on each element below if not necessary
+    var skipFlavorCheck = !cmp.getDef().hasFlavorableChild();
+
     var len = elements.length;
     for (var i = 0; i < len; i++) {
         var element = elements[i];
         if(this.isMarker(element)){
             continue;
         }
-        this.addAuraClass(cmp,element);
+        this.addAuraClass(cmp,element,skipFlavorCheck);
         cmp.associateElement(element);
     }
 };

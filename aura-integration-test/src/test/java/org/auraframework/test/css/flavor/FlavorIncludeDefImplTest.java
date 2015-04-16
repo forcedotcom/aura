@@ -17,9 +17,12 @@ package org.auraframework.test.css.flavor;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.css.FlavorRef;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
@@ -27,10 +30,13 @@ import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.flavor.FlavorRefImpl;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.impl.css.util.Flavors;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.ImmutableMap;
 
 public class FlavorIncludeDefImplTest extends StyleTestCase {
 
@@ -38,14 +44,252 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         super(name);
     }
 
+    /* util */
     private FlavorIncludeDef source(String flavorIncludeSource) throws QuickFixException {
         String fmt = String.format("<aura:flavors>%s</aura:flavors>", flavorIncludeSource);
-        DefDescriptor<FlavorAssortmentDef> parent = addSourceAutoCleanup(FlavorAssortmentDef.class, fmt);
+        DefDescriptor<FlavorAssortmentDef> parent = addFlavorAssortment(fmt);
         return parent.getDef().getFlavorIncludeDefs().get(0);
     }
 
-    private DefDescriptor<ComponentDef> cmp() {
-        return getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+    /* util: given source results in given cmp => flavor override map */
+    private void checkMatches(String src, Map<DefDescriptor<ComponentDef>, FlavorRef> expected) throws Exception {
+        Map<DefDescriptor<ComponentDef>, FlavorRef> matches = source(src).computeFilterMatches();
+        assertEquals("didn't get expected number of matches", expected.size(), matches.size());
+        for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : expected.entrySet()) {
+            assertEquals("didn't find expected match", entry.getValue(), matches.get(entry.getKey()));
+        }
+    }
+
+    /** component="foo:bar" flavor="someFlavor" */
+    public void testSpecificComponentAndStandardFlavor() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
+        addStandardFlavor(cmp, "@flavor foo");
+
+        FlavorRef ref = Flavors.buildFlavorRef(cmp, "foo");
+        String fmt = String.format("<aura:flavor component='%s' flavor='foo'/>", cmp.getDescriptorName());
+        checkMatches(fmt, ImmutableMap.of(cmp, ref));
+    }
+
+    /** component="foo:bar" flavor="someNamespace:someFlavor" */
+    public void testSpecificComponentAndCustomFlavor() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
+        addCustomFlavor(cmp, "@flavor foo");
+        FlavorRef ref = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp, getNs2(), "flavors"), "foo");
+        String fmt = String.format("<aura:flavor component='%s' flavor='%s:foo'/>", cmp.getDescriptorName(), getNs2());
+        checkMatches(fmt, ImmutableMap.of(cmp, ref));
+    }
+
+    /** component="*" flavor="someFlavor" */
+    public void testComponentGlobAndStandardFlavor() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp3 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp4 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp5 = addComponentDef("<aura:component/>");
+
+        addStandardFlavor(cmp1, "@flavor foo;");
+        addStandardFlavor(cmp2, "@flavor baz;");
+        addStandardFlavor(cmp3, "@flavor foo, bar");
+        // none for cmp4
+        addStandardFlavor(cmp5, "@flavor foo");
+
+        addContextApp(String.format("<aura:application> <%s/> <%s/> <%s/> <%s/> <%s/> </aura:application>",
+                cmp1.getDescriptorName(), cmp2.getDescriptorName(), cmp3.getDescriptorName(), cmp4.getDescriptorName(),
+                cmp5.getDescriptorName()));
+
+        FlavorRef ref1 = Flavors.buildFlavorRef(cmp1, "foo");
+        FlavorRef ref3 = Flavors.buildFlavorRef(cmp3, "foo");
+        FlavorRef ref5 = Flavors.buildFlavorRef(cmp5, "foo");
+        checkMatches("<aura:flavor component='*' flavor='foo'/>", ImmutableMap.of(cmp1, ref1, cmp3, ref3, cmp5, ref5));
+    }
+
+    /** component="*" flavor="someNamespace:someFlavor" */
+    @SuppressWarnings("unused")
+    public void testComponentGlobAndCustomFlavor() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp3 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp4 = addComponentDef("<aura:component/>");
+
+        addStandardFlavor(cmp1, "@flavor foo;"); // ignored because standard
+        addStandardFlavor(cmp2, "@flavor baz;"); // ignored
+        // other two don't have flavors
+
+        DefDescriptor<FlavoredStyleDef> custom1 = addCustomFlavor(cmp1, "@flavor foo;"); // match
+        DefDescriptor<FlavoredStyleDef> custom2 = addCustomFlavor(cmp2, "@flavor foo;"); // match
+        DefDescriptor<FlavoredStyleDef> custom3 = addCustomFlavor(cmp3, "@flavor baz;"); // ignored
+        // no custom flavor for component4
+
+        // add custom flavor in a bundle different from "flavors" which should be ignored
+        DefDescriptor<FlavoredStyleDef> desc = Flavors.customFlavorDescriptor(cmp1, getNs2(), "flavors2");
+        addSourceAutoCleanup(desc, "@flavor foo;"); // ignored
+
+        FlavorRef ref1 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp1, custom1.getNamespace(), "flavors"), "foo");
+        FlavorRef ref2 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp2, custom2.getNamespace(), "flavors"), "foo");
+
+        String fmt = String.format("<aura:flavor component='*' flavor='%s:foo'/>", custom1.getNamespace());
+        checkMatches(fmt, ImmutableMap.of(cmp1, ref1, cmp2, ref2));
+    }
+
+    /** component="someNamespace:*" flavor="someFlavor" */
+    public void testComponentNameGlobAndStandardFlavor() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp3 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp4 = addComponentDef("<aura:component/>");
+
+        DefDescriptor<ComponentDef> cmp5 = addComponentDefOtherNamespace("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp6 = addComponentDefOtherNamespace("<aura:component/>");
+
+        addStandardFlavor(cmp1, "@flavor foo");
+        addStandardFlavor(cmp2, "@flavor foo");
+        addStandardFlavor(cmp3, "@flavor baz"); // ignored because different name
+        // none for 4
+
+        addStandardFlavor(cmp5, "@flavor foo"); // ignored because component in non-matching ns
+        addStandardFlavor(cmp6, "@flavor foo"); // ignored because component in non-matching ns
+
+        addContextApp(String.format("<aura:application> <%s/> <%s/> <%s/> <%s/> <%s/> <%s/> </aura:application>",
+                cmp1.getDescriptorName(), cmp2.getDescriptorName(), cmp3.getDescriptorName(), cmp4.getDescriptorName(),
+                cmp5.getDescriptorName(), cmp6.getDescriptorName()));
+
+        FlavorRef ref1 = Flavors.buildFlavorRef(cmp1, "foo");
+        FlavorRef ref2 = Flavors.buildFlavorRef(cmp2, "foo");
+
+        String fmt = String.format("<aura:flavor component='%s:*' flavor='foo'/>", getNs1());
+        checkMatches(fmt, ImmutableMap.of(cmp1, ref1, cmp2, ref2));
+    }
+
+    /** component="someNamespace:*" flavor="someNamespace:someFlavor" */
+    public void testComponentNameGlobAndCustomFlavor() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp3 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp4 = addComponentDef("<aura:component/>");
+
+        DefDescriptor<ComponentDef> cmp5 = addComponentDefOtherNamespace("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp6 = addComponentDefOtherNamespace("<aura:component/>");
+
+        DefDescriptor<FlavoredStyleDef> custom1 = addCustomFlavor(cmp1, "@flavor foo");
+        DefDescriptor<FlavoredStyleDef> custom2 = addCustomFlavor(cmp2, "@flavor foo");
+        addCustomFlavor(cmp3, "@flavor baz"); // ignored
+        // none for 4
+        addCustomFlavor(cmp5, "@flavor foo"); // ignored because component in non-matching ns
+        addCustomFlavor(cmp6, "@flavor foo"); // ignored because component in non-matching ns
+
+        addContextApp(String.format("<aura:application> <%s/> <%s/> <%s/> <%s/> <%s/> <%s/> </aura:application>",
+                cmp1.getDescriptorName(), cmp2.getDescriptorName(), cmp3.getDescriptorName(), cmp4.getDescriptorName(),
+                cmp5.getDescriptorName(), cmp6.getDescriptorName()));
+
+        FlavorRef ref1 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp1, custom1.getNamespace(), "flavors"), "foo");
+        FlavorRef ref2 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp2, custom2.getNamespace(), "flavors"), "foo");
+
+        String fmt = String.format("<aura:flavor component='%s:*' flavor='%s:foo'/>", getNs1(), custom1.getNamespace());
+        checkMatches(fmt, ImmutableMap.of(cmp1, ref1, cmp2, ref2));
+    }
+
+    /** component="*:button" flavor="someFlavor" */
+    public void testComponentNamespaceGlobAndStandardFlavor() throws Exception {
+        // cmp1 has a name that matches, cmp2 doesn't
+        DefDescriptor<ComponentDef> cmp1Desc = DefDescriptorImpl.getInstance(
+                String.format("markup://%s:%s", getNs1(), getAuraTestingUtil().getNonce("button")), ComponentDef.class);
+
+        DefDescriptor<ComponentDef> cmp1 = addSourceAutoCleanup(cmp1Desc, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
+
+        // cmp3 (which is in another namespace) has a name that matches, cmp4 doesn't.
+        DefDescriptor<ComponentDef> cmp3Desc = DefDescriptorImpl.getInstance(
+                String.format("markup://%s:%s", getNs2(), getAuraTestingUtil().getNonce("button")), ComponentDef.class);
+
+        DefDescriptor<ComponentDef> cmp3 = addSourceAutoCleanup(cmp3Desc, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmp4 = addComponentDefOtherNamespace("<aura:component/>");
+
+        addStandardFlavor(cmp1, "@flavor foo");
+        addStandardFlavor(cmp2, "@flavor foo");
+        addStandardFlavor(cmp3, "@flavor foo");
+        addStandardFlavor(cmp4, "@flavor foo");
+
+        addContextApp(String.format("<aura:application> <%s/> <%s/> <%s/> <%s/> </aura:application>",
+                cmp1.getDescriptorName(), cmp2.getDescriptorName(), cmp3.getDescriptorName(), cmp4.getDescriptorName()));
+
+        FlavorRef ref1 = Flavors.buildFlavorRef(cmp1, "foo");
+        FlavorRef ref3 = Flavors.buildFlavorRef(cmp3, "foo");
+
+        checkMatches("<aura:flavor component='*:button*' flavor='foo'/>", ImmutableMap.of(cmp1, ref1, cmp3, ref3));
+    }
+
+    /** component="foo:bar" flavor="~someFlavor" */
+    public void testSpecificComponentAndFuzzyFlavorMatch() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = addComponentDefOtherNamespace("<aura:component/>");
+
+        addCustomFlavorToFirstNamespace(cmp1, "@flavor foo");
+        addStandardFlavor(cmp1, "@flavor foo"); // ignored
+
+        DefDescriptor<ApplicationDef> app = addContextApp(String.format(
+                "<aura:application> <%s/> </aura:application>", cmp1.getDescriptorName()));
+
+        FlavorRef ref1 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp1, app.getNamespace(), "flavors"), "foo");
+
+        String fmt = String.format("<aura:flavor component='%s' flavor='~foo'/>", cmp1.getDescriptorName());
+        checkMatches(fmt, ImmutableMap.of(cmp1, ref1));
+    }
+
+    /** component="foo:bar" flavor="~someFlavor" */
+    public void testSpecificComponentAndFuzzyFlavorMatchStandard() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = addComponentDefOtherNamespace("<aura:component/>");
+
+        addStandardFlavor(cmp1, "@flavor foo");
+
+        addContextApp(String.format(
+                "<aura:application> <%s/> </aura:application>", cmp1.getDescriptorName()));
+
+        FlavorRef ref1 = new FlavorRefImpl(Flavors.standardFlavorDescriptor(cmp1), "foo");
+
+        String fmt = String.format("<aura:flavor component='%s' flavor='~foo'/>", cmp1.getDescriptorName());
+        checkMatches(fmt, ImmutableMap.of(cmp1, ref1));
+    }
+
+    /** component="*" flavor="~someFlavor" */
+    public void testComponentGlobAndFuzzyFlavorMatch() throws Exception {
+        // matching custom flavor not present, matching standard flavor not present
+        DefDescriptor<ComponentDef> cmp1 = addComponentDefOtherNamespace("<aura:component/>");
+        // matching custom flavor not present, matching standard flavor present
+        DefDescriptor<ComponentDef> cmp2 = addComponentDefOtherNamespace("<aura:component/>");
+        // matching custom flavor present, matching standard flavor not present
+        DefDescriptor<ComponentDef> cmp3 = addComponentDefOtherNamespace("<aura:component/>");
+        // matching custom flavor present, matching standard flavor not present
+        DefDescriptor<ComponentDef> cmp4 = addComponentDefOtherNamespace("<aura:component/>");
+
+        addStandardFlavor(cmp1, "@flavor ignored;");
+        addStandardFlavor(cmp2, "@flavor foo;");
+        addStandardFlavor(cmp4, "@flavor foo, ignored;");
+
+        addCustomFlavorToFirstNamespace(cmp3, "@flavor foo;");
+        addCustomFlavorToFirstNamespace(cmp4, "@flavor foo, ignored;");
+
+        // and now some extraneous data to make sure things are robust
+        addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> e1 = addComponentDef("<aura:component/>");
+        addStandardFlavor(e1, "@flavor ignored");
+        addCustomFlavor(e1, "@flavor ignored");
+
+        DefDescriptor<ApplicationDef> app = addContextApp(String.format(
+                "<aura:application> <%s/> <%s/> <%s/> <%s/> </aura:application>",
+                cmp1.getDescriptorName(), cmp2.getDescriptorName(), cmp3.getDescriptorName(), cmp4.getDescriptorName()));
+
+        // cmp1 doesn't have a flavor with a matching name, so should not be present
+
+        // custom flavor isn't present for cmp2, so should pick up standard flavor
+        FlavorRef ref2 = new FlavorRefImpl(Flavors.standardFlavorDescriptor(cmp2), "foo");
+
+        // custom flavor is present for cmp3 so should that up
+        FlavorRef ref3 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp3, app.getNamespace(), "flavors"), "foo");
+
+        // custom and standard flavors both present, but custom should take precedence as it is in the same ns as the
+        // override
+        FlavorRef ref4 = new FlavorRefImpl(Flavors.customFlavorDescriptor(cmp4, app.getNamespace(), "flavors"), "foo");
+
+        checkMatches("<aura:flavor component='*' flavor='~foo'/>", ImmutableMap.of(cmp2, ref2, cmp3, ref3, cmp4, ref4));
     }
 
     public void testMissingComponentAttribute() throws Exception {
@@ -53,7 +297,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
             source("<aura:flavor flavor='test'/>").validateDefinition();
             fail("expected exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "Missing component");
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute 'component'");
         }
     }
 
@@ -62,7 +306,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
             source("<aura:flavor component='ui:button'/>").validateDefinition();
             fail("expected exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "Missing flavor");
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute 'flavor'");
         }
     }
 
@@ -71,7 +315,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
             source("<aura:flavor component='' flavor='test'/>").validateDefinition();
             fail("expected exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "Missing component");
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute 'component'");
         }
     }
 
@@ -80,127 +324,24 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
             source("<aura:flavor component='ui:button' flavor=''/>").validateDefinition();
             fail("expected exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "Missing flavor");
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute 'flavor'");
         }
     }
 
-    public void testInvalidComponentRef() throws Exception {
-        try {
-            source("<aura:flavor component='fake:fake' flavor='test'/>").validateDefinition();
-            fail("expected exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, DefinitionNotFoundException.class, "No COMPONENT");
-        }
-    }
-
-    public void testInvalidStandardFlavorRef() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
-        addStandardFlavor(cmp, "@flavor test");
-        String fmt = String.format("<aura:flavor component='%s' flavor='rest'/>", cmp.getDescriptorName());
+    public void testInvalidFlavorRef() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
+        addStandardFlavor(cmp, "@flavor foo");
+        String fmt = String.format("<aura:flavor component='%s' flavor='bar'/>", cmp.getDescriptorName());
         try {
             source(fmt).validateDefinition();
             fail("expected exception");
         } catch (Exception e) {
             checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
         }
-    }
-
-    public void testInvalidCustomFlavorRef() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
-        DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, "@flavor test");
-        String fmt = String.format("<aura:flavor component='%s' flavor='%s.rest'/>", cmp.getDescriptorName(), custom.getNamespace());
-        try {
-            source(fmt).validateDefinition();
-            fail("expected exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
-        }
-    }
-
-    public void testComponentPlusNamedUsedTogether() throws Exception {
-        try {
-            source("<aura:flavor component='ui:button'  named='test'/>").validateDefinition();
-            fail("expected exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "cannot use both");
-        }
-    }
-
-    public void testFlavorPlusNamedUsedTogether() throws Exception {
-        try {
-            source("<aura:flavor component='ui:button' flavor='test' named='test'/>").validateDefinition();
-            fail("expected exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "cannot use both");
-        }
-    }
-
-    public void testGetFlavorsWhenIndividual() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
-        DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, "@flavor test");
-        FlavorIncludeDef flavorInclude = source(String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName()));
-
-        Map<DefDescriptor<ComponentDef>, FlavorRef> map = flavorInclude.getFlavorsMap();
-        assertEquals("did not return the correct number of flavors", 1, map.size());
-        assertEquals(map.get(cmp).getFlavoredStyleDescriptor(), flavor);
-    }
-
-    @SuppressWarnings("unused")
-    public void testGetFlavorsFilteredByName() throws Exception {
-        DefDescriptor<ComponentDef> cmp1 = cmp();
-        DefDescriptor<ComponentDef> cmp2 = cmp();
-        DefDescriptor<ComponentDef> cmp3 = cmp();
-        DefDescriptor<ComponentDef> cmp4 = cmp();
-        DefDescriptor<ComponentDef> cmp5 = cmp();
-
-        DefDescriptor<FlavoredStyleDef> flavor1 = addCustomFlavor(cmp1, "@flavor yes;");
-        DefDescriptor<FlavoredStyleDef> flavor2 = addCustomFlavor(cmp2, "@flavor no;");
-        DefDescriptor<FlavoredStyleDef> flavor3 = addCustomFlavor(cmp3, "@flavor yes;");
-        DefDescriptor<FlavoredStyleDef> flavor4 = addCustomFlavor(cmp4, "@flavor nah; @flavor yes; @flavor no;");
-        DefDescriptor<FlavoredStyleDef> flavor5 = addCustomFlavor(cmp5, "@flavor no; @flavor noagain;");
-
-        String src = "<aura:flavors><aura:flavor named='yes'/></aura:flavors>";
-        DefDescriptor<FlavorAssortmentDef> parent = addFlavorAssortmentOtherNamespace(src);
-        FlavorIncludeDef fi = parent.getDef().getFlavorIncludeDefs().get(0);
-
-        Map<DefDescriptor<ComponentDef>, FlavorRef> map = fi.getFlavorsMap();
-
-        assertEquals("did not find the expected number of flavors", 3, map.size());
-        assertEquals(new FlavorRefImpl(flavor1, "yes"), map.get(cmp1));
-        assertEquals(new FlavorRefImpl(flavor3, "yes"), map.get(cmp3));
-        assertEquals(new FlavorRefImpl(flavor4, "yes"), map.get(cmp4));
-    }
-
-    @SuppressWarnings("unused")
-    public void testGetFlavorsFilteredByNameDifferentNamespace() throws Exception {
-        DefDescriptor<ComponentDef> cmp1 = cmp();
-        DefDescriptor<ComponentDef> cmp2 = cmp();
-        DefDescriptor<ComponentDef> cmp3 = cmp();
-
-        // these are added to same ns as components
-        DefDescriptor<FlavoredStyleDef> flavor1a = addCustomFlavorSameNamespace(cmp1, "@flavor yes;");
-        DefDescriptor<FlavoredStyleDef> flavor2a = addCustomFlavorSameNamespace(cmp2, "@flavor yes;");
-        DefDescriptor<FlavoredStyleDef> flavor3a = addCustomFlavorSameNamespace(cmp3, "@flavor yes;");
-
-        // these are added to another namespace
-        DefDescriptor<FlavoredStyleDef> flavor1b = addCustomFlavor(cmp1, "@flavor yes;");
-        DefDescriptor<FlavoredStyleDef> flavor2b = addCustomFlavor(cmp2, "@flavor no;");
-
-        // this is added to the same ns as components, but has a filter for flavors in ns2
-        String src = String.format("<aura:flavors><aura:flavor named='yes' namespace='%s'/></aura:flavors>", getNs2());
-        DefDescriptor<FlavorAssortmentDef> parent = addFlavorAssortment(src);
-        FlavorIncludeDef fi = parent.getDef().getFlavorIncludeDefs().get(0);
-
-        // so basically this is testing that a flavor assortment in ns1 can include flavors from ns2 using a named
-        // filter.
-        Map<DefDescriptor<ComponentDef>, FlavorRef> map = fi.getFlavorsMap();
-
-        assertEquals("did not find the expected number of flavors", 1, map.size());
-        assertEquals(new FlavorRefImpl(flavor1b, "yes"), map.get(cmp1));
     }
 
     public void testAppendDependencies() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, "@flavor test");
         FlavorIncludeDef fi = source(String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName()));
 
@@ -213,19 +354,19 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
 
     @SuppressWarnings("unused")
     public void testAppendFilteredDependencies() throws Exception {
-        DefDescriptor<ComponentDef> cmp1 = cmp();
-        DefDescriptor<ComponentDef> cmp2 = cmp();
-        DefDescriptor<ComponentDef> cmp3 = cmp();
-        DefDescriptor<ComponentDef> cmp4 = cmp();
-        DefDescriptor<ComponentDef> cmp5 = cmp();
+        DefDescriptor<ComponentDef> cmp1 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp3 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp4 = addComponentDef("<aura:component/>");
+        DefDescriptor<ComponentDef> cmp5 = addComponentDef("<aura:component/>");
 
-        DefDescriptor<FlavoredStyleDef> flavor1 = addCustomFlavor(cmp1, "@flavor yes;");
+        DefDescriptor<FlavoredStyleDef> flavor1 = addCustomFlavor(cmp1, "@flavor yes;"); // yes
         DefDescriptor<FlavoredStyleDef> flavor2 = addCustomFlavor(cmp2, "@flavor no;");
-        DefDescriptor<FlavoredStyleDef> flavor3 = addCustomFlavor(cmp3, "@flavor yes;");
-        DefDescriptor<FlavoredStyleDef> flavor4 = addCustomFlavor(cmp4, "@flavor nah; @flavor yes; @flavor no;");
+        DefDescriptor<FlavoredStyleDef> flavor3 = addCustomFlavor(cmp3, "@flavor yes;"); // yes
+        DefDescriptor<FlavoredStyleDef> flavor4 = addCustomFlavor(cmp4, "@flavor nah; @flavor yes; @flavor no;"); // yes
         DefDescriptor<FlavoredStyleDef> flavor5 = addCustomFlavor(cmp5, "@flavor no; @flavor noagain;");
 
-        String src = "<aura:flavors><aura:flavor named='yes'/></aura:flavors>";
+        String src = String.format("<aura:flavors><aura:flavor component='*' flavor='%s:yes'/></aura:flavors>", getNs2());
         DefDescriptor<FlavorAssortmentDef> parent = addFlavorAssortmentOtherNamespace(src);
         FlavorIncludeDef fi = parent.getDef().getFlavorIncludeDefs().get(0);
 
@@ -238,5 +379,13 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         assertTrue("did not append correct dependencies", deps.contains(flavor1));
         assertTrue("did not append correct dependencies", deps.contains(flavor3));
         assertTrue("did not append correct dependencies", deps.contains(flavor4));
+    }
+
+    public void testSerialization() throws Exception {
+        DefDescriptor<FlavorAssortmentDef> fa = Aura.getDefinitionService().getDefDescriptor("flavorTest:serializationTest",
+                FlavorAssortmentDef.class);
+
+        FlavorIncludeDef fi = fa.getDef().getFlavorIncludeDefs().get(0);
+        serializeAndGoldFile(fi);
     }
 }

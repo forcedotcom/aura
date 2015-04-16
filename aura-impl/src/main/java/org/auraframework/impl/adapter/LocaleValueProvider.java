@@ -125,8 +125,10 @@ public class LocaleValueProvider implements GlobalValueProvider {
             builder.put(TIME_FORMAT, DEFAULT_TIME_FORMAT);
         }
 
-        builder.put(TIME_ZONE, al.getTimeZone().getID());
-        builder.put(TIME_ZONE_FILE_NAME, al.getTimeZone().getID().replace("/", "-"));
+        String timezoneId = al.getTimeZone().getID();
+        String availableTimezoneId = Aura.getConfigAdapter().getAvailableTimezone(timezoneId);
+        builder.put(TIME_ZONE, availableTimezoneId);
+        builder.put(TIME_ZONE_FILE_NAME, availableTimezoneId.replace("/", "-"));
 
         builder.put(IS_EASTERN_NAME_STYLE, al.isEasternNameStyle());
 

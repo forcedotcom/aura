@@ -34,6 +34,7 @@
  	testSwitchPageUsingPageIndicator : {
  		browsers: ["-IE7","-IE8"],
  		test : [function(cmp) {
+ 			debugger;
  			// go to 1st page
  			this.goToPageOnCarousel(cmp, "carousel1", 1, "c1-p1");
  		}, function(cmp) {

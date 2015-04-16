@@ -23,10 +23,9 @@
 	},
 	
 	rerender: function(cmp, helper) {
-		var shouldRerender = false,
-            forceUpdate = cmp.isDirty("v.pageComponents");
-
-		if (cmp.isDirty("v.width") || cmp.isDirty("v.height") || cmp.isDirty("v.priv_carouselStyle") || forceUpdate) {
+		var shouldRerender = false;
+		var forceUpdate = cmp.isDirty("v.pageComponents");
+		if (cmp.isDirty("v.width") || cmp.isDirty("v.height") || cmp.isDirty("v.priv_carouselStyle") || cmp.isDirty("v.pageComponents")) {
 			helper.updateSize(cmp, forceUpdate);
 			shouldRerender = true;
 		}

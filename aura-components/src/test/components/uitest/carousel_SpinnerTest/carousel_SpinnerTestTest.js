@@ -23,28 +23,5 @@
 			var spinnerCmp = cmp.find("testSpinner");
 			$A.test.assertFalse($A.util.isUndefinedOrNull(spinnerCmp), "Spinner component was not set properly");
         }
-    },
-    
-    /**
-     * Verify spinner appears then disappears.
-     */
-    testCarouselSpinnerAppearsDisappears : {
-    	browsers: ["-IE7","-IE8"],
- 		test : [function(cmp, event, helper){
- 			// spinner appears
- 			$A.test.addWaitFor("false", function() {
-				var elm = cmp.find("testSpinner").getElement();
-				return $A.util.hasClass(elm,"hideEl").toString();
-			});
- 		}, function(cmp, event, helper){
-                        var helper = cmp.getDef().getHelper();
-                        helper.hideLoadingIndicator(cmp.getSuper());
-
- 			// spinner is gone
-			$A.test.addWaitFor("true", function() {
-				var elm = cmp.find("testSpinner").getElement();
-				return $A.util.hasClass(elm,"hideEl").toString();
-			});
-        }]
     }
 })

@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-({	
-	onInit: function(cmp, evt, helper) {
-		//populate pageId with component's globalId
-		cmp.set('v.priv_pageId', cmp.getGlobalId());
-	},
-
-	onPageSelected : function (cmp, evt, helper) {
-		helper.selectPage(cmp, evt);
-	},
-
-	onPageUpdate: function(cmp, evt, helper) {
-		helper.updatePage(cmp, evt.getParam("pageComponent"));
-	},
-
-	onPageShow: function(cmp, evt, helper) {
-		helper.showPage(cmp, evt.getParam('pageIndex'));
-	},
-
-	onPageHide: function(cmp, evt, helper) {
-		helper.hidePage(cmp, evt.getParam('pageIndex'));
-	},
-
-	onUpdateSize: function(cmp, evt, helper) {
-		var size = evt.getParam('pageSize');
-		if (size) {
-			helper.updateSize(cmp, size.width, size.height);
-		}
-	}
+({
+    doInit: function (cmp, evt, hlp) {
+    	hlp.initialize(cmp);
+    },
+    load: function (cmp, evt, hlp) {
+    	if (!cmp.get('v.isContentLoaded')) {
+    		hlp.loadComponent(cmp);
+    	}
+    },
+    handleShowMore: function (component, scrollerCallback, helper) {
+    	var contentCmp        = component.get('v.body')[0],
+    		canHandleShowMore = contentCmp.isInstanceOf("ui:handlesShowMore"), 
+			canShowMore       = canHandleShowMore && !!contentCmp.get('e.showMore'),
+			payload           = { callback: scrollerCallback };
+    	if (canShowMore) {
+    		var showMoreEvt = contentCmp.get("e.showMore");
+    		showMoreEvt.setParams({parameters : payload});
+    		showMoreEvt.fire();
+    	} else {
+    		scrollerCallback({labelError: 'Nothing to show.'});
+    	}
+    },
+    handleNoMoreContent: function (component, event, helper) {
+        component.find('scroller').set('v.canShowMore', false);
+    }
 })

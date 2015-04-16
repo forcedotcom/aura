@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 ({
-    afterRender: function (component, helper) {
-        this.superAfterRender();
-        helper.afterRenderCarouselPage(component);
+    changeActivePage: function (component, event, helper) {
+        helper.changeActivePage(component, event);
     },
-    unrender: function (component, helper) {
-        this.superUnrender();
+    setAriaAttributes: function (component, event, helper) {
+        helper.setAriaAttributes(component, event);
     }
 })

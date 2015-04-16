@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 ({
-    afterRender: function (component, helper) {
-        this.superAfterRender();
-        helper.afterRenderCarouselPage(component);
+	render: function (cmp, hlp) {
+		var dom = this.superRender(),
+			root = dom[0],
+			indicatorDOM = hlp.createDOM(cmp);
+		
+		root.insertBefore(indicatorDOM, root.firstChild);
+		hlp.setIndicatorSize(cmp, root);
+		hlp.attachHandlers(cmp, root);
+		
+		return dom;
+	},
+	afterRender: function (cmp, hlp) {
+		this.superAfterRender();
     },
-    unrender: function (component, helper) {
+    unrender: function (cmp, hlp) {
         this.superUnrender();
     }
 })

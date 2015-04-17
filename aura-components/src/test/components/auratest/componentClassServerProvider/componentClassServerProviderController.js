@@ -15,10 +15,10 @@
  */
 ({
     init : function(cmp, event, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ServerProviderInit');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ServerProviderInit');
     },
     
     clientAction : function(cmp, event, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ServerProviderAction');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ServerProviderAction');
     }
 })

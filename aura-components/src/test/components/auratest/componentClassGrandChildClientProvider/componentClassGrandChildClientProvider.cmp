@@ -23,6 +23,6 @@
 		<aura:attribute name="value" type="String"/>
 	</aura:method>
 	
-	<ui:button label="GrandChildClientProviderButton" aura:id="button" press="{!c.clientAction}"/>
+	<ui:button label="GrandChildClientProviderButton" aura:id="button" press="{!c.clientAction}" class="uiButtonGrandChildClientProvider"/>
 	{!v.body}
 </aura:component>

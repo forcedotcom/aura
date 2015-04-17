@@ -60,6 +60,11 @@
 	<aura:attribute name="iterationItems" type="List" default=""/>
 	<aura:attribute name="iterationForceServer" type="Boolean" default="false"/>
 	
+	<!-- attributes that we use to create component in controller dynamically into client div -->
+	<aura:attribute name="cmpDef" type="String" default="markup://auratest:componentClassParent"/>
+    <aura:attribute name="errorOutFrom" type="String" default="errorOutFromRender_Parent"/>
+                
+	
     <!-- this is where we store log output, and filter out those we care -->
     <aura:attribute name="logFilter" type="String"/>
 	<div class="logPanel">
@@ -137,6 +142,8 @@
 				
 				<!-- This is where we push our client created component-->
 				<div aura:id="client"></div>
+				<ui:button label="createCmp and push to client div" aura:id="button_newCmp" press="{!c.createCmp}" class="uiButton_createCmp"/>
+				
 				
 			</aura:renderIf>
 		</aura:if>

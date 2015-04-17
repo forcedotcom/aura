@@ -15,7 +15,7 @@
  */
 ({
     provide : function(cmp) {
-        $A.logger.info(cmp.getGlobalId() + ":" + cmp.helper.getDelimiter() + 'GrandChildClientProviderProvide');
+        $A.logger.info(cmp.getGlobalId() + ":" + cmp.helper.getDelimiter(cmp) + 'GrandChildClientProviderProvide');
         return cmp;
     }
 })

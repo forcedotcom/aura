@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    getDelimiter : function() {
+    getDelimiter : function(cmp) {
         return "GrandChildClientProviderHelper";
     }
 })

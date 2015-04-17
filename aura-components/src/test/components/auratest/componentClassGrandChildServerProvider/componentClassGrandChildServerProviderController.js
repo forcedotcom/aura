@@ -15,14 +15,14 @@
  */
 ({
     init : function(cmp, event, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'GrandChildServerProviderInit');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'GrandChildServerProviderInit');
     },
     
     clientAction : function(cmp, event, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'GrandChildServerProviderAction');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'GrandChildServerProviderAction');
         var action = cmp.get("c.echo");
         action.setParams({
-            input : helper.getDelimiter() + 'GrandChildServerProviderParam'
+            input : helper.getDelimiter(cmp) + 'GrandChildServerProviderParam'
         });
         action.setCallback(this, function(a){
             var val = a.getReturnValue();
@@ -33,11 +33,11 @@
     },
     
     valueChange : function(cmp, event, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'GrandChildServerProviderValuechange');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'GrandChildServerProviderValuechange');
     },
     
     setValue : function(cmp, event, helper) {
-        var val = helper.getDelimiter() + 'GrandChildServerProvider' + event.getParam("arguments").value;
+        var val = helper.getDelimiter(cmp) + 'GrandChildServerProvider' + event.getParam("arguments").value;
         $A.logger.info(cmp.getGlobalId() + ":" + val);
         cmp.set("v.value", val);
     }

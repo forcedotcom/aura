@@ -15,7 +15,7 @@
  */
 ({
     provide : function(cmp) {
-        $A.logger.info(cmp.getGlobalId() + ":" + cmp.helper.getDelimiter() + 'ServerProviderProvide');
+        $A.logger.info(cmp.getGlobalId() + ":" + cmp.helper.getDelimiter(cmp) + 'ServerProviderProvide');
         return cmp;
     }
 })

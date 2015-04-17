@@ -24,7 +24,6 @@
     },
     
     getLogs : function(testCmp) {
-    	debugger;
         var targetId = testCmp._target.getGlobalId();
         var filterStr = "^" + targetId + ":(.*)";
         testCmp.set("v.logFilter", filterStr);
@@ -36,7 +35,6 @@
         var that = this;
         var expectedStr = expected.join();
         var actual;
-        debugger;
         $A.test.addWaitForWithFailureMessage(true, function() {
             actual = that.getLogs(testCmp, testCmp._target);
             if (actual) {

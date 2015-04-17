@@ -194,7 +194,6 @@
         for (i = 0; i < children.length; i++) {
             $A.util.setDataAttribute(children[i], 'visible', "visible");
         }
-
         if (query) {
             regexp = new RegExp(query,'i');
             for (i = 0; i < children.length; i++) {
@@ -205,7 +204,7 @@
                 name = li.getElementsByClassName('ns')[0].textContent;
                 if (!regexp.test(name)) {
                     $A.util.setDataAttribute(li, 'visible', "hidden");
-                }
+                } 
                 
             }
         }

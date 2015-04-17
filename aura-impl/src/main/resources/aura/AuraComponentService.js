@@ -150,10 +150,15 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
     }
 
     if (!def || def.hasRemoteDependencies()) {
-        this.requestComponent(null, callback, configItem, null, 0, true);
+        var action=this.requestComponent(null, callback, configItem, null, 0, true);
+        // Abortable by default, but return the action so that customers can manipulate other settings.
+        action.setAbortable(true);
+        $A.enqueueAction(action);
+        return action;
     } else {
-        callback(this.createComponentInstance(configItem, true),"SUCCESS");
+        callback(this.createComponentInstance(configItem, true),"SUCCESS","");
     }
+    return null;
 };
 
 /**
@@ -174,9 +179,9 @@ $A.ns.AuraComponentService.prototype.createComponents = function(components, cal
     var collected=0;
 
     function getCollector(index){
-        return function(component, status) {
+        return function(component, status, statusMessage) {
             created[index] = component;
-            statusList[index] = status;
+            statusList[index] = {"status":status,"message":statusMessage};
             if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!="ERROR")) {
                 overallStatus = status;
             }
@@ -421,7 +426,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
     var statusList=[];
     var collected=0;
 
-    function collectComponent(newComponent,status,index){
+    function collectComponent(newComponent,status,statusMessage,index){
         components[index]=newComponent;
         statusList[index] = status;
         if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!="ERROR")) {
@@ -463,9 +468,10 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
             }
 
             if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
-                this.requestComponent(callbackScope, collectComponent, configItem, attributeValueProvider, i);
+                var action=this.requestComponent(callbackScope, collectComponent, configItem, attributeValueProvider, i);
+                $A.enqueueAction(action);
             } else {
-                collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS",i);
+                collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
             }
         }
     }
@@ -509,6 +515,7 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
 
         var newComp = null;
         var status= a.getState();
+        var statusMessage='';
         if(status === "SUCCESS"){
             var returnedConfig = a.getReturnValue();
             if (!returnedConfig["attributes"]) {
@@ -524,25 +531,23 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
             returnedConfig["localId"] = config["localId"];
 
             newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
-        }else if(!returnNullOnError){
+        }else{
             var errors = a.getError();
-
-            newComp = $A.newCmpDeprecated("markup://aura:text");
-            if (errors) {
-                newComp.set("v.value", errors[0].message);
-            } else {
-                newComp.set("v.value", 'unknown error');
+            statusMessage=errors?errors[0].message:"Unknown Error.";
+            if(!returnNullOnError) {
+                newComp = $A.newCmpDeprecated("markup://aura:text");
+                newComp.set("v.value", statusMessage);
             }
         }
         if ( $A.util.isFunction(callback) ) {
-            callback.call(callbackScope, newComp, status, index);
+            callback.call(callbackScope, newComp, status, statusMessage, index);
         }
     });
     action.setParams({
         "name" : config["componentDef"]["descriptor"],
         "attributes" : atts
     });
-    $A.enqueueAction(action);
+    return action;
 };
 
 /**

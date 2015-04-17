@@ -294,6 +294,9 @@
      *  - Use a foreground process to kick off one of the backgrounds, causing the last one to fire as well.
      */
     testMaxNumBackgroundServerAction : {
+        // The test is only failing in autobuild IE8.
+        // Since we are deprecating IE7,8 support, disable it.
+        browsers: ["-IE7","-IE8"],
         test : [
             function(cmp) {
                 var that = this;

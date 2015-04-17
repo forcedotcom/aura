@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 ({
-    testStandard: {
+    testInsideIteration: {
         test: function(cmp) {
-            var el = cmp.find("standard").getElement();
             var expected = $A.util.buildFlavorClass("test");
-            $A.test.assertTrue($A.util.hasClass(el, expected));
-        }
-    },
-
-    testCustom: {
-        test: function(cmp) {
-            var el = cmp.find("custom").getElement();
-            var expected = $A.util.buildFlavorClass("flavorTestB:test2");
-            $A.test.assertTrue($A.util.hasClass(el, expected));
+            var els = cmp.find("foo");
+            for (var i = 0; i < els.length; i++) {
+                $A.test.assertTrue($A.util.hasClass(els[i], expected));
+            }
         }
     }
 })

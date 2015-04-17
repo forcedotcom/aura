@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2015 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="PROTO" description="A draggable component in drag and drop operation.">
+
+	<aura:attribute name="context" type="String" required="true" description="The context of this draggable. This attribute can accept localId, globalId, or the component object. If the value is resolved to a component, the global id of the component will be used in the output."/>	
+	<aura:attribute name="type" type="String" default="move" description="Operation type: can be either copy, link, or move."/>
+	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
+	<aura:attribute name="dataTransfer" type="Object" description="Data to be transferred during drag and drop operation."/>
+	<aura:attribute name="ariaGrabbed" type="boolean" default="false" access="private" description="Indicate a draggable component."/>
+	
+	<aura:registerEvent name="dragStart" type="ui:dragEvent" description="Event fired when user starts dragging this component."/>
+	<aura:registerEvent name="dragEnd" type="ui:dragEvent" description="Event fired when this drag operation is being ended."/>
+	<aura:registerEvent name="dropComplete" type="ui:dragEvent"  description="Event fired when drop operation is completed."/>
+	
+	<aura:handler name="dropComplete" action="{!c.handleDropComplete}"/>
+	
+    <div draggable="true" aria-grabbed="{!v.ariaGrabbed}" class="{!v.class}">
+	    {!v.body}
+    </div>
+    
+</aura:component>

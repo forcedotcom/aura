@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:actionMenuItem</code> component represents a menu list item that triggers an action when clicked.
+            Use <code>aura:iteration</code> to iterate over a list of values and display the menu items. A <code>ui:menuTriggerLink</code> component
+            displays and hides your menu items.</p>
+
+<pre>&lt;aura:attribute name="status" type="String[]" default="Open, Closed, Closed Won, Any"/>
+    &lt;ui:menu>
+        &lt;ui:menuTriggerLink aura:id="trigger" label="Opportunity Status"/>
+        &lt;ui:menuList class="actionMenu" aura:id="actionMenu">
+            &lt;aura:iteration items="{!v.status}" var="s">
+                &lt;ui:actionMenuItem value="{!s}" label="{!s}" click="{!c.doSomething}"/>
+            &lt;/aura:iteration>
+        &lt;/ui:menuList>
+    &lt;/ui:menu></pre>
+
+	</aura:description>
+</aura:documentation>

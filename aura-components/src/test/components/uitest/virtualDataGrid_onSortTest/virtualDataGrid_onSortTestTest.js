@@ -21,7 +21,7 @@
   compare: function(sortBy) {
   	if (sortBy.indexOf("id") >=0 || sortBy.indexOf("age") >= 0) {
   		return function(item1, item2) {
-      		if (sortBy.startsWith("-")) {
+      		if (sortBy.indexOf("-") == 0) {
       			return -1 * (item1[sortBy.substring(1)] - item2[sortBy.substring(1)]);
       		} else {
       			return item1[sortBy] - item2[sortBy]; 
@@ -29,7 +29,7 @@
       	}
   	} else {
   	    return function(item1, item2) {
-  		    if (sortBy.startsWith("-")) {
+  		    if (sortBy.indexOf("-") == 0) {
   			    return -1 * (item1[sortBy.substring(1)].localeCompare(item2[sortBy.substring(1)]));
   		    } else {
   			    return item1[sortBy].localeCompare(item2[sortBy]); 

@@ -29,6 +29,12 @@
         return $A.test.getElementAttributeValue(inputElement,"id");
     },
 
+    getLabelElement : function(label){
+        var labelElement = label.getElementsByTagName('label');
+ 	   
+ 	    $A.test.assertTrue(!$A.util.isEmpty(labelElement), "There is no label element on the component in question");
+ 	    return labelElement;
+    },
     /**
      * Test label separate from input with raw string id
      */
@@ -210,5 +216,48 @@
             var label = div.getElementsByTagName('span')[0];
             $A.test.assertFalsy(label.title,'Title attribute for label should not be present');
         }
+    },
+    
+    /**
+     * Check to make sure that a label position that we are not expecting (something other than 'left', 'right', 'top', 'bottom')
+     * defaults to left
+     */
+    testLabelWithWrongPosition : {
+    	attributes : {whichPosition : "WRONG_LABEL"},
+    	test : function(component){
+    	   var labelElement = this.getLabelElement(component.find("myInputCheckbox").getElement());
+    	   var labelClass = labelElement[0].getAttribute("class");
+    	   $A.test.assertTrue(labelClass.indexOf("-left")>0, "The incorrect label attribute was found");
+    	}  	
+    },
+    
+    //Making sure that dynamically changing the label works as expected. Test is needed since input handles this case, not label
+    testDynamicallyModifyingLabel : {
+    	test : [function(component){
+    		 var inputCmp = component.find("myInputCheckbox");
+     	     var labelElement = this.getLabelElement(inputCmp.getElement());
+      	     inputCmp.set("v.label", "myNewLabel");
+    	},
+    	function(component){
+     	    var labelElement = this.getLabelElement(component.find("myInputCheckbox").getElement());
+     	    var currLabelText = $A.util.getText(labelElement[0]);
+     	    $A.test.assertEquals("myNewLabel", currLabelText, "New label was not populated through");    	    
+    	}]
+    },
+    
+    //Making sure that the dynamically modifying the labels display through input works as expected
+    testDynamicallyModifyingLabelDisplay : {
+    	test : [function(component){
+    		 var inputCmp = component.find("myInputCheckbox");
+    		 var labelElement = this.getLabelElement(component.find("myInputCheckbox").getElement());
+      	     var currLabelText = $A.util.getText(labelElement[0]);
+     	     $A.test.assertEquals("inputCheckbox", currLabelText, "Label should be present");
+      	     inputCmp.set("v.labelPosition", "hidden");
+    	},
+    	function(component){
+     	    var labelElement = this.getLabelElement(component.find("myInputCheckbox").getElement());
+     	    var currLabelTextClass = labelElement[0].getElementsByTagName('span')[0].getAttribute("class");
+     	    $A.test.assertEquals("assistiveText", currLabelTextClass, "New label was not populated through");    	    
+    	}]
     }
 })

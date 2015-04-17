@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 ({
-
     buildBody : function(component) {
         var innerBody = component.get("v.body");
         var labelAttribute = component.get("v.label");
@@ -24,8 +23,9 @@
             if (!domId) {
                 domId = component.getConcreteComponent().getGlobalId();
             }
-            var labelClass = component.get("v.labelClass") + " uiLabel-" + component.get("v.labelPosition");
-            var labelDisplay = component.get("v.labelPosition") != "hidden";
+            var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
+            var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute;
+            var labelDisplay = labelPositionAttribute != "hidden";
             var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
             var labelComponent = $A.newCmp({
                     componentDef: {descriptor: 'markup://ui:label'},
@@ -38,7 +38,7 @@
                         title: component.get("v.labelTitle"),
                         requiredIndicator: requiredIndicator}}},
                     component );
-            var labelPositionAttribute = component.get("v.labelPosition");
+           
             if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
                 innerBody.unshift(labelComponent);
             } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom' || labelPositionAttribute == 'hidden') {
@@ -54,6 +54,14 @@
             body.push(divComponent);
             component.set("v.body", body);
         }
+    },
+    /**
+     * Helper method that will check to make sure that we are looking at a valid position.
+     * Otherwise it defaults to left
+     */
+    checkValidPosition : function(passedInPosition){
+    	var positionMap={"top":1,"right":1,"bottom":1,"left":1,"hidden":1};
+        return positionMap[passedInPosition] ? passedInPosition : "left"; 	
     },
 
 	/**

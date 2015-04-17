@@ -1,0 +1,62 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	
+	<aura:attribute name="_dropzoneContext1" access="private" type="Object"/>
+	<aura:attribute name="_dropzoneContext2" access="private" type="Object"/>
+	<aura:attribute name="_draggableContext1" access="private" type="Object"/>
+	<aura:attribute name="_draggableContext2" access="private" type="Object"/>
+	
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	
+	<div class="container">
+		<ui:dropzone inContextOf="{!v._dropzoneContext1}" class="sampleList" drop="{!c.handleDrop}">
+			<ui:infinitelist aura:id="list" itemVar="item">
+				<aura:set attribute="dataProvider">
+					<uiExamples:dragAndDropProvider prefix="Acme" count="5"/>
+				</aura:set>
+				<aura:set attribute="itemTemplate">
+					<ui:draggable inContextOf="{!v._draggableContext1}"
+								  dragEnd="{!c.handleDragEnd}"
+								  dataTransfer="{!item}"
+								  class="sampleCard"
+								  dragClass="dragging">
+						<p>{!item}</p>
+					</ui:draggable>
+				</aura:set>
+			</ui:infinitelist>
+		</ui:dropzone>
+		
+		<ui:dropzone inContextOf="{!v._dropzoneContext2}" class="sampleList" drop="{!c.handleDrop}">
+			<ui:infinitelist aura:id="list" itemVar="item">
+				<aura:set attribute="dataProvider">
+					<uiExamples:dragAndDropProvider prefix="Foo" count="3"/>
+				</aura:set>
+				<aura:set attribute="itemTemplate">
+					<ui:draggable inContextOf="{!v._draggableContext2}" 
+								  dataTransfer="{!item}"
+								  dragEnd="{!c.handleDragEnd}"
+								  class="sampleCard"
+								  dragClass="dragging">
+						<p>{!item}</p>
+					</ui:draggable>
+				</aura:set>
+			</ui:infinitelist>
+		</ui:dropzone>
+	</div>
+</aura:component>

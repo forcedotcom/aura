@@ -308,7 +308,11 @@
                 ["bogus:bogus",{value:4}],
                 ["aura:text",{value:5}]
             ],function(components,overallStatus,statusList){
-                actual=statusList.join(',');
+                actual=[];
+                for(var i=0;i<statusList.length;i++){
+                    actual.push(statusList[i].status);
+                }
+                actual=actual.join(',');
                 actionComplete = true;
             });
 

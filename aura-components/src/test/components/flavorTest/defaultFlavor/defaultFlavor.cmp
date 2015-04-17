@@ -16,5 +16,5 @@
 
 -->
 <aura:component>
-    <flavorTest:defaultFlavorHelper aura:id="cmp"/>
+    <flavorTest:defaultFlavorHelper aura:id="cmp">test</flavorTest:defaultFlavorHelper>
 </aura:component>

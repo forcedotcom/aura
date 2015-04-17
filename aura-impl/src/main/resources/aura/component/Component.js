@@ -446,6 +446,7 @@ if(!this.concreteComponentId) {
                     var cdr = {};
                     cdr["componentDef"] = value[i]["componentDef"];
                     cdr["localId"] = value[i]["localId"];
+                    cdr["flavorReference"] = value[i]["flavorReference"];
                     cdr["attributes"] = value[i]["attributes"];
                     cdr["valueProvider"] = value[i]["valueProvider"] || config["valueProvider"];
 //JBUCH: HALO: TODO: SOMETHING LIKE THIS TO FIX DEFERRED COMPDEFREFS?

@@ -29,10 +29,12 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.flavor.FlavorRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.base.CaseFormat;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Utilities for working with flavors.
@@ -164,11 +166,13 @@ public final class Flavors {
      * @return The CSS class name.
      */
     public static String toComponentClassName(DefDescriptor<FlavoredStyleDef> flavoredStyle) {
-        if (!flavoredStyle.getName().contains("-")) {
-            return flavoredStyle.getName();
+        List<String> split = Lists.newArrayList(Splitter.on('-').limit(2).split(flavoredStyle.getName()));
+        if (split.size() == 1) {
+            return split.get(0);
+        } else if (split.size() == 2) {
+            return split.get(0) + AuraTextUtil.initCap(split.get(1));
         }
-
-        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, flavoredStyle.getName());
+        throw new AuraRuntimeException("Unable to convert flavored style to component css class" + flavoredStyle.getName());
     }
 
     /**

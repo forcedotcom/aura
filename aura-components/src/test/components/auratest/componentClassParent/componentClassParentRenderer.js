@@ -15,7 +15,7 @@
  */
 ({
     render : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'RootRender' );
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ParentRender' );
         if (cmp.get("v.errorOutFromRender_Parent") === true ) {
         	blahFromParentRerender.willExplode();
         }
@@ -23,7 +23,7 @@
     },
 
     afterRender : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'RootAfterrender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ParentAfterrender');
         if (cmp.get("v.errorOutFromAfterRender_Parent") === true ) {
         	blahFromParentAfterRerender.willExplode();
         }
@@ -31,8 +31,7 @@
     },
 
     rerender : function(cmp, helper) {
-    	debugger;
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'RootRerender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ParentRerender');
         if (cmp.get("v.errorOutFromReRender_Parent") === true ) {
         	blahFromParentReRerender.willExplode();
         }
@@ -40,8 +39,7 @@
     },
 
     unrender : function(cmp, helper) {
-    	debugger;
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'RootUnrender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ParentUnrender');
         if (cmp.get("v.errorOutFromUnRender_Parent") === true ) {
         	blahFromParentUnRerender.willExplode();
         }

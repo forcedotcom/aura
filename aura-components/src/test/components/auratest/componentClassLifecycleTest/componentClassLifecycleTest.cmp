@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
+<aura:component>
 	<!-- let's only load the component we want to test -->
 	<!-- Child extends Parent, GrandChildXXX extends Child -->
 	<aura:attribute name="testParent" type="Boolean" default="false"/>
@@ -124,7 +124,8 @@
 					   <auratest:componentClassClientProvider aura:id="ClientProvidedGrandChildClientProviderInIteration" requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'ClientProvidedGrandChildClientProviderInIteration'}"/><br/>
 					</aura:if>
 					<aura:if isTrue="{!v.testServerProviderGrandChildClientProviderInIteration}">
-					   <auratest:componentClassServerProvider aura:id="ServerProviderGrandChildClientProviderInIteration" requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'ServerProviderGrandChildClientProviderInIteration'}"/><br/>
+					   <auratest:componentClassServerProvider aura:id="ServerProviderGrandChildClientProviderInIteration" 
+					   requestDescriptor="auratest:componentClassGrandChildClientProvider" requestAttributes="{'id':'ServerProviderGrandChildClientProviderInIteration'}"/><br/>
                     </aura:if>
                     <aura:if isTrue="{!v.testClientProviderGrandChildServerProviderInIteration}">
                        <auratest:componentClassClientProvider aura:id="ClientProviderGrandChildServerProviderInIteration" requestDescriptor="auratest:componentClassGrandChildServerProvider" requestAttributes="{'id':'ClientProviderGrandChildServerProviderInIteration'}"/><br/>

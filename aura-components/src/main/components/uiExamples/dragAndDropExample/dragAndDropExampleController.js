@@ -25,21 +25,13 @@
 	handleDrop: function(component, event, helper) {
 		var target = event.getParam("dropComponent");
 		var targetHelper = target.getDef().getHelper();
-		
-		// add data to list
-		targetHelper.addDataTransfer(event);
-		
-		// fire dragComplete event
 		targetHelper.fireDropComplete(event, true);
 	},
 	
 	handleDragEnd: function(component, event, helper) {
 		var status = event.getParam("status");
 		if (status === "DROP_SUCCESS") {
-			// remove data from source
-			var source = event.getParam("dragComponent");
-			var sourceHelper = source.getDef().getHelper();
-			sourceHelper.removeDataTransfer(event, function(o1, o2){
+			$A.dragAndDropService.moveDataTransfer(event, function(o1, o2){
 				if (o1 === o2) {
 					return 0;
 				} else {

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 ({
-	
-	$dropOperationStatus$: null,
+	$dropStatus$: {},
 	
 	/**
 	 * Handle dragstart event.
@@ -46,7 +45,7 @@
 			"type": type,
 			"dragComponent": component,
 			"data": dataTransfer,
-			"status": "DRAGGING"
+			"status": $A.dragAndDropService.OperationStatus.DRAGGING
 		});
 		dragEvent.fire();
 	},
@@ -57,16 +56,17 @@
 	 * @param {Event} event - HTML DOM Event for dragend
 	 */
 	handleDragEnd: function(component, event) {
-		var dropOperationStatus = $dropOperationStatus$;
+		var dropStatus = this.$dropStatus$;
 		this.exitDragOperation(component);
-		
+
 		// Fire dragEnd event
 		var dragEvent = component.getEvent("dragEnd");
 		dragEvent.setParams({
 			"type": component.get("v.type"),
 			"dragComponent": component,
+			"dropComponent": dropStatus["dropComponent"],
 			"data": component.get("v.dataTransfer"),
-			"status": dropOperationStatus ? dropOperationStatus : "DRAG_END"
+			"status": dropStatus["status"] ? dropStatus["status"] : $A.dragAndDropService.OperationStatus.DRAG_END
 		});
 		dragEvent.fire();
 	},
@@ -74,10 +74,17 @@
 	/**
 	 * Handle dropComplete event.
 	 * @param {Aura.Component} component - this component
-	 * @param {Aura.Event} event - Aura Event for dropComplete
+	 * @param {Aura.Event} dragEvent - Aura Event for dropComplete. Must be of type ui:dragEvent
 	 */
-	handleDropComplete: function(component, event) {
-		$dropOperationStatus$ = event.getParam("status");
+	handleDropComplete: function(component, dragEvent) {
+		this.setDropStatus(dragEvent);
+	},
+	
+	setDropStatus: function(dragEvent) {
+		this.$dropStatus$ = {
+			"dropComponent": dragEvent ? dragEvent.getParam("dropComponent") : null,
+			"status": dragEvent ? dragEvent.getParam("status") : null
+		};
 	},
 	
 	/**
@@ -85,7 +92,7 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	enterDragOperation: function(component) {
-		$dropOperationStatus$ = null;
+		this.setDropStatus();
 		component.set("v.ariaGrabbed", true);
 	},
 	
@@ -94,66 +101,7 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	exitDragOperation: function(component) {
-		$dropOperationStatus$ = null;
+		this.setDropStatus();
 		component.set("v.ariaGrabbed", false);
-	},
-	
-	/**
-	 * Remove data being transferred. - TODO: move this into a library or something.
-	 * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
-	 * @param {Function} comparator - comparator used for comparison
-	 */
-	removeDataTransfer: function(dragEvent, comparator) {
-		var dragComponent = dragEvent.getParam("dragComponent");
-		var context = this.resolveContext(dragComponent);
-		
-		if(context.get("v.items") && context.getEvent("addRemove")) {
-			// Calculate index to be removed
-			var record = dragEvent.getParam("data");
-			var items = context.get("v.items");
-			
-			var removeIndex = -1;
-			for (var i = 0; i < items.length; i++) {
-				if (comparator(record, items[i]) === 0) {
-					removeIndex = i;
-					break;
-				}
-			}
-			
-			// fire addRemove event
-			if (removeIndex > -1) {
-				var addRemoveEvent = context.getEvent("addRemove");
-				addRemoveEvent.setParams({
-					"index": removeIndex,
-					"count": 1,
-					"remove": true
-				});
-				addRemoveEvent.fire();
-			}
-		}
-	},
-	
-	resolveContext: function(component) {
-		var context = component.get("v.context");
-		if (context) {
-			if ($A.util.isComponent(context)) {
-				return context;
-			}
-			
-			var globalId;
-			var valueProvider = component.getAttributeValueProvider();
-			var refCmp = valueProvider.find(context);
-			if (refCmp) {
-				refCmp = refCmp.length ? refCmp[0] : refCmp;
-				globalId = refCmp.getGlobalId();
-			} else {
-				globalId = $A.componentService.get(context) ? context : null;
-			}
-			
-			if (!$A.util.isEmpty(globalId)) {
-				return $A.componentService.get(globalId);
-			}
-		}
-		return component;
 	}
 })

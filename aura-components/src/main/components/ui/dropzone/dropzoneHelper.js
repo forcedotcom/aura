@@ -24,7 +24,8 @@
 		var dragEvent = component.getEvent("dragEnter");
 		dragEvent.setParams({
 			"dropComponent": component,
-			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target)
+			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
+			"status": $A.dragAndDropService.OperationStatus.DRAGGING
 		});
 		dragEvent.fire();
 	},
@@ -60,7 +61,7 @@
 		dragEvent.setParams({
 			"dropComponent": component,
 			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
-			"status": "DROPPING"
+			"status": $A.dragAndDropService.OperationStatus.DRAGGING
 		});
 		dragEvent.fire();
 	},
@@ -96,7 +97,7 @@
 				"dropComponent": component,
 				"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
 				"data": data,
-				"status": "DROPPING"
+				"status": $A.dragAndDropService.OperationStatus.DROPPING
 			});
 			dragEvent.fire();
 		}
@@ -133,63 +134,9 @@
 		var dropCompleteEvent = dragComponent.getEvent("dropComplete");
 		dropCompleteEvent.setParams({
 			"type": type,
-			"status": success ? "DROP_SUCCESS" : "DROP_ERROR"
+			"dropComponent": dragEvent.getParam("dropComponent"),
+			"status": success ? $A.dragAndDropService.OperationStatus.DROP_SUCCESS : DragAndDropUtil.OperationStatus.DROP_ERROR
 		});
 		dropCompleteEvent.fire();
-	},
-	
-	/**
-	 * Add data being transferred. TODO: move this to a library or something.
-	 * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent.
-	 */
-	addDataTransfer: function(dragEvent) {
-		var dragComponent = dragEvent.getParam("dragComponent");
-		var dropComponent = dragEvent.getParam("dropComponent");
-		var context = this.resolveContext(dropComponent);
-		var dataTransfer = dragComponent.get("v.dataTransfer");
-		
-		if (context.hasEventHandler("addRemove")) {
-			// fire addRemove event -- addRemove event in ui:abstractList is unsupported yet!
-//			var list = component.find("list");
-//			var addRemoveEvent = list.getEvent("addRemove");
-//			addRemoveEvent.setParams({
-//				"index": 0
-//				"items": [dataTransfer]
-//			});
-//			addRemoveEvent.fire();
-		} else if (context.get("v.dataProvider[0]")) {
-			// fire onchange event on dataProvider -- this will only add to last index
-			var dataProvider = context.get("v.dataProvider[0]");
-	    	var onChangeEvent = dataProvider.getEvent("onchange");
-	    	onChangeEvent.setParams({
-				"data" : [dataTransfer]
-			});
-	    	onChangeEvent.fire();
-		}
-	},
-	
-	resolveContext: function(component) {
-		var context = component.get("v.context");
-		if (context) {
-			if ($A.util.isComponent(context)) {
-				return context;
-			}
-			
-			var globalId;
-			var valueProvider = component.getAttributeValueProvider();
-			var refCmp = valueProvider.find(context);
-			if (refCmp) {
-				refCmp = refCmp.length ? refCmp[0] : refCmp;
-				globalId = refCmp.getGlobalId();
-			} else {
-				globalId = $A.componentService.get(context) ? context : null;
-			}
-			
-			if (!$A.util.isEmpty(globalId)) {
-				return $A.componentService.get(globalId);
-			}
-		}
-		return component;
 	}
-	
 })

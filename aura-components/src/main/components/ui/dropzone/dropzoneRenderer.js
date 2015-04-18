@@ -35,6 +35,16 @@
         	helper.handleDrop(component, event);
         }, false);
         
+        // Component registration
+        $A.dragAndDropService.register(component);
+        
         return ret;
-    }  
+    },
+    
+    unrender: function(component, helper) {
+    	// Component deregistration
+    	$A.dragAndDropService.deregister(component);
+        
+    	this.superUnrender();
+    }
 })

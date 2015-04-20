@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -24,6 +25,7 @@ import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavorIncludeDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.flavor.FlavorAssortmentDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -62,6 +64,11 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     @Override
     protected RootDefinitionBuilder<FlavorAssortmentDef> getBuilder() {
         return builder;
+    }
+
+    @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        builder.addAllExpressionRefs(propRefs);
     }
 
     @Override

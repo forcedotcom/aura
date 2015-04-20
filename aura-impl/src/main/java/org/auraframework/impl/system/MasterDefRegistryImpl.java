@@ -1542,10 +1542,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
         return cacheable;
     }
-    
+
     /**
      * Track if the component class was already added to the pay load for this request.
      */
+    @Override
     public void setComponentClassLoaded(DefDescriptor<?> componentClass, Boolean isLoaded) {
     	componentClassesLoaded.put(componentClass.getQualifiedName(), isLoaded);
     }
@@ -1553,13 +1554,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Check if the component class has already been added to the request pay load.
      */
+    @Override
     public Boolean getComponentClassLoaded(DefDescriptor<?> componentClass) {
     	if(componentClassesLoaded.containsKey(componentClass.getQualifiedName())) {
     		return componentClassesLoaded.get(componentClass.getQualifiedName());
     	}
     	return false;
     }
-    
+
 
     // TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
     // a least-common-denominator implementation

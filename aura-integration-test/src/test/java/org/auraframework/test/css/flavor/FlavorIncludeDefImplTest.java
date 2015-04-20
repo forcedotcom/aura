@@ -15,26 +15,17 @@
  */
 package org.auraframework.test.css.flavor;
 
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.css.FlavorRef;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.FlavorIncludeDef;
-import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.flavor.FlavorRefImpl;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -53,7 +44,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
 
     /* util: given source results in given cmp => flavor override map */
     private void checkMatches(String src, Map<DefDescriptor<ComponentDef>, FlavorRef> expected) throws Exception {
-        Map<DefDescriptor<ComponentDef>, FlavorRef> matches = source(src).computeFilterMatches();
+        Map<DefDescriptor<ComponentDef>, FlavorRef> matches = source(src).computeFilterMatches(false);
         assertEquals("didn't get expected number of matches", expected.size(), matches.size());
         for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : expected.entrySet()) {
             assertEquals("didn't find expected match", entry.getValue(), matches.get(entry.getKey()));
@@ -109,7 +100,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         DefDescriptor<ComponentDef> cmp1 = addComponentDef("<aura:component/>");
         DefDescriptor<ComponentDef> cmp2 = addComponentDef("<aura:component/>");
         DefDescriptor<ComponentDef> cmp3 = addComponentDef("<aura:component/>");
-        DefDescriptor<ComponentDef> cmp4 = addComponentDef("<aura:component/>");
+        addComponentDef("<aura:component/>");
 
         addStandardFlavor(cmp1, "@flavor foo;"); // ignored because standard
         addStandardFlavor(cmp2, "@flavor baz;"); // ignored
@@ -117,7 +108,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
 
         DefDescriptor<FlavoredStyleDef> custom1 = addCustomFlavor(cmp1, "@flavor foo;"); // match
         DefDescriptor<FlavoredStyleDef> custom2 = addCustomFlavor(cmp2, "@flavor foo;"); // match
-        DefDescriptor<FlavoredStyleDef> custom3 = addCustomFlavor(cmp3, "@flavor baz;"); // ignored
+        addCustomFlavor(cmp3, "@flavor baz;"); // ignored
         // no custom flavor for component4
 
         // add custom flavor in a bundle different from "flavors" which should be ignored
@@ -361,10 +352,10 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         DefDescriptor<ComponentDef> cmp5 = addComponentDef("<aura:component/>");
 
         DefDescriptor<FlavoredStyleDef> flavor1 = addCustomFlavor(cmp1, "@flavor yes;"); // yes
-        DefDescriptor<FlavoredStyleDef> flavor2 = addCustomFlavor(cmp2, "@flavor no;");
+        addCustomFlavor(cmp2, "@flavor no;");
         DefDescriptor<FlavoredStyleDef> flavor3 = addCustomFlavor(cmp3, "@flavor yes;"); // yes
         DefDescriptor<FlavoredStyleDef> flavor4 = addCustomFlavor(cmp4, "@flavor nah; @flavor yes; @flavor no;"); // yes
-        DefDescriptor<FlavoredStyleDef> flavor5 = addCustomFlavor(cmp5, "@flavor no; @flavor noagain;");
+        addCustomFlavor(cmp5, "@flavor no; @flavor noagain;");
 
         String src = String.format("<aura:flavors><aura:flavor component='*' flavor='%s:yes'/></aura:flavors>", getNs2());
         DefDescriptor<FlavorAssortmentDef> parent = addFlavorAssortmentOtherNamespace(src);

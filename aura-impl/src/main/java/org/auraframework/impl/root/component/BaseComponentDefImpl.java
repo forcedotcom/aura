@@ -899,6 +899,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * Gets all the component class definitions for this component definition.
      * Returns a string of all the client component classes wrapped in a closure for later execution.
      */
+    @Override
     public String getComponentClass() throws DefinitionNotFoundException, QuickFixException, IOException {
     	
     	if(this.clientComponentClass == null) {

@@ -25,7 +25,10 @@ function FlavorIncludeDef(config) {
 
     for (var key in config) {
         if (config.hasOwnProperty(key)) {
-            this.map[key] = config[key];
+            this.map[key] = {
+                flavor: config[key]["flavor"],
+                context: config[key]["context"]
+            };
         }
     }
 }
@@ -37,5 +40,19 @@ FlavorIncludeDef.prototype.auraType = "FlavorIncludeDef";
  * @param {DefDescriptor} componentDescriptor The component descriptor, e.g., "ui:button".
  */
 FlavorIncludeDef.prototype.getFlavor = function(componentDescriptor) {
-    return this.map[componentDescriptor.getQualifiedName()];
+    var entry = this.map[componentDescriptor.getQualifiedName()];
+
+    if (entry && entry.context) {
+        var value = valueFactory.create(entry.context, null, $A);
+        $A.assert(value && value.evaluate, "unable to parse expression for aura:flavor override");
+
+        var result = value.evaluate();
+        $A.assert($A.util.isBoolean(result), "expressions for aura:flavor overrides must result in a boolean value");
+
+        return result ? entry.flavor : null;
+    } else if (entry) {
+        return entry.flavor;
+    }
+
+    return null;
 };

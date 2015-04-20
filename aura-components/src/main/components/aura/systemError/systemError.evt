@@ -18,5 +18,5 @@
 <aura:event type="APPLICATION" support="GA" access="GLOBAL" description="Indicates that an error has occurred.">
     <aura:attribute name="message" type="String" access="GLOBAL" />
     <aura:attribute name="error" type="String" access="GLOBAL" />
-    <aura:attribute name="auraError" type="Object" access="GLOBAL" />
+    <aura:attribute name="auraError" type="Object" />
 </aura:event>

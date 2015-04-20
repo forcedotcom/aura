@@ -65,9 +65,9 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     @Override
     public void validateDefinition() throws QuickFixException {
 
-        if (descriptor == null && name == null || descriptor != null && name != null) {
+        if (descriptor == null && name == null) {
             throw new InvalidDefinitionException(
-                    "aura:handler must specify one and only one of name=\"…\" or event=\"…\"", getLocation());
+                    "aura:handler must specify at least one of name=\"…\" or event=\"…\"", getLocation());
         }
 
         if (action == null) {

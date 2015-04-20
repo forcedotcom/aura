@@ -58,6 +58,89 @@ var AuraEventService = function() {
             return new Event(config);
 
         },
+        /**
+         * Dispatch events
+         * @param {Event} evt The event object
+         * @memberOf AuraEventService
+         * @private
+         */
+        dispatchEventHandlers: function (handlers, evt) {
+            for (var i = 0; i < handlers.length; i++) {
+                handlers[j](evt);
+            }
+        },
+        /**
+         * Bubbles the event from the source to the root
+         * @param {Event} evt The event object
+         * @memberOf AuraEventService
+         * @private
+         */
+        bubbleEvent : function(evt) {
+            var eventName = evt.getName();
+            var needsDispatch;
+            var i,j;
+
+            // Loop over facet value provider all the way up to the root
+            for (var cmp = evt.getSource(); cmp && !evt.eventStopPropagation; cmp = cmp.isValid() && cmp.getComponentValueProvider()) {
+                
+                // Loop for super() parents inside the current component
+                for (var superCmp = cmp; superCmp; superCmp = cmp.isValid() ? superCmp.getSuper(): null) {
+
+                    var dispatcher = superCmp.getEventDispatcher();
+                    var dispatcherHandlers = dispatcher && dispatcher[eventName];
+                    needsDispatch = false; // reset for each loop of inheritance
+
+                    // First of all, check if we have any dispatch handlers, if not we are done for this level
+                    if (dispatcherHandlers && dispatcherHandlers.length) {
+                        needsDispatch = true;
+
+                        var cmpHandlerDefs = superCmp.getDef().getCmpHandlerDefs();
+                        // If we got cmp handler Defs, we need to check for eventDef matching
+                        if (cmpHandlerDefs) {
+                            // Each handler
+                            for (i = 0; i < cmpHandlerDefs.length && needsDispatch; i++) {
+                                // Check for inheritance event def structure
+                                for (var evtDef = evt.getDef(); evtDef; evtDef = evtDef.getSuperDef()) {
+                                    var hDef = cmpHandlerDefs[i]["eventDef"];
+
+                                    // If we have the def we guard against it. If we just have name, only check the name
+                                    // TODO @dval: Refactor this, once we remove all self-events + move parent->child event into methods
+                                    if (cmpHandlerDefs[i]["name"] === eventName && (!hDef || hDef === evtDef)) {
+                                        for (j = 0; j < dispatcherHandlers.length; j++) {
+                                            dispatcherHandlers[j](evt);
+                                        }
+                                        needsDispatch = false;
+                                        break;
+                                    }
+
+                                    // And if we dont have a def, we are firing an event against ourselves
+                                    // TODO @dval: Refactor this, once we remove all self-events + move parent->child event into methods
+                                    if (!hDef) {
+                                        evt.stopPropagation();
+                                    }
+                                }
+                            }
+                        
+                        }
+
+                    } // dispatcher-check
+
+                    // If we need to dispatch here, is a direct parent-children event (no def handler)
+                    // So we can cancel Propagation
+                    if (needsDispatch && superCmp.getDef().getEventDef(eventName)) {
+                        evt.stopPropagation();
+                        for (j = 0; j < dispatcherHandlers.length; j++) {
+                            dispatcherHandlers[j](evt);
+                        }
+                    }
+
+                } // inheritance-loop
+
+                if (cmp.isValid() && cmp === cmp.getComponentValueProvider()) {
+                    return;
+                }
+            } // parent-bubble-loop
+        },
 
         /**
          * Returns the new event.

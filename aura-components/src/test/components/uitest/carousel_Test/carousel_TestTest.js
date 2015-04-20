@@ -34,7 +34,6 @@
  	testSwitchPageUsingPageIndicator : {
  		browsers: ["-IE7","-IE8"],
  		test : [function(cmp) {
- 			debugger;
  			// go to 1st page
  			this.goToPageOnCarousel(cmp, "carousel1", 1, "c1-p1");
  		}, function(cmp) {
@@ -416,7 +415,7 @@
 		var carousel = cmp.find(carouselName);
 		var navIndicators = this.getNavigationIndicators(carousel);
 		var targetIndicator = navIndicators[pageNumber];
-		targetIndicator.get("e.click").fire();
+		targetIndicator.get("e.click").setComponentEvent().fire();
 		var waitForPageChange = this.waitForPageChange;
 		var that = this;
 		$A.test.addWaitFor(true,

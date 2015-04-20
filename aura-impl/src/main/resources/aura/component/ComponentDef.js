@@ -92,21 +92,27 @@ $A.ns.ComponentDef = function ComponentDef(config) {
         for (var j = 0; j < handlerDefConfigs.length; j++) {
             var handlerConfig = handlerDefConfigs[j];
             if (handlerConfig["eventDef"]) {
-                //
-                // We cannot modify handlerConfig here, as it is sometimes
-                // stored
-                // in localStorage. We used to replace eventDef with the actual
-                // eventDef, but the json serialize-deserialize loses the object
-                // prototype.
-                //
-                appHandlerConfig = {
-                    "action" : handlerConfig["action"],
-                    "eventDef" : eventService.getEventDef(handlerConfig["eventDef"])
-                };
-                if (!appHandlerDefs) {
-                    appHandlerDefs = [];
+                // We cannot modify handlerConfig directly, as it is sometimes stored in localStorage. 
+                // and the json serialize-deserialize loses the object prototype.
+                if (handlerConfig.name) {
+                    if (!cmpHandlerDefs) {
+                        cmpHandlerDefs = [];
+                    }
+                    cmpHandlerDefs.push({
+                        "name"     : handlerConfig["name"],
+                        "action"   : handlerConfig["action"],
+                        "eventDef" : eventService.getEventDef(handlerConfig["eventDef"])
+                    });
+                } else {
+                    if (!appHandlerDefs) {
+                        appHandlerDefs = [];
+                    }
+                    appHandlerDefs.push({
+                        "action"   : handlerConfig["action"],
+                        "eventDef" : eventService.getEventDef(handlerConfig["eventDef"])
+                    });
                 }
-                appHandlerDefs.push(appHandlerConfig);
+
             } else if (handlerConfig["value"]) {
                 if (!valueHandlerDefs) {
                     valueHandlerDefs = [];

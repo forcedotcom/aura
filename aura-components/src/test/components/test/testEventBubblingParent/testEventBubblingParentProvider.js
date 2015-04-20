@@ -13,17 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = Event.prototype;
-exp(p,
-    "getSource", p.getSource,
-    "getDef", p.getDef,
-    "getName", p.getName,
-    "getParam", p.getParam,
-    "setParam", p.setParam,
-    "getParams", p.getParams,
-    "stopPropagation", p.stopPropagation,
-    "setComponentEvent", p.setComponentEvent,
-    "setParams", p.setParams,
-    "fire", p.fire
-);
+({
+    provide : function (component) {
+        return component;
+    }
+})

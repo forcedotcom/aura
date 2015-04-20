@@ -567,6 +567,7 @@ function (w) {
         * @private
         */
         _destroy: function () {
+            CAF(this._rafReq);
             this._handleEvents('unbind');
         },
 

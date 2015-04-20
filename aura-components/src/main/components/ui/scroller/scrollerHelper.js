@@ -92,6 +92,7 @@
     getScrollerNamespace: function () {
         return window.__S;
     },
+    // TODO: handleScrollTo: Move and clean this logic inside the scroller (@dval, @jye)
     handleScrollTo : function(component, event) {
         var scroller   = this.getScrollerInstance(component),
             isNative   = component.get('v.useNativeScroller'),

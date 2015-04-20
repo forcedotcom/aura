@@ -113,9 +113,8 @@ MetricsService.prototype = {
         this.doneBootstrap = true;
 
         var bootstrap = this.getBootstrapMetrics();
-        this.transactionEnd('bootstrap','app', function (transaction, callback) {
+        this.transactionEnd('bootstrap','app', function (transaction) {
             transaction["marks"]["bootstrap"] = bootstrap;
-            callback();
         });
 
         // #if {"modes" : ["PRODUCTION"]}
@@ -200,9 +199,7 @@ MetricsService.prototype = {
             }
 
             if (postProcess) {
-                postProcess(parsedTransaction, this.signalBeacon.bind(this, beacon, parsedTransaction));
-            } else {
-                this.signalBeacon(beacon, parsedTransaction);
+                postProcess(parsedTransaction);
             }
 
             //#if {"excludeModes" : ["PRODUCTION"]}
@@ -210,6 +207,8 @@ MetricsService.prototype = {
                     this.callHandlers("transactionEnd", parsedTransaction);
                 }
             //#end
+
+            this.signalBeacon(beacon, parsedTransaction);
 
             // Cleanup transaction
             if (!this.clearCompleteTransactions) {

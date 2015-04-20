@@ -547,6 +547,7 @@ if(!this.concreteComponentId) {
                 params["arguments"]=$A.util.toArray(arguments);
             }
             methodEvent.setParams(params);
+            methodEvent.setComponentEvent();
             methodEvent.fire();
         };
     };

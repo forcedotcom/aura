@@ -56,7 +56,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
      * 
      * IE8: homeEndButton test is flappy, works fine manually and on webdriver after running a few times
      * 
-     * IE9/10: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
+     * IE9/10/11: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
      * Manually works fine
      * 
      * Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
@@ -179,7 +179,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.ANDROID_PHONE,
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testPageUpDownYear() throws Exception {
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_STR);

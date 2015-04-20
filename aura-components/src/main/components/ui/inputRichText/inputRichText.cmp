@@ -19,7 +19,8 @@
 
     <aura:clientLibrary name="CkEditor" type="JS" />
 
-	<aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Possible values: standard, full, email. Default value is &quot;basic&quot;. Custom config can be added in inputRichTextHelper."/>
+	<aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Possible values: standard, full, email and custom. Default value is &quot;basic&quot;. Custom config can be added in inputRichTextHelper"/>
+	<aura:attribute name="customToolbarConfig" type="Object" description="A custom configuration for the toolbar"/>
 	<aura:attribute name="toolbarLocation" type="String" default="top" description="Location of the toolbar. Possible options are &quot;top&quot; and &quot;bottom&quot;." /> 
 	 
 	<aura:attribute access="GLOBAL" name="width" type="String"  description="The editor UI outer width. This can be an integer, for pixel sizes, or any CSS-defined unit. If isRichText is set to false, use the cols attribute instead." />

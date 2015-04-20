@@ -652,7 +652,11 @@
         }
 
         return {
-            initial: initial ? initial : first,
+            // security restriction on iOS doesn't allow focus without user gesture, and focusing an input
+            // inside a timeout causes weird behaviours (See W-2564192)
+            // we can't completely ignore focus in iOS because the header is positioned on focus. Therefore
+            // allowing iOS to focus the header buttons as before.
+            initial: initial && !$A.get('$Browser.isIOS') ? initial : first,
             first: first,
             last: last
         };

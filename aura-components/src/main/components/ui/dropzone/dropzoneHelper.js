@@ -35,19 +35,25 @@
 	 * @param {Aura.Component} component - this component
 	 * @param {Event} event - HTML DOM Event for dragover
 	 */
-	handleDragOver: function(component, event) {		
-		if (event.preventDefault) {
-			// Necessary. Allows us to drop, i.e. this is a dropzone component
-			event.preventDefault(); 
+	handleDragOver: function(component, event) {
+		var effectAllowed = event.dataTransfer.effectAllowed;
+		var types = component.get("v.types");
+		if (types.indexOf(effectAllowed) > -1) {
+			if (event.preventDefault) {
+				// Necessary. Allows us to drop, i.e. this is a dropzone component
+				event.preventDefault(); 
+			}
+			
+			// The actual effect that will be used, 
+			// and should always be one of the possible values of effectAllowed.
+			event.dataTransfer.dropEffect = effectAllowed;
+			
+			// Prevent default behavior in certain browser such as
+			// navigate to link when the dropzone is an anchor element
+			return false;
 		}
-
-		// The actual effect that will be used, 
-		// and should always be one of the possible values of effectAllowed.
-		event.dataTransfer.dropEffect = component.get("v.type");
 		
-		// Prevent default behavior in certain browser such as
-		// navigate to link when the dropzone is an anchor element
-		return false;
+		return true;
 	},
 	
 	/**

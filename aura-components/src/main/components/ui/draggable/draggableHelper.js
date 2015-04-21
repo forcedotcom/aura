@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	$dropStatus$: {},
+	$dragStatus$: {},
 	
 	/**
 	 * Handle dragstart event.
@@ -56,18 +56,25 @@
 	 * @param {Event} event - HTML DOM Event for dragend
 	 */
 	handleDragEnd: function(component, event) {
-		var dropStatus = this.$dropStatus$;
-		this.exitDragOperation(component);
-
-		// Fire dragEnd event
 		var dragEvent = component.getEvent("dragEnd");
-		dragEvent.setParams({
-			"type": component.get("v.type"),
-			"dragComponent": component,
-			"dropComponent": dropStatus["dropComponent"],
-			"data": component.get("v.dataTransfer"),
-			"status": dropStatus["status"] ? dropStatus["status"] : $A.dragAndDropService.OperationStatus.DRAG_END
-		});
+		var dropEffect = event.dataTransfer.dropEffect 
+		if (dropEffect === component.get("v.type")) {
+			dragEvent.setParams({
+				"type": dropEffect,
+				"dragComponent": component,
+				"dropComponent": this.$dropStatus$["dropComponent"],
+				"data": component.get("v.dataTransfer"),
+				"status": this.$dropStatus$["status"] ? this.$dropStatus$["status"] : $A.dragAndDropService.OperationStatus.DRAG_END
+			});
+		} else {
+			dragEvent.setParams({
+				"type": dropEffect,
+				"dragComponent": component,
+				"status": $A.dragAndDropService.OperationStatus.DRAG_END
+			});
+		}
+		
+		this.exitDragOperation(component);
 		dragEvent.fire();
 	},
 	
@@ -77,13 +84,18 @@
 	 * @param {Aura.Event} dragEvent - Aura Event for dropComplete. Must be of type ui:dragEvent
 	 */
 	handleDropComplete: function(component, dragEvent) {
-		this.setDropStatus(dragEvent);
+		this.setDragStatus(dragEvent.getParam("status"), dragEvent.getParam("dropComponent"));
 	},
 	
-	setDropStatus: function(dragEvent) {
+	/**
+	 * Set drag and drop operation status for this draggable component
+	 * @param {String} status - status of the drag and drop operation
+	 * @param {Aura.Component} dropComponent - the drop component if applicable
+	 */
+	setDragStatus: function(status, dropComponent) {
 		this.$dropStatus$ = {
-			"dropComponent": dragEvent ? dragEvent.getParam("dropComponent") : null,
-			"status": dragEvent ? dragEvent.getParam("status") : null
+			"status": status,
+			"dropComponent": dropComponent
 		};
 	},
 	
@@ -92,7 +104,7 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	enterDragOperation: function(component) {
-		this.setDropStatus();
+		this.setDragStatus($A.dragAndDropService.OperationStatus.DRAGGING);
 		component.set("v.ariaGrabbed", true);
 	},
 	
@@ -101,7 +113,7 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	exitDragOperation: function(component) {
-		this.setDropStatus();
+		this.setDragStatus();
 		component.set("v.ariaGrabbed", false);
 	}
 })

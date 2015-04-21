@@ -1,0 +1,32 @@
+<aura:component>
+    <aura:attribute name="iterationForceServer" type="Boolean" default="true"/>
+    <aura:attribute name="shouldCreate1" type="Boolean" default="true"/>
+    <aura:attribute name="shouldCreate2" type="Boolean" default="true"/>
+    <aura:attribute name="shouldCreate3" type="Boolean" default="true"/>
+    <aura:attribute name="shouldCreate4" type="Boolean" default="false"/>
+    <aura:attribute name="iterationItems" type="List" default="one,two,three"/>
+    
+    <div aura:id="testPanel" class="testPanel">
+    <aura:if isTrue="{!v.shouldCreate1}">
+       <aura:renderIf isTrue="{!v.shouldCreate2}">
+            <aura:if isTrue="{!v.shouldCreate4}">
+                    <auratest:componentClassGrandChildClientProvider aura:id="GrandChildClientProvider" id="GrandChildClientProvider"/><br/>
+            </aura:if>
+            <aura:iteration items="{!v.iterationItems}" var="x" forceServer="{!v.iterationForceServer}">
+                <aura:if isTrue="{!v.shouldCreate3}">
+                        <auratest:componentClassServerProvider aura:id="ServerProviderGrandChildClientProviderInIteration" 
+                        requestDescriptor="auratest:componentClassGrandChildClientProvider" 
+                        requestAttributes="{'id':'ServerProviderGrandChildClientProviderInIteration'}"/><br/>
+                 </aura:if>
+                 <aura:if isTrue="{!v.shouldCreate4}">
+                        <auratest:componentClassServerProvider aura:id="ServerProviderGrandChildClientProviderInIteration" 
+                        requestDescriptor="auratest:componentClassGrandChildClientProvider" 
+                        requestAttributes="{'id':'ServerProviderGrandChildClientProviderInIteration'}"/><br/>
+                 </aura:if>
+            </aura:iteration>
+         </aura:renderIf>
+       </aura:if>
+        
+     </div>
+        
+</aura:component>

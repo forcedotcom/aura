@@ -34,7 +34,7 @@
 	</aura:method>
 	
 	{!v.id}:
-	<ui:button label="RootButton" aura:id="button" press="{!c.clientAction}" class="uiButtonParent"/>
+	<ui:button label="ParentButton" aura:id="button" press="{!c.clientAction}" class="uiButtonParent"/>
 	{!v.body}
 	<aura:text value="{!v.value}"/>
 	

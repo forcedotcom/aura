@@ -18,6 +18,6 @@
     	if (cmp.get("v.errorOutFromHelper_Parent") === true ) {
         	blahFromParentHelper.willExplode();
         }
-        return "RootHelper";
+        return "ParentHelper";
     }
 })

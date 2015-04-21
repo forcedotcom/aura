@@ -68,10 +68,10 @@
     			 }
 	             // first check initial state
 	             var expected = testCmp._initialExpected || [
-	                                                         "RootHelperRootProvide",
-	                                                         "RootHelperRootInit",
-	                                                         "RootHelperRootRender",
-	                                                         "RootHelperRootAfterrender" ];
+	                                                         "ParentHelperParentProvide",
+	                                                         "ParentHelperParentInit",
+	                                                         "ParentHelperParentRender",
+	                                                         "ParentHelperParentAfterrender" ];
 	             this.assertLogs(testCmp, expected);
              }
     },
@@ -102,10 +102,10 @@
     		testCmp.find("logPanel").clear();
     		// then fire an action and check after rerender
             testCmp._target.find("button").getElement().click();
-            var expected = [ "RootHelperRootAction",
-                             "[RootHelperRootParam]",
-                             "RootHelperRootValuechange",
-                             "RootHelperRootRerender" ];
+            var expected = [ "ParentHelperParentAction",
+                             "[ParentHelperParentParam]",
+                             "ParentHelperParentValuechange",
+                             "ParentHelperParentRerender" ];
             this.assertLogs(testCmp, expected);
     	}
     	
@@ -127,19 +127,19 @@
 			}
     		// then check after unrender
             testCmp.set("v.shouldRender", false);
-            var expected = [ "RootHelperRootUnrender" ];
+            var expected = [ "ParentHelperParentUnrender" ];
             that.assertLogs(testCmp, expected, function() {
                 // then check after render again (same as initial without provide or init)
                 testCmp.set("v.shouldRender", true);
-                var expected = [ "RootHelperRootRender",
-                                 "RootHelperRootAfterrender" ];
+                var expected = [ "ParentHelperParentRender",
+                                 "ParentHelperParentAfterrender" ];
                 this.assertLogs(testCmp, expected);
             });
     	}
     },
     
     //put Parent in iteration and check if it behaves just like loading it alone
-    testIteratedParent : {
+    testIteratedParent_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             "testParentInIteration": true
@@ -147,9 +147,29 @@
         test : [function(testCmp) {
             this.setTargetCmp(testCmp, testCmp.find("ParentInIteration")[0]);
             this.testStaticParent_Init.test.call(this, testCmp, "ParentInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //put Parent in iteration and check if it behaves just like loading it alone
+    testIteratedParent_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            "testParentInIteration": true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ParentInIteration")[0]);
         	this.testStaticParent_Rerender.test.call(this, testCmp, "ParentInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //put Parent in iteration and check if it behaves just like loading it alone
+    testIteratedParent_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            "testParentInIteration": true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ParentInIteration")[0]);
         	this.testStaticParent_Unrender.test.call(this, testCmp, "ParentInIteration");
         }]
     },
@@ -206,7 +226,6 @@
     	test : function(testCmp, expectedId) {
     			 if(!expectedId) {//only need to setTarget when running this test directly
 	    			 expectedId = expectedId || "Child";
-	    			 debugger;
 	    			 var targetCmp = testCmp.find(expectedId);
 	    			 targetCmp = (targetCmp.length === undefined)?targetCmp:targetCmp[0];
 		             this.setTargetCmp(testCmp, targetCmp);
@@ -214,12 +233,12 @@
 	             // first check initial state
 	             var expected = testCmp._initialExpected || [
 	                                                         "ChildHelperChildProvide",
-	                                                         "RootHelperRootInit",
+	                                                         "ParentHelperParentInit",
 	                                                         "ChildHelperChildInit",
 	                                                         "ChildHelperChildRender",
-	                                                         "RootHelperRootRender",
+	                                                         "ParentHelperParentRender",
 	                                                         "ChildHelperChildAfterrender",
-	                                                         "RootHelperRootAfterrender" ];
+	                                                         "ParentHelperParentAfterrender" ];
 	             this.assertLogs(testCmp, expected);
              }
     },
@@ -247,10 +266,10 @@
             testCmp._target.find("button").getElement().click();
             var expected = [ "ChildHelperChildAction",
                              "[ChildHelperChildParam]",
-                             "RootHelperRootValuechange",
+                             "ParentHelperParentValuechange",
                              "ChildHelperChildValuechange",
                              "ChildHelperChildRerender",
-                             "RootHelperRootRerender" ];
+                             "ParentHelperParentRerender" ];
             this.assertLogs(testCmp, expected);
     	}
     	
@@ -276,31 +295,51 @@
     		// then check after unrender
             testCmp.set("v.shouldRender", false);
             var expected = [ "ChildHelperChildUnrender",
-                             "RootHelperRootUnrender" ];
+                             "ParentHelperParentUnrender" ];
             that.assertLogs(testCmp, expected, function() {
                 // then check after render again (same as initial without provide or init)
                 testCmp.set("v.shouldRender", true);
                 var expected = [ "ChildHelperChildRender",
-                                 "RootHelperRootRender",
+                                 "ParentHelperParentRender",
                                  "ChildHelperChildAfterrender",
-                                 "RootHelperRootAfterrender" ];
+                                 "ParentHelperParentAfterrender" ];
                 this.assertLogs(testCmp, expected);
             });
     	}
     },
     
-    testIteratedChild : {
+    //put static child into an iteration, see if it behaves same as loading alone
+    testIteratedChild_Init : {
         attributes : {
             iterationItems : "ONE,TWO",  
             testChildInIteration : true
         },
         test : [ function(testCmp) {
-        	debugger;
             this.setTargetCmp(testCmp, testCmp.find("ChildInIteration")[0]);
             this.testStaticChild_Init.test.call(this, testCmp, "ChildInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //put static child into an iteration, see if it behaves same as loading alone
+    testIteratedChild_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",  
+            testChildInIteration : true
+        },
+        test : [ function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ChildInIteration")[0]);
         	this.testStaticChild_Rerender.test.call(this, testCmp, "ChildInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //put static child into an iteration, see if it behaves same as loading alone
+    testIteratedChild_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",  
+            testChildInIteration : true
+        },
+        test : [ function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ChildInIteration")[0]);
         	this.testStaticChild_Unrender.test.call(this, testCmp, "ChildInIteration");
         }]
     },
@@ -362,18 +401,19 @@
     			 }
 	             // first check initial state
 	             var expected = testCmp._initialExpected || [
-							"RootHelperRootInit",
+							"ParentHelperParentInit",
 							"ChildHelperChildInit",
 							"GrandChildServerProviderHelperGrandChildServerProviderInit",
 							"GrandChildServerProviderHelperGrandChildServerProviderRender",
 							"ChildHelperChildRender",
-							"RootHelperRootRender",
+							"ParentHelperParentRender",
 							"GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
 							"ChildHelperChildAfterrender",
-							"RootHelperRootAfterrender" ];
+							"ParentHelperParentAfterrender" ];
 	             this.assertLogs(testCmp, expected);
              }
     },
+    
     
     /* 
      * make sure you set targetCmp before calling this function !!!
@@ -398,12 +438,12 @@
             testCmp._target.find("button").getElement().click();
             var expected = [ "GrandChildServerProviderHelperGrandChildServerProviderAction",
                              "[GrandChildServerProviderHelperGrandChildServerProviderParam]",
-                             "RootHelperRootValuechange",
+                             "ParentHelperParentValuechange",
                              "ChildHelperChildValuechange",
                              "GrandChildServerProviderHelperGrandChildServerProviderValuechange",
                              "GrandChildServerProviderHelperGrandChildServerProviderRerender",
                              "ChildHelperChildRerender",
-                             "RootHelperRootRerender" ];
+                             "ParentHelperParentRerender" ];
             this.assertLogs(testCmp, expected);
     	}
     	
@@ -430,23 +470,23 @@
             testCmp.set("v.shouldRender", false);
             var expected = [ "GrandChildServerProviderHelperGrandChildServerProviderUnrender",
                              "ChildHelperChildUnrender",
-                             "RootHelperRootUnrender" ];
+                             "ParentHelperParentUnrender" ];
             that.assertLogs(testCmp, expected, function() {
                 // then check after render again (same as initial without provide or init)
                 testCmp.set("v.shouldRender", true);
                 var expected = [ "GrandChildServerProviderHelperGrandChildServerProviderRender",
                                  "ChildHelperChildRender",
-                                 "RootHelperRootRender",
+                                 "ParentHelperParentRender",
                                  "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                  "ChildHelperChildAfterrender",
-                                 "RootHelperRootAfterrender" ];
+                                 "ParentHelperParentAfterrender" ];
                 this.assertLogs(testCmp, expected);
             });
     	}
     },
     
     //Check grandChild component provided by server in iteration
-    testIteratedGrandChildServerProvider : {
+    testIteratedGrandChildServerProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             iterationForceServer : true,
@@ -455,9 +495,31 @@
         test : [function(testCmp) {
             this.setTargetCmp(testCmp, testCmp.find("GrandChildServerProviderInIteration")[0]);
             this.testGrandChildServerProvider_Init.test.call(this, testCmp, "GrandChildServerProviderInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //Check grandChild component provided by server in iteration
+    testIteratedGrandChildServerProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testGrandChildServerInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("GrandChildServerProviderInIteration")[0]);
         	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "GrandChildServerProviderInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //Check grandChild component provided by server in iteration
+    testIteratedGrandChildServerProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testGrandChildServerInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("GrandChildServerProviderInIteration")[0]);
         	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "GrandChildServerProviderInIteration");
         }]
     },
@@ -484,17 +546,17 @@
         }]
     },
     
+    
     /*
      * see what we did for testServerProvidedGrandChildServerProvider above
      * this test put that in iteration, and verify it behaves the same 
      * 
      * This is not working as expected. W-2559712
-     * componentClassServerProvider actually has a js provider file, though we didn't use it in the component's mark-up, 
-     * but it's still being called. somehow the componentClassServerProvider component itself is being served. that's
-     * not what we expected.
+     * componentClassServerProvider has java provider, and it use it in the markup, but in fact it's not being used. 
+     * somehow the componentClassServerProvider component itself is being served. that's not what we expected.
      * there are warnings being thrown about "unused config"
      */
-    _testIteratedServerProvidedGrandChildServerProvider : {
+    _testIteratedServerProvidedGrandChildServerProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             iterationForceServer : true,
@@ -503,13 +565,32 @@
         test : [function(testCmp) {
             this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildServerProviderInIteration")[0]);
             this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
-        }, function(testCmp) {
-        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
-        }, function(testCmp) {
-        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
         }]
     },
     
+    _testIteratedServerProvidedGrandChildServerProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildServerProviderInIteration")[0]);
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
+        }]
+    },
+    
+    _testIteratedServerProvidedGrandChildServerProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildServerProviderInIteration")[0]);
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderGrandChildServerProviderInIteration");
+        }]
+    },
     
     /*
      * componentClassClientProvider will call its js provider to create a component
@@ -523,15 +604,15 @@
         test : [function(testCmp, expectedId) {
             this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProvider"));
             testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
                 this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProvider"));
                 this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ClientProviderGrandChildServerProvider");
             }, function(testCmp) {
@@ -546,7 +627,7 @@
      * see what we did for testClientProvidedGrandChildServerProvider above
      * this test put that in iteration, and verify it behaves the same 
      */
-    testIteratedClientProvidedGrandChildServerProvider : {
+    testIteratedClientProvidedGrandChildServerProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             iterationForceServer : true,
@@ -554,20 +635,40 @@
         },
         test : [function(testCmp) {
         	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
             this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProviderInIteration")[0]);
             this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ClientProviderGrandChildServerProviderInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    testIteratedClientProvidedGrandChildServerProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testClientProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProviderInIteration")[0]);
         	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ClientProviderGrandChildServerProviderInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    testIteratedClientProvidedGrandChildServerProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testClientProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildServerProviderInIteration")[0]);
         	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ClientProviderGrandChildServerProviderInIteration");
         }]
     },
@@ -683,15 +784,15 @@
         },function(testCmp) {
         	this.setTargetCmp(testCmp, testCmp.find("ClientCreatedClientProvidedGrandChildServerProvider"));
         	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
         	this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildServerProvider");
         },function(testCmp) {
         	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildServerProvider");
@@ -713,15 +814,15 @@
     	},
         test : [function(testCmp) {
         	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
             this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildServerProvider"));
             this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProvider");
         }, function(testCmp) {
@@ -736,10 +837,9 @@
      * this test put that in iteration, and verify it behaves the same 
      * 
      * this is not working. W-2559712
-     * once we put componentClassServerProvider.cmp inside an iteration, it start to use its client provider file,
-     * igoring what we ask it to use the server provider in its markup
+     * once we put componentClassServerProvider.cmp inside an iteration, it igore the fact that we ask it to use the server provider in its markup
      */
-    _testIteratedServerProvidedClientProvidingGrandChildServerProvider : {
+    _testIteratedServerProvidedClientProvidingGrandChildServerProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             iterationForceServer : true,
@@ -747,26 +847,46 @@
         },
         test : [function(testCmp) {
         	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderInit",
                                          "GrandChildServerProviderHelperGrandChildServerProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildServerProviderHelperGrandChildServerProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
             this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildServerProviderInIteration")[0]);
             this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
-        }, function(testCmp) {
-        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
-        }, function(testCmp) {
-        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
         }
         ]
     },
     
+    _testIteratedServerProvidedClientProvidingGrandChildServerProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderClientProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildServerProviderInIteration")[0]);
+        	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
+        }
+        ]
+    },
     
+    _testIteratedServerProvidedClientProvidingGrandChildServerProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderClientProviderGrandChildServerProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildServerProviderInIteration")[0]);
+        	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildServerProviderInIteration");
+        }
+        ]
+    },
     
     
 ///////////////////////////////////////   tests with componentClassGrandChildClientProvider.cmp begin   /////////////////////////////////////////
@@ -792,15 +912,15 @@
 	             // first check initial state
 	             var expected = testCmp._initialExpected || [
 						"GrandChildClientProviderHelperGrandChildClientProviderProvide",
-						"RootHelperRootInit",
+						"ParentHelperParentInit",
 						"ChildHelperChildInit",
 						"GrandChildClientProviderHelperGrandChildClientProviderInit",
 						"GrandChildClientProviderHelperGrandChildClientProviderRender",
 						"ChildHelperChildRender",
-						"RootHelperRootRender",
+						"ParentHelperParentRender",
 						"GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
 						"ChildHelperChildAfterrender",
-						"RootHelperRootAfterrender" ];
+						"ParentHelperParentAfterrender" ];
 	             this.assertLogs(testCmp, expected);
              }
     },
@@ -828,12 +948,12 @@
             testCmp._target.find("button").getElement().click();
             var expected = [ "GrandChildClientProviderHelperGrandChildClientProviderAction",
                              "[GrandChildClientProviderHelperGrandChildClientProviderParam]",
-                             "RootHelperRootValuechange",
+                             "ParentHelperParentValuechange",
                              "ChildHelperChildValuechange",
                              "GrandChildClientProviderHelperGrandChildClientProviderValuechange",
                              "GrandChildClientProviderHelperGrandChildClientProviderRerender",
                              "ChildHelperChildRerender",
-                             "RootHelperRootRerender" ];
+                             "ParentHelperParentRerender" ];
             this.assertLogs(testCmp, expected);
     	}
     	
@@ -860,23 +980,23 @@
             testCmp.set("v.shouldRender", false);
             var expected = [ "GrandChildClientProviderHelperGrandChildClientProviderUnrender",
                              "ChildHelperChildUnrender",
-                             "RootHelperRootUnrender" ];
+                             "ParentHelperParentUnrender" ];
             that.assertLogs(testCmp, expected, function() {
                 // then check after render again (same as initial without provide or init)
                 testCmp.set("v.shouldRender", true);
                 var expected = [ "GrandChildClientProviderHelperGrandChildClientProviderRender",
                                  "ChildHelperChildRender",
-                                 "RootHelperRootRender",
+                                 "ParentHelperParentRender",
                                  "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
                                  "ChildHelperChildAfterrender",
-                                 "RootHelperRootAfterrender" ];
+                                 "ParentHelperParentAfterrender" ];
                 this.assertLogs(testCmp, expected);
             });
     	}
     },
     
     //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
-    testIteratedGrandChildClientProvider : {
+    testIteratedGrandChildClientProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             testGrandChildClientInIteration : true
@@ -884,9 +1004,29 @@
         test : [function(testCmp) {
             this.setTargetCmp(testCmp, testCmp.find("GrandChildClientProviderInIteration")[0]);
             this.testGrandChildClientProvider_Init.test.call(this, testCmp, "GrandChildClientProviderInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
+    testIteratedGrandChildClientProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            testGrandChildClientInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("GrandChildClientProviderInIteration")[0]);
         	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "GrandChildClientProviderInIteration");
-        }, function(testCmp) {
+        }]
+    },
+    
+    //put GrandChildClientProvider in interation, verify it behaves the same of loading seperately
+    testIteratedGrandChildClientProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            testGrandChildClientInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("GrandChildClientProviderInIteration")[0]);
         	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "GrandChildClientProviderInIteration");
         }]
     },
@@ -915,12 +1055,11 @@
      * we are doing it in an iteration and verify GrandChildClientProvider behaves the same like loading it individually
      * 
      * This is not working as expected. W-2559712
-     * componentClassServerProvider actually has a js provider file, though we didn't use it in the component's mark-up, 
-     * but it's still being called. somehow the componentClassServerProvider component itself is being served. that's
+     * somehow the componentClassServerProvider component itself is being served. that's
      * not what we expected.
      * there are warnings being thrown about "unused config"
      */
-    _testIteratedServerProvidedGrandChildClientProvider : {
+    _testIteratedServerProvidedGrandChildClientProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             iterationForceServer : true,
@@ -929,9 +1068,31 @@
         test : [function(testCmp) {
             this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildClientProviderInIteration")[0]);
             this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
-        }, function(testCmp) {
+        }
+        ]
+    },
+    
+    _testIteratedServerProvidedGrandChildClientProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildClientProviderInIteration")[0]);
         	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
-        }, function(testCmp) {
+        }
+        ]
+    },
+    
+    _testIteratedServerProvidedGrandChildClientProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderGrandChildClientProviderInIteration")[0]);
         	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ServerProviderGrandChildClientProviderInIteration");
         }
         ]
@@ -950,15 +1111,15 @@
         test : [function(testCmp, expectedId) {
             this.setTargetCmp(testCmp, testCmp.find("ClientProviderGrandChildClientProvider"));
             testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
                 this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ClientProviderGrandChildClientProvider");
             }, function(testCmp) {
             	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientProviderGrandChildClientProvider");
@@ -971,7 +1132,7 @@
      * look at what we did in testClientProvidedGrandChildClientProvider above
      * this test do that in an iteration, and verify it behaves the same as  loading indivisually
      */
-    testIteratedClientProvidedGrandChildClientProvider : {
+    testIteratedClientProvidedGrandChildClientProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             testClientProviderGrandChildClientProviderInIteration : true
@@ -979,19 +1140,45 @@
         test : [function(testCmp) {
         	this.setTargetCmp(testCmp, testCmp.find("ClientProvidedGrandChildClientProviderInIteration")[0]);
 	        testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-	                                         "RootHelperRootInit",
+	                                         "ParentHelperParentInit",
 	                                         "ChildHelperChildInit",
 	                                         "GrandChildClientProviderHelperGrandChildClientProviderInit",
 	                                         "GrandChildClientProviderHelperGrandChildClientProviderRender",
 	                                         "ChildHelperChildRender",
-	                                         "RootHelperRootRender",
+	                                         "ParentHelperParentRender",
 	                                         "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
 	                                         "ChildHelperChildAfterrender",
-	                                         "RootHelperRootAfterrender" ];
+	                                         "ParentHelperParentAfterrender" ];
 	            this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
-	        }, function(testCmp) {
-	        	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
-	        }, function(testCmp) {
+        }]
+    },
+    
+    /*
+     * look at what we did in testClientProvidedGrandChildClientProvider above
+     * this test do that in an iteration, and verify it behaves the same as  loading indivisually
+     */
+    testIteratedClientProvidedGrandChildClientProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            testClientProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+        	this.setTargetCmp(testCmp, testCmp.find("ClientProvidedGrandChildClientProviderInIteration")[0]);
+	        this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
+        }]
+    },
+    
+    /*
+     * look at what we did in testClientProvidedGrandChildClientProvider above
+     * this test do that in an iteration, and verify it behaves the same as  loading indivisually
+     */
+    testIteratedClientProvidedGrandChildClientProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            testClientProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+        	this.setTargetCmp(testCmp, testCmp.find("ClientProvidedGrandChildClientProviderInIteration")[0]);
 	        	this.testGrandChildClientProvider_Unrender.test.call(this, testCmp, "ClientProvidedGrandChildClientProviderInIteration");
         }]
     },
@@ -1107,15 +1294,15 @@
         }, function(testCmp) {
         	this.setTargetCmp(testCmp, testCmp.find("ClientCreatedClientProvidedGrandChildClientProvider"));
         	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
             this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildClientProvider");
         }, function(testCmp) {
         	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ClientCreatedClientProvidedGrandChildClientProvider");
@@ -1138,15 +1325,15 @@
         test : [function(testCmp) {
             this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildClientProvider"));
             testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
             this.testGrandChildClientProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProvider");
         }, function(testCmp) {
         	this.testGrandChildClientProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProvider");
@@ -1163,7 +1350,7 @@
      * once we put componentClassServerProvider.cmp inside an iteration, it start to use its client provider file,
      * igoring that we ask it to use the server provider in its markup
      */
-    _testIteratedServerProvidedClientProvidingGrandChildClientProvider : {
+    _testIteratedServerProvidedClientProvidingGrandChildClientProvider_Init : {
         attributes : {
             iterationItems : "ONE,TWO",
             iterationForceServer : true,
@@ -1171,20 +1358,42 @@
         },
         test : [function(testCmp) {
         	testCmp._initialExpected = [ "ClientProviderHelperClientProviderProvide",
-                                         "RootHelperRootInit",
+                                         "ParentHelperParentInit",
                                          "ChildHelperChildInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderInit",
                                          "GrandChildClientProviderHelperGrandChildClientProviderRender",
                                          "ChildHelperChildRender",
-                                         "RootHelperRootRender",
+                                         "ParentHelperParentRender",
                                          "GrandChildClientProviderHelperGrandChildClientProviderAfterrender",
                                          "ChildHelperChildAfterrender",
-                                         "RootHelperRootAfterrender" ];
+                                         "ParentHelperParentAfterrender" ];
             this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildClientProviderInIteration")[0]);
             this.testGrandChildServerProvider_Init.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProviderInIteration");
-        }, function(testCmp) {
+        }
+        ]
+    },
+    
+    _testIteratedServerProvidedClientProvidingGrandChildClientProvider_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderClientProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildClientProviderInIteration")[0]);
         	this.testGrandChildServerProvider_Rerender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProviderInIteration");
-        }, function(testCmp) {
+        }
+        ]
+    },
+    
+    _testIteratedServerProvidedClientProvidingGrandChildClientProvider_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            iterationForceServer : true,
+            testServerProviderClientProviderGrandChildClientProviderInIteration : true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("ServerProviderClientProviderGrandChildClientProviderInIteration")[0]);
         	this.testGrandChildServerProvider_Unrender.test.call(this, testCmp, "ServerProviderClientProviderGrandChildClientProviderInIteration");
         }
         ]

@@ -17,9 +17,9 @@ function (w) {
 	'use strict';
 	w || (w = window);
     
-    function DragAndDropUtil() {}
+    function DragAndDropService() {}
     
-    DragAndDropUtil.OperationStatus = {
+    DragAndDropService.OperationStatus = {
     	"DRAGGING": "DRAGGING",
     	"DRAG_END": "DRAG_END",
     	"DROPPING": "DROPPING",
@@ -27,15 +27,18 @@ function (w) {
     	"DROP_ERROR": "DROP_ERROR"
     };
     
-    DragAndDropUtil.prototype.$dndTypeMap$ = {};
+    DragAndDropService.prototype.$dndTypeMap$ = {};
     
-    DragAndDropUtil.prototype.register = function(component) {
-    	var types, ns;
+    /**
+     * Register a drag and drop component.
+     * @param {String[]} types - drag and drop operations type that the component should be registered as
+     * @param {Aura.Component} component - the drag and drop component
+     */
+    DragAndDropService.prototype.register = function(types, component) {
+    	var ns;
     	if (component.isInstanceOf("ui:draggable")) {
-    		types = [component.get("v.type")];
     		ns = "ui:draggable";
     	} else if (component.isInstanceOf("ui:dropzone")) {
-    		types = component.get("v.types");
     		ns = "ui:dropzone";
     	}
     	
@@ -53,13 +56,16 @@ function (w) {
     	}
     };
     
-    DragAndDropUtil.prototype.deregister = function(component) {
-    	var types, ns;
+    /**
+     * Deregister a drag and drop component.
+     * @param {String[]} types - drag and drop operations type that the component should be registered as
+     * @param {Aura.Component} component - the drag and drop component
+     */
+    DragAndDropService.prototype.deregister = function(types, component) {
+    	var ns;
     	if (component.isInstanceOf("ui:draggable")) {
-    		types = [component.get("v.type")];
     		ns = "ui:draggable";
     	} else if (component.isInstanceOf("ui:dropzone")) {
-    		types = component.get("v.types");
     		ns = "ui:dropzone";
     	}
     	
@@ -74,7 +80,11 @@ function (w) {
     	}
     };
     
-    DragAndDropUtil.prototype.getDropzoneComponents = function(type) {
+    /**
+     * Get dropzone components that can handle drop operation of the specified type.
+     * @return {Aura.Component[]} dropzone components of specified type
+     */
+    DragAndDropService.prototype.getDropzoneComponents = function(type) {
     	var globalIds = this.$dndTypeMap$[type]["ui:dropzone"];
     	var components = [];
     	$A.util.forEach(globalIds, function(globalId) {
@@ -83,8 +93,12 @@ function (w) {
     	return components;
     };
     
-    DragAndDropUtil.prototype.$resolveContext$ = function(component) {
-    	var context = component.get("v.context");
+    /**
+     * Resolve context component for drag and drop component.
+     * @return {Aura.Component} context component or null/ undefined if there is none
+     */
+    DragAndDropService.prototype.$resolveContext$ = function(component) {
+    	var context = component.get("v.inContextOf");
     	if (context) {
     		if ($A.util.isComponent(context)) {
     			return context;
@@ -112,7 +126,7 @@ function (w) {
      * Add data being transferred. 
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent.
      */
-    DragAndDropUtil.prototype.addDataTransfer = function(dragEvent) {
+    DragAndDropService.prototype.addDataTransfer = function(dragEvent) {
     	var dropComponent = dragEvent.getParam("dropComponent");
     	var context = this.$resolveContext$(dropComponent);
     	
@@ -145,7 +159,7 @@ function (w) {
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
      * @param {Function} comparator - comparator used for comparison to find data to be removed
      */
-    DragAndDropUtil.prototype.removeDataTransfer = function(dragEvent, comparator) {
+    DragAndDropService.prototype.removeDataTransfer = function(dragEvent, comparator) {
     	var dragComponent = dragEvent.getParam("dragComponent");
     	var context = this.$resolveContext$(dragComponent);
     	
@@ -176,12 +190,17 @@ function (w) {
     		}
     	}
     };
-
-    DragAndDropUtil.prototype.moveDataTransfer = function(dragEvent, comparator) {
+    
+    /**
+     * Move data being transferred from dragComponent to dropComponent.
+     * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
+     * @param {Function} comparator - comparator used for comparison to find data to be removed
+     */
+    DragAndDropService.prototype.moveDataTransfer = function(dragEvent, comparator) {
     	this.addDataTransfer(dragEvent);
     	this.removeDataTransfer(dragEvent, comparator);
     };
     
-    w.$A["dragAndDropService"] = new DragAndDropUtil();
-    w.$A["dragAndDropService"]["OperationStatus"] = DragAndDropUtil.OperationStatus;
+    w.$A["dragAndDropService"] = new DragAndDropService();
+    w.$A["dragAndDropService"]["OperationStatus"] = DragAndDropService.OperationStatus;
 }

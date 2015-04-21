@@ -15,11 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO" description="A draggable component in drag and drop operation.">
-
-	<aura:import library="ui:dragAndDropLib" property="lib" />
+<aura:component extensible="true" implements="ui:hasContextComponent" support="PROTO" description="A draggable component in drag and drop operation.">
 	
-	<aura:attribute name="context" type="Object" required="true" description="The context of this draggable. This attribute can accept localId, globalId, or the component object. If the value is resolved to a component, the global id of the component will be used in the output."/>	
+	<aura:import library="ui:dragAndDropService" property="lib" />
+	
 	<aura:attribute name="type" type="String" default="move" description="Operation type: can be either copy, link, or move."/>
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
 	<aura:attribute name="dataTransfer" type="Object" description="Data to be transferred during drag and drop operation."/>

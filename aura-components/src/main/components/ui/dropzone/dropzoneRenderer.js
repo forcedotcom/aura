@@ -36,14 +36,14 @@
         }, false);
         
         // Component registration
-        $A.dragAndDropService.register(component);
+        $A.dragAndDropService.register(component.get("v.types"), component);
         
         return ret;
     },
     
     unrender: function(component, helper) {
     	// Component deregistration
-    	$A.dragAndDropService.deregister(component);
+    	$A.dragAndDropService.deregister(component.get("v.types"), component);
         
     	this.superUnrender();
     }

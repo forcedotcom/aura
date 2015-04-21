@@ -30,7 +30,7 @@
 	
 	handleDragEnd: function(component, event, helper) {
 		var status = event.getParam("status");
-		if (status === "DROP_SUCCESS") {
+		if (status === $A.dragAndDropService.OperationStatus.DROP_SUCCESS) {
 			$A.dragAndDropService.moveDataTransfer(event, function(o1, o2){
 				if (o1 === o2) {
 					return 0;

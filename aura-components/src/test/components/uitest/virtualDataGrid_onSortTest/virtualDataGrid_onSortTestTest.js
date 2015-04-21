@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-  Browsers: ["-IE7","-IE8"],
+  browsers: ["-IE7","-IE8"],
   
   /**************************************************HELPER FUNCTIONS**************************************************/
   

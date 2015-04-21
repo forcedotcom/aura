@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	$dragStatus$: {},
+	$dropOperationStatus$: null,
 	
 	/**
 	 * Handle dragstart event.
@@ -45,7 +45,6 @@
 			"type": type,
 			"dragComponent": component,
 			"data": dataTransfer,
-			"status": $A.dragAndDropService.OperationStatus.DRAGGING
 		});
 		dragEvent.fire();
 	},
@@ -56,26 +55,23 @@
 	 * @param {Event} event - HTML DOM Event for dragend
 	 */
 	handleDragEnd: function(component, event) {
-		var dragEvent = component.getEvent("dragEnd");
-		var dropEffect = event.dataTransfer.dropEffect 
-		if (dropEffect === component.get("v.type")) {
-			dragEvent.setParams({
-				"type": dropEffect,
-				"dragComponent": component,
-				"dropComponent": this.$dropStatus$["dropComponent"],
-				"data": component.get("v.dataTransfer"),
-				"status": this.$dropStatus$["status"] ? this.$dropStatus$["status"] : $A.dragAndDropService.OperationStatus.DRAG_END
-			});
-		} else {
-			dragEvent.setParams({
-				"type": dropEffect,
-				"dragComponent": component,
-				"status": $A.dragAndDropService.OperationStatus.DRAG_END
-			});
+		if (component.isValid()) {
+			var dropEffect = event.dataTransfer.dropEffect;
+			if (dropEffect === component.get("v.type")) {
+				// drop operation is performed
+				this.updateDropOperationStatus(component, "dragEnd", event);
+			} else {
+				// drag operation is ended without performing drop operation.
+				var dragEvent = component.getEvent("dragEnd");
+				dragEvent.setParams({
+					"type": dropEffect,
+					"dragComponent": component
+				});
+				dragEvent.fire();
+			}
+			
+			this.exitDragOperation(component);
 		}
-		
-		this.exitDragOperation(component);
-		dragEvent.fire();
 	},
 	
 	/**
@@ -84,19 +80,49 @@
 	 * @param {Aura.Event} dragEvent - Aura Event for dropComplete. Must be of type ui:dragEvent
 	 */
 	handleDropComplete: function(component, dragEvent) {
-		this.setDragStatus(dragEvent.getParam("status"), dragEvent.getParam("dropComponent"));
+		this.updateDropOperationStatus(component, "dropComplete", dragEvent);
 	},
 	
 	/**
-	 * Set drag and drop operation status for this draggable component
-	 * @param {String} status - status of the drag and drop operation
-	 * @param {Aura.Component} dropComponent - the drop component if applicable
+	 * Update drop operation status. Drop operation is considered complete when
+	 * dragEnd HTML event and dropComplete Aura event have been fired. 
+	 * @param {Aura.Component} component - this component
+	 * @param {String} eventType - "dragEnd" for dragEnd HTML DOM Event or "dropComplete" for dropComplete Aura event
+	 * @param {(Event|Aura.Event)} event - the HTML DOM Event for dragend or dropComplete Aura event
 	 */
-	setDragStatus: function(status, dropComponent) {
-		this.$dropStatus$ = {
-			"status": status,
-			"dropComponent": dropComponent
-		};
+	updateDropOperationStatus: function(component, eventType, event) {
+		if (this.$dropOperationStatus$ == null) {
+			this.$dropOperationStatus$ = {
+				"dragEnd": null,
+				"dropComplete": null,
+			};
+		}
+		
+		if (eventType === "dragEnd") {
+			this.$dropOperationStatus$["dragEnd"] = {
+				"type": event.dataTransfer.dropEffect
+			};
+		} else if (eventType === "dropComplete") {
+			this.$dropOperationStatus$["dropComplete"] = {
+				"dropComponent": event.getParam("dropComponent"),
+				"status": event.getParam("dropComplete")
+			};
+		}
+		
+		// Ultimately this should be implemented with either Promise
+		// or Object.observe() instead of dirty checking. However,
+		// IE doesn't support either of those.
+		if (this.$dropOperationStatus$["dragEnd"] !== null && this.$dropOperationStatus$["dropComplete"] !== null) {
+			var dragEvent = component.getEvent("dragEnd");
+			dragEvent.setParams({
+				"type": this.$dropOperationStatus$["dragEnd"]["type"],
+				"dragComponent": component,
+				"dropComponent": this.$dropOperationStatus$["dropComplete"]["dropComponent"],
+				"data": component.get("v.dataTransfer"),
+				"dropComplete": this.$dropOperationStatus$["dropComplete"]["status"]
+			});
+			dragEvent.fire();
+		}
 	},
 	
 	/**
@@ -104,7 +130,7 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	enterDragOperation: function(component) {
-		this.setDragStatus($A.dragAndDropService.OperationStatus.DRAGGING);
+		this.$dropOperationStatus$ = null;
 		component.set("v.ariaGrabbed", true);
 	},
 	
@@ -113,7 +139,6 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	exitDragOperation: function(component) {
-		this.setDragStatus();
 		component.set("v.ariaGrabbed", false);
 	}
 })

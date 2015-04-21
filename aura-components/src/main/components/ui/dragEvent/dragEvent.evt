@@ -21,5 +21,5 @@
 	<aura:attribute name="dropComponent" type="Aura.Component[]" description="The dropzone component."/>
 	<aura:attribute name="dropComponentTarget" type="Aura.Component[]" description="Target event component receiving drop."/>
 	<aura:attribute name="data" type="Object" description="Data that is being transferred during a drag and drop operation."/>
-	<aura:attribute name="status" type="String" default="DRAGGING" description="Drag and drop operation status. Can be either: DRAGGING, DRAG_END, DROPPING, DROP_SUCCESS, DROP_ERROR"/>
+	<aura:attribute name="dropComplete" type="Boolean" description="Set to true if drop operation has been completed or false otherwise. The value should only be set when drop operation is performed."/>
 </aura:event>

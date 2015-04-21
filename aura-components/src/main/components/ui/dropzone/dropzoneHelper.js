@@ -24,8 +24,7 @@
 		var dragEvent = component.getEvent("dragEnter");
 		dragEvent.setParams({
 			"dropComponent": component,
-			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
-			"status": $A.dragAndDropService.OperationStatus.DRAGGING
+			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target)
 		});
 		dragEvent.fire();
 	},
@@ -66,8 +65,7 @@
 		var dragEvent = component.getEvent("dragLeave");
 		dragEvent.setParams({
 			"dropComponent": component,
-			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
-			"status": $A.dragAndDropService.OperationStatus.DRAGGING
+			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target)
 		});
 		dragEvent.fire();
 	},
@@ -102,8 +100,7 @@
 				"dragComponent": dragComponent,
 				"dropComponent": component,
 				"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
-				"data": data,
-				"status": $A.dragAndDropService.OperationStatus.DROPPING
+				"data": data
 			});
 			dragEvent.fire();
 		}
@@ -141,7 +138,7 @@
 		dropCompleteEvent.setParams({
 			"type": type,
 			"dropComponent": dragEvent.getParam("dropComponent"),
-			"status": success ? $A.dragAndDropService.OperationStatus.DROP_SUCCESS : DragAndDropUtil.OperationStatus.DROP_ERROR
+			"dropComplete": success
 		});
 		dropCompleteEvent.fire();
 	}

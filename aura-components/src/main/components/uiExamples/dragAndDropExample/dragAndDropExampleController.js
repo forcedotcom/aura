@@ -24,13 +24,13 @@
 	
 	handleDrop: function(component, event, helper) {
 		var target = event.getParam("dropComponent");
-		var targetHelper = target.getDef().getHelper();
+		var targetHelper = target.getDef().getHelper();		
 		targetHelper.fireDropComplete(event, true);
 	},
 	
 	handleDragEnd: function(component, event, helper) {
-		var status = event.getParam("status");
-		if (status === $A.dragAndDropService.OperationStatus.DROP_SUCCESS) {
+		var dropComplete = $A.util.getBooleanValue(event.getParam("dropComplete"));
+		if (dropComplete) {
 			$A.dragAndDropService.moveDataTransfer(event, function(o1, o2){
 				if (o1 === o2) {
 					return 0;

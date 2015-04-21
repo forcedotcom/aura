@@ -19,14 +19,6 @@ function (w) {
     
     function DragAndDropService() {}
     
-    DragAndDropService.OperationStatus = {
-    	"DRAGGING": "DRAGGING",
-    	"DRAG_END": "DRAG_END",
-    	"DROPPING": "DROPPING",
-    	"DROP_SUCCESS": "DROP_SUCCESS",
-    	"DROP_ERROR": "DROP_ERROR"
-    };
-    
     DragAndDropService.prototype.$dndTypeMap$ = {};
     
     /**
@@ -202,5 +194,4 @@ function (w) {
     };
     
     w.$A["dragAndDropService"] = new DragAndDropService();
-    w.$A["dragAndDropService"]["OperationStatus"] = DragAndDropService.OperationStatus;
 }

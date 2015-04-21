@@ -56,6 +56,7 @@
 	 */
 	handleDragEnd: function(component, event) {
 		if (component.isValid()) {
+			this.exitDragOperation(component);
 			var dropEffect = event.dataTransfer.dropEffect;
 			if (dropEffect === component.get("v.type")) {
 				// drop operation is performed
@@ -69,8 +70,6 @@
 				});
 				dragEvent.fire();
 			}
-			
-			this.exitDragOperation(component);
 		}
 	},
 	

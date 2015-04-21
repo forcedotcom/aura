@@ -20,6 +20,7 @@ import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class AuraClientServiceUITest extends WebDriverTestCase {
 
@@ -27,13 +28,21 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         super(name);
     }
 
+    public void testCsrfTokenSavedOnBootstrap() throws Exception {
+        String expectedToken = "expectedTestToken";
+
+        getMockConfigAdapter().setCSRFToken(expectedToken);
+        open("/clientServiceTest/csrfTokenStorage.app");
+        WebElement actual = getDriver().findElement(By.className("output"));
+
+        waitForElementTextPresent(actual, expectedToken);
+    }
+
     /**
-     * Verify that a refresh during a location change does not display an alert.
-     * The component under test uses DelayedController.java to ensure that the
-     * refresh occurs while the location change is still taking place.
+     * Verify that a refresh during a location change does not display an alert. The component under test uses
+     * DelayedController.java to ensure that the refresh occurs while the location change is still taking place.
      * 
-     * Excluded on ipad/iphone due to known WebDriver issue:
-     * http://code.google.com/p/selenium/issues/detail?id=4348
+     * Excluded on ipad/iphone due to known WebDriver issue: http://code.google.com/p/selenium/issues/detail?id=4348
      */
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testRefreshDuringLocationChange() throws Exception {

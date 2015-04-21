@@ -134,6 +134,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Boolean isAuraJSStatic = null;
     private Boolean validateCss = null;
     private ContentSecurityPolicy csp;
+    private String csrfToken = null;
 
     public MockConfigAdapterImpl() {
         super();
@@ -149,6 +150,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         isProduction = null;
         isAuraJSStatic = null;
         validateCss = null;
+        csrfToken = null;
     }
 
     @Override
@@ -243,5 +245,15 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public void setValidateCSRFTokenException(RuntimeException exception) {
+    }
+
+    @Override
+    public void setCSRFToken(String token) {
+        this.csrfToken = token;
+    }
+
+    @Override
+    public String getCSRFToken() {
+        return (this.csrfToken == null) ? super.getCSRFToken() : this.csrfToken;
     }
 }

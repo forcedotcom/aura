@@ -1529,4 +1529,36 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
     this.continueWhenReady();
 };
 
+/**
+ * @description Asynchronously wait for CKEditor instance in inputRichText component to be ready
+ * before continuing to enter test data. 
+ *
+ *  @example
+ * <code>$A.test.executeAfterCkEditorIsReady(inputRichTextComponent, function(){<br/>
+ *   inputRichTextComponent.set('v.value', 'tab1 content'); });</code>
+ *
+ * @param {Component} ui:inputRichText component, or a component that extends it, that you are entering data in.
+ * @param {Function} callback Invoked after the CKEditor is ready for user input 
+ */    
+$A.ns.Test.prototype.executeAfterCkEditorIsReady = function(inputRichTextComponent, callback) {
+    if(!inputRichTextComponent.isInstanceOf("ui:inputRichText")) {
+            this.fail("The component has to be an instance of ui:inputRichText or extend it");
+    }
+
+    var editorReady = false;
+    var instance =  $A.util.lookup(window, "CKEDITOR", "instances", inputRichTextComponent.getGlobalId()); 
+
+    if (instance === undefined) {
+        this.fail("CKEDITOR instance was not found.");
+    }
+
+    instance["on"]("instanceReady", function() { editorReady = true; });    
+
+    this.addWaitForWithFailureMessage(true, function() {
+        // In case the test missed the instanceReady event, we can check
+        // status of the instance. 
+        return instance.status === "ready" || editorReady; },
+        "Editor was not initialized", callback);
+};
+
 //#include aura.test.Test_export

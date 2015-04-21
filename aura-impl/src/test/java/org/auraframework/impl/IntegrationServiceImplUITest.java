@@ -751,8 +751,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         // historyService.set() to a new location - W-1506261
         auraUITestingUtil.getEval("$A.historyService.set('forward')");
-        assertTrue("Failed to change window location using set()",
-                getDriver().getCurrentUrl().endsWith("#forward"));
+        String url = (String) auraUITestingUtil.getEval("return window.location.href");
+        assertTrue("Failed to change window location using set()", url.endsWith("#forward"));
 
         // historyService.get()
         assertEquals("get() failed to retrieve expected token",

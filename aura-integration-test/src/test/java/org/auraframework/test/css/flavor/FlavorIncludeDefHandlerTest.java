@@ -18,10 +18,7 @@ package org.auraframework.test.css.flavor;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.FlavorIncludeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.FlavorAssortmentDefHandler;
@@ -41,7 +38,7 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         addStandardFlavor(cmp, "@flavor test;");
         String fmt = String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName());
         FlavorIncludeDef def = source(fmt);
-        assertFalse(def.computeFilterMatches().isEmpty());
+        assertFalse(def.computeFilterMatches(false).isEmpty());
     }
 
     public void testDescription() throws Exception {

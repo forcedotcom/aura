@@ -35,5 +35,5 @@ public interface FlavorIncludeDef extends Definition {
      * @throws QuickFixException If there's a problem loading a {@link FlavoredStyleDef} (they can be loaded to check if
      *             they contain a matching flavor name declaration).
      */
-    Map<DefDescriptor<ComponentDef>, FlavorRef> computeFilterMatches() throws QuickFixException;
+    Map<DefDescriptor<ComponentDef>, FlavorRef> computeFilterMatches(boolean findDeps) throws QuickFixException;
 }

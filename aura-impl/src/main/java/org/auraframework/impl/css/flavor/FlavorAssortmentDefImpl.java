@@ -16,17 +16,10 @@
 package org.auraframework.impl.css.flavor;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.FlavorIncludeDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -35,16 +28,19 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortmentDef> implements FlavorAssortmentDef {
     private static final long serialVersionUID = -4162113731545878044L;
 
     private final List<FlavorIncludeDef> flavorIncludeDefs;
+    //private final Set<PropertyReference> expressionRefs;
     private final int hashCode;
 
     public FlavorAssortmentDefImpl(Builder builder) {
         super(builder);
         this.flavorIncludeDefs = AuraUtil.immutableList(builder.flavorIncludeDefs);
+        //this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         this.hashCode = AuraUtil.hashCode(descriptor, location, flavorIncludeDefs);
     }
 
@@ -127,9 +123,18 @@ public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortment
 
     public static final class Builder extends RootDefinitionImpl.Builder<FlavorAssortmentDef> {
         private final List<FlavorIncludeDef> flavorIncludeDefs = Lists.newArrayList();
+        private Set<PropertyReference> expressionRefs;
 
         public Builder() {
             super(FlavorAssortmentDef.class);
+        }
+
+        public Builder addAllExpressionRefs(Collection<PropertyReference> refs) {
+            if (expressionRefs == null) {
+                expressionRefs = Sets.newHashSet();
+            }
+            expressionRefs.addAll(refs);
+            return this;
         }
 
         @Override

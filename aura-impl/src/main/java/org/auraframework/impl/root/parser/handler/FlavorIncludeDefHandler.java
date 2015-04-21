@@ -25,8 +25,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.expression.Expression;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -38,11 +40,13 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
     protected static final String TAG = "aura:flavor";
     private static final String ATTRIBUTE_COMPONENT = "component";
     private static final String ATTRIBUTE_FLAVOR = "flavor";
+    private static final String ATTRIBUTE_CONTEXT = "context";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_COMPONENT, ATTRIBUTE_FLAVOR, ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_COMPONENT, ATTRIBUTE_FLAVOR, ATTRIBUTE_CONTEXT, ATTRIBUTE_DESCRIPTION);
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
+    private String context;
 
     public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -75,8 +79,12 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
             throw new InvalidDefinitionException("Missing required attribute 'flavor'", getLocation());
         }
 
-        builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
+        String context = getAttributeValue(ATTRIBUTE_CONTEXT);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(context)) {
+            this.context = context; // have to tokenize later due to exception signature
+        }
 
+        builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
         builder.setParentDescriptor(getParentDefDescriptor());
         builder.setDescriptor(DefDescriptorImpl.getInstance(flavorFilter, FlavorIncludeDef.class));
     }
@@ -95,6 +103,16 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
     @Override
     protected FlavorIncludeDef createDefinition() throws QuickFixException {
+        if (context != null) {
+            TextTokenizer tt = TextTokenizer.tokenize(context, getLocation());
+            Object value = tt.asValue(getParentHandler());
+            if (value instanceof Expression) {
+                builder.setContext((Expression) value);
+            } else {
+                throw new InvalidDefinitionException("only expressions allowed for 'context' attribute", getLocation());
+            }
+        }
+
         return builder.build();
     }
 

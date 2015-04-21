@@ -32,9 +32,11 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.expression.Expression;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -51,6 +53,7 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
     private final ComponentFilter componentFilter;
     private final FlavorFilter flavorFilter;
     private final Mode mode;
+    private final Expression context;
     private final int hashCode;
 
     private QuickFixException error;
@@ -84,6 +87,7 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
 
         this.componentFilter = new ComponentFilter(builder.component);
         this.flavorFilter = new FlavorFilter(builder.flavor, builder.parentDescriptor.getNamespace());
+        this.context = builder.context;
 
         if (flavorFilter.isFuzzy) {
             if (componentFilter.singleMatch.isPresent()) {
@@ -103,7 +107,7 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
     }
 
     @Override
-    public Map<DefDescriptor<ComponentDef>, FlavorRef> computeFilterMatches() throws QuickFixException {
+    public Map<DefDescriptor<ComponentDef>, FlavorRef> computeFilterMatches(boolean findDeps) throws QuickFixException {
         Map<DefDescriptor<ComponentDef>, FlavorRef> map = new HashMap<>();
         AuraContext context = Aura.getContextService().getCurrentContext();
         MasterDefRegistry mdr = context.getDefRegistry();
@@ -147,7 +151,9 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             }
         }
 
-        if (mode == Mode.STANDARD_GLOB || mode == Mode.FUZZY_GLOB) {
+        // todo findDeps is bad, this whole thing is bad, but should still work for now as all of these things will be
+        // in the deps for the app anyway.
+        if ((mode == Mode.STANDARD_GLOB || mode == Mode.FUZZY_GLOB) && !findDeps) {
             // fuzzy matches for standard flavors requires an application for its deps-- trying to use find over all
             // namespaces and components would be too inefficient
             DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
@@ -180,7 +186,7 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             // flavored style defs with a matching flavor name, the non-matching flavored style def will still be
             // included in app.css since the MDR will add it as a dependency. So we'll need to remove the CSS for
             // flavors that aren't used, which we need to do anyway.
-            for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : computeFilterMatches().entrySet()) {
+            for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : computeFilterMatches(true).entrySet()) {
                 dependencies.add(entry.getKey());
                 dependencies.add(entry.getValue().getFlavoredStyleDescriptor());
             }
@@ -201,8 +207,14 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
         json.writeMapBegin();
 
         try {
-            for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : computeFilterMatches().entrySet()) {
-                json.writeMapEntry(entry.getKey().getQualifiedName(), entry.getValue().toStringReference());
+            for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : computeFilterMatches(false).entrySet()) {
+                json.writeMapKey(entry.getKey().getQualifiedName());
+                json.writeMapBegin();
+                json.writeMapEntry("flavor", entry.getValue().toStringReference());
+                if (context != null) {
+                    json.writeMapEntry("context", context);
+                }
+                json.writeMapEnd();
             }
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
@@ -235,12 +247,18 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             super(FlavorIncludeDef.class);
         }
 
-        private String flavor;
-        private String component;
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
+        private String component;
+        private String flavor;
+        private Expression context;
 
         public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
+            return this;
+        }
+
+        public Builder setComponentFilter(String component) {
+            this.component = component.trim();
             return this;
         }
 
@@ -249,9 +267,8 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             return this;
         }
 
-        public Builder setComponentFilter(String component) {
-            this.component = component.trim();
-            return this;
+        public void setContext(Expression context) throws InvalidDefinitionException {
+            this.context = context;
         }
 
         @Override

@@ -155,7 +155,8 @@ public class DialogUITest extends WebDriverTestCase {
         assertEquals("list item with tabindex=0 should be active element", "coffee", auraUITestingUtil.getEval(CLASSNAME));
 
         auraUITestingUtil.pressTab(getActiveElement());
-        assertEquals("anchor element should be active", "anchor", auraUITestingUtil.getEval(CLASSNAME));
+        // active element should be anchor
+        waitForCondition("return $A.test.getActiveElement().className == 'anchor'");
     }
 
 

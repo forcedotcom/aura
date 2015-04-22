@@ -296,7 +296,9 @@ $A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, f
         facet=[facet];
     }
     if(!$A.util.isArray(facet)){
-        $A.error("Aura.RenderingService.getUpdatedFacetInfo: 'facet' must be a valid Array. Found '"+facet+"'.");
+        $A.warning("Aura.RenderingService.getUpdatedFacetInfo: 'facet' should be a valid Array. Found '" +
+            facet + "' in '" + component + "'.");
+        facet = [];
     }
     var updatedFacet={
         components:[],

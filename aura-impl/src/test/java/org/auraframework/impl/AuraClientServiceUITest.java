@@ -28,6 +28,8 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         super(name);
     }
 
+    // needs to be investigated/updated after Chrome upgrade
+    @ExcludeBrowsers({ BrowserType.GOOGLECHROME })
     public void testCsrfTokenSavedOnBootstrap() throws Exception {
         String expectedToken = "expectedTestToken";
 

@@ -97,7 +97,7 @@
     </dependencies>
     <properties>
         <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-        <chromedriver.version>2.9</chromedriver.version>
+        <chromedriver.version>2.15</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/src/test/resources/htdocs</jetty.resources>
         <aura.build.id />

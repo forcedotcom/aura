@@ -39,16 +39,20 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
     private static final long serialVersionUID = -8621907027705407577L;
     private final Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignDefs;
     private final DesignTemplateDef template;
     private final String label;
+    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES = Sets.newHashSet("string", "integer", "boolean");
+    private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
 
     protected DesignDefImpl(Builder builder) {
         super(builder);
@@ -71,13 +75,20 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         if (cmp == null) {
             throw new DefinitionNotFoundException(cmpDesc, getLocation());
         }
-
         if (!attributeDesignDefs.isEmpty()) {
             for (AttributeDesignDef attrDesignDef : attributeDesignDefs.values()) {
                 AttributeDef attr = cmp.getAttributeDef(attrDesignDef.getName());
                 if (attr == null) {
                     throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(attrDesignDef.getName(),
                             AttributeDef.class));
+                }
+                if(!VALID_DESIGN_ATTRIBUTE_TYPES.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
+                	throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
+                }
+                if(attrDesignDef.getDataSource() != null){
+                	if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
+                    	throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());
+                    }
                 }
             }
         }

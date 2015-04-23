@@ -44,7 +44,7 @@ exp(p,
     "getTransactions"              , p.getTransactions,
     "getTransaction"               , p.getTransaction,
     "setClearCompletedTransactions", p.setClearCompletedTransactions,
-    "onTransactionEnd"             , p.onTransactionEnd,
     //#end
+    "onTransactionEnd"             , p.onTransactionEnd,
     "clearTransactions"            , p.clearTransactions
 );

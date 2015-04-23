@@ -113,8 +113,13 @@ MetricsService.prototype = {
         this.doneBootstrap = true;
 
         var bootstrap = this.getBootstrapMetrics();
+        var now = this.time();
         this.transactionEnd('bootstrap','app', function (transaction) {
+            // We need to override manually the duration to add the time before aura was initialized
+            var bootstrapStart = MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
             transaction["marks"]["bootstrap"] = bootstrap;
+            transaction["ts"] = bootstrapStart;
+            transaction["duration"] = now - bootstrapStart;
         });
 
         // #if {"modes" : ["PRODUCTION"]}

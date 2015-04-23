@@ -241,8 +241,6 @@ public class PopupUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
-    // needs to be investigated/updated after Chrome upgrade
-    @ExcludeBrowsers({ BrowserType.GOOGLECHROME })
     public void testPopupManualPosition() throws Exception {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);
@@ -256,7 +254,7 @@ public class PopupUITest extends WebDriverTestCase {
             + "<ui:popup>"
             + "<ui:popupTrigger class='triggerExtendedTarget' aura:id='triggerExtendedTarget' label='" + triggerText + "'/>"
             + "<ui:popupTarget aura:id='targetExtendedTarget' attachToBody='true' manualPosition='true' autoPosition='false'>"
-            + "<div style='position: absolute; left: " + xCoord + "px;width: " + popupWidth + "px;height: " + popupHeight + "px'>" + popupText
+            + "<div style='position: relative; left: " + xCoord + "px;width: " + popupWidth + "px;height: " + popupHeight + "px'>" + popupText
             + "</div>"
             + "</ui:popupTarget>"
             + "</ui:popup>"

@@ -951,7 +951,15 @@ if(!this.concreteComponentId) {
             }else{
                 if(isArray){
                     return this.outputArrayValue(value, avp, serialized, depth);
-                }else if($A.util.isObject(value)){
+                } else if($A.util.isElement(value)) {
+                    var domOutput = {};
+                    domOutput["tagName"]  = value.tagName;
+                    domOutput["id"] = value.id||"";
+                    domOutput["className"] = value.className||"";
+                    domOutput["$serId"] = value["$serId"];
+                    domOutput["__proto__"] = null;
+                    return domOutput;
+                } else if($A.util.isObject(value)){
                     return this.outputMapValue(value, avp, serialized, depth);
                 }
             }

@@ -411,7 +411,7 @@ public class MenuUITest extends WebDriverTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException TODO: Uncomment test once W-2235117 is fixed
      */
-    public void _testMenuPostionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
+    public void testMenuPostionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_ATTACHTOBODY_APP);
         String menuItem3 = "actionItemAttachToBody3";
         WebDriver driver = this.getDriver();
@@ -435,6 +435,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick,
                 triggerLeftPosAfterClickOnItem2);
 
+        menuLabel.click();
         int currentWidth = driver.manage().window().getSize().width;
         int currentHeight = driver.manage().window().getSize().height;
         driver.manage().window().setSize(new Dimension(currentWidth - 200, currentHeight - 100));

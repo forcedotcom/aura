@@ -19,7 +19,7 @@
 <aura:attribute name="expandEventFired" type="boolean" default="false"/>
 <aura:attribute name="collapseEventFired" type="boolean" default="false"/>
 <div style="display:inline-block;width:50%;vertical-align:top;overflow:hidden;">
-        <h2>Attach MenuList To Body</h2>
+        <h2>Attach MenuList To Body - Test Keyboard Interaction</h2>
         <ui:menu aura:id="uiMenu" class="clubMenu">
             <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
             <ui:menuList class="actionMenu" aura:id="actionMenu" attachToBody="true">
@@ -34,8 +34,8 @@
 <p/>
 	<ui:block aura:id="overflowHidden">
 		<aura:set attribute="right">
-		<div style="display:inline-block;width:50%;vertical-align:top;overflow:hidden;">
-        <h2>Attach MenuList To Body</h2>
+		<div style="display:inline-block;vertical-align:top;overflow:hidden;">
+        <h2>Attach MenuList To Body - Test Menu Position</h2>
         <ui:menu aura:id="uiMenuAttachToBody" class="uiMenuAttachToBody">
             <ui:menuTriggerLink class="triggerAttachToBody" aura:id="triggerAttachToBody" label="Please pick your favorite soccer club"/>
             <ui:menuList class="actionMenuAttachToBody" aura:id="actionMenuAttachToBody" attachToBody="true">

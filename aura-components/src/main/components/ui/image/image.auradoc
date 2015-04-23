@@ -17,9 +17,14 @@
 -->
 <aura:documentation>
 	<aura:description>
+		By default, <code>imageType</code> is set to <code>informational</code>. The following image is informational and provides a description in its <code>alt</code> attribute.
+		<pre>&lt;ui:image title="My image" 
+    src="/auraFW/resources/aura/auralogo.png" 
+    alt="Aura logo"/></pre>
+		
 	</aura:description>	
 		<aura:example name="buttonExample" ref="uitest:image_ErrorTest" label="Using ui:image">
-    	<p>This example shows how broken and unbroken images are rendered when passing onerror aura action to ui:image</p>
+    	<p>This example shows how broken and unbroken images are rendered when passing in the <code>onerror</code> Aura action.</p>
     	
 	</aura:example>
 	

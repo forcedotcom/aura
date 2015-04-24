@@ -579,6 +579,11 @@ $A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCoun
         // #end
 
         var acs = this;
+        var actionDefs = [];
+
+        for (var i = 0; i < actionsToSend.length; i++) {
+            actionDefs.push(actionsToSend[i].getDef().toString());
+        }
 
         // clientService.requestQueue reference is mutable
         var requestConfig = {
@@ -602,8 +607,10 @@ $A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCoun
                 "beaconData" : $A.Perf.getBeaconData()
                 // #end
             },
-            "markDescription" : markDescription
+            "actionDefs": actionDefs,
+            "markDescription" : markDescription // Delete this when we remove all jiffy marks
         };
+
         $A.Perf.endMark("Action Group " + collector.getCollectorId() + " enqueued");
 
         // clear the beaconData

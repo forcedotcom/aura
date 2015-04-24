@@ -105,6 +105,24 @@
     },
 
     /*
+     * Verify using getComponent to get a destroyed element
+     */
+    testGetComponentWithDestroyedElement : {
+        test : function(cmp) {
+            var element = document.getElementById('destroyedElement');
+            var component = cmp.find("destroyedElement");
+            // Verify thet are same component
+            var tempCmp = $A.getComponent(element);
+            $A.test.assertEquals(component, tempCmp);
+
+            component.destroy(false);
+            var actual = $A.getComponent(element);
+
+            $A.test.assertUndefinedOrNull(actual);
+        }
+    },
+
+    /*
      * Verify using getComponent to get component by given a element without tag
      */
     testGetComponentWithNoTagElement : {

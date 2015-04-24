@@ -34,10 +34,14 @@
 	border-right: #f5f6f7 1px solid;
 }
 
-.THIS .sampleList .sampleCard {
+.THIS .sampleCard {
 	position: relative;
 	margin: .5rem;
 	padding: .5rem;
 	border: #f5f6f7 1px solid;
 	border-radius: .3125rem;
+}
+
+.THIS .sampleCard.dragging {
+	border: 2px dashed #000;
 }

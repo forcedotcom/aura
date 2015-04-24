@@ -22,15 +22,18 @@
 	<aura:attribute name="type" type="String" default="move" description="Operation type: can be either copy, link, or move."/>
 	<aura:attribute name="dataTransfer" type="Object" description="Data to be transferred during drag and drop operation."/>
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
+	<aura:attribute name="dragClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged."/>
+	<aura:attribute name="theClass" type="String" default="" access="private" description="The CSS style to be applied to this component."/>
 	<aura:attribute name="ariaGrabbed" type="boolean" default="false" access="private" description="Indicate a draggable component."/>
 	
 	<aura:registerEvent name="dragStart" type="ui:dragEvent" description="Event fired when user starts dragging this component."/>
 	<aura:registerEvent name="dragEnd" type="ui:dragEvent" description="Event fired when this drag operation is being ended."/>
 	<aura:registerEvent name="dropComplete" type="ui:dragEvent"  description="Event fired when drop operation is completed."/>
 	
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="dropComplete" action="{!c.handleDropComplete}"/>
 	
-    <div draggable="true" aria-grabbed="{!v.ariaGrabbed}" class="{!v.class}">
+    <div draggable="true" aria-grabbed="{!v.ariaGrabbed}" class="{!v.theClass}">
 	    {!v.body}
     </div>
     

@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+	init: function (component, event, helper) {
+		helper.resetCssClass(component);
+	},
+	
 	handleDropComplete: function (component, event, helper) {
 		helper.handleDropComplete(component, event);
 	}

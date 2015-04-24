@@ -34,7 +34,8 @@
 					<ui:draggable inContextOf="{!v._draggableContext1}"
 								  dragEnd="{!c.handleDragEnd}"
 								  dataTransfer="{!item}"
-								  class="sampleCard">
+								  class="sampleCard"
+								  dragClass="dragging">
 						<p>{!item}</p>
 					</ui:draggable>
 				</aura:set>
@@ -50,7 +51,8 @@
 					<ui:draggable inContextOf="{!v._draggableContext2}" 
 								  dataTransfer="{!item}"
 								  dragEnd="{!c.handleDragEnd}"
-								  class="sampleCard">
+								  class="sampleCard"
+								  dragClass="dragging">
 						<p>{!item}</p>
 					</ui:draggable>
 				</aura:set>

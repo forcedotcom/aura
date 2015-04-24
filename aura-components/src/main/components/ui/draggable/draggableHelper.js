@@ -16,6 +16,10 @@
 ({
 	$dropOperationStatus$: null,
 	
+	resetCssClass: function(component) {
+		component.set("v.theClass", component.get("v.class"));
+	},
+	
 	/**
 	 * Handle dragstart event.
 	 * @param {Aura.Component} component - this component
@@ -131,6 +135,11 @@
 	 */
 	enterDragOperation: function(component) {
 		this.$dropOperationStatus$ = null;
+		
+		// set onDrag class
+		component.set("v.theClass", component.get("v.class") + " " + component.get("v.dragClass"));
+		
+		// Set aria-describe
 		component.set("v.ariaGrabbed", true);
 	},
 	
@@ -139,6 +148,10 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	exitDragOperation: function(component) {
+		// reset onDrag class
+		this.resetCssClass(component);
+		
+		// Set aria-describe
 		component.set("v.ariaGrabbed", false);
 	}
 })

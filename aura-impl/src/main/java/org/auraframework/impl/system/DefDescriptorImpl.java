@@ -33,6 +33,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  */
 public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T> {
@@ -360,6 +363,31 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      */
     public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
         return getInstance(name, defClass, null);
+    }
+
+    /**
+     * Get an instance from name parts.
+     *
+     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
+     * @param defClass The Interface's Class for the DefDescriptor being requested.
+     * @return An instance of a AuraDescriptor for the provided tag
+     */
+    public static DefDescriptor<?> getInstance(@CheckForNull String prefix, @NonNull String namespace,
+            @NonNull String name, @NonNull DefType defType) {
+        StringBuilder sb = new StringBuilder();
+        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
+            prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);
+        }
+        sb.append(prefix.toLowerCase());
+        sb.append("://");
+        sb.append(namespace);
+        if (prefix.equals("markup")) {
+            sb.append(":");
+        } else {
+            sb.append(".");
+        }
+        sb.append(name);
+        return getInstance(sb.toString(), defType.getPrimaryInterface(), null);
     }
 
     /**

@@ -15,11 +15,13 @@
  */
 .THIS.container {
 	display: flex;
+	display: -webkit-flex;
 }
 
 .THIS .sampleList ul {
 	padding: 0;
 	flex: 1;
+	-webkit-flex: 1;
 	width: 15em;
 }
 

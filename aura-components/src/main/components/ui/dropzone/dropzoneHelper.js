@@ -37,7 +37,7 @@
 	handleDragOver: function(component, event) {
 		var effectAllowed = event.dataTransfer.effectAllowed;
 		var types = component.get("v.types");
-		if (types.indexOf(effectAllowed) > -1) {
+		if (effectAllowed === "all" || types.indexOf(effectAllowed) > -1) {
 			if (event.preventDefault) {
 				// Necessary. Allows us to drop, i.e. this is a dropzone component
 				event.preventDefault(); 

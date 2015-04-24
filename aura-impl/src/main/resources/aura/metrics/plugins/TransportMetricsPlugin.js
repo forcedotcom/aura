@@ -50,7 +50,8 @@ TransportMetricsPlugin.prototype = {
                     auraNum  = config["params"]["aura.num"];
                 startMark["context"] = {
                     "aura.num"      : auraNum,
-                    "requestLength" : config["params"]["message"] && config["params"]["message"].length
+                    "requestLength" : config["params"]["message"] && config["params"]["message"].length,
+                    "actionDefs"    : config["actionDefs"]
                 };
 
                 config["callback"] = function (xhr) {

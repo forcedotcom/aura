@@ -75,11 +75,12 @@ ServerActionsMetricsPlugin.prototype = {
                             actionStart = metricsCollector.markStart(ServerActionsMetricsPlugin.NAME, 'dispatch');
 
                         actionStart["context"] = {
-                            "id"        : action.getId(),
-                            "params"    : action.getParams(),
-                            "abortable" : action.isAbortable(),
-                            "storable"  : action.isStorable(),
-                            "def"       : action.getDef().toString()
+                            "id"         : action.getId(),
+                            "params"     : action.getParams(),
+                            "abortable"  : action.isAbortable(),
+                            "storable"   : action.isStorable(),
+                            "background" : action.isBackground(),
+                            "defName"    : action.getDef().name
                         };
 
                         ids.push(action.getId());

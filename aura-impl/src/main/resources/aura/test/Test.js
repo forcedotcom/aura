@@ -35,7 +35,6 @@ $A.ns.Test = function() {
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
-    this.failed = undefined;
 };
 
 //#include aura.test.Test_private
@@ -563,7 +562,7 @@ $A.ns.Test.prototype.isComplete = function(){
 $A.ns.Test.prototype.getErrors = function(){
     var errors = $A.ns.Test.prototype.errors;
     if (errors.length > 0) {
-        return aura.util.json.encode(errors);
+        return $A.util.json.encode(errors);
     } else {
         return "";
     }
@@ -743,7 +742,7 @@ $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertM
  * @param {String} assertMessage The message that is returned if the two values are not equal
  */
 $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
-    if(full.indexOf(start) !== 0){
+    if(!full || !full.indexOf || full.indexOf(start) !== 0){
         var fullStart = full;
         if (fullStart.length > start.length+20) {
             fullStart = fullStart.substring(0, start.length+20) + "...";
@@ -874,8 +873,8 @@ $A.ns.Test.prototype.fail = function(assertMessage, extraInfoMessage) {
         msg += extraInfoMessage;
     }
     var error = new Error(msg);
-	this.failed = error;
-	throw error;
+    this.logError(msg, error);
+    throw error;
 };
 
 /**

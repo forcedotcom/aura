@@ -90,8 +90,13 @@
 		var operationType = dragComponent.get("v.type");
 		if (supportedTypes.indexOf(operationType) > -1) {
 			// Get data being transferred
-			var dataTransfer = event.dataTransfer.getData("aura-data");
-			var data = JSON.parse(dataTransfer);
+			var data = {};
+			var dataTransferTypes = event.dataTransfer.types;
+			$A.util.forEach(dataTransferTypes, function (dataTransferType){
+				if (dataTransferType !== "aura-id") {
+					data[dataTransferType] = event.dataTransfer.getData(dataTransferType);
+				}
+			})
 			
 			// Fire drop event
 			var dragEvent = component.getEvent("drop");

@@ -36,10 +36,17 @@
 		
 		// Set data to be transferred between drag component and drop component
 		var dataTransfer = component.get("v.dataTransfer");
-		if ($A.util.isUndefinedOrNull(dataTransfer)) {
-			dataTransfer = {};
+		if (!$A.util.isUndefinedOrNull(dataTransfer)) {
+			if($A.util.isString(dataTransfer)) {
+				event.dataTransfer.setData("text/plain", dataTransfer);
+			} else {
+				for (var key in dataTransfer) {
+					if (key !== "aura-id" && dataTransfer.hasOwnProperty(key)) {
+						event.dataTransfer.setData(key, dataTransfer[key]);
+					}
+				}
+			}
 		}
-		event.dataTransfer.setData("aura-data", JSON.stringify(dataTransfer));
 		
 		// Enter drag operation
 		this.enterDragOperation(component);

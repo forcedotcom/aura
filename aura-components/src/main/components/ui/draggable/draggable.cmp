@@ -20,7 +20,7 @@
 	<aura:import library="ui:dragAndDropService" property="lib" />
 	
 	<aura:attribute name="type" type="String" default="move" description="Operation type: can be either copy, link, or move."/>
-	<aura:attribute name="dataTransfer" type="Object" description="Data to be transferred during drag and drop operation."/>
+	<aura:attribute name="dataTransfer" type="Map" description="A Map&lt;String, String&gt; of data to be transferred during drag and drop operation. The key could be MIME type or some custom type."/>
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
 	<aura:attribute name="dragClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged."/>
 	<aura:attribute name="theClass" type="String" default="" access="private" description="The CSS style to be applied to this component."/>

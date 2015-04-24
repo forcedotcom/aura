@@ -20,8 +20,8 @@
 	<aura:import library="ui:dragAndDropService" property="lib" />
 	
 	<aura:attribute name="type" type="String" default="move" description="Operation type: can be either copy, link, or move."/>
-	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
 	<aura:attribute name="dataTransfer" type="Object" description="Data to be transferred during drag and drop operation."/>
+	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
 	<aura:attribute name="ariaGrabbed" type="boolean" default="false" access="private" description="Indicate a draggable component."/>
 	
 	<aura:registerEvent name="dragStart" type="ui:dragEvent" description="Event fired when user starts dragging this component."/>

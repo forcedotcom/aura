@@ -22,8 +22,6 @@
 	 * @param {Event} event - HTML DOM Event for dragstart
 	 */
 	handleDragStart: function(component, event) {
-		this.enterDragOperation(component);
-		
 		// Setting up DataTransferObject
 		var type = component.get("v.type");
 		event.dataTransfer.effectAllowed = type;
@@ -38,6 +36,9 @@
 			dataTransfer = {};
 		}
 		event.dataTransfer.setData("aura-data", JSON.stringify(dataTransfer));
+		
+		// Enter drag operation
+		this.enterDragOperation(component);
 		
 		// Fire dragStart event
 		var dragEvent = component.getEvent("dragStart");

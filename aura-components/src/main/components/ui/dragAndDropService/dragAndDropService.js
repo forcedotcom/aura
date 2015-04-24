@@ -115,7 +115,7 @@ function (w) {
     };
 
     /**
-     * Add data being transferred. 
+     * Add data being transferred to dropzone component.
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent.
      */
     DragAndDropService.prototype.addDataTransfer = function(dragEvent) {
@@ -147,7 +147,7 @@ function (w) {
     };
 
     /**
-     * Remove data being transferred.
+     * Remove data being transferred from a draggable component.
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
      * @param {Function} comparator - comparator used for comparison to find data to be removed
      */
@@ -184,7 +184,7 @@ function (w) {
     };
     
     /**
-     * Move data being transferred from dragComponent to dropComponent.
+     * Move data being transferred from a draggable component to a dropzone component.
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
      * @param {Function} comparator - comparator used for comparison to find data to be removed
      */

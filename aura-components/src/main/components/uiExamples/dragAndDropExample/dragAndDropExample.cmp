@@ -31,10 +31,11 @@
 					<uiExamples:dragAndDropProvider prefix="Acme" count="5"/>
 				</aura:set>
 				<aura:set attribute="itemTemplate">
-					<ui:draggable inContextOf="{!v._draggableContext1}" dragEnd="{!c.handleDragEnd}" dataTransfer="{!item}">
-						<div class="sampleCard">
-							<p>{!item}</p>
-						</div>
+					<ui:draggable inContextOf="{!v._draggableContext1}"
+								  dragEnd="{!c.handleDragEnd}"
+								  dataTransfer="{!item}"
+								  class="sampleCard">
+						<p>{!item}</p>
 					</ui:draggable>
 				</aura:set>
 			</ui:infinitelist>
@@ -46,10 +47,11 @@
 					<uiExamples:dragAndDropProvider prefix="Foo" count="3"/>
 				</aura:set>
 				<aura:set attribute="itemTemplate">
-					<ui:draggable inContextOf="{!v._draggableContext2}" dragEnd="{!c.handleDragEnd}" dataTransfer="{!item}">
-						<div class="sampleCard">
-							<p>{!item}</p>
-						</div>
+					<ui:draggable inContextOf="{!v._draggableContext2}" 
+								  dataTransfer="{!item}"
+								  dragEnd="{!c.handleDragEnd}"
+								  class="sampleCard">
+						<p>{!item}</p>
 					</ui:draggable>
 				</aura:set>
 			</ui:infinitelist>

@@ -51,6 +51,12 @@ function () {
 	    domEventHandler : function (event) {
 	        var element = event.target;
 	        var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
+
+	        // cmp might be destroyed, just ignore this event. 
+	        if (!htmlCmp) {
+	            return;
+	        }
+
 	        var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
 	        var helper = component.getDef().getHelper();
 

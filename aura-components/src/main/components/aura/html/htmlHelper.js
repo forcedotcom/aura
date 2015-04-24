@@ -95,8 +95,14 @@
     domEventHandler: function (event) {
         var eventName = "on" + event.type,
             element = event.currentTarget,
-            ownerComponent = $A.componentService.getRenderingComponentForElement(element),
-            htmlAttributes = ownerComponent.get("v.HTMLAttributes"),
+            ownerComponent = $A.componentService.getRenderingComponentForElement(element);
+
+        // cmp might be destroyed, just ignore this event.
+        if (!ownerComponent) {
+            return;
+        }
+
+        var htmlAttributes = ownerComponent.get("v.HTMLAttributes"),
             valueExpression = htmlAttributes[eventName],
             onclickExpression;
 

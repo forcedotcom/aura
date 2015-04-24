@@ -79,7 +79,6 @@ $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(
     if ($A.util.hasDataAttribute(element, this.renderedBy)) {
         var id = $A.util.getDataAttribute(element, this.renderedBy);
         ret = this.get(id);
-        $A.assert(!$A.util.isUndefinedOrNull(ret), "No component found for element with id : " + id);
     } else if(element.parentNode){
         ret = this.getRenderingComponentForElement(element.parentNode);
     }

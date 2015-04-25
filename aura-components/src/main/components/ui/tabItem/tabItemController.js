@@ -33,5 +33,19 @@
 	close: function(cmp, evt, helper) {
 		cmp.get("e.onClose").fire();
 		$A.util.squash(evt, true);
+	},
+	
+	onTabItemHover: function(cmp, evt, helper) {
+		var event = cmp.getEvent('onTabItemHover');
+		var params = {
+			title : cmp.get('v.title'),
+			name : cmp.get('v.name')
+		};
+		event.setParams(params);
+		event.fire();
+	},
+	
+	onTabItemUnhover: function(cmp, evt, helper) {
+		cmp.getEvent('onTabItemUnhover').fire();
 	}
 })

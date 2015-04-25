@@ -38,8 +38,7 @@
 	onTabItemHover: function(cmp, evt, helper) {
 		var event = cmp.getEvent('onTabItemHover');
 		var params = {
-			title : cmp.get('v.title'),
-			name : cmp.get('v.name')
+			tabItem : cmp
 		};
 		event.setParams(params);
 		event.fire();

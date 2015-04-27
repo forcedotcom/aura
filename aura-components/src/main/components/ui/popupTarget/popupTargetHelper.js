@@ -290,7 +290,6 @@
 	            		clickIsInsideTrigger : helper.isElementInComponent(elements.trigger, event.target),
                 		closeOnClickInside : component.get('v.closeOnClickInside'),
                 		closeOnClickOutside : component.get('v.closeOnClickOutside'),
-                		triggerIsCustom : elements.trigger.get('v.trigger').length > 0,
                 		clickIsInCurtain : $A.util.hasClass(event.target, 'popupCurtain')
                 	};
 

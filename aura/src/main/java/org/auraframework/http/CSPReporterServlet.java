@@ -30,13 +30,13 @@ import com.google.common.net.HttpHeaders;
 
 /**
  * Endpoint for reporting Content Security Policy violations,
- * per the <a href="http://www.w3.org/TR/CSP/">W3C Content Security
- * Policy 1.0 spec</a>.
+ * per the <a href="http://www.w3.org/TR/CSP2/">W3C Content Security
+ * Policy 2.0 spec</a>.
  */
 @SuppressWarnings("serial")
 public class CSPReporterServlet extends HttpServlet {
 
-    // KEEP THIS IN SYNC WITH THE SERVLET'S URL-MAPPING ENTRY IN WEB.XML!
+    // KEEP THIS URL IN SYNC WITH THE SERVLET'S URL-MAPPING ENTRY IN WEB.XML!
     // (or find a way to do it programmatically.)
     public static final String URL = "/_/csp";
    
@@ -52,6 +52,7 @@ public class CSPReporterServlet extends HttpServlet {
     public static final String SOURCE_FILE = "source-file";
     public static final String STATUS_CODE = "status-code";
     public static final String VIOLATED_DIRECTIVE = "violated-directive";
+    public static final String EFFECTIVE_DIRECTIVE = "effective-directive";
     
     @SuppressWarnings("unchecked")
     @Override

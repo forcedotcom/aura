@@ -216,6 +216,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
         assertDocumentUri(cspReport, uri);
         assertSourceFile(cspReport, null);
         assertViolatedDirective(cspReport, "script-src 'self'");
+        assertEffectiveDirective(cspReport, "script-src");
     }
 
     /**
@@ -298,6 +299,7 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
 	                cspReport.get(CSPReporterServlet.BLOCKED_URI));
 	        assertSourceFile(cspReport, APP_SOURCE_SUFFIX);
 	        assertViolatedDirective(cspReport, "connect-src 'self'");
+	        assertEffectiveDirective(cspReport, "connect-src");
         }
     }
 
@@ -328,6 +330,15 @@ public class CSPReportLoggingTest extends WebDriverTestCase {
                     reportedViolatedDirective));
         }
     }
+    
+    private void assertEffectiveDirective(Map<String, Object> cspReport, String expectedContains) {
+        Object reportedEffectiveDirective = cspReport.get(CSPReporterServlet.EFFECTIVE_DIRECTIVE);
+        if (!reportedEffectiveDirective.toString().contains(expectedContains)) {
+            fail(String.format("Unexpected effective directive, expected: %s, actual: %s", expectedContains,
+            		reportedEffectiveDirective));
+        }
+    }
+    
 
     private List<Map<String, Object>> getCspReportLogs(int expectedLogs) throws InterruptedException {
         int waitTime = 30000;

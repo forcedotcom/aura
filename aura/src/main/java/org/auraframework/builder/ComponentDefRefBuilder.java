@@ -15,7 +15,6 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.css.FlavorRef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -73,5 +72,5 @@ public interface ComponentDefRefBuilder extends DefBuilder<ComponentDef, Compone
      *
      * @see FlavoredStyleDef
      */
-    ComponentDefRefBuilder setFlavor(FlavorRef flavor);
+    ComponentDefRefBuilder setFlavor(String flavor);
 }

@@ -96,6 +96,16 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         return addSourceAutoCleanup(StyleDef.class, src.toString(), getNs2() + "." + "style");
     }
 
+    /** adds a {@link ComponentDef} to the namespace with a basic source */
+    public DefDescriptor<ComponentDef> addComponentDef() {
+        return addComponentDef("<aura:component/>");
+    }
+
+    /** adds a {@link ComponentDef} to the namespace with a flavorable div */
+    public DefDescriptor<ComponentDef> addFlavorableComponentDef() {
+        return addComponentDef("<aura:component><div aura:flavorable='true'></div></aura:component>");
+    }
+
     /** adds a {@link ComponentDef} to the namespace with the given source */
     public DefDescriptor<ComponentDef> addComponentDef(CharSequence src) {
         return addSourceAutoCleanup(ComponentDef.class, src.toString(), getNs1() + ":" + "cmp");
@@ -104,7 +114,6 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     /** adds a {@link ComponentDef} to the namespace with the given source */
     public DefDescriptor<ComponentDef> addComponentDefOtherNamespace(CharSequence src) {
         return addSourceAutoCleanup(ComponentDef.class, src.toString(), getNs2() + ":" + "cmp");
-
     }
 
     /** gets the parsed output of the given style */
@@ -231,6 +240,13 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     /** adds a flavor assortment def to the "other" namespace */
     public DefDescriptor<FlavorAssortmentDef> addFlavorAssortmentOtherNamespace(CharSequence src) {
         return addSourceAutoCleanup(FlavorAssortmentDef.class, src.toString(), getNs2() + ":" + "fa");
+    }
+
+    /** adds a flavor assortment with the given source to the same bundle as the context app */
+    public DefDescriptor<FlavorAssortmentDef> addContextAppFlavorAssortment(CharSequence src) {
+        String fmt = String.format("%s:%s", ns1, "testApp");
+        DefDescriptor<FlavorAssortmentDef> faDesc = Aura.getDefinitionService().getDefDescriptor(fmt, FlavorAssortmentDef.class);
+        return addSourceAutoCleanup(faDesc, src.toString());
     }
 
     /** helper for building a theme string source */

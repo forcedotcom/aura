@@ -327,10 +327,12 @@ $A.ns.ComponentDef.prototype.getDefaultFlavor = function() {
 
         var appDesc = $A.getContext().getApp();
         if (appDesc) {
-            var appDef = $A.componentService.getDef(appDesc);
-            var overrides = appDef && appDef.getDefaultFlavors();
-            if (overrides) {
-                override = overrides.getFlavor(this.descriptor);
+            var appDef = $A.componentService.getDef(appDesc, true);
+            if (appDef) { // might be null if there's a problem loading the app
+                var defaults = appDef.getDefaultFlavors();
+                if (defaults) {
+                    override = defaults.getFlavor(this.descriptor);
+                }
             }
         }
 

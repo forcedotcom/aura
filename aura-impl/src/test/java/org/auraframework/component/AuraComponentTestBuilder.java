@@ -191,6 +191,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case DESIGN_TEMPLATE:
         case DESIGN_TEMPLATE_REGION:
         case FLAVOR_INCLUDE:
+        case FLAVOR_DEFAULT:
             qualified = name;
             break;
         case APPLICATION:

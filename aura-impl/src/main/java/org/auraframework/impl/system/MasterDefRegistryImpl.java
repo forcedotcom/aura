@@ -341,6 +341,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case FLAVORS:
             case FLAVOR_ASSORTMENT:
             case FLAVOR_INCLUDE:
+            case FLAVOR_DEFAULT:
             case DESIGN:
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:

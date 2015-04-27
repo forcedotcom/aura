@@ -1,0 +1,5 @@
+<aura:flavors>
+    <!--  otherwise fall back to the "default" default -->
+    <aura:flavor component="*" default="testAlt"/> <!-- otherwise fall back to this -->
+    <aura:flavor component="*" default="neutral"/> <!-- if a cmp has this flavor it should use this -->
+</aura:flavors>

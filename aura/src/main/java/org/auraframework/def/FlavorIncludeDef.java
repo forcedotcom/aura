@@ -15,25 +15,26 @@
  */
 package org.auraframework.def;
 
-import java.util.Map;
-
-import org.auraframework.css.FlavorRef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Table;
+
 /**
- * {@code <aura:flavor>} tags inside of {@link FlavorAssortmentDef}s.
+ * {@code <aura:use>} tags inside of {@link FlavorAssortmentDef}s.
  */
 public interface FlavorIncludeDef extends Definition {
     @Override
     DefDescriptor<FlavorIncludeDef> getDescriptor();
 
     /**
-     * Determines the matching of components to specific flavors based on the values of the 'component' and 'flavor'
-     * attributes.
-     *
-     * @return A map of each component and its corresponding flavor.
-     * @throws QuickFixException If there's a problem loading a {@link FlavoredStyleDef} (they can be loaded to check if
-     *             they contain a matching flavor name declaration).
+     * Gets the original source attribute.
      */
-    Map<DefDescriptor<ComponentDef>, FlavorRef> computeFilterMatches(boolean findDeps) throws QuickFixException;
+    String getSource();
+
+    /**
+     * Gets a mapping of which {@link FlavoredStyleDef} is specified for a component and flavor name pair.
+     *
+     * @throws QuickFixException If there's a problem loading the flavor def.
+     */
+    Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> computeFlavorMapping() throws QuickFixException;
 }

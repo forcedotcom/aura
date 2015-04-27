@@ -1,0 +1,32 @@
+{
+  "s":1,
+  "v":{
+    "flavorDefaultDefs":[
+      {
+        "s":2,
+        "v":{
+          "markup://flavorTest:sampleCmp3":{
+            "flavor":"default",
+            "context":"{!$Browser.isPhone}"
+          },
+          "markup://flavorTest:sampleCmp1":{
+            "flavor":"default",
+            "context":"{!$Browser.isPhone}"
+          },
+          "markup://flavorTest:sampleCmp2":{
+            "flavor":"default",
+            "context":"{!$Browser.isPhone}"
+          }
+        }
+      },
+      {
+        "s":3,
+        "v":{
+          "markup://flavorTest:sampleCmp3":{
+            "flavor":"neutral"
+          }
+        }
+      }
+    ]
+  }
+}

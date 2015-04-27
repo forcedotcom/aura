@@ -25,10 +25,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.expression.Expression;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -37,16 +35,12 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedTagHandler<FlavorIncludeDef, P> {
-    protected static final String TAG = "aura:flavor";
-    private static final String ATTRIBUTE_COMPONENT = "component";
-    private static final String ATTRIBUTE_FLAVOR = "flavor";
-    private static final String ATTRIBUTE_CONTEXT = "context";
+    protected static final String TAG = "aura:use";
+    private static final String ATTRIBUTE_SOURCE = "source";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_COMPONENT, ATTRIBUTE_FLAVOR, ATTRIBUTE_CONTEXT, ATTRIBUTE_DESCRIPTION);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SOURCE, ATTRIBUTE_DESCRIPTION);
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
-    private String context;
 
     public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -65,28 +59,16 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
     @Override
     protected void readAttributes() throws InvalidDefinitionException {
-        String componentFilter = getAttributeValue(ATTRIBUTE_COMPONENT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(componentFilter)) {
-            builder.setComponentFilter(componentFilter);
+        String source = getAttributeValue(ATTRIBUTE_SOURCE);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(source)) {
+            builder.setSource(source);
         } else {
-            throw new InvalidDefinitionException("Missing required attribute 'component'", getLocation());
-        }
-
-        String flavorFilter = getAttributeValue(ATTRIBUTE_FLAVOR);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(flavorFilter)) {
-            builder.setFlavorFilter(flavorFilter);
-        } else {
-            throw new InvalidDefinitionException("Missing required attribute 'flavor'", getLocation());
-        }
-
-        String context = getAttributeValue(ATTRIBUTE_CONTEXT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(context)) {
-            this.context = context; // have to tokenize later due to exception signature
+            throw new InvalidDefinitionException("Missing required attribute 'source'", getLocation());
         }
 
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
         builder.setParentDescriptor(getParentDefDescriptor());
-        builder.setDescriptor(DefDescriptorImpl.getInstance(flavorFilter, FlavorIncludeDef.class));
+        builder.setDescriptor(DefDescriptorImpl.getInstance(source, FlavorIncludeDef.class));
     }
 
     @Override
@@ -103,16 +85,6 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
     @Override
     protected FlavorIncludeDef createDefinition() throws QuickFixException {
-        if (context != null) {
-            TextTokenizer tt = TextTokenizer.tokenize(context, getLocation());
-            Object value = tt.asValue(getParentHandler());
-            if (value instanceof Expression) {
-                builder.setContext((Expression) value);
-            } else {
-                throw new InvalidDefinitionException("only expressions allowed for 'context' attribute", getLocation());
-            }
-        }
-
         return builder.build();
     }
 

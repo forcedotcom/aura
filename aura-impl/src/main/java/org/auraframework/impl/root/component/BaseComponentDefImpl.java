@@ -258,6 +258,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (ClientLibraryDef def : this.clientLibraries) {
             def.validateDefinition();
         }
+
+        if (defaultFlavor != null) {
+            // component must be flavorable
+            if (!hasFlavorableChild()) {
+                throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
+                        + "specified on a component with no flavorable children", location);
+            }
+        }
     }
 
     @Override
@@ -364,7 +372,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
 
-
         MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         if (extendsDescriptor != null) {
             T parentDef = extendsDescriptor.getDef();
@@ -452,13 +459,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             // flavor name must exist on the flavor descriptor
             if (!flavorDescriptor.getDef().getFlavorNames().contains(defaultFlavor)) {
                 throw new FlavorNameNotFoundException(defaultFlavor, flavorDescriptor);
-            }
-
-            // component must be flavorable
-            if (!hasFlavorableChild()) {
-                throw new InvalidDefinitionException(
-                        "The 'defaultFlavor' attribute cannot be specified on a component with no flavorable children",
-                        location);
             }
         }
     }
@@ -571,7 +571,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(styleDescriptor);
         }
 
-        if (flavorDescriptor  != null) {
+        if (flavorDescriptor != null) {
             dependencies.add(flavorDescriptor);
         }
 

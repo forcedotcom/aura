@@ -772,22 +772,29 @@ $A.ns.AuraRenderingService.prototype.insertElements = function(elements, refNode
     }
 };
 
-$A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element, skipFlavorCheck){
+$A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
     var concrete = cmp.getConcreteComponent();
     var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
+    var flavorClassName = null; // instance-specific, flavor class name applied to flavorable elements if applicable
+
+    if (cmp.isFlavorable()) {
+        var vp = cmp.getComponentValueProvider();
+        if (vp) {
+            flavorClassName = vp.get("style.flavor");
+        }
+    }
 
     if (className) {
-        // add the instance-specific flavor class name if a flavor is specified and this element is flavorable
-        if (!skipFlavorCheck
-                && !$A.util.isUndefinedOrNull(concrete.getFlavor())
-                && $A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
-            className = className + $A.util.buildFlavorClass(concrete.getFlavor());
+        if (flavorClassName) {
+            className = className + flavorClassName;
         }
 
         $A.util.addClass(element, className);
         if (element["tagName"]) {
             element["auraClass"] = $A.util.buildClass(element["auraClass"],className);
         }
+    } else if (flavorClassName) {
+        $A.util.addClass(element, flavorClassName);
     }
 };
 
@@ -800,16 +807,13 @@ $A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element, skipF
 $A.ns.AuraRenderingService.prototype.associateElements = function(cmp, elements) {
     elements = this.getArray(elements);
 
-    // so we don't check for a flavor on each element below if not necessary
-    var skipFlavorCheck = !cmp.getDef().hasFlavorableChild();
-
     var len = elements.length;
     for (var i = 0; i < len; i++) {
         var element = elements[i];
         if(this.isMarker(element)){
             continue;
         }
-        this.addAuraClass(cmp,element,skipFlavorCheck);
+        this.addAuraClass(cmp,element);
         cmp.associateElement(element);
     }
 };

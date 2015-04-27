@@ -34,7 +34,6 @@ $A.ns.Util = function() {
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};
-    this.flavorClassCache = {};
     this.debugToolWindow = undefined;
     this.sizeEstimator = new SizeEstimator();
 };
@@ -471,37 +470,11 @@ $A.ns.Util.prototype.buildClass=function(oldClass, newClass, remove){
 /**
  * Builds the appropriate css class name for a flavor.
  *
- * @param {String} flavorReference The delimited reference to a flavor, e.g.,
- *            "default", "myNamespace:default", "myNamespace:flavors:default".
- * @returns {String} The flavor css class name for usage on an element.
+ * @param {Object} cmp The DefDescriptor of the component being flavored.
+ * @returns {String} flavor The flavor name.
  */
-$A.ns.Util.prototype.buildFlavorClass = function(flavorReference) {
-    if (this.flavorClassCache[flavorReference]) {
-        return this.flavorClassCache[flavorReference];
-    }
-
-    // this should follow the same logic as Flavors#buildFlavorClassName
-    var namespace, name;
-
-    if (flavorReference.indexOf(":") > -1) {
-        var split = flavorReference.split(":");
-        namespace = split[0];
-        name = split[split.length - 1];
-    } else {
-        name = flavorReference;
-    }
-
-    var clz = "";
-    if (namespace) {
-        clz += namespace;
-        clz += name.charAt(0).toUpperCase() + name.slice(1);
-    } else {
-        clz += name;
-    }
-    clz += "-f";
-
-    this.flavorClassCache[flavorReference] = clz;
-	return clz;
+$A.ns.Util.prototype.buildFlavorClass = function(cmp, flavor) {
+    return cmp.getDef().getStyleDef().getClassName() + "--" + flavor;
 };
 
 /**

@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.flavor.FlavorAssortmentDefImpl;
@@ -77,7 +78,11 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
 
         if (FlavorIncludeDefHandler.TAG.equalsIgnoreCase(tag)) {
             FlavorIncludeDef def = new FlavorIncludeDefHandler<>(this, xmlReader, source).getElement();
-            builder.addFlavorInclude(def);
+            builder.addFlavorIncludeDef(def);
+        }
+        else if (FlavorDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
+            FlavorDefaultDef def = new FlavorDefaultDefHandler<>(this, xmlReader, source).getElement();
+            builder.addFlavorDefaultDef(def);
         } else {
             error("Found unexpected tag %s", tag);
         }

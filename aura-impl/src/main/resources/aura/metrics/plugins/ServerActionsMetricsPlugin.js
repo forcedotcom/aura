@@ -128,13 +128,13 @@ ServerActionsMetricsPlugin.prototype = {
                 var children = action["context"]["children"];
                 var ids = action["context"]["ids"];
                 for (j = 0; j < ids.length; j++) {
-                    children[ids[j]] = ' ';
+                    children[ids[j]] = '';
                 }
                 
             } else if (phase === 'start' && actionMarks[i]["duration"] === undefined) {
                 queue[id] = actionMarks[i];
             } else if (phase === 'end' && queue[id]) {
-                mark = queue[id];
+                mark = $A.util.apply({}, queue[id], true, true);
                 mark["context"]  = $A.util.apply(mark["context"], actionMarks[i]["context"]);
                 mark["duration"] = actionMarks[i]["ts"] - mark["ts"];
                 procesedMarks.push(mark);
@@ -146,14 +146,20 @@ ServerActionsMetricsPlugin.prototype = {
             for (j = 0; j < bundle.length; j++) {
                 var masterMark = bundle[j];
                 var markId = mark["context"]["id"];
-                if (masterMark["context"]["children"][markId]) {
+                if (masterMark["context"]["children"][markId] !== undefined) {
                     masterMark["context"]["children"][markId] = mark;
+                    masterMark._resolved = true;
                 }
                 
             }
         }
 
-        return bundle;
+        return bundle.filter(function (s) { 
+            if (s._resolved) {
+                delete s._resolved;
+                return true;
+            }
+        }); // filter the serverActions which have not resolve any of its children
     },
     // #end
     unbind: function (metricsCollector) {

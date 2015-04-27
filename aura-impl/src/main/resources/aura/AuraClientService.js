@@ -582,7 +582,7 @@ $A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCoun
         var actionDefs = [];
 
         for (var i = 0; i < actionsToSend.length; i++) {
-            actionDefs.push(actionsToSend[i].getDef().toString());
+            actionDefs.push(actionsToSend[i].getDef() + '[' + actionsToSend[i].getId() + ']');
         }
 
         // clientService.requestQueue reference is mutable

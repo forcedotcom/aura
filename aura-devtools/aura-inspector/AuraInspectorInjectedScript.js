@@ -143,10 +143,9 @@
                 if (this.opts.componentCreation && $A.getContext().mode !== 'PROD') {
                     this._initializeHooksComponentCreation();
                 }
-
-                if (this.opts.transactions && $A.getContext().mode !== 'PROD') {
-                    this._initializeHooksTransactions();
-                }
+                // It should work in all modes
+                this._initializeHooksTransactions();
+                
             },
             _createNode: function (name, mark, id) {
                 return {
@@ -167,10 +166,8 @@
                 }
             },
             _initializeHooksTransactions: function () {
-                $A.metricsService.setClearCompletedTransactions(false);
                 $A.metricsService.onTransactionEnd(this._onTransactionEnd.bind(this));
             },
-
             _onTransactionEnd: function (t) {
                 window.postMessage({
                     action  : "AuraDevToolService.OnTransactionEnd", 

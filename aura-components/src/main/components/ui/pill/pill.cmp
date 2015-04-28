@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component
+        support="PROTO"
+        implements="ui:visible, ui:focusable"
+        description="A UI pill in a ui:pillContainer component">
+
+
+    <aura:import library="ui:eventLib" property="lib"/>
+
+    <!-- attributes -->
+    <aura:attribute name="label" type="String" description="The text displayed in the pill"/>
+    <aura:attribute name="id" type="String" description="The id of the object the pill represents"/>
+    <aura:attribute name="showDelete" type="Boolean" default="true" description="Show delete icon inside pill"/>
+    <aura:attribute name="iconUrl" type="String" description="The url for the icon"/>
+    <aura:attribute name="accessibleDeleteLabel" type="String" default="Delete" description="The accessible label for the close icon."/>
+
+    <!-- events -->
+    <aura:registerevent name="onHandledEvent"
+                        type="ui:response"
+                        description="The event fired when the user interactions with this component which it should be handled by the pillContainer (i.e left and right arrow, Enter, and Backspace)"/>
+    <aura:registerEvent name="keydown" type="ui:keydown" access="GLOBAL" description="The event fired when the user presses a keyboard key on the component."/>
+    <aura:registerEvent name="blur" type="ui:blur" access="GLOBAL" description="The event fired when the user moves off from the component."/>
+
+    <!-- handlers -->
+    <aura:handler name="keydown" action="{!c.handleInteraction}"/>
+    <aura:handler name="blur" action="{!c.onBlur}"/>
+
+    <a aura:id="link" aura:flavorable="true" role="listitem" class="pill" title="{!v.label}">
+        <aura:if isTrue="{!!empty(v.iconUrl)}">
+            <ui:image src="{!v.iconUrl}" class="pillIcon"/>
+        </aura:if>
+        {!v.label}
+        <aura:if isTrue="{!v.showDelete}">
+            <ui:label label="{! $Label.Feeds.DeleteAction }" labelDisplay="false"/>
+            <a onclick="{!c.deleteItem}" tabindex="-1">
+                <span class="{!v.iconClass + ' deleteIcon'}"/>
+            </a>
+        </aura:if>
+    </a>
+
+</aura:component>

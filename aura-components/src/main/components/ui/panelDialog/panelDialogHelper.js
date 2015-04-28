@@ -97,30 +97,9 @@
             animEnd    = this.getAnimationEndEventName(),
             animName   = 'movefrom' + cmp.get('v.animation'),
 
-            calculateScrollerHeight = function () {
-                //move this eventually to somewhere global
-                var margin = 10,
-                    modalHeightPercentage = 0.7,
-                    panelScrollContent = panel.querySelector('.panelScrollContent'),
-
-                    //calculate all needed heights to see if the scroller is taking too much room
-                    windowHeight    = window.innerHeight,
-                    maxModalHeight  = windowHeight * modalHeightPercentage,
-                    titleHeight     = panelTitle ? panelTitle.offsetHeight: 0,
-                    panelHeight     = panelScrollContent.offsetHeight + titleHeight,
-                    availableHeight = maxModalHeight - titleHeight,
-                    scrollerHeight  = panelScrollContent.offsetHeight;
-
-                if (scrollerHeight > availableHeight) {
-                    panelBody.style.height = availableHeight - margin + 'px';
-                } else {
-                    $A.util.removeClass(panelBody, 'scrollbox');
-                    self._findContainedComponent(cmp, "scroller").set('v.enabled',  false);
-                }
-            },
             //endAnimationHandler: cleanup all classes and events
             finishHandler = function (e) {
-                panel.style.display = 'block';
+                $A.util.removeClass(panel, 'hidden');
                 $A.util.removeClass(panel, 'sliding');
                 $A.util.removeClass(panel, 'movefrombottom');
                 panel.removeEventListener(animEnd, finishHandler);
@@ -153,7 +132,7 @@
         cmp.getElement().style.display = '';
         $A.util.addClass(panel, 'sliding');
         panel.style.visibility = 'hidden';
-        panel.style.display = 'block';
+        $A.util.removeClass(panel, 'hidden');
 
         //glass
         if (modalGlass !== null) {
@@ -161,8 +140,8 @@
             modalGlass.offsetWidth; //force the browser to paint it.
             $A.util.addClass(modalGlass, 'fadeIn');
         }
-
-        calculateScrollerHeight();
+        
+        this.beforeTransitionEnd(cmp.getConcreteComponent());
 
         panel.offsetWidth;// make the browser repaint with the new .sliding and inline css style attribrutes
         panel.style.visibility = 'visible';
@@ -172,6 +151,10 @@
         } else {
             $A.util.addClass(panel, animName);
         }
+    },
+    
+	//Hook for subcomponent
+    beforeTransitionEnd: function(cmp) {
     },
 
     position: function(cmp) {

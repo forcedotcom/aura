@@ -69,14 +69,6 @@
 			else {
 				$A.test.assertFalsy(ele.querySelector(".title")?ele.querySelector(".title").textContent:ele.querySelector(".title"), "title is unexpectedly rendered");
 			}
-
-			// detail
-			if(cmp.get("v.detail")) {
-				$A.test.assertEquals(cmp.get("v.detail"), ele.querySelector(".detail").textContent, "detail is not expected");
-			}
-			else {
-				$A.test.assertFalsy(ele.querySelector(".detail")?ele.querySelector(".detail").textContent:ele.querySelector(".detail"), "detail is unexpectedly rendered");
-			}
 		}
 		else {
 			$A.test.assertFalsy(ele.querySelector(".titleBar"), "titleBar is unexpectedly rendered");

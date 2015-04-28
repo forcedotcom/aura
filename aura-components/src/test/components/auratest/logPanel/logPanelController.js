@@ -15,40 +15,74 @@
  */
 ({
     clear : function(cmp, event, helper) {
-        cmp._logs.length = 0;
-        cmp.set("v.logs", []);
+        cmp._handler.clear();
     },
 
     filter : function(cmp, event, helper) {
-        cmp._filter = new RegExp(cmp.get("v.filter") || "");
-        var output = [];
-        var logs = cmp._logs;
-        for (var i = 0; i < logs.length; i++) {
-            var entry = logs[i];
-            var match = cmp._filter.exec(entry);
-            if(match != null){
-                output.push(match.length > 1 ? match[1] : entry);
-            }
-        }
-        cmp.set("v.logs", output);
+        cmp._handler.setFilter(cmp.get("v.filter"));
     },
     
     init : function(cmp, event, helper) {
         var component = cmp;
-        cmp._logs = [];
-        cmp._filter = new RegExp(cmp.get("v.filter") || "");
+        
         var handler = function(level, msg, error) {
-            component._logs.push(msg);
-            var match = component._filter.exec(msg);
-            if(match != null){
+            handler.logs.push(msg);
+            handler.handleMessage(msg);
+        };
+        handler.logs = [];
+        handler.output = [];
+        handler.handleMessage = function(msg) {
+            var match = handler.filter.exec(msg);
+            if (match != null) {
                 msg = match.length > 1 ? match[1] : msg;
-                $A.run(function(){
-                    var output = component.get("v.logs");
-                    output.push(msg);
-                    component.set("v.logs", output);
-                });
+                handler.output.push(msg);
+                handler.appendOutput(msg);
+                component.set("v.logs", handler.output);
             }
         }
+        handler.appendOutput = function(msg) {
+            if(component.find("entries").getElement()){
+                handler.appendOutput = function(msg) {
+                    var p = document.createElement("p");
+                    p.appendChild(document.createTextNode(msg))
+                    component.find("entries").getElement().appendChild(p);
+                }
+                for(var i = 0; i < handler.output.length; i++) {
+                    handler.appendOutput(handler.output[i]);
+                }
+            }
+        };
+        handler.clear = function(){
+            handler.logs.length = 0;
+            handler.clearOutput();
+        };
+        handler.clearOutput = function(){
+            if(component.find("entries").getElement()){
+                handler.clearOutput = function(){
+                    handler.output.length = 0;
+                    component.set("v.logs", handler.output);
+                    var outputElement = component.find("entries").getElement();
+                    while(outputElement.lastChild){
+                        outputElement.removeChild(outputElement.lastChild);
+                    }
+                };
+                handler.clearOutput();
+            } else {
+                handler.output.length = 0;
+                component.set("v.logs", handler.output);
+            }
+        };
+        handler.setFilter = function(filter){
+            handler.filter = new RegExp(filter || "");
+            handler.clearOutput();
+            for (var i = 0; i < handler.logs.length; i++) {
+                handler.handleMessage(handler.logs[i]);
+            }
+        };
+        
+        handler.setFilter(cmp.get("v.filter"));
+        cmp._handler = handler;
+        
         $A.logger.subscribe("INFO", handler);
         $A.logger.subscribe("WARNING", handler);
         $A.logger.subscribe("ASSERT", handler);

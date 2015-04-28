@@ -15,18 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component>
-	<aura:attribute name="logs" type="List" default="" description="display copy of filtered logs"/>
-	<aura:attribute name="filter" type="String" description="output log entries matching this regex, only the first capturing group if found"/>
-
-	<aura:method name="clear" action="{!c.clear}"/>
-
-	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
-	<aura:handler name="change" value="{!v.filter}" action="{!c.filter}"/>
-	<div>
-		<ui:button label="clear logs" press="{!c.clear}"/>
-		<ui:inputText value="{!v.filter}" placeholder="filter regexp"/>
-		<br/>
-		<div aura:id="entries"/>
-	</div>
+<aura:component extensible="true" extends="test:testEventBubblingHandler">
+    <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handleChild}"/>
+    
+    <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
+    	{!v.logId}Child
+    	<test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
+    	<test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
+    	<test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
+		{!v.body}
+    </div>
 </aura:component>

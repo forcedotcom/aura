@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 ({
-    provide : function (component) {
+    provide : function(component) {
+        var desc = component.get("v.provideByHandler");
+        if (desc) {
+            $A.logger.info("provide " + desc + " in " + component.get("v.logId"));
+            return desc;
+        }
         return component;
     }
 })

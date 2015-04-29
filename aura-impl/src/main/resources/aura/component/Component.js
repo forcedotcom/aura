@@ -2431,4 +2431,44 @@ Component.prototype.getFlavor = function() {
 	return this.priv.flavorReference || this.getDef().getDefaultFlavor();
 };
 
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no render method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.render = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["render"]() : undefined;
+};
+
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no rerender method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.rerender = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["rerender"]() : undefined;
+};
+
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no afterRender method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.afterRender = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["afterRender"]() : undefined;
+};
+
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no unrender method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.unrender = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["unrender"]() : undefined;
+};
+
 // #include aura.component.Component_export

@@ -85,9 +85,6 @@ exp(p,
     "getRenderable", p.getRenderable
 );
 
-exp(Component,
-	"registerMethods", Component.registerMethods);
-
 $A["Component"] = Component;
 
 

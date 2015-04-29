@@ -1,8 +1,19 @@
-/* xUnit tests.
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-To run tests in just this file:
-blt --build js-utest -Djstest.modules= -Djstest.path=../org.auraframework.aura-components/src/test/javascript/ui/tabItem/tabItemControllerTest.js
-*/
 Function.RegisterNamespace("Test.Ui.TabItem");
 
 [Fixture]
@@ -29,7 +40,7 @@ Test.Ui.TabItem = function() {
     }
 	
 	// Sets up a mock "tabItem" component with the specified getEvent() function
-    function getComponentMock(expectedEventName) {
+    function getComponentMock(eventName) {
 		return {
 			setParamsCalledWithCmpAsParam : false,
 			firedEvents : [],
@@ -55,6 +66,7 @@ Test.Ui.TabItem = function() {
                targetController.onTabItemHover(componentMock, null, null);
             });
             
+            Assert.Equal(2,1);
             // ASSERT -- make sure that the event was fired ... and with the proper params
             Assert.Contains(componentMock.firedEvents, 'onTabItemHover');
             Assert.True(componentMock.setParamsCalledWithCmpAsParam, "Expected params not set on event.");

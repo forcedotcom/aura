@@ -36,7 +36,8 @@
 	},
 	
 	onTabItemHover: function(cmp, evt, helper) {
-		var event = cmp.getEvent('onTabItemHover');
+		var event = cmp.getEvent('onTabItemHover');		
+		// Set this tabItem component as a param in the event
 		var params = {
 			tabItem : cmp
 		};

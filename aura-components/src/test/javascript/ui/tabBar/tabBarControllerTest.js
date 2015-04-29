@@ -1,41 +1,52 @@
-/* xUnit tests.
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-To run tests in just this file:
-blt --build js-utest -Djstest.modules= -Djstest.path=../org.auraframework.aura-components/src/test/javascript/ui/tabBar/tabBarControllerTest.js
-*/
-Function.RegisterNamespace("Test.Ui.TabBar");
+Function.RegisterNamespace("Test.Components.Ui.TabBar");
 
 [Fixture]
-Test.Ui.TabBar = function() {
+Test.Components.Ui.TabBar = function() {
     var targetController = null;
-    ImportJson("ui.tabBar.tabBarController.js", function(path, result){
+    ImportJson("ui.tabBar.tabBarController", function(path, result){
         targetController = result;
     });
     
-    // -- HELPER FUNCTIONS -- //
-    
-    // Sets up and returns a mock event object
-	function getEventMock(component, eventName) {
-    	return {
-    		setParams : function(params){
-    			component.paramsSetByEvents[eventName] = params;
-    		},
-    		fire = function() { 
-    			component.firedEvents.push(eventName);
-    		}
-    	}
-    }
-	
-	// Sets up a mock "tabBar" component with the specified getEvent() function
-    function getComponentMock(eventName) {
-		return {
-			paramsSetByEvents : {},
-			firedEvents : [],
-			getEvent : function(eventName){
-				return getEventMock(this, eventName);
-			}
-		}
-    }
+//    // -- HELPER FUNCTIONS -- //
+//    
+//    // Sets up and returns a mock event object
+//	function getEventMock(component, eventName) {
+//    	return {
+//    		setParams : function(params){
+//    			component.paramsSetByEvents[eventName] = params;
+//    		},
+//    		fire = function() { 
+//    			component.firedEvents.push(eventName);
+//    		}
+//    	}
+//    }
+//	
+//	// Sets up a mock "tabBar" component with the specified getEvent() function
+//    function getComponentMock(eventName) {
+//		return {
+//			paramsSetByEvents : {},
+//			firedEvents : [],
+//			getEvent : function(eventName){
+//				return getEventMock(this, eventName);
+//			}
+//		}
+//    }
     
     // -- TESTS -- //
     

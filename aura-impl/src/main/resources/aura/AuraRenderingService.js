@@ -661,7 +661,7 @@ $A.ns.AuraRenderingService.prototype.rerenderDirty = function(stackName) {
             if (rerenderedCmpDef) {
                 markDescription += "'" + rerenderedCmpDef.descriptor.getQualifiedName() + "'";
             }
-            if (m < dirty.length - 1) {
+            if (m < allRerendered.length - 1) {
                 markDescription += ",";
             }
         }

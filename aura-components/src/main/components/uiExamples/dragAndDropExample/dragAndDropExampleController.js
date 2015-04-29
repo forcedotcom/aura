@@ -22,7 +22,7 @@
 		component.set("v._draggableContext2", draggableContext[1]);
 	},
 	
-	handleDrop: function(component, event, helper) {
+	handleDrop: function(component, event, helper) {	
 		var target = event.getParam("dropComponent");
 		var targetHelper = target.getDef().getHelper();		
 		targetHelper.fireDropComplete(event, true);
@@ -31,13 +31,31 @@
 	handleDragEnd: function(component, event, helper) {
 		var dropComplete = $A.util.getBooleanValue(event.getParam("dropComplete"));
 		if (dropComplete) {
-			$A.dragAndDropService.moveDataTransfer(event, function(o1, o2){
-				if (o1 === o2) {
-					return 0;
-				} else {
-					return -1;
+			var addParams = {
+				"items": [event.getParam("data")]
+			};
+			
+			// Calculate index to be removed
+			var record = event.getParam("data");
+	    	var context = $A.dragAndDropService.getContext(event.getParam("dragComponent"));
+	    	var items = context.get("v.items");
+	    	
+	    	var removeIndex = -1;
+	    	for (var i = 0; i < items.length; i++) {
+				if (record === items[i]) {
+					removeIndex = i;
+					break;
 				}
-			});
+	    	}
+	    	
+			var removeParams = {
+				"index": removeIndex,
+				"count": 1,
+				"remove": true
+			};
+			
+			// Move data transfer
+			$A.dragAndDropService.moveDataTransfer(event, addParams, removeParams);
 		}
 	}
 })

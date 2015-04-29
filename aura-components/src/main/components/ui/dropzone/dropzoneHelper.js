@@ -73,7 +73,7 @@
 	/**
 	 * Handle drop event.
 	 * @param {Aura.Component} component - this component
-	 * @param {Event} event - HTML DOM Event for dragleave
+	 * @param {Event} event - HTML DOM Event for drop
 	 */
 	handleDrop: function(component, event) {
 		if (event.stopPropagation) {

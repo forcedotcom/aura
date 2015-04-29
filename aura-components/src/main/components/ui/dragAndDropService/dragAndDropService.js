@@ -89,7 +89,7 @@ function (w) {
      * Resolve context component for drag and drop component.
      * @return {Aura.Component} context component or null/ undefined if there is none
      */
-    DragAndDropService.prototype.$resolveContext$ = function(component) {
+    DragAndDropService.prototype.getContext = function(component) {
     	var context = component.get("v.inContextOf");
     	if (context) {
     		if ($A.util.isComponent(context)) {
@@ -117,29 +117,28 @@ function (w) {
     /**
      * Add data being transferred to dropzone component.
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent.
+     * @param {Object} addParams - parameter for adding data transfer. See ui:addRemove.
      */
-    DragAndDropService.prototype.addDataTransfer = function(dragEvent) {
+    DragAndDropService.prototype.addDataTransfer = function(dragEvent, addParams) {
     	var dropComponent = dragEvent.getParam("dropComponent");
-    	var context = this.$resolveContext$(dropComponent);
+    	var context = this.getContext(dropComponent);
     	
     	if (context) {
     		var dragComponent = dragEvent.getParam("dragComponent");
     		var dataTransfer = dragComponent.get("v.dataTransfer");
     		
-    		if (context.hasEventHandler("addRemove")) {
-    			// fire addRemove event -- addRemove event in ui:abstractList is unsupported yet!
+//    		if (context.getEvent("addRemove")) {
+//    			// fire addRemove event -- addRemove event in ui:abstractList is unsupported yet!
 //    			var addRemoveEvent = context.getEvent("addRemove");
-//    			addRemoveEvent.setParams({
-//    				"index": 0
-//    				"items": [dataTransfer]
-//    			});
+//    			addRemoveEvent.setParams(addParams);
 //    			addRemoveEvent.fire();
-    		} else if (context.get("v.dataProvider[0]")) {
+//    		} else 
+    		if (context.get("v.dataProvider[0]")) {
     			// fire onchange event on dataProvider -- this will only add to last index
     			var dataProvider = context.get("v.dataProvider[0]");
     	    	var onChangeEvent = dataProvider.getEvent("onchange");
     	    	onChangeEvent.setParams({
-    				"data" : [dataTransfer]
+    				"data" : addParams["items"]
     			});
     	    	onChangeEvent.fire();
     		}
@@ -149,36 +148,17 @@ function (w) {
     /**
      * Remove data being transferred from a draggable component.
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
-     * @param {Function} comparator - comparator used for comparison to find data to be removed
+     * @param {Object} removeParams - parameter for adding data transfer. See ui:addRemove.
      */
-    DragAndDropService.prototype.removeDataTransfer = function(dragEvent, comparator) {
+    DragAndDropService.prototype.removeDataTransfer = function(dragEvent, removeParams) {
     	var dragComponent = dragEvent.getParam("dragComponent");
-    	var context = this.$resolveContext$(dragComponent);
+    	var context = this.getContext(dragComponent);
     	
     	if (context) {
-    		if(context.get("v.items") && context.getEvent("addRemove")) {
-    			// Calculate index to be removed
-    			var record = dragEvent.getParam("data");
-    			var items = context.get("v.items");
-    			
-    			var removeIndex = -1;
-    			for (var i = 0; i < items.length; i++) {
-    				if (comparator(record, items[i]) === 0) {
-    					removeIndex = i;
-    					break;
-    				}
-    			}
-    			
-    			// fire addRemove event
-    			if (removeIndex > -1) {
-    				var addRemoveEvent = context.getEvent("addRemove");
-    				addRemoveEvent.setParams({
-    					"index": removeIndex,
-    					"count": 1,
-    					"remove": true
-    				});
-    				addRemoveEvent.fire();
-    			}
+    		if(context.getEvent("addRemove")) {
+    			var addRemoveEvent = context.getEvent("addRemove");
+				addRemoveEvent.setParams(removeParams);
+				addRemoveEvent.fire();
     		}
     	}
     };
@@ -186,11 +166,17 @@ function (w) {
     /**
      * Move data being transferred from a draggable component to a dropzone component.
      * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent
-     * @param {Function} comparator - comparator used for comparison to find data to be removed
+     * @param {Object} addParams - parameter for adding data transfer. See ui:addRemove.
+     * @param {Object} removeParams - parameter for adding data transfer. See ui:addRemove.
      */
-    DragAndDropService.prototype.moveDataTransfer = function(dragEvent, comparator) {
-    	this.addDataTransfer(dragEvent);
-    	this.removeDataTransfer(dragEvent, comparator);
+    DragAndDropService.prototype.moveDataTransfer = function(dragEvent, addParams, removeParams) {
+    	if (addParams) {
+    		this.addDataTransfer(dragEvent, addParams);
+    	}
+    	
+    	if (removeParams) {
+    		this.removeDataTransfer(dragEvent, removeParams);
+    	}
     };
     
     w.$A["dragAndDropService"] = new DragAndDropService();

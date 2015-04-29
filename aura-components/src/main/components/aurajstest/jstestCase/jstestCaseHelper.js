@@ -43,7 +43,7 @@
                 return;
             }
         }
-        win.aura.test.run(cmp.get("v.case.name"), cmp.get("v.suite.code"), 10);
+        win.aura.test.run(cmp.get("v.case.name"), cmp.get("v.suite.code"), 10, cmp.get("v.case.quickFixException"));
         cmp.getDef().getHelper().displayResults(cmp, win);
     },
 

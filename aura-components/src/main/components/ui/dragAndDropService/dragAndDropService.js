@@ -130,7 +130,8 @@ function (w) {
     		}
     	}
     	
-    	return context;
+    	// no context defined so returned the original component
+    	return component.getConcreteComponent();
     };
 
     /**
@@ -143,16 +144,12 @@ function (w) {
     	var context = this.getContext(dropComponent);
     	
     	if (context) {
-    		var dragComponent = dragEvent.getParam("dragComponent");
-    		var dataTransfer = dragComponent.get("v.dataTransfer");
-    		
-//    		if (context.getEvent("addRemove")) {
-//    			// fire addRemove event -- addRemove event in ui:abstractList is unsupported yet!
-//    			var addRemoveEvent = context.getEvent("addRemove");
-//    			addRemoveEvent.setParams(addParams);
-//    			addRemoveEvent.fire();
-//    		} else 
-    		if (context.get("v.dataProvider[0]")) {
+    		if (context.getEvent("addRemove")) {
+    			// fire addRemove event
+    			var addRemoveEvent = context.getEvent("addRemove");
+    			addRemoveEvent.setParams(addParams);
+    			addRemoveEvent.fire();
+    		} else if (context.get("v.dataProvider[0]")) {
     			// fire onchange event on dataProvider -- this will only add to last index
     			var dataProvider = context.get("v.dataProvider[0]");
     	    	var onChangeEvent = dataProvider.getEvent("onchange");

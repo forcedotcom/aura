@@ -129,22 +129,5 @@
 	 */
 	exitDragOperation: function(component) {
 		component.set("v.ariaDropEffect", "none");
-	},
-	
-	/**
-	 * Fire a dropComplete event.
-	 * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent.
-	 * @param {boolean} success - true if drop operation is successful or false otherwise
-	 */
-	fireDropComplete: function(dragEvent, success) {
-		var dragComponent = dragEvent.getParam("dragComponent");
-		var type = dragEvent.getParam("type");
-		var dropCompleteEvent = dragComponent.getEvent("dropComplete");
-		dropCompleteEvent.setParams({
-			"type": type,
-			"dropComponent": dragEvent.getParam("dropComponent"),
-			"dropComplete": success
-		});
-		dropCompleteEvent.fire();
 	}
 })

@@ -86,6 +86,25 @@ function (w) {
     };
     
     /**
+     * Fire a drop complete event.
+     * @param {Aura.Event} dragEvent - the drop event that is occurred. Must be of type ui:dragEvent.
+     * @param {boolean} isSuccess - true if the drop has been completed successfully or false otherwise
+     */
+    DragAndDropService.prototype.fireDropComplete = function(dragEvent, isSuccess) {
+      var dropComponent = dragEvent.getParam("dropComponent");
+      var dragComponent = dragEvent.getParam("dragComponent");
+      var type = dragEvent.getParam("type");
+      
+      var dropCompleteEvent = dragComponent.getEvent("dropComplete");
+      dropCompleteEvent.setParams({
+         "type": type,
+         "dropComponent": dropComponent,
+         "dropComplete": isSuccess
+      });
+      dropCompleteEvent.fire();
+    };
+    
+    /**
      * Resolve context component for drag and drop component.
      * @return {Aura.Component} context component or null/ undefined if there is none
      */

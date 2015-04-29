@@ -23,9 +23,7 @@
 	},
 	
 	handleDrop: function(component, event, helper) {	
-		var target = event.getParam("dropComponent");
-		var targetHelper = target.getDef().getHelper();		
-		targetHelper.fireDropComplete(event, true);
+		$A.dragAndDropService.fireDropComplete(event, true);
 	},
 	
 	handleDragEnd: function(component, event, helper) {

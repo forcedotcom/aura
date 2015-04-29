@@ -975,6 +975,19 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return false;
     }
 
+    /**
+     * Check to ensure that a DescriptorFilter is not in the cache.
+     */
+    private boolean notInDescriptorFilterCache(DescriptorFilter filter, MasterDefRegistryImpl mdr) throws Exception {
+        Cache<String, Set<DefDescriptor<?>>> cache = AuraPrivateAccessor.get(mdr, "descriptorFilterCache");
+        for (String key : cache.getKeySet()) {
+            if (key.startsWith(filter.toString() + "|")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private boolean isInDepsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
         Cache<String, ?> cache = AuraPrivateAccessor.get(mdr, "depsCache");
         String ddKey = dd.getDescriptorName().toLowerCase();
@@ -1314,6 +1327,148 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertFalse("results4 should not be cached", isInDescriptorFilterCache(filter4, results4, mdri2));
         assertFalse("results5 should not be cached", isInDescriptorFilterCache(filter5, results5, mdri2));
         // assertFalse("results6 should not be cached", isInDescriptorFilterCache(filter6, results6, mdri2));
+    }
+
+    /**
+     * Test a constant Descriptor filter.
+     *
+     * Preconditions:
+     * (1) Cacheable registry.
+     * (2) DescriptorFilter.isConstant() should be true.
+     *
+     * PostConditions:
+     * (1) registry.find() should _not_ be called.
+     * (2) We should get exactly one descriptor.
+     * (3) It should contain the def descriptor.
+     * (4) There should be no cache.
+     */
+    public void testDescriptorFilterConstant() throws Exception {
+        DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
+        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        Set<DefDescriptor<?>> findable = Sets.newHashSet();
+        findable.add(dd);
+
+        Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
+        Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
+        Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
+        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+
+        DescriptorFilter df = new DescriptorFilter("aura:mocked", DefType.COMPONENT);
+        Set<DefDescriptor<?>> result = mdr.find(df);
+        assertEquals("Resulting set should contain exactly 1 item", 1, result.size());
+        assertTrue("Resulting set should contain our descriptor", result.contains(dd));
+        Mockito.verify(mockedRegistry, Mockito.never()).find((DescriptorFilter)Mockito.any());
+        assertTrue("No caching for constant filters", notInDescriptorFilterCache(df, mdr));
+    }
+
+    /**
+     * Test a wildcard name Descriptor filter (cacheable).
+     *
+     * Preconditions:
+     * (1) Cacheable registry.
+     * (2) DescriptorFilter.isConstant() should be true.
+     *
+     * PostConditions:
+     * (1) registry.find() should be called.
+     * (2) We should get exactly one descriptor.
+     * (3) It should contain the def descriptor.
+     * (4) There should be a cache.
+     */
+    public void testDescriptorFilterNameWildcardWithCache() throws Exception {
+        DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
+        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        Set<DefDescriptor<?>> findable = Sets.newHashSet();
+        findable.add(dd);
+
+        Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
+        Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
+        Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
+        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
+        Mockito.when(mockedRegistry.isCacheable()).thenReturn(true);
+
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+
+        DescriptorFilter df = new DescriptorFilter("aura:*", DefType.COMPONENT);
+        Set<DefDescriptor<?>> result = mdr.find(df);
+        assertEquals("Resulting set should contain exactly 1 item", 1, result.size());
+        assertTrue("Resulting set should contain our descriptor", result.contains(dd));
+        Mockito.verify(mockedRegistry).find(Mockito.eq(df));
+        assertTrue("Caching for wildcard names", isInDescriptorFilterCache(df, findable, mdr));
+    }
+
+    /**
+     * Test a wildcard name Descriptor filter (not cacheable).
+     *
+     * Preconditions:
+     * (1) Non-Cacheable registry.
+     * (2) DescriptorFilter.isConstant() should be true.
+     *
+     * PostConditions:
+     * (1) registry.find() should be called.
+     * (2) We should get exactly one descriptor.
+     * (3) It should contain the def descriptor.
+     * (4) There should be no cache.
+     */
+    public void testDescriptorFilterNameWildcardWithoutCache() throws Exception {
+        DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
+        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        Set<DefDescriptor<?>> findable = Sets.newHashSet();
+        findable.add(dd);
+
+        Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
+        Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
+        Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
+        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
+        Mockito.when(mockedRegistry.isCacheable()).thenReturn(false);
+
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+
+        DescriptorFilter df = new DescriptorFilter("aura:*", DefType.COMPONENT);
+        Set<DefDescriptor<?>> result = mdr.find(df);
+        assertEquals("Resulting set should contain exactly 1 item", 1, result.size());
+        assertTrue("Resulting set should contain our descriptor", result.contains(dd));
+        Mockito.verify(mockedRegistry).find(Mockito.eq(df));
+        assertTrue("Caching for wildcard names", notInDescriptorFilterCache(df, mdr));
+    }
+
+    /**
+     * Test a wildcard namespace Descriptor filter (cacheable).
+     *
+     * Preconditions:
+     * (1) Cacheable registry.
+     * (2) DescriptorFilter.isConstant() should be true.
+     *
+     * PostConditions:
+     * (1) registry.find() should be called.
+     * (2) We should get exactly one descriptor.
+     * (3) It should contain the def descriptor.
+     * (4) There should be no cache.
+     */
+    public void testDescriptorFilterNamespaceWildcard() throws Exception {
+        DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
+        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        Set<DefDescriptor<?>> findable = Sets.newHashSet();
+        findable.add(dd);
+
+        Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
+        Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
+        Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
+        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
+        Mockito.when(mockedRegistry.isCacheable()).thenReturn(true);
+
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+
+        DescriptorFilter df = new DescriptorFilter("*:mocked", DefType.COMPONENT);
+        Set<DefDescriptor<?>> result = mdr.find(df);
+        assertEquals("Resulting set should contain exactly 1 item", 1, result.size());
+        assertTrue("Resulting set should contain our descriptor", result.contains(dd));
+        Mockito.verify(mockedRegistry).find(Mockito.eq(df));
+        assertTrue("No caching for wildcard namespaces", notInDescriptorFilterCache(df, mdr));
     }
 
     public void testDepsCache() throws Exception {
@@ -1790,10 +1945,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         lti = new LockTestInfo();
         try {
-            lti.mdr.find(new DescriptorFilter("bah:humbug"));
+            lti.mdr.find(new DescriptorFilter("bah:hum*"));
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
             Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
-            lti.mdr.find(new DescriptorFilter("bah:humbug"));
+            lti.mdr.find(new DescriptorFilter("bah:hum*"));
             // we always lock, so we cannot check for a single lock here.
             Mockito.verify(lti.rLock, Mockito.times(2)).lock();
             Mockito.verify(lti.rLock, Mockito.times(2)).unlock();

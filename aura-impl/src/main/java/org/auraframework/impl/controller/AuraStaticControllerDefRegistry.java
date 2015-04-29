@@ -22,12 +22,14 @@ import org.auraframework.Aura;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.controller.JavaControllerDefImpl.Builder;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -51,9 +53,16 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.CONTROLLER);
 
     public static final AuraStaticControllerDefRegistry INSTANCE = new AuraStaticControllerDefRegistry();
+    private final Map<DefDescriptor<?>,Definition> allMap;
 
     protected AuraStaticControllerDefRegistry() {
         super(defTypes, prefixes, null, getDefs());
+
+       ImmutableMap.Builder<DefDescriptor<?>, Definition> builder = new ImmutableMap.Builder<DefDescriptor<?>, Definition>();
+       for (Map.Entry<DefDescriptor<ControllerDef>, ControllerDef> entry : defs.entrySet()) {
+            builder.put(entry.getKey(), entry.getValue());
+        }
+        allMap = builder.build();
     }
 
     private static Map<DefDescriptor<ControllerDef>, ControllerDef> getDefs() {
@@ -96,5 +105,9 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
         builder.setDescriptor(controllerDesc);
 
         return builder;
+    }
+
+    public Map<DefDescriptor<?>, Definition> getAll() {
+        return allMap;
     }
 }

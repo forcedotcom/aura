@@ -18,6 +18,7 @@
      * Positive test case: Assign Negative value for attribute 'value'.
      */
     testNegativeValue:{
+    	labels : [ "UnAdaptableTest" ],
         attributes: {value : -123},
         test: function(component){
         	var val = $A.test.getText(component.find('span').getElement());

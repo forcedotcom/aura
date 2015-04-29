@@ -15,4 +15,5 @@
  */
 .THIS {
 	cursor: move;
+	-webkit-user-drag: element;
 }

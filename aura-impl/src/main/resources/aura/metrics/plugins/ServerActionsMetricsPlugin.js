@@ -154,7 +154,7 @@ ServerActionsMetricsPlugin.prototype = {
             }
         }
 
-        return bundle.filter(function (s) { 
+        return $A.util.filter(bundle, function (s) { 
             if (s._resolved) {
                 delete s._resolved;
                 return true;

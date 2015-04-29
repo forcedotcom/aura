@@ -33,7 +33,7 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="dropComplete" action="{!c.handleDropComplete}"/>
 	
-    <div draggable="true" aria-grabbed="{!v.ariaGrabbed}" class="{!v.theClass}">
+    <div draggable="true" aria-grabbed="{!v.ariaGrabbed}" class="{!v.theClass}" tabIndex="0">
 	    {!v.body}
     </div>
     

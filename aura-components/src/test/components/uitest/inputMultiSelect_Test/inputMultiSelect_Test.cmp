@@ -19,7 +19,7 @@
 
     <aura:attribute name="testCmpName" type="string" default="SelectMulti"/>
 
-    <uitest:inputSelect_Extend multiple="true" aura:id="SelectMulti" options="{!m.selectOptions}" value="{!m.selectValue}"/> <br/>
+    <uitest:inputSelect_Extend multiple="true" aura:id="SelectMulti" options="{!m.selectOptions}" value="{!m.selectValue}" updateOn="blur" /> <br/>
 
     <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.selectValue}"/>
 

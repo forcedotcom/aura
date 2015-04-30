@@ -14,35 +14,39 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.TabItem");
+Function.RegisterNamespace("Test.Components.Ui.TabItem");
 
 [Fixture]
-Test.Ui.TabItem = function() {
+Test.Components.Ui.TabItem = function() {
     var targetController = null;
-    ImportJson("ui.tabItem.tabItemController.js", function(path, result){
+    ImportJson("ui.tabItem.tabItemController", function(path, result){
         targetController = result;
     });
     
     // -- HELPER FUNCTIONS -- //
     
-    // Sets up and returns a mock event object
+    // Sets up and returns a mock event object that has both the setParams() function and the fire() function mocked out.
+    // When setParams() is called it checks to see if the param passed in is equal to the tabItemComponentMock and if so
+    // it sets the relevant attribute on that object to true. When fire() is called it adds the name of the event that was
+    // fired to an array stored in the tabItemComponentMock. 
 	function getEventMock(component, eventName) {
     	return {
     		setParams : function(params){
-    			if (params != undefined && params != null && params.tabItem != undefined && params.tabItem != null && params.tabItem == component){
-    				component.setParamsCalledWithCmpAsParam = true;
-    			}
+    			component.paramsSetByEvents[eventName] = params;
+    			return this;
     		},
-    		fire = function() { 
+    		fire : function() { 
     			component.firedEvents.push(eventName);
     		}
     	}
     }
 	
-	// Sets up a mock "tabItem" component with the specified getEvent() function
-    function getComponentMock(eventName) {
+	// Sets up a mock "tabItem" component with the specified getEvent() function as well as a couple additional attributes that
+	// are used by the event mock's functions in a way such that we are able to later determine the nature of the target function's
+	// interactions with the given event. 
+    function getTabItemComponentMock() {
 		return {
-			setParamsCalledWithCmpAsParam : false,
+			paramsSetByEvents : {},
 			firedEvents : [],
 			getEvent : function(eventName){
 				return getEventMock(this, eventName);
@@ -58,18 +62,20 @@ Test.Ui.TabItem = function() {
         [Fact]
         function TestHoverEventIsFiredWithComponentAsParam() {   
             // ARRANGE -- setup aura and component mocks
-        	var auraMock = Mocks.GetMocks( Object.Global(), "$A", {});       
-            var componentMock = getComponentMock('onTabItemHover');
+        	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+            var tabItemComponentMock = getTabItemComponentMock();
         	
             // ACT -- call target function with mocked data
             auraMock(function(){
-               targetController.onTabItemHover(componentMock, null, null);
+               targetController.onTabItemHover(tabItemComponentMock, null, null);
             });
             
-            Assert.Equal(2,1);
             // ASSERT -- make sure that the event was fired ... and with the proper params
-            Assert.Contains(componentMock.firedEvents, 'onTabItemHover');
-            Assert.True(componentMock.setParamsCalledWithCmpAsParam, "Expected params not set on event.");
+            Assert.Contains(tabItemComponentMock.firedEvents, 'onTabItemHover');
+            var actualParams = tabItemComponentMock.paramsSetByEvents['onTabItemHover'];
+            Assert.NotUndefined(actualParams);
+            Assert.NotNull(actualParams);
+            Assert.Equal(tabItemComponentMock, actualParams.tabItem);
         } 
     }
     
@@ -79,16 +85,16 @@ Test.Ui.TabItem = function() {
         [Fact]
         function TestUnhoverEventIsFired() {   
             // ARRANGE -- setup aura and component mocks
-        	var auraMock = Mocks.GetMocks( Object.Global(), "$A", {});       
-            var componentMock = getComponentMock('onTabItemUnhover');
+        	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+            var tabItemComponentMock = getTabItemComponentMock();
         	
             // ACT -- call target function with mocked data
             auraMock(function(){
-               targetController.onTabItemUnhover(componentMock, null, null);
+               targetController.onTabItemUnhover(tabItemComponentMock, null, null);
             });
             
             // ASSERT -- make sure that the event was fired
-            Assert.Contains(componentMock.firedEvents, 'onTabItemUnhover');
+            Assert.Contains(tabItemComponentMock.firedEvents, 'onTabItemUnhover');
         } 
     }
 }

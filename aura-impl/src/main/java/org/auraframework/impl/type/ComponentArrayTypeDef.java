@@ -33,6 +33,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 /**
@@ -74,6 +75,9 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
     @Override
     public Object valueOf(Object stringRep) {
+    	if(stringRep instanceof String && AuraTextUtil.isNullEmptyOrWhitespace(stringRep.toString())) {
+    		stringRep = new ArrayList<ComponentDefRef>();
+    	}
         return stringRep;
     }
 

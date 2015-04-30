@@ -58,6 +58,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -74,6 +75,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.throwable.quickfix.InvalidValueSetTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -360,7 +362,21 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             att.validateReferences();
         }
 
+        AttributeDef facetAttributeDef;
         for (AttributeDefRef facet : this.facets) {
+        	facetAttributeDef = this.getAttributeDef(facet.getDescriptor().getName());
+        	if(facetAttributeDef != null) {
+        		try {
+        			facet.parseValue(facetAttributeDef.getTypeDef());
+        		} catch(InvalidExpressionException exception) {
+        			Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        			if(mode.isDevMode() || mode.isTestMode()) {
+	                	throw new InvalidValueSetTypeException(
+	                			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()), 
+	                			exception.getLocation());
+        			}
+                }
+        	}
             facet.validateReferences();
         }
 

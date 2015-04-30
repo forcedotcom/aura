@@ -199,7 +199,7 @@ public class TemplateDefTest extends AuraImplTestCase {
         // Script tags as attribute value of parent template
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true' extensible='true'",
-                        "<aura:attribute name='scriptTags' type='String'/>"));
+                        "<aura:attribute name='scriptTags' type='Aura.Component[]'/>"));
         DefDescriptor<ComponentDef> scriptTagInAuraSet = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag,
@@ -304,7 +304,7 @@ public class TemplateDefTest extends AuraImplTestCase {
      * Verify the new errorTitle attribute, when error message is provided in template.
      */
     public void testCustomErrorTitleAttributeInTemplate() throws Exception {
-    	String errorTitle = "<aura:set attribute='errorTitle'>Looks like there's a problem.</aura:set>";        
+    	String errorTitle = "<aura:set attribute='errorTitle' value='Looks like theres a problem.'></aura:set>";        
         DefDescriptor<ComponentDef> errorTitleIntemplate = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(
@@ -317,6 +317,6 @@ public class TemplateDefTest extends AuraImplTestCase {
         Aura.getRenderingService().render(template, sb);
         String result = sb.toString();
         assertTrue("errorTitle attribute on aura:template has wrong text",
-                result.contains("Looks like there's a problem."));              
+                result.contains("Looks like theres a problem."));              
     }
 }

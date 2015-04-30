@@ -241,14 +241,21 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         }
 
         public void testRun() throws Throwable {
+            String validationError = "";
+
+            try {
+                caseDef.validateDefinition();
+            } catch (QuickFixException qfe) {
+                validationError = ", '"+AuraTextUtil.escapeForJavascriptString(qfe.getMessage())+"'";
+            }
             addMocksToTestContextLocalDef(caseDef.getLocalDefs());
 
             open(getUrl(), Mode.AUTOJSTEST);
 
             String ret = (String) auraUITestingUtil.getEval(String.format(
-                    "return window.aura.test.run('%s', '%s', 30)",
+                    "return window.aura.test.run('%s', '%s', 30%s)",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
-                    AuraTextUtil.escapeForJavascriptString(suite.getCode())));
+                    AuraTextUtil.escapeForJavascriptString(suite.getCode()), validationError));
 
             if (ret != null && !"null".equals(ret)) {
                 @SuppressWarnings("unchecked")

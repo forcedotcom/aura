@@ -1293,6 +1293,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> void addLocalDef(D def) {
         DefDescriptor<? extends Definition> desc = def.getDescriptor();
 
+        if (desc == null) {
+            throw new AuraRuntimeException("Invalid def has no descriptor");
+        }
         defs.put(desc, def);
         if (localDescs == null) {
             localDescs = Sets.newHashSet();
@@ -1433,12 +1436,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
         Map<DefDescriptor<? extends Definition>, Definition> filtered;
 
-        if (preloads == null || preloads.isEmpty()) {
-            return Maps.newHashMap(defs);
-        }
         filtered = Maps.newHashMapWithExpectedSize(defs.size());
+        if (preloads == null) {
+            preloads = Sets.newHashSet();
+        }
         for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defs.entrySet()) {
-            if (!preloads.contains(entry.getKey())) {
+            if (entry.getValue() != null && !preloads.contains(entry.getKey())) {
                 filtered.put(entry.getKey(), entry.getValue());
             }
         }

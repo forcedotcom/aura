@@ -44,6 +44,7 @@ import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Lists;
@@ -208,7 +209,12 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                 List<NameValuePair> newParams = Lists.newArrayList();
                 for (Entry<String, Object> entry : attributes) {
                     String key = entry.getKey();
-                    String value = entry.getValue().toString();
+                    String value;
+                    if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
+                    	value = Json.serialize(entry.getValue());
+                    } else {
+                    	value = entry.getValue().toString();
+                    }
                     if (key.equals("__layout")) {
                         hash = value;
                     } else {

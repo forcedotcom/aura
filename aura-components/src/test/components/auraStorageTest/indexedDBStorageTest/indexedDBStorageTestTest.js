@@ -3,7 +3,7 @@
 
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
-        var storage = $A.storageService.initStorage("browserdb", false, true, 32768, 2000, 3000, true, true);
+        var storage = $A.storageService.initStorage("browserdb", true, false, 32768, 2000, 3000, true, true);
     },
 
     resetCounters:function(cmp){
@@ -466,12 +466,75 @@
         }]
     },
 
-
     testStorageInfo: {
         test: function(cmp) {
             var storage = $A.storageService.getStorage("browserdb");
             $A.test.assertTrue(storage.isPersistent(), "indexeddb is a persistent storage");
             $A.test.assertFalse(storage.isSecure(), "indexeddb is not a secure storage");
         }
+    },
+
+    /**
+     * Store an item in the database and reload the page (iframe) to verify data is persisted.
+     */
+    testReloadPage: {
+        test: [
+        function loadComponentInIframe(cmp) {
+            cmp._frameLoaded = false;
+            cmp._expected = "expected value";
+            var frame = document.createElement("iframe");
+            frame.src = "/auraStorageTest/indexedDBCmp.cmp?value="+cmp._expected;
+            frame.scrolling = "auto";
+            frame.id = "myFrame";
+            $A.util.on(frame, "load", function(){
+                cmp._frameLoaded = true;
+            });
+            var content = cmp.find("iframeContainer");
+            $A.util.insertFirst(frame, content.getElement());
+
+            this.waitForIframeLoad(cmp);
+        },
+        function resetDatabase(cmp) {
+            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            iframeCmp.resetStorage();
+            $A.test.addWaitFor(true, function() {
+                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Resetting";
+            }, function() {
+                $A.test.assertEquals("Done Resetting", $A.util.getText(iframeCmp.find("status").getElement()));
+            });
+        },
+        function addItemToDatabase(cmp) {
+            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            iframeCmp.addToStorage();
+            $A.test.addWaitFor(true, function() {
+                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Adding";
+            }, function() {
+                $A.test.assertEquals("Done Adding", $A.util.getText(iframeCmp.find("status").getElement()));
+            });
+        },
+        function reloadIframe(cmp) {
+            cmp._frameLoaded = false;
+            document.getElementById("myFrame").contentWindow.location.reload();
+            this.waitForIframeLoad(cmp);
+        },
+        function getItemFromDatabase(cmp) {
+            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            iframeCmp.getFromStorage();
+            $A.test.addWaitFor(true, function() {
+                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
+            }, function() {
+                var actual = $A.util.getText(iframeCmp.find("output").getElement());
+                $A.test.assertEquals(cmp._expected, actual, "Got unexpected item from storage after page reload");
+            });
+        }]
+    },
+
+    waitForIframeLoad: function(cmp) {
+        var iframeWindow = document.getElementById("myFrame").contentWindow;
+        $A.test.addWaitFor(true, function() {
+            return cmp._frameLoaded
+                   && document.getElementById("myFrame").contentWindow.$A
+                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined; 
+        });
     }
 })

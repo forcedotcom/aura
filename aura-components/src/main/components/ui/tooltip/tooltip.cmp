@@ -17,17 +17,17 @@
 -->
 <aura:component>
     <aura:attribute name="tooltipBody" type="String" default="false" description="The message to display in the tooltip"/>
-    <aura:attribute name="disabled" type="Boolean" default="false" description="Disable the tooltip"/>
-    <aura:attribute name="advanced" type="Boolean" default="false" description="Use advanced (Javascript) positioning"/>
-    <aura:attribute name="trigger" type="String" default="hover" description="What should toggle the tooltip?"/>
-    <aura:attribute name="triggerClass" type="String" description="Add this class to the trigger element"/>
-    <aura:attribute name="isVisible" type="Boolean" description="If if is visible..." default="false"/>
-    <aura:attribute name="fadeIn" type="Boolean" description="Fading" default="false"/>
-    <aura:attribute name="fadeOut" type="Boolean" description="Fading" default="false"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
+    <aura:attribute name="advanced" type="Boolean" default="false" description="Uses JavaScript positioning. The default is &quot;false&quot;."/>
+    <aura:attribute name="trigger" type="String" default="hover" description="The event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;."/>
+    <aura:attribute name="triggerClass" type="String" description="The CSS class for the trigger element"/>
+    <aura:attribute name="isVisible" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
+    <aura:attribute name="fadeIn" type="Boolean" description="Specifies whether fading animation is used to display the tooltip. The default is &quot;false&quot;." default="false"/>
+    <aura:attribute name="fadeOut" type="Boolean" description="Specifies whether fading animation is used to hide the tooltip. The default is &quot;false&quot;." default="false"/>
 
     <!-- fadeOut and fadeIn duration must be the same for simple tooltips -->
-    <aura:attribute name="fadeOutDuration" type="Integer" description="Fade out duration"/>
-    <aura:attribute name="fadeInDuration" type="Integer" description="Fading"/>
+    <aura:attribute name="fadeOutDuration" type="Integer" description="Fade out duration in ms"/>
+    <aura:attribute name="fadeInDuration" type="Integer" description="Fade in duration in ms"/>
     <aura:attribute name="delay" type="Integer" description="Appearance delay in ms" />
     <aura:attribute name="class" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
      <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />

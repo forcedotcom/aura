@@ -45,6 +45,7 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter.removeItem = this.adapter.removeItem || this.adapter["removeItem"];
     this.adapter.setItem = this.adapter.setItem || this.adapter["setItem"];
     this.adapter.getAll = this.adapter.getAll || this.adapter["getAll"];
+    this.adapter.deleteStorage = this.adapter.deleteStorage || this.adapter["deleteStorage"];
 
     var adapterConfig = $A.storageService.getAdapterConfig(this.adapter.getName());
     this.persistent = !$A.util.isUndefinedOrNull(adapterConfig["persistent"]) && adapterConfig["persistent"];
@@ -297,5 +298,16 @@ AuraStorage.prototype.getVersion  = function() {
     return this.version;
 };
 
+AuraStorage.prototype.deleteStorage = function() {
+    var that = this;
+    if (this.adapter.deleteStorage) {
+        return this.adapter.deleteStorage();
+    } else {
+        return new Promise(function(success, error) {
+            that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement a deleteStorage, returning success");
+            success();
+        });
+    }
+};
 
 //#include aura.storage.Storage_export

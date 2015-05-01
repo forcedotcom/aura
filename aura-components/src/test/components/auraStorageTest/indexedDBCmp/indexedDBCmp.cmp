@@ -9,6 +9,7 @@
     <aura:method name="addToStorage" action="c.addToStorage"/>
     <aura:method name="getFromStorage" action="c.getFromStorage"/>
     <aura:method name="resetStorage" action="c.resetStorage"/>
+    <aura:method name="deleteStorage" action="c.deleteStorage"/>
 
     Status: <span aura:id="status">{!v.status}</span><br/>
     Storage output: <span aura:id="output">{!v.return}</span>

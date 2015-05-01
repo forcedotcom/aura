@@ -1,9 +1,14 @@
 ({
+    // IndexedDb not supported in IE < 10
     browsers:["-IE7", "-IE8", "-IE9"],
+
+    // Test modifies/deletes the persistent database
+    labels : [ "threadHostile" ],
 
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
         var storage = $A.storageService.initStorage("browserdb", true, false, 32768, 2000, 3000, true, true);
+        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb")});
     },
 
     resetCounters:function(cmp){
@@ -27,7 +32,6 @@
         $A.test.fail(string);
     },
 
-
     assertAfterStorageChange:function(cmp, callback){
         $A.test.addWaitFor(2, function() {
             return cmp._storageModified?cmp._storageModifiedCounter:0;
@@ -46,7 +50,8 @@
         test:[function (cmp) {
             $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
             cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
-                    false, true, 32768, 2000, 3000, true, true);
+                    true, false, 32768, 2000, 3000, true, true);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow")});
             cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
             cmp._append = function(string) { this.append(cmp, string); }.bind(this);
         }, function(cmp){
@@ -103,7 +108,6 @@
 
     testGetMaxSize:{
         test:function(cmp){
-            //Max Size doesn't seem to mean anything in the case of WebSQLAdapter. It just a transient variable.
             var storage = $A.storageService.getStorage("browserdb");
             $A.test.assertEquals(32, storage.getMaxSize(), "testGetMaxSize: Failed to configure max size of storage");
         }
@@ -317,7 +321,8 @@
         test:[function (cmp) {
             $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
             cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
-                    false, true, 5000, 2000, 3000, true, true);
+                    true, false, 5000, 2000, 3000, true, true);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow")});
             cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
             cmp._append = function(string) { this.append(cmp, string); }.bind(this);
         }, function(cmp) {
@@ -350,6 +355,7 @@
                 }, cmp._die);
             $A.test.addWaitFor(true, function() { return completed; });
         }, function(cmp) {
+            var completed = false;
             cmp._storage.getAll()
                 .then(function(result) {
                     cmp._append("Race 1, length="+result.length);
@@ -366,7 +372,10 @@
                 }).then(function(size) {
                     cmp._append("post getAll size = "+size);
                     $A.assert(size < 5.0, "Size is too large");
+                    completed = true;
                 }, cmp._die);
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }
         ]
     },
@@ -375,7 +384,8 @@
         test:[function (cmp) {
             $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
             cmp._storage = $A.storageService.initStorage("browserdb-testGetAll",
-                    false, true, 32768, 2000, 3000, true, true);
+                    true, false, 32768, 2000, 3000, true, true);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testGetAll")});
             cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
             cmp._append = function(string) { this.append(cmp, string); }.bind(this);
         }, function(cmp) {
@@ -419,7 +429,8 @@
         test:[function (cmp) {
             $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
             cmp._storage = $A.storageService.initStorage("browserdb-testClear-",
-                    false, true, 32768, 2000, 3000, true, true);
+                    true, false, 32768, 2000, 3000, true, true);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testClear-")});
             cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
             cmp._append = function(string) { this.append(cmp, string); }.bind(this);
         },
@@ -526,15 +537,109 @@
                 var actual = $A.util.getText(iframeCmp.find("output").getElement());
                 $A.test.assertEquals(cmp._expected, actual, "Got unexpected item from storage after page reload");
             });
+        },
+        function cleanupDatabase(cmp) {
+            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            iframeCmp.deleteStorage();
         }]
     },
 
     waitForIframeLoad: function(cmp) {
-        var iframeWindow = document.getElementById("myFrame").contentWindow;
         $A.test.addWaitFor(true, function() {
             return cmp._frameLoaded
                    && document.getElementById("myFrame").contentWindow.$A
                    && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined; 
         });
+    },
+
+    testDeleteDatabase: {
+        test: function(cmp) {
+            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+            var dbName = "browserdb";
+            var completed = false;
+            var results;
+
+            $A.test.assertDefined($A.storageService.getStorage(dbName));
+            $A.storageService.deleteStorage(dbName)
+                .then(function(){
+                    // Only Chrome currently provides an easy way to check current DBs
+                    if (window.indexedDB.webkitGetDatabaseNames) {
+                        window.indexedDB.webkitGetDatabaseNames().onsuccess = function(event) {
+                            results = event.target.result;
+                            completed = true;
+                        }
+                    } else {
+                        completed = true;
+                    }
+                }, die);
+
+            $A.test.addWaitFor(
+                    true, 
+                    function() {
+                        return completed; 
+                    }, function() {
+                        $A.test.assertUndefined($A.storageService.getStorage(dbName),
+                                "Storage service still has reference to deleted database "+dbName);
+                        if (window.indexedDB.webkitGetDatabaseNames) {
+                            $A.test.assertFalse(results.contains(dbName), "IndexedDb "+dbName+" still present in browser");
+                        }
+                    });
+        }
+    },
+
+    testDeleteDatabaseTwice: {
+        test: function(cmp) {
+            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+            var completed = false;
+            var dbName = "browserdb";
+
+            $A.storageService.deleteStorage(dbName)
+                .then(function() {
+                    $A.test.assertUndefined($A.storageService.getStorage(dbName));
+                    return $A.storageService.deleteStorage(dbName);
+                })
+                .then(function() {
+                    $A.test.assertUndefined($A.storageService.getStorage(dbName));
+                    completed = true;
+                }, die);
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
+    },
+
+    testDeleteAndRecreateDatabase: {
+        test: [
+        function deleteAndRecreateDatabase(cmp) {
+            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+            var completed = false;
+            cmp._dbName = "browserdb";
+
+            $A.storageService.deleteStorage(cmp._dbName)
+                .then(function() {
+                    $A.test.assertUndefined($A.storageService.getStorage(cmp._dbName));
+                    $A.storageService.initStorage(cmp._dbName, true, false, 32768, 2000, 3000, true, true);
+                })
+                .then(function() {
+                    $A.test.assertDefined($A.storageService.getStorage(cmp._dbName));
+                    completed = true;
+                }, die);
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function verifyRecreationOfDatabase(cmp) {
+            var completed = false;
+
+            // Unfortunately, only Chrome has an easy way to check if a DB exists
+            if (window.indexedDB.webkitGetDatabaseNames) {
+                $A.test.addWaitFor(true, function() {
+                    window.indexedDB.webkitGetDatabaseNames().onsuccess = function(event) {
+                        if (event.target.result.contains(cmp._dbName)){
+                            completed = true;
+                        }
+                    }
+                    return completed;
+                });
+            }
+        }]
     }
 })

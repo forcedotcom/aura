@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component.">
-	<aura:attribute name="tabItem" type="Aura.Component" description="The tab item that is being hovered over."/>
+	<aura:attribute name="tabItem" type="Aura.Component" description="The tab item that the mouse has moved over."/>
 </aura:event>

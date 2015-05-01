@@ -46,6 +46,12 @@
 	},
 	
 	onTabItemUnhover: function(cmp, evt, helper) {
-		cmp.getEvent('onTabItemUnhover').fire();
+		var event = cmp.getEvent('onTabItemUnhover');		
+		// Set this tabItem component as a param in the event
+		var params = {
+			tabItem : cmp
+		};
+		event.setParams(params);
+		event.fire();
 	}
 })

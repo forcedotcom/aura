@@ -54,6 +54,26 @@ Test.Components.Ui.TabItem = function() {
 		}
     }
     
+    // Verifies that when the target function is called that the event with the specified name is called
+    // with the expected params
+    function testHoverEventHandlers(targetFunction, eventName) {
+        // ARRANGE -- setup aura and component mocks
+    	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+        var tabItemComponentMock = getTabItemComponentMock();
+    	
+        // ACT -- call target function with mocked data
+        auraMock(function(){
+           targetFunction(tabItemComponentMock, null, null);
+        });
+        
+        // ASSERT -- make sure that the event was fired ... and with the proper params
+        Assert.Contains(tabItemComponentMock.firedEvents, eventName);
+        var actualParams = tabItemComponentMock.paramsSetByEvents[eventName];
+        Assert.NotUndefined(actualParams);
+        Assert.NotNull(actualParams);
+        Assert.Equal(tabItemComponentMock, actualParams.tabItem);
+    }
+    
     // -- TESTS -- //
     
     [Fixture]
@@ -61,21 +81,7 @@ Test.Components.Ui.TabItem = function() {
     	
         [Fact]
         function TestHoverEventIsFiredWithComponentAsParam() {   
-            // ARRANGE -- setup aura and component mocks
-        	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
-            var tabItemComponentMock = getTabItemComponentMock();
-        	
-            // ACT -- call target function with mocked data
-            auraMock(function(){
-               targetController.onTabItemHover(tabItemComponentMock, null, null);
-            });
-            
-            // ASSERT -- make sure that the event was fired ... and with the proper params
-            Assert.Contains(tabItemComponentMock.firedEvents, 'onTabItemHover');
-            var actualParams = tabItemComponentMock.paramsSetByEvents['onTabItemHover'];
-            Assert.NotUndefined(actualParams);
-            Assert.NotNull(actualParams);
-            Assert.Equal(tabItemComponentMock, actualParams.tabItem);
+        	testHoverEventHandlers(targetController.onTabItemHover, 'onTabItemHover');
         } 
     }
     
@@ -84,17 +90,7 @@ Test.Components.Ui.TabItem = function() {
     	
         [Fact]
         function TestUnhoverEventIsFired() {   
-            // ARRANGE -- setup aura and component mocks
-        	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
-            var tabItemComponentMock = getTabItemComponentMock();
-        	
-            // ACT -- call target function with mocked data
-            auraMock(function(){
-               targetController.onTabItemUnhover(tabItemComponentMock, null, null);
-            });
-            
-            // ASSERT -- make sure that the event was fired
-            Assert.Contains(tabItemComponentMock.firedEvents, 'onTabItemUnhover');
+        	testHoverEventHandlers(targetController.onTabItemUnhover, 'onTabItemUnhover');
         } 
     }
 }

@@ -76,6 +76,7 @@
 	},
 	
 	onTabItemUnhover: function(cmp, evt, helper) {
-		cmp.getEvent("onTabItemUnhover").fire();
+		var params = evt.getParams();
+		cmp.getEvent("onTabItemUnhover").setParams(params).fire();
 	}
 })

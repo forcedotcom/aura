@@ -64,4 +64,14 @@
 	text-decoration: underline;;
 }
 
+.THIS input{
+  padding: 12px;
+  border: 1px solid #dce4ec;
+  border-radius: 4px;
+}
+
+.THIS label {
+  padding-right: 12px;
+}
+
 /*.THIS .content .*/

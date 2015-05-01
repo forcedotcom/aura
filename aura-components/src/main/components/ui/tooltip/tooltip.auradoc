@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+		    A <code>ui:tooltip</code> component can be attached to any element or component, displaying textual information when you hover over the element.
+		    Tooltips are useful when you want to provide contextual information on a form field. For example, you can display the tooltip when users hover over an icon or when a field is focused.
+		</p>
+<pre>&lt;ui:label for="inputField" label="This tooltip shows on field focus:"/>
+&lt;ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this">
+    &lt;ui:inputText aura:id="inputField"/>
+&lt;/ui:tooltip></pre>
+		
+		<p>Setting <code>trigger="focus"</code> displays the tooltip only when the field is focused. To provide a custom trigger, set <code>trigger="none"</code> and <code>advanced="true"</code>.</p>
+<pre>&lt;ui:tooltip advanced="true" trigger="none" 
+        aura:id="theTip" 
+        tooltipBody="You have to use the advanced mode in this case.">?&lt;/ui:tooltip>
+&lt;ui:button label="Click me to show tooltip" press="{!c.handleClick}" /></pre>
+        <p>In your client-side controller, hide and display the tooltip using the <code>hide()</code> and <code>show()</code> component methods.
+        See the Examples tab for more information.</p>
+        <p>    
+		The fade animation can be customized using these attributes: <code>fadeIn</code>, <code>fadeInDuration</code>, <code>fadeOut</code>, and <code>fadeOutDuration</code>. 
+		You can also use the <code>delay</code> attribute to delay the appearance of the tooltip. By default, <code>advanced="false"</code> creates the tooltip using CSS only. 
+		Using <code>advanced="true"</code> creates the tooltip using JavaScript.
+		</p>
+	</aura:description>	
+		<aura:example name="tooltipExample1" ref="auradocs:demoTooltip" label="Displaying the Tooltip using Fade Animation">
+    	<p>This example fades the tooltip into view with a delayed appearance of 500ms when you hover over the icon.</p>
+	   </aura:example>	
+		<aura:example name="tooltipExample2" ref="uiExamples:tooltipExample" label="Using ui:tooltip">
+    	<p>This example demonstrates various ways to implement the tooltip, including manually hiding and showing the tooltip for custom implementations.</p>
+	   </aura:example>	
+</aura:documentation>

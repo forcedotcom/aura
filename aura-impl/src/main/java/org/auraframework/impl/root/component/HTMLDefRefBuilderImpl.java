@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.HtmlDefRefBuilder;
-import org.auraframework.css.FlavorRef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -88,7 +87,7 @@ public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implement
     }
 
     @Override
-    public ComponentDefRefBuilder setFlavor(FlavorRef flavor) {
+    public ComponentDefRefBuilder setFlavor(String flavor) {
        throw new UnsupportedOperationException("Cannot set flavor on an html tag");
     }
 

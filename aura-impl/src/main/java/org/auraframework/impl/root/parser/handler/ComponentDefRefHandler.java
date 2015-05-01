@@ -31,7 +31,6 @@ import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -42,10 +41,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 /**
- * Handles all references to other components. Note that while the reference to
- * the other component is created here, it is not validated until the
- * {@link ComponentDefRefImpl#validateReferences()} method is called by loading
- * registry.
+ * Handles all references to other components. Note that while the reference to the other component is created here, it
+ * is not validated until the {@link ComponentDefRefImpl#validateReferences()} method is called by loading registry.
  */
 public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTagHandler<ComponentDefRef, P> {
 
@@ -64,8 +61,8 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
     }
 
     /**
-     * this one is only used by {@link HTMLComponentDefRefHandler}, which passes
-     * in the descriptor, the one above can't use it cause of java stupidness
+     * this one is only used by {@link HTMLComponentDefRefHandler}, which passes in the descriptor, the one above can't
+     * use it cause of java stupidness
      */
     protected ComponentDefRefHandler(RootTagHandler<P> parentHandler, DefDescriptor<ComponentDef> descriptor,
             XMLStreamReader xmlReader, Source<?> source) {
@@ -104,8 +101,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         String flavor = getSystemAttributeValue("flavor");
         if (!AuraTextUtil.isNullEmptyOrWhitespace(flavor)) {
-            DefDescriptor<ComponentDef> flavoredCmp = builder.getDescriptor();
-            builder.setFlavor(Flavors.buildFlavorRef(flavoredCmp, flavor));
+            builder.setFlavor(flavor);
         }
     }
 

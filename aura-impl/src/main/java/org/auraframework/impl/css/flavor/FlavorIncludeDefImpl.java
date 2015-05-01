@@ -16,15 +16,11 @@
 package org.auraframework.impl.css.flavor;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.FlavorRef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -32,195 +28,92 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.expression.Expression;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> implements FlavorIncludeDef {
-    private static final long serialVersionUID = 5695464798233444175L;
+    private static final long serialVersionUID = -1770409815240347647L;
+    private static final String ERROR_MSG = "The 'source' attribute must take the format of ns:bundle, e.g., 'myNamespace:flavors'";
 
-    private final ComponentFilter componentFilter;
-    private final FlavorFilter flavorFilter;
-    private final Mode mode;
-    private final Expression context;
+    private final String source;
+    private final String namespace;
+    private final String bundle;
+    private final DescriptorFilter filter;
     private final int hashCode;
-
-    private QuickFixException error;
-
-    private enum Mode {
-        /**
-         * <aura:flavor component="foo:bar" flavor="standard" /> <br>
-         * <aura:flavor component="foo:bar" flavor="ns:custom" />
-         */
-        SINGLE_CMP,
-        /**
-         * <aura:flavor component="foo:bar" flavor="~fuzzy"/>
-         */
-        FUZZY_SINGLE_CMP,
-        /**
-         * <aura:flavor component="*" flavor="standard"/>
-         */
-        STANDARD_GLOB,
-        /**
-         * <aura:flavor component="*" flavor="ns:custom"/>
-         */
-        CUSTOM_GLOB,
-        /**
-         * <aura:flavor component="*" flavor="~fuzzy"/>
-         */
-        FUZZY_GLOB;
-    }
 
     public FlavorIncludeDefImpl(Builder builder) throws InvalidDefinitionException {
         super(builder);
+        this.source = builder.source;
 
-        this.componentFilter = new ComponentFilter(builder.component);
-        this.flavorFilter = new FlavorFilter(builder.flavor, builder.parentDescriptor.getNamespace());
-        this.context = builder.context;
-
-        if (flavorFilter.isFuzzy) {
-            if (componentFilter.singleMatch.isPresent()) {
-                mode = Mode.FUZZY_SINGLE_CMP;
-            } else {
-                mode = Mode.FUZZY_GLOB;
-            }
-        } else if (componentFilter.singleMatch.isPresent()) {
-            mode = Mode.SINGLE_CMP;
-        } else if (flavorFilter.isCustomFlavorMatch) {
-            mode = Mode.CUSTOM_GLOB;
-        } else {
-            mode = Mode.STANDARD_GLOB;
+        String[] split = source.split(":");
+        if (split.length != 2) {
+            throw new InvalidDefinitionException(ERROR_MSG, getLocation());
         }
 
-        this.hashCode = AuraUtil.hashCode(descriptor, location, componentFilter.raw, flavorFilter.raw);
+        namespace = split[0];
+        bundle = split[1];
+
+        String fmt = String.format("%s://%s:*", DefDescriptor.CUSTOM_FLAVOR_PREFIX, namespace);
+        this.filter = new DescriptorFilter(fmt, DefType.FLAVORED_STYLE);
+
+        this.hashCode = AuraUtil.hashCode(descriptor, location, source);
     }
 
     @Override
-    public Map<DefDescriptor<ComponentDef>, FlavorRef> computeFilterMatches(boolean findDeps) throws QuickFixException {
-        Map<DefDescriptor<ComponentDef>, FlavorRef> map = new HashMap<>();
+    public String getSource() {
+        return source;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<DefDescriptor<FlavoredStyleDef>> getDefs() {
         AuraContext context = Aura.getContextService().getCurrentContext();
         MasterDefRegistry mdr = context.getDefRegistry();
 
-        if (mode == Mode.SINGLE_CMP) {
-            DefDescriptor<ComponentDef> flavored = componentFilter.singleMatch.get();
-            // using buildFlavorRef because it handles various reference patterns
-            FlavorRef flavor = Flavors.buildFlavorRef(flavored, flavorFilter.raw);
-            flavor.verifyReference(); // single matches point to specific flavors that we can verify
-            map.put(flavored, flavor);
-            return map;
-        } else if (mode == Mode.FUZZY_SINGLE_CMP) {
-            DefDescriptor<ComponentDef> flavored = componentFilter.singleMatch.get();
-            DefDescriptor<FlavoredStyleDef> style = Flavors.
-                    customFlavorDescriptor(flavored, flavorFilter.namespace, FlavorFilter.BUNDLE);
-            if (style.exists() && flavorFilter.matches(style)) {
-                map.put(flavored, new FlavorRefImpl(style, flavorFilter.name));
-            } else {
-                style = Flavors.standardFlavorDescriptor(flavored);
-                if (style.exists() && flavorFilter.matches(style)) {
-                    map.put(flavored, new FlavorRefImpl(style, flavorFilter.name));
-                }
+        List<DefDescriptor<FlavoredStyleDef>> defs = new ArrayList<>();
+
+        for (DefDescriptor<?> dd : mdr.find(filter)) {
+            // currently getBundle will only work with file-based, unless the other loaders also set the bundle
+            if (dd.getDefType() == DefType.FLAVORED_STYLE && dd.getBundle().getName().equals(bundle)) {
+                defs.add((DefDescriptor<FlavoredStyleDef>) dd);
             }
         }
 
-        if (mode == Mode.CUSTOM_GLOB || mode == Mode.FUZZY_GLOB) {
-            String fmt = String.format("%s://%s:*", DefDescriptor.CUSTOM_FLAVOR_PREFIX, flavorFilter.namespace);
-            DescriptorFilter df = new DescriptorFilter(fmt, DefType.FLAVORED_STYLE);
+        return defs;
+    }
 
-            // this depends on #find returning descriptors with the bundle set (as of now only true for file-based)
-            for (DefDescriptor<?> potentialMatch : mdr.find(df)) {
-                if (potentialMatch.getDefType() == DefType.FLAVORED_STYLE) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<FlavoredStyleDef> style = (DefDescriptor<FlavoredStyleDef>) potentialMatch;
-                    DefDescriptor<ComponentDef> cmp = Flavors.toComponentDescriptor(style);
+    @Override
+    public Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> computeFlavorMapping()
+            throws QuickFixException {
+        Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> table = HashBasedTable.create();
 
-                    if (componentFilter.matches(cmp) && flavorFilter.matches(style)) {
-                        map.put(cmp, new FlavorRefImpl(style, flavorFilter.name));
-                    }
-                }
+        for (DefDescriptor<FlavoredStyleDef> style : getDefs()) {
+            DefDescriptor<ComponentDef> cmp = Flavors.toComponentDescriptor(style);
+            Set<String> flavorNames = style.getDef().getFlavorNames();
+            for (String name : flavorNames) {
+                table.put(cmp, name, style);
             }
         }
 
-        // todo findDeps is bad, this whole thing is bad, but should still work for now as all of these things will be
-        // in the deps for the app anyway.
-        if ((mode == Mode.STANDARD_GLOB || mode == Mode.FUZZY_GLOB) && !findDeps) {
-            // fuzzy matches for standard flavors requires an application for its deps-- trying to use find over all
-            // namespaces and components would be too inefficient
-            DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
-            if (appDesc != null) {
-                String uid = context.getUid(appDesc);
-                for (DefDescriptor<?> dep : mdr.getDependencies(uid)) {
-                    if (dep.getDefType() == DefType.FLAVORED_STYLE && dep.getPrefix().equals(DefDescriptor.CSS_PREFIX)) {
-                        @SuppressWarnings("unchecked")
-                        DefDescriptor<FlavoredStyleDef> style = (DefDescriptor<FlavoredStyleDef>) dep;
-                        DefDescriptor<ComponentDef> cmp = Aura.getDefinitionService().getDefDescriptor(style,
-                                DefDescriptor.MARKUP_PREFIX, ComponentDef.class);
-
-                        if (componentFilter.matches(cmp) && flavorFilter.matches(style)) {
-                            if (mode != Mode.FUZZY_GLOB || !map.containsKey(cmp)) {
-                                map.put(cmp, Flavors.buildFlavorRef(cmp, flavorFilter.name));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return map;
+        return table;
     }
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        try {
-            // all accessed/loaded defs will be counted as a dependency by MDR, so even though this will restrict to
-            // flavored style defs with a matching flavor name, the non-matching flavored style def will still be
-            // included in app.css since the MDR will add it as a dependency. So we'll need to remove the CSS for
-            // flavors that aren't used, which we need to do anyway.
-            for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : computeFilterMatches(true).entrySet()) {
-                dependencies.add(entry.getKey());
-                dependencies.add(entry.getValue().getFlavoredStyleDescriptor());
-            }
-        } catch (QuickFixException qfe) {
-            this.error = qfe;
-        }
-    }
-
-    @Override
-    public void validateReferences() throws QuickFixException {
-        if (error != null) {
-            throw error; // from appendDeps (stupid, yes, but better than requiring each flavor in a separate file.
-        }
+        dependencies.addAll(getDefs());
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-
-        try {
-            for (Entry<DefDescriptor<ComponentDef>, FlavorRef> entry : computeFilterMatches(false).entrySet()) {
-                json.writeMapKey(entry.getKey().getQualifiedName());
-                json.writeMapBegin();
-                json.writeMapEntry("flavor", entry.getValue().toStringReference());
-                if (context != null) {
-                    json.writeMapEntry("context", context);
-                }
-                json.writeMapEnd();
-            }
-        } catch (QuickFixException e) {
-            throw new AuraRuntimeException(e);
-        }
-
-        json.writeMapEnd();
     }
 
     @Override
@@ -230,12 +123,11 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof FlavorIncludeDefImpl) {
+        if (obj instanceof FlavorIncludeDef) {
             FlavorIncludeDefImpl other = (FlavorIncludeDefImpl) obj;
             return Objects.equal(descriptor, other.descriptor)
                     && Objects.equal(location, other.location)
-                    && Objects.equal(componentFilter.raw, other.componentFilter.raw)
-                    && Objects.equal(flavorFilter.raw, other.flavorFilter.raw);
+                    && Objects.equal(source, other.source);
         }
 
         return false;
@@ -247,119 +139,23 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             super(FlavorIncludeDef.class);
         }
 
+        @SuppressWarnings("unused")
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
-        private String component;
-        private String flavor;
-        private Expression context;
+        private String source;
 
         public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
             return this;
         }
 
-        public Builder setComponentFilter(String component) {
-            this.component = component.trim();
+        public Builder setSource(String source) {
+            this.source = source;
             return this;
-        }
-
-        public Builder setFlavorFilter(String flavor) {
-            this.flavor = flavor.trim();
-            return this;
-        }
-
-        public void setContext(Expression context) throws InvalidDefinitionException {
-            this.context = context;
         }
 
         @Override
-        public FlavorIncludeDefImpl build() throws InvalidDefinitionException {
+        public FlavorIncludeDef build() throws InvalidDefinitionException {
             return new FlavorIncludeDefImpl(this);
-        }
-    }
-
-    /** matcher for the "component" filter attribute */
-    private static final class ComponentFilter implements Serializable {
-        private static final long serialVersionUID = 6005876851032097896L;
-        private static final String ANY = "*";
-
-        private final String raw;
-        private final DescriptorFilter filter;
-        private final Optional<DefDescriptor<ComponentDef>> singleMatch;
-
-        public ComponentFilter(String rawComponentFilter) {
-            this.raw = rawComponentFilter;
-            if (rawComponentFilter.equals(ANY)) { // match any component
-                filter = new DescriptorFilter("markup://*:*", DefType.COMPONENT);
-                singleMatch = Optional.absent();
-            } else if (rawComponentFilter.contains(ANY)) { // match glob pattern
-                filter = new DescriptorFilter("markup://" + rawComponentFilter, DefType.COMPONENT);
-                singleMatch = Optional.absent();
-            } else { // match single component
-                filter = new DescriptorFilter("markup://" + rawComponentFilter, DefType.COMPONENT);
-                singleMatch = Optional.of(Aura.getDefinitionService().getDefDescriptor(rawComponentFilter, ComponentDef.class));
-            }
-
-        }
-
-        public boolean matches(DefDescriptor<ComponentDef> componentDescriptor) {
-            return filter.matchDescriptor(componentDescriptor);
-        }
-    }
-
-    /** matcher for the "flavor" filter attribute */
-    private static final class FlavorFilter implements Serializable {
-        private static final long serialVersionUID = 6662040779818236425L;
-        private static final String BUNDLE = "flavors";
-        private static final char FUZZY = '~';
-
-        private final String name;
-        private final String bundle;
-        private final String namespace;
-        private final String raw;
-
-        private final boolean isFuzzy;
-        private final boolean isCustomFlavorMatch;
-
-        public FlavorFilter(String rawFlavorFilter, String implicitNamespace) {
-            this.raw = rawFlavorFilter;
-
-            String[] split = rawFlavorFilter.split(":");
-            if (split.length == 1) {
-                bundle = null;
-                if (split[0].charAt(0) == FUZZY) {
-                    namespace = implicitNamespace;
-                    name = split[0].substring(1);
-                    isFuzzy = true;
-                } else {
-                    namespace = null;
-                    name = split[0];
-                    isFuzzy = false;
-                }
-            } else if (split.length == 2) {
-                namespace = split[0];
-                bundle = BUNDLE;
-                name = split[1];
-                isFuzzy = false;
-            } else if (split.length == 3) {
-                namespace = split[0];
-                bundle = split[1];
-                name = split[2];
-                isFuzzy = false;
-            } else {
-                throw new AuraRuntimeException("unable to parse flavor reference");
-            }
-
-            isCustomFlavorMatch = (namespace != null && bundle != null);
-        }
-
-        public boolean matches(DefDescriptor<FlavoredStyleDef> style) throws QuickFixException {
-            if (this.bundle != null) {
-                if (style.getBundle() == null || !style.getBundle().getName().equals(this.bundle)) {
-                    return false;
-                }
-            }
-
-            return style.getDef().getFlavorNames().contains(this.name);
         }
     }
 }

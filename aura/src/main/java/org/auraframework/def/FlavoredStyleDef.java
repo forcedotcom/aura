@@ -17,8 +17,6 @@ package org.auraframework.def;
 
 import java.util.Set;
 
-import org.auraframework.css.FlavorRef;
-
 /**
  * Similar to {@link StyleDef}, except this represents CSS that contains <em>flavors</em>.
  * <p>

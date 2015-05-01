@@ -153,6 +153,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case DESIGN_TEMPLATE_REGION:
             case INCLUDE_REF:
             case FLAVOR_INCLUDE:
+            case FLAVOR_DEFAULT:
                 name = qualifiedName;
                 break;
             case APPLICATION:

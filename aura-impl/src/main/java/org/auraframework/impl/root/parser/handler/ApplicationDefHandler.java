@@ -158,13 +158,13 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         String defaultFlavors = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVORS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavors)) {
             DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getInstance(defaultFlavors, FlavorAssortmentDef.class);
-            builder.setDefaultFlavorsDescriptor(flavors);
+            builder.setFlavorAssortmentDescriptor(flavors);
         } else {
             // see if there is a flavor assortment file in the app bundle
             DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(),
                     FlavorAssortmentDef.class, DefDescriptor.MARKUP_PREFIX);
             if (flavors.exists()) {
-                builder.setDefaultFlavorsDescriptor(flavors);
+                builder.setFlavorAssortmentDescriptor(flavors);
             }
         }
     }

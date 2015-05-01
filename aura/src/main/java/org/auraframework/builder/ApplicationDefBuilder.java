@@ -37,5 +37,5 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
     /**
      * Specifies the {@link FlavorAssortmentDef} containing the flavors to use as defaults.
      */
-    ApplicationDefBuilder setDefaultFlavorsDescriptor(DefDescriptor<FlavorAssortmentDef> defaultFlavors);
+    ApplicationDefBuilder setFlavorAssortmentDescriptor(DefDescriptor<FlavorAssortmentDef> flavors);
 }

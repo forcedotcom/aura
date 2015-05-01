@@ -21,14 +21,12 @@ import java.util.List;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.css.FlavorRef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
@@ -142,14 +140,13 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testReadFlavorAttribute() throws Exception {
-        cdrHandler = createComponentDefHandler("<fake:component aura:flavor='test.fake'/>");
+        cdrHandler = createComponentDefHandler("<fake:component aura:flavor='fake'/>");
         cdrHandler.readSystemAttributes();
         cdrHandler.createDefinition();
 
         DefDescriptor<ComponentDef> dd = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
-        FlavorRef expected = Flavors.buildFlavorRef(dd, "test.fake");
 
-        assertEquals(expected, cdrHandler.createDefinition().getFlavor());
+        assertEquals("fake", cdrHandler.createDefinition().getFlavor());
     }
 
     private ComponentDefRefHandler<?> createComponentDefHandler(String markup) throws Exception {

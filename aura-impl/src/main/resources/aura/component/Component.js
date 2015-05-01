@@ -37,8 +37,8 @@ var ComponentPriv = (function() { // Scoping priv
             this.flavorable = true;
         }
 
-        if (config["flavorReference"]) {
-            this.flavorReference = config["flavorReference"];
+        if (config["flavor"]) {
+            this.flavor = config["flavor"];
         }
 
         var context = $A.getContext();
@@ -227,6 +227,7 @@ var ComponentPriv = (function() { // Scoping priv
         vp["this"]=cmp;
         vp["globalid"]=cmp.getGlobalId();
         vp["def"]=this.componentDef;
+        vp["style"]=this.createStyleValueProvider(cmp);
         vp["super"]=this.superComponent;
         vp["null"]=null;
 
@@ -254,6 +255,20 @@ var ComponentPriv = (function() { // Scoping priv
                 }
             };
         }
+    };
+
+    ComponentPriv.prototype.createStyleValueProvider = function(cmp) {
+        return {
+            get: function(key) {
+                if (key === "name") {
+                    var styleDef = cmp.getDef().getStyleDef();
+                    return !$A.util.isUndefinedOrNull(styleDef) ? styleDef.getClassName() : null;
+                } else if (key === "flavor") {
+                    var flavor = cmp.getFlavor();
+                    return !$A.util.isUndefinedOrNull(flavor) ? $A.util.buildFlavorClass(cmp, flavor) : null;
+                }
+            }
+        };
     };
 
     /**
@@ -446,7 +461,7 @@ if(!this.concreteComponentId) {
                     var cdr = {};
                     cdr["componentDef"] = value[i]["componentDef"];
                     cdr["localId"] = value[i]["localId"];
-                    cdr["flavorReference"] = value[i]["flavorReference"];
+                    cdr["flavor"] = value[i]["flavor"];
                     cdr["attributes"] = value[i]["attributes"];
                     cdr["valueProvider"] = value[i]["valueProvider"] || config["valueProvider"];
 //JBUCH: HALO: TODO: SOMETHING LIKE THIS TO FIX DEFERRED COMPDEFREFS?
@@ -936,7 +951,7 @@ if(!this.concreteComponentId) {
                         return { "$serRefId": c };
                     }
                 }
-                
+
                 value["$serId"] = length;
                 serialized.push(value);
             }
@@ -1811,14 +1826,7 @@ Component.prototype.associateElement = function(element) {
         }
 
         priv.elements.push(element);
-
         priv.associateRenderedBy(this, element);
-
-        if (priv.flavorable) {
-            if (!$A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
-        		$A.util.setDataAttribute(element, $A.componentService.flavorable, true);
-        	}
-        }
     }
 };
 
@@ -2428,7 +2436,7 @@ Component.prototype.isFlavorable = function() {
  * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
  */
 Component.prototype.getFlavor = function() {
-	return this.priv.flavorReference || this.getDef().getDefaultFlavor();
+	return this.priv.flavor || this.getDef().getDefaultFlavor();
 };
 
 /**

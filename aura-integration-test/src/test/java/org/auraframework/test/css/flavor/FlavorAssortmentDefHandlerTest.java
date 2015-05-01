@@ -15,13 +15,8 @@
  */
 package org.auraframework.test.css.flavor;
 
-import java.util.List;
-
-import org.auraframework.def.*;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-
-import com.google.common.collect.Iterables;
 
 public class FlavorAssortmentDefHandlerTest extends StyleTestCase {
 
@@ -45,24 +40,5 @@ public class FlavorAssortmentDefHandlerTest extends StyleTestCase {
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "No literal text");
         }
-    }
-
-    public void testFlavorIncludes() throws Exception {
-        DefDescriptor<ComponentDef> cmp1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        DefDescriptor<ComponentDef> cmp2 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-
-        addStandardFlavor(cmp1, "@flavor test;");
-        addStandardFlavor(cmp2, "@flavor test2;");
-
-        String src = "<aura:flavors>"
-                + String.format("<aura:flavor component='%s' flavor='test'/>", cmp1.getDescriptorName())
-                + String.format("<aura:flavor component='%s' flavor='test2'/>", cmp2.getDescriptorName())
-                + "</aura:flavors>";
-        DefDescriptor<FlavorAssortmentDef> fa = addFlavorAssortment(src);
-
-        List<FlavorIncludeDef> flavorIncludes = fa.getDef().getFlavorIncludeDefs();
-        assertEquals("did not find the right number of flavors", 2, flavorIncludes.size());
-        assertEquals("test", Iterables.getOnlyElement(flavorIncludes.get(0).computeFilterMatches(false).values()).getFlavorName());
-        assertEquals("test2", Iterables.getOnlyElement(flavorIncludes.get(1).computeFilterMatches(false).values()).getFlavorName());
     }
 }

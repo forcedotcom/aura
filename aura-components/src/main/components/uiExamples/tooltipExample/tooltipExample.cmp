@@ -65,7 +65,6 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
         </div>
         <div class="section custom">
             <h2>But I want to do things my own way</h2>
-            <p>Don't click the following button</p>
             <p>
                 <ui:tooltip advanced="true" trigger="none" aura:id="theTip" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">?
                 </ui:tooltip>Click the button

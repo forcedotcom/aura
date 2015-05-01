@@ -71,12 +71,10 @@
 	},
 	
 	onTabItemHover: function(cmp, evt, helper) {
-		var params = evt.getParams();
-		cmp.getEvent("onTabItemHover").setParams(params).fire();
+		cmp.getEvent("onTabItemHover").setParams(evt.getParams()).fire();
 	},
 	
 	onTabItemUnhover: function(cmp, evt, helper) {
-		var params = evt.getParams();
-		cmp.getEvent("onTabItemUnhover").setParams(params).fire();
+		cmp.getEvent("onTabItemUnhover").setParams(evt.getParams()).fire();
 	}
 })

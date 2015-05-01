@@ -40,5 +40,15 @@
                 closeEl.setAttribute("tabindex", -1);
             }
 		}
+	},
+	
+	handleHoverEvent: function(cmp, eventName) {
+		var event = cmp.getEvent(eventName);		
+		// Set this tabItem component as a param in the event
+		var params = {
+			tabItem : cmp
+		};
+		event.setParams(params);
+		event.fire();
 	}
 })

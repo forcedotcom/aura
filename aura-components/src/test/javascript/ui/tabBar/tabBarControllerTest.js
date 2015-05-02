@@ -78,21 +78,21 @@ Test.Components.Ui.TabBar = function() {
     
     // -- TESTS -- //
     
-	  [Fixture]
-	  function testOnTabItemHover(){
+	[Fixture]
+	function testOnTabHover(){
 	  	
-	      [Fact]
-	      function TestHoverEventIsFiredWithComponentAsParam() {   
-	    	  testHoverEventHandlers(targetController.onTabItemHover, 'onTabItemHover');
-	      } 
-	  }
+	    [Fact]
+	    function TestHoverEventIsFiredWithComponentAsParam() {   
+	  	  testHoverEventHandlers(targetController.onTabHover, 'onTabHover');
+	    } 
+    }
     
     [Fixture]
-    function testOnTabItemUnhover(){
+    function testOnTabUnhover(){
     	
         [Fact]
         function TestUnhoverEventIsFired() {   
-        	testHoverEventHandlers(targetController.onTabItemUnhover, 'onTabItemUnhover');
+        	testHoverEventHandlers(targetController.onTabUnhover, 'onTabUnhover');
         } 
     }
 }

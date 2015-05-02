@@ -76,7 +76,7 @@ Test.Components.Ui.TabItem = function() {
             var actualParams = tabItemComponentMock.paramsSetByEvents[eventName];
             Assert.NotUndefined(actualParams);
             Assert.NotNull(actualParams);
-            Assert.Equal(tabItemComponentMock, actualParams.tabItem);
+            Assert.Equal(tabItemComponentMock, actualParams.tabComponent);
         } 
     }
 }

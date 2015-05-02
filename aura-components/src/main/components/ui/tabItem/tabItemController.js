@@ -35,11 +35,11 @@
 		$A.util.squash(evt, true);
 	},
 	
-	onTabItemHover: function(cmp, evt, helper) {
-		helper.handleHoverEvent(cmp, 'onTabItemHover');
+	onTabHover: function(cmp, evt, helper) {
+		helper.handleHoverEvent(cmp, 'onTabHover');
 	},
 	
-	onTabItemUnhover: function(cmp, evt, helper) {
-		helper.handleHoverEvent(cmp, 'onTabItemUnhover');
+	onTabUnhover: function(cmp, evt, helper) {
+		helper.handleHoverEvent(cmp, 'onTabUnhover');
 	}
 })

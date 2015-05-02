@@ -70,11 +70,11 @@
 		cmp.get("e.onTabClosed").setParams({"index": index}).fire();
 	},
 	
-	onTabItemHover: function(cmp, evt, helper) {
-		cmp.getEvent("onTabItemHover").setParams(evt.getParams()).fire();
+	onTabHover: function(cmp, evt, helper) {
+		cmp.getEvent("onTabHover").setParams(evt.getParams()).fire();
 	},
 	
-	onTabItemUnhover: function(cmp, evt, helper) {
-		cmp.getEvent("onTabItemUnhover").setParams(evt.getParams()).fire();
+	onTabUnhover: function(cmp, evt, helper) {
+		cmp.getEvent("onTabUnhover").setParams(evt.getParams()).fire();
 	}
 })

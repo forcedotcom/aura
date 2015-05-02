@@ -46,7 +46,7 @@
 		var event = cmp.getEvent(eventName);		
 		// Set this tabItem component as a param in the event
 		var params = {
-			tabItem : cmp
+			tabComponent : cmp
 		};
 		event.setParams(params);
 		event.fire();

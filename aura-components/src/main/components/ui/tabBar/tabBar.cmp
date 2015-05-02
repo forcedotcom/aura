@@ -24,8 +24,8 @@
     <aura:registerevent name="closeTab" type="ui:tabsetEvent" description="This event is fired from parent component to close a tab item." />
     <aura:registerevent name="onTabClosed" type="ui:tabsetEvent" description="This event is fired when the close icon is clicked." />
     <aura:registerevent name="onTabActivated" type="ui:tabsetEvent" description="This event is fired when the tab item is clicked." />
-    <aura:registerevent name="onTabItemHover" type="ui:onTabItemHover" description="The event is fired when the mouse moves over a tab item or when a tab item is put in tab focus." />
-    <aura:registerevent name="onTabItemUnhover" type="ui:onTabItemUnhover" description="The event is fired when the mouse moves off of a tab item or when tab focus is moved away from a tab item." /> 
+    <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab item or when a tab item is put in tab focus." />
+    <aura:registerevent name="onTabUnhover" type="ui:onTabUnhover" description="The event is fired when the mouse moves off of a tab item or when tab focus is moved away from a tab item." /> 
      
     <aura:handler name="setActive" action="{!c.setActive}" />
     <aura:handler name="addTab" action="{!c.addTab}" />

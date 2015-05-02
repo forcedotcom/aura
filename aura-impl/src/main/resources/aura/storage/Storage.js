@@ -35,14 +35,10 @@ var AuraStorage = function AuraStorage(config) {
         + this.adapter.getName() + "\", maxSize: " + this.maxSize + ", defaultExpiration: " + this.defaultExpiration
         + ", defaultAutoRefreshInterval: " + this.defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + ", debugLoggingEnabled: " + this.debugLoggingEnabled + " }");
 
-    if (clearStorageOnInit === true) {
-        this.log("clearing " + this.getName() + " storage on init");
-        this.adapter.clear();
-    }
-
     // work around the obfuscation logic to allow external Adapters to properly plug in
     this.adapter.clear = this.adapter.clear || this.adapter["clear"];
     this.adapter.getExpired = this.adapter.getExpired || this.adapter["getExpired"];
+    this.adapter.sweep = this.adapter.sweep || this.adapter["sweep"];
     this.adapter.getItem = this.adapter.getItem || this.adapter["getItem"];
     this.adapter.getName = this.adapter.getName || this.adapter["getName"];
     this.adapter.getSize = this.adapter.getSize || this.adapter["getSize"];
@@ -58,6 +54,11 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter["getItem"] = this.adapter.getItem;
     this["adapter"] = this.adapter;
     //#end
+
+    if (clearStorageOnInit === true) {
+        this.log("clearing " + this.getName() + " storage on init");
+        this.adapter.clear();
+    }
 };
 
 /**
@@ -139,7 +140,7 @@ AuraStorage.prototype.getAll = function() {
                 // then only replace first occurrence
                 key = item["key"].replace(that.version, "");
             }
-            return { "key": key, "value": item["value"], "isExpired": (new Date().getTime() > item.expires) };
+            return { "key": key, "value": item["value"], "isExpired": (new Date().getTime() > item["expires"]) };
         });
     });
 };
@@ -201,34 +202,37 @@ AuraStorage.prototype.sweep = function() {
     }
 
     var that = this;
+    if (this.adapter.sweep) {
+        this.adapter.sweep();
+    } else {
+        // Check simple expirations
+        this.adapter.getExpired().then(function (expired) {
 
-    // Check simple expirations
-    this.adapter.getExpired().then(function (expired) {
-
-        if (expired.length === 0) {
-            return;
-        }
-
-        var promiseSet = [];
-        var key;
-        for (var n = 0; n < expired.length; n++) {
-            key = expired[n];
-            that.log("sweep() - expiring item with key: " + key);
-            promiseSet.push(that.remove(key, true));
-        }
-
-        // When all of the remove promises have completed...
-        Promise.all(promiseSet).then(
-            function () {
-                that.log("sweep() - complete");
-                that.lastSweep = new Date().getTime();
-                $A.storageService.fireModified();
-            },
-            function (err) {
-                that.log("Error while sweep() was removing items: " + err);
+            if (expired.length === 0) {
+                return;
             }
-        );
-    });
+
+            var promiseSet = [];
+            var key;
+            for (var n = 0; n < expired.length; n++) {
+                key = expired[n];
+                that.log("sweep() - expiring item with key: " + key);
+                promiseSet.push(that.remove(key, true));
+            }
+
+            // When all of the remove promises have completed...
+            Promise.all(promiseSet).then(
+                function () {
+                    that.log("sweep() - complete");
+                    that.lastSweep = new Date().getTime();
+                    $A.storageService.fireModified();
+                },
+                function (err) {
+                    that.log("Error while sweep() was removing items: " + err);
+                }
+            );
+        });
+    }
 };
 
 /**

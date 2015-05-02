@@ -50,7 +50,8 @@ TransportMetricsPlugin.prototype = {
                     auraNum  = config["params"]["aura.num"];
                 startMark["context"] = {
                     "aura.num"      : auraNum,
-                    "requestLength" : config["params"]["message"] && config["params"]["message"].length
+                    "requestLength" : config["params"]["message"] && config["params"]["message"].length,
+                    "actionDefs"    : config["actionDefs"]
                 };
 
                 config["callback"] = function (xhr) {
@@ -85,9 +86,10 @@ TransportMetricsPlugin.prototype = {
             } else if (phase === 'start') {
                 queue[id] = transportMarks[i];
             } else if (phase === 'end' && queue[id]){
-                var mark = queue[id];
+                var mark = $A.util.apply({}, queue[id], true, true);
                 mark["context"]  = $A.util.apply(mark["context"], transportMarks[i]["context"]);
                 mark["duration"] = transportMarks[i]["ts"] - mark["ts"];
+                mark["phase"]    = 'processed';
                 procesedMarks.push(mark);
                 delete queue[id];
             }

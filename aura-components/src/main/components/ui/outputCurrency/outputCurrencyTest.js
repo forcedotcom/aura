@@ -18,9 +18,16 @@
      * Positive test case: Assign Negative value for attribute 'value'.
      */
     testNegativeValue:{
+    	labels : [ "UnAdaptableTest" ],
         attributes: {value : -123},
         test: function(component){
-            aura.test.assertEquals('($123.00)', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
+        	var val = $A.test.getText(component.find('span').getElement());
+        	
+        	// ICU4J 4.6.1 negative values are (value) -- Aura
+        	// ICU4J 55.1  negative values are -value  -- SFDC
+        	var isPass = val === "($123.00)" || val === "-$123.00";
+        	
+            aura.test.assertTrue(isPass, "Negative values not displayed correctly: '(value)' or '-value'. Actual is '" + val + "'");
         }
     },
     /**

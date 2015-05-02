@@ -24,9 +24,9 @@ function FlavorAssortmentDef(config) {
     this.flavors = []; // ordered by reverse so that last declared wins
     this.cache = {};
 
-    var flavorIncludeDefs = config["flavorIncludeDefs"];
-    for(var i = flavorIncludeDefs.length - 1; i >= 0; i--) { // reverse ordering
-        this.flavors.push(new FlavorIncludeDef(flavorIncludeDefs[i]));
+    var flavorDefaultDefs = config["flavorDefaultDefs"];
+    for(var i = flavorDefaultDefs.length - 1; i >= 0; i--) { // reverse ordering so last one wins
+        this.flavors.push(new FlavorDefaultDef(flavorDefaultDefs[i]));
     }
 }
 

@@ -1,0 +1,120 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS.tooltip-trigger {
+	cursor: pointer;
+	display: inline;
+	position: relative;
+}
+
+.THIS.tooltip-wrapper {
+	display: inline;
+	position: relative;
+}
+
+.THIS.tooltip-basic {
+	position: relative;
+}
+
+.THIS.tooltip-advanced {
+	display: none;
+}
+
+.THIS.tooltip {
+	width: intrinsic;
+  	width: -moz-max-content;   
+  	width: -webkit-max-content;
+  	position: absolute;
+  	pointer-events: none;
+}
+
+.THIS .wrapper {
+	box-sizing: border-box;
+	position: absolute;
+	display: block;
+	visibility: hidden;
+	bottom: 100%;
+	left: 50%;
+	width: intrinsic;
+  	width: -moz-max-content;   
+  	width: -webkit-max-content;
+  	max-width: 300px;
+  	transform-origin: bottom left;
+  	transform: translateX(-50%) translateY(-18px);
+  	pointer-events: none;
+  	text-indent: 0;
+}
+
+.THIS.tooltip-basic.fade-out .wrapper,
+.THIS.tooltip.fade-out .wrapper {
+	opacity: 0;
+	visibility: visible;
+}
+
+.THIS .content {
+	padding: 12px;
+	box-sizing: border-box;
+	border-radius: 5px;
+	background-color: #16325c;
+	color: white;
+	display: block;
+	pointer-events: none;
+
+	/* overrides necessary because parent might mess this all up */
+	font-family: SalesforceSans-Regular;
+	font-weight: normal;
+	line-height: 1.5em;
+	font-size: 12px;
+	text-indent: 0;
+	
+}
+
+.THIS.tooltip-basic:hover .wrapper,
+.THIS.tooltip.visible .wrapper {
+	visibility: visible;
+	opacity: 1;
+}
+
+.THIS.tooltip-basic.fade-in .wrapper,
+.THIS.tooltip.fade-in .wrapper {
+	opacity: 0;
+}
+
+.THIS.tooltip-basic.fade-out .wrapper,
+.THIS.tooltip.fade-out .wrapper {
+	transition: opacity 0.5s ease-out;
+}
+
+.THIS.tooltip-basic.fade-out:hover .wrapper,
+.THIS.tooltip.fade-out.visible .wrapper {
+	transition: none;
+}
+
+.THIS.tooltip-basic.fade-in:hover .wrapper,
+.THIS.tooltip.fade-in.visible .wrapper {
+	opacity: 1;
+	transition: opacity 0.5s ease-out;
+}
+
+.THIS .pointer {
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	transform-origin: center center;
+	background-color: #16325c;
+	left: 50%;
+	bottom: 0;
+	transform: translateX(-50%) translateY(7px) rotate(-45deg);
+}

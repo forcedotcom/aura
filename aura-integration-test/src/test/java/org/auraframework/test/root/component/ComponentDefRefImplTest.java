@@ -29,15 +29,10 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.css.flavor.FlavorRefImpl;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 
@@ -304,93 +299,93 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
                 vendor.makeLocation("fakefilename", 10, 10, 0)));
     }
 
-    public void testValidatesFlavorName() throws Exception {
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component><div aura:flavorable='true'></div></aura:component>");
-        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(cmp);
-        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
+//    public void testValidatesFlavorName() throws Exception {
+//        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component><div aura:flavorable='true'></div></aura:component>");
+//        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(cmp);
+//        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
+//
+//        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+//        builder.setDescriptor(cmp);
+//        builder.setLocation(vendor.getLocation());
+//        builder.setFlavor(new FlavorRefImpl(flavor, "wallmaria"));
+//
+//        try {
+//            builder.build().validateReferences();
+//            fail("expected to get an exception");
+//        } catch (Exception e) {
+//            checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
+//        }
+//    }
+//
+//    public void testValidatesComponentIsFlavorable() throws Exception {
+//        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+//        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(cmp);
+//        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
+//
+//        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+//        builder.setDescriptor(cmp);
+//        builder.setLocation(vendor.getLocation());
+//        builder.setFlavor(new FlavorRefImpl(flavor, "test"));
+//
+//        try {
+//            builder.build().validateReferences();
+//            fail("expected to get an exception");
+//        } catch (Exception e) {
+//            checkExceptionContains(e, InvalidDefinitionException.class, "does not have any flavorable");
+//        }
+//    }
+//
+//    public void testValidatesComponentToFlavorIsNotIntf() throws Exception {
+//        DefDescriptor<InterfaceDef> intf = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface></aura:interface>");
+//        String fmt = String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, intf.getNamespace(),
+//                intf.getName());
+//        DefDescriptor<FlavoredStyleDef> flavor =  DefDescriptorImpl.getInstance(fmt, FlavoredStyleDef.class);
+//        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
+//
+//        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+//        builder.setIntfDescriptor(intf);
+//        builder.setLocation(vendor.getLocation());
+//        builder.setFlavor(new FlavorRefImpl(flavor, "test"));
+//
+//        try {
+//            builder.build().validateReferences();
+//            fail("expected to get an exception");
+//        } catch (Exception e) {
+//            checkExceptionContains(e, InvalidDefinitionException.class, "cannot be specified on an interface");
+//        }
+//    }
+//
+//    public void testAppendsFlavoredStyleDefToDependencies() throws Exception {
+//        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component><div aura:flavorable='true'></div></aura:component>");
+//        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(cmp);
+//        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
+//
+//        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+//        builder.setDescriptor(cmp);
+//        builder.setLocation(vendor.getLocation());
+//        builder.setFlavor(new FlavorRefImpl(flavor, "test"));
+//
+//        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+//        builder.build().appendDependencies(dependencies);
+//        assertTrue("expected flavor def to be in dependencies", dependencies.contains(flavor));
+//    }
 
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor(cmp);
-        builder.setLocation(vendor.getLocation());
-        builder.setFlavor(new FlavorRefImpl(flavor, "wallmaria"));
-
-        try {
-            builder.build().validateReferences();
-            fail("expected to get an exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, FlavorNameNotFoundException.class, "was not found");
-        }
-    }
-
-    public void testValidatesComponentIsFlavorable() throws Exception {
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
-        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(cmp);
-        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
-
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor(cmp);
-        builder.setLocation(vendor.getLocation());
-        builder.setFlavor(new FlavorRefImpl(flavor, "test"));
-
-        try {
-            builder.build().validateReferences();
-            fail("expected to get an exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "does not have any flavorable");
-        }
-    }
-
-    public void testValidatesComponentToFlavorIsNotIntf() throws Exception {
-        DefDescriptor<InterfaceDef> intf = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface></aura:interface>");
-        String fmt = String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, intf.getNamespace(),
-                intf.getName());
-        DefDescriptor<FlavoredStyleDef> flavor =  DefDescriptorImpl.getInstance(fmt, FlavoredStyleDef.class);
-        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
-
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setIntfDescriptor(intf);
-        builder.setLocation(vendor.getLocation());
-        builder.setFlavor(new FlavorRefImpl(flavor, "test"));
-
-        try {
-            builder.build().validateReferences();
-            fail("expected to get an exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "cannot be specified on an interface");
-        }
-    }
-
-    public void testAppendsFlavoredStyleDefToDependencies() throws Exception {
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component><div aura:flavorable='true'></div></aura:component>");
-        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(cmp);
-        flavor = addSourceAutoCleanup(flavor, "@flavor test; .test{}");
-
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor(cmp);
-        builder.setLocation(vendor.getLocation());
-        builder.setFlavor(new FlavorRefImpl(flavor, "test"));
-
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        builder.build().appendDependencies(dependencies);
-        assertTrue("expected flavor def to be in dependencies", dependencies.contains(flavor));
-    }
-
-    public void testSerializeIsFlavorable() throws Exception {
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor(vendor.getChildComponentDefDescriptor());
-        builder.setLocation(vendor.getLocation());
-        builder.setIsFlavorable(true); // what we care about
-        serializeAndGoldFile(builder.build());
-    }
-
-    public void testSerializeSpecifiesFlavor() throws Exception {
-        DefDescriptor<ComponentDef> cmp = vendor.getFlavorableComponentDescriptor();
-        DefDescriptor<FlavoredStyleDef> flavor = vendor.getFlavoredStyleDescriptor();
-
-        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-        builder.setDescriptor(cmp);
-        builder.setLocation(vendor.getLocation());
-        builder.setFlavor(new FlavorRefImpl(flavor, "test")); // what we care about
-        serializeAndGoldFile(builder.build());
-    }
+//    public void testSerializeIsFlavorable() throws Exception {
+//        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+//        builder.setDescriptor(vendor.getChildComponentDefDescriptor());
+//        builder.setLocation(vendor.getLocation());
+//        builder.setIsFlavorable(true); // what we care about
+//        serializeAndGoldFile(builder.build());
+//    }
+//
+//    public void testSerializeSpecifiesFlavor() throws Exception {
+//        DefDescriptor<ComponentDef> cmp = vendor.getFlavorableComponentDescriptor();
+//        DefDescriptor<FlavoredStyleDef> flavor = vendor.getFlavoredStyleDescriptor();
+//
+//        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+//        builder.setDescriptor(cmp);
+//        builder.setLocation(vendor.getLocation());
+//        builder.setFlavor(new FlavorRefImpl(flavor, "test")); // what we care about
+//        serializeAndGoldFile(builder.build());
+//    }
 }

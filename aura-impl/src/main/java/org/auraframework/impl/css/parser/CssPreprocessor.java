@@ -197,7 +197,7 @@ public final class CssPreprocessor {
 
             Optional<AuraFlavorPlugin> auraFlavorPlugin = registry.retrieve(AuraFlavorPlugin.class);
             if (auraFlavorPlugin.isPresent()) {
-                result.flavorNames = auraFlavorPlugin.get().flavorNames();
+                result.flavorNames = auraFlavorPlugin.get().getFlavorNames();
             }
 
             return result;

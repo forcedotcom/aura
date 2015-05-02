@@ -16,22 +16,36 @@
 package org.auraframework.impl.css.flavor;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
+import org.auraframework.css.FlavorMapping;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.css.parser.plugin.FlavorMappingEnforcer;
 import org.auraframework.impl.css.style.AbstractStyleDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Themes;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Lists;
+import com.salesforce.omakase.plugin.Plugin;
+
 /**
- * TODONM: add support for async loading via serialize method (same behavior as regular style def, probably just
- * abstract that).
+ * Implementation of {@link FlavoredStyleDef}.
  */
 public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDef> implements FlavoredStyleDef {
     private static final long serialVersionUID = -8722320028754842489L;
@@ -49,6 +63,30 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     }
 
     @Override
+    public String getCode(List<Plugin> plugins) {
+        List<Plugin> augmented = Lists.newArrayList(plugins);
+
+        try {
+            AuraContext ctx = Aura.getContextService().getCurrentContext();
+            DefDescriptor<? extends BaseComponentDef> top = ctx.getLoadingApplicationDescriptor();
+            if (top != null && top.getDefType() == DefType.APPLICATION) {
+                DefDescriptor<FlavorAssortmentDef> flavors = ((ApplicationDef) top.getDef()).getAppFlavors();
+                if (flavors != null) {
+                    FlavorMapping mapping = flavors.getDef().computeOverrides();
+                    if (!mapping.isEmpty()) {
+                        boolean devMode = Aura.getContextService().getCurrentContext().isDevMode();
+                        augmented.add(new FlavorMappingEnforcer(getDescriptor(), mapping, devMode));
+                    }
+                }
+            }
+        } catch (QuickFixException e) {
+            throw new AuraRuntimeException(e);
+        }
+
+        return super.getCode(augmented);
+    }
+
+    @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
             DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(descriptor);
@@ -63,7 +101,19 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     }
 
     @Override
-    public void serialize(Json json) throws IOException {}
+    public void validateReferences() throws QuickFixException {
+        DefDescriptor<ComponentDef> cmp = Flavors.toComponentDescriptor(getDescriptor());
+        if (!cmp.getDef().hasFlavorableChild()) {
+            throw new InvalidDefinitionException(
+                    String.format("%s must contain at least one aura:flavorable element", cmp), getLocation());
+        }
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        // TODONM: add support for async loading via serialize method (same behavior as regular style def, probably just
+        // abstract that).
+    }
 
     public static class Builder extends AbstractStyleDef.Builder<FlavoredStyleDef> implements FlavoredStyleDefBuilder {
         public Builder() {

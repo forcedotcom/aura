@@ -35,7 +35,6 @@ $A.ns.Test = function() {
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
-    this.failed = undefined;
 };
 
 //#include aura.test.Test_private
@@ -270,8 +269,8 @@ $A.ns.Test.prototype.enqueueAction = function(action, background) {
  * 
  * @example
  * <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/> 
- * 			{name:"aura:text", attributes:{value:"valuable"}},<br/>
- * 			function(action){alert(action.getReturnValue().attributes.values.value)})</code>
+ *          {name:"aura:text", attributes:{value:"valuable"}},<br/>
+ *          function(action){alert(action.getReturnValue().attributes.values.value)})</code>
  * 
  * @param {Component} component
  *            The scope to run the action with, even if the action is not visible to it
@@ -294,11 +293,11 @@ $A.ns.Test.prototype.getExternalAction = function(component, descriptor, params,
         paramDefs.push({"name":k});
     }
     var def = new ActionDef({
-    	"name" : descriptor,
-    	"descriptor" : descriptor,
-    	"actionType" : "SERVER",
-    	"params" : paramDefs,
-    	"returnType" : returnType
+        "name" : descriptor,
+        "descriptor" : descriptor,
+        "actionType" : "SERVER",
+        "params" : paramDefs,
+        "returnType" : returnType
     });
     var action = def.newInstance(component);
     action.setParams(params);
@@ -563,7 +562,7 @@ $A.ns.Test.prototype.isComplete = function(){
 $A.ns.Test.prototype.getErrors = function(){
     var errors = $A.ns.Test.prototype.errors;
     if (errors.length > 0) {
-        return aura.util.json.encode(errors);
+        return $A.util.json.encode(errors);
     } else {
         return "";
     }
@@ -743,7 +742,7 @@ $A.ns.Test.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertM
  * @param {String} assertMessage The message that is returned if the two values are not equal
  */
 $A.ns.Test.prototype.assertStartsWith = function(start, full, assertMessage){
-    if(full.indexOf(start) !== 0){
+    if(!full || !full.indexOf || full.indexOf(start) !== 0){
         var fullStart = full;
         if (fullStart.length > start.length+20) {
             fullStart = fullStart.substring(0, start.length+20) + "...";
@@ -874,16 +873,16 @@ $A.ns.Test.prototype.fail = function(assertMessage, extraInfoMessage) {
         msg += extraInfoMessage;
     }
     var error = new Error(msg);
-	this.failed = error;
-	throw error;
+    this.logError(msg, error);
+    throw error;
 };
 
 /**
  * Get an object's prototype.
  * @param {Object} instance
- * 				The instance of the object
+ *              The instance of the object
  * @returns {Object}
- * 				The prototype of the specified object
+ *              The prototype of the specified object
  */
 $A.ns.Test.prototype.getPrototype = function(instance) {
     return (instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance))) || instance.__proto || instance.constructor.prototype;
@@ -892,11 +891,11 @@ $A.ns.Test.prototype.getPrototype = function(instance) {
 /**
  * Replace a function on an object with a restorable override.
  * @param {Object} instance
- * 				The instance of the object
+ *              The instance of the object
  * @param {String} name
- * 				The name of the function to be replaced
+ *              The name of the function to be replaced
  * @param {Function} newFunction
- * 				The new function that replaces originalFunction
+ *              The new function that replaces originalFunction
  * @returns {Function}
  *             The override (newFunction) with an added "restore"
  *             function that, when invoked, will restore originalFunction
@@ -958,11 +957,11 @@ $A.ns.Test.prototype.overrideFunction = function(instance, name, newFunction) {
  * the original arguments.  If attached before (postProcess !== true),
  * the handler will be invoked with just the original arguments.
  * @param {Object} instance
- * 				The instance of the object
+ *              The instance of the object
  * @param {String} name
- * 				The name of the function whose arguments are applied to the handler
+ *              The name of the function whose arguments are applied to the handler
  * @param {Function} newFunction
- * 				The target function to attach the handler to
+ *              The target function to attach the handler to
  * @param {Boolean} postProcess
  *             Set to true if the handler will be called after the target function
  *             or false if the handler will be called before originalFunction
@@ -988,9 +987,9 @@ $A.ns.Test.prototype.addFunctionHandler = function(instance, name, newFunction, 
 /**
  * Get a DOM node's outerHTML.
  * @param {Node} node
- * 				The node to get outer HTML from
+ *              The node to get outer HTML from
  * @returns {String}
- * 				The outer HTML
+ *              The outer HTML
  */
 $A.ns.Test.prototype.getOuterHtml = function(node) {
     return node.outerHTML || (function(n){
@@ -1006,9 +1005,9 @@ $A.ns.Test.prototype.getOuterHtml = function(node) {
  * Get the text content of a DOM node. Tries <code>innerText</code> followed by
  * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
  * @param {Node} node
- * 				The node to get the text content from
+ *              The node to get the text content from
  * @returns {String}
- * 				The text content of the specified DOM node
+ *              The text content of the specified DOM node
  */
 $A.ns.Test.prototype.getText = function(node) {
     return $A.util.getText(node);
@@ -1017,9 +1016,9 @@ $A.ns.Test.prototype.getText = function(node) {
 /**
  * Get the textContent of all elements rendered by this component.
  * @param {Component} component
- * 				The component to get the text content from
+ *              The component to get the text content from
  * @returns {String}
- * 				The text content of the specified component
+ *              The text content of the specified component
  */
 $A.ns.Test.prototype.getTextByComponent = function(component){
     var ret = "";
@@ -1041,14 +1040,14 @@ $A.ns.Test.prototype.getTextByComponent = function(component){
  * Get the current value for a style for a DOMElement.
  *
  * @param {DOMElement} elem
- * 				The element to get the CSS property value from
+ *              The element to get the CSS property value from
  * @param {String} Style
- * 				The property name to retrieve
+ *              The property name to retrieve
  * @returns {String}
- * 				The CSS property value of the specified DOMElement
+ *              The CSS property value of the specified DOMElement
  */
 $A.ns.Test.prototype.getStyle = function(elem, style){
-	var val = "";
+    var val = "";
     if(document.defaultView && document.defaultView.getComputedStyle){
         val = document.defaultView.getComputedStyle(elem, "").getPropertyValue(style);
     }
@@ -1064,9 +1063,9 @@ $A.ns.Test.prototype.getStyle = function(elem, style){
 /**
  * Filter out comment nodes from a list of nodes.
  * @param {Array|Object} nodes
- * 				The list of nodes to filter
+ *              The list of nodes to filter
  * @returns {Array}
- * 				The list of nodes without comment nodes
+ *              The list of nodes without comment nodes
  */
 $A.ns.Test.prototype.getNonCommentNodes = function(nodes){
     var ret = [];
@@ -1089,9 +1088,9 @@ $A.ns.Test.prototype.getNonCommentNodes = function(nodes){
 /**
  * Check if a node has been "deleted" by Aura.
  * @param {Node} node
- * 				The node to check
+ *              The node to check
  * @returns {Boolean}
- * 				Returns true if the specified node has been deleted, or false otherwise
+ *              Returns true if the specified node has been deleted, or false otherwise
  */
 $A.ns.Test.prototype.isNodeDeleted = function(node){
     if (!node.parentNode){
@@ -1106,7 +1105,7 @@ $A.ns.Test.prototype.isNodeDeleted = function(node){
 /**
  * Return a node list and pass each argument as a separate parameter.
  * @returns {Array}
- * 				The list of nodes contained in the document node
+ *              The list of nodes contained in the document node
  */
 $A.ns.Test.prototype.select = function() {
     return document.querySelectorAll.apply(document, arguments);
@@ -1119,7 +1118,7 @@ $A.ns.Test.prototype.select = function() {
  * @param {String} targetString
  *             The string to look for within testString
  * @returns {Boolean}
- * 				Return true if testString contains targetString, or false otherwise
+ *              Return true if testString contains targetString, or false otherwise
      */
 $A.ns.Test.prototype.contains = function(testString, targetString){
     if (!$A.util.isUndefinedOrNull(testString)) {
@@ -1398,7 +1397,7 @@ $A.ns.Test.prototype.objectKeys = function(obj){
  * @param {String} attributeName The name of attribute to look up on element.
  */
 $A.ns.Test.prototype.getElementAttributeValue = function(element,attributeName){
-        	return $A.util.getElementAttributeValue(element, attributeName);
+            return $A.util.getElementAttributeValue(element, attributeName);
 };
 
 /**
@@ -1467,7 +1466,7 @@ $A.ns.Test.prototype.getAuraErrorMessage = function(){
  *
  * @public
  */
-$A.ns.Test.prototype.run = function(name, code, timeoutOverride){
+$A.ns.Test.prototype.run = function(name, code, timeoutOverride, quickFixException) {
     // check if test has already started running, since frame loads from layouts may trigger multiple runs
     if(this.inProgress >= 0){
         return;
@@ -1481,11 +1480,16 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
 
     this.cmp = $A.getRoot();
     this.suite = aura.util.json.decode(code);
+    if (quickFixException) {
+        this.logError(quickFixException);
+        this.doTearDown();
+        return;
+    }
 
     var useLabel = function(labelName){
-   	    var suiteLevel = that.suite[labelName] || false;
-   	    var testLevel = that.suite[name][labelName];
-   	    return (testLevel === undefined) ? suiteLevel : testLevel;
+        var suiteLevel = that.suite[labelName] || false;
+        var testLevel = that.suite[name][labelName];
+        return (testLevel === undefined) ? suiteLevel : testLevel;
     };
    
     this.failOnWarning = useLabel("failOnWarning");
@@ -1521,10 +1525,10 @@ $A.ns.Test.prototype.run = function(name, code, timeoutOverride){
     this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ", auraWarningsExpectedDuringInit);
     this.preWarnings = null;
     
-	}catch(e){
-	    this.logError("Error during setUp", e);
-	    this.doTearDown();
-	}
+    }catch(e){
+        this.logError("Error during setUp", e);
+        this.doTearDown();
+    }
 
     this.continueWhenReady();
 };

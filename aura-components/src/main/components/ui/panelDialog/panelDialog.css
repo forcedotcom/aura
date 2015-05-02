@@ -42,17 +42,6 @@
     overflow: hidden;
 }
 
-.THIS.nonmodal {
-
-}
-
-.THIS .uiScroller>.scroller {
-	position: static;
-}
-.THIS .scrollbox .uiScroller>.scroller {
-	position: absolute;
-}
-
 .THIS .modal-glass {
 	background-color: #2A4158;
 	opacity: 0;
@@ -64,50 +53,27 @@
 	transition: opacity 300ms;
 }
 
-.THIS .body.hidden {
+.THIS .hidden {
 	display: none;
 }
 
-.THIS .scrollbox .scrollWrapper {
-	overflow: auto;
-}
-
-.THIS .scrollbox {
-	position: relative;
-}
-
-.THIS .scrollbox:before {
-	content: "";
-	position: relative;
-	z-index: 100;
-	display: block;
-	height: 20px;
-	margin: 0 0 -18px;
-}
-
-.THIS .scrollbox:after {
-	content: "";
-	position: relative;
-	z-index: 999;
-	display: block;
-	height: 6px;
-	margin-top: -6px;
-}
-
-.THIS .panelDialog {
-	width: 100%;
+.THIS div[role=document] {
+	overflow: hidden;
 	height: 100%;
-	transition: transform .3s ease-in;
-	/*overflow: scroll;*/
+}
+
+.THIS .body {
+    padding: 1px 14px;
 }
 
 .THIS .panelDialog {
-    height: auto;
+    width: 100%;
+    height: 100%;
 	max-height: 70%;
-	max-width: 292px;
 	border-radius: 5px;
 	background-color: #FFFFFF;
 	overflow: visible;
+	transition: transform .3s ease-in;
 }
 
 .THIS.modal .panelDialog {
@@ -119,43 +85,14 @@
     position:relative;
     border: 1px solid #B6B6B6;
 }
-
 @media only screen and (min-width: 35.625em) {
 	.THIS .panelDialog {
 		max-width: 400px;
 	}
 }
 
-.THIS .panelDialog .body {
-	padding-top: 0;
-	background-color: inherit;
-	overflow: hidden;
-}
-
-.THIS .panelDialog .body.scrollbox > div.uiScrollerDeprecated > div {
-	padding-bottom: 14px
-}
-
 .THIS .panelDialog .label {
 	max-width: 100%;
-}
-
-.THIS .panelDialog .body.actions button:last-of-type {
-	margin-bottom: 14px;
-}
-
-.THIS .panelDialog .actions {
-	padding: 1px 14px;
-	border-radius: 5px;
-	-webkit-box-flex: 1;     
-  	-moz-box-flex: 1;                     
-    -webkit-flex: 1;         
-    -ms-flex: 1;             
-    flex: 1;                 
-}
-
-.THIS .panelDialog .actions.scrollbox {
-	padding: 0 14px 14px 14px;
 }
 
 .THIS .panelDialog .actions .uiButton.default {
@@ -219,15 +156,6 @@
 	padding: 14px 0;
 	text-align: center;
 	word-break: break-word;
-}
-
-.THIS .panelDialog .titleBar > .bBody > .forceIcon {
-	width: 100%;
-	height: 40px;
-	font-size: 40px;
-	text-align: center;
-	margin: 10px 0;
-	display: block;
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */

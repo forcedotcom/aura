@@ -18,7 +18,10 @@ package org.auraframework.test.css.flavor;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.FlavorAssortmentDefHandler;
@@ -26,30 +29,30 @@ import org.auraframework.impl.root.parser.handler.FlavorIncludeDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class FlavorIncludeDefHandlerTest extends StyleTestCase {
-
     public FlavorIncludeDefHandlerTest(String name) {
         super(name);
     }
 
-    public void testReadsAttributes() throws Exception {
-        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component/>");
-        addStandardFlavor(cmp, "@flavor test;");
-        String fmt = String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName());
+    public void testReadsSourceAttribute() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addComponentDef();
+        addStandardFlavor(cmp, ".THIS--test{}");
+        String fmt = String.format("<aura:use source='foo:flavors'/>", cmp.getDescriptorName());
         FlavorIncludeDef def = source(fmt);
-        assertFalse(def.computeFilterMatches(false).isEmpty());
+        assertEquals("foo:flavors", def.getSource());
     }
 
     public void testDescription() throws Exception {
-        addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor component='*' flavor='x' description='testdesc'/>");
+        addStandardFlavor(addComponentDef(), ".THIS--test{}");
+        FlavorIncludeDef def = source("<aura:use source='foo:flavors' description='testdesc'/>");
         assertEquals("testdesc", def.getDescription());
     }
 
     public void testInvalidChild() throws Exception {
         try {
-            source("<aura:flavor component='x' flavor='test'><ui:button></aura:flavor>");
+            source("<aura:use source='foo:flavors'><ui:button></aura:use>");
             fail("Should have thrown an exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "No children");
@@ -58,10 +61,28 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
 
     public void testWithTextBetweenTag() throws Exception {
         try {
-            source("<aura:flavor component='x' flavor='test'>blah</aura:flavor>");
+            source("<aura:use source='foo:flavors'>blah</aura:use>");
             fail("Should have thrown an exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "No literal text");
+        }
+    }
+
+    public void testErrorsIfMissingSource() throws Exception {
+        try {
+            source("<aura:use/>");
+            fail("Should have thrown an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute");
+        }
+    }
+
+    public void testErrorsIfEmptySource() throws Exception {
+        try {
+            source("<aura:use source=''/>");
+            fail("Should have thrown an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute");
         }
     }
 
@@ -79,9 +100,5 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         xmlReader.next();
         FlavorIncludeDefHandler<FlavorAssortmentDef> handler = new FlavorIncludeDefHandler<>(parent, xmlReader, ss);
         return handler.getElement();
-    }
-
-    private DefDescriptor<ComponentDef> cmp() {
-        return getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
     }
 }

@@ -212,7 +212,7 @@
 
         // don't modify original config object; needed in testing code
         config = this._copy(config);
-        this.buildPanelDialogConfig(cmp, config);
+        this.beforeCreatePanel(cmp, config);
         config.animation = config.animation || 'bottom';
         config.closeAction = this.getCloseActionForModal(cmp);
 		
@@ -227,22 +227,12 @@
 		 });
     },
     
-    isModal: function(panelType) {
-    	return  panelType == 'markup://ui:panelDialog'
+    //Hook for subcomponent
+    beforeCreatePanel: function(cmp, config) {
     },
     
-    buildPanelDialogConfig: function(cmp, config) {
-    	var actionList = config.body;
-    	 // add 'closePanel' action to all buttons (so every action also closes the dialog)
-        if (actionList && actionList.length) {
-            for (action in actionList) {
-                actionButton = actionList[action];
-                if ($A.util.isComponent(actionButton)) {
-                    button = actionButton.isInstanceOf('ui:actionButton') ? actionButton.find('button') : actionButton;
-                    button.addHandler('press', cmp, 'c.closePanel', true);
-                }
-            }
-        }
+    isModal: function(panelType) {
+    	return  panelType == 'markup://ui:panelDialog'
     },
     
     getCloseActionForModal: function(cmp) {
@@ -587,10 +577,16 @@
             manager = this.getManager(cmp),
             stack = manager._stack,
             stackIndex = manager._startStackLevel + stack.length + 1;
-        stack.push(panel);
-        this.setActiveInstance(cmp, panel);
-        this._updateModalGlasszIndex(panelHelper, panel, stackIndex);
-        this._updatePanelElementzIndex(panelHelper, panel, stackIndex);
+        //only stack if it's new panel
+        if (stack[stack.length - 1] === panel) {
+            this.setActiveInstance(cmp, panel);
+        } else {
+            stack.push(panel);
+            this.setActiveInstance(cmp, panel);
+            this._updateModalGlasszIndex(panelHelper, panel, stackIndex);
+            this._updatePanelElementzIndex(panelHelper, panel, stackIndex);
+        }
+        
     },
     
     // remove the currently active panel from the top of the zIndex stack
@@ -722,7 +718,7 @@
                 target = event.target || event.srcElement,
                 clickedInside = $A.util.contains(panel, target);
             if (active && !clickedInside) {
-                $A.get('e.ui:closePanel').fire();
+                $A.get('e.ui:closePanel').setParams({instance: active}).fire();
             }
         };
 

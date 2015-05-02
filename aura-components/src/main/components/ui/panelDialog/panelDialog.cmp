@@ -23,12 +23,13 @@
     <aura:attribute name="class" type="String" default="" description="Adds CSS classes to the dialog"/>
     <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog"/>
 	<aura:attribute name="title" type="String" description="The title of the dialog window"/>
+	<aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog"/>
+	<aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
     <aura:attribute name="detail" type="String" description="The description of the dialog window"/>
     <aura:attribute name="icon" type="Aura.Component[]" description="The icon for the dialog"/>
     <aura:attribute name="isVisible" type="Boolean" default="false" description="Displays dialog on render"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Focuses automatically on the first focusable element"/>
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility"/>
-    <aura:attribute name="isScrollable" type="Boolean" default="true" description="Indicates if a scroller should be created in the dialog"/>
     <aura:attribute name="isTransient" type="Boolean" default="true" description="Indicates if the dialog is one-time use and should be destroyed when hidden"/>
     <aura:attribute name="isModal" type="Boolean" default="false" description="Indicates if this dialog is modal"/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
@@ -51,12 +52,12 @@
 	    
 	    <div aura:id='panel'
              tabindex="-1"
-	     	 class="{! 'panel panelDialog ' + $Browser.formFactor + ' ' + v.class}"
+	     	 class="{! 'hidden panel panelDialog ' + $Browser.formFactor + ' ' + v.class}"
          	 role="dialog" 
-             aria-labeled-by="{!'title_' + globalId}"
-	         style="display:none">
-	        <div role="document" class="{! v.body.length || v.detail ? 'headerAndBody' : 'headerOnly' }"> 
-                <span class="assistiveText">{!$Label.Global.startOfDialog}</span>
+             aria-labeledby="{!'title_' + globalId}">
+             
+	        <div aura:id="content" role="document" class="{! v.body.length || v.detail ? 'headerAndBody' : 'headerOnly' }"> 
+                <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
     	       	<ui:header class="titleBar modalWindow">
     	       	    {!v.icon}
@@ -67,19 +68,14 @@
     	            </aura:renderIf>
     	        </ui:header>
     	            
-    	        <div class="{! 'body actions scrollbox ' + ((v.body.length || v.detail) ? '' : 'hidden') }">
-    	    		<ui:scroller aura:id='scroller' scrollContentClass="panelScrollContent" bindEventsToScroller="true">
-	    	        	<aura:renderIf isTrue="{! v.detail != '' &amp;&amp; v.detail != null}">
-	    					<div class="detail">{!v.detail}</div>
-	    				</aura:renderIf>
-    	    			{!v.body}
-    	    		</ui:scroller>
+    	        <div aura:id="body" class="body">
+    	    		{!v.body}
     	        </div>
 
                 <aura:if isTrue="{!v.showCloseButton}">
                     <ui:button class="closeBtn" press="{!c.close}"
-                    	label="{!$Label.Buttons.closeWindow}"
-                    	buttonTitle="{!$Label.Buttons.closeWindow}"
+                    	label="{!v.closeDialogLabel}"
+                    	buttonTitle="{!v.closeDialogLabel}"
                     	labelDisplay="false"
                     	>&times;</ui:button>
                 </aura:if>

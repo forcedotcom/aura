@@ -135,7 +135,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 fa.getDescriptorName());
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
 
-        assertEquals(fa, app.getDef().getDefaultFlavorsDescriptor());
+        assertEquals(fa, app.getDef().getAppFlavors());
     }
 
     public void testFindsDefaultFlavorsInBundleNoAttributeSpecified() throws QuickFixException {
@@ -145,6 +145,6 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 DefDescriptor.MARKUP_PREFIX);
         addSourceAutoCleanup(app, String.format("<aura:application></aura:application>"));
 
-        assertEquals(fa, app.getDef().getDefaultFlavorsDescriptor());
+        assertEquals(fa, app.getDef().getAppFlavors());
     }
 }

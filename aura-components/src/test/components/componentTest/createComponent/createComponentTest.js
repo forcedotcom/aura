@@ -159,6 +159,22 @@
         }
     },
 
+    testReturnsActionErrorMessageForUnknownComponentType:{
+        test:function(){
+            var expected="No COMPONENT named markup://bogus:bogus found";
+            var actual=null;
+            var actionComplete = false;
+
+            $A.createComponent("bogus:bogus",null,function(component,state, statusMessage){
+                actual=statusMessage;
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertTrue(actual.indexOf(expected) != -1, "Received unexpected action status message: <"+actual+">");
+            });
+        }
+    },
 
     testCreatesMultipleComponents:{
         test:function(component){
@@ -320,5 +336,59 @@
                 $A.test.assertEquals(expected,actual);
             });
         }
+    },
+
+    testPassesActionErrorMessageWhenCreatingMultipleComponents:{
+        test:function(){
+            var expected="No COMPONENT named markup://bogus:bogus found";
+            var actual;
+            var actionComplete = false;
+
+            $A.createComponents([
+                ["aura:text",{value:1}],
+                ["ui:button",{label:2}],
+                ["aura:text",{value:3}],
+                ["bogus:bogus",{value:4}],
+                ["aura:text",{value:5}]
+            ],function(components,overallStatus,statusList){
+                actual=statusList[3].message
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                $A.test.assertTrue(actual.indexOf(expected) != -1, "Received unexpected action status message: <"+actual+">");
+            });
+        }
+    },
+
+    testCreatingServerComponentAbortsPreviousServerRequest: {
+        test: [function(cmp) {
+            $A.test.blockRequests();
+            $A.test.addCleanup(function() { $A.test.releaseRequests(); });
+            cmp.__testAction = $A.createComponent("ui:button", {label: "label"}, function() {});
+        }, function(cmp) {
+            $A.createComponent("ui:outputText", {value:"output"}, function() {});
+            $A.test.assertEquals("ABORTED", cmp.__testAction.getState());
+        }]
+    },
+
+    /**
+     * The createComponent callback function will not be called for aborted actions, but the caller can attach their
+     * own aborted callback via Action.js#setCallback.
+     */
+    testSetAbortedCallbackOnServerAction: {
+        test: [function(cmp) {
+            $A.test.blockRequests();
+            $A.test.addCleanup(function() { $A.test.releaseRequests(); });
+            var action = $A.createComponent("ui:button", {label: "label"}, function() {});
+            if (action) {
+                action.setCallback(this, function() { cmp.__testAbortedCallback=true; }, "ABORTED");
+            } else {
+                $A.test.fail("createComponent did not return an action");
+            }
+        }, function(cmp) {
+            $A.createComponent("ui:outputText", {value:"output"}, function() {});
+            $A.test.assertTrue(cmp.__testAbortedCallback);
+        }]
     }
 })

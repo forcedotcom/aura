@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import java.util.Map;
 
-import org.auraframework.css.FlavorRef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -64,5 +63,5 @@ public interface ComponentDefRef extends Definition {
     /**
      * Gets the flavor.
      */
-    FlavorRef getFlavor();
+    String getFlavor();
 }

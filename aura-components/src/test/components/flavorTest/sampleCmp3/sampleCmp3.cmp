@@ -1,0 +1,5 @@
+<aura:component>
+	<div class="parent">
+	    <span class="child" aura:id="child" aura:flavorable="true">{!v.body}</span>
+	</div>
+</aura:component>

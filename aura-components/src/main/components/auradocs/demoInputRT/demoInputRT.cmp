@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-	<ui:inputRichText aura:id="inputRT" label="Rich Text Demo" labelPosition="hidden" cols="50" rows="5" value="&lt;b&gt;Aura&lt;/b&gt;, &lt;span style='color:red'&gt;input rich text demo&lt;/span&gt;"/>
+	<ui:inputRichText aura:id="inputRT" label="Rich Text Demo" value="&lt;script&gt;test&lt;/script&gt; &lt;b&gt;rich text&lt;/b&gt;" />
 	<ui:button aura:id="outputButton" buttonTitle="Click to see what you put into the rich text field" label="Display" press="{!c.getInput}"/>
-    <ui:outputRichText aura:id="outputRT" value=" "/> 
+    <ui:outputRichText aura:id="outputRT"/>     
 </aura:component>

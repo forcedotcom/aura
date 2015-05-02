@@ -30,18 +30,17 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
     this.libraryDefRegistry = new $A.ns.LibraryDefRegistry();
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
-    this.flavorable = "auraFlavorable";
 
-    // KRIS: 
+    // KRIS:
     // We delay the creation of the definition of a class till it's requested.
     // The function that creates the component class is a classConstructorExporter
     this.classConstructorExporter={};
-    
-    // KRIS: 
+
+    // KRIS:
     // Collection of all the component classes we generate for
     // proper stack traces and proper use of prototypical inheritance
     this.classConstructors={};
-    
+
 };
 
 /**
@@ -79,7 +78,6 @@ $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(
     if ($A.util.hasDataAttribute(element, this.renderedBy)) {
         var id = $A.util.getDataAttribute(element, this.renderedBy);
         ret = this.get(id);
-        $A.assert(!$A.util.isUndefinedOrNull(ret), "No component found for element with id : " + id);
     } else if(element.parentNode){
         ret = this.getRenderingComponentForElement(element.parentNode);
     }

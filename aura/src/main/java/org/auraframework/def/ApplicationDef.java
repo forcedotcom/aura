@@ -53,7 +53,7 @@ public interface ApplicationDef extends BaseComponentDef {
     List<DefDescriptor<ThemeDef>> getThemeDescriptors();
 
     /**
-     * Gets the {@link FlavorAssortmentDef} representing the default flavor overrides.
+     * Gets the {@link FlavorAssortmentDef} representing the default flavor overrides and replacements.
      */
-    DefDescriptor<FlavorAssortmentDef> getDefaultFlavorsDescriptor();
+    DefDescriptor<FlavorAssortmentDef> getAppFlavors();
 }

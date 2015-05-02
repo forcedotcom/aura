@@ -202,7 +202,6 @@
 				forcePasteAsPlainText : false,
 	    		forceSimpleAmpersand : true
 			};
-
 		return config;
 	},
 
@@ -282,6 +281,28 @@
 			}
 			toolbarConfig = this.emailToolbarConfig;
 			break;
+        case 'custom':
+            if (!this.customToolbarConfig) {
+                var config = cmp.get("v.customToolbarConfig");
+                // Initialize with the default
+                this.customToolbarConfig = toolbar;
+                if (config != null && !$A.util.isEmpty(config)) {
+                    if ($A.util.isString(config)) {
+                        try {
+                            // parse into a JSON object
+                            config = JSON.parse(config);
+                            this.customToolbarConfig = config;
+                        } catch (e) {
+                            // Use the default if there is an error
+                            // Set in line 288 above
+                        }
+                    } else if ($A.util.isArray(config)) {
+                        this.customToolbarConfig = config;
+                    }
+                }
+            }
+            toolbarConfig = this.customToolbarConfig;
+            break;
 		default:
 			toolbarConfig = toolbar;
 		}

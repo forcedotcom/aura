@@ -14,106 +14,127 @@
  * limitations under the License.
  */
 ({
-    init: function(cmp) {
-		var currentValue = cmp.get("v.value");
+    optionSeparator: ";",
 
-		if (!$A.util.isUndefined(currentValue)) {
-			// if a "value" attribute is specified on initial render, it should win over what the individual options report
-			this.updateOptionsFromValue(cmp);
-		} else {
-			// otherwise update the "value" attribute based on the options that claim to be selected
-			this.updateValueFromOptions(cmp);
-		}
-	},
+    init: function (cmp) {
+        var currentValue = cmp.get("v.value");
 
-	/**
+        if (!$A.util.isUndefined(currentValue)) {
+            // if a "value" attribute is specified on initial render, it should win over what the individual options report
+            this.updateOptionsFromValue(cmp);
+        } else {
+            // otherwise update the "value" attribute based on the options that claim to be selected
+            this.updateValueFromOptions(cmp);
+        }
+    },
+
+    /**
      * Iterates over the options in the select element and returns a semicolon-delimited string of the selected values
      */
-    getDomElementValue : function (el) {
+    getDomElementValue: function (el) {
         var selectedOptions = [];
         for (var i = 0; i < el.options.length; i++) {
             if (el.options[i].selected) {
                 selectedOptions.push(el.options[i].value);
             }
         }
-        return selectedOptions.join(";");
+        return selectedOptions.join(this.optionSeparator);
     },
 
     /**
      * Returns a package with the array of options (as either an array of components or an array of JS objects)
      * and the strategy to work with that array
      */
-    getOptionsWithStrategy: function(cmp) {
+    getOptionsWithStrategy: function (cmp) {
         var opts = cmp.get("v.options"),
-        	strat = this.optionsStrategy;
+            strat = this.optionsStrategy;
 
         if ($A.util.isEmpty(opts)) {
-        	opts = cmp.get("v.body");
-        	if (!$A.util.isEmpty(opts)) {
-        		strat = this.bodyStrategy;
-        	} else {
-        		opts = [];
-        	}
+            opts = cmp.get("v.body");
+            if (!$A.util.isEmpty(opts)) {
+                strat = this.bodyStrategy;
+            } else {
+                opts = [];
+            }
         }
 
-        return { options : opts, strategy : strat };
+        return {options: opts, strategy: strat};
     },
 
     /**
      * Updates all options' "selected" attributes in the select element, based on the semicolon-delimited newValue string
      */
-    updateOptionsFromValue: function(cmp) {
-    	if (cmp._suspendChangeHandlers) {
-    		return;
-    	}
-    	
-        var value = cmp.get("v.value"),
-        	optionsPack = this.getOptionsWithStrategy(cmp),
-        	selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
-
-        if (optionsPack.options.length == 0) {
-        	cmp._initOptionsFromValue = true;
-        	return;
-        }
-
-        if (selectedOptions.found && value === selectedOptions.optionValue) {
+    updateOptionsFromValue: function (cmp) {
+        if (cmp._suspendChangeHandlers) {
             return;
         }
 
-        var newValues = (cmp.get("v.value") || "").split(";");
+        var value = cmp.get("v.value"),
+            optionsPack = this.getOptionsWithStrategy(cmp),
+            selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
 
-        if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues) && !($A.util.getBooleanValue(cmp.get("v.multiple")) && value == "")) {
-        	this.updateValueFromOptions(cmp, optionsPack);
-        } else {
-        	cmp._suspendChangeHandlers = true;
-        	optionsPack.strategy.persistOptions(cmp, optionsPack.options);
-        	cmp._suspendChangeHandlers = false;
+        if (optionsPack.options.length == 0) {
+            cmp._initOptionsFromValue = true;
+            return;
         }
+
+
+        if (this.isAlreadySelected(cmp, selectedOptions)) {
+            return;
+        }
+
+        var valueOrEmpty = cmp.get("v.value") || "";
+        var newValues;
+
+        var isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple"));
+        if (isMultiple) {
+            // This breaks if the option itself contains the separator
+            newValues = valueOrEmpty.split(this.optionSeparator);
+        } else {
+            newValues = [valueOrEmpty];
+        }
+
+        if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues) && !(isMultiple && value == "")) {
+            this.updateValueFromOptions(cmp, optionsPack);
+        } else {
+            cmp._suspendChangeHandlers = true;
+            optionsPack.strategy.persistOptions(cmp, optionsPack.options);
+            cmp._suspendChangeHandlers = false;
+        }
+    },
+
+    isAlreadySelected: function(cmp, selectedOptions) {
+        var value = cmp.get("v.value");
+        var isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple"));
+
+        return selectedOptions.length > 0 &&
+            (isMultiple && value === selectedOptions.join(this.optionSeparator)) ||
+            (!isMultiple && value === selectedOptions[0]);
     },
 
     /**
      * Updates this component's "value" attribute based on the state of its options' "selected" attributes
      */
-    updateValueFromOptions: function(cmp, optionsPack) {
-    	if (cmp._suspendChangeHandlers) {
-    		return;
-    	}
-    	
-        var value = cmp.get("v.value"),
-        	isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple")),
-        	optionsPack = optionsPack || this.getOptionsWithStrategy(cmp),
-        	selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
+    updateValueFromOptions: function (cmp, optionsPack) {
+        if (cmp._suspendChangeHandlers) {
+            return;
+        }
 
-        if (!selectedOptions.found || value !== selectedOptions.optionValue) {
-        	if (!isMultiple && !selectedOptions.found) {
-        		selectedOptions.optionValue = optionsPack.strategy.getValue(optionsPack.options, 0);
-        		optionsPack.strategy.setOptionSelected(optionsPack.options, 0, true);
-        		
-        		cmp._suspendChangeHandlers = true;
-            	optionsPack.strategy.persistOptions(cmp, optionsPack.options);
-            	cmp._suspendChangeHandlers = false;
-        	}
-        	cmp.set("v.value", selectedOptions.optionValue, true);
+        var value = cmp.get("v.value"),
+            isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple")),
+            optionsPack = optionsPack || this.getOptionsWithStrategy(cmp),
+            selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
+        var optionValue = selectedOptions.join(this.optionSeparator);
+        if (selectedOptions.length === 0 || value !== optionValue) {
+            if (!isMultiple && selectedOptions.length === 0) {
+                optionValue = optionsPack.strategy.getValue(optionsPack.options, 0);
+                optionsPack.strategy.setOptionSelected(optionsPack.options, 0, true);
+
+                cmp._suspendChangeHandlers = true;
+                optionsPack.strategy.persistOptions(cmp, optionsPack.options);
+                cmp._suspendChangeHandlers = false;
+            }
+            cmp.set("v.value", optionValue, true);
         }
     },
 
@@ -125,9 +146,9 @@
      *
      * Main functions available:
      *   updateOptions(options, newValues) - updates the list of options based on newValues, which is either an array or a string
-     *   	Used for ensuring consistency between "v.value" and the list of options
+     *    Used for ensuring consistency between "v.value" and the list of options
      *   getValues(options) - returns a ';'-concatenated String of selected values and whether a selected value was found
-     *   	Used for seeing which options are selected from the perspective of the options
+     *    Used for seeing which options are selected from the perspective of the options
      *   getText(options, index) - returns the internal text of options[index]
      *   setOptionSelected(options, index, selected) - equivalent to options[index].selected = selected
      *   persistOptions(cmp, options) - persists the array of options into the appropriate component attribute
@@ -137,134 +158,135 @@
      * Strategy object for an array of option objects
      */
     optionsStrategy: {
-    	// If an option is in newValues, we want to select it
-    	updateOptions : function(cmp, options, newValues) {
-    		var found = false;
 
-    		for(var i=0;i<options.length;i++){
-                var option=options[i];
-    			var val = option.value;
-    			var selectOption = (newValues.length > 1 && newValues.indexOf(val) > -1) || newValues[0] == val.toString();
+        // If an option is in newValues, we want to select it
+        updateOptions: function (cmp, options, newValues) {
+            var found = false;
 
-    			found = found || selectOption;
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                var val = option.value;
+                var selectOption = (newValues.length > 1 && newValues.indexOf(val) > -1) || newValues[0] == val.toString();
+
+                found = found || selectOption;
                 option.selected = selectOption;
-    		};
+            }
 
-    		return found;
-    	},
-    	// If an option is selected, we want to aggregate it into our list
-    	getSelected : function(options) {
-    		var values = [];
+            return found;
+        },
+        // If an option is selected, we want to aggregate it into our list
+        getSelected: function (options) {
+            var values = [];
 
-            for(var i=0;i<options.length;i++){
-    			var option=options[i];
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
                 if (option.selected) {
-    				values.push(option.value);
-    			}
-    		}
+                    values.push(option.value);
+                }
+            }
 
-    		return { found : (values.length > 0), optionValue : values.join(";") };
-    	},
-    	getValue : function(options, index) {
-    		if (!$A.util.isUndefinedOrNull(options[index])) {
-    			return options[index].value;
-    		}
-    		return undefined;
-    	},
-    	setOptionSelected : function(options, index, selected) {
-    		if (!$A.util.isUndefinedOrNull(options[index])) {
-    			options[index].selected = selected;
-    		} else {
-    			// TODO: somehow expose that the option couldn't be set.
-    		}
-    	},
-    	persistOptions : function(cmp, options) {
-    		cmp.set("v.options", options);
-    	}
+            return values;
+        },
+        getValue: function (options, index) {
+            if (!$A.util.isUndefinedOrNull(options[index])) {
+                return options[index].value;
+            }
+            return undefined;
+        },
+        setOptionSelected: function (options, index, selected) {
+            if (!$A.util.isUndefinedOrNull(options[index])) {
+                options[index].selected = selected;
+            } else {
+                // TODO: somehow expose that the option couldn't be set.
+            }
+        },
+        persistOptions: function (cmp, options) {
+            cmp.set("v.options", options);
+        }
     },
 
     /**]
      * Strategy object for an array of components (used for maintaining support for using inputSelectOption components in the body)
      */
     bodyStrategy: {
-		SUPPORTEDCONTAINERS : ["ui:inputSelectOptionGroup", "aura:iteration", "aura:if", "aura:renderIf"],
+        SUPPORTEDCONTAINERS: ["ui:inputSelectOptionGroup", "aura:iteration", "aura:if", "aura:renderIf"],
 
-    	// Updates options based on their existence in newValues
-    	updateOptions : function(cmp, options, newValues) {
-            var result = { found : false };
+        // Updates options based on their existence in newValues
+        updateOptions: function (cmp, options, newValues) {
+            var result = {found: false};
             // Perform single option update function on all of our options
-    		this.performOperationOnCmps(options, this.updateOption, result, newValues);
-    		return result.found;
-    	},
-    	getSelected : function(bodyCmps) {
-    		var values = [];
-    		this.performOperationOnCmps(bodyCmps, this.pushIfSelected, values);
-    		return { found : (values.length > 0), optionValue : values.join(";") };
-    	},
-    	getValue : function(options, index) {
-    		if (!$A.util.isUndefinedOrNull(options[index])) {
-    			return options[index].get("v.text");
-    		}
-    		return undefined;
-    	},
-    	setOptionSelected : function(options, index, selected) {
-    		if (!$A.util.isUndefinedOrNull(options[index])) {
-    			options[index].set("v.value", selected);
-    		} else {
-    			// TODO: somehow expose that the option couldn't be set.
-    		}
-    	},
-    	persistOptions : function(cmp, options) {
-    		cmp.set("v.body", options);
-    	},
-    	// Performs op on every ui:inputSelectOption in opts, where op = function(optionCmp, resultsObject, optionalArguments)
-    	performOperationOnCmps : function(opts, op, result, newValues) {
-    		for(var i=0;i<opts.length;i++){
-        		var cmp=opts[i];
-				if (cmp.isInstanceOf("ui:inputSelectOption")) {
-					op(cmp, result, newValues);
-				} else if (this.canSupportOptions(cmp)) {
-        			var groupBody = cmp.get("v.body");
-        			if (!$A.util.isEmpty(groupBody)) {
-						this.performOperationOnCmps(groupBody, op, result, newValues);
-        			}
-        		} else {
+            this.performOperationOnCmps(options, this.updateOption, result, newValues);
+            return result.found;
+        },
+        getSelected: function (bodyCmps) {
+            var values = [];
+            this.performOperationOnCmps(bodyCmps, this.pushIfSelected, values);
+            return values;
+        },
+        getValue: function (options, index) {
+            if (!$A.util.isUndefinedOrNull(options[index])) {
+                return options[index].get("v.text");
+            }
+            return undefined;
+        },
+        setOptionSelected: function (options, index, selected) {
+            if (!$A.util.isUndefinedOrNull(options[index])) {
+                options[index].set("v.value", selected);
+            } else {
+                // TODO: somehow expose that the option couldn't be set.
+            }
+        },
+        persistOptions: function (cmp, options) {
+            cmp.set("v.body", options);
+        },
+        // Performs op on every ui:inputSelectOption in opts, where op = function(optionCmp, resultsObject, optionalArguments)
+        performOperationOnCmps: function (opts, op, result, newValues) {
+            for (var i = 0; i < opts.length; i++) {
+                var cmp = opts[i];
+                if (cmp.isInstanceOf("ui:inputSelectOption")) {
+                    op(cmp, result, newValues);
+                } else if (this.canSupportOptions(cmp)) {
+                    var groupBody = cmp.get("v.body");
+                    if (!$A.util.isEmpty(groupBody)) {
+                        this.performOperationOnCmps(groupBody, op, result, newValues);
+                    }
+                } else {
                     var descriptor = cmp.getDef().getDescriptor();
                     var cmpName = descriptor.getNamespace() + ":" + descriptor.getName();
-    				$A.warning("<" + cmpName + "> is currently not supported inside <ui:inputSelect> since it does not properly " +
-    						   "attach the options to the component. This will lead to undefined behavior. Please " +
-    						   "use 'v.options' to insert your option objects instead.");
-    			}
-        	}
+                    $A.warning("<" + cmpName + "> is currently not supported inside <ui:inputSelect> since it does not properly " +
+                    "attach the options to the component. This will lead to undefined behavior. Please " +
+                    "use 'v.options' to insert your option objects instead.");
+                }
+            }
         },
         // Helper function for updateOptions
         // Update optionCmp if it exists in newValues; passes result back in result object
-        updateOption : function(optionCmp, result, newValues) {
-        	var text = optionCmp.get("v.text");
-			var selectOption = (newValues.length > 1 && newValues.indexOf(text) > -1) || newValues[0] === text;
+        updateOption: function (optionCmp, result, newValues) {
+            var text = optionCmp.get("v.text");
+            var selectOption = (newValues.length > 1 && newValues.indexOf(text) > -1) || newValues[0] === text;
 
-			result.found = result.found || selectOption;
-			optionCmp.set("v.value", selectOption);
+            result.found = result.found || selectOption;
+            optionCmp.set("v.value", selectOption);
 
         },
         // Helper function for getValues
         // Push optionCmp's value into valueList if selected
-		pushIfSelected : function(optionCmp, valueList) {
-			if ($A.util.getBooleanValue(optionCmp.get("v.value")) === true) {
-				var text = optionCmp.get("v.text");
-				if (!$A.util.isUndefined(text)) {
-					valueList.push(text);
-				}
-			}
-		},
-		canSupportOptions : function(cmp) {
-			for (var i = 0; i < this.SUPPORTEDCONTAINERS.length; i++) {
-				if (cmp.isInstanceOf(this.SUPPORTEDCONTAINERS[i])) {
-					return true;
-				}
-			}
-			return false;
-		}
+        pushIfSelected: function (optionCmp, valueList) {
+            if ($A.util.getBooleanValue(optionCmp.get("v.value")) === true) {
+                var text = optionCmp.get("v.text");
+                if (!$A.util.isUndefined(text)) {
+                    valueList.push(text);
+                }
+            }
+        },
+        canSupportOptions: function (cmp) {
+            for (var i = 0; i < this.SUPPORTEDCONTAINERS.length; i++) {
+                if (cmp.isInstanceOf(this.SUPPORTEDCONTAINERS[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
     },
 
     /**
@@ -279,49 +301,49 @@
      *     disabled (optional) 	: // whether option should be disabled
      * }
      */
-    renderOptions: function(cmp) {
-    	var options = cmp.get("v.options"),
-			select = cmp.find("select").getElement(),
-			optFrag, option, internalText;
+    renderOptions: function (cmp) {
+        var options = cmp.get("v.options"),
+            select = cmp.find("select").getElement(),
+            optFrag, option, internalText;
 
-		if ($A.util.isEmpty(options) && (!$A.util.isEmpty(cmp.get("v.body")))) {
-			return;
-		}
+        if ($A.util.isEmpty(options) && (!$A.util.isEmpty(cmp.get("v.body")))) {
+            return;
+        }
 
-    	optFrag = document.createDocumentFragment();
-    	for (var i = 0; i < options.length; i++) {
-    		option = document.createElement("option");
-    		internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label) || "";
+        optFrag = document.createDocumentFragment();
+        for (var i = 0; i < options.length; i++) {
+            option = document.createElement("option");
+            internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label) || "";
 
-    		option.label = options[i].label || internalText;
+            option.label = options[i].label || internalText;
 
-    		if (!$A.util.isUndefined(options[i].value)) {
-    			option.value = options[i].value;
-    		} else {
-    			$A.warning("Option at index " + i + " in select component " + cmp.getGlobalId() + " has an undefined value.");
-    		}
+            if (!$A.util.isUndefined(options[i].value)) {
+                option.value = options[i].value;
+            } else {
+                $A.warning("Option at index " + i + " in select component " + cmp.getGlobalId() + " has an undefined value.");
+            }
 
-    		if (options[i]["class"]) {
-    			option.setAttribute("class", options[i]["class"]);
-    		}
+            if (options[i]["class"]) {
+                option.setAttribute("class", options[i]["class"]);
+            }
 
-    		if (options[i].selected) {
-    			option.selected = "selected";
-    		}
+            if (options[i].selected) {
+                option.selected = "selected";
+            }
 
-    		if (options[i].disabled) {
-    			option.disabled = "disabled";
-    		}
+            if (options[i].disabled) {
+                option.disabled = "disabled";
+            }
 
-    		option.appendChild(document.createTextNode(internalText));
+            option.appendChild(document.createTextNode(internalText));
 
-    		optFrag.appendChild(option);
-    	}
+            optFrag.appendChild(option);
+        }
 
-    	while (select.firstChild) {
-    		select.removeChild(select.firstChild);
-    	}
-    	select.appendChild(optFrag);
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
+        }
+        select.appendChild(optFrag);
     }
 
 })

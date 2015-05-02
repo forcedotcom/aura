@@ -122,6 +122,15 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
     }
 
     /**
+     * Is the entire filter just a match for a constant?
+     *
+     * @return true if it is constant.
+     */
+    public boolean isConstant() {
+        return namespaceMatch.isConstant() && nameMatch.isConstant() && defTypes != null && defTypes.size() == 1;
+    }
+
+    /**
      * Gets the prefix match for this instance.
      * 
      * @return The prefix matcher.
@@ -146,6 +155,13 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
      */
     public GlobMatcher getNameMatch() {
         return this.nameMatch;
+    }
+
+    /**
+     * get the list of matching def types.
+     */
+    public List<DefType> getDefTypes() {
+        return this.defTypes;
     }
 
     @Override

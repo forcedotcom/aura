@@ -207,11 +207,9 @@ MetricsService.prototype = {
                 postProcess(parsedTransaction);
             }
 
-            //#if {"excludeModes" : ["PRODUCTION"]}
-                if (this.hasGlobalHandlers) {
-                    this.callHandlers("transactionEnd", parsedTransaction);
-                }
-            //#end
+            if (this.hasGlobalHandlers) {
+                this.callHandlers("transactionEnd", parsedTransaction);
+            }
 
             this.signalBeacon(beacon, parsedTransaction);
 
@@ -235,6 +233,14 @@ MetricsService.prototype = {
     clearTransactions: function () {
         this.transactions = {};
     },
+    callHandlers: function (type, t) {
+        var handlers = this.globalHandlers[type];
+        if (handlers) {
+            for (var i = 0; i < handlers.length; i++) {
+                handlers[i](t);
+            }
+        }
+    },
     //#if {"excludeModes" : ["PRODUCTION"]}
     defaultPostProcessing: function (customMarks) {
         var procesedMarks = [];
@@ -256,14 +262,6 @@ MetricsService.prototype = {
             }
         }
         return procesedMarks;
-    },
-    callHandlers: function (type, t) {
-        var handlers = this.globalHandlers[type];
-        if (handlers) {
-            for (var i = 0; i < handlers.length; i++) {
-                handlers[i](t);
-            }
-        }
     },
     getTransactions: function () {
         var transactions = [];
@@ -287,7 +285,6 @@ MetricsService.prototype = {
                 return t;
             }
         }
-        
     },
     setClearCompletedTransactions: function (value) {
         this.clearCompleteTransactions = value;

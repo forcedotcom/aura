@@ -196,7 +196,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
      * TODO: Once W-2521190 is fixed need to change the arogument from 1 to 2
      */
     public void testClickEscButtonClosesAllNonModalOverlays() throws MalformedURLException, URISyntaxException, InterruptedException{
-    	verifyClickEscButtonClosesAllModalNonModalOverlays(PANELDIALOG_NONMODAL_BUTTON, true, 1);
+    	verifyClickEscButtonClosesAllModalNonModalOverlays(PANELDIALOG_NONMODAL_BUTTON, true, 2);
     }
     
     /**

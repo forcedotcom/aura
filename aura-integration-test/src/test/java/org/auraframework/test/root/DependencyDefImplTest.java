@@ -90,12 +90,10 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         assertTrue("Dependency not found", containsDependency(deps, "markup://aura:rootComponent"));
 
         // Check dependency that exists but is wrong type
-        // TODO(W-1497192): can't find providers or helpers as dependencies
-        // testDependencyDef =
-        // vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
-        // "aura", "PROVIDER", vendor.makeLocation("f1", 5, 5, 0));
-        // deps.clear();
-        // testDependencyDef.appendDependencies(deps);
+        testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
+                "aura", "PROVIDER", vendor.makeLocation("f1", 5, 5, 0));
+        deps.clear();
+        testDependencyDef.appendDependencies(deps);
 
         // Get dependency of specific component
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
@@ -107,7 +105,7 @@ public class DependencyDefImplTest extends AuraImplTestCase {
 
         // Try to get dependency that doesn't exist, verify exception thrown
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
-                "markup://aura:iDontExist", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
+                "markup://aura:iDontExist*", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
         testDependencyDef.appendDependencies(deps);
         try {
@@ -115,12 +113,12 @@ public class DependencyDefImplTest extends AuraImplTestCase {
             fail("Exception not thrown when looking for dependency that does not exist");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Invalid dependency markup://aura:iDontExist[APPLICATION]", "f1");
+                    "Invalid dependency markup://aura:iDontExist*[APPLICATION]", "f1");
         }
 
         // Valid resource name but wrong type
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
-                "markup://aura:application", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
+                "markup://aura:applicatio*", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
         testDependencyDef.appendDependencies(deps);
         try {
@@ -128,7 +126,7 @@ public class DependencyDefImplTest extends AuraImplTestCase {
             fail("Exception not thrown when dependency resource is valid but is of wrong type");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Invalid dependency markup://aura:application[COMPONENT]", "f1");
+                    "Invalid dependency markup://aura:applicatio*[COMPONENT]", "f1");
         }
     }
 

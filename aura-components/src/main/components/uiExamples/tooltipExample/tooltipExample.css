@@ -1,0 +1,77 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+	text-align: center;
+	background: #ccc;
+}
+
+.THIS b {
+	font-weight: bold;
+}
+
+.THIS p,
+.THIS h1,
+.THIS h2 {
+	margin-bottom: 1em;
+}
+
+.THIS h1, 
+.THIS h2 {
+	font-family: georgia;
+	font-weight: bold;
+}
+
+.THIS h1 {
+	font-size: 1.5em;
+}
+
+.THIS .formwrap {
+	margin-left: 200px;
+	text-align: left;
+}
+
+.THIS .help-icon {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAABnUlEQVR4Ae2WsUoDQRCGU0lMmTyCIBZCnkAulb21pb2VJKVEe8HOEHwCH0AEMeCRkMrCzsZKL0QkCCp6QbP%2BA6NMZLPOMggWHnyge3N%2BzIy7O4VZz%2F8zV3CLoA5OQQZyJuO1OscUNGiCEnAOnAaOTSziIjgAE%2BCI1ZU3d7j%2F6IZXQ%2BdGt1883Qxond5%2Fyif8bTFWXAY9mQn%2BMIvCbG%2B9yOx7oKwVl0BfSi%2FT%2B7AwLO%2BDkkbcltLlhfcpMf28ufE69f7k6EGKqRVSTLR%2FEieyp5Lu8YjKPb0eqAr3W%2FY8CYlTDowGWYfERDpLXFWLFBmjBb64qk%2FcjJXJNkgpsp8V2%2FSJz2KF62tjd31xJ6X0uzdbpuMTZwpZcF%2Bj3CEpkfnEuUW6t%2Fus%2BTY3iVFOuWep5NpK5aZSy0x5b2vJDP9cJjqG7WRix3CAmKhGHZmhS4MvDA1p%2FCUhwJX3%2FcDQSCegFhITrV8Qt%2FSDgL3U%2BkFAUBFyC31QiR325uWwF4Ec9krW8barlXJszTxXC5ZAg0%2B4ARgzA15rcIx9oLfzB8UfUZ8KJZZlMuoAAAAASUVORK5CYII%3D);
+	background-size: cover;
+	height: 15px;
+	text-indent: -9999px;
+	width: 15px;
+	display: inline-block;
+}
+
+.THIS .section{
+	padding: 20px 0;
+	max-width: 1200px;
+	text-align: left;
+	margin: auto;
+	background: #fff;
+}
+
+.THIS .tooltip-trigger {
+	text-decoration: underline;;
+}
+
+.THIS input{
+  padding: 12px;
+  border: 1px solid #dce4ec;
+  border-radius: 4px;
+}
+
+.THIS label {
+  padding-right: 12px;
+}
+
+/*.THIS .content .*/

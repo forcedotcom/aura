@@ -35,6 +35,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -205,42 +206,94 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         final String filterKey = matcher.toString();
         Set<DefRegistry<?>> registries = delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
+        GlobMatcher namespaceMatcher = matcher.getNamespaceMatch();
+        String namespace = namespaceMatcher.isConstant()?namespaceMatcher.toString():null;
 
-        rLock.lock();
-        try {
-            boolean cacheable = shouldCache(matcher);
-            for (DefRegistry<?> reg : registries) {
-                //
-                // This could be a little dangerous, but unless we force all of our
-                // registries to implement find, this is necessary.
-                //
-                if (reg.hasFind()) {
-                    Set<DefDescriptor<?>> registryResults = null;
+        if (matcher.isConstant()) {
+            //
+            // If we have a constant matcher (i.e. namespace, name, and type), we can simply
+            // figure out our def descriptor and return it. This short-circuits a lot of code,
+            // and also slightly changes the validation, as we validate nothing until we try
+            // to retrieve the definition during the tree walk.
+            //
+            String prefix = null;
+            GlobMatcher prefixMatcher = matcher.getPrefixMatch();
+            if (prefixMatcher.isConstant()) {
+                prefix = prefixMatcher.toString();
+            }
 
-                    if (cacheable && reg.isCacheable()) {
-                        // cache results per registry
-                        String cacheKey = filterKey + "|" + reg.toString();
-                        registryResults = descriptorFilterCache.getIfPresent(cacheKey);
-                        if (registryResults == null) {
-                            registryResults = reg.find(matcher);
-                            descriptorFilterCache.put(cacheKey, registryResults);
+            // just one match
+            DefDescriptor<?> singleMatch = DefDescriptorImpl.getInstance(
+                    prefix, matcher.getNamespaceMatch().toString(), matcher.getNameMatch().toString(),
+                    matcher.getDefTypes().get(0));
+            matched.add(singleMatch);
+            return matched;
+        } else {
+            //
+            // If we have somthing that is non-constant, we'll have to muck with caches and do some funky
+            // running around.
+            //
+            rLock.lock();
+            try {
+                //
+                // We _never_ cache non-constant namespaces. We'd like to make them illegal, but for the moment
+                // we will make them undesirable.
+                //
+                boolean cacheable = shouldCache(matcher) && namespaceMatcher.isConstant();
+                for (DefRegistry<?> reg : registries) {
+                    if (reg.hasFind()) {
+                        //
+                        // Now we walk then entire set of registries, and check to see if our namespace
+                        // matches them. In the case of a constant namespace, this is easy, otherwise
+                        // we have to do a double walk.
+                        //
+                        // We could theoretically do the cache lookup first, but that seems overly complicated
+                        //
+                        Set<String> namespaces = reg.getNamespaces();
+                        boolean nsm = namespaces.contains("*");
+                        if (!nsm) {
+                            if (namespace != null) {
+                                nsm = namespaces.contains(namespace);
+                            } else {
+                                for (String ns : namespaces) {
+                                    if (namespaceMatcher.match(ns)) {
+                                        nsm = true;
+                                    }
+                                }
+                            }
                         }
-                    } else {
-                        registryResults = reg.find(matcher);
-                    }
+                        //
+                        // Only look up results if we have a match.
+                        //
+                        if (nsm) {
+                            Set<DefDescriptor<?>> registryResults = null;
 
-                    matched.addAll(registryResults);
-                }
-            }
-            if (localDescs != null) {
-                for (DefDescriptor<? extends Definition> desc : localDescs) {
-                    if (matcher.matchDescriptor(desc)) {
-                        matched.add(desc);
+                            if (cacheable && reg.isCacheable()) {
+                                // cache results per registry
+                                String cacheKey = filterKey + "|" + reg.toString();
+                                registryResults = descriptorFilterCache.getIfPresent(cacheKey);
+                                if (registryResults == null) {
+                                    registryResults = reg.find(matcher);
+                                    descriptorFilterCache.put(cacheKey, registryResults);
+                                }
+                            } else {
+                                registryResults = reg.find(matcher);
+                            }
+
+                            matched.addAll(registryResults);
+                        }
                     }
                 }
+                if (localDescs != null) {
+                    for (DefDescriptor<? extends Definition> desc : localDescs) {
+                        if (matcher.matchDescriptor(desc)) {
+                            matched.add(desc);
+                        }
+                    }
+                }
+            } finally {
+                rLock.unlock();
             }
-        } finally {
-            rLock.unlock();
         }
 
         return matched;
@@ -288,6 +341,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case FLAVORS:
             case FLAVOR_ASSORTMENT:
             case FLAVOR_INCLUDE:
+            case FLAVOR_DEFAULT:
             case DESIGN:
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:
@@ -462,6 +516,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 compiled.put(descriptor, cd);
             }
             return cd;
+        }
+
+        private <D extends Definition> void addEntry(DefDescriptor<D> dd, Definition def) {
+            @SuppressWarnings("unchecked")
+            D realDef = (D)def;
+            CompilingDef<D> cd = getCompiling(dd);
+            cd.def = realDef;
+        }
+
+        public void addMap(Map<DefDescriptor<? extends Definition>,Definition> toAdd) {
+            for (Map.Entry<DefDescriptor<? extends Definition>,Definition> entry : toAdd.entrySet()) {
+                addEntry(entry.getKey(), entry.getValue());
+            }
         }
     }
 
@@ -820,6 +887,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         try {
             List<ClientLibraryDef> clientLibs = Lists.newArrayList();
             CompileContext cc = new CompileContext(descriptor, clientLibs);
+            cc.addMap(AuraStaticControllerDefRegistry.INSTANCE.getAll());
             Definition def = compileDef(descriptor, cc);
             DependencyEntry de;
             String uid;
@@ -1226,6 +1294,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> void addLocalDef(D def) {
         DefDescriptor<? extends Definition> desc = def.getDescriptor();
 
+        if (desc == null) {
+            throw new AuraRuntimeException("Invalid def has no descriptor");
+        }
         defs.put(desc, def);
         if (localDescs == null) {
             localDescs = Sets.newHashSet();
@@ -1366,12 +1437,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
         Map<DefDescriptor<? extends Definition>, Definition> filtered;
 
-        if (preloads == null || preloads.isEmpty()) {
-            return Maps.newHashMap(defs);
-        }
         filtered = Maps.newHashMapWithExpectedSize(defs.size());
+        if (preloads == null) {
+            preloads = Sets.newHashSet();
+        }
         for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defs.entrySet()) {
-            if (!preloads.contains(entry.getKey())) {
+            if (entry.getValue() != null && !preloads.contains(entry.getKey())) {
                 filtered.put(entry.getKey(), entry.getValue());
             }
         }

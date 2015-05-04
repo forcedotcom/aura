@@ -45,4 +45,9 @@ public interface FlavorDefaultDef extends Definition {
      * Gets the value of the context attribute if present, or {@link Optional#absent()} if not specified.
      */
     public Optional<Expression> getContext();
+
+    /**
+     * @return Returns the parentDescriptor.
+     */
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

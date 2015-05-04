@@ -474,7 +474,19 @@ $A.ns.Util.prototype.buildClass=function(oldClass, newClass, remove){
  * @returns {String} flavor The flavor name.
  */
 $A.ns.Util.prototype.buildFlavorClass = function(cmp, flavor) {
-    return cmp.getDef().getStyleDef().getClassName() + "--" + flavor;
+    $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "StyleDef not set for component");
+
+    var base = cmp.getDef().getStyleDef().getClassName();
+    var split = flavor.split(",");
+    var clz = "";
+    for (var i = 0, len = split.length; i < len; i++) {
+        if (i != 0) {
+            clz += " ";
+        }
+
+        clz += base + "--" + this.trim(split[i]);
+    }
+    return clz;
 };
 
 /**

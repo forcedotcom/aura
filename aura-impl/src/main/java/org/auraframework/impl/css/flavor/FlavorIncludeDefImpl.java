@@ -49,11 +49,14 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
     private final String namespace;
     private final String bundle;
     private final DescriptorFilter filter;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+
     private final int hashCode;
 
     public FlavorIncludeDefImpl(Builder builder) throws InvalidDefinitionException {
         super(builder);
         this.source = builder.source;
+        this.parentDescriptor = builder.parentDescriptor;
 
         String[] split = source.split(":");
         if (split.length != 2) {
@@ -72,6 +75,11 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
     @Override
     public String getSource() {
         return source;
+    }
+
+    @Override
+    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        return parentDescriptor;
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +147,6 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             super(FlavorIncludeDef.class);
         }
 
-        @SuppressWarnings("unused")
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private String source;
 

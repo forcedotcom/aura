@@ -56,6 +56,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
 
     private final DescriptorFilter componentFilter;
     private final DefDescriptor<ComponentDef> singleComponent;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
 
     private final int hashCode;
 
@@ -76,6 +77,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         }
         this.singleComponent = singleComponent;
 
+        this.parentDescriptor = builder.parentDescriptor;
         this.context = builder.context;
         this.hashCode = AuraUtil.hashCode(descriptor, location, component, flavor, context);
     }
@@ -83,6 +85,11 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
     @Override
     public Optional<Expression> getContext() {
         return Optional.fromNullable(context);
+    }
+
+    @Override
+    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        return parentDescriptor;
     }
 
     @Override
@@ -188,7 +195,6 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
             super(FlavorDefaultDef.class);
         }
 
-        @SuppressWarnings("unused")
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private String component;
         private String flavor;

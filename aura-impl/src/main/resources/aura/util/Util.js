@@ -476,6 +476,10 @@ $A.ns.Util.prototype.buildClass=function(oldClass, newClass, remove){
 $A.ns.Util.prototype.buildFlavorClass = function(cmp, flavor) {
     $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "StyleDef not set for component");
 
+    if (this.isEmpty(flavor)) {
+        return "";
+    }
+
     var base = cmp.getDef().getStyleDef().getClassName();
     var split = flavor.split(",");
     var clz = "";

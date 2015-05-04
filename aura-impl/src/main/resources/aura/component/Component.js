@@ -572,7 +572,7 @@ if(!this.concreteComponentId) {
             valueProvider=actionExpression.valueProvider;
         }
         return function Component$getActionCaller(event) {
-            if (valueProvider.isValid && !valueProvider.isValid()) {
+            if (valueProvider.isValid && !valueProvider.isValid() && event.getDef().getDescriptor().getName() !== "valueDestroy") {
                 return;
             }
             var clientAction;

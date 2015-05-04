@@ -24,15 +24,16 @@
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
     <aura:attribute name="closable" type="Boolean" description="Specifies whether to display an 'x' that will close the tab when clicked" />
-    
+    <aura:attribute name="ariaControlId" type="String" description="Internal use for aria-controls attribute."/>
+
     <aura:registerevent name="beforeActivate" type="ui:tabsetEvent" description="The event is triggered before the tab is activated. Can be canceled to prevent the tab from activating." />
     <aura:registerEvent name="onActivated" type="ui:tabsetEvent" description="The event fired when the tab is activated."/>
     <aura:registerEvent name="setActive" type="ui:tabsetEvent" description="The event fired from ui:tabset to set this tab as active or deactive."/>
-    
+
 	<aura:handler name="setActive" action="{!c.setActive}" />
- 
+
     <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">
         {!v.body}
     </section>
-       
+
 </aura:component>

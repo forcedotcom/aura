@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer away from the component.">
-	<aura:attribute name="tabComponent" type="Aura.Component" description="The tab item that the mouse has moved out of."/>
+<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer away from the tab component.">
+	<aura:attribute name="tabComponent" type="Aura.Component" description="The tab component that the mouse has moved out of."/>
 </aura:event>

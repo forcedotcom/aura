@@ -43,7 +43,7 @@ Test.Components.Ui.TabItem = function() {
 	
 	// Sets up a mock "tabItem" component with the specified getEvent() function as well as a couple additional attributes that
 	// are used by the event mock's functions in a way such that we are able to later determine the nature of the target function's
-	// interactions with the given event. 
+	// interactions with the given event object. 
     function getTabItemComponentMock() {
 		return {
 			paramsSetByEvents : {},

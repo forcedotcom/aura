@@ -38,7 +38,9 @@ Test.Components.Ui.TabBar = function() {
     	}
     }
 	
-	// Sets up a mock "tabBar" component with the specified getEvent() function
+	// Sets up a mock "tabBar" component with the specified getEvent() function as well as a couple additional attributes that
+	// are used by the event mock's functions in a way such that we are able to later determine the nature of the target function's
+	// interactions with the given event object. 
     function getComponentMock() {
 		return {
 			paramsSetByEvents : {},
@@ -59,7 +61,7 @@ Test.Components.Ui.TabBar = function() {
         // The event param that gets passed into the target function
         var handlerEventParam = {
         	getParams : function(){
-        		return "test";
+        		return "component";
         	}	
         };
         
@@ -73,7 +75,7 @@ Test.Components.Ui.TabBar = function() {
         var actualParams = componentMock.paramsSetByEvents[eventName];
         Assert.NotUndefined(actualParams);
         Assert.NotNull(actualParams);
-        Assert.Equal("test", actualParams);
+        Assert.Equal("component", actualParams);
     }
     
     // -- TESTS -- //

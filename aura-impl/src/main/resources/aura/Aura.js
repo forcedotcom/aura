@@ -623,7 +623,7 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
     } else {
         // Use the existing context and just join the new context into it
         // FIXME: is this used? it won't do the right thing if there are components.
-        $A.getContext().merge(config["context"]);
+        $A.getContext()['merge'](config["context"]);
     }
 };
 
@@ -1320,4 +1320,5 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.TransportMetricsPlugin
 // #include aura.metrics.plugins.ServerActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
+// #include aura.metrics.plugins.AuraContextPlugin
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}

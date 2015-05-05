@@ -23,6 +23,7 @@ exp(p,
     "getCurrentAction", p.getCurrentAction,
     "setCurrentAction", p.setCurrentAction,
     "getContextPath", p.getContextPath,
+    "merge", p.merge,
     "clearComponentConfigs", p.clearComponentConfigs
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,

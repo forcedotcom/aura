@@ -478,4 +478,6 @@ AuraContext.prototype.setContextPath = function(path) {
     this.contextPath = path;
 };
 
+$A.ns.AuraContext = AuraContext;
+
 //#include aura.context.AuraContext_export

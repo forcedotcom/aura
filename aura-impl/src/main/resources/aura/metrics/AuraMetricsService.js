@@ -64,7 +64,7 @@ MetricsService.prototype = {
             afterFn  = typeof after === 'function';
 
         instance[method] = function () {
-            var mark = self.markStart(ns, method),
+            var mark = !override && self.markStart(ns, method),
                 ret;
 
             if (beforeFn) {
@@ -81,7 +81,7 @@ MetricsService.prototype = {
                 return ret;
             }
 
-            mark = self.markEnd(ns, method);
+            mark = !override && self.markEnd(ns, method);
 
             if (afterFn) {
                 after.apply(this, Array.prototype.concat.apply(mark, arguments));
@@ -313,9 +313,9 @@ MetricsService.prototype = {
         this.transactions[id] = transaction;
         return id;
     },
-    markStamp: function (ns, name) {
+    markStamp: function (ns, name, context) {
         if (!name) {name = ns; ns = MetricsService.DEFAULT;}
-        var mark        = this.createMarkNode(ns, name, MetricsService.STAMP),
+        var mark        = this.createMarkNode(ns, name, MetricsService.STAMP, context),
             nsCollector = this.collector[ns], 
             collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
 
@@ -337,13 +337,14 @@ MetricsService.prototype = {
         this.collector[ns].push(mark);
         return mark;
     },
-    createMarkNode: function (ns, name, eventType, context) {
+    createMarkNode: function (ns, name, eventType, options) {
+        var context = options ? (options.context || options) : null;
         return {
             "ns"      : ns, 
             "name"    : name,
             "phase"   : eventType,
             "ts"      : MetricsService.TIMER(),
-            "context" : context || null /*keep the shape of the object for perf*/
+            "context" : context
         };
     },
     clearMarks: function (ns) {

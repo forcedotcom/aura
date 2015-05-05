@@ -446,7 +446,7 @@ $A.ns.AuraClientService.prototype.doActionCallback = function(response, collecto
             this.saveTokenToStorage();
         }
 
-        $A.getContext().merge(responseMessage["context"]);
+        $A.getContext()['merge'](responseMessage["context"]);
 
         // Look for any Client side event exceptions
         var events = responseMessage["events"];
@@ -1448,7 +1448,7 @@ $A.ns.AuraClientService.prototype.injectComponent = function(rawConfig, locatorD
     var config = $A.util.json.resolveRefs(rawConfig);
 
     // Save off any context global stuff like new labels
-    $A.getContext().merge(config["context"]);
+    $A.getContext()['merge'](config["context"]);
 
     var actionResult = config["actions"][0];
     var action = $A.get("c.aura://ComponentController.getComponent");

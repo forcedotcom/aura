@@ -642,6 +642,8 @@
                                 <webdriver.remote.server>${webdriver.remote.server}</webdriver.remote.server>
                                 <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                 <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
+                                <webdriver.device.name>${webdriver.device.name}</webdriver.device.name>
+                                <webdriver.platform.version>${webdriver.platform.version}</webdriver.platform.version>
                                 <skipIntTests>${skipIntTests}</skipIntTests>
                             </systemPropertyVariables>
                             <environmentVariables>

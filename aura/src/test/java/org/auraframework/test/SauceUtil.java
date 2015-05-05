@@ -29,6 +29,7 @@ import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.uiautomation.ios.communication.device.DeviceType;
 
 /**
  * SauceLabs-related utility methods
@@ -80,6 +81,45 @@ public final class SauceUtil {
         return new URL(hubURL);
     }
 
+    //For Appium
+    private static final String PLATFORM_VERSION = "8.1";
+    private static final String APPIUM_VERSION = "1.3.6";
+    private static final String IOS_IPHONE_DEVICE = "iPhone 5s";
+    private static final String IOS_IPAD_DEVICE = "iPad Simulator"; //Ipad Simulator will launch iPad2 
+    
+    public static String getIosIphoneDevice() {
+		return IOS_IPHONE_DEVICE;
+	}
+
+	public static String getIosIpadDevice() {
+		return IOS_IPAD_DEVICE;
+	}
+    
+    /**
+     * 
+     * @param capabilities just pass in the capability we created in WebDriverUtil
+     * @param app just use "Safari"
+     * @param deviceType iphone or ipad
+     * @return
+     */
+    public static void setIOSAppiumCapabilities(DesiredCapabilities capabilities, String app, String deviceName, String platformVersion) {
+        capabilities.setCapability("browserName", app);
+        capabilities.setCapability("platformVersion", platformVersion);
+        capabilities.setCapability("appiumVersion", APPIUM_VERSION);
+        capabilities.setCapability("platformName", "iOS");
+        capabilities.setCapability("deviceName", deviceName);
+        capabilities.setCapability("orientation", "portrait");
+        return;
+    }
+    
+    public static void setIOSAppiumCapabilities(DesiredCapabilities capabilities, String app, String deviceName) {
+    	setIOSAppiumCapabilities(capabilities, app, deviceName, PLATFORM_VERSION);
+    }
+    
+    public static void setIOSAppiumCapabilities(DesiredCapabilities capabilities, String app) {
+    	setIOSAppiumCapabilities(capabilities, app, IOS_IPHONE_DEVICE, PLATFORM_VERSION);
+    }
+    
     /**
      * @param test
      * @param browserType String identifying browser and version (same String as the one used by

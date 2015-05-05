@@ -81,14 +81,15 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 	};
 
 	this.summarizeActions = function (t) {
-		return (t.marks.serverActions.filter(function (m) {
+		var serverActions = t.marks.serverActions || [];
+		return (serverActions.filter(function (m) {
 			return m.phase === 'stamp';
 		})).reduce(function (r, m) {
 			return m.context.ids.length + r;
 		}, 0);
 	};
 	this.summarizeXHR = function (t) {
-		var transportMarks = t.marks.transport;
+		var transportMarks = t.marks.transport || [];
 		var counter = 0;
         var queue = {};
         for (var i = 0; i < transportMarks.length; i++) {

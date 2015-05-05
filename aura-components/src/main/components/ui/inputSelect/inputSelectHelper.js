@@ -181,7 +181,7 @@
             for (var i = 0; i < options.length; i++) {
                 var option = options[i];
                 if (option.selected) {
-                    values.push(option.value);
+                    values.push(option.value || "");
                 }
             }
 

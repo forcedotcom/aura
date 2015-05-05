@@ -1,0 +1,6 @@
+({
+    handleGrandchild : function(cmp, event, helper) {
+        var name = event.getParam("name");
+        $A.logger.info("handleGrandchild " + name + " in " + cmp.get("v.logId"));
+    }
+})

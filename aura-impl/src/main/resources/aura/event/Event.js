@@ -61,9 +61,9 @@ Event.prototype.stopPropagation = function() {
 
 /**
  * Sets the event as a "componentEvent" (won't bubble)
- * This type of events were used historicaly in Aura as a construct to call an action on a children 
- * Since aura supports methods this type of event communication is discouraged and a "method" is preferred.
- * NOTE: Calling events on a children is discouraged and will be deprecated
+ * This type of event was used historically as a construct to call an action of a child 
+ * Since the advent of "methods", this type of event communication is discouraged and a "method" is preferred.
+ * NOTE: Calling events on a child is discouraged and will be deprecated
  */
 Event.prototype.setComponentEvent = function(){
     this.componentEvent = true;
@@ -138,9 +138,9 @@ Event.prototype.getParams = function(){
 Event.prototype.statsIndex = [];
 //#end
 
-Event.prototype.dispatchApplicationEventHandlers = function () {
-    var def = this.eventDef;
+Event.prototype.dispatchNonComponentEventHandlers = function () {
     if (this.eventDispatcher) {
+        var def = this.eventDef;
         while (def) {
             var qname = def.getDescriptor().getQualifiedName();
             var handlers = this.eventDispatcher[qname];
@@ -207,16 +207,16 @@ Event.prototype.fire = function(params) {
 
     $A.run(function() {
         self.fired = true;
-        // if is has an eventName is not an application level event
+        // if it has an eventName it is not a method or application event
         if (self.eventName) {
-            // for legacy reasons, if the event is set as component level event dispatch it alone (not bubbling)
+            // for legacy reasons, if the event is set as component level event, dispatch it alone (not bubbling)
             if (self.componentEvent) {
                 self.dispatchComponentEventHandlers();
             } else {
-                eventService.bubbleEvent(self);
+                $A.eventService.bubbleEvent(self);
             }
         } else {
-            self.dispatchApplicationEventHandlers();
+            self.dispatchNonComponentEventHandlers();
         }
     }, this.eventDef.getDescriptor().getQualifiedName()/*name for the stack*/);
 

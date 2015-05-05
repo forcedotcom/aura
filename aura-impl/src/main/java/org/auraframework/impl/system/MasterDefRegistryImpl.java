@@ -204,7 +204,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     @NonNull
     public Set<DefDescriptor<?>> find(@NonNull DescriptorFilter matcher) {
         final String filterKey = matcher.toString();
-        Set<DefRegistry<?>> registries = delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
         GlobMatcher namespaceMatcher = matcher.getNamespaceMatch();
         String namespace = namespaceMatcher.isConstant()?namespaceMatcher.toString():null;
@@ -240,7 +239,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // we will make them undesirable.
                 //
                 boolean cacheable = shouldCache(matcher) && namespaceMatcher.isConstant();
-                for (DefRegistry<?> reg : registries) {
+                for (DefRegistry<?> reg : delegateRegistries.getRegistries(matcher)) {
                     if (reg.hasFind()) {
                         //
                         // Now we walk then entire set of registries, and check to see if our namespace

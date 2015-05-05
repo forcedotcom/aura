@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2015 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
     <aura:registerevent name="onTabClosed" type="ui:tabsetEvent" description="This event is fired when the close icon is clicked." />
     <aura:registerevent name="onTabActivated" type="ui:tabsetEvent" description="This event is fired when the tab item is clicked." />
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
-    <aura:registerevent name="onTabUnhover" type="ui:onTabUnhover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." /> 
+    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." /> 
      
     <aura:handler name="setActive" action="{!c.setActive}" />
     <aura:handler name="addTab" action="{!c.addTab}" />

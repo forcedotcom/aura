@@ -1506,12 +1506,6 @@ Component.prototype.finishDestroy = function() {
  * @public
  */
 Component.prototype.destroy = function(async) {
-    var concrete = this.getConcreteComponent();
-    if (concrete && this !== concrete && concrete.isValid()) {
-        concrete.destroy(async);
-        return;
-    }
-    
     this.fire("destroy");
 
     // #if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING",

@@ -81,11 +81,10 @@ var AuraEventService = function() {
             var i,j;
 
             // Loop over facet value provider all the way up to the root
-            var cmp = evt.getSource();
-            while (cmp && cmp.isValid() && !evt.eventStopPropagation) {
+            for (var cmp = evt.getSource(); cmp && !evt.eventStopPropagation; cmp = cmp.isValid() && cmp.getComponentValueProvider()) {
                 
                 // Loop for super() parents inside the current component
-                for (var superCmp = cmp; superCmp && !evt.eventStopPropagation; superCmp = superCmp.isValid() ? superCmp.getSuper() : null) {
+                for (var superCmp = cmp; superCmp; superCmp = cmp.isValid() ? superCmp.getSuper(): null) {
 
                     var dispatcher = superCmp.getEventDispatcher();
                     var dispatcherHandlers = dispatcher && dispatcher[eventName];
@@ -93,8 +92,6 @@ var AuraEventService = function() {
 
                     // First of all, check if we have any dispatch handlers, if not we are done for this level
                     if (dispatcherHandlers && dispatcherHandlers.length) {
-                        // In case somebody tries to insert new handlers during bubbling
-                        dispatcherHandlers = dispatcherHandlers.slice();
                         needsDispatch = true;
 
                         var cmpHandlerDefs = superCmp.getDef().getCmpHandlerDefs();
@@ -109,7 +106,7 @@ var AuraEventService = function() {
                                     // If we have the def we guard against it. If we just have name, only check the name
                                     // TODO @dval: Refactor this, once we remove all self-events + move parent->child event into methods
                                     if (cmpHandlerDefs[i]["name"] === eventName && (!hDef || hDef === evtDef)) {
-                                        for (j = 0; j < dispatcherHandlers.length && superCmp.isValid(); j++) {
+                                        for (j = 0; j < dispatcherHandlers.length; j++) {
                                             dispatcherHandlers[j](evt);
                                         }
                                         needsDispatch = false;
@@ -139,24 +136,9 @@ var AuraEventService = function() {
 
                 } // inheritance-loop
 
-                if (!cmp.isValid()) {
+                if (cmp.isValid() && cmp === cmp.getComponentValueProvider()) {
                     return;
                 }
-                
-                // Look for a facet value provider (some providers may just be extending definitions)
-                do {
-                    var next = cmp.getComponentValueProvider();
-                    if (next === cmp) {
-                        // We are at the top-level now, so we are done;
-                        return;
-                    }
-                    if (next.getGlobalId() !== cmp.getGlobalId()) {
-                        // Reached a facet value provider
-                        cmp = next;
-                        break;
-                    }
-                    cmp = next;
-                } while (cmp);
             } // parent-bubble-loop
         },
 

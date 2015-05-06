@@ -27,6 +27,8 @@
 		<ui:button label="clear logs" press="{!c.clear}"/>
 		<ui:inputText value="{!v.filter}" placeholder="filter regexp"/>
 		<br/>
-		<div aura:id="entries"/>
+		<aura:iteration items="{!v.logs}" var="entry">
+			<aura:text value="{!entry}"/><br/>
+		</aura:iteration>
 	</div>
 </aura:component>

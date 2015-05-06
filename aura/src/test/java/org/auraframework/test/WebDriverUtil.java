@@ -27,8 +27,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.uiautomation.ios.IOSCapabilities;
-import org.uiautomation.ios.communication.device.DeviceType;
 
 import com.google.common.collect.Lists;
 
@@ -48,9 +46,7 @@ public final class WebDriverUtil {
         TABLET("deviceType", "tablet"),
         LANDSCAPE("deviceOrientation", "landscape"),
         PORTRAIT("deviceOrientation", "portrait"),
-        DISABLE_NATIVE_EVENTS("webdriverEnableNativeEvents", "false"),
-        SIMULATOR_SCALE_IPAD("simulatorScale", ".35"),
-        SIMULATOR_SCALE_IPHONE("simulatorScale", ".5");
+        DISABLE_NATIVE_EVENTS("webdriverEnableNativeEvents", "false");
 
         private final String value;
         private final String name;
@@ -80,8 +76,8 @@ public final class WebDriverUtil {
         SAFARI(DesiredCapabilities.safari(), "7", "OS X 10.9"),
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
-        IPAD(IOSCapabilities.ipad("Safari"),  ExtraCapability.SIMULATOR_SCALE_IPAD),
-        IPHONE(IOSCapabilities.iphone("Safari"),  ExtraCapability.SIMULATOR_SCALE_IPHONE);
+        IPAD(DesiredCapabilities.ipad()),
+        IPHONE(DesiredCapabilities.iphone());
         private final DesiredCapabilities capability;
         private final String version;
 
@@ -90,29 +86,29 @@ public final class WebDriverUtil {
             this.version = version;
             initExtraCapabilities(extraCapabilities);
         }
-        
+
         private BrowserType(DesiredCapabilities capabilities, ExtraCapability... extraCapabilities) {
-        	this.capability = capabilities;
-        	this.version = "";
-        	// capabilities for ios-driver common to ipad/iphone
-            if (capabilities instanceof IOSCapabilities) {
-            	String deviceName = System.getProperty(WebDriverProvider.DEVICE_NAME_PROPERTY);
-            	String platformVersion = System.getProperty(WebDriverProvider.PLATFORM_VERSION_PROPERTY);
-            	if( deviceName == null || deviceName.length() <= 0 ) {
-            		DeviceType deviceType = ((IOSCapabilities)this.capability).getDevice();
-            		if(deviceType.name().equalsIgnoreCase("IPHONE")) {
-            			deviceName = SauceUtil.getIosIphoneDevice();
-                    } else if(deviceType.name().equalsIgnoreCase("IPAD")) {
-                    	deviceName = SauceUtil.getIosIpadDevice();
+            this.capability = capabilities;
+            this.version = "";
+
+            String browser = capabilities.getBrowserName();
+            if (browser.equalsIgnoreCase("iphone") || browser.equalsIgnoreCase("ipad")) {
+                String deviceName = System.getProperty(WebDriverProvider.DEVICE_NAME_PROPERTY);
+                String platformVersion = System.getProperty(WebDriverProvider.PLATFORM_VERSION_PROPERTY);
+                if (deviceName == null || deviceName.length() <= 0) {
+                    if (browser.equalsIgnoreCase("iphone")) {
+                        deviceName = SauceUtil.getIosIphoneDevice();
+                    } else if (browser.equalsIgnoreCase("ipad")) {
+                        deviceName = SauceUtil.getIosIpadDevice();
                     }
-            	}
-            	if( platformVersion == null || platformVersion.length() <= 0 ) {
-            		SauceUtil.setIOSAppiumCapabilities(this.capability, "Safari", deviceName);
-            	} else {
-            		SauceUtil.setIOSAppiumCapabilities(this.capability, "Safari", deviceName, platformVersion);
-            	}
-            	
+                }
+                if (platformVersion == null || platformVersion.length() <= 0) {
+                    SauceUtil.setIOSAppiumCapabilities(this.capability, "Safari", deviceName);
+                } else {
+                    SauceUtil.setIOSAppiumCapabilities(this.capability, "Safari", deviceName, platformVersion);
+                }
             }
+
             initExtraCapabilities(extraCapabilities);
         }
 

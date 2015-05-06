@@ -16,14 +16,10 @@
 package org.auraframework.components.ui.inputNumber;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// ios-driver gets a NoSuchElementException trying to type after a input.clear()
-@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
 public class InputNumberUITest extends WebDriverTestCase {
 
     public InputNumberUITest(String name) {

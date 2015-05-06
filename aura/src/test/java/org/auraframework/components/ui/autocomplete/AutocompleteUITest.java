@@ -15,12 +15,18 @@
  */
 package org.auraframework.components.ui.autocomplete;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.auraframework.test.*;
+import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
@@ -35,7 +41,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     private final String AUTOCOMPLETE_LIST_SELECTOR = "div[class*='uiAutocompleteList']";
     private final String AUTOCOMPLETE_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
     private final String AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION_SELECTOR = "div[class*='uitestAutoComplete_CustomTemplate']";
-    //since W-2419601, 'invisible' is being added to the li contains "div[class*='customOption']";
+    // since W-2419601, 'invisible' is being added to the li contains "div[class*='customOption']";
     private final String AUTOCOMPLETE_CUSTOM_OPTION_SELECTOR = "li[class*='uiAutocompleteOption']";
     private final String MATCHED_SELECTOR = "mark[class*='data-match']";
 
@@ -83,13 +89,13 @@ public class AutocompleteUITest extends WebDriverTestCase {
      * Test to verify input cmp does get its value updated on clicking ENTER in the field Bug: W-2293143 Press Enter is
      * not used for Safari
      */
-    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.SAFARI })
     public void testAutoCompleteWithUpdateOnAttributeSet() throws Exception {
         open(URL);
         String inputAutoComplete = "autoCompleteUpdateOn";
         String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete)
                 + ".find('input').get('v.value')");
-        String autoCompleteText = (String)auraUITestingUtil.getEval(expr);
+        String autoCompleteText = (String) auraUITestingUtil.getEval(expr);
         assertNull("Auto complete Text for input should be undefined", autoCompleteText);
         WebDriver driver = getDriver();
         WebElement inputElement = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("autoCompleteUpdateOn"));
@@ -97,16 +103,14 @@ public class AutocompleteUITest extends WebDriverTestCase {
         String expectedText = "testing";
         inputElement.sendKeys(expectedText);
         auraUITestingUtil.pressEnter(inputElement);
-        autoCompleteText = (String)auraUITestingUtil.getEval(expr);
+        autoCompleteText = (String) auraUITestingUtil.getEval(expr);
         assertEquals("Input Value was not change after pressing Enter", expectedText, autoCompleteText);
     }
-    
+
     /**
-     * Test to verify blur and focus events works when set in the ui:autocomplete component.
-     * Test case: W-2391008
+     * Test to verify blur and focus events works when set in the ui:autocomplete component. Test case: W-2391008
      */
-    // Exclude on ios-driver because the driver hides the keyboard after send keys which triggers a blur event
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testAutoCompleteWithBlurAndFocusEvent() throws Exception {
         open(URL);
         String inputAutoComplete = "blurFocus";
@@ -116,11 +120,11 @@ public class AutocompleteUITest extends WebDriverTestCase {
         WebDriver driver = getDriver();
         WebElement outputText = findDomElement(By.cssSelector(outputTextLocator));
         assertEquals("No Event should be fire yet", "", outputText.getText());
-        //selecting input to fire focus event
+        // selecting input to fire focus event
         WebElement inputElement = getAutoCompleteInput(driver, inputBlurFocus);
         inputElement.click();
         assertEquals("Focus Event should be fired", "Focus Event Fired!!", outputText.getText());
-        //selecting different input to fire blur event
+        // selecting different input to fire blur event
         WebElement inputmatchFunc = getAutoCompleteInput(driver, matchFuncInput);
         inputmatchFunc.click();
         assertEquals("Blur Event should be fired", "Blur Event Fired!!", outputText.getText());
@@ -273,7 +277,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
     // DVAL: HALO: HACK: WTF: FIXME THIS WHOLE AUTOCOMPLETE COMPONENT
 
     // public void testAutoCompleteEmptyListContentNoMatches() throws Exception {
-    //     doTestEmptyListContent(AUTOCOMPLETE_COMPONENT.get("emptyListContent"), "hello worldx", true, true);
+    // doTestEmptyListContent(AUTOCOMPLETE_COMPONENT.get("emptyListContent"), "hello worldx", true, true);
     // }
 
     /**
@@ -291,17 +295,17 @@ public class AutocompleteUITest extends WebDriverTestCase {
     // DVAL: HALO: HACK: WTF: FIXME THIS WHOLE AUTOCOMPLETE COMPONENT
 
     // public void testAutoCompleteEmptyListContentUseCase() throws Exception {
-    //     Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("emptyListContent");
-    //     doTestEmptyListContent(autoCompleteCmpNum, "hello world", true, false);
-    //     doTestEmptyListContent(autoCompleteCmpNum, "hello worldx", true, true);
+    // Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("emptyListContent");
+    // doTestEmptyListContent(autoCompleteCmpNum, "hello world", true, false);
+    // doTestEmptyListContent(autoCompleteCmpNum, "hello worldx", true, true);
 
-    //     WebDriver driver = getDriver();
-    //     WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
-    //     auraUITestingUtil.pressTab(input);
+    // WebDriver driver = getDriver();
+    // WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
+    // auraUITestingUtil.pressTab(input);
 
-    //     WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
-    //     waitForAutoCompleteListVisible(list, false);
-    //     assertFalse("Expected emptyListContent to be invisible", hasCssClass(list, "showEmptyContent"));
+    // WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
+    // waitForAutoCompleteListVisible(list, false);
+    // assertFalse("Expected emptyListContent to be invisible", hasCssClass(list, "showEmptyContent"));
     // }
 
     /**
@@ -322,7 +326,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
         List<WebElement> options = getAutoCompleteListOptions(list);
         assertEquals("Incorrect number of visible options", 10, options.size());
     }
-    
+
     /**
      * Test for autocomplete with a list toggle button. The behavior is overridden to show all items no matter what gets
      * typed in the input field. Verifies that the list visibility can be toggled.
@@ -343,9 +347,9 @@ public class AutocompleteUITest extends WebDriverTestCase {
         toggle.click();
         waitForAutoCompleteListVisible(list, false);
     }
-    
+
     /**
-     * Test accessibility when autocompleteOptions is extended 
+     * Test accessibility when autocompleteOptions is extended
      */
     // Excluding mobile devices since they dont have arrow key functionality
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
@@ -365,56 +369,56 @@ public class AutocompleteUITest extends WebDriverTestCase {
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("OptionExtention"));
         List<WebElement> options = getAutoCompleteListOptions(list, OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
         waitForOptionHighlighted(options.get(1));
-        
+
         // verify aria attributes
         String ariaActiveDecendant = input.getAttribute("aria-activedescendant");
         String ariaExpanded = input.getAttribute("aria-expanded");
         String optionId = options.get(1).findElement(By.tagName("a")).getAttribute("id");
         assertTrue("aria-expanded should be true", Boolean.parseBoolean(ariaExpanded));
         assertEquals("aria-activedescendant incorrect", optionId, ariaActiveDecendant);
-        
+
         // escape and verify everything gets reset
         input.sendKeys(Keys.ESCAPE);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("OptionExtention"));
         waitForAutoCompleteListVisible(list, false);
-        
+
         ariaActiveDecendant = input.getAttribute("aria-activedescendant");
         ariaExpanded = input.getAttribute("aria-expanded");
         assertFalse("aria-expanded should be false after hitting escape", Boolean.parseBoolean(ariaExpanded));
         assertEquals("aria-activedescendant incorrect after hitting escape", "", ariaActiveDecendant);
     }
-    
+
     /**
      * Test editing value to new value works.
      */
     public void testAutocompleteEditSelectedValue() throws Exception {
-    	doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
-    	WebDriver driver = getDriver();
+        doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
+        WebDriver driver = getDriver();
         WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
-        
-    	// edit input
+
+        // edit input
         input.sendKeys("xyz");
         waitForInputValue(input, "hello world3xyz");
     }
-    
+
     private void waitForOptionHighlighted(final WebElement o) {
-    	auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return hasCssClass(o, "highlighted");
             }
-        }, timeoutInSecs,"fail on waiting for option to be highlighted");
+        }, timeoutInSecs, "fail on waiting for option to be highlighted");
     }
-    
+
     private void waitForInputValue(final WebElement input, final String expectedOption) {
-    	auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return expectedOption.equals(input.getAttribute("value"));
             }
-        }, timeoutInSecs,"fail on waiting for option '" + expectedOption + "' to be selected");
+        }, timeoutInSecs, "fail on waiting for option '" + expectedOption + "' to be selected");
     }
-    
+
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,
             OptionType optionType) throws Exception {
         open(URL);

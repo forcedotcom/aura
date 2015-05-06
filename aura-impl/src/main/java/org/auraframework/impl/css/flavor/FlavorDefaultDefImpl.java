@@ -49,13 +49,17 @@ import com.google.common.collect.ImmutableMap;
 public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> implements FlavorDefaultDef {
     private static final long serialVersionUID = 5695464798233444175L;
     private static final String ANY = "*";
+    private static final String REMOVE = "{!remove}";
 
     private final String component;
     private final String flavor;
     private final Expression context;
 
+    private final String removeAllNamespace;
+
     private final DescriptorFilter componentFilter;
     private final DefDescriptor<ComponentDef> singleComponent;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
 
     private final int hashCode;
 
@@ -76,6 +80,14 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         }
         this.singleComponent = singleComponent;
 
+        // TODONM testme
+        if (singleComponent == null && flavor.equals(REMOVE)) {
+            removeAllNamespace = component.split(":")[0];
+        } else {
+            removeAllNamespace = null;
+        }
+
+        this.parentDescriptor = builder.parentDescriptor;
         this.context = builder.context;
         this.hashCode = AuraUtil.hashCode(descriptor, location, component, flavor, context);
     }
@@ -86,9 +98,16 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
     }
 
     @Override
+    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        return parentDescriptor;
+    }
+
+    @Override
     public Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorMapping mapping) throws QuickFixException {
         if (singleComponent != null) {
             return ImmutableMap.of(singleComponent, flavor);
+        } else if (removeAllNamespace != null) {
+            return ImmutableMap.of();
         }
 
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -146,20 +165,28 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
                 FlavorMapping mapping = ((FlavorAssortmentDef) dd.getDef()).computeOverrides();
 
                 json.writeMapBegin();
-                for (Entry<DefDescriptor<ComponentDef>, String> entry : computeFilterMatches(mapping).entrySet()) {
-                    json.writeMapKey(entry.getKey().getQualifiedName());
-                    json.writeMapBegin();
-                    json.writeMapEntry("flavor", entry.getValue());
+
+                if (removeAllNamespace != null) {
+                    json.writeMapEntry("removeAll", removeAllNamespace);
                     if (context != null) {
                         json.writeMapEntry("context", context);
                     }
-                    json.writeMapEnd();
+                } else {
+                    for (Entry<DefDescriptor<ComponentDef>, String> entry : computeFilterMatches(mapping).entrySet()) {
+                        json.writeMapKey(entry.getKey().getQualifiedName());
+                        json.writeMapBegin();
+                        json.writeMapEntry("flavor", entry.getValue());
+                        if (context != null) {
+                            json.writeMapEntry("context", context);
+                        }
+                        json.writeMapEnd();
+                    }
                 }
+
                 json.writeMapEnd();
             } catch (QuickFixException e) {
                 throw new AuraRuntimeException(e);
             }
-
         }
     }
 
@@ -188,7 +215,6 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
             super(FlavorDefaultDef.class);
         }
 
-        @SuppressWarnings("unused")
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private String component;
         private String flavor;

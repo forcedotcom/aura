@@ -37,4 +37,9 @@ public interface FlavorIncludeDef extends Definition {
      * @throws QuickFixException If there's a problem loading the flavor def.
      */
     Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> computeFlavorMapping() throws QuickFixException;
+
+    /**
+     * @return Returns the parentDescriptor.
+     */
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

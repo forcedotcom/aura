@@ -44,7 +44,7 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     	componentClassDef = $A.util.json.decode(componentClassDef);
     	componentClassDef();
     }
-    
+
     this.interfaces = {};
     var intfConfig = config["interfaces"];
     if (intfConfig) {
@@ -86,13 +86,13 @@ $A.ns.ComponentDef = function ComponentDef(config) {
             registerEventDefs[name] = eventService.getEventDef(regConfig["eventDef"]);
         }
     }
-    
+
     var handlerDefConfigs = config["handlerDefs"];
     if (handlerDefConfigs) {
         for (var j = 0; j < handlerDefConfigs.length; j++) {
             var handlerConfig = handlerDefConfigs[j];
             if (handlerConfig["eventDef"]) {
-                // We cannot modify handlerConfig directly, as it is sometimes stored in localStorage. 
+                // We cannot modify handlerConfig directly, as it is sometimes stored in localStorage.
                 // and the json serialize-deserialize loses the object prototype.
                 if (handlerConfig.name) {
                     if (!cmpHandlerDefs) {
@@ -133,7 +133,7 @@ $A.ns.ComponentDef = function ComponentDef(config) {
             $A.componentService.getDef(subDefs[k]);
         }
     }
-    
+
     var imports = config["imports"];
     if (imports) {
         this.libraryDefs = $A.util.reduce(imports, function(libraryDefs, imported) {
@@ -180,7 +180,7 @@ $A.ns.ComponentDef.prototype.auraType = "ComponentDef";
 
 /**
  * Returns a DefDescriptor object.
- * 
+ *
  * @returns {DefDescriptor} A DefDescriptor object contains a prefix, namespace,
  *          and name.
  */
@@ -191,7 +191,7 @@ $A.ns.ComponentDef.prototype.getDescriptor = function() {
 /**
  * Checks whether the Component is abstract. Returns true if the component is
  * abstract.
- * 
+ *
  * @returns {Boolean} True if component is abstract, or false otherwise.
  */
 $A.ns.ComponentDef.prototype.isAbstract = function() {
@@ -201,7 +201,7 @@ $A.ns.ComponentDef.prototype.isAbstract = function() {
 /**
  * Returns the component definition for the immediate super type or null if none
  * exists (should only be null for aura:component).
- * 
+ *
  * @return {ComponentDef} The ComponentDef for the immediate super type
  */
 $A.ns.ComponentDef.prototype.getSuperDef = function() {
@@ -210,7 +210,7 @@ $A.ns.ComponentDef.prototype.getSuperDef = function() {
 
 /**
  * Returns a HelperDef object.
- * 
+ *
  * @returns {HelperDef}
  */
 $A.ns.ComponentDef.prototype.getHelperDef = function() {
@@ -219,7 +219,7 @@ $A.ns.ComponentDef.prototype.getHelperDef = function() {
 
 /**
  * Gets the Helper instance
- * 
+ *
  * @returns {Helper}
  */
 $A.ns.ComponentDef.prototype.getHelper = function() {
@@ -232,7 +232,7 @@ $A.ns.ComponentDef.prototype.getHelper = function() {
 
 /**
  * Returns a RendererDef object.
- * 
+ *
  * @returns {RendererDef}
  */
 $A.ns.ComponentDef.prototype.getRendererDef = function() {
@@ -242,7 +242,7 @@ $A.ns.ComponentDef.prototype.getRendererDef = function() {
 /**
  * Checks whether the component has remote dependencies. Returns true if remote
  * dependencies are found.
- * 
+ *
  * @returns {Boolean} True if remote dependencies exist, or false otherwise.
  */
 $A.ns.ComponentDef.prototype.hasRemoteDependencies = function() {
@@ -258,7 +258,7 @@ $A.ns.ComponentDef.prototype.getRenderingDetails = function() {
 
 /**
  * Returns a ProviderDef object associated with this ComponentDef.
- * 
+ *
  * @returns {ProviderDef}
  */
 $A.ns.ComponentDef.prototype.getProviderDef = function() {
@@ -268,7 +268,7 @@ $A.ns.ComponentDef.prototype.getProviderDef = function() {
 /**
  * Gets all the StyleDef objects, including inherited ones, for this
  * ComponentDef.
- * 
+ *
  * @returns {StyleDef}
  */
 $A.ns.ComponentDef.prototype.getAllStyleDefs = function() {
@@ -281,7 +281,7 @@ $A.ns.ComponentDef.prototype.getAllStyleDefs = function() {
  * this ComponentDef. If multiple class names are found, the return value is a
  * space-separated list of class names. This string can be applied directly to
  * DOM elements rendered by Components of this type.
- * 
+ *
  * @returns {String} The style class name
  */
 $A.ns.ComponentDef.prototype.getStyleClassName = function() {
@@ -308,7 +308,7 @@ $A.ns.ComponentDef.prototype.getStyleClassName = function() {
 
 /**
  * Gets the style definition. Returns a StyleDef object.
- * 
+ *
  * @returns {StyleDef}
  */
 $A.ns.ComponentDef.prototype.getStyleDef = function() {
@@ -322,7 +322,7 @@ $A.ns.ComponentDef.prototype.getStyleDef = function() {
  * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
  */
 $A.ns.ComponentDef.prototype.getDefaultFlavor = function() {
-    if ($A.util.isUndefined(this.overriddenDefault)) {
+    if ($A.util.isUndefined(this.flavorOverride)) {
         var override = null;
 
         var appDesc = $A.getContext().getApp();
@@ -332,14 +332,17 @@ $A.ns.ComponentDef.prototype.getDefaultFlavor = function() {
                 var defaults = appDef.getDefaultFlavors();
                 if (defaults) {
                     override = defaults.getFlavor(this.descriptor);
+                    if (override === "{!remove}") {
+                        override = "";
+                    }
                 }
             }
         }
 
-        this.overriddenDefault = $A.util.isUndefinedOrNull(override) ? null : override;
+        this.flavorOverride = $A.util.isUndefinedOrNull(override) ? null : override;
     }
 
-    return this.overriddenDefault || this.defaultFlavor;
+    return !$A.util.isUndefinedOrNull(this.flavorOverride) ? this.flavorOverride : this.defaultFlavor;
 };
 
 /**
@@ -371,7 +374,7 @@ $A.ns.ComponentDef.prototype.getAttributeDefs = function() {
 
 /**
  * Gets the component facets. A facet is any attribute of type Aura.Component[].
- * 
+ *
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getFacets = function() {
@@ -380,7 +383,7 @@ $A.ns.ComponentDef.prototype.getFacets = function() {
 
 /**
  * Gets the controller definition. Returns a ControllerDef object.
- * 
+ *
  * @returns {ControllerDef}
  */
 $A.ns.ComponentDef.prototype.getControllerDef = function() {
@@ -409,7 +412,7 @@ $A.ns.ComponentDef.valueEvents = {
 
 /**
  * Returns the event definitions.
- * 
+ *
  * @param {String}
  *            The name of the event definition.
  * @param {Boolean}
@@ -429,11 +432,11 @@ $A.ns.ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
 
 /**
  * Get an event name by descriptor qualified name.
- * 
+ *
  * This is only used in the case of an action firing a component event. It is a
  * bit of a hack, but will give back the name of the event that corresponds to
  * the descriptor.
- * 
+ *
  * @param {String}
  *            descriptor a descriptor qualified name.
  * @return {String} null, or the component fired event name.
@@ -450,7 +453,7 @@ $A.ns.ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
 
 /**
  * Gets all events associated with the Component.
- * 
+ *
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getAllEvents = function() {
@@ -459,7 +462,7 @@ $A.ns.ComponentDef.prototype.getAllEvents = function() {
 
 /**
  * Gets the application handler definitions.
- * 
+ *
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getAppHandlerDefs = function() {
@@ -468,7 +471,7 @@ $A.ns.ComponentDef.prototype.getAppHandlerDefs = function() {
 
 /**
  * Gets the component handler definitions.
- * 
+ *
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getCmpHandlerDefs = function() {
@@ -477,7 +480,7 @@ $A.ns.ComponentDef.prototype.getCmpHandlerDefs = function() {
 
 /**
  * Gets the value of the handler definitions.
- * 
+ *
  * @returns {Object}
  */
 $A.ns.ComponentDef.prototype.getValueHandlerDefs = function() {
@@ -486,7 +489,7 @@ $A.ns.ComponentDef.prototype.getValueHandlerDefs = function() {
 
 /**
  * Converts a ComponentDef object to type String.
- * 
+ *
  * @returns {String}
  */
 $A.ns.ComponentDef.prototype.toString = function() {
@@ -496,7 +499,7 @@ $A.ns.ComponentDef.prototype.toString = function() {
 /**
  * Checks whether the Component is an instance of the given component name (or
  * interface name).
- * 
+ *
  * @param {String}
  *            name The name of the component (or interface), with a format of
  *            <code>namespace:componentName</code> (e.g.,
@@ -516,7 +519,7 @@ $A.ns.ComponentDef.prototype.isInstanceOf = function(name) {
 
 /**
  * Primarily used by isInstanceOf().
- * 
+ *
  * @private
  */
 $A.ns.ComponentDef.prototype.implementsDirectly = function(type) {
@@ -553,10 +556,10 @@ $A.ns.ComponentDef.prototype.initSuperDef = function(config) {
 
 /**
  * Setup the style defs and renderer details.
- * 
+ *
  * Note that the style defs are in reverse order so that they get applied in
  * forward order.
- * 
+ *
  * @private
  */
 $A.ns.ComponentDef.prototype.initRenderer = function() {

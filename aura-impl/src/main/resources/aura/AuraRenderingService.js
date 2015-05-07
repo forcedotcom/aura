@@ -296,7 +296,9 @@ $A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, f
         facet=[facet];
     }
     if(!$A.util.isArray(facet)){
-        $A.error("Aura.RenderingService.getUpdatedFacetInfo: 'facet' must be a valid Array. Found '"+facet+"'.");
+        $A.warning("Aura.RenderingService.getUpdatedFacetInfo: 'facet' should be a valid Array. Found '" +
+            facet + "' in '" + component + "'.");
+        facet = [];
     }
     var updatedFacet={
         components:[],
@@ -659,7 +661,7 @@ $A.ns.AuraRenderingService.prototype.rerenderDirty = function(stackName) {
             if (rerenderedCmpDef) {
                 markDescription += "'" + rerenderedCmpDef.descriptor.getQualifiedName() + "'";
             }
-            if (m < dirty.length - 1) {
+            if (m < allRerendered.length - 1) {
                 markDescription += ",";
             }
         }
@@ -773,17 +775,26 @@ $A.ns.AuraRenderingService.prototype.insertElements = function(elements, refNode
 $A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
     var concrete = cmp.getConcreteComponent();
     var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
+    var flavorClassName = null; // instance-specific, flavor class name applied to flavorable elements if applicable
+
+    if (cmp.isFlavorable()) {
+        var vp = cmp.getComponentValueProvider();
+        if (vp) {
+            flavorClassName = vp.get("style.flavor");
+        }
+    }
 
     if (className) {
-        // add the instance-specific flavor class name if a flavor is specified and this element is flavorable
-        if (!$A.util.isUndefinedOrNull(concrete.getFlavorName()) && $A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
-            className = className + $A.util.buildFlavorClass(concrete.getFlavorName(), concrete.getFlavorNamespace());
+        if (flavorClassName) {
+            className = className + flavorClassName;
         }
 
         $A.util.addClass(element, className);
         if (element["tagName"]) {
             element["auraClass"] = $A.util.buildClass(element["auraClass"],className);
         }
+    } else if (flavorClassName) {
+        $A.util.addClass(element, flavorClassName);
     }
 };
 

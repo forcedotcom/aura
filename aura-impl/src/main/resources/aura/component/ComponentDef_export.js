@@ -39,5 +39,7 @@ exp(p,
     "isInstanceOf", p.isInstanceOf,
     "getAllEvents", p.getAllEvents,
     "getStyleClassName", p.getStyleClassName,
-    "getDefaultFlavor", p.getDefaultFlavor
+    "getDefaultFlavor", p.getDefaultFlavor,
+    "hasFlavorableChild", p.hasFlavorableChild,
+    "getDefaultFlavors", p.getDefaultFlavors
 );

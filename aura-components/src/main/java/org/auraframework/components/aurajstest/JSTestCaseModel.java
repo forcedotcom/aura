@@ -16,6 +16,7 @@
 package org.auraframework.components.aurajstest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 
@@ -43,7 +45,7 @@ public class JSTestCaseModel {
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
         TestCaseDef caseDef = (TestCaseDef) component.getAttributes().getValue("case");
-
+        
         String baseUrl = component.getAttributes().getValue("url").toString();
         Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
         List<NameValuePair> newParams = Lists.newArrayList();
@@ -51,7 +53,12 @@ public class JSTestCaseModel {
         if (!attributes.isEmpty()) {
             for (Entry<String, Object> entry : attributes) {
                 String key = entry.getKey();
-                String value = entry.getValue().toString();
+                String value;
+                if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
+                	value = Json.serialize(entry.getValue());
+                } else {
+                	value = entry.getValue().toString();
+                }
                 if (key.equals("__layout")) {
                     hash = value;
                 } else {

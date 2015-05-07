@@ -20,7 +20,7 @@ Function.RegisterNamespace("Test.Components.Ui.CarouselPage");
 Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
 	var targetHelper = null;
 
-	ImportJson("ui.carouselPage.carouselPageHelper",function(path,result){
+	ImportJson("ui.carouselPageDeprecated.carouselPageDeprecatedHelper",function(path,result){
 		targetHelper=result;
 	});
 

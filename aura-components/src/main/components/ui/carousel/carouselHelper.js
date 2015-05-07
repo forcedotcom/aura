@@ -14,689 +14,330 @@
  * limitations under the License.
  */
 ({
-	//number of milliseconds to wait before navigating to the next page with arrow key
-	KEY_PAGE_SELECTION_TIMEOUT_DURATION: 200,
-	//number of pixels the scroller has moved before handling the scrollMove event
-	SCROLL_START_THRESHOLD : 4,
-	//indicates only the selected page is visible or not
-    SHOW_SELECTED_PAGE_ONLY : true,
-    //Minimum distance to swipe to find out the intended swipe direction
-    DISTANCE_THRESHOLD : 5,
-    //Direction
-    HORIZONTAL : 1,
-    //navContainer height, hardcode for now so it does not require updating the size dynamically if width and height is set
-    NAV_CONTAINER_HEIGHT : 58,
-    //number of previous or next pages to mark as visible while user is swiping
-    NUMBER_OF_PAGES_TO_SHOW : 3,
+    // Bootstrap everything
+    initialize: function (cmp) {
+    	this.initializeInstrumentation(cmp);
+        this.initializeIndicator(cmp);
+        this.initializePages(cmp);
+        this.initializeCarouselPlugin(cmp);
+    },
+    /*
+     * Carousel Plugin (will be injected into the Scroller overriding and extending functionality)
+     */
+    _buildCarouselPlugin : function (cmp) {
+        return {
+            init: function () {
+                this.opts.carouselTransitionTime = this.opts.carouselTransitionTime || 300;
+                this.on('scrollEnd', this._onCarouselScrollEnd);
+                this.on('scrollStart', this._onCarouselScrollStart);
+                this.on('_refresh', this._onCarouselRefresh);
+                this._setInitialPage();
+            },
+            _setInitialPage: function () {
+                var initial = this.opts.initialPage;
+                if (typeof initial === 'number') {
+                    this._activePage = initial;
+                    var dest = this._calculateScrollByPage(initial);
+                    this.scrollTo(dest.x, dest.y);
+                }
+            },
+            _getPageSize: function (force) {
+            	if (!this.pageSize || force) {
+            		this.pageSize = this.scrollVertical ? this.itemHeight || this.wrapperHeight : this.itemWidth || this.wrapperWidth;
+            	}
+            	return this.pageSize;
+            },
+            _onCarouselRefresh: function () {
+            	this._getPageSize("force");
+            },
+            _calculateScrollByPage: function (pageIndex, force) {
+                var size = this._getPageSize(force),
+                    dest = -size * pageIndex,
+                    x    = this.scrollVertical ? 0 : dest,
+                    y    = this.scrollVertical ? dest : 0;
 
-	init : function(cmp) {
-		this.initSize(cmp);
-		this.initPages(cmp);
-	},
+                return { x: x, y: y };
+            },
+            _onCarouselScrollEnd: function () {
+                var oldPage  = this._activePage,
+                    pageSize = this._getPageSize(),
+                    newPage  = Math.abs(this.x / pageSize);
 
-	initSize : function(cmp) {
-		var carouselSize = this.getCarouselSize(cmp);
-		cmp._width = carouselSize.width;
-		cmp.set('v.priv_carouselStyle', this.getSizeStyle(carouselSize.width, carouselSize.height));
-	},
+                this._setContinuousFlow(false);
+                if (oldPage !== newPage) {
+                    this._activePage = newPage;
+                    this._fire('pageChange', this._activePage);
+                }
+            },
+            /*
+             * If the scroller was forced to stop in the middle of a page transition, 
+             * we need to make sure it does not get stucked in the middle,
+             * so we force it to transalte to a correct state in that case. 
+             */
+            _onStopScrolling: function (e) {
+                e.preventDefault();
+                var end = this._end;
+                var pageSize = this._getPageSize();
+                
+                // Hook in the _end since this scroller won't fire any event since has been stopped
+                this._end = function () {
+                	end.apply(this, arguments);
+                	this._end = end; // restore it
+                	if ((this.x % pageSize) !== 0) {
+                		var dest = this._calculateScrollByPage(Math.abs(Math.round(this.x / pageSize)));
+                        this.scrollTo(dest.x, dest.y, this.opts.carouselTransitionTime);
+                	}
+                };
+            },
+            _onCarouselScrollStart: function () {
+                this._setContinuousFlow(true);
+            },
+            /**
+             * During tab transition, enable continuous flow so that all pages will be visible
+             * and give better user experience as the pages slide through the carousel.
+             * After tab transition end, disable continuous flow(only the selected tab will be visible)
+             * so that keyboard tabbing will be contained only on the active page.
+             * @param isContinuousFlow
+             * @private
+             */
+            _setContinuousFlow: function(isContinuousFlow) {
+            	if (!this.isDesktop) {
+            		return;
+            	}
 
-	initScroller: function(cmp) {
-		var pageCmps = this.getPageComponents(cmp);
+                var scrollerEl = this.scroller,
+                    cssClass = 'continuous-flow';
 
-		if (pageCmps && pageCmps.length > 0) {
+                if(isContinuousFlow) {
+                    $A.util.addClass(scrollerEl, cssClass);
+                }
+                else {
+                    $A.util.removeClass(scrollerEl, cssClass);
+                }
+            },
+            _updatePagesSize: function () {
+                var wrapperDom = this.wrapper,
+                    pages = wrapperDom.getElementsByClassName('carousel-page') || [],
+                    width  = wrapperDom.offsetWidth;
 
-			var snap = this.getSnap(cmp);
+                for (var i = 0, len = pages.length; i < len; i++) {
+                    pages[i].style.width =  width + 'px';
+                }
 
-			if (snap) {
-				cmp.set('v.priv_snap', snap);
-			}
+                this._setSize();
+                this._refreshIndicators();
+            },
 
-			if (cmp._width) {
-				//set scroller width
-				var totalWidth = cmp._width * pageCmps.length;
-				cmp.set('v.priv_scrollerWidth',	totalWidth + 'px');
-			}
-		}
-	},
+            /* PUBLIC */
+            gotoPage: function (pageIndex, force) {
+                if ($A.util.isEmpty(pageIndex) || (!force && pageIndex === this._activePage)) {
+                    return;
+                }
 
-	initPages: function(cmp) {
-		var pageModels = this.getPageModels(cmp),
-			pageCmps = this.getPageComponents(cmp),
-			isContinuousFlow = cmp.get('v.continuousFlow'),
-			isVisible = isContinuousFlow || !this.SHOW_SELECTED_PAGE_ONLY,
-			page, pageSuper, pageTmp, snap = this.getSnap(cmp),
-			pageHeight = this.getPageSize(cmp).height,
-			pages = [];
+                this._setContinuousFlow(true);
+                var dest = this._calculateScrollByPage(pageIndex, force);
+                this.scrollTo(dest.x, dest.y, this.opts.carouselTransitionTime);
+            },
+            getActivePage: function (pageIndex) {
+                return this._activePage;
+            },
+            /**
+             * Override scroller 'resize' method to set carouselPage and indicator dimensions.
+             * This gets fired on orientationchange or resize.
+             * Also select the currently active tab on orientation change.
+             */
+            resize: function() {
+                this._updatePagesSize();
+                this.gotoPage(this._activePage, true);
+            }
+        };
+    },
+    initializeInstrumentation: function (cmp) {
+    	cmp._swiped = {};
+    },
+    initializeCarouselPlugin: function (cmp) {
+        var carouselCmp = cmp.find('carousel');
+        if (!carouselCmp.isPluginRegistered('Carousel')) {
+            carouselCmp.registerPlugin('Carousel', this._buildCarouselPlugin(cmp));
+        }
 
-		//reset current page;
-		cmp.set('v.priv_currentPage', -1);
+        /*
+         * We want to merge some new configuration
+         * that is not defined in the aura Scroller by default
+         */
+        carouselCmp.setPluginConfig({
+        	isDesktop: $A.get('$Browser.isDesktop'),
+        	disableWheel: true, // in desktop it will do weird things due to nesting scrollers
+        	indicators: [{
+        		// Define the selector for the indicator (scope to the component itself)
+                el     : '.carousel[data-id="' + cmp.getGlobalId() + '"] .' + cmp.get('v.indicatorStateClass'),
+                config : { resize : false, snap : true}
+            }],
+            initialPage : this.getCurrentPageIndex(cmp)
+        });
+    },
 
-		if (pageCmps && pageCmps.length > 0) {
-			//TODO: need a better solution to handle iteration inside the pageComponents
-			if (pageCmps[0].isInstanceOf('aura:iteration')) {
-				pageCmps = this.getPageComponentsFromIteration(pageCmps[0]);
-			}
+    /*
+     * @initializeIndicator:
+     * Pass through all parameters to the give Indicator
+     * Add handlers to the interface-defined events
+    */
+    initializeIndicator: function (cmp) {
+        var pager = cmp.get('v.pageIndicatorComponent')[0];
+            pager.set('v.pageModels', cmp.get('v.pageModels'));
+            pager.set('v.pageComponents', cmp.get('v.pageComponents'));
+            pager.set('v.justifyContent', cmp.get('v.justifyContent'));
+            pager.set('v.isDotIndicator', cmp.get('v.isDotIndicator'));
+            pager.addHandler('pagerClicked', cmp, 'c.pagerClicked');
+    },
+    /*
+     * @initializePages
+     * It get either an array of pageModels (Objects which hold the component definition)
+     * or an array of components and it creates carouselPages to hold them
+     * and manage the interaction with the Carousel
+    */
+    initializePages: function (cmp) {
+        var prefetchedTab      = $A.util.lookup(cmp.get('v.prefetchedTab'), 0),
+        	prefetchedTabIndex = cmp.get('v.prefetchedTabIndex') || 0,
+        	pageModels         = cmp.get('v.pageModels'),
+            pageComponents     = cmp.get('v.pageComponents'),
+            pages              = pageModels && pageModels.length > 0 ? pageModels : pageComponents,
+            numberOfPages      = pages && pages.length || 0,
+            carouselPageCmp    = cmp.get('v.carouselPageComponent')[0],
+            carouselPages      = [],
+            pageConfig         = {
+        		componentDef:         carouselPageCmp.componentDef.descriptor,
+        		scrollerPlugins:      cmp.get('v.pageScrollerPlugins'),
+        		isScrollable:         cmp.get("v.isScrollable"),
+        		ignoreExistingAction: cmp.get("v.ignoreExistingAction")
+        	},
+            page, i;
 
-			for ( var i = 0; i < pageCmps.length; i++) {
-				page = pageCmps[i];
-				pageSuper = page.getSuper();
-				//append page components to page container body
-				if ($A.util.isComponent(page) && page.isInstanceOf("ui:carouselPage")) {
-                    page.autoDestroy(false);
-					pageTmp = pageSuper.isInstanceOf('ui:carouselPage') ? pageSuper : page;
-					//page index starts with 1
-					pageTmp.set('v.pageIndex', i + 1);
-					pageTmp.set('v.parent', [cmp]);
-					pageTmp.set('v.priv_width', cmp._width);
-					pageTmp.set('v.priv_height', pageHeight);
-					pageTmp.set('v.priv_visible', isVisible);
-					pageTmp.set('v.priv_snap', snap);
-					pageTmp.set('v.priv_continuousFlow', isContinuousFlow);
-					pages.push(page);
-				}
-			}
-			
-			cmp.set('v.pageComponents', pages, true);
-		} else if (pageModels.length > 0) {
-			for ( var i = 0; i < pageModels.length; i++) {
-				page = pageModels[i];
-				//create new instance of carousePage and pass pageModel to it
-				 var component=$A.componentService.newComponentDeprecated({
-			            componentDef:{descriptor: 'markup://ui:carouselPage'},
-			            //page index starts with 1
-			            attributes:{values: {
-			            	'priv_visible' : isVisible,
-			            	'pageModel' : page,
-			            	'pageIndex' : i + 1,
-			            	'parent' : [cmp],
-			            	'priv_snap' : snap,
-			            	'priv_width' : cmp._width,
-			            	'priv_height' : pageHeight,
-			            	'priv_continuousFlow' : isContinuousFlow}}
-			        },null,true);
-                component.autoDestroy(false);
-				pages.push(component);
-			}
-			
-			cmp.set('v.pageComponents', pages, true);
-		}
+        cmp._numOfPages = numberOfPages;
+        this.setCurrentPageIndex(cmp, 0);
 
-		this.initPageIndicator(cmp);
-		this.initScroller(cmp);
-	},
+        for (i = 0; i < numberOfPages; i++) {
+        	page = pages[i];
+        	if (i === prefetchedTabIndex) {
+        		this.setCurrentPageIndex(cmp, i);
+        		cmp._swiped[i] = true; // for instrumentation purposes
+        		carouselPages.push(this.createCarouselPage(pages[i], pageConfig, i, prefetchedTab));
+        	} else {
+        		carouselPages.push(this.createCarouselPage(pages[i], pageConfig, i));
+        	}
+        }
+        cmp.set('v.body', carouselPages);
+    },
+    createCarouselPage: function (contentCmp, pageConfig, index, preloadContent) {
+        return $A.newCmp({
+            componentDef : pageConfig.componentDef,
+            attributes   : {
+                values : {
+                    placeholder: pageConfig.placeholder,
+                    content: preloadContent || contentCmp,
+                    pageIndex: index,
+                    scrollerPlugins: pageConfig.scrollerPlugins,
+                    isScrollable: pageConfig.isScrollable,
+                    ignoreExistingAction: pageConfig.ignoreExistingAction
+                }
+            }
+        });
+    },
+    /*
+     * @getCarouselSize
+     * gets the current updated DOM size of the carousel
+     */
+    getCarouselSize: function (cmp) {
+        var carousel = this.getCarouselDOM(cmp) || {},
+            width    = carousel.offsetWidth,
+            height   = carousel.offsetHeight;
 
-	initPageIndicator : function(cmp) {
-		var indCmp = this.getPageIndicatorsComponent(cmp);
-		if (indCmp) {
-			indCmp.set('v.pageComponents', cmp.get('v.pageComponents'));
-			indCmp.addHandler('pagerClicked', cmp, 'c.pagerClicked');
-			indCmp.addHandler('pagerKeyed', cmp, 'c.pagerKeyed');
-		}
-	},
+        return {
+            width : width,
+            height: height
+        };
+    },
+    /*
+     * @afterRenderCarousel
+     * This function is called immediately after the Carousel is on the renderTree
+     * which in Aura corresponds to the afterRender method (it was just attached to the DOM)
+     */
+    afterRenderCarousel: function (cmp) {
+    	var self        = this,
+    		initialPage = this.getCurrentPageIndex(cmp),
+    		carousel    = this.getCarouselInstance(cmp),
+            indicator   = cmp.get('v.pageIndicatorComponent')[0],
+    		pages       = cmp.get('v.body'),
+    		page        = pages[initialPage];
 
-	attachEvents : function(cmp) {
-		var el = cmp.getElement();
-		var helper = this;
-		var hasTouch = 'ontouchstart' in window;
+    	carousel._updatePagesSize(cmp, carousel);
+        indicator.get('c.changeActivePage').run({pageIndex: initialPage});
 
-		cmp._startEvt = hasTouch ? 'touchstart' : 'mousedown';
-		cmp._moveEvt = hasTouch ? 'touchmove' : 'mousemove';
-		cmp._resizeEvt =  hasTouch ? 'orientationchange' : 'resize';
+    	carousel.on('pageChange', function (page) {
+    		self.onPageChange.call(self, cmp, page);
+    	});
 
-		cmp._onStart = function(e) {helper.onStart(cmp, e)};
-		cmp._onMove = function(e) {helper.onMove(cmp, e)};
-		cmp._onClick = function(e){helper.onClick(cmp, e)};
-		cmp._onResize = function(e) {helper.refresh(cmp)};
+        var lazyLoadTabs = cmp.get('v.lazyLoadTabs');
+        for (var i = 0; i < pages.length; i++) {
+            indicator.get('c.setAriaAttributes').run({pageIndex: i, pageId: pages[i].getGlobalId()});
+            this.setPageVisibility(pages[i], (i === initialPage));
 
-		$A.util.on(el, cmp._startEvt, cmp._onStart);
-		$A.util.on(el, cmp._moveEvt, cmp._onMove);
-		$A.util.on(el, 'click', cmp._onClick, true); //useCapture
-		$A.util.on(window, cmp._resizeEvt, cmp._onResize);
-	},
+            if (lazyLoadTabs) {
+                pages[i].get('c.load').run();
+            }
+        }
+    },
+    onPageChange: function (cmp, pageIndex) {
+    	var pages        = cmp.get('v.body'),
+    		oldPageIndex = this.getCurrentPageIndex(cmp),
+    		oldPage      = pages[oldPageIndex],
+    		page         = pages[pageIndex],
+    		indicator    = cmp.get('v.pageIndicatorComponent')[0];
 
-	detachEvents : function(cmp) {
-		var el = cmp.getElement();
-		var hasTouch = 'ontouchstart' in window;
+        if (!page.get('v.isContentLoaded')) {
+            $A.run(function () {
+                page.get('c.load').run();
+            });
+        }
 
-		$A.util.removeOn(el, cmp._startEvt, cmp._onStart);
-		$A.util.removeOn(el, cmp._moveEvt, cmp._onMove);
-		$A.util.removeOn(el, 'click', cmp._onClick, true);
-		$A.util.removeOn(window, cmp._resizeEvt, cmp._onResize);
-	},
+        this.setPageVisibility(oldPage, false);
+        this.setPageVisibility(page, true);
 
-	onStart: function(cmp, evt) {
-		var point = evt.touches && evt.touches.length == 1 ? evt.touches[0] : evt;
-		cmp._startPos = {
-			startx: point.pageX,
-			starty: point.pageY
-		}
-	},
+        indicator.get('c.changeActivePage').run({pageIndex: pageIndex});
+        this.setCurrentPageIndex(cmp, pageIndex);
 
-	onMove: function(cmp, evt) {
-		if (cmp._startPos && this.hasMoved(cmp, evt, this.HORIZONTAL)) {
-    		//swiping horizontally, stop event from bubbling up to prevent parent scroller from moving
-			evt.stopPropagation();
-		}
-	},
+    },
+    /* GETTERS & SETTERS*/
+    setCurrentPageIndex: function (cmp, currentIndex) {
+    	cmp._currentPage = currentIndex;
+    },
+    setPageVisibility: function(carouselPage, isVisible) {
+        var cssClass      = 'hidden',
+            ariaAttribute = 'aria-expanded',
+            pageEl        = carouselPage.getElement();
 
-	onClick : function(cmp, evt) {
-		if (this.hasMoved(cmp, evt)) {
-			$A.util.squash(evt, true);
-		}
-		delete cmp._startPos;
-	},
-
-	/**
-	 * Check whether the mouse/touch past the boundary since it started
-	 */
-	hasMoved : function(cmp, evt, direction) {
-		var startPos = cmp._startPos
-		if (!startPos) {
-			return false;
-		}
-
-		var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;
-        var dx = point.pageX - startPos.startx,
-            dy = point.pageY - startPos.starty,
-            y = Math.abs(dy),
-            x = Math.abs(dx);
-
-        if (direction == this.HORIZONTAL) {
-        	return x > this.DISTANCE_THRESHOLD && x > y;
+        if (isVisible) {
+            pageEl.setAttribute(ariaAttribute, 'true');
+            if (this.isDesktop) {
+            	$A.util.removeClass(pageEl, cssClass);
+            }
         } else {
-        	return x > this.DISTANCE_THRESHOLD || y > this.DISTANCE_THRESHOLD;
+        	pageEl.setAttribute(ariaAttribute, 'false');
+        	if (this.isDesktop) {
+        		$A.util.addClass(pageEl, cssClass);
+        	}
         }
-	},
-
-	getPageComponentsFromIteration : function(iterCmp) {
-		var body = iterCmp.get('v.body'),
-			pageCmps = [];
-
-		for (var i=0; i< body.length; i++) {
-			if (body[i].isInstanceOf('aura:iteration')) {
-				pageCmps = pageCmps.concat(this.getPageComponentsFromIteration(body[i]));
-			} else if (body[i].isInstanceOf("ui:carouselPage")) {
-				pageCmps.push(body[i]);
-			}
-		}
-
-		return pageCmps;
-	},
-
-	/**
-	 * Handle window resize or orientationchange event
-	 */
-	refresh: function(cmp, evt) {
-		//need to call getConcreteComponent() in case there's a sub-component that extends this component
-		if (cmp.isValid() && cmp.getConcreteComponent().isRendered()) {
-			var me = this;
-			var selectedPage = me.getSelectedPage(cmp);
-			var scroller = me.getScroller(cmp);
-			me.updateSize(cmp);
-			//Need to scroll if not on the first page to reset the x position after resize
-			//TODO: this should be fixed inside ui:scroller instead of here
-			if (selectedPage > 0) {
-				if (cmp._scrollToTimeout) {
-					window.clearTimeout(cmp._scrollToTimeout)
-					cmp._scrollToTimeout = null;
-				}
-				//need to wait for scroller to finish refreshing
-				cmp._scrollToTimeout = window.setTimeout(function(){
-					var curPage = me.getSelectedPage(cmp);
-					if (curPage == selectedPage) {
-						scroller.scrollToPage(--selectedPage, null, 0);
-					}
-				}, 500);
-			}
-		}
-	},
-
-
-	/**
-	 * Update carousel and page size if carousel width is not pre-defined
-	 */
-	updateSize: function(cmp, force) {
-		var width = cmp.get('v.width'),
-			height = cmp.get('v.height');
-
-		var pages = this.getPageComponents(cmp);
-		//need to update size width if carousel width and height is not explicitly set
-		if (pages.length > 0) {
-			var carouselSize = this.getCarouselSize(cmp);
-
-            // Do not update the carousel if the width is 0
-			if (carouselSize.width > 0) {
-    			this.updateCarouselSize(cmp, pages, carouselSize, force);
-            }
-		}
-	},
-
-	updateCarouselSize: function(cmp, pages, carouselSize, force) {
-		var cStyle = this.getSizeStyle(carouselSize.width, carouselSize.height);
-		if (cStyle !== cmp.get('v.priv_carouselStyle') || force) {
-			cmp.set('v.priv_carouselStyle', cStyle);
-			cmp.set('v.priv_scrollerWidth', carouselSize.width * pages.length + 'px');
-			this.updatePageSize(cmp, pages, carouselSize);
-		}
-	},
-
-	updatePageSize: function(cmp, pages, carouselSize) {
-		var pageSize = this.getPageSize(cmp);
-
-		for (var i=0; i< pages.length; i++) {
-			var e = pages[i].get('e.updateSize');
-			//page width always same as carousel width
-			e.setParams({pageSize: {width: carouselSize.width, height: pageSize.height}});
-			e.fire();
-		}
-	},
-
-	getSizeStyle: function(width, height) {
-		var style = width ? 'width:' + width + 'px;' : '';
-
-		style += height ? 'height:' + height + 'px;' : '';
-
-		return style ? style : '';
-	},
-
-	getCarouselSize: function(cmp) {
-		var width = cmp.get('v.width'),
-			height = cmp.get('v.height');
-
-		if (!width) {
-			var el = cmp.getElement();
-			if (el) {
-				width = el.parentNode.offsetWidth;
-			}
-		}
-
-		return {width: width, height: height};
-	},
-
-	getPageSize: function(cmp) {
-		var width = cmp.get('v.width'),
-			height = cmp.get('v.height'),
-			navContainer = cmp.find('navContainer');
-
-		if (navContainer && height) {
-			var el = navContainer.getElement();
-			height = el ? height - el.offsetHeight : height - this.NAV_CONTAINER_HEIGHT;
-		}
-
-		return {width: width, height: height};
-	},
-
-	/**
-	 * Update page content
-	 */
-	updatePage: function(cmp, pageIndex, pageContentCmp) {
-		var pageCmp = this.getPageComponentFromIndex(cmp, pageIndex);
-		var e = pageCmp.get('e.update');
-		e.setParams({pageComponent: pageContentCmp});
-		e.fire();
-	},
-
-	handlePagerClicked : function(cmp, pageIndex) {
-		this.selectPage(cmp, pageIndex);
-	},
-
-	/**
-	 * Handle carousel indicator key events
-	 */
-	handlePagerKeyed : function(cmp, evt) {
-		var keyCode = evt.getParam("event").keyCode;
-        // left arrow or right arrow
-        if (keyCode === 37 || keyCode == 39) {
-            var pageComps = this.getPageComponents(cmp),
-            	prevPage = evt.getParam("pageIndex"),
-            	pageIndex = prevPage;
-
-            if (keyCode === 37 && pageIndex > 0) {  // left arrow
-            	pageIndex--;
-            }
-            if (keyCode === 39 && pageIndex < pageComps.length) {  // right arrow
-            	pageIndex++;
-            }
-
-            if (cmp._keyPageSelectionTimeout != null) {
-    			window.clearTimeout(cmp._keyPageSelectionTimeout);
-    			cmp._keyPageSelectionTimeout = null;
-    		}
-
-    		// When coming from a key event, wait a second to commit to the page
-    		// selection
-            var me = this;
-    		cmp._keyPageSelectionTimeout = window.setTimeout(function() {
-    			cmp._keyPageSelectionTimeout = null;
-    			me.selectPage(cmp, pageIndex);
-    		}, this.KEY_PAGE_SELECTION_TIMEOUT_DURATION);
-
-            if (evt.preventDefault) evt.preventDefault();
-        }
-	},
-
-	/**
-	 * Handle scrollStart event
-	 */
-	handleScrollMove: function(cmp, evt) {
-		if (!this.SHOW_SELECTED_PAGE_ONLY) {
-			return;
-		}
-
-		var scroller = this.getScroller(cmp),
-			nextPage,
-			toPage,
-			prevSelectedPage = cmp.get('v.priv_currentPage');
-
-		cmp._isMoving = true;
-
-		if (scroller.absDistX > this.SCROLL_START_THRESHOLD && !cmp._isScrollStartProcessed) {
-			var pages = this.getPageComponents(cmp);
-			cmp._isScrollStartProcessed = true;
-
-			if (scroller.dirX == 1) {
-				//scrolling to right
-				//scroller page starts with 0;
-				nextPage = scroller.currPageX + 2;
-				toPage = Math.min(nextPage + this.NUMBER_OF_PAGES_TO_SHOW, pages.length);
-			} else if (scroller.dirX == -1) {
-				//scrolling to the left
-				nextPage = scroller.currPageX;
-				toPage = Math.max(1, nextPage - this.NUMBER_OF_PAGES_TO_SHOW);
-			}
-
-			if (nextPage > 0 && nextPage <= pages.length) {
-				this.showPages(cmp, nextPage, toPage);
-			}
-		}
-	},
-
-	/**
-	 * Handle scroll event
-	 */
-	handleScrollEnd: function(cmp, evt) {
-		var scroller = this.getScroller(cmp),
-			//scroller page starts with 0
-			currentPageX = scroller.currPageX + 1,
-			prevSelectedPage = cmp.get('v.priv_currentPage');
-
-		cmp._isScrollStartProcessed = false;
-		cmp._isMoving = false;
-
-		if (prevSelectedPage == currentPageX) {
-			//scrolled back to the same page
-			return;
-		}
-
-		var action = cmp.get("v.onPageChange");
-		if (action) {
-			action.runDeprecated(cmp);
-		}
-
-		this.pageSelected(cmp, currentPageX);
-	},
-
-	showPage: function(pageCmp, pageIndex){
-		var e = pageCmp.get('e.show');
-		e.setParams({'pageIndex' : pageIndex});
-		e.fire();
-	},
-
-	hidePage: function(pageCmp, pageIndex) {
-		var e = pageCmp.get('e.hide');
-		e.setParams({'pageIndex' : pageIndex});
-		e.fire();
-	},
-
-	/**
-	 * Page is selected, delegate the event to page component
-	 */
-	pageSelected: function(cmp, pageIndex) {
-
-		var prevSelectedPage = cmp.get('v.priv_currentPage');
-		var me = this;
-		if (prevSelectedPage == pageIndex) {
-			return;
-		}
-
-		var curPageCmp = this.getPageComponentFromIndex(cmp, pageIndex);
-		if (curPageCmp && curPageCmp.isRendered()) {
-			var prePageCmp = this.getPageComponentFromIndex(cmp, prevSelectedPage);
-			this.setSelectedPage(cmp, pageIndex);
-
-			me.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
-
-			cmp.set('v.priv_currentPage', pageIndex);
-			me.firePageSelectedEventToPage(prePageCmp, pageIndex);
-			me.firePageSelectedEventToPage(curPageCmp, pageIndex);
-			var pageModel = me.getPageModelFromIndex(cmp, pageIndex);
-
-			setTimeout(function() {
-				if (cmp.isValid()) {
-					var e = cmp.get('e.loadPage');
-					e.setParams({pageComponent: curPageCmp, pageModel: pageModel, pageIndex: pageIndex});
-					e.fire();
-					//Fire pageSelected to let any sub-components that are handling it know the change has been done.
-					cmp.get("e.pageSelected").setParams({pageComponent: curPageCmp, "pageModel" : pageModel, pageIndex: pageIndex}).fire();
-				}
-			}, 0);
-
-			me.delayHideAllUnselectedPages(cmp);
-		}
-	},
-
-	showPages: function(cmp, from, to) {
-		var that = this;
-		var pages = this.getPageComponents(cmp);
-
-		if ($A.util.isNumber(from) && $A.util.isNumber(to) && from > 0 && from <= pages.length && to > 0 && to <= pages.length) {
-			var pageCmp = pages[from-1]
-			this.showPage(pageCmp, from);
-			//show rest of the pages for smoother swiping
-			if (to > from && to <= pages.length) {
-				//scrolling to the right
-				for (var i=from + 1; i<= to; i++) {
-					this.showPage(pages[i-1], i);
-				}
-			} else if (from > to && to > 0) {
-				//scrolling to the left
-				for (var i=from - 1; i >= to; i--) {
-					this.showPage(pages[i-1], i);
-				}
-			}
-		} else {
-			for (var i=1; i<= pages.length; i++) {
-				this.showPage(pages[i-1], i);
-			}
-		}
-	},
-
-	hideAllUnselectedPages: function(cmp) {
-		if (!cmp.isValid() || cmp.isValid() && cmp.get('v.continuousFlow')) {
-			return;
-		}
-
-		if (cmp._delayHidePagesTimer) {
-			window.clearTimeout(cmp._delayHidePagesTimer);
-			cmp._delayHidePagesTimer = null;
-		}
-
-		if (cmp._isMoving) {
-			this.delayHideAllUnselectedPages(cmp);
-			return;
-		}
-
-		var pages = this.getPageComponents(cmp),
-			selectedPage = this.getSelectedPage(cmp);
-
-		for (var i=1; i<= pages.length; i++) {
-			if (i != selectedPage) {
-				this.hidePage(pages[i-1], i);
-			}
-		}
-	},
-	/**
-	 * Fire pageSelected event to page component
-	 */
-	firePageSelectedEventToPage: function(pageCmp, selectedPage) {
-		if (pageCmp) {
-			var e = pageCmp.get('e.pageSelected');
-			e.setParams({pageIndex : selectedPage});
-			e.fire();
-		}
-	},
-
-	firePageSelectedEventToPageIndicator: function(carouselCmp, pageCmp, selectedPage) {
-		var pageIndicator = this.getPageIndicatorsComponent(carouselCmp);
-
-		if (pageIndicator && pageIndicator.isRendered()) {
-			var pageId = pageCmp.getElement().id,
-				e = pageIndicator.get('e.pageSelected');
-
-			e.setParams({pageIndex : selectedPage, pageId: pageId});
-			e.fire();
-		}
-	},
-
-	/**
-	 * Selecting a page from non-scrolling events
-	 */
-	selectPage : function(cmp, pageIndex, time) {
-		var pages = this.getPageComponents(cmp),
-			prevSelectedPage = cmp.get('v.priv_currentPage');
-
-		if (pageIndex > 0 && pageIndex <= pages.length && prevSelectedPage !== pageIndex) {
-			//show all pages in between before scrolling for better UI experience
-			var from = prevSelectedPage == -1 ? pageIndex : (prevSelectedPage < pageIndex ? ++prevSelectedPage : --prevSelectedPage);
-			//save the pageIndex, so that it won't be hide by the callback in the timer, which could cause flickering and performance issue
-			this.setSelectedPage(cmp, pageIndex);
-			this.showPages(cmp, from, pageIndex);
-
-			var scroller = this.getScroller(cmp);
-			//scroller page starts with 0
-			scroller.scrollToPage(--pageIndex, null, time);
-		}
-	},
-
-	selectDefaultPage : function(cmp) {
-		var curPage = cmp.get('v.priv_currentPage'),
-			scroller = this.getScroller(cmp);
-
-		if (!scroller || curPage > -1) {
-			return;
-		}
-
-		this.selectPage(cmp, cmp.getConcreteComponent().getDef().getHelper().getDefaultPageIndex(cmp), 0);
-	},
-
-	getDefaultPageIndex : function(cmp) {
-		var	pageCmps = this.getPageComponents(cmp),
-			defaultPage = cmp.get('v.defaultPage'),
-			pageToSelect = 1;
-
-		if (defaultPage) {
-			pageToSelect = defaultPage;
-		} else {
-		    for (var i = 0; i < pageCmps.length; i++) {
-		        if (pageCmps[i].get('v.isDefault')) {
-		        	//page starts at 1
-		        	pageToSelect = i + 1;
-		        }
-		    }
-		}
-
-		return pageToSelect;
-	},
-
-
-	getPageComponents:function(cmp) {
-		return cmp.get('v.pageComponents') || [];
-	},
-
-	getPageModels:function(cmp) {
-		return cmp.get('v.pageModels');
-	},
-
-	getPageModelFromIndex: function(cmp, pageIndex) {
-		var pageModels = this.getPageModels(cmp);
-		//page start from 1
-		pageIndex--;
-
-		return pageModels ? pageModels[pageIndex] : null;
-	},
-
-	getPageComponentFromIndex: function(cmp, pageIndex) {
-		var pages = this.getPageComponents(cmp);
-		//page start from 1
-		pageIndex--;
-		if (pages && pageIndex >=0 && pageIndex < pages.length) {
-			return pages[pageIndex];
-		}
-
-		return null;
-	},
-
-	getPageIndicatorsComponent : function(cmp) {
-		var navContainer = cmp.find('navContainer');
-		var indicators = navContainer ? navContainer.get('v.body') : null;
-
-		return cmp.get('v.continuousFlow') != true && indicators ? indicators[0] : null;
-	},
-
-	getScroller : function(cmp) {
-		return cmp.find('scroller')._scroller;
-	},
-
-	getSnap : function(cmp) {
-		var id = cmp.getGlobalId().replace(';', '_').replace(':', '-');
-		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
-	},
-
-	/**
-	 * Buffer the execution of the function, if during the time interval, the function is call again, the previous execution will be canceled
-	 */
-	delayHideAllUnselectedPages : function(cmp) {
-		if (!cmp._delayHidePagesTimer) {
-			var that = this;
-			cmp._delayHidePagesTimer = window.setTimeout(function(){that.hideAllUnselectedPages(cmp)}, 500);
-		}
-	},
-
-	/**
-	 * Spinner controls
-	 */
-	showLoadingIndicator: function (cmp) {
-		var spinner = cmp.get("v.spinner")[0];
-		if (!$A.util.isUndefinedOrNull(spinner)) {
-			var evt = spinner.getEvent("toggle");
-			if (!$A.util.isUndefinedOrNull(evt)) {
-				evt.setParams({"isVisible": true});
-		        evt.fire();
-			}
-		}
     },
-
-    hideLoadingIndicator: function (cmp) {
-    	var spinner = cmp.get("v.spinner")[0];
-		if (!$A.util.isUndefinedOrNull(spinner)) {
-			var evt = spinner.getEvent("toggle");
-			if (!$A.util.isUndefinedOrNull(evt)) {
-				evt.setParams({"isVisible": false});
-		        evt.fire();
-			}
-		}
+    getCurrentPageIndex: function (cmp) {
+    	return cmp._currentPage;
     },
-
-    setSelectedPage: function(cmp, selectedPage) {
-    	cmp._selectedPage = selectedPage;
+    getCarouselInstance: function (cmp) {
+        return cmp.find('carousel').getScrollerInstance();
     },
-
-    getSelectedPage: function(cmp) {
-    	return cmp._selectedPage || cmp.get('v.priv_currentPage');
+    getDOMPages: function (cmp) {
+        return cmp.getElement().getElementsByClassName('carousel-page');
     },
-
-    unrender: function(cmp) {
-    	this.detachEvents(cmp);
+    getCarouselDOM: function (cmp) {
+        return cmp.find('carousel').getElement();
     }
-
 })

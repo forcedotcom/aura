@@ -26,5 +26,6 @@
     </div>
 
     <aura:text aura:id="destroyedComponent" value="value"/>
+    <div aura:id="destroyedElement" id="destroyedElement"></div>
 
 </aura:component>

@@ -20,10 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.builder.DesignTemplateDefBuilder;
+import org.auraframework.builder.design.DesignTemplateDefBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignTemplateDef;
-import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;

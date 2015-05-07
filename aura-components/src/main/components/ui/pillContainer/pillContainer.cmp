@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="A container for ui:pill" extensible="true" support="PROTO">
+
+    <aura:attribute name="items" type="List"/>
+    <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>
+    <aura:attribute name="focusOnInput" type="Boolean" default="true" description="Focus on input box when the component is created."/>
+    <aura:attribute name="allowRemove" type="Boolean" default="true" description="Allows deleting pills from container."/>
+    <aura:attribute name="pillInput" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
+
+    <!-- events -->
+    <aura:registerevent name="pillInserted"
+                        type="ui:response"
+                        description="Event fired when a pill is inserted in this container."/>
+
+    <aura:registerevent name="pillRemoved"
+                        type="ui:response"
+                        description="Event fired when a pill is removed from this container."/>
+
+    <aura:method name="insertItems" description="The method called to add new items. Takes in an array of object [{name:'name', id:'id'}, ...]">
+        <aura:attribute name="items" type="List"/>
+    </aura:method>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="pillInserted" action="{!c.processPillInserted}"/>
+    <aura:handler name="pillRemoved" action="{!c.processPillRemoved}"/>
+
+    <ol aura:flavorable="true" class="orderedList">
+        <aura:iteration items="{!v.items}" var="item" aura:id="pills">
+            <li aura:id="listitem" role="presentation" class="pillContainerListItem">
+                <ui:pill aura:id="pill" iconUrl="{!item.icon.url}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" onHandledEvent="{!c.handlePillEvent}"/>
+            </li>
+        </aura:iteration>
+
+        <aura:if isTrue="{!v.pillInput.length>0 &amp;&amp; v.items.length&lt;v.maxAllowed}">
+            <li role="presentation" class="pillContainerListItem">
+                {!v.pillInput}
+            </li>
+        </aura:if>
+    </ol>
+
+</aura:component>

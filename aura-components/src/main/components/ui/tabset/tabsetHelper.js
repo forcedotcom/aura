@@ -17,7 +17,7 @@
     /**
      * Set tab as active or deactive
      * @param {Component} cmp An instance of ui:tabset componen.
-     * @param {Number} index Index position of the tab to activate. 
+     * @param {Number} index Index position of the tab to activate.
      */
      setActive: function(cmp, option) {
          var active = option.active;
@@ -33,17 +33,17 @@
          if (tab && this.fireBeforeActiveEvent(cmp, {"tab": tab, "oldTab": this.getActiveTab(cmp)}, tab)) {
             // set active tabItem
             var e = cmp.find('tabBar').get('e.setActive');
-            e.setParams({"index": index, "active": active, "focus": option.focus}).fire();
+            e.setParams({"index": index, "active": active, "focus": option.focus}).setComponentEvent().fire();
             // activate body
             this.setActiveTabBody(cmp, {"index":index, "active": active, "tab": tab});
             //fire tabset onActivate event
-            cmp.get("e.onActivate").setParams({"tab": tab}).fire();
+            cmp.get("e.onActivate").setParams({"tab": tab}).setComponentEvent().fire();
          }
     },
     /**
      * Add new tab
      * @param {Number} [index] The index of the new tab to insert to.
-     * @param {Object} tab The configuration for the new tab. If the "componentDef" is not defined, "ui:tab" is used. 
+     * @param {Object} tab The configuration for the new tab. If the "componentDef" is not defined, "ui:tab" is used.
      */
     addTab: function(cmp, index, tab, callback) {
     	var self = this, size = cmp._tabCollection.getSize();
@@ -56,7 +56,7 @@
     		// add tab into tabBar
     	    var active = newTab.get("v.active");
         	var e = cmp.find("tabBar").get("e.addTab");
-        	e.setParams({"index": index, "active": active, "tab": self.getTabItemConfig(cmp, newTab)}).fire();
+        	e.setParams({"index": index, "active": active, "tab": self.getTabItemConfig(cmp, newTab)}).setComponentEvent().fire();
         	if (newTab.get("v.active")) {
         	    this.setActiveTabBody(cmp, {"index": index, "tab": newTab, "active": true});
         	}
@@ -67,7 +67,7 @@
     },
     /**
      * Remove tab
-     * @param {Component} cmp 
+     * @param {Component} cmp
      * @param {Integer} index Index position of tab to remove
      */
     removeTab: function(cmp, index) {
@@ -77,7 +77,7 @@
                 self.removeTabBody(cmp, index);
             }
         }
-        e.setParams({"index": index, "callback": callback}).fire();
+        e.setParams({"index": index, "callback": callback}).setComponentEvent().fire();
     },
     /**
      * Returns the active tab
@@ -94,8 +94,8 @@
             }
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
         var oldTab = typeof params.oldTab === "number" ? cmp._tabCollection.getTab(params.oldTab) : params.oldTab;
-        
-        target.get("e.beforeActivate").setParams({"tab": tab, "oldTab": oldTab, "callback": callback}).fire();
+
+        target.get("e.beforeActivate").setParams({"tab": tab, "oldTab": oldTab, "callback": callback}).setComponentEvent().fire();
 
         return activate;
     },
@@ -118,7 +118,7 @@
     setActiveTabBody: function(cmp, option) {
         // set active tab body;
         var tab = option.tab, evt;
-  
+
         if (!tab.isRendered() && option.active) {
             // manually render tab component instead of setting v.body to avoid rerendering of all the tabs
             this.renderTabBody(cmp, tab);
@@ -127,15 +127,15 @@
             //deactivate current tabBody
             if (cmp._activeTab && cmp._activeTab.isValid()) {
                 evt = cmp._activeTab.get("e.setActive");
-                evt.setParams({"active": false}).fire();
+                evt.setParams({"active": false}).setComponentEvent().fire();
             }
-            //fire event to curent tab to update status 
-            tab.get('e.setActive').setParams({active: true}).fire();
+            //fire event to curent tab to update status
+            tab.get('e.setActive').setParams({active: true}).setComponentEvent().fire();
             //save current active tab
             cmp._activeTab = tab;
         } else if (option.active === false && cmp._activeTab === tab){
             //deactivate tab
-            tab.get('e.setActive').setParams({active: false}).fire();
+            tab.get('e.setActive').setParams({active: false}).setComponentEvent().fire();
             cmp._activeTab = null;
         }
     },
@@ -171,20 +171,20 @@
         cmp._tabCollection.init(result.tabs, result.tabIds, result.tabNames);
         cmp.set('v.tabItems', result.tabItemConfigs, true);
     },
-    
+
     /**
      * @private
      */
     createTabsFromAttribute: function(cmp, tabConfigs) {
       //construct tabs from pass-in tab objects
-        var tabComponents = [], tabIds = [], tabItems = [], tabNames = [], activeIndex = 0, 
+        var tabComponents = [], tabIds = [], tabItems = [], tabNames = [], activeIndex = 0,
             lazyRendering = cmp.get("v.lazyRenderTabs"),
             count = 0, total = tabConfigs.length - 1;
-        
+
         var callback = function(newTab) {
             var id = newTab.getGlobalId(),
                 name = newTab.get("v.name");
-            
+
             tabIds.push(id);
             tabComponents[id] = newTab;
             tabItems.push(this.getTabItemConfig(cmp, newTab));
@@ -215,7 +215,7 @@
     	var tabs = [], tabIds = [], tabItemConfigs =[], tabNames = [],
     	    //default active tab to first tab
     	    activeTab = 0;
-    	
+
     	// get all instances of ui:tab in the body
         var body=cmp.getConcreteComponent().get('v.body');
         for(var i=0;i<body.length;i++){
@@ -273,7 +273,7 @@
     	var config={}, values = {},
     		compService = $A.componentService,
     		tabItemDef = this.CONSTANTS.TAB_ITEM_DEF;
-    	
+
     		// Iterate all the attributes ui:tabItem and find the values in ui:tab component
     		var attrDefs = compService.getDef(tabItemDef).getAttributeDefs();
     		attrDefs.each(function(def){
@@ -283,10 +283,12 @@
                     values[name] = tab.get("v." + name);
     			}
     		});
-    		values["ariaControlId"] = tab.getGlobalId();
+            if ( $A.util.isUndefinedOrNull(values["ariaControlId"]) ) {
+    		    values["ariaControlId"] = tab.getGlobalId();
+            }
     		config["attributes"] = {"values": values};
     		config["componentDef"] = tabItemDef;
-    	 
+
     	return config;
     },
 
@@ -405,7 +407,7 @@
                  if ($A.util.isComponent(tab)) {
                      var id = tab.getGlobalId(),
                          name = tab.get("v.name");
-                     
+
                      if (name) {
                          this.tabNames[name] = {"tabId": id};
                      }
@@ -429,7 +431,7 @@
          }
          return new TabCollection();
      },
-     
+
      CONSTANTS: {
          TAB_DEF : "markup://ui:tab",
          TAB_ITEM_DEF : "markup://ui:tabItem"

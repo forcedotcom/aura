@@ -62,10 +62,17 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     @Override
     public void validateDefinition() throws QuickFixException {
         // super.validateDefinition();
-        if (this.error != null) {
+        if (error != null) {
             throw this.error;
         }
-        if (this.parentDescriptor == null) {
+        //
+        //We would like to check for this, but it will break current code.
+        //
+        //if (!dependency.getNamespaceMatch().isConstant()) {
+        //    throw new InvalidDefinitionException("wildcard namespaces not allowed: "+dependency.toString(),
+        //        getLocation());
+        //}
+        if (parentDescriptor == null) {
             throw new InvalidDefinitionException("No parent in DependencyDef", getLocation());
         }
     }

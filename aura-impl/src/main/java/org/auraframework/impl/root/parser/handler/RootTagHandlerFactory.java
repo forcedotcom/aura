@@ -20,7 +20,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorAssortmentDef;
@@ -30,6 +30,7 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 

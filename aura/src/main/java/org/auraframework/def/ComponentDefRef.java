@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import java.util.Map;
 
-import org.auraframework.css.FlavorRef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -57,12 +56,12 @@ public interface ComponentDefRef extends Definition {
     boolean isFlavorable();
 
     /**
-     * Returns true if a child ComponentDefRef was marked with aura:flavorable. Most common with nested html tags.
+     * Returns true if a child ComponentDefRef was marked with aura:flavorable. This will be on nested html tags.
      */
     boolean hasFlavorableChild();
 
     /**
      * Gets the flavor.
      */
-    FlavorRef getFlavor();
+    String getFlavor();
 }

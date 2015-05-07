@@ -15,57 +15,31 @@
  */
 package org.auraframework.def;
 
-import java.util.Map;
-
-import org.auraframework.css.FlavorRef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Table;
+
 /**
- * {@code <aura:flavor>} tags inside of {@link FlavorAssortmentDef}s.
- * <p>
- * This takes on two main forms: 1) filter patterns, which look like {@code <aura:flavor named='xyz'/>} or
- * {@code <aura:flavor named='xyz' namespace='blah'/>} or 2) individual matches, which look like {@code <aura:flavor
- * component='ui:button' flavor='foo.flavors.test2'/>. See {@link FlavorRef} for more info on flavor references in areas
- * like the 'flavor' attribute.
+ * {@code <aura:use>} tags inside of {@link FlavorAssortmentDef}s.
  */
 public interface FlavorIncludeDef extends Definition {
     @Override
     DefDescriptor<FlavorIncludeDef> getDescriptor();
 
     /**
-     * Gets a map of the components to associate with specific flavors. This performs a calculation so cache result if
-     * applicable.
-     * <p>
-     * Usages such as <aura:flavor component='x:y' flavor='xyz'/> will generally have just one entry.
-     * <p>
-     * Usages such as <aura:flavor named='xyz' namespace='abc'/> may have multiple entries depending on how many custom
-     * flavors exist in that namespace with the given name.
+     * Gets the original source attribute.
+     */
+    String getSource();
+
+    /**
+     * Gets a mapping of which {@link FlavoredStyleDef} is specified for a component and flavor name pair.
      *
-     * @throws QuickFixException If there is a problem loading one of the {@link FlavoredStyleDef}s.
+     * @throws QuickFixException If there's a problem loading the flavor def.
      */
-    Map<DefDescriptor<ComponentDef>, FlavorRef> getFlavorsMap() throws QuickFixException;
+    Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> computeFlavorMapping() throws QuickFixException;
 
     /**
-     * Gets the value of the 'named' attribute, in usages such as <aura:flavor named='xyz'/>. This will return null if
-     * not set.
+     * @return Returns the parentDescriptor.
      */
-    String getFilteredName();
-
-    /**
-     * Gets the {@link DescriptorFilter} that will be used for finding matching flavors, in usages such as <aura:flavor
-     * named='xyz'/>. This will return null if not set. To find the namespace, check
-     * {@link DescriptorFilter#getNamespaceMatch()}.
-     */
-    DescriptorFilter getFilter();
-
-    /**
-     * Gets the matched component descriptor in usages such as <aura:flavor component='ui:button' flavor='primary'/>.
-     * This will return null if not set.
-     */
-    DefDescriptor<ComponentDef> getComponentDescriptor();
-
-    /**
-     * Gets the flavor referenced in usages such as <aura:flavor component='ui:button' flavor='primary'/>.
-     */
-    FlavorRef getFlavor();
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

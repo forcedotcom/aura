@@ -22,7 +22,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavorIncludeDef;
-import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.FlavorAssortmentDefHandler;
@@ -30,55 +29,30 @@ import org.auraframework.impl.root.parser.handler.FlavorIncludeDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class FlavorIncludeDefHandlerTest extends StyleTestCase {
-
     public FlavorIncludeDefHandlerTest(String name) {
         super(name);
     }
 
-    public void testReadsNamedAttribute() throws Exception {
-        addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor named='test'/>");
-        assertEquals("test", def.getFilteredName());
-    }
-
-    public void testReadsNamespaceAttribute() throws Exception {
-        addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor named='test' namespace='tmp'/>");
-        assertEquals("tmp", def.getFilter().getNamespaceMatch().toString());
-    }
-
-    public void testReadsBundleFlavor() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
-        addStandardFlavor(cmp, "@flavor test;");
-        FlavorIncludeDef def = source(String.format("<aura:flavor component='%s' flavor='test' />", cmp.getDescriptorName()));
-        assertNull("filter should not be set", def.getFilter());
-        assertEquals("didn't set right component descriptor", cmp, def.getComponentDescriptor());
-        assertEquals("didn't set right flavor name", "test", def.getFlavor().getFlavorName());
-    }
-
-    public void testReadsNamespaceFlavor() throws Exception {
-        DefDescriptor<ComponentDef> cmp = cmp();
-        addStandardFlavor(cmp, "@flavor test;");
-        DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, "@flavor test2");
-
-        FlavorIncludeDef def = source(String.format("<aura:flavor component='%s' flavor='%s.test2' />", cmp.getDescriptorName(),
-                custom.getNamespace()));
-        assertNull("filter should not be set", def.getFilter());
-        assertEquals("didn't set right component descriptor", cmp, def.getComponentDescriptor());
-        assertEquals("didn't set right flavor name", "test2", def.getFlavor().getFlavorName());
+    public void testReadsSourceAttribute() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addComponentDef();
+        addStandardFlavor(cmp, ".THIS--test{}");
+        String fmt = String.format("<aura:use source='foo:flavors'/>", cmp.getDescriptorName());
+        FlavorIncludeDef def = source(fmt);
+        assertEquals("foo:flavors", def.getSource());
     }
 
     public void testDescription() throws Exception {
-        addStandardFlavor(cmp(), "@flavor test;");
-        FlavorIncludeDef def = source("<aura:flavor component='x' flavor='test' description='testdesc'/>");
+        addStandardFlavor(addComponentDef(), ".THIS--test{}");
+        FlavorIncludeDef def = source("<aura:use source='foo:flavors' description='testdesc'/>");
         assertEquals("testdesc", def.getDescription());
     }
 
     public void testInvalidChild() throws Exception {
         try {
-            source("<aura:flavor component='x' flavor='test'><ui:button></aura:flavor>");
+            source("<aura:use source='foo:flavors'><ui:button></aura:use>");
             fail("Should have thrown an exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "No children");
@@ -87,10 +61,28 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
 
     public void testWithTextBetweenTag() throws Exception {
         try {
-            source("<aura:flavor component='x' flavor='test'>blah</aura:flavor>");
+            source("<aura:use source='foo:flavors'>blah</aura:use>");
             fail("Should have thrown an exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "No literal text");
+        }
+    }
+
+    public void testErrorsIfMissingSource() throws Exception {
+        try {
+            source("<aura:use/>");
+            fail("Should have thrown an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute");
+        }
+    }
+
+    public void testErrorsIfEmptySource() throws Exception {
+        try {
+            source("<aura:use source=''/>");
+            fail("Should have thrown an exception");
+        } catch (Exception e) {
+            checkExceptionContains(e, InvalidDefinitionException.class, "Missing required attribute");
         }
     }
 
@@ -108,9 +100,5 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         xmlReader.next();
         FlavorIncludeDefHandler<FlavorAssortmentDef> handler = new FlavorIncludeDefHandler<>(parent, xmlReader, ss);
         return handler.getElement();
-    }
-
-    private DefDescriptor<ComponentDef> cmp() {
-        return getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
     }
 }

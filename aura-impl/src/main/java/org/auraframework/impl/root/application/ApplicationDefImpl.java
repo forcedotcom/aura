@@ -66,9 +66,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
         this.themeDescriptors = AuraUtil.immutableList(builder.themeDescriptors);
-        this.defaultFlavorsDescriptor = builder.defaultFlavorsDescriptor;
+        this.flavors = builder.flavors;
 
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptors, defaultFlavorsDescriptor);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), themeDescriptors, flavors);
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -78,7 +78,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
         public List<DefDescriptor<ThemeDef>> themeDescriptors = Lists.newArrayList();
-        public DefDescriptor<FlavorAssortmentDef> defaultFlavorsDescriptor;
+        public DefDescriptor<FlavorAssortmentDef> flavors;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -103,8 +103,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
 
         @Override
-        public Builder setDefaultFlavorsDescriptor(DefDescriptor<FlavorAssortmentDef> defaultFlavorsDescriptor) {
-            this.defaultFlavorsDescriptor = defaultFlavorsDescriptor;
+        public Builder setFlavorAssortmentDescriptor(DefDescriptor<FlavorAssortmentDef> flavors) {
+            this.flavors = flavors;
             return this;
         }
     }
@@ -138,7 +138,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     @Override
     protected void serializeFields(Json json) throws IOException, QuickFixException {
-
         DefDescriptor<EventDef> locationChangeEventDescriptor = getLocationChangeEventDescriptor();
         if (locationChangeEventDescriptor != null) {
             json.writeMapEntry("locationChangeEventDef", locationChangeEventDescriptor.getDef());
@@ -146,6 +145,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         if (layoutsDefDescriptor != null) {
             json.writeMapEntry("layouts", getLayoutsDefDescriptor().getDef());
+        }
+
+        if (flavors != null) {
+            json.writeMapEntry("defaultFlavors", flavors.getDef());
         }
     }
 
@@ -161,8 +164,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             dependencies.add(themeDescriptor);
         }
 
-        if (defaultFlavorsDescriptor != null) {
-            dependencies.add(defaultFlavorsDescriptor);
+        if (flavors != null) {
+            dependencies.add(flavors);
         }
 
         if (locationChangeEventDescriptor != null) {
@@ -259,6 +262,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (layoutsDefDescriptor != null) {
             ret.add(layoutsDefDescriptor);
         }
+        if (flavors != null) {
+            ret.add(flavors);
+        }
         return ret;
     }
 
@@ -268,8 +274,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public DefDescriptor<FlavorAssortmentDef> getDefaultFlavorsDescriptor() {
-        return defaultFlavorsDescriptor;
+    public DefDescriptor<FlavorAssortmentDef> getAppFlavors() {
+        return flavors;
     }
 
     @Override
@@ -284,7 +290,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
             return super.equals(obj)
                     && Objects.equal(this.themeDescriptors, other.themeDescriptors)
-                    && Objects.equal(this.defaultFlavorsDescriptor,  other.defaultFlavorsDescriptor);
+                    && Objects.equal(this.flavors,  other.flavors);
         }
 
         return false;
@@ -293,7 +299,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final List<DefDescriptor<ThemeDef>> themeDescriptors;
-    private final DefDescriptor<FlavorAssortmentDef> defaultFlavorsDescriptor;
+    private final DefDescriptor<FlavorAssortmentDef> flavors;
     private final int hashCode;
 
     private final Boolean isAppcacheEnabled;

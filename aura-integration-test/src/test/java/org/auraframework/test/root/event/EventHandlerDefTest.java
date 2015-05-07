@@ -40,18 +40,6 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         serializeAndGoldFile(eventHandlerDef2);
     }
 
-    public void testHandlerWithNameAndEventAttribute() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
-                "handleEventTest:handlerWithNameAndEvent", ComponentDef.class);
-        try {
-            componentDefDescriptor.getDef();
-            fail("Expected InvalidDefinitionException");
-        } catch (InvalidDefinitionException e) {
-            assertEquals("Incorrect exception message",
-                    "aura:handler must specify one and only one of name=\"…\" or event=\"…\"", e.getMessage());
-        }
-    }
-
     public void testHandlerWithoutNameOrEventAttribute() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
                 "handleEventTest:handlerWithoutNameOrEvent", ComponentDef.class);
@@ -60,7 +48,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
             fail("Expected InvalidDefinitionException");
         } catch (InvalidDefinitionException e) {
             assertEquals("Incorrect exception message",
-                    "aura:handler must specify one and only one of name=\"…\" or event=\"…\"", e.getMessage());
+                    "aura:handler must specify at least one of name=\"…\" or event=\"…\"", e.getMessage());
         }
     }
 
@@ -146,7 +134,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
             fail("Expected InvalidDefinitionException");
         } catch (InvalidDefinitionException e) {
             assertEquals("Incorrect exception message",
-                    "aura:handler must specify one and only one of name=\"…\" or event=\"…\"", e.getMessage());
+                    "aura:handler must specify at least one of name=\"…\" or event=\"…\"", e.getMessage());
         }
     }
 

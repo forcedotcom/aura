@@ -446,7 +446,7 @@ $A.ns.AuraClientService.prototype.doActionCallback = function(response, collecto
             this.saveTokenToStorage();
         }
 
-        $A.getContext().merge(responseMessage["context"]);
+        $A.getContext()['merge'](responseMessage["context"]);
 
         // Look for any Client side event exceptions
         var events = responseMessage["events"];
@@ -579,6 +579,11 @@ $A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCoun
         // #end
 
         var acs = this;
+        var actionDefs = [];
+
+        for (var i = 0; i < actionsToSend.length; i++) {
+            actionDefs.push(actionsToSend[i].getDef() + '[' + actionsToSend[i].getId() + ']');
+        }
 
         // clientService.requestQueue reference is mutable
         var requestConfig = {
@@ -602,8 +607,10 @@ $A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCoun
                 "beaconData" : $A.Perf.getBeaconData()
                 // #end
             },
-            "markDescription" : markDescription
+            "actionDefs": actionDefs,
+            "markDescription" : markDescription // Delete this when we remove all jiffy marks
         };
+
         $A.Perf.endMark("Action Group " + collector.getCollectorId() + " enqueued");
 
         // clear the beaconData
@@ -1441,7 +1448,7 @@ $A.ns.AuraClientService.prototype.injectComponent = function(rawConfig, locatorD
     var config = $A.util.json.resolveRefs(rawConfig);
 
     // Save off any context global stuff like new labels
-    $A.getContext().merge(config["context"]);
+    $A.getContext()['merge'](config["context"]);
 
     var actionResult = config["actions"][0];
     var action = $A.get("c.aura://ComponentController.getComponent");

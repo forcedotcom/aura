@@ -64,7 +64,7 @@ MetricsService.prototype = {
             afterFn  = typeof after === 'function';
 
         instance[method] = function () {
-            var mark = self.markStart(ns, method),
+            var mark = !override && self.markStart(ns, method),
                 ret;
 
             if (beforeFn) {
@@ -81,7 +81,7 @@ MetricsService.prototype = {
                 return ret;
             }
 
-            mark = self.markEnd(ns, method);
+            mark = !override && self.markEnd(ns, method);
 
             if (afterFn) {
                 after.apply(this, Array.prototype.concat.apply(mark, arguments));
@@ -113,9 +113,13 @@ MetricsService.prototype = {
         this.doneBootstrap = true;
 
         var bootstrap = this.getBootstrapMetrics();
-        this.transactionEnd('bootstrap','app', function (transaction, callback) {
+        var now = this.time();
+        this.transactionEnd('bootstrap','app', function (transaction) {
+            // We need to override manually the duration to add the time before aura was initialized
+            var bootstrapStart = MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
             transaction["marks"]["bootstrap"] = bootstrap;
-            callback();
+            transaction["ts"] = bootstrapStart;
+            transaction["duration"] = now - bootstrapStart;
         });
 
         // #if {"modes" : ["PRODUCTION"]}
@@ -200,16 +204,14 @@ MetricsService.prototype = {
             }
 
             if (postProcess) {
-                postProcess(parsedTransaction, this.signalBeacon.bind(this, beacon, parsedTransaction));
-            } else {
-                this.signalBeacon(beacon, parsedTransaction);
+                postProcess(parsedTransaction);
             }
 
-            //#if {"excludeModes" : ["PRODUCTION"]}
-                if (this.hasGlobalHandlers) {
-                    this.callHandlers("transactionEnd", parsedTransaction);
-                }
-            //#end
+            if (this.hasGlobalHandlers) {
+                this.callHandlers("transactionEnd", parsedTransaction);
+            }
+
+            this.signalBeacon(beacon, parsedTransaction);
 
             // Cleanup transaction
             if (!this.clearCompleteTransactions) {
@@ -230,6 +232,14 @@ MetricsService.prototype = {
     },
     clearTransactions: function () {
         this.transactions = {};
+    },
+    callHandlers: function (type, t) {
+        var handlers = this.globalHandlers[type];
+        if (handlers) {
+            for (var i = 0; i < handlers.length; i++) {
+                handlers[i](t);
+            }
+        }
     },
     //#if {"excludeModes" : ["PRODUCTION"]}
     defaultPostProcessing: function (customMarks) {
@@ -253,14 +263,6 @@ MetricsService.prototype = {
         }
         return procesedMarks;
     },
-    callHandlers: function (type, t) {
-        var handlers = this.globalHandlers[type];
-        if (handlers) {
-            for (var i = 0; i < handlers.length; i++) {
-                handlers[i](t);
-            }
-        }
-    },
     getTransactions: function () {
         var transactions = [];
         for (var i in this.transactions) {
@@ -283,7 +285,6 @@ MetricsService.prototype = {
                 return t;
             }
         }
-        
     },
     setClearCompletedTransactions: function (value) {
         this.clearCompleteTransactions = value;
@@ -312,9 +313,9 @@ MetricsService.prototype = {
         this.transactions[id] = transaction;
         return id;
     },
-    markStamp: function (ns, name) {
+    markStamp: function (ns, name, context) {
         if (!name) {name = ns; ns = MetricsService.DEFAULT;}
-        var mark        = this.createMarkNode(ns, name, MetricsService.STAMP),
+        var mark        = this.createMarkNode(ns, name, MetricsService.STAMP, context),
             nsCollector = this.collector[ns], 
             collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
 
@@ -336,13 +337,14 @@ MetricsService.prototype = {
         this.collector[ns].push(mark);
         return mark;
     },
-    createMarkNode: function (ns, name, eventType, context) {
+    createMarkNode: function (ns, name, eventType, options) {
+        var context = options ? (options.context || options) : null;
         return {
             "ns"      : ns, 
             "name"    : name,
             "phase"   : eventType,
             "ts"      : MetricsService.TIMER(),
-            "context" : context || null /*keep the shape of the object for perf*/
+            "context" : context
         };
     },
     clearMarks: function (ns) {

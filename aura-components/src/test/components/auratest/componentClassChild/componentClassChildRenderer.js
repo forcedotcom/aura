@@ -15,22 +15,34 @@
  */
 ({
     render : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ChildRender' );
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ChildRender' );
+        if (cmp.get("v.errorOutFromRender_Child") === true ) {
+        	blahFromChildRerender.willExplode();
+        }
         return this.superRender();
     },
 
     afterRender : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ChildAfterrender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ChildAfterrender');
+        if (cmp.get("v.errorOutFromAfterRender_Child") === true ) {
+        	blahFromChildAfterRerender.willExplode();
+        }
         this.superAfterRender();
     },
 
     rerender : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ChildRerender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ChildRerender');
+        if (cmp.get("v.errorOutFromReRender_Child") === true ) {
+        	blahFromChildReRerender.willExplode();
+        }
         this.superRerender();
     },
 
     unrender : function(cmp, helper) {
-        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter() + 'ChildUnrender');
+        $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'ChildUnrender');
+        if (cmp.get("v.errorOutFromUnRender_Child") === true ) {
+        	blahFromChildUnRerender.willExplode();
+        }
         this.superUnrender();
     }
 })

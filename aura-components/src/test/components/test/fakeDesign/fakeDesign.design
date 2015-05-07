@@ -1,10 +1,42 @@
 <design:component label="some label">
-	<design:template>
-		<design:region name="regionOne" allowedInterfaces="test:fakeInterface"/>
-		<design:region name="regionTwo" />
-		<design:region name="regionThree" allowedInterfaces="test:fakeInterface,auratest:testInterface"/>
-	</design:template>
-	<design:attribute name="something" label="some label" max="100" min="-100" placeholder="Leave blank for default value"/>
-	<design:attribute name="else" label="something else" datasource="one,two,three"/>
-	<design:attribute name="entities" label="some entities" type="EntityName" datasource="Account,Contact" required="true" readonly="false" />
+    <design:attribute name="something" label="some label" max="100" min="-100"
+                      placeholder="Leave blank for default value"/>
+    <design:attribute name="else" label="something else" datasource="one,two,three"/>
+    <design:attribute name="entities" label="some entities" type="EntityName" datasource="Account,Contact"
+                      required="true" readonly="false"/>
+
+    <design:option name="filter" value="none"/>
+    <design:option name="desktopEnabled"/>
+
+    <design:template>
+        <design:region name="regionOne" allowedInterfaces="test:fakeInterface"/>
+        <design:region name="regionTwo"/>
+        <design:region name="regionThree" allowedInterfaces="test:fakeInterface,auratest:testInterface"/>
+    </design:template>
+
+    <design:layout>
+        <design:section>
+            <design:layoutItems>
+                <design:layoutAttribute name="something"/>
+                <design:layoutComponent name="ui:button"/>
+            </design:layoutItems>
+            <design:layoutItems name="second">
+                <design:layoutAttribute name="else"/>
+            </design:layoutItems>
+        </design:section>
+
+        <design:section name="second">
+            <design:layoutItems>
+                <design:layoutAttribute name="entities"/>
+            </design:layoutItems>
+        </design:section>
+    </design:layout>
+
+    <design:layout name="second">
+        <design:section>
+            <design:layoutItems>
+                <design:layoutAttribute name="something"/>
+            </design:layoutItems>
+        </design:section>
+    </design:layout>
 </design:component>

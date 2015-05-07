@@ -14,53 +14,49 @@
  * limitations under the License.
  */
  
- 
-.THIS   {
- 	position: relative;
-	background: #2e4153;
-	display: block;
-	backface-visibility:hidden;
-	-webkit-backface-visibility: hidden;		
- }
-  
-  
- .THIS .carousel-nav-container { 	
- 	position: relative;
- 	padding: 20px 0;
-	display: block;
-	width: 100%;
-	text-align: center;	
- }
+.THIS {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
 
- .THIS .carousel-pages {
- 	position: relative;
- 	clear: both;	
-	overflow: hidden; 	
- }
-   
- 
- .THIS .carousel-pages .page-list { 
- 	list-style: none;
- 	padding: 0px;
- 	margin: 0px;
- }
- 
- .THIS .carousel-nav-position-top {
- 	top: 0px;
- }
-  
- .THIS .carousel-nav-position-bottom {
- 	bottom: 0px;
- }
-   
- 
- .THIS .carousel-pages .carousel-page { 	
- 	display: inline-block;
- 	vertical-align: top;    
- }
- 
- .THIS .full-height {
- 	height: 100%;
- }
- 
- 
+.THIS > .carousel-body {
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+}
+
+.THIS.flex {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    
+    -webkit-box-orient: vertical;
+    -ms-box-orient    : vertical;
+    box-orient        : vertical;
+    
+    -webkit-flex-flow: column;
+    -ms-flex-flow: column;
+    flex-flow: column;
+}
+.THIS.flex > .carousel-body {
+    -webkit-box-flex: 1;
+    -ms-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+}
+
+/* This selector is this long to avoid CSS problems when nested scrollers */
+.THIS > .carousel-body > .scroller > .carousel-page {
+    position: relative;
+    white-space: normal;
+    width: 100%;
+    display: inline-block;
+}
+
+.THIS .scroll-horizontal > .carousel-page {
+    height: 100%;
+}

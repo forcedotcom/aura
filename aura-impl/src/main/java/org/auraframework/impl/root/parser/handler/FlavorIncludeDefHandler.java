@@ -23,35 +23,28 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
 public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedTagHandler<FlavorIncludeDef, P> {
-    protected static final String TAG = "aura:flavor";
-    private static final String ATTRIBUTE_COMPONENT = "component";
-    private static final String ATTRIBUTE_FLAVOR = "flavor";
-    private static final String ATTRIBUTE_NAMED = "named";
-    private static final String ATTRIBUTE_NAMESPACE = "namespace";
+    protected static final String TAG = "aura:use";
+    private static final String ATTRIBUTE_SOURCE = "source";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_COMPONENT, ATTRIBUTE_FLAVOR, ATTRIBUTE_NAMED, ATTRIBUTE_NAMESPACE, ATTRIBUTE_DESCRIPTION);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SOURCE, ATTRIBUTE_DESCRIPTION);
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
 
     public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
         builder.setLocation(getLocation());
-        builder.setParentDescriptor(parentHandler.getDefDescriptor());
     }
 
     @Override
@@ -65,31 +58,17 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
     }
 
     @Override
-    protected void readAttributes() {
-        // component / flavor
-        String component = getAttributeValue(ATTRIBUTE_COMPONENT);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(component)) {
-            DefDescriptor<ComponentDef> componentDesc = DefDescriptorImpl.getInstance(component, ComponentDef.class);
-            builder.setComponent(componentDesc);
-
-            String flavor = getAttributeValue(ATTRIBUTE_FLAVOR);
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(flavor)) {
-                builder.setFlavor(Flavors.buildFlavorRef(componentDesc, flavor));
-            }
-        }
-
-        // named / namespace
-        String named = getAttributeValue(ATTRIBUTE_NAMED);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(named)) {
-            builder.setFilteredName(named);
-        }
-
-        String namespace = getAttributeValue(ATTRIBUTE_NAMESPACE);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(namespace)) {
-            builder.setFilterNamespace(namespace);
+    protected void readAttributes() throws InvalidDefinitionException {
+        String source = getAttributeValue(ATTRIBUTE_SOURCE);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(source)) {
+            builder.setSource(source);
+        } else {
+            throw new InvalidDefinitionException("Missing required attribute 'source'", getLocation());
         }
 
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
+        builder.setParentDescriptor(getParentDefDescriptor());
+        builder.setDescriptor(DefDescriptorImpl.getInstance(source, FlavorIncludeDef.class));
     }
 
     @Override
@@ -110,5 +89,6 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
     }
 
     @Override
-    public void writeElement(FlavorIncludeDef def, Appendable out) throws IOException {}
+    public void writeElement(FlavorIncludeDef def, Appendable out) throws IOException {
+    }
 }

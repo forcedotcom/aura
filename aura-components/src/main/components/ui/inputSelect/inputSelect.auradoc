@@ -29,13 +29,18 @@
 
                 <h4>Generating Options with <code>aura:iteration</code></h4>
                  <p>You can use <code>aura:iteration</code> to iterate over a list of items to generate options. 
-                 This example iterates over a list of items.</p>
-<pre>&lt;aura:attribute name="contacts" type="String[]" default="Primary Contact, Secondary Contact, Other"/>
-&lt;ui:inputSelect>
-    &lt;aura:iteration items="{!v.contacts}" var="contact">
-         &lt;ui:inputSelectOption text="{!contact}" label="{!contact}"/>
-    &lt;/aura:iteration>
-&lt;/ui:inputSelect></pre>
+                 This example iterates over a list of items and handles the change event.</p>
+<pre>&lt;aura:attribute name="contactLevel" type="String[]" default="Primary Contact, Secondary Contact, Other"/>
+    &lt;ui:inputSelect aura:id="levels" label="Contact Levels" change="{!c.onSelectChange}">
+        &lt;aura:iteration items="{!v.contactLevel}" var="level">
+             &lt;ui:inputSelectOption text="{!level}" label="{!level}"/>
+        &lt;/aura:iteration>
+    &lt;/ui:inputSelect></pre>
+    <p>When the selected option changes, this client-side controller retrieves the new text value.</p>
+<pre>onSelectChange : function(component, event, helper) {
+    var selected = component.find("levels").get("v.value");
+    //do something else
+}</pre>
 		<h4>Generating Options Dynamically</h4>
 		<p>
 		    Generate the options dynamically on component initialization using a controller-side action.

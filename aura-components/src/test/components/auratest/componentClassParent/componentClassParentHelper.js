@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 ({
-    getDelimiter : function() {
-        return "RootHelper";
+    getDelimiter : function(cmp) {
+    	if (cmp.get("v.errorOutFromHelper_Parent") === true ) {
+        	blahFromParentHelper.willExplode();
+        }
+        return "ParentHelper";
     }
 })

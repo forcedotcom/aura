@@ -76,17 +76,26 @@
             list.set("v.visible", false);
         }
     },
-    
+
     handleEnterkey: function(component, event) {
         var list = component.find("list");
         if (list.get("v.visible") === true) {
-            var pEvent = list.get("e.pressOnHighlighted");
-            pEvent.fire();
+            this.handleEnterkeyOnList(component, list)
+        } else {
+            this.handleEnterKeyOnInput(component, component.find("input"));
         }
     },
-    
+
+    handleEnterkeyOnList: function(component, list) {
+        var pEvent = list.get("e.pressOnHighlighted");
+        pEvent.fire();
+    },
+
+    handleEnterKeyOnInput: function(component, input) {
+    },
+
     handleEsckey: function(component, event) {
-        this.hideList(component);
+    this.hideList(component);
     },
     
     handleKeyAction: function(component, event) {
@@ -105,9 +114,14 @@
             this.handleTabkey(component, event);
         } else if (keyCode === 13) {  // enter key: select the highlighted list option
             this.handleEnterkey(component, event);
+        } else {
+            this.handleOtherKeyAction(component, component.find("input"), event);
         }
     },
-    
+
+    handleOtherKeyAction: function(component, input, event) {
+    },
+
     handleTabkey: function(component, event) {
         this.hideList(component);
     },

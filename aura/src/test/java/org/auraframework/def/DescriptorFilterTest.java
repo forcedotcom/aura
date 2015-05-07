@@ -381,7 +381,7 @@ public class DescriptorFilterTest extends UnitTestCase {
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
         assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
 
-        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", null);
+        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", (String)null);
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
         assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);

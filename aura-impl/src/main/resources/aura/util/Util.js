@@ -34,7 +34,6 @@ $A.ns.Util = function() {
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};
-    this.flavorClassCache = {};
     this.debugToolWindow = undefined;
     this.sizeEstimator = new SizeEstimator();
 };
@@ -469,35 +468,29 @@ $A.ns.Util.prototype.buildClass=function(oldClass, newClass, remove){
 };
 
 /**
- * Builds the appropriate css class name for a flavor with the given name and (optional) namespace.
+ * Builds the appropriate css class name for a flavor.
  *
- * @param {String} name The name of the flavor.
- * @param {String} [namespace] The namespace of the flavor. Only specified for namespace flavors.
- * @returns The flavor css class name for usage on an element.
+ * @param {Object} cmp The DefDescriptor of the component being flavored.
+ * @returns {String} flavor The flavor name.
  */
-$A.ns.Util.prototype.buildFlavorClass = function(name, namespace){
-    var namespaceKey = namespace || "__bundle";
+$A.ns.Util.prototype.buildFlavorClass = function(cmp, flavor) {
+    $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "StyleDef not set for component");
 
-    if (this.flavorClassCache[namespaceKey] && this.flavorClassCache[namespaceKey][name]) {
-        return this.flavorClassCache[namespaceKey][name];
+    if (this.isEmpty(flavor)) {
+        return "";
     }
 
-    if (!this.flavorClassCache[namespaceKey]) {
-        this.flavorClassCache[namespaceKey] = {};
-    }
+    var base = cmp.getDef().getStyleDef().getClassName();
+    var split = flavor.split(",");
+    var clz = "";
+    for (var i = 0, len = split.length; i < len; i++) {
+        if (i != 0) {
+            clz += " ";
+        }
 
-    // this should follow the same logic as Flavors#scopeClassName
-    var  clz = "";
-    if (namespace) {
-        clz += namespace;
-        clz += name.charAt(0).toUpperCase() + name.slice(1);
-    } else {
-        clz += name;
+        clz += base + "--" + this.trim(split[i]);
     }
-    clz += "-f";
-
-    this.flavorClassCache[namespaceKey][name] = clz;
-	return clz;
+    return clz;
 };
 
 /**
@@ -1092,7 +1085,7 @@ $A.ns.Util.prototype.isSubDef = function(def, qname) {
 };
 
 /**
- * 
+ *
  * @description Takes the methods, and properties from one object and assigns them to another.
  * Returns the base object with the members from the child object.
  * This is commonly used to apply a set of configurations to a default set, to get a single set of configuration properties.
@@ -1166,7 +1159,7 @@ $A.ns.Util.prototype.hyphensToCamelCase = function(str) {
 };
 
 /**
- * 
+ *
  * @description A map of nodeNames that cannot accept custom data attributes.
  * @private
  */
@@ -1178,7 +1171,7 @@ $A.ns.Util.prototype.noData = {
 };
 
 /**
- * 
+ *
  * @description Returns whether a given DOM element can accept custom data attributes.
  *
  * @param {HTMLElement} element The element to check for custom data attribute support.
@@ -1226,7 +1219,7 @@ $A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
 };
 
 /**
- * 
+ *
  * @description Returns a custom data attribute value from a DOM element.
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/
  * @param {HTMLElement} element The element from which to retrieve data.
@@ -1242,7 +1235,7 @@ $A.ns.Util.prototype.getDataAttribute = function(element, key) {
 };
 
 /**
- * 
+ *
  * @description Sets a custom data attribute value from a DOM element.
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/
  * @param {HTMLElement} element The element from which to retrieve data.
@@ -1364,7 +1357,7 @@ if (!!(Object && Object.keys)) {
                 keys.push(key);
             }
         }
-        
+
         return keys;
     };
 } else {
@@ -1391,7 +1384,7 @@ if (!!(Object && Object.keys)) {
 
 /**
  * Performs a series of 'safe' sequential lookup of nested properies.
- * 
+ *
  * Example: a safe lookup for "VALUE" in: object: {
  *    first: {
  *       second: [
@@ -1399,21 +1392,21 @@ if (!!(Object && Object.keys)) {
  *       ]
  *    }
  * }
- * 
- * Can be done via: $A.util.lookup(object, "first", "second", 0); 
+ *
+ * Can be done via: $A.util.lookup(object, "first", "second", 0);
  * Instead of: object && object.first && object.first.second && object.first.second[0]
- * 
+ *
  * @param {Object} root object or array to sequentially lookup properties from.
- * @param {String} var-args of string property names. 
+ * @param {String} var-args of string property names.
  * @return {Any} the looked-up property or undefined if any properties along the way were not found.
  */
 $A.ns.Util.prototype.lookup = function(object /*, var-args of arrays*/) {
     var properties = Array.prototype.slice.call(arguments, 1),
         util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
-    
+
     return util.reduce(properties, function(current, property) {
         return current && current[property];
-    }, object);  
+    }, object);
 };
 
 
@@ -1520,11 +1513,11 @@ if (!!Array.prototype.reduce) {
     };
 } else {
     /**
-     * Loops over an array, calling a function that provides the returned result of calling the function on the 
-     * previous element.  
+     * Loops over an array, calling a function that provides the returned result of calling the function on the
+     * previous element.
      * @param {Array} array to loop over.
-     * @param {Function} reduction method that takes the resturned result from the previous call, the current element from 
-     * the input array and index. 
+     * @param {Function} reduction method that takes the resturned result from the previous call, the current element from
+     * the input array and index.
      * @param {Any} the initial object passed to the first element in the array's reduction method.
      * @returns {Any} the final value returned from calling the reduction method on the last element.
      */
@@ -1897,7 +1890,7 @@ $A.ns.Util.prototype.supportsTouchEvents = function() {
 
             // IE  will also give false positives, so we make sure that only enable pointer events when is a windowsPhone
             || ($A.get('$Browser.isWindowsPhone') && (window["navigator"]["pointerEnabled"] ||  window["navigator"]["msPointerEnabled"]))
-            || window["navigator"]["msMaxTouchPoints"] > 0 
+            || window["navigator"]["msMaxTouchPoints"] > 0
             || window["navigator"]["maxTouchPoints"] > 0)
 
             // Aura internal testing

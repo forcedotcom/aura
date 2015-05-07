@@ -35,7 +35,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     private final String CK_EDITOR_LOCATOR = ".cke_contents";
     private final String SUBMIT_BUTTON_LOCATOR = ".uiButton";
     private final String OUTPUT_LOCATOR = ".uiOutputText";
-    private final String IN_RICHTEXT_BODY = ".inputRichTextBody"; 
+    private final String IN_RICHTEXT_BODY = ".inputRichTextBody";
     private final String RT_CMP = "Text";
 
     public InputRichTextUITest(String name) {
@@ -76,9 +76,8 @@ public class InputRichTextUITest extends WebDriverTestCase {
      * Test html content is escaped.
      */
     // Issue with sendKeys in Safari https://code.google.com/p/selenium/issues/detail?id=4467.
-    // ios-driver fails to send the '/' key
-    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
+            BrowserType.IPHONE })
     @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
@@ -92,18 +91,16 @@ public class InputRichTextUITest extends WebDriverTestCase {
         ckEditorInput.sendKeys(html);
         waitForTextInRichText(RT_CMP, escapedHtml);
     }
+
     /**
-     * ui:inputRichText doesn't render its initial value
-     * Test case: W-2428455
-     * @throws Exception
-     * Excluding test as switchTo not supported with ios and android drivers
+     * ui:inputRichText doesn't render its initial value Test case: W-2428455
      */
-    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
-        BrowserType.IPAD, BrowserType.IPHONE })
+    // Excluding test as switchTo not supported with android drivers
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testRenderInitialValueOfRichText() throws Exception {
         String defaultText = "testing text";
         WebDriver driver = this.getDriver();
-    	open(String.format("%s?value=%s",CMP_URL,defaultText));
+        open(String.format("%s?value=%s", CMP_URL, defaultText));
         WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
         driver.switchTo().frame(ckEditorInput);

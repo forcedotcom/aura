@@ -55,7 +55,7 @@ var clientService;
 // #include aura.polyfill.Promise
 // #include aura.util.Util
 // #include aura.AuraError
-// #include aura.AuraFriendlyError 
+// #include aura.AuraFriendlyError
 // #include aura.Logger
 // #include aura.DocLevelHandler
 // #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
@@ -90,6 +90,8 @@ var clientService;
 // #include aura.attribute.AttributeDefSet
 // #include aura.renderer.RendererDefRegistry
 // #include aura.style.StyleDef
+// #include aura.flavors.FlavorDefaultDef
+// #include aura.flavors.FlavorAssortmentDef
 // #include aura.component.ComponentDef
 // #include aura.controller.ControllerDef
 // #include aura.controller.ControllerDefRegistry
@@ -484,7 +486,7 @@ $A.ns.Aura = function() {
      * @borrows AuraEventService.newEvent
      */
     this.getEvt = this.eventService.newEvent;
-    
+
     this.Component = Component;
 
     // TODO: convert to //#exportSymbols when available
@@ -528,7 +530,7 @@ $A.ns.Aura = function() {
         "newCmpAsync", aura.newCmpAsync,
         "getEvt", aura.getEvt,
         "Component", aura.Component,
-    
+
         "auraError", aura.auraError,
         "auraFriendlyError", aura.auraFriendlyError);
     var services = aura.services;
@@ -621,7 +623,7 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
     } else {
         // Use the existing context and just join the new context into it
         // FIXME: is this used? it won't do the right thing if there are components.
-        $A.getContext().merge(config["context"]);
+        $A.getContext()['merge'](config["context"]);
     }
 };
 
@@ -688,7 +690,7 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
         this["finishedInit"] = true;
         $A.clientService.fireLoadEvent("e.aura:initialized");
         $A.metricsService.applicationReady();
-        
+
     }
 };
 
@@ -786,9 +788,9 @@ $A.ns.Aura.prototype.get = function(key, callback) {
                 return $A.expressionService.resolve(path, valueProvider);
             }
         }
-        return valueProvider.getValues ? valueProvider.getValues() : valueProvider;   
+        return valueProvider.getValues ? valueProvider.getValues() : valueProvider;
     }
-    
+
 };
 
 /**
@@ -1318,4 +1320,5 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.TransportMetricsPlugin
 // #include aura.metrics.plugins.ServerActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
+// #include aura.metrics.plugins.AuraContextPlugin
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}

@@ -132,13 +132,19 @@
 		numberList: "cke_button__numberedlist_icon"
 	},
 	
+	ckeCustomButtons:{
+		font: "cke_combo__font",
+		fontSize: "cke_combo__fontsize"
+	},
+
+	
     /**
      * Test basic tool bar is loaded.
      */
     testToolbarTypeBasic:{
     	attributes : {toolbar: "basic"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(component) {
     		this.assertButtonsOnToolBar(this.ckeBasicButtons);
     	}]
@@ -150,7 +156,7 @@
     testToolbarTypeFull:{
     	attributes : {toolbar: "full"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(components) {
     		this.assertButtonsOnToolBar(this.ckeButtons);
     	}]
@@ -162,7 +168,7 @@
     testToolbarTypeStandard:{
     	attributes : {toolbar: "standard"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(components) {
     		this.assertButtonsOnToolBar(this.ckeStandardButtons);
     	}]
@@ -174,7 +180,7 @@
     testToolbarTypeEmail:{
     	attributes : {toolbar: "email"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(components) {
     		this.assertButtonsOnToolBar(this.ckeEmailButtons);
     	}]
@@ -187,10 +193,71 @@
     _testToolbarTypeDefault:{
     	attributes : {toolbar: ""},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(components) {
     		this.assertButtonsOnToolBar(this.ckeDefaultButtons);
     	}]
+    },
+    
+
+
+    /**
+     * Test custom tool bar is loaded.
+     */
+    testToolbarTypeCustom : {
+        attributes : {
+            toolbar : "custom",
+            customToolbarConfig : '[{"name" : "format", "items" : ["Font","FontSize"]}]'
+        },
+        test : [ function(component) {
+            this.assertRichTextInitalized();
+        }, function(components) {
+            this.assertButtonsOnToolBar(this.ckeCustomButtons);
+        } ]
+    },
+
+    /**
+     * Test default tool bar is loaded for an empty custom tool bar configuration.
+     */
+    testToolbarTypeCustomWithEmptyConfig : {
+        attributes : {
+            toolbar : "custom",
+            customToolbarConfig : ""
+        },
+        test : [ function(component) {
+            this.assertRichTextInitalized();
+        }, function(components) {
+            this.assertButtonsOnToolBar(this.ckeBasicButtons);
+        } ]
+    },
+
+    /**
+     * Test default tool bar is loaded for no custom tool bar configuration.
+     */
+    testToolbarTypeCustomWithNoConfig : {
+        attributes : {
+            toolbar : "custom"
+        },
+        test : [ function(component) {
+            this.assertRichTextInitalized();
+        }, function(components) {
+            this.assertButtonsOnToolBar(this.ckeBasicButtons);
+        } ]
+    },
+
+    /**
+     * Test default tool bar is loaded for a bad custom tool bar configuration.
+     */
+    testToolbarTypeCustomWithBadConfig : {
+        attributes : {
+            toolbar : "custom",
+            customToolbarConfig : false
+        },
+        test : [ function(component) {
+            this.assertRichTextInitalized();
+        }, function(components) {
+            this.assertButtonsOnToolBar(this.ckeBasicButtons);
+        } ]
     },
     
     /**
@@ -199,7 +266,7 @@
     testToolbarLocationBottom:{
     	attributes : {toolbarLocation: "outerspace"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(component) {
     		this.assertToolbarPresent(false);
     	}]
@@ -211,7 +278,7 @@
     testToolbarLocationInvalid:{
     	attributes : {toolbarLocation: "outerspace"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(component) {
     		this.assertToolbarPresent(false);
     	}]
@@ -236,7 +303,7 @@
     	attributes : {width: -100, height:-10},
     	test : function(component) {
     		// just verify ckeditor loaded
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}
     },
     
@@ -246,14 +313,14 @@
     testRichTextContent:{
     	attributes : {value: "<h3 style='color:red;'><span style='font-family:courier new,courier,monospace;'><span style='font-size:8px;'>test content</span></span></h3>"},
     	test : [function(component) {
-    		this.assertRickTextInitalized();
+    		this.assertRichTextInitalized();
     	}, function(component) {
     		var content = component.get("v.value");
     		$A.test.assertNotNull(content, 
     			"Content should be present (note: can not verify styling)");
     	}]    }, 
     
-    assertRickTextInitalized : function() {
+    assertRichTextInitalized : function() {
     	$A.test.addWaitFor(true, function(){
     		return !$A.util.isUndefinedOrNull(
     			$A.test.getElementByClass("cke_wysiwyg_frame"));

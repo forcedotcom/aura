@@ -620,6 +620,35 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     }
 
     /**
+     * Test find() using a constant Descriptor Filter.
+     */
+    public void testFindWithConstantFilter() throws Exception {
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
+
+        String qualifiedName = String.format("markup://%s", DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT);
+
+        assertEquals("find() should find single match for " + qualifiedName, 1,
+                definitionService.find(new DescriptorFilter(qualifiedName, DefType.COMPONENT)).size());
+    }
+
+    /**
+     * Test find() using a Descriptor Filter with given DefType.
+     */
+    public void testFindByFilterWithDefType() throws Exception {
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
+
+        assertEquals("find() fails with wildcard as namespace", 1,
+                definitionService.find(new DescriptorFilter("markup://*:targetComponent", DefType.COMPONENT)).size());
+
+        String prefixAsWildcard = String.format("*://%s", DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT);
+        assertEquals("find() fails with wildcard as prefix", 1,
+                definitionService.find(new DescriptorFilter(prefixAsWildcard, DefType.COMPONENT)).size());
+
+        assertEquals("find() fails when filter with multiple def types", 2,
+                definitionService.find(new DescriptorFilter(prefixAsWildcard, "COMPONENT,DOCUMENTATION")).size());
+    }
+
+    /**
      * Test find() using regex's and look in different DefRegistry's for results.
      */
     public void testFindRegex() throws Exception {

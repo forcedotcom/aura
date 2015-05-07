@@ -18,8 +18,6 @@ package org.auraframework.impl.source;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -40,9 +38,6 @@ public class DescriptorFileMapper {
 
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
-    /** match extensions such as Renderer.js, Flavors.css */
-    private static final Pattern EXT_PATTERN = Pattern.compile("[A-Z][a-z]+\\.[a-z]+$");
-
     public enum NameFormat {
         BUNDLE, // ! A 'bundle' file like controller, component, app, helper.
         BUNDLED_EXTRA, // ! An 'extra' file e.g. library include js file
@@ -55,13 +50,15 @@ public class DescriptorFileMapper {
         public final String prefix;
         public final DefType defType;
         public final Format format;
+        public final DefType bundleDefType;
 
-        public ExtensionInfo(String extension, NameFormat nameFormat, String prefix, DefType defType, Format format) {
+        public ExtensionInfo(String extension, NameFormat nameFormat, String prefix, DefType defType, Format format, DefType bundleDefType) {
             this.extension = extension;
             this.nameFormat = nameFormat;
             this.prefix = prefix;
             this.defType = defType;
             this.format = format;
+            this.bundleDefType = bundleDefType;
         }
 
         @Override
@@ -73,13 +70,18 @@ public class DescriptorFileMapper {
 
     protected final static Map<String, ExtensionInfo> byExtension = Maps.newHashMapWithExpectedSize(32);
     private final static Map<String, Map<DefType, ExtensionInfo>> byCompound = Maps.newHashMapWithExpectedSize(8);
-    private final static Map<String, Map<String, ExtensionInfo>> byExtensionCompound = Maps.newHashMapWithExpectedSize(8);
+    private final static Map<NameFormat, Map<String, ExtensionInfo>> byNameFormatCompound = Maps.newHashMapWithExpectedSize(4);
     private final static Set<DefType> defTypes = Sets.newHashSet();
     private final static Set<String> prefixes = Sets.newHashSet();
 
     protected synchronized static void addExtension(String extension, NameFormat nameFormat,
             String prefix, DefType defType, Format format) {
-        ExtensionInfo ei = new ExtensionInfo(extension, nameFormat, prefix, defType, format);
+        addExtension(extension, nameFormat, prefix, defType, format, null);
+    }
+
+    protected synchronized static void addExtension(String extension, NameFormat nameFormat,
+            String prefix, DefType defType, Format format, DefType bundleDefType) {
+        ExtensionInfo ei = new ExtensionInfo(extension, nameFormat, prefix, defType, format, bundleDefType);
         byExtension.put(ei.extension.toLowerCase(), ei);
 
         Map<DefType, ExtensionInfo> defTypeMap = byCompound.get(ei.prefix.toLowerCase());
@@ -89,13 +91,13 @@ public class DescriptorFileMapper {
         }
         defTypeMap.put(defType, ei);
 
-        // index by extension => { prefix => ei } for cases where the extensions are the same
-        Map<String, ExtensionInfo> extMap = byExtensionCompound.get(extension);
+        // index by nameFormat => { extension => ei } for cases where the extensions are the same
+        Map<String, ExtensionInfo> extMap = byNameFormatCompound.get(nameFormat);
         if (extMap == null) {
             extMap = Maps.newHashMap();
-            byExtensionCompound.put(extension, extMap);
+            byNameFormatCompound.put(nameFormat, extMap);
         }
-        extMap.put(ei.prefix.toLowerCase(), ei);
+        extMap.put(extension, ei);
 
         defTypes.add(defType);
         prefixes.add(ei.prefix);
@@ -124,7 +126,7 @@ public class DescriptorFileMapper {
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);
-        addExtension("Flavors.xml", NameFormat.BUNDLE, "markup", DefType.FLAVOR_ASSORTMENT, Format.XML);
+        addExtension(".flavors", NameFormat.BUNDLE, "markup", DefType.FLAVOR_ASSORTMENT, Format.XML);
         addExtension("Layouts.xml", NameFormat.BUNDLE, "markup", DefType.LAYOUTS, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);
@@ -134,14 +136,14 @@ public class DescriptorFileMapper {
         addExtension("Model.js", NameFormat.BUNDLE, "js", DefType.MODEL, Format.JS);
         addExtension("Resource.js", NameFormat.BUNDLE, "js", DefType.RESOURCE, Format.JS);
         addExtension("Test.js", NameFormat.BUNDLE, "js", DefType.TESTSUITE, Format.JS);
-        addExtension(".js", NameFormat.BUNDLED_EXTRA, "js", DefType.INCLUDE, Format.JS);
+        addExtension(".js", NameFormat.BUNDLED_EXTRA, "js", DefType.INCLUDE, Format.JS, DefType.LIBRARY);
 
+        addExtension(".css", NameFormat.BUNDLED_EXTRA, DefDescriptor.CUSTOM_FLAVOR_PREFIX, DefType.FLAVORED_STYLE, Format.CSS, DefType.FLAVORS);
+        addExtension("Flavors.css", NameFormat.BUNDLE, DefDescriptor.CSS_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
         addExtension(".css", NameFormat.BUNDLE, "templateCss", DefType.STYLE, Format.TEMPLATE_CSS);
         addExtension("Resource.css", NameFormat.BUNDLE, "templateCss", DefType.RESOURCE, Format.TEMPLATE_CSS);
         addExtension(".css", NameFormat.BUNDLE, "css", DefType.STYLE, Format.CSS);
         addExtension("Resource.css", NameFormat.BUNDLE, "css", DefType.RESOURCE, Format.CSS);
-        addExtension("Flavors.css", NameFormat.BUNDLED_EXTRA, DefDescriptor.CUSTOM_FLAVOR_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
-        addExtension("Flavors.css", NameFormat.BUNDLE, DefDescriptor.CSS_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
     }
 
     protected static DefDescriptor<? extends Definition> getDescriptor(String filename) {
@@ -171,28 +173,19 @@ public class DescriptorFileMapper {
             }
         }
 
+        // bundle extrasss
         List<String> ext = AuraTextUtil.splitSimple(".", last);
-        if (ext != null && ext.size() == 2) {
-            ei = byExtension.get(ext.get(1).toLowerCase());
-            if (ei != null) {
-                if (ei.nameFormat == NameFormat.BUNDLED_EXTRA) {
-                    String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
-                    return Aura.getDefinitionService().getDefDescriptor(
-                            String.format(format, ei.prefix, ns, ext.get(0)), ei.defType.getPrimaryInterface());
-                }
-            }
-        }
+        if (ext != null && ext.size() == 2 && !last.startsWith(name)) {
+            Map<String, ExtensionInfo> bundledExtras = byNameFormatCompound.get(NameFormat.BUNDLED_EXTRA);
+            ei = bundledExtras.get("." + ext.get(1));
 
-        Matcher matcher = EXT_PATTERN.matcher(last);
-        if (matcher.find()) {
-            Map<String, ExtensionInfo> extMap = byExtensionCompound.get(matcher.group());
-            if (extMap != null) {
-                ei = extMap.get(DefDescriptor.CUSTOM_FLAVOR_PREFIX.toLowerCase());
-                if (ei != null) {
-                    return Aura.getDefinitionService().getDefDescriptor(
-                            String.format("%s://%s.%s", ei.prefix, ns, last.substring(0, matcher.start())),
-                            ei.defType.getPrimaryInterface());
-                }
+            if (ei != null && ei.bundleDefType != null) {
+                DefDescriptor<? extends Definition> bundle = Aura.getDefinitionService().getDefDescriptor(
+                        String.format("%s://%s:%s", DefDescriptor.MARKUP_PREFIX, ns, name), ei.bundleDefType.getPrimaryInterface());
+
+                String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
+                return Aura.getDefinitionService().getDefDescriptor(
+                        String.format(format, ei.prefix, ns, ext.get(0)), ei.defType.getPrimaryInterface(), bundle);
             }
         }
 

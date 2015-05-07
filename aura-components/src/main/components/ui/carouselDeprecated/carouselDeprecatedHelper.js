@@ -81,7 +81,7 @@
 				page = pageCmps[i];
 				pageSuper = page.getSuper();
 				//append page components to page container body
-				if ($A.util.isComponent(page) && page.isInstanceOf("ui:carouselPage")) {
+				if ($A.util.isComponent(page) && page.isInstanceOf("ui:carouselPageDeprecated")) {
                     page.autoDestroy(false);
 					pageTmp = pageSuper.isInstanceOf('ui:carouselPage') ? pageSuper : page;
 					//page index starts with 1
@@ -95,13 +95,14 @@
 					pages.push(page);
 				}
 			}
+			
 			cmp.set('v.pageComponents', pages, true);
 		} else if (pageModels.length > 0) {
 			for ( var i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
 				//create new instance of carousePage and pass pageModel to it
 				 var component=$A.componentService.newComponentDeprecated({
-			            componentDef:{descriptor: 'markup://ui:carouselPageDeprecated'},
+			            componentDef:{descriptor: 'markup://ui:carouselPage'},
 			            //page index starts with 1
 			            attributes:{values: {
 			            	'priv_visible' : isVisible,
@@ -116,6 +117,7 @@
                 component.autoDestroy(false);
 				pages.push(component);
 			}
+			
 			cmp.set('v.pageComponents', pages, true);
 		}
 
@@ -213,7 +215,7 @@
 		for (var i=0; i< body.length; i++) {
 			if (body[i].isInstanceOf('aura:iteration')) {
 				pageCmps = pageCmps.concat(this.getPageComponentsFromIteration(body[i]));
-			} else if (body[i].isInstanceOf("ui:carouselPage")) {
+			} else if (body[i].isInstanceOf("ui:carouselPageDeprecated")) {
 				pageCmps.push(body[i]);
 			}
 		}
@@ -285,6 +287,7 @@
 			var e = pages[i].get('e.updateSize');
 			//page width always same as carousel width
 			e.setParams({pageSize: {width: carouselSize.width, height: pageSize.height}});
+			e.setComponentEvent();
 			e.fire();
 		}
 	},
@@ -552,6 +555,7 @@
 				e = pageIndicator.get('e.pageSelected');
 
 			e.setParams({pageIndex : selectedPage, pageId: pageId});
+			e.setComponentEvent();
 			e.fire();
 		}
 	},
@@ -646,7 +650,7 @@
 	},
 
 	getSnap : function(cmp) {
-		var id = cmp.getGlobalId().replace('.', '_').replace(':', '-');
+		var id = cmp.getGlobalId().replace(';', '_').replace(':', '-');
 		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
 	},
 

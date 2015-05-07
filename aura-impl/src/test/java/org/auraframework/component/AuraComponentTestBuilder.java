@@ -191,6 +191,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case DESIGN_TEMPLATE:
         case DESIGN_TEMPLATE_REGION:
         case FLAVOR_INCLUDE:
+        case FLAVOR_DEFAULT:
             qualified = name;
             break;
         case APPLICATION:
@@ -205,6 +206,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case THEME:
         case DESIGN:
         case SVG:
+        case FLAVORS:
         case FLAVOR_ASSORTMENT:
             qualified = String.format("%s:%s", ns, name);
             break;

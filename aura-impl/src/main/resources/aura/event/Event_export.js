@@ -22,6 +22,8 @@ exp(p,
     "getParam", p.getParam,
     "setParam", p.setParam,
     "getParams", p.getParams,
+    "stopPropagation", p.stopPropagation,
+    "setComponentEvent", p.setComponentEvent,
     "setParams", p.setParams,
     "fire", p.fire
 );

@@ -40,7 +40,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
@@ -206,7 +206,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
         if (modelDefDescriptor != null) {
-        	mdr.assertAccess(this.descriptor, modelDefDescriptor.getDef());
+            mdr.assertAccess(this.descriptor, modelDefDescriptor.getDef());
         }
 
         for (DefDescriptor<ControllerDef> d : controllerDescriptors) {
@@ -257,6 +257,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         // validate all client libraries
         for (ClientLibraryDef def : this.clientLibraries) {
             def.validateDefinition();
+        }
+
+        if (defaultFlavor != null) {
+            // component must be flavorable
+            if (!hasFlavorableChild()) {
+                throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
+                        + "specified on a component with no flavorable children", location);
+            }
         }
     }
 
@@ -364,7 +372,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
 
-
         MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         if (extendsDescriptor != null) {
             T parentDef = extendsDescriptor.getDef();
@@ -453,13 +460,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             if (!flavorDescriptor.getDef().getFlavorNames().contains(defaultFlavor)) {
                 throw new FlavorNameNotFoundException(defaultFlavor, flavorDescriptor);
             }
-
-            // component must be flavorable
-            if (!hasFlavorableChild()) {
-                throw new InvalidDefinitionException(
-                        "The 'defaultFlavor' attribute cannot be specified on a component with no flavorable children",
-                        location);
-            }
         }
     }
 
@@ -522,7 +522,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      *
      * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this
      *            ComponentDef imports
-     * @throws QuickFixException
      */
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
@@ -572,7 +571,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.add(styleDescriptor);
         }
 
-        if (flavorDescriptor  != null) {
+        if (flavorDescriptor != null) {
             dependencies.add(flavorDescriptor);
         }
 
@@ -708,11 +707,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * @return all the required versions for this component
-     * @throws QuickFixException
      */
     @Override
     public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
-    	return requiredVersionDefs;
+        return requiredVersionDefs;
     }
 
     /**
@@ -899,31 +897,32 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * Gets all the component class definitions for this component definition.
      * Returns a string of all the client component classes wrapped in a closure for later execution.
      */
-    public String getComponentClass() throws DefinitionNotFoundException, QuickFixException, IOException {
-    	
-    	if(this.clientComponentClass == null) {
-			final StringBuilder sb = new StringBuilder();
-			BaseComponentDef descriptor = this;
-			String name = null;			
-			ClientComponentClass clientClass;
-			
-	    	sb.append("function(){");
-	    	while(descriptor != null && !"markup://aura:component".equals(name)) {
-	    		clientClass = new ClientComponentClass(descriptor);
-	    		clientClass.writeComponentClass(sb);
-	    		
-	    		if(descriptor.getExtendsDescriptor() == null) {
-	    			break;
-	    		}
-	    		
-        		descriptor = descriptor.getExtendsDescriptor().getDef(); 
-        		name = descriptor.getDescriptor().getQualifiedName();
-	    	}
-	        sb.append('}');
-	        
-	        this.clientComponentClass = sb.toString();
-    	}
-    	
+    @Override
+    public String getComponentClass() throws QuickFixException, IOException {
+
+        if(this.clientComponentClass == null) {
+            final StringBuilder sb = new StringBuilder();
+            BaseComponentDef descriptor = this;
+            String name = null;
+            ClientComponentClass clientClass;
+
+            sb.append("function(){");
+            while(descriptor != null && !"markup://aura:component".equals(name)) {
+                clientClass = new ClientComponentClass(descriptor);
+                clientClass.writeComponentClass(sb);
+
+                if(descriptor.getExtendsDescriptor() == null) {
+                    break;
+                }
+
+                descriptor = descriptor.getExtendsDescriptor().getDef();
+                name = descriptor.getDescriptor().getQualifiedName();
+            }
+            sb.append('}');
+
+            this.clientComponentClass = sb.toString();
+        }
+
         return this.clientComponentClass;
     }
 
@@ -937,11 +936,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             AuraContext context = Aura.getContextService().getCurrentContext();
             boolean preloaded = context.isPreloaded(getDescriptor());
             boolean preloading = context.isPreloading();
-            final String uid = context.getUid(context.getApplicationDescriptor());
             final Mode mode = context.getMode();
-            final boolean minify = !mode.prettyPrint();
-            final String mKey = minify ? "MIN:" : "DEV:";
-            final String key = "JS:" + mKey + uid;
             
             if (preloaded) {
                 json.writeValue(descriptor);
@@ -949,19 +944,21 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeMapBegin();
                 json.writeValue(getAccess());
                 json.writeMapEntry("descriptor", descriptor);
-             //    context.pushCallingDescriptor(descriptor);
-             //    try {
-             //        RendererDef rendererDef = getRendererDef();
-             //        if (rendererDef != null && !rendererDef.isLocal()) {
-             //            json.writeMapEntry("rendererDef", rendererDef);
-             //        }
-             //    } finally {
-             //        context.popCallingDescriptor();
-            	// }
-//                HelperDef helperDef = getHelperDef();
-//                if (helperDef != null && !helperDef.isLocal()) {
-//                    json.writeMapEntry("helperDef", helperDef);
-//                }
+                /*
+                context.pushCallingDescriptor(descriptor);
+                try {
+                    RendererDef rendererDef = getRendererDef();
+                    if (rendererDef != null && !rendererDef.isLocal()) {
+                        json.writeMapEntry("rendererDef", rendererDef);
+                    }
+                } finally {
+                    context.popCallingDescriptor();
+                }
+                HelperDef helperDef = getHelperDef();
+                if (helperDef != null && !helperDef.isLocal()) {
+                    json.writeMapEntry("helperDef", helperDef);
+                }
+                */
 
                 json.writeMapEntry("styleDef", getStyleDef());
                 json.writeMapEntry("controllerDef", getControllerDef());
@@ -1038,13 +1035,27 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);
                 }
 
-                if(context.getDefRegistry().getComponentClassLoaded(descriptor) == false) {
+                if (hasFlavorableChild) {
+                    json.writeMapEntry("hasFlavorableChild", true);
+                }
+
+                if(!context.getDefRegistry().getComponentClassLoaded(descriptor)) {
                     // KRIS:
                     // This needs to be conditional. We can't just return the component class each time.
                     // We do still return this componentdef object even if we already have the component class.
                     // This is because this still has a lot of logic not genereated as part of the component class.
                     // I see no reason we can't do that, but we just haven't yet.
-                    json.writeMapEntry("componentClass", getComponentClass());
+
+                    // we don't want componentClass component def returned ever.
+                    // stash the current context containing mdr without componentClass component def
+                    Aura.getContextService().pushSystemContext();
+                    try {
+                        // this will add componentClass def to temp context
+                        json.writeMapEntry("componentClass", getComponentClass());
+                    } finally {
+                        // retrieve our original context without componentClass
+                        Aura.getContextService().popSystemContext();
+                    }
                 }
 
                 serializeFields(json);

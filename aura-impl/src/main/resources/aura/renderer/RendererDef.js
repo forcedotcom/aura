@@ -23,15 +23,20 @@ function RendererDef(descriptor){
     var componentClass = $A.componentService.getComponentClass(descriptor);
     
     if(componentClass) {
-        this.renderMethod = componentClass.prototype["render"];
-        this.afterRenderMethod  = componentClass.prototype["afterRender"];
-        this.rerenderMethod = componentClass.prototype["rerender"];
-        this.unrenderMethod = componentClass.prototype["unrender"];
+        var ccPrototype = componentClass.prototype;
 
-        // this.renderMethod = aura.util.json.decodeString(config["render"]);
-        // this.afterRenderMethod  = aura.util.json.decodeString(config["afterRender"]);
-        // this.rerenderMethod = aura.util.json.decodeString(config["rerender"]);
-        // this.unrenderMethod = aura.util.json.decodeString(config["unrender"]);
+        // If we didn't directly define a render method for the component
+        // we'll use the default one on the Component prototype
+        // If we don't do this, then it'll use an inherited render method.
+        if(!ccPrototype.hasOwnProperty("render")) {     ccPrototype["render"] = ccPrototype.render; }
+        if(!ccPrototype.hasOwnProperty("afterRender")){ ccPrototype["afterRender"] = ccPrototype.afterRender; }
+        if(!ccPrototype.hasOwnProperty("rerender")) {   ccPrototype["rerender"] = ccPrototype.rerender; }
+        if(!ccPrototype.hasOwnProperty("unrender")) {   ccPrototype["unrender"] = ccPrototype.unrender; }
+
+        this.renderMethod = ccPrototype["render"];
+        this.afterRenderMethod  = ccPrototype["afterRender"];
+        this.rerenderMethod = ccPrototype["rerender"];
+        this.unrenderMethod = ccPrototype["unrender"];
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         this["renderMethod"] = this.renderMethod;
@@ -39,10 +44,6 @@ function RendererDef(descriptor){
         this["rerenderMethod"] = this.rerenderMethod;
         this["unrenderMethod"] = this.unrenderMethod;
         //#end
-    }
-    
-    if (RendererDef["initializeDef"]) {
-        RendererDef["initializeDef"](this);
     }
 }
 

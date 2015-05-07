@@ -66,9 +66,7 @@ exp(p,
     "getFacets", p.getFacets,
 
     "isFlavorable", p.isFlavorable,
-    "getFlavorName", p.getFlavorName,
-    "getFlavorNamespace", p.getFlavorNamespace,
-    
+    "getFlavor", p.getFlavor,
 
     "render", p.render,
     "afterRender", p.afterRender,
@@ -83,12 +81,9 @@ exp(p,
     "getAttributeValueProvider", p.getAttributeValueProvider,
     "getComponentValueProvider", p.getComponentValueProvider,
     "mergeAttributes", p.mergeAttributes,
-    
+
     "getRenderable", p.getRenderable
 );
-
-exp(Component,
-	"registerMethods", Component.registerMethods);
 
 $A["Component"] = Component;
 

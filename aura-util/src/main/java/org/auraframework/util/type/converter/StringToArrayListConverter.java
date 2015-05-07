@@ -18,11 +18,12 @@ package org.auraframework.util.type.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import aQute.bnd.annotation.component.Component;
+
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Convert strings to array lists.
@@ -44,11 +45,19 @@ public class StringToArrayListConverter implements Converter<String, ArrayList> 
      * @param value the incoming value.
      */
     @Override
-    public ArrayList<String> convert(String value) {
+    public ArrayList<?> convert(String value) {
         if (value == null) {
             return null;
         } else if (value.length() == 0) {
-            return new ArrayList<String>();
+            return new ArrayList<Object>();
+        } else if(value.startsWith("[") && value.endsWith("]")) {
+             try {
+                 final JsonStreamReader reader = new JsonStreamReader(value);
+                 reader.next();
+                 return (ArrayList<?>)reader.getList();
+             } catch (Exception e) {
+                 // Didn't parse, fall back to splitSimple down below.
+             }
         }
         List<String> splitList = AuraTextUtil.splitSimple(",", value);
         return (ArrayList<String>) splitList;

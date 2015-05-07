@@ -18,9 +18,9 @@ package org.auraframework.impl.design;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.builder.DesignTemplateRegionDefBuilder;
+import org.auraframework.builder.design.DesignTemplateRegionDefBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;

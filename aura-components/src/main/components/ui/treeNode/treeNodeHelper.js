@@ -81,7 +81,7 @@
                     child.getEvent("traverse").setParams({
                         "traverser" : this,
                         "visitor" : this.visitor
-                    }).fire();
+                    }).setComponentEvent().fire();
                 }
 
                 // accept this node
@@ -122,7 +122,7 @@
                     child.getEvent("traverse").setParams({
                         "traverser" : this,
                         "visitor" : this.visitor
-                    }).fire();
+                    }).setComponentEvent().fire();
                 }
 
                 this.visitor.endVisit(node);

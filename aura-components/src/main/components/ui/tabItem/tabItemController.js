@@ -33,5 +33,13 @@
 	close: function(cmp, evt, helper) {
 		cmp.get("e.onClose").fire();
 		$A.util.squash(evt, true);
+	},
+	
+	onTabHover: function(cmp, evt, helper) {
+		helper.handleHoverEvent(cmp, 'onTabHover');
+	},
+	
+	onTabUnhover: function(cmp, evt, helper) {
+		helper.handleHoverEvent(cmp, 'onTabUnhover');
 	}
 })

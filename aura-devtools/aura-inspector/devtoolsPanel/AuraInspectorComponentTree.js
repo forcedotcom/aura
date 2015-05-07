@@ -188,8 +188,8 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             return composeComponentBodies(ids, component);
         }
 
-        function composeComponentBodies(heirarchy, cmp) {
-            if(!heirarchy.length) { return; }
+        function composeComponentBodies(hierarchy, cmp) {
+            if(!hierarchy.length) { return; }
             var bodies;
             var collection = [];
             if(isExpression(cmp)) {
@@ -198,7 +198,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                 bodies = cmp.attributes && cmp.attributes.body || {};
             }
 
-            var currentGlobalId = heirarchy.shift();
+            var currentGlobalId = hierarchy.shift();
             var currentBody = bodies[currentGlobalId] || [];
             for(var c=0;c<currentBody.length;c++) {
                 if(isExpression(currentBody[c]) && currentBody[c].expressions.value === "{!v.body}") {
@@ -208,7 +208,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                         collection = collection.concat(expressionBodies);
                     }
                     // Must reference the Attribute Value provider for it's v.body
-                    collection = collection.concat(composeComponentBodies(heirarchy, currentBody[c]));
+                    collection = collection.concat(composeComponentBodies(hierarchy, currentBody[c]));
                 } else {
                     collection.push(currentBody[c]);       
                 }

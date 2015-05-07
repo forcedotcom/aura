@@ -90,7 +90,7 @@
         <ui:popup>
         <ui:popupTrigger class='triggerExtendedTarget' aura:id='triggerExtendedTarget' label='Triggerglsc'/>
         <ui:popupTarget aura:id='targetExtendedTarget' attachToBody='true' manualPosition='true' autoPosition='false'>
-        	<div style='position: absolute;left: 5px;width: 100px;height: 220px'>Targetbdir</div>
+        	<div style='position:relative;left: 5px;width: 100px;height: 220px'>Targetbdir</div>
         </ui:popupTarget>
         </ui:popup>
         </li>

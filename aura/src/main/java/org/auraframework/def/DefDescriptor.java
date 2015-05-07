@@ -19,6 +19,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.design.DesignItemsDef;
+import org.auraframework.def.design.DesignLayoutAttributeDef;
+import org.auraframework.def.design.DesignLayoutComponentDef;
+import org.auraframework.def.design.DesignLayoutDef;
+import org.auraframework.def.design.DesignOptionDef;
+import org.auraframework.def.design.DesignSectionDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
@@ -110,7 +120,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         STYLE(StyleDef.class), //
         FLAVORED_STYLE(FlavoredStyleDef.class), //
         FLAVOR_ASSORTMENT(FlavorAssortmentDef.class), //
+        FLAVOR_DEFAULT(FlavorDefaultDef.class), //
         FLAVOR_INCLUDE(FlavorIncludeDef.class), //
+        FLAVORS(FlavorsDef.class), //
         THEME(ThemeDef.class, true), //
         THEME_DEF_REF(ThemeDefRef.class), //
         THEME_PROVIDER(ThemeDescriptorProviderDef.class), //
@@ -129,9 +141,15 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class),
         DESIGN(DesignDef.class),
-        ATTRIBUTE_DESIGN(AttributeDesignDef.class),
+        ATTRIBUTE_DESIGN(DesignAttributeDef.class),
         DESIGN_TEMPLATE(DesignTemplateDef.class),
         DESIGN_TEMPLATE_REGION(DesignTemplateRegionDef.class),
+        DESIGN_LAYOUT(DesignLayoutDef.class),
+        DESIGN_LAYOUT_SECTION(DesignSectionDef.class),
+        DESIGN_LAYOUT_SECTION_ITEMS(DesignItemsDef.class),
+        DESIGN_LAYOUT_SECTION_ITEMS_ATTRIBUTE(DesignLayoutAttributeDef.class),
+        DESIGN_LAYOUT_SECTION_ITEMS_COMPONENT(DesignLayoutComponentDef.class),
+        DESIGN_OPTION(DesignOptionDef.class),
         SVG(SVGDef.class);
 
         private static Map<Class<? extends Definition>, DefType> defTypeMap;

@@ -17,11 +17,13 @@ package org.auraframework.def;
 
 import java.util.List;
 
+import org.auraframework.css.FlavorMapping;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
 /**
  * Represents a flavor assortment def, usually used for app-level overrides of default flavors.
  * <p>
  * These are {@code <aura:flavors>} tags that contain {@code <aura:flavor>} inner tags.
- *
  */
 public interface FlavorAssortmentDef extends RootDefinition {
     @Override
@@ -31,4 +33,21 @@ public interface FlavorAssortmentDef extends RootDefinition {
      * Gets the list of specified {@link FlavorIncludeDef}s, in order of declaration.
      */
     List<FlavorIncludeDef> getFlavorIncludeDefs();
+
+    /**
+     * Gets the list of specified {@link FlavorDefaultDef}s, in order of declaration.
+     */
+    List<FlavorDefaultDef> getFlavorDefaultDefs();
+
+    /**
+     * Computes a {@link FlavorMapping}. This mapping contains info on which flavors should replace the standard ones.
+     * <p>
+     * If multiple {@link FlavorIncludeDef}s contain entries for the same flavor name and component, only the last one
+     * to do so will be utilized.
+     *
+     * @return The {@link FlavorMapping} instance.
+     * @throws QuickFixException If there was a problem loading a flavored style def.
+     */
+    FlavorMapping computeOverrides() throws QuickFixException;
+
 }

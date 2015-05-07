@@ -11,6 +11,8 @@
     A UI framework for scalable web apps
     </header>
         <ul>
-            <li><a href="/auradocs">Aura Documentation</a></li></ul>
+            <li><a href="/auradocs">Aura Documentation</a></li>
+            <li><a href="/auratest/testPerfRunner.app">Aura Test Runner</a></li>
+        </ul>
     </body>
 </html>

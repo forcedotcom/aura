@@ -254,7 +254,7 @@ public class PopupUITest extends WebDriverTestCase {
             + "<ui:popup>"
             + "<ui:popupTrigger class='triggerExtendedTarget' aura:id='triggerExtendedTarget' label='" + triggerText + "'/>"
             + "<ui:popupTarget aura:id='targetExtendedTarget' attachToBody='true' manualPosition='true' autoPosition='false'>"
-            + "<div style='position: absolute; left: " + xCoord + "px;width: " + popupWidth + "px;height: " + popupHeight + "px'>" + popupText
+            + "<div style='position: relative; left: " + xCoord + "px;width: " + popupWidth + "px;height: " + popupHeight + "px'>" + popupText
             + "</div>"
             + "</ui:popupTarget>"
             + "</ui:popup>"

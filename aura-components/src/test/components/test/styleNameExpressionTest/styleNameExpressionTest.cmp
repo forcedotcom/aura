@@ -1,0 +1,5 @@
+<aura:component>
+    <div class="parent">
+        <span aura:id="child" class="{!style.name + '__test'}">test</span>
+    </div>
+</aura:component>

@@ -15,18 +15,23 @@
  */
 package org.auraframework.test.java.design;
 
-import java.util.Map;
-
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DesignTemplateDef;
-import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.design.DesignItemsDef;
+import org.auraframework.def.design.DesignLayoutDef;
+import org.auraframework.def.design.DesignLayoutItemDef;
+import org.auraframework.def.design.DesignSectionDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public class DesignDefTest extends AuraImplTestCase {
 
@@ -62,9 +67,9 @@ public class DesignDefTest extends AuraImplTestCase {
         DesignDef c = Aura.getDefinitionService().getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
         assertTrue("DesignDef not found!", c.getDescriptor().exists());
-        Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attrs = c.getAttributeDesignDefs();
+        Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attrs = c.getAttributeDesignDefs();
         assertFalse("Unable to parse AttributeDesignDefs on DesignDef!", attrs == null || attrs.size() == 0);
-        AttributeDesignDef attr = c.getAttributeDesignDef("something");
+        DesignAttributeDef attr = c.getAttributeDesignDef("something");
         assertNotNull("AttributeDesignDef something not found!", attr);
     }
 
@@ -72,9 +77,9 @@ public class DesignDefTest extends AuraImplTestCase {
         DesignDef c = Aura.getDefinitionService().getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
         assertTrue("DesignDef not found!", c.getDescriptor().exists());
-        Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attrs = c.getAttributeDesignDefs();
+        Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attrs = c.getAttributeDesignDefs();
         assertFalse("Unable to parse AttributeDesignDefs on DesignDef!", attrs == null || attrs.size() == 0);
-        AttributeDesignDef attr = c.getAttributeDesignDef("something");
+        DesignAttributeDef attr = c.getAttributeDesignDef("something");
         assertNotNull("AttributeDesignDef 'something' not found!", attr);
         assertEquals("AttributeDesignDef 'something' name is incorrect.", "something", attr.getName());
         assertEquals("AttributeDesignDef 'something' label is incorrect.", "some label", attr.getLabel());
@@ -83,7 +88,7 @@ public class DesignDefTest extends AuraImplTestCase {
         assertEquals("AttributeDesignDef 'something' min is incorrect.", "-100", attr.getMin());
         assertEquals("AttributeDesignDef 'something' max is incorrect.", "100", attr.getMax());
 
-        AttributeDesignDef attr2 = c.getAttributeDesignDef("entities");
+        DesignAttributeDef attr2 = c.getAttributeDesignDef("entities");
         assertNotNull("AttributeDesignDef 'entities' not found!", attr2);
         assertEquals("AttributeDesignDef 'entities' type is incorrect.", "EntityName", attr2.getType());
         assertEquals("AttributeDesignDef 'entities' datasource is incorrect or has wrong format.", "Account,Contact",
@@ -96,9 +101,9 @@ public class DesignDefTest extends AuraImplTestCase {
         DesignDef c = Aura.getDefinitionService().getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
         assertTrue("DesignDef not found!", c.getDescriptor().exists());
-        Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attrs = c.getAttributeDesignDefs();
+        Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attrs = c.getAttributeDesignDefs();
         assertFalse("Unable to parse AttributeDesignDefs on DesignDef!", attrs == null || attrs.size() == 0);
-        AttributeDesignDef attr = c.getAttributeDesignDef("else");
+        DesignAttributeDef attr = c.getAttributeDesignDef("else");
         assertNotNull("AttributeDesignDef 'else' not found!", attr);
         assertEquals("AttributeDesignDef 'else' datasource is incorrect or has wrong format", "one,two,three",
                 attr.getDataSource());
@@ -133,6 +138,55 @@ public class DesignDefTest extends AuraImplTestCase {
         }
     }
 
+    /**
+     * Design layouts should allow multiple layouts, sections, items and item. This tests the order and overall
+     * functionality of the design system.
+     * @throws Exception
+     */
+    public void testDesignLayoutWithMultipleSectionsAndItems() throws Exception {
+        ComponentDef cmp = Aura.getDefinitionService().getDefinition("test:fakeDesign", ComponentDef.class);
+        DesignDef c = cmp.getDesignDefDescriptor().getDef();
+        //Get default layout (empty string is default)
+        DesignLayoutDef layout = c.getDefaultDesignLayoutDef();
+        assertNotNull(layout);
+
+        DesignLayoutDef secondLayout = c.getDesignLayoutDefs().get("second");
+        assertNotNull("Unable to retrieve second layout", secondLayout);
+
+        //Sections should keep order
+        Iterator<DesignSectionDef> sections = layout.getSections().iterator();
+        DesignSectionDef firstSection = sections.next();
+        assertEquals("Name of first section was incorrect, maybe order incorrect", "", firstSection.getName());
+        DesignSectionDef secondSection = sections.next();
+        assertEquals("Name of second section was incorrect, maybe order incorrect", "second", secondSection.getName());
+
+        //Items should keep order as well
+        Iterator<DesignItemsDef> items = firstSection.getItems().iterator();
+        DesignItemsDef firstItem = items.next();
+        assertEquals("Items name was incorrect, should be default of empty string", "", firstItem.getName());
+        DesignItemsDef secondItem = items.next();
+        assertEquals("Items name was incorrect, maybe order is not preserved", "second", secondItem.getName());
+
+        //And layoutItem as well
+        Iterator<DesignLayoutItemDef> layoutItems = firstItem.getItems().iterator();
+        DesignLayoutItemDef firstLayoutItem = layoutItems.next();
+        assertTrue("First layout attribute should be an attribute", firstLayoutItem.isAttribute());
+        assertEquals("Name of the first layout attribute is incorrect", "something", firstLayoutItem.getAttribute().getName());
+        DesignLayoutItemDef secondLayoutItem = layoutItems.next();
+        assertFalse("Second item should be a component, got attribute instead", secondLayoutItem.isAttribute());
+        DefDescriptor<ComponentDef> cmpDef = Aura.getDefinitionService().getDefDescriptor("ui:button", ComponentDef.class);
+        assertEquals("Second layout components name incorrect", cmpDef, secondLayoutItem.getComponent().getComponentDef());
+
+    }
+
+    public void testDesignOption() throws Exception {
+        ComponentDef cmp = Aura.getDefinitionService().getDefinition("test:fakeDesign", ComponentDef.class);
+        DesignDef c = cmp.getDesignDefDescriptor().getDef();
+
+        assertNotNull("Expected to receive a value with option", c.getOption("filter").get(0).getValue());
+        assertNull("Expected option to return null value", c.getOption("desktopEnabled").get(0).getValue());
+    }
+
     public void testDesignTemplateWithNonExistentInterface() throws Exception {
         try {
             Aura.getDefinitionService().getDefinition("test:fakeDesignNonExistentInterface", ComponentDef.class);
@@ -142,4 +196,5 @@ public class DesignDefTest extends AuraImplTestCase {
                     "No INTERFACE named markup://this:doesNotExist found");
         }
     }
+
 }

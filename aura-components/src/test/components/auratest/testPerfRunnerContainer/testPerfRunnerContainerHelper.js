@@ -96,7 +96,7 @@
             self.toggleFailTests(cmp, failButton, dom, e);
         });
 
-        inputSearch.addEventListener('input', function (e) {            
+        inputSearch.addEventListener('input', function (e) {
             self.filterTests(dom, e.target.value);
         });
 
@@ -194,15 +194,17 @@
         for (i = 0; i < children.length; i++) {
             $A.util.setDataAttribute(children[i], 'visible', "visible");
         }
-
         if (query) {
             regexp = new RegExp(query,'i');
             for (i = 0; i < children.length; i++) {
                 li = children[i];
+                if (li.getElementsByTagName("input")[0].checked) {
+                    continue;
+                }
                 name = li.getElementsByClassName('ns')[0].textContent;
                 if (!regexp.test(name)) {
                     $A.util.setDataAttribute(li, 'visible', "hidden");
-                }
+                } 
                 
             }
         }

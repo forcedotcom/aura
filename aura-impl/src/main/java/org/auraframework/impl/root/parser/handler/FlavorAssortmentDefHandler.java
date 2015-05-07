@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -23,7 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.flavor.FlavorAssortmentDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -65,12 +68,21 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     }
 
     @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        builder.addAllExpressionRefs(propRefs);
+    }
+
+    @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
 
         if (FlavorIncludeDefHandler.TAG.equalsIgnoreCase(tag)) {
             FlavorIncludeDef def = new FlavorIncludeDefHandler<>(this, xmlReader, source).getElement();
-            builder.addFlavorInclude(def);
+            builder.addFlavorIncludeDef(def);
+        }
+        else if (FlavorDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
+            FlavorDefaultDef def = new FlavorDefaultDefHandler<>(this, xmlReader, source).getElement();
+            builder.addFlavorDefaultDef(def);
         } else {
             error("Found unexpected tag %s", tag);
         }
@@ -79,7 +91,7 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
-            error("No literal text allowed in theme definition");
+            error("No literal text allowed in %s tag", TAG);
         }
     }
 
@@ -89,5 +101,6 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     }
 
     @Override
-    public void writeElement(FlavorAssortmentDef def, Appendable out) throws IOException {}
+    public void writeElement(FlavorAssortmentDef def, Appendable out) throws IOException {
+    }
 }

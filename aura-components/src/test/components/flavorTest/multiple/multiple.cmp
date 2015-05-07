@@ -1,3 +1,0 @@
-<aura:component>
-    <div aura:flavorable="true">test</div>
-</aura:component>

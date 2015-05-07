@@ -118,6 +118,8 @@
 
             $A.test.addWaitFor(true,function(){return cmp.get("v.loaded");},function(){
                 var actual=$A.test.getTextByComponent(list);
+                // infiniteList.cmp has a hidden loading message that we don't care about
+                actual = $A.util.trim(actual.replace("Loading...",""));
 
                 $A.test.assertEquals(expected,actual);
             })

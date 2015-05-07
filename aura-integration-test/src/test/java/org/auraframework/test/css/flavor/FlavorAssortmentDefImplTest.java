@@ -15,19 +15,18 @@
  */
 package org.auraframework.test.css.flavor;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.auraframework.css.FlavorMapping;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class FlavorAssortmentDefImplTest extends StyleTestCase {
-
     public FlavorAssortmentDefImplTest(String name) {
         super(name);
     }
@@ -50,28 +49,57 @@ public class FlavorAssortmentDefImplTest extends StyleTestCase {
         fa.getDef().validateDefinition(); // no errors
     }
 
-    public void testGetFlavorIncludes() throws QuickFixException {
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
-        addStandardFlavor(cmp, "@flavor test");
+    public void testGetFlavorIncludeDefs() throws QuickFixException {
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
+        addStandardFlavor(cmp, ".THIS--test{}");
 
-        String src = "<aura:flavors>"
-                + String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName())
-                + "</aura:flavors>";
+        String src = "<aura:flavors><aura:use source='flavorTestAlt:flavorsAlt'/></aura:flavors>";
         DefDescriptor<FlavorAssortmentDef> fa = addFlavorAssortment(src);
         assertEquals("flavors did not have the right size", 1, fa.getDef().getFlavorIncludeDefs().size());
     }
 
-    public void testAppendsDependencies() throws QuickFixException {
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
-        addStandardFlavor(cmp, "@flavor test");
+    public void testGetFlavorDefaultDefs() throws QuickFixException {
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
+        addStandardFlavor(cmp, ".THIS--test{}");
 
         String src = "<aura:flavors>"
-                + String.format("<aura:flavor component='%s' flavor='test'/>", cmp.getDescriptorName())
+                + String.format("<aura:flavor component='%s' default='test'/>", cmp.getDescriptorName())
                 + "</aura:flavors>";
         DefDescriptor<FlavorAssortmentDef> fa = addFlavorAssortment(src);
+        assertEquals("flavors did not have the right size", 1, fa.getDef().getFlavorDefaultDefs().size());
+    }
 
-        Set<DefDescriptor<?>> set = new HashSet<>();
-        fa.getDef().appendDependencies(set);
-        assertEquals("did not append correct # of dependencies", 2, set.size()); // cmp and flavor
+    public void testIterationOrderOfComputeOverrides() throws Exception {
+        // both of these should have flavors for sampleCmp1
+        String fmt = "<aura:flavors>"
+                + "<aura:use source='flavorTestAlt:flavors'/>"
+                + "<aura:use source='flavorTestAlt:flavorsAlt'/>"
+                + "</aura:flavors>";
+
+        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<FlavoredStyleDef> style = Flavors.customFlavorDescriptor(cmp1, "flavorTestAlt", "flavorsAlt");
+
+        DefDescriptor<FlavorAssortmentDef> fa = addFlavorAssortment(fmt);
+        FlavorMapping mapping = fa.getDef().computeOverrides();
+
+        assertEquals(style, mapping.getLocation(cmp1, "default").get());
+    }
+
+    public void testSerialization() throws Exception {
+        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp2 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp2", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp3 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp3", ComponentDef.class);
+
+        String fmt = "<aura:flavors>"
+                + "<aura:use source='flavorTestAlt:flavors'/>"
+                + "<aura:flavor component='*' default='default' context='{!$Browser.isPhone}'/>"
+                + "<aura:flavor component='*' default='neutral'/>"
+                + "</aura:flavors>";
+        DefDescriptor<FlavorAssortmentDef> fa = addContextAppFlavorAssortment(fmt);
+
+        addContextApp(String.format("<aura:application><%s/><%s/><%s/></aura:application>", cmp1.getDescriptorName(),
+                cmp2.getDescriptorName(), cmp3.getDescriptorName()));
+
+        serializeAndGoldFile(fa.getDef());
     }
 }

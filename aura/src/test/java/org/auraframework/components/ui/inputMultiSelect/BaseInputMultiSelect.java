@@ -16,15 +16,11 @@
 package org.auraframework.components.ui.inputMultiSelect;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-// TODO(W-2233222): ios-driver cannot select or deselect options from ui:inputSelect options
-@ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD })
 public class BaseInputMultiSelect extends WebDriverTestCase {
     private final String URL;
     private final By outputLocator = By.xpath("//span[@class='uiOutputText']");

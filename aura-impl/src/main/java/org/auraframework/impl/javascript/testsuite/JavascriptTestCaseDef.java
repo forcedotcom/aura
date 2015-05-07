@@ -55,6 +55,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         try {
             tMockDefs = parseMocks();
         } catch (QuickFixException t) {
+            tMockDefs = Lists.newArrayList();
             qfe = t;
         }
         this.mockDefs = tMockDefs;
@@ -85,6 +86,9 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         json.writeMapEntry("auraErrorsExpectedDuringInit", auraErrorsExpectedDuringInit);
         json.writeMapEntry("scrumTeam", scrumTeam);
         json.writeMapEntry("owner", owner);
+        if (this.mockException != null) {
+            json.writeMapEntry("quickFixException", this.mockException.getMessage());
+        }
         json.writeMapEnd();
     }
     
@@ -181,6 +185,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
                 @SuppressWarnings("unchecked")
                 Definition mockDef = parseMock(compDesc, (Map<String, Object>) mock);
                 if (mockDef != null) {
+                    mockDef.validateDefinition();
                     building.add(mockDef);
                 }
             }

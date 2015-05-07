@@ -227,14 +227,20 @@
                     $A.util.removeClass(document.body,'auraError');
                     $A.util.removeClass(auraErrorMask,'auraForcedErrorBox');
                 }
-                // To support older browsers
-                if (window.addEventListener) {
-                    window.addEventListener('load', function() {
-                        // If server-side only aura rendering, window.FastClick won't be loaded
-                        if (window.FastClick) {
-                            window.FastClick.attach(document.body, {tapDelay: 100, touchBoundary: 10});
-                        }
-                    }, false);
+                // We explicitly disable IE as there are issues with it and fastclick.
+                // Instead, "touch-action: manipulation;" (IE11) and "-ms-touch-action: manipulation" (IE10)
+                // should be used on the components that we want no touch-delay on.
+                var attachFastClick = !$A.util.isIE;
+                if (attachFastClick) {
+                  // To support older browsers
+                  if (window.addEventListener) {
+                      window.addEventListener('load', function() {
+                          // If server-side only aura rendering, window.FastClick won't be loaded
+                          if (window.FastClick) {
+                              window.FastClick.attach(document.body, {tapDelay: 100, touchBoundary: 10});
+                          }
+                      }, false);
+                  }
                 }
             </script>
             

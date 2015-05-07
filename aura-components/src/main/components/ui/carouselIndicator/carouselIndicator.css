@@ -1,0 +1,104 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+.THIS {
+	position: relative;
+	height: 40px;
+	width: 100%;
+}
+
+.THIS .nav-container {
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	text-align: center;
+	/*flex*/
+	display: -webkit-box;
+	display: -webkit-flexbox;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	display: box;
+	-webkit-box-orient: horizontal;
+	-ms-box-orient: horizontal;
+	box-orient: horizontal;
+	-webkit-align-items: center;
+	-webkit-box-align: center;
+	-webkit-flex-align: center;
+	-webkit-box-pack: center;
+	align-items: center;
+}
+
+.THIS .item {
+	-webkit-box-flex: 1;
+	-ms-box-flex: 1;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+}
+
+.THIS .item > a {
+	text-transform: uppercase;
+	display: block;
+	line-height: 40px;
+}
+
+.THIS .item>a>span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: block;
+}
+
+.THIS .indicator-bar {
+	height: 2px;
+}
+
+.THIS .indicator-state {
+	position: absolute;
+	bottom: 0;
+	height: 2px;
+}
+
+/* Suppress the underline selection indicator in dot mode.*/
+.THIS.dot-mode .indicator-state {
+	display: none;
+}
+
+
+.THIS .dot-indicator {
+	width: 10px;
+	height: 10px;
+	position: relative;
+	left: 50%;
+	margin-left: -5px;
+	box-shadow: inset grey 0px 0px 3px 0px;
+}
+
+.THIS.dot-mode ul li {
+	-webkit-flex: none;
+	flex: inherit !important;
+	width:40px;
+}
+
+.THIS.dot-mode ul li:first-child {
+	margin-left:auto;
+}
+
+.THIS.dot-mode ul li:last-child {
+	margin-right:auto;
+}

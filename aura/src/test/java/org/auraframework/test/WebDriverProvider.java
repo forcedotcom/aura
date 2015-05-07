@@ -32,6 +32,8 @@ public interface WebDriverProvider extends AuraServiceProvider {
     String REUSE_BROWSER_PROPERTY = "webdriver.reusebrowser";
     String BROWSER_TYPE_PROPERTY = "webdriver.browser.type";
     String GETDRIVER_TIMEOUT_PROPERTY = "webdriver.timeout.getdriver";
+    String DEVICE_NAME_PROPERTY = "webdriver.device.name";
+    String PLATFORM_VERSION_PROPERTY = "webdriver.platform.version";
 
     /**
      * Get a a {@link WebDriver} instance.

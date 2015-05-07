@@ -14,15 +14,13 @@
  * limitations under the License.
  */
  .THIS {
- 	overflow: hidden;
- 	height: 100%; 	 	 	
- }
- 
- .THIS.visible {
- 	visibility: visible;
- }
- 
- .THIS.hidden {
- 	visibility: hidden;
- }
- 
+	background: none;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	padding-top: 14px;
+}
+
+.THIS.hidden {
+    visibility: hidden;
+}

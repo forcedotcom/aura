@@ -48,6 +48,7 @@ $A.ns.Test.prototype["addCleanup"] = $A.ns.Test.prototype.addCleanup;
 $A.ns.Test.prototype["expectAuraError"] = $A.ns.Test.prototype.expectAuraError;
 $A.ns.Test.prototype["expectAuraWarning"] = $A.ns.Test.prototype.expectAuraWarning;
 $A.ns.Test.prototype["getAuraErrorMessage"] = $A.ns.Test.prototype.getAuraErrorMessage;
+$A.ns.Test.prototype["executeAfterCkEditorIsReady"] = $A.ns.Test.prototype.executeAfterCkEditorIsReady;
 
 // DOM
 $A.ns.Test.prototype["getOuterHtml"] = $A.ns.Test.prototype.getOuterHtml;

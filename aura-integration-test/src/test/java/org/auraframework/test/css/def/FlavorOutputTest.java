@@ -19,7 +19,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
@@ -31,123 +30,107 @@ public class FlavorOutputTest extends StyleTestCase {
         super(name);
     }
 
-    private DefDescriptor<ComponentDef> cmp() {
-        return getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-    }
-
-    /** aura-flavor at-rule should not be output in final css */
-    public void testFlavorAtRuleNotOutput() throws Exception {
-        DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp(), "@flavor test;");
-        assertEquals("", flavor.getDef().getCode());
-    }
-
     /** [flavorName] -> [namespace][FlavorName]-f */
-    public void testRenameCustomFlavorClassNames() throws Exception {
-        String src = "@flavor primary; \n" +
-                "     @flavor secondary; \n" +
-                "    .primary {color:red} \n" +
-                "    .secondary {color:red}";
+    public void testRenameFlavorClassNames() throws Exception {
+        String src = ".THIS--primary {color:red} \n" +
+                ".THIS--secondary {color:red}";
 
-        String fmt = ".%s.%s {color:red}\n" +
-                ".%s.%s {color:red}";
+        String fmt = ".%s--primary {color:red}\n" +
+                ".%s--secondary {color:red}";
 
-        DefDescriptor<ComponentDef> cmp = cmp();
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> flavor = addCustomFlavor(cmp, src);
 
         String addedClass = Styles.buildClassName(cmp);
-        String primary = Flavors.buildFlavorClassName("primary", flavor.getNamespace());
-        String secondary = Flavors.buildFlavorClassName("secondary", flavor.getNamespace());
 
-        String expected = String.format(fmt, addedClass, primary, addedClass, secondary);
+        String expected = String.format(fmt, addedClass, addedClass);
         assertEquals(expected, flavor.getDef().getCode());
     }
 
     /** nested selectors with the flavor name should be renamed too */
     public void testRenameCustomFlavorClassNamesNested() throws Exception {
-        String src = "@flavor primary; \n" +
-                "    .primary div .primary {color:red}";
+        String src = ".THIS--primary div .THIS--primary {color:red}";
+        String fmt = ".%s--primary div .%s--primary {color:red}";
 
-        String fmt = ".%s.%s div .%s.%s {color:red}";
-
-        DefDescriptor<ComponentDef> cmp = cmp();
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> flavor = addCustomFlavor(cmp, src);
 
         String addedClass = Styles.buildClassName(cmp);
-        String primary = Flavors.buildFlavorClassName("primary", flavor.getNamespace());
 
-        String expected = String.format(fmt, addedClass, primary, addedClass, primary);
+        String expected = String.format(fmt, addedClass, addedClass);
         assertEquals(expected, flavor.getDef().getCode());
     }
 
-    /** if multiple flavors are adjoined, only one selector should be prepended */
-    public void testRenameCustomFlavorClassNamesAdjoining() throws Exception {
-        String src = "@flavor primary; \n" +
-                "     @flavor secondary; \n" +
-                "    .primary.secondary {color:red}";
+    /** test other valid key selectors, such as .THIS-foo, .THIS__foo */
+    public void testAlternativeKeySelectors() throws Exception {
+        String src = ".THIS-foo {color:red}\n"
+                + ".THIS__foo {color:red}\n"
+                + ".THIS-foo__bar {color:red}\n"
+                + ".THIS-foo-this__THISbar div .THIS__test {color:red}\n"
+                + ".THIS--foo__bar {color:red}\n"
+                + ".THIS__foo--bar {color:red}";
 
-        String fmt = ".%s.%s.%s {color:red}";
+        String fmt = ".%1$s-foo {color:red}\n"
+                + ".%1$s__foo {color:red}\n"
+                + ".%1$s-foo__bar {color:red}\n"
+                + ".%1$s-foo-this__THISbar div .%1$s__test {color:red}\n"
+                + ".%1$s--foo__bar {color:red}\n"
+                + ".%1$s__foo--bar {color:red}";
 
-        DefDescriptor<ComponentDef> cmp = cmp();
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> flavor = addCustomFlavor(cmp, src);
 
         String addedClass = Styles.buildClassName(cmp);
-        String primary = Flavors.buildFlavorClassName("primary", flavor.getNamespace());
-        String secondary = Flavors.buildFlavorClassName("secondary", flavor.getNamespace());
 
-        String expected = String.format(fmt, addedClass, primary, secondary);
+        String expected = String.format(fmt, addedClass, addedClass);
         assertEquals(expected, flavor.getDef().getCode());
     }
 
-    /** [flavorName] -> [flavorName]_flavor */
-    public void testRenameStandardFlavorClassNames() throws Exception {
-        String src = "@flavor primary; \n" +
-                "     @flavor secondary; \n" +
-                "    .primary {color:red} \n" +
-                "    .secondary {color:red}";
+    public void testResolvesThemeTokens() throws Exception {
+        String src = ".THIS--primary {color:t(color)}";
+        String fmt = ".%s--primary {color:red}";
 
-        String fmt = ".%s.%s {color:red}\n" +
-                ".%s.%s {color:red}";
-
-        DefDescriptor<ComponentDef> cmp = cmp();
+        addNsTheme(theme().var("color", "red"));
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, src);
 
         String addedClass = Styles.buildClassName(cmp);
-        String primary = Flavors.buildFlavorClassName("primary");
-        String secondary = Flavors.buildFlavorClassName("secondary");
+        String expected = String.format(fmt, addedClass);
+        assertEquals(expected, flavor.getDef().getCode());
+    }
 
-        String expected = String.format(fmt, addedClass, primary, addedClass, secondary);
+    public void testRenamesThisShorthand() throws Exception {
+        String src = ".THIS {color:red}";
+        String fmt = ".%s--default {color:red}";
+
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
+        DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, src);
+
+        String addedClass = Styles.buildClassName(cmp);
+        String expected = String.format(fmt, addedClass);
         assertEquals(expected, flavor.getDef().getCode());
     }
 
     /** selectors must begin with a class selector containing one of the declared flavor names */
-    public void testErrorsOnUnscopedSelectorInCustomFlavor() throws Exception {
+    public void testErrorsOnUnscopedSelectorInFlavor() throws Exception {
         try {
-            addCustomFlavor(cmp(), "@flavor test; .bad{}").getDef();
+            addCustomFlavor(addFlavorableComponentDef(), ".bad{}").getDef();
             fail("Parser should have thrown StyleParserException trying to parse invalid CSS.");
         } catch (Exception e) {
-            checkExceptionContains(e, StyleParserException.class, "CSS rules must start with a class selector");
-        }
-    }
-
-    /** selectors must begin with a class selector containing one of the declared flavor names */
-    public void testErrorsOnUnscopedSelectorInStandardFlavor() throws Exception {
-        try {
-            addStandardFlavor(cmp(), "@flavor test; .bad{}").getDef();
-            fail("Parser should have thrown StyleParserException trying to parse invalid CSS.");
-        } catch (Exception e) {
-            checkExceptionContains(e, StyleParserException.class, "CSS rules must start with a class selector");
+            checkExceptionContains(e, StyleParserException.class,
+                    "CSS selectors must begin with a class selector of the proper format");
         }
     }
 
     /** selectors must begin with a class selector containing one of the declared flavor names */
     public void testErrorsOnUnscopedSelectorNested() throws Exception {
         try {
-            addStandardFlavor(cmp(), "@flavor test; div .test{}").getDef();
+            addStandardFlavor(addFlavorableComponentDef(), "div .THIS--primary{}").getDef();
             fail("Parser should have thrown StyleParserException trying to parse invalid CSS.");
         } catch (Exception e) {
-            checkExceptionContains(e, StyleParserException.class, "CSS rules must start with a class selector");
+            checkExceptionContains(e, StyleParserException.class,
+                    "CSS selectors must begin with a class selector of the proper format");
         }
     }
 
-    /** TOODNM: resolves theme tokens */
 }

@@ -16,47 +16,77 @@
 package org.auraframework.impl.css.flavor;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
+import org.auraframework.css.FlavorMapping;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortmentDef> implements FlavorAssortmentDef {
     private static final long serialVersionUID = -4162113731545878044L;
 
-    private final List<FlavorIncludeDef> flavorIncludes;
+    private final List<FlavorIncludeDef> flavorIncludeDefs;
+    private final List<FlavorDefaultDef> flavorDefaultDefs;
     private final int hashCode;
 
     public FlavorAssortmentDefImpl(Builder builder) {
         super(builder);
-        this.flavorIncludes = AuraUtil.immutableList(builder.flavorIncludes);
-        this.hashCode = AuraUtil.hashCode(descriptor, location, flavorIncludes);
+        this.flavorIncludeDefs = AuraUtil.immutableList(builder.flavorIncludeDefs);
+        this.flavorDefaultDefs = AuraUtil.immutableList(builder.flavorDefaultDefs);
+        this.hashCode = AuraUtil.hashCode(descriptor, location, flavorIncludeDefs, flavorDefaultDefs);
+    }
+
+    @Override
+    public FlavorMapping computeOverrides() throws QuickFixException {
+        FlavorMappingImpl.Builder builder = new FlavorMappingImpl.Builder();
+
+        // loop in this order so that subsequent entries override the previous where overlapping
+        for (FlavorIncludeDef fi : flavorIncludeDefs) {
+            builder.putAll(fi.computeFlavorMapping());
+        }
+
+        return builder.build();
     }
 
     @Override
     public List<FlavorIncludeDef> getFlavorIncludeDefs() {
-        return flavorIncludes;
+        return flavorIncludeDefs;
+    }
+
+    @Override
+    public List<FlavorDefaultDef> getFlavorDefaultDefs() {
+        return flavorDefaultDefs;
     }
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        for (FlavorIncludeDef flavorInclude : flavorIncludes) {
-            flavorInclude.appendDependencies(dependencies);
+        for (FlavorIncludeDef flavorIncludeDef : flavorIncludeDefs) {
+            flavorIncludeDef.appendDependencies(dependencies);
+        }
+        for (FlavorDefaultDef flavorDefaultDef : flavorDefaultDefs) {
+            flavorDefaultDef.appendDependencies(dependencies);
         }
     }
 
@@ -64,15 +94,21 @@ public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortment
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
-        for (FlavorIncludeDef flavorInclude : flavorIncludes) {
-            flavorInclude.validateDefinition();
+        for (FlavorIncludeDef flavorIncludeDef : flavorIncludeDefs) {
+            flavorIncludeDef.validateDefinition();
+        }
+        for (FlavorDefaultDef flavorDefaultDef : flavorDefaultDefs) {
+            flavorDefaultDef.validateDefinition();
         }
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
-        for (FlavorIncludeDef flavorInclude : flavorIncludes) {
+        for (FlavorIncludeDef flavorInclude : flavorIncludeDefs) {
             flavorInclude.validateReferences();
+        }
+        for (FlavorDefaultDef flavorDefaultDef : flavorDefaultDefs) {
+            flavorDefaultDef.validateReferences();
         }
     }
 
@@ -87,10 +123,23 @@ public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortment
             FlavorAssortmentDefImpl other = (FlavorAssortmentDefImpl) obj;
             return Objects.equal(descriptor, other.descriptor)
                     && Objects.equal(location, other.location)
-                    && Objects.equal(flavorIncludes, other.flavorIncludes);
+                    && Objects.equal(flavorIncludeDefs, other.flavorIncludeDefs)
+                    && Objects.equal(flavorDefaultDefs, other.flavorDefaultDefs);
         }
 
         return false;
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        if (ctx != null) {
+            ctx.pushCallingDescriptor(getDescriptor());
+            json.writeMapBegin();
+            json.writeMapEntry("flavorDefaultDefs", flavorDefaultDefs);
+            json.writeMapEnd();
+            ctx.popCallingDescriptor();
+        }
     }
 
     @Override
@@ -118,25 +167,36 @@ public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortment
         return Lists.newArrayList();
     }
 
-    @Override
-    public void serialize(Json json) throws IOException {
-    }
-
     public static final class Builder extends RootDefinitionImpl.Builder<FlavorAssortmentDef> {
-        private final List<FlavorIncludeDef> flavorIncludes = Lists.newArrayList();
+        private final List<FlavorIncludeDef> flavorIncludeDefs = new ArrayList<>();
+        private final List<FlavorDefaultDef> flavorDefaultDefs = new ArrayList<>();
+        private Set<PropertyReference> expressionRefs;
 
         public Builder() {
             super(FlavorAssortmentDef.class);
         }
 
+        public Builder addAllExpressionRefs(Collection<PropertyReference> refs) {
+            if (expressionRefs == null) {
+                expressionRefs = Sets.newHashSet();
+            }
+            expressionRefs.addAll(refs);
+            return this;
+        }
+
+        public Builder addFlavorIncludeDef(FlavorIncludeDef flavorInclude) {
+            this.flavorIncludeDefs.add(flavorInclude);
+            return this;
+        }
+
+        public Builder addFlavorDefaultDef(FlavorDefaultDef flavorDefault) {
+            this.flavorDefaultDefs.add(flavorDefault);
+            return this;
+        }
+
         @Override
         public FlavorAssortmentDef build() throws QuickFixException {
             return new FlavorAssortmentDefImpl(this);
-        }
-
-        public Builder addFlavorInclude(FlavorIncludeDef flavorInclude) {
-            this.flavorIncludes.add(flavorInclude);
-            return this;
         }
     }
 }

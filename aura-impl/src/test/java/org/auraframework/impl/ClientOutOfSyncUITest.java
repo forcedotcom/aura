@@ -46,6 +46,7 @@ import com.google.common.base.Function;
 /**
  * Tests to verify that the client gets updated when we want it to get updated.
  */
+@ExcludeBrowsers({ BrowserType.IPAD }) //W-2572170: exclude from IPAD for now, there are issues in autobuild
 public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public ClientOutOfSyncUITest(String name) {

@@ -15,25 +15,11 @@
  */
 
 ({
-	render: function(cmp, helper) {		
-		helper.setVisibility(cmp);
-		return this.superRender();
-	},
-	
-	afterRender: function(cmp, helper) {
-		helper.setDefaultAttributes(cmp);
-		this.superAfterRender();
-		helper.updateSize(cmp);
-	},
-	
-	rerender: function(cmp, helper) {
-		// call super rerender only if necessary, to avoid triggering unnecessary rerendering for contained child components
-		if (cmp.isDirty("v.priv_width") || cmp.isDirty("v.priv_height")) {			
-			helper.updateSize(cmp);
-		}
-		
-		if (cmp.isDirty("v.class") || cmp.isDirty("v.priv_snap")) {
-			this.superRerender();
-		}
-	}
+    afterRender: function (component, helper) {
+        this.superAfterRender();
+        helper.afterRenderCarouselPage(component);
+    },
+    unrender: function (component, helper) {
+        this.superUnrender();
+    }
 })

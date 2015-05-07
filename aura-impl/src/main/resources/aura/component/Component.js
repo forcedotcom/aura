@@ -37,12 +37,8 @@ var ComponentPriv = (function() { // Scoping priv
             this.flavorable = true;
         }
 
-        if (config["flavorName"]) {
-            this.flavorName = config["flavorName"];
-        }
-
-        if (config["flavorNs"]) {
-            this.flavorNamespace = config["flavorNs"];
+        if (config["flavor"]) {
+            this.flavor = config["flavor"];
         }
 
         var context = $A.getContext();
@@ -84,7 +80,7 @@ var ComponentPriv = (function() { // Scoping priv
         var partialConfig;
         if (this.creationPath && this.creationPath !== "client created") {
             partialConfig = context.getComponentConfig(this.creationPath);
-            
+
             // Done with it in the context, it's now safe to remove so we don't process it again later.
             context.removeComponentConfig(this.creationPath);
         }
@@ -231,6 +227,7 @@ var ComponentPriv = (function() { // Scoping priv
         vp["this"]=cmp;
         vp["globalid"]=cmp.getGlobalId();
         vp["def"]=this.componentDef;
+        vp["style"]=this.createStyleValueProvider(cmp);
         vp["super"]=this.superComponent;
         vp["null"]=null;
 
@@ -258,6 +255,25 @@ var ComponentPriv = (function() { // Scoping priv
                 }
             };
         }
+    };
+
+    ComponentPriv.prototype.createStyleValueProvider = function(cmp) {
+        return {
+            get: function(key) {
+                if (key === "name") {
+                    var styleDef = cmp.getDef().getStyleDef();
+                    return !$A.util.isUndefinedOrNull(styleDef) ? styleDef.getClassName() : null;
+                } else if (key === "flavor") {
+                    var flavor = cmp.getFlavor();
+                    // todo-- nathan: this is probably wrong
+                    if (!$A.util.isUndefinedOrNull(flavor)) {
+                       flavor = valueFactory.create(flavor, null, cmp.getComponentValueProvider());
+                       return $A.util.buildFlavorClass(cmp, $A.util.isExpression(flavor) ? flavor.evaluate() : flavor);
+                    }
+                    return null;
+                }
+            }
+        };
     };
 
     /**
@@ -450,6 +466,7 @@ if(!this.concreteComponentId) {
                     var cdr = {};
                     cdr["componentDef"] = value[i]["componentDef"];
                     cdr["localId"] = value[i]["localId"];
+                    cdr["flavor"] = value[i]["flavor"];
                     cdr["attributes"] = value[i]["attributes"];
                     cdr["valueProvider"] = value[i]["valueProvider"] || config["valueProvider"];
 //JBUCH: HALO: TODO: SOMETHING LIKE THIS TO FIX DEFERRED COMPDEFREFS?
@@ -550,6 +567,7 @@ if(!this.concreteComponentId) {
                 params["arguments"]=$A.util.toArray(arguments);
             }
             methodEvent.setParams(params);
+            methodEvent.setComponentEvent();
             methodEvent.fire();
         };
     };
@@ -559,7 +577,7 @@ if(!this.concreteComponentId) {
             valueProvider=actionExpression.valueProvider;
         }
         return function Component$getActionCaller(event) {
-            if (valueProvider.isValid && !valueProvider.isValid()) {
+            if (valueProvider.isValid && !valueProvider.isValid() && event.getDef().getDescriptor().getName() !== "valueDestroy") {
                 return;
             }
             var clientAction;
@@ -856,7 +874,7 @@ if(!this.concreteComponentId) {
                     cmp["afterRender"] = classConstructor.prototype["afterRender"];
                     cmp["unrender"] = classConstructor.prototype["unrender"];
                 }
-                
+
                 self.setupModel(config["model"],cmp);
                 self.valueProviders["m"]=self.model;
                 self.valueProviders["c"]=self.createActionValueProvider(cmp);
@@ -938,7 +956,7 @@ if(!this.concreteComponentId) {
                         return { "$serRefId": c };
                     }
                 }
-                
+
                 value["$serId"] = length;
                 serialized.push(value);
             }
@@ -953,7 +971,15 @@ if(!this.concreteComponentId) {
             }else{
                 if(isArray){
                     return this.outputArrayValue(value, avp, serialized, depth);
-                }else if($A.util.isObject(value)){
+                } else if($A.util.isElement(value)) {
+                    var domOutput = {};
+                    domOutput["tagName"]  = value.tagName;
+                    domOutput["id"] = value.id||"";
+                    domOutput["className"] = value.className||"";
+                    domOutput["$serId"] = value["$serId"];
+                    domOutput["__proto__"] = null;
+                    return domOutput;
+                } else if($A.util.isObject(value)){
                     return this.outputMapValue(value, avp, serialized, depth);
                 }
             }
@@ -1088,7 +1114,7 @@ function Component(config, localCreation, creatingPrototype) {
     if(creatingPrototype) {
         return;
     }
-      
+
     this.priv = new ComponentPriv(config, this, localCreation);
     this._destroying = false;
 
@@ -1658,7 +1684,7 @@ Component.prototype.superRender = function() {
 };
 
 /**
- * Execute the super components rerender method. 
+ * Execute the super components rerender method.
  * @protected
  */
 Component.prototype.superRerender = function() {
@@ -1805,14 +1831,7 @@ Component.prototype.associateElement = function(element) {
         }
 
         priv.elements.push(element);
-
         priv.associateRenderedBy(this, element);
-
-        if (priv.flavorable) {
-            if (!$A.util.hasDataAttribute(element, $A.componentService.flavorable)) {
-        		$A.util.setDataAttribute(element, $A.componentService.flavorable, true);
-        	}
-        }
     }
 };
 
@@ -2408,24 +2427,61 @@ Component.prototype.getFacets = function() {
 
 
 /**
- * Returns true if this component instance has at least one flavorable element.
+ * Returns true if this is a flavorable html element.
  */
 Component.prototype.isFlavorable = function() {
 	return this.priv.flavorable;
 };
 
 /**
- * Returns the name of the flavor specified or assumed for this component instance.
+ * Gets the flavor reference. This is either the flavor explicitly set on the
+ * component instance (component def ref) or it is the default flavor of the
+ * component, if a default (or app override) exists.
+ *
+ * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
  */
-Component.prototype.getFlavorName = function() {
-	return this.priv.flavorName || this.getDef().getDefaultFlavor();
+Component.prototype.getFlavor = function() {
+	return this.priv.flavor || this.getDef().getDefaultFlavor();
 };
 
 /**
- * Returns the namespace of the flavor specified or assumed for this component instance (usually only applicable to namespace flavors).
+ * Render logic is output as part of the component class.
+ * This method is used when no render method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
  */
-Component.prototype.getFlavorNamespace = function() {
-	return this.priv.flavorNamespace;
+Component.prototype.render = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["render"]() : undefined;
+};
+
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no rerender method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.rerender = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["rerender"]() : undefined;
+};
+
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no afterRender method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.afterRender = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["afterRender"]() : undefined;
+};
+
+/**
+ * Render logic is output as part of the component class.
+ * This method is used when no unrender method was specified, thus bubbling up
+ * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ */
+Component.prototype.unrender = function() {
+    var superComponent = this.getSuper();
+    return superComponent ? superComponent["unrender"]() : undefined;
 };
 
 // #include aura.component.Component_export

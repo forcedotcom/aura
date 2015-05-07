@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.IOException;
-
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
@@ -32,6 +30,10 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
 
 /**
  */
@@ -148,8 +150,15 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:
             case DESIGN_TEMPLATE_REGION:
+            case DESIGN_LAYOUT:
+            case DESIGN_LAYOUT_SECTION:
+            case DESIGN_LAYOUT_SECTION_ITEMS:
+            case DESIGN_LAYOUT_SECTION_ITEMS_ATTRIBUTE:
+            case DESIGN_LAYOUT_SECTION_ITEMS_COMPONENT:
+            case DESIGN_OPTION:
             case INCLUDE_REF:
             case FLAVOR_INCLUDE:
+            case FLAVOR_DEFAULT:
                 name = qualifiedName;
                 break;
             case APPLICATION:
@@ -164,6 +173,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case THEME:
             case DESIGN:
             case SVG:
+            case FLAVORS:
             case FLAVOR_ASSORTMENT:
                 Type tag = TypeParser.parseTag(qualifiedName);
                 if (tag != null) {
@@ -359,6 +369,31 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      */
     public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
         return getInstance(name, defClass, null);
+    }
+
+    /**
+     * Get an instance from name parts.
+     *
+     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
+     * @param defClass The Interface's Class for the DefDescriptor being requested.
+     * @return An instance of a AuraDescriptor for the provided tag
+     */
+    public static DefDescriptor<?> getInstance(@CheckForNull String prefix, @NonNull String namespace,
+            @NonNull String name, @NonNull DefType defType) {
+        StringBuilder sb = new StringBuilder();
+        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
+            prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);
+        }
+        sb.append(prefix.toLowerCase());
+        sb.append("://");
+        sb.append(namespace);
+        if (prefix.equals("markup")) {
+            sb.append(":");
+        } else {
+            sb.append(".");
+        }
+        sb.append(name);
+        return getInstance(sb.toString(), defType.getPrimaryInterface(), null);
     }
 
     /**

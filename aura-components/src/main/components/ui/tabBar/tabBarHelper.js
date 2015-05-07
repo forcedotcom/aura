@@ -149,6 +149,8 @@
 			counter--;
 			newCmp.addHandler("onActivate", cmp, "c.onTabActivated");
 			newCmp.addHandler("onClose", cmp, "c.onTabClosed");
+			newCmp.addHandler("onTabHover", cmp, "c.onTabHover");
+			newCmp.addHandler("onTabUnhover", cmp, "c.onTabUnhover");
 			items.push(newCmp);
 			$A.render(newCmp, parentEl);
 			$A.afterRender(newCmp);

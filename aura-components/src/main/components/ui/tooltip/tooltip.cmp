@@ -1,0 +1,56 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="tooltipBody" type="String" default="false" description="The message to display in the tooltip"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
+    <aura:attribute name="advanced" type="Boolean" default="false" description="Uses JavaScript positioning. The default is &quot;false&quot;."/>
+    <aura:attribute name="trigger" type="String" default="hover" description="The event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;."/>
+    <aura:attribute name="triggerClass" type="String" description="The CSS class for the trigger element"/>
+    <aura:attribute name="isVisible" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
+    <aura:attribute name="fadeIn" type="Boolean" description="Specifies whether fading animation is used to display the tooltip. The default is &quot;false&quot;." default="false"/>
+    <aura:attribute name="fadeOut" type="Boolean" description="Specifies whether fading animation is used to hide the tooltip. The default is &quot;false&quot;." default="false"/>
+
+    <!-- fadeOut and fadeIn duration must be the same for simple tooltips -->
+    <aura:attribute name="fadeOutDuration" type="Integer" description="Fade out duration in ms"/>
+    <aura:attribute name="fadeInDuration" type="Integer" description="Fade in duration in ms"/>
+    <aura:attribute name="delay" type="Integer" description="Appearance delay in ms" />
+    <aura:attribute name="class" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
+     <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
+    <aura:method name="show" />
+    <aura:method name="hide" />
+    <aura:if isTrue="{!v.advanced}">
+        <div class="tooltip-trigger" aria-describedby="{!v.domId}">
+            {!v.body}
+            <div aura:id="tooltip" aria-hidden="{!!v.isVisible}" class="{!(v.fadeIn == true ? 'fade-in ' : '') + 'uiTooltip tooltip tooltip-advanced' + (v.fadeOut == true ? ' fade-out' : '')  }">
+                <span class="wrapper" style="{!v.delay ? 'transition-delay: '+ v.delay +'ms' : ''}">
+                    <span role="tooltip" id="{!v.domId}" class="content">{!v.tooltipBody}</span>
+                    <span class="pointer"></span>
+                </span>
+            </div>
+        </div>
+        <aura:set attribute="else">
+            <div aura:id="tooltip" aria-describedby="{!v.domId}" class="{!(v.fadeIn == true ? 'fade-in ' : '') + 'tooltip-trigger tooltip-wrapper tooltip-basic' + (v.fadeOut == true ? ' fade-out' : '')  }">
+                {!v.body}
+                <span class="wrapper" role="tooltip" style="{!(v.delay ? 'transition-delay: '+ v.delay +'ms' : '') +(v.fadeInDuration ? 'transition: opacity '+ v.fadeInDuration +'ms ease-in-out' : '')}">
+                    <span class="content" id="{!v.domId}" role="tooltip">{!v.tooltipBody}</span>
+                    <span class="pointer"></span>
+                </span>
+            </div>
+        </aura:set>
+    </aura:if>
+</aura:component>

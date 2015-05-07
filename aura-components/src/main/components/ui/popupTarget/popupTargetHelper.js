@@ -184,7 +184,7 @@
 			visible = elements.target.get("v.visible"),
 			transitionEndEventName = this.getTransitionEndEventName(component),
 			hideFunc;
-	
+
 	    if (elements.target.get('v.closeOnClickOutside') || elements.target.get('v.closeOnClickInside')) {
 	        if (visible === true) {
 	        	this.addDismissEvents(component);
@@ -290,7 +290,6 @@
 	            		clickIsInsideTrigger : helper.isElementInComponent(elements.trigger, event.target),
                 		closeOnClickInside : component.get('v.closeOnClickInside'),
                 		closeOnClickOutside : component.get('v.closeOnClickOutside'),
-                		triggerIsCustom : elements.trigger.get('v.trigger').length > 0,
                 		clickIsInCurtain : $A.util.hasClass(event.target, 'popupCurtain')
                 	};
 
@@ -348,6 +347,16 @@
         
         return component._windowBlurHandlerFunc;
     },
+
+	getWindowResizeHandler : function(component) {
+		if ($A.util.isUndefined(component._windowResizeHandlerFunc)) {
+			component._windowResizeHandlerFunc = function () {
+				component.getDef().getHelper().position(component);
+			}
+		}
+
+		return component._windowResizeHandlerFunc;
+	},
     
     isElementInComponent : function(component, targetElem) {
     	var currentNode = targetElem,
@@ -382,12 +391,17 @@
         $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));        
         // window blur event is to hide/show menu when clicking on an iframe (as events do not bubble up and out of an iframe)
         $A.util.on(window, "blur", this.getWindowBlurHandler(component));
+		// adding resize handler only when menuList is attached to the body
+		if (this.getElementCache(component).target.get("v.attachToBody")) {
+			$A.util.on(window, "resize", this.getWindowResizeHandler(component));
+		}
     },
     
     removeDismissEvents : function(component) {
     	$A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
     	$A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
     	$A.util.removeOn(window, "blur", this.getWindowBlurHandler(component));
+		$A.util.removeOn(window, "resize", this.getWindowResizeHandler(component));
     },
 
     /*

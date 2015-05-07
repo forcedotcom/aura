@@ -220,12 +220,21 @@ public class AuraContextFilter implements Filter {
                         MasterDefRegistry registry = context.getDefRegistry();
                         Set<Definition> mocks = testContext.getLocalDefs();
                         if (mocks != null) {
+                        	boolean error = false;
                             boolean doReset = testReset.get(request);
                             for (Definition def : mocks) {
-                                if (doReset && def instanceof Resettable) {
-                                    ((Resettable) def).reset();
+                                try {
+                                    if (doReset && def instanceof Resettable) {
+                                        ((Resettable) def).reset();
+                                    }
+                                    registry.addLocalDef(def);
+                                } catch (Throwable t) {
+                                    LOG.error("Failed to add mock "+def, t);
+                                    error = true;
                                 }
-                                registry.addLocalDef(def);
+                            }
+                            if (error) {
+                            	testContextAdapter.release();
                             }
                         }
                     }

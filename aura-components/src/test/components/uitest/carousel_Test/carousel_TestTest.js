@@ -415,7 +415,7 @@
 		var carousel = cmp.find(carouselName);
 		var navIndicators = this.getNavigationIndicators(carousel);
 		var targetIndicator = navIndicators[pageNumber];
-		targetIndicator.get("e.click").fire();
+		targetIndicator.get("e.click").setComponentEvent().fire();
 		var waitForPageChange = this.waitForPageChange;
 		var that = this;
 		$A.test.addWaitFor(true,

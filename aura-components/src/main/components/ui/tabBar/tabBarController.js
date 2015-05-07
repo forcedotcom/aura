@@ -68,5 +68,13 @@
 
 		helper.closeTab(cmp, index);
 		cmp.get("e.onTabClosed").setParams({"index": index}).fire();
+	},
+	
+	onTabHover: function(cmp, evt, helper) {
+		cmp.getEvent("onTabHover").setParams(evt.getParams()).fire();
+	},
+	
+	onTabUnhover: function(cmp, evt, helper) {
+		cmp.getEvent("onTabUnhover").setParams(evt.getParams()).fire();
 	}
 })

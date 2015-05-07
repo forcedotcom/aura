@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.root.parser.handler;
+package org.auraframework.test.root.parser.handler.design;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
+public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
 
-    public AttributeDesignDefHandlerTest(String name) {
+    public DesignAttributeDefHandlerTest(String name) {
         super(name);
     }
 
     public void testGetElement() throws Exception {
         String name = "mystring";
-        AttributeDesignDef element = setupAttributeDesignDef(
+        DesignAttributeDef element = setupAttributeDesignDef(
                 name,
                 "<design:attribute name=\""
                         + name
@@ -50,14 +51,14 @@ public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
 
     public void testRequiredAndReadOnlyAttributeParsingNull() throws Exception {
         String name = "mystring";
-        AttributeDesignDef element = setupAttributeDesignDef(name, "<design:attribute name=\"" + name + "\" />");
+        DesignAttributeDef element = setupAttributeDesignDef(name, "<design:attribute name=\"" + name + "\" />");
         assertFalse(element.isRequired());
         assertFalse(element.isReadOnly());
     }
 
     public void testRequiredAndReadOnlyAttributeParsingNotNull() throws Exception {
         String name = "mystring";
-        AttributeDesignDef element = setupAttributeDesignDef(name,
+        DesignAttributeDef element = setupAttributeDesignDef(name,
                 "<design:attribute name=\"" + name + "\" required=\"nottrue\" readonly=\"nottrue\" />");
         assertFalse(element.isRequired());
         assertFalse(element.isReadOnly());
@@ -88,7 +89,36 @@ public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    private AttributeDesignDef setupAttributeDesignDef(String name, String markup) throws Exception {
+    public void testDesignFileWithInvalidAttributeTypesExposed() throws Exception {
+        String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"String[]\" />";
+        String design = "<design:component><design:attribute name=\"invalidAttribute\" /> </design:component>";
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design);
+
+        try {
+            cmpDesc.getDef();
+            fail("String[] attribute should not be allowed to be exposed in the design file.");
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
+                    "Only Boolean, Integer or String attributes may be exposed in design files.");
+        }
+    }
+
+    public void testDesignFileWithInvalidAttributeTypeForDataSource() throws Exception {
+        String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"Integer\" />";
+        String design = "<design:component><design:attribute name=\"invalidAttribute\" datasource=\"1,2,3\" /> </design:component>";
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design);
+
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Integer attribute should not allow to have a Datasource");
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
+                    "Only String attributes may have a datasource in the design file.");
+        }
+    }
+
+
+    private DesignAttributeDef setupAttributeDesignDef(String name, String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
         String cmpBody = "<aura:attribute name='" + name + "' type='String' />";
@@ -99,5 +129,15 @@ public class AttributeDesignDefHandlerTest extends AuraImplTestCase {
         addSourceAutoCleanup(designDesc, String.format("<design:component>%s</design:component>", markup));
 
         return designDesc.getDef().getAttributeDesignDef(name);
+    }
+
+    private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource) {
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
+                ComponentDef.class, null);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), false);
+        DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+                DesignDef.class);
+        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, false);
+        return cmpDesc;
     }
 }

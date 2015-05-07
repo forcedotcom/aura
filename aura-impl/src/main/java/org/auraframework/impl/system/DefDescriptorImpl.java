@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.IOException;
-
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
@@ -35,6 +33,7 @@ import org.auraframework.util.json.Json;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
 
 /**
  */
@@ -151,6 +150,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:
             case DESIGN_TEMPLATE_REGION:
+            case DESIGN_LAYOUT:
+            case DESIGN_LAYOUT_SECTION:
+            case DESIGN_LAYOUT_SECTION_ITEMS:
+            case DESIGN_LAYOUT_SECTION_ITEMS_ATTRIBUTE:
+            case DESIGN_LAYOUT_SECTION_ITEMS_COMPONENT:
+            case DESIGN_OPTION:
             case INCLUDE_REF:
             case FLAVOR_INCLUDE:
             case FLAVOR_DEFAULT:

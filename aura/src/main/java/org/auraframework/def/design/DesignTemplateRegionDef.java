@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.def.design;
+
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.InterfaceDef;
 
 import java.util.Set;
 

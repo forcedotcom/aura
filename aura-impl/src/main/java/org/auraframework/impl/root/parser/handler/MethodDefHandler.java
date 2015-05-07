@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefImpl;

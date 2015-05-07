@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.def.design;
 
-public interface AttributeDesignDef extends Definition {
+import org.auraframework.def.Definition;
+
+public interface DesignAttributeDef extends Definition {
     /**
      * Get the attribute design time requiredness
      * 
@@ -81,5 +83,31 @@ public interface AttributeDesignDef extends Definition {
      * @return the localized placeholder text, may be null
      */
     public String getPlaceholderText();
+
+
+    /**
+     * Get the value to pass into the component during design time.
+     * Can be used to override the components attribute default
+     * @return the default value, may be null
+     */
+    public String getDefaultValue();
+
+    /**
+     * Returns the minimum api this attribute should show up in during design time.
+     * @return the minimum api, may be null
+     */
+    public String getMinApi();
+
+    /**
+     * Gets the maximum api this attribute should show up in during design time.
+     * @return the maximum api, may be null
+     */
+    public String getMaxApi();
+
+    /**
+     * Whether this attribute can be translated externally.
+     * @return whether this attribute is translatable
+     */
+    public boolean isTranslatable();
 
 }

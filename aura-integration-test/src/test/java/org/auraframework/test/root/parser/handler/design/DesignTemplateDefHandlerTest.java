@@ -13,48 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.root.parser.handler;
+package org.auraframework.test.root.parser.handler.design;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DesignTemplateRegionDef;
-import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
-    public DesignTemplateRegionDefHandlerTest(String name) {
+public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
+    public DesignTemplateDefHandlerTest(String name) {
         super(name);
     }
 
     public void testGetElement() throws Exception {
-        String name = "regionone";
-        DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\"/>");
-
-        assertEquals("regionone", element.getName());
-        assertTrue(element.getAllowedInterfaces().isEmpty());
+        DesignTemplateDef element = setupDesignTemplateDef("<design:template><design:region name=\"regionone\"/></design:template>");
+        assertNotNull(element.getDesignTemplateRegionDef("regionone"));
     }
 
-    public void testAllowedInterfaces() throws Exception {
-        String name = "regionone";
-        DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name
-                + "\" allowedInterfaces=\"test:fakeInterface\"/>");
-
-        assertEquals("regionone", element.getName());
-        assertTrue(element.getAllowedInterfaces().size() == 1);
-
-        for (DefDescriptor<InterfaceDef> intf : element.getAllowedInterfaces()) {
-            assertEquals("markup://test:fakeInterface", intf.getQualifiedName());
-            assertTrue(intf.exists());
-        }
+    public void testGetEmptyTemplate() throws Exception {
+        DesignTemplateDef element = setupDesignTemplateDef("<design:template></design:template>");
+        assertTrue(element.getDesignTemplateRegionDefs().isEmpty());
     }
 
     public void testInvalidSystemAttributeName() throws Exception {
         try {
-            String name = "regionone";
-            setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\" foo=\"bar\" />");
+            setupDesignTemplateDef("<design:template name=\"template\" foo=\"bar\" />");
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, "Invalid attribute \"foo\"");
@@ -63,8 +49,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
-            String name = "regionone";
-            setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\" other:name=\"asdf\" />");
+            setupDesignTemplateDef("<design:template name=\"template\" other:name=\"asdf\" />");
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
@@ -72,7 +57,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    private DesignTemplateRegionDef setupDesignTemplateRegionDef(String name, String markup) throws Exception {
+    private DesignTemplateDef setupDesignTemplateDef(String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
         String cmpBody = "<aura:attribute name='mystring' type='String' />";
@@ -80,9 +65,8 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
 
         DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        addSourceAutoCleanup(designDesc,
-                String.format("<design:component><design:template>%s</design:template></design:component>", markup));
+        addSourceAutoCleanup(designDesc, String.format("<design:component>%s</design:component>", markup));
 
-        return designDesc.getDef().getDesignTemplateDef().getDesignTemplateRegionDef(name);
+        return designDesc.getDef().getDesignTemplateDef();
     }
 }

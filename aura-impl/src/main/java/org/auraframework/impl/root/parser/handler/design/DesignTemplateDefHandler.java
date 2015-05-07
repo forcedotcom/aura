@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser.handler;
+package org.auraframework.impl.root.parser.handler.design;
 
 import java.io.IOException;
 import java.util.Set;
@@ -21,10 +21,12 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DesignTemplateDef;
-import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.design.DesignTemplateDefImpl;
+import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;

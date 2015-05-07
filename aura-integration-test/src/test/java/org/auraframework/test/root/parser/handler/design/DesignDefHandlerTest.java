@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.root.parser.handler;
+package org.auraframework.test.root.parser.handler.design;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -38,7 +38,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         DesignDef element = setupSimpleDesignDef(
                 "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>")
                 .getDef();
-        AttributeDesignDef child = element.getAttributeDesignDef("mystring");
+        DesignAttributeDef child = element.getAttributeDesignDef("mystring");
         assertNotNull("Expected one AttributeDesignDef", child);
         assertTrue(child.isRequired());
     }

@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser.handler;
+package org.auraframework.impl.root.parser.handler.design;
 
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
-
-import java.io.IOException;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.AttributeDesignDef;
-import org.auraframework.def.DesignDef;
-import org.auraframework.impl.design.AttributeDesignDefImpl;
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.impl.design.DesignAttributeDefImpl;
+import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.util.Set;
 
-public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesignDef, DesignDef> {
+public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttributeDef, DesignDef> {
     public static final String TAG = "design:attribute";
 
     private static final String ATTRIBUTE_NAME = "name";
@@ -46,17 +44,28 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     private static final String ATTRIBUTE_MIN = "min";
     private static final String ATTRIBUTE_MAX = "max";
     private static final String ATTRIBUTE_PLACEHOLDER = "placeholder";
+    private static final String ATTRIBUTE_DESCRIPTION = "description";
+    private static final String ATTRIBUTE_DEFAULT = "default";
+    //private attributes
+    private static final String ATTRIBUTE_MIN_API = "minAPI";
+    private static final String ATTRIBUTE_MAX_API = "maxAPI";
+    private static final String ATTRIBUTE_TRANSLATABLE = "translatable";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
-            ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT );
 
-    private final AttributeDesignDefImpl.Builder builder = new AttributeDesignDefImpl.Builder();
+    private final static Set<String> PRIVILEGED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
+            ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
+            ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT,
+            ATTRIBUTE_MAX_API, ATTRIBUTE_MIN_API, ATTRIBUTE_TRANSLATABLE );
+
+    private final DesignAttributeDefImpl.Builder builder = new DesignAttributeDefImpl.Builder();
 
     // TODO implement tool specific properties
 
-    public AttributeDesignDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-            Source<?> source) {
+    public DesignAttributeDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
+                                     Source<?> source) {
         super(parentHandler, xmlReader, source);
     }
 
@@ -75,9 +84,13 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         String max = getAttributeValue(ATTRIBUTE_MAX);
         String placeholder = getAttributeValue(ATTRIBUTE_PLACEHOLDER);
         String description = getAttributeValue(ATTRIBUTE_DESCRIPTION);
+        String defaultValue = getAttributeValue(ATTRIBUTE_DEFAULT);
+        String minApi = getAttributeValue(ATTRIBUTE_MIN_API);
+        String maxApi = getAttributeValue(ATTRIBUTE_MAX_API);
+        Boolean translatable = getBooleanAttributeValue(ATTRIBUTE_TRANSLATABLE);
 
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
+            builder.setDescriptor(DefDescriptorImpl.getInstance(name, DesignAttributeDef.class));
             builder.setName(name);
         } else {
             error("Name attribute is required for attribute design definitions");
@@ -94,6 +107,11 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
         builder.setPlaceholderText(placeholder);
         builder.setDescription(description);
         builder.setLocation(getLocation());
+        builder.setDefault(defaultValue);
+        builder.setMinApi(minApi);
+        builder.setMaxApi(maxApi);
+        builder.setTranslatable(translatable);
+
     }
 
     @Override
@@ -108,7 +126,7 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace() ? PRIVILEGED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -117,12 +135,12 @@ public class AttributeDesignDefHandler extends ParentedTagHandler<AttributeDesig
     }
 
     @Override
-    protected AttributeDesignDef createDefinition() throws QuickFixException {
+    protected DesignAttributeDef createDefinition() throws QuickFixException {
         return builder.build();
     }
 
     @Override
-    public void writeElement(AttributeDesignDef def, Appendable out) throws IOException {
+    public void writeElement(DesignAttributeDef def, Appendable out) throws IOException {
     }
 
 }

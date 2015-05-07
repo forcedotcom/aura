@@ -15,25 +15,27 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
-import org.auraframework.builder.DesignDefBuilder;
+import org.auraframework.builder.design.DesignDefBuilder;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDesignDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DesignTemplateDef;
-import org.auraframework.def.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.design.DesignItemsDef;
+import org.auraframework.def.design.DesignLayoutDef;
+import org.auraframework.def.design.DesignLayoutItemDef;
+import org.auraframework.def.design.DesignOptionDef;
+import org.auraframework.def.design.DesignSectionDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -43,20 +45,27 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
     private static final long serialVersionUID = -8621907027705407577L;
-    private final Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignDefs;
+    private final Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignDefs;
+    private final Map<String, DesignLayoutDef> layoutDesignDefs;
     private final DesignTemplateDef template;
+    private final Map<String, List<DesignOptionDef>> options;
     private final String label;
-    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES = Sets.newHashSet("string", "integer", "boolean");
-    private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
+
 
     protected DesignDefImpl(Builder builder) {
         super(builder);
         this.attributeDesignDefs = AuraUtil.immutableMap(builder.attributeDesignMap);
+        this.layoutDesignDefs = AuraUtil.immutableMap(builder.layoutDesignMap);
+        this.options = AuraUtil.immutableMap(builder.options);
         this.label = builder.label;
         this.template = builder.template;
     }
@@ -64,34 +73,6 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
-        // Each <design:attribute> must have a matching <aura:attribute> in the component definition.
-        // This will first validate that the component definition exists. If the component exists, we must
-        // iterate through each design attribute definition and validate that a matching aura attribute
-        // definition exists on the component definition.
-        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
-                ComponentDef.class);
-
-        ComponentDef cmp = cmpDesc.getDef();
-        if (cmp == null) {
-            throw new DefinitionNotFoundException(cmpDesc, getLocation());
-        }
-        if (!attributeDesignDefs.isEmpty()) {
-            for (AttributeDesignDef attrDesignDef : attributeDesignDefs.values()) {
-                AttributeDef attr = cmp.getAttributeDef(attrDesignDef.getName());
-                if (attr == null) {
-                    throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(attrDesignDef.getName(),
-                            AttributeDef.class));
-                }
-                if(!VALID_DESIGN_ATTRIBUTE_TYPES.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
-                	throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
-                }
-                if(attrDesignDef.getDataSource() != null){
-                	if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
-                    	throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());
-                    }
-                }
-            }
-        }
 
         // Validate that any referenced interfaces exist as accessible definitions.
         // If the definition does not exist or isn't accessible, the template definition
@@ -113,6 +94,47 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
                     registry.assertAccess(descriptor, interfaze);
                 }
             }
+        }
+
+        if (layoutDesignDefs != null) {
+            //Ensure that only one item with the same name is defined in a layout.
+            for (DesignLayoutDef layout : layoutDesignDefs.values()) {
+                Set<String> items = Sets.newHashSet();
+                for (DesignSectionDef section : layout.getSections()) {
+                    for (DesignItemsDef itemsdef : section.getItems()) {
+                        for (DesignLayoutItemDef item : itemsdef.getItems()) {
+                            DefDescriptor descriptor;
+                            if (item.isAttribute()) {
+                                String name = item.getAttribute().getName();
+                                if (!items.add(name)) {
+                                    throw new InvalidDefinitionException(String.format("Item %s defined multiple times", name), getLocation());
+                                }
+                                descriptor = Aura.getDefinitionService()
+                                        .getDefDescriptor(name, DesignAttributeDef.class);
+                                if (!attributeDesignDefs.containsKey(descriptor)) {
+                                    throw new DefinitionNotFoundException(descriptor, getLocation());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        for (DesignAttributeDef attr : getAttributeDesignDefs().values()) {
+            attr.validateDefinition();
+        }
+
+        for (DesignLayoutDef layout : layoutDesignDefs.values()) {
+            layout.validateDefinition();
+        }
+
+        if (template != null) {
+            template.validateDefinition();
         }
     }
 
@@ -144,13 +166,28 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> getAttributeDesignDefs() {
+    public Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> getAttributeDesignDefs() {
         return attributeDesignDefs;
     }
 
     @Override
-    public AttributeDesignDef getAttributeDesignDef(String name) {
-        return getAttributeDesignDefs().get(DefDescriptorImpl.getInstance(name, AttributeDesignDef.class));
+    public DesignAttributeDef getAttributeDesignDef(String name) {
+        return getAttributeDesignDefs().get(DefDescriptorImpl.getInstance(name, DesignAttributeDef.class));
+    }
+
+    @Override
+    public Map<String, DesignLayoutDef> getDesignLayoutDefs() {
+        return layoutDesignDefs;
+    }
+
+    @Override
+    public DesignLayoutDef getDefaultDesignLayoutDef() {
+        return layoutDesignDefs.get("");
+    }
+
+    @Override
+    public List<DesignOptionDef> getOption(String key) {
+        return options.get(key);
     }
 
     @Override
@@ -179,8 +216,10 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<DesignDef> implements DesignDefBuilder {
-        private final LinkedHashMap<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> attributeDesignMap = new LinkedHashMap<DefDescriptor<AttributeDesignDef>, AttributeDesignDef>();
+        private final LinkedHashMap<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignMap = new LinkedHashMap<DefDescriptor<DesignAttributeDef>, DesignAttributeDef>();
+        private final LinkedHashMap<String, DesignLayoutDef> layoutDesignMap = Maps.newLinkedHashMap();
         private DesignTemplateDef template;
+        private Map<String, List<DesignOptionDef>> options = Maps.newHashMap();
         private String label;
 
         public Builder() {
@@ -196,9 +235,14 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         }
 
         @Override
-        public DesignDefBuilder addAttributeDesign(DefDescriptor<AttributeDesignDef> desc,
-                AttributeDesignDef attributeDesign) {
-            this.attributeDesignMap.put(desc, attributeDesign);
+        public DesignDefBuilder addAttributeDesign(DefDescriptor<DesignAttributeDef> desc,
+                DesignAttributeDef attributeDesign) {
+            if (attributeDesignMap.containsKey(desc)) {
+                setParseError(new InvalidDefinitionException(String.format(
+                        "Design attribute %s already defined", attributeDesign.getName()), getLocation()));
+            } else {
+                this.attributeDesignMap.put(desc, attributeDesign);
+            }
             return this;
         }
 
@@ -211,6 +255,30 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         @Override
         public DesignDefBuilder setDesignTemplateDef(DesignTemplateDef template) {
             this.template = template;
+            return this;
+        }
+
+        @Override
+        public DesignDefBuilder addLayoutDesign(String desc, DesignLayoutDef layoutDesign) {
+            if (layoutDesignMap.containsKey(desc)) {
+                setParseError(new XMLStreamException(
+                        String.format("Layout with name %s already defined", layoutDesign.getName())));
+            }
+            layoutDesignMap.put(desc, layoutDesign);
+            return this;
+        }
+
+        @Override
+        public DesignDefBuilder addOption(DesignOptionDef value) {
+            String key = value.getKey();
+            if (options.containsKey(key)) {
+                options.get(key).add(value);
+            } else {
+                List<DesignOptionDef> option = Lists.newArrayList();
+                option.add(value);
+                options.put(key, option);
+            }
+
             return this;
         }
 

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.builder.design;
 
+import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignTemplateDef;
-import org.auraframework.def.DesignTemplateRegionDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 
 public interface DesignTemplateDefBuilder extends DefBuilder<DesignTemplateDef, DesignTemplateDef> {
     public DesignTemplateDefBuilder setName(String name);

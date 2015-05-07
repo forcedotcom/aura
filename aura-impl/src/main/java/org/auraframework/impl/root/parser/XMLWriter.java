@@ -34,6 +34,7 @@ import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.root.library.ImportDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.parser.handler.*;
+import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 

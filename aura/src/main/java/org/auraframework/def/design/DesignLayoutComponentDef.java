@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.def.design;
 
-import org.auraframework.def.AttributeDesignDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DesignDef;
-import org.auraframework.def.DesignTemplateDef;
+import org.auraframework.def.Definition;
 
-public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
-    public DesignDefBuilder addAttributeDesign(DefDescriptor<AttributeDesignDef> desc,
-            AttributeDesignDef attributeDesign);
-
-    public DesignDefBuilder setLabel(String label);
-
-    public DesignDefBuilder setDesignTemplateDef(DesignTemplateDef template);
+public interface DesignLayoutComponentDef extends Definition {
+    /**
+     * Gets the defDescriptor of a component
+     * @return
+     */
+    public DefDescriptor<ComponentDef> getComponentDef();
 }

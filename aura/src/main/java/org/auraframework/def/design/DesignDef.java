@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.def.design;
 
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RootDefinition;
+
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -32,7 +37,7 @@ public interface DesignDef extends RootDefinition {
      * 
      * @return a map of attribute design definitions
      */
-    public Map<DefDescriptor<AttributeDesignDef>, AttributeDesignDef> getAttributeDesignDefs();
+    public Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> getAttributeDesignDefs();
 
     /**
      * Retrieve an attribute design definition by name.
@@ -41,7 +46,27 @@ public interface DesignDef extends RootDefinition {
      * 
      * @return the attribute design definition
      */
-    public AttributeDesignDef getAttributeDesignDef(String name);
+    public DesignAttributeDef getAttributeDesignDef(String name);
+
+
+    /**
+     * Get a layout based on name, If no name was provided it will be an empty string
+     * @return A layout with the given name, can be null if no layout exists
+     */
+    public Map<String, DesignLayoutDef> getDesignLayoutDefs();
+
+    /**
+     * Returns the default template (with no name or name="")
+     * @return the default design layout
+     */
+    public DesignLayoutDef getDefaultDesignLayoutDef();
+
+    /**
+     * Get the value of a option given its name
+     * @param key the name of the option
+     * @return a string of the value. Can be null if no value is provided or no option is defined with name
+     */
+    public List<DesignOptionDef> getOption(String key);
 
     /**
      * Get the simple label for this design definition. May be null.

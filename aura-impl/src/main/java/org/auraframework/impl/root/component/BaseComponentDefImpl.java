@@ -40,7 +40,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
-import org.auraframework.def.DesignDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;

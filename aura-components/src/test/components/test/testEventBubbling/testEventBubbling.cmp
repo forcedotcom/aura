@@ -15,37 +15,23 @@
     limitations under the License.
 -->
 
-<aura:component extends="test:testEventBubblingSuper">
-	<aura:dependency resource="markup://test:testEventBubbling*" type="COMPONENT"/>
+<aura:component provider="js://test.testEventBubbling">
+    <aura:handler name="notifyUp" event="ui:command" action="{!c.handlerDataChange}"/>
+    <aura:attribute name="bubble" type="Boolean" default="false"/>
 
-	<aura:attribute name="iterationIds" type="List" default=""/>
-	<aura:set attribute="logId" value="Root"/>
-
-    <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handle}"/>
-    <aura:handler name="init" action="{!c.handleInit}" value="{!this}"/>
-
-    <div style="position: fixed; left: 60%; padding: 5px; border: 1px solid #333; max-width:40%;">
-		<auraTest:logPanel aura:id="logPanel"/>
-	</div>
-	
-    <div aura:id="clientTarget" style="margin: 5px; padding: 5px; border: 1px solid #333;">
-    	ClientCreated
+    <div>
+        <p>Direct children</p>
+        <test:testEventEmitter aura:id="outEmitter"/>
     </div>
 
-    <aura:iteration items="{!v.iterationIds}" var="i">
-		<test:testEventBubblingHandlerContainer aura:id="container" logId="{!'Container' + i}">
-			<test:testEventBubblingHandlerGrandchild aura:id="inner" logId="{!'Inner' + i}">
-			    <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
-			    	{!'Facet' + i}
-			    	<test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
-			    	<test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
-			    	<test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
-			    </div>
-			</test:testEventBubblingHandlerGrandchild>
-		</test:testEventBubblingHandlerContainer>
-	</aura:iteration>
+    <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
+        <p>Container (non-listener)</p>
+        <aura:iteration items="[1,2,3,4,5]" var="item">
+            <test:testEventEmitter aura:id="iterEmitter"/>
+        </aura:iteration>
+    </div>
 
-	<test:testEventBubblingHandler aura:id="provided" logId="Provided" provideByHandler="test:testEventBubblingHandlerChild"/>
-	
-	<test:testEventBubblingHandler aura:id="noSuperHandlers" logId="NoSuperHandlers" provideByHandler="test:testEventBubblingHandlerGrandchildWithoutHandlers"/>
+    <div>
+        <test:testEventReceiver aura:id="receiver"/>
+    </div>
 </aura:component>

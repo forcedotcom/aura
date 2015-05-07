@@ -1,6 +1,6 @@
 ({
 	handlerDataChange: function (cmp, event, helper) {
-        console.log('bubble!');
+		event.stopPropagation();
 		cmp.set('v.bubble', true);
 	}
 })

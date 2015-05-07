@@ -1401,17 +1401,20 @@ $A.ns.Test.prototype.getElementAttributeValue = function(element,attributeName){
 };
 
 /**
- * Add an event handler. If component is specified, the handler will be applied to component events. If
- * component is not specified, the handler will be applied to application events.
- *
+ * Add an event handler. If component is specified, the handler will be applied to component events. If component is not
+ * specified, the handler will be applied to application events.
+ * 
  * @param {String}
  *            eventName The registered name, for component events; the descriptor name for application events.
  * @param {Function}
  *            handler The function handler, which should expect the event as input.
  * @param {Component}
  *            component The component to add the handler on.
+ * @param {Boolean}
+ *            insert For component events only, insert the handler at the front of the list if true, otherwise at the
+ *            end
  */
-$A.ns.Test.prototype.addEventHandler = function(eventName, handler, component) {
+$A.ns.Test.prototype.addEventHandler = function(eventName, handler, component, insert) {
     if ($A.util.isUndefinedOrNull(component)) {
         // application event handler
         $A.eventService.addHandler({
@@ -1430,7 +1433,7 @@ $A.ns.Test.prototype.addEventHandler = function(eventName, handler, component) {
                     runDeprecated : handler
                 };
             }
-        }, 'TESTHANDLER'); // expression is irrelevant
+        }, 'TESTHANDLER', insert); // expression is irrelevant, because our synthesized provider above doesn't care
     }
 };
 

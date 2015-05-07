@@ -13,15 +13,16 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 -->
-<aura:component>
-	<aura:registerEvent name="notifyUp" type="ui:refresh" />
-    <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
-        <p>Emitter</p>
-        <ui:button aura:id="button" press="{!c.fireEvent}" label="Fire!"/>
-        <div class="emiter-container">
-            {!v.body}
-        </div>
-    </div>
+
+<aura:component extensible="true" implements="test:testEventBubblingHasLogId">
+    <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handleSuper}"/>
+
+	<div style="max-width:60%;">
+	    {!v.body}
+	    <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
+	    	Super
+	    	<test:testEventBubblingEmitter aura:id="emitter" logId="Super"/>
+	    </div>
+	</div>
 </aura:component>

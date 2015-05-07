@@ -15,13 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:handler name="notifyUp" event="ui:command" action="{!c.handlerDataChange}"/>
-    <aura:attribute name="bubble" type="Boolean" default="false"/>
-
-    <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
-        <div class="receiver-container">
-            <test:testEventEmitter aura:id="outEmitter"/>
-        </div>
+<aura:component extensible="true" implements="test:testEventBubblingHasLogId,test:testEventBubblingProvidable" provider="js://test.testEventBubblingHandler">
+    <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handle}"/>
+    
+    <div style="margin: 5px; padding: 5px; border: 1px solid #333;">
+    	{!v.logId}
+    	<test:testEventBubblingEmitter aura:id="emitter" logId="Event"/>
+    	<test:testEventBubblingEmitterExtended aura:id="emitterExtended" logId="Extended"/>
+    	<test:testEventBubblingEmitterOther aura:id="emitterOther" logId="Other"/>
+		{!v.body}
     </div>
 </aura:component>

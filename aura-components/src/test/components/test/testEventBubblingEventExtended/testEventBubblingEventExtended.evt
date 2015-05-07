@@ -15,10 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component provider="js://test.testEventBubblingParent">
-    <aura:handler name="init" action="{!c.init}" value="{!this}"/>
-    <aura:handler name="notifyUp" event="ui:dataChanged" action="{!c.handlerDataChange}"/>
-
-	<test:testEventBubbling aura:id="bubbling"/>
-
-</aura:component>
+<aura:event type="component" extends="test:testEventBubblingEvent">
+</aura:event>

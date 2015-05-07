@@ -23,7 +23,6 @@ import org.auraframework.util.ServiceLocator;
 
 public class AuraIntegrationUnitTestSuite {
     public static TestSuite suite() throws Exception {
-        System.out.println("Got the test suite");
         TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraIntegrationTestInventory");
         TestSuite suite = inventory.getTestSuite(Type.UNIT);
         suite.setName("aura-integration unit tests");

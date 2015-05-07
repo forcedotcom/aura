@@ -25,13 +25,16 @@
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
@@ -100,6 +103,10 @@
             <artifactId>ios-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>biz.aQute</groupId>
+            <artifactId>bnd</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
@@ -111,7 +118,6 @@
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
         <testClasses>**/*IntegrationTests.java</testClasses>
-        <testCoverageClasses>**/*IntegrationCoverageTests.java</testCoverageClasses>
         <testNameContains /> <!-- case insensitive -->
         <testPhase>disabled</testPhase>
         <testSetupPhase>disabled</testSetupPhase>
@@ -301,9 +307,9 @@
                         </execution>
                     </executions>
                 </plugin>
-                <!--This plugin's configuration is used to store Eclipse m2e settings
-                    only. It has no influence on the Maven build itself. -->
                 <plugin>
+	                <!--This plugin's configuration is used to store Eclipse m2e settings
+	                    only. It has no influence on the Maven build itself. -->
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
                     <version>1.0.0</version>
@@ -359,27 +365,6 @@
     </build>
     <profiles>
         <profile>
-            <id>autotest</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <includes>
-                                    <include>**/*UnitTestSuite.java</include>
-                                </includes>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>runIntTests</id>
             <activation>
                 <property>
@@ -412,7 +397,7 @@
                 </property>
             </activation>
             <properties>
-               <testClasses>**/*PerfTests.java</testClasses>
+				<testClasses>**/*PerfTests.java</testClasses>
                 <testPhase>integration-test</testPhase>
                 <testSetupPhase>pre-integration-test</testSetupPhase>
                 <testTeardownPhase>post-integration-test</testTeardownPhase>
@@ -591,10 +576,10 @@
             </properties>
         </profile>
         <profile>
-            <id>coverage</id>
+            <id>integration-coverage</id>
             <activation>
                 <property>
-                    <name>coverage</name>
+                    <name>integration-coverage</name>
                 </property>
             </activation>
             <properties>
@@ -609,9 +594,12 @@
                         <inherited>true</inherited>
                         <configuration>
                             <includes>
-                                <include>${testCoverageClasses}</include>
+                                <include>**/*UnitTestSuite.java</include>
+                                <include>**/*IntegrationCoverageTests.java</include>
                             </includes>
+                            <parallel></parallel>
                             <failIfNoTests>false</failIfNoTests>
+                            <forkCount>1</forkCount>
                             <forkMode>once</forkMode>
                             <perCoreThreadCount>false</perCoreThreadCount>
                             <threadCount>1</threadCount>
@@ -663,10 +651,14 @@
                                 </goals>
                                 <configuration>
                                     <sources>
-                                        <source>${aura.home}/aura/src/main/java</source>
                                         <source>${aura.home}/aura-util/src/main/java</source>
+                                        <source>${aura.home}/aura/src/main/java</source>
+                                        <source>${aura.home}/aura/target/generated-sources/enum/java</source>
                                         <source>${aura.home}/aura-impl-expression/src/main/java</source>
+                                        <source>${aura.home}/aura-impl-expression/target/src-gen/main/java</source>
                                         <source>${aura.home}/aura-impl/src/main/java</source>
+                                        <source>${aura.home}/aura-tools/src/main/java</source>
+                                        <source>${aura.home}/aura-components/src/main/java</source>
                                     </sources>
                                 </configuration>
                             </execution>

@@ -283,7 +283,7 @@
                     values[name] = tab.get("v." + name);
     			}
     		});
-            if ( !values["ariaControlId"] ) {
+            if ( $A.util.isUndefinedOrNull(values["ariaControlId"]) ) {
     		    values["ariaControlId"] = tab.getGlobalId();
             }
     		config["attributes"] = {"values": values};

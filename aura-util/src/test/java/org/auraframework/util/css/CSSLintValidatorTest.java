@@ -34,7 +34,7 @@ public final class CSSLintValidatorTest extends UnitTestCase {
 
         CSSLintValidator validator = new CSSLintValidator();
         List<ValidationError> errors = validator.validate("input.css",
-                ".mybox {\n\tborder: 1px solid black;\n\tpadding: 5px;\n\twidth: 100px;}", false);
+                ".mybox {\n\tborder: 1px solid black;\n\tpadding-left: 5px;\n\twidth: 100px;}", false);
         assertEquals(2, errors.size());
         ValidationError error = errors.get(0);
         assertEquals("input.css", error.getFilename());
@@ -48,7 +48,7 @@ public final class CSSLintValidatorTest extends UnitTestCase {
 
         // can rerun on the same validator
         errors = validator.validate("input2.css",
-                ".mybox {\n\tborder: 2px solid black;\n\tpadding: 5px;\n\twidth: 100px;}", false);
+                ".mybox {\n\tborder: 2px solid black;\n\tpadding-left: 5px;\n\twidth: 100px;}", false);
         assertEquals(2, errors.size());
         assertEquals("input2.css", errors.get(0).getFilename());
     }

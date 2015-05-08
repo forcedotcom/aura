@@ -484,10 +484,10 @@ public class DateServiceTest extends UnitTestCase {
         resultDate = converter.parse(testDate, TimeZone.getTimeZone("GMT+8"));
         assertEquals(offsetGMT8, resultDate.getTime());
 
-        // If parse, without timezone is called, the JDK's default timezone
-        // should be used.
+        // If parse, without timezone is called, the ISO8601's default 
+        // timezone should be used ("GMT").
         resultDate = converter.parse(testDate);
-        assertEquals(-TimeZone.getDefault().getRawOffset(), resultDate.getTime());
+        assertEquals(-TimeZone.getTimeZone("GMT").getRawOffset(), resultDate.getTime());
 
         // switch to dateTime converter
         converter = DateServiceImpl.get().getDateTimeISO8601Converter();

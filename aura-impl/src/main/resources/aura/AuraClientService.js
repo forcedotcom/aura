@@ -443,6 +443,7 @@ $A.ns.AuraClientService.prototype.doActionCallback = function(response, collecto
         var token = responseMessage["token"];
         if (token) {
             this._token = token;
+            // Persists the CSRF token so it's accessible when the app is launched while offline.
             this.saveTokenToStorage();
         }
 
@@ -1177,8 +1178,6 @@ $A.ns.AuraClientService.prototype.loadComponent = function(descriptor, attribute
                 var state = a.getState();
 
                 if (state === "SUCCESS") {
-                    // Persists the CSRF token so it's accessible when the app is launched while offline.
-                    acs.saveTokenToStorage();
                     callback(a.getReturnValue());
                 } else if (state === "INCOMPLETE"){
                     // Use a stored response if one exists

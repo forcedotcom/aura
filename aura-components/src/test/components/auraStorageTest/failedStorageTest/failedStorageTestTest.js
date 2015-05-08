@@ -14,7 +14,6 @@
     	//failOnWarning: true, //ailOnWarning will fail on jenkins : W-2523040
     	auraWarningsExpectedDuringInit : ["AuraClientService.saveTokenToStorage(): failed to persist token: Error: setItem(): mock always fails", 
     	                                  "GlobalValueProvider.merge(), failed to put, error:Error: setItem(): mock always fails", 
-    	                                  "AuraClientService.saveTokenToStorage(): failed to persist token: Error: setItem(): mock always fails", 
     	                                  "AuraClientService.singleAction, problem when putting aura://ComponentController/ACTION$getComponent:{\"name\":\"auraStorageTest:failedStorageTest\"} into storage, error:Error: setItem(): mock always fails"],
         test : function(cmp) {
             // at this point aura has init'ed and the app has loaded! that's half of the test.

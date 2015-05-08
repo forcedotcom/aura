@@ -347,7 +347,14 @@ $A.ns.AuraClientService.prototype.setCurrentTransasctionId = function(abortableI
  * @private
  */
 $A.ns.AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
-    var key = action.getStorageKey();
+    var key = undefined;
+    try {
+    	key = action.getStorageKey();
+    } catch (e) {
+    	this.state = "FAILURE";
+    	this.error = e;
+    	throw new $A.auraError("Fail when processing a single action with response, getStorageKey error out with :"+e.message);
+    }
 
     $A.run(function() {
         var storage, toStore, needUpdate, errorHandler;

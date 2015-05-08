@@ -25,7 +25,6 @@ function AuraClientService () {
     this._token = null;
     this._isDisconnected = false;
     this.auraStack = [];
-    this.loadEventQueue = [];
     this.appcacheDownloadingEventFired = false;
     this.isOutdated = false;
     this.isUnloading = false;
@@ -48,7 +47,6 @@ function AuraClientService () {
     Aura.Utils.Util.prototype.on(window, "beforeunload", function(event) {
         if (!$A.util.isIE) {
             acs.isUnloading = true;
-            acs.requestQueue = [];
         }
     });
 
@@ -66,15 +64,6 @@ function AuraClientService () {
     });
 
     this.handleAppCache();
-
-    // only expose following private properties for Test.js and xUnit
-    //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"]}
-    this["foreground"] = this.foreground;
-    this["background"] = this.background;
-    this["actionQueue"] = this.actionQueue;
-    this["checkAndDecodeResponse"] = this.checkAndDecodeResponse;
-    this["isBB10"] = this.isBB10;
-    //#end
 }
 
 /**
@@ -241,7 +230,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 };
 
 AuraClientService.prototype.fireDoneWaiting = function() {
-    this.fireLoadEvent("e.aura:doneWaiting");
+    $A.get("e.aura:doneWaiting").fire();
 };
 
 AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
@@ -545,7 +534,6 @@ AuraClientService.prototype.finishRequest = function(collector, flightCounter, a
             actionDefs.push(actionsToSend[i].getDef() + '[' + actionsToSend[i].getId() + ']');
         }
 
-        // clientService.requestQueue reference is mutable
         var requestConfig = {
             "url" : this._host + "/aura",
             "method" : "POST",
@@ -715,15 +703,6 @@ AuraClientService.prototype.hardRefresh = function() {
     //AuraServlet doesn't get to do the GET reqeust
     if( (location.href).indexOf("?nocache=") > -1 ) {
         location.href = (url + params);
-    }
-};
-
-AuraClientService.prototype.fireLoadEvent = function(eventName) {
-    var e = $A.get(eventName);
-    if (e) {
-        e.fire();
-    } else {
-        this.loadEventQueue.push(eventName);
     }
 };
 

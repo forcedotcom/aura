@@ -180,10 +180,7 @@ var ComponentPriv = (function() { // Scoping priv
                 suffix = currentAction.getId();
             } else {
                 id = context.getNextGlobalId();
-                var num = context.getNum();
-                if (num > 0) {
-                    suffix = num;
-                }
+                suffix = "g";
             }
 
             return suffix ? (id + ":" + suffix) : id;

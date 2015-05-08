@@ -748,9 +748,8 @@ AuraInstance.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
         }
 
         this["finishedInit"] = true;
-        $A.clientService.fireLoadEvent("e.aura:initialized");
+        $A.get("e.aura:initialized").fire();
         $A.metricsService.applicationReady();
-
     }
 };
 

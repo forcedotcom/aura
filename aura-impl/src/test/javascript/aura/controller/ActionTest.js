@@ -1149,111 +1149,6 @@ Test.Aura.Controller.ActionTest = function() {
         }
 
         [ Fact ]
-        function CallsCompleteGroups() {
-            var target = new Action();
-            var context = {
-                setCurrentAction : function() {
-                }
-            };
-            target.completeGroups = Stubs.GetMethod(null);
-            target.getStorage = function() {
-                return false;
-            };
-            target.getId = function() {
-                return "1";
-            };
-
-            mockContext(false)(function() {
-                target.finishAction(context);
-            });
-
-            Assert.Equal([ {
-                Arguments : {},
-                ReturnValue : null
-            } ], target.completeGroups.Calls);
-        }
-
-        [ Fact ]
-        function CallsCompleteGroupsEvenOnErrorsInLoop() {
-            var target = new Action();
-            var errorStub,
-                clearConfigsActionId;
-            target.completeGroups = Stubs.GetMethod(null);
-            target.components = "something";
-            target.getStorage = function() {
-                return false;
-            };
-            target.getId = function() {
-                return "1";
-            };
-
-            var error = Record.Exception(function() {
-                mockContext(true)(function() {
-                    errorStub = $A.error;
-                    target.finishAction({
-                        setCurrentAction : function() {
-                        },
-                        joinComponentConfigs : function() {
-                            throw new Error("intentional");
-                        },
-                        clearComponentConfigs : function (id) {
-                            clearConfigsActionId = id;
-                        }
-                    });
-                });
-            });
-
-            Assert.Equal([ {
-                Arguments : {},
-                ReturnValue : null
-            } ], target.completeGroups.Calls);
-            Assert.Equal("intentional", error);
-            Assert.Equal(0, errorStub.Calls.length);
-            Assert.Equal("1", clearConfigsActionId);
-        }
-
-        [ Fact ]
-        function CallsCompleteGroupsEvenOnErrorsOutOfLoop() {
-            var target = new Action();
-            var errorStub = undefined;
-            var expected = new Error("intentional"),
-                clearConfigsActionId;
-            target.completeGroups = Stubs.GetMethod(null);
-            target.components = "something";
-            target.getStorage = function() {
-                return false;
-            };
-            target.getId = function() {
-                return "1";
-            };
-            target.isFromStorage = function() {
-                return false;
-            };
-
-            mockContext(false)(function() {
-                errorStub = $A.error;
-                target.finishAction({
-                    setCurrentAction : function() {
-                    },
-                    joinComponentConfigs : function() {
-                        throw expected
-                    },
-                    clearComponentConfigs : function (id) {
-                        clearConfigsActionId = id;
-                    }
-                });
-            });
-
-            Assert.Equal([ {
-                Arguments : {},
-                ReturnValue : null
-            } ], target.completeGroups.Calls);
-            Assert.Equal(1, errorStub.Calls.length);
-            Assert.Equal(expected, errorStub.Calls[0].Arguments.error);
-            Assert.Equal("1", clearConfigsActionId);
-        }
-
-        [ Fact ]
         function CallsContextFinishComponentsWithStorageFalse() {
             var target = new Action();
             var expectedId = "9955";
@@ -1268,7 +1163,6 @@ Test.Aura.Controller.ActionTest = function() {
             target.components = [ {
                 "creationPath" : "hi"
             } ];
-            target.completeGroups = Stubs.GetMethod(null);
             target.getStorage = function() {
                 return false;
             };
@@ -1304,7 +1198,6 @@ Test.Aura.Controller.ActionTest = function() {
             target.components = [ {
                 "creationPath" : "hi"
             } ];
-            target.completeGroups = Stubs.GetMethod(null);
             target.getStorage = function() {
                 return true;
             };
@@ -1343,7 +1236,6 @@ Test.Aura.Controller.ActionTest = function() {
             target.components = [ {
                 "creationPath" : "hi"
             } ];
-            target.completeGroups = Stubs.GetMethod(null);
             target.getStorage = function() {
                 return false;
             };
@@ -2167,107 +2059,6 @@ Test.Aura.Controller.ActionTest = function() {
     }
 
     [ Fixture ]
-    function AddCallbackGroup() {
-        var MockGroup = function() {
-            this.completeAction = Stubs.GetMethod("action", null);
-        }
-
-        [Fact]
-        function AddsGroupIfNew() {
-            var expected = "expected";
-            var target = new Action();
-            target.state = "NEW";
-
-            target.addCallbackGroup(expected);
-            var actual = target.groups;
-
-            Assert.Equal([ expected ], actual);
-        }
-
-        [ Fact ]
-        function DoesNotAddGroupIfNotNew() {
-            var expected = [];
-            var target = new Action();
-            target.state = "new";
-            var group = new MockGroup();
-
-            target.addCallbackGroup(group);
-            var actual = target.groups;
-
-            Assert.Equal(expected, actual);
-        }
-
-        [ Fact ]
-        function CallsCompleteActionOnGroupIfNotNew() {
-            var target = new Action();
-            target.state = "new";
-            var group = new MockGroup();
-
-            target.addCallbackGroup(group);
-
-            Assert.Equal([ {
-                Arguments : {
-                    action : target
-                },
-                ReturnValue : null
-            } ], group.completeAction.Calls);
-        }
-
-        [ Fact ]
-        function DoesNotCallCompleteActionOnGroupIfNew() {
-            var target = new Action();
-            target.state = "NEW";
-            var group = new MockGroup();
-
-            target.addCallbackGroup(group);
-
-            Assert.Equal(0, group.completeAction.Calls.length);
-        }
-    }
-
-    [ Fixture ]
-    function CompleteGroups() {
-        var MockGroup = function() {
-            this.completeAction = Stubs.GetMethod("action", null);
-        }
-
-        [Fact]
-        function SetsGroupsEmpty() {
-            var target = new Action();
-            var group1 = new MockGroup();
-            var group2 = new MockGroup();
-            target.groups = [ group1, group2 ];
-
-            target.completeGroups();
-
-            Assert.Equal([], target.groups);
-        }
-
-        [ Fact ]
-        function CallsCompleteActionOnEachGroup() {
-            var target = new Action();
-            var group1 = new MockGroup();
-            var group2 = new MockGroup();
-            target.groups = [ group1, group2 ];
-
-            target.completeGroups();
-
-            Assert.Equal([ {
-                Arguments : {
-                    action : target
-                },
-                ReturnValue : null
-            } ], group1.completeAction.Calls);
-            Assert.Equal([ {
-                Arguments : {
-                    action : target
-                },
-                ReturnValue : null
-            } ], group2.completeAction.Calls);
-        }
-    }
-
-    [ Fixture ]
     function Abort() {
         var mockGlobal = Mocks.GetMocks(Object.Global(), {
             "$A" : {
@@ -2295,21 +2086,6 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             Assert.Equal("ABORTED", target.state);
-        }
-
-        [ Fact ]
-        function CallsCompleteGroups() {
-            var target = new Action();
-            target.completeGroups = Stubs.GetMethod(null);
-
-            mockGlobal(function() {
-                target.abort();
-            });
-
-            Assert.Equal([ {
-                Arguments : {},
-                ReturnValue : null
-            } ], target.completeGroups.Calls);
         }
 
         [ Fact ]

@@ -49,7 +49,6 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.state = "NEW";
     this.callbacks = {};
     this.events = [];
-    this.groups = [];
     this.components = null;
     this.actionId = Action.prototype.nextActionId++;
     this.id = this.actionId + ";" + suffix;
@@ -63,6 +62,8 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.returnValue = undefined;
     this.returnValueUnmodified = undefined;
 
+    // FIXME: only for runActions - deprecated
+    this.completion = undefined;
     this.pathStack = [];
     this.canCreate = true;
     // start with a body
@@ -265,6 +266,35 @@ Action.prototype.setCreationPathIndex = function(idx) {
 };
 
 /**
+ * Set the completion function.
+ *
+ * @private
+ */
+Action.prototype.setCompletion = function(fn) {
+    $A.assert($A.util.isFunction(fn), "Action.setCompletion: argument must be a function");
+    this.completion = fn;
+};
+
+/**
+ * Call the completion function if any.
+ *
+ * @private
+ */
+Action.prototype.complete = function() {
+    try {
+        if (this.completion) {
+            this.completion();
+        }
+    } catch (e) {
+        if ($A.clientService.inAuraLoop()) {
+            throw e;
+        } else {
+            $A.error("Action.complete: Failed during completion callback", e);
+        }
+    }
+};
+
+/**
  * Gets the current creatorPath from the top of the pathStack
  *
  * @returns {String}
@@ -289,35 +319,6 @@ Action.prototype.getCurrentPath = function() {
  */
 Action.prototype.getDef = function() {
     return this.def;
-};
-
-/**
- * Adds a callback group for completion tracking.
- *
- * If this action is already completed, <code>completeAction()</code> is called.
- *
- * @param {CallbackGroup} group
- *      the group to add
- * @private
- */
-Action.prototype.addCallbackGroup = function(group) {
-    if (this.state === "NEW") {
-        this.groups.push(group);
-    } else {
-        group.completeAction(this);
-    }
-};
-
-/**
- * Marks this action as complete for all callback groups.
- *
- * @private
- */
-Action.prototype.completeGroups = function() {
-    while (this.groups.length > 0) {
-        var group = this.groups.pop();
-        group.completeAction(this);
-    }
 };
 
 /**
@@ -835,6 +836,7 @@ Action.prototype.finishAction = function(context) {
                 }
                 $A.warning("Callback failed: " + (this.def?this.def.toString():""), e);
             }
+            this.complete();
             if (this.components && (cb || !this.storable || !this.getStorage())) {
                 context.finishComponentConfigs(id);
                 clearComponents = false;
@@ -851,7 +853,6 @@ Action.prototype.finishAction = function(context) {
     }
     context.releaseCurrentAccess();
     context.setCurrentAction(previous);
-    this.completeGroups();
     if (clearComponents) {
         context.clearComponentConfigs(id);
     }
@@ -886,8 +887,8 @@ Action.prototype.abort = function() {
         }
     } finally {
         $A.log("ABORTED: "+this.getStorageKey());
-        this.completeGroups();
     }
+    this.complete();
 };
 
 /**

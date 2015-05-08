@@ -139,9 +139,9 @@
             a.setParams({testName : "testSetStorableAPI"});
             a.setStorable();
             $A.test.enqueueAction(a);
-            $A.test.addWaitFor("SUCCESS", 
-                function(){return a.getState()},
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); },
                 function(){
+                    $A.test.assertEquals("SUCCESS", a.getState());
                     $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
                     $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
                     //Set response stored time
@@ -158,9 +158,9 @@
             aSecond.setParams({testName : "testSetStorableAPI"});
             aSecond.setStorable();
             $A.test.enqueueAction(aSecond);
-            $A.test.addWaitFor("SUCCESS", 
-                function(){return aSecond.getState()},
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([aSecond]); },
                 function(){
+                    $A.test.assertEquals("SUCCESS", aSecond.getState());
                     $A.test.assertEquals(0, aSecond.getReturnValue().Counter, "aSecond response invalid.");
                     $A.test.assertEquals("", that.textForName(cmp, "refreshBegin"),
                             "refreshBegin fired unexpectedly");
@@ -198,9 +198,9 @@
                     aThird.setStorable({"refresh": 0});
                     requestTime = new Date().getTime();
                     $A.test.enqueueAction(aThird);
-                    $A.test.addWaitFor("SUCCESS", 
-                        function(){return aThird.getState()},
+                    $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([aThird]); },
                         function(){
+                            $A.test.assertEquals("SUCCESS", aThird.getState());
                             $A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
                         });
                 });
@@ -230,11 +230,10 @@
             aFourth.setParams({testName : "testSetStorableAPI"});
             aFourth.setStorable();
             $A.test.enqueueAction(aFourth);
-            $A.test.addWaitForWithFailureMessage(
-                "SUCCESS",
-                function(){return aFourth.getState()},
+            $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([aFourth]); },
                 "Expected action to become SUCCESSful.",
                 function(){
+                    $A.test.assertEquals("SUCCESS", aFourth.getState());
                     $A.test.assertTrue(aFourth.isFromStorage(), "aFourth should have been from storage");
                 }
             );
@@ -330,15 +329,14 @@
                 aSecond.setStorable({});
                 $A.test.assertTrue(aSecond.isStorable());
                 $A.test.enqueueAction(aSecond);
-                $A.test.addWaitFor("SUCCESS", function() {
-                    return aSecond.getState()
-                }, function() {
-                    $A.test.assertTrue(aSecond.isFromStorage(), "failed to fetch cached response");
-                    //Refresh interval should default to 0 and refresh should happen.
-                    $A.test.addWaitFor("refreshEnd", function() {
-                        return $A.test.getText(cmp.find("refreshEnd").getElement())
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([aSecond]); },
+                    function() {
+                        $A.test.assertTrue(aSecond.isFromStorage(), "failed to fetch cached response");
+                        //Refresh interval should default to 0 and refresh should happen.
+                        $A.test.addWaitFor("refreshEnd", function() {
+                            return $A.test.getText(cmp.find("refreshEnd").getElement())
+                        });
                     });
-                });
             }
         ]
     },
@@ -828,27 +826,18 @@
                 $A.test.enqueueAction(a);
                 $A.test.runAfterIf(function() { return "SUCCESS" === a.getState(); }, function() {
                         $A.test.blockRequests();
-                        $A.run(function() {
-                                $A.clientService.runActions([ abortable1 ], cmp, function() {
-                                        cmp._testCounter--;
-                                    });
-                            });
-                        $A.run(function() {
-                                $A.clientService.runActions([ abortable2 ], cmp, function() {
-                                        cmp._testCounter--;
-                                });
-                            });
+                        $A.run(function() { $A.enqueueAction(abortable1); });
+                        $A.run(function() { $A.enqueueAction(abortable2); });
                         $A.test.releaseRequests();
                     });
-                $A.test.runAfterIf(function() {
-                    return cmp._testCounter == 0;
-                }, function() {
-                    $A.test.assertEquals("ABORTED", abortable1.getState(), "Action was not aborted");
-                    $A.test.assertEquals("SUCCESS", abortable2.getState(), "Last abortable group did not complete.");
-                    var now = new Date().getTime();
-                    // wait for the timer to tick over
-                    $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
-                });
+                $A.test.runAfterIf(function() { return $A.test.areActionsComplete([abortable1, abortable2]); },
+                    function() {
+                        $A.test.assertEquals("ABORTED", abortable1.getState(), "Action was not aborted");
+                        $A.test.assertEquals("SUCCESS", abortable2.getState(), "Last abortable group did not complete.");
+                        var now = new Date().getTime();
+                        // wait for the timer to tick over
+                        $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
+                    });
             },
             function(cmp) {
                 var abortedAction = cmp.get("c.substring");

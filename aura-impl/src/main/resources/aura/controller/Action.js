@@ -491,19 +491,18 @@ Action.prototype.setAllAboardCallback = function(scope, callback) {
  * @private
  * @return false if the callback failed.
  */
-Action.prototype.callAllAboardCallback = function () {
+Action.prototype.callAllAboardCallback = function (context) {
     if (this.allAboardCallback) {
+        var previous = context.setCurrentAction(this);
+        context.setCurrentAccess(this.cmp);
         try {
             this.allAboardCallback();
         } catch (e) {
-            this.state = "ERROR";
-            this.error = e;
-            $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
-            $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
-            if ($A.clientService.inAuraLoop()) {
-                throw e;
-            }
+            this.markException(e);
             return false;
+        } finally {
+            context.setCurrentAction(previous);
+            $A.getContext().releaseCurrentAccess();
         }
     }
     return true;
@@ -574,13 +573,7 @@ Action.prototype.runDeprecated = function(evt) {
         this.returnValue = this.meth.call(this, this.cmp, evt, this.cmp['helper']);
         this.state = "SUCCESS";
     } catch (e) {
-        this.state = "ERROR";
-        this.error = e;
-        $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
-        $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
-        if ($A.clientService.inAuraLoop()) {
-            throw e;
-        }
+        this.markException(e);
     } finally {
         $A.getContext().releaseCurrentAccess();
     }
@@ -1118,6 +1111,21 @@ Action.prototype.toJSON = function() {
 };
 
 /**
+ * Mark an action as having an error.
+ *
+ * @param e the exception with which we want to mark the action.
+ */
+Action.prototype.markException = function(e) {
+    this.state = "ERROR";
+    this.error = e;
+    $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
+    $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
+    if ($A.clientService.inAuraLoop()) {
+        throw e;
+    }
+};
+
+/**
  * Mark the current action as incomplete.
  *
  * @private
@@ -1143,6 +1151,7 @@ Action.prototype.copyToRefresh = function() {
 
     refreshAction.abortable = this.abortable;
     refreshAction.abortableId = this.abortableId;
+    refreshAction.background = this.background;
 
     return refreshAction;
 };

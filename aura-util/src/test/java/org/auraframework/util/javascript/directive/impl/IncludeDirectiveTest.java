@@ -51,6 +51,7 @@ public class IncludeDirectiveTest extends UnitTestCase {
     public void testIncludeConfig() throws Exception {
         String[] config = { "{\"modes\": [\"TESTING\"]}", "reallyconkyinclude" };
         IncludeDirective id = null;
+        boolean failed = false;
         try {
             id = new IncludeDirective(4, config[0]);
             fail("Should not have continued processing the include directive without a value for path");
@@ -66,10 +67,15 @@ public class IncludeDirectiveTest extends UnitTestCase {
                     EnumSet.of(JavascriptGeneratorMode.TESTING));
             id = new IncludeDirective(4, config[1]);
             id.processDirective(jg);
-            fail("should have failed because 'reallyconkyinclude' is an invalid javascript file to include");
-        } catch (IOException e) {
+            failed = true;
+        } catch (Throwable e) {
             // Expected the Javascript group to throw an error while adding an
             // invalid file
+            assertTrue("Add File function failed because of an unexpected error message",
+                e.getMessage().indexOf("reallyconkyinclude") != -1);
+        }
+        if (failed) {
+            fail("should have failed because 'reallyconkyinclude' is an invalid javascript file to include");
         }
     }
 
@@ -84,14 +90,17 @@ public class IncludeDirectiveTest extends UnitTestCase {
                 file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
                 EnumSet.of(JavascriptGeneratorMode.TESTING));
         DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
+        boolean failed = false;
         try {
             dp.parseFile();
-            fail("Should have failed processing a non-existing file");
-        } catch (IOException expected) {
+            failed = true;
+        } catch (Throwable expected) {
             assertTrue("Add File function failed because of an unexpected error message",
-                expected.getMessage().startsWith("File did not exist or was not a valid, acceptable file"));
+                expected.getMessage().indexOf("haha.js") != -1);
         }
-
+        if (failed) {
+            fail("Should have failed processing a non-existing file");
+        }
     }
 
     /**

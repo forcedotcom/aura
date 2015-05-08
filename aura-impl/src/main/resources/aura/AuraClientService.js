@@ -14,13 +14,137 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-
 /**
- * @description The Aura Client Service, accessible using $A.services.client. Communicates with the Aura Server.
+ * AuraXHR: struct used to represent a connection.
+ *
  * @constructor
  */
+Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
+    this.iteration = 0;
+    this.length = 0;
+    this.marker = 0;
+    this.request = undefined;
+    this.actions = {};
+    this.time = undefined;
+    this.iteration += 1;
+    this.transactionId = undefined;
+    // FIXME: this will go away in iteration 2.
+    this.foreground = false;
+    this.reset();
+};
 
-function AuraClientService () {
+/**
+ * Reset the xhr.
+ */
+Aura.Services.AuraClientService$AuraXHR.prototype.reset = function() {
+    this.request = undefined;
+    this.actions = {};
+    this.time = undefined;
+    this.iteration += 1;
+    // FIXME: this will go away in iteration 2.
+    this.foreground = false;
+};
+
+/**
+ * 'progress' the XHR.
+ *
+ * We set a failsafe timeout here.
+ */
+Aura.Services.AuraClientService$AuraXHR.prototype.mark = function(foreground) {
+    this.time = new Date().getTime();
+    // FIXME: this will go away in iteration 2, along with the parameter
+    this.foreground = foreground;
+};
+
+/**
+ * add an action.
+ */
+Aura.Services.AuraClientService$AuraXHR.prototype.addAction = function(action) {
+    if (action) {
+        if (this.actions[""+action.getId()]) {
+            throw new $A.auraError("Adding duplicate action");
+        }
+        this.actions[""+action.getId()] = action;
+    }
+};
+
+/**
+ * get an action for a response.
+ */
+Aura.Services.AuraClientService$AuraXHR.prototype.getAction = function(id) {
+    var action = this.actions[id];
+
+    if (action) {
+        this.actions[id] = undefined;
+    }
+    return action;
+};
+
+/**
+ * A handy structure to hold data.
+ *
+ * @constructor
+ */
+Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollector() {
+    // Collected client actions for execution.
+    this.clientActions = [];
+    this.clientIndex = 0;
+
+    // collected server actions to send.
+    this.actionsToCollect = 0;
+    this.collected = [];
+
+    // collected server actions to complete (stored)
+    this.actionsToComplete = [];
+    this.completionIndex = 0;
+
+    // server actions completed.
+    this.actionsCompleted = 0;
+};
+
+
+/**
+ * @description The Aura Client Service.
+ * 
+ * There be dragons here.
+ *
+ * Manage the queue of actions sent to the server.
+ *
+ * Abortable actions are handled via three variables:
+ *  (1) lastTransactionId - The abortable transaction that should be executed
+ *  (2) nextTransactionId - used to track the next abortable group to be created.
+ *  (3) currentTransactionId - if we are executing in context of an abortable group, this is the group to use.
+ *
+ * Queue Processing Notes:
+ *  * The queue is processed synchronously, but almost all of the interesting functionily occurs asynchronously.
+ *  * client actions are run in a single flow of setTimeout calls.
+ *  * storable server actions get processed in the "then" clause of the promise
+ *  * non-storable server actions are processed synchronously.
+ *
+ * Input conditions:
+ * We have a queue of actions that are inserted vie enqueueAction.
+ *
+ * Dangers:
+ *  * Race conditions.
+ *  * caboose actions.
+ *  * problems with storage.
+ *  * complexity of code due to asynchronicity.
+ *
+ * Tradeoffs:
+ *  * number of actions boxcarred.
+ *  * actions in flight
+ *  * sending XHR early vs. late.
+ *
+ * Processing Loop:
+ *  * gather actions into a collector.
+ *  * walk each action, queueing up server actions to retrieve from storage and client actions to execute.
+ *  * execute client actions with setTimeout(0) to allow server actions to complete.
+ *  * As server actions come back from storage, queue up for execution, and queue refresh actions to refresh.
+ *  * After all actions collect, check for further actions in the queue, restart loop if there are some.
+ *
+ * @constructor
+ */
+AuraClientService = function AuraClientService () {
     this._host = "";
     this._token = null;
     this._isDisconnected = false;
@@ -35,15 +159,7 @@ function AuraClientService () {
     // token storage key should not be changed because external client may query independently
     this._tokenStorageKey = "$AuraClientService.token$";
 
-    this.foreground = new FlightCounter(1);
-    this.background = new FlightCounter(3);
-    this.actionQueue = new ActionQueue();
-
     this.NOOP = function() {};
-
-    this["Action"] = Action;
-    this["ActionQueue"] = ActionQueue;
-    this["ActionCollector"] = ActionCollector;
 
     var acs = this;
 
@@ -66,15 +182,71 @@ function AuraClientService () {
         }
     });
 
+    var auraXHR = new Aura.Services.AuraClientService$AuraXHR();
+    this.availableXHRs = [ auraXHR ];
+    this.allXHRs = [ auraXHR ];
+    this.collector = undefined;
+    // FIXME: this will go away in iteration 2.
+    this.foregroundXHR = undefined;
+    // FIXME: this will go away in iteration 3.
+    this.setQueueSize(4);
+
+    this.actionsQueued = [];
+    this.actionsDeferred = [];
+
+    // guess at xhr type.
+    if (window.XMLHttpRequest) {
+        this.httpType = 'generic';
+    } else {
+        this.httpType = undefined;
+    }
+
+    this._disconnected = undefined;
+
+    //
+    // Transactions
+    //
+    this.nextTransactionId = 1;
+    this.currentTransactionId = undefined;
+    this.lastTransactionId = 1;
+
+    //
+    // Option to send stored actions after the XHR send. version 33 behaviour is false
+    //
+    this.optionStoredAfterSend = false;
+    //
+    // Run client actions synchronously. This is the previous behaviour.
+    //
+    this.optionClientSynchronous = true;
+
     this.handleAppCache();
-}
+
+};
 
 /**
- * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
+ * set the queue size.
+ *
+ * This is a one time set for the queue size. Any further attempts will be ignored.
+ * This should become a configuration parameter at some point.
  *
  * @private
  */
-AuraClientService.prototype.checkAndDecodeResponse = function(response, noStrip) {
+AuraClientService.prototype.setQueueSize = function(queueSize) {
+    var auraXHR;
+    if (this.allXHRs.length === 1) {
+        for (var i = 1; i < queueSize; i+= 1) {
+            auraXHR = new Aura.Services.AuraClientService$AuraXHR();
+            this.availableXHRs.push(auraXHR);
+            this.allXHRs.push(auraXHR);
+        }
+    }
+};
+
+
+/**
+ * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
+ */
+AuraClientService.prototype.decode = function(response, noStrip) {
     if (this.isUnloading) {
         return null;
     }
@@ -236,6 +408,27 @@ AuraClientService.prototype.fireDoneWaiting = function() {
     $A.get("e.aura:doneWaiting").fire();
 };
 
+/**
+ * make the current thread be 'in aura collections'
+ *
+ * @private
+ */
+AuraClientService.prototype.setInCollection = function() {
+    this.auraStack.push("AuraClientService$collection");
+    this.setCurrentTransactionId(this.collector.transactionId);
+};
+
+/**
+ * release the current thread from 'in aura collections'
+ *
+ * @private
+ */
+AuraClientService.prototype.clearInCollection = function() {
+    this.setCurrentTransactionId(undefined);
+    var name = this.auraStack.pop();
+    $A.assert(name === "AuraClientService$collection");
+};
+
 AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
     if (response && response.status) {
         if (response.status === 0) {
@@ -251,30 +444,53 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
 };
 
 /**
- * Get the abortable ID that is currently in force.
+ * Get the current transaction ID.
+ *
+ * This routine selects the transaction id that should be assigned by first selecting currentTransactionId if it
+ * is defined, otherwise, we fall back to using nextTransactionId.
  *
  * @private
  */
-AuraClientService.prototype.getCurrentTransasctionId = function() {
+AuraClientService.prototype.getCurrentTransactionId = function() {
     if (!this.inAuraLoop()) {
-        $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get abortable ID outside of aura loop");
+        $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
         return;
     }
-    return this.actionQueue.getCurrentAbortableId();
+    if (this.currentTransactionId !== undefined) {
+        return this.currentTransactionId;
+    }
+    return this.nextTransactionId;
 };
 
 /**
- * Get the abortable ID that is currently in force.
+ * Set the current transaction ID.
+ *
+ * This routine sets the currentTransactionId, and it should always be a previous transaction ID, or things
+ * may well go very wrong.
  *
  * @private
  */
-AuraClientService.prototype.setCurrentTransasctionId = function(abortableId) {
-    if (!this.inAuraLoop()) {
-        $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get abortable ID outside of aura loop");
-        return;
+AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
+    var tid = undefined;
+
+    if (abortableId !== undefined) {
+        if (!this.inAuraLoop()) {
+            $A.error("AuraClientService.setCurrentTransasctionId(): Unable to set abortable ID outside aura loop");
+            return;
+        }
+        tid = parseInt(abortableId, 10);
+        
+        if (!(tid <= this.nextTransactionId)) {
+            $A.error("ActionQueue.setCurrentTransactionId(): invalid transaction id: "+tid);
+            return;
+        }
+        if (tid > this.lastTransactionId) {
+            this.lastTransactionId = tid;
+        }
     }
-    return this.actionQueue.setCurrentAbortableId(abortableId);
+    this.currentTransactionId = tid;
 };
+
 
 /**
  * Process a single action/response.
@@ -291,20 +507,10 @@ AuraClientService.prototype.setCurrentTransasctionId = function(abortableId) {
  * @private
  */
 AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
-    var key = undefined;
-    try {
-    	key = action.getStorageKey();
-    } catch (e) {
-    	this.state = "FAILURE";
-    	this.error = e;
-    	throw new $A.auraError("Fail when processing a single action with response, getStorageKey error out with :"+e.message);
-    }
-
-    $A.run(function() {
         var storage, toStore, needUpdate, errorHandler;
 
+    try {
         needUpdate = action.updateFromResponse(actionResponse);
-
         if (noAbort || !action.isAbortable()) {
             if (needUpdate) {
                 action.finishAction($A.getContext());
@@ -317,8 +523,20 @@ AuraClientService.prototype.singleAction = function(action, noAbort, actionRespo
         }
         storage = action.getStorage();
         if (storage) {
-            toStore = action.getStored(storage.getName());
             errorHandler = action.getStorageErrorHandler();
+
+            try {
+                key = action.getStorageKey();
+            } catch (e) {
+                if (errorHandler && $A.util.isFunction(errorHandler)) {
+                    errorHandler(error);
+                } else {
+                    $A.logger.auraErrorHelper(e, action);
+                }
+                return;
+            }
+
+            toStore = action.getStored(storage.getName());
 
             if (toStore) {
                 storage.put(key, toStore).then(
@@ -336,305 +554,10 @@ AuraClientService.prototype.singleAction = function(action, noAbort, actionRespo
                 );
             }
         }
-    }, key);
-};
-
-/**
- * Callback for an XHR for a set of actions.
- *
- * This function does all of the processing for a set of actions that come back from the server. It correctly deals
- * with the case of interrupted communications, and handles aborts.
- *
- * @param {Object}
- *            response the response from the server.
- * @param {ActionCollector}
- *            the collector for the actions.
- * @param {FlightCounter}
- *            the in flight counter under which the actions were run
- * @param {Scalar}
- *            the abortableId associated with the set of actions.
- * @private
- */
-AuraClientService.prototype.actionCallback = function(response, collector, flightCounter, abortableId) {
-    //
-    // Note that this is a very specific assertion. We can either be called back from an empty stack
-    // (the normal case, after an XHR has gone to the server), or we can be called back from inside
-    // the popStack protection (currently I only know this to occur in disconnected webkit).
-    //
-    if (this.auraStack.length > 0) {
-        if (this.auraStack.length != 1 || this.auraStack[0] !== "$A.clientServices.popStack") {
-            $A.error("Action callback called on non-empty stack '" + this.auraStack + "', length = " + this.auraStack.length);
-            this.auraStack = [];
-        }
-    }
-
-
-    if (abortableId) {
-        this.actionQueue.setCurrentAbortableId(abortableId);
-    }
-    var that = this;
-    try {
-        $A.run(function() { that.doActionCallback(response, collector, flightCounter, abortableId); }, "actionCallback");
     } catch (e) {
-        throw e;
-    } finally {
-        this.actionQueue.setCurrentAbortableId(undefined);
-    }
-};
-
-AuraClientService.prototype.doActionCallback = function(response, collector, flightCounter, abortableId) {
-    var action, actionResponses;
-    var responseMessage = this.checkAndDecodeResponse(response);
-    var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
-
-    //
-    // pre-decrement so that we correctly send the next response right after this.
-    //
-    if (responseMessage) {
-        var token = responseMessage["token"];
-        if (token) {
-            this._token = token;
-            // Persists the CSRF token so it's accessible when the app is launched while offline.
-            this.saveTokenToStorage();
-        }
-
-        $A.getContext()['merge'](responseMessage["context"]);
-
-        // Look for any Client side event exceptions
-        var events = responseMessage["events"];
-        if (events) {
-            for ( var en = 0, len = events.length; en < len; en++) {
-                this.parseAndFireEvent(events[en]);
-            }
-        }
-
-        actionResponses = responseMessage["actions"];
-
-        // Process each action and its response
-        for ( var r = 0; r < actionResponses.length; r++) {
-            var actionResponse = actionResponses[r];
-            action = collector.findActionAndClear(actionResponse["id"]);
-
-            if (action === null) {
-                if (actionResponse["storable"]) {
-                    //
-                    // Hmm, we got a missing action. We allow this in the case that we have
-                    // a storable action from the server (i.e. we are faking an action from the
-                    // server to store data on the client. This is only used in priming, and is
-                    // more than a bit of a hack.
-                    //
-                    // Create a client side action instance to go with the server created action response
-                    //
-                    var descriptor = actionResponse["action"];
-                    var actionDef = $A.componentService.getActionDef(descriptor);
-                    action = actionDef.newInstance();
-                    action.setStorable();
-                    action.setParams(actionResponse["params"]);
-                    action.setAbortable(false);
-                } else {
-                    $A.assert(action, "Unable to find action for action response " + actionResponse["id"]);
-                }
-            }
-            this.singleAction(action, noAbort, actionResponse);
-        }
-    } else if (this.isDisconnectedOrCancelled(response) && !this.isUnloading) {
-        var actions = collector.getActionsToSend();
-
-        for ( var m = 0; m < actions.length; m++) {
-            action = actions[m];
-            if (noAbort || !action.isAbortable()) {
-                action.incomplete($A.getContext());
-            } else {
-                action.abort();
-            }
-        }
-    }
-    $A.Perf.endMark("Completed Action Callback - XHR " + collector.getNum());
-    this.fireDoneWaiting();
-};
-
-/**
- * Execute the list of client actions synchronously. Populate state and return values and execute the action
- * callbacks. This method does not interact with the inFlight counter and does no throttling. All actions will be
- * run as it is assumed abortable actions have already been pruned.
- *
- * @private
- */
-AuraClientService.prototype.runClientActions = function(actions) {
-    var action;
-    for ( var i = 0; i < actions.length; i++) {
-        action = actions[i];
-        action.runDeprecated();
-        action.finishAction($A.getContext());
-    }
-};
-
-/**
- * The last step before sending to the server.
- *
- * This routine does the actual XHR request to the server, using the collected actions to do so. In the event that
- * there are no actions to send, it simply completes the request.
- *
- * @private
- */
-AuraClientService.prototype.finishRequest = function(collector, flightCounter, abortableId, flightHandled) {
-    var actionsToSend = collector.getActionsToSend();
-    var actionsToComplete = collector.getActionsToComplete();
-
-    if (actionsToComplete.length > 0) {
-        for ( var n = 0; n < actionsToComplete.length; n++) {
-            var info = actionsToComplete[n];
-            info.action.updateFromResponse(info.response);
-            try {
-                info.action.finishAction($A.getContext());
-            } catch(e) {
-                var retryAction = info.action.getRetryFromStorageAction();
-                if (retryAction) {
-                    $A.warning("Finishing cached action failed. Trying to refetch from server: " + retryAction.getStorageKey(), e);
-                    // Clear potential leftover configs
-                    $A.getContext().clearComponentConfigs(info.action.getId());
-                    // Enqueue the retry action
-                    $A.enqueueAction(retryAction);
-                } else {
-                    // If it was not from storage, just rethrow the error and carry on as normal.
-                    throw e;
-                }
-            }
-        }
-        this.fireDoneWaiting();
-    }
-
-    if (actionsToSend.length > 0) {
-        collector.setNum($A.getContext().incrementNum());
-
-        var markDescription = undefined;
-        // #if {"modes" : ["PTEST"]}
-        markDescription = ": [";
-        for (var m = 0; m < actionsToSend.length; m++) {
-            if (actionsToSend[m].def) {
-                markDescription += "'" + actionsToSend[m].def.name
-            } else {
-                markDescription += "'undefined";
-            }
-            if (actionsToSend[m].background) {
-                markDescription += "<BG>'";
-            } else {
-                markDescription += "'";
-            }
-            if (m < actionsToSend.length - 1) {
-                markDescription += ",";
-            }
-        }
-        markDescription += "]";
-        // #end
-
-        var acs = this;
-        var actionDefs = [];
-
-        for (var i = 0; i < actionsToSend.length; i++) {
-            actionDefs.push(actionsToSend[i].getDef() + '[' + actionsToSend[i].getId() + ']');
-        }
-
-        var requestConfig = {
-            "url" : this._host + "/aura",
-            "method" : "POST",
-            "scope" : this,
-            "callback" : function(response) {
-                // always finish our in-flight counter here.
-                flightCounter.finish();
-                acs.actionCallback(response, collector, flightCounter, abortableId);
-            },
-            "params" : {
-                "message" : $A.util.json.encode({
-                    "actions" : actionsToSend
-                }),
-                "aura.token" : this._token,
-                "aura.context" : $A.getContext().encodeForServer(),
-                "aura.num" : collector.getNum()
-                // #if {"modes" : ["PTEST"]}
-                ,
-                "beaconData" : $A.Perf.getBeaconData()
-                // #end
-            },
-            "actionDefs": actionDefs,
-            "markDescription" : markDescription // Delete this when we remove all jiffy marks
-        };
-
-        $A.Perf.endMark("Action Group " + collector.getCollectorId() + " enqueued");
-
-        // clear the beaconData
-        // #if {"modes" : ["PTEST"]}
-        $A.Perf.clearBeaconData();
-        // #end
-
-        $A.Perf.endMark("Action Request Prepared");
-        $A.util.transport["request"](requestConfig);
-        flightCounter.send();
-        flightHandled.value = true;
-
-        setTimeout(function() {
-            $A.get("e.aura:waiting").fire();
-        }, 1);
-    } else {
-        // We didn't send a request, so clean up the in-flight counter.
-        flightCounter.cancel();
-        flightHandled.value = true;
-    }
-};
-
-/**
- * Start a request sequence for a set of actions and an 'in-flight' counter.
- *
- * This routine will usually send off a request to the server, and will always walk through the steps to do so. If
- * no request is sent to the server, it is because the request was either a storable action without needing refresh,
- * or all abortable actions that will be aborted (not sure if that is even possible).
- *
- * This function should never be called unless flightCounter.start() was called and returned true (meaning there is
- * capacity in the channel).
- *
- * @param {Array}
- *            actions the list of actions to process.
- * @param {FlightCounter}
- *            the flight counter under which the actions should be run.
- * @private
- */
-AuraClientService.prototype.request = function(actions, flightCounter) {
-    $A.Perf.mark("AuraClientService.request");
-    $A.Perf.mark("Action Request Prepared");
-    var flightHandled = { value: false };
-    var acs = this;
-    //
-    // NOTE: this is done here, before the callback to avoid a race condition of someone else queueing up
-    // an abortable action while we are off waiting for storage.
-    //
-    window.setTimeout(function() {
-        if(!flightHandled.value) {
-            $A.warning("Timed out waiting for ActionController to reset flight counter! Resetting the flight counter and clearing component configs of processed actions");
-            flightCounter.cancel();
-        }
-    }, 30000);
-    try {
-        var abortableId = this.actionQueue.getLastAbortableTransactionId();
-        var collector = new Aura.Controller.ActionCollector(actions, function() {
-            try {
-                acs.actionQueue.setCurrentAbortableId(abortableId);
-                acs.finishRequest(collector, flightCounter, abortableId, flightHandled);
-            } catch (e) {
-                if (!flightHandled.value) {
-                    flightCounter.cancel();
-                    flightHandled.value = true;
-                }
-                throw e;
-            }
-        });
-        collector.process();
-        $A.Perf.mark("Action Group " + collector.getCollectorId() + " enqueued");
-    } catch (e) {
-        if (!flightHandled.value) {
-            flightCounter.cancel();
-            flightHandled.value = true;
-        }
-        throw e;
+        $A.logger.auraErrorHelper(e, action);
+        // FIXME: we should not be calling $A.error here.
+        $A.error(e);
     }
 };
 
@@ -653,9 +576,76 @@ AuraClientService.prototype.isManifestPresent = function() {
 };
 
 /**
+ * Check to see if an action should be aborted.
+ *
+ * @param {Action} the action to check.
+ * @returns true if the action was aborted
+ */
+AuraClientService.prototype.maybeAbortAction = function(action) {
+    if (action.isAbortable() && action.getAbortableId() !== this.lastTransactionId) {
+        // whoops, action is already aborted.
+                action.abort();
+        return true;
+            }
+    return false;
+};
+
+/**
+ * Count the available XHRs, including abortable ones.
+ */
+AuraClientService.prototype.countAvailableXHRs = function(isBackground) {
+    // FIXME : this needs to figure out what XHRs can be aborted.
+    return this.availableXHRs.length;
+};
+
+/**
+ * Get an available XHR, possibly aborting others.
+ *
+ * Used for instrumentation
+ *
+ * This function MUST be called after a call to countAvailableXHRs().
+ *
+ * @param {Boolean} isBackground is the XHR for a background action.
+ */
+AuraClientService.prototype.getAvailableXHR = function(isBackground) {
+    //FIXME : this needs to abort XHRs.
+    //FIXME : fhe foreground check will go away.
+    if (!isBackground && this.foregroundXHR) {
+        return null;
+                }
+    if (isBackground && !this.foregroundXHR && this.availableXHRs.length === 1) {
+        // FIXME: this is bogux and will change.
+        return null;
+            }
+    var auraXHR = this.availableXHRs.pop();
+    if (auraXHR) {
+        auraXHR.mark(!isBackground);
+        if (!isBackground) {
+            this.foregroundXHR = auraXHR;
+        }
+    }
+    return auraXHR;
+};
+
+/**
+ * Releas an xhr back in to the pool.
+ *
+ * @export
+ */
+AuraClientService.prototype.releaseXHR = function(auraXHR) {
+    if (auraXHR.foreground) {
+        this.foregroundXHR = undefined;
+        }
+    auraXHR.reset();
+    this.availableXHRs.push(auraXHR);
+};
+
+
+/**
  * Perform a hard refresh.
  *
  * @memberOf AuraClientService
+ * @export
  */
 AuraClientService.prototype.hardRefresh = function() {
     var url = location.href;
@@ -772,15 +762,12 @@ AuraClientService.prototype.handleAppCache = function() {
 
         if (manifestURL) {
             setTimeout(function() {
-                $A.util.transport["request"]({
-                    "url" : manifestURL,
-                    "method" : "GET",
-                    "callback" : function() {
-                    },
-                    "params" : {
+                var xhr = acs.createXHR();
+                qs = acs.buildParams({
                         "aura.error" : "true"
-                    }
                 });
+                xhr["open"]("GET", manifestURL+"?"+qs, true);
+                xhr["send"]();
             }, 500);
         }
 
@@ -836,6 +823,7 @@ AuraClientService.prototype.handleAppCache = function() {
  * Marks the application as outdated.
  *
  * @memberOf AuraClientService
+ * @export
  */
 AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
@@ -855,7 +843,7 @@ AuraClientService.prototype.setOutdated = function() {
  * @param {Boolean} isConnected Set to true to run Aura in online mode,
  * or false to run Aura in offline mode.
  * @memberOf AuraClientService
- * @public
+ * @export
  */
 AuraClientService.prototype.setConnected = function(isConnected) {
     var isDisconnected = !isConnected;
@@ -912,7 +900,7 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
  * Note that in testing, this can be used to make the host appear unreachable.
  *
  * @param {string} host the host name of the server.
- * @public
+ * @export
  */
 AuraClientService.prototype.initHost = function(host) {
     this._host = host || "";
@@ -925,13 +913,15 @@ AuraClientService.prototype.initHost = function(host) {
 /**
  * Initialize aura.
  *
+ * FIXME: why is this exported
+ *
  * This should never be called by client code.
  *
  * @param {Object} config the configuration for aura.
  * @param {string} token the XSS token.
  * @param {function} callback the callback when init is complete.
  * @param {object} container the place to install aura (defaults to document.body).
- * @private
+ * @export
  */
 AuraClientService.prototype.init = function(config, token, container) {
     $A.Perf.mark("Initial Component Created");
@@ -978,17 +968,20 @@ AuraClientService.prototype.init = function(config, token, container) {
  * @private
  */
 AuraClientService.prototype.idle = function() {
-    return this.foreground.idle() && this.background.idle() && this.actionQueue.actions.length === 0;
+    return (this.actionsQueued.length === 0 && this.actionsDeferred.length === 0
+        && this.availableXHRs.length === this.allXHRs.length);
 };
 
 /**
  * Initialize definitions.
  *
+ * FIXME: why is this exported 
+ *
  * This should never be called by client code. It is exposed, but deleted after
  * first use.
  *
  * @param {Object} config the set of definitions to initialize
- * @private
+ * @export
  */
 
 AuraClientService.prototype.initDefs = function(config) {
@@ -1184,25 +1177,6 @@ AuraClientService.prototype.inAuraLoop = function() {
 };
 
 /**
- * Check to see if a public pop should be allowed.
- *
- * We allow a public pop if the name was pushed, or if there is nothing
- * on the stack.
- *
- * @param {string} name the name of the public 'pop' that will happen.
- * @return {Boolean} true if the pop should be allowed.
- */
-AuraClientService.prototype.checkPublicPop = function(name) {
-    if (this.auraStack.length > 0) {
-        return this.auraStack[this.auraStack.length-1] === name;
-    }
-    //
-    // Allow public pop calls on an empty stack for now.
-    //
-    return true;
-};
-
-/**
  * Push a new name on the stack.
  *
  * @param {string} name the name of the item to push.
@@ -1235,43 +1209,660 @@ AuraClientService.prototype.popStack = function(name) {
     }
 
     if (this.auraStack.length === 0) {
+        this.auraStack.push("AuraClientService$popStack");
         try {
-            this.handleProcessing(name);
+            this.process();
         } catch (e) {
-            // this should be very unlikely, but we need to finish processing here.
-            $A.error("AuraClientService.popStack(): Failed during processing", e);
-        } finally {
-            this.auraStack = [];
-            this.actionQueue.incrementNextTransactionId();
-            this.actionQueue.setCurrentAbortableId(undefined);
+            $A.error("AuraClientService.popStack: error in processing", e);
+        }
+        this.auraStack.pop();
+        this.nextTransactionId += 1;
+        this.currentTransactionId = undefined;
+    }
+};
+
+/**
+ * Run the collection of actions.
+ *
+ * Entry point for processing actions. This creates a collector, and parcels out the action handling.
+ * After this, server actions will be either getting values from storage, or will be executed, and the
+ * client actions will all be queued up to be executed in order via setTimeout, giving server actions
+ * entry points to collect.
+ */
+AuraClientService.prototype.process = function() {
+    if (this.collector) {
+        return;
+    }
+    this.collector = new Aura.Services.AuraClientService$AuraActionCollector();
+    this.collector.transactionId = this.currentTransactionId;
+    this.continueProcessing();
+};
+
+/**
+ * continuation.
+ *
+ * Setp 2: walk actions setting up collections.
+ *
+ * We divide into client actions and server actions. Server actions are further
+ * divided into stored vs. non-stored.
+ */
+AuraClientService.prototype.continueProcessing = function() {
+    var i;
+    var index = 0;
+    var action;
+    var actionList;
+
+    // Protect against server actions collecting early.
+    this.collector.actionsToCollect += 1;
+    actionList = this.actionsQueued;
+    this.actionsQueued = [];
+    for (i = 0; i < actionList.length; i++) {
+        action = actionList[i];
+        try {
+            if (this.maybeAbortAction(action)) {
+                // action alrealy aborted.
+                continue;
+            }
+            if (action.getDef().isServerAction()) {
+                this.collector.actionsToCollect += 1;
+                var storage = action.getStorage();
+                this.collector.collected[index] = undefined;
+                if (!action.isRefreshAction() && action.isStorable() && storage) {
+                    this.getStoredResult(action, storage, index);
+                } else {
+                    this.collectServerAction(action, index);
+                }
+                index += 1;
+            } else {
+                this.collector.clientActions.push(action);
+            }
+        } catch (e) {
+            $A.logger.auraErrorHelper(e, action);
+        }
+    }
+    this.collector.actionsToCollect -= 1;
+    // Start our index at 0
+    this.collector.clientIndex = 0;
+    if (this.optionClientSynchronous) {
+        this.runClientActions();
+    } else {
+        this.continueClientActions();
+    }
+};
+
+/**
+ * Handle a single server action.
+ */
+AuraClientService.prototype.getStoredResult = function(action, storage, index) {
+    //
+    // For cacheable actions check the storage service to see if we already have a viable cached action
+    // response we can complete immediately. In this case, we get a callback, so we create a callback
+    // for each one (ugh, this could have been handled via passing an additional param to the action,
+    // but we don't have that luxury now.)
+    //
+    var that = this;
+    var key;
+
+    key = action.getStorageKey();
+    // using storage so callbacks *must* be in an aura loop
+    storage.get(key).then(
+        function(value) {
+            if (value && value.value) {
+                if (that.optionStoredAfterSend) {
+                    that.enqueueStoredAction(action, value.value);
+                } else {
+                    that.executeStoredAction(action, value.value, that.collector.collected, index);
+                }
+                that.collector.actionsToCollect -= 1;
+                that.finishCollection();
+            } else {
+                that.collectServerAction(action, index);
+            }
+        },
+        function(err) {
+            // error fetching from storage so go to the server
+            that.collectServerAction(action, index);
+        }
+    );
+};
+
+/**
+ * Enqueue a stored action for execution after the XHR send.
+ */
+AuraClientService.prototype.enqueueStoredAction = function(action, response) {
+    this.collector.actionsToComplete.push({ "action":action, "response":response});
+};
+
+/**
+ * Execute a single stored action.
+ *
+ * This is done in situ when we get a result from the storage service. We also queue up a refresh
+ * action if we are due a refresh or we have trouble running the action.
+ */
+AuraClientService.prototype.executeStoredAction = function(action, response, collected, index) {
+    var refreshAction = null;
+
+    this.setInCollection();
+    try {
+        if (!this.maybeAbortAction(action)) {
+            try {
+                action.updateFromResponse(response);
+                action.finishAction($A.getContext());
+            } catch (e) {
+                refreshAction = action.getRetryFromStorageAction();
+                $A.warning("Finishing cached action failed. Trying to refetch from server: "
+                    + refreshAction.getStorageKey(), e);
+                // Clear potential leftover configs
+                $A.getContext().clearComponentConfigs(action.getId());
+            }
+            this.collector.actionsCompleted += 1;
+            if (!refreshAction) {
+                refreshAction = action.getRefreshAction(response);
+            }
+            if (refreshAction) {
+                action.fireRefreshEvent("refreshBegin");
+                collected[index] = refreshAction;
+            }
+        }
+    } catch (e) {
+        $A.logger.auraErrorHelper(e, action);
+    } finally {
+        this.clearInCollection();
+    }
+};
+
+/**
+ * Collect a single action into our list.
+ */
+AuraClientService.prototype.collectServerAction = function(action, index) {
+    this.collector.collected[index] = action;
+    this.collector.actionsToCollect -= 1;
+    this.finishCollection();
+};
+
+/**
+ * Run client actions asynchronously.
+ */
+AuraClientService.prototype.continueClientActions = function() {
+    var that = this;
+
+    if (this.collector.clientIndex < this.collector.clientActions.length) {
+        setTimeout(function() {
+            that.setInCollection();
+            that.executeClientAction(that.collector.clientActions[that.collector.clientIndex]);
+            that.clearInCollection();
+            that.collector.clientIndex += 1;
+            that.continueClientActions();
+        }, 0);
+    } else {
+        this.collector.clientActions = [];
+        this.finishCollection();
+    }
+};
+
+/**
+ * Run client actions synchronously.
+ */
+AuraClientService.prototype.runClientActions = function() {
+    var i;
+
+    this.setInCollection();
+    for (i = 0; i < this.collector.clientActions.length; i++) {
+        this.executeClientAction(this.collector.clientActions[i]);
+    }
+    this.clearInCollection();
+    this.collector.clientActions = [];
+    this.finishCollection();
+};
+
+/**
+ * Execute a client action.
+ */
+AuraClientService.prototype.executeClientAction = function(action) {
+    try {
+        if (!this.maybeAbortAction(action)) {
+            action.runDeprecated();
+            action.finishAction($A.getContext());
+        }
+    } catch (ignore) {
+        // already handled in the action.
+    }
+};
+
+/**
+ * Finish the collection process and send XHRs.
+ */
+AuraClientService.prototype.finishCollection = function() {
+    if (this.collector.actionsToCollect !== 0 || this.collector.clientActions.length) {
+        return;
+    }
+    if (this.collector.actionsCompleted) {
+        this.fireDoneWaiting();
+    }
+    this.actionsDeferred = this.actionsDeferred.concat(this.collector.collected);
+    this.collector.collected = [];
+    if (this.actionsQueued.length) {
+        this.continueProcessing();
+        return;
+    }
+    if (this.actionsDeferred.length) {
+        // optionSend_v33
+        this.sendActionXHRsv33();
+    }
+
+    //
+    // This will only be true if we opt for stored actions after send.
+    //
+    if (this.collector.actionsToComplete.length) {
+        for (i = 0; i < this.collector.actionsToComplete.length; i++) {
+            this.collector.collected.push(undefined);
+        }
+        this.continueCompletions();
+    } else {
+        this.finishProcessing();
+    }
+};
+
+/**
+ * Send actions, mimicking v.33 behaviour.
+ */
+AuraClientService.prototype.sendActionXHRsv33 = function() {
+    var processing;
+    var foreground = [];
+    var background = [];
+    var action, auraXHR;
+    var caboose = 0;
+    var transactionId = this.collector.transactionId;
+    var i;
+
+    //
+    // FIXME: First cut. this is the same as the previous handling, where we only allow one
+    // foreground and three background actions.
+    //
+    processing = this.actionsDeferred;
+    this.actionsDeferred = [];
+    for (i = 0; i < processing.length; i++) {
+        action = processing[i];
+        if (!action) {
+            continue;
+        }
+        if (this.maybeAbortAction(action)) {
+            continue;
+        }
+        if (action.isAbortable()) {
+            transactionId = action.getAbortableId();
+        }
+        if (action.isBackground()) {
+            background.push(action);
+        } else {
+            foreground.push(action);
+            if (action.isCaboose()) {
+                caboose += 1;
+            }
+        }
+    }
+    if (transactionId === undefined) {
+        transactionId = this.lastTransactionId;
+    }
+
+    if (foreground.length > caboose) {
+        auraXHR = this.getAvailableXHR(false);
+        if (auraXHR) {
+            auraXHR.transactionId = transactionId;
+            if (!this.send(auraXHR, foreground, "POST")) {
+                this.releaseXHR(auraXHR);
+                auraXHR = null;
+            }
+        }
+        if (!auraXHR) {
+            this.actionsDeferred = this.actionsDeferred.concat(foreground);
+        }
+    } else {
+        this.actionsDeferred = this.actionsDeferred.concat(foreground);
+    }
+
+    if (background.length) {
+        for (i = 0; i < background.length; i++) {
+            action = background[i];
+            auraXHR = this.getAvailableXHR(true);
+            if (auraXHR) {
+                auraXHR.transactionId = transactionId;
+                if (!this.send(auraXHR, [ action ], "POST")) {
+                    this.releaseXHR(auraXHR);
+                    auraXHR = null;
+                }
+            }
+            if (!auraXHR) {
+                this.actionsDeferred.push(action);
+            }
         }
     }
 };
 
-AuraClientService.prototype.handleProcessing = function(name) {
-    var tmppush = "$A.clientServices.popStack";
-    var lastName;
-    var count = 0;
-    var done;
 
-    this.auraStack.push(tmppush);
-    this.processActions();
-    done = !$A["finishedInit"];
-    while (!done && count <= 15) {
-        $A.renderingService.rerenderDirty(name);
+AuraClientService.prototype.continueCompletions = function() {
+    var that = this;
 
-        done = !this.processActions();
+    if (this.collector.completionIndex < this.collector.actionsToComplete.length) {
+        setTimeout(function() {
+            var collected = [ null ];
+            var completion = that.collector.actionsToComplete[that.collector.completionIndex];
+            that.executeStoredAction(completion["action"], completion["response"], collected, 0);
+            that.collector.completionIndex += 1;
+            if (collected[0]) {
+                that.enqueueAction(collected[0]);
+            }
+            that.continueCompletions();
+        }, 0);
+    } else {
+        if (this.actionsQueued.length) {
+            this.continueProcessing();
+        } else {
+            this.finishProcessing();
+        }
+    }
+};
 
-        count += 1;
-        if (count > 14) {
-            $A.error("popStack has not completed after 15 loops");
+AuraClientService.prototype.finishProcessing = function() {
+    if (this.collector.completionIndex < this.collector.actionsToComplete.length) {
+        throw new Error("Bah!!!");
+    }
+    this.setInCollection();
+    try {
+        $A.renderingService.rerenderDirty();
+        } catch (e) {
+        $A.logger.auraErrorHelper(e);
+        } finally {
+        this.clearInCollection();
+        if (this.actionsQueued.length > 0) {
+            this.continueProcessing();
+        } else {
+            this.collector = undefined;
+        }
+    }
+};
+
+/**
+ * Send an xhr with a set of actions.
+ *
+ * The only note here is that if we fail to serialize the actions for any reason, we will log an
+ * error and error out the actions. This is because we don't have a way of determining which of the
+ * actions errored out.
+ *
+ * Used for instrumentation.
+ *
+ * @param auraXHR the wrapped XHR.
+ * @param actions the set of actions to send.
+ * @param method GET or POST
+ * @param options extra options for the send, allows callers to set headers.
+ * @return true if the actions were sent, otherwise false.
+ */
+AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
+    var actionsToSend = [];
+    var that = this;
+    var action;
+    var context = $A.getContext();
+
+    for (var i = 0; i < actions.length; i++) {
+        action = actions[i];
+        if (!action.callAllAboardCallback(context)) {
+            action.finishAction(context);
+            continue;
+        }
+        auraXHR.addAction(action);
+        if (action.isChained()) {
+            continue;
+        }
+        actionsToSend.push(action);
+    }
+    if (actionsToSend.length === 0) {
+        return false;
+    }
+
+    var processed = false;
+    try {
+        qs = this.buildParams({
+            "message" : $A.util.json.encode({
+                "actions" : actionsToSend
+            }),
+            "aura.token" : this._token,
+            "aura.context" : context.encodeForServer()
+        });
+    } catch (e) {
+        for (var i = 0; i < actions.length; i++) {
+            action = actions[i];
+            action.markException(e);
+            action.finishAction(context);
         }
     }
 
-    // Force our stack to nothing.
-    lastName = this.auraStack.pop();
-    if (lastName !== tmppush) {
-        $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+auraStack);
+    var url = this._host+"/aura";
+    if (qs && method !== "POST") {
+        url = url + "?" + qs;
+    }
+
+    auraXHR.length = qs.length;
+    auraXHR.request = this.createXHR();
+    auraXHR.request["open"](method, url, true);
+    auraXHR.request["onreadystatechange"] = function() {
+        // Ordering is important. auraXHR will no longer be valid after processed.
+        if (processed == false && auraXHR.request["readyState"] == 4) {
+            processed = true;
+            that.receive(auraXHR);
+        }
+    };
+    if (options && options["headers"]) {
+        var key, headers = options["headers"];
+
+        for (key in headers) {
+            if (headers.hasOwnProperty(key)) {
+                auraXHR.request.setRequestHeader(key, headers[key]);
+            }
+        }
+    }
+    if (qs && method === "POST") {
+        auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
+        auraXHR.request["send"](qs);
+    } else {
+        auraXHR.request["send"]();
+    }
+    setTimeout(function() {
+        $A.get("e.aura:waiting").fire();
+    }, 1);
+    return true;
+};
+
+
+/**
+ * @returns {Object} An XHR based on what is available on the current browser.
+ * @private
+ */
+AuraClientService.prototype.createXHR = function() {
+    if (this.httpType) {
+        if (this.httpType === 'generic') {
+            return new XMLHttpRequest();
+        } else if (this.httpType === 'msxml2') {
+            return new ActiveXObject("Msxml2.XMLHTTP");
+        } else {
+            return new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    }
+    // UGLY!!!!
+    if (window.ActiveXObject) {
+        try {
+            this.httpType = 'msxml2';
+            return new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            this.httpType = 'msxml';
+            // If this throws, we are out of ideas anyway, so just "let it throw, let it throw, let it throw".
+            return new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    } else {
+        throw new Error("AuraClientService.createXHR: Unable to find an appropriate XHR");
+    }
+};
+
+/**
+ * Create an encoded string of parameters.
+ * 
+ * @param {Map} map A map of parameter names and values
+ * @returns {String} The encoded parameters
+ * @private
+ */
+AuraClientService.prototype.buildParams = function(map) {
+    var arr = [];
+    var first = true;
+    for (var key in map) {
+        if (!first) {
+            arr.push("&");
+        }
+        first = false;
+        if ($A.util.isArray(map[key])) {
+            var valueArray = map[key];
+            if (valueArray.length === 0) {
+                arr.push(key);
+                arr.push("=");
+            } else {
+                for ( var i = 0; i < valueArray.length; i++) {
+                    if (i > 0) {
+                        arr.push("&");
+                    }
+                    arr.push(key);
+                    arr.push("=");
+                    arr.push(encodeURIComponent(valueArray[i]));
+                }
+            }
+        } else {
+            arr.push(key);
+            arr.push("=");
+            arr.push(encodeURIComponent(map[key]));
+        }
+    }
+    return arr.join("");
+};
+
+/**
+ * Callback for an XHR for a set of actions.
+ *
+ * This function does all of the processing for a set of actions that come back from the server. It correctly deals
+ * with the case of interrupted communications, and handles aborts.
+ *
+ * @param {AuraXHR} the xhr container.
+ * @private
+ */
+AuraClientService.prototype.receive = function(auraXHR) {
+    this.auraStack.push("AuraClientService$receive");
+    if (auraXHR.transactionId) {
+        this.setCurrentTransactionId(auraXHR.transactionId);
+    }
+    try {
+        var responseMessage = this.decode(auraXHR.request);
+        var noAbort = (auraXHR.transactionId === this.lastTransactionId);
+
+        if (responseMessage) {
+            this.processResponses(auraXHR, responseMessage, noAbort);
+        } else if (!this.isUnloading) {
+            this.processIncompletes(auraXHR, noAbort);
+        }
+        this.fireDoneWaiting();
+    } catch (e) {
+        $A.error("AuraClientService.receive action callback failed", e);
+    } finally {
+        this.auraStack.pop();
+        this.setCurrentTransactionId(undefined);
+        this.releaseXHR(auraXHR);
+        this.process();
+    }
+};
+
+AuraClientService.prototype.processResponses = function(auraXHR, responseMessage, noAbort) {
+    var action, actionResponses, response;
+    var token = responseMessage["token"];
+    if (token) {
+        this._token = token;
+        try {
+            this.saveTokenToStorage();
+        } catch (e) {
+            $A.logger.auraErrorHelper(e);
+        }
+    }
+
+    try {
+        $A.getContext()['merge'](responseMessage["context"]);
+    } catch (e) {
+        $A.logger.auraErrorHelper(e);
+    }
+
+    // Look for any Client side event exceptions
+    var events = responseMessage["events"];
+    if (events) {
+        for ( var en = 0, len = events.length; en < len; en++) {
+            try {
+                this.parseAndFireEvent(events[en]);
+            } catch (e) {
+                $A.logger.auraErrorHelper(e);
+            }
+        }
+    }
+
+    actionResponses = responseMessage["actions"];
+
+    // Process each action and its response
+    for ( var r = 0; r < actionResponses.length; r++) {
+        action = null;
+        try {
+            response = actionResponses[r];
+            action = auraXHR.getAction(response["id"]);
+            if (action == null) {
+                action = this.buildFakeAction(response);
+            }
+            if (action == null) {
+                throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
+            } else {
+                this.singleAction(action, noAbort, response);
+            }
+        } catch (e) {
+            $A.logger.auraErrorHelper(e, action);
+            $A.error(e);
+        }
+    }
+};
+
+AuraClientService.prototype.buildFakeAction = function(response) {
+    var action = null;
+    if (response["storable"]) {
+        //
+        // Hmm, we got a missing action. We allow this in the case that we have
+        // a storable action from the server (i.e. we are faking an action from the
+        // server to store data on the client. This is only used in priming, and is
+        // more than a bit of a hack.
+        //
+        // Create a client side action instance to go with the server created action response
+        //
+        var descriptor = response["action"];
+        var actionDef = $A.services.component.getActionDef(descriptor);
+        action = actionDef.newInstance();
+        action.setStorable();
+        action.setParams(response["params"]);
+        action.setAbortable(false);
+        action.updateFromResponse(response);
+    }
+    return action;
+};
+
+AuraClientService.prototype.processIncompletes = function(auraXHR, noAbort) {
+    var actions = auraXHR.actions;
+    var id;
+
+    for (id in actions) {
+        if (actions.hasOwnProperty(id)) {
+            action = actions[id];
+            if (noAbort || !action.isAbortable()) {
+                action.incomplete($A.getContext());
+            } else {
+                action.abort();
+            }
+        }
     }
 };
 
@@ -1299,10 +1890,12 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
 /**
  * Reset the token.
  *
+ * Used by plugins.
+ *
  * @param {Object}
  *            newToken Refresh the current token with a new one.
  * @memberOf AuraClientService
- * @private
+ * @export
  */
 AuraClientService.prototype.resetToken = function(newToken) {
     this._token = newToken;
@@ -1326,7 +1919,7 @@ AuraClientService.prototype.resetToken = function(newToken) {
  *            callback The callback function to run
  * @memberOf AuraClientService
  * @deprecated
- * @public
+ * @export
  */
 AuraClientService.prototype.runActions = function(actions, scope, callback) {
     var i;
@@ -1339,10 +1932,10 @@ AuraClientService.prototype.runActions = function(actions, scope, callback) {
     };
 
     for (i = 0; i < actions.length; i++) {
-        this.actionQueue.enqueue(actions[i]);
+        this.enqueueAction(actions[i]);
         actions[i].setCompletion(completion);
     }
-    this.processActions();
+    this.process();
 };
 
 /**
@@ -1355,7 +1948,7 @@ AuraClientService.prototype.runActions = function(actions, scope, callback) {
  * @param {String} locatorDomId the DOM id where we should place our element.
  * @param {String} localId the local id for the component to be created.
  * @memberOf AuraClientService
- * @public
+ * @export
  */
 AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
     var config = $A.util.json.resolveRefs(rawConfig);
@@ -1495,6 +2088,7 @@ AuraClientService.prototype.renderInjection = function(component, locatorDomId, 
  * @param {Object} config - component def config
  * @param {String} locatorDomId - id of element to inject component
  * @param {Object} [eventHandlers] - handlers of registered event
+ * @export
  */
 AuraClientService.prototype.injectComponentAsync = function(config, locatorDomId, eventHandlers) {
     var acs = this;
@@ -1541,32 +2135,69 @@ AuraClientService.prototype.addComponentHandlers = function(component, actionEve
  * Immediate and future communication with the server may fail.
  * @memberOf AuraClientService
  * @return {Boolean} Returns true if Aura believes it is online; false otherwise.
- * @public
+ * @export
  */
 AuraClientService.prototype.isConnected = function() {
     return !this._isDisconnected;
 };
 
+AuraClientService.prototype.clearPreviousAbortableActions = function() {
+    var actions = this.actionsQueued;
+    var i;
+
+    this.actionsQueued = [];
+    for (i = 0; i < actions.length; i++) {
+        if (!this.maybeAbortAction(actions[i])) {
+            this.actionsQueued.push(actions[i]);
+        }
+    }
+    actions = this.actionsDeferred;
+    this.actionsDeferred = [];
+    for (i = 0; i < actions.length; i++) {
+        if (!this.maybeAbortAction(actions[i])) {
+            this.actionsDeferred.push(actions[i]);
+        }
+    }
+};
+
 /**
- * Queue an action for execution after the current event loop has ended.
+ * [DEPRECATED] Queue an action for execution after the current event loop has ended.
+ *
+ * FIXME: this should not be public. Its use is deprecated.
  *
  * This function must be called from within an event loop.
  *
  * @param {Action} action the action to enqueue
- * @param {Boolean} background Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
  * @memberOf AuraClientService
- * @public
+ * @export
  */
-// TODO: remove boolean trap http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html
 AuraClientService.prototype.enqueueAction = function(action, background) {
     $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
-    $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
-
+    $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action",
+            "Cannot call EnqueueAction() with a non Action parameter.");
     if (background) {
-        action.setBackground();
+        $A.warning("Do not use the deprecated background parameter");
     }
-
-    this.actionQueue.enqueue(action);
+    if (action.isAbortable()) {
+        if (action.getAbortableId() === undefined) {
+            // need a ququeId
+            action.setAbortableId(this.getCurrentTransactionId());
+            if (action.getAbortableId() === this.nextTransactionId
+                    && this.lastTransactionId !== this.nextTransactionId) {
+                // FIXME: this is where we need to add queue iDs.
+                this.lastTransactionId = this.nextTransactionId;
+                this.actions = this.clearPreviousAbortableActions();
+            } else if (this.currentTransactionId !== undefined && this.currentTransactionId != this.lastTransactionId) {
+                action.abort();
+                return;
+            }
+        } else if (this.maybeAbortAction(action)) {
+            // whoops, action is already aborted.
+            return;
+        }
+        this.currentTransactionId = action.getAbortableId();
+    }
+    this.actionsQueued.push(action);
 };
 
 /**
@@ -1574,9 +2205,9 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
  * Configure your action excluding the callback prior to deferring.
  * The Promise is a thenable, meaning it exposes a 'then' function for consumers to chain updates.
  *
- * @public
  * @param {Action} action - target action
  * @return {Promise} a promise which is resolved or rejected depending on the state of the action
+ * @export
  */
 AuraClientService.prototype.deferAction = function (action) {
     $A.warning("$A.deferAction is broken, do not use it!");
@@ -1615,6 +2246,7 @@ AuraClientService.prototype.hasActionStorage = function() {
  * @param {Object} params - map of keys to parameter values.
  * @param {Function} callback - called asynchronously after the action was looked up in the cache. Fired with a
  * single parameter, isInStorge {Boolean} - representing whether the action was found in the cache.
+ * @export
  */
 AuraClientService.prototype.isActionInStorage = function(descriptor, params, callback) {
     var storage = Action.getStorage();
@@ -1630,6 +2262,9 @@ AuraClientService.prototype.isActionInStorage = function(descriptor, params, cal
             $A.run(function() {
                 callback(!!response && !!response.value && !response.isExpired);
             });
+        }, function(error) {
+            // FIXME: what to do.
+            $A.error(error);
         });
 };
 
@@ -1641,6 +2276,7 @@ AuraClientService.prototype.isActionInStorage = function(descriptor, params, cal
  * @param {Function} callback - called asynchronously after the action was revalidated. Called with a single
  * parameter, wasRevalidated {Boolean} - representing whether the action was found in the cache and
  * successfully revalidated.
+ * @export
  */
 AuraClientService.prototype.revalidateAction = function(descriptor, params, callback) {
     var storage = Action.getStorage();
@@ -1655,10 +2291,15 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
     storage.get(actionKey).then(function(response) {
         if (!!response && !!response.value) {
             storage.put(actionKey, response.value)
-                .then(function() { callback(true); });
+                .then(function() { callback(true); }, function(err) {
+                    // FIXME: what to do.
+                });
         } else {
             callback(false);
         }
+    }, function(error) {
+        //FIXME: what to do
+        $A.error(error);
     });
 };
 
@@ -1670,6 +2311,7 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
  * @param successCallback {Function} called after the action was invalidated. Called with true if the action was
  * successfully invalidated and false if the action was invalid or was not found in the cache.
  * @param errorCallback {Function} called if an error occured during execution
+ * @export
  */
 AuraClientService.prototype.invalidateAction = function(descriptor, params, successCallback, errorCallback) {
     var storage = Action.getStorage();
@@ -1683,51 +2325,6 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
 
     storage.remove(Action.getStorageKey(descriptor, params))
         .then(function() { successCallback(true); }, errorCallback );
-};
-
-/**
- * process the current set of actions, looping if needed.
- *
- * This runs the current action set.
- *
- * @private
- */
-AuraClientService.prototype.processActions = function() {
-    var actions;
-    var processedActions = false;
-    var action;
-
-    actions = this.actionQueue.getClientActions();
-    if(actions.length > 0) {
-        this.runClientActions(actions);
-        processedActions = true;
-    }
-
-    //
-    // Only send forground actions if we have something that
-    // needs to be sent (force boxcar will delay this)
-    // FIXME: we need measures of how long this delays things.
-    //
-    if (this.actionQueue.needXHR() && this.foreground.start()) {
-        actions = this.actionQueue["getServerActions"]();
-        if (actions.length > 0) {
-            this.request(actions, this.foreground);
-            processedActions = true;
-        } else {
-            this.foreground.cancel();
-        }
-    }
-
-    if (this.background.start()) {
-        action = this.actionQueue.getNextBackgroundAction();
-        if (action !== null) {
-            this.request([action], this.background);
-            processedActions = true;
-        } else {
-            this.background.cancel();
-        }
-    }
-    return processedActions;
 };
 
 AuraClientService.prototype.allowAccess = function(definition, component) {
@@ -1770,26 +2367,5 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
     }
     return false;
 };
-
-exp(AuraClientService.prototype,
-    // FIXME: initHost is used in a single UI test in SFDC.
-    "initHost", AuraClientService.prototype.initHost,
-    "init", AuraClientService.prototype.init,
-    "initDefs", AuraClientService.prototype.initDefs,
-    "enqueueAction", AuraClientService.prototype.enqueueAction,
-    //FIXME: deferAction is broken, should never have existed, and needs to die.
-    "deferAction", AuraClientService.prototype.deferAction,
-    "runActions", AuraClientService.prototype.runActions,
-    "resetToken", AuraClientService.prototype.resetToken,
-    "hardRefresh", AuraClientService.prototype.hardRefresh,
-    "setOutdated", AuraClientService.prototype.setOutdated,
-    "injectComponent", AuraClientService.prototype.injectComponent,
-    "injectComponentAsync", AuraClientService.prototype.injectComponentAsync,
-    "isConnected", AuraClientService.prototype.isConnected,
-    "setConnected", AuraClientService.prototype.setConnected,
-    "isActionInStorage", AuraClientService.prototype.isActionInStorage,
-    "revalidateAction", AuraClientService.prototype.revalidateAction,
-    "invalidateAction", AuraClientService.prototype.invalidateAction
-);
 
 Aura.Services.AuraClientService = AuraClientService;

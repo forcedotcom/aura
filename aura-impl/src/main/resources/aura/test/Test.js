@@ -35,6 +35,10 @@ TestInstance = function() {
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
+
+    this.blockForeground = 0;
+    this.blockBackground = 0;
+    this.sentXHRCount = 0;
 };
 
 //#include aura.test.Test_private
@@ -79,7 +83,7 @@ TestInstance.prototype.addWaitFor = function(expected, testFunction, callback){
  * <code>$A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});</code>
  *
  * @param {Object} success true if the action should succeed.
- * @param {Object} actionName the name of the action from createAction or markForCompletion
+ * @param {Object} actionName the name of the action from createAction
  * @param {Function} callback Invoked after the action completes
  */
 TestInstance.prototype.addWaitForAction = function(success, actionName, callback) {
@@ -126,6 +130,7 @@ TestInstance.prototype.addWaitForWithFailureMessage = function(expected, testFun
     this.waits.push({ expected:expected, actual:testFunction, callback:callback , failureMessage:failureMessage});
 };
 
+
 /**
  * Block requests from being sent to the server.
  *
@@ -134,22 +139,22 @@ TestInstance.prototype.addWaitForWithFailureMessage = function(expected, testFun
  * queueing on the client).
  */
 TestInstance.prototype.blockRequests = function () {
-    this.blockForegroundRequests();
-    this.blockBackgroundRequests();
+    this.blockForeground +=1;
+    this.blockBackground +=1;
 };
 
 /**
  * Block only foreground actions from being sent to the server.
  */
 TestInstance.prototype.blockForegroundRequests = function() {
-    $A.clientService.foreground.inFlight += $A.clientService.foreground.max;
+    this.blockForeground +=1;
 };
 
 /**
  * Block only background actions from being sent to the server.
  */
 TestInstance.prototype.blockBackgroundRequests = function() {
-    $A.clientService.background.inFlight += $A.clientService.background.max;
+    this.blockBackground +=1;
 };
 
 /**
@@ -158,8 +163,9 @@ TestInstance.prototype.blockBackgroundRequests = function() {
  * This must be called after blockRequests, otherwise it may result in unknown consequences.
  */
 TestInstance.prototype.releaseRequests = function () {
-    this.releaseForegroundRequests();
-    this.releaseBackgroundRequests();
+    this.blockForeground -=1;
+    this.blockBackground -=1;
+    $A.clientService.process();
 };
 
 /**
@@ -169,9 +175,8 @@ TestInstance.prototype.releaseRequests = function () {
  * unknown consequences.
  */
 TestInstance.prototype.releaseForegroundRequests = function() {
-    $A.run(function() {
-        $A.clientService.foreground.inFlight -= $A.clientService.foreground.max;
-    });
+    this.blockForeground -=1;
+    $A.clientService.process();
 };
 
 /**
@@ -181,9 +186,8 @@ TestInstance.prototype.releaseForegroundRequests = function() {
  * unknown consequences.
  */
 TestInstance.prototype.releaseBackgroundRequests = function() {
-    $A.run(function() {
-        $A.clientService.background.inFlight -= $A.clientService.background.max;
-    });
+    this.blockBackground -=1;
+    $A.clientService.process();
 };
 
 /**
@@ -193,7 +197,7 @@ TestInstance.prototype.releaseBackgroundRequests = function() {
  * we are only sending the necessary amount of requests.
  */
 TestInstance.prototype.getSentRequestCount = function () {
-    return $A.clientService.foreground.sent + $A.clientService.background.sent;
+    return this.sentXHRCount;
 };
 
 /**
@@ -201,6 +205,7 @@ TestInstance.prototype.getSentRequestCount = function () {
  */
 TestInstance.prototype.areActionsComplete = function(actions) {
     var state;
+    var i;
 
     this.assertTrue($A.util.isArray(actions), "actions must be an array");
     for (i = 0; i < actions.length; i++) {
@@ -210,13 +215,6 @@ TestInstance.prototype.areActionsComplete = function(actions) {
         }
     }
     return true;
-};
-
-/**
- * Get the current ActionQueue.
- */
-TestInstance.prototype.getActionQueue = function() {
-    return $A.clientService.actionQueue;
 };
 
 /**
@@ -246,7 +244,7 @@ TestInstance.prototype.getAction = function(component, name, params, callback){
         if ($A.util.isFunction(callback)) {
             action.setCallback(component, callback);
         } else {
-            this.markForCompletion(action, callback);
+            $A.test.fail("getAction: callback must be a function");
         }
     }
     return action;
@@ -353,86 +351,6 @@ TestInstance.prototype.isActionPending = function() {
 };
 
 /**
- * Mark an action so we can tell when it is complete.
- *
- * This sets the callback on the action to mark the action complete.
- * The action passed in may have a callback set previously, if so, that
- * callback will be called before the action is set as complete.
- *
- * @param {Action} action The action to modify
- * @param {string} name The name to use (must be unique)
- */
-TestInstance.prototype.markForCompletion = function(action, name) {
-    if (!$A.util.isUndefinedOrNull(this.completed[name])) {
-        this.fail("Duplicate name "+name);
-    }
-    var myName = name;
-    this.completed[myName] = "INCOMPLETE";
-    action.wrapCallback(this, function(a) {
-        if (a.getState() === "SUCCESS") {
-            this.completed[myName] = "SUCCESS";
-        } else {
-            this.completed[myName] = "FAILURE";
-        }
-    });
-};
-
-/**
- * Check to see if an action is complete.
- *
- * If you have previously called <code>markForCompletion</code> this
- * will check that the callback has been called (and thus
- * that the action is complete). It does not check for
- * success/failure.
- *
- * @param {string} name
- *          The name of the action to check for completion
- * @returns {Boolean} true if action has completed, false otherwise.
- */
-TestInstance.prototype.isActionComplete = function(name) {
-    if ($A.util.isUndefinedOrNull(this.completed[name])) {
-        this.fail("Unregistered name "+name);
-    }
-    return this.completed[name] !== "INCOMPLETE";
-};
-
-/**
- * Check to see if an action was successful
- *
- * If you have previously called <code>markForCompletion</code> this
- * will check that the callback has been called with a
- * successful completion code.
- *
- * @param {string} name
- *          The name of the action to check for success
- * @returns {Boolean} true if action has completed successfully, false otherwise.
- */
-TestInstance.prototype.isActionSuccessfullyComplete = function(name) {
-    if ($A.util.isUndefinedOrNull(this.completed[name])) {
-        this.fail("Unregistered name "+name);
-    }
-    return this.completed[name] === "SUCCESS";
-};
-
-/**
- * Check to see if an action is complete.
- *
- * If you have previously called <code>markForCompletion</code> this
- * will check that the callback has been called (and thus
- * that the action is complete). It does not check for
- * success/failure.
- *
- * @param {string} name
- *          The name of the Action to check.
- */
-TestInstance.prototype.clearComplete = function(name) {
-    if ($A.util.isUndefinedOrNull(this.completed[name])) {
-        this.fail("Unregistered name "+name);
-    }
-    delete this.completed[name];
-};
-
-/**
  * Invoke a server action.  At the end of current test case stage, the
  * test will wait for any actions to complete before continuing to the
  * next stage of the test case.
@@ -448,51 +366,27 @@ TestInstance.prototype.callServerAction = function(action, doImmediate){
     if(this.inProgress === 0){
         return;
     }
-    //Increment 'inProgress' to indicate that a asynchronous call is going to be initiated, selenium will
-    //wait till 'inProgress' comes down to 0 which indicates all asynchronous calls were complete
-    this.inProgress++;
     var actions = $A.util.isArray(action) ? action : [action];
-    var cmp = $A.getRoot();
     var that = this;
-    try {
-        if (!!doImmediate) {
-            var requestConfig = {
-                "url": $A["clientService"]._host + '/aura',
-                "method": 'POST',
-                "scope" : cmp,
-                "callback" :function(response) {
-                    var msg = $A.clientService.checkAndDecodeResponse(response);
-                    if ($A.util.isUndefinedOrNull(msg)) {
-                        for ( var k = 0; k < actions.length; k++) {
-                            that.logError("Unable to execute action", actions[k]);
-                        }
-                    }
-                    var serverActions = msg["actions"];
-                    for (var i = 0; i < serverActions.length; i++) {
-                        for ( var j = 0; j < serverActions[i]["error"].length; j++) {
-                            that.logError("Error during action", serverActions[i]["error"][j]);
-                        }
-                    }
-                    that.inProgress--;
-                },
-                "params" : {
-                    "message": $A.util.json.encode({"actions" : actions}),
-                    "aura.token" : $A["clientService"]._token,
-                    "aura.context" : $A.getContext().encodeForServer(),
-                    "aura.num" : 0
-                }
-            };
-            $A.util.transport.request(requestConfig);
-        } else {
-            $A.clientService.runActions(actions, cmp , function() {
-                that.inProgress--;
-            });
+    var i;
+    if (!!doImmediate) {
+        // HACK! This needs to get fixed.
+        var auraXHR = $A.clientService.getAvailableXHR(true);
+        if (!auraXHR) {
+            this.fail("$A.test.callServerAction: Unable to send actions");
         }
-    }catch(e){
-        // If trying to runAction() fails with an error, catch that error, signal that the attempt to run
-        // server action was complete and throw error.
-        this.inProgress--;
-        throw e;
+        if ($A.clientService.send(auraXHR, actions, "POST")) {
+            this.addWaitFor(true, function() {return that.areActionsComplete(actions);});
+        } else {
+            // whoops couldn't send
+            $A.clientService.releaseXHR(auraXHR);
+            this.fail("$A.test.callServerAction: Unable to send actions");
+        }
+    } else {
+        for (i = 0; i < actions.length; i++) {
+            $A.enqueueAction(actions[i]);
+        }
+        this.addWaitFor(true, function() {return that.areActionsComplete(actions);});
     }
 };
 
@@ -1036,6 +930,7 @@ TestInstance.prototype.getText = function(node) {
  */
 TestInstance.prototype.getTextByComponent = function(component){
     var ret = "";
+    var i;
     if(component){
         var elements = component.getElements();
         if(elements){
@@ -1483,6 +1378,55 @@ TestInstance.prototype.getAuraErrorMessage = function(){
 };
 
 /**
+ * Override function for client service get XHR.
+ */
+TestInstance.prototype.getAvailableXHROverride = function (config, isBackground) {
+    if (!isBackground && this.blockForeground) {
+        return null;
+    }
+    if (isBackground && this.blockBackground) {
+        return null;
+    }
+    return config["fn"].call(config["scope"], isBackground);
+};
+
+/**
+ * Override send so that we can account for packets.
+ */
+TestInstance.prototype.sendOverride = function (config, auraXHR, actions, method, options) {
+    if (this.disconnectedNoSend) {
+        return false;
+    }
+    var value = config["fn"].call(config["scope"], auraXHR, actions, method, options);
+    if (value) {
+        this.sentXHRCount += 1;
+    }
+    return value;
+};
+
+/**
+ * Override decode so that we can fail out packets.
+ */
+TestInstance.prototype.decodeOverride = function (config, response, noStrip) {
+    if (this.disconnected) {
+        return null;
+    }
+    return config["fn"].call(config["scope"], response, noStrip);
+};
+
+/**
+ * Install all of the overrides needed.
+ *
+ * @private
+ */
+TestInstance.prototype.install = function() {
+    // install getAvailableXHR at the end of the chain, since we may not call it.
+    $A.installOverride("ClientService.getAvailableXHR", this.getAvailableXHROverride, this, 100);
+    $A.installOverride("ClientService.send", this.sendOverride, this, 100);
+    $A.installOverride("ClientService.decode", this.decodeOverride, this, 100);
+};
+
+/**
  * Run the test
  *
  * @param {String} name
@@ -1500,6 +1444,8 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
     if(this.inProgress >= 0){
         return;
     }
+    this.install();
+
     var that = this;
     this.inProgress = 2;
     if(!timeoutOverride) {
@@ -1610,7 +1556,26 @@ TestInstance.prototype.getCreationPath = function(cmp) {
 };
 
 TestInstance.prototype.createHttpRequest = function() {
-    return $A.util.transport.createHttpRequest();
+    if (window.XMLHttpRequest) {
+        return new XMLHttpRequest();
+    } else if (this.httpType === 'msxml2') {
+        return new ActiveXObject("Msxml2.XMLHTTP");
+    } else if (this.httpType === 'msxml') {
+        return new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    // UGLY!!!!
+    if (window.ActiveXObject) {
+        try {
+            this.httpType = 'msxml2';
+            return new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            this.httpType = 'msxml';
+            // If this throws, we are out of ideas anyway, so just "let it throw, let it throw, let it throw".
+            return new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    } else {
+        throw new Error("Test.createHttpRequest: Unable to find an appropriate XHR");
+    }
 };
 
 /**
@@ -1644,9 +1609,6 @@ Aura.Test.Test = TestInstance;
 // #if {"excludeModes" : ["DOC"]}
 // External references are not handled by xUnit framework js generation
 AuraInstance.prototype["test"] = new TestInstance();
-
-//Still used for overriding by metricsPluginTest:transport
-Aura.Utils.Transport.prototype["createHttpRequest"] = Aura.Utils.Transport.prototype.createHttpRequest;
 
 //Should try to remove this hack
 (function(originalDestroy){

@@ -32,13 +32,11 @@
                 component._gotResponse = true;
             });
             $A.test.enqueueAction(action, true);
-        }, function(component) {
-
-            $A.test.addWaitFor(true, function() {
-                return component._gotResponse;
-            });
-        }, function(component) {
-            $A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([action]); },
+                function() {
+                    $A.test.assertEquals("SUCCESS", action.getState());
+                    $A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
+                });
         } ]
     },
 
@@ -53,13 +51,11 @@
                 component._gotResponse = true;
             });
             $A.test.enqueueAction(action, true);
-        }, function(component) {
-
-            $A.test.addWaitFor(true, function() {
-                return component._gotResponse;
-            });
-        }, function(component) {
-            $A.test.assertTrue(component._gotResponse, "Background Client Side Action was not called after enqueue.");
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([action]); },
+                function() {
+                    $A.test.assertEquals("SUCCESS", action.getState());
+                    $A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
+                });
         } ]
     },
 

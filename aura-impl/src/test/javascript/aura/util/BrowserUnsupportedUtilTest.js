@@ -55,13 +55,11 @@ Test.Aura.BrowserUnsupportedUtilTest=function() {
                 window:Object.Global(),
                 document:{createDocumentFragment:function() {}},
                 Json:function() {},
-                Transport:function() {},
                 Style:function() {},
                 Bitset:{},
                 NumberFormat:{},            
                 Aura: {Utils: {
                     Json:function() {},
-                    Transport:function() {},
                     Style:function() {},
                     Bitset:{},
                     NumberFormat:{}

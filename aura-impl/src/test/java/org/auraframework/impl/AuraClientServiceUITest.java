@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl;
 
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
@@ -28,6 +29,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         super(name);
     }
 
+    @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     public void testCsrfTokenSavedOnBootstrap() throws Exception {
         String expectedToken = "expectedTestToken";
 

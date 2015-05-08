@@ -19,7 +19,6 @@ Function.RegisterNamespace("Test.Aura");
 Test.Aura.UtilTest = function() {
     var Aura = {Utils:{
         Json:function() {},
-            Transport:function() {},
             Style:function() {},
             SizeEstimator: function () {},
             Bitset:{},
@@ -31,7 +30,6 @@ Test.Aura.UtilTest = function() {
             window:Object.Global(),
             document:{createDocumentFragment:function() {}},
             Json:function() {},
-            Transport:function() {},
             Style:function() {},
             SizeEstimator: function () {},
             Bitset:{},
@@ -50,21 +48,6 @@ Test.Aura.UtilTest = function() {
     auraMock(function(){
         targetUtil = new Aura.Utils.Util();
     });
-
-    [Fixture]
-    function transportRequest(){
-        [Fact]
-        function testTransportRequestNotPublic(){
-            var targetUtil;
-            auraMock(function(){
-                targetUtil = new Aura.Utils.Util();
-            });
-
-            var method = targetUtil.transport.request;
-
-            Assert.Equal(undefined, method);
-        }
-    }
 
     [Fixture]
     function isIOSWebView(){
@@ -281,7 +264,6 @@ Test.Aura.UtilTest = function() {
                 window:Object.Global(),
                 document:{createDocumentFragment:function() {}},
                 Json:function() {},
-                Transport:function() {},
                 Style:function() {},
                 Bitset:{},
                 NumberFormat:{},

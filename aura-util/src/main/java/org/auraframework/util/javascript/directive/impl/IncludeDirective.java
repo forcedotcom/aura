@@ -50,7 +50,12 @@ public class IncludeDirective extends DirectiveImpl {
     public void processDirective(DirectiveBasedJavascriptGroup group) throws IOException {
         // get the file, group will do validation
         String relativeFile = path.replace('.', File.separatorChar) + ".js";
-        this.include = group.addFile(relativeFile);
+        try {
+            this.include = group.addFile(relativeFile);
+        } catch (Throwable t) {
+            System.err.println("ERROR: include directive unable to find: "+path);
+            throw new RuntimeException("Unable to include "+path);
+        }
         includedParser = new DirectiveParser(group, include);
         includedParser.parseFile();
     }

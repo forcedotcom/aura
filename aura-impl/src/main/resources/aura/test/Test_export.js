@@ -88,10 +88,6 @@ TestInstance.prototype["objectKeys"] = TestInstance.prototype.objectKeys;
 // actions
 TestInstance.prototype["callServerAction"] = TestInstance.prototype.callServerAction;
 TestInstance.prototype["isActionPending"] = TestInstance.prototype.isActionPending;
-TestInstance.prototype["markForCompletion"] = TestInstance.prototype.markForCompletion;
-TestInstance.prototype["isComplete"] = TestInstance.prototype.isComplete;
-TestInstance.prototype["isSuccessfullyComplete"] = TestInstance.prototype.isSuccessfullyComplete;
-TestInstance.prototype["clearComplete"] = TestInstance.prototype.clearComplete;
 TestInstance.prototype["getAction"] = TestInstance.prototype.getAction;
 TestInstance.prototype["getExternalAction"] = TestInstance.prototype.getExternalAction;
 TestInstance.prototype["blockRequests"] = TestInstance.prototype.blockRequests;

@@ -16,7 +16,7 @@
 .THIS {
     padding: 5px 5px 0 5px;
     margin: 0;
-    line-height: 25px;
+    line-height: 26px;
     border:1px solid #CCCCCC;
     border-radius:5px;
     position:relative;
@@ -38,7 +38,7 @@
     border: none;
     outline: none;
     font-size: 100%;
-    margin-top: 6px;
+    margin-top: 7px;
 }
 
 .THIS a {
@@ -49,3 +49,10 @@
 .THIS a:hover {
     text-decoration: none;
 }
+
+.THIS .showMore {
+    text-align:center;
+    line-height: 26px;
+    padding: 5px;
+}
+

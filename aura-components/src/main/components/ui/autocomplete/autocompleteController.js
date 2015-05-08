@@ -20,6 +20,7 @@
             inputCmp.addHandler("input", component, "c.handleInputChange"); // Later on we need to make it work on older browsers too.
             inputCmp.addHandler("keydown", component, "c.handleKeyAction");
             inputCmp.addHandler("focus", component, "c.handleFocus");
+            inputCmp.addHandler("blur", component, "c.handleBlur");
         }
         helper.relayEvents(component);
         // This calls a function (callback) in a delayed manner and it can be cancelled.
@@ -42,12 +43,22 @@
         	e.setParams(event.getParams());
         	e.fire();
         }
-    }, 
-    
+    },
+
     handleFocus: function(component, event, helper) {
         var inputCmp = event.getSource();
         if (inputCmp) {
-        	inputCmp.set("v.ariaActiveDescendant", "");
+            inputCmp.set("v.ariaActiveDescendant", "");
+            var domEvent = event.getParam("domEvent");
+            helper.fireEvent(component, domEvent, helper);
+        }
+    },
+
+    handleBlur: function(component, event, helper) {
+        var inputCmp = event.getSource();
+        if (inputCmp) {
+            var domEvent = event.getParam("domEvent");
+            helper.fireEvent(component, domEvent, helper);
         }
     },
     

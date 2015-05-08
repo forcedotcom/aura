@@ -19,9 +19,11 @@
 
     <aura:attribute name="items" type="List"/>
     <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>
+    <aura:attribute name="maxLines" type="Integer" default="0" description="Maximum lines to show. Hidden lines can be expanded. Use 0 to disable."/>
     <aura:attribute name="focusOnInput" type="Boolean" default="true" description="Focus on input box when the component is created."/>
     <aura:attribute name="allowRemove" type="Boolean" default="true" description="Allows deleting pills from container."/>
     <aura:attribute name="pillInput" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
+    <aura:attribute name="showMoreLabel" type="String" default="Show More &#9662;" description="The label for the show more button"/>
 
     <!-- events -->
     <aura:registerevent name="pillInserted"
@@ -40,18 +42,22 @@
     <aura:handler name="pillInserted" action="{!c.processPillInserted}"/>
     <aura:handler name="pillRemoved" action="{!c.processPillRemoved}"/>
 
-    <ol aura:flavorable="true" class="orderedList">
-        <aura:iteration items="{!v.items}" var="item" aura:id="pills">
-            <li aura:id="listitem" role="presentation" class="pillContainerListItem">
-                <ui:pill aura:id="pill" iconUrl="{!item.icon.url}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" onHandledEvent="{!c.handlePillEvent}"/>
-            </li>
-        </aura:iteration>
+    <div aura:flavorable="true"  onmousedown="{!c.onClickBackground}">
+        <ol aura:id="list" class="orderedList">
+            <aura:iteration items="{!v.items}" var="item" iterationComplete="{!c.pillIterationComplete}" aura:id="pills">
+                <li aura:id="listitem" role="presentation" class="pillContainerListItem">
+                    <ui:pill aura:id="pill" iconUrl="{!item.icon.url}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" onHandledEvent="{!c.handlePillEvent}"/>
+                </li>
+            </aura:iteration>
 
-        <aura:if isTrue="{!v.pillInput.length>0 &amp;&amp; v.items.length&lt;v.maxAllowed}">
-            <li role="presentation" class="pillContainerListItem">
-                {!v.pillInput}
-            </li>
-        </aura:if>
-    </ol>
+            <aura:if isTrue="{!v.pillInput.length>0 &amp;&amp; v.items.length&lt;v.maxAllowed}">
+                <li role="presentation" class="pillContainerListItem">
+                    {!v.pillInput}
+                </li>
+            </aura:if>
+
+        </ol>
+        <a aura:id="showMore" class="showMore" onclick="{!c.onShowMore}">{!v.showMoreLabel}</a>
+    </div>
 
 </aura:component>

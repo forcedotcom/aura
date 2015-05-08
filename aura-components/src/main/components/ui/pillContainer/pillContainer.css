@@ -32,3 +32,26 @@
     margin: 0;
     padding: 0;
 }
+
+.THIS .showMore {
+    display:block;
+}
+
+.THIS.focused .showMore, .THIS .showMore.invisible {
+    display:none;
+}
+
+.THIS ol {
+    overflow-y: hidden;
+}
+
+.THIS.focused ol {
+    overflow-y: scroll;
+}
+
+.THIS input {
+    width:0px;
+}
+.THIS.focused input {
+    width:auto;
+}

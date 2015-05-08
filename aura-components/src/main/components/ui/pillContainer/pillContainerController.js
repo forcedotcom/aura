@@ -20,6 +20,8 @@
         if (!$A.util.isEmpty(pillInput)) {
             pillInput[0].addHandler("onItemSelected", cmp, "c.onItemSelected");
             pillInput[0].addHandler("onBackspacePressedWhenEmpty", cmp, "c.onBackspacePressedWhenEmpty");
+            pillInput[0].addHandler("focus", cmp, "c.onInputFocus");
+            pillInput[0].addHandler("blur", cmp, "c.onInputBlur");
         }
     },
 
@@ -71,6 +73,33 @@
         if (newItems) {
             helper.insertItems(cmp, newItems);
         }
+    },
+
+    onShowMore: function(cmp, event, helper) {
+        helper.showMore(cmp);
+    },
+
+    onClickBackground: function(cmp, event, helper) {
+        if (event.target === cmp.find("list").getElement()) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            helper.focusOnInputBox(cmp);
+        }
+    },
+
+    onInputFocus: function(cmp, event, helper) {
+        $A.util.addClass(cmp.getElement(), 'focused');
+        var element = cmp.find("list").getElement();
+        element.scrollTop = element.scrollHeight;
+    },
+
+    onInputBlur: function(cmp, event, helper) {
+        $A.util.removeClass(cmp.getElement(), 'focused');
+        cmp.find("list").getElement().scrollTop = 0;
+    },
+
+    pillIterationComplete: function(cmp, event, helper) {
+        setTimeout(function(){helper.adjustHeight(cmp)},0);
     }
 
 })

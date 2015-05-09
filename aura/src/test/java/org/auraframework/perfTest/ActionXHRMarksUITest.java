@@ -18,6 +18,8 @@ package org.auraframework.perfTest;
 import java.util.Map;
 
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -27,7 +29,11 @@ import com.google.common.collect.Maps;
 /**
  * Tests to verify contents of Action XHR marks.
  * 
+ * Excluding IE10/11 because the tests were hanging in the browsers. (when open/click)
+ * Manually verified they are working fine in IE10/11.
+ * Could be caused by some bug in webdriver. (W-2580972)
  */
+@ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
 public class ActionXHRMarksUITest extends PerfMetricsTestCase {
 
     public ActionXHRMarksUITest(String name) {

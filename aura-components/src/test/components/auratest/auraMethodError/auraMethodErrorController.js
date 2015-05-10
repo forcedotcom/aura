@@ -13,21 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
-
-/**
- */
-public interface MethodDef extends RootDefinition {
-    @Override
-    DefDescriptor<MethodDef> getDescriptor();
-
-    public static enum SerializeToType {
-        SERVER, BOTH, NONE, INVALID
-    };
-
-    String getAction();
-
-    SerializeToType getSerializeTo();
-
-    DefDescriptor<? extends RootDefinition> getParentDescriptor();
-}
+({	
+	blank: function(cmp, event, helper) {
+		 
+	}
+	
+})

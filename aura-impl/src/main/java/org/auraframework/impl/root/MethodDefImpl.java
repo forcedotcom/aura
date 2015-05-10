@@ -30,21 +30,16 @@ import java.util.*;
  */
 public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implements MethodDef {
 
+    private static final long serialVersionUID = 2241357666688011567L;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+    private final String action;
+    private final SerializeToType serializeTo;
+    
     protected MethodDefImpl(Builder builder) {
         super(builder);
         this.parentDescriptor = builder.parentDescriptor;
-        this.typeDefDescriptor = builder.typeDefDescriptor;
         this.action = builder.action;
         this.serializeTo = builder.serializeTo;
-    }
-
-    /**
-     * @return The ValueDef that defines type information about Values for instances of this MethodDef
-     * @throws org.auraframework.throwable.quickfix.QuickFixException
-     */
-    @Override
-    public TypeDef getTypeDef() throws QuickFixException {
-        return typeDefDescriptor.getDef();
     }
 
     /**
@@ -68,7 +63,6 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("name", descriptor);
-        json.writeMapEntry("type", typeDefDescriptor);
         if(!AuraTextUtil.isNullEmptyOrWhitespace(action)) {
             json.writeMapEntry("action", action);
         }
@@ -79,18 +73,9 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        dependencies.add(typeDefDescriptor);
-    }
-
-    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-
-        if (this.typeDefDescriptor == null) {
-            throw new InvalidDefinitionException("Invalid typeDefDescriptor: null", getLocation());
-        }
-
+        
         String name = this.descriptor.getName();
         // Calls the validateMethodName method in AuraTextUtil.java to check if its a valid method name
         if (!AuraTextUtil.validateMethodName(name)) {
@@ -207,10 +192,5 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
         }
     }
 
-    private static final long serialVersionUID = 2241357666688011566L;
-    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
-    private final DefDescriptor<TypeDef> typeDefDescriptor;
-    private final String action;
-    private final SerializeToType serializeTo;
 
 }

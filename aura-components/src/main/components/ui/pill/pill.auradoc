@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+		    A <code>ui:pill</code> component represents text in a read-only output field or editable input field, which are grouped as pills when saved. Users create pills when they add text in the input field and press enter.
+		    Each pill can also be deleted. Pills can be used to provide text for categories or tags, and provide text selection in an auto-complete field. You can include an icon or image in a pill.
+		    Pills can be inserted dynamically via the <code>ui:pillContainer</code> component using <code>pillContainer.insertItems(pills)</code>. This example creates a read-only output field with three pills.
+		</p>
+<pre>&lt;aura:component>
+&lt;aura:handler name="init" value="{!this}" action="{!c.setPills}"/>
+    &lt;ui:pillContainer aura:id="pillContainer"/>
+&lt;/aura:component></pre>
+		<p>During initialization, this client-side controller sets the pill labels and images.</p>
+<pre>({
+    setPills : function(component, event, helper) {
+        var pills = [{id:'pill01',label:"HTML",icon: {url:'path/to/url'}},
+            {id:'pill02',label:"CSS",icon: {url:'path/to/url'}},
+            {id:'pill03',label:"JavaScript",icon: {url:'path/to/url'}}];
+  
+        var pillContainer = component.find("pillContainer");
+        pillContainer.insertItems(pills);
+   }
+ })</pre>	
+		<p>
+		To create an editable input field for pills, set the <code>pillInput</code> attribute on <code>ui:pillContainer</code>. This attribute takes in a facet and can also take in a <code>ui:pillContainerAutoComplete</code> 
+		component for autocompletion. The component you use as a facet must implement the <code>ui:pillContainerInput</code> interface.
+		</p>
+<pre>&lt;ui:pillContainer>
+    &lt;aura:set attribute="pillInput">
+        &lt;uitest:pillContainerInputText aura:id="textInput"/>
+    &lt;/aura:set>
+&lt;/ui:pillContainer></pre>
+	</aura:description>	
+</aura:documentation>

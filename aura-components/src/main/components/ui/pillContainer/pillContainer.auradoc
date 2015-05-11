@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>A <code>ui:pillContainer</code> component contains <code>ui:pill</code> components in an ordered list. Pills can be added or removed from the input field as necessary.
+		To create an editable input field for pills, set the <code>pillInput</code> attribute on <code>ui:pillContainer</code>. 
+		This attribute takes in a facet and can also take in a <code>ui:pillContainerAutoComplete</code> component for auto-completion. 
+		The component you use as a facet must implement the <code>ui:pillContainerInput</code> interface. Use the <code>ui:eventLib</code> library to fire the blur and focus events automatically. 
+<pre>&lt;aura:component implements="ui:pillContainerInput">
+    &lt;aura:import library="ui:eventLib" property="lib"/>
+    &lt;ui:inputText value="{!v.value}" label="pills"/>
+&lt;/aura:component></pre>
+		Alternatively, add blur and focus handlers for your input field, and fire the events in your client-side controller. 
+		</p>
+<pre>&lt;ui:inputText value="{!v.value}" label="pills" focus="{!c.focus}" blur="{!c.blur}"/></pre>
+	<p>This client-side controller fires the blur event on the <code>ui:inputText</code> component.</p>
+<pre>blur: function(component) {
+   component.getEvent("blur").fire();
+}</pre>		
+
+		<p>See the Examples tab for more information.</p>
+	</aura:description>	
+		<aura:example name="pillExample1" ref="uitest:pillContainerWithTextInput" label="Creating Pills in an Input Field">
+    	<p>This pill container handles the <code>pillInserted</code> and <code>pillRemoved</code> events and contains an input field that's wired up to the <code>ui:eventLib</code> library.</p>
+	   Type a string of text and press enter to see how it works.
+	   </aura:example>	
+		
+</aura:documentation>

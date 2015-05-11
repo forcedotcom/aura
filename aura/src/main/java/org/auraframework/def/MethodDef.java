@@ -15,8 +15,6 @@
  */
 package org.auraframework.def;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
  */
 public interface MethodDef extends RootDefinition {
@@ -26,8 +24,6 @@ public interface MethodDef extends RootDefinition {
     public static enum SerializeToType {
         SERVER, BOTH, NONE, INVALID
     };
-
-    TypeDef getTypeDef() throws QuickFixException;
 
     String getAction();
 

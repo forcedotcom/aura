@@ -15,10 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component provider="js://test.testEventBubblingParent">
-    <aura:handler name="init" action="{!c.init}" value="{!this}"/>
-    <aura:handler name="notifyUp" event="ui:dataChanged" action="{!c.handlerDataChange}"/>
+<aura:event type="COMPONENT"
+            extends="ui:command"
+            access="PRIVATE"
+            description="Test Private Event.">
 
-	<test:testEventBubbling aura:id="bubbling"/>
-
-</aura:component>
+    <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
+    <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>
+    <aura:attribute name="Internal" type="String" access="INTERNAL" description="private" default="INTERNAL"/>
+    <aura:attribute name="Global" type="String" access="GLOBAL" description="private" default="GLOBAL"/>
+</aura:event>

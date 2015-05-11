@@ -15,13 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:handler name="notifyUp" event="ui:command" action="{!c.handlerDataChange}"/>
-    <aura:attribute name="bubble" type="Boolean" default="false"/>
+<aura:event type="COMPONENT"
+            extends="ui:command"
+            access="PRIVATE"
+            description="Test Private Event.">
 
-    <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
-        <div class="receiver-container">
-            <test:testEventEmitter aura:id="outEmitter"/>
-        </div>
-    </div>
-</aura:component>
+    <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
+    <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>
+    <aura:attribute name="Internal" type="String" access="INTERNAL" description="private" default="INTERNAL"/>
+    <aura:attribute name="Global" type="String" access="GLOBAL" description="private" default="GLOBAL"/>
+</aura:event>

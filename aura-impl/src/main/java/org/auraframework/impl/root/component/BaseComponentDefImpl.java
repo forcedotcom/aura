@@ -228,6 +228,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (ImportDef def : imports) {
             def.validateDefinition();
         }
+        
+        for(MethodDef def : this.methodDefs.values()) {
+        	def.validateDefinition();
+        }
 
         // an abstract component that you can't extend is pretty useless
         if (this.isAbstract() && !this.isExtensible()) {

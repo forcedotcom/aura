@@ -160,6 +160,14 @@ PassthroughValue.prototype.getComponent = function() {
     return this.component;
 };
 
+PassthroughValue.prototype.getDef=function(){
+    var valueProvider=this;
+    while (valueProvider instanceof PassthroughValue) {
+        valueProvider = valueProvider.getComponent();
+    }
+    return valueProvider.getDef();
+};
+
 /**
  * Passthrough's have extra providers that can reference other items of data.
  * If it's raw data, no problem. If it's another reference, you may want to

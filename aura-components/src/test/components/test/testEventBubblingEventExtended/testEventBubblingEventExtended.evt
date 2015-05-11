@@ -15,13 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component>
-	<aura:registerEvent name="notifyUp" type="ui:refresh" />
-    <div style="margin: 5px; padding: 10px; border: 1px solid #333;">
-        <p>Emitter</p>
-        <ui:button aura:id="button" press="{!c.fireEvent}" label="Fire!"/>
-        <div class="emiter-container">
-            {!v.body}
-        </div>
-    </div>
-</aura:component>
+<aura:event type="component" extends="test:testEventBubblingEvent">
+</aura:event>

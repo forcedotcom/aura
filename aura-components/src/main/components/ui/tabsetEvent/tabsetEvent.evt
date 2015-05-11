@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Event for ui:tabset component.">
+<aura:event type="COMPONENT" access="GLOBAL" description="Event for ui:tabset component.">
     <aura:attribute name="index" type="Integer" description="The index position of the tab."/>
     <aura:attribute name="name" type="String" description="The internal name of the tab."/>
     <aura:attribute name="focus" type="Boolean" description="Whether to focus the tabset item or not."/>

@@ -19,6 +19,8 @@ import java.util.Map;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase.CheckAccessibility;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -28,8 +30,13 @@ import com.google.common.collect.Maps;
 /**
  * 
  * Automation to verify UIPerf marks for rerender cycle.
+ * 
+ * Excluding IE10/11 because the tests were hanging in the browsers. (when open/click)
+ * Manually verified they are working fine in IE10/11.
+ * Could be caused by some bug in webdriver. (W-2580972)
  */
 @CheckAccessibility(false)
+@ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
 public class RerenderMarksUITest extends PerfMetricsTestCase {
     public RerenderMarksUITest(String name) {
         super(name);

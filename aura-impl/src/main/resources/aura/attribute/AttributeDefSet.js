@@ -20,14 +20,18 @@
  * @constructor
  * @protected
  */
-function AttributeDefSet(configs) {
+function AttributeDefSet(configs,defaultNamespace) {
     if (configs) {
         this.values = {};
         // maintain attribute order
         this.valuesOrder = [];
         for (var i = 0; i < configs.length; i++) {
-            var attributeDef = new AttributeDef(configs[i]);
-            var name = attributeDef.getDescriptor().getName();
+            var attributeDef = new AttributeDef(configs[i],defaultNamespace);
+            var descriptor=attributeDef.getDescriptor();
+            if(!descriptor.namespace){
+                descriptor.namespace=defaultNamespace;
+            }
+            var name = descriptor.getName();
             this.values[name] = attributeDef;
             this.valuesOrder.push(name);
         }
@@ -56,11 +60,7 @@ AttributeDefSet.prototype.each = function(f) {
  * @returns {AttributeDef} An AttributeDef object is stored in a parent definition, such as a ComponentDef object.
  */
 AttributeDefSet.prototype.getDef = function(name) {
-    var values = this.values;
-    if (values) {
-        return values[name];
-    }
-    return null;
+    return (this.values&&this.values[name.split('.')[0]])||null;
 };
 
 /**

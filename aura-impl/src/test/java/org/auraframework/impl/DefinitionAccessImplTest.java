@@ -95,7 +95,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
             definitionParser.parseAccess(null, "GLOBAL, PRIVATE");
             fail("Should not allow to specify more than one access level.");
         }catch(InvalidAccessValueException expected){
-            assertEquals("Access attribute can only specifiy one of GLOBAL, PUBLIC, or PRIVATE", expected.getMessage());
+            assertEquals("Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE", expected.getMessage());
         }
     }
     

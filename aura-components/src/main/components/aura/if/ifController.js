@@ -15,10 +15,10 @@
  */
 ({
     init: function(cmp, evt, helper) {
-        var bodyTemplate = cmp.get("v.body"),
-            isTrue       = $A.util.getBooleanValue(cmp.get("v.isTrue")),
-            template     = cmp.get("v.template"),
-            localCreation = true;
+        var bodyTemplate = cmp.get("v.body");
+        var isTrue       = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        var template     = cmp.get("v.template");
+        var localCreation = true;
 
         if (bodyTemplate.length && !template.length) {
             cmp.set("v.template", bodyTemplate, true);

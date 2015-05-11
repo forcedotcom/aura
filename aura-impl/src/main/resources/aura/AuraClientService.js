@@ -347,7 +347,14 @@ $A.ns.AuraClientService.prototype.setCurrentTransasctionId = function(abortableI
  * @private
  */
 $A.ns.AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
-    var key = action.getStorageKey();
+    var key = undefined;
+    try {
+    	key = action.getStorageKey();
+    } catch (e) {
+    	this.state = "FAILURE";
+    	this.error = e;
+    	throw new $A.auraError("Fail when processing a single action with response, getStorageKey error out with :"+e.message);
+    }
 
     $A.run(function() {
         var storage, toStore, needUpdate, errorHandler;
@@ -443,6 +450,7 @@ $A.ns.AuraClientService.prototype.doActionCallback = function(response, collecto
         var token = responseMessage["token"];
         if (token) {
             this._token = token;
+            // Persists the CSRF token so it's accessible when the app is launched while offline.
             this.saveTokenToStorage();
         }
 
@@ -1014,6 +1022,7 @@ $A.ns.AuraClientService.prototype.init = function(config, token, container) {
         }
 
         var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
+        $A.getContext().setCurrentAccess(component);
 
         $A.Perf.endMark("Initial Component Created");
 
@@ -1177,8 +1186,6 @@ $A.ns.AuraClientService.prototype.loadComponent = function(descriptor, attribute
                 var state = a.getState();
 
                 if (state === "SUCCESS") {
-                    // Persists the CSRF token so it's accessible when the app is launched while offline.
-                    acs.saveTokenToStorage();
                     callback(a.getReturnValue());
                 } else if (state === "INCOMPLETE"){
                     // Use a stored response if one exists
@@ -1814,6 +1821,34 @@ $A.ns.AuraClientService.prototype.processActions = function() {
         }
     }
     return processedActions;
+};
+
+$A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
+    if(definition&&definition.getDescriptor){
+        var context;
+        var currentAccess;
+        switch(definition.access){
+            case 'G':
+                // GLOBAL means accessible from anywhere
+                return true;
+            case 'P':
+                // PRIVATE means "same component only".
+                context=$A.getContext();
+                currentAccess=context&&context.getCurrentAccess();
+                return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component);
+            default:
+                // INTERNAL, PUBLIC, or absence of value means "same namespace only".
+                context=$A.getContext();
+                currentAccess=context&&context.getCurrentAccess();
+                if(currentAccess){
+                    var targetNamespace=definition&&definition.getDescriptor().getNamespace();
+                    return currentAccess===component ||
+                        (currentAccess.getDef().getDescriptor().getNamespace()===targetNamespace) ||
+                        (currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace()===targetNamespace);
+                }
+        }
+    }
+    return false;
 };
 
 exp($A.ns.AuraClientService.prototype,

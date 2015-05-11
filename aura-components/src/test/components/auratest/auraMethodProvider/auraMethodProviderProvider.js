@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide : function (component) {
-        return component;
+    provide : function auraMethodProviderProvider(component) {
+        return "auratest:auraMethod";
     }
 })

@@ -87,6 +87,7 @@
     	 if(component.isValid()) {
 	        var e = component.getEvent(event.type);
 	        helper.setEventParams(e, event);
+	        e.setComponentEvent();
 	        e.fire();
     	 }
      },

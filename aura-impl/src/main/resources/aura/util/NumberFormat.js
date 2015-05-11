@@ -360,5 +360,6 @@ NumberFormat.prototype.format = function(number) {
     
     return result.join("");
 };
+Aura.Utils.NumberFormat = NumberFormat;
 
 //#include aura.util.NumberFormat_export

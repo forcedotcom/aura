@@ -178,3 +178,5 @@ var AuraStorageService = function(){
 
     return storageService;
 };
+
+Aura.Services.AuraStorageService = AuraStorageService;

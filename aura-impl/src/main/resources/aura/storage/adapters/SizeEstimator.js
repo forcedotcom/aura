@@ -18,8 +18,7 @@
  * @description Provides operations to estimate size of JSON objects in memory.
  * @constructor
  */
-var SizeEstimator = function SizeEstimator(){
-};
+function SizeEstimator() {}
 
 /*
  * Note on sizing.  The following values are taken from the ECMAScript specification, where available.
@@ -27,46 +26,38 @@ var SizeEstimator = function SizeEstimator(){
  *
  * Source: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
  */
-SizeEstimator.prototype.CHARACTER_SIZE = 2;
-SizeEstimator.prototype.NUMBER_SIZE = 8;
-// note: this value is not defined by the spec.
-SizeEstimator.prototype.BOOLEAN_SIZE = 4;
-SizeEstimator.prototype.POINTER_SIZE = 8;
+SizeEstimator.CHARACTER_SIZE = 2;
+SizeEstimator.NUMBER_SIZE    = 8;
+SizeEstimator.BOOLEAN_SIZE   = 4; // This value is not defined by the spec.
+SizeEstimator.POINTER_SIZE   = 8;
 
 SizeEstimator.prototype.hasOwnProperty = Object.prototype.hasOwnProperty;
 
 SizeEstimator.prototype.estimateSize = function(value) {
-    var bytes = 0;
+    if (value === null || value === undefined) {
+        return 0;
+    }
     var type = typeof value;
 
-    if (value === null || value === undefined) {
-        bytes = 0;
-    } else if (type === 'boolean') {
-        bytes = this.BOOLEAN_SIZE;
-    } else if (type === 'string') {
-        bytes = this.sizeOfString(value);
-    } else if (type === 'number') {
-        bytes = this.NUMBER_SIZE;
-    } else if (type === 'object') {
-        // we have an object or an array. optimize for the case of a larger
-        // object/array by using native JSON serialization and the resulting
-        // string length. however, JSON.stringify doesn't handle objects/arrays
-        // with cycles. thankfully these are rare so we give up and say 0.
+    if (type === 'object') {
         try {
-            bytes = $A.util.json.encode(value).length;
+            return $A.util.json.encode(value).length;
         } catch (e) {
             $A.log("Error during size estimate, using 0: " + e);
-            bytes = 0;
+            return 0;
         }
-    } else if (type === 'function') {
-        // uh-oh. This is likely wrong.
-        bytes = this.POINTER_SIZE;
-    } else {
-        bytes = this.POINTER_SIZE;
     }
-    return bytes;
+
+    switch (type) {
+        case 'string'  : return this.sizeOfString(value);
+        case 'number'  : return SizeEstimator.NUMBER_SIZE;
+        case 'boolean' : return SizeEstimator.BOOLEAN_SIZE;
+        default : return SizeEstimator.POINTER_SIZE;
+    }
 };
 
 SizeEstimator.prototype.sizeOfString = function(value) {
-    return value.length * this.CHARACTER_SIZE;
+    return value.length * SizeEstimator.CHARACTER_SIZE;
 };
+
+Aura.Utils.SizeEstimator = SizeEstimator;

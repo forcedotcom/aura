@@ -123,4 +123,6 @@ Bitset.init = function() {
     }
 };
 
+Aura.Utils.Bitset = Bitset;
+
 //#include aura.util.Bitset_export

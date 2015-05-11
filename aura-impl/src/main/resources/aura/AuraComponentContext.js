@@ -22,13 +22,13 @@
  *
  * @constructor
  */
-$A.ns.AuraComponentContext = function() {
+function AuraComponentContext() {
     /** Stack of components in nested-context order */
     this.stack = [];
-};
+}
 
 /** Inner type for stack frames. */
-$A.ns.AuraComponentContext.prototype.Frame = function(cmp) {
+AuraComponentContext.prototype.Frame = function(cmp) {
     this.cmp = cmp;
     this.notes = undefined;
 };
@@ -39,7 +39,7 @@ $A.ns.AuraComponentContext.prototype.Frame = function(cmp) {
  * @param {Component} cmp Incoming context component
  * @returns old (covered-over) context component, or undefined at top of stack
  */
-$A.ns.AuraComponentContext.prototype.push = function(cmp) {
+AuraComponentContext.prototype.push = function(cmp) {
     var prior = this.stack.length ? this.stack[this.stack.length - 1].cmp : undefined;
     this.stack.push(new this.Frame(cmp));
     return prior;
@@ -58,7 +58,7 @@ $A.ns.AuraComponentContext.prototype.push = function(cmp) {
  *      to verify.
  * @returns component context that is no longer in effect
  */
-$A.ns.AuraComponentContext.prototype.pop = function(cmp) {
+AuraComponentContext.prototype.pop = function(cmp) {
     var oldFrame = this.stack.pop();
     if (cmp) {
         $A.assert(cmp === oldFrame.cmp, "ComponentContext mismatch detected.");
@@ -71,7 +71,7 @@ $A.ns.AuraComponentContext.prototype.pop = function(cmp) {
  *
  * @return top-of-stack context, or undefined.
  */
-$A.ns.AuraComponentContext.prototype.currentContext = function() {
+AuraComponentContext.prototype.currentContext = function() {
     var len = this.stack.length;
     return len ? this.stack[len - 1].cmp : undefined;
 };
@@ -81,7 +81,7 @@ $A.ns.AuraComponentContext.prototype.currentContext = function() {
  * the uses of the context stack, it is up to those users to ensure name collisions and
  * such are safely handled.
  */
-$A.ns.AuraComponentContext.prototype.addNote = function(k, v) {
+AuraComponentContext.prototype.addNote = function(k, v) {
     if (!this.stack.length) {
         return;
     }
@@ -95,7 +95,7 @@ $A.ns.AuraComponentContext.prototype.addNote = function(k, v) {
 /**
  * Gets an annotation from the current context frame.
  */
-$A.ns.AuraComponentContext.prototype.getNote = function(k) {
+AuraComponentContext.prototype.getNote = function(k) {
     if (!this.stack.length) {
         return undefined;
     }
@@ -109,7 +109,7 @@ $A.ns.AuraComponentContext.prototype.getNote = function(k) {
 /**
  * Removes an annotation from the current context frame.
  */
-$A.ns.AuraComponentContext.prototype.clearNote = function(k) {
+AuraComponentContext.prototype.clearNote = function(k) {
     if (!this.stack.length) {
         return;
     }
@@ -119,3 +119,5 @@ $A.ns.AuraComponentContext.prototype.clearNote = function(k) {
     }
     delete top[k];
 };
+
+Aura.Services.AuraComponentContext = AuraComponentContext;

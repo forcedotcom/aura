@@ -471,4 +471,7 @@ MetricsService.prototype = {
         return bootstrap;
     }
 };
+
+Aura.Services.MetricsService = MetricsService;
+
 //#include aura.metrics.AuraMetricsService_export

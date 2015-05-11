@@ -23,25 +23,25 @@
  * @param {Component} component
  * @returns {Function}
  */
-$A.ns.AuraError = function() {
-    this.name="AuraError";
-    this.message="";
-    this.stackTrace="";
-    this.errorCode="";
+function AuraError() {
+    this.name       = "AuraError";
+    this.message    = "";
+    this.stackTrace = "";
+    this.errorCode  = "";
 
-    function AuraError(message) {
+    function AuraErrorInternal(message) {
         // for IE8
-        function getName(method){
-            var funcStr=method.toString();
-            var name=null;
+        function getName(method) {
+            var funcStr = method.toString();
+            var name = null;
             var matches = funcStr.match(/\bfunction\s?([^(]*)\(/);
             if (matches && matches.length == 2) {
-                name=matches[1];
+                name = matches[1];
             }
-            return name||"[anonymous]";
+            return name || "[anonymous]";
         }
 
-        function getStack(error){
+        function getStack(error) {
             var map = {};
             var stack = [];
             var caller = getStack.caller && getStack.caller.caller;
@@ -83,7 +83,7 @@ $A.ns.AuraError = function() {
         this.stackTrace = getStackTrace(error);
     }
 
-    AuraError.apply(this,arguments);
+    AuraErrorInternal.apply(this,arguments);
 
     this["name"] = this.name;
     this["message"] = this.message;
@@ -92,7 +92,10 @@ $A.ns.AuraError = function() {
     this["handled"] = false;
     this["reported"] = false;
     this["data"] = null;
-};
+}
 
-$A.ns.AuraError.prototype = new Error();
-$A.ns.AuraError.prototype.constructor = $A.ns.AuraError;
+AuraError.prototype = new Error();
+AuraError.prototype.constructor = AuraError;
+
+$A.ns.AuraError = AuraError;
+Aura.Errors.AuraError = AuraError;

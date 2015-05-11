@@ -17,7 +17,7 @@
  * @description The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
  * @constructor
  */
-var AuraExpressionService = function AuraExpressionService() {
+function AuraExpressionService() {
 	var expressionService = {
 
 		/**
@@ -102,4 +102,6 @@ var AuraExpressionService = function AuraExpressionService() {
 	// #include aura.AuraExpressionService_export
 
 	return expressionService;
-};
+}
+
+Aura.Services.AuraExpressionService = AuraExpressionService;

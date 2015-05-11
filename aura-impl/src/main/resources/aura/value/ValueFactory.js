@@ -100,3 +100,5 @@ var valueFactory = {
     }
 //#end
 };
+
+Aura.Value.ValueFactory  = valueFactory;

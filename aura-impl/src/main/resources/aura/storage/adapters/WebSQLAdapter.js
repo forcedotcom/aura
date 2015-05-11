@@ -302,3 +302,5 @@ if (window.openDatabase) {
         "persistent": true
     });
 }
+
+Aura.Storage.WebSQLStorageAdapter = WebSQLStorageAdapter;

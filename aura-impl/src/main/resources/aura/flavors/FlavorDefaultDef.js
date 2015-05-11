@@ -80,3 +80,5 @@ FlavorDefaultDef.prototype.isContextual = function(context) {
     $A.assert($A.util.isBoolean(result), "expressions for aura:flavor overrides must result in a boolean value");
     return result;
 };
+
+Aura.Flavors.FlavorDefaultDef = FlavorDefaultDef;

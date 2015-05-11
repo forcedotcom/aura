@@ -17,13 +17,16 @@ Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentTest=function(){
+
+    var $A= { ns : {}};
 	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMock(Object.Global(), "exp", function(){})(function()
-        {Mocks.GetMock(Object.Global(), "$A", function(){})(function(){
-            $A.ns = {};
-            // #import aura.component.Component
+    Mocks.GetMocks(Object.Global(), {
+        "exp": function(){},
+        "$A": $A,
+        "Aura": {"Utils": {}, "Errors": {}, "Component": {}},
+    })(function(){
+        // #import aura.component.Component
 	    // #import aura.component.InvalidComponent
-        });
     });
     
     [Fixture]

@@ -79,7 +79,6 @@ Style.prototype.include = function(href) {
     this.getHead().appendChild(styleElement);
     return styleElement;
 };
-
 /**
  * Gets the CSS property of an element.
  * note for "background": if we specify "background" in  CSS, Firefox will use "background-color" as key
@@ -88,24 +87,26 @@ Style.prototype.include = function(href) {
  * @param {String} cssprop The CSS property to be retrieved
  */
 Style.prototype.getCSSProperty = function(el, cssprop) {
-	var elcsIE = el.currentStyle;
+    var elcsIE = el.currentStyle;
     if (elcsIE){ //IE
-    	if(elcsIE[cssprop]!=undefined) {//IE8
-    		return elcsIE[cssprop];
-    	}
-    	else if(elcsIE.getPropertyValue!=undefined){//IE9 or up
-    		return elcsIE.getPropertyValue(cssprop);
-    	}
+        if(elcsIE[cssprop]!=undefined) {//IE8
+            return elcsIE[cssprop];
+        }
+        else if(elcsIE.getPropertyValue!=undefined){//IE9 or up
+            return elcsIE.getPropertyValue(cssprop);
+        }
     }else if (document.defaultView && document.defaultView.getComputedStyle){ //Firefox
-    	var elcsFF = document.defaultView.getComputedStyle(el, "");
-    	if(elcsFF[cssprop]!=undefined) {
-    		return elcsFF[cssprop];
-    	}else if(elcsFF.getPropertyValue(cssprop)!=undefined){
-    		return elcsFF.getPropertyValue(cssprop);
-    	}
+        var elcsFF = document.defaultView.getComputedStyle(el, "");
+        if(elcsFF[cssprop]!=undefined) {
+            return elcsFF[cssprop];
+        }else if(elcsFF.getPropertyValue(cssprop)!=undefined){
+            return elcsFF.getPropertyValue(cssprop);
+        }
     }else{ //try and get inline style
         return el.style[cssprop];
     }
 };
+
+Aura.Utils.Style = Style;
 
 //#include aura.util.Style_export

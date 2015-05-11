@@ -178,9 +178,9 @@ var AuraLayoutService = function() {
 			if (history.length > 1) {
 				pop();
 				this.refreshLayout();
-				historyService.back();
+				$A.historyService.back();
 			} else {
-				historyService.set(layouts.getDefault().getName());
+				$A.historyService.set(layouts.getDefault().getName());
 			}
 		},
 
@@ -301,7 +301,7 @@ var AuraLayoutService = function() {
 
 			if (actions.length > 0 || config.length > 0) {
 				window.scrollTo(0, 0);
-				clientService.runActions(actions, cmp, function(msg) {
+				$A.clientService.runActions(actions, cmp, function(msg) {
 					/**
 					 * This function gets called in
 					 * AuraClientService.runActions(). After all server actions
@@ -415,3 +415,5 @@ var AuraLayoutService = function() {
 	// #include aura.AuraLayoutService_export
 	return layoutService;
 };
+
+Aura.Services.AuraLayoutService = AuraLayoutService;

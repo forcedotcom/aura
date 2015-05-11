@@ -22,3 +22,5 @@
 function AuraLocalizationContext(config) {
     this.dateFormat = config.dateFormat;
 }
+
+Aura.L10n.AuraLocalizationContext = AuraLocalizationContext;

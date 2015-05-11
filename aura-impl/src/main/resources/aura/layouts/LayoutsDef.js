@@ -70,3 +70,5 @@ LayoutsDef.prototype.getCatchall = function(){
 LayoutsDef.prototype.getDefault = function(){
     return this.getLayout(this.defaultLayout);
 };
+
+Aura.Layouts.LayoutsDef = LayoutsDef;

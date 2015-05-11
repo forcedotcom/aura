@@ -193,5 +193,5 @@ PropertyReferenceValue.prototype.toJSON = function() {
     return this.evaluate();
 };
 
-
+Aura.Value.PropertyReferenceValue = PropertyReferenceValue;
 // #include aura.value.PropertyReferenceValue_export

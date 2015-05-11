@@ -23,10 +23,12 @@
  * @param {Component} component
  * @returns {Function}
  */
-$A.ns.AuraFriendlyError = function() {
-    $A.ns.AuraError.apply(this,arguments);
-    this.name="AuraFriendlyError";
-};
+function AuraFriendlyError() {
+    Aura.Errors.AuraError.apply(this,arguments);
+    this.name = "AuraFriendlyError";
+}
 
-$A.ns.AuraFriendlyError.prototype = new $A.ns.AuraError();
-$A.ns.AuraFriendlyError.prototype.constructor = $A.ns.AuraFriendlyError;
+AuraFriendlyError.prototype = new Aura.Errors.AuraError();
+AuraFriendlyError.prototype.constructor = AuraFriendlyError;
+
+Aura.Errors.AuraFriendlyError = AuraFriendlyError;

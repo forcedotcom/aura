@@ -60,12 +60,14 @@ Test.Aura.BrowserSupportedUtilTest=function() {
                 Bitset:{},
                 NumberFormat:{},            
                 $A:{ns:{}},
+                "Aura":{"Utils":{}},
                 navigator:{userAgent:''},
                 Array: override === MockArray ? override : Array,
                 Function: override === MockFunction ? override : Function
             })(function(){
                 var CurrentObject = window.Object;
                 window.Object = override === MockObject ? MockObject : window.Object;
+                // #import aura.util.CoreUtil
                 // #import aura.util.Util
                 try {
                     delegate(new $A.ns.Util());

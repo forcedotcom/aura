@@ -65,4 +65,5 @@ ControllerDef.prototype.get = function(key){
     return this.getActionDef(key).newInstance();
 };
 
+Aura.Controller.ControllerDef = ControllerDef;
 //#include aura.controller.ControllerDef_export

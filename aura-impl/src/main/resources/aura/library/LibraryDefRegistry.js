@@ -19,11 +19,11 @@
  * @description A registry for libraryDefs.
  * @constructor
  */
-$A.ns.LibraryDefRegistry = function LibraryDefRegistry() {
+function LibraryDefRegistry() {
     this.libraryDefs = {};
-};
+}
 
-$A.ns.LibraryDefRegistry.prototype.auraType = "LibraryDefRegistry";
+LibraryDefRegistry.prototype.auraType = "LibraryDefRegistry";
 
 /**
  * Returns an evaluated module or evaluates one.
@@ -32,7 +32,7 @@ $A.ns.LibraryDefRegistry.prototype.auraType = "LibraryDefRegistry";
  *     is evaluated and registered. 
  * @returns {Object} Evaluated module instance.
  */
-$A.ns.LibraryDefRegistry.prototype.getDef = function(descriptor, libraryDef) {
+LibraryDefRegistry.prototype.getDef = function(descriptor, libraryDef) {
 	if ($A.util.isObject(descriptor)) {
 		libraryDef = descriptor;
 		descriptor = descriptor["descriptor"];
@@ -54,13 +54,13 @@ $A.ns.LibraryDefRegistry.prototype.getDef = function(descriptor, libraryDef) {
     return this.libraryDefs[descriptor];
 };
 
-$A.ns.LibraryDefRegistry.prototype.define = function(/*var args*/) {
+LibraryDefRegistry.prototype.define = function(/*var args*/) {
     var args = Array.prototype.slice.call(arguments);
-    var identifier = $A.ns.LibraryDefRegistry.parseLocator(args.shift());
+    var identifier = LibraryDefRegistry.parseLocator(args.shift());
     var module = args.pop();
     var imports = $A.util.map(args, function(arg) {
         // Externally located definitions are already fully qualified:
-        if ($A.ns.LibraryDefRegistry.isLocator(arg)) {
+        if (LibraryDefRegistry.isLocator(arg)) {
             return this.require(arg);
         }
         
@@ -70,8 +70,8 @@ $A.ns.LibraryDefRegistry.prototype.define = function(/*var args*/) {
     this.libraryDefs[identifier.library][identifier.name] = module.apply({}, imports);
 };
 
-$A.ns.LibraryDefRegistry.prototype.require = function(locator) {
-    var identifier = $A.ns.LibraryDefRegistry.parseLocator(locator);
+LibraryDefRegistry.prototype.require = function(locator) {
+    var identifier = LibraryDefRegistry.parseLocator(locator);
     if (this.libraryDefs[identifier.library] && Object.prototype.hasOwnProperty.call(this.libraryDefs[identifier.library],identifier.name)) {
         return this.libraryDefs[identifier.library][identifier.name];
     } else {
@@ -79,11 +79,11 @@ $A.ns.LibraryDefRegistry.prototype.require = function(locator) {
     }
 };
 
-$A.ns.LibraryDefRegistry.isLocator = function(locator) {
+LibraryDefRegistry.isLocator = function(locator) {
     return (locator.split(":").length === 3);
 };
 
-$A.ns.LibraryDefRegistry.parseLocator = function(locator) {
+LibraryDefRegistry.parseLocator = function(locator) {
     var tokens = locator.split(":");
     if (tokens.length !== 3) {
         throw "Library locator must be in the form: 'namespace:libraryName:fileName'";
@@ -93,3 +93,6 @@ $A.ns.LibraryDefRegistry.parseLocator = function(locator) {
         name: tokens[2]
     };
 };
+
+$A.ns.LibraryDefRegistry = LibraryDefRegistry;
+Aura.Library.LibraryDefRegistry = LibraryDefRegistry;

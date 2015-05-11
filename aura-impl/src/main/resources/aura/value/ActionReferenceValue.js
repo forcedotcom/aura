@@ -91,4 +91,5 @@ ActionReferenceValue.prototype.toString = function(){
     return "ActionReferenceValue";
 };
 
+Aura.Value.ActionReferenceValue = ActionReferenceValue;
 //#include aura.value.ActionReferenceValue_export

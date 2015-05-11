@@ -93,6 +93,8 @@ Model.prototype.getErrors = function(expression) {
     return this.errors[expression] || [];
 };
 
-Model.prototype.destroy=function(async){
+Model.prototype.destroy = function(async){
     this.data = this.def = this.component = this.errors = null;
 };
+
+Aura.Model.Model = Model;

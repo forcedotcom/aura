@@ -39,3 +39,6 @@ ProviderDefRegistry.prototype.getDef = function(componentDefDescriptor, config){
     }
     return ret;
 };
+
+
+Aura.Provider.ProviderDefRegistry = ProviderDefRegistry;

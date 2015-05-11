@@ -19,7 +19,7 @@
  * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
  * @constructor
  */
-$A.ns.AuraComponentService = function(actions, finishedCallback) {
+function AuraComponentService (actions, finishedCallback) {
     this.registry = new ComponentDefRegistry();
     this.controllerDefRegistry = new ControllerDefRegistry();
     this.actionDefRegistry = new ActionDefRegistry();
@@ -40,8 +40,7 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
     // Collection of all the component classes we generate for
     // proper stack traces and proper use of prototypical inheritance
     this.classConstructors={};
-
-};
+}
 
 /**
  * Gets an instance of a component.
@@ -50,7 +49,7 @@ $A.ns.AuraComponentService = function(actions, finishedCallback) {
  * @public
  * @deprecated use getComponent instead
  */
-$A.ns.AuraComponentService.prototype.get =  function(globalId) {
+AuraComponentService.prototype.get =  function(globalId) {
     var ret = this.indexes.globalId[globalId];
     return ret;
 };
@@ -61,17 +60,17 @@ $A.ns.AuraComponentService.prototype.get =  function(globalId) {
  *
  * @public
  */
-$A.ns.AuraComponentService.prototype.getComponent = function(identifier) {
+AuraComponentService.prototype.getComponent = function(identifier) {
     return this.get(identifier) || this.getRenderingComponentForElement(identifier);
 };
 
 /**
  * Gets the rendering component for the provided element recursively.
  * @param {Object} element The element that is used to find the rendering component
- * @memberOf $A.ns.AuraComponentService
+ * @memberOf AuraComponentService
  * @private
  */
-$A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(element) {
+AuraComponentService.prototype.getRenderingComponentForElement = function(element) {
     if ($A.util.isUndefinedOrNull(element)) { return null;}
 
     var ret;
@@ -88,10 +87,10 @@ $A.ns.AuraComponentService.prototype.getRenderingComponentForElement = function(
 /**
  * Gets the attribute provider for the provided element.
  * @param {Object} element The element whose attribute provider is to be returned
- * @memberOf $A.ns.AuraComponentService
+ * @memberOf AuraComponentService
  * @private
  */
-$A.ns.AuraComponentService.prototype.getAttributeProviderForElement = function(element) {
+AuraComponentService.prototype.getAttributeProviderForElement = function(element) {
     return this.getRenderingComponentForElement(element).getAttributeValueProvider();
 };
 
@@ -99,7 +98,7 @@ $A.ns.AuraComponentService.prototype.getAttributeProviderForElement = function(e
  * Create a new component array.
  * @private
  */
-$A.ns.AuraComponentService.prototype.newComponentArray = function(config, attributeValueProvider, localCreation, doForce){
+AuraComponentService.prototype.newComponentArray = function(config, attributeValueProvider, localCreation, doForce){
     var ret = [];
 
     for(var i=0;i<config.length;i++){
@@ -119,7 +118,7 @@ $A.ns.AuraComponentService.prototype.newComponentArray = function(config, attrib
  *
  * @public
  */
-$A.ns.AuraComponentService.prototype.createComponent = function(type, attributes, callback){
+AuraComponentService.prototype.createComponent = function(type, attributes, callback){
     $A.assert($A.util.isString(type), "ComponentService.createComponent(): 'type' must be a valid String.");
     $A.assert(!attributes||$A.util.isObject(attributes),"ComponentService.createComponent(): 'attributes' must be a valid Object.");
     $A.assert($A.util.isFunction(callback),"ComponentService.createComponent(): 'callback' must be a Function pointer.");
@@ -190,7 +189,7 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
  *
  * @public
  */
-$A.ns.AuraComponentService.prototype.createComponents = function(components, callback) {
+AuraComponentService.prototype.createComponents = function(components, callback) {
     $A.assert($A.util.isArray(components), "ComponentService.createComponents(): 'components' must be a valid Array.");
     $A.assert($A.util.isFunction(callback),"ComponentService.createComponents(): 'callback' must be a Function pointer.");
 
@@ -225,7 +224,7 @@ $A.ns.AuraComponentService.prototype.createComponents = function(components, cal
  * @public
  * @deprecated use createComponent instead
  */
-$A.ns.AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
+AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
     return this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
 };
 
@@ -238,7 +237,7 @@ $A.ns.AuraComponentService.prototype.newComponent = function(config, attributeVa
  *
  * @deprecated use createComponent instead
  */
-$A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
+AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
 
     if ($A.util.isArray(config)){
@@ -305,7 +304,7 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
  * @param {Object} config Config is the same object you would pass to the constructor $A.Component to create a component. This method will use that information to further configure the component class that is created.
  * @param {Boolean} localCreation See documentation on Component.js constructor for documentation on the localCreation property.
  */
-$A.ns.AuraComponentService.prototype.createComponentInstance = function(config, localCreation) {
+AuraComponentService.prototype.createComponentInstance = function(config, localCreation) {
 
 
     if(!config["skipCreationPath"]) {
@@ -381,7 +380,7 @@ $A.ns.AuraComponentService.prototype.createComponentInstance = function(config, 
  * @param {String} descriptor Uses the pattern of namespace:componentName.  
  * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
  */
-$A.ns.AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
+AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
     if(descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
         return;
     }
@@ -394,7 +393,7 @@ $A.ns.AuraComponentService.prototype.addComponentClass = function(descriptor, cl
  * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
  * @returns Either the class that defines the component you are requesting, or null if not found.
  */
-$A.ns.AuraComponentService.prototype.getComponentClass = function(descriptor) {
+AuraComponentService.prototype.getComponentClass = function(descriptor) {
 	descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
     
     var storedConstructor = this.classConstructors[descriptor];
@@ -419,7 +418,7 @@ $A.ns.AuraComponentService.prototype.getComponentClass = function(descriptor) {
  * 
  * @param {String} descriptor The qualified name of the component to check in the form prefix:componentname or protocol://prefix:componentname
  */
-$A.ns.AuraComponentService.prototype.hasComponentClass = function(descriptor) {
+AuraComponentService.prototype.hasComponentClass = function(descriptor) {
     descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
 
     if(descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
@@ -443,7 +442,7 @@ $A.ns.AuraComponentService.prototype.hasComponentClass = function(descriptor) {
  *
  * @deprecated use createComponent instead
  */
-$A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
+AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
     $A.assert(config, "ComponentService.newComponentAsync(): 'config' must be a valid Object.");
     $A.assert($A.util.isFunction(callback),"ComponentService.newComponentAsync(): 'callback' must be a Function pointer.");
 
@@ -492,7 +491,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
 
             if (!def && desc.indexOf("layout://") == 0) {
                 // clear dynamic namespaces so that the server can send it back.
-                componentService.registry.dynamicNamespaces = [];
+                $A.componentService.registry.dynamicNamespaces = [];
                 // throw error instead of trying to requestComponent from server which is prohibited
                 throw new Error("Missing " + desc + " definition.");
             }
@@ -523,7 +522,7 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
  * @param callback
  * @private
  */
-$A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp, index, returnNullOnError) {
+AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp, index, returnNullOnError) {
     var action = $A.get("c.aura://ComponentController.getComponent");
 
     // JBUCH: HALO: TODO: WHERE IS THIS COMING FROM IN MIXED FORM? WHY DO WE ALLOW THIS?
@@ -603,7 +602,7 @@ $A.ns.AuraComponentService.prototype.requestComponent = function(callbackScope, 
  *
  * @returns {*}
  */
-$A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProvider) {
+AuraComponentService.prototype.computeValue = function(valueObj, valueProvider) {
     if(aura.util.isExpression(valueObj)){
         return valueObj.evaluate(valueProvider);
     }
@@ -617,7 +616,7 @@ $A.ns.AuraComponentService.prototype.computeValue = function(valueObj, valueProv
  * @param {Object} attributeValueProvider
  * @return {Object} {{configuration: {}, definition: ComponentDef, descriptor: String}}
  */
-$A.ns.AuraComponentService.prototype.getComponentConfigs = function(config, attributeValueProvider) {
+AuraComponentService.prototype.getComponentConfigs = function(config, attributeValueProvider) {
     var configuration, configAttributes, def, desc, configKey, attributeKey; 
     
     // Given a string input, expand the config to be an object.
@@ -676,7 +675,7 @@ $A.ns.AuraComponentService.prototype.getComponentConfigs = function(config, attr
  * Indexes the component using its global Id, which is uniquely generated across pageloads.
  * @private
  */
-$A.ns.AuraComponentService.prototype.index = function(component){
+AuraComponentService.prototype.index = function(component){
     this.indexes.globalId[component.priv.globalId] = component;
 };
 
@@ -688,7 +687,7 @@ $A.ns.AuraComponentService.prototype.index = function(component){
  *
  * @public
  */
-$A.ns.AuraComponentService.prototype.getDef = function(config, noInit){
+AuraComponentService.prototype.getDef = function(config, noInit){
     var def = this.registry.getDef(config, noInit);
     if (!noInit) {
         if (!def) {
@@ -711,7 +710,7 @@ $A.ns.AuraComponentService.prototype.getDef = function(config, noInit){
  * Gets the component's controller definition from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getControllerDef = function(config){
+AuraComponentService.prototype.getControllerDef = function(config){
     return this.controllerDefRegistry.getDef(config);
 };
 
@@ -719,7 +718,7 @@ $A.ns.AuraComponentService.prototype.getControllerDef = function(config){
  * Gets the action definition from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getActionDef = function(config){
+AuraComponentService.prototype.getActionDef = function(config){
     return this.actionDefRegistry.getDef(config);
 };
 
@@ -727,7 +726,7 @@ $A.ns.AuraComponentService.prototype.getActionDef = function(config){
  * Gets the model definition from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getModelDef = function(config){
+AuraComponentService.prototype.getModelDef = function(config){
     return this.modelDefRegistry.getDef(config);
 };
 
@@ -735,7 +734,7 @@ $A.ns.AuraComponentService.prototype.getModelDef = function(config){
  * Gets the provider definition from the registry. A provider enables an abstract component definition to be used directly in markup.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getProviderDef = function(providerDefDescriptor, config){
+AuraComponentService.prototype.getProviderDef = function(providerDefDescriptor, config){
     return this.providerDefRegistry.getDef(providerDefDescriptor, config);
 };
 
@@ -743,7 +742,7 @@ $A.ns.AuraComponentService.prototype.getProviderDef = function(providerDefDescri
  * Gets the renderer definition from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getRendererDef = function(componentDefDescriptor, config){
+AuraComponentService.prototype.getRendererDef = function(componentDefDescriptor, config){
     return this.rendererDefRegistry.getDef(componentDefDescriptor, config);
 };
 
@@ -751,7 +750,7 @@ $A.ns.AuraComponentService.prototype.getRendererDef = function(componentDefDescr
  * Gets the helper definition from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getHelperDef = function(componentDefDescriptor, config, componentDef, libraries){
+AuraComponentService.prototype.getHelperDef = function(componentDefDescriptor, config, componentDef, libraries){
     return this.helperDefRegistry.getDef(componentDefDescriptor, config, componentDef, libraries);
 };
 
@@ -759,7 +758,7 @@ $A.ns.AuraComponentService.prototype.getHelperDef = function(componentDefDescrip
  * Gets the helper module from the registry.
  * @private
  */
-$A.ns.AuraComponentService.prototype.getLibraryDef = function(descriptor, libraryDef){
+AuraComponentService.prototype.getLibraryDef = function(descriptor, libraryDef){
     return this.libraryDefRegistry.getDef(descriptor, libraryDef);
 };
 
@@ -767,7 +766,7 @@ $A.ns.AuraComponentService.prototype.getLibraryDef = function(descriptor, librar
  * Destroys the components.
  * @private
  */
-$A.ns.AuraComponentService.prototype.destroy = function(components){
+AuraComponentService.prototype.destroy = function(components){
     if (!aura.util.isArray(components)) {
         components = [components];
     }
@@ -784,15 +783,15 @@ $A.ns.AuraComponentService.prototype.destroy = function(components){
  * Removes the index of the component.
  * @private
  */
-$A.ns.AuraComponentService.prototype.deIndex = function(globalId){
+AuraComponentService.prototype.deIndex = function(globalId){
     delete this.indexes.globalId[globalId];
 };
 
 /**
  * Returns the descriptors of all components known to the registry.
- * @memberOf $A.ns.AuraComponentService
+ * @memberOf AuraComponentService
  */
-$A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
+AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
     var ret = [];
     var name;
 
@@ -815,15 +814,15 @@ $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors = functio
 /**
  * Get the dynamic namespaces defined by 'layout://name'
  */
-$A.ns.AuraComponentService.prototype.getDynamicNamespaces = function(){
+AuraComponentService.prototype.getDynamicNamespaces = function(){
     return this.registry.dynamicNamespaces;
 };
 
 /**
- * @memberOf $A.ns.AuraComponentService
+ * @memberOf AuraComponentService
  * @private
  */
-$A.ns.AuraComponentService.prototype.getIndex = function(){
+AuraComponentService.prototype.getIndex = function(){
     var ret = "";
     var index = this.indexes.globalId;
     for (var globalId in index) {
@@ -844,10 +843,10 @@ $A.ns.AuraComponentService.prototype.getIndex = function(){
 };
 
 /**
- * @memberOf $A.ns.AuraComponentService
+ * @memberOf AuraComponentService
  * @private
  */
-$A.ns.AuraComponentService.prototype.isConfigDescriptor = function(config) {
+AuraComponentService.prototype.isConfigDescriptor = function(config) {
     /*
      * This check is to distinguish between a AttributeDefRef that came
      * from server which has a descriptor and value, and just a thing
@@ -858,25 +857,27 @@ $A.ns.AuraComponentService.prototype.isConfigDescriptor = function(config) {
      */
     return config && config["descriptor"];
 };
+$A.ns.AuraComponentService = AuraComponentService;
+Aura.Services.AuraComponentService = AuraComponentService;
 
-exp($A.ns.AuraComponentService.prototype,
-    "addComponentClass", $A.ns.AuraComponentService.prototype.addComponentClass,
-    "get", $A.ns.AuraComponentService.prototype.get,
-    "getComponent", $A.ns.AuraComponentService.prototype.getComponent,
-    "getComponentClass", $A.ns.AuraComponentService.prototype.getComponentClass,
-    "getRenderingComponentForElement", $A.ns.AuraComponentService.prototype.getRenderingComponentForElement,
-    "getAttributeProviderForElement", $A.ns.AuraComponentService.prototype.getAttributeProviderForElement,
+exp(AuraComponentService.prototype,
+    "addComponentClass", AuraComponentService.prototype.addComponentClass,
+    "get", AuraComponentService.prototype.get,
+    "getComponent", AuraComponentService.prototype.getComponent,
+    "getComponentClass", AuraComponentService.prototype.getComponentClass,
+    "getRenderingComponentForElement", AuraComponentService.prototype.getRenderingComponentForElement,
+    "getAttributeProviderForElement", AuraComponentService.prototype.getAttributeProviderForElement,
 
-    "createComponent", $A.ns.AuraComponentService.prototype.createComponent,
-    "createComponents", $A.ns.AuraComponentService.prototype.createComponents,
+    "createComponent", AuraComponentService.prototype.createComponent,
+    "createComponents", AuraComponentService.prototype.createComponents,
 
-    "newComponent", $A.ns.AuraComponentService.prototype.newComponent,
-    "newComponentDeprecated", $A.ns.AuraComponentService.prototype.newComponentDeprecated,
-    "newComponentAsync", $A.ns.AuraComponentService.prototype.newComponentAsync,
+    "newComponent", AuraComponentService.prototype.newComponent,
+    "newComponentDeprecated", AuraComponentService.prototype.newComponentDeprecated,
+    "newComponentAsync", AuraComponentService.prototype.newComponentAsync,
 
-    "getDef", $A.ns.AuraComponentService.prototype.getDef,
-    "getRegisteredComponentDescriptors", $A.ns.AuraComponentService.prototype.getRegisteredComponentDescriptors,
-    "getIndex", $A.ns.AuraComponentService.prototype.getIndex,
-    "renderedBy", $A.ns.AuraComponentService.prototype.renderedBy,
-    "computeValue", $A.ns.AuraComponentService.prototype.computeValue
+    "getDef", AuraComponentService.prototype.getDef,
+    "getRegisteredComponentDescriptors", AuraComponentService.prototype.getRegisteredComponentDescriptors,
+    "getIndex", AuraComponentService.prototype.getIndex,
+    "renderedBy", AuraComponentService.prototype.renderedBy,
+    "computeValue", AuraComponentService.prototype.computeValue
 );

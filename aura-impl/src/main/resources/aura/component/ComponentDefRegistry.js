@@ -317,3 +317,5 @@ ComponentDefRegistry.prototype.removeDef = function(descriptor) {
         this.definitionStorage.remove(descriptor, true);
     }
 };
+
+Aura.Component.ComponentDefRegistry = ComponentDefRegistry;

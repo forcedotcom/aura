@@ -41,3 +41,5 @@ ModelDefRegistry.prototype.getDef = function(config){
     }
     return ret;
 };
+
+Aura.Model.ModelDefRegistry = ModelDefRegistry;

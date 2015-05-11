@@ -27,6 +27,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             Style: function() {},
             Bitset: {},
             NumberFormat: {},
+            Aura: {Utils:{}},
             $A: {
                 log: function() {},
                 util: {

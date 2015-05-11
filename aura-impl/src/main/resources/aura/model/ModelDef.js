@@ -56,4 +56,6 @@ ModelDef.prototype.newInstance = function(config, component){
 ModelDef.prototype.getMembers = function() {
     return this.members;
 };
+
+Aura.Model.ModelDef = ModelDef;
 //#include aura.model.ModelDef_export

@@ -40,3 +40,5 @@ RendererDefRegistry.prototype.getDef = function(componentDefDescriptor){
     }
     return ret;
 };
+
+Aura.Renderer.RendererDefRegistry = RendererDefRegistry;

@@ -36,3 +36,5 @@ var AuraSerializationService = function(){
         }
     };
 };
+
+Aura.Services.AuraSerializationService = AuraSerializationService;

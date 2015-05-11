@@ -18,14 +18,14 @@
  * @description Simple Value Provider. Holds generic map of Key/Value Pairs
  * @constructor
  */
-$A.ns.ObjectValueProvider = function() {
+function ObjectValueProvider() {
     this.values = {};
-};
+}
 
 /**
  * returns $GVP values
  */
-$A.ns.ObjectValueProvider.prototype.getValues = function(values) {
+ObjectValueProvider.prototype.getValues = function(values) {
     return this.values;
 };
 
@@ -34,7 +34,7 @@ $A.ns.ObjectValueProvider.prototype.getValues = function(values) {
  *
  * @param values
  */
-$A.ns.ObjectValueProvider.prototype.merge = function(values) {
+ObjectValueProvider.prototype.merge = function(values) {
     $A.util.apply(this.values, values, true, true);
 };
 
@@ -45,10 +45,13 @@ $A.ns.ObjectValueProvider.prototype.merge = function(values) {
  * @param {Function} callback called after creating the new values
  * @return {Object} The value referenced by the expression.
  */
-$A.ns.ObjectValueProvider.prototype.get = function(expression, callback) {
+ObjectValueProvider.prototype.get = function(expression, callback) {
     var value = $A.expressionService.resolve(expression,this.values);
     if( $A.util.isFunction(callback) ) {
         callback(value);
     }
     return value;
 };
+
+$A.ns.ObjectValueProvider = ObjectValueProvider;
+Aura.Provider.ObjectValueProvider = ObjectValueProvider;

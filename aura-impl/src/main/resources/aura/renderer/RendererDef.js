@@ -112,3 +112,5 @@ RendererDef.prototype.unrender = function RendererDef$Unrender(component) {
         component.disassociateElements();
     }
 };
+
+Aura.Renderer.RendererDef = RendererDef;

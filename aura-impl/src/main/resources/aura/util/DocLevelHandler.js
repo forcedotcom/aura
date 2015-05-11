@@ -29,7 +29,7 @@
  * @constructor
  * @private
  */
-$A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component) {
+function DocLevelHandler(eventName, callback, component) {
     this.eventName = eventName;
     this.component = component;
     this.enabled = false;
@@ -39,7 +39,7 @@ $A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component)
             callback(eventObj);
         }
     };
-};
+}
 
 /**
  * Set whether the handler is enabled.
@@ -50,7 +50,7 @@ $A.ns.DocLevelHandler = function DocLevelHandler(eventName, callback, component)
  * @param {Boolean}
  *            enable if truthy, the handler is enabled, otherwise disabled.
  */
-$A.ns.DocLevelHandler.prototype.setEnabled = function(enable) {
+DocLevelHandler.prototype.setEnabled = function(enable) {
     if (enable) {
         if (!this.enabled) {
             this.enabled = true;
@@ -64,5 +64,7 @@ $A.ns.DocLevelHandler.prototype.setEnabled = function(enable) {
     }
 };
 
-var dlp = $A.ns.DocLevelHandler.prototype;
+var dlp = DocLevelHandler.prototype;
+Aura.Utils.DocLevelHandler = DocLevelHandler;
+
 exp(dlp, "setEnabled", dlp.setEnabled);

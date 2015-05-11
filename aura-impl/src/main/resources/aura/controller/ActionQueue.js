@@ -32,13 +32,13 @@
  * @private
  */
 
-var ActionQueue = function ActionQueue() {
+function ActionQueue() {
     this.nextTransactionId = 1;
     this.lastAbortableTransactionId = 1;
     this.currentTransactionId = undefined;
     this.actions = [];
     this.xhr = false;
-};
+}
 
 ActionQueue.prototype.auraType = "ActionQueue";
 
@@ -270,6 +270,7 @@ ActionQueue.prototype.filterActions = function(filter) {
     return requestedActions;
 };
 
-// #include aura.controller.ActionQueue_export
-
+Aura.Controller.ActionQueue = ActionQueue;
 $A.ns.ActionQueue = ActionQueue;
+
+// #include aura.controller.ActionQueue_export

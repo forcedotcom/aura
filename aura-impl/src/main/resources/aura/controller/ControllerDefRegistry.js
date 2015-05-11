@@ -40,3 +40,5 @@ ControllerDefRegistry.prototype.getDef = function(config){
     }
     return ret;
 };
+
+Aura.Controller.ControllerDefRegistry = ControllerDefRegistry;

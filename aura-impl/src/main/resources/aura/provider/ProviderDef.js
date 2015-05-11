@@ -45,7 +45,7 @@ ProviderDef.prototype.provide = function(component, localCreation, callback) {
     }
 
     if (providedConfig['componentDef']) {
-        var def = componentService.getDef(providedConfig['componentDef']);
+        var def = $A.componentService.getDef(providedConfig['componentDef']);
         // set available component def
         providedConfig['componentDef'] = def;
     } else {
@@ -54,4 +54,7 @@ ProviderDef.prototype.provide = function(component, localCreation, callback) {
     }
     callback(providedConfig['componentDef'], providedConfig['attributes']);
 };
+
+Aura.Provider.ProviderDef = ProviderDef;
+
 //#include aura.provider.ProviderDef_export

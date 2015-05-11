@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 ({
+
     /**
      * Calling destroy on a facet which has its own facet.
      * Each level of facet evaluating v.body in its markup.
@@ -139,6 +140,21 @@
             this.verifyComponentDestroyed(cmp);
         }
     },
+
+    /**
+     * Verify customized destroy handler gets called when component gets destroyed.
+     */
+    testCustomizedDestroyHanlder : {
+        test : function(cmp) {
+                component = cmp.find("cmpWithDestroyHandlerWrapper");
+                component.destroy(false);
+
+                $A.test.assertTrue(cmp.get("v.cmpDestroyed"),
+                        "Destroy handler didn't get called when component gets destroyed");
+                $A.test.assertTrue(cmp.get("v.childCmpDestroyed"),
+                        "Child component's Destroy handler didn't get called when parent component gets destroyed");
+            }
+     },
 
     /**
      * After a component is destroyed it's prototype is swapped with InvalidComponent to display error messages if

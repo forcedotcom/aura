@@ -16,23 +16,28 @@
 
 -->
 <aura:component render="client">
+    <aura:attribute name="cmpDestroyed" type="Boolean" default="false" />
+    <aura:attribute name="childCmpDestroyed" type="Boolean" default="false" />
+
     <div aura:id="team" class="team">
-	    <componentTest:hasBody aura:id="outerFacet">
-	        <aura:text aura:id="textInOuterFacet" value="Outer Facet"/>
-	        <div aura:id="bullPen" class="bullPen"/>
-	        <componentTest:stubComponent aura:id="innerFacet1">
-	            <aura:text aura:id="textInInnerFacet" value="Inner Facet"/>
-	            <div aura:id="players" class="players"/>
-	        </componentTest:stubComponent>
-	        <componentTest:stubComponent aura:id="innerFacet2">
-	            <div aura:id="coach" class="coach"/>
-	        </componentTest:stubComponent>
-	    </componentTest:hasBody>
-	</div>
-	
-	<!--Cause a reference loop between facet and its owner-->
+        <componentTest:hasBody aura:id="outerFacet">
+            <aura:text aura:id="textInOuterFacet" value="Outer Facet"/>
+            <div aura:id="bullPen" class="bullPen"/>
+            <componentTest:stubComponent aura:id="innerFacet1">
+                <aura:text aura:id="textInInnerFacet" value="Inner Facet"/>
+                <div aura:id="players" class="players"/>
+            </componentTest:stubComponent>
+            <componentTest:stubComponent aura:id="innerFacet2">
+                <div aura:id="coach" class="coach"/>
+            </componentTest:stubComponent>
+        </componentTest:hasBody>
+    </div>
+
+    <!--Cause a reference loop between facet and its owner-->
     <componentTest:informFacetOfParent aura:id="informFacet">
         <componentTest:knowParent aura:id="knowParent"/>
     </componentTest:informFacetOfParent>
-    
+
+    <componentTest:cmpWithDestroyHandlerWrapper aura:id="cmpWithDestroyHandlerWrapper">
+    </componentTest:cmpWithDestroyHandlerWrapper>
 </aura:component>

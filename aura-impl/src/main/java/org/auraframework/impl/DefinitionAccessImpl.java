@@ -73,9 +73,9 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         
         // See if it is one of the scope constants
         try {
-            Access acc = Access.valueOf(item.toUpperCase());
+            Access acc = Access.valueOf(ucItem);
             if (access != null && access != acc) {
-                throw new InvalidAccessValueException("Access attribute can only specifiy one of GLOBAL, PUBLIC, or PRIVATE"); // or internal
+                throw new InvalidAccessValueException("Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE"); // or internal
             }
             access = acc;
             return;

@@ -150,7 +150,6 @@ $A.ns.ComponentDef = function ComponentDef(config) {
     if (config["defaultFlavor"]) {
         this.defaultFlavor = config["defaultFlavor"];
     }
-
     if (config["hasFlavorableChild"]) {
         this.flavorableChild = true;
     }
@@ -161,7 +160,7 @@ $A.ns.ComponentDef = function ComponentDef(config) {
         this.defaultFlavors = null;
     }
 
-    this.attributeDefs = new AttributeDefSet(config["attributeDefs"]);
+    this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
 
     this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
     this.initRenderer();

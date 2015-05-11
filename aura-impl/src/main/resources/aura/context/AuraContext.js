@@ -44,6 +44,7 @@ function AuraContext(config, initCallback) {
     this.contextPath = config["contextPath"] || "";
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
+    this.accessStack=[];
 
     var that = this;
     if(!config["globalValueProviders"]){
@@ -99,6 +100,21 @@ AuraContext.prototype.getMode = function() {
     return this.mode;
 };
 
+AuraContext.prototype.getCurrentAccess=function(){
+    var access=this.accessStack[this.accessStack.length-1];
+    while(access instanceof PassthroughValue){
+        access=access.getComponent();
+    }
+    return access;
+};
+
+AuraContext.prototype.setCurrentAccess=function(component){
+    return this.accessStack.push(component?component:this.getCurrentAccess());
+};
+
+AuraContext.prototype.releaseCurrentAccess=function(){
+    this.accessStack.pop();
+};
 
 /**
  * Adds a new global value provider.

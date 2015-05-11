@@ -63,6 +63,7 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("name", descriptor);
+        json.writeValue(getAccess());
         if(!AuraTextUtil.isNullEmptyOrWhitespace(action)) {
             json.writeMapEntry("action", action);
         }

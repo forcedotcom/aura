@@ -23,10 +23,14 @@
     <aura:attribute name="iterationCompleteFired" type="Boolean" default="false" />
     <aura:attribute name="iterationCompleteOperation" type="String" default="" />
 
+    <div>Before</div>
     <aura:renderIf aura:id="if" isTrue="{!v.showIteration}">
         <aura:set attribute="else">
-            iteration disabled
+            <div>iteration disabled</div>
         </aura:set>
+        <aura:if isTrue="{!v.showIteration}">
+            <div>&lt;aura:if&gt; Before</div>
+        </aura:if>
         <aura:iteration aura:id="iteration"
                         items="{!v.items}"
                         var="var"
@@ -36,6 +40,10 @@
                         iterationComplete="{!c.iterationComplete}">
             {!idx + ':' + var + ','}
         </aura:iteration>
+        <aura:if isTrue="{!v.showIteration}">
+            <div>&lt;aura:if&gt; After</div>
+        </aura:if>
     </aura:renderIf>
+    <div>After</div>
 
 </aura:component>

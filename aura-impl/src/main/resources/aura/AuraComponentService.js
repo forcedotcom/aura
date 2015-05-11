@@ -147,6 +147,7 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
         throw new Error("Missing " + desc + " definition.");
     }
 
+
     if (!def || def.hasRemoteDependencies()) {
         var action=this.requestComponent(null, callback, configItem, null, 0, true);
         // Abortable by default, but return the action so that customers can manipulate other settings.
@@ -154,16 +155,29 @@ $A.ns.AuraComponentService.prototype.createComponent = function(type, attributes
         $A.enqueueAction(action);
         return action;
     } else {
-        var component;
-        var status = "SUCCESS";
-        var message = "";
+		var component=null;
+        var status="";
+        var message="";
         try {
-            component = this.createComponentInstance(configItem, true);
+			if($A.clientService.allowAccess(def)) {
+    	        component=this.createComponentInstance(configItem, true);
+				status="SUCCESS";
+        	}else{
+            	// #if {"modes" : ["DEVELOPMENT"]}
+	            $A.warning("Access Check Failed! AuraComponentService.createComponent(): '"+(def&&def.getDescriptor().getQualifiedName())+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+    	        // #end
+        	    // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+           		//status="ERROR";
+				//message="Unknown component '"+type+"'.";
+				component=this.createComponentInstance(configItem, true);
+				status="SUCCESS";
+			}
         } catch(e) {
             status = "ERROR";
             message = e.message;
         }
         callback(component, status, message);
+        
     }
     return null;
 };
@@ -272,6 +286,15 @@ $A.ns.AuraComponentService.prototype.newComponentDeprecated = function(config, a
                 "valueProvider":oldConfig["valueProvider"]
             }
         };
+    }else{
+        // Server should handle the case of an unknown def fetched "lazily"
+        if(!$A.clientService.allowAccess(def)) {
+            // #if {"modes" : ["DEVELOPMENT"]}
+            $A.warning("Access Check Failed! AuraComponentService.newComponentDeprecated(): '"+(def&&def.getDescriptor().getQualifiedName())+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+            // #end
+            // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+            //return null;
+        }
     }
 
     return this.createComponentInstance(config, localCreation);
@@ -478,7 +501,16 @@ $A.ns.AuraComponentService.prototype.newComponentAsync = function(callbackScope,
                 var action=this.requestComponent(callbackScope, collectComponent, configItem, attributeValueProvider, i);
                 $A.enqueueAction(action);
             } else {
-                collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
+                if($A.clientService.allowAccess(def)) {
+                    collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
+                }else{
+                    // #if {"modes" : ["DEVELOPMENT"]}
+                    $A.warning("Access Check Failed! AuraComponentService.newComponentAsync(): '"+def.getDescriptor().getQualifiedName()+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+                    // #end
+                    // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+                    //collectComponent(null,"ERROR","Unknown component '"+desc+"'.",i);
+                    collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
+                }
             }
         }
     }
@@ -660,9 +692,17 @@ $A.ns.AuraComponentService.prototype.getDef = function(config, noInit){
     var def = this.registry.getDef(config, noInit);
     if (!noInit) {
         if (!def) {
-            $A.error("Unknown component: "+descriptor);
-            throw new Error("Unknown component: "+descriptor);
+            $A.error("Unknown component: "+config["descriptor"]);
+            throw new Error("Unknown component: "+config["descriptor"]);
         }
+    }
+    if (!$A.clientService.allowAccess(def)) {
+        // #if {"modes" : ["DEVELOPMENT"]}
+        $A.warning("Access Check Failed! ComponentService.getDef():'" + config["descriptor"] + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
+        // #end
+
+        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+        // return null;
     }
     return def;
 };

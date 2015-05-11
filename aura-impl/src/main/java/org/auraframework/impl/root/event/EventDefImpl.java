@@ -88,11 +88,11 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             json.writeMapBegin();
             json.writeMapEntry("descriptor", getDescriptor());
             json.writeMapEntry("type", eventType);
+            json.writeValue(getAccess());
             if (extendsDescriptor != null) {
                 json.writeMapEntry("superDef", extendsDescriptor.getDef());
             }
             json.writeMapEntry("attributes", getAttributeDefs());
-            json.writeValue(getAccess());
             if(requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
             	json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
             }

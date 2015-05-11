@@ -309,7 +309,9 @@ var ComponentPriv = (function() { // Scoping priv
                     if (action) {
                         action.setCreationPathIndex(index);
                     }
+                    $A.getContext().setCurrentAccess(valueProvider);
                     components.push($A.componentService["newComponentDeprecated"](config, valueProvider, localCreation, true));
+                    $A.getContext().releaseCurrentAccess();
                 } else {
                 	// KRIS: HALO:
                 	// This is hit, when you create a newComponentDeprecated and use raw values, vs configs on the attribute values.
@@ -351,7 +353,9 @@ var ComponentPriv = (function() { // Scoping priv
             }
             superConfig["attributes"] = superAttributes;
             $A.pushCreationPath("super");
+            $A.getContext().setCurrentAccess(cmp);
             this.setSuperComponent($A.componentService["newComponentDeprecated"](superConfig, null, localCreation, true));
+            $A.getContext().releaseCurrentAccess();
             $A.popCreationPath("super");
         }
     };
@@ -594,7 +598,6 @@ if(!this.concreteComponentId) {
                 if($A.util.isString(clientAction)){
                     clientAction=valueProvider.getConcreteComponent().get(clientAction);
                 }
-
                 clientAction.runDeprecated(event);
             } else {
                 $A.assert(false, "no client action by name " + actionExpression);
@@ -1946,7 +1949,7 @@ Component.prototype.get = function(key) {
             $A.assert(false, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
         }
         if($A.util.isFunction(valueProvider.get)){
-            return valueProvider.get(path.join('.'));
+            return valueProvider.get(path.join('.'),this);
         }else{
             return $A.expressionService.resolve(path,valueProvider);
         }
@@ -1997,9 +2000,9 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     }
     var subPath=path.join('.');
 
-    var oldValue=valueProvider.get(subPath);
+    var oldValue=valueProvider.get(subPath,this);
 
-    var returnValue=valueProvider.set(subPath, value, ignoreChanges);
+    var returnValue=valueProvider.set(subPath, value, this);
     if($A.util.isExpression(value)){
         value.addChangeHandler(this,key);
         if(!ignoreChanges){
@@ -2170,8 +2173,16 @@ Component.prototype.getModel = function() {
  */
 Component.prototype.getEvent = function(name) {
     var eventDef = this.getDef().getEventDef(name);
-    if (!eventDef) {
+    if(!eventDef){
         return null;
+    }
+    if (!$A.clientService.allowAccess(eventDef,this)) {
+        // #if {"modes" : ["DEVELOPMENT"]}
+        $A.warning("Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+        // #end
+
+        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+        // return null;
     }
     return new Event({
         "name" : name,

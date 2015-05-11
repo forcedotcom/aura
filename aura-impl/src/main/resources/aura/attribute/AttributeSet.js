@@ -65,8 +65,15 @@ AttributeSet.prototype.hasAttribute = function(name) {
  * @protected
  *
  */
-AttributeSet.prototype.get = function(key) {
+AttributeSet.prototype.get = function(key, component) {
 	var value = undefined;
+    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(key), component)){
+        // #if {"modes" : ["DEVELOPMENT"]}
+        $A.warning("Access Check Failed! AttributeSet.get(): attribute '"+key+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+        // #end
+        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+        //return null;
+    }
 	if (key.indexOf('.') < 0) {
         var decorators=this.decorators[key];
         if(decorators&&decorators.length){
@@ -135,9 +142,16 @@ AttributeSet.prototype.setShadowValue=function(key,value){
  * @protected
  *
  */
-AttributeSet.prototype.set = function(key, value) {
+AttributeSet.prototype.set = function(key, value, component) {
     var target = this.values;
+    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(key),component)){
+        // #if {"modes" : ["DEVELOPMENT"]}
+        $A.warning("Access Check Failed! AttributeSet.set(): '"+key+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+        // #end
 
+        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+        //return;
+    }
     if(!$A.util.isUndefinedOrNull(value) && !this.isValueValidForAttribute(key, value)) {
     	if(this.isTypeOfArray(key)) {
     		value = !$A.util.isArray(value) ? [value] : value;

@@ -11,7 +11,8 @@
             "s":3,
             "v":{
               "name":"body",
-              "type":"aura://Aura.Component[]"
+              "type":"aura://Aura.Component[]",
+              "xs":"G"
             }
           }
         ],

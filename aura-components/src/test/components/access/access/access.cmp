@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component access="GLOBAL" description="An abstract component that provides a basic layout for the ui:list component.">
+    <aura:attribute name="currentTest" type="String"/>
+
+    <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
+    <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>
+    <aura:attribute name="Internal" type="String" access="INTERNAL" description="private" default="INTERNAL"/>
+    <aura:attribute name="Global" type="String" access="GLOBAL" description="private" default="GLOBAL"/>
+
+    <aura:registerEvent name="globalGlobalEvent" type="access:globalEvent" access="GLOBAL"/>
+    <aura:registerEvent name="internalGlobalEvent" type="access:globalEvent" access="INTERNAL"/>
+    <aura:registerEvent name="privateGlobalEvent" type="access:globalEvent" access="PRIVATE"/>
+
+    <aura:registerEvent name="globalInternalEvent" type="access:internalEvent" access="GLOBAL"/>
+    <aura:registerEvent name="internalInternalEvent" type="access:internalEvent" access="INTERNAL"/>
+    <aura:registerEvent name="privateInternalEvent" type="access:internalEvent" access="PRIVATE"/>
+
+    <aura:registerEvent name="globalPrivateEvent" type="access:privateEvent" access="GLOBAL"/>
+    <aura:registerEvent name="internalPrivateEvent" type="access:privateEvent" access="INTERNAL"/>
+    <aura:registerEvent name="privatePrivateEvent" type="access:privateEvent" access="PRIVATE"/>
+
+    <div aura:id="local">
+        {!v.Private}<br/>
+        {!v.Public}<br/>
+        {!v.Internal}<br/>
+        {!v.Global}<br/>
+    </div>
+    <access2:attributes aura:id="remote"/>
+
+    <ui:button aura:id="testAttributes" label="testAttributeAccess" press="{!c.testAttributeAccess}"></ui:button>
+    <ui:button aura:id="testRemoteAttributes" label="testAttributeAccess" press="{!c.testRemoteAttributeAccess}"></ui:button>
+    <ui:button aura:id="testEvent" label="testEventAccess" press="{!c.testEventAccess}"></ui:button>
+    <ui:button aura:id="testComponent" label="testComponentAccess" press="{!c.testComponentAccess}"></ui:button>
+</aura:component>

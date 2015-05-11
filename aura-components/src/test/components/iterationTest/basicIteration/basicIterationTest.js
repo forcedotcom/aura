@@ -35,9 +35,9 @@
         	// Verify renderIf
             var value = cmp.find("if").get("v.body");
             $A.test.assertTrue($A.util.isArray(value));
-            $A.test.assertEquals(1, value.length);
+            $A.test.assertEquals(3, value.length);
             var iteration = cmp.find("iteration");
-            $A.test.assertEquals(iteration, value[0]);
+            $A.test.assertEquals(iteration, value[1]);
 
             this.assertTemplateComponentDefRef(cmp);
 
@@ -66,9 +66,9 @@
             // Verify renderIf
             var value = cmp.find("if").get("v.body");
             $A.test.assertTrue($A.util.isArray(value));
-            $A.test.assertEquals(1, value.length);
+            $A.test.assertEquals(3, value.length);
             var iteration = cmp.find("iteration");
-            $A.test.assertEquals(iteration, value[0]);
+            $A.test.assertEquals(iteration, value[1]);
 
             this.assertTemplateComponentDefRef(cmp);
 

@@ -549,6 +549,7 @@ Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def && this.def.isClientAction(),
              "run() cannot be called on a server action. Use $A.enqueueAction() instead.");
     this.state = "RUNNING";
+    $A.getContext().setCurrentAccess(this.cmp);
     try {
         this.returnValue = this.meth.call(this, this.cmp, evt, this.cmp['helper']);
         this.state = "SUCCESS";
@@ -562,6 +563,8 @@ Action.prototype.runDeprecated = function(evt) {
                 throw e;
             }
         }
+    } finally {
+        $A.getContext().releaseCurrentAccess();
     }
 };
 
@@ -768,6 +771,7 @@ Action.prototype.getStorageErrorHandler = function() {
  */
 Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
+    context.setCurrentAccess(this.cmp);
     var clearComponents = false;
     var id = this.getId(context);
     var error = undefined;
@@ -823,6 +827,7 @@ Action.prototype.finishAction = function(context) {
         $A.warning("Action failed: " + (this.def?this.def.toString():""), e);
         clearComponents = true;
     }
+    context.releaseCurrentAccess();
     context.setCurrentAction(previous);
     this.completeGroups();
     if (clearComponents) {

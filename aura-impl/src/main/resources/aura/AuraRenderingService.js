@@ -69,7 +69,9 @@ $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
             continue;
         }
         if (cmp.isValid()) {
+            $A.getContext().setCurrentAccess(cmp);
             var renderedElements = cmp["render"]();
+            $A.getContext().releaseCurrentAccess();
             renderedElements=this.finishRender(cmp, renderedElements);
             elements=elements.concat(renderedElements);
         }
@@ -118,6 +120,7 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
         var cmp = components[i];
         var id = cmp.getGlobalId();
         if (cmp.isValid()){
+            $A.getContext().setCurrentAccess(cmp);
             var renderedElements=[];
             var addExistingElements=visited[id];
             if(!visited[id]) {
@@ -145,6 +148,7 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
                 renderedElements=renderedElements.concat(cmp.getElements());
             }
             elements=elements.concat(renderedElements);
+            $A.getContext().releaseCurrentAccess();
         }
         this.cleanComponent(id);
     }

@@ -15,8 +15,12 @@
     limitations under the License.
 
 -->
-<aura:application abstract="true" extensible="true" locationChangeEvent="aura:locationChange"
-         template="aura:template" renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
-         access="UNAUTHENTICATED" implements="aura:rootComponent" support="GA" useAppcache="false" description="The root of the application hierarchy.">
-    <aura:attribute name="body" access="GLOBAL" type="Aura.Component[]" description="The components to render within this application."/>
-</aura:application>
+<aura:event type="COMPONENT"
+            extends="ui:command"
+            description="Test Internal Event.">
+
+    <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
+    <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>
+    <aura:attribute name="Internal" type="String" access="INTERNAL" description="private" default="INTERNAL"/>
+    <aura:attribute name="Global" type="String" access="GLOBAL" description="private" default="GLOBAL"/>
+</aura:event>

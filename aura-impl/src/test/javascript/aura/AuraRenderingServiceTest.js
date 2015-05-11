@@ -17,7 +17,9 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraRenderingServiceTest = function(){
+    var context={getCurrentAccess:function(){},setCurrentAccess:function(){},releaseCurrentAccess:function(){}};
     var $A = {
+        getContext:function(){return context;},
         ns : {}
     };
 
@@ -92,6 +94,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
         return {
             "stubbedLogger":stubbedLogger,
             "mock":Mocks.GetMock(Object.Global(), "$A", {
+                getContext:function(){return context;},
                 util : {
                     isComponent : function() { return shouldBeComponent; },
                     isArray : function(obj) { return obj instanceof Array; },

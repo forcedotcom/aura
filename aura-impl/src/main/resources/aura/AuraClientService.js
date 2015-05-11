@@ -1022,6 +1022,7 @@ $A.ns.AuraClientService.prototype.init = function(config, token, container) {
         }
 
         var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
+        $A.getContext().setCurrentAccess(component);
 
         $A.Perf.endMark("Initial Component Created");
 
@@ -1820,6 +1821,34 @@ $A.ns.AuraClientService.prototype.processActions = function() {
         }
     }
     return processedActions;
+};
+
+$A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
+    if(definition&&definition.getDescriptor){
+        var context;
+        var currentAccess;
+        switch(definition.access){
+            case 'G':
+                // GLOBAL means accessible from anywhere
+                return true;
+            case 'P':
+                // PRIVATE means "same component only".
+                context=$A.getContext();
+                currentAccess=context&&context.getCurrentAccess();
+                return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component);
+            default:
+                // INTERNAL, PUBLIC, or absence of value means "same namespace only".
+                context=$A.getContext();
+                currentAccess=context&&context.getCurrentAccess();
+                if(currentAccess){
+                    var targetNamespace=definition&&definition.getDescriptor().getNamespace();
+                    return currentAccess===component ||
+                        (currentAccess.getDef().getDescriptor().getNamespace()===targetNamespace) ||
+                        (currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace()===targetNamespace);
+                }
+        }
+    }
+    return false;
 };
 
 exp($A.ns.AuraClientService.prototype,

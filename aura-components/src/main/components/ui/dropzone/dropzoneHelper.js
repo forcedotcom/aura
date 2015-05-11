@@ -92,11 +92,12 @@
 			// Get data being transferred
 			var data = {};
 			var dataTransferTypes = event.dataTransfer.types;
-			$A.util.forEach(dataTransferTypes, function (dataTransferType){
+			for (var i = 0; i < dataTransferTypes.length; i++) {
+				var dataTransferType = dataTransferTypes[i];
 				if (dataTransferType !== "aura-id") {
 					data[dataTransferType] = event.dataTransfer.getData(dataTransferType);
 				}
-			})
+			}
 			
 			// Fire drop event
 			var dragEvent = component.getEvent("drop");

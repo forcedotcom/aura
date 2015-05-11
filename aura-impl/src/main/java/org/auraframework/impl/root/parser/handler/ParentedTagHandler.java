@@ -62,7 +62,7 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
     
     @Override
     public boolean isInPrivilegedNamespace() {
-    	return parentHandler.isInPrivilegedNamespace();
+        return parentHandler != null && parentHandler.isInPrivilegedNamespace();
 	}
 
     protected List<ComponentDefRef> tokenizeChildText() throws XMLStreamException, QuickFixException {

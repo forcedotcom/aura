@@ -651,7 +651,11 @@
             var testCmp = component.find('myOutputCurrencyComp');
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('$1,234,567,890.00', $A.test.getText(testCmp.find('span').getElement()), "Decimal part of value was not rounded up based on format.");
-            $A.test.assertEquals("($1,234,567,890.00)", $A.localizationService.formatCurrency(-1234567890), "Both values should be same.");
+            // ICU4J 4.6.1 negative values are (value) -- Aura
+            // ICU4J 55.1  negative values are -value  -- SFDC
+            var val = $A.localizationService.formatCurrency(-1234567890);
+            var isPass = val === "($1,234,567,890.00)" || val === "-$1,234,567,890.00";
+            $A.test.assertTrue(isPass, "Both values should be same.");
             $A.test.assertEquals("$1,234,567,890.32", $A.localizationService.formatCurrency(1234567890.321), "Both values should be same.");
             $A.test.assertEquals("$1,234,567,890.33", $A.localizationService.formatCurrency(1234567890.326), "Both values should be same.");
 

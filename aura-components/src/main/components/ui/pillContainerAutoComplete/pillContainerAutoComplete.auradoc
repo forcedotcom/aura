@@ -1,0 +1,29 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>A <code>ui:pillContainerAutoComplete</code> component is nested in <code>ui:pillContainer</code> to create pills that work with autocompletion.
+		When users type in the input field, a list of suggested values is displayed. Selecting the value or pressing enter creates a pill with the selected text value.
+		Use the <code>ui:pillContainerAutoCompleteOption</code> component to provide an icon and text label for your predefined list of values.	See the Examples tab for more information.
+		</p>	
+	</aura:description>	
+		<aura:example name="pillAutoCompleteExample" ref="uitest:pillContainerWithAutoComplete" label="Creating Pills with Autocompletion">
+    	<p>This example shows how to create pills that displays suggested values from a predefined list of values as you type. Type <code>Test Pill</code> and press enter to see how it works.</p>
+	   </aura:example>	
+		
+</aura:documentation>

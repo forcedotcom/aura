@@ -19,6 +19,7 @@
  * Util methods provide utility functions for browsers in addition to
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
+ * @platform
  */
 $A.ns.Util = function() {
     this.trashcan = document.createDocumentFragment();
@@ -75,6 +76,7 @@ $A.ns.Util.prototype.globalEval = $A.ns.Util.prototype.isIE ? function(src) {
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is an array, or false otherwise.
+ * @platform
  */
 $A.ns.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
     return obj instanceof Array;
@@ -87,6 +89,7 @@ $A.ns.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArr
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid object, or false otherwise.
+ * @platform
  */
 $A.ns.Util.prototype.isObject = function(obj){
     return typeof obj === "object" && obj !== null && !this.isArray(obj);
@@ -326,6 +329,7 @@ $A.ns.Util.prototype.compareValues = function(expected, actual){
  * @param {Object} element The element to check for.
  * @param {String} className The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
+ * @platform
  */
 $A.ns.Util.prototype.hasClass = function(element, className){
     var oldClass='';
@@ -349,7 +353,7 @@ $A.ns.Util.prototype.hasClass = function(element, className){
  *
  * @param {Object} element The element to apply the class on.
  * @param {String} clz The CSS class to be applied on the element.
- *
+ * @platform
  */
 $A.ns.Util.prototype.addClass = function(element, newClass){
     this.setClass(element,newClass,false);
@@ -360,6 +364,7 @@ $A.ns.Util.prototype.addClass = function(element, newClass){
  *
  * @param {Object} element The element to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.
+ * @platform
  */
 $A.ns.Util.prototype.removeClass = function(element, newClass){
     this.setClass(element,newClass,true);
@@ -370,6 +375,7 @@ $A.ns.Util.prototype.removeClass = function(element, newClass){
  *
  * @param {Object} element The element to add or remove the class from.
  * @param {String} className The CSS class to be added or removed from the class.
+ * @platform
  */
 $A.ns.Util.prototype.toggleClass = function(element, className, condition){
     if(condition===undefined){
@@ -390,6 +396,7 @@ $A.ns.Util.prototype.toggleClass = function(element, className, condition){
  * @param {Object} element The element to be processed.
  * @param {String} oldClass The class to remove from the element.
  * @param {String} newClass The class to add to the element.
+ * @platform
  */
 $A.ns.Util.prototype.swapClass = function(element, oldClass, newClass){
     oldClass = this.isArray(oldClass)?oldClass:[oldClass];
@@ -1852,6 +1859,7 @@ $A.ns.Util.prototype.isComponent = function(obj) {
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is an expression, or false otherwise.
+ * @platform
  */
 $A.ns.Util.prototype.isExpression = function (obj) {
     return obj instanceof PropertyReferenceValue || obj instanceof FunctionCallValue;

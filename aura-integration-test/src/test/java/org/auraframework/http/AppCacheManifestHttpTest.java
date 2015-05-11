@@ -93,23 +93,34 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     private void assertManifest(String manifestContent, List<String> requiredLinks) throws Exception {
-        assertManifestFormat(manifestContent);
+    	assertManifest(manifestContent, requiredLinks, null);
+    }
+    
+    /**
+     * check if requried links are in manifest content, also make sure excludeLinks are NOT in manifest content.
+     * @param manifestContent
+     * @param requiredLinks
+     * @param excludeLinks could be null
+     * @throws Exception 
+     */
+    private void assertManifest(String manifestContent, List<String> requiredLinks, List<String> excludedLinks) throws Exception {
+    	assertManifestFormat(manifestContent);
         assertTrue("Could not find the LAST MOD: line in manifest", manifestContent.contains("\n# LAST MOD: app="));
 
         List<String> links = getManifestLinks(manifestContent);
         List<String> required = getRequiredLinks();
         required.addAll(requiredLinks);
-        assertRequiredLinks(required, links);
+        assertRequiredLinks(required, excludedLinks, links);
         assertLinksReachable(links);
     }
-
+    
     private void assertManifestFormat(String manifestContent) {
         if (!manifestContent.startsWith("CACHE MANIFEST\n")) {
             fail("Manifest should starts with: " + "CACHE MANIFEST");
         }
     }
 
-    private void assertRequiredLinks(List<String> required, List<String> links) throws Exception {
+    private void assertRequiredLinks(List<String> required, List<String> excluded, List<String> links) throws Exception {
         for (String requiredLink : required) {
             boolean foundFlag = false;
             for (String link : links) {
@@ -121,8 +132,21 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
                 fail("Missing required link: " + requiredLink + " but got instead: " + links);
             }
         }
+        if(excluded != null) {
+	        	for (String excludedLink : excluded) {
+	            boolean failFlag = false;
+	            for (String link : links) {
+	                if (link.matches(excludedLink)) {
+	                	failFlag = true;
+	                }
+	            }
+	            if (failFlag) {
+	                fail("Hit link that not suppose to exist: " + excludedLink);
+	            }
+        	}
+        }
     }
-
+    
     private void assertLinksReachable(List<String> links) throws Exception {
         for (String link : links) {
             HttpGet get = obtainGetMethod(link);
@@ -283,7 +307,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
 
         assertManifest(response, Lists.newArrayList(".*/app\\.css", ".*/app\\.js",
-                "/auraFW/resources/aura/auraIdeLogo.png", "/auraFW/resources/aura/resetCSS.css"));
+                "/auraFW/resources/aura/auraIdeLogo.png", "/auraFW/resources/aura/resetCSS.css"),
+                Lists.newArrayList("/auraFW/resources/aura/normalize.css"));
     }
 
     /**

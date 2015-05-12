@@ -74,6 +74,7 @@ public interface ConfigAdapter extends AuraAdapter {
     String getResetCssURL();
 
     boolean isPrivilegedNamespace(String namespace);
+    Set<String> getPrivilegedNamespaces();
     String getDefaultNamespace();
 	boolean isUnsecuredPrefix(String prefix);
 	

@@ -1,6 +1,7 @@
 {
   "s":1,
   "v":{
+    "xs":"P",
     "descriptor":"markup://fake:component",
     "superDef":{
       "s":2,
@@ -26,15 +27,16 @@
           "v":{
             "descriptor":"markup://aura:locationChange",
             "type":"APPLICATION",
+            "xs":"G",
             "superDef":{
               "s":5,
               "v":{
                 "descriptor":"markup://aura:applicationEvent",
                 "type":"APPLICATION",
+                "xs":"G",
                 "attributes":{
 
-                },
-                "xs":"G"
+                }
               }
             },
             "attributes":{
@@ -54,8 +56,7 @@
                   "xs":"G"
                 }
               }
-            },
-            "xs":"G"
+            }
           }
         }
       }

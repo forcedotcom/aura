@@ -202,6 +202,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public Set<String> getPrivilegedNamespaces(){
+        return SYSTEM_NAMESPACES;
+    }
+
+    @Override
     public String getDefaultNamespace() {
         return null;
     }

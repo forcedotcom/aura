@@ -30,6 +30,7 @@ $A.ns.ComponentDef = function ComponentDef(config) {
         this.hasRemoteDeps = true;
     }
     this.access=config[Json.ApplicationKey.ACCESS];
+    delete config[Json.ApplicationKey.ACCESS];
 
     this.superDef = this.initSuperDef(config["superDef"]);
     this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;

@@ -26,15 +26,16 @@
           "v":{
             "descriptor":"markup://aura:locationChange",
             "type":"APPLICATION",
+            "xs":"G",
             "superDef":{
               "s":5,
               "v":{
                 "descriptor":"markup://aura:applicationEvent",
                 "type":"APPLICATION",
+                "xs":"G",
                 "attributes":{
 
-                },
-                "xs":"G"
+                }
               }
             },
             "attributes":{
@@ -54,8 +55,7 @@
                   "xs":"G"
                 }
               }
-            },
-            "xs":"G"
+            }
           }
         }
       }
@@ -69,6 +69,7 @@
         "v":{
           "name":"testAttributeDescriptorName",
           "type":"aura://String",
+          "xs":"P",
           "default":"testValue"
         }
       }

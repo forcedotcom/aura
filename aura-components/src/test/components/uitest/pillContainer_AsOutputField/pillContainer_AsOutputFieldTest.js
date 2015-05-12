@@ -35,6 +35,18 @@
             this._validateIconURLIsPresent(cmp, actualNumberOfPills);
         }
     },
+    
+    testDoNotDisplayDeleteIconInPills: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems( [this.PILLS[0]] );
+            //Do not display delete icon on pills
+            pillContainer.find("pill").set("v.showDelete",false);
+            var actualNumberOfPills = $A.test.select(".pill").length;
+            $A.test.assertEquals(1, actualNumberOfPills, "Incorrect number of pills displayed.");
+            $A.test.assertEquals(0, $A.test.select(".deleteIcon").length, "Delete Icon on pill should not be present");
+        }
+    },
 
     testInsertTwo: {
         test: function (cmp) {

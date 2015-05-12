@@ -20,5 +20,5 @@
     <aura:attribute name="typeInteger" type="Integer"/>
     <aura:attribute name="typeList" type="List"/>
     <aura:attribute name="typeStringList" type="String[]"/>
-    <aura:attribute name="typeMapList" type="Object[]"/>
+    <aura:attribute name="typeMapList" type="Map[]"/>
 </aura:component>

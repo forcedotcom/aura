@@ -114,7 +114,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     	HashMap<String, Object> defaultLocaleProperties = new HashMap<>();
     	defaultLocaleProperties.put(LocaleValueProvider.LANGUAGE, "en");
     	defaultLocaleProperties.put(LocaleValueProvider.COUNTRY, "US");
-    	defaultLocaleProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00;(¤#,##0.00)");
+    	defaultLocaleProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00");
     	defaultLocaleProperties.put(LocaleValueProvider.CURRENCY_CODE, "USD");
     	defaultLocaleProperties.put(LocaleValueProvider.CURRENCY, "$");
     	assertLocaleProperties(null, defaultLocaleProperties);
@@ -215,7 +215,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     private void createLocaleProperties_ENUS(HashMap<String, Object> localeProperties) {
     	 localeProperties.put(LocaleValueProvider.LANGUAGE, "en");
          localeProperties.put(LocaleValueProvider.COUNTRY, "US");
-         localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00;(¤#,##0.00)");  // Patterns shouldn't localize
+         localeProperties.put(LocaleValueProvider.CURRENCY_FORMAT, "¤#,##0.00");  // Patterns shouldn't localize
          localeProperties.put(LocaleValueProvider.GROUPING, ',');
          localeProperties.put(LocaleValueProvider.DECIMAL, '.');
          localeProperties.put(LocaleValueProvider.NUMBER_FORMAT, "#,##0.###");

@@ -121,20 +121,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-test-resources</phase>
-                        <id>unpack-xunit</id>
-                    </execution>
-                    <execution>
-                        <phase>generate-test-resources</phase>
-                        <id>unpack-auraImpl</id>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -296,6 +282,28 @@
             </build>
         </profile>
         <profile>
+            <id>m2eAuraComponents</id>
+            <activation>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+	                <plugin>
+	                    <groupId>org.apache.maven.plugins</groupId>
+	                    <artifactId>maven-resources-plugin</artifactId>
+	                    <executions>
+	                        <execution>
+	                            <id>copy-xunit</id>
+	                            <phase>generate-test-resources</phase>
+	                        </execution>
+	                    </executions>
+	                </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>xunit.js</id>
             <activation>
                 <property>
@@ -304,6 +312,20 @@
             </activation>
             <build>
                 <plugins>
+	                <plugin>
+	                    <groupId>org.apache.maven.plugins</groupId>
+	                    <artifactId>maven-dependency-plugin</artifactId>
+	                    <executions>
+	                        <execution>
+	                            <id>unpack-xunit</id>
+	                            <phase>generate-test-resources</phase>
+	                        </execution>
+	                        <execution>
+	                            <id>unpack-auraImpl</id>
+	                            <phase>generate-test-resources</phase>
+	                        </execution>
+	                    </executions>
+	                </plugin>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>

@@ -141,9 +141,11 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <goals><goal>enum</goal></goals>
                         <id>generate-enums</id>
                         <phase>generate-sources</phase>
+						<goals>
+							<goal>enum</goal>
+						</goals>
                         <configuration>
                             <baseScanDirectory>.</baseScanDirectory>
                             <scanDirectoryList>
@@ -157,30 +159,29 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.eclipse.m2e</groupId>
-                <artifactId>lifecycle-mapping</artifactId>
-                <configuration>
-                    <lifecycleMappingMetadata>
-                        <pluginExecutions>
-                            <pluginExecution>
-                                <pluginExecutionFilter>
-                                    <groupId>org.auraframework</groupId>
-                                    <artifactId>aura-util</artifactId>
-                                    <goals>
-                                        <goal>enum</goal>
-                                    </goals>
-                                </pluginExecutionFilter>
-                                <action>
-                                    <!-- M2E should ignore the plugin -->
-                                    <ignore />
-                                </action>
-                            </pluginExecution>
-
-                        </pluginExecutions>
-                    </lifecycleMappingMetadata>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.auraframework</groupId>
+									<artifactId>aura-util</artifactId>
+									<goals>
+										<goal>enum</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<!-- M2E should ignore the plugin -->
+									<ignore />
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 </project>

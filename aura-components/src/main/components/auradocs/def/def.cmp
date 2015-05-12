@@ -37,7 +37,7 @@
         <aura:if isTrue="{!m.interfaces.length > 0}">
             <ui:message severity="info">Implements
                 <aura:iteration items="{!m.interfaces}" var="intf">
-                    <auradocs:defLink descriptor="{!intf}" defType="interface">{!intf}</auradocs:defLink>
+                    <auradocs:defLink descriptor="{!intf}" defType="interface">{!intf}</auradocs:defLink>&nbsp;
                 </aura:iteration>
             </ui:message><br/>
         </aura:if>

@@ -16,5 +16,5 @@
 
 -->
 <aura:interface support="PROTO" description="Interface for components that has context of another component.">
-    <aura:attribute name="inContextOf" type="Object" required="true" description="The context of this component. This attribute can accept localId, globalId, or the component object."/>
+    <aura:attribute name="inContextOf" type="Object" description="The context of this component. This attribute can accept localId, globalId, or the component object."/>
 </aura:interface>

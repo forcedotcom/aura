@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 ({
-    render : function ViewerRenderer(cmp){
-        var desc = new DefDescriptor(cmp.get("v.descriptor"));
+    render : function(cmp, helper){
         var ret = this.superRender();
-        var def = desc.getNamespace()+":"+desc.getName();
+        var def = helper.normalizeDescriptor(cmp.get("v.descriptor"));
         var url = "/auradocs/outputViewer.app";
         var locationBar = cmp.find("locationBar").getElement();
         locationBar.value = url;

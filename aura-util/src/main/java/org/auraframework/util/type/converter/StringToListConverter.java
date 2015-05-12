@@ -18,10 +18,11 @@ package org.auraframework.util.type.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.util.type.Converter;
-
 import aQute.bnd.annotation.component.Component;
+
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.util.json.JsonStreamReader;
+import org.auraframework.util.type.Converter;
 
 /**
  * Used by aura.util.type.TypeUtil
@@ -31,10 +32,24 @@ import aQute.bnd.annotation.component.Component;
 public class StringToListConverter implements Converter<String, List> {
 
     @Override
-    public List<String> convert(String value) {
-        List<String> ret = new ArrayList<String>();
-        ret.add(value);
-        return ret;
+    public List<?> convert(String value) {
+        if(value == null) {
+            return null;
+        }
+
+        if(value.startsWith("[") && value.endsWith("]")) {
+            try {
+                final JsonStreamReader reader = new JsonStreamReader(value);
+                reader.next();
+                return reader.getList();
+            } catch (Exception e) {
+                // Didn't parse, put the origin string to a list down below.
+            }
+       }
+
+       List<String> ret = new ArrayList<>();
+       ret.add(value);
+       return ret;
     }
 
     @Override

@@ -83,7 +83,7 @@ public class ImportDirective extends DirectiveImpl {
         }catch(IOException e){
             throw new AuraRuntimeException(e);
         }
-        return "[Import(\""+path+"\")]";
+        return "[Import(\""+path+"\")]\n";
     }
 
     @Override

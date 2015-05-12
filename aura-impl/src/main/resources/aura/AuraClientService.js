@@ -80,6 +80,7 @@ $A.ns.AuraClientService = function() {
     this.isUnloading = false;
     this.initDefsObservers = [];
     this.finishedInitDefs = false;
+    this.namespaces={};
 
     this.foreground = new $A.ns.FlightCounter(1);
     this.background = new $A.ns.FlightCounter(3);
@@ -1061,6 +1062,9 @@ $A.ns.AuraClientService.prototype.idle = function() {
  * @private
  */
 $A.ns.AuraClientService.prototype.initDefs = function(config) {
+    //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
+    this.currentlyInSideEffectMode=true;
+
     var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
     $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
     for ( var j = 0; j < evtConfigs.length; j++) {
@@ -1088,6 +1092,14 @@ $A.ns.AuraClientService.prototype.initDefs = function(config) {
         $A.componentService.getDef(comConfigs[i]);
     }
     $A.Perf.endMark("Registered Components [" + comConfigs.length + "]");
+
+    var namespaces = config["namespaces"];
+    for(var i=0;i<namespaces.length;i++){
+        this.namespaces[namespaces[i]]=true;
+    }
+
+    //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
+    delete this.currentlyInSideEffectMode;
 
     $A.Perf.endMark("PageStart");
 
@@ -1824,6 +1836,10 @@ $A.ns.AuraClientService.prototype.processActions = function() {
 };
 
 $A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
+    //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
+    if(this.currentlyInSideEffectMode){
+        return true;
+    }
     if(definition&&definition.getDescriptor){
         var context;
         var currentAccess;
@@ -1831,7 +1847,7 @@ $A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
             case 'G':
                 // GLOBAL means accessible from anywhere
                 return true;
-            case 'P':
+            case 'p':
                 // PRIVATE means "same component only".
                 context=$A.getContext();
                 currentAccess=context&&context.getCurrentAccess();
@@ -1842,9 +1858,17 @@ $A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
                 currentAccess=context&&context.getCurrentAccess();
                 if(currentAccess){
                     var targetNamespace=definition&&definition.getDescriptor().getNamespace();
-                    return currentAccess===component ||
-                        (currentAccess.getDef().getDescriptor().getNamespace()===targetNamespace) ||
-                        (currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace()===targetNamespace);
+                    var accessNamespace=currentAccess.getDef().getDescriptor().getNamespace();
+                    var accessFacetNamespace=currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace();
+                    if(definition.access!=="P"){
+                        // INTERNAL / DEFAULT
+                        if(this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace)){
+                            // Privileged Namespace
+                            return true;
+                        }
+                    }
+                    // Not a privileged namespace or explicitly set to PUBLIC
+                    return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
                 }
         }
     }

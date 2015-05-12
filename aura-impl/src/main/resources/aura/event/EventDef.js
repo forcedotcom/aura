@@ -25,6 +25,7 @@ function EventDef(config) {
     this.attributeDefs = config["attributes"];   // TODO: real defs
     this.type = config["type"];
     this.access=config[Json.ApplicationKey.ACCESS];
+    delete config[Json.ApplicationKey.ACCESS];
 }
 
 EventDef.prototype.auraType = "EventDef";

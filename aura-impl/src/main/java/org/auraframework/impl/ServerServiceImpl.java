@@ -313,6 +313,11 @@ public class ServerServiceImpl implements ServerService {
             Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
             sb.append(",");
 
+            // append namespaces. for now. *sigh*
+            sb.append("namespaces:");
+            Json.serialize(Aura.getConfigAdapter().getPrivilegedNamespaces(),sb,context.getJsonSerializationContext());
+            sb.append(",");
+
             // append event definitions
             sb.append("eventDefs:");
             Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);

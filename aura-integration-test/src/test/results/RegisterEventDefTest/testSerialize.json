@@ -11,10 +11,10 @@
           "v":{
             "descriptor":"markup://aura:componentEvent",
             "type":"COMPONENT",
+            "xs":"G",
             "attributes":{
 
-            },
-            "xs":"G"
+            }
           }
         },
         "attributes":{
@@ -22,7 +22,8 @@
             "s":4,
             "v":{
               "name":"att1",
-              "type":"aura://String"
+              "type":"aura://String",
+              "xs":"P"
             }
           },
           "att2":{
@@ -30,6 +31,7 @@
             "v":{
               "name":"att2",
               "type":"aura://Boolean",
+              "xs":"P",
               "required":true
             }
           }

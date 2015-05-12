@@ -1845,13 +1845,13 @@ $A.ns.Util.prototype.getWindowSize = function() {
 };
 
 /**
- * Checks if the object is an aura component via auraType property.
+ * Checks if the object is an aura component.
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is a component, or return false otherwise.
  */
 $A.ns.Util.prototype.isComponent = function(obj) {
-    return (obj && obj.auraType === 'Component')||false;
+    return obj instanceof Component;
 };
 
 /**

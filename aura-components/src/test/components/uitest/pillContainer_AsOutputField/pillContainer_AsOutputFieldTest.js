@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    PILLS: [{id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=1&f=FFFFFF'}},{id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=1&f=FFFFFF'}},{id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=1&f=FFFFFF'}}],
+    PILLS: [{id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=1&f=FFFFFF'}},{id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=2&f=FFFFFF'}},{id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=3&f=FFFFFF'}}],
     PILLS_CASEINSENSITIVE: [{id:'pill01',label:"TEST PILL 01"},{id:'pill02',label:"TEST PILL 02"},{id:'pill03',label:"Test PILL 03"}],
     
     browsers: ["GOOGLECHROME", "IPHONE", "IPAD", "FIREFOX", "IE9", "IE10", "SAFARI", "ANDROID_PHONE", "ANDROID_TABLET"],
@@ -30,14 +30,18 @@
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0]] );
-            $A.test.assertEquals(1, $A.test.select(".pill").length, "Incorrect number of pills displayed.");
+            var actualNumberOfPills = $A.test.select(".pill").length;
+            $A.test.assertEquals(1, actualNumberOfPills, "Incorrect number of pills displayed.");
+            this._validateIconURLIsPresent(cmp, actualNumberOfPills);
         }
     },
 
     testInsertTwo: {
         test: function (cmp) {
             this._initializeWithTwoPills(cmp);
-            $A.test.assertEquals(2, $A.test.select(".pill").length, "Incorrect number of pills displayed.");
+            var actualNumberOfPills = $A.test.select(".pill").length;
+            $A.test.assertEquals(2, actualNumberOfPills, "Incorrect number of pills displayed.");
+            this._validateIconURLIsPresent(cmp, actualNumberOfPills);
             $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[0].label + "']").length, "Expected pill not found");
             $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[1].label + "']").length, "Expected pill not found");
         }
@@ -204,6 +208,15 @@
         $A.test.assertEquals("visible",
             $A.test.getStyle(cmp.getElement().getElementsByClassName("deleteIcon")[0], "visibility"),
             "The delete icon is not visible when the pillItem is on focus or hover");
+    },
+    
+    _validateIconURLIsPresent: function(cmp, expectedPillsCount) {
+    	var that = this;
+    	var pillIcons = $A.test.select(".pillIcon");
+    	for (i = 0; i < expectedPillsCount; i++) {
+    		var expectedURL = that.PILLS[i].icon.url;
+    		$A.test.assertEquals(expectedURL,$A.test.getElementAttributeValue(pillIcons[i], "src"),"Icon Url for pill " + i + " is not correct");
+    	}
     },
 
     _fireKeydownEvent: function(cmp, keycode) {

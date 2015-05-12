@@ -34,6 +34,7 @@ function exp() {
  *            attached to it. Note that this almost empty object $A is replaced later, after $A.ns (created below) is
  *            populated with the types that can be used to populate the "real" $A. TODO(fabbott): Make that "only gobal
  *            name" goal become true; today it ain't.
+ * @platform
  */
 window['$A'] = {};
 
@@ -43,6 +44,7 @@ window['$A'] = {};
  *            instance of $A.ns.Util), and collects our proper types into one place. The types themselves must be proper
  *            functional objects with prototypes, or Closure can't deal with obfuscating them (and particularly their
  *            exports) properly.
+ * @deprecated
  */
 $A.ns = {};
 $A['ns'] = $A.ns; // TODO: use exportSymbols when available
@@ -130,6 +132,7 @@ var clientService;
  * @class Aura
  * @classdesc The Aura framework. Default global instance name is $A.
  * @constructor
+ * @platform
  */
 $A.ns.Aura = function() {
     this.util = new $A.ns.Util();
@@ -287,6 +290,7 @@ $A.ns.Aura = function() {
      * @function
      * @param {Action} action
      * @borrows AuraClientService.enqueueAction
+     * @platform
      */
     this.enqueueAction = this.clientService.enqueueAction.bind(this.clientService);
 
@@ -358,18 +362,21 @@ $A.ns.Aura = function() {
      * @function
      * @param {Component|Array} cmp
      * @borrows AuraComponentService.getComponent
+     * @platform
      */
     this.getComponent = this.componentService.getComponent.bind(this.componentService);
 
     /**
      * Create a component from a type and a set of attributes.
      * @borrows AuraComponentService.createComponent
+     * @platform
      */
     this.createComponent = this.componentService["createComponent"].bind(this.componentService);
 
     /**
      * Create an array of components from a list of types and attributes.
      * @borrows AuraComponentService.createComponents
+     * @platform
      */
     this.createComponents = this.componentService["createComponents"].bind(this.componentService);
 
@@ -379,6 +386,7 @@ $A.ns.Aura = function() {
      * @param {Object} attributeValueProvider
      * @param {Boolean} localCreation
      * @deprecated Use createComponent instead.
+     * @platform
      */
     this.newCmp = this.componentService["newComponentDeprecated"].bind(this.componentService);
 
@@ -774,6 +782,7 @@ $A.ns.Aura.prototype.message = function(msg) {
  * @function
  * @param {String} key The data key to look up on element, for example, <code>$A.get("$Label.section.key")</code>.
  * @param {Function} callback The method to call with the result if a server trip is expected.
+ * @platform
  */
 $A.ns.Aura.prototype.get = function(key, callback) {
     key = $A.expressionService.normalize(key);
@@ -799,6 +808,7 @@ $A.ns.Aura.prototype.get = function(key, callback) {
  * @function
  * @param {String} key The data key we want to change on the global value provider, for example, <code>$A.set("$Custom.something","new Value")</code>.
  * @param {Object} value The value to set the key location to. If the global value provider does not implement .set(), this method will throw an exception.</code>.
+ * @platform
  */
 $A.ns.Aura.prototype.set = function(key, value) {
     key = $A.expressionService.normalize(key);
@@ -818,6 +828,7 @@ $A.ns.Aura.prototype.set = function(key, value) {
  * Gets the component that is passed to a controller method. For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
  * @public
  * @function
+ * @platform
  */
 $A.ns.Aura.prototype.getRoot = function() {
     return this.root;

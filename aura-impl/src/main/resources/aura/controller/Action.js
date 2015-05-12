@@ -36,6 +36,7 @@
  *            cmp The component associated with the Action.
  * @param {boolean}
  *            caboose should this action wait for the next non boxcar action?
+ * @platform
  */
 function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.def = def;
@@ -326,6 +327,7 @@ Action.prototype.completeGroups = function() {
  * @param {Object}
  *            config The key/value pairs that specify the Action. The key is an attribute on the given component.
  *             For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
+ * @platform
  */
 Action.prototype.setParams = function(config) {
     var paramDefs = this.paramDefs;
@@ -342,7 +344,7 @@ Action.prototype.setParams = function(config) {
  *            key the name of the parameter to set.
  * @param {Object}
  *            value the value to set.
- *
+ * @platform
  */
 Action.prototype.setParam = function(key, value) {
     var paramDef = this.paramDefs[key];
@@ -359,6 +361,7 @@ Action.prototype.setParam = function(key, value) {
  * @param {!string}
  *            name The name of the Action.
  * @returns {Object} The parameter value
+ * @platform
  */
 Action.prototype.getParam = function(name) {
     return this.params[name];
@@ -369,6 +372,7 @@ Action.prototype.getParam = function(name) {
  *
  * @public
  * @returns {Object} The key/value pairs that specify the Action.
+ * @platform
  */
 Action.prototype.getParams = function() {
     return this.params;
@@ -405,6 +409,7 @@ Action.prototype.getComponent = function() {
  *            callback The callback function to run for each controller.
  * @param {String}
  *            name The action state for which the callback is to be associated with.
+ * @platform
  */
 Action.prototype.setCallback = function(scope, callback, name) {
     if (!$A.util.isFunction(callback)) {
@@ -444,6 +449,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
  *
  * @public
  * @returns {string} the abortable id that was set for this action.
+ * @platform
  */
  Action.prototype.getCallback = function (type) {
     return this.callbacks[type];
@@ -580,6 +586,7 @@ Action.prototype.runDeprecated = function(evt) {
  *   "ERROR": The server returned an error
  *   "INCOMPLETE": The server didn't return a response. The server might be down or the client might be offline.
  *   "ABORTED": The action was aborted. You can register a callback for this explicitly
+ * @platform
  */
 Action.prototype.getState = function() {
     return this.state;
@@ -589,6 +596,7 @@ Action.prototype.getState = function() {
  * Gets the return value of the Action. A server-side Action can return any object containing serializable JSON data.<br/>
  *
  * @public
+ * @platform
  */
 Action.prototype.getReturnValue = function() {
     return this.returnValue;
@@ -614,6 +622,7 @@ Action.prototype.getReturnValue = function() {
  * </code></pre>
  *
  * @public
+ * @platform
  */
 Action.prototype.getError = function() {
     return this.error;
@@ -623,6 +632,7 @@ Action.prototype.getError = function() {
  * Returns true if the actions should be enqueued in the background, false if it should be run in the foreground.
  *
  * @public
+ * @platform
  */
 Action.prototype.isBackground = function() {
     return this.background === true;
@@ -633,6 +643,7 @@ Action.prototype.isBackground = function() {
  * lower priority actions.
  *
  * @public
+ * @platform
  */
 Action.prototype.setBackground = function() {
     this.background = true;
@@ -980,6 +991,7 @@ Action.prototype.isExclusive = function() {
  * @param {Object}
  *            config Optional. A set of key/value pairs that specify the storage options to set. You can set the
  *            following options: <code>ignoreExisting</code> and <code>refresh</code>.
+ * @platform
  */
 Action.prototype.setStorable = function(config) {
     $A.assert(this.def && this.def.isServerAction(),

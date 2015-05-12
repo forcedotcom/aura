@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = DefDescriptor.prototype;
-exp(p,
-    "auraType", p.auraType,
-    "getQualifiedName", p.getQualifiedName,
-    "getNamespace", p.getNamespace,
-    "getName", p.getName,
-    "getPrefix", p.getPrefix,
-    "toString", p.toString
-);
+({
+    /**
+     * Takes a descriptor possibly in the form prefix:desc or markup://prefix:desc and 
+     * always returns the form prefix:desc
+     */
+    normalizeDescriptor : function(descriptor){
+    	var re = new RegExp("^\w+:\/\/");
+        return descriptor.replace(re, "");
+    }
+})

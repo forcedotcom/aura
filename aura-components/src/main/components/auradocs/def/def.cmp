@@ -35,9 +35,10 @@
             <ui:message severity="info">Extends <auradocs:defLink descriptor="{!m.super}" defType="{!m.defType}">{!m.super}</auradocs:defLink></ui:message><br/>
         </aura:if>
         <aura:if isTrue="{!m.interfaces.length > 0}">
-            <ui:message severity="info">Implements
+            <ui:message severity="info">
+                <span>Implements</span>
                 <aura:iteration items="{!m.interfaces}" var="intf">
-                    <auradocs:defLink descriptor="{!intf}" defType="interface">{!intf}</auradocs:defLink>&nbsp;
+                    <span>&nbsp;</span><auradocs:defLink descriptor="{!intf}" defType="interface">{!intf}</auradocs:defLink>
                 </aura:iteration>
             </ui:message><br/>
         </aura:if>

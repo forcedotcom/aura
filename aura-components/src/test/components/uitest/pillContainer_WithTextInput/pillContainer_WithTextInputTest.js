@@ -22,6 +22,7 @@
     BACKSPACE_KEY: 8,
     LEFTARROW_KEY: 37,
     RIGHTARROW_KEY: 39,
+    COMMA_KEY: 188,
     
     testEnterCreatesPill: {
         test: function (cmp) {
@@ -29,6 +30,13 @@
         	this._inputPill(cmp.find("textInput"), this.PILLS[0].label);
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
             $A.test.assertTrue(cmp.get("v.pillInsertFired"),"Pills Insert Event should be fired after pill was created");
+        }
+    },
+    
+    testUsingCommaDoesNotCreatePill: {
+        test: function (cmp) {
+        	this._inputPillWithComma(cmp.find("textInput"), this.PILLS[0].label);
+            $A.test.assertEquals(0, $A.test.select(".pill").length, "Pill was not created");
         }
     },
 
@@ -188,6 +196,11 @@
     _inputPill: function(textInput, text) {
         textInput.set("v.value", text);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
-    }
+    },
+    
+    _inputPillWithComma: function(textInput, text) {
+    	textInput.set("v.value", text);
+        this._fireKeydownEvent(textInput, this.COMMA_KEY);
+    },
 
 })

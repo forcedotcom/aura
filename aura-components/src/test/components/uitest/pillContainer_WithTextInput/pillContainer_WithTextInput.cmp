@@ -3,7 +3,7 @@
 <aura:attribute name="pillRemovedFired" type="boolean" default="false"/>
     <ui:pillContainer aura:id="pillContainer" pillInserted="{!c.processPillInserted}" pillRemoved="{!c.processPillRemoved}">
         <aura:set attribute="pillInput">
-            <uitest:pillContainerInputText aura:id="textInput"/>
+            <uitest:pillContainer_InputText aura:id="textInput"/>
         </aura:set>
     </ui:pillContainer>
 </aura:component>

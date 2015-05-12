@@ -19,10 +19,18 @@
     doNotWrapInAuraRun: true,
     
     ENTER_KEY: 13,
+    COMMA_KEY: 188,
 
     testEnterCreatesPill: {
         test: function (cmp) {
             this._inputPill(this._getInput(cmp), this.PILLS[0].label);
+            $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
+        }
+    },
+    
+    testCreatesPillUsingComma: {
+        test: function (cmp) {
+            this._inputPillWithComma(this._getInput(cmp), this.PILLS[0].label);
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
         }
     },
@@ -33,7 +41,7 @@
             $A.test.assertEquals(0, $A.test.select(".pill").length, "Pill should not have been created");
         }
     },
-
+        
     testEnterClearsInput: {
         test: function (cmp) {
             var textInput = this._getInput(cmp);
@@ -168,6 +176,11 @@
         textInput.set("v.value", text);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
     },
+    
+    _inputPillWithComma: function(textInput, text) {
+    	textInput.set("v.value", text);
+        this._fireKeydownEvent(textInput, this.COMMA_KEY);
+    },
 
     _fireInputchange: function(cmp, value) {
         var inputChangeEvt = cmp.get("e.inputChange");
@@ -183,7 +196,7 @@
         var textInput = this._getInput(cmp);
         var autocomplete = cmp.find("autocomplete");
         var value = this.PILLS[0].label.substring(0, 4);
-        this._getInput(cmp).set("v.value", value);
+        textInput.set("v.value", value);
         this._fireInputchange(autocomplete, value);
 
         this._fireKeydownEvent(textInput, this.DOWNARROW_KEY);

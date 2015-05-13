@@ -20,7 +20,8 @@
         var fruit = cmp.get("v.locationToken");
         if(fruit === "Peach") {
             cmp.set("v.locationChangeCountPeach", cmp.get("v.locationChangeCountPeach") + 1);
-        }
+        } 
+        cmp.set("v.debugMsg", fruit);
         //increase common counter
         cmp.set("v.locationChangeCount", cmp.get("v.locationChangeCount") + 1);
     },

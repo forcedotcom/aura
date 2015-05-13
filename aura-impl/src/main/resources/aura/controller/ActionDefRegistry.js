@@ -46,3 +46,5 @@ ActionDefRegistry.prototype.getDef = function(config){
     
     return ret;
 };
+
+Aura.Controller.ActionDefRegistry = ActionDefRegistry;

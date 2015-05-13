@@ -249,3 +249,5 @@ var AuraEventService = function() {
     // #include aura.AuraEventService_export
     return eventService;
 };
+
+Aura.Services.AuraEventService = AuraEventService;

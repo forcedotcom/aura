@@ -235,4 +235,5 @@ Event.prototype.fire = function(params) {
     //#end
 };
 
+Aura.Event.Event = Event;
 //#include aura.event.Event_export

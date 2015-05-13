@@ -33,10 +33,10 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         }
     };
 
-    var mockAura = Mocks.GetMocks(Object.Global(), { "$A": $A });
+    var mockAura = Mocks.GetMocks(Object.Global(), { "$A": $A, "Aura": {"Controller": {}} });
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A})(function(){
+    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A, "Aura": {"Controller": {}}})(function(){
         //#import aura.controller.ActionCollector
     });
 

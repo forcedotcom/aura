@@ -299,6 +299,8 @@ MemoryStorageAdapter.prototype.getMRU = function() {
 
 //#include aura.storage.adapters.MemoryAdapter_export
 
+Aura.Storage.MemoryStorageAdapter = MemoryStorageAdapter;
+
 $A.storageService.registerAdapter({
     "name": MemoryStorageAdapter.NAME,
     "adapterClass": MemoryStorageAdapter,

@@ -51,3 +51,5 @@ FlavorAssortmentDef.prototype.getFlavor = function(componentDescriptor) {
 
     return this.cache[qn];
 };
+
+Aura.Flavors.FlavorAssortmentDef = FlavorAssortmentDef;

@@ -75,4 +75,6 @@ EventDef.prototype.initSuperDef = function(config) {
     }
 };
 
+Aura.Event.EventDef = EventDef;
+
 //#include aura.event.EventDef_export

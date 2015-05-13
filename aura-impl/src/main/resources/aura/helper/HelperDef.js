@@ -62,4 +62,6 @@ HelperDef.prototype.toJSON = function() {
     return output;
 };
 
+Aura.Helper.HelperDef = HelperDef;
+
 //#include aura.helper.HelperDef_export

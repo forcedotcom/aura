@@ -114,7 +114,7 @@ var AuraDevToolService = function() {
                 return flattenRegistry(ret);
             },
             "rerenderings" : function(){
-                return renderingService.statsIndex["rerenderDirty"];
+                return $A.renderingService.statsIndex["rerenderDirty"];
             },
 
             "renderings": function() {
@@ -123,7 +123,7 @@ var AuraDevToolService = function() {
 
                 for(var i = 0; i < types.length; i++) {
                     var type = types[i];
-                    var stat = renderingService.statsIndex[type];
+                    var stat = $A.renderingService.statsIndex[type];
 
                     for(var j = 0; j < stat.length; j++) {
                         stat[j].type = type;

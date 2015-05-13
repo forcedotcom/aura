@@ -979,3 +979,5 @@ var AuraLocalizationService = function AuraLocalizationService() {
 
     return localizationService;
 };
+
+Aura.Services.AuraLocalizationService = AuraLocalizationService;

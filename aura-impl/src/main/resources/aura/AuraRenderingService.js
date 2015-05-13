@@ -20,7 +20,7 @@
  *        client-side renderer.
  * @constructor
  */
-$A.ns.AuraRenderingService = function() {
+function AuraRenderingService() {
     this.visited = undefined;
     this.afterRenderStack = [];
     this.dirtyComponents = {};
@@ -31,7 +31,7 @@ $A.ns.AuraRenderingService = function() {
     // Ideally, we shouldn't care what order we rerender in, but that's a more difficult bug to track down in 194/patch
     this.dirtyComponentIds = [];
     this.needsCleaning = false;
-};
+}
 
 /**
  * Renders a component by calling its renderer.
@@ -40,10 +40,10 @@ $A.ns.AuraRenderingService = function() {
  *            components The component or component array to be rendered
  * @param {Component}
  *            parent Optional. The component's parent
- * @memberOf $A.ns.AuraRenderingService
+ * @memberOf AuraRenderingService
  * @public
  */
-$A.ns.AuraRenderingService.prototype.render = function(components, parent) {
+AuraRenderingService.prototype.render = function(components, parent) {
     //#if {"modes" : ["STATS"]}
     var startTime = (new Date()).getTime();
     //#end
@@ -97,10 +97,10 @@ $A.ns.AuraRenderingService.prototype.render = function(components, parent) {
  *
  * @param {Component}
  *            components The component or component array to be rerendered
- * @memberOf $A.ns.AuraRenderingService
+ * @memberOf AuraRenderingService
  * @public
  */
-$A.ns.AuraRenderingService.prototype.rerender = function(components) {
+AuraRenderingService.prototype.rerender = function(components) {
     //#if {"modes" : ["STATS"]}
     var startTime = (new Date()).getTime();
     //#end
@@ -174,10 +174,10 @@ $A.ns.AuraRenderingService.prototype.rerender = function(components) {
  *
  * @param {component}
  *            components The component or component array that has finished rendering
- * @memberOf $A.ns.AuraRenderingService
+ * @memberOf AuraRenderingService
  * @public
  */
-$A.ns.AuraRenderingService.prototype.afterRender = function(components) {
+AuraRenderingService.prototype.afterRender = function(components) {
     //#if {"modes" : ["STATS"]}
     var startTime = (new Date()).getTime();
     //#end
@@ -218,10 +218,10 @@ $A.ns.AuraRenderingService.prototype.afterRender = function(components) {
  *
  * @param {Component}
  *            components The component or component array to be unrendered
- * @memberOf $A.ns.AuraRenderingService
+ * @memberOf AuraRenderingService
  * @public
  */
-$A.ns.AuraRenderingService.prototype.unrender = function(components) {
+AuraRenderingService.prototype.unrender = function(components) {
     if (!components) {
         return;
     }
@@ -270,12 +270,12 @@ $A.ns.AuraRenderingService.prototype.unrender = function(components) {
 
 /**
  * @private
- * @memberOf $A.ns.AuraRenderingService
+ * @memberOf AuraRenderingService
  *
  * @param {Component} component the component for which we are storing the facet.
  * @param {Object} facet the component or array of components to store.
  */
-$A.ns.AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
+AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {
         $A.error("Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.");
     }
@@ -290,9 +290,9 @@ $A.ns.AuraRenderingService.prototype.storeFacetInfo = function(component, facet)
 
 /**
  * @private
- * @memberOf $A.ns.AuraRenderingService
+ * @memberOf AuraRenderingService
  */
-$A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
+AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {
         $A.error("Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.");
     }
@@ -356,7 +356,7 @@ $A.ns.AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, f
  * @param {Component} facet the facet to render.
  * @param {Component} parent (optional) the parent for the facet.
  */
-$A.ns.AuraRenderingService.prototype.renderFacet = function(component, facet, parent) {
+AuraRenderingService.prototype.renderFacet = function(component, facet, parent) {
     this.storeFacetInfo(component, facet);
     var ret=this.render(facet,parent);
     if(!ret.length){
@@ -373,7 +373,7 @@ $A.ns.AuraRenderingService.prototype.renderFacet = function(component, facet, pa
  * @param {Component} facet the facet to render.
  * @param {HTMLElement} referenceNode the reference node for insertion
  */
-$A.ns.AuraRenderingService.prototype.rerenderFacet = function(component, facet, referenceNode) {
+AuraRenderingService.prototype.rerenderFacet = function(component, facet, referenceNode) {
     var updatedFacet=this.getUpdatedFacetInfo(component,facet);
     var ret=[];
     var components=updatedFacet.components;
@@ -482,7 +482,7 @@ $A.ns.AuraRenderingService.prototype.rerenderFacet = function(component, facet, 
  * @param {Component} cmp the component for which we are unrendering the facet.
  * @param {Component} facet the facet to unrender.
  */
-$A.ns.AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
+AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
     if (cmp._facetInfo) {
         this.unrender(cmp._facetInfo);
         cmp._facetInfo = null;
@@ -506,7 +506,7 @@ $A.ns.AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
  * @param {Component} cmp the component for which we want a marker.
  * @return the marker.
  */
-$A.ns.AuraRenderingService.prototype.getMarker = function(cmp){
+AuraRenderingService.prototype.getMarker = function(cmp){
     return cmp && cmp._marker;
 };
 
@@ -515,7 +515,7 @@ $A.ns.AuraRenderingService.prototype.getMarker = function(cmp){
  * @param expression the expression to mark as dirty.
  * @param cmp the owning component.
  */
-$A.ns.AuraRenderingService.prototype.addDirtyValue = function(expression, cmp) {
+AuraRenderingService.prototype.addDirtyValue = function(expression, cmp) {
     this.needsCleaning = true;
     if (cmp && cmp.isValid() && cmp.isRendered()) {
         var id = cmp.getGlobalId();
@@ -539,14 +539,14 @@ $A.ns.AuraRenderingService.prototype.addDirtyValue = function(expression, cmp) {
  * @protected
  * @param cmp the component to check.
  */
-$A.ns.AuraRenderingService.prototype.hasDirtyValue = function(cmp){
+AuraRenderingService.prototype.hasDirtyValue = function(cmp){
    return this.dirtyComponents.hasOwnProperty(cmp.getConcreteComponent().getGlobalId());
 };
 
 /**
  * @protected
  */
-$A.ns.AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
+AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
     if (cmp && cmp.isValid()) {
         var id = cmp.getConcreteComponent().getGlobalId();
         var list = this.dirtyComponents[id];
@@ -564,7 +564,7 @@ $A.ns.AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
  *
  * @protected
  */
-$A.ns.AuraRenderingService.prototype.rerenderDirty = function(stackName) {
+AuraRenderingService.prototype.rerenderDirty = function(stackName) {
     if (this.needsCleaning) {
         var maxiterations = 1000;
         var num = aura.getContext().incrementRender();
@@ -679,7 +679,7 @@ $A.ns.AuraRenderingService.prototype.rerenderDirty = function(stackName) {
  * @deprecated
  * @protected
  */
-$A.ns.AuraRenderingService.prototype.removeDirtyValue = function(value, cmp) {
+AuraRenderingService.prototype.removeDirtyValue = function(value, cmp) {
     if (cmp && cmp.isValid()) {
         var id = cmp.getConcreteComponent().getGlobalId();
         var dirtyAttributes = this.dirtyComponents[id];
@@ -701,7 +701,7 @@ $A.ns.AuraRenderingService.prototype.removeDirtyValue = function(value, cmp) {
 };
 
 //#if {"modes" : ["PTEST","STATS"]}
-$A.ns.AuraRenderingService.prototype.statsIndex = {
+AuraRenderingService.prototype.statsIndex = {
     "afterRender": [],
     "render": [],
     "rerender": [],
@@ -710,7 +710,7 @@ $A.ns.AuraRenderingService.prototype.statsIndex = {
 };
 //#end
 //
-$A.ns.AuraRenderingService.prototype.cleanComponent = function(id) {
+AuraRenderingService.prototype.cleanComponent = function(id) {
     delete this.dirtyComponents[id];
 };
 
@@ -719,7 +719,7 @@ $A.ns.AuraRenderingService.prototype.cleanComponent = function(id) {
  * @param things either an array or an item.
  * @return an array.
  */
-$A.ns.AuraRenderingService.prototype.getArray = function(things) {
+AuraRenderingService.prototype.getArray = function(things) {
     if (!$A.util.isArray(things)) {
         return things?[things]:[];
     }
@@ -734,14 +734,14 @@ $A.ns.AuraRenderingService.prototype.getArray = function(things) {
  *
  * @private
  */
-$A.ns.AuraRenderingService.prototype.evalStrings = function(elements) {
+AuraRenderingService.prototype.evalStrings = function(elements) {
     if ($A.util.isString(elements)) {
         elements=$A.util.createElementsFromMarkup(elements);
     }
     return elements || [];
 };
 
-$A.ns.AuraRenderingService.prototype.finishRender = function(cmp, elements) {
+AuraRenderingService.prototype.finishRender = function(cmp, elements) {
     elements = this.evalStrings(elements);
 
     this.associateElements(cmp, elements);
@@ -758,7 +758,7 @@ $A.ns.AuraRenderingService.prototype.finishRender = function(cmp, elements) {
  *
  * @private
  */
-$A.ns.AuraRenderingService.prototype.insertElements = function(elements, refNode, asSibling, asFirst) {
+AuraRenderingService.prototype.insertElements = function(elements, refNode, asSibling, asFirst) {
     if (refNode) {
         if (asSibling) {
             if (asFirst) {
@@ -776,7 +776,7 @@ $A.ns.AuraRenderingService.prototype.insertElements = function(elements, refNode
     }
 };
 
-$A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
+AuraRenderingService.prototype.addAuraClass = function(cmp, element){
     var concrete = cmp.getConcreteComponent();
     var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
     var flavorClassName = null; // instance-specific, flavor class name applied to flavorable elements if applicable
@@ -808,7 +808,7 @@ $A.ns.AuraRenderingService.prototype.addAuraClass = function(cmp, element){
  *
  * @private
  */
-$A.ns.AuraRenderingService.prototype.associateElements = function(cmp, elements) {
+AuraRenderingService.prototype.associateElements = function(cmp, elements) {
     elements = this.getArray(elements);
 
     var len = elements.length;
@@ -822,7 +822,7 @@ $A.ns.AuraRenderingService.prototype.associateElements = function(cmp, elements)
     }
 };
 
-$A.ns.AuraRenderingService.prototype.createMarker = function(target,reason){
+AuraRenderingService.prototype.createMarker = function(target,reason){
     var node = document.createComment(reason);
     node.aura_marker=true;
     if(target){
@@ -831,18 +831,21 @@ $A.ns.AuraRenderingService.prototype.createMarker = function(target,reason){
     return node;
 };
 
-$A.ns.AuraRenderingService.prototype.isMarker = function(node){
+AuraRenderingService.prototype.isMarker = function(node){
     return node&&node.aura_marker;
 };
 
-exp($A.ns.AuraRenderingService.prototype,
-    "render", $A.ns.AuraRenderingService.prototype.render,
-    "afterRender", $A.ns.AuraRenderingService.prototype.afterRender,
-    "rerender", $A.ns.AuraRenderingService.prototype.rerender,
-    "rerenderDirty", $A.ns.AuraRenderingService.prototype.rerenderDirty,
-    "unrender", $A.ns.AuraRenderingService.prototype.unrender,
-    "renderFacet", $A.ns.AuraRenderingService.prototype.renderFacet,
-    "rerenderFacet", $A.ns.AuraRenderingService.prototype.rerenderFacet,
-    "unrenderFacet", $A.ns.AuraRenderingService.prototype.unrenderFacet,
-    "getMarker", $A.ns.AuraRenderingService.prototype.getMarker
+$A.ns.AuraRenderingService = AuraRenderingService;
+Aura.Services.AuraRenderingService = AuraRenderingService;
+
+exp(AuraRenderingService.prototype,
+    "render", AuraRenderingService.prototype.render,
+    "afterRender", AuraRenderingService.prototype.afterRender,
+    "rerender", AuraRenderingService.prototype.rerender,
+    "rerenderDirty", AuraRenderingService.prototype.rerenderDirty,
+    "unrender", AuraRenderingService.prototype.unrender,
+    "renderFacet", AuraRenderingService.prototype.renderFacet,
+    "rerenderFacet", AuraRenderingService.prototype.rerenderFacet,
+    "unrenderFacet", AuraRenderingService.prototype.unrenderFacet,
+    "getMarker", AuraRenderingService.prototype.getMarker
 );

@@ -15,19 +15,37 @@
  */
 /*jslint sub: true, debug: true */
 
-/**
- * Export symbols. TODO(fabbott): Destroy this when we're consistently using Closure's exportSymbols directive instead.
- */
-function exp() {
-    var obj = arguments[0];
+// -- Aura Bootstrap ------------------------------------------------------------
 
-    for ( var i = 1; i < arguments.length; i++) {
-        var name = arguments[i];
-        i++;
-        var val = arguments[i];
-        obj[name] = val;
-    }
+if (typeof Aura != 'undefined') {
+    Aura._Aura = Aura;
 }
+var Aura = {};
+
+// -- Namespaces ------------------------------------------------------------
+Aura.Utils      = {};
+Aura.Errors     = {};
+Aura.Context    = {};
+Aura.System     = {};
+Aura.Style      = {};
+Aura.Flavors    = {};
+Aura.Value      = {};
+Aura.Model      = {};
+Aura.Component  = {};
+Aura.Renderer   = {};
+Aura.Provider   = {};
+Aura.Helper     = {};
+Aura.Library    = {};
+Aura.Event      = {};
+Aura.Layouts    = {};
+Aura.Controller = {};
+Aura.Attribute  = {};
+Aura.L10n       = {};
+Aura.Services   = {};
+Aura.Storage    = {};
+
+// Move to the bottom and remove
+window["Aura"] = Aura; 
 
 /**
  * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
@@ -38,71 +56,118 @@ function exp() {
  */
 window['$A'] = {};
 
-/**
- * @description The separate Aura "namespace" object contains Aura types, as opposed to instances and properties and such
- *            which might hang off $A. This allows some colliding or near-miss variable duplication (e.g. $A.util is an
- *            instance of $A.ns.Util), and collects our proper types into one place. The types themselves must be proper
- *            functional objects with prototypes, or Closure can't deal with obfuscating them (and particularly their
- *            exports) properly.
- * @deprecated
- */
-$A.ns = {};
-$A['ns'] = $A.ns; // TODO: use exportSymbols when available
 
-var clientService;
+$A.ns = {}; //DELETE!
 
+// -- Polyfills --------------------------------------------------------
 // #include aura.polyfill.Array
 // #include aura.polyfill.Function
 // #include aura.polyfill.Json
 // #include aura.polyfill.Promise
-// #include aura.util.Util
-// #include aura.AuraError
-// #include aura.AuraFriendlyError
-// #include aura.Logger
-// #include aura.DocLevelHandler
-// #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
-// #include aura.system.DefDescriptor
+
+// -- Utils ------------------------------------------------------------
+// #include aura.util.ExportSymbolsHelper
 // #include aura.util.Transport
 // #include aura.util.Style
 // #include aura.util.Bitset
 // #include aura.util.NumberFormat
+// #include aura.util.DocLevelHandler
+// #include aura.storage.adapters.SizeEstimator
+// #include aura.util.CoreUtil
+// #include aura.util.Util
+// #include aura.Logger
+
+// -- Errors ------------------------------------------------------------
+// #include aura.AuraError
+// #include aura.AuraFriendlyError
+
+// -- Context -----------------------------------------------------------
 // #include aura.context.AuraContext
+
+// -- System ------------------------------------------------------------
+// #include aura.system.DefDescriptor
+
+// -- Style -------------------------------------------------------------
+// #include aura.style.StyleDef
+
+// -- Flavors -----------------------------------------------------------
+// #include aura.flavors.FlavorDefaultDef
+// #include aura.flavors.FlavorAssortmentDef
+
+// -- Value -------------------------------------------------------------
 // #include aura.value.PropertyReferenceValue
 // #include aura.value.FunctionCallValue
 // #include aura.value.ActionReferenceValue
 // #include aura.value.PassthroughValue
+// #include aura.value.ValueFactory
+// #include aura.value.ExpressionFunctions
+
+// -- Model -------------------------------------------------------------
+// #include aura.model.ModelDefRegistry
+// #include aura.model.ValueDef
 // #include aura.model.ModelDef
+// #include aura.model.Model
+
+// -- Component ---------------------------------------------------------
 // #include aura.component.ComponentDefRegistry
 // #include aura.component.Component
 // #include aura.component.InvalidComponent
+// #include aura.component.ComponentDef
+
+// -- Renderer ----------------------------------------------------------
 // #include aura.renderer.RendererDef
+// #include aura.renderer.RendererDefRegistry
+
+// -- Provider ----------------------------------------------------------
 // #include aura.provider.ProviderDef
+// #include aura.provider.ProviderDefRegistry
+// #include aura.provider.GlobalValueProviders
+// #include aura.provider.LabelQueue
+// #include aura.provider.LabelValueProvider
+// #include aura.provider.ObjectValueProvider
+// #include aura.provider.ContextValueProvider
+
+// -- Helper -------------------------------------------------------------
 // #include aura.helper.HelperDefRegistry
+// #include aura.helper.HelperDef
+
+// -- Library ------------------------------------------------------------
 // #include aura.library.LibraryDefRegistry
+
+// -- Event --------------------------------------------------------------
 // #include aura.event.EventDefRegistry
 // #include aura.event.EventDef
 // #include aura.event.Event
-// #include aura.helper.HelperDef
+
+// -- Layouts ------------------------------------------------------------
 // #include aura.layouts.LayoutItemDef
 // #include aura.layouts.LayoutDef
+// #include aura.layouts.LayoutsDef
+
+// -- Controller ---------------------------------------------------------
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
-// #include aura.attribute.AttributeDef
-// #include aura.attribute.AttributeSet
-// #include aura.attribute.AttributeDefSet
-// #include aura.renderer.RendererDefRegistry
-// #include aura.style.StyleDef
-// #include aura.flavors.FlavorDefaultDef
-// #include aura.flavors.FlavorAssortmentDef
-// #include aura.component.ComponentDef
 // #include aura.controller.ControllerDef
 // #include aura.controller.ControllerDefRegistry
 // #include aura.controller.ActionDefRegistry
-// #include aura.model.ModelDefRegistry
-// #include aura.provider.ProviderDefRegistry
-// #include aura.layouts.LayoutsDef
-// #include aura.model.ValueDef
+// #include aura.controller.ActionCallbackGroup
+// #include aura.controller.ActionQueue
+// #include aura.controller.ActionCollector
+// #include aura.controller.FlightCounter
+
+// -- Attribute ----------------------------------------------------------
+// #include aura.attribute.AttributeDef
+// #include aura.attribute.AttributeSet
+// #include aura.attribute.AttributeDefSet
+
+// -- L10n ---------------------------------------------------------------
 // #include aura.l10n.AuraLocalizationContext
+
+// -- Storage -------------------------------------------------------------
+// #include aura.storage.AuraStorageService
+// #include aura.storage.Storage
+
+// -- Services -----------------------------------------------------------
 // #include aura.AuraClientService
 // #include aura.AuraComponentContext
 // #include aura.AuraComponentService
@@ -114,19 +179,11 @@ var clientService;
 // #include aura.AuraLayoutService
 // #include aura.AuraLocalizationService
 // #include aura.AuraStyleService
-// #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
-// #include aura.value.ValueFactory
-// #include aura.value.ExpressionFunctions
-// #include aura.model.Model
-// #include aura.storage.AuraStorageService
-// #include aura.storage.Storage
-// #include aura.provider.GlobalValueProviders
-// #include aura.provider.LabelQueue
-// #include aura.provider.LabelValueProvider
-// #include aura.provider.ObjectValueProvider
-// #include aura.provider.ContextValueProvider
 // #include aura.metrics.AuraMetricsService
 
+// -- Mode injection ------------------------------------------------------
+// #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
+// #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
 
 /**
  * @class Aura
@@ -134,36 +191,38 @@ var clientService;
  * @constructor
  * @platform
  */
-$A.ns.Aura = function() {
-    this.util = new $A.ns.Util();
-    this["util"] = this.util;
-    this.globalValueProviders={};
-    this.auraError = $A.ns.AuraError;
-    this.auraFriendlyError = $A.ns.AuraFriendlyError;
+function AuraInstance () {
+    this.globalValueProviders = {};
+    this.displayErrors = true;
+
+    this.logger = new Aura.Utils.Logger();
+    this.util = new Aura.Utils.Util();
+    this["util"] = this.util; //Move this? (check prod mangling)
+    
+    this.auraError = Aura.Errors.AuraError;
+    this.auraFriendlyError = Aura.Errors.AuraFriendlyError;
+    
+    this.clientService = new Aura.Services.AuraClientService();
+    this.componentService = new Aura.Services.AuraComponentService();
+    this.serializationService = new Aura.Services.AuraSerializationService();
+    this.renderingService = new Aura.Services.AuraRenderingService();
+    this.expressionService = new Aura.Services.AuraExpressionService();
+    this.historyService = new Aura.Services.AuraHistoryService();
+    this.eventService = new Aura.Services.AuraEventService();
+    this.layoutService = new Aura.Services.AuraLayoutService();
+    this.localizationService = Aura.Services.AuraLocalizationService();
+    this.storageService = new Aura.Services.AuraStorageService();
+    this.styleService = new Aura.Services.AuraStyleService();
+    this.metricsService = new Aura.Services.MetricsService();
+
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
     this.test = new $A.ns.Test();
     this["test"] = this.test;
     //#end
 
-    this.clientService = new $A.ns.AuraClientService();
-    this.componentService = new $A.ns.AuraComponentService();
-    this.serializationService = new AuraSerializationService();
-    this.renderingService = new $A.ns.AuraRenderingService();
-    this.expressionService = new AuraExpressionService();
-    this.historyService = new $A.ns.AuraHistoryService();
-    this.eventService = new AuraEventService();
-    this.layoutService = new AuraLayoutService();
-    this.localizationService = new AuraLocalizationService();
-    this.storageService = new AuraStorageService();
-    this.styleService = new AuraStyleService();
-    this.logger = new $A.ns.Logger();
-    this.displayErrors = true;
-    this.metricsService = new MetricsService();
-
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
     //#end
-    var aura = this;
 
     /** @field */
     this.services = {
@@ -174,7 +233,7 @@ $A.ns.Aura = function() {
          * @type AuraRenderingService
          * @memberOf $A.ns.Aura
          */
-        rendering : aura.renderingService,
+        rendering : this.renderingService,
         /**
          * Event Service
          *
@@ -182,7 +241,7 @@ $A.ns.Aura = function() {
          * @type AuraEventService
          * @memberOf $A.ns.Aura
          */
-        event : aura.eventService,
+        event : this.eventService,
         /**
          * Component Service
          *
@@ -190,89 +249,89 @@ $A.ns.Aura = function() {
          * @type AuraComponentService
          * @memberOf $A.ns.Aura
          */
-        component : aura.componentService,
+        component : this.componentService,
         /**
          * Client Service
          *
          * @public
          * @type AuraClientService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          */
-        client : aura.clientService,
+        client : this.clientService,
 
         /**
          * History Service
          *
          * @public
          * @type AuraHistoryService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          */
-        history : aura.historyService,
+        history : this.historyService,
 
         /**
          * Localization Service
          *
          * @public
          * @type AuraLocalizationService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          */
-        localization : aura.localizationService,
+        localization : this.localizationService,
 
         /**
          * Storage Service
          *
          * @public
          * @type AuraStorageService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          */
-        storage : aura.storageService,
+        storage : this.storageService,
 
         /**
          * Alias of Component Service
          *
          * @public
          * @type AuraComponentService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          * @see Aura#services.component
          */
-        cmp : aura.componentService,
+        cmp : this.componentService,
 
         /**
          * Alias of Event Service
          *
          * @public
          * @type AuraEventService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          * @see Aura#services.event
          */
-        e : aura.eventService,
+        e : this.eventService,
 
         /**
          * Alias of Localization Service
          *
          * @public
          * @type AuraLocalizationService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          * @see Aura#service.localization
          */
-        l10n : aura.localizationService,
+        l10n : this.localizationService,
 
         /**
          * Style Service
          *
          * @public
          * @type AuraStyleService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          */
-        style: aura.styleService,
+        style: this.styleService,
         /**
          * Metrics Service
          *
          * @public
          * @type AuraMetricsService
-         * @memberOf $A.ns.Aura.prototype
+         * @memberOf AuraInstance.prototype
          */
-        metrics: aura.metricsService,
+        metrics: this.metricsService,
 
         get : function(key) {
             var ret = $A.services[key];
@@ -498,50 +557,50 @@ $A.ns.Aura = function() {
     this.Component = Component;
 
     // TODO: convert to //#exportSymbols when available
-    exp(aura,
-        "getCurrentTransactionId", aura.getCurrentTransactionId,
-        "setCurrentTransactionId", aura.setCurrentTransactionId,
-        "clientService", aura.clientService,
-        "componentService", aura.componentService,
-        "serializationService", aura.serializationService,
-        "renderingService", aura.renderingService,
-        "expressionService", aura.expressionService,
-        "historyService", aura.historyService,
-        "localizationService", aura.localizationService,
-        "eventService", aura.eventService,
-        "layoutService", aura.layoutService,
-        "metricsService", aura.metricsService,
-        "storageService", aura.storageService,
-        "styleService", aura.styleService,
-        "services", aura.services,
-        "enqueueAction", aura.enqueueAction,
-        "deferAction", aura.deferAction,
-        "render", aura.render,
-        "rerender", aura.rerender,
-        "unrender", aura.unrender,
-        "afterRender", aura.afterRender,
-        "logger", aura.logger,
-        "getCmp", aura.getCmp,
-        "getComponent", aura.getComponent,
-        "pushCreationPath", aura.pushCreationPath,
-        "popCreationPath", aura.popCreationPath,
-        "setCreationPathIndex", aura.setCreationPathIndex,
+    exp(this,
+        "getCurrentTransactionId", this.getCurrentTransactionId,
+        "setCurrentTransactionId", this.setCurrentTransactionId,
+        "clientService", this.clientService,
+        "componentService", this.componentService,
+        "serializationService", this.serializationService,
+        "renderingService", this.renderingService,
+        "expressionService", this.expressionService,
+        "historyService", this.historyService,
+        "localizationService", this.localizationService,
+        "eventService", this.eventService,
+        "layoutService", this.layoutService,
+        "metricsService", this.metricsService,
+        "storageService", this.storageService,
+        "styleService", this.styleService,
+        "services", this.services,
+        "enqueueAction", this.enqueueAction,
+        "deferAction", this.deferAction,
+        "render", this.render,
+        "rerender", this.rerender,
+        "unrender", this.unrender,
+        "afterRender", this.afterRender,
+        "logger", this.logger,
+        "getCmp", this.getCmp,
+        "getComponent", this.getComponent,
+        "pushCreationPath", this.pushCreationPath,
+        "popCreationPath", this.popCreationPath,
+        "setCreationPathIndex", this.setCreationPathIndex,
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            "devToolService", aura.devToolService,
-            "getQueryStatement", aura.devToolService.newStatement,
-            "qhelp", function() { return aura.devToolService.help() },
+            "devToolService", this.devToolService,
+            "getQueryStatement", this.devToolService.newStatement,
+            "qhelp", function() { return this.devToolService.help();},
         //#end
-        "createComponent", aura.createComponent,
-        "createComponents", aura.createComponents,
-        "newCmp", aura.newCmp,
-        "newCmpDeprecated", aura.newCmpDeprecated,
-        "newCmpAsync", aura.newCmpAsync,
-        "getEvt", aura.getEvt,
-        "Component", aura.Component,
+        "createComponent", this.createComponent,
+        "createComponents", this.createComponents,
+        "newCmp", this.newCmp,
+        "newCmpDeprecated", this.newCmpDeprecated,
+        "newCmpAsync", this.newCmpAsync,
+        "getEvt", this.getEvt,
+        "Component", this.Component,
 
-        "auraError", aura.auraError,
-        "auraFriendlyError", aura.auraFriendlyError);
-    var services = aura.services;
+        "auraError", this.auraError,
+        "auraFriendlyError", this.auraFriendlyError);
+    var services = this.services;
 
     // TODO: convert to //#exportSymbols when available
     exp(services,
@@ -573,7 +632,7 @@ $A.ns.Aura = function() {
         	}
         }
     });
-};
+}
 
 /**
  * Initializes Aura with context info about the app that should be loaded.
@@ -587,7 +646,7 @@ $A.ns.Aura = function() {
  * }
  * @public
  */
-$A.ns.Aura.prototype.initAsync = function(config) {
+AuraInstance.prototype.initAsync = function(config) {
     $A.Perf.mark("Component Load Complete");
     $A.Perf.mark("Component Load Initiated");
 
@@ -596,9 +655,9 @@ $A.ns.Aura.prototype.initAsync = function(config) {
     // are none.
     //
     $A.context = new AuraContext(config["context"], function() {
-        clientService.initHost(config["host"]);
+        $A.clientService.initHost(config["host"]);
         $A.metricsService.initialize();
-        clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
+        $A.clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
             $A.metricsService.bootstrapMark("metadataReady");
             $A.initPriv(resp);
             $A.Perf.endMark("Component Load Complete");
@@ -618,11 +677,11 @@ $A.ns.Aura.prototype.initAsync = function(config) {
  * @param {Boolean} doNotCallUIPerfOnLoad True if UIPerf.onLoad() should not be called after initialization. In case of
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  */
-$A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeServices, doNotCallUIPerfOnLoad) {
+AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices, doNotCallUIPerfOnLoad) {
     config = $A.util.json.resolveRefs(config);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
-        clientService.initHost(config["host"]);
+        $A.clientService.initHost(config["host"]);
         // creating context.
         $A.context = new AuraContext(config["context"]);
         this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices, doNotCallUIPerfOnLoad);
@@ -648,10 +707,10 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  * @private
  */
-$A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallUIPerfOnLoad) {
+AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallUIPerfOnLoad) {
     if (!$A["hasErrors"]) {
         $A.Perf.mark("ClientService.init");
-        var cmp = clientService["init"](config, token, container ? $A.util.getElement(container) : null);
+        var cmp = $A.clientService["init"](config, token, container ? $A.util.getElement(container) : null);
         $A.Perf.endMark("ClientService.init");
         $A.setRoot(cmp);
 
@@ -661,7 +720,7 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
             }
 
             // restore component definitions from AuraStorage into memory and localStorage
-            componentService.registry.restoreAllFromStorage();
+            $A.componentService.registry.restoreAllFromStorage();
             $A.initialized = true;
         }
         $A.finishInit(doNotCallUIPerfOnLoad);
@@ -679,7 +738,7 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  * @private
  */
-$A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
+AuraInstance.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
     if (!this["finishedInit"]) {
         $A.Perf.mark("Aura.finishInit");
         $A.util.removeClass(document.body, "loading");
@@ -727,7 +786,7 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
  * @param {String} msg The error message to be displayed to the user.
  * @param {Error} [e] The error object to be displayed to the user.
  */
-$A.ns.Aura.prototype.error = function(msg, e){
+AuraInstance.prototype.error = function(msg, e){
     this.logger.error(msg, e);
 };
 
@@ -738,7 +797,7 @@ $A.ns.Aura.prototype.error = function(msg, e){
  * @param {Boolean} [toggle] toggles display of error dialog
  * @returns {Boolean} whether to display error dialog
  */
-$A.ns.Aura.prototype.showErrors = function(toggle){
+AuraInstance.prototype.showErrors = function(toggle){
     if (toggle !== undefined) {
         this.displayErrors = !!toggle;
     }
@@ -756,7 +815,7 @@ $A.ns.Aura.prototype.showErrors = function(toggle){
  * @param {String} w The message to display.
  * @param {Error} e an error, if any.
  */
-$A.ns.Aura.prototype.warning = function(w, e) {
+AuraInstance.prototype.warning = function(w, e) {
     this.logger.warning(w, e);
 };
 
@@ -767,7 +826,7 @@ $A.ns.Aura.prototype.warning = function(w, e) {
  * @public
  * @param {String} msg The message to display.
  */
-$A.ns.Aura.prototype.message = function(msg) {
+AuraInstance.prototype.message = function(msg) {
     var message = $A.util.getElement("auraErrorMessage");
     message.innerHTML = "";
     message.appendChild(document.createTextNode(msg));
@@ -784,7 +843,7 @@ $A.ns.Aura.prototype.message = function(msg) {
  * @param {Function} callback The method to call with the result if a server trip is expected.
  * @platform
  */
-$A.ns.Aura.prototype.get = function(key, callback) {
+AuraInstance.prototype.get = function(key, callback) {
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
@@ -810,7 +869,7 @@ $A.ns.Aura.prototype.get = function(key, callback) {
  * @param {Object} value The value to set the key location to. If the global value provider does not implement .set(), this method will throw an exception.</code>.
  * @platform
  */
-$A.ns.Aura.prototype.set = function(key, value) {
+AuraInstance.prototype.set = function(key, value) {
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
@@ -830,14 +889,14 @@ $A.ns.Aura.prototype.set = function(key, value) {
  * @function
  * @platform
  */
-$A.ns.Aura.prototype.getRoot = function() {
+AuraInstance.prototype.getRoot = function() {
     return this.root;
 };
 
 /**
  * @private
  */
-$A.ns.Aura.prototype.setRoot = function(root) {
+AuraInstance.prototype.setRoot = function(root) {
     this.root = root;
 };
 
@@ -848,7 +907,7 @@ $A.ns.Aura.prototype.setRoot = function(root) {
  * @function
  * @return {AuraContext} current context
  */
-$A.ns.Aura.prototype.getContext = function() {
+AuraInstance.prototype.getContext = function() {
     return this.context;
 };
 
@@ -862,7 +921,7 @@ $A.ns.Aura.prototype.getContext = function() {
  * @param {String} name an optional name for the stack.
  * @public
  */
-$A.ns.Aura.prototype.run = function(func, name) {
+AuraInstance.prototype.run = function(func, name) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
     if (name === undefined) {
         name = "$A.run()";
@@ -898,7 +957,7 @@ $A.ns.Aura.prototype.run = function(func, name) {
  * @param {Boolean} condition True prevents the error message from being displayed, or false otherwise.
  * @param {String} assertMessage A message to be displayed when condition is false
  */
-$A.ns.Aura.prototype.assert = function(condition, assertMessage) {
+AuraInstance.prototype.assert = function(condition, assertMessage) {
     this.logger.assert(condition, assertMessage);
 };
 
@@ -910,7 +969,7 @@ $A.ns.Aura.prototype.assert = function(condition, assertMessage) {
  * @param {String} msg The message to be displayed when the condition is false.
  * @public
  */
-$A.ns.Aura.prototype.userAssert = function(condition, msg) {
+AuraInstance.prototype.userAssert = function(condition, msg) {
     // For now use the same method
     $A.assert(condition, msg);
 };
@@ -925,7 +984,7 @@ $A.ns.Aura.prototype.userAssert = function(condition, msg) {
  * @param {Object} value The first object to log.
  * @param {Object} error The error messages to be logged in the stack trace.
  */
-$A.ns.Aura.prototype.log = function(value, error) {
+AuraInstance.prototype.log = function(value, error) {
     this.logger.info(value, error);
 };
 
@@ -933,7 +992,7 @@ $A.ns.Aura.prototype.log = function(value, error) {
  *  Logs to the browser's JavaScript console if it is available.
  *  This method doesn't log in PROD or PRODDEBUG modes.
  */
-$A.ns.Aura.prototype.logf = function() {
+AuraInstance.prototype.logf = function() {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     if (window["console"]) {
         window["console"]["log"].apply(window["console"], arguments);
@@ -945,7 +1004,7 @@ $A.ns.Aura.prototype.logf = function() {
  * Logs a stack trace. Trace calls using <code>console.trace()</code> if defined on the console implementation.
  * @public
  */
-$A.ns.Aura.prototype.trace = function() {
+AuraInstance.prototype.trace = function() {
     if (window["console"] && window["console"]["trace"]) {
         window["console"]["trace"]();
     }
@@ -957,7 +1016,7 @@ $A.ns.Aura.prototype.trace = function() {
  * @param {String} mode Possible values are production "PROD", development "DEV", or testing "PTEST".
  * @private
  */
-$A.ns.Aura.prototype.setMode = function(mode) {
+AuraInstance.prototype.setMode = function(mode) {
     this.mode = mode;
     this.enableAssertions = (mode != 'PROD' && mode != 'PTEST');
 };
@@ -969,7 +1028,7 @@ $A.ns.Aura.prototype.setMode = function(mode) {
  *
  * @private
  */
-$A.ns.Aura.prototype.getValueProvider = function(type) {
+AuraInstance.prototype.getValueProvider = function(type) {
     return this.getContext().getGlobalValueProvider(type);
 };
 
@@ -982,7 +1041,7 @@ $A.ns.Aura.prototype.getValueProvider = function(type) {
  *
  * @public
  */
-$A.ns.Aura.prototype.addValueProvider=function(type,valueProvider){
+AuraInstance.prototype.addValueProvider=function(type,valueProvider){
     $A.assert($A.util.isString(type),"$A.addValueProvider(): 'type' must be a valid String.");
     $A.assert(type.charAt(0)==='$',"$A.addValueProvider(): 'type' must start with '$'.");
     $A.assert(",$browser,$label,$locale,".indexOf(","+type.toLowerCase()+",")==-1,"$A.addValueProvider(): '"+type+"' is a reserved valueProvider.");
@@ -997,297 +1056,8 @@ $A.ns.Aura.prototype.addValueProvider=function(type,valueProvider){
     }
 };
 
-/**
- * The levels for logging performance m
- *
- * @enum {{name: !string, value: !number}}
- * @expose
- */
-var PerfLogLevel = {
-    /** @expose */
-    DEBUG : {
-        name : "DEBUG",
-        value : 1
-    },
-    /** @expose */
-    INTERNAL : {
-        name : "INTERNAL",
-        value : 2
-    },
-    /** @expose */
-    PRODUCTION : {
-        name : "PRODUCTION",
-        value : 3
-    },
-    /** @expose */
-    DISABLED : {
-        name : "DISABLED",
-        value : 4
-    }
-};
-
-/**
- * Various Perf constants.
- *
- * @enum {!string}
- * @expose
- */
-var PerfConstants = {
-    /** @expose */
-    PAGE_START_MARK : "PageStart",
-    /** @expose */
-    PERF_PAYLOAD_PARAM : "bulkPerf",
-    /** @expose */
-    MARK_NAME : "mark",
-    /** @expose */
-    MEASURE_NAME : "measure",
-    /** @expose */
-    MARK_START_TIME : "st",
-    /** @expose */
-    MARK_LAST_TIME : "lt",
-    /** @expose */
-    PAGE_NAME : "pn",
-    /** @expose */
-    ELAPSED_TIME : "et",
-    /** @expose */
-    REFERENCE_TIME : "rt",
-    /** @expose */
-    Perf_LOAD_DONE : "loadDone"
-};
-
-/**
- * @enum {!string}
- * @expose
- */
-PerfConstants.STATS = {
-    /** @expose */
-    NAME : "stat",
-    /** @expose */
-    SERVER_ELAPSED : "internal_serverelapsed",
-    /** @expose */
-    DB_TOTAL_TIME : "internal_serverdbtotaltime",
-    /** @expose */
-    DB_CALLS : "internal_serverdbcalls",
-    /** @expose */
-    DB_FETCHES : "internal_serverdbfetches"
-};
-
-window["PerfConstants"] = PerfConstants;
-window["PerfLogLevel"] = PerfLogLevel;
-
-/**
- * @public
- * @namespace
- * @const
- * @type {!IPerf}
- */
-$A.ns.Aura.prototype.Perf = window["Perf"] ?
-    //Planning to delete window.Perf, but can't until removing SFDC references to it
-    //var tmp = window["Perf"];
-    //delete window["Perf"];
-    window["Perf"] :
-{
-    /**
-     * @type {!window.typePerfLogLevel}
-     * @expose
-     * @const
-     */
-    currentLogLevel: PerfLogLevel.DISABLED,
-
-    /**
-     * @param {!string} id The id used to identify the mark.
-     * @param {string|window.typePerfLogLevel=} logLevel The level at which this mark should
-     * be logged at.
-     * @return {!IPerf}
-     * @expose
-     */
-    mark: function (id, logLevel) { return this; },
-
-    /**
-     * @param {!string} id This is the id associated with the mark that uses
-     * the same id.
-     * @param {string|window.typePerfLogLevel=} logLevel The level at which this mark should
-     * be logged at.
-     * @return {!IPerf}
-     * @expose
-     */
-    endMark: function (id, logLevel) { return this; },
-
-    /**
-     * This method is used to the update the name of a mark
-     *
-     * @param {!string} oldName The id used to identify the old mark name.
-     * @param {!string} newName The id used to identify the new mark name.
-     * @return {!IPerf} for chaining methods
-     * @expose
-     */
-    updateMarkName: function (oldName, newName) { return this; },
-
-    /**
-     * Serializes a measure object to JSON.
-     *
-     * @param {!window.typejsonMeasure} measure The measure to serialize.
-     * @return {!string} JSON-serialized version of the supplied measure.
-     * @expose
-     */
-    measureToJson: function (measure) { return ""; },
-
-    /**
-     * Serializes timers to JSON.
-     *
-     * @param {boolean=} includeMarks
-     * @return {!string} JSON-serialized version of supplied marks.
-     * @expose
-     */
-    toJson: function (includeMarks) { return ""; },
-
-    /**
-     * @param {!string} timer_name The name of the timer to set.
-     * @param {number=} timer_delta The time delta to set.
-     * @param {string|window.typePerfLogLevel=} logLevel The level at which this mark should be logged at. Defaults to PerfLogLevel.INTERNAL if left blank
-     * @return {!IPerf}
-     * @expose
-     */
-    setTimer: function (timer_name, timer_delta, logLevel) { return this; },
-
-    /**
-     * Get a JSON-serialized version of all existing timers and stats in POST friendly format.
-     *
-     * @return {!string} POST-friendly timers and stats.
-     * @expose
-     */
-    toPostVar: function () { return ""; },
-
-    /**
-     * Returns all of the measures that have been captured
-     *
-     * @return {!Array.<window.typejsonMeasure>} all existing measures.
-     * @expose
-     */
-    getMeasures: function () { return []; },
-
-    /**
-     * Returns the beaconData to piggyback on the next XHR call
-     *
-     * @return {?string} beacon data.
-     * @expose
-     */
-    getBeaconData: function () { return null; },
-
-    /**
-     * Sets the beaconData to piggyback on the next XHR call
-     *
-     * @param {!string} beaconData
-     * @expose
-     */
-    setBeaconData: function (beaconData) {},
-
-    /**
-     * Clears beacon data
-     *
-     * @expose
-     */
-    clearBeaconData: function () {},
-
-    /**
-     * Removes the existing timers
-     *
-     * @expose
-     */
-    removeStats: function () {},
-
-    /**
-     * Add a performance measurement from the server.
-     *
-     * @param {!string} label
-     * @param {!number} elapsedMillis
-     * @return {!IPerf}
-     * @expose
-     */
-    stat: function (label, elapsedMillis) { return this; },
-
-    /**
-     * Get the stored server side performance measures.
-     *
-     * @param {!string} label
-     * @return {!string|number}
-     * @expose
-     */
-    getStat: function (label) { return -1; },
-
-    /**
-     * Called when the page is ready to interact with. To support the existing Kylie.onLoad method.
-     *
-     * @expose
-     */
-    onLoad: function () {},
-
-    /**
-     * This method is used to mark the start of a transaction
-     *
-     * @param {!string} tName The id used to identify the transaction.
-     * @return {!IPerf} for chaining methods
-     * @expose
-     */
-    startTransaction: function (tName) { return this; },
-
-    /**
-     * This method is used to mark the end of a transaction
-     *
-     * @param {!string} tName The id used to identify the transaction.
-     * @return {!IPerf} for chaining methods
-     * @expose
-     */
-    endTransaction: function (tName) { return this; },
-
-    /**
-     * This method is used to the update the name of the
-     * transaction
-     *
-     * @param {!string} oldName The id used to identify the old transaction name.
-     * @param {!string} newName The id used to identify the new transaction name.
-     * @return {!IPerf} for chaining methods
-     * @expose
-     */
-    updateTransaction: function (oldName, newName) { return this; },
-
-    /**
-     * This method is used to figure if onLoad/page_ready has been fired or
-     * not
-     *
-     * @return {!boolean}
-     * @expose
-     */
-    isOnLoadFired: function () { return false; },
-
-    /**
-     * @namespace
-     * @type {!IPerf_util}
-     * @const
-     * @expose
-     */
-    util: /** @type {!IPerf_util} */ ({
-        /**
-         * Sets the roundtrip time cookie
-         *
-         * @param {!string=} name
-         * @param {!string|number=} value
-         * @param {Date=} expires
-         * @param {string=} path
-         * @expose
-         */
-        setCookie: function (name, value, expires, path) {}
-    }),
-
-    /**
-     * Whether the full Kylie framework is loaded, as opposed to just the stubs.
-     *
-     * @type {boolean}
-     * @const
-     */
-    enabled: false
-};
-
+// #include aura.util.PerfShim
+AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 
 // #include aura.Aura_export
 
@@ -1296,40 +1066,25 @@ $A.ns.Aura.prototype.Perf = window["Perf"] ?
 // $A, without making a new top-level name:
 (function bootstrap() {
     var ns = $A.ns;
-    window['$A'] = new ns.Aura();
+    window['$A'] = new AuraInstance();
     window['$A']['ns'] = ns;
     window['$A'].ns = ns;
     $A.metricsService.bootstrapMark("frameworkReady");
 })();
 
-// shortcuts for using throughout the framework code.
-// TODO(fabbott): All of these need to move into $A only.
-clientService = $A.clientService;
-var componentService = $A.componentService;
-var serializationService = $A.serializationService;
-var renderingService = $A.renderingService;
-var expressionService = $A.expressionService;
-var historyService = $A.historyService;
-var eventService = $A.eventService;
-var layoutService = $A.layoutService;
-var metricsService = $A.metricsService;
-
-var services = $A.services;
-
 // TODO(fabbott): Remove the legacy 'aura' top-level name.
 window['aura'] = window['$A'];
 
-// **** Storage Adapters ****
-// --------------------------
+// -- Storage Adapters -------------------------------------------------
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
 // #include aura.storage.adapters.WebSQLAdapter
-// #include aura.Logging
 
-// **** Metrics Plugins ****
-// --------------------------
+// -- Metrics Plugins --------------------------------------------------
 // #include aura.metrics.plugins.TransportMetricsPlugin
 // #include aura.metrics.plugins.ServerActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}
+
+// #include aura.Logging

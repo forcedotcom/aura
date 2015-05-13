@@ -31,7 +31,7 @@
  *  asynchronous initialization.
  * @constructor
  */
-$A.ns.GlobalValueProviders = function (gvp, initCallback) {
+ function GlobalValueProviders (gvp, initCallback) {
     this.valueProviders = {
         "$Browser" : new $A.ns.ObjectValueProvider(),
         "$Label": new $A.ns.LabelValueProvider(),
@@ -55,8 +55,7 @@ $A.ns.GlobalValueProviders = function (gvp, initCallback) {
             initCallback();
         }
     });
-
-};
+}
 
 /**
  * Merges new GVPs with existing and saves to storage
@@ -65,7 +64,7 @@ $A.ns.GlobalValueProviders = function (gvp, initCallback) {
  * @param {Boolean} doNotPersist
  * @protected
  */
-$A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
+GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
     if (!gvps) {
         return;
     }
@@ -114,7 +113,7 @@ $A.ns.GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
  * @return {Object} storage - undefined if no storage exists
  * @private
  */
-$A.ns.GlobalValueProviders.prototype.getStorage = function () {
+GlobalValueProviders.prototype.getStorage = function () {
     var storage = $A.storageService.getStorage("actions");
     if (!storage) {
         return undefined;
@@ -128,7 +127,7 @@ $A.ns.GlobalValueProviders.prototype.getStorage = function () {
  * load GVPs from storage if available
  * @private
  */
-$A.ns.GlobalValueProviders.prototype.loadFromStorage = function(callback) {
+GlobalValueProviders.prototype.loadFromStorage = function(callback) {
 	// If persistent storage is active then write through for disconnected support
     var storage = this.getStorage();
     var that = this;
@@ -161,7 +160,7 @@ $A.ns.GlobalValueProviders.prototype.loadFromStorage = function(callback) {
  * @param {Object} gvp Global Value Providers
  * @private
  */
-$A.ns.GlobalValueProviders.prototype.load = function(gvp) {
+GlobalValueProviders.prototype.load = function(gvp) {
     if (gvp) {
         for ( var i = 0; i < gvp.length; i++) {
             this.merge(gvp[i]);
@@ -176,7 +175,7 @@ $A.ns.GlobalValueProviders.prototype.load = function(gvp) {
  * @param valueProvider The valueProvider to add.
  * @private
  */
-$A.ns.GlobalValueProviders.prototype.addValueProvider = function(type, valueProvider) {
+GlobalValueProviders.prototype.addValueProvider = function(type, valueProvider) {
     if(!this.valueProviders.hasOwnProperty(type)) {
         // work around the obfuscation logic to allow external GVPs
         valueProvider.getValues = valueProvider.getValues || valueProvider["getValues"];
@@ -193,7 +192,7 @@ $A.ns.GlobalValueProviders.prototype.addValueProvider = function(type, valueProv
  * @return {Object} ValueProvider
  * @private
  */
-$A.ns.GlobalValueProviders.prototype.getValueProvider = function(type) {
+GlobalValueProviders.prototype.getValueProvider = function(type) {
     return this.valueProviders[type];
 };
 
@@ -202,7 +201,7 @@ $A.ns.GlobalValueProviders.prototype.getValueProvider = function(type) {
  * when we start the app offline, the server is not avalable, 
  * all we have is whatever we get from persist storage.
  */
-$A.ns.GlobalValueProviders.prototype.clearValueProvider = function(loadFromStorage) {
+GlobalValueProviders.prototype.clearValueProvider = function(loadFromStorage) {
 	this.valueProviders = {
 	        "$Browser" : new $A.ns.ObjectValueProvider(),
 	        "$Label": new $A.ns.LabelValueProvider(),
@@ -221,7 +220,7 @@ $A.ns.GlobalValueProviders.prototype.clearValueProvider = function(loadFromStora
  * @param {Component} component
  * @return {String} The value of expression
  */
-$A.ns.GlobalValueProviders.prototype.get = function(expression, callback) {
+GlobalValueProviders.prototype.get = function(expression, callback) {
     expression=$A.expressionService.normalize(expression).split('.');
     var type=expression.shift();
     var valueProvider=this.valueProviders[type];
@@ -229,4 +228,7 @@ $A.ns.GlobalValueProviders.prototype.get = function(expression, callback) {
     return (valueProvider.get ? valueProvider.get(expression, callback) : $A.expressionService.resolve(expression, valueProvider));
 };
 
+
+$A.ns.GlobalValueProviders = GlobalValueProviders;
+Aura.Provider.GlobalValueProviders = GlobalValueProviders;
 //#include aura.provider.GlobalValueProviders_export

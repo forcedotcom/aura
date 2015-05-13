@@ -22,9 +22,14 @@ Test.Aura.AuraRenderingServiceTest = function(){
         getContext:function(){return context;},
         ns : {}
     };
+    var NS = {Services: {}};
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A})(function(){
+    Mocks.GetMocks(Object.Global(), {
+        "exp": function(){}, 
+        "$A":$A,
+        Aura: NS
+    })(function(){
         // #import aura.AuraRenderingService
     });
 

@@ -21,7 +21,8 @@ Test.Aura.Controller.ActionTest = function() {
     
     Mocks.GetMocks(Object.Global(), {
         "exp": function() {},
-        "$A": {ns:{}}
+        "$A": {ns:{}},
+        "Aura": {Controller: {}}
     })(function() {
         // #import aura.controller.Action
     });

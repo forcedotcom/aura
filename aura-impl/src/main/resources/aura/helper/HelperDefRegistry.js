@@ -42,3 +42,5 @@ HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, componentD
     }
     return ret;
 };
+
+Aura.Helper.HelperDefRegistry = HelperDefRegistry;

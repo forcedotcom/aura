@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /*jslint sub: true */
+
 /**
  * A 'collector' for a set of actions that will be sent to the server.
  *
@@ -30,7 +32,8 @@
  * @param {Function}
  *            finishedCallback the callback for when the actions are collected.
  */
-var ActionCollector = function ActionCollector(actions, finishedCallback) {
+
+function ActionCollector(actions, finishedCallback) {
     this.actionsToSend = [];
     this.actionsCount = 0;
     this.actionsToComplete = [];
@@ -47,7 +50,7 @@ var ActionCollector = function ActionCollector(actions, finishedCallback) {
         this.actionsCount = 0;
     }
     this.num = -1;
-};
+}
 
 ActionCollector.prototype.auraType = "ActionCollector";
 
@@ -268,3 +271,4 @@ ActionCollector.prototype.finishCollection = function() {
 };
 
 $A.ns.ActionCollector = ActionCollector;
+Aura.Controller.ActionCollector = ActionCollector;

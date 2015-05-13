@@ -111,4 +111,6 @@ AttributeDef.prototype.getNativeType = function() {
     return "object";
 };
 
+Aura.Attribute.AttributeDef = AttributeDef;
+
 //#include aura.attribute.AttributeDef_export

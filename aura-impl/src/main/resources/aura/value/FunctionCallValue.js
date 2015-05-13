@@ -169,6 +169,9 @@ FunctionCallValue.prototype.toString = function(){
     
     return "FunctionCallValue";
 };
+
+Aura.Value.FunctionCallValue = FunctionCallValue;
+
 //#include aura.value.FunctionCallValue_export
 
 

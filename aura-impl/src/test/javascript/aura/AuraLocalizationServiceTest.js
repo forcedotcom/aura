@@ -19,8 +19,10 @@ Function.RegisterNamespace("Test.Aura");
 Test.Aura.AuraLocalizationServiceTest = function(){
 
 	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-	Mocks.GetMock(Object.Global(), "exp", function() {
-	})(function() {
+	Mocks.GetMocks(Object.Global(), {
+        "exp": function() {}, 
+        Aura: {Services: {}}
+    })(function() {
 		// #import aura.AuraLocalizationService
 	});
 

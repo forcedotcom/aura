@@ -192,3 +192,5 @@ var AuraStyleService = function() {
 
     return styleService;
 };
+
+Aura.Services.AuraStyleService = AuraStyleService;

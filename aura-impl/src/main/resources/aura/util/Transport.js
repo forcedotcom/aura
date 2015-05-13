@@ -119,4 +119,6 @@ Transport.prototype.request = function(config) {
     }
 };
 
+Aura.Utils.Transport = Transport;
+
 //#include aura.util.Transport_export

@@ -19,11 +19,11 @@
  * Internet Explorer 7 and 8 are not supported for this service.
  * @constructor
  */
-$A.ns.AuraHistoryService = function() {
+function AuraHistoryService() {
     this.history = [];       // tracks url hashes
     this.currentIndex = -1;  // pointer to current hash within history
     this.evt = null;
-};
+}
 
 /**
  * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>.
@@ -33,10 +33,10 @@ $A.ns.AuraHistoryService = function() {
  * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
  *
  * @param {Object} token The provided token set to the current location hash
- * @memberOf $A.ns.AuraHistoryService
+ * @memberOf AuraHistoryService
  * @public
  */
-$A.ns.AuraHistoryService.prototype.set = function(token) {
+AuraHistoryService.prototype.set = function(token) {
     if (token) {
         // Check for HTML5 window.history.pushState support
         if (this.usePushState()) {
@@ -68,10 +68,10 @@ $A.ns.AuraHistoryService.prototype.set = function(token) {
  * <p>Example:</p> 
  * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>
  * 
- * @memberOf $A.ns.AuraHistoryService
+ * @memberOf AuraHistoryService
  * @public
  */
-$A.ns.AuraHistoryService.prototype.get = function() {
+AuraHistoryService.prototype.get = function() {
     // 
     // Windows phone doesn't save the hash after navigating backwards. 
     // So get it from the history state. 
@@ -83,10 +83,10 @@ $A.ns.AuraHistoryService.prototype.get = function() {
 /**
  * Loads the previous URL in the history list. Standard JavaScript <code>history.go()</code> method.
  *
- * @memberOf $A.ns.AuraHistoryService
+ * @memberOf AuraHistoryService
  * @public
  */
-$A.ns.AuraHistoryService.prototype.back = function() {
+AuraHistoryService.prototype.back = function() {
     if (!$A.util.isIOSWebView()) {
         //history -> Standard javascript object
         window.history.go(-1);
@@ -109,20 +109,20 @@ $A.ns.AuraHistoryService.prototype.back = function() {
  * Sets the title of the document.
  * 
  * @param {String} title The new title
- * @memberOf $A.ns.AuraHistoryService
+ * @memberOf AuraHistoryService
  * @public
  */
-$A.ns.AuraHistoryService.prototype.setTitle = function(title) {
+AuraHistoryService.prototype.setTitle = function(title) {
     document.title = title;
 };
 
 /**
  * Loads the next URL in the history list. Standard JavaScript <code>history.go()</code> method.
  * 
- * @memberOf $A.ns.AuraHistoryService
+ * @memberOf AuraHistoryService
  * @public
  */
-$A.ns.AuraHistoryService.prototype.forward = function() {
+AuraHistoryService.prototype.forward = function() {
     if (!$A.util.isIOSWebView()) {
         //history -> Standard javascript object
         window.history.go(1);
@@ -142,7 +142,7 @@ $A.ns.AuraHistoryService.prototype.forward = function() {
  *
  * @public
  */
-$A.ns.AuraHistoryService.prototype.reset = function () {
+AuraHistoryService.prototype.reset = function () {
     this.history = [];
     this.currentIndex = -1;
 };
@@ -154,7 +154,7 @@ $A.ns.AuraHistoryService.prototype.reset = function () {
  * @returns {boolean} true if pushState should be used
  * @private
  */
-$A.ns.AuraHistoryService.prototype.usePushState = function() {
+AuraHistoryService.prototype.usePushState = function() {
     if (this._usePushState === undefined) {
         var ua = window.navigator.userAgent;
         this._usePushState =
@@ -171,7 +171,7 @@ $A.ns.AuraHistoryService.prototype.usePushState = function() {
 /**
  * @private
  */
-$A.ns.AuraHistoryService.prototype.init = function() {
+AuraHistoryService.prototype.init = function() {
     // Check for HTML5 window.history.pushState support
     var that = this;
     if (this.usePushState()) {
@@ -213,7 +213,7 @@ $A.ns.AuraHistoryService.prototype.init = function() {
 /**
  * @private
  */
-$A.ns.AuraHistoryService.prototype.getEvent = function(){
+AuraHistoryService.prototype.getEvent = function(){
     if (!this.evt){
         this.evt = $A.getRoot().getDef().getLocationChangeEvent();
     }
@@ -223,9 +223,9 @@ $A.ns.AuraHistoryService.prototype.getEvent = function(){
 /**
  * @private
  */
-$A.ns.AuraHistoryService.prototype.changeHandler = function(){
+AuraHistoryService.prototype.changeHandler = function(){
     var loc = location["hash"] || (history["state"] && history["state"]["hash"]);
-    var event = eventService.newEvent(this.getEvent());
+    var event = $A.eventService.newEvent(this.getEvent());
 
     if(!event) {
         throw new Error("The event specified on the app for the locationChange (" + this.getEvent() + ") was not found.");
@@ -254,7 +254,7 @@ $A.ns.AuraHistoryService.prototype.changeHandler = function(){
 /**
  * @private
  */
-$A.ns.AuraHistoryService.prototype.parseLocation = function(location) {
+AuraHistoryService.prototype.parseLocation = function(location) {
     if (location["indexOf"]("#") === 0) {
         location = location["substring"](1);
     }
@@ -277,5 +277,8 @@ $A.ns.AuraHistoryService.prototype.parseLocation = function(location) {
         return {"token" : location, "querystring": "" };
     }
 };
+
+$A.ns.AuraHistoryService = AuraHistoryService;
+Aura.Services.AuraHistoryService = AuraHistoryService;
 
 //#include aura.AuraHistoryService_export

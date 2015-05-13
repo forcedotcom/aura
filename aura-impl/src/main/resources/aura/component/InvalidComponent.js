@@ -309,5 +309,6 @@ InvalidComponent.prototype.raiseInvalidComponentError = function(func, args) {
     $A.error(error);
 };
 
+Aura.Component.InvalidComponent = InvalidComponent;
 
 //#include aura.component.InvalidComponent_export

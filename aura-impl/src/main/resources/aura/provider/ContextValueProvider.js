@@ -18,9 +18,9 @@
  * @description Context's Global ValueProvider. 
  * @constructor
  */
-$A.ns.ContextValueProvider = function() {
+function ContextValueProvider() {
     this.values = {}; 
-};
+}
 
 /**
  * returns $Global values
@@ -28,7 +28,7 @@ $A.ns.ContextValueProvider = function() {
  * @protected
  * @return {Object} a copy of the internal store.
  */
-$A.ns.ContextValueProvider.prototype.getValues = function() {
+ContextValueProvider.prototype.getValues = function() {
     var result = {};
     for (var key in this.values)  {
         if (this.values.hasOwnProperty(key)) {
@@ -44,11 +44,11 @@ $A.ns.ContextValueProvider.prototype.getValues = function() {
  * @private
  * @return {Object} a reference to the internal store.
  */
-$A.ns.ContextValueProvider.prototype.getStorableValues = function() {
+ContextValueProvider.prototype.getStorableValues = function() {
     return this.values;
 };
 
-$A.ns.ContextValueProvider.prototype.serializeForServer = function () {
+ContextValueProvider.prototype.serializeForServer = function () {
     var serverValues = {};
 
     for (var key in this.values)  {
@@ -72,7 +72,7 @@ $A.ns.ContextValueProvider.prototype.serializeForServer = function () {
  * @private
  * @param {Object} values the new set of values to merge
  */
-$A.ns.ContextValueProvider.prototype.merge = function(values) {
+ContextValueProvider.prototype.merge = function(values) {
     for (key in values) {
         if (values.hasOwnProperty(key)) {
             var value = values[key];
@@ -101,7 +101,7 @@ $A.ns.ContextValueProvider.prototype.merge = function(values) {
  * @param {string} key - the key to retrieve
  * @return {Object} - the assigned of (if not assigned) default value
  */
-$A.ns.ContextValueProvider.prototype.get = function(key) {
+ContextValueProvider.prototype.get = function(key) {
     if (this.values.hasOwnProperty(key) === false) {
         throw new Error("Attempting to retrieve an unknown global item '" + key + "'. Global items must be pre-registered and have a default value");
     }
@@ -117,7 +117,7 @@ $A.ns.ContextValueProvider.prototype.get = function(key) {
  * @param {Boolean} ignoreChanges - should we ignore changes for change notification.
  * @return {Object} the value that was set.
  */
-$A.ns.ContextValueProvider.prototype.set = function(key, value, ignoreChanges) {
+ContextValueProvider.prototype.set = function(key, value, ignoreChanges) {
     $A.assert(key.indexOf('.') == -1, "Unable to set value for key '" + key + "', did you add an extra '.'?");
     if ($A.util.isExpression(value)) {
         throw new Error("Unable to set global value '"+key+"' to the expression '"+value+"'. Global items must be constants");
@@ -143,6 +143,9 @@ $A.ns.ContextValueProvider.prototype.set = function(key, value, ignoreChanges) {
  * @param {Object} the global value (keys = [ "value", "defaultValue", "writable" ]
  * @return {Object} the value
  */
-$A.ns.ContextValueProvider.prototype.extract = function(gv) {
+ContextValueProvider.prototype.extract = function(gv) {
     return gv && (gv.hasOwnProperty("value") ? gv["value"] : gv["defaultValue"]);  
 };
+
+$A.ns.ContextValueProvider = ContextValueProvider;
+Aura.Provider.ContextValueProvider = ContextValueProvider;

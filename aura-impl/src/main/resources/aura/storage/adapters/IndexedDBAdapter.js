@@ -35,7 +35,7 @@
  *
  * @constructor
  */
-$A.ns.IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
+IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
     var that = this;
 
     this.instanceName = config["name"];
@@ -82,7 +82,7 @@ $A.ns.IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
     };
 };
 
-$A.ns.IndexedDBStorageAdapter.NAME = "indexeddb";
+IndexedDBStorageAdapter.NAME = "indexeddb";
 
 /**
  * Get the name of the adapter.
@@ -90,8 +90,8 @@ $A.ns.IndexedDBStorageAdapter.NAME = "indexeddb";
  * @public
  * @return the name of this adapter ("indexeddb")
  */
-$A.ns.IndexedDBStorageAdapter.prototype.getName = function() {
-    return $A.ns.IndexedDBStorageAdapter.NAME;
+IndexedDBStorageAdapter.prototype.getName = function() {
+    return IndexedDBStorageAdapter.NAME;
 };
 
 /**
@@ -102,7 +102,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.getName = function() {
  * @public
  * @return a promise that will complete with the size.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.getSize = function() {
+IndexedDBStorageAdapter.prototype.getSize = function() {
     var that = this;
     if (this.sizeAge < 50) {
         return new Promise(function(success, error) {
@@ -121,7 +121,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.getSize = function() {
  * @param {*} key the key to look up.
  * @return {Promise} a promise that will complete with the item, null, or an error.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.getItem = function(key) {
+IndexedDBStorageAdapter.prototype.getItem = function(key) {
     var that = this;
     var execute = function(success, error) {
         that.getItemInternal(key, success, error);
@@ -134,7 +134,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.getItem = function(key) {
  *
  * @returns {Promise} Promise with array of all rows
  */
-$A.ns.IndexedDBStorageAdapter.prototype.getAll = function() {
+IndexedDBStorageAdapter.prototype.getAll = function() {
     var that = this;
     var execute = function(success, error) {
         that.walkInternal(success, error, true);
@@ -149,7 +149,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.getAll = function() {
  * @param {*} item the item to set.
  * @return a promise that will complete with either success (no value) or error.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.setItem = function(key, item) {
+IndexedDBStorageAdapter.prototype.setItem = function(key, item) {
     var that = this;
     var execute = function(success, error) {
         that.setItemInternal(key, item, success, error);
@@ -163,7 +163,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.setItem = function(key, item) {
  * @param {*} key the key to remove.
  * @return {Promise} a promise that will resolve when the operation finishes.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.removeItem = function(key) {
+IndexedDBStorageAdapter.prototype.removeItem = function(key) {
     var that = this;
     var execute = function(success, error) {
         that.removeItemInternal(key, success, error);
@@ -176,7 +176,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.removeItem = function(key) {
  *
  * @return {Promise} a promise that will resolve when the operation finishes.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.clear = function() {
+IndexedDBStorageAdapter.prototype.clear = function() {
     var that = this;
     var execute = function(success, error) {
         that.clearInternal(success, error);
@@ -189,7 +189,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.clear = function() {
  *
  * @return {Promise} a promise that will resolve when the operation finishes.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.sweep = function() {
+IndexedDBStorageAdapter.prototype.sweep = function() {
     var that = this;
     var execute = function(success, error) {
         that.expireCache(0, success, error);
@@ -204,7 +204,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.sweep = function() {
  * @private
  * @param {IndexedDB} db the database.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.setupDB = function(db) {
+IndexedDBStorageAdapter.prototype.setupDB = function(db) {
     $A.assert(this.db === undefined);
     this.db = db;
     this.db.onError = function(e) {
@@ -226,7 +226,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.setupDB = function(db) {
  * @private
  * @param {IndexedDB} db the database.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.createTables = function(db) {
+IndexedDBStorageAdapter.prototype.createTables = function(db) {
     var objectStore = db.createObjectStore(this.tableName, { "keyPath": "key" });
     objectStore.createIndex("expires", "expires", {"unique": false});
 };
@@ -239,7 +239,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.createTables = function(db) {
  *
  * @private
  */
-$A.ns.IndexedDBStorageAdapter.prototype.executeQueue = function() {
+IndexedDBStorageAdapter.prototype.executeQueue = function() {
     var queue = this.pendingRequests;
     var idx;
 
@@ -255,7 +255,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.executeQueue = function() {
  * @param {function} execute the function to execute.
  * @return {Promise} a promise.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.enqueue = function(execute) {
+IndexedDBStorageAdapter.prototype.enqueue = function(execute) {
     var that = this;
 
     if (this.ready === false) {
@@ -284,7 +284,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.enqueue = function(execute) {
  * @param {function} success the success callback from the promise
  * @param {function} error the error callback from the promise
  */
-$A.ns.IndexedDBStorageAdapter.prototype.getItemInternal = function(key, success, error) {
+IndexedDBStorageAdapter.prototype.getItemInternal = function(key, success, error) {
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var objectStoreRequest = objectStore.get(key);
@@ -308,7 +308,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.getItemInternal = function(key, success,
  * @param {function} error the error callback from the promise
  * @param {boolean} sendResult should we send the full set of results instead of the size.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.walkInternal = function(success, error, sendResult) {
+IndexedDBStorageAdapter.prototype.walkInternal = function(success, error, sendResult) {
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var cursor = objectStore.openCursor();
@@ -362,7 +362,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.walkInternal = function(success, error, 
  * @param {function} success the promise success callback.
  * @param {function} error the promise error callback.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.setItemInternal = function(key, item, success, error) {
+IndexedDBStorageAdapter.prototype.setItemInternal = function(key, item, success, error) {
     var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
     var expires = +item["expires"];
     var that = this;
@@ -406,7 +406,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.setItemInternal = function(key, item, su
  * @param {function} success the success callback from the promise.
  * @param {function} error the error callback from the promise.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.removeItemInternal = function(key, success, error) {
+IndexedDBStorageAdapter.prototype.removeItemInternal = function(key, success, error) {
     var transaction = this.db.transaction([this.tableName], "readwrite");
     var objectStore = transaction.objectStore(this.tableName);
     this.updateSize(-this.sizeAvg, this.sizeAvg);
@@ -428,7 +428,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.removeItemInternal = function(key, succe
  * @param {function} success the success callback for the promise.
  * @param {function} error the error callback from the promise.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.clearInternal = function(success, error) {
+IndexedDBStorageAdapter.prototype.clearInternal = function(success, error) {
     var transaction = this.db.transaction([this.tableName], "readwrite");
     var objectStore = transaction.objectStore(this.tableName);
     //FIXME: probably should do an object here.
@@ -450,7 +450,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.clearInternal = function(success, error)
  *
  * @param {number} requestedSize the size we want to free.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success, error) {
+IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success, error) {
     var now = new Date().getTime();
     if (this.lastSweep + this.sweepInterval > now && this.sizeGuess < this.limitSweepHigh) {
         if (this.debugLoggingEnabled) {
@@ -529,7 +529,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, su
  * @param {number} sizeChange the amount to change the size of the db.
  * @param {number} error a really random guess of the size of the error.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.updateSize = function(sizeChange, error) {
+IndexedDBStorageAdapter.prototype.updateSize = function(sizeChange, error) {
     this.sizeGuess += sizeChange;
     this.sizeErrorBar += error;
     this.sizeAge += 1;
@@ -541,7 +541,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.updateSize = function(sizeChange, error)
  * @param {number} size the actual calculated size.
  * @param {number} count the number of items in the DB.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.refreshSize = function(size, count) {
+IndexedDBStorageAdapter.prototype.refreshSize = function(size, count) {
     var mistake = this.sizeGuess - size;
     if (mistake < 0) {
         mistake = -mistake;
@@ -568,7 +568,7 @@ $A.ns.IndexedDBStorageAdapter.prototype.refreshSize = function(size, count) {
  * @param {number} size the actual calculated size.
  * @param {number} count the number of items in the DB.
  */
-$A.ns.IndexedDBStorageAdapter.prototype.setSize = function(size, count) {
+IndexedDBStorageAdapter.prototype.setSize = function(size, count) {
     this.sizeLastReal = size;
     this.sizeGuess = size;
     this.sizeErrorBar = 0;
@@ -578,17 +578,20 @@ $A.ns.IndexedDBStorageAdapter.prototype.setSize = function(size, count) {
     }
 };
 
-$A.ns.IndexedDBStorageAdapter.prototype.log = function (msg, obj) {
+IndexedDBStorageAdapter.prototype.log = function (msg, obj) {
     if (this.debugLoggingEnabled) {
-        $A.log("IndexedDBAStorageAdapter '" + this.instanceName + "' " + msg + ":", obj);
+        $A.log("IndexedDBStorageAdapter '" + this.instanceName + "' " + msg + ":", obj);
     }
 };
 
 // Only register this adapter if the IndexedDB API is present
 if (window.indexedDB) {
     $A.storageService.registerAdapter({
-        "name": $A.ns.IndexedDBStorageAdapter.NAME,
-        "adapterClass": $A.ns.IndexedDBStorageAdapter,
+        "name": IndexedDBStorageAdapter.NAME,
+        "adapterClass": IndexedDBStorageAdapter,
         "persistent": true
     });
 }
+
+$A.ns.IndexedDBStorageAdapter = IndexedDBStorageAdapter;
+Aura.Storage.IndexedDBStorageAdapter = IndexedDBStorageAdapter;

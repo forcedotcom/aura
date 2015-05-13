@@ -24,7 +24,7 @@
  * @namespace
  * @constructor
  */
-$A.ns.Logger = function() {
+function Logger() {
     this.subscribers = [];
     this.INFO = "INFO";
     this.WARNING = "WARNING";
@@ -36,7 +36,7 @@ $A.ns.Logger = function() {
     this.subscriptions[this.WARNING] = 0;
     this.subscriptions[this.ASSERT] = 0;
     this.subscriptions[this.ERROR] = 0;
-};
+}
 
 /**
  * Info log
@@ -44,7 +44,7 @@ $A.ns.Logger = function() {
  * @param {String} info message
  * @param {Error} [error] error
  */
-$A.ns.Logger.prototype.info = function(info, error) {
+Logger.prototype.info = function(info, error) {
     this.log(this.INFO, info, error);
 };
 
@@ -54,7 +54,7 @@ $A.ns.Logger.prototype.info = function(info, error) {
  * @param {String} warning message
  * @param {Error} [error] error
  */
-$A.ns.Logger.prototype.warning = function(warning, error) {
+Logger.prototype.warning = function(warning, error) {
     this.log(this.WARNING, warning, error);
 };
 
@@ -64,7 +64,7 @@ $A.ns.Logger.prototype.warning = function(warning, error) {
  * @param {Boolean} condition check
  * @param {String} assertMessage message when assertion fails
  */
-$A.ns.Logger.prototype.assert = function(condition, assertMessage) {
+Logger.prototype.assert = function(condition, assertMessage) {
     if (!condition) {
         var message = "Assertion Failed!: " + assertMessage + " : " + condition;
         this.log(this.ASSERT, message);
@@ -77,7 +77,7 @@ $A.ns.Logger.prototype.assert = function(condition, assertMessage) {
  * @param {String} msg error message
  * @param {Error} [e] error
  */
-$A.ns.Logger.prototype.error = function(msg, e){
+Logger.prototype.error = function(msg, e){
     var logMsg = msg || "";
     var dispMsg;
     if (e && e instanceof $A.auraError) {
@@ -162,7 +162,7 @@ $A.ns.Logger.prototype.error = function(msg, e){
  * @param {String} msg error message
  * @param {AuraError} [e] error
  */
-$A.ns.Logger.prototype.auraErrorHelper = function(e){
+Logger.prototype.auraErrorHelper = function(e){
     this.handleError(e);
     this.reportError(e);
 };
@@ -174,7 +174,7 @@ $A.ns.Logger.prototype.auraErrorHelper = function(e){
  * @param {String} msg error message
  * @param {AuraError} [e] error
  */
-$A.ns.Logger.prototype.handleError = function(e){
+Logger.prototype.handleError = function(e){
     if (e["handled"]) {
         return;
     }
@@ -184,7 +184,7 @@ $A.ns.Logger.prototype.handleError = function(e){
     }
 };
 
-$A.ns.Logger.prototype.reportError = function(e, action, id){
+Logger.prototype.reportError = function(e, action, id){
     if (e["reported"]) {
         return;
     }
@@ -211,7 +211,7 @@ $A.ns.Logger.prototype.reportError = function(e, action, id){
  * @param {String} message log message
  * @param {Error} [error]
  */
-$A.ns.Logger.prototype.log = function(level, message, error) {
+Logger.prototype.log = function(level, message, error) {
     if (this.hasSubscriptions(level)) {
         this.notify(level, message, error);
     }
@@ -224,7 +224,7 @@ $A.ns.Logger.prototype.log = function(level, message, error) {
  * @param {String} message log message
  * @param {Error} [error]
  */
-$A.ns.Logger.prototype.notify = function(level, msg, error) {
+Logger.prototype.notify = function(level, msg, error) {
     var subsLength = this.subscribers.length;
     for (var i = 0; i < subsLength; i++) {
         var sub = this.subscribers[i];
@@ -242,7 +242,7 @@ $A.ns.Logger.prototype.notify = function(level, msg, error) {
  * @param {Number} [remove]
  * @returns {String|null} stack
  */
-$A.ns.Logger.prototype.getStackTrace = function(e, remove) {
+Logger.prototype.getStackTrace = function(e, remove) {
     var stack = undefined;
 
     if (!remove) {
@@ -284,7 +284,7 @@ $A.ns.Logger.prototype.getStackTrace = function(e, remove) {
  * @param {Array} trace
  * @returns {String} string log
  */
-$A.ns.Logger.prototype.stringVersion = function(logMsg, error, trace) {
+Logger.prototype.stringVersion = function(logMsg, error, trace) {
     var stringVersion = !$A.util.isUndefinedOrNull(logMsg) ? logMsg : "" ;
     if (!$A.util.isUndefinedOrNull(error) && !$A.util.isUndefinedOrNull(error.message)) {
         stringVersion += " : " + error.message;
@@ -302,7 +302,7 @@ $A.ns.Logger.prototype.stringVersion = function(logMsg, error, trace) {
  * @param {String} level log level
  * @param {Function} callback function
  */
-$A.ns.Logger.prototype.subscribe = function(level, callback) {
+Logger.prototype.subscribe = function(level, callback) {
     level = level.toUpperCase();
     if (this.isValidSubscriber(level, callback)) {
         this.subscribers.push({
@@ -319,7 +319,7 @@ $A.ns.Logger.prototype.subscribe = function(level, callback) {
  * @param {String} level log level
  * @param {Function} callback function
  */
-$A.ns.Logger.prototype.unsubscribe = function(level, callback) {
+Logger.prototype.unsubscribe = function(level, callback) {
     level = level.toUpperCase();
     if (this.isValidSubscriber(level, callback)) {
         var subsLength = this.subscribers.length;
@@ -339,7 +339,7 @@ $A.ns.Logger.prototype.unsubscribe = function(level, callback) {
  * @param {String} level level to adjust
  * @param {Number} adjustment Number to adjust subscription
  */
-$A.ns.Logger.prototype.adjustSubscriptions = function(level, adjustment) {
+Logger.prototype.adjustSubscriptions = function(level, adjustment) {
     this.subscriptions[level] += adjustment;
 };
 
@@ -350,7 +350,7 @@ $A.ns.Logger.prototype.adjustSubscriptions = function(level, adjustment) {
  * @param {Function} callback function
  * @returns {boolean} Valid subscriber
  */
-$A.ns.Logger.prototype.isValidSubscriber = function(level, callback) {
+Logger.prototype.isValidSubscriber = function(level, callback) {
     if (this.isValidLevel(level) && typeof callback === "function") {
         return true;
     }
@@ -362,7 +362,7 @@ $A.ns.Logger.prototype.isValidSubscriber = function(level, callback) {
  * @param {String} level log level
  * @returns {boolean}
  */
-$A.ns.Logger.prototype.isValidLevel = function(level) {
+Logger.prototype.isValidLevel = function(level) {
     if (level === this.INFO ||
         level === this.WARNING ||
         level === this.ASSERT ||
@@ -378,19 +378,23 @@ $A.ns.Logger.prototype.isValidLevel = function(level) {
  * @param {String} level
  * @returns {boolean} Whether there are subscriptions to given level
  */
-$A.ns.Logger.prototype.hasSubscriptions = function(level) {
+Logger.prototype.hasSubscriptions = function(level) {
     level = level.toUpperCase();
     if (this.isValidLevel(level)) {
         return this.subscriptions[level] > 0;
     }
 };
 
-$A.ns.Logger.prototype["getStackTrace"] = $A.ns.Logger.prototype.getStackTrace;
-$A.ns.Logger.prototype["stringVersion"] = $A.ns.Logger.prototype.stringVersion;
-$A.ns.Logger.prototype["subscribe"] = $A.ns.Logger.prototype.subscribe;
-$A.ns.Logger.prototype["unsubscribe"] = $A.ns.Logger.prototype.unsubscribe;
-$A.ns.Logger.prototype["hasSubscriptions"] = $A.ns.Logger.prototype.hasSubscriptions;
-$A.ns.Logger.prototype["info"] = $A.ns.Logger.prototype.info;
-$A.ns.Logger.prototype["warning"] = $A.ns.Logger.prototype.warning;
-$A.ns.Logger.prototype["error"] = $A.ns.Logger.prototype.error;
-$A.ns.Logger.prototype["assert"] = $A.ns.Logger.prototype.assert;
+// Exports to delete once we fix closure compiler
+Logger.prototype["getStackTrace"] = Logger.prototype.getStackTrace;
+Logger.prototype["stringVersion"] = Logger.prototype.stringVersion;
+Logger.prototype["subscribe"] = Logger.prototype.subscribe;
+Logger.prototype["unsubscribe"] = Logger.prototype.unsubscribe;
+Logger.prototype["hasSubscriptions"] = Logger.prototype.hasSubscriptions;
+Logger.prototype["info"] = Logger.prototype.info;
+Logger.prototype["warning"] = Logger.prototype.warning;
+Logger.prototype["error"] = Logger.prototype.error;
+Logger.prototype["assert"] = Logger.prototype.assert;
+
+$A.ns.Logger = Logger;
+Aura.Utils.Logger = Logger;

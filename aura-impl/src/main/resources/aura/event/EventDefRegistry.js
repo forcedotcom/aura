@@ -50,3 +50,5 @@ EventDefRegistry.prototype.getEventDef = function(config) {
         return this.eventDefs[config];
     }
 };
+
+Aura.Event.EventDefRegistry = EventDefRegistry;

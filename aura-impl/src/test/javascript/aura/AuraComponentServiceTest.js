@@ -33,9 +33,16 @@ Test.Aura.AuraComponentServiceTest = function(){
             }
         }
     };
+    var NS = {Component: {}, Services: {}};
     
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A": $A, "window": function(){}, "Components": function(){} })(function(){
+    Mocks.GetMocks(Object.Global(), { 
+        "exp": function(){}, 
+        "$A": $A,
+        "window": function(){}, 
+        "Components": function(){},
+        Aura: NS,
+    })(function(){
         // #import aura.AuraComponentService
     });
 
@@ -51,7 +58,8 @@ Test.Aura.AuraComponentServiceTest = function(){
         "exp": function(){},
         "$A": $A,
         "window": function(){},
-        "Components": function(){}
+        "Components": function(){},
+        Aura: NS
     });
 
     var targetService;

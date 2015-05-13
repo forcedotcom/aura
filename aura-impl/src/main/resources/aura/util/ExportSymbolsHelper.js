@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-
-AuraHistoryService.prototype["set"] = AuraHistoryService.prototype.set;
-AuraHistoryService.prototype["get"] = AuraHistoryService.prototype.get;
-AuraHistoryService.prototype["back"] = AuraHistoryService.prototype.back;
-AuraHistoryService.prototype["setTitle"] = AuraHistoryService.prototype.setTitle;
-AuraHistoryService.prototype["forward"] = AuraHistoryService.prototype.forward;
-AuraHistoryService.prototype["reset"] = AuraHistoryService.prototype.reset;
-
+ 
+// Export symbols. TODO(fabbott): Destroy this when we're consistently using Closure's exportSymbols directive instead.
+function exp() {
+    var obj = arguments[0];
+    for ( var i = 1; i < arguments.length; i++) {
+        var name = arguments[i];
+        i++;
+        var val = arguments[i];
+        obj[name] = val;
+    }
+}

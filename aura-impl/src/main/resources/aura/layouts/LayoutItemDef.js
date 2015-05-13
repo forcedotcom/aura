@@ -95,3 +95,5 @@ LayoutItemDef.prototype.setCachedBody = function(inst){
 LayoutItemDef.prototype.getCachedBody = function(){
     return this.cachedBody;
 };
+
+Aura.Layouts.LayoutItemDef = LayoutItemDef;

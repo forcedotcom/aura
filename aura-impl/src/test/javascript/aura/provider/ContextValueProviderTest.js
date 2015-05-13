@@ -21,7 +21,7 @@ Test.Aura.ContextValueProviderTest = function() {
         ns : { },
     };
     
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A})(function(){
+    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A, Aura:{Provider: {}}})(function(){
         // #import aura.provider.ContextValueProvider
     });
 

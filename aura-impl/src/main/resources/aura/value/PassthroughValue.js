@@ -364,4 +364,6 @@ PassthroughValue.prototype.getErrors = function(expression) {
     return this.errors[expression] || [];
 };
 
+Aura.Value.PassthroughValue = PassthroughValue;
+
 //#include aura.value.PassthroughValue_export

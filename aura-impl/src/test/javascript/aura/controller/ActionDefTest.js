@@ -20,7 +20,8 @@ Test.Aura.Controller.ActionDefTest = function() {
 	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
 	Mocks.GetMocks(Object.Global(), {
 		"exp": function() {},
-		"$A": {ns:{}}
+		"$A": {ns:{}},
+		"Aura": {Controller: {}}
 	})(function() {
 		// #import aura.controller.ActionDef
 		// #import aura.controller.Action

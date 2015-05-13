@@ -25,11 +25,14 @@ Test.Aura.UtilTest=function(){
             Json:function() {},
             Transport:function() {},
             Style:function() {},
+            SizeEstimator: function () {},
             Bitset:{},
             NumberFormat:{},
+            "Aura": {"Utils":{}, "Errors": {}},
             $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
             navigator:{userAgent:''}
         })(function(){
+            // #import aura.util.CoreUtil
             // #import aura.util.Util
             delegate();
         });
@@ -275,8 +278,10 @@ Test.Aura.UtilTest=function(){
                 Bitset:{},
                 NumberFormat:{},
                 $A:{ns:{}},
+                "Aura": {"Utils" :{}, "Errors":{}},
                 navigator:{userAgent : userAgentOverride }
             })(function(){
+                // #import aura.util.CoreUtil
                 // #import aura.util.Util
                 delegate();
             });

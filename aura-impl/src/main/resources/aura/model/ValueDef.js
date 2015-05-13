@@ -31,3 +31,5 @@ ValueDef.prototype.auraType = "ValueDef";
 ValueDef.prototype.getName = function(){
     return this.name;
 };
+
+Aura.Model.ValueDef = ValueDef;

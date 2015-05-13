@@ -18,27 +18,37 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraClientServiceTest = function() {
 
-    var $A = {
-        ns : {
-            Util:{
-                prototype:{
-                    on:function(){}
-                }
-            }
-        }
-    };
-
-    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), {
+    var $A = {ns : {Util:{prototype:{on:function(){}}}}};
+    var NS = {Controller: {}, Utils: {}, Services: {}};
+    var Importer = Mocks.GetMocks(Object.Global(), {
         "exp": function(){},
-        "$A": $A
-    })(function(){
+        "$A": $A,
+        Aura: NS
+    });
+
+    Importer(function () {
+        // #import aura.controller.ActionCallbackGroup
+    });
+
+    Importer(function () {
+        // #import aura.controller.ActionQueue
+    });
+
+    Importer(function () {
+        // #import aura.controller.ActionCollector
+    });
+
+    Importer(function () {
+        // #import aura.controller.FlightCounter
+    });
+
+    Importer(function () {
         // #import aura.AuraClientService
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
         "$A": {
-            ns:$A.ns,
+            ns: $A.ns,
             log : function() {},
             assert : function(condition, message) {
                 if(!condition){
@@ -61,7 +71,8 @@ Test.Aura.AuraClientServiceTest = function() {
             mark : function() {}
         },
         window:{},
-        document:{}
+        document:{},
+       "Aura": NS
     });
     
     [Fixture]
@@ -756,6 +767,7 @@ Test.Aura.AuraClientServiceTest = function() {
         // Sets up the environment with a mock action storage:
         var mockActionService = function(delegate) {
             Mocks.GetMocks(Object.Global(), {
+                "Aura": NS,
                 "$A" : {
                     "storageService": {
                         "getStorage": function(name) {

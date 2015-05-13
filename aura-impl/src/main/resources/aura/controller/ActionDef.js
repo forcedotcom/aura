@@ -148,4 +148,6 @@ ActionDef.prototype.toString = function() {
     return this.descriptor.toString();
 };
 
+Aura.Controller.ActionDef = ActionDef;
+
 // #include aura.controller.ActionDef_export

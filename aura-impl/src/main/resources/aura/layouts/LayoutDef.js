@@ -73,3 +73,5 @@ LayoutDef.prototype.each = function(func){
         func(items[i]);
     }
 };
+
+Aura.Layouts.LayoutDef = LayoutDef;

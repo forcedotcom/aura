@@ -686,7 +686,7 @@ if(!this.concreteComponentId) {
                 handlerConfig["globalId"] = cmp.priv.globalId;
                 handlerConfig["handler"] = getHandler(cmp, handlerDef["action"]);
                 handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
-                eventService.addHandler(handlerConfig);
+                $A.eventService.addHandler(handlerConfig);
             }
         }
     };
@@ -1456,7 +1456,7 @@ Component.prototype.removeValueHandler = function(config) {
  * @return {Object} an object with a single visible call of setEnabled(Boolean)
  */
 Component.prototype.addDocumentLevelHandler = function(eventName, callback, autoEnable) {
-    var dlh = new $A.ns.DocLevelHandler(eventName, callback, this);
+    var dlh = new Aura.Utils.DocLevelHandler(eventName, callback, this);
     if (!this.priv.docLevelHandlers) {
         this.priv.docLevelHandlers = {};
     }
@@ -2521,5 +2521,8 @@ Component.prototype.unrender = function() {
     var superComponent = this.getSuper();
     return superComponent ? superComponent["unrender"]() : undefined;
 };
+
+Aura.Component.ComponentPriv = ComponentPriv;
+Aura.Component.Component = Component;
 
 // #include aura.component.Component_export

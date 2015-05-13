@@ -15,61 +15,12 @@
  */
 /*jslint sub: true */
 
-// #include aura.controller.ActionCallbackGroup
-// #include aura.controller.ActionQueue
-// #include aura.controller.ActionCollector
-
-/**
- * @description Counter for in flight actions
- * @constructor
- */
-$A.ns.FlightCounter = function(max) {
-    this.lastStart = 0;
-    this.started = 0;
-    this.startCount = 0;
-    this.inFlight = 0;
-    this.sent = 0;
-    this.finished = 0;
-    this.max = max;
-};
-
-$A.ns.FlightCounter.prototype.idle = function() {
-    return this.started === 0 && this.inFlight === 0;
-};
-
-$A.ns.FlightCounter.prototype.start = function() {
-    if (this.started + this.inFlight < this.max) {
-        this.started += 1;
-        this.startCount += 1;
-        // this.lastStart = now;
-        return true;
-    }
-    return false;
-};
-
-$A.ns.FlightCounter.prototype.cancel = function() {
-    $A.assert(this.started > 0, "broken inFlight counter");
-    this.started -= 1;
-};
-
-$A.ns.FlightCounter.prototype.send = function() {
-    $A.assert(this.started > 0, "broken inFlight counter");
-    this.started -= 1;
-    this.sent += 1;
-    this.inFlight += 1;
-};
-
-$A.ns.FlightCounter.prototype.finish = function() {
-    $A.assert(this.inFlight > 0, "broken inFlight counter");
-    this.inFlight -= 1;
-    this.finished += 1;
-};
-
 /**
  * @description The Aura Client Service, accessible using $A.services.client. Communicates with the Aura Server.
  * @constructor
  */
-$A.ns.AuraClientService = function() {
+
+function AuraClientService () {
     this._host = "";
     this._token = null;
     this._isDisconnected = false;
@@ -82,8 +33,8 @@ $A.ns.AuraClientService = function() {
     this.finishedInitDefs = false;
     this.namespaces={};
 
-    this.foreground = new $A.ns.FlightCounter(1);
-    this.background = new $A.ns.FlightCounter(3);
+    this.foreground = new FlightCounter(1);
+    this.background = new FlightCounter(3);
     this.actionQueue = new ActionQueue();
 
     this.NOOP = function() {};
@@ -124,14 +75,14 @@ $A.ns.AuraClientService = function() {
     this["checkAndDecodeResponse"] = this.checkAndDecodeResponse;
     this["isBB10"] = this.isBB10;
     //#end
-};
+}
 
 /**
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.checkAndDecodeResponse = function(response, noStrip) {
+AuraClientService.prototype.checkAndDecodeResponse = function(response, noStrip) {
     if (this.isUnloading) {
         return null;
     }
@@ -260,19 +211,19 @@ $A.ns.AuraClientService.prototype.checkAndDecodeResponse = function(response, no
  * not sure if this is important.
  *
  * @param {Object} config The data for the exception event
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @private
  */
-$A.ns.AuraClientService.prototype.throwExceptionEvent = function(resp) {
+AuraClientService.prototype.throwExceptionEvent = function(resp) {
     var evtObj = resp["event"];
     var descriptor = evtObj["descriptor"];
 
     if (evtObj["eventDef"]) {
         // register the event with the EventDefRegistry
-        eventService.getEventDef(evtObj["eventDef"]);
+        $A.eventService.getEventDef(evtObj["eventDef"]);
     }
 
-    if (eventService.hasHandlers(descriptor)) {
+    if ($A.eventService.hasHandlers(descriptor)) {
         var evt = $A.getEvt(descriptor);
         if (evtObj["attributes"]) {
             evt.setParams(evtObj["attributes"]["values"]);
@@ -289,11 +240,11 @@ $A.ns.AuraClientService.prototype.throwExceptionEvent = function(resp) {
     }
 };
 
-$A.ns.AuraClientService.prototype.fireDoneWaiting = function() {
+AuraClientService.prototype.fireDoneWaiting = function() {
     this.fireLoadEvent("e.aura:doneWaiting");
 };
 
-$A.ns.AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
+AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
     if (response && response.status) {
         if (response.status === 0) {
             return true;
@@ -312,7 +263,7 @@ $A.ns.AuraClientService.prototype.isDisconnectedOrCancelled = function(response)
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.getCurrentTransasctionId = function() {
+AuraClientService.prototype.getCurrentTransasctionId = function() {
     if (!this.inAuraLoop()) {
         $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get abortable ID outside of aura loop");
         return;
@@ -325,7 +276,7 @@ $A.ns.AuraClientService.prototype.getCurrentTransasctionId = function() {
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.setCurrentTransasctionId = function(abortableId) {
+AuraClientService.prototype.setCurrentTransasctionId = function(abortableId) {
     if (!this.inAuraLoop()) {
         $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get abortable ID outside of aura loop");
         return;
@@ -347,7 +298,7 @@ $A.ns.AuraClientService.prototype.setCurrentTransasctionId = function(abortableI
  *            actionResponse the server response.
  * @private
  */
-$A.ns.AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
+AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
     var key = undefined;
     try {
     	key = action.getStorageKey();
@@ -412,7 +363,7 @@ $A.ns.AuraClientService.prototype.singleAction = function(action, noAbort, actio
  *            the abortableId associated with the set of actions.
  * @private
  */
-$A.ns.AuraClientService.prototype.actionCallback = function(response, collector, flightCounter, abortableId) {
+AuraClientService.prototype.actionCallback = function(response, collector, flightCounter, abortableId) {
     //
     // Note that this is a very specific assertion. We can either be called back from an empty stack
     // (the normal case, after an XHR has gone to the server), or we can be called back from inside
@@ -439,7 +390,7 @@ $A.ns.AuraClientService.prototype.actionCallback = function(response, collector,
     }
 };
 
-$A.ns.AuraClientService.prototype.doActionCallback = function(response, collector, flightCounter, abortableId) {
+AuraClientService.prototype.doActionCallback = function(response, collector, flightCounter, abortableId) {
     var action, actionResponses;
     var responseMessage = this.checkAndDecodeResponse(response);
     var noAbort = (abortableId === this.actionQueue.getLastAbortableTransactionId());
@@ -519,7 +470,7 @@ $A.ns.AuraClientService.prototype.doActionCallback = function(response, collecto
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.runClientActions = function(actions) {
+AuraClientService.prototype.runClientActions = function(actions) {
     var action;
     for ( var i = 0; i < actions.length; i++) {
         action = actions[i];
@@ -536,7 +487,7 @@ $A.ns.AuraClientService.prototype.runClientActions = function(actions) {
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCounter, abortableId, flightHandled) {
+AuraClientService.prototype.finishRequest = function(collector, flightCounter, abortableId, flightHandled) {
     var actionsToSend = collector.getActionsToSend();
     var actionsToComplete = collector.getActionsToComplete();
 
@@ -658,7 +609,7 @@ $A.ns.AuraClientService.prototype.finishRequest = function(collector, flightCoun
  *            the flight counter under which the actions should be run.
  * @private
  */
-$A.ns.AuraClientService.prototype.request = function(actions, flightCounter) {
+AuraClientService.prototype.request = function(actions, flightCounter) {
     $A.Perf.mark("AuraClientService.request");
     $A.Perf.mark("Action Request Prepared");
     var flightHandled = { value: false };
@@ -698,26 +649,26 @@ $A.ns.AuraClientService.prototype.request = function(actions, flightCounter) {
     }
 };
 
-$A.ns.AuraClientService.prototype.isBB10 = function() {
+AuraClientService.prototype.isBB10 = function() {
     var ua = navigator.userAgent;
     return (ua.indexOf("BB10") > 0 && ua.indexOf("AppleWebKit") > 0);
 };
 
-$A.ns.AuraClientService.prototype.getManifestURL = function() {
+AuraClientService.prototype.getManifestURL = function() {
     var htmlNode = document.body.parentNode;
     return htmlNode ? htmlNode.getAttribute("manifest") : null;
 };
 
-$A.ns.AuraClientService.prototype.isManifestPresent = function() {
+AuraClientService.prototype.isManifestPresent = function() {
     return !!this.getManifestURL();
 };
 
 /**
  * Perform a hard refresh.
  *
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  */
-$A.ns.AuraClientService.prototype.hardRefresh = function() {
+AuraClientService.prototype.hardRefresh = function() {
     var url = location.href;
     if (!this.isManifestPresent() || url.indexOf("?nocache=") > -1) {
         location.reload(true);
@@ -767,7 +718,7 @@ $A.ns.AuraClientService.prototype.hardRefresh = function() {
     }
 };
 
-$A.ns.AuraClientService.prototype.fireLoadEvent = function(eventName) {
+AuraClientService.prototype.fireLoadEvent = function(eventName) {
     var e = $A.get(eventName);
     if (e) {
         e.fire();
@@ -776,12 +727,12 @@ $A.ns.AuraClientService.prototype.fireLoadEvent = function(eventName) {
     }
 };
 
-$A.ns.AuraClientService.prototype.isDevMode = function() {
+AuraClientService.prototype.isDevMode = function() {
     var context = $A.getContext();
     return !$A.util.isUndefined(context) && context.getMode() === "DEV";
 };
 
-$A.ns.AuraClientService.prototype.handleAppCache = function() {
+AuraClientService.prototype.handleAppCache = function() {
 
     var acs = this;
 
@@ -907,9 +858,9 @@ $A.ns.AuraClientService.prototype.handleAppCache = function() {
 /**
  * Marks the application as outdated.
  *
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  */
-$A.ns.AuraClientService.prototype.setOutdated = function() {
+AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
     var appCache = window.applicationCache;
     if (!appCache || (appCache && appCache.status === appCache.UNCACHED)) {
@@ -926,10 +877,10 @@ $A.ns.AuraClientService.prototype.setOutdated = function() {
  *
  * @param {Boolean} isConnected Set to true to run Aura in online mode,
  * or false to run Aura in offline mode.
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @public
  */
-$A.ns.AuraClientService.prototype.setConnected = function(isConnected) {
+AuraClientService.prototype.setConnected = function(isConnected) {
     var isDisconnected = !isConnected;
     if (isDisconnected === this._isDisconnected) {
         // Already in desired state so no work to be done:
@@ -949,7 +900,7 @@ $A.ns.AuraClientService.prototype.setConnected = function(isConnected) {
 /**
  * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
  */
-$A.ns.AuraClientService.prototype.saveTokenToStorage = function() {
+AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
     var storage = Action.prototype.getStorage();
@@ -966,7 +917,7 @@ $A.ns.AuraClientService.prototype.saveTokenToStorage = function() {
  * Loads the CSRF token from Actions storage.
  * @return {Promise} resolves or rejects based on data loading.
  */
-$A.ns.AuraClientService.prototype.loadTokenFromStorage = function() {
+AuraClientService.prototype.loadTokenFromStorage = function() {
     var storage = Action.prototype.getStorage();
     if (storage) {
         return storage.get("$AuraClientService.priv$");
@@ -985,11 +936,11 @@ $A.ns.AuraClientService.prototype.loadTokenFromStorage = function() {
  * @param {string} host the host name of the server.
  * @public
  */
-$A.ns.AuraClientService.prototype.initHost = function(host) {
+AuraClientService.prototype.initHost = function(host) {
     this._host = host || "";
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    delete $A.ns.AuraClientService.prototype.initHost;
-    delete $A.ns.AuraClientService.prototype["initHost"];
+    delete AuraClientService.prototype.initHost;
+    delete AuraClientService.prototype["initHost"];
     //#end
 };
 
@@ -1004,7 +955,7 @@ $A.ns.AuraClientService.prototype.initHost = function(host) {
  * @param {object} container the place to install aura (defaults to document.body).
  * @private
  */
-$A.ns.AuraClientService.prototype.init = function(config, token, container) {
+AuraClientService.prototype.init = function(config, token, container) {
     $A.Perf.mark("Initial Component Created");
     $A.Perf.mark("Initial Component Rendered");
 
@@ -1027,8 +978,8 @@ $A.ns.AuraClientService.prototype.init = function(config, token, container) {
 
         $A.Perf.endMark("Initial Component Created");
 
-        renderingService.render(component, container || document.body);
-        renderingService.afterRender(component);
+        $A.renderingService.render(component, container || document.body);
+        $A.renderingService.afterRender(component);
 
         $A.Perf.endMark("Initial Component Rendered");
 
@@ -1048,7 +999,7 @@ $A.ns.AuraClientService.prototype.init = function(config, token, container) {
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.idle = function() {
+AuraClientService.prototype.idle = function() {
     return this.foreground.idle() && this.background.idle() && this.actionQueue.actions.length === 0;
 };
 
@@ -1061,7 +1012,8 @@ $A.ns.AuraClientService.prototype.idle = function() {
  * @param {Object} config the set of definitions to initialize
  * @private
  */
-$A.ns.AuraClientService.prototype.initDefs = function(config) {
+
+AuraClientService.prototype.initDefs = function(config) {
     //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
     this.currentlyInSideEffectMode=true;
 
@@ -1125,7 +1077,7 @@ $A.ns.AuraClientService.prototype.initDefs = function(config) {
  * @param {function} callback the callback that should be invoked after defs are initialized
  * @private
  */
-$A.ns.AuraClientService.prototype.runAfterInitDefs = function(callback) {
+AuraClientService.prototype.runAfterInitDefs = function(callback) {
     if (!this.finishedInitDefs) {
         // Add to the list of callbacks waiting until initDefs() is done
         this.initDefsObservers.push(callback);
@@ -1145,10 +1097,10 @@ $A.ns.AuraClientService.prototype.runAfterInitDefs = function(callback) {
  *            attributes The configuration data to use in the app
  * @param {function}
  *            callback The callback function to run
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @private
  */
-$A.ns.AuraClientService.prototype.loadApplication = function(descriptor, attributes, callback) {
+AuraClientService.prototype.loadApplication = function(descriptor, attributes, callback) {
     this.loadComponent(descriptor, attributes, callback, "APPLICATION");
 };
 
@@ -1165,10 +1117,10 @@ $A.ns.AuraClientService.prototype.loadApplication = function(descriptor, attribu
  *            callback The callback function to run
  * @param {String}
  *            defType Sets the defType to "COMPONENT"
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @private
  */
-$A.ns.AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback, defType) {
+AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback, defType) {
     var acs = this;
     this.runAfterInitDefs(function() {
         $A.run(function() {
@@ -1270,7 +1222,7 @@ $A.ns.AuraClientService.prototype.loadComponent = function(descriptor, attribute
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.inAuraLoop = function() {
+AuraClientService.prototype.inAuraLoop = function() {
     return this.auraStack.length > 0;
 };
 
@@ -1283,7 +1235,7 @@ $A.ns.AuraClientService.prototype.inAuraLoop = function() {
  * @param {string} name the name of the public 'pop' that will happen.
  * @return {Boolean} true if the pop should be allowed.
  */
-$A.ns.AuraClientService.prototype.checkPublicPop = function(name) {
+AuraClientService.prototype.checkPublicPop = function(name) {
     if (this.auraStack.length > 0) {
         return this.auraStack[this.auraStack.length-1] === name;
     }
@@ -1299,7 +1251,7 @@ $A.ns.AuraClientService.prototype.checkPublicPop = function(name) {
  * @param {string} name the name of the item to push.
  * @private
  */
-$A.ns.AuraClientService.prototype.pushStack = function(name) {
+AuraClientService.prototype.pushStack = function(name) {
     this.auraStack.push(name);
 };
 
@@ -1313,7 +1265,7 @@ $A.ns.AuraClientService.prototype.pushStack = function(name) {
  * @param name the name of the last item pushed.
  * @private
  */
-$A.ns.AuraClientService.prototype.popStack = function(name) {
+AuraClientService.prototype.popStack = function(name) {
     var lastName;
 
     if (this.auraStack.length > 0) {
@@ -1339,7 +1291,7 @@ $A.ns.AuraClientService.prototype.popStack = function(name) {
     }
 };
 
-$A.ns.AuraClientService.prototype.handleProcessing = function(name) {
+AuraClientService.prototype.handleProcessing = function(name) {
     var tmppush = "$A.clientServices.popStack";
     var lastName;
     var count = 0;
@@ -1369,15 +1321,15 @@ $A.ns.AuraClientService.prototype.handleProcessing = function(name) {
 /**
  * A utility to handle events passed back from the server.
  */
-$A.ns.AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
+AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
     var descriptor = evtObj["descriptor"];
 
     if (evtObj["eventDef"]) {
         // register the event with the EventDefRegistry
-        eventService.getEventDef(evtObj["eventDef"]);
+        $A.eventService.getEventDef(evtObj["eventDef"]);
     }
 
-    if (eventService.hasHandlers(descriptor)) {
+    if ($A.eventService.hasHandlers(descriptor)) {
         var evt = $A.getEvt(descriptor);
         if (evtObj["attributes"]) {
             evt.setParams(evtObj["attributes"]["values"]);
@@ -1392,10 +1344,10 @@ $A.ns.AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
  *
  * @param {Object}
  *            newToken Refresh the current token with a new one.
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @private
  */
-$A.ns.AuraClientService.prototype.resetToken = function(newToken) {
+AuraClientService.prototype.resetToken = function(newToken) {
     this._token = newToken;
     this.saveTokenToStorage();
 };
@@ -1412,7 +1364,7 @@ $A.ns.AuraClientService.prototype.resetToken = function(newToken) {
  * @param callback
  *      {function} The callback function
  */
-$A.ns.AuraClientService.prototype.makeActionGroup = function(actions, scope, callback) {
+AuraClientService.prototype.makeActionGroup = function(actions, scope, callback) {
     var group = undefined;
     $A.assert($A.util.isArray(actions), "makeActionGroup expects a list of actions, but instead got: " + actions);
     if (callback !== undefined) {
@@ -1438,10 +1390,10 @@ $A.ns.AuraClientService.prototype.makeActionGroup = function(actions, scope, cal
  *            scope The scope in which the function is executed
  * @param {function}
  *            callback The callback function to run
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @public
  */
-$A.ns.AuraClientService.prototype.runActions = function(actions, scope, callback) {
+AuraClientService.prototype.runActions = function(actions, scope, callback) {
     var i;
 
     this.makeActionGroup(actions, scope, callback);
@@ -1460,10 +1412,10 @@ $A.ns.AuraClientService.prototype.runActions = function(actions, scope, callback
  * @param {Object} rawConfig the config for the component to be injected
  * @param {String} locatorDomId the DOM id where we should place our element.
  * @param {String} localId the local id for the component to be created.
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @public
  */
-$A.ns.AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
+AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
     var config = $A.util.json.resolveRefs(rawConfig);
 
     // Save off any context global stuff like new labels
@@ -1534,7 +1486,7 @@ $A.ns.AuraClientService.prototype.injectComponent = function(rawConfig, locatorD
  * @param {(String|String[])} errorText
  * @returns {Object} error config for ui:message
  */
-$A.ns.AuraClientService.prototype.createIntegrationErrorConfig = function(errorText) {
+AuraClientService.prototype.createIntegrationErrorConfig = function(errorText) {
     return {
         "componentDef" : {
             "descriptor" : "markup://ui:message"
@@ -1569,7 +1521,7 @@ $A.ns.AuraClientService.prototype.createIntegrationErrorConfig = function(errorT
  * @param {String} locatorDomId - element id
  * @param {Object} [actionEventHandlers] - event handlers
  */
-$A.ns.AuraClientService.prototype.renderInjection = function(component, locatorDomId, actionEventHandlers) {
+AuraClientService.prototype.renderInjection = function(component, locatorDomId, actionEventHandlers) {
     var error = null,
         hostEl = document.getElementById(locatorDomId);
 
@@ -1602,7 +1554,7 @@ $A.ns.AuraClientService.prototype.renderInjection = function(component, locatorD
  * @param {String} locatorDomId - id of element to inject component
  * @param {Object} [eventHandlers] - handlers of registered event
  */
-$A.ns.AuraClientService.prototype.injectComponentAsync = function(config, locatorDomId, eventHandlers) {
+AuraClientService.prototype.injectComponentAsync = function(config, locatorDomId, eventHandlers) {
     var acs = this;
     $A.componentService.newComponentAsync(undefined, function(component) {
         acs.renderInjection(component, locatorDomId, eventHandlers);
@@ -1621,7 +1573,7 @@ $A.ns.AuraClientService.prototype.injectComponentAsync = function(config, locato
  * @param {Component} component - component
  * @param {Object} [actionEventHandlers] - handlers of registered events
  */
-$A.ns.AuraClientService.prototype.addComponentHandlers = function(component, actionEventHandlers) {
+AuraClientService.prototype.addComponentHandlers = function(component, actionEventHandlers) {
     if (actionEventHandlers) {
         var containerValueProvider = {
             get : function(functionName) {
@@ -1645,11 +1597,11 @@ $A.ns.AuraClientService.prototype.addComponentHandlers = function(component, act
 /**
  * Return whether Aura believes it is online.
  * Immediate and future communication with the server may fail.
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @return {Boolean} Returns true if Aura believes it is online; false otherwise.
  * @public
  */
-$A.ns.AuraClientService.prototype.isConnected = function() {
+AuraClientService.prototype.isConnected = function() {
     return !this._isDisconnected;
 };
 
@@ -1660,11 +1612,11 @@ $A.ns.AuraClientService.prototype.isConnected = function() {
  *
  * @param {Action} action the action to enqueue
  * @param {Boolean} background Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
- * @memberOf $A.ns.AuraClientService
+ * @memberOf AuraClientService
  * @public
  */
 // TODO: remove boolean trap http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html
-$A.ns.AuraClientService.prototype.enqueueAction = function(action, background) {
+AuraClientService.prototype.enqueueAction = function(action, background) {
     $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
     $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
 
@@ -1684,7 +1636,7 @@ $A.ns.AuraClientService.prototype.enqueueAction = function(action, background) {
  * @param {Action} action - target action
  * @return {Promise} a promise which is resolved or rejected depending on the state of the action
  */
-$A.ns.AuraClientService.prototype.deferAction = function (action) {
+AuraClientService.prototype.deferAction = function (action) {
     var acs = this;
     var promise = new Promise(function(success, error) {
 
@@ -1709,7 +1661,7 @@ $A.ns.AuraClientService.prototype.deferAction = function (action) {
  * Gets whether or not the Aura "actions" cache exists.
  * @returns {Boolean} true if the Aura "actions" cache exists.
  */
-$A.ns.AuraClientService.prototype.hasActionStorage = function() {
+AuraClientService.prototype.hasActionStorage = function() {
     return !!Action.getStorage();
 };
 
@@ -1721,7 +1673,7 @@ $A.ns.AuraClientService.prototype.hasActionStorage = function() {
  * @param {Function} callback - called asynchronously after the action was looked up in the cache. Fired with a
  * single parameter, isInStorge {Boolean} - representing whether the action was found in the cache.
  */
-$A.ns.AuraClientService.prototype.isActionInStorage = function(descriptor, params, callback) {
+AuraClientService.prototype.isActionInStorage = function(descriptor, params, callback) {
     var storage = Action.getStorage();
     callback = callback || this.NOOP;
 
@@ -1747,7 +1699,7 @@ $A.ns.AuraClientService.prototype.isActionInStorage = function(descriptor, param
  * parameter, wasRevalidated {Boolean} - representing whether the action was found in the cache and
  * successfully revalidated.
  */
-$A.ns.AuraClientService.prototype.revalidateAction = function(descriptor, params, callback) {
+AuraClientService.prototype.revalidateAction = function(descriptor, params, callback) {
     var storage = Action.getStorage();
     callback = callback || this.NOOP;
 
@@ -1776,7 +1728,7 @@ $A.ns.AuraClientService.prototype.revalidateAction = function(descriptor, params
  * successfully invalidated and false if the action was invalid or was not found in the cache.
  * @param errorCallback {Function} called if an error occured during execution
  */
-$A.ns.AuraClientService.prototype.invalidateAction = function(descriptor, params, successCallback, errorCallback) {
+AuraClientService.prototype.invalidateAction = function(descriptor, params, successCallback, errorCallback) {
     var storage = Action.getStorage();
     successCallback = successCallback || this.NOOP;
     errorCallback = errorCallback || this.NOOP;
@@ -1797,7 +1749,7 @@ $A.ns.AuraClientService.prototype.invalidateAction = function(descriptor, params
  *
  * @private
  */
-$A.ns.AuraClientService.prototype.processActions = function() {
+AuraClientService.prototype.processActions = function() {
     var actions;
     var processedActions = false;
     var action;
@@ -1835,7 +1787,8 @@ $A.ns.AuraClientService.prototype.processActions = function() {
     return processedActions;
 };
 
-$A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
+
+AuraClientService.prototype.allowAccess = function(definition, component) {
     //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
     if(this.currentlyInSideEffectMode){
         return true;
@@ -1875,24 +1828,28 @@ $A.ns.AuraClientService.prototype.allowAccess=function(definition,component){
     return false;
 };
 
-exp($A.ns.AuraClientService.prototype,
-    "initHost", $A.ns.AuraClientService.prototype.initHost,
-    "init", $A.ns.AuraClientService.prototype.init,
-    "initDefs", $A.ns.AuraClientService.prototype.initDefs,
-    "loadApplication", $A.ns.AuraClientService.prototype.loadApplication,
-    "loadComponent", $A.ns.AuraClientService.prototype.loadComponent,
-    "enqueueAction", $A.ns.AuraClientService.prototype.enqueueAction,
-    "deferAction", $A.ns.AuraClientService.prototype.deferAction,
-    "runActions", $A.ns.AuraClientService.prototype.runActions,
-    "throwExceptionEvent", $A.ns.AuraClientService.prototype.throwExceptionEvent,
-    "resetToken", $A.ns.AuraClientService.prototype.resetToken,
-    "hardRefresh", $A.ns.AuraClientService.prototype.hardRefresh,
-    "setOutdated", $A.ns.AuraClientService.prototype.setOutdated,
-    "injectComponent", $A.ns.AuraClientService.prototype.injectComponent,
-    "injectComponentAsync", $A.ns.AuraClientService.prototype.injectComponentAsync,
-    "isConnected", $A.ns.AuraClientService.prototype.isConnected,
-    "setConnected", $A.ns.AuraClientService.prototype.setConnected,
-    "isActionInStorage", $A.ns.AuraClientService.prototype.isActionInStorage,
-    "revalidateAction", $A.ns.AuraClientService.prototype.revalidateAction,
-    "invalidateAction", $A.ns.AuraClientService.prototype.invalidateAction
+
+exp(AuraClientService.prototype,
+    "initHost", AuraClientService.prototype.initHost,
+    "init", AuraClientService.prototype.init,
+    "initDefs", AuraClientService.prototype.initDefs,
+    "loadApplication", AuraClientService.prototype.loadApplication,
+    "loadComponent", AuraClientService.prototype.loadComponent,
+    "enqueueAction", AuraClientService.prototype.enqueueAction,
+    "deferAction", AuraClientService.prototype.deferAction,
+    "runActions", AuraClientService.prototype.runActions,
+    "throwExceptionEvent", AuraClientService.prototype.throwExceptionEvent,
+    "resetToken", AuraClientService.prototype.resetToken,
+    "hardRefresh", AuraClientService.prototype.hardRefresh,
+    "setOutdated", AuraClientService.prototype.setOutdated,
+    "injectComponent", AuraClientService.prototype.injectComponent,
+    "injectComponentAsync", AuraClientService.prototype.injectComponentAsync,
+    "isConnected", AuraClientService.prototype.isConnected,
+    "setConnected", AuraClientService.prototype.setConnected,
+    "isActionInStorage", AuraClientService.prototype.isActionInStorage,
+    "revalidateAction", AuraClientService.prototype.revalidateAction,
+    "invalidateAction", AuraClientService.prototype.invalidateAction
 );
+
+$A.ns.AuraClientService = AuraClientService;
+Aura.Services.AuraClientService = AuraClientService;

@@ -18,10 +18,10 @@
  * @description Label Provider. Performs server action to retrieve label values
  * @constructor
  */
-$A.ns.LabelValueProvider = function() {
+function LabelValueProvider() {
     this.values = {};
     this.queue = {};
-};
+}
 
 /**
  * Performs LabelController.getLabel action to get specified section and name.
@@ -33,7 +33,7 @@ $A.ns.LabelValueProvider = function() {
  * @return {String}
  * @private
  */
-$A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, callback) {
+LabelValueProvider.prototype.requestServerLabel = function(section, name, callback) {
     var lvp = this,
         queue = this.getQueue(section, name),
         placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]";
@@ -89,7 +89,7 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
  * @param {String} name - label name
  * @return {LabelQueue} queue for given label
  */
-$A.ns.LabelValueProvider.prototype.getQueue = function(section, name) {
+LabelValueProvider.prototype.getQueue = function(section, name) {
     var exp = this.getQueueKey(section, name);
     if (!this.queue[exp]) {
         this.queue[exp] = new $A.ns.LabelQueue();
@@ -102,7 +102,7 @@ $A.ns.LabelValueProvider.prototype.getQueue = function(section, name) {
  * @param {String} section - label section
  * @param {String} name - label name
  */
-$A.ns.LabelValueProvider.prototype.removeQueue = function(section, name) {
+LabelValueProvider.prototype.removeQueue = function(section, name) {
     var exp = this.getQueueKey(section, name);
     delete this.queue[exp];
 };
@@ -112,21 +112,21 @@ $A.ns.LabelValueProvider.prototype.removeQueue = function(section, name) {
  * @param {String} section - label section
  * @param {String} name - label name
  */
-$A.ns.LabelValueProvider.prototype.getQueueKey = function(section, name) {
+LabelValueProvider.prototype.getQueueKey = function(section, name) {
     return section + "." + name;
 };
 
 /**
  * returns $Label values
  */
-$A.ns.LabelValueProvider.prototype.getValues = function(values) {
+LabelValueProvider.prototype.getValues = function(values) {
     return this.values;
 };
 
 /**
  * Merges $Label values
  */
-$A.ns.LabelValueProvider.prototype.merge = function(values) {
+LabelValueProvider.prototype.merge = function(values) {
     $A.util.apply(this.values, values, true, true);
 };
 
@@ -138,7 +138,7 @@ $A.ns.LabelValueProvider.prototype.merge = function(values) {
  * @param {Function} [callback] - callback
  * @return {String}
  */
-$A.ns.LabelValueProvider.prototype.get = function(expression, callback) {
+LabelValueProvider.prototype.get = function(expression, callback) {
     var value;
     var path=expression.split('.');
 
@@ -161,3 +161,6 @@ $A.ns.LabelValueProvider.prototype.get = function(expression, callback) {
 
     return value;
 };
+
+Aura.Provider.LabelValueProvider = LabelValueProvider;
+$A.ns.LabelValueProvider = LabelValueProvider;

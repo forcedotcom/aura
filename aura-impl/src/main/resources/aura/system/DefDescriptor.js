@@ -90,4 +90,6 @@ DefDescriptor.prototype.toString = function(){
     return this.getQualifiedName();
 };
 
+Aura.System.DefDescriptor = DefDescriptor;
+
 //#include aura.system.DefDescriptor_export

@@ -17,7 +17,10 @@ Function.RegisterNamespace("Test.Aura.Controller");
 
 [ Fixture ]
 Test.Aura.Controller.ActionCallbackGroupTest = function() {
-	// #import aura.controller.ActionCallbackGroup
+	Mocks.GetMocks(Object.Global(), {"Aura": {"Controller": {}}})(function(){
+    	// #import aura.controller.ActionCallbackGroup
+    });
+	
 
 	var MockAction = function(id) {
 		this.id = id;

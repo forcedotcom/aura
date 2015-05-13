@@ -335,7 +335,7 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
             config = otherComponentConfigs[idx];
             def = config["componentDef"];
             if (def) {
-                componentService.getDef(def);
+                $A.componentService.getDef(def);
             }
             cP = config["creationPath"];
             this.componentConfigs[actionId+cP] = config;
@@ -495,5 +495,6 @@ AuraContext.prototype.setContextPath = function(path) {
 };
 
 $A.ns.AuraContext = AuraContext;
+Aura.Context.AuraContext = AuraContext;
 
 //#include aura.context.AuraContext_export

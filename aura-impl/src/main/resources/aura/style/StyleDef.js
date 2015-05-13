@@ -52,3 +52,5 @@ StyleDef.prototype.remove = function(){
 StyleDef.prototype.getClassName = function(){
     return this.className;
 };
+
+Aura.Style.StyleDef = StyleDef;

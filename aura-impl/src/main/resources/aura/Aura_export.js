@@ -15,45 +15,44 @@
  */
 /*jslint sub: true */
 
-// //#exportSymbols $A.ns.Aura
-$A.ns.Aura.prototype["addValueProvider"] = $A.ns.Aura.prototype.addValueProvider;
-$A.ns.Aura.prototype["initAsync"] = $A.ns.Aura.prototype.initAsync;
-$A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;
-$A.ns.Aura.prototype["error"] = $A.ns.Aura.prototype.error;
-$A.ns.Aura.prototype["warning"] = $A.ns.Aura.prototype.warning;
-$A.ns.Aura.prototype["message"] = $A.ns.Aura.prototype.message;
-$A.ns.Aura.prototype["enqueueAction"] = $A.ns.Aura.prototype.enqueueAction;
-$A.ns.Aura.prototype["deferAction"] = $A.ns.Aura.prototype.deferAction;
-$A.ns.Aura.prototype["get"] = $A.ns.Aura.prototype.get;
-$A.ns.Aura.prototype["getRoot"] = $A.ns.Aura.prototype.getRoot;
-$A.ns.Aura.prototype["getContext"] = $A.ns.Aura.prototype.getContext;
-$A.ns.Aura.prototype["run"] = $A.ns.Aura.prototype.run;
-$A.ns.Aura.prototype["set"] = $A.ns.Aura.prototype.set;
-$A.ns.Aura.prototype["assert"] = $A.ns.Aura.prototype.assert;
-$A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;
-$A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
-$A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
-$A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
+AuraInstance.prototype["addValueProvider"] = AuraInstance.prototype.addValueProvider;
+AuraInstance.prototype["initAsync"] = AuraInstance.prototype.initAsync;
+AuraInstance.prototype["initConfig"] = AuraInstance.prototype.initConfig;
+AuraInstance.prototype["error"] = AuraInstance.prototype.error;
+AuraInstance.prototype["warning"] = AuraInstance.prototype.warning;
+AuraInstance.prototype["message"] = AuraInstance.prototype.message;
+AuraInstance.prototype["enqueueAction"] = AuraInstance.prototype.enqueueAction;
+AuraInstance.prototype["deferAction"] = AuraInstance.prototype.deferAction;
+AuraInstance.prototype["get"] = AuraInstance.prototype.get;
+AuraInstance.prototype["getRoot"] = AuraInstance.prototype.getRoot;
+AuraInstance.prototype["getContext"] = AuraInstance.prototype.getContext;
+AuraInstance.prototype["run"] = AuraInstance.prototype.run;
+AuraInstance.prototype["set"] = AuraInstance.prototype.set;
+AuraInstance.prototype["assert"] = AuraInstance.prototype.assert;
+AuraInstance.prototype["userAssert"] = AuraInstance.prototype.userAssert;
+AuraInstance.prototype["log"] = AuraInstance.prototype.log;
+AuraInstance.prototype["logf"] = AuraInstance.prototype.logf;
+AuraInstance.prototype["trace"] = AuraInstance.prototype.trace;
 
 // Perf
-$A.ns.Aura.prototype["Perf"] = $A.ns.Aura.prototype.Perf;
-$A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.Perf.mark;
-$A.ns.Aura.prototype["endMark"] = $A.ns.Aura.prototype.Perf.endMark;
-$A.ns.Aura.prototype["startTransaction"] = $A.ns.Aura.prototype.Perf.startTransaction;
-$A.ns.Aura.prototype["endTransaction"] = $A.ns.Aura.prototype.Perf.endTransaction;
-$A.ns.Aura.prototype["updateTransaction"] = $A.ns.Aura.prototype.Perf.updateTransaction;
-$A.ns.Aura.prototype["toJson"] = $A.ns.Aura.prototype.Perf.toJson;
-$A.ns.Aura.prototype["setBeaconData"] = $A.ns.Aura.prototype.Perf.setBeaconData;
-$A.ns.Aura.prototype["getBeaconData"] = $A.ns.Aura.prototype.Perf.getBeaconData;
-$A.ns.Aura.prototype["clearBeaconData"] = $A.ns.Aura.prototype.Perf.clearBeaconData;
-$A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.Perf.removeStats;
-$A.ns.Aura.prototype["isLoadFired"] = $A.ns.Aura.prototype.Perf.isLoadFired;
+AuraInstance.prototype["Perf"] = AuraInstance.prototype.Perf;
+AuraInstance.prototype["mark"] = AuraInstance.prototype.Perf.mark;
+AuraInstance.prototype["endMark"] = AuraInstance.prototype.Perf.endMark;
+AuraInstance.prototype["startTransaction"] = AuraInstance.prototype.Perf.startTransaction;
+AuraInstance.prototype["endTransaction"] = AuraInstance.prototype.Perf.endTransaction;
+AuraInstance.prototype["updateTransaction"] = AuraInstance.prototype.Perf.updateTransaction;
+AuraInstance.prototype["toJson"] = AuraInstance.prototype.Perf.toJson;
+AuraInstance.prototype["setBeaconData"] = AuraInstance.prototype.Perf.setBeaconData;
+AuraInstance.prototype["getBeaconData"] = AuraInstance.prototype.Perf.getBeaconData;
+AuraInstance.prototype["clearBeaconData"] = AuraInstance.prototype.Perf.clearBeaconData;
+AuraInstance.prototype["removeStats"] = AuraInstance.prototype.Perf.removeStats;
+AuraInstance.prototype["isLoadFired"] = AuraInstance.prototype.Perf.isLoadFired;
 
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-$A.ns.Aura.prototype["devToolService"] = $A.ns.Aura.prototype.devToolService;
-$A.ns.Aura.prototype["getQueryStatement"] = $A.ns.Aura.prototype.getQueryStatement;
-$A.ns.Aura.prototype["qhelp"] = $A.ns.Aura.prototype.qhelp;
+AuraInstance.prototype["devToolService"] = AuraInstance.prototype.devToolService;
+AuraInstance.prototype["getQueryStatement"] = AuraInstance.prototype.getQueryStatement;
+AuraInstance.prototype["qhelp"] = AuraInstance.prototype.qhelp;
 //#end
 

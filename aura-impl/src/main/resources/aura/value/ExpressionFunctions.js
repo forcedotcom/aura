@@ -132,3 +132,5 @@ var expressionFunctions = {
         return aura.util.isEmpty(a);
     }
 };
+
+Aura.Value.ExpressionFunctions = expressionFunctions;

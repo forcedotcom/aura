@@ -25,7 +25,7 @@
  * @param {Function}
  *            callback The function to be called when all actions complete
  */
-var ActionCallbackGroup = function ActionCallbackGroup(actions, scope, callback) {
+function ActionCallbackGroup(actions, scope, callback) {
 	this.actions = [];
 	this.scope = scope;
 	this.callback = callback;
@@ -45,7 +45,7 @@ var ActionCallbackGroup = function ActionCallbackGroup(actions, scope, callback)
 	if (this.callback && this.actions.length === 0) {
             this.callback.call(this.scope || window, { "errors" : [] });
 	}
-};
+}
 
 /**
  * Mark a single action as complete.
@@ -66,3 +66,5 @@ ActionCallbackGroup.prototype.completeAction = function(action) {
 		}
 	}
 };
+
+Aura.Controller.ActionCallbackGroup = ActionCallbackGroup;

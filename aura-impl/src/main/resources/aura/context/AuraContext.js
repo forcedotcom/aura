@@ -113,6 +113,15 @@ Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
     this.accessStack.pop();
 };
 
+Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
+    var currentAccess = this.getCurrentAccess();
+    if (currentAccess) {
+        return currentAccess.getDef().getRequiredVersionDefs().getDef(name);
+    }
+
+    return null;
+};
+
 /**
  * Adds a new global value provider.
  * @param type The key to identify the valueProvider.

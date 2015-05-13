@@ -162,6 +162,7 @@ function ComponentDef(config) {
     }
 
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
+    this.requiredVersionDefs = new RequiredVersionDefSet(config["requiredVersionDefs"]);
 
     this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
     this.initRenderer();
@@ -237,6 +238,15 @@ ComponentDef.prototype.getHelper = function() {
  */
 ComponentDef.prototype.getRendererDef = function() {
     return this.rendererDef;
+};
+
+/**
+ * Returns RequiredVersionDef objects.
+ *
+ * @returns {RequiredVersionDefs}
+ */
+ComponentDef.prototype.getRequiredVersionDefs = function() {
+    return this.requiredVersionDefs;
 };
 
 /**

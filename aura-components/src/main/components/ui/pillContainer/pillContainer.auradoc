@@ -35,7 +35,7 @@
 
 		<p>See the Examples tab for more information.</p>
 	</aura:description>	
-		<aura:example name="pillExample1" ref="uitest:pillContainerWithTextInput" label="Creating Pills in an Input Field">
+		<aura:example name="pillExample1" ref="uitest:pillContainer_WithTextInput" label="Creating Pills in an Input Field">
     	<p>This pill container handles the <code>pillInserted</code> and <code>pillRemoved</code> events and contains an input field that's wired up to the <code>ui:eventLib</code> library.</p>
 	   Type a string of text and press enter to see how it works.
 	   </aura:example>	

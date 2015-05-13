@@ -1,75 +1,74 @@
 ({
-	tearDown : function(component){
-		component._gotResponse = null;
+    tearDown : function(component) {
+        component._gotResponse = null;
         delete component._gotResponse;
-	},
-	/**
-	 * Test the client side action is a background action
-	 */
-	testClientActionIsBackground : {
-		test : function(component) {
-			var clientSideAction = component.get("c.clientSideAction");
-			$A.test.assertFalse(clientSideAction.isBackground(),
-					"clientSideAction should have had isBackground === false");
+    },
+    /**
+     * Test the client side action is a background action
+     */
+    testClientActionIsBackground : {
+        test : function(component) {
+            var clientSideAction = component.get("c.clientSideAction");
+            $A.test.assertFalse(clientSideAction.isBackground(),
+                    "clientSideAction should have had isBackground === false");
 
-			clientSideAction.setBackground(true);
-			$A.test.assertTrue(clientSideAction.isBackground(),
-					"clientSideAction should have had isBackground === true after calling setBackground(true)");
+            clientSideAction.setBackground(true);
+            $A.test.assertTrue(clientSideAction.isBackground(),
+                    "clientSideAction should have had isBackground === true after calling setBackground(true)");
 
-			var clientSideAction = component.get("c.clientSideAction");
-			$A.test.assertFalse(clientSideAction.isBackground(),
-					"a freshly created clientSideAction should have had isBackground === false");
-		}
-	},
-	/**
-	 * Test the client side foreground action is executed once enqueued
-	 */
-	testClientActionInForeground : {
-		test : [function(component) {
-			var action = component.get("c.cExecuteInForeground");
-			component._gotResponse = false;
-			action.setCallback(this, function() {
-				component._gotResponse = true;
-			});
-			$A.test.enqueueAction(action, true);
-		}, function(component) {
-			
+            var clientSideAction = component.get("c.clientSideAction");
+            $A.test.assertFalse(clientSideAction.isBackground(),
+                    "a freshly created clientSideAction should have had isBackground === false");
+        }
+    },
+    /**
+     * Test the client side foreground action is executed once enqueued
+     */
+    testClientActionInForeground : {
+        test : [ function(component) {
+            var action = component.get("c.clientExecuteInForeground");
+            component._gotResponse = false;
+            action.setCallback(this, function() {
+                component._gotResponse = true;
+            });
+            $A.test.enqueueAction(action, true);
+        }, function(component) {
 
-			$A.test.addWaitFor(true, function() {
-				return component._gotResponse;
-			});
-		}, function(component) {
-			$A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
-		}]
-	},
+            $A.test.addWaitFor(true, function() {
+                return component._gotResponse;
+            });
+        }, function(component) {
+            $A.test.assertTrue(component._gotResponse, "Client Side Action was not called after enqueue.");
+        } ]
+    },
 
-	/**
-	 * Test the client side foreground action is executed once enqueued
-	 */
-	testClientActionInBackground : {
-		test : [function(component) {
-			var action = component.get("c.cExecuteInBackground");
-			component._gotResponse = false;
-			action.setCallback(this, function() {
-				component._gotResponse = true;
-			});
-			$A.test.enqueueAction(action, true);
-		}, function(component) {
-		
-			$A.test.addWaitFor(true, function() {
-				return component._gotResponse;
-			});
-		}, function(component) {
-			$A.test.assertTrue(component._gotResponse, "Background Client Side Action was not called after enqueue.");
-		}]
-	},
+    /**
+     * Test the client side foreground action is executed once enqueued
+     */
+    testClientActionInBackground : {
+        test : [ function(component) {
+            var action = component.get("c.clientExecuteInBackground");
+            component._gotResponse = false;
+            action.setCallback(this, function() {
+                component._gotResponse = true;
+            });
+            $A.test.enqueueAction(action, true);
+        }, function(component) {
+
+            $A.test.addWaitFor(true, function() {
+                return component._gotResponse;
+            });
+        }, function(component) {
+            $A.test.assertTrue(component._gotResponse, "Background Client Side Action was not called after enqueue.");
+        } ]
+    },
 
     /**
      * When trying to get a non-existent action, we should fail fast by displaying an error to the user (via $A.error),
      * and throwing a Javascript exception, since $A.error will only display a message and does not stop execution.
      */
-    testGetNonExistentAction: {
-        test: function(cmp) {
+    testGetNonExistentAction : {
+        test : function(cmp) {
             var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'";
             $A.test.expectAuraError(errorMsg); // Expect error from explicit $A.error call when looking for actionDef
             try {
@@ -77,8 +76,8 @@
                 $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");
             } catch (e) {
                 // We also expect a javascript error to be thrown since $A.error does not stop code execution
-                $A.test.assertTrue(e.message.indexOf(errorMsg) !== -1, "Javascript error not thrown with expected " +
-                        "message. Expected <"+errorMsg+">, but got: <"+e.message+">");
+                $A.test.assertTrue(e.message.indexOf(errorMsg) !== -1, "Javascript error not thrown with expected "
+                        + "message. Expected <" + errorMsg + ">, but got: <" + e.message + ">");
             }
         }
     },
@@ -101,6 +100,18 @@
                 $A.test.assertEquals("intentional error", e.message);
             }
             $A.test.assertEquals("Action failed: js://actionsTest.clientAction/ACTION$error", message);
+        }
+    },
+
+    testActionCaseSensitivity : {
+        test : function(cmp) {
+            $A.test.assertTruthy(cmp.get("c.clientExecuteInForeground"));
+            $A.test.assertTruthy(cmp.get("c.clientExecuteInFOREGROUND"));
+            
+            cmp.find("executeInForeground").get("e.press").fire();
+            $A.test.assertEquals("clientExecuteInForeground", cmp.get("v.value"));
+            cmp.find("executeInFOREGROUND").get("e.press").fire();
+            $A.test.assertEquals("clientExecuteInFOREGROUND", cmp.get("v.value"));
         }
     }
 })

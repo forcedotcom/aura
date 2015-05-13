@@ -24,5 +24,9 @@
     
     incrementClickCount : function(cmp, evt){
         cmp.set("v.clickCount", cmp.get("v.clickCount") + 1);
+    },
+    
+    throwAnError : function(cmp, evt){
+        throw new Error("This should have been expected");
     }
 })

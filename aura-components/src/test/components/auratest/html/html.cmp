@@ -18,6 +18,8 @@
 <aura:component render="client">
     <aura:attribute name="clickCount" type="Integer" default="0" />
     <aura:attribute name="classValue" type="String"/>
+    
+    {!v.clickCount}<br/>
     <a aura:id="nohash" href="http://www.salesforce.com/">salesforce</a>
     <a aura:id="hashString" href="#layout">layout</a>
     <a aura:id="hash" href="#">hash</a>
@@ -42,7 +44,8 @@
     <div onclick="{!c.handleOnClick}" aura:id="onlyClickHandler"/>
     <div ontouchend="{!c.handleTouchEnd}" aura:id="onlyTouchEndHandler"/>
     
-    <a onclick="{!c.incrementClickCount}" aura:id="anchor">Clickable Anchor</a>
+    <a onclick="{!c.incrementClickCount}" aura:id="anchor">Clickable Anchor</a><br/>
+	<a onClick="{!c.throwAnError}" aura:id="hasBadOnClickHandler">Have a handler for onClick</a><br/>
 
     <iframe aura:id="frame"
             height="300"

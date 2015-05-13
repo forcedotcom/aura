@@ -28,7 +28,7 @@ function ControllerDef(config){
     for(var i=0;i<actionDefs.length;i++){
         var actionDefConfig = actionDefs[i];
         var actionDef = $A.services.component.getActionDef(actionDefConfig);
-        this.actionDefs[actionDef.getName().toLowerCase()] = actionDef;
+        this.actionDefs[actionDef.getName()] = actionDef;
     }
 }
 
@@ -48,7 +48,7 @@ ControllerDef.prototype.getDescriptor = function(){
  * @returns {Object}
  */
 ControllerDef.prototype.getActionDef = function(key){
-    var action = this.actionDefs[key&&key.toLowerCase()];
+    var action = this.actionDefs[key];
     if (!action) {
         $A.error("Unable to find '"+key+"' on '"+this.descriptor+"'.");
         throw Error("Unable to find '"+key+"' on '"+this.descriptor+"'.");

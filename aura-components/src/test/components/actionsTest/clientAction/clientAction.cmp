@@ -16,7 +16,10 @@
 
 -->
 <aura:component controller="java://org.auraframework.impl.java.controller.ParallelActionTestController">
-    <ui:button label="Run client action in foreground" press="{!c.cExecuteInForeground}" aura:id="executeInForeground"/>
-    <ui:button label="Run client action in background" press="{!c.cExecuteIneBackground}" aura:id="executeInBackground"/>
+	<aura:attribute name="value" type="String"/>
+    <ui:button label="Run client action in foreground" press="{!c.clientExecuteInForeground}" aura:id="executeInForeground"/>
+    <ui:button label="Run client action in background" press="{!c.clientExecuteInBackground}" aura:id="executeInBackground"/>
+    <ui:button label="Run client action in FOREGROUND (case-sensitivity of controller method name)" press="{!c.clientExecuteInFOREGROUND}" aura:id="executeInFOREGROUND"/>
+    {!v.value}
     <p/>
 </aura:component>

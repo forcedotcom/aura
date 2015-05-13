@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    render: function LabelRenderer(component, helper){
+    render: function(component, helper){
         var base = component.get('v.value');
         var vPattern = new RegExp("\\{(0|[1-9][0-9]*)\\}"); // match {#}
         var vEndPattern = new RegExp("\\}"); // match }
@@ -70,12 +70,22 @@
         return document.createTextNode(base);
     },
 
-    rerender: function LabelRenderer(component){
+    rerender: function(component){
         var body = component.get("v.body");
         for (var i = 0; i < body.length; i++) {
             var child = body[i];
             if (child.isRendered()) {
                 $A.rerender(child);
+            }
+        }
+    },
+
+    afterRender: function(component) {
+        var body = component.get("v.body");
+        for (var i = 0; i < body.length; i++) {
+            var child = body[i];
+            if (child.isRendered()) {
+                $A.afterRender(child);
             }
         }
     }

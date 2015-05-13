@@ -380,7 +380,7 @@ AttributeSet.prototype.destroy = function(async) {
             value = v[i];
             if($A.util.isExpression(value)){
                 expressions[k]=value;
-            } else if (value && value.destroy && typeof value.destroy == 'function') {
+            } else if ($A.util.isComponent(value)) {
                 value.destroy(async);
             }
         }

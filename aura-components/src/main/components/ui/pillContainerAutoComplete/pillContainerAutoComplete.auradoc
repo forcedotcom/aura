@@ -22,7 +22,7 @@
 		Use the <code>ui:pillContainerAutoCompleteOption</code> component to provide an icon and text label for your predefined list of values.	See the Examples tab for more information.
 		</p>	
 	</aura:description>	
-		<aura:example name="pillAutoCompleteExample" ref="uitest:pillContainerWithAutoComplete" label="Creating Pills with Autocompletion">
+		<aura:example name="pillAutoCompleteExample" ref="uitest:pillContainer_WithAutoComplete" label="Creating Pills with Autocompletion">
     	<p>This example shows how to create pills that displays suggested values from a predefined list of values as you type. Type <code>Test Pill</code> and press enter to see how it works.</p>
 	   </aura:example>	
 		

@@ -31,6 +31,9 @@
     <div>location token Orange: {!v.locationTokenOrange}</div>
     <div>click count: {!v.clickCount}</div>
     
+    <aura:attribute name="debugMsg" type="String" default="Nothing"/>
+    <div>for debug only: {!v.debugMsg}</div>
+    
     <br/><br/>
     <!-- value with hash, won't change -->
     <ui:outputURL value="#APPLE" label="hashLinkApple" aura:id="hashLinkA" click="{!c.clickApple}"/><br/><br/>

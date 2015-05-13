@@ -69,6 +69,7 @@
                                 $A.test.addWaitForWithFailureMessage(2, 
                                         function() { return cmp.get("v.locationChangeCount"); }, 
                                         "locationChangeCount should increase after clicking on Peach");
+                            
                                 $A.test.addWaitForWithFailureMessage(1, 
                                         function() { return cmp.get("v.locationChangeCountPeach"); }, 
                                         "locationChangeCountPeach should increase after clicking on Peach");

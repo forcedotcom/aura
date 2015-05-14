@@ -19,6 +19,10 @@
     <aura:attribute name="cmpDestroyed" type="Boolean" default="false" />
     <aura:attribute name="childCmpDestroyed" type="Boolean" default="false" />
 
+    <aura:attribute name="cmpAttribute" type="Aura.Component"/>
+    <aura:attribute name="cmpArrayAttribute" type="Aura.Component[]"/>
+    <aura:attribute name="objWithDestroy" type="Object"/>
+
     <div aura:id="team" class="team">
         <componentTest:hasBody aura:id="outerFacet">
             <aura:text aura:id="textInOuterFacet" value="Outer Facet"/>

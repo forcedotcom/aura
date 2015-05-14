@@ -199,6 +199,58 @@
         $A.test.assertEquals(globalIdMsg, chunk, "InvalidComponent error message did not display expected globalId.");
     },
 
+    /**
+     * Verify component in attribute will be destroyed when parent component is destroyed.
+     */
+    testDestroyCmpWithComponentTypedAttribute : {
+        test : function(cmp) {
+            var newCmp = this.createComponent("markup://aura:text");
+            cmp.set("v.cmpAttribute", newCmp);
+
+            cmp.destroy(false);
+
+            $A.test.assertFalse(newCmp.isValid());
+        }
+    },
+
+    /**
+     * Verify component in array attribute will be destroyed when parent component is destroyed.
+     */
+    testDestroyCmpWithComponentArrayTypedAttribute : {
+        test : function(cmp) {
+            var newCmp = this.createComponent("markup://aura:text");
+            var cmpArray = [newCmp];
+            cmp.set("v.cmpArrayAttribute", cmpArray);
+
+            cmp.destroy(false);
+
+            $A.test.assertFalse(newCmp.isValid());
+        }
+    },
+
+    /**
+     * Verify non Aura Component object attribute's destroy method does NOT get called when destroying component.
+     */
+    testDestroyCmpWithOjectAttributeWithDestroyMethod : {
+        test : function(cmp) {
+            var destroyed = false;
+            var obj = {
+                "destroy" : function() {
+                    destroyed = true;
+                },
+                // the compiler adds $ sign to method name
+                "$destroy$" : function() {
+                    destroyed = true;
+                }
+            }
+            cmp.set("v.objWithDestroy", obj);
+            cmp.destroy(false);
+
+            $A.test.assertFalse(destroyed,
+                    "Non Aura Component attribute's destroy method should not be called when destroying component.");
+        }
+    },
+
     verifyComponentDestroyed : function(cmp) {
         $A.test.assertUndefinedOrNull(cmp.find("outerFacet"));
         $A.test.assertUndefinedOrNull(cmp.find("textInOuterFacet"));
@@ -212,5 +264,14 @@
         $A.test.assertUndefinedOrNull(cmp.find("coach"));
 
         $A.test.assertEquals(0, cmp.find("team").getElement().childNodes.length);
+    },
+
+    createComponent : function(qualifyedName) {
+        var newCmp;
+        $A.createComponent(qualifyedName,null,function(targetComponent){
+            newCmp = targetComponent;
+        });
+        $A.test.assertTrue(newCmp.isValid());
+        return newCmp;
     }
 })

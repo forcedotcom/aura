@@ -29,14 +29,10 @@
 	handleDragEnd: function(component, event, helper) {
 		var dropComplete = $A.util.getBooleanValue(event.getParam("dropComplete"));
 		if (dropComplete) {
-			var addParams = {
-				"items": [event.getParam("data")]
-			};
-			
 			// Calculate index to be removed
 			var record = event.getParam("data");
-	    	var context = $A.dragAndDropService.getContext(event.getParam("dragComponent"));
-	    	var items = context.get("v.items");
+	    	var source = $A.dragAndDropService.getContext(event.getParam("dragComponent"));
+	    	var items = source.get("v.items");
 	    	
 	    	var removeIndex = -1;
 	    	for (var i = 0; i < items.length; i++) {
@@ -52,8 +48,17 @@
 				"remove": true
 			};
 			
-			// Move data transfer
-			$A.dragAndDropService.moveDataTransfer(event, addParams, removeParams);
+			// Remove data transfer
+			$A.dragAndDropService.removeDataTransfer(event, removeParams);
+			
+			// Add data transfer
+			var target = $A.dragAndDropService.getContext(event.getParam("dropComponent"));
+			var dataProvider = target.get("v.dataProvider[0]");
+	    	var onChangeEvent = dataProvider.getEvent("onchange");
+	    	onChangeEvent.setParams({
+				"data" : [event.getParam("data")]
+			});
+	    	onChangeEvent.fire();
 		}
 	}
 })

@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 ({
-    PILLS: [{id:'pill01',label:"Test Pill 01"},{id:'pill02',label:"Test Pill 02"},{id:'pill03',label:"Test Pill 03"}],
+    PILLS: [{id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,ff8888?l=1&f=FFFFFF'}},
+        {id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,88cc88?l=2&f=FFFFFF'}},
+        {id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,8888FF?l=3&f=FFFFFF'}},
+        {id:'pill04',label:"Test Pill 04",icon: {url:'https://ipsumimage.appspot.com/20x20,88cccc?l=4&f=FFFFFF'}}],
     browsers: ["GOOGLECHROME", "IPHONE", "IPAD", "FIREFOX", "IE9", "IE10", "SAFARI", "ANDROID_PHONE", "ANDROID_TABLET"],
     doNotWrapInAuraRun: true,
     
@@ -158,6 +161,37 @@
         }
     },
 
+    testShowMoreHidden: {
+        test: function (cmp) {
+            this._getInput(cmp).getElement().blur();
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
+    testShowMoreHiddenOnFocus: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            this._initializeWithThreePills(cmp);
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
+    testShowMoreVisibleOnBlur: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            this._initializeWithFourPills(cmp);
+            this._getInput(cmp).getElement().blur();
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return !that._isDisplayNone($A.test.select(".showMore")[0]);
+            }, "\"show more\" button should exist");
+        }
+    },
+
     _getInput: function(cmp) {
         return cmp.find("autocomplete").getSuper().find("input");
     },
@@ -202,6 +236,29 @@
         this._fireKeydownEvent(textInput, this.DOWNARROW_KEY);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
         return textInput;
+    },
+
+    _isDisplayNone: function (element) {
+        var display = element.currentStyle ? element.currentStyle.display : getComputedStyle(element, null).display;
+        return display === "none";
+    },
+
+    _initializeWithTwoPills: function (cmp) {
+        var pillContainer = cmp.find("pillContainer");
+        pillContainer.insertItems([this.PILLS[0],this.PILLS[1]]);
+        return pillContainer;
+    },
+
+    _initializeWithThreePills: function (cmp) {
+        var pillContainer = this._initializeWithTwoPills(cmp);
+        pillContainer.insertItems([this.PILLS[2]]);
+        return pillContainer;
+    },
+
+    _initializeWithFourPills: function (cmp) {
+        var pillContainer = this._initializeWithThreePills(cmp);
+        pillContainer.insertItems([this.PILLS[3]]);
+        return pillContainer;
     }
 
 })

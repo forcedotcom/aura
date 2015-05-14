@@ -123,9 +123,71 @@
 
     focusOnInputBox: function(cmp) {
         var pillInput = cmp.get("v.pillInput");
-        if (!$A.util.isEmpty(pillInput)) {
+        var itemsLength = cmp.get("v.items").length
+        var maxAllowed = cmp.get("v.maxAllowed");
+        if (!$A.util.isEmpty(pillInput) && itemsLength < maxAllowed) {
             pillInput[0].focus();
         }
+    },
+
+    adjustHeight: function(cmp) {
+        var hideShowMore = true;
+        var maxLines = cmp.get("v.maxLines");
+        if (maxLines > 0) {
+            var listItems = cmp.find("listitem");
+            if (!$A.util.isEmpty(listItems)) {
+
+                //find the height of a pill
+                var firstItem;
+                var lastItem;
+                if ($A.util.isArray(listItems)) {
+                    firstItem = listItems[0].getElement();
+                    lastItem = listItems[listItems.length - 1].getElement();
+                } else {
+                    lastItem = firstItem = listItems.getElement()
+                }
+                var pillHeight = this._getActualHeight(firstItem);
+
+                //set the maximum height of the pill container based on maxLines attribute
+                var list = cmp.find("list");
+                var limitedHeight = pillHeight * maxLines;
+                var scrollHeight = list.getElement().scrollHeight;
+                list.getElement().style.maxHeight = limitedHeight + "px";
+
+                //only show the Show More button if there's overflow
+                var lastItemBottom = lastItem.offsetTop - list.getElement().offsetTop + pillHeight;
+                console.log("lastItemBottom: " + lastItemBottom + " limitedHeight: " + limitedHeight)
+                if (lastItemBottom > limitedHeight) {
+                    hideShowMore = false;
+                }
+            }
+        }
+        if (hideShowMore) {
+            $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
+        } else {
+            $A.util.removeClass(cmp.find("showMore").getElement(), 'invisible');
+        }
+    },
+
+    showMore: function(cmp) {
+        var list = cmp.find("list");
+        list.getElement().style.maxHeight = "";
+        $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
+
+    },
+
+    _getActualHeight: function(element) {
+        var elmHeight, elmMargin;
+        if (document.all) { // IE
+            elmHeight = element.currentStyle.height;
+            elmMargin = parseInt(element.currentStyle.marginTop, 10) + parseInt(element.currentStyle.marginBottom, 10);
+        }
+        else {
+            var computedStyle = getComputedStyle(element, null);
+            elmHeight = parseInt(computedStyle.height);
+            elmMargin = parseInt(computedStyle.marginTop) + parseInt(computedStyle.marginBottom);
+        }
+        return elmHeight + elmMargin;
     },
 
     _itemExists: function(itemsList, newItem) {

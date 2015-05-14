@@ -43,7 +43,7 @@
 
     <a aura:id="link" aura:flavorable="true" role="listitem" class="pill" title="{!v.label}">
         <aura:if isTrue="{!!empty(v.iconUrl)}">
-            <ui:image src="{!v.iconUrl}" class="pillIcon"/>
+            <ui:image src="{!v.iconUrl}" class="pillIcon" imageType="decorative"/>
         </aura:if>
         {!v.label}
         <aura:if isTrue="{!v.showDelete}">

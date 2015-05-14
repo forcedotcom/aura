@@ -87,7 +87,7 @@
 		
 		// Check for supported drop operation
 		var supportedTypes = component.get("v.types");
-		var operationType = dragComponent.get("v.type");
+		var operationType = event.dataTransfer.effectAllowed;
 		if (supportedTypes.indexOf(operationType) > -1) {
 			// Get data being transferred
 			var data = {};

@@ -88,7 +88,7 @@
 		// Check for supported drop operation
 		var supportedTypes = component.get("v.types");
 		var operationType = event.dataTransfer.effectAllowed;
-		if (supportedTypes.indexOf(operationType) > -1) {
+		if (operationType === "all" || supportedTypes.indexOf(operationType) > -1) {
 			// Get data being transferred
 			var data = {};
 			var dataTransferTypes = event.dataTransfer.types;

@@ -63,6 +63,8 @@ public class ComponentDefModel {
         definition = descriptor.getDef();
 
         ReferenceTreeModel.assertAccess(definition);
+        
+        showSource = !Aura.getConfigAdapter().isProduction();
 
         String type = null;
         if (definition instanceof RootDefinition) {
@@ -253,6 +255,12 @@ public class ComponentDefModel {
         return doc;
     }
 
+    @AuraEnabled
+    public boolean getShowSource() {
+        return showSource;
+    }
+    
+    
     public class AttributeModel implements JsonSerializable {
 
         private final String name;
@@ -371,4 +379,5 @@ public class ComponentDefModel {
     private final List<DefModel> defs = Lists.newArrayList();
     private final List<IncludeDefModel> includeDefs = Lists.newArrayList();
     private final DocumentationDefModel doc;
+    private final boolean showSource;
 }

@@ -166,6 +166,9 @@
             for (var i = 0; i < options.length; i++) {
                 var option = options[i];
                 var val = option.value;
+                if ($A.util.isUndefinedOrNull(val)) {
+                	continue;
+                }
                 var selectOption = (newValues.length > 1 && newValues.indexOf(val) > -1) || newValues[0] == val.toString();
 
                 found = found || selectOption;

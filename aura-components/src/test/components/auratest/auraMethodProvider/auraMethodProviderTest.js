@@ -16,44 +16,37 @@
 ({
     testMethodsFromPreProvidedComponentAreNotPresent:{
         test:[
-            function(){
+            function(cmp){
             	var methodName = "auraMethodProviderMethod";
-            	$A.componentService.createComponent("auratest:auraMethodProvider", {}, function(instance) {
-            		
-            		// Assert that we have auratest:auraMethod methods, not auraMethodProvider methods
-            		$A.test.assertUndefined(instance[methodName], methodName + " is not present on the client provided component and should not be on the returned instance.");
-            	});
+            	$A.test.assertFalse($A.util.isFunction(cmp[methodName]));
             }            
         ]
     },
 
     testMethodsFromProvidededComponentArePresent: {
-    	test: [
-	    	function() {
-	        	var methodName = "hasAttr";
-	        	var actual;
-	        	$A.componentService.createComponent("auratest:auraMethodProvider", {}, function(instance) {
-	        		
-	        		actual = $A.util.isFunction(instance[methodName]);
-
-	        		// Assert that we have auratest:auraMethod methods, not auraMethodProvider methods
-	        		$A.test.assertTrue(actual, methodName + " is present on the client provided component and should be on the returned instance.");
-	        	});
-	        }
-       ]
+    	test: function(cmp) {
+	        var methodName = "hasAttr";
+	        $A.test.assertTrue($A.util.isFunction(cmp[methodName]));
+	        //run the method
+	        cmp[methodName]();
+	        $A.test.addWaitForWithFailureMessage("default string, return from hasAttr",
+	        		function() { return cmp.get("v.outputStringAttr"); },
+	        		"fail to change outputStringAttr"
+	        );
+	    }
+       
     },
 
     testSharedMethodFromProvidedComponentsIsPresent: {
-    	test: function() {
+    	test: function(cmp) {
     		var methodName = "noAttr";
-        	var actual;
-        	$A.componentService.createComponent("auratest:auraMethodProvider", {}, function(instance) {
-        		
-        		actual = $A.util.isFunction(instance[methodName]);
-
-        		// Assert that we have auratest:auraMethod methods, not auraMethodProvider methods
-        		$A.test.assertTrue(actual, methodName + " is present on the client provided component and should be on the returned instance.");
-        	});
+        	$A.test.assertTrue($A.util.isFunction(cmp[methodName]));
+        	//run the method
+        	cmp[methodName]();
+        	$A.test.addWaitForWithFailureMessage("paramArray: , return from noAttr",
+        			function() { return cmp.get("v.outputStringAttr"); },
+        			"fail to change outputStringAttr"
+        	);
     	}
     }
     

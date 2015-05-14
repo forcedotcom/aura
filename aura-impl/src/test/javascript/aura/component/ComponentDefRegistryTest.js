@@ -17,11 +17,13 @@ Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentDefRegistryTest = function () {
-    Mocks.GetMocks(
-        Object.Global(), {
-            "window" : {},
-            "Aura": {Component: {}}
-        })
+    
+    var Aura = {Component: {}};
+
+    Mocks.GetMocks(Object.Global(), {
+        "window" : {},
+        Aura: Aura
+    })
     (function () {
         // #import aura.component.ComponentDefRegistry
     });
@@ -69,13 +71,16 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
     [Fixture, Skip("Delete or refactor this tests, they are terrible written")]
     function isLocalStorageAvailable() {
         function MockLocalStorageSetRemove(during) {
-            return Mocks.GetMock(Object.Global(), "window", {
-                "Aura": {Component:{}},
-                localStorage: {
-                    setItem: function () {},
-                    removeItem: function () {}
-                }
-            })(function () {
+            return Mocks.GetMocks(Object.Global(), 
+                {
+                    Aura: Aura,
+                    "window": {
+                        localStorage: {
+                            setItem: function () {},
+                            removeItem: function () {}
+                        }
+                    }
+                })(function () {
                 // Since the actual file was already imported once, only specify
                 // the dependency
                 Import("aura.component.ComponentDefRegistry");
@@ -99,18 +104,19 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         }
 
         function MockErrorOnTestWrite(during) {
-            return Mocks.GetMock(Object.Global(), "window", {
-                localStorage: {
-                    setItem: function () {
-                        throw new Error()
-                    },
-                    removeItem: function () {
+            return Mocks.GetMocks(Object.Global(), {
+                "window": {
+                    localStorage: {
+                        setItem: function () {
+                            throw new Error();
+                        },
+                        removeItem: function () {
+                        }
                     }
-                }
+                },
+                Aura: Aura
             })(function () {
-                // Since the actual file was already imported once, only specify
-                // the dependency
-                [ Import("aura.component.ComponentDefRegistry") ]
+                [Import("aura.component.ComponentDefRegistry")]
                 during();
             });
         }
@@ -146,62 +152,70 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
     [Fixture]
     function GetDef() {
-        var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-            util: {
-                isString: function () {
-                    return true;
+        var mockAuraUtil = Mocks.GetMocks(Object.Global(),{
+            "$A": {
+                util: {
+                    isString: function () {
+                        return true;
+                    },
+                    isUndefinedOrNull: function (obj) {
+                        return obj === undefined || obj === null;
+                    }
                 },
-                isUndefinedOrNull: function (obj) {
-                    return obj === undefined || obj === null;
-                }
-            },
-            warning: function (message, error) {
-            },
-            assert: function (condition, message) {
-                if (!condition) {
-                    throw Error(message);
-                }
-            },
-            Perf: {
-                mark: function () {
+                warning: function (message, error) {},
+                assert: function (condition, message) {
+                    if (!condition) {
+                        throw Error(message);
+                    }
                 },
-                endMark: function () {
-                }
-            }
-        });
-        var mockComponentDef = Mocks.GetMock(Object.Global(), "$A", {
-            ns: {
-                ComponentDef: function (config) {
-                    return {
-                        "config": config,
-                        "getDescriptor": function () {
-                            return makeDefDescriptor(config["descriptor"]);
-                        }
+                Perf: {
+                    mark: function () {
+                    },
+                    endMark: function () {
                     }
                 }
             },
-            util: {
-                isString: function () {
-                    return true;
+            Aura: Aura
+        });
+
+        var mockComponentDef = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    isString: function () {
+                        return true;
+                    },
+                    isUndefinedOrNull: function (obj) {
+                        return obj === undefined || obj === null;
+                    }
                 },
-                isUndefinedOrNull: function (obj) {
-                    return obj === undefined || obj === null;
+                warning: function (message, error) {
+                },
+                assert: function (condition, message) {
+                    if (!condition) {
+                        throw new Error(message);
+                    }
+                },
+                Perf: {
+                    mark: function () {
+                    },
+                    endMark: function () {
+                    }
                 }
             },
-            warning: function (message, error) {
-            },
-            assert: function (condition, message) {
-                if (!condition) {
-                    throw new Error(message);
-                }
-            },
-            Perf: {
-                mark: function () {
-                },
-                endMark: function () {
+            Aura: {
+                Component: {
+                    ComponentDef: function (config) {
+                        return {
+                            "config": config,
+                            "getDescriptor": function () {
+                                return makeDefDescriptor(config["descriptor"]);
+                            }
+                        }
+                    }
                 }
             }
         });
+
         [Fact]
         function ThrowsIfConfigParamUndefined() {
             // Arrange
@@ -452,15 +466,19 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
     [Fixture]
     function UseLocalCache() {
-        var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-            warning: function (message, error) {
-            },
-            util: {
-                isUndefinedOrNull: function (obj) {
-                    return obj === undefined || obj === null;
+        var mockAuraUtil = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                warning: function (message, error) {
+                },
+                util: {
+                    isUndefinedOrNull: function (obj) {
+                        return obj === undefined || obj === null;
+                    }
                 }
-            }
+            },
+            Aura: Aura
         });
+        
         [Fact]
         function ShouldReturnFalseIfLocalStorageNotSupported() {
             // Arrange
@@ -946,6 +964,5 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
             Assert.Undefined(target.componentDefs[descriptor]);
             Assert.Equal(descriptor, actual);
         }
-
     }
 };

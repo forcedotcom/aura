@@ -70,7 +70,7 @@ Test.Aura.BrowserUnsupportedUtilTest=function() {
                 // #import aura.util.CoreUtil
                 // #import aura.util.Util
                 try {
-                    delegate(new $A.ns.Util());
+                    delegate(new Aura.Utils.Util());
                 } finally {
                     window.Object = CurrentObject;
                 }

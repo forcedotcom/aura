@@ -278,7 +278,6 @@ AuraHistoryService.prototype.parseLocation = function(location) {
     }
 };
 
-$A.ns.AuraHistoryService = AuraHistoryService;
 Aura.Services.AuraHistoryService = AuraHistoryService;
 
 //#include aura.AuraHistoryService_export

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = $A.ns.Util.prototype;
+var p = Aura.Utils.Util.prototype;
 p["isIE"] = p.isIE;
 p["isIOSWebView"] = p.isIOSWebView;
 p["isArray"] = p.isArray;

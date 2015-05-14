@@ -17,13 +17,17 @@ Function.RegisterNamespace("Test.Aura.Test");
 
 [Fixture]
 Test.Aura.TestTest = function() {
-    var $A = {
-            ns : {}
-        };
+    var $A = { ns : {} };
+    var Aura = { Test:{} };
     var window = {};
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A, "window":window})(function(){
+    Mocks.GetMocks(Object.Global(), { 
+        exp: function(){}, 
+        "$A": $A, 
+        "window": window,
+        Aura: Aura
+    })(function(){
         // #import aura.test.Test
     });
 
@@ -35,7 +39,7 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Mammoth", "Lake Tahoe"];
             var expectedArray = ["Lake Tahoe", "Mammoth"];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal([undefined, "Mammoth", undefined], preArray);
             Assert.Equal([undefined, undefined], expectedArray);
@@ -46,7 +50,7 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Lake Tahoe"];
             var expectedArray = ["Lake Tahoe", "Mammoth", "Mammoth"];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal([undefined, undefined], preArray);
             Assert.Equal([undefined, undefined, "Mammoth"], expectedArray);
@@ -60,7 +64,7 @@ Test.Aura.TestTest = function() {
             var preArray = ["undefined something", "something undefined"];
             var expectedArray = ["undefined something", "don't clear me"];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal([undefined, "don't clear me"], expectedArray);
         }
@@ -71,7 +75,7 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
             var expectedArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal(expected, preArray);
             Assert.Equal(expected, expectedArray);
@@ -83,7 +87,7 @@ Test.Aura.TestTest = function() {
             var preArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
             var expectedArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal(expected, preArray);
             Assert.Equal(expected, expectedArray);
@@ -94,7 +98,7 @@ Test.Aura.TestTest = function() {
             var preArray = [];
             var expectedArray = ["Yosemite", "Lake Tahoe"];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal([], preArray);
             Assert.Equal(["Yosemite", "Lake Tahoe"], expectedArray);
@@ -105,7 +109,7 @@ Test.Aura.TestTest = function() {
             var preArray = ["Yosemite", "Lake Tahoe"];
             var expectedArray = [];
 
-            new $A.ns.Test().clearExpected(preArray, expectedArray);
+            new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
             Assert.Equal(["Yosemite", "Lake Tahoe"], preArray);
             Assert.Equal([], expectedArray);

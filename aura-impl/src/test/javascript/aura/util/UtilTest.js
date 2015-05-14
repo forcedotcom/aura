@@ -16,8 +16,9 @@
 Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
-Test.Aura.UtilTest=function(){
-    var auraMock=function(delegate){
+Test.Aura.UtilTest = function() {
+    var Aura = {Utils:{}};
+    var auraMock = function(delegate) {
         Mocks.GetMocks(Object.Global(),{
             exp:function() {},
             window:Object.Global(),
@@ -28,7 +29,7 @@ Test.Aura.UtilTest=function(){
             SizeEstimator: function () {},
             Bitset:{},
             NumberFormat:{},
-            "Aura": {"Utils":{}, "Errors": {}},
+            Aura: Aura,
             $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
             navigator:{userAgent:''}
         })(function(){
@@ -40,7 +41,7 @@ Test.Aura.UtilTest=function(){
 
     var targetUtil;
     auraMock(function(){
-        targetUtil = new $A.ns.Util();
+        targetUtil = new Aura.Utils.Util();
     });
 
     [Fixture]
@@ -49,7 +50,7 @@ Test.Aura.UtilTest=function(){
         function testTransportRequestNotPublic(){
             var targetUtil;
             auraMock(function(){
-                targetUtil = new $A.ns.Util();
+                targetUtil = new Aura.Utils.Util();
             });
 
             var method = targetUtil.transport.request;
@@ -71,7 +72,7 @@ Test.Aura.UtilTest=function(){
             // Create fresh instance of Util.js since we store isIOSWebView return value on object
             var targetUtil;
             auraMock(function(){
-                targetUtil = new $A.ns.Util();
+                targetUtil = new Aura.Utils.Util();
             });
 
             mockUserAgentIOS7WebView(function(){
@@ -92,12 +93,12 @@ Test.Aura.UtilTest=function(){
             // Create fresh instance of Util.js since we store isIOSWebView return value on object
             var targetUtil;
             auraMock(function(){
-                targetUtil = new $A.ns.Util();
+                targetUtil = new Aura.Utils.Util();
             });
 
             mockUserAgentIOS7Safari(function(){
                 actual = targetUtil.isIOSWebView();
-            })
+            });
 
             Assert.False(actual);
         }
@@ -267,7 +268,7 @@ Test.Aura.UtilTest=function(){
 
     [Fixture]
     function isIE(){
-        var auraMockCustomUserAgent=function(delegate, userAgentOverride){
+        var auraMockCustomUserAgent = function(delegate, userAgentOverride) {
             Mocks.GetMocks(Object.Global(),{
                 exp:function() {},
                 window:Object.Global(),
@@ -278,7 +279,7 @@ Test.Aura.UtilTest=function(){
                 Bitset:{},
                 NumberFormat:{},
                 $A:{ns:{}},
-                "Aura": {"Utils" :{}, "Errors":{}},
+                Aura: Aura,
                 navigator:{userAgent : userAgentOverride }
             })(function(){
                 // #import aura.util.CoreUtil
@@ -295,7 +296,7 @@ Test.Aura.UtilTest=function(){
 
             //Act
             auraMockCustomUserAgent(function(){
-                var targetUtil = new $A.ns.Util();
+                var targetUtil = new Aura.Utils.Util();
                 actual = targetUtil.isIE;
             }, userAgent);
 
@@ -311,7 +312,7 @@ Test.Aura.UtilTest=function(){
 
             //Act
             auraMockCustomUserAgent(function(){
-                var targetUtil = new $A.ns.Util();
+                var targetUtil = new Aura.Utils.Util();
                 actual = targetUtil.isIE;
             }, userAgent);
 
@@ -325,7 +326,7 @@ Test.Aura.UtilTest=function(){
         [Fact]
         function testMerge() {
             auraMock(function() {
-                var util = new $A.ns.Util(),
+                var util = new Aura.Utils.Util(),
                     array1 = [0, 1],
                     array2 = [2, 3, 4],
                     array3 = [5, 6, 7, 8],
@@ -351,14 +352,14 @@ Test.Aura.UtilTest=function(){
         function testMergeError() {
             auraMock(function() {
                 try {
-                    new $A.ns.Util().merge({}, [0], [1, 2]);
+                    new Aura.Utils.Util().merge({}, [0], [1, 2]);
                     Assert.False(true, "Invalid arguments. Should throw exception.");
                 } catch (e) {
                     Assert.Equal("Merge takes only arrays as arguments.", e);
                 }
 
                 try {
-                    new $A.ns.Util().merge([0], [1, 2], {});
+                    new Aura.Utils.Util().merge([0], [1, 2], {});
                     Assert.False(true, "Invalid arguments. Should throw exception.");
                 } catch (e) {
                     Assert.Equal("Merge takes only arrays as arguments.", e);
@@ -459,7 +460,7 @@ Test.Aura.UtilTest=function(){
             auraMock(function() {
 
                 // Arrange
-                var util = new $A.ns.Util(),
+                var util = new Aura.Utils.Util(),
                     base     =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { "j": 6 } },
                     members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 7 },
                     expected =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { "j": 6 } };
@@ -477,7 +478,7 @@ Test.Aura.UtilTest=function(){
             auraMock(function() {
 
                 // Arrange
-                var util = new $A.ns.Util(),
+                var util = new Aura.Utils.Util(),
                     base     =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { "j": 6 } },
                     members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 7 },
                     expected =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 7 };
@@ -494,7 +495,7 @@ Test.Aura.UtilTest=function(){
         function DeepCopiesMembersWithoutOverridingExistingValues() {
             auraMock(function() {
                 // Arrange
-                var util = new $A.ns.Util(),
+                var util = new Aura.Utils.Util(),
                     base     =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }         }}, "h": 5,  "i": { j: 7 } },
                     members  =  { "a": { "b": { "c": 10, "d": { "e": 20        }, "g": 4 }}, "h": 50, "i": 6 },
                     expected =  { "a": { "b": { "c": 1,  "d": { "e": 2, "f": 3 }, "g": 4 }}, "h": 5,  "i": { j: 7 } };
@@ -512,7 +513,7 @@ Test.Aura.UtilTest=function(){
         function DeepCopiesMembersAndOverridesExistingValues() {
             auraMock(function() {
                 // Arrange
-                var util = new $A.ns.Util(),
+                var util = new Aura.Utils.Util(),
                     base     =  { "a": { "b": { "c": 1,  "d": { "e": 2,  "f": 3 }         }}, "h": 5,  "i": { j: 7 } },
                     members  =  { "a": { "b": { "c": 10, "d": { "e": 20         }, "g": 4 }}, "h": 50, "i": 6 },
                     expected =  { "a": { "b": { "c": 10, "d": { "e": 20, "f": 3 }, "g": 4 }}, "h": 50, "i": 6 };
@@ -761,7 +762,7 @@ Test.Aura.UtilTest=function(){
             };
 
             auraMock(function() {
-                Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, "first", "second", "third"));
+                Assert.Equal("VALUE", new Aura.Utils.Util().lookup(structure, "first", "second", "third"));
             });
         }
 
@@ -770,7 +771,7 @@ Test.Aura.UtilTest=function(){
             var structure = ["WRONG", ["WRONG", ["VALUE", "WRONG"]]];
 
             auraMock(function() {
-                Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, 1, 1, 0));
+                Assert.Equal("VALUE", new Aura.Utils.Util().lookup(structure, 1, 1, 0));
             });
         }
 
@@ -782,7 +783,7 @@ Test.Aura.UtilTest=function(){
             };
 
             auraMock(function() {
-                Assert.Equal("VALUE", new $A.ns.Util().lookup(structure, "first", 1, 1, 0, "result"));
+                Assert.Equal("VALUE", new Aura.Utils.Util().lookup(structure, "first", 1, 1, 0, "result"));
             });
         }
 
@@ -794,7 +795,7 @@ Test.Aura.UtilTest=function(){
             };
 
             auraMock(function() {
-                var util = new $A.ns.Util();
+                var util = new Aura.Utils.Util();
 
                 var found = 0;
                 found += util.lookup(structure, "second", 1, 4, 3, "result") === undefined ? 0 : 1;

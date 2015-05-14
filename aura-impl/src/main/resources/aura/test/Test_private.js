@@ -15,7 +15,7 @@
  */
 /*jslint sub:true */
 
-$A.ns.Test.prototype.putMessage = function(pre, expected, msg) {
+TestInstance.prototype.putMessage = function(pre, expected, msg) {
 	if (typeof msg !== "string") {
 		msg = ""+msg;
 	}
@@ -35,7 +35,7 @@ $A.ns.Test.prototype.putMessage = function(pre, expected, msg) {
     return false;
 };
 
-$A.ns.Test.prototype.expectMessage = function(pre, expected, msg) {
+TestInstance.prototype.expectMessage = function(pre, expected, msg) {
     if (pre !== null) {
         for (var i = 0; i < pre.length; i++) {
             if (pre[i] === undefined) {
@@ -58,7 +58,7 @@ $A.ns.Test.prototype.expectMessage = function(pre, expected, msg) {
  * 
  * @private
  */
-$A.ns.Test.prototype.clearExpected = function(pre, expected) {
+TestInstance.prototype.clearExpected = function(pre, expected) {
     for (var i = 0; i < pre.length; i++) {
         for (var j = 0; j < expected.length; j++) {
             if (expected[j] !== undefined && pre[i].indexOf(expected[j]) !== -1) {
@@ -85,7 +85,7 @@ window.onerror = (function(){
         if(line){
             error["line"] = line;
         }
-        $A.ns.Test.prototype.errors.push(error);
+        TestInstance.prototype.errors.push(error);
     };
 
     if(origHandler) {
@@ -99,8 +99,8 @@ window.onerror = (function(){
  * Used to keep track of errors happening in test modes.
  * @private
  */
-$A.ns.Test.prototype.logError = function(msg, e){
-    var errors = $A.ns.Test.prototype.errors;
+TestInstance.prototype.logError = function(msg, e){
+    var errors = TestInstance.prototype.errors;
     var err;
     var p;
 
@@ -123,7 +123,7 @@ $A.ns.Test.prototype.logError = function(msg, e){
  *
  * @private
  */
-$A.ns.Test.prototype.doTearDown = function() {
+TestInstance.prototype.doTearDown = function() {
     var i;
     var that = this;
 
@@ -157,7 +157,7 @@ $A.ns.Test.prototype.doTearDown = function() {
     }
 };
 
-$A.ns.Test.prototype.logErrors = function(error, label, errorArray) {
+TestInstance.prototype.logErrors = function(error, label, errorArray) {
     var i;
 
     if (errorArray !== null && errorArray.length > 0) {
@@ -178,7 +178,7 @@ $A.ns.Test.prototype.logErrors = function(error, label, errorArray) {
  *
  * @private
  */
-$A.ns.Test.prototype.continueWhenReady = function() {
+TestInstance.prototype.continueWhenReady = function() {
     var that = this;
     var internalCWR = function () {
         that.continueWhenReady();
@@ -186,7 +186,7 @@ $A.ns.Test.prototype.continueWhenReady = function() {
     if (this.inProgress < 2) {
         return;
     }
-    var errors = $A.ns.Test.prototype.errors;
+    var errors = TestInstance.prototype.errors;
     if(errors.length > 0){
         this.doTearDown();
         return;
@@ -284,9 +284,9 @@ $A.ns.Test.prototype.continueWhenReady = function() {
  *
  * @private
  */
-$A.ns.Test.prototype.getDump = function() {
+TestInstance.prototype.getDump = function() {
     var status = "";
-    var errors = $A.ns.Test.prototype.errors;
+    var errors = TestInstance.prototype.errors;
     if (errors.length > 0) {
         status += "errors {" + $A.test.print($A.test.getErrors()) + "} ";
     }
@@ -309,7 +309,7 @@ $A.ns.Test.prototype.getDump = function() {
 /**
  * Set up AppCache event listeners. Not a complete set of events, but all the ones we care about in our current tests.
  */
-$A.ns.Test.prototype.appCacheEvents = (function() {
+TestInstance.prototype.appCacheEvents = (function() {
     var appCacheEvents = [];
 
     var handleAppcacheChecking = function() {

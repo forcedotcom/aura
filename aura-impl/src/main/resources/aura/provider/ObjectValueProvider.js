@@ -53,5 +53,4 @@ ObjectValueProvider.prototype.get = function(expression, callback) {
     return value;
 };
 
-$A.ns.ObjectValueProvider = ObjectValueProvider;
 Aura.Provider.ObjectValueProvider = ObjectValueProvider;

@@ -33,10 +33,10 @@
  */
  function GlobalValueProviders (gvp, initCallback) {
     this.valueProviders = {
-        "$Browser" : new $A.ns.ObjectValueProvider(),
-        "$Label": new $A.ns.LabelValueProvider(),
-        "$Locale": new $A.ns.ObjectValueProvider(),
-        "$Global": new $A.ns.ContextValueProvider()
+        "$Browser" : new Aura.Provider.ObjectValueProvider(),
+        "$Label": new Aura.Provider.LabelValueProvider(),
+        "$Locale": new Aura.Provider.ObjectValueProvider(),
+        "$Global": new Aura.Provider.ContextValueProvider()
     };
     for(var type in gvp){
         $A.assert(this.valueProviders[type]==null,"$A.globalValueProviders.ctor(): '"+type+"' has already been registered.");
@@ -75,7 +75,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         newGvp = gvps[i];
         type = newGvp["type"];
         if (!this.valueProviders[type]) {
-            this.valueProviders[type] = new $A.ns.ObjectValueProvider();
+            this.valueProviders[type] = new Aura.Provider.ObjectValueProvider();
         }
         valueProvider = this.valueProviders[type];
         if (valueProvider.merge) {
@@ -203,10 +203,10 @@ GlobalValueProviders.prototype.getValueProvider = function(type) {
  */
 GlobalValueProviders.prototype.clearValueProvider = function(loadFromStorage) {
 	this.valueProviders = {
-	        "$Browser" : new $A.ns.ObjectValueProvider(),
-	        "$Label": new $A.ns.LabelValueProvider(),
-	        "$Locale": new $A.ns.ObjectValueProvider(),
-	        "$Global": new $A.ns.ContextValueProvider()
+	        "$Browser" : new Aura.Provider.ObjectValueProvider(),
+	        "$Label": new Aura.Provider.LabelValueProvider(),
+	        "$Locale": new Aura.Provider.ObjectValueProvider(),
+	        "$Global": new Aura.Provider.ContextValueProvider()
 	};
 	if(loadFromStorage) {
 		this.loadFromStorage();
@@ -228,7 +228,5 @@ GlobalValueProviders.prototype.get = function(expression, callback) {
     return (valueProvider.get ? valueProvider.get(expression, callback) : $A.expressionService.resolve(expression, valueProvider));
 };
 
-
-$A.ns.GlobalValueProviders = GlobalValueProviders;
 Aura.Provider.GlobalValueProviders = GlobalValueProviders;
 //#include aura.provider.GlobalValueProviders_export

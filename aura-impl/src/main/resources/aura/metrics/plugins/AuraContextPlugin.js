@@ -79,7 +79,7 @@ AuraContextPlugin.prototype = {
             };
 
         metricsCollector["instrument"](
-            $A.ns.AuraContext.prototype,
+            Aura.Context.AuraContext.prototype,
             method,
             AuraContextPlugin.NAME,
             false/*async*/,
@@ -94,7 +94,7 @@ AuraContextPlugin.prototype = {
     },
     // #end
     unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"]($A.ns.AuraContext.prototype, 'merge');
+        metricsCollector["unInstrument"](Aura.Context.AuraContext.prototype, 'merge');
     }
 };
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = $A.ns.GlobalValueProviders.prototype;
+var p = GlobalValueProviders.prototype;
 exp(p,
     "get", p.get
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

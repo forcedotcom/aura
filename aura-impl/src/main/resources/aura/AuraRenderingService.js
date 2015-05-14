@@ -835,7 +835,6 @@ AuraRenderingService.prototype.isMarker = function(node){
     return node&&node.aura_marker;
 };
 
-$A.ns.AuraRenderingService = AuraRenderingService;
 Aura.Services.AuraRenderingService = AuraRenderingService;
 
 exp(AuraRenderingService.prototype,

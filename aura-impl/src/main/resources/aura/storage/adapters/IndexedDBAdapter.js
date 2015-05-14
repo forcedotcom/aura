@@ -617,5 +617,4 @@ if (window.indexedDB) {
     });
 }
 
-$A.ns.IndexedDBStorageAdapter = IndexedDBStorageAdapter;
 Aura.Storage.IndexedDBStorageAdapter = IndexedDBStorageAdapter;

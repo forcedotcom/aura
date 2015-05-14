@@ -18,8 +18,7 @@ Function.RegisterNamespace("Test.Aura.Controller");
 
 [Fixture]
 Test.Aura.Controller.ActionCollectorTest = function(){
-    var $A = {
-        ns : {},
+    var $A = {ns : {},
         assert: function(condition, message) {
             if (!condition) {
                 var error = new Error(message);
@@ -32,11 +31,19 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             }
         }
     };
+    var Aura = {Controller: {}};
 
-    var mockAura = Mocks.GetMocks(Object.Global(), { "$A": $A, "Aura": {"Controller": {}} });
+    var mockAura = Mocks.GetMocks(Object.Global(), { 
+        "$A": $A, 
+        Aura: Aura 
+    });
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A, "Aura": {"Controller": {}}})(function(){
+    Mocks.GetMocks(Object.Global(), {
+        "exp": function(){}, 
+        "$A": $A, 
+        Aura: Aura
+    })(function(){
         //#import aura.controller.ActionCollector
     });
 
@@ -48,7 +55,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = [];
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector();
+                target = new Aura.Controller.ActionCollector();
             });
 
             // Act
@@ -64,7 +71,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = [];
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector();
+                target = new Aura.Controller.ActionCollector();
             });
 
             // Act
@@ -80,7 +87,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = -1;
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector();
+                target = new Aura.Controller.ActionCollector();
             });
 
             // Act
@@ -96,7 +103,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = 0;
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector();
+                target = new Aura.Controller.ActionCollector();
             });
 
             // Act
@@ -112,7 +119,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = 1;
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector(["action"]);
+                target = new Aura.Controller.ActionCollector(["action"]);
             });
 
             // Act
@@ -131,7 +138,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = [ "action" ];
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector(expected);
+                target = new Aura.Controller.ActionCollector(expected);
             });
 
             // Act
@@ -147,7 +154,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
             var expected = [ "action1", "action2" ];
             var target;
             mockAura(function(){
-                target = new $A.ns.ActionCollector();
+                target = new Aura.Controller.ActionCollector();
             });
             target.actionsRequested = expected;
 

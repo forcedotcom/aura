@@ -97,5 +97,4 @@ function AuraError() {
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;
 
-$A.ns.AuraError = AuraError;
 Aura.Errors.AuraError = AuraError;

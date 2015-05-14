@@ -27,7 +27,7 @@ function AuraComponentService (actions, finishedCallback) {
     this.providerDefRegistry = new ProviderDefRegistry();
     this.rendererDefRegistry = new RendererDefRegistry();
     this.helperDefRegistry = new HelperDefRegistry();
-    this.libraryDefRegistry = new $A.ns.LibraryDefRegistry();
+    this.libraryDefRegistry = new LibraryDefRegistry();
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
 
@@ -857,7 +857,7 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
      */
     return config && config["descriptor"];
 };
-$A.ns.AuraComponentService = AuraComponentService;
+
 Aura.Services.AuraComponentService = AuraComponentService;
 
 exp(AuraComponentService.prototype,

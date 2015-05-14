@@ -1241,7 +1241,6 @@ Action.prototype.fireRefreshEvent = function(event, responseUpdated) {
     }
 };
 
-$A.ns.Action = Action;
 Aura.Controller.Action = Action;
 
 // #include aura.controller.Action_export

@@ -18,6 +18,7 @@
 <aura:component render="client">
     <aura:attribute name="typeMap" type="Map"/>
     <aura:attribute name="typeInteger" type="Integer"/>
+    <aura:attribute name="typeString" type="String"/>
     <aura:attribute name="typeList" type="List"/>
     <aura:attribute name="typeStringList" type="String[]"/>
     <aura:attribute name="typeMapList" type="Map[]"/>

@@ -66,10 +66,8 @@ IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
     // FIXME: we should use the name of the storage here, and the DB should be per webapp
     this.tableName = "keyStore";
 
-    var dbRequest = window.indexedDB.open(this.instanceName);
-    dbRequest.onupgradeneeded = function(e) {
-        that.setupDB(that.dbRequest.result);
-    };
+    // Set version number on open call to avoid weirdness when deleting/recreating DBs of the same name
+    var dbRequest = window.indexedDB.open(this.instanceName, "1");
     dbRequest.onupgradeneeded = function (e) {
         that.createTables(e.target.result);
     };
@@ -79,6 +77,12 @@ IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
     dbRequest.onerror = function(e) {
         // this means we have no storage.
         that.ready = false;
+        var message = "open() - Error opening DB";
+        message += (e.target.error && e.target.error.message) ? ": "+e.target.error.message : "";
+        that.log(message);
+    };
+    dbRequest.onblocked = function(e) {
+        that.log("open() - Blocked from opening DB, most likely by another open browser tab");
     };
 };
 
@@ -213,6 +217,9 @@ IndexedDBStorageAdapter.prototype.setupDB = function(db) {
             $A.error(e.error);
         }
     };
+    this.db.onversionchange = function(e) {
+        e.target.close();
+    };
     if (!this.db.objectStoreNames.contains(this.tableName)) {
         this.createTables(db);
     }
@@ -227,8 +234,10 @@ IndexedDBStorageAdapter.prototype.setupDB = function(db) {
  * @param {IndexedDB} db the database.
  */
 IndexedDBStorageAdapter.prototype.createTables = function(db) {
-    var objectStore = db.createObjectStore(this.tableName, { "keyPath": "key" });
-    objectStore.createIndex("expires", "expires", {"unique": false});
+    if (!db.objectStoreNames.contains(this.tableName)) {
+        var objectStore = db.createObjectStore(this.tableName, { "keyPath": "key" });
+        objectStore.createIndex("expires", "expires", {"unique": false});
+    }
 };
 
 /**
@@ -453,9 +462,7 @@ IndexedDBStorageAdapter.prototype.clearInternal = function(success, error) {
 IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success, error) {
     var now = new Date().getTime();
     if (this.lastSweep + this.sweepInterval > now && this.sizeGuess < this.limitSweepHigh) {
-        if (this.debugLoggingEnabled) {
-            this.log("Shortcircuiting sweep last sweep = "+this.lastSweep+", time = "+now);
-        }
+        this.log("Shortcircuiting sweep last sweep = "+this.lastSweep+", time = "+now);
         if (success) {
             success();
         }
@@ -478,18 +485,14 @@ IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success,
         if (this.sizeGuess > this.limitSweepLow) {
             removeSize += this.sizeGuess-this.limitSweepLow;
         }
-        if (this.debugLoggingEnabled) {
-            this.log("Sweeping to remove "+removeSize);
-        }
+        this.log("Sweeping to remove "+removeSize);
         cursor.onsuccess = function(event) {
             var icursor = event.target.result;
             if (icursor) {
                 var store = icursor.value;
                 if (store) {
                     if (store["expires"] < expireDate || expiredSize < removeSize) {
-                        if (that.debugLoggingEnabled) {
-                            that.log("Sweep: removing - "+icursor.primaryKey);
-                        }
+                        that.log("Sweep: removing - "+icursor.primaryKey);
                         icursor['delete']();
                         expiredSize += store["size"];
                     } else {
@@ -555,10 +558,8 @@ IndexedDBStorageAdapter.prototype.refreshSize = function(size, count) {
         this.sizeOutsideErrorBar += 1;
     }
 
-    if (this.debugLoggingEnabled) {
-        this.log("Size Calculation: mistake = "+mistake+", avg = "+(this.sizeMistake/this.sizeMistakeCount)+
-            ", max = "+this.sizeMistakeMax+", outside error bars = "+this.sizeOutsideErrorBar);
-    }
+    this.log("Size Calculation: mistake = "+mistake+", avg = "+(this.sizeMistake/this.sizeMistakeCount)+
+        ", max = "+this.sizeMistakeMax+", outside error bars = "+this.sizeOutsideErrorBar);
     this.setSize(size, count);
 };
 
@@ -582,6 +583,29 @@ IndexedDBStorageAdapter.prototype.log = function (msg, obj) {
     if (this.debugLoggingEnabled) {
         $A.log("IndexedDBStorageAdapter '" + this.instanceName + "' " + msg + ":", obj);
     }
+};
+
+IndexedDBStorageAdapter.prototype.deleteStorage = function() {
+    var that = this;
+    var execute = function(success, error) {
+        that.deleteStorageInternal(success, error);
+    };
+    return this.enqueue(execute);
+};
+
+IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, error) {
+    var that = this;
+    var dbRequest = window.indexedDB.deleteDatabase(this.instanceName);
+    dbRequest.onerror = function(event) {
+        error("IndexedDBStorageAdapter.deleteStorage: Database failed to be deleted");
+    };
+    dbRequest.onsuccess = function(event) {
+        that.log("deleted successfully");
+        success();
+    };
+    dbRequest.onblocked = function(event) {
+        error("IndexedDBStorageAdapter.deleteStorage: Database blocked from being deleted");
+    };
 };
 
 // Only register this adapter if the IndexedDB API is present

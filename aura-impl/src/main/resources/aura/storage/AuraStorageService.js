@@ -165,7 +165,17 @@ var AuraStorageService = function(){
          * @param {String} name name of storage
          */
         deleteStorage: function(name) {
+            var storage = this.getStorage(name);
+            if (!storage) {
+                // Nothing to delete, just call success callback
+                return new Promise(function(success, error) {
+                    success();
+                });
+            }
+
+            var promise = storage.deleteStorage();
             delete storages[name];
+            return promise;
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

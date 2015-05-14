@@ -35,5 +35,15 @@
             }, function() {
                 cmp.set("v.status", "Error during add");
             });
+    },
+
+    deleteStorage: function(cmp) {
+        cmp.set("v.status", "Deleting storage");
+        $A.storageService.deleteStorage("indexedDBCmp")
+            .then(function() {
+                cmp.set("v.status", "Done Deleting");
+            }, function() {
+                cmp.set("v.status", "Error during delete of storage")
+            });
     }
 })

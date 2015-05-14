@@ -304,5 +304,28 @@
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
+    },
+
+    /**
+     * Memory adapter does not implement deleting the whole storage so calling delete will just remove the reference
+     * to the storage from the storage service.
+     */
+    testDeleteStorage: {
+        test: function(cmp) {
+            var completed = false;
+            var name = "memoryTest";
+            $A.storageService.initStorage(name, false, true, 4096);
+            $A.test.assertDefined($A.storageService.getStorage(name));
+
+            $A.storageService.deleteStorage(name)
+                .then(function() {
+                    $A.test.assertUndefined($A.storageService.getStorage(name));
+                    completed = true;
+                }, function(){
+                    $A.test.fail("Failed to delete storage");
+                });
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        }
     }
 })

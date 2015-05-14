@@ -17,7 +17,8 @@
 exp(storageService,
     "getStorage", storageService.getStorage,
     "initStorage", storageService.initStorage,
-    "registerAdapter", storageService.registerAdapter
+    "registerAdapter", storageService.registerAdapter,
+    "deleteStorage", storageService.deleteStorage
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,"createAdapter", storageService.createAdapter 
         , "selectAdapter", storageService.selectAdapter

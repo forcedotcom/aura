@@ -169,10 +169,14 @@
                 $A.metricsService.onTransactionEnd(this._onTransactionEnd.bind(this));
             },
             _onTransactionEnd: function (t) {
-                window.postMessage({
-                    action  : "AuraDevToolService.OnTransactionEnd", 
-                    payload : t
-                }, '*');
+                setTimeout(function (){ 
+                // We do a timeout to give a chance to 
+                // other transactionEnd handlers to modify the transaction
+                    window.postMessage({
+                        action  : "AuraDevToolService.OnTransactionEnd", 
+                        payload : t
+                    }, '*');    
+                }, 0);
             },
 
             _initializeHooksComponentCreation: function () {

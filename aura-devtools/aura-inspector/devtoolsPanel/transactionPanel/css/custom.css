@@ -1,5 +1,6 @@
 #trs {
-
+	height: 100px;
+	overflow: scroll;
 }
 
 #trs table {

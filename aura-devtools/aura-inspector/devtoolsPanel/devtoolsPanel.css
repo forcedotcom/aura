@@ -94,7 +94,7 @@ body.sidebar-visible .sidebar { display: block; }
 .trans-panel td { max-width: 200px }
 .trans-panel tr:nth-child(even) {background: #DDD}
 .trans-panel tr:nth-child(odd) {background: #FFF}
-.trans-panel .transactions { padding: 0 1em; }
+.trans-panel .transactions { padding: 0 1em; height: calc(100% - 60px); overflow: scroll;}
 
 /* Loading Indicator */
 #loading { display: none; position: absolute; height: 100%; width: 100%; }

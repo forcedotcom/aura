@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS{
+    font-weight: bold;
+    font-size: .9em;
+    margin: 2px 3px;
+    padding: 4px 6px;
+    text-decoration:none;
+    text-align:center;
+    border-radius:4px;
+    border:0;
+    border-top:1px solid rgba(255,255,255,.45);
+    background:#DDDFE1;
+    background:linear-gradient(#F8F8F9,#DDDFE1);
+    box-shadow:0 1px 3px rgba(0, 0, 0, 0.7),0 1px 0 rgba(0, 0, 0, 0.3) ;
+    text-shadow:0 1px 1px #FFF;	
+}
+@if (IE7){
+    .THIS{
+        border:1px solid #999;
+    }
+}
+.THIS:hover,
+.THIS:focus{
+    background:#757D8A;
+    background:#757D8A linear-gradient(#7F8792,#535B68);
+    text-shadow:0 -1px 1px rgba(0, 0, 0, 0.5);
+}
+.THIS .label{
+    white-space:nowrap;
+    color: #3A3D42;
+}
+.THIS:hover .label,
+.THIS:focus .label{
+    color: #FFF;
+}
+.THIS:disabled{
+    cursor:default;
+    background:#B9B9B9;
+    box-shadow:none;
+    text-shadow:none;
+}
+.THIS:disabled .label{
+    color:#888;
+}
+.THIS:disabled .label:hover{
+    color:#888;
+}

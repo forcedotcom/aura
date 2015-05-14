@@ -162,7 +162,6 @@ Test.Aura.AuraClientServiceTest = function() {
             this.getDef = sdef;
             this.isCaboose = Stubs.GetMethod(true);
         }
-        this.toString = function() { return this.id+":"+type; };
     };
 
     var MockActionQueue = function() {
@@ -258,7 +257,6 @@ Test.Aura.AuraClientServiceTest = function() {
                 target.popStack("AbortableActionsAreCleared.2");
             });
             // Assert
-            System.Environment.Write(target.actionQueue.actions);
             Assert.Equal(6, target.actionQueue.actions.length);
             Assert.False(target.actionQueue.actions[0].isAbortable(), "First action should not be abortable");
             Assert.False(target.actionQueue.actions[1].isAbortable(), "Second action should not be abortable");

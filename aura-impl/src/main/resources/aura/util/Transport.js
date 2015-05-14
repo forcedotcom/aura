@@ -111,6 +111,13 @@ Transport.prototype.request = function(config) {
     $A.Perf.mark("Received Response - XHR " + aura_num + (config["markDescription"] || ""));
     $A.Perf.mark("Completed Action Callback - XHR " + aura_num);
     $A.Perf.mark("Callback Complete - XHR " + aura_num);
+
+    if (config["headers"]) {
+        for (var header in config["headers"]) {
+            request.setRequestHeader(header, config["headers"][header]);
+        }
+    }
+
     if (qs && method === "POST") {
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
         request.send(qs);

@@ -18,5 +18,5 @@
 <aura:component extends="ui:autocompleteOption"
                 description="Auto complete component for use in a ui:pillContainer" extensible="true" support="PROTO">
     <aura:attribute name="iconUrl" type="String" default="true"/>
-    <ui:image src="{!v.iconUrl}" class="optionIcon"/>{!v.label}
+    <ui:image src="{!v.iconUrl}" class="optionIcon" imageType="decorative"/>{!v.label}
 </aura:component>

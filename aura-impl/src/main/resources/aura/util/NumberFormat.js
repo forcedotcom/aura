@@ -312,14 +312,14 @@ NumberFormat.prototype.format = function(number) {
         suffix = this.negativeSuffix;
     }
     var result = [];
-    if (prefix) {
-        result.push(prefix);
-    }
+    
     if (negative && !this.hasNegativePattern) {
         // if there is no negative pattern, append '-' for negative numbers
         result.push("-");
     }
-    
+    if (prefix) {
+        result.push(prefix);
+    }
     var zeroPad = this.minDigits - decimalPos;
 
     for (var i = 0; i < zeroPad; i++) {

@@ -652,8 +652,7 @@
             $A.test.assertNotNull(testCmp);
             $A.test.assertEquals('$1,234,567,890.00', $A.test.getText(testCmp.find('span').getElement()), "Decimal part of value was not rounded up based on format.");
             var val = $A.localizationService.formatCurrency(-1234567890);
-            var isPass = val === "-$1,234,567,890.00" || val === "$-1,234,567,890.00";
-            $A.test.assertTrue(isPass, "Both values should be same.");
+            $A.test.assertEquals("-$1,234,567,890.00", val, "Both values should be same.");
             $A.test.assertEquals("$1,234,567,890.32", $A.localizationService.formatCurrency(1234567890.321), "Both values should be same.");
             $A.test.assertEquals("$1,234,567,890.33", $A.localizationService.formatCurrency(1234567890.326), "Both values should be same.");
         }

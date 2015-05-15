@@ -38,32 +38,32 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
     public BaseDiffUtils(UnitTestCase test, String goldName) throws Exception {
         this.test = test;
 
-        Class<? extends UnitTestCase> testClass = test.getClass();
-        String relativeResourceName = testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
+        final Class<? extends UnitTestCase> testClass = test.getClass();
+        final String relativeResourceName = testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
                 + goldName;
 
-        String explicitResultsFolder = test.getExplicitGoldResultsFolder();
+        final String explicitResultsFolder = test.getExplicitGoldResultsFolder();
         if (explicitResultsFolder != null) {
             srcUrl = destUrl = new URL("file://" + explicitResultsFolder + '/' + relativeResourceName);
             return;
         }
 
         // auto-detect gold file location logic:
-        String resourceName = getResultsFolder() + relativeResourceName;
+        final String resourceName = getResultsFolder() + relativeResourceName;
         srcUrl = testClass.getResource(resourceName);
         if (srcUrl == null) {
             // gold file not found, but try to identify expected gold file location based on the test class location
-            String relPath = testClass.getName().replace('.', '/') + ".class";
-            URL testUrl = testClass.getResource("/" + relPath);
+            final String relPath = testClass.getName().replace('.', '/') + ".class";
+            final URL testUrl = testClass.getResource("/" + relPath);
             if ("file".equals(testUrl.getProtocol())) {
-                String fullPath = testUrl.getPath();
-                String basePath = fullPath.substring(0, fullPath.indexOf(relPath)).replaceFirst(
+                final String fullPath = testUrl.getPath();
+                final String basePath = fullPath.substring(0, fullPath.indexOf(relPath)).replaceFirst(
                         "/target/test-classes/", "/src/test");
                 destUrl = new URL("file://" + basePath + resourceName);
             }
         } else if ("file".equals(srcUrl.getProtocol())) {
             // probably in dev so look for source rather than target
-            String devPath = srcUrl.getPath().replaceFirst("/target/test-classes/", "/src/test/");
+            final String devPath = srcUrl.getPath().replaceFirst("/target/test-classes/", "/src/test/");
             srcUrl = destUrl = new URL("file://" + devPath);
         }
 
@@ -102,19 +102,23 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
      * try to invoke "diff" to create a readable diff for the test failure results, otherwise append our crappy
      * unreadable garbage
      */
-    protected void appendDiffs(String results, StringBuilder sb) {
+    protected void appendDiffs(String results, String gold, StringBuilder sb) {
         try {
             // create a temp file and write the results so that we're sure to
             // have something for diff to use
-            File file = File.createTempFile("aura-gold.", ".xml");
+            final File resultsFile = File.createTempFile("aura-results.", ".xml");
+            final File goldFile = File.createTempFile("aura-gold.", ".xml");
             try {
-                OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+                final OutputStreamWriter fw1 = new OutputStreamWriter(new FileOutputStream(resultsFile), "UTF-8");
+                final OutputStreamWriter fw2 = new OutputStreamWriter(new FileOutputStream(goldFile), "UTF-8");
                 try {
-                    fw.write(results);
+                    fw1.write(results);
+                    fw2.write(gold);
                 } finally {
-                    fw.close();
+                    fw1.close();
+                    fw2.close();
                 }
-                Process child = Runtime.getRuntime().exec("diff -du " + srcUrl.getPath() + " " + file.getPath());
+                final Process child = Runtime.getRuntime().exec("diff -du " + goldFile.getPath() + " " + resultsFile.getPath());
                 try {
                     printToBuffer(sb, child.getInputStream());
                     printToBuffer(sb, child.getErrorStream());
@@ -122,15 +126,16 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
                     child.waitFor();
                 }
             } finally {
-                file.delete();
+                resultsFile.delete();
+                goldFile.delete();
             }
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
         }
     }
 
     private boolean printToBuffer(StringBuilder sb, InputStream in) throws IOException {
         boolean printedAny = false;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         try {
             String line = reader.readLine();
             while (null != line) {
@@ -145,25 +150,25 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
     }
 
     protected final void writeGoldFileContent(String content) {
-        URL url = getDestUrl();
-        SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
+        final URL url = getDestUrl();
+        final SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
         try {
-            File f = new File(url.getFile());
-            boolean existed = f.exists();
+            final File f = new File(url.getFile());
+            final boolean existed = f.exists();
             if (existed && !f.canWrite() && sca.canCheckout()) {
                 sca.checkout(f);
             }
             if (!f.getParentFile().exists()) {
                 f.getParentFile().mkdirs();
             }
-            OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
+            final OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
             fw.write(content);
             fw.close();
 
             if (!existed && sca.canCheckout()) {
                 sca.add(f);
             }
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             throw new RuntimeException("Failed to write gold file: " + url.toString(), t);
         }
     }
@@ -171,10 +176,10 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
     protected final String readGoldFileContent() throws IOException {
         final int READ_BUFFER = 4096;
 
-        Reader br = new BufferedReader(new InputStreamReader(getUrl().openStream(), "UTF-8"));
-        char[] buff = new char[READ_BUFFER];
+        final Reader br = new BufferedReader(new InputStreamReader(getUrl().openStream(), "UTF-8"));
+        final char[] buff = new char[READ_BUFFER];
         int read = -1;
-        StringBuffer sb = new StringBuffer(READ_BUFFER);
+        final StringBuffer sb = new StringBuffer(READ_BUFFER);
         while ((read = br.read(buff, 0, READ_BUFFER)) != -1) {
             sb.append(buff, 0, read);
         }

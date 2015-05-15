@@ -488,11 +488,24 @@ Action.prototype.setAllAboardCallback = function(scope, callback) {
  * This should only be called internally just before an action is sent to the server.
  *
  * @private
+ * @return false if the callback failed.
  */
 Action.prototype.callAllAboardCallback = function () {
     if (this.allAboardCallback) {
-        this.allAboardCallback();
+        try {
+            this.allAboardCallback();
+        } catch (e) {
+            this.state = "ERROR";
+            this.error = e;
+            $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
+            $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
+            if ($A.clientService.inAuraLoop()) {
+                throw e;
+            }
+            return false;
+        }
     }
+    return true;
 };
 
 /**
@@ -560,14 +573,12 @@ Action.prototype.runDeprecated = function(evt) {
         this.returnValue = this.meth.call(this, this.cmp, evt, this.cmp['helper']);
         this.state = "SUCCESS";
     } catch (e) {
-        this.state = "FAILURE";
+        this.state = "ERROR";
         this.error = e;
         $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
-        if (this.getDef().getDescriptor() !== "aura://ComponentController/ACTION$reportFailedAction") {
-            $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
-            if ($A.clientService.inAuraLoop()) {
-                throw e;
-            }
+        $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
+        if ($A.clientService.inAuraLoop()) {
+            throw e;
         }
     } finally {
         $A.getContext().releaseCurrentAccess();

@@ -159,12 +159,22 @@ Logger.prototype.error = function(msg, e){
  * @private
  * @memberOf Aura.Utils.Logger
  *
- * @param {String} msg error message
  * @param {AuraError} [e] error
+ * @param {Action} [action] the responsible action, if there is one.
  */
-Logger.prototype.auraErrorHelper = function(e){
+Logger.prototype.auraErrorHelper = function(e, action){
     this.handleError(e);
-    this.reportError(e);
+    var actionName = undefined;
+    var actionId = undefined;
+    if (action) {
+        if (action.getDef && action.getDef()) {
+            actionName = action.getDef().getDescriptor();
+        }
+        if (action.getId) {
+            actionId = action.getId();
+        }
+    }
+    this.reportError(e, actionName, actionId);
 };
 
 /**

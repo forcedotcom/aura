@@ -91,6 +91,9 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
                 }
             }
             actionDef = controllerDef.getSubDefinition(name);
+            if (actionDef == null) {
+                throw new InvalidDefinitionException("JavaMockActionHandler: unable to find action "+name, getLocation());
+            }
             return new ActionInvocation("createAction", ImmutableList.of(name), type);
         }
         return super.getInvocation(object);

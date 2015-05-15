@@ -524,6 +524,7 @@ Test.Aura.AuraClientServiceTest = function() {
     [Fixture]
     function handleAppCache() {
         var storageClearCalled = false;
+        var componentDefsClearCalled = false;
         var evtCallbacks = {};
         var mockApplicationCache = {
             "addEventListener": function(evt, callback) {
@@ -538,6 +539,17 @@ Test.Aura.AuraClientServiceTest = function() {
         };
 
         var mockLocation = { reload: function() {} };
+
+        var mockComponentService = {
+            registry: {
+                clearStorage: function() {
+                    componentDefsClearCalled = true;
+                    return {
+                        then: function() {}
+                    }
+                }
+            }
+        };
 
         var mockDeps = Mocks.GetMocks(Object.Global(), {
             "$A": {
@@ -563,7 +575,8 @@ Test.Aura.AuraClientServiceTest = function() {
                         }
                     }
                 },
-                mark : function() {}
+                mark : function() {},
+                componentService: mockComponentService
             },
             window:{
                 "applicationCache": mockApplicationCache,
@@ -582,6 +595,7 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function doesNotCallLocalStorageClearWhenUpdateReady() {
             storageClearCalled = false;
+            componentDefsClearCalled = false;
 
             mockDeps(function() {
                 evtCallbacks["updateready"]();
@@ -593,12 +607,25 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function doesNotCallSessionStorageClearWhenUpdateReady() {
             storageClearCalled = false;
+            componentDefsClearCalled = false;
 
             mockDeps(function() {
                 evtCallbacks["updateready"]();
             });
 
             Assert.False(storageClearCalled);
+        }
+
+        [Fact]
+        function callsComponentRegistryClearWhenUpdateReady() {
+            storageClearCalled = false;
+            componentDefsClearCalled = false;
+
+            mockDeps(function() {
+                evtCallbacks["updateready"]();
+            });
+
+            Assert.True(componentDefsClearCalled);
         }
     }
 

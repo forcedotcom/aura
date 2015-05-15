@@ -188,8 +188,10 @@ AuraStorage.prototype.put = function(key, value) {
  * @private
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
+    var that = this;
     return this.adapter.removeItem(this.version + key)
         .then(function(){
+            that.log("remove() - key: " + key);
             if (!doNotFireModified) {
                 $A.storageService.fireModified();
             }

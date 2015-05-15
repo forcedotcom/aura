@@ -60,7 +60,7 @@ function AuraExpressionService() {
             var segment;
             while (!$A.util.isUndefinedOrNull(target) && path.length) {
             	segment = path.shift();
-            	//#if {"modes" : ["TESTINGDEBUG", "AUTOTESTINGDEBUG", "DEVELOPMENT"]}
+            	//#if {"modes" : ["DEVELOPMENT"]}
             	if(!target["hasOwnProperty"](segment)) {
             		var searchkey = segment.toLowerCase();
             		for(var key in target){

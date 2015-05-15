@@ -26,7 +26,7 @@
     },
 
     assertCreationPath : function(cmp, path, msg) {
-        var cp = cmp.creationPath;
+        var cp = $A.test.getCreationPath(cmp);
         $A.test.assertEquals(path, cp.substring(cp.indexOf("/")), msg); 
     },
     
@@ -135,7 +135,7 @@
             $A.run(function(){cmp.set("v.iftrue", true)});
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("truebody"))}, "'true' components not instantiated");
         }, function(cmp) {
-            $A.log("Looking For: ", cmp.find("truebody").creationPath, " to be client created");
+            $A.log("Looking For: ", $A.test.getCreationPath(cmp.find("truebody")), " to be client created");
             this.assertCreationPath(cmp.find("truebody"), "client created");
         }]
     },

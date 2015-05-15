@@ -87,15 +87,6 @@ var AuraLayoutService = function() {
     }
 
     function fireOnload() {
-        //#if {"modes" : ["TESTING", "AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-        //For Selenium
-        var frame = window.frameElement;
-        if (frame && document.createEvent) {
-            var loadEvent = document.createEvent('HTMLEvents');
-            loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
-            frame.dispatchEvent(loadEvent);
-        }
-        //#end
     }
 
     var layoutService = {

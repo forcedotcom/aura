@@ -1048,11 +1048,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("subDefs", subDefs.values());
                 }
 
-                if (mode.equals(Mode.AUTOJSTEST)) {
-                    json.writeMapEntry("testSuiteDef", getTestSuiteDef());
-                }
-
-
                 String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
                 if (defaultFlavorToSerialize != null) {
                     json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);

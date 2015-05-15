@@ -16,9 +16,9 @@
 package org.auraframework.util.validation;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.phobos.script.javascript.RhinoScriptEngineFactory;
 
 /**
  * Sanity tests to verify the rhino engine we use works as expected.
@@ -26,7 +26,7 @@ import org.auraframework.test.UnitTestCase;
 public final class RhinoTest extends UnitTestCase {
 
     public void testSanity() throws Exception {
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+        ScriptEngine engine = new RhinoScriptEngineFactory().getScriptEngine();
 
         // non-|| equivalents that work with JDK 1.6:
         engine.eval("var ret = (5 !== undefined)? 5 : -1;"); // equiv to: 5 || -1

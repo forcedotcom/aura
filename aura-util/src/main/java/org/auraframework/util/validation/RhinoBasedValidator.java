@@ -21,8 +21,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.auraframework.util.phobos.script.javascript.*;
 
 /**
  * Base class for validators using Rhino
@@ -35,7 +36,7 @@ public abstract class RhinoBasedValidator {
     }
 
     protected final String tool;
-    protected final ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+    protected final ScriptEngine engine = new RhinoScriptEngineFactory().getScriptEngine();
 
     /**
      * @param tool tool used for validation (i.e. "jslint")

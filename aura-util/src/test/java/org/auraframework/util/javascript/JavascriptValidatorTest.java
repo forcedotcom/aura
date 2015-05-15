@@ -63,5 +63,9 @@ public final class JavascriptValidatorTest extends UnitTestCase {
         assertEquals(1, errors.size());
         ValidationTestUtil
                 .assertError("input.js [line 1, column 33] jslint2009: Missing semicolon", errors.get(0));
+
+        validator = new JavascriptValidator(true);
+        errors = validator.validate("input.js", "function unused() {for(var i=0;i>1;i++){}}", false, false);
+        assertEquals(0, errors.size());
     }
 }

@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>aura-util</artifactId>
     <packaging>maven-plugin</packaging>
-    
+
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
@@ -43,6 +43,10 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>

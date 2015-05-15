@@ -117,7 +117,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
  * @returns {ComponentDef} ComponentDef
  */
 ComponentDefRegistry.prototype.saveComponentDef = function(config) {
-    var def = new $A.ns.ComponentDef(config);
+    var def = new Aura.Component.ComponentDef(config);
     var descriptor = def.getDescriptor().toString();
     this.componentDefs[descriptor] = def;
     var namespace = def.getDescriptor().getNamespace();

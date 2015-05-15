@@ -271,6 +271,5 @@ ActionQueue.prototype.filterActions = function(filter) {
 };
 
 Aura.Controller.ActionQueue = ActionQueue;
-$A.ns.ActionQueue = ActionQueue;
 
 // #include aura.controller.ActionQueue_export

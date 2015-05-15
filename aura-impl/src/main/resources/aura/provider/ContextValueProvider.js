@@ -147,5 +147,4 @@ ContextValueProvider.prototype.extract = function(gv) {
     return gv && (gv.hasOwnProperty("value") ? gv["value"] : gv["defaultValue"]);  
 };
 
-$A.ns.ContextValueProvider = ContextValueProvider;
 Aura.Provider.ContextValueProvider = ContextValueProvider;

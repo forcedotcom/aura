@@ -157,7 +157,7 @@ Logger.prototype.error = function(msg, e){
 
 /**
  * @private
- * @memberOf $A.ns.Logger
+ * @memberOf Aura.Utils.Logger
  *
  * @param {String} msg error message
  * @param {AuraError} [e] error
@@ -169,7 +169,7 @@ Logger.prototype.auraErrorHelper = function(e){
 
 /**
  * @private
- * @memberOf $A.ns.Logger
+ * @memberOf Aura.Utils.Logger
  *
  * @param {String} msg error message
  * @param {AuraError} [e] error
@@ -396,5 +396,4 @@ Logger.prototype["warning"] = Logger.prototype.warning;
 Logger.prototype["error"] = Logger.prototype.error;
 Logger.prototype["assert"] = Logger.prototype.assert;
 
-$A.ns.Logger = Logger;
 Aura.Utils.Logger = Logger;

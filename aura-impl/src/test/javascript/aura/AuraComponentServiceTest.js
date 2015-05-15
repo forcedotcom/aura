@@ -18,9 +18,7 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraComponentServiceTest = function(){
     var $A = {
-        ns : {
-            "LibraryDefRegistry": function(){}
-        },
+        ns : {},
         assert: function(condition, message) {
             if (!condition) {
                 var error = new Error(message);
@@ -49,6 +47,7 @@ Test.Aura.AuraComponentServiceTest = function(){
     // Mocks necessary to create a new AuraComponentService Object
     var mockOnLoadUtil = Mocks.GetMocks(Object.Global(), {
         "ComponentDefRegistry": function(){},
+        "LibraryDefRegistry": function(){},
         "ControllerDefRegistry": function(){},
         "ActionDefRegistry": function(){},
         "ModelDefRegistry": function(){},
@@ -63,8 +62,8 @@ Test.Aura.AuraComponentServiceTest = function(){
     });
 
     var targetService;
-    mockOnLoadUtil(function(){
-        targetService = new $A.ns.AuraComponentService();
+    mockOnLoadUtil(function() {
+        targetService = new Aura.Services.AuraComponentService();
     });
 
 
@@ -308,7 +307,7 @@ Test.Aura.AuraComponentServiceTest = function(){
             var expected = "ComponentService.newComponentAsync(): 'config' must be a valid Object.";
             var target;
             mockOnLoadUtil(function(){
-                target = new $A.ns.AuraComponentService();
+                target = new Aura.Services.AuraComponentService();
             });
 
             // Act
@@ -328,7 +327,7 @@ Test.Aura.AuraComponentServiceTest = function(){
             var expected = "ComponentService.newComponentAsync(): 'callback' must be a Function pointer.";
             var target;
             mockOnLoadUtil(function(){
-                target = new $A.ns.AuraComponentService();
+                target = new Aura.Services.AuraComponentService();
             });
 
             // Act

@@ -17,48 +17,45 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.LoggerTest = function() {
-    var $A = {
-        ns: {}
-    };
+    var Aura = {Utils:{}};
 
-    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "$A": $A, Aura: {Utils: {}} })(function(){
+    Mocks.GetMocks(Object.Global(), {Aura: Aura })(function(){
         // #import aura.Logger
     });
 
     var messageCalled = false,
-        showErrors = true;
-    var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
-        util: {
-            isString: function (obj) {
-                return typeof obj === 'string';
+        showErrors    = true,
+        mockUtil      = Mocks.GetMock(Object.Global(), "$A", {
+            util: {
+                isString: function (obj) {
+                    return typeof obj === 'string';
+                },
+                isError: function (obj) {
+                    return !!obj && this.objToString.apply(obj) === '[object Error]';
+                },
+                isUndefinedOrNull: function (obj) {
+                    return obj === undefined || obj === null;
+                },
+                isObject: function(obj){
+                    return typeof obj === "object" && obj !== null && !this.isArray(obj);
+                },
+                isArray: typeof Array.isArray === "function" ? Array.isArray : function(obj) {
+                    return obj instanceof Array;
+                },
+                objToString: Object.prototype.toString
             },
-            isError: function (obj) {
-                return !!obj && this.objToString.apply(obj) === '[object Error]';
+            message: function() {
+                messageCalled = true;
             },
-            isUndefinedOrNull: function (obj) {
-                return obj === undefined || obj === null;
-            },
-            isObject: function(obj){
-                return typeof obj === "object" && obj !== null && !this.isArray(obj);
-            },
-            isArray: typeof Array.isArray === "function" ? Array.isArray : function(obj) {
-                return obj instanceof Array;
-            },
-            objToString: Object.prototype.toString
-        },
-        message: function() {
-            messageCalled = true;
-        },
-        showErrors: function() {
-            return showErrors;
-        }
-    });
+            showErrors: function() {
+                return showErrors;
+            }
+        });
 
     [Fixture]
     function info() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -85,7 +82,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function warning() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -112,7 +109,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function assertion() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -152,7 +149,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function error() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -201,7 +198,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function subscribe() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -220,7 +217,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function unsubscribe() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -316,7 +313,7 @@ Test.Aura.LoggerTest = function() {
     [Fixture]
     function validation() {
 
-        var logger = new $A.ns.Logger(),
+        var logger = new Aura.Utils.Logger(),
             level, message, error;
         var cb = function(l, m, e) {
             level = l;
@@ -347,7 +344,7 @@ Test.Aura.LoggerTest = function() {
 
     [Fixture]
     function reportError() {
-        var logger = new $A.ns.Logger();
+        var logger = new Aura.Utils.Logger();
         var called = false;
         var mockAction = {
                 setAbortable: function() {},

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = $A.ns.ComponentDef.prototype;
+var p = ComponentDef.prototype;
 exp(p,
     "auraType", p.auraType,
     "getDescriptor", p.getDescriptor,

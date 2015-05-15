@@ -43,21 +43,14 @@ Aura.Attribute  = {};
 Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
-
-// Move to the bottom and remove
-window["Aura"] = Aura; 
+Aura.Test       = {};
 
 /**
- * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
- *            attached to it. Note that this almost empty object $A is replaced later, after $A.ns (created below) is
- *            populated with the types that can be used to populate the "real" $A. TODO(fabbott): Make that "only gobal
- *            name" goal become true; today it ain't.
+ * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. 
+ * Everything else in Aura is attached to it.
  * @platform
  */
 window['$A'] = {};
-
-
-$A.ns = {}; //DELETE!
 
 // -- Polyfills --------------------------------------------------------
 // #include aura.polyfill.Array
@@ -193,30 +186,30 @@ $A.ns = {}; //DELETE!
  */
 function AuraInstance () {
     this.globalValueProviders = {};
-    this.displayErrors = true;
+    this.displayErrors        = true;
 
-    this.logger = new Aura.Utils.Logger();
-    this.util = new Aura.Utils.Util();
-    this["util"] = this.util; //Move this? (check prod mangling)
+    this.logger               = new Aura.Utils.Logger();
+    this.util                 = new Aura.Utils.Util();
+    this["util"]              = this.util; //Move this? (check prod mangling)
     
-    this.auraError = Aura.Errors.AuraError;
-    this.auraFriendlyError = Aura.Errors.AuraFriendlyError;
+    this.auraError            = Aura.Errors.AuraError;
+    this.auraFriendlyError    = Aura.Errors.AuraFriendlyError;
+    this.localizationService  = Aura.Services.AuraLocalizationService();
     
-    this.clientService = new Aura.Services.AuraClientService();
-    this.componentService = new Aura.Services.AuraComponentService();
+    this.clientService        = new Aura.Services.AuraClientService();
+    this.componentService     = new Aura.Services.AuraComponentService();
     this.serializationService = new Aura.Services.AuraSerializationService();
-    this.renderingService = new Aura.Services.AuraRenderingService();
-    this.expressionService = new Aura.Services.AuraExpressionService();
-    this.historyService = new Aura.Services.AuraHistoryService();
-    this.eventService = new Aura.Services.AuraEventService();
-    this.layoutService = new Aura.Services.AuraLayoutService();
-    this.localizationService = Aura.Services.AuraLocalizationService();
-    this.storageService = new Aura.Services.AuraStorageService();
-    this.styleService = new Aura.Services.AuraStyleService();
-    this.metricsService = new Aura.Services.MetricsService();
+    this.renderingService     = new Aura.Services.AuraRenderingService();
+    this.expressionService    = new Aura.Services.AuraExpressionService();
+    this.historyService       = new Aura.Services.AuraHistoryService();
+    this.eventService         = new Aura.Services.AuraEventService();
+    this.layoutService        = new Aura.Services.AuraLayoutService();
+    this.storageService       = new Aura.Services.AuraStorageService();
+    this.styleService         = new Aura.Services.AuraStyleService();
+    this.metricsService       = new Aura.Services.MetricsService();
 
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-    this.test = new $A.ns.Test();
+    this.test = new Aura.Test.Test();
     this["test"] = this.test;
     //#end
 
@@ -231,7 +224,7 @@ function AuraInstance () {
          *
          * @public
          * @type AuraRenderingService
-         * @memberOf $A.ns.Aura
+         * @memberOf Aura.Services
          */
         rendering : this.renderingService,
         /**
@@ -239,7 +232,7 @@ function AuraInstance () {
          *
          * @public
          * @type AuraEventService
-         * @memberOf $A.ns.Aura
+         * @memberOf Aura.Services
          */
         event : this.eventService,
         /**
@@ -247,7 +240,7 @@ function AuraInstance () {
          *
          * @public
          * @type AuraComponentService
-         * @memberOf $A.ns.Aura
+         * @memberOf Aura.Services
          */
         component : this.componentService,
         /**
@@ -1061,19 +1054,19 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 
 // #include aura.Aura_export
 
-// At this point, $A.ns has been defined with all our types on it, but $A itself
-// is just a placeholder. Use this function to preserve $A.ns while populating
+// At this point, Aura has been defined with all our types on it, but $A itself
+// is just a placeholder. Use this function to preserve Aura while populating
 // $A, without making a new top-level name:
 (function bootstrap() {
-    var ns = $A.ns;
     window['$A'] = new AuraInstance();
-    window['$A']['ns'] = ns;
-    window['$A'].ns = ns;
     $A.metricsService.bootstrapMark("frameworkReady");
 })();
 
 // TODO(fabbott): Remove the legacy 'aura' top-level name.
 window['aura'] = window['$A'];
+
+// Move to the bottom and remove
+window["Aura"] = Aura; 
 
 // -- Storage Adapters -------------------------------------------------
 // #include aura.storage.adapters.MemoryAdapter

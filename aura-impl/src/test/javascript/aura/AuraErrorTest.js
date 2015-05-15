@@ -17,15 +17,11 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraErrorTest = function() {
-    var $A = {
-        ns : {}
-    };
+    var Aura = {Errors: {}};
 
-    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
     Mocks.GetMocks(Object.Global(), { 
-        "exp": function() {}, 
-        "Aura": {"Errors": {}},
-        "$A": $A })(function() {
+        Aura: Aura
+    })(function() {
         // #import aura.AuraError
     });
 
@@ -36,7 +32,7 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "AuraError";
 
-            actual = new $A.ns.AuraError().name;
+            actual = new Aura.Errors.AuraError().name;
 
             Assert.Equal(expected, actual);
         }
@@ -45,7 +41,7 @@ Test.Aura.AuraErrorTest = function() {
         function EmptyConstructorReturnsEmptyMessage() {
             var actual;
 
-            actual = new $A.ns.AuraError().message;
+            actual = new Aura.Errors.AuraError().message;
 
             Assert.Empty(actual);
         }
@@ -55,7 +51,7 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "test message";
 
-            actual = new $A.ns.AuraError(expected).message;
+            actual = new Aura.Errors.AuraError(expected).message;
 
             Assert.Equal(expected, actual);
         }
@@ -64,7 +60,7 @@ Test.Aura.AuraErrorTest = function() {
         function ReturnsCallStack() {
             var actual;
 
-            actual = new $A.ns.AuraError().stackTrace;
+            actual = new Aura.Errors.AuraError().stackTrace;
 
             Assert.NotNull(actual);
         }

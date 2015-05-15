@@ -270,5 +270,4 @@ ActionCollector.prototype.finishCollection = function() {
     this.finishedCallback(this);
 };
 
-$A.ns.ActionCollector = ActionCollector;
 Aura.Controller.ActionCollector = ActionCollector;

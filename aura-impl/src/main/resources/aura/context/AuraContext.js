@@ -52,7 +52,7 @@ function AuraContext(config, initCallback) {
     }
     $A.util.apply(config["globalValueProviders"],$A.globalValueProviders);
 
-    this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"], function() {
+    this.globalValueProviders = new Aura.Provider.GlobalValueProviders(config["globalValueProviders"], function() {
         var i, defs;
         
         // Careful now, the def is null, this fake action sets up our paths.
@@ -494,7 +494,6 @@ AuraContext.prototype.setContextPath = function(path) {
     this.contextPath = path;
 };
 
-$A.ns.AuraContext = AuraContext;
 Aura.Context.AuraContext = AuraContext;
 
 //#include aura.context.AuraContext_export

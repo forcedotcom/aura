@@ -17,12 +17,14 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraHistoryServiceTest = function(){
-    var $A = {
-        ns : {}
-    };
+    var $A = { ns : {} };
+    var Aura = { Services:{} };
 
-    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A, Aura: {Services:{}}})(function(){
+    Mocks.GetMocks(Object.Global(), {
+        "exp": function(){}, 
+        "$A":$A, 
+        Aura: Aura})
+    (function(){
         // #import aura.AuraHistoryService
     });
     
@@ -59,7 +61,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
                     }
                 }
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
             historyService.usePushState = function() { return true; };
             historyService.changeHandler = function() {};
 
@@ -83,7 +85,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHash = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
             historyService.usePushState = function() { return false; };
 
             var actual;
@@ -110,7 +112,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHash = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
             historyService.usePushState = function() { return false; };
 
             var actualHash;
@@ -154,7 +156,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
 
         [Fact]
         function ReturnsFalseIfIOS7WebView() {
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
 
             var actual; 
             mockUserAgentChromeAndroid(function() {
@@ -168,7 +170,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
 
         [Fact]
         function ReturnsFalseIfNativeAndroid() {
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
 
             var actual; 
             mockUserAgentNativeAndroid(function() {
@@ -182,7 +184,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
 
         [Fact]
         function ReturnsTrueIfChromeAndroid() {
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
 
             var actual; 
             mockUserAgentChromeAndroid(function() {
@@ -211,7 +213,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
                     }
                 }
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
 
             mockHistory(function() {
                 mockIsIOSWebViewFalse(function() {
@@ -236,7 +238,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHash = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
             historyService.history = [token];
             historyService.currentIndex = -1;
 
@@ -267,7 +269,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
                     }
                 }
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
 
             mockHistory(function() {
                 mockIsIOSWebViewFalse(function() {
@@ -292,7 +294,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHash = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
             historyService.history = [token];
             historyService.currentIndex = 1;
 
@@ -320,7 +322,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHash = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            var historyService = new $A.ns.AuraHistoryService();
+            var historyService = new Aura.Services.AuraHistoryService();
             historyService.history = ["something"];
             historyService.currentIndex = 0;
 

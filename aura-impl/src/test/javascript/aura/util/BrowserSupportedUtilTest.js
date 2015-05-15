@@ -21,8 +21,8 @@ Function.RegisterNamespace("Test.Aura.BrowserSupportedUtilTest");
  */
 
 [Fixture]
-Test.Aura.BrowserSupportedUtilTest=function() {
-    
+Test.Aura.BrowserSupportedUtilTest = function() {
+    var Aura = {Utils: {}};
     [Fixture]
     function browserSupportedTests() {
         var MockObject = {};
@@ -60,7 +60,7 @@ Test.Aura.BrowserSupportedUtilTest=function() {
                 Bitset:{},
                 NumberFormat:{},            
                 $A:{ns:{}},
-                "Aura":{"Utils":{}},
+                Aura: Aura,
                 navigator:{userAgent:''},
                 Array: override === MockArray ? override : Array,
                 Function: override === MockFunction ? override : Function
@@ -70,7 +70,7 @@ Test.Aura.BrowserSupportedUtilTest=function() {
                 // #import aura.util.CoreUtil
                 // #import aura.util.Util
                 try {
-                    delegate(new $A.ns.Util());
+                    delegate(new Aura.Utils.Util());
                 } finally {
                     window.Object = CurrentObject;
                 }

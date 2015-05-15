@@ -22,13 +22,13 @@ Test.Aura.AuraRenderingServiceTest = function(){
         getContext:function(){return context;},
         ns : {}
     };
-    var NS = {Services: {}};
+    var Aura = {Services: {}};
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
     Mocks.GetMocks(Object.Global(), {
         "exp": function(){}, 
         "$A":$A,
-        Aura: NS
+        Aura: Aura
     })(function(){
         // #import aura.AuraRenderingService
     });
@@ -123,7 +123,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
         function AssertRerenderCalled() {
             var target;
             mockOnLoadUtil(function(){
-                target = new $A.ns.AuraRenderingService();
+                target = new Aura.Services.AuraRenderingService();
             });
             var mockAuraInfo = getMockAuraInfo(true);
             var expectedRenderable = 'value';
@@ -148,7 +148,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
         function ErrorOnNoComponent() {
             var target;
             mockOnLoadUtil(function(){
-                target = new $A.ns.AuraRenderingService();
+                target = new Aura.Services.AuraRenderingService();
             });
             var mockAuraInfo = getMockAuraInfo(false);
             var mockComponent = 'bad';
@@ -163,7 +163,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
         function AssertAfterRenderNotCalledForInvalid() {
             var target;
             mockOnLoadUtil(function(){
-                target = new $A.ns.AuraRenderingService();
+                target = new Aura.Services.AuraRenderingService();
             });
             var stubbedAfterRender = Stubs.GetMethod("rendered", null);
             var mockAuraInfo = getMockAuraInfo(true);
@@ -184,7 +184,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
         function ErrorOnAfterRenderThrows() {
             var target;
             mockOnLoadUtil(function(){
-                target = new $A.ns.AuraRenderingService();
+                target = new Aura.Services.AuraRenderingService();
             });
             var expected = new Error("expected");
             var mockAuraInfo = getMockAuraInfo(true);

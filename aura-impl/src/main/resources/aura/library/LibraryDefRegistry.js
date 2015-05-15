@@ -94,5 +94,4 @@ LibraryDefRegistry.parseLocator = function(locator) {
     };
 };
 
-$A.ns.LibraryDefRegistry = LibraryDefRegistry;
 Aura.Library.LibraryDefRegistry = LibraryDefRegistry;

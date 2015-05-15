@@ -92,7 +92,7 @@ LabelValueProvider.prototype.requestServerLabel = function(section, name, callba
 LabelValueProvider.prototype.getQueue = function(section, name) {
     var exp = this.getQueueKey(section, name);
     if (!this.queue[exp]) {
-        this.queue[exp] = new $A.ns.LabelQueue();
+        this.queue[exp] = new Aura.Provider.LabelQueue();
     }
     return this.queue[exp];
 };
@@ -163,4 +163,3 @@ LabelValueProvider.prototype.get = function(expression, callback) {
 };
 
 Aura.Provider.LabelValueProvider = LabelValueProvider;
-$A.ns.LabelValueProvider = LabelValueProvider;

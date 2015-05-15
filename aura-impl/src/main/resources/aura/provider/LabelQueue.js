@@ -98,5 +98,4 @@ LabelQueue.prototype.reset = function() {
 };
 
 
-$A.ns.LabelQueue = LabelQueue;
 Aura.Provider.LabelQueue = LabelQueue;

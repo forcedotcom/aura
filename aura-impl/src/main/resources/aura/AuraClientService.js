@@ -45,14 +45,14 @@ function AuraClientService () {
 
     var acs = this;
 
-    $A.ns.Util.prototype.on(window, "beforeunload", function(event) {
+    Aura.Utils.Util.prototype.on(window, "beforeunload", function(event) {
         if (!$A.util.isIE) {
             acs.isUnloading = true;
             acs.requestQueue = [];
         }
     });
 
-    $A.ns.Util.prototype.on(window, "load", function(event) {
+    Aura.Utils.Util.prototype.on(window, "load", function(event) {
         // Lazy load data-src scripts
         var scripts = document.getElementsByTagName("script");
         if (scripts) {
@@ -626,7 +626,7 @@ AuraClientService.prototype.request = function(actions, flightCounter) {
     }, 30000);
     try {
         var abortableId = this.actionQueue.getLastAbortableTransactionId();
-        var collector = new $A.ns.ActionCollector(actions, function() {
+        var collector = new Aura.Controller.ActionCollector(actions, function() {
             try {
                 acs.actionQueue.setCurrentAbortableId(abortableId);
                 acs.finishRequest(collector, flightCounter, abortableId, flightHandled);
@@ -1017,28 +1017,28 @@ AuraClientService.prototype.initDefs = function(config) {
     //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
     this.currentlyInSideEffectMode=true;
 
-    var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
+    var evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
     $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
     for ( var j = 0; j < evtConfigs.length; j++) {
         $A.eventService.getEventDef(evtConfigs[j]);
     }
     $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
 
-    var libraryConfigs = aura.util.json.resolveRefs(config["libraryDefs"]);
+    var libraryConfigs = $A.util.json.resolveRefs(config["libraryDefs"]);
     $A.Perf.mark("Registered Libraries [" + libraryConfigs.length + "]");
     for (j = 0; j < libraryConfigs.length; j++) {
         $A.componentService.getLibraryDef(libraryConfigs[j]);
     }
     $A.Perf.endMark("Registered Libraries [" + libraryConfigs.length + "]");
 
-    var controllerConfigs = aura.util.json.resolveRefs(config["controllerDefs"]);
+    var controllerConfigs = $A.util.json.resolveRefs(config["controllerDefs"]);
     $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
     for (j = 0; j < controllerConfigs.length; j++) {
         $A.componentService.getControllerDef(controllerConfigs[j]);
     }
     $A.Perf.endMark("Registered Controllers [" + controllerConfigs.length + "]");
 
-    var comConfigs = aura.util.json.resolveRefs(config["componentDefs"]);
+    var comConfigs = $A.util.json.resolveRefs(config["componentDefs"]);
     $A.Perf.mark("Registered Components [" + comConfigs.length + "]");
     for ( var i = 0; i < comConfigs.length; i++) {
         $A.componentService.getDef(comConfigs[i]);
@@ -1851,5 +1851,4 @@ exp(AuraClientService.prototype,
     "invalidateAction", AuraClientService.prototype.invalidateAction
 );
 
-$A.ns.AuraClientService = AuraClientService;
 Aura.Services.AuraClientService = AuraClientService;

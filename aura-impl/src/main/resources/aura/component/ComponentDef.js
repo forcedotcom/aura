@@ -598,7 +598,6 @@ ComponentDef.prototype.initRenderer = function() {
     this.renderingDetails = rd;
 };
 
-$A.ns.ComponentDef = ComponentDef;
 Aura.Component.ComponentDef = ComponentDef;
 
 // #include aura.component.ComponentDef_export

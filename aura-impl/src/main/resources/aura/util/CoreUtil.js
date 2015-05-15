@@ -1308,7 +1308,7 @@ if (!!Function.prototype.bind) {
     CoreUtil.prototype.bind = function(method /*, this, bind arguments*/) {
         var args = Array.prototype.slice.call(arguments, 1),
             that = args.shift(),
-            util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+            util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isFunction(method)) {
             throw new TypeError("$A.util.bind called on non-function.");
@@ -1346,7 +1346,7 @@ if (!!(Object && Object.keys)) {
     };
 } else {
     CoreUtil.prototype.keys = function(object, excludeFunctions) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         var isAnyObjectType = !util.isObject(object)
             && !util.isFunction(object)
@@ -1386,7 +1386,7 @@ if (!!(Object && Object.keys)) {
  */
 CoreUtil.prototype.lookup = function(object /*, var-args of arrays*/) {
     var properties = Array.prototype.slice.call(arguments, 1),
-        util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
     return util.reduce(properties, function(current, property) {
         return current && current[property];
@@ -1402,7 +1402,7 @@ CoreUtil.prototype.lookup = function(object /*, var-args of arrays*/) {
  */
 CoreUtil.prototype.merge = function(first /*, var-args of arrays*/) {
     var arrays = Array.prototype.slice.call(arguments, 1),
-        util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
     if (!arrays) {
         return first;
@@ -1440,7 +1440,7 @@ if (!!Array.prototype.forEach) {
      * @param {Any} the 'this' instance inside the scope of provided method.
      */
     CoreUtil.prototype.forEach = function(array, method, that) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.forEach called on non-array.");
@@ -1472,7 +1472,7 @@ if (!!Array.prototype.map) {
      * applied to the element (at the same index) from the input array.
      */
     CoreUtil.prototype.map = function(array, method, that) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.map called on non-array.");
@@ -1506,7 +1506,7 @@ if (!!Array.prototype.reduce) {
      * @returns {Any} the final value returned from calling the reduction method on the last element.
      */
     CoreUtil.prototype.reduce = function(array, method, initial) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.reduce called on non-array.");
@@ -1538,7 +1538,7 @@ if (!!Array.prototype.every) {
      * @returns {Boolean} true if all elements of the array satisfy the predicate.
      */
     CoreUtil.prototype.every = function(array, predicate, that) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.every called on non-array.");
@@ -1572,7 +1572,7 @@ if (!!Array.prototype.some) {
      * @returns {Boolean} true if any of the elements of the array satisfy the predicate.
      */
     CoreUtil.prototype.some = function(array, predicate, that) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.some called on non-array.");
@@ -1606,7 +1606,7 @@ if (!!Array.prototype.filter) {
      * @returns {Array} ordered array of elements that pass the predicate.
      */
     CoreUtil.prototype.filter = function(array, predicate, that) {
-        var util = this instanceof $A.ns.Util ? this : new $A.ns.Util();
+        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
             throw new TypeError("$A.util.filter called on non-array.");

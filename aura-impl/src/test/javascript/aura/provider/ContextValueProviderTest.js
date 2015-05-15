@@ -17,11 +17,13 @@ Function.RegisterNamespace("Test.Aura");
 
 [ Fixture ]
 Test.Aura.ContextValueProviderTest = function() {
-    var $A = {
-        ns : { },
-    };
+    var $A = {ns : {}};
+    var Aura = {Provider: {}};
     
-    Mocks.GetMocks(Object.Global(), { "exp": function(){}, "$A":$A, Aura:{Provider: {}}})(function(){
+    Mocks.GetMocks(Object.Global(), { 
+        exp: function(){},
+        "$A":$A, 
+        Aura: Aura })(function(){
         // #import aura.provider.ContextValueProvider
     });
 
@@ -40,7 +42,7 @@ Test.Aura.ContextValueProviderTest = function() {
     };
 
     var getCVP = function() {
-        var target = new $A.ns.ContextValueProvider();
+        var target = new Aura.Provider.ContextValueProvider();
         target.merge(getStandardSet());
         return target;
     };
@@ -61,7 +63,7 @@ Test.Aura.ContextValueProviderTest = function() {
 
         [Fact]
         function BadValuesThrow() {
-            var target = new $A.ns.ContextValueProvider();
+            var target = new Aura.Provider.ContextValueProvider();
             // record exception
             var actual = Record.Exception(function(){
                 target.merge({ "readOnly" : "baffle" });
@@ -122,7 +124,7 @@ Test.Aura.ContextValueProviderTest = function() {
     function GetStorableValues() {
         [Fact]
         function StartsEmpty() {
-            var target = new $A.ns.ContextValueProvider();
+            var target = new Aura.Provider.ContextValueProvider();
 
             var result = target.getStorableValues();
 
@@ -131,7 +133,7 @@ Test.Aura.ContextValueProviderTest = function() {
 
         [Fact]
         function MergeToEmptyGetsIdentical() {
-            var target = new $A.ns.ContextValueProvider();
+            var target = new Aura.Provider.ContextValueProvider();
             var toMerge = { "test":{"defaultValue":"value"} };
 
             target.merge(toMerge);
@@ -296,7 +298,7 @@ Test.Aura.ContextValueProviderTest = function() {
     function GetValues() {
         [Fact]
         function StartsEmpty() {
-            var target = new $A.ns.ContextValueProvider();
+            var target = new Aura.Provider.ContextValueProvider();
 
             var result = target.getValues();
 
@@ -337,7 +339,7 @@ Test.Aura.ContextValueProviderTest = function() {
     function SerializeForServer() {
         [Fact]
         function StartsEmpty() {
-            var target = new $A.ns.ContextValueProvider();
+            var target = new Aura.Provider.ContextValueProvider();
 
             var result = target.serializeForServer();
 

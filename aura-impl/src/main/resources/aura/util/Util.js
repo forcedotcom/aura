@@ -41,7 +41,6 @@ function Util() {
 
 Aura.Utils.CoreUtil.prototype.apply(Util.prototype, Aura.Utils.CoreUtil.prototype);
 
-$A.ns.Util = Util; 
 Aura.Utils.Util = Util;
 
 //#include aura.util.Util_export

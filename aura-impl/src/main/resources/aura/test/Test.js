@@ -49,7 +49,7 @@ TestInstance = function() {
 TestInstance.prototype.errors = [];
 
 /**
- * 
+ *
  * @description Asynchronously wait for a condition before continuing with the next
  * stage of the test case.  The wait condition is checked after the
  * current test stage is completed but before the next stage is started.
@@ -101,7 +101,7 @@ TestInstance.prototype.addWaitForAction = function(success, actionName, callback
 };
 
 /**
- * 
+ *
  * @description Asynchronously wait for a condition before continuing with the next
  * stage of the test case.  The wait condition is checked after the
  * current test stage is completed but before the next stage is started.
@@ -164,7 +164,7 @@ TestInstance.prototype.releaseRequests = function () {
 
 /**
  * Release only foreground requests from being sent to the server.
- * 
+ *
  * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
  * unknown consequences.
  */
@@ -176,7 +176,7 @@ TestInstance.prototype.releaseForegroundRequests = function() {
 
 /**
  * Release only background actions from being sent to the server.
- * 
+ *
  * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
  * unknown consequences.
  */
@@ -196,7 +196,7 @@ TestInstance.prototype.getSentRequestCount = function () {
     return $A.clientService.foreground.sent + $A.clientService.background.sent;
 };
 
-/** 
+/**
  * Get the current ActionQueue.
  */
 TestInstance.prototype.getActionQueue = function() {
@@ -264,14 +264,14 @@ TestInstance.prototype.enqueueAction = function(action, background) {
 };
 
 /**
- * 
+ *
  * @description Get an instance of a server action that is not available to the component.
- * 
+ *
  * @example
- * <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/> 
+ * <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/>
  *          {name:"aura:text", attributes:{value:"valuable"}},<br/>
  *          function(action){alert(action.getReturnValue().attributes.values.value)})</code>
- * 
+ *
  * @param {Component} component
  *            The scope to run the action with, even if the action is not visible to it
  * @param {String} descriptor
@@ -484,9 +484,9 @@ TestInstance.prototype.callServerAction = function(action, doImmediate){
 
 /**
  * Set whether the server is reachable, to mimick being offline.
- * 
+ *
  * Note that this will not work with IE < 10 (see W-2537764).
- * 
+ *
  * @param {Boolean} reachable True or absent to make the server reachable; otherwise the server is made unreachable.
  */
 TestInstance.prototype.setServerReachable = function(reachable) {
@@ -641,7 +641,7 @@ TestInstance.prototype.expectAuraWarning = function(w) {
  * Assert that the current component HTML is Accessibility compliant.
  *
  * @description Calls the checkAccessibilty method to verify certain tags are accessible.
- * 
+ *
  * @param {String} errorMessage The message that is returned if the condition is not false
  * @throws {Error} Throws Error containing concatenated string representation of all accessibility errors found
  */
@@ -653,14 +653,14 @@ TestInstance.prototype.assertAccessible = function() {
 };
 
 /**
- * 
+ *
  * @description Assert that if(condition) check evaluates to true.
  * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
- * 
+ *
  * @example
  * Positive: <code>assertTruthy("helloWorld")</code>,
  * Negative: <code>assertTruthy(null)</code>
- * 
+ *
  * @param {Object} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition is not true
  */
@@ -672,11 +672,11 @@ TestInstance.prototype.assertTruthy = function(condition, assertMessage) {
 
  /**
  * Assert that the if(condition) check evaluates to false.
- * 
+ *
  * @param {Object} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition is not false
  * @description A falsey value refers to zero, an empty string, null, undefined, or false.
- * 
+ *
  * @example
  * Negative: <code>assertFalsy("helloWorld")</code>,
  * Postive: <code>assertFalsy(null)</code>
@@ -689,7 +689,7 @@ TestInstance.prototype.assertFalsy = function(condition, assertMessage) {
 
  /**
  * Assert that if(condition) check evaluates to true.
- * 
+ *
  * @param {Object} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition is not true
  * @description
@@ -702,7 +702,7 @@ TestInstance.prototype.assert = function(condition, assertMessage) {
 
 /**
  * Assert that the two values provided are equal.
- * 
+ *
  * @param {Object} arg1 The argument to evaluate against arg2
  * @param {Object} arg2 The argument to evaluate against arg1
  * @param {String} assertMessage The message that is returned if the two values are not equal
@@ -736,7 +736,7 @@ TestInstance.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, asser
 
 /**
  * Assert that a string starts with another.
- * 
+ *
  * @param {Object} start The start string.
  * @param {Object} full The string that is expected to start with the start string
  * @param {String} assertMessage The message that is returned if the two values are not equal
@@ -753,7 +753,7 @@ TestInstance.prototype.assertStartsWith = function(start, full, assertMessage){
 
 /**
  * Complement of assertEquals, throws Error if arg1===arg2.
- * 
+ *
  * @param {Object} arg1 The argument to evaluate against arg2
  * @param {Object} arg2 The argument to evaluate against arg1
  * @param {String} assertMessage The message that is returned if the two values are equal
@@ -766,7 +766,7 @@ TestInstance.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
 
 /**
  * Assert that the value is not undefined.
- * 
+ *
  * @param {Object} condition The argument to evaluate
  * @param {String} assertMessage The message that is returned if arg1 is undefined
  */
@@ -778,7 +778,7 @@ TestInstance.prototype.assertDefined = function(condition, assertMessage) {
 
 /**
  * Assert that the condition === true.
- * 
+ *
  * @param {Boolean} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition !==true
  */
@@ -790,7 +790,7 @@ TestInstance.prototype.assertTrue = function(condition, assertMessage){
 
 /**
  * Assert that the condition === false.
- * 
+ *
  * @param {Boolean} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition !==false
  */
@@ -802,7 +802,7 @@ TestInstance.prototype.assertFalse = function(condition, assertMessage){
 
 /**
  * Assert that the value passed in is undefined.
- * 
+ *
  * @param {Object} condition The argument to evaluate
  * @param {String} assertMessage The message that is returned if the argument is not undefined
  */
@@ -814,7 +814,7 @@ TestInstance.prototype.assertUndefined = function(condition, assertMessage) {
 
 /**
  * Assert that the value passed in is not undefined or null.
- * 
+ *
  * @param {Object} condition The argument to evaluate
  * @param {String} assertMessage The message that is returned if the argument is not undefined or null
  */
@@ -826,7 +826,7 @@ TestInstance.prototype.assertNotUndefinedOrNull = function(condition, assertMess
 
  /**
  * Assert that the value passed in is either undefined or null.
- * 
+ *
  * @param {Object} condition The argument to evaluate
  * @param {String} assertMessage The message that is returned if the argument is not undefined or null
  */
@@ -835,10 +835,10 @@ TestInstance.prototype.assertUndefinedOrNull = function(condition, assertMessage
         this.fail(assertMessage, "\nExpected: {undefined or null} but Actual: {"+condition+"}");
     }
 };
-        
+
  /**
  * Assert that value === null.
- * 
+ *
  * @param {Object} condition The argument to evaluate
  * @param {String} assertMessage The message that is returned if the value !==null
  */
@@ -850,7 +850,7 @@ TestInstance.prototype.assertNull = function(condition, assertMessage){
 
 /**
  * Assert that value !== null.
- * 
+ *
  * @param {Object} condition The argument to evaluate
  * @param {String} assertMessage The message that is returned if the value is null
  */
@@ -862,9 +862,9 @@ TestInstance.prototype.assertNotNull = function(condition, assertMessage){
 
 /**
  * Throw an Error, making a test fail with the specified message.
- * 
+ *
  * @param {String} assertMessage Defaults to "Assertion failure", if assertMessage is not provided
- * @param {String} extraInfoMessage 
+ * @param {String} extraInfoMessage
  * @throws {Error} Throws error with a message
  */
 TestInstance.prototype.fail = function(assertMessage, extraInfoMessage) {
@@ -1128,6 +1128,18 @@ TestInstance.prototype.contains = function(testString, targetString){
 };
 
 /**
+ * Compares values. In the case of an Array or Object, compares first level references only.
+ * In the case of a literal, directly compares value and type equality.
+ *
+ * @param {Object} expected The source value to compare.
+ * @param {Object} actual The target value to compare.
+ * @returns {Object} The result of the comparison, with reasons.
+ */
+TestInstance.prototype.compareValues = function(expected, actual){
+    return $A.util.compareValues(expected, actual);
+};
+
+/**
  * Returns a reference to the object that is currently designated as the active element in the document.
  *
  * @returns {DOMElement} The current active element.
@@ -1341,7 +1353,7 @@ TestInstance.prototype.isInstanceOfImageElement = function(element){
 TestInstance.prototype.isInstanceOfDivElement = function(element){
     return this.isInstanceOf(element, window.HTMLDivElement, "div");
 };
-        
+
 /**
  * Checks if the specified element is a span element.
  * @param {HTMLElement} element The element to check
@@ -1403,7 +1415,7 @@ TestInstance.prototype.getElementAttributeValue = function(element,attributeName
 /**
  * Add an event handler. If component is specified, the handler will be applied to component events. If component is not
  * specified, the handler will be applied to application events.
- * 
+ *
  * @param {String}
  *            eventName The registered name, for component events; the descriptor name for application events.
  * @param {Function}
@@ -1494,7 +1506,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
         var testLevel = that.suite[name][labelName];
         return (testLevel === undefined) ? suiteLevel : testLevel;
     };
-   
+
     this.failOnWarning = useLabel("failOnWarning");
     this.doNotWrapInAuraRun = useLabel("doNotWrapInAuraRun");
 
@@ -1514,20 +1526,20 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
                 });
             }
         }
-    
+
     // Fail now if we got any unexpected errors or warnings during test initialization/setup
     this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
-    
+
     this.logErrors(true, "Received unexpected error: ",this.preErrors);
     this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
     this.preErrors = null;
-    
+
     this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
-    
+
     this.logErrors(this.failOnWarning, "Received unexpected warning: ",this.preWarnings);
     this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ", auraWarningsExpectedDuringInit);
     this.preWarnings = null;
-    
+
     }catch(e){
         this.logError("Error during setUp", e);
         this.doTearDown();
@@ -1538,32 +1550,32 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
 
 /**
  * @description Asynchronously wait for CKEditor instance in inputRichText component to be ready
- * before continuing to enter test data. 
+ * before continuing to enter test data.
  *
  *  @example
  * <code>$A.test.executeAfterCkEditorIsReady(inputRichTextComponent, function(){<br/>
  *   inputRichTextComponent.set('v.value', 'tab1 content'); });</code>
  *
  * @param {Component} ui:inputRichText component, or a component that extends it, that you are entering data in.
- * @param {Function} callback Invoked after the CKEditor is ready for user input 
- */    
+ * @param {Function} callback Invoked after the CKEditor is ready for user input
+ */
 TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextComponent, callback) {
     if(!inputRichTextComponent.isInstanceOf("ui:inputRichText")) {
             this.fail("The component has to be an instance of ui:inputRichText or extend it");
     }
 
     var editorReady = false;
-    var instance =  $A.util.lookup(window, "CKEDITOR", "instances", inputRichTextComponent.getGlobalId()); 
+    var instance =  $A.util.lookup(window, "CKEDITOR", "instances", inputRichTextComponent.getGlobalId());
 
     if (instance === undefined) {
         this.fail("CKEDITOR instance was not found.");
     }
 
-    instance["on"]("instanceReady", function() { editorReady = true; });    
+    instance["on"]("instanceReady", function() { editorReady = true; });
 
     this.addWaitForWithFailureMessage(true, function() {
         // In case the test missed the instanceReady event, we can check
-        // status of the instance. 
+        // status of the instance.
         return instance.status === "ready" || editorReady; },
         "Editor was not initialized", callback);
 };

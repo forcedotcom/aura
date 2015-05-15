@@ -35,6 +35,9 @@ TestInstance.prototype["assertNotNull"] = TestInstance.prototype.assertNotNull;
 TestInstance.prototype["assertStartsWith"] = TestInstance.prototype.assertStartsWith;
 TestInstance.prototype["assertAccessible"] = TestInstance.prototype.assertAccessible;
 
+// utils
+TestInstance.prototype["compareValues"] = TestInstance.prototype.compareValues;
+
 // test flow/state
 TestInstance.prototype["fail"] = TestInstance.prototype.fail;
 TestInstance.prototype["isComplete"] = TestInstance.prototype.isComplete;

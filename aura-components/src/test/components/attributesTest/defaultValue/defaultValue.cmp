@@ -107,4 +107,9 @@
     <aura:attribute type="String" name="stringDefaultWithExpView" default="{!v.stringDefaultWithString}"/>
     <aura:attribute type="String" name="stringDefaultWithExpression" default="{!v.stringDefaultWithString + ' bla'}"/>
     <aura:attribute type="String" name="stringDefaultWithExpGVP" default="{!$Label.AuraTestLabelSection.label_for_attribute_default_value_test}"/>
+
+    <aura:attribute type="Set" name="setDefaultWithEmpty" default=""/>
+    <aura:attribute type="Set" name="setDefaultWithString" default="'a','b','c'"/>
+    <aura:attribute type="Set" name="setDefaultWithBracketString" default="[1,2,3]"/>
+    <aura:attribute type="Set" name="setDefaultWithStringContainBracket" default="['[1]','2','3']"/>
 </aura:component>

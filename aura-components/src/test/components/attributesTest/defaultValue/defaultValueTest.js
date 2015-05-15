@@ -33,6 +33,47 @@
         }
     },
 
+    testSetTypeWithEmptyDefaultValue : {
+        test : function(cmp) {
+            var actual = cmp.get("v.setDefaultWithEmpty");
+            $A.test.assertTrue($A.util.isArray(actual));
+            $A.test.assertEquals(0, actual.length);
+        }
+    },
+
+    testSetTypeWithStringDefaultValue : {
+        test : function(cmp) {
+            var except = ['a', 'b', 'c'];
+            var actual = cmp.get("v.setDefaultWithString");
+            $A.test.assertTrue($A.util.isArray(actual));
+            // Set is unordered
+            var result = $A.test.compareValues(except.sort(), actual.sort());
+            $A.test.assertTrue(result['match'], result['reasons']);
+        }
+    },
+
+    testSetTypeWithStringDefaultValue : {
+        test : function(cmp) {
+            var except = [1, 2, 3];
+            var actual = cmp.get("v.setDefaultWithBracketString");
+            $A.test.assertTrue($A.util.isArray(actual));
+            // Set is unordered
+            var result = $A.test.compareValues(except.sort(), actual.sort());
+            $A.test.assertTrue(result['match'], result['reasons']);
+        }
+    },
+
+    testSetTypeWithStringElementContainBrancketDefaultValue : {
+        test : function(cmp) {
+            var except = ['[1]', '2', '3'];
+            var actual = cmp.get("v.setDefaultWithStringContainBracket");
+            $A.test.assertTrue($A.util.isArray(actual));
+            // Set is unordered
+            var result = $A.test.compareValues(except.sort(), actual.sort());
+            $A.test.assertTrue(result['match'], result['reasons']);
+        }
+    },
+
     testCaseSensitivity : {
         test : function(cmp) {
             $A.test.assertEquals('Aura', cmp.get("v.strAttributeWithDefaultValue"));
@@ -233,7 +274,7 @@
             var attributeType = "boolean";
             $A.test.assertEquals(true, cmp.get("v.booleanDefaultWithStringTrue"),
                     "boolean attribute value did not match default value as true in String.");
-            $A.test.assertEquals(false, cmp.get("v.booleanDefaultWithStringFalse"), 
+            $A.test.assertEquals(false, cmp.get("v.booleanDefaultWithStringFalse"),
                     "boolean attribute value did not match default value as false in String.");
             $A.test.assertEquals(true, cmp.get("v.booleanDefaultWithLiteralExpTrue"),
                     "boolean attribute value did not match default value as true in literal expression.");
@@ -255,7 +296,7 @@
             var expected = "test string";
             $A.test.assertEquals(expected, cmp.get("v.stringDefaultWithString"),
                     "string attribute value did not match default value in String.");
-            $A.test.assertEquals(expected, cmp.get("v.stringDefaultWithLiteralExp"), 
+            $A.test.assertEquals(expected, cmp.get("v.stringDefaultWithLiteralExp"),
                     "string attribute value did not match default value in literal expression.");
 
             expected = "";

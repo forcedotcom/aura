@@ -22,4 +22,5 @@
     <aura:attribute name="typeList" type="List"/>
     <aura:attribute name="typeStringList" type="String[]"/>
     <aura:attribute name="typeMapList" type="Map[]"/>
+    <aura:attribute name="typeSet" type="Set"/>
 </aura:component>

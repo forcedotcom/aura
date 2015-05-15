@@ -873,7 +873,7 @@ TestInstance.prototype.fail = function(assertMessage, extraInfoMessage) {
         msg += extraInfoMessage;
     }
     var error = new Error(msg);
-    this.logError(msg, error);
+    this.logError(msg);
     throw error;
 };
 

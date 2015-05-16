@@ -20,18 +20,36 @@ import java.util.List;
 
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
 
-import com.google.common.collect.Sets;
-
 import aQute.bnd.annotation.component.Component;
+
+import com.google.common.collect.Sets;
 
 @SuppressWarnings("rawtypes")
 @Component (provide=AuraServiceProvider.class)
 public class StringToHashSetConverter implements Converter<String, HashSet> {
 
     @Override
-    public HashSet<String> convert(String value) {
+    public HashSet<?> convert(String value) {
+        if(value == null) {
+            return null;
+        }
+
+        if (value.length() == 0) {
+            return new HashSet<>();
+        }
+
+        if(value.startsWith("[") && value.endsWith("]")) {
+             try {
+                 final JsonStreamReader reader = new JsonStreamReader(value);
+                 reader.next();
+                 return Sets.newHashSet(reader.getList());
+             } catch (Exception e) {
+                 // Didn't parse, fall back to splitSimple down below.
+             }
+        }
         List<String> splitList = AuraTextUtil.splitSimple(",", value);
         return Sets.newHashSet(splitList);
     }

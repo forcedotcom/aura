@@ -1,0 +1,37 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>A <code>ui:dropzone</code> component represents a drop area for your draggable target.  
+		<code>ui:dropzone</code> is used with a nested <code>ui:draggable</code> component to create drag and drop functionality.
+		You can click and hold an element using a mouse or keyboard, and drag and drop it at another area.</p>
+		<p>The <code>dragAndDropService</code> library provides methods for your drag and drop implementation. 
+		<code>$A.dragAndDropService.getContext(event.getParam("dragComponent"))</code> returns the context component whose item is being dragged.
+		For example, dragging a list item on a <code>ui:infiniteList</code> component returns the component and its properties. Similarly,
+		<code>$A.dragAndDropService.getContext(event.getParam("dropComponent"));</code> returns the context component of the drop area.
+		To signal a drop and fire a drop complete event, use <code>$A.dragAndDropService.fireDropComplete(event, true);</code>.
+		To remove data being transferred from a dragged item, use <code>$A.dragAndDropService.removeDataTransfer(event, removeParams);</code>.
+		</p>
+		<p>The library uses the <code>ui:addRemove</code> event to move data from the source to target drop area in the <code>removeDataTransfer()</code> method. 
+		If your context component doesn't support this event, you must implement your own remove method. See the Examples tab for more information.</p>
+	</aura:description>	
+		<aura:example name="draganddrop" ref="uiExamples:dragAndDropExample" label="Creating Lists for Drag and Drop">
+    	    <p>This example shows two lists enabled for drag and drop. To see how it works, drag and drop a list item to the other list.</p>
+	    </aura:example>	
+		
+</aura:documentation>

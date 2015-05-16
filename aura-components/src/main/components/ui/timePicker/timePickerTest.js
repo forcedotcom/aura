@@ -24,12 +24,12 @@
         	cmp.get("c.updateHours").runDeprecated({});
         },function(cmp){
         	cmp.find("minutes").set("v.value", "100");
-        	cmp.get("c.updateMinutes").runDeprecated({});   
+        	cmp.get("c.updateMinutes").runDeprecated({});
         },function(cmp){
         	$A.test.assertAccessible();
         }]
     },
-    
+
     testHoursAttribute : {
         attributes : {  "hours" : 5 },
         test : function(cmp) {
@@ -74,7 +74,7 @@
             cmp.find("hours").set("v.value", 100);
             var evt = {
             "getSource" : function() {
-                return cmp.find("hours")
+                return cmp.find("hours");
              }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
@@ -90,7 +90,7 @@
             cmp.find("minutes").set("v.value", 100);
              var evt = {
                      "getSource" : function() {
-                     return cmp.find("minutes")
+                     return cmp.find("minutes");
                   }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
@@ -108,7 +108,7 @@
             cmp.find("hours").set("v.value", 25);
             var evt = {
                 "getSource" : function() {
-                   return cmp.find("hours")
+                   return cmp.find("hours");
                  }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
@@ -124,7 +124,7 @@
             cmp.find("minutes").set("v.value", 60);
             var evt = {
             "getSource" : function() {
-                return cmp.find("minutes")
+                return cmp.find("minutes");
              }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
@@ -210,7 +210,7 @@
             cmp.find("hours").set("v.value", 14);
             var evt = {
             "getSource" : function() {
-                return cmp.find("hours")
+                return cmp.find("hours");
             }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
@@ -227,7 +227,7 @@
             cmp.find("hours").set("v.value", "$25");
             var evt = {
                 "getSource" : function() {
-                   return cmp.find("hours")
+                   return cmp.find("hours");
                  }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
@@ -243,7 +243,7 @@
             cmp.find("hours").set("v.value", "4.0");
             var evt = {
                 "getSource" : function() {
-                    return cmp.find("hours")
+                    return cmp.find("hours");
                  }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
@@ -257,10 +257,10 @@
         attributes : {"is24HourFormat" : true},
         test : [function(cmp) {
             cmp.find("hours").set("v.value", "");
-            
+
             var evt = {
                 "getSource" : function() {
-                return cmp.find("hours")
+                return cmp.find("hours");
             }
             };
             cmp.get("c.updateHours").runDeprecated(evt);
@@ -276,7 +276,7 @@
             cmp.find("minutes").set("v.value", "$25");
             var evt = {
             "getSource" : function() {
-                return cmp.find("minutes")
+                return cmp.find("minutes");
              }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
@@ -292,7 +292,7 @@
             cmp.find("minutes").set("v.value", "4.0");
             var evt = {
             "getSource" : function() {
-                return cmp.find("minutes")
+                return cmp.find("minutes");
              }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
@@ -308,7 +308,7 @@
             cmp.find("minutes").set("v.value", "");
             var evt = {
 	            "getSource" : function() {
-	                return cmp.find("minutes")
+	                return cmp.find("minutes");
 	            }
             };
             cmp.get("c.updateMinutes").runDeprecated(evt);
@@ -350,7 +350,7 @@
             cmp.find("hours").set("v.value", 14);
             var evt = {
             "getSource" : function() {
-                return cmp.find("hours")
+                return cmp.find("hours");
             }
             };
             cmp.get("c.updateHours").runDeprecated(evt);

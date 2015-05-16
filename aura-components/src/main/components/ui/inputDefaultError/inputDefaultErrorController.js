@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 ({
-	doInit: function(component) {		
-        var domId = component.get('v.domId'),						
-			globalId = component.getGlobalId();			
-        
+	doInit: function(component) {
+        var domId = component.get('v.domId');
+
 		if (!domId) {
+            var globalId = component.getGlobalId();
 			component.set("v.domId", globalId);
 		}
 	}

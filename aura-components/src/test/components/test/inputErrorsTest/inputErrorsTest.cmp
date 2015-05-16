@@ -20,7 +20,7 @@
   <aura:attribute name="inputText2" type="String" />
   <ui:button label="Add Error" press="c.addError" /> <br />
   <ui:button label="Clear Errors" press="c.clearErrors" /> <br />
-  <div aura:id="inputText1">
-    <ui:inputText value="{!v.inputText1}" /> <br />
+  <div aura:id="inputBlock1">
+    <ui:inputText aura:id="inputText1" value="{!v.inputText1}" /> <br />
   </div>
 </aura:component>

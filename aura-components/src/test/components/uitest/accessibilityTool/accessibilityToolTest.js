@@ -16,18 +16,18 @@
 ({
     //Excluding IE7/8 because this test will only work with modern browsers
     browsers: ["-IE7", "-IE8"],
-    
+
         runTest: function (expected, errorMessage, element, testsToSkip) {
             var output = $A.devToolService.checkAccessibility(element, testsToSkip);
             var actual = 0;
             if(!$A.util.isEmpty(output)){
             	actual = output.trim().split("\n\n").length;
             }
-           
+
             $A.test.assertEquals(expected, actual, errorMessage + output);
-           
+
         },
-        
+
 
         testNoActivePanelSliderWithActiveDiv : {
         	attributes: {
@@ -37,7 +37,7 @@
                 this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
             }
         },
-        
+
         testActiveSliderAriaHiddenIncorrect : {
         	attributes: {
                 caseToRender: 'testActiveSliderAriaHiddenIncorrect'
@@ -54,7 +54,7 @@
                 this.runTest(0, "Unexpected return from CheckAccessibility, should return 1 errornous string. output: \n");
             }
         },
-        
+
         testTopPanelHidden : {
         	attributes: {
                 caseToRender: 'testTopPanelHidden'
@@ -72,7 +72,7 @@
                 this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
             }
         },
-        
+
         testBasePanelAriaHiddenIsFalse : {
         	attributes: {
                 caseToRender: 'testBasePanelAriaHiddenIsFalse'
@@ -80,8 +80,8 @@
             test: function (cmp) {
                 this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
             }
-        }, 
-        
+        },
+
         testNoActiveTopPanelAriaHiddenOk : {
         	attributes: {
                 caseToRender: 'testNoActiveTopPanelAriaHiddenOk'
@@ -89,8 +89,8 @@
             test: function (cmp) {
                 this.runTest(0, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
             }
-        }, 
-        
+        },
+
         testNoActiveTopPanelBasePanelAriaHiddenIsTrue : {
         	attributes: {
                 caseToRender: 'testNoActiveTopPanelBasePanelAriaHiddenIsTrue'
@@ -98,8 +98,8 @@
             test: function (cmp) {
                 this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
             }
-        }, 
-        
+        },
+
         testNoActiveTopPanelAriaHiddenNotExists: {
         	attributes: {
                 caseToRender: 'testNoActiveTopPanelAriaHiddenNotExists'
@@ -108,7 +108,7 @@
                 this.runTest(1, "Unexpected return from CheckAccessibility, should not return errornous string. output: \n");
             }
         },
-      
+
         //This test is used for checking that we can conditionally skip checks
         testRunSpecificChecks: {
             attributes: {
@@ -121,7 +121,7 @@
                     this.runTest(9, "Unexpected return from CheckAccessibility, should return 3 errors. output: \n", null, ["A11Y_DOM_06", "A11Y_DOM_02", "A11Y_DOM_08"]);
                 }]
         },
-        
+
         testMultiInputDefaultULToSingleInput :  {
         	attributes: {
                 caseToRender: 'testMultiULToOne'
@@ -130,13 +130,13 @@
                 this.runTest(0, "Unexpected return from CheckAccessibility, should not return erroneous string. output: \n");
             }
         },
-        
+
         testInputDefaultError : {
         	attributes: {
                 caseToRender: 'testInputDefaultError'
             },
             test: function (cmp) {
-            	cmp.find("inputErrorTest").find("validate").getEvent("press").fire({});
+            	cmp.find("inputErrorTest").find("validate").getEvent("press").fire();
                 this.runTest(1, "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
             }
         },

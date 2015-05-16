@@ -16,11 +16,11 @@
 ({
 
 	doInit : function(cmp, evt, helper){
-	  var inputCmp = cmp.find("myInputNumber")
+	  var inputCmp = cmp.find("myInputNumber");
 
-	  if( inputCmp ){
-        inputCmp.setValid('v.value',false);
-        inputCmp.addErrors('v.value',[{message : "This is an invalid value: " + inputCmp.get('v.value')}]);
+	  if (inputCmp) {
+        var value = inputCmp.get('v.value');
+        inputCmp.set('v.errors',[{message : "This is an invalid value: " + value}]);
 	  }
 	}
 })

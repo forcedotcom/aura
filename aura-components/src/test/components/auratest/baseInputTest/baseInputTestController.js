@@ -14,39 +14,39 @@
  * limitations under the License.
  */
 ({
-	submit : function(component, event) {		
-		var cmpType = component.get("v.cmpType");
-		var inputCmpValue = component.get('v.ref');
+    submit : function(component) {
 
-		try {
-			var a = component.get("c.echo" + cmpType);
-			
-			a.setParams({
-	            inVar : inputCmpValue
-	        });
-	        
-	        a.setCallback(component, function(action){
-	        	var retValue;
-				var inputCmp = $A.getRoot().getSuper().getConcreteComponent().find(cmpType);
-				
-		        if (action.getState() === "SUCCESS") {
-		        	retValue = action.getReturnValue();
-		        	
-		        	// clean error
-		        	if (!inputCmp.isValid("v.value")) {
-		        		inputCmp.setValid("v.value",true);
-		        	}
-		        } else {
-		        	retValue = "Got Error!";
-		        	inputCmp.setValid("v.value", false);
-		        	inputCmp.addErrors("v.value", action.getError());
-		        }
-		        component.find("outputValue").set("v.value", retValue);
-	        });
+        var cmpType = component.get("v.cmpType");
+        var inputCmpValue = component.get('v.ref');
+
+        try {
+            var action = component.get("c.echo" + cmpType);
+
+            action.setParams({
+                inVar : inputCmpValue
+            });
+
+            action.setCallback(component, function(response){
+                var retValue;
+                var errors;
+
+                if (response.getState() === "SUCCESS") {
+                    retValue = response.getReturnValue();
+                } else {
+                    retValue = "Got Error!";
+                    errors = response.getError();
+                }
+
+                component.find("outputValue").set("v.value", retValue);
+
+                var inputCmp = $A.getRoot().getSuper().getConcreteComponent().find(cmpType);
+                inputCmp.set("v.errors", errors);
+            });
+
+            $A.enqueueAction(action);
+
         } catch(e) {
-        	$A.test.fail("Test fail! Unexpected error: " + e.message);       
+            $A.test.fail("Test fail! Unexpected error: " + e.message);
         }
-        
-        $A.enqueueAction(a);
-	}
+    }
 })

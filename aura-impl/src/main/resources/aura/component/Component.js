@@ -2271,97 +2271,10 @@ Component.prototype.isDirty = function(expression) {
  * @public
  * @platform
  */
-Component.prototype.isValid = function(expression) {
-    if (!expression) {
-        return !this._scheduledForAsyncDestruction && !this._destroying && this.priv !== undefined
-            && (!this.priv.attributeValueProvider || !this.priv.attributeValueProvider.isValid
-                || this.priv.attributeValueProvider.isValid());
-    }
-    return this.callOnExpression(Component.prototype.isValidCallback, expression);
-};
-
-/**
- * Looks up the specified value and sets it to valid or invalid.
- *
- * @public
- * @deprecated TEMPORARY WORKAROUND
- */
-Component.prototype.setValid = function(expression, valid) {
-    if(valid != this.callOnExpression(Component.prototype.isValidCallback, expression)) {
-        $A.renderingService.addDirtyValue(expression, this);
-    }
-    this.callOnExpression(Component.prototype.setValidCallback, expression, valid);
-};
-
-/**
- * Looks up the specified value and adds errors to it.
- *
- * @public
- * @deprecated TEMPORARY WORKAROUND
- */
-Component.prototype.addErrors = function(expression, errors) {
-    if($A.util.isUndefinedOrNull(errors)){
-        return;
-    }
-    $A.renderingService.addDirtyValue(expression, this);
-    this.callOnExpression(Component.prototype.addErrorsCallback, expression, errors);
-    $A.renderingService.addDirtyValue(expression, this);
-    this.priv.fireChangeEvent(this,expression,undefined,undefined,undefined);
-};
-
-/**
- * Looks up the specified value and clears errors on it.
- *
- * @public
- * @deprecated TEMPORARY WORKAROUND
- */
-Component.prototype.clearErrors = function(expression) {
-    this.setValid(expression,true);
-    $A.renderingService.addDirtyValue(expression, this);
-    this.priv.fireChangeEvent(this,expression,undefined,undefined,undefined);
-};
-
-/**
- * Looks up the specified value and gets errors on it.
- *
- * @public
- * @deprecated TEMPORARY WORKAROUND
- */
-Component.prototype.getErrors = function(expression) {
-    return this.callOnExpression(Component.prototype.getErrorsCallback, expression);
-};
-
-Component.prototype.callOnExpression = function(callback, expression, option) {
-    expression = $A.expressionService.normalize(expression);
-
-    var path = expression.split('.');
-    var root = path.shift();
-    var valueProvider = this.priv.getValueProvider(root, this);
-
-    $A.assert(valueProvider, "Unable to get value for expression '" + expression + "'. No value provider was found for '" + root + "'.");
-
-    var subPath = path.join('.');
-    return callback.call(this, valueProvider, root, subPath, option);
-};
-
-Component.prototype.isValidCallback = function(valueProvider, root, subPath) {
-    $A.assert(valueProvider.isValid, "Value provider '" + root + "' doesn't implement isValid().");
-    return valueProvider.isValid(subPath);
-};
-
-Component.prototype.setValidCallback = function(valueProvider, root, path, subPath) {
-    $A.assert(valueProvider.setValid, "Value provider '" + root + "' doesn't implement setValid().");
-    valueProvider.setValid(path, subPath);
-};
-
-Component.prototype.addErrorsCallback = function(valueProvider, root, subPath, errors) {
-    $A.assert(valueProvider.addErrors, "Value provider '" + root + "' doesn't implement addErrors().");
-    valueProvider.addErrors(subPath, errors);
-};
-
-Component.prototype.getErrorsCallback = function(valueProvider, root, subPath) {
-    $A.assert(valueProvider.getErrors, "Value provider '" + root + "' doesn't implement getErrors().");
-    return valueProvider.getErrors(subPath);
+Component.prototype.isValid = function() {
+    return !this._scheduledForAsyncDestruction && !this._destroying && this.priv !== undefined
+        && (!this.priv.attributeValueProvider || !this.priv.attributeValueProvider.isValid
+            || this.priv.attributeValueProvider.isValid());
 };
 
 /**

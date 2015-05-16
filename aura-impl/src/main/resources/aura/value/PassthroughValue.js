@@ -310,60 +310,22 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
 	        while (valueProvider instanceof PassthroughValue) {
 	            valueProvider = valueProvider.getComponent();
 	        }
-        
+
 	        valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
 	        valueProvider.markDirty(fullPath);
-        
-        
+
+
 	        // KRIS: HALO:
 	        // Do we have any change events for the key?
 	        // It's possible both we and the component have references that need
 	        // to be fired, so I'm firing both here.
 	        this.fireChangeEvent(key,oldValue,value,key);
         }
-                
+
         return value;
     }
 
    return this.component.set(key,value, ignoreChanges);
 };
-
-// JF: HALO: TODO: TEMPORARY VALID/ERROR MANAGEMENT - REMOVE WHEN POSSIBLE
-PassthroughValue.prototype.hasExpression = function(expression) {
-    var path = $A.util.isArray(expression)?expression:expression.split(".");
-    return $A.util.isExpression(this.references[path[0]]);
-};
-
-PassthroughValue.prototype.isValid = function(expression) {
-    if (expression) {
-        return !this.errors.hasOwnProperty(expression);
-    }
-    var valueProvider = this.getComponent();
-
-    // Potentially nested PassthroughValue objects.
-    while (valueProvider instanceof PassthroughValue) {
-        valueProvider = valueProvider.getComponent();
-    }
-
-    if (!valueProvider || !valueProvider.isValid) {
-        return false;
-    }
-    return valueProvider.isValid();
-};
-
-PassthroughValue.prototype.addErrors = function(expression, errors) {
-    if (!this.errors[expression]) {
-        this.errors[expression] = [];
-    }
-    this.errors[expression] = this.errors[expression].concat(errors);
-};
-PassthroughValue.prototype.clearErrors = function(expression) {
-    delete this.errors[expression];
-};
-PassthroughValue.prototype.getErrors = function(expression) {
-    return this.errors[expression] || [];
-};
-
-Aura.Value.PassthroughValue = PassthroughValue;
 
 //#include aura.value.PassthroughValue_export

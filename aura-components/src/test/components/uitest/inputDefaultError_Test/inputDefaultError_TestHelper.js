@@ -1,20 +1,16 @@
 ({
 	//Helper function that will go to the component, and either validate it or invalidate it
-	addErrorsToCmp : function(invalidCmp){		    	
-    	 var ariaDesc = document.getElementById(invalidCmp.get("v.ariaDescribedBy"))
-    	 var value = "v.value";
-    	 
-    	 if($A.util.isEmpty(ariaDesc)){
-    		 invalidCmp.setValid(value, false);
-        	 invalidCmp.addErrors(value, {"message":"The wren"});
-        	 invalidCmp.addErrors(value, {"message":"Earns his living"});
-        	 invalidCmp.addErrors(value, {"message":"Noiselessly"});
-    	 }
-    	 else{
-    		 invalidCmp.setValid(value, true);
-    	 }
+	addErrorsToCmp : function(invalidCmp){
+    	var ariaDesc = document.getElementById(invalidCmp.get("v.ariaDescribedBy"));
+
+    	if($A.util.isEmpty(ariaDesc)){
+        	invalidCmp.set("v.errors", [{"message":"The wren"}, {"message":"Earns his living"}, {"message":"Noiselessly"}]);
+    	}
+    	else{
+    		invalidCmp.set("v.errors", null);
+    	}
 	},
-	
+
 	//Extracting out the ability to create this new inputDefaultError
 	createNewCmp : function(cmp, lblAide){
 		 $A.componentService.newComponentAsync(

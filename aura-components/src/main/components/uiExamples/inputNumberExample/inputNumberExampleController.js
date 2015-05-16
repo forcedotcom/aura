@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-({  
+({
     validate : function(component, evt) {
         var inputCmp = component.find("inputCmp");
         var value = inputCmp.get("v.value");
-        
+
         var myOutput = component.find("outNum");
-        
         myOutput.set("v.value", value);
-        
+
         // Check if input is numeric
         if (isNaN(value)) {
-            // Set error message
-            inputCmp.setValid("v.value", false);
-            inputCmp.addErrors("v.value", [{message:"Input not a number: " + value}]);
+            inputCmp.set("v.errors", [{message:"Input not a number: " + value}]);
         } else {
-            // Clear error
-            inputCmp.setValid("v.value", true);
+            inputCmp.set("v.errors", null);
         }
     }
 })

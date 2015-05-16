@@ -18,19 +18,19 @@
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="full"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-    
-    
+
+
     <!--Testing to make sure that the utility can handle inputs with multiple ids
         Note that the ariaDescribedBy attribute is set in this components init function.-->
     <aura:if isTrue="{!v.caseToRender == 'testMultiULToOne'}">
 	    <ui:inputText aura:id="inputTextId" label="hello"/>
-        <ui:inputDefaultError aura:id="error1" value="first error, second error, third error, fourth error"/>
-        <ui:inputDefaultError aura:id="error2" value="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError aura:id="error1" errors="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError aura:id="error2" errors="first error, second error, third error, fourth error"/>
     	<br/>
     </aura:if>
 
     <!--Top panel is hidden, no errors-->
-    <aura:if isTrue="{!v.caseToRender == 'testTopPanelHidden'}"> 
+    <aura:if isTrue="{!v.caseToRender == 'testTopPanelHidden'}">
 	    <section class="stage panelSlide forceAccess" aria-hidden="true">
 	        <span>test</span>
 	    </section>
@@ -88,7 +88,7 @@
                 <div class="panelModal">test</div>
              </div>
      </aura:if>
-     
+
      <!-- PanelSlider should have no errors-->
      <aura:if isTrue="{!v.caseToRender == 'testNoActiveSliderAriaHiddenCorrect'}">
              <div class="forcePanelSlider">
@@ -96,7 +96,7 @@
                 <div class="body" aria-hidden="true">test</div>
              </div>
      </aura:if>
-     
+
       <!-- PanelSlider should have 1 error-->
      <aura:if isTrue="{!v.caseToRender == 'testActiveSliderAriaHiddenIncorrect'}">
              <div class="forcePanelSlider active">
@@ -104,7 +104,7 @@
                 <div class="body" aria-hidden="true">test</div>
              </div>
      </aura:if>
-     
+
       <!-- PanelSlider should have no errors-->
      <aura:if isTrue="{!v.caseToRender == 'testActivePanelSliderAriaHiddenCorrect'}">
             <div class="forcePanelSlider active">
@@ -112,15 +112,15 @@
                 <div class="body" aria-hidden="false">test</div>
              </div>
      </aura:if>
-     
 
-    <!--Should have 1 error -->   
+
+    <!--Should have 1 error -->
     <aura:if isTrue="{!v.caseToRender == 'testInputDefaultError'}">
         <uitest:inputDefaultError_Test aura:id="inputErrorTest" caseToRender="all"/>
-        <ui:inputDefaultError value="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError errors="first error, second error, third error, fourth error"/>
     </aura:if>
 
-      <!--Should Pass Since there are no headers -->   
+      <!--Should Pass Since there are no headers -->
     <aura:if isTrue="{!v.caseToRender == 'testWithNoHeader'}">
        <table>
            <tr>
@@ -129,8 +129,8 @@
           </tr>
        </table>
     </aura:if>
-    
-     <!--Should Pass since we are using scope but don't have TD--> 
+
+     <!--Should Pass since we are using scope but don't have TD-->
     <aura:if isTrue="{!v.caseToRender == 'testThWithScopeNoTD'}">
        <table>
            <tr>
@@ -139,7 +139,7 @@
           </tr>
        </table>
     </aura:if>
-     <!--Should Pass since we are using scope--> 
+     <!--Should Pass since we are using scope-->
     <aura:if isTrue="{!v.caseToRender == 'testThWithIdNoTD'}">
        <table>
            <tr>
@@ -148,7 +148,7 @@
           </tr>
        </table>
     </aura:if>
-    <!--Should Pass since we are using scope--> 
+    <!--Should Pass since we are using scope-->
     <aura:if isTrue="{!v.caseToRender == 'testTableHeaderWithScope'}">
        <table>
            <tr>
@@ -161,118 +161,118 @@
           </tr>
        </table>
     </aura:if>
-    <!--Should Pass since all td header attributes are associated with with th ids--> 
-    <aura:if isTrue="{!v.caseToRender == 'testTHandTDtagsAssociateCorrectly'}">            
-       <table> 
-             <tr> 
-               <th rowspan="2" id="h">Homework</th> 
-               <th colspan="3" id="e">Exams</th> 
-               <th colspan="3" id="p">Projects</th> 
-            </tr> 
-            <tr> 
-               <th id="e1" headers="e">1</th> 
-               <th id="e2" headers="e">2</th> 
-               <th id="ef" headers="e">Final</th> 
-               <th id="p1" headers="p">1</th> 
-               <th id="p2" headers="p">2</th> 
-               <th id="pf" headers="p">Final</th> 
-             </tr> 
-             <tr> 
-               <td headers="h">15%</td> 
-               <td headers="e e1">15%</td> 
-               <td headers="e e2">15%</td> 
-               <td headers="e ef">20%</td> 
-               <td headers="p p1">10%</td> 
-               <td headers="p p2">10%</td> 
-               <td headers="p pf">15%</td> 
-             </tr> 
+    <!--Should Pass since all td header attributes are associated with with th ids-->
+    <aura:if isTrue="{!v.caseToRender == 'testTHandTDtagsAssociateCorrectly'}">
+       <table>
+             <tr>
+               <th rowspan="2" id="h">Homework</th>
+               <th colspan="3" id="e">Exams</th>
+               <th colspan="3" id="p">Projects</th>
+            </tr>
+            <tr>
+               <th id="e1" headers="e">1</th>
+               <th id="e2" headers="e">2</th>
+               <th id="ef" headers="e">Final</th>
+               <th id="p1" headers="p">1</th>
+               <th id="p2" headers="p">2</th>
+               <th id="pf" headers="p">Final</th>
+             </tr>
+             <tr>
+               <td headers="h">15%</td>
+               <td headers="e e1">15%</td>
+               <td headers="e e2">15%</td>
+               <td headers="e ef">20%</td>
+               <td headers="p p1">10%</td>
+               <td headers="p p2">10%</td>
+               <td headers="p pf">15%</td>
+             </tr>
        </table>
     </aura:if>
-    <!--Should fail since a TD has an invalid id in its headers--> 
+    <!--Should fail since a TD has an invalid id in its headers-->
     <aura:if isTrue="{!v.caseToRender == 'testTDUsesWrongID'}">
        <table>
-             <tr> 
-               <th rowspan="2" id="h">Homework</th> 
-               <th colspan="3" id="e">Exams</th> 
-               <th colspan="3" id="p">Projects</th> 
-             </tr> 
-             <tr> 
-               <th id="e1" headers="e">1</th> 
-               <th id="e2" headers="e">2</th> 
-               <th id="ef" headers="e">Final</th> 
-               <th id="p1" headers="p">1</th> 
-               <th id="p2" headers="p">2</th> 
-               <th id="pf" headers="p">Final</th> 
-             </tr> 
-             <tr> 
-               <td headers="h">15%</td> 
-               <td headers="e e1">15%</td> 
-               <td headers="e e3">15%</td> 
-               <td headers="e ef">20%</td> 
-               <td headers="p p1">10%</td> 
-               <td headers="p p2">10%</td> 
-               <td headers="p pf">15%</td> 
-             </tr> 
+             <tr>
+               <th rowspan="2" id="h">Homework</th>
+               <th colspan="3" id="e">Exams</th>
+               <th colspan="3" id="p">Projects</th>
+             </tr>
+             <tr>
+               <th id="e1" headers="e">1</th>
+               <th id="e2" headers="e">2</th>
+               <th id="ef" headers="e">Final</th>
+               <th id="p1" headers="p">1</th>
+               <th id="p2" headers="p">2</th>
+               <th id="pf" headers="p">Final</th>
+             </tr>
+             <tr>
+               <td headers="h">15%</td>
+               <td headers="e e1">15%</td>
+               <td headers="e e3">15%</td>
+               <td headers="e ef">20%</td>
+               <td headers="p p1">10%</td>
+               <td headers="p p2">10%</td>
+               <td headers="p pf">15%</td>
+             </tr>
        </table>
     </aura:if>
-     <!--Should fail since a TD does not have a header attribute--> 
+     <!--Should fail since a TD does not have a header attribute-->
     <aura:if isTrue="{!v.caseToRender == 'testTDWithOutHeaderAttrib'}">
        <table>
-             <tr> 
-               <th rowspan="2" id="h">Homework</th> 
-               <th colspan="3" id="e">Exams</th> 
-               <th colspan="3" id="p">Projects</th> 
-             </tr> 
-             <tr> 
-               <th id="e1" headers="e">1</th> 
-               <th id="e2" headers="e">2</th> 
-               <th id="ef" headers="e">Final</th> 
-               <th id="p1" headers="p">1</th> 
-               <th id="p2" headers="p">2</th> 
-               <th id="pf" headers="p">Final</th> 
-             </tr> 
-             <tr> 
-               <td headers="h">15%</td> 
-               <td headers="e e1">15%</td> 
-               <td headers="e e2">15%</td> 
-               <td headers="e ef">20%</td> 
-               <td>10%</td> 
-               <td headers="p p2">10%</td> 
-               <td headers="p pf">15%</td> 
-             </tr> 
+             <tr>
+               <th rowspan="2" id="h">Homework</th>
+               <th colspan="3" id="e">Exams</th>
+               <th colspan="3" id="p">Projects</th>
+             </tr>
+             <tr>
+               <th id="e1" headers="e">1</th>
+               <th id="e2" headers="e">2</th>
+               <th id="ef" headers="e">Final</th>
+               <th id="p1" headers="p">1</th>
+               <th id="p2" headers="p">2</th>
+               <th id="pf" headers="p">Final</th>
+             </tr>
+             <tr>
+               <td headers="h">15%</td>
+               <td headers="e e1">15%</td>
+               <td headers="e e2">15%</td>
+               <td headers="e ef">20%</td>
+               <td>10%</td>
+               <td headers="p p2">10%</td>
+               <td headers="p pf">15%</td>
+             </tr>
        </table>
     </aura:if>
 
-    <!--Should fail since a TH does not have an id attribute--> 
+    <!--Should fail since a TH does not have an id attribute-->
     <aura:if isTrue="{!v.caseToRender == 'testTableHeaderWoID'}">
        <table>
-             <tr> 
-               <th rowspan="2" >Homework</th> 
-               <th colspan="3" id="e">Exams</th> 
-               <th colspan="3" id="p">Projects</th> 
-             </tr> 
-             <tr> 
-               <th id="e1" headers="e">1</th> 
-               <th id="e2" headers="e">2</th> 
-               <th id="ef" headers="e">Final</th> 
-               <th id="p1" headers="p">1</th> 
-               <th id="p2" headers="p">2</th> 
-               <th id="pf" headers="p">Final</th> 
-             </tr> 
-             <tr> 
-               <td headers="e">15%</td> 
-               <td headers="e e1">15%</td> 
-               <td headers="e e2">15%</td> 
-               <td headers="e ef">20%</td> 
-               <td headers="p p1">10%</td> 
-               <td headers="p p2">10%</td> 
-               <td headers="p pf">15%</td> 
-             </tr> 
+             <tr>
+               <th rowspan="2" >Homework</th>
+               <th colspan="3" id="e">Exams</th>
+               <th colspan="3" id="p">Projects</th>
+             </tr>
+             <tr>
+               <th id="e1" headers="e">1</th>
+               <th id="e2" headers="e">2</th>
+               <th id="ef" headers="e">Final</th>
+               <th id="p1" headers="p">1</th>
+               <th id="p2" headers="p">2</th>
+               <th id="pf" headers="p">Final</th>
+             </tr>
+             <tr>
+               <td headers="e">15%</td>
+               <td headers="e e1">15%</td>
+               <td headers="e e2">15%</td>
+               <td headers="e ef">20%</td>
+               <td headers="p p1">10%</td>
+               <td headers="p p2">10%</td>
+               <td headers="p pf">15%</td>
+             </tr>
        </table>
     </aura:if>
 
-    <!--Should fail since a TH does not have id--> 
-    <aura:if isTrue="{!v.caseToRender == 'testTableHeadersWandWoScope'}">              
+    <!--Should fail since a TH does not have id-->
+    <aura:if isTrue="{!v.caseToRender == 'testTableHeadersWandWoScope'}">
        <table>
              <tr>
                 <th scope="col">Month</th>
@@ -284,18 +284,18 @@
              </tr>
        </table>
     </aura:if>
-    <!--Should fail since a TH does not have scope or id--> 
+    <!--Should fail since a TH does not have scope or id-->
     <aura:if isTrue="{!v.caseToRender == 'testThNoWoScope'}">
        <table>
              <tr>
                 <th>Month</th>
              </tr>
-             <tr>                
+             <tr>
                  <td>January</td>
              </tr>
        </table>
     </aura:if>
-    <!--Should fail since a TH has a wrong scope--> 
+    <!--Should fail since a TH has a wrong scope-->
     <aura:if isTrue="{!v.caseToRender == 'testScopeWithWrongVal'}">
        <table>
              <tr>
@@ -312,16 +312,16 @@
         <iframe id="vfFrameId" src="http://localhost.blah.com/apex//testDetail0000?id=000x000xxx0000000"></iframe>
         <iframe id="DiffernetID" src="/apex/blahField?id=00-xx00000000000"></iframe>
         <iframe id="vfFrameId" src="/setup/ui/blah.jsp"></iframe>
-        <iframe src="http://www.salesforce.com"></iframe> 
+        <iframe src="http://www.salesforce.com"></iframe>
     </aura:if>
 
-    <!--Test for image alt. Mixture of failures and correct tags-->  
+    <!--Test for image alt. Mixture of failures and correct tags-->
     <aura:if isTrue="{!v.caseToRender == 'imageTagTest'}">
          <img src="1" alt="Blah"/>
          <ui:image src="2" alt="" imageType="decorative"/>
          <ui:image src="3" alt="  Blah  " imageType="informational"/>
-         
-         <!--Images that are going to be errors-->        
+
+         <!--Images that are going to be errors-->
          <img src="4" alt="UnDeFiNeD"/>
          <img src="5" alt="Null"/>
          <img src="6" alt="EMPTY"/>
@@ -332,19 +332,19 @@
          <ui:image src="11" alt="  NuLl  " imageType="informational"/>
          <div aura:id="injectableDiv"></div>
     </aura:if>
-  
-    <!--Test for buttons. Making sure that the label attribute is set correctly-->  
+
+    <!--Test for buttons. Making sure that the label attribute is set correctly-->
     <aura:if isTrue="{!v.caseToRender == 'buttonLabelValid'}">
        <!--Buttons should fail, no label-->
        <ui:button iconImgSrc="/auraFW/resources/aura/images/bug.png" label=""/>
-       <ui:button labelDisplay="false" label=" "/> 
-       <ui:button label=""/> 
-      
+       <ui:button labelDisplay="false" label=" "/>
+       <ui:button label=""/>
+
        <!--Three buttons that are set correctly-->
        <ui:button iconImgSrc="/auraFW/resources/aura/images/bug.png" label="bug Icon" />
-       <ui:button label="This should be shown"/>  
-    </aura:if> 
-    
+       <ui:button label="This should be shown"/>
+    </aura:if>
+
     <!--Test for inputs that don't need labels. Verifying that they don't fail-->
     <aura:if isTrue="{!v.caseToRender == 'labelsNotNeeded'}">
         <label for="ID_EGO">Something Something</label>
@@ -355,33 +355,33 @@
         <input type="button" size="25" value="CLick me"/>
         <input type="image" src="/auraFW/resources/aura/images/auraNoteDemo.png" name="image" width="60" height="60"/>
     </aura:if>
-    
+
     <!--Test for fieldset legends. All fields sets should have a legend associated with them-->
     <aura:if isTrue="{!v.caseToRender == 'fieldSetWithStyles'}">
         <fieldset  aura:id="field_set_W_style_and_legend">
                      <legend>field_set_W_style_and_legend</legend>
         </fieldset>
-        
+
         <fieldset aura:id="field_set_field_style_no_legend">
         </fieldset>
-        
+
         <fieldset aura:id="field_set_fieldset_no_style_legend">
                      <legend>field_set_fieldset_no_style_legend</legend>
         </fieldset>
-        
+
           <fieldset aura:id="field_set_no_sytle_no_legend">
          </fieldset>
-        
+
           <fieldset aura:id="field_set_fieldset_wrong_style_legend" style="BLAH">
                      <legend>field_set_fieldset_wrong_style_legend</legend>
         </fieldset>
-        
+
           <fieldset  aura:id="field_set_wrong_style_no_legend" >
          </fieldset>
     </aura:if>
-    
+
     <!--Generic test. Making sure that all of these separate test modules find the correct errorneous items-->
-    <aura:if isTrue="{!v.caseToRender == 'full'}">  
+    <aura:if isTrue="{!v.caseToRender == 'full'}">
         <div id="table1">
 	        <table>
 	            <th></th>
@@ -419,24 +419,24 @@
                       <ui:inputRadio aura:id="36-40"/>
                       </ui:label>
                         <br/>
-                      
+
                       <br/>
-                      <ui:inputRadio label="Old and wise enough" aura:id="Old and wise enough"/>   
+                      <ui:inputRadio label="Old and wise enough" aura:id="Old and wise enough"/>
                 </fieldset>
-                <ui:inputRadio label="I WANT TO BE CLICKED!!!!" aura:id="click me"/>  
+                <ui:inputRadio label="I WANT TO BE CLICKED!!!!" aura:id="click me"/>
                 <ui:inputTextArea aura:id="tellUsAboutYou" placeholder="Tell us about yourself" rows="10" cols="20"/>
                 <iframe height="300px" width="50%" src="http://www.salesforce.com"></iframe>
                </td></tr>
-        </table> 
+        </table>
     </aura:if>
-    
-    <!--Same test as above. The difference is that this one focuses on having labels above and below their respective inputs. 
+
+    <!--Same test as above. The difference is that this one focuses on having labels above and below their respective inputs.
         As long and an input has a label, it should not matter where it is located in the dom
     -->
     <aura:if isTrue="{!v.caseToRender == 'labelTest'}">
         <ui:label for="first" label="first"/>
-        <ui:label for="mid" label="mid"/>    
-         
+        <ui:label for="mid" label="mid"/>
+
         <table>
              <th scope="row"></th>
             <tr><td>
@@ -451,7 +451,7 @@
          <table>
             <th scope="row"></th>
             <tr><td>
-                
+
                 <ui:inputDate aura:id="birthdayInput" displayDatePicker="true"/>
                 <fieldset class="field_set">
                       <legend>what is your age range?</legend>
@@ -468,20 +468,20 @@
                       <ui:label for="31-35" label="31-35"/>
                       <ui:inputRadio aura:id="31-35"/>
                         <br/>
-                      
+
                       <br/>
-                      <ui:inputRadio label="Old and wise enough" aura:id="Old and wise enough"/>   
+                      <ui:inputRadio label="Old and wise enough" aura:id="Old and wise enough"/>
                 </fieldset>
-                <ui:inputRadio label="I WANT TO BE CLICKED!!!!" aura:id="click me"/>  
+                <ui:inputRadio label="I WANT TO BE CLICKED!!!!" aura:id="click me"/>
                 <ui:inputTextArea aura:id="tellUsAboutYou" placeholder="Tell us about yourself" rows="10" cols="20"/>
                 <iframe height="300px" title="tmpTitle" width="50%" src="http://www.salesforce.com"></iframe>
                </td></tr>
         </table>
-        <ui:label for="tellUsAboutYou" label="tellUsAboutYou"/> 
-        <ui:label for="last" label="last"/> 
+        <ui:label for="tellUsAboutYou" label="tellUsAboutYou"/>
+        <ui:label for="last" label="last"/>
         <ui:label for="birthdayInput" label="Birthday"/>
     </aura:if>
-    
+
     <!-- Test for Anchor inner text. All anchors should have some innerText. This test does not have innerText-->
     <aura:if isTrue="{!v.caseToRender == 'anchorWOInnerText'}">
           <a href="javascript:void(0)">
@@ -489,14 +489,14 @@
                 <th scope="col"></th>
                 <tr>
                     <td>
-                       <ui:block>   
+                       <ui:block>
                           </ui:block>
                     </td>
                 </tr>
             </table>
         </a>
-    </aura:if> 
-    
+    </aura:if>
+
     <!-- Test for Anchor inner text. All anchors should have some innerText. This test has innerText-->
     <aura:if isTrue="{!v.caseToRender == 'anchorWInnerText'}">
           <a href="javascript:void(0)">
@@ -516,7 +516,7 @@
             </table>
         </a>
     </aura:if>
-    
+
     <!--Test for outputURL. This test makes sure that img wrapped anchors have alt and that they are found correctly.
      This test should not have a failure
      -->
@@ -533,8 +533,8 @@
             <img class="/auraFW/resources/aura/s.gif uiImage" src="/auraFW/resources/aura/s.gif" />
         </a>
     </aura:if>
-    
-   <!--Test specifically making sure that it doesn't break menuitems. All menuItems default to radio buttons--> 
+
+   <!--Test specifically making sure that it doesn't break menuitems. All menuItems default to radio buttons-->
    <aura:if isTrue="{!v.caseToRender == 'anchorMenuTest'}">
          <ui:menu>
             <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
@@ -547,14 +547,14 @@
             </ui:menuList>
         </ui:menu>
     </aura:if>
-    
+
     <!--Test making sure that we skip ckeditor. There is an issue with the current version of CKEDITOR with one of its attributes
         Skipping until, we upgrade
     -->
     <aura:if isTrue="{!v.caseToRender == 'ckeditor_test'}">
-        <ui:inputRichText aura:id="RICH_TEXT" label="label For Rich Text" value="{!v.testContent}"/> <br/> 
+        <ui:inputRichText aura:id="RICH_TEXT" label="label For Rich Text" value="{!v.testContent}"/> <br/>
     </aura:if>
-    
+
     <!--test for radio buttons in fieldSets. All radio buttons with the same name should be in a fieldset. No errors-->
     <aura:if isTrue="{!v.caseToRender == 'NoRadioErrors'}">
        <fieldset class="field_set">
@@ -570,7 +570,7 @@
         <ui:inputCheckbox label="Radio8" name="Group3"/>
         <ui:inputRadio label="Radio9" name="Group4"/>
     </aura:if>
-    
+
     <!--test for radio buttons in fieldSets. All radio buttons with the same name should be in a fieldset. Errors-->
    <aura:if isTrue="{!v.caseToRender == 'RadioErrors'}">
        <fieldset class="field_set">
@@ -578,7 +578,7 @@
             <ui:inputCheckbox label="Radio1" name="Group1"/>
             <ui:inputCheckbox label="Radio2" name="Group1"/>
             <ui:inputCheckbox label="Radio3" name="Group1"/>
-            <ui:inputCheckbox label="Radio4" name="Group1"/>  
+            <ui:inputCheckbox label="Radio4" name="Group1"/>
         </fieldset>
         <ui:inputRadio    label="Radio5" name="Group1"/>
         <ui:inputRadio    label="Radio6" name="Group1"/>
@@ -596,28 +596,28 @@
           <h3>3rdHeader</h3>
           <h4>4thHeader</h4>
           <h5>5thHeader</h5>
-          <h6>6thHeader</h6>      
+          <h6>6thHeader</h6>
     </aura:if>
     <aura:if isTrue="{!v.caseToRender == 'headersWrongOrder'}">
           <h1>1stHeader</h1>
           <h3>3rdHeader</h3>
           <h5>5thHeader</h5>
-          
-    </aura:if>    
+
+    </aura:if>
     <aura:if isTrue="{!v.caseToRender == 'headersWrongOrderReverse'}">
           <h6>6thHeader</h6>
           <h5>5thHeader</h5>
           <h4>4thHeader</h4>
           <h3>3rdHeader</h3>
           <h2>2ndHeader</h2>
-          <h1>1stHeader</h1>      
+          <h1>1stHeader</h1>
     </aura:if>
     <aura:if isTrue="{!v.caseToRender == 'headersWrongOrderWrapAround'}">
           <h1>1stHeader</h1>
           <h3>3rdHeader</h3>
           <h5>5thHeader</h5>
           <h6>6thHeader</h6>
-          <h4>4thHeader</h4>      
+          <h4>4thHeader</h4>
     </aura:if>
     <!--Test that will make sure that the accessibility tool can handle empty tags that do not have any attributes-->
     <aura:if isTrue="{!v.caseToRender == 'tagsWithoutAttributes'}">

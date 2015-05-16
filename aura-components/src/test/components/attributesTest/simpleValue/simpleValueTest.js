@@ -27,54 +27,6 @@
         }
     },
 
-    testSimpleValueIsValid: {
-        test:function(cmp){
-        	$A.test.assertTruthy(cmp.isValid('v.strAttribute'));
-        }
-    },
-
-    testSimpleValueSetInValid: {
-        test:function(cmp){
-        	var valueObj = cmp.get('v.strAttribute');
-            cmp.setValid('v.strAttribute', false);
-            $A.test.assertFalse(cmp.isValid('v.strAttribute'));
-        }
-    },
-
-    testErrorFunctionsOnSimpleValueObject:{
-        attributes:{intAttribute:3},
-        test:function(cmp){
-        	//Attribute with no default value
-            cmp.clearErrors('v.strAttribute');
-            this.verifyErrors(cmp, 'v.strAttribute' ,[]);
-
-            //Boundary cases for argument
-            cmp.addErrors('v.strAttribute', undefined);
-            cmp.addErrors('v.strAttribute');
-            cmp.addErrors('v.strAttribute',null);
-            //TODO W-2248499
-            //this.verifyErrors(cmp, 'v.strAttribute',[]);
-
-            //Attribute with default value
-            cmp.clearErrors('v.intAttribute');
-            //Add 1 valid error message
-            cmp.addErrors('v.intAttribute','Something went wrong!');
-            this.verifyErrors(cmp,'v.intAttribute', ['Something went wrong!']);
-
-            //Add multiple error messages
-            cmp.clearErrors('v.intAttribute');
-            cmp.addErrors('v.intAttribute', ['I know what went wrong!', 'fooBared']);
-            this.verifyErrors(cmp, 'v.intAttribute', ['I know what went wrong!', 'fooBared']);
-
-            //Add a non-literal, non-array error message
-            cmp.clearErrors('v.intAttribute');
-            cmp.addErrors('v.intAttribute', {1:'I know what went wrong!', 2:'fooBared'});
-            var err = cmp.getErrors('v.intAttribute');
-            $A.test.assertEquals( err.length, 1);
-            $A.test.assertTrue( $A.util.isObject(err[0]));
-        }
-    },
-
     // dirty value in action should not get overwritten in rerender when evaluating functions
     testMakeDirtyIndirectly:{
     	attributes:{intAttribute:100},

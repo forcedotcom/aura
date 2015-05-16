@@ -14,44 +14,41 @@
  * limitations under the License.
  */
 ({
-    "addError": function(cmp) {
-        var a = cmp.get("c.addError");
-        $A.enqueueAction(a);
-        //
-        // FIXME:
-        // I don't like this. It seems to have a delay before the text appears,
-        // and that delay is such that we have to wait on the text itself. I'm
-        // quite dubious of what is going on in inputRenderer.js
-        //
-        // We should be able to simply wait for the action complete, and see the
-        // error present e.g. addWaitFor("SUCCESS", function() { return a.getState(); }, checkForText)
-        // I also don't much like the way that I check for the error text
-        //
+    addError: function(cmp) {
+        var action = cmp.get("c.addError");
+        $A.enqueueAction(action);
+
         $A.test.addWaitFor(true,
             function() {
-                var text = cmp.find("inputText1").getElement().innerHTML;
+                var text = cmp.find("inputBlock1").getElement().innerHTML;
                 return text.indexOf("m an error") > -1;
-            } );
+            }
+        );
     },
 
-    "testAddErrors": {
-        "test": [ function(cmp) {
+    testAddErrors: {
+        test: function(cmp) {
             this.addError(cmp);
-        }]
+        }
     },
 
-    "testClearErrors": {
-        "test": [ function(cmp) {
-            // We have to add an error before we can clear them.
-            this.addError(cmp);
-        }, function(cmp) {
-            var a = cmp.get("c.clearErrors");
-            $A.enqueueAction(a);
-            $A.test.addWaitFor(true,
-                function() {
-                    var text = cmp.find("inputText1").getElement().innerHTML;
-                    return text.indexOf("m an error") == -1;
-                } );
-        }]
+    testClearErrors: {
+        test: [
+            function(cmp) {
+                this.addError(cmp);
+            },
+            function(cmp) {
+
+                var action = cmp.get("c.clearErrors");
+                $A.enqueueAction(action);
+
+                $A.test.addWaitFor(true,
+                    function() {
+                        var text = cmp.find("inputBlock1").getElement().innerHTML;
+                        return text.indexOf("m an error") == -1;
+                    }
+                );
+            }
+        ]
     }
 })

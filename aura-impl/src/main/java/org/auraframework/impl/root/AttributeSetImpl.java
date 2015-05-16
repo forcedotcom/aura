@@ -47,10 +47,13 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.instance.Wrapper;
 import org.auraframework.system.Location;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.throwable.quickfix.InvalidValueSetTypeException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -142,7 +145,17 @@ public class AttributeSetImpl implements AttributeSet {
         } else {
             attribute = new AttributeImpl(attributeDef.getDescriptor());
         }
-
+       
+        try {
+        	attributeDefRef.parseValue(attributeDef.getTypeDef());
+        } catch(InvalidExpressionException exception) {
+        	Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        	if(mode.isDevMode() || mode.isTestMode()) { 
+	        	throw new InvalidValueSetTypeException(
+	        			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", attributeDef.getName(), attributeDef.getTypeDef().getName(), attributeDefRef.getValue().getClass().getName()), 
+	        			exception.getLocation());
+        	}
+        }
         Object value = attributeDefRef.getValue();
         InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
         iStack.markParent(parent);

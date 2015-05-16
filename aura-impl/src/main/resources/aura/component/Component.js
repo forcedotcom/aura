@@ -2121,6 +2121,10 @@ Component.prototype.getAttributeValueProvider = function() {
     return this.priv.attributeValueProvider||this;
 };
 
+Component.prototype.setAttributeValueProvider = function (avp) {
+    this.priv.attributeValueProvider = avp;
+};
+
 /**
  * Returns the value provider of the component.
  *

@@ -13,17 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
 
-	handleClick: function(component,evt, helper) {
-		var tt = component.find('theTip');
-		console.log('h', helper.lib);
-
-		if(tt.get('v.isVisible')) {
-			tt.hide();
-		} else {
-			tt.show();
-		}
-	}
-	
-})
+.THIS.header {
+    font-weight: 300;
+    line-height: 1.25;
+    font-size: 1.125rem;
+}

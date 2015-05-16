@@ -25,7 +25,7 @@ statu suo vel quiescendi vel movendi difficulter deturbetur. Unde etiam vis
 insita nomine significantissimo vis inertiæ dici possit. Exercet vero
 corpus hanc vim solummodo in mutatione status sui per vim aliam in se
 impressam facta, estq; exercitium ejus sub diverso respectu et Resistentia
-et Impetus: Resistentia quatenus  <ui:tooltip fadeIn="true" fadeInDuration="1000" tooltipBody="corpus means body"><b>corpus</b></ui:tooltip> ad conservandum statum suum
+et Impetus: Resistentia quatenus  <ui:tooltip fadeInDuration="1000" tooltipBody="corpus means body"><b>corpus</b></ui:tooltip> ad conservandum statum suum
 reluctatur vi impressæ; Impetus quatenus corpus idem, vi resistentis
 obstaculi difficulter cedendo, conatur statum ejus mutare. Vulgus
 Resistentiam quiescentibus et Impetum moventibus tribuit; sed motus et
@@ -41,17 +41,17 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                 <p><ui:tooltip tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
                 <form>
                     <p>
-                        <ui:tooltip fadeOut="true" triggerClass="tooltip-trigger" tooltipBody="Please?">
+                        <ui:tooltip fadeOutDuration="500" triggerClass="tooltip-trigger" tooltipBody="Please?">
                             <span>Fade out only</span>
                         </ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip fadeIn="true" triggerClass="tooltip-trigger" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
+                        <ui:tooltip fadeInDuration="500" triggerClass="tooltip-trigger" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
                             <span>Fade in only</span>
                         </ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip delay="500" fadeIn="true" fadeOut="true" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
+                        <ui:tooltip delay="500" fadeInDuration="500" fadeOutDuration="500" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
                         <span>Fade in/out with delay</span>
                     </p>
                     <p>

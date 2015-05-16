@@ -13,17 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
+.THIS.viewport {
+    position: absolute;
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
 
-	handleClick: function(component,evt, helper) {
-		var tt = component.find('theTip');
-		console.log('h', helper.lib);
+.THIS.viewport header {
+    background: #304a62;
+    display: flex;
+    justify-content: flex-end;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    padding: 0.75em 1rem;
+}
 
-		if(tt.get('v.isVisible')) {
-			tt.hide();
-		} else {
-			tt.show();
-		}
-	}
-	
-})
+.THIS.viewport .controls {
+    flex: 1;
+}
+
+.THIS.viewport footer {
+    background: #304a62;
+    padding: 0.75em 1rem;
+}
+
+.THIS.manager {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}

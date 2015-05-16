@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+({
+    init: function(cmp, event, helper) {
+        helper.initialize(cmp);
+    },
+    createPanel: function (cmp, event, helper) {
+        helper.createPanel(cmp, event.getParams());
+    },
+    destroyPanel: function (cmp, event, helper) {
+        helper.destroyPanel(cmp, event.getParams());
+    },
+    handleNotify: function (cmp, event, helper) {
+        var action = event.getParam('action'),
+            intf   = event.getParam('typeOf');
+        
+        if (action === 'destroyPanel' && intf === 'ui:destroyPanel') {
+            helper.destroyPanelInstance(cmp, event.getParam('payload'));
+        }
+        else if (action === 'deActivatePanels' && intf === 'ui:showPanel') {
+            //de-active all other panels except the one currently shown
+            var panelParam = event.getParam('payload').panelInstance,
+                panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
+                panelObj   = helper.PANELS_INSTANCE[panelId],
+                panel      = panelObj.panel;
+
+            helper.deActivateAllPanelInstances(cmp, panel);
+        } else {
+            helper.broadcastNotify(cmp, event.getSource(), event.getParams());
+        }
+    }
+})

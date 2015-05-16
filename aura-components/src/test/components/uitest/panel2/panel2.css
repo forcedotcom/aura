@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
+.THIS {
+    position: relative;
+    background: tomato;
+    padding: 5px;
+    width: 250px;
+    height: 150px;
+    margin: 5px;
+    opacity: 0.2;
+}
 
-	handleClick: function(component,evt, helper) {
-		var tt = component.find('theTip');
-		console.log('h', helper.lib);
+.THIS.visible {
+    display: block;
+    opacity: 1;
+}
 
-		if(tt.get('v.isVisible')) {
-			tt.hide();
-		} else {
-			tt.show();
-		}
-	}
-	
-})
+.THIS .close {
+    position: absolute;
+    top: 0;
+    right: 4px;
+}
+
+.THIS.active {
+    background: yellow;
+}

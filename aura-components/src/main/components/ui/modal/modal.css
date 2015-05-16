@@ -1,0 +1,143 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+    display: none;
+}
+
+.THIS.open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.THIS .modal-glass {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #2A4158;
+    transition: opacity 300ms;
+}
+
+.THIS .modal-glass.fadein {
+    opacity: .8;
+}
+
+.THIS .hidden {
+    display: none;
+}
+
+.THIS header {
+    position: relative;
+    border-top-right-radius: 0.25rem;
+    border-top-left-radius: 0.25rem;
+    border-bottom: 2px solid #e0e5ee;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.THIS header .titles {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 1.25;
+}
+
+.THIS footer {
+    border-top: 2px solid #e0e5ee;
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+}
+
+.THIS .body {
+    padding: 1px 14px;
+}
+
+.THIS .panel {
+    position: relative;
+    margin: auto;
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    overflow: visible;
+    z-index: 21;
+
+    max-width: 70%;
+}
+
+.THIS .container{
+    overflow: hidden;
+}
+
+.THIS .uiButton.closeBtn {
+    position: absolute;
+    top: -30px;
+    right: 4px;
+    font-family: Arial;
+    font-size: 25px;
+    padding: 12px;
+    margin: -12px;
+    overflow: visible; /* for outline */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #FFFFFF;
+}
+
+.THIS .titleBar {
+    padding: 0 14px;
+    color: #3C3D3E;
+    font-size: 15px;
+    text-align: center;
+    width: auto;
+    height: auto;
+    position: static;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color: #FFFFFF;
+}
+
+/* ===== ANIMATION AND TRANSFORMS ======= */
+.THIS .modal-glass.fadeIn {
+    opacity: 0.8;
+}
+
+.THIS .transitioning {
+    transition: transform .3s linear, opacity .2s linear;
+}
+
+.THIS .panel.movefrombottom {
+    visibility: visible;
+    animation: movefrombottom .3s ease both;
+}
+
+.THIS .panel.movetobottom {
+    visibility: visible;
+    animation: movetobottom .3s ease both;
+}
+
+/* ANIMATIONS */
+@keyframes movetobottom {
+    to { transform:translate3d(0, 100%, 0);}
+}
+@keyframes movefrombottom {
+    from { transform:translate3d(0, 100%, 0);}
+}

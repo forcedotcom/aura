@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 ({
+    openNewPanel: function(cmp, evt) {
+        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
 
-	handleClick: function(component,evt, helper) {
-		var tt = component.find('theTip');
-		console.log('h', helper.lib);
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'modal',
+            visible: true,
+            panelConfig : {
+                title: 'New Panel 2',
+                body  : body
+            },
+            onCreate: function (panel) {
+                //console.log(panel);
+            }
 
-		if(tt.get('v.isVisible')) {
-			tt.hide();
-		} else {
-			tt.show();
-		}
-	}
-	
+        }).fire();
+    }
 })

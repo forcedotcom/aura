@@ -21,8 +21,44 @@
         if(!domId) {
             domId = component.getConcreteComponent().getGlobalId();
         }
+        var fadeInDuration = component.get('v.fadeInDuration');
+        var fadeOutDuration = component.get('v.fadeOutDuration');
+        var delay = component.get('v.delay');
+        if(!fadeInDuration) {
+            fadeInDuration = 0;
+        }
 
+        if(!fadeOutDuration) {
+            fadeOutDuration = 0;
+        }
+
+        
+        var classList = ['tooltip'];
+
+        if(fadeInDuration > 0) {
+            classList.push('fade-in');
+        }
+        if(fadeOutDuration > 0) {
+            classList.push('fade-out');
+        }
+
+        if(fadeInDuration > fadeOutDuration) {
+            fadeOutDuration = fadeInDuration;
+        } else {
+            fadeInDuration = fadeOutDuration;
+        }
+
+        var styleDeclaration = [
+            '-webkit-transtion-duration:' + fadeInDuration + 'ms',
+            'transition-duration:' + fadeInDuration  + 'ms',
+            '-webkit-transition-delay:' + delay  + 'ms', 
+            'transition-delay:' + delay  + 'ms'
+        ];
+
+        component.set('v.tooltipStyle', styleDeclaration.join(';'));
         component.set('v.domId', domId);
+        component.set('v.classList', classList.join(' '));
+
         return this.superRender();
     },
 

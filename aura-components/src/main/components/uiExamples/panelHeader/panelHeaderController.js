@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 ({
-
-	handleClick: function(component,evt, helper) {
-		var tt = component.find('theTip');
-		console.log('h', helper.lib);
-
-		if(tt.get('v.isVisible')) {
-			tt.hide();
-		} else {
-			tt.show();
-		}
-	}
-	
-})
+    close: function(cmp) {
+        cmp.getEvent('notify').setParams({
+            action: 'destroyPanel',
+            typeOf: 'ui:destroyPanel'
+        }).fire();
+    }
+}
+)

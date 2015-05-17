@@ -1,0 +1,20 @@
+<aura:component implements="performance:test">
+    <aura:attribute name="item"    type="Object"/>
+    <aura:attribute name="counter" type="Integer" default="0"/>
+    <section>
+        <div style="margin: 10px; padding:10px; border: 1px solid black">
+            <p> 
+                <ui:button label="+" press="{!c.press}" /> Runner Example Performance Test! 
+                <span>{!v.counter}</span>
+            </p>
+        </div>
+        <div style="margin: 10px; padding:10px; border: 1px solid black">
+            <p>Finish the test:</p>
+            <p>
+                <ui:button label="Finish test with an event" press="{!c.finishTestWithEvent}"/>
+                <ui:button label="Finish test via PerfRunner" press="{!c.finishTestPerfRunner}" />
+            </p>
+        </div>
+    </section>
+
+</aura:component>

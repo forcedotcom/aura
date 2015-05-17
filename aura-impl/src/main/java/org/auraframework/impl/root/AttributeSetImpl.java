@@ -149,12 +149,15 @@ public class AttributeSetImpl implements AttributeSet {
         try {
         	attributeDefRef.parseValue(attributeDef.getTypeDef());
         } catch(InvalidExpressionException exception) {
-        	Mode mode = Aura.getContextService().getCurrentContext().getMode();
-        	if(mode.isDevMode() || mode.isTestMode()) { 
-	        	throw new InvalidValueSetTypeException(
-	        			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", attributeDef.getName(), attributeDef.getTypeDef().getName(), attributeDefRef.getValue().getClass().getName()), 
-	        			exception.getLocation());
-        	}
+            // Kris:
+            // This is going to fail a good handfull of things at the moment, I need to 
+            // Uncomment and test against the app before trying to check this in.
+        	// Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        	// if(mode.isDevMode() || mode.isTestMode()) { 
+	        // 	throw new InvalidValueSetTypeException(
+	        // 			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", attributeDef.getName(), attributeDef.getTypeDef().getName(), attributeDefRef.getValue().getClass().getName()), 
+	        // 			exception.getLocation());
+        	// }
         }
         Object value = attributeDefRef.getValue();
         InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();

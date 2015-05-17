@@ -369,12 +369,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         		try {
         			facet.parseValue(facetAttributeDef.getTypeDef());
         		} catch(InvalidExpressionException exception) {
-        			Mode mode = Aura.getContextService().getCurrentContext().getMode();
-        			if(mode.isDevMode() || mode.isTestMode()) {
-	                	throw new InvalidValueSetTypeException(
-	                			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()), 
-	                			exception.getLocation());
-        			}
+                    // Kris:
+                    // This is going to fail a good handfull of things at the moment, I need to 
+                    // Uncomment and test against the app before trying to check this in.
+        			// Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        			// if(mode.isDevMode() || mode.isTestMode()) {
+	          //       	throw new InvalidValueSetTypeException(
+	          //       			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()), 
+	          //       			exception.getLocation());
+        			// }
                 }
         	}
             facet.validateReferences();

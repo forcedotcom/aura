@@ -20,12 +20,12 @@
 		<p>A <code>ui:draggable</code> component represents a draggable item in a context component.  
 		<code>ui:draggable</code> is nested in a <code>ui:dropzone</code> component to create drag and drop functionality.
 		You can click and hold an element using a mouse or keyboard, and drag and drop it at another area.</p>
-		<p>The <code>dragAndDropService</code> library provides methods for your drag and drop implementation. 
-		<code>$A.dragAndDropService.getContext(event.getParam("dragComponent"))</code> returns the context component whose item is being dragged.
+		<p><code>$A.dragAndDropService</code>provides methods for your drag and drop implementation. 
+		<code>getContext(event.getParam("dragComponent"))</code> returns the context component whose item is being dragged.
 		For example, dragging a list item on a <code>ui:infiniteList</code> component returns the component and its properties. Similarly,
-		<code>$A.dragAndDropService.getContext(event.getParam("dropComponent"));</code> returns the context component of the drop area.
-		To signal a drop and fire a drop complete event, use <code>$A.dragAndDropService.fireDropComplete(event, true);</code>.
-		To remove data being transferred from a dragged item, use <code>$A.dragAndDropService.removeDataTransfer(event, removeParams);</code>.
+		<code>getContext(event.getParam("dropComponent"));</code> returns the context component of the drop area.
+		To signal a drop and fire a drop complete event, use <code>fireDropComplete(event, true);</code>.
+		To remove data being transferred from a dragged item, use <code>removeDataTransfer(event, removeParams);</code>.
 		</p>
 		<p>The library uses the <code>ui:addRemove</code> event to move data from the source to target drop area in the <code>removeDataTransfer()</code> method. 
 		If your context component doesn't support this event, you must implement your own remove method. See the Examples tab for more information.</p>

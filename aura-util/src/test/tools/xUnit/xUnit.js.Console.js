@@ -5863,7 +5863,7 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
 
     this.CompleteComponent=function(component,duration){
         if(!Object.IsType(xUnit.js.Model.Fact,component))return;
-        System.Environment.Write(String.Format("<fact path=\"{0}\" result=\"{1}\" message=\"{2}\" duration=\"{3}\" />",encode(getPath(component)),getResult(component.State.Result),encode(component.State.Message||''),duration/1000));
+        System.Environment.Write(String.Format("<fact path=\"{0}\" result=\"{1}\" message=\"{2}\" duration=\"{3}\" filename=\"{4}\" testname=\"{5}\" />",encode(getPath(component)),getResult(component.State.Result),encode(component.State.Message||''),duration/1000,encode(getFilename(component)),encode(getTestname(component))));
     };
 
     this.Enumerate=function(component){
@@ -5888,6 +5888,15 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
     
     function getPath(fact){
         return fact.GetPath().split('.').slice(1).join('.');
+    }
+    
+    function getFilename(fact){
+        var path = fact.GetPath().split('.');
+        return path[path.length-3];
+    }
+    
+    function getTestname(fact){
+        return fact.GetPath().split('.').slice(-2).join('.');
     }
     
     function getResult(result){

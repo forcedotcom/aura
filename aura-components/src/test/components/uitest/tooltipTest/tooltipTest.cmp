@@ -1,0 +1,477 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="renderItem" type="String" default="all"/>
+    <aura:if isTrue="{! v.renderItem == 'triggers' || v.renderItem == 'all'}">
+       
+    </aura:if>
+    <aura:if isTrue="{! v.renderItem == 'advancedPositioning' || v.renderItem == 'all'}">
+        <div>
+        	<div class="title"> 	
+        		Tooltip Component Test Cases
+        	</div>
+        	<!--
+            	Body Test
+            -->
+        	
+        	<div class="blocks"> 	
+	           <div class="case">
+	                <h1>Body Alphanumerics:</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">ab54@#$Ω®</ui:tooltip>
+	            </div>
+	            <div class="case">
+	                <h1>Body HTML Tag: image</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">
+	                	<br></br>
+	                	<img src = "http://ccoenraets.github.io/salesforce-mobile-sdk-presentation/images/salesforce-logo.png" style="width:60px;height:40px"></img>
+	                </ui:tooltip>
+	            </div>
+	            <div class="case">
+	                <h1>Body HTML Tag: table</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen">
+	                <br></br>
+	                	<table border="2px" style="width:50%">
+						  <tr>
+						    <td>Jill</td>
+						    <td>Smith</td>		
+						    <td>50</td>
+						  </tr>
+						  <tr>
+						    <td>Eve</td>
+						    <td>Jackson</td>		
+						    <td>94</td>
+						  </tr>
+						  <tr>
+						    <td>John</td>
+						    <td>Doe</td>		
+						    <td>80</td>
+						  </tr>
+						</table>
+	                </ui:tooltip>
+	            </div>
+	            <div class="case">
+	                <h1>Body Empty:</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="Long enough to go off the edge of the screen"> </ui:tooltip>
+	            </div>
+	            <div class="attribute">
+	            	Body
+	            </div>
+            </div>
+            
+            
+            <!--
+            	Disabled Test
+            -->
+            <div class="blocks">
+            	<div class="case">
+            		<h1>TT Disabled=false:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" disabled="false" trigger="hover" tooltipBody="Disabled is set to false">?</ui:tooltip> 
+            	</div>      
+            	<div class="case">
+            		<h1>TT Disabled=true:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" disabled="true" trigger="hover" tooltipBody="Disabled is set to true">?</ui:tooltip> 
+            	</div>      
+            	<div class="case">
+            		<h1>TT Disabled="":</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" disabled="" trigger="hover" tooltipBody="Disabled attribute is not set">?</ui:tooltip> 
+            	</div>     	
+            	<div class="attribute">
+	            	Disabled
+	            </div>
+            </div>
+            
+            <!--
+            	TriggerTest Advanced=true
+            -->
+            
+            <div class="blocks">Advanced = true
+            	<div class="case">
+            		<h1>trigger=hover:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="Trigger is set to hover">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>trigger=click:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="click" tooltipBody="Trigger is set to click">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>trigger=focus:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="focus" tooltipBody="Trigger is set to focus">
+	                 	<input type="text"></input>
+	                 </ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>trigger=none:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="none" tooltipBody="Trigger is set to none">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	Trigger
+	            </div>
+            </div>
+            
+            <!--
+            	TriggerTest Advanced=false
+            -->
+          
+             <div class="blocks">Advanced = false
+             	<div class="case">
+            		<h1>trigger=hover:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="false" trigger="hover" tooltipBody="Trigger is set to hover">?</ui:tooltip> 
+            	</div>
+            	<div class="case">
+            		<h1>trigger=click:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="false" trigger="click" tooltipBody="Trigger is set to click">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>trigger=focus:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="false" trigger="focus" tooltipBody="Trigger is set to focus">
+	                 	<input type="text"></input>
+	                 </ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>trigger=none:</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="false" trigger="none" tooltipBody="Trigger is set to none">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	Trigger
+	            </div>
+             </div>
+            
+            
+            
+              <!--
+            	fadeIn Test
+            -->
+            
+            <div class="blocks">
+            	<div class="case">
+            		<h1>fadeIn=true</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" fadeIn="true" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeIn=false</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="false" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeIn=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	fadeIn
+	            </div>
+            </div>
+            
+              <!--
+            	fadeOut Test
+            -->
+            
+            <div class="blocks">
+            	<div class="case">
+            		<h1>fadeOut=true</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" fadeOut="true" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOut=false</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="false" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOut=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	fadeOut
+	            </div>
+            </div>
+            
+              <!--
+            	fadeInDuration Test
+            -->
+            
+            <div class="blocks">
+            fadeIn = true
+            	<div class="case">
+            		<h1>fadeInDuration=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  fadeIn="true" fadeInDuration="0" trigger="hover" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeInDuration=200</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" fadeInDuration="200"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div>
+            	<div class="case">
+            		<h1>fadeInDuration=5000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" fadeInDuration="5000" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeInDuration="-1000"</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" fadeInDuration="-1000"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeInDuration=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" fadeInDuration="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div> 
+            		<div class="attribute">
+	            	fadeInDuration
+	            </div>
+            	</div>
+            </div>
+            
+              <!--
+            	fadeInDuration Test fadeIn=false
+            -->
+            
+            <div class="blocks">
+            fadeIn = false
+            	<div class="case">
+            		<h1>fadeInDuration=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  fadeIn="false" fadeInDuration="0" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeInDuration=200</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="false" fadeInDuration="200"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div>
+            	<div class="case">
+            		<h1>fadeInDuration=5000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="false" fadeInDuration="5000"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeInDuration="-1000"</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="false" fadeInDuration="-1000"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeInDuration=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="false" fadeInDuration="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div> 
+            		<div class="attribute">
+	            	fadeInDuration
+	            </div>
+            	</div>
+            </div>
+            
+              <!--
+            	fadeOutDuration Test
+            -->
+            
+            <div class="blocks">
+            	fadeOut=true
+            	<div class="case">
+            		<h1>fadeOutDuration=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  fadeOut="true" fadeOutDuration="0" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=200</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" fadeOutDuration="200"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=5000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" fadeOutDuration="5000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=-1000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" fadeOutDuration="-1000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" fadeOutDuration="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	fadeOutDuration
+	            </div>
+            </div>
+            
+            
+              <!--
+            	fadeOutDuration Test fadeOut=false
+            -->
+            
+            <div class="blocks">
+            	fadeOut=false
+            	<div class="case">
+            		<h1>fadeOutDuration=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  fadeOut="false" fadeOutDuration="0" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=200</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="false" fadeOutDuration="200"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=5000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="false" fadeOutDuration="5000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=-1000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="false" fadeOutDuration="-1000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>fadeOutDuration=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="false" fadeOutDuration="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	fadeOutDuration
+	            </div>
+            </div>
+            
+              <!--
+            	delay Test
+            -->
+            
+            <div class="blocks">
+            	delay
+            	<div class="case">
+            		<h1>delay=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"   delay="0" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=300</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" delay="300"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=3000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" delay="3000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=-150</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" delay="-150" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div>
+            	<div class="case">
+            		<h1>delay=-1000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" delay="-1000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" delay="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	Delay
+	            </div>
+            </div>
+            
+             <!--
+            	delay Test for fadeIn
+            -->
+            
+            <div class="blocks">
+            	delay for fadeIn
+            	<div class="case">
+            		<h1>delay=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  fadeIn="true" delay="0" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=300</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" delay="300"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=3000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" delay="3000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=-150</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" delay="-150" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div>
+            	<div class="case">
+            		<h1>delay=-1000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" delay="-1000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeIn="true" delay="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	Delay
+	            </div>
+            </div>
+            
+             <!--
+            	delay Test for fadeOut
+            -->
+            
+            <div class="blocks">
+            	delay for fadeOut
+            	<div class="case">
+            		<h1>delay=0</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  fadeOut="true" delay="0" trigger="hover" isVisible="false" tooltipBody="isVisible is set to false">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=300</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" delay="300"  tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=3000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" delay="3000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=-200</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" delay="-200" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div>
+            	<div class="case">
+            		<h1>delay=-1000</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" delay="-1000" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="case">
+            		<h1>delay=""</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" fadeOut="true" delay="" isVisible="true" tooltipBody="isVisible is set to true">?</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	Delay
+	            </div>
+            </div>
+            
+            <!--
+            	Test Class Attribute
+            -->
+            
+            <div class="blocks">
+            class attribute
+            	<div class="case">
+            		<h1>class=tt-class</h1>
+	                 <ui:tooltip aura:id="tooltip7" advanced="true"  class="tt-class" trigger="hover" tooltipBody="isVisible is set to false">Class</ui:tooltip> 
+            	</div> 
+            	<div class="attribute">
+	            	Class
+	            </div>
+            </div>
+            
+             <!--
+            	Tooltip-Body Test
+            -->
+            
+            <div class="blocks">
+	            <div class="case">
+	                <h1>TT Body:</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (&quot;!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ &amp; &quot;)">?</ui:tooltip>
+	            </div>
+	             <div class="case">
+	                <h1>TT Body Many Chars:</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (&quot;!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ &amp; &quot;) This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. Lets see how spaces are handled.       There are a few spaces before this sentence. Can you see it?		There are two tabs before this one">?</ui:tooltip>
+	            </div>
+	            <div class="case">
+	                <h1>TT Body:</h1>
+	                <ui:tooltip aura:id="tooltip7" advanced="true" trigger="hover" tooltipBody="&lt;h1&gt;Hello&lt;/h1&gt;">?</ui:tooltip>               
+	            </div>
+	            <div class="attribute">
+	            	tooltipBody
+	            </div>
+            </div>
+            
+            
+         
+            
+            
+        </div>
+    </aura:if>
+</aura:component>

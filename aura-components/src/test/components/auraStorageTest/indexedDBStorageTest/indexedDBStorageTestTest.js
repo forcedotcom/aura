@@ -641,5 +641,44 @@
                 });
             }
         }]
+    },
+
+    // TODO(W-2599085): Storages should clear existing entry after trying to put an item above the max size
+    _testReplaceExistingWithEntryTooLarge: {
+        test: [
+        function putItemThenReplaceWithEntryTooLarge(cmp) {
+            var maxSize = 5000;
+            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
+            cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
+                    true, false, maxSize, 2000, 3000, true, true);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge")});
+            cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
+            var itemTooLarge = new Array(2560).join("x");
+            var completed = false;
+
+            cmp._storage.put("testReplaceExistingWithEntryTooLarge", "ORIGINAL")
+                .then(function() { return cmp._storage.get("testReplaceExistingWithEntryTooLarge"); })
+                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
+                .then(function() { return cmp._storage.put("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
+                .then(function(){
+                        $A.test.fail("Should not be able to save an item above the maxSize")
+                     },
+                     function(error){
+                         var expectedMsg = "IndexedDBStorageAdapter.setItem(): Item larger than size limit of " + maxSize*0.25;
+                         $A.test.assertEqual(expectedMsg, error, "Unexpected error message trying to save item too large");
+                     })
+                 .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        },
+        function getItem(cmp) {
+            var completed = false;
+
+            cmp._storage.get("testReplaceExistingWithEntryTooLarge")
+                .then(function(item) { $A.test.assertEquals("", item.value, "Entry should be empty after attemping to put item too large")})
+                .then(function(){ completed = true;}, cmp._die);
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        }]
     }
 })

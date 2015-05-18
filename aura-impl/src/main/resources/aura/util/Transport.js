@@ -17,14 +17,15 @@
 /**
  * Create and send XHRs to the server.
  * @constructor
+ * @export
  */
-function Transport() {}
+Aura.Utils.Transport = function Transport() {};
 
 /**
  * @returns {Object} An XHR based on what is available on the current browser, null if no valid options found
- * @private
+ * @export
  */
-Transport.prototype.createHttpRequest = function() {
+Aura.Utils.Transport.prototype.createHttpRequest = function() {
     if (window.XMLHttpRequest) {
         return new XMLHttpRequest();
     } else if (window.ActiveXObject) {
@@ -47,7 +48,7 @@ Transport.prototype.createHttpRequest = function() {
  * @returns {String} The encoded parameters
  * @private
  */
-Transport.prototype.buildParams = function(map) {
+Aura.Utils.Transport.prototype.buildParams = function(map) {
     var arr = [];
     var first = true;
     for (var key in map) {
@@ -83,8 +84,9 @@ Transport.prototype.buildParams = function(map) {
  * Create and send an XHR request based on the config.
  * 
  * @param {Object} config The config for the request containing url, method, callback, scope, and params.
+ * @export
  */
-Transport.prototype.request = function(config) {
+Aura.Utils.Transport.prototype.request = function(config) {
     var request = this.createHttpRequest();
     var method = config["method"] || "GET";
     var qs;
@@ -125,7 +127,3 @@ Transport.prototype.request = function(config) {
         request.send();
     }
 };
-
-Aura.Utils.Transport = Transport;
-
-//#include aura.util.Transport_export

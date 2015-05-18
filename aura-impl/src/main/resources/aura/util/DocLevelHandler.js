@@ -28,8 +28,9 @@
  *
  * @constructor
  * @private
+ * @export
  */
-function DocLevelHandler(eventName, callback, component) {
+Aura.Utils.DocLevelHandler = function DocLevelHandler(eventName, callback, component) {
     this.eventName = eventName;
     this.component = component;
     this.enabled = false;
@@ -39,7 +40,7 @@ function DocLevelHandler(eventName, callback, component) {
             callback(eventObj);
         }
     };
-}
+};
 
 /**
  * Set whether the handler is enabled.
@@ -47,10 +48,10 @@ function DocLevelHandler(eventName, callback, component) {
  * This function will enable or disable the handler as necessary. Note that the
  * callback will be called only if the component is rendered.
  *
- * @param {Boolean}
- *            enable if truthy, the handler is enabled, otherwise disabled.
+ * @param {Boolean} enable if truthy, the handler is enabled, otherwise disabled.
+ * @export
  */
-DocLevelHandler.prototype.setEnabled = function(enable) {
+Aura.Utils.DocLevelHandler.prototype.setEnabled = function(enable) {
     if (enable) {
         if (!this.enabled) {
             this.enabled = true;
@@ -63,8 +64,3 @@ DocLevelHandler.prototype.setEnabled = function(enable) {
         }
     }
 };
-
-var dlp = DocLevelHandler.prototype;
-Aura.Utils.DocLevelHandler = DocLevelHandler;
-
-exp(dlp, "setEnabled", dlp.setEnabled);

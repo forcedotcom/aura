@@ -25,10 +25,10 @@ var ClientServiceMetricsPlugin = function ClientServiceMetricsPlugin(config) {
 
 ClientServiceMetricsPlugin.NAME = "clientService";
 ClientServiceMetricsPlugin.prototype = {
-    initialize: function (metricsCollector) {
-        this.collector = metricsCollector;
+    initialize: function (metricsService) {
+        this.collector = metricsService;
         if (this["enabled"]) {
-            this.bind(metricsCollector);
+            this.bind(metricsService);
         }
     },
     enable: function () {
@@ -43,7 +43,7 @@ ClientServiceMetricsPlugin.prototype = {
             this.unbind(this.collector);
         }
     },
-    bind: function (metricsCollector) {
+    bind: function (metricsService) {
         var method     = 'init',
             startTime  = 0;
 
@@ -52,10 +52,10 @@ ClientServiceMetricsPlugin.prototype = {
         }
 
         function afterHook(markEnd) {
-            metricsCollector.bootstrapMark("appCreationTime", markEnd["ts"] - startTime);
+            metricsService.bootstrapMark("appCreationTime", markEnd["ts"] - startTime);
         }
 
-        metricsCollector["instrument"](
+        metricsService.instrument(
             $A["clientService"],
             method, 
             ClientServiceMetricsPlugin.NAME,
@@ -64,8 +64,8 @@ ClientServiceMetricsPlugin.prototype = {
             afterHook
         );
     },
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"]($A["clientService"], 'init');
+    unbind: function (metricsService) {
+        metricsService["unInstrument"]($A["clientService"], 'init');
     },
     postProcess: function (marks) {
         // Remove them all since we already got the appCreation metrics

@@ -25,11 +25,11 @@ var AuraContextPlugin = function AuraContextPlugin(config) {
 
 AuraContextPlugin.NAME = "defRegistry";
 AuraContextPlugin.prototype = {
-    initialize: function (metricsCollector) {
-        this.collector = metricsCollector;
+    initialize: function (metricsService) {
+        this.collector = metricsService;
 
         if (this["enabled"]) {
-            this.bind(metricsCollector);
+            this.bind(metricsService);
         }
     },
     enable: function () {
@@ -44,7 +44,7 @@ AuraContextPlugin.prototype = {
             this.unbind(this.collector);
         }
     },
-    bind: function (metricsCollector) {
+    bind: function (metricsService) {
         var method  = 'merge',
             defIter = function (b) {
                 var a = [];
@@ -72,13 +72,13 @@ AuraContextPlugin.prototype = {
                 }
 
                 if (hasDefs) {
-                    metricsCollector['transaction']('AURAPERF', 'newDefs', {"context": payload});
+                    metricsService['transaction']('AURAPERF', 'newDefs', {"context": payload});
                 }
                 
                 return ret;
             };
 
-        metricsCollector["instrument"](
+        metricsService.instrument(
             Aura.Context.AuraContext.prototype,
             method,
             AuraContextPlugin.NAME,
@@ -93,8 +93,8 @@ AuraContextPlugin.prototype = {
         return transportMarks;
     },
     // #end
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"](Aura.Context.AuraContext.prototype, 'merge');
+    unbind: function (metricsService) {
+        metricsService["unInstrument"](Aura.Context.AuraContext.prototype, 'merge');
     }
 };
 

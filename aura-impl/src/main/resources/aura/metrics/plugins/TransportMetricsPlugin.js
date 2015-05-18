@@ -25,10 +25,10 @@ var TransportMetricsPlugin = function TransportMetricsPlugin(config) {
 
 TransportMetricsPlugin.NAME = "transport";
 TransportMetricsPlugin.prototype = {
-    initialize: function (metricsCollector) {
-        this.collector = metricsCollector;
+    initialize: function (metricsService) {
+        this.collector = metricsService;
         if (this["enabled"]) {
-            this.bind(metricsCollector);
+            this.bind(metricsService);
         }
     },
     enable: function () {
@@ -43,7 +43,7 @@ TransportMetricsPlugin.prototype = {
             this.unbind(this.collector);
         }
     },
-    bind: function (metricsCollector) {
+    bind: function (metricsService) {
         var method       = 'request',
             callbackHook = function (startMark, config) {
                 var original = config["callback"],
@@ -56,7 +56,7 @@ TransportMetricsPlugin.prototype = {
                 };
 
                 config["callback"] = function (xhr) {
-                    var endMark = metricsCollector["markEnd"](TransportMetricsPlugin.NAME, method);
+                    var endMark = metricsService["markEnd"](TransportMetricsPlugin.NAME, method);
                     endMark["context"] = {
                         "aura.num"       : auraNum,
                         "status"         : xhr.status,
@@ -67,7 +67,7 @@ TransportMetricsPlugin.prototype = {
                 };
             };
 
-        metricsCollector["instrument"](
+        metricsService.instrument(
             $A["util"]["transport"],
             'request', 
             TransportMetricsPlugin.NAME,
@@ -98,8 +98,8 @@ TransportMetricsPlugin.prototype = {
         return procesedMarks;
     },
     // #end
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"]($A["util"]["transport"], 'request');
+    unbind: function (metricsService) {
+        metricsService["unInstrument"]($A["util"]["transport"], 'request');
     }
 };
 

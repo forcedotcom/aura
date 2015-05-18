@@ -20,7 +20,7 @@
  * @constructor
  */
 var AuraStyleService = function() {
-    var style = new Style(); // util for adding and removing <style> elements
+    var style = new Aura.Utils.Style(); // util for adding and removing <style> elements
     var added = []; // keep track of <style> elements added to head
 
     var styleService = {

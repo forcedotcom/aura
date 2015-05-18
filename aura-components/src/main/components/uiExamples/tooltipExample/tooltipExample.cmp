@@ -40,25 +40,25 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                 <h2>Give us information:</h2>
                 <p><ui:tooltip tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
                 <form>
-                    <p tabindex="1">
+                    <p>
                         <ui:tooltip fadeOut="true" triggerClass="tooltip-trigger" tooltipBody="Please?">
-                            <label for="name">Fade out only</label>
+                            <span>Fade out only</span>
                         </ui:tooltip>
-                        <input type="text" name="name" id="name"/>
                     </p>
                     <p>
                         <ui:tooltip fadeIn="true" triggerClass="tooltip-trigger" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
-                            <label for="email">Fade in only</label>
+                            <span>Fade in only</span>
                         </ui:tooltip>
-                        <input type="email" name="email" id="email"/>
                     </p>
                     <p>
-                        <ui:tooltip delay="500" fadeIn="true" fadeOut="true" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip><label for="coversheet">Fade in and out, with 500ms delay</label>
-                        <input type="file" name="coversheet" id="coversheet" />
+                        <ui:tooltip delay="500" fadeIn="true" fadeOut="true" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
+                        <span>Fade in/out with delay</span>
                     </p>
                     <p>
-                        <label for="mrfocus">This one shows on focus:</label>
-                        <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this"><input type="text" name="mrfocus" id="mrfocus"/></ui:tooltip>
+                        <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this"><ui:inputText placeholder="Show tooltip on focus" type="text" aura:id="mrfocus"/></ui:tooltip>
+                    </p>
+                    <p>
+                        <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
                     </p>
                 </form>
             </div>

@@ -14,7 +14,7 @@
 				</xsl:for-each>
 			</properties>
 			<xsl:for-each select="/xunit/facts/fact">
-				<testcase time="{@duration}" classname="xunit" name="{@path}">
+				<testcase time="{@duration}" classname="xunit.xunit" name="{@path}">
 					<xsl:if test="@result!='Success'">
 						<xsl:element name="{translate(@result,$uppercase,$lowercase)}">
 							<xsl:attribute name="message">

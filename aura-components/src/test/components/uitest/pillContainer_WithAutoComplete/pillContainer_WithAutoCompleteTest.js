@@ -127,7 +127,7 @@
         test: function (cmp) {
             this._createPillByAutoComplete(cmp);
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
-            $A.test.assertTrue($A.test.select(".pill")[0].innerText.indexOf(this.PILLS[0].label) > -1, "The wrong pill was created");
+            $A.test.assertTrue($A.test.getText(($A.test.select(".pill")[0])).indexOf(this.PILLS[0].label) > -1, "The wrong pill was created");
         }
     },
 

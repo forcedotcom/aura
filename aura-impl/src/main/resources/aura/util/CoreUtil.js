@@ -2003,6 +2003,18 @@ CoreUtil.prototype.toArray = function(collection) {
         return t;
     };
 
+
+    CoreUtil.prototype.setText = function(node, text) {
+        if (node.textContent !== undefined) {
+            //webkit & ff
+            node.textContent = text;
+        } else if (styleElement.innerText !== undefined) {
+            //chrome, safari, IE
+            node.innerText = text;
+        }
+    };
+
+
     CoreUtil.prototype.errorBasedOnMode = function(msg) {
         $A.error(msg);
     };

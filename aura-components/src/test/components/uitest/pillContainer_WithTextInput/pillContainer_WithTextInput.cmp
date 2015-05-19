@@ -1,9 +1,11 @@
 <aura:component>
 <aura:attribute name="pillInsertFired" type="boolean" default="false"/>
 <aura:attribute name="pillRemovedFired" type="boolean" default="false"/>
+    <div style="margin:20px; width:400px;">
     <ui:pillContainer aura:id="pillContainer" pillInserted="{!c.processPillInserted}" pillRemoved="{!c.processPillRemoved}">
         <aura:set attribute="pillInput">
             <uitest:pillContainer_InputText aura:id="textInput"/>
         </aura:set>
     </ui:pillContainer>
+    </div>
 </aura:component>

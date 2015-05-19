@@ -22,6 +22,10 @@
     position:relative;
 }
 
+.THIS.noinput {
+    border:none
+}
+
 .THIS:after {
     content: " ";
     display: block;

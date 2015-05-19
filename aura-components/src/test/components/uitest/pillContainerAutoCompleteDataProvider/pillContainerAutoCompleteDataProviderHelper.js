@@ -15,9 +15,10 @@
  */
 ({
     items: [
-        { id:1, label:"Test Pill 01", icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=1&f=FFFFFF'}},
-        { id:2, label:"Test Pill 02", icon: {url:'https://ipsumimage.appspot.com/20x20,ff88cc?l=2&f=FFFFFF'}}
-    ],
+        {id:'pill01',label:"Test Pill 01", icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF'}},
+        {id:'pill02',label:"Test Pill 02", icon: {url:'https://ipsumimage.appspot.com/20x20,ff88cc?l=2&f=FFFFFF'}},
+        {id:'pill03',label:"Test Pill 03", icon: {url:'https://ipsumimage.appspot.com/20x20,88cc88?l=3&f=FFFFFF'}},
+        {id:'pill04',label:"Test Pill 04", icon: {url:'https://ipsumimage.appspot.com/20x20,FFCC88?l=4&f=FFFFFF'}}],
     provide: function(component, event, controller) {
         var params = event.getParam("parameters");
         if (!$A.util.isUndefinedOrNull(params) && !$A.util.isEmpty(params.keyword)) {

@@ -1,9 +1,10 @@
 <aura:component>
+    <aura:attribute name="flavor" type="String" default="default" description=""/>
     <aura:attribute name="maxLines" type="Integer" default="0" description="Maximum lines to show. Hidden lines can be expanded. Use 0 to disable."/>
     <div style="margin:20px; width:400px;">
-    <ui:pillContainer aura:id="pillContainer" maxLines="{!v.maxLines}">
+    <ui:pillContainer aura:id="pillContainer" maxLines="{!v.maxLines}" aura:flavor="{!v.flavor}" pillFlavor="{!v.flavor}">
         <aura:set attribute="pillInput">
-            <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row" >
+            <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row">
                 <aura:set attribute="dataProvider">
                     <uitest:pillContainerAutoCompleteDataProvider/>
                 </aura:set>

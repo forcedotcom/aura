@@ -594,6 +594,10 @@ Test.Aura.AuraClientServiceTest = function() {
                     }
                 });
             };
+
+            this.adapter = {
+                setItem: function() {}
+            };
         })();
 
         // Sets up the environment with a mock action storage:
@@ -782,9 +786,7 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function testResetToken() {
             mockActionService(function(service, storage) {
-                storage.setup({
-                    put: function(){}
-                });
+                service.saveTokenToStorage = function() {};
 
                 // Act
                 service.resetToken("myToken");

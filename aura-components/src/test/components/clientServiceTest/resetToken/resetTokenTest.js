@@ -24,10 +24,10 @@
                 var storage = $A.storageService.getStorage("actions");
                 $A.test.assertNotUndefinedOrNull(storage);
                 // Verify the token in storage gets updated
-                storage.get("$AuraClientService.priv$").then(
+                storage.adapter.getItem("$AuraClientService.token$").then(
                     function(value) {
-                        if(value && value.value) {
-                            actual = value.value.token;
+                        if(value && value.token) {
+                            actual = value.token;
                         }
                     }, function() {
                         fail("Failed to get value from storage.");

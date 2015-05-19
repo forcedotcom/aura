@@ -32,6 +32,9 @@ function AuraClientService () {
     this.finishedInitDefs = false;
     this.namespaces={};
 
+    // token storage key should not be changed because external client may query independently
+    this._tokenStorageKey = "$AuraClientService.token$";
+
     this.foreground = new FlightCounter(1);
     this.background = new FlightCounter(3);
     this.actionQueue = new ActionQueue();
@@ -885,7 +888,7 @@ AuraClientService.prototype.saveTokenToStorage = function() {
     var storage = Action.prototype.getStorage();
     if (storage && this._token) {
         var value = { "token": this._token };
-        storage.put("$AuraClientService.priv$", value).then(
+        storage.adapter.setItem(this._tokenStorageKey, value).then(
             this.NOOP,
             function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }
         );
@@ -899,9 +902,9 @@ AuraClientService.prototype.saveTokenToStorage = function() {
 AuraClientService.prototype.loadTokenFromStorage = function() {
     var storage = Action.prototype.getStorage();
     if (storage) {
-        return storage.get("$AuraClientService.priv$");
+        return storage.adapter.getItem(this._tokenStorageKey);
     }
-    return Promise.reject(new Error("no Action storage"));
+    return Promise["reject"](new Error("no Action storage"));
 };
 
 /**
@@ -1139,8 +1142,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                         var key = action.getStorageKey();
                         acs.loadTokenFromStorage()
                             .then(function(value) {
-                                if (value && value.value && value.value.token) {
-                                    this._token = value.value.token;
+                                if (value && value["token"]) {
+                                    this._token = value["token"];
                                 }
                             }, function(err) {
                                 // So this isn't good: we don't have the CSRF token so if we go back online the server

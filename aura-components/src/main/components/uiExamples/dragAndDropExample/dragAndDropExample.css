@@ -30,10 +30,6 @@
 	background-color: #f1f1f1;
 }
 
-.THIS .sampleList.dragOverAccessible {
-	background-color: #eda2a2;
-}
-
 .THIS .sampleList .listContent {
 	height: 100vh;
 	border-left: #f5f6f7 1px solid;
@@ -53,8 +49,4 @@
 
 .THIS .sampleCard.dragging {
 	border: 2px dashed #000;
-}
-
-.THIS .sampleCard.draggingAccessible {
-	border: 2px dashed red;
 }

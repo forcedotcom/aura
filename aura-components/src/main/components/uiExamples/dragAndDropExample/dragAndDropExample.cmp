@@ -26,9 +26,7 @@
 	<ui:dragAndDropAccessibilityMenu aura:id="accessibilityComponent"/>
 	
 	<div class="container">
-		<ui:dropzone inContextOf="{!v._context1}" label="List A" 
-					 class="sampleList" dragOverClass="dragOver" dragOverAccessibilityClass="dragOverAccessible"
-					 drop="{!c.handleDrop}">
+		<ui:dropzone inContextOf="{!v._context1}" label="List A" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}">
 			<ui:infinitelist aura:id="list" itemVar="item">
 				<aura:set attribute="dataProvider">
 					<uiExamples:dragAndDropProvider prefix="Acme" count="5"/>
@@ -40,7 +38,6 @@
 									  dataTransfer="{!item}"
 									  class="sampleCard"
 									  dragClass="dragging"
-									  dragAccessibilityClass="draggingAccessible"
 									  accessibilityComponent="{!v._accessibilityComponent[0]}">
 							<p>{!item}</p>
 						</ui:draggable>
@@ -49,9 +46,7 @@
 			</ui:infinitelist>
 		</ui:dropzone>
 		
-		<ui:dropzone inContextOf="{!v._context2}" label="List B" 
-					 class="sampleList" dragOverClass="dragOver" dragOverAccessibilityClass="dragOverAccessible"
-					 drop="{!c.handleDrop}" >
+		<ui:dropzone inContextOf="{!v._context2}" label="List B" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}" >
 			<ui:infinitelist aura:id="list" itemVar="item">
 				<aura:set attribute="dataProvider">
 					<uiExamples:dragAndDropProvider prefix="Foo" count="3"/>
@@ -63,7 +58,6 @@
 									  dragEnd="{!c.handleDragEnd}"
 									  class="sampleCard"
 									  dragClass="dragging"
-									  dragAccessibilityClass="draggingAccessible"
 									  accessibilityComponent="{!v._accessibilityComponent}">
 							<p>{!item}</p>
 						</ui:draggable>

@@ -15,14 +15,13 @@
  */
 ({
 	init: function(component, event, helper) {
-		var draggableContext = component.find("list");
-		component.set("v._dropzoneContext1", draggableContext[0]);
-		component.set("v._dropzoneContext2", draggableContext[1]);
-		component.set("v._draggableContext1", draggableContext[0]);
-		component.set("v._draggableContext2", draggableContext[1]);
+		var context = component.find("list");
+		component.set("v._context1", context[0]);
+		component.set("v._context2", context[1]);
+		component.set("v._accessibilityComponent", component.find("accessibilityComponent").getGlobalId());
 	},
 	
-	handleDrop: function(component, event, helper) {	
+	handleDrop: function(component, event, helper) {
 		$A.dragAndDropService.fireDropComplete(event, true);
 	},
 	

@@ -23,6 +23,15 @@
 	flex: 1;
 	-webkit-flex: 1;
 	width: 15em;
+	list-style-type: none;
+}
+
+.THIS .sampleList.dragOver {
+	background-color: #f1f1f1;
+}
+
+.THIS .sampleList.dragOverAccessible {
+	background-color: #eda2a2;
 }
 
 .THIS .sampleList .listContent {
@@ -44,4 +53,8 @@
 
 .THIS .sampleCard.dragging {
 	border: 2px dashed #000;
+}
+
+.THIS .sampleCard.draggingAccessible {
+	border: 2px dashed red;
 }

@@ -73,6 +73,7 @@
             if (action) {
                 action.runDeprecated();
             }
+            this.fireMenuFocusChangeEvent(component, null, menuItem);
         }
     },
 
@@ -161,6 +162,8 @@
         var nextFocusCmp = menuItems[nextIndex];
         var action = nextFocusCmp.get("c.setFocus");
         action.runDeprecated();
+        
+        this.fireMenuFocusChangeEvent(component, srcComponent, nextFocusCmp);
     },
 
     setFocusToPreviousItem: function(component, event) {
@@ -179,6 +182,17 @@
         var previousFocusCmp = menuItems[previousIndex];
         var action = previousFocusCmp.get("c.setFocus");
         action.runDeprecated();
+        
+        this.fireMenuFocusChangeEvent(component, srcComponent, previousFocusCmp);
+    },
+    
+    fireMenuFocusChangeEvent: function(component, previousItem, currentItem) {
+    	var event = component.getEvent("menuFocusChange");
+    	event.setParams({
+			"previousItem": previousItem,
+			"currentItem": currentItem
+		});
+    	event.fire();
     },
 
     /**
@@ -216,6 +230,7 @@
             if(text.toLowerCase().indexOf(matchText) === 0) {
                 var action = c.get("c.setFocus");
                 action.runDeprecated();
+                this.fireMenuFocusChangeEvent(component, null, c);
                 break;
             }
         }

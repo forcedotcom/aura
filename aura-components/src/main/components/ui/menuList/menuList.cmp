@@ -26,6 +26,7 @@
     <aura:registerEvent access="GLOBAL" name="menuCollapse" type="ui:collapse" description="The event fired when the menu list collapses."/>
     <aura:registerEvent access="GLOBAL" name="menuExpand" type="ui:expand" description="The event fired when the menu list displays."/>
     <aura:registerEvent access="GLOBAL" name="menuSelect" type="ui:menuSelect" description="The event fired when the user select a menu item."/>
+    <aura:registerEvent access="GLOBAL" name="menuFocusChange" type="ui:menuFocusChange" description="The event fired when the menu list focus changed from one menuItem to another menuItem."/>
     <aura:registerEvent name="refresh" type="ui:refresh" description="Fire this event to refresh the menuList."/>
 
     <aura:handler name="refresh" action="{!c.update}"/>

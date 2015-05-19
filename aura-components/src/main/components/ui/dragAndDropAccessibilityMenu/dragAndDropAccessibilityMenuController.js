@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 ({
-	init: function (component, event, helper) {
-		helper.resetCssClass(component);
+	handleMenuCollapse: function (component, event, helper) {
+		helper.handleMenuCollapse(component);
 	},
 	
-	handleDropComplete: function (component, event, helper) {
-		helper.handleDropComplete(component, event);
+	handleMenuFocusChange: function (component, event, helper) {
+		var previousItem = event.getParam("previousItem");
+		var currentItem = event.getParam("currentItem");
+		helper.handleMenuFocusChange(previousItem, currentItem);
 	},
 	
-	fireDragEnd: function (component, event, helper) {
-		var params = event.getParam("arguments");
-		helper.fireDragEnd(component, params.isValid, params.isInAccessibilityMode);
+	handleMenuSelect: function (component, event, helper) {
+		helper.handleMenuSelect(component, event);
 	}
 })

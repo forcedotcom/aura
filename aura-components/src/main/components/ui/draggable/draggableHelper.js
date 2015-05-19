@@ -21,18 +21,41 @@
 	},
 	
 	/**
+	 * Handle keypress event.
+	 * @param {Aura.Component} component - this component
+	 * @param {Event} event - HTML DOM Event for keypress
+	 */
+	handleKeyPress: function(component, event) {
+		// SPACE
+		if (event.keyCode === 32) {
+			// Stop default scroll to bottom behavior
+			event.preventDefault();
+			
+			// Delegate drag and drop operation to accessibility component
+			var accessibilityComponent = component.get("v.accessibilityComponent");
+			if (accessibilityComponent) {
+				var concreteCmp = $A.componentService.get(accessibilityComponent);
+				if (concreteCmp.isInstanceOf("ui:dragAndDropAccessibility")) {
+					concreteCmp.startDragAndDrop([component]);
+				}
+			}
+			
+			this.fireDragStart(component, true);
+    	}
+	},
+	
+	/**
 	 * Handle dragstart event.
 	 * @param {Aura.Component} component - this component
 	 * @param {Event} event - HTML DOM Event for dragstart
 	 */
 	handleDragStart: function(component, event) {
 		// Setting up DataTransferObject
-		var type = component.get("v.type");
-		event.dataTransfer.effectAllowed = type;
+		event.dataTransfer.effectAllowed = component.get("v.type");
 		
 		// Set aura-id of this draggable component so that 
 		// we can pass this component to the dropzone
-		event.dataTransfer.setData("aura-id", component.getGlobalId());
+		event.dataTransfer.setData("aura/id", component.getGlobalId());
 		
 		// Set data to be transferred between drag component and drop component
 		var dataTransfer = component.get("v.dataTransfer");
@@ -41,22 +64,27 @@
 				event.dataTransfer.setData("text/plain", dataTransfer);
 			} else {
 				for (var key in dataTransfer) {
-					if (key !== "aura-id" && dataTransfer.hasOwnProperty(key)) {
+					if (key !== "aura/id" && dataTransfer.hasOwnProperty(key)) {
 						event.dataTransfer.setData(key, dataTransfer[key]);
 					}
 				}
 			}
 		}
 		
+		this.fireDragStart(component, false);
+	},
+	
+	fireDragStart: function(component, isInAccessibilityMode) {
 		// Enter drag operation
-		this.enterDragOperation(component);
+		this.enterDragOperation(component, isInAccessibilityMode);
 		
 		// Fire dragStart event
 		var dragEvent = component.getEvent("dragStart");
 		dragEvent.setParams({
-			"type": type,
+			"type": component.get("v.type"),
 			"dragComponent": component,
-			"data": dataTransfer,
+			"data": component.get("v.dataTransfer"),
+			"isInAccessibilityMode": isInAccessibilityMode
 		});
 		dragEvent.fire();
 	},
@@ -67,18 +95,23 @@
 	 * @param {Event} event - HTML DOM Event for dragend
 	 */
 	handleDragEnd: function(component, event) {
+		var dropEffect = event.dataTransfer.dropEffect;
+		this.fireDragEnd(component, dropEffect === component.get("v.type"), false);
+	},
+	
+	fireDragEnd: function(component, isValid, isInAccessibilityMode) {
 		if (component.isValid()) {
-			this.exitDragOperation(component);
-			var dropEffect = event.dataTransfer.dropEffect;
-			if (dropEffect === component.get("v.type")) {
+			this.exitDragOperation(component, isInAccessibilityMode);
+			if (isValid) {
 				// drop operation is performed
-				this.updateDropOperationStatus(component, "dragEnd", event);
+				this.updateDropOperationStatus(component, "dragEnd");
 			} else {
 				// drag operation is ended without performing drop operation.
 				var dragEvent = component.getEvent("dragEnd");
 				dragEvent.setParams({
-					"type": dropEffect,
-					"dragComponent": component
+					"type": component.get("v.type"),
+					"dragComponent": component,
+					
 				});
 				dragEvent.fire();
 			}
@@ -99,7 +132,7 @@
 	 * dragEnd HTML event and dropComplete Aura event have been fired. 
 	 * @param {Aura.Component} component - this component
 	 * @param {String} eventType - "dragEnd" for dragEnd HTML DOM Event or "dropComplete" for dropComplete Aura event
-	 * @param {(Event|Aura.Event)} event - the HTML DOM Event for dragend or dropComplete Aura event
+	 * @param {Aura.Event} [event] - the Aura event for dropComplete
 	 */
 	updateDropOperationStatus: function(component, eventType, event) {
 		if (this.$dropOperationStatus$ == null) {
@@ -111,7 +144,7 @@
 		
 		if (eventType === "dragEnd") {
 			this.$dropOperationStatus$["dragEnd"] = {
-				"type": event.dataTransfer.dropEffect
+				"type": component.get("v.type")
 			};
 		} else if (eventType === "dropComplete") {
 			this.$dropOperationStatus$["dropComplete"] = {
@@ -140,11 +173,18 @@
 	 * Make this component entering drag operation.
 	 * @param {Aura.Component} component - this component
 	 */
-	enterDragOperation: function(component) {
+	enterDragOperation: function(component, isInAccessibilityMode) {
 		this.$dropOperationStatus$ = null;
 		
 		// set onDrag class
-		component.set("v.theClass", component.get("v.class") + " " + component.get("v.dragClass"));
+		var onDragClass = component.get("v.dragClass");
+		if (isInAccessibilityMode) {
+			var onDragAccessibilityClass = component.get("v.dragAccessibilityClass");
+			if (!$A.util.isEmpty(onDragAccessibilityClass)) {
+				onDragClass = onDragAccessibilityClass;
+			}
+		}
+		component.set("v.theClass", component.get("v.class") + " " + onDragClass);
 		
 		// Set aria-describe
 		component.set("v.ariaGrabbed", true);
@@ -154,7 +194,7 @@
 	 * Make this component exiting drag operation.
 	 * @param {Aura.Component} component - this component
 	 */
-	exitDragOperation: function(component) {
+	exitDragOperation: function(component, isInAccessibilityMode) {
 		// reset onDrag class
 		this.resetCssClass(component);
 		

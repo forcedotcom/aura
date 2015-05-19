@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 ({
-	init: function (component, event, helper) {
-		helper.resetCssClass(component);
-	},
-	
-	handleDropComplete: function (component, event, helper) {
-		helper.handleDropComplete(component, event);
-	},
-	
-	fireDragEnd: function (component, event, helper) {
+	startDragAndDrop: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.fireDragEnd(component, params.isValid, params.isInAccessibilityMode);
+		helper.startDragAndDrop(component, params.draggables);
 	}
 })

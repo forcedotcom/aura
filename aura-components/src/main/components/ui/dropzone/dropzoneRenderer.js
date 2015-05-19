@@ -18,20 +18,20 @@
         var ret = this.superAfterRender();
         
         // Listen to drag and drop events
-        var draggable = component.getElement();
-        draggable.addEventListener("dragenter", function(event) {
+        var dropzone = component.getElement();
+        dropzone.addEventListener("dragenter", function(event) {
         	helper.handleDragEnter(component, event);
         }, false);
         
-        draggable.addEventListener("dragover", function(event) {
+        dropzone.addEventListener("dragover", function(event) {
         	helper.handleDragOver(component, event);
         }, false);
         
-        draggable.addEventListener("dragleave", function(event) {
+        dropzone.addEventListener("dragleave", function(event) {
         	helper.handleDragLeave(component, event);
         }, false);
         
-        draggable.addEventListener("drop", function(event) {
+        dropzone.addEventListener("drop", function(event) {
         	helper.handleDrop(component, event);
         }, false);
         

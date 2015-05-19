@@ -14,17 +14,35 @@
  * limitations under the License.
  */
 ({
+	resetCssClass: function(component) {
+		component.set("v.theClass", component.get("v.class"));
+	},
+	
 	/**
 	 * Handle dragenter event.
 	 * @param {Aura.Component} component - this component
 	 * @param {Event} event - HTML DOM Event for dragenter
 	 */
 	handleDragEnter: function(component, event) {
-		// Fire dragEnter event
+		this.fireDragEnter(component, $A.componentService.getRenderingComponentForElement(event.target), false);
+	},
+	
+	fireDragEnter: function(component, targetComponent, isInAccessibilityMode) {
+		// Set onDragOver class
+		var onDragOverClass = component.get("v.dragOverClass");
+		if (isInAccessibilityMode) {
+			var onDragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
+			if (!$A.util.isEmpty(onDragOverAccessibilityClass)) {
+				onDragOverClass = onDragOverAccessibilityClass;
+			}
+		}
+		component.set("v.theClass", component.get("v.class") + " " + onDragOverClass);
+		
 		var dragEvent = component.getEvent("dragEnter");
 		dragEvent.setParams({
 			"dropComponent": component,
-			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target)
+			"dropComponentTarget": targetComponent,
+			"isInAccessibilityMode": isInAccessibilityMode
 		});
 		dragEvent.fire();
 	},
@@ -61,11 +79,18 @@
 	 * @param {Event} event - HTML DOM Event for dragleave
 	 */
 	handleDragLeave: function(component, event) {		
-		// Fire dragLeave event
+		this.fireDragLeave(component, $A.componentService.getRenderingComponentForElement(event.target), false);
+	},
+	
+	fireDragLeave: function(component, targetComponent, isInAccessibilityMode) {
+		// reset onDragOver class
+		this.resetCssClass(component);
+		
 		var dragEvent = component.getEvent("dragLeave");
 		dragEvent.setParams({
 			"dropComponent": component,
-			"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target)
+			"dropComponentTarget": targetComponent,
+			"isInAccessibilityMode": isInAccessibilityMode
 		});
 		dragEvent.fire();
 	},
@@ -82,37 +107,34 @@
 		}
 		
 		// Get draggable component
-		var auraId = event.dataTransfer.getData("aura-id");
+		var auraId = event.dataTransfer.getData("aura/id");
 		var dragComponent = $A.getCmp(auraId);
 		
 		// Check for supported drop operation
 		var supportedTypes = component.get("v.types");
 		var operationType = event.dataTransfer.effectAllowed;
-		if (operationType === "all" || supportedTypes.indexOf(operationType) > -1) {
-			// Get data being transferred
-			var data = {};
-			var dataTransferTypes = event.dataTransfer.types;
-			for (var i = 0; i < dataTransferTypes.length; i++) {
-				var dataTransferType = dataTransferTypes[i];
-				if (dataTransferType !== "aura-id") {
-					data[dataTransferType] = event.dataTransfer.getData(dataTransferType);
-				}
-			}
-			
-			// Fire drop event
-			var dragEvent = component.getEvent("drop");
-			dragEvent.setParams({
-				"type": operationType,
-				"dragComponent": dragComponent,
-				"dropComponent": component,
-				"dropComponentTarget": $A.componentService.getRenderingComponentForElement(event.target),
-				"data": data
-			});
-			dragEvent.fire();
+		if (operationType === "all" || supportedTypes.indexOf(operationType) > -1) {			
+			this.fireDrop(component, dragComponent, $A.componentService.getRenderingComponentForElement(event.target), false);
 		}
 		
 		// Prevent default browser action, such as redirecting
 		return false;
+	},
+	
+	fireDrop: function(component, dragComponent, targetComponent, isInAccessibilityMode) {
+		// reset onDragOver class
+		this.resetCssClass(component);
+		
+		var dragEvent = component.getEvent("drop");
+		dragEvent.setParams({
+			"type": dragComponent.get("v.type"),
+			"dragComponent": dragComponent,
+			"dropComponent": component,
+			"dropComponentTarget": targetComponent,
+			"data": dragComponent.get("v.dataTransfer"),
+			"isInAccessibilityMode": isInAccessibilityMode
+		});
+		dragEvent.fire();
 	},
 	
 	/**
@@ -120,8 +142,8 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	enterDragOperation: function(component) {
-		var type = component.get("v.type");
-		component.set("v.ariaDropEffect", type);
+		var types = component.get("v.types");
+		component.set("v.ariaDropEffect", types.join(" "));
 	},
 	
 	/**
@@ -130,5 +152,8 @@
 	 */
 	exitDragOperation: function(component) {
 		component.set("v.ariaDropEffect", "none");
+		
+		// reset onDragOver class
+		this.resetCssClass(component);
 	}
 })

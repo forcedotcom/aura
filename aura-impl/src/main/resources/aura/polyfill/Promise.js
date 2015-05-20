@@ -18,6 +18,9 @@
 
 // Will use ES6Promises in the global namespace when native Promises
 // aren't supported.
-ES6Promise['polyfill']();
+
+if (window['ES6Promise']) {
+	ES6Promise['polyfill']();
+}
 
 //#include aura.polyfill.Promise_export

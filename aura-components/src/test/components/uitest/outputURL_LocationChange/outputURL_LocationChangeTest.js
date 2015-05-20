@@ -56,7 +56,6 @@
                 // location change count would increase exponentially instead of + 1
                 var urlCmpPeach = cmp.find('hashLinkP'),
                 urlElPeach = urlCmpPeach.getElement();
-                console.log(urlElPeach);
                 cmp.set("v.locationToken","Peach");
                 $A.test.clickOrTouch(urlElPeach);
                 $A.test.assertEquals(1, cmp.get("v.clickCount"),
@@ -69,7 +68,6 @@
              }, function(cmp) {
                 var peachElement = cmp.find('hashLinkP').getElement();
                 href = peachElement.getAttribute('href');
-                console.log(href);
                 var locationChangeCountPeach = cmp.get("v.locationChangeCountPeach");
                 $A.test.assertTrue(
                    href == "javascript:void(0);" || href == "javascript:void(0/*#" + locationChangeCountPeach +"*/);",

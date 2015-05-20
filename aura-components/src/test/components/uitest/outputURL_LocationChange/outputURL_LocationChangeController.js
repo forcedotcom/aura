@@ -1,7 +1,7 @@
 ({
 
     clickPeach : function (cmp, evt, helper) {
-        cmp.set("v.locationToken", "Peach");
+        helper.clickFruit(cmp,"Peach");
     },
 
     clickApple : function(cmp,evt,helper) {

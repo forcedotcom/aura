@@ -16,6 +16,5 @@
 ({
     clickFruit : function(cmp, fruit) {
         cmp.set("v.clickCount", cmp.get("v.clickCount") + 1);
-    },
-
+    }
 })

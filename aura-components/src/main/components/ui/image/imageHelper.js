@@ -67,17 +67,17 @@
             "title": cmp.get("v.title")
         });
 
-        image["onerror"] = function () {
+        image["onerror"] = $A.getCallback(function () {
             if (cmp.isValid()) {
                 cmp.get("e.onerror").fire();
             }
-        };
+        });
 
-        image["onload"] = function () {
+        image["onload"] = $A.getCallback(function () {
             if (cmp.isValid()) {
                 cmp.get("e.onload").setParams({"value": image}).fire()
             }
-        };
+        });
 
         return image;
     }

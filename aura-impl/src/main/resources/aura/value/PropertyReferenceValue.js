@@ -24,6 +24,7 @@ function PropertyReferenceValue(path, valueProvider) {
     this.path = isArray?path:path.split('.');
     this.expression = isArray?path.join('.'):path;
     this.valueProvider = valueProvider;
+    this.context=$A.getContext().getCurrentAccess();
 
     // #if {"modes" : ["STATS"]}
     valueFactory.index(this);
@@ -39,7 +40,10 @@ PropertyReferenceValue.prototype.evaluate = function(valueProvider) {
     if (this.isGlobal()) {
         return aura.get(this.expression);
     }
-    return (valueProvider || this.valueProvider).get(this.expression);
+    $A.getContext().setCurrentAccess(this.context);
+    var value=(valueProvider || this.valueProvider).get(this.expression);
+    $A.getContext().releaseCurrentAccess();
+    return value;
 };
 
 /**
@@ -168,12 +172,10 @@ PropertyReferenceValue.prototype.isExpression = function() {
  * Destroys the path.
  */
 PropertyReferenceValue.prototype.destroy = function() {
-
-
     // #if {"modes" : ["STATS"]}
     valueFactory.deIndex(this);
     // #end
-    this.valueProvider=this.expression=this.path=null;
+    this.valueProvider=this.expression=this.path=this.context=null;
 };
 
 /**

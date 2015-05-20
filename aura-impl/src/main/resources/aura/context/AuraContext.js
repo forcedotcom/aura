@@ -329,8 +329,9 @@ AuraContext.prototype.getApp = function() {
  */
 AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
     var cP, idx, config, def;
-
     if (otherComponentConfigs) {
+        //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
+        $A.clientService.currentlyInSideEffectMode=true;
         for (idx = 0; idx < otherComponentConfigs.length; idx++) {
             config = otherComponentConfigs[idx];
             def = config["componentDef"];
@@ -340,6 +341,8 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
             cP = config["creationPath"];
             this.componentConfigs[actionId+cP] = config;
         }
+        //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
+        delete $A.clientService.currentlyInSideEffectMode;
     }
 };
 

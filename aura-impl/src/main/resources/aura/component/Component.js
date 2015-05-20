@@ -410,6 +410,16 @@ if(!this.concreteComponentId) {
                 value = value["value"];
             }
 
+            // JBUCH: TODO: ACCESS: This needs help. Setting up attributes needs checks
+            if (!$A.clientService.allowAccess(attributeDef,this)) {
+                // #if {"modes" : ["DEVELOPMENT"]}
+//                $A.warning("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+                // #end
+
+                // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
+                // continue;
+            }
+
             if (isFacet) {
                 if($A.util.isUndefinedOrNull(value)) {
                     continue;

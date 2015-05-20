@@ -41,11 +41,11 @@
     display:none;
 }
 
-.THIS ol {
+.THIS ul {
     overflow-y: hidden;
 }
 
-.THIS.focused ol {
+.THIS.focused ul {
     overflow-y: scroll;
 }
 

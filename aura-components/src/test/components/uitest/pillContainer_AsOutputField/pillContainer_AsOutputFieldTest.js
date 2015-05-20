@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 ({
-    PILLS: [{id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=1&f=FFFFFF'}},{id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=2&f=FFFFFF'}},{id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,cc88ff?l=3&f=FFFFFF'}}],
+    PILLS: [
+        {id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF'}},
+        {id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,ff88cc?l=2&f=FFFFFF'}},
+        {id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,88cc88?l=3&f=FFFFFF'}}],
     PILLS_CASEINSENSITIVE: [{id:'pill01',label:"TEST PILL 01"},{id:'pill02',label:"TEST PILL 02"},{id:'pill03',label:"Test PILL 03"}],
     
     browsers: ["GOOGLECHROME", "IPHONE", "IPAD", "FIREFOX", "IE9", "IE10", "SAFARI", "ANDROID_PHONE", "ANDROID_TABLET"],
     doNotWrapInAuraRun: true,
-    
+
     testStartsEmpty: {
         test: function (cmp) {
             $A.test.assertEquals(0, $A.test.select(".pill").length, "pill should not be displayed on empty pillContainer.");
@@ -54,8 +57,8 @@
             var actualNumberOfPills = $A.test.select(".pill").length;
             $A.test.assertEquals(2, actualNumberOfPills, "Incorrect number of pills displayed.");
             this._validateIconURLIsPresent(cmp, actualNumberOfPills);
-            $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[0].label + "']").length, "Expected pill not found");
-            $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[1].label + "']").length, "Expected pill not found");
+            $A.test.assertTrue(this._pillExists(cmp, this.PILLS[0].label), "Expected pill not found");
+            $A.test.assertTrue(this._pillExists(cmp, this.PILLS[1].label), "Expected pill not found");
         }
     },
 
@@ -64,7 +67,7 @@
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0], this.PILLS[0]] );
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Only one pill component should exist");
-            $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[0].label + "']").length, "Expected pill not found");
+            $A.test.assertTrue(this._pillExists(cmp, this.PILLS[0].label), "Expected pill not found");
         }
     },
     
@@ -73,7 +76,7 @@
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0], this.PILLS_CASEINSENSITIVE[0]]);
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Only one pill component should exist");
-            $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[0].label + "']").length, "Expected pill not found");
+            $A.test.assertTrue(this._pillExists(cmp, this.PILLS[0].label), "Expected pill not found");
         }
     },
 
@@ -84,10 +87,10 @@
         test: function (cmp) {
             this._initializeWithThreePills(cmp);
             $A.test.assertEquals(2, $A.test.select(".pill").length, "maxAllowed should restrict number of pills");
-            $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[0].label + "']").length, "Expected pill 1 not found");
-            $A.test.assertEquals(1, $A.test.select(".pill[title='" + this.PILLS[1].label + "']").length, "Expected pill 2 not found");
+            $A.test.assertTrue(this._pillExists(cmp, this.PILLS[0].label), "Expected pill 1 not found");
+            $A.test.assertTrue(this._pillExists(cmp, this.PILLS[1].label), "Expected pill 2 not found");
             //to make sure it third pill doesn't overwrite the second pill
-            $A.test.assertEquals(0, $A.test.select(".pill[title='" + this.PILLS[2].label + "']").length, "Pill 3 should not be found");
+            $A.test.assertFalse(this._pillExists(cmp, this.PILLS[2].label), "Pill 3 should not be found");
         }
     },
 
@@ -138,7 +141,7 @@
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
-                var deletedPillDoesNotExist = $A.test.select(".pill[title='"+that.PILLS[0].label+"']").length === 0;
+                var deletedPillDoesNotExist = !that._pillExists(cmp, that.PILLS[0].label);
                 var thereAreTwoPills = $A.test.select(".pill").length === 2;
                 return thereAreTwoPills && deletedPillDoesNotExist;
             }, "There should only be two pills and the deleted pill should not exist after pressing backSpace on the first pill");
@@ -154,7 +157,7 @@
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
-                var deletedPillDoesNotExist = $A.test.select(".pill[title='" + that.PILLS[0].label + "']").length === 0;
+                var deletedPillDoesNotExist = !that._pillExists(cmp, that.PILLS[0].label);
                 var thereAreTwoPills = $A.test.select(".pill").length === 2;
                 return thereAreTwoPills && deletedPillDoesNotExist;
             }, "There should only be two pills and the deleted pill should not exist after pressing delete on first pill");
@@ -169,7 +172,7 @@
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function () {
-                var deletedPillDoesNotExist = $A.test.select(".pill[title='" + that.PILLS[1].label + "']").length === 0;
+                var deletedPillDoesNotExist = !that._pillExists(cmp, that.PILLS[1].label);
                 var thereAreTwoPills = $A.test.select(".pill").length === 2;
                 return thereAreTwoPills && deletedPillDoesNotExist;
             }, "There should only be two pills and the deleted pill should not exist after pressing delete icon");
@@ -192,7 +195,7 @@
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
-                var clickedPillStillExists = $A.test.select(".pill[title='" + that.PILLS[0].label + "']").length === 1;
+                var clickedPillStillExists = that._pillExists(cmp, that.PILLS[0].label);
                 var thereAreThreePills = $A.test.select(".pill").length === 3;
                 return thereAreThreePills && clickedPillStillExists;
             }, "Clicking the pill should not delete it");
@@ -207,7 +210,7 @@
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
-                var clickedPillStillExists = $A.test.select(".pill[title='" + that.PILLS[0].name + "']").length === 1;
+                var clickedPillStillExists = that._pillExists(cmp, that.PILLS[0].label);
                 var thereAreTwoPills = $A.test.select(".pill").length === 2;
                 return thereAreTwoPills && !clickedPillStillExists;
             }, "Clicking the pill's delete icon should delete it");
@@ -247,6 +250,12 @@
         var pillContainer = this._initializeWithTwoPills(cmp);
         pillContainer.insertItems([this.PILLS[2]]);
         return pillContainer;
+    },
+
+    _pillExists: function(cmp, label) {
+        var innerHTML = $A.test.getText(cmp.getElement());
+        var indexOf = innerHTML.indexOf(label);
+        return indexOf != -1;
     }
 
 

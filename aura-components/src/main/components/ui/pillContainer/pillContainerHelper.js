@@ -127,7 +127,10 @@
         var maxAllowed = cmp.get("v.maxAllowed");
         if (!$A.util.isEmpty(pillInput) && itemsLength < maxAllowed) {
             pillInput[0].focus();
+        } else {
+            $A.util.addClass(cmp.getElement(), 'noinput');
         }
+
     },
 
     adjustHeight: function(cmp) {

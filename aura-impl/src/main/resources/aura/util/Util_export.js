@@ -89,6 +89,7 @@ p["setDebugToolWindow"] = p.setDebugToolWindow;
 p["getDebugToolsAuraInstance"] = p.getDebugToolsAuraInstance;
 p["getUrl"] = p.getUrl;
 p["getText"] = p.getText;
+p["setText"] = p.setText;
 p["errorBasedOnMode"] = p.errorBasedOnMode;
 //#end
 

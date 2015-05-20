@@ -58,7 +58,7 @@ import com.google.common.collect.Sets;
 public class ComponentJSTestSuiteTest extends TestSuite {
 
     public static TestSuite suite() throws Exception {
-        final TestSuite suite = new NamespaceTestSuite("*");
+        TestSuite suite = new NamespaceTestSuite("*");
         suite.setName("JS component tests");
         return suite;
     }
@@ -81,8 +81,8 @@ public class ComponentJSTestSuiteTest extends TestSuite {
     public static class NamespaceTestSuite extends TestSuite {
         public NamespaceTestSuite(String namespace) throws Exception {
             super(namespace);
-            final ContextService contextService = Aura.getContextService();
-            final DefinitionService definitionService = Aura.getDefinitionService();
+            ContextService contextService = Aura.getContextService();
+            DefinitionService definitionService = Aura.getDefinitionService();
 
             boolean contextStarted = false;
             if (!contextService.isEstablished()) {
@@ -90,22 +90,21 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                 contextService.startContext(Mode.JSTEST, Format.JSON, Authentication.AUTHENTICATED);
             }
 
-            final Map<String, TestSuite> subSuites = new HashMap<>();
+            Map<String, TestSuite> subSuites = new HashMap<>();
             try {
-                final DescriptorFilter filter = new DescriptorFilter("js://"+namespace, DefType.TESTSUITE.toString());
-                final Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
+                DescriptorFilter filter = new DescriptorFilter("js://"+namespace, DefType.TESTSUITE.toString());
+                Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
 
-                for (final DefDescriptor<?> qd  : descriptors) {
+                for (DefDescriptor<?> qd  : descriptors) {
                     @SuppressWarnings("unchecked")
-                    final
                     DefDescriptor<TestSuiteDef> descriptor = (DefDescriptor<TestSuiteDef>)qd;
                     Test test;
                     try {
                         test = new ComponentTestSuite(descriptor.getDef());
-                    } catch (final Throwable t) {
+                    } catch (Throwable t) {
                         test = new FailTestCase(descriptor, t);
                     }
-                    final String testNamespace = descriptor.getNamespace();
+                    String testNamespace = descriptor.getNamespace();
                     if (namespace.equals(testNamespace)) {
                         addTest(test);
                     } else {
@@ -118,7 +117,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                         subSuite.addTest(test);
                     }
                 }
-            } catch (final Throwable t) {
+            } catch (Throwable t) {
                 System.err.println("Failed to load component tests for namespace: " + namespace);
                 t.printStackTrace();
             } finally {
@@ -137,7 +136,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             super(String.format("%s:%s", suiteDef.getDescriptor().getNamespace(), suiteDef.getDescriptor().getName()));
 
             this.descriptor = suiteDef.getDescriptor();
-            for (final TestCaseDef caseDef : suiteDef.getTestCaseDefs()) {
+            for (TestCaseDef caseDef : suiteDef.getTestCaseDefs()) {
                 addTest(new ComponentTestCase(this, caseDef));
             }
         }
@@ -160,8 +159,8 @@ public class ComponentJSTestSuiteTest extends TestSuite {
          * @throws QuickFixException
          */
         public String getCode() throws QuickFixException {
-            final ContextService contextService = Aura.getContextService();
-            final boolean isEstablished = contextService.isEstablished();
+            ContextService contextService = Aura.getContextService();
+            boolean isEstablished = contextService.isEstablished();
             if (!isEstablished) {
                 contextService.startContext(Mode.AUTOJSTEST, Format.JSON, Authentication.AUTHENTICATED);
             }
@@ -177,11 +176,12 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
     public static class ComponentTestCase extends WebDriverTestCase {
         private ComponentTestCase(ComponentTestSuite suite, TestCaseDef caseDef) {
-            super("testRun");  // need to use "testRun" for test case name so that testRun() is executed
-            this.name = String.format("%s$%s", suite.getName(), caseDef.getName());
+            super("testRun");
+            this.name = String.format("%s$%s", suite.descriptor.getQualifiedName().replaceAll("://", "_"),
+                    caseDef.getName());
             this.suite = suite;
             this.caseDef = caseDef;
-            for (final String browser : caseDef.getBrowsers()) {
+            for (String browser : caseDef.getBrowsers()) {
                 String token = browser.trim().toUpperCase();
                 Set<BrowserType> set;
                 if (token.charAt(0) == '-') {
@@ -192,33 +192,28 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                 }
                 try {
                     set.add(BrowserType.valueOf(token));
-                } catch (final IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     fail("Unknown BrowserType: " + browser);
                 }
             }
         }
 
-        @Override
-        public String toString() {
-            return getName();
-        }
-
         private String getUrl() {
-            final DefType defType = caseDef.getDefType();
-            final String baseUrl = suite.getUrl(defType);
-            final Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
+            DefType defType = caseDef.getDefType();
+            String baseUrl = suite.getUrl(defType);
+            Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
             if (attributes.isEmpty()) {
                 return baseUrl;
             } else {
                 String hash = "";
-                final List<NameValuePair> newParams = Lists.newArrayList();
-                for (final Entry<String, Object> entry : attributes) {
-                    final String key = entry.getKey();
+                List<NameValuePair> newParams = Lists.newArrayList();
+                for (Entry<String, Object> entry : attributes) {
+                    String key = entry.getKey();
                     String value;
                     if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
-                        value = Json.serialize(entry.getValue());
+                    	value = Json.serialize(entry.getValue());
                     } else {
-                        value = entry.getValue().toString();
+                    	value = entry.getValue().toString();
                     }
                     if (key.equals("__layout")) {
                         hash = value;
@@ -241,7 +236,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         @Override
         public String getQualifiedName() {
-            final String btype = getBrowserTypeString();
+            String btype = getBrowserTypeString();
             return caseDef.getDescriptor().getQualifiedName() + btype;
         }
 
@@ -250,23 +245,22 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
             try {
                 caseDef.validateDefinition();
-            } catch (final QuickFixException qfe) {
+            } catch (QuickFixException qfe) {
                 validationError = ", '"+AuraTextUtil.escapeForJavascriptString(qfe.getMessage())+"'";
             }
             addMocksToTestContextLocalDef(caseDef.getLocalDefs());
 
             open(getUrl(), Mode.AUTOJSTEST);
 
-            final String ret = (String) auraUITestingUtil.getEval(String.format(
+            String ret = (String) auraUITestingUtil.getEval(String.format(
                     "return window.aura.test.run('%s', '%s', 30%s)",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
                     AuraTextUtil.escapeForJavascriptString(suite.getCode()), validationError));
 
             if (ret != null && !"null".equals(ret)) {
                 @SuppressWarnings("unchecked")
-                final
                 Map<String, Object> e = (Map<String, Object>) new JsonReader()
-                .read(ret);
+                        .read(ret);
                 fail((String) e.get("message"));
             }
             // Actions run on servers need special handling because their call

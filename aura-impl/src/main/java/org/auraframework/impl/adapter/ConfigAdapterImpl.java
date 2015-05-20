@@ -84,6 +84,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
     
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
+    private static final Set<String> CANONICAL_NAMESPACES = Sets.newHashSet();
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
     
@@ -203,7 +204,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public Set<String> getPrivilegedNamespaces(){
-        return SYSTEM_NAMESPACES;
+        return CANONICAL_NAMESPACES;
     }
 
     @Override
@@ -584,12 +585,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public void addPrivilegedNamespace(String namespace) {
         if(namespace != null && !namespace.isEmpty()){
             SYSTEM_NAMESPACES.add(namespace.toLowerCase());
+            CANONICAL_NAMESPACES.add(namespace);
         }
     }
 
     @Override
     public void removePrivilegedNamespace(String namespace) {
         SYSTEM_NAMESPACES.remove(namespace.toLowerCase());
+        CANONICAL_NAMESPACES.remove(namespace);
     }
 
     @Override

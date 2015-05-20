@@ -20,8 +20,9 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.auraframework.test.UnitTestCase;
 import org.junit.Assert;
+
+import org.auraframework.test.UnitTestCase;
 import org.xml.sax.SAXException;
 
 public class TextDiffUtils extends BaseDiffUtils<String> {
@@ -32,20 +33,20 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
 
     @Override
     public void assertDiff(String results, StringBuilder sb) throws SAXException, IOException,
-    ParserConfigurationException {
+            ParserConfigurationException {
         if (sb == null) {
             sb = new StringBuilder();
         }
         String gold = "";
         try {
             gold = readGoldFile();
-        } catch (final FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             sb.append(String.format("Gold file not found: %s\n", getUrl().toString()));
         }
         final boolean result = gold.equals(results);
         if (!result) {
             sb.append("\ndiff:\n");
-            appendDiffs(results, gold, sb);
+            appendDiffs(results, sb);
             Assert.fail(sb.toString());
         }
     }

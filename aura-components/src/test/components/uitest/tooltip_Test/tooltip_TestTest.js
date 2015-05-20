@@ -55,15 +55,8 @@
 			var trigger = component.find('tooltip1-trigger').getElement();
 			trigger.focus();
 			var tt = component.find('tooltip1');
-			console.log(tt._tooltip);
 			$A.test.assertEquals('Hello world', $A.test.getText(tt._tooltip));
-			$A.test.addWaitFor(true, function(){
-				return tt._tooltip.className.match(/visible/) ? true : false;
-			}, function() {
-				$A.test.assertTruthy(tt._tooltip.className.match(/visible/), 'The tooltip has the visible class');
-			});
-
-
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(tt._tooltip,"visible");}, "The tooltip has the visible class");
 		}
 	},
 

@@ -20,9 +20,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
-
 import org.auraframework.test.UnitTestCase;
+import org.junit.Assert;
 import org.xml.sax.SAXException;
 
 public class TextDiffUtils extends BaseDiffUtils<String> {
@@ -33,7 +32,7 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
 
     @Override
     public void assertDiff(String results, StringBuilder sb) throws SAXException, IOException,
-            ParserConfigurationException {
+    ParserConfigurationException {
         if (sb == null) {
             sb = new StringBuilder();
         }
@@ -46,7 +45,7 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
         final boolean result = gold.equals(results);
         if (!result) {
             sb.append("\ndiff:\n");
-            appendDiffs(results, sb);
+            appendDiffs(results, gold, sb);
             Assert.fail(sb.toString());
         }
     }

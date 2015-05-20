@@ -265,6 +265,34 @@
         }
     },
 
+    // TODO(W-2599085): Storages should clear existing entry after trying to put an item above the max size
+    _testReplaceItemOverMaxSize : {
+        test : [
+        function putItemThenReplaceWithEntryTooLarge(cmp) {
+            var that = this;
+            var tooBig = new Array(5000).join("x");
+            var completed = false;
+
+            that.adapter.setItem("testReplaceItemOverMaxSize", { "value": { "foo": "ORIGINAL"}})
+                .then(function() { return that.adapter.getItem("testReplaceItemOverMaxSize") })
+                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value.foo)})
+                .then(function() { return that.adapter.setItem("testReplaceItemOverMaxSize", { "value": { "foo": tooBig }}) })
+                .then(function() { $A.test.fail("Should not be able to save entry that's above maxSize")},
+                      function(error) { completed = true; });
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function getItem(cmp) {
+            var completed = false;
+
+            this.adapter.getItem("testReplaceItemOverMaxSize")
+                .then(function(item) { $A.test.assertEquals("", item.value, "Entry should be empty after attemping to put item too large")})
+                .then(function() { completed = true;});
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }]
+    },
+
     testGetAll: {
         test: function() {
             var adapter = this.adapter;

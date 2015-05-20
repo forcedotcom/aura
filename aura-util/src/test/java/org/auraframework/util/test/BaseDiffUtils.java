@@ -102,19 +102,23 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
      * try to invoke "diff" to create a readable diff for the test failure results, otherwise append our crappy
      * unreadable garbage
      */
-    protected void appendDiffs(String results, StringBuilder sb) {
+    protected void appendDiffs(String results, String gold, StringBuilder sb) {
         try {
             // create a temp file and write the results so that we're sure to
             // have something for diff to use
-            File file = File.createTempFile("aura-gold.", ".xml");
+            File resultsFile = File.createTempFile("aura-results.", ".xml");
+            File goldFile = File.createTempFile("aura-gold.", ".xml");
             try {
-                OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+                OutputStreamWriter fw1 = new OutputStreamWriter(new FileOutputStream(resultsFile), "UTF-8");
+                OutputStreamWriter fw2 = new OutputStreamWriter(new FileOutputStream(goldFile), "UTF-8");
                 try {
-                    fw.write(results);
+                    fw1.write(results);
+                    fw2.write(gold);
                 } finally {
-                    fw.close();
+                    fw1.close();
+                    fw2.close();
                 }
-                Process child = Runtime.getRuntime().exec("diff -du " + srcUrl.getPath() + " " + file.getPath());
+                Process child = Runtime.getRuntime().exec("diff -du " + goldFile.getPath() + " " + resultsFile.getPath());
                 try {
                     printToBuffer(sb, child.getInputStream());
                     printToBuffer(sb, child.getErrorStream());
@@ -122,7 +126,8 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
                     child.waitFor();
                 }
             } finally {
-                file.delete();
+                resultsFile.delete();
+                goldFile.delete();
             }
         } catch (Throwable t) {
         }

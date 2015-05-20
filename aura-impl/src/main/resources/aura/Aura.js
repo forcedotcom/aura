@@ -828,6 +828,23 @@ AuraInstance.prototype.message = function(msg) {
 };
 
 /**
+ * Returns a callback which is safe to invoke from outside Aura, e.g. as an event handler or in a setTimeout.
+ * @public
+ * @function
+ * @param {Function} callback The method to call after reestablishing Aura context.
+ * @platform
+ */
+AuraInstance.prototype.getCallback = function(callback) {
+    $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
+    var context=$A.getContext().getCurrentAccess();
+    return function(){
+        $A.getContext().setCurrentAccess(context);
+        callback.apply(null,Array.prototype.slice.call(arguments));
+        $A.getContext().releaseCurrentAccess();
+    };
+};
+
+/**
  * Returns the value referenced using property syntax. Gets the value from the specified global value provider.
  * @public
  * @function

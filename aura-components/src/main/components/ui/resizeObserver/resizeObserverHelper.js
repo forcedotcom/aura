@@ -32,11 +32,11 @@
             resizer._resizing = false;
 
             var helper = this;
-            resizer._resizer = function() {
+            resizer._resizer = $A.getCallback(function() {
                 if (!resizer._resizing) {
                     resizer._resizing = true;
 
-                    setTimeout(function() {
+                    setTimeout($A.getCallback(function() {
                         try {
                             for (var n in resizer._resizerComponentSet) {
                                 var c = resizer._resizerComponentSet[n];
@@ -48,9 +48,9 @@
                         } finally {
                             resizer._resizing = false;
                         }
-                    }, 0);
+                    }), 0);
                 }
-            };
+            });
 
             $A.util.on(window, "resize", resizer._resizer, false, 400);
         }

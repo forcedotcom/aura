@@ -28,7 +28,7 @@
     		var storage = this.getStorage(cmp);
 	    	var maxSize = storage.getMaxSize();
 
-            storage.getSize().then(function(size) {
+            storage.getSize().then($A.getCallback(function(size) {
                 $A.run(function() {
                     var severity;
                     if (size < maxSize / 2) {
@@ -44,7 +44,7 @@
 
                     cmp.set("v.value", Math.round(size * 100) / 100);
                 });
-            });
+            }));
     	}
     }
 })

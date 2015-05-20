@@ -23,6 +23,7 @@
 	<aura:attribute name="disabled" type="Boolean" default="false" description="Sets whether the column header's interactions should be disabled"/>
 	<aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
 	<aura:attribute name="direction" type="String" description="{ '', ascending, descending }"/>
+	<aura:attribute name="initialDirection" type="String" description="The initial sort direction when user clicks on the column header: {ascending, descending}"/>
 	<aura:attribute name="ascLabel" type="String" default="Ascending" description="Accessibility label to use when column is ascending"/>
 	<aura:attribute name="descLabel" type="String" default="Descending" description="Accessibility label to use when column is descending"/>
 	<aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>

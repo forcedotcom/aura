@@ -117,6 +117,23 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    public void testDesignFileWithDuplicateAttribute() throws Exception {
+        final String attr = "attr";
+        String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";
+        String design = "<design:component>" +
+                "<design:attribute name=\"" + attr + "\"/>" +
+                "<design:attribute name=\"" + attr + "\"/> </design:component>";
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design);
+
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Design file should prevent duplicate attributes from being saved");
+        } catch (Exception t) {
+            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
+                    String.format("Design attribute %s already defined", attr));
+        }
+    }
+
 
     private DesignAttributeDef setupAttributeDesignDef(String name, String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,

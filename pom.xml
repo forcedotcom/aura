@@ -50,7 +50,7 @@
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
         <xunit.js.engine>rhino</xunit.js.engine>
         <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
-        <xunit.js.format>xml</xunit.js.format>
+        <xunit.js.format>junit</xunit.js.format>
         <xunit.js.verbose>false</xunit.js.verbose>
     </properties>
     <repositories>
@@ -731,6 +731,11 @@
                                         <case value="xml">
                                             <echo>Generating test report</echo>
                                             <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/target/tools/xUnit/junit.xsl" />
+                                            <echo>Test report completed: ${xunit.js.report}</echo>i
+                                        </case>
+                                        <case value="junit">
+                                            <echo>Generating test report in junit format</echo>
+                                            <copy file="${project.build.directory}/xunitjs/rawresults.xml" tofile="${xunit.js.report}"  />
                                             <echo>Test report completed: ${xunit.js.report}</echo>i
                                         </case>
                                         <default>

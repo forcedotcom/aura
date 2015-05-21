@@ -74,7 +74,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 // Static methods:
 
 Action.getStorageKey = function(descriptor, params) {
-    return descriptor + ":" + $A.util["json"].encode(params);
+    return descriptor + ":" + $A.util["json"].orderedEncode(params);
 };
 
 Action.getStorage = function() {

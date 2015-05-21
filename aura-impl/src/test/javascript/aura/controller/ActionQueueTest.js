@@ -41,10 +41,10 @@ Test.Aura.Controller.ActionQueueTest = function() {
                 json : {
                     encode : function(val) {
                         return val;
+                    },
+                    orderedEncode: function(obj) {
+                        return obj;
                     }
-                },
-                sortObject: function(obj) {
-                    return obj;
                 }
             },
             log : function() {

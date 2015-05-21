@@ -97,7 +97,6 @@ PerfConstants.STATS = {
  * @public
  * @namespace
  * @const
- * @type {!IPerf}
  */
 PerfShim = {
     /**
@@ -111,7 +110,7 @@ PerfShim = {
      * @param {!string} id The id used to identify the mark.
      * @param {string|window.typePerfLogLevel=} logLevel The level at which this mark should
      * be logged at.
-     * @return {!IPerf}
+     * @return {!PerfShim}
      * @expose
      */
     mark: function (id, logLevel) { return this; },
@@ -121,7 +120,7 @@ PerfShim = {
      * the same id.
      * @param {string|window.typePerfLogLevel=} logLevel The level at which this mark should
      * be logged at.
-     * @return {!IPerf}
+     * @return {!PerfShim}
      * @expose
      */
     endMark: function (id, logLevel) { return this; },
@@ -131,7 +130,7 @@ PerfShim = {
      *
      * @param {!string} oldName The id used to identify the old mark name.
      * @param {!string} newName The id used to identify the new mark name.
-     * @return {!IPerf} for chaining methods
+     * @return {!PerfShim} for chaining methods
      * @expose
      */
     updateMarkName: function (oldName, newName) { return this; },
@@ -158,7 +157,7 @@ PerfShim = {
      * @param {!string} timer_name The name of the timer to set.
      * @param {number=} timer_delta The time delta to set.
      * @param {string|window.typePerfLogLevel=} logLevel The level at which this mark should be logged at. Defaults to PerfLogLevel.INTERNAL if left blank
-     * @return {!IPerf}
+     * @return {!PerfShim}
      * @expose
      */
     setTimer: function (timer_name, timer_delta, logLevel) { return this; },
@@ -214,7 +213,7 @@ PerfShim = {
      *
      * @param {!string} label
      * @param {!number} elapsedMillis
-     * @return {!IPerf}
+     * @return {!PerfShim}
      * @expose
      */
     stat: function (label, elapsedMillis) { return this; },
@@ -239,7 +238,7 @@ PerfShim = {
      * This method is used to mark the start of a transaction
      *
      * @param {!string} tName The id used to identify the transaction.
-     * @return {!IPerf} for chaining methods
+     * @return {!PerfShim} for chaining methods
      * @expose
      */
     startTransaction: function (tName) { return this; },
@@ -248,7 +247,7 @@ PerfShim = {
      * This method is used to mark the end of a transaction
      *
      * @param {!string} tName The id used to identify the transaction.
-     * @return {!IPerf} for chaining methods
+     * @return {!PerfShim} for chaining methods
      * @expose
      */
     endTransaction: function (tName) { return this; },
@@ -259,7 +258,7 @@ PerfShim = {
      *
      * @param {!string} oldName The id used to identify the old transaction name.
      * @param {!string} newName The id used to identify the new transaction name.
-     * @return {!IPerf} for chaining methods
+     * @return {!PerfShim} for chaining methods
      * @expose
      */
     updateTransaction: function (oldName, newName) { return this; },
@@ -275,11 +274,10 @@ PerfShim = {
 
     /**
      * @namespace
-     * @type {!IPerf_util}
      * @const
      * @expose
      */
-    util: /** @type {!IPerf_util} */ ({
+    util: ({
         /**
          * Sets the roundtrip time cookie
          *

@@ -1576,14 +1576,36 @@ TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextCompo
 
 /**
  * Reload the Global Value Providers on the client by calling the GlobalValueProviders.js constructor.
- * 
+ *
  * @param {Object} gvp an optional serialized GVP to load.
- * @param {Function} initCallback an optional callback invoked after the GVP has finished its
+ * @param {Function} callback an optional callback invoked after the GVP has finished its
  *  asynchronous initialization.
  */
 TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
     $A.getContext().globalValueProviders = new Aura.Provider.GlobalValueProviders(gvp, callback);
 };
+
+/**
+ * Json instance for test. Used to export Json methods for testing.
+ *
+ * @constructor
+ */
+JsonTestInstance = function() {};
+
+/**
+ * Serializes object in alphabetical asc order. Sorts object keys during serialization.
+ * @param {Object} obj Object to be serialized
+ * @returns {String} serialized order object
+ * @export
+ */
+JsonTestInstance.prototype.orderedEncode = function(obj) {
+    return $A.util.json.orderedEncode(obj);
+};
+
+/**
+ * @export
+ */
+TestInstance.prototype.json = new JsonTestInstance();
 
 Aura.Test.Test = TestInstance;
 

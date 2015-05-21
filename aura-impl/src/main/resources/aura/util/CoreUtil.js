@@ -1922,37 +1922,6 @@ CoreUtil.prototype.toArray = function(collection) {
     }
 };
 
-/**
- * Sorts object by setting key and value alphabetically asc
- * @param {Object} object to sort
- * @returns {Object} sorted object by key
- */
-CoreUtil.prototype.sortObject = function(object) {
-    if (!this.isObject(object)) {
-        return object;
-    }
-
-    var keys = [], k, i, len, sorted = {};
-    for (k in object) {
-        if (object.hasOwnProperty(k)) {
-            keys.push(k);
-        }
-    }
-
-    keys.sort();
-    len = keys.length;
-
-    for (i = 0; i < len; i++) {
-        var value = object[ keys[i] ];
-        if (this.isObject(value)) {
-            value = this.sortObject(value);
-        }
-        sorted[ keys[i] ] = value;
-    }
-
-    return sorted;
-};
-
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.

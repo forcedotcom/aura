@@ -328,4 +328,23 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
    return this.component.set(key,value, ignoreChanges);
 };
 
+/**
+ * Returns true if the referenced component has not been destroyed.
+ */
+PassthroughValue.prototype.isValid = function(expression) {
+
+    var valueProvider = this.getComponent();
+
+    // Potentially nested PassthroughValue objects.
+    while (valueProvider instanceof PassthroughValue) {
+        valueProvider = valueProvider.getComponent();
+    }
+
+    if (valueProvider instanceof Component) {
+        return valueProvider.isValid();
+    }
+
+    return false;
+};
+
 //#include aura.value.PassthroughValue_export

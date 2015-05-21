@@ -553,8 +553,19 @@
     },
 
     testDeleteDatabase: {
-        test: function(cmp) {
-            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+        test: [
+        function waitForDatabaseInitialize(cmp) {
+            // Wait for an arbritrary command to complete so we know DB is initialized
+            // This is necessary only on slower browsers when the first command we run is a delete
+            cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+            var completed = false;
+
+            $A.storageService.getStorage("browserdb").getSize()
+                .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        },
+        function deleteDatabase(cmp) {
             var dbName = "browserdb";
             var completed = false;
             var results;
@@ -571,7 +582,7 @@
                     } else {
                         completed = true;
                     }
-                }, die);
+                }, cmp._die);
 
             $A.test.addWaitFor(
                     true, 
@@ -584,12 +595,23 @@
                             $A.test.assertFalse(results.contains(dbName), "IndexedDb "+dbName+" still present in browser");
                         }
                     });
-        }
+        }]
     },
 
     testDeleteDatabaseTwice: {
-        test: function(cmp) {
-            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+        test: [
+        function waitForDatabaseInitialize(cmp) {
+            // Wait for an arbritrary command to complete so we know DB is initialized
+            // This is necessary only on slower browsers when the first command we run is a delete
+            cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+            var completed = false;
+            
+            $A.storageService.getStorage("browserdb").getSize()
+                .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        },
+        function deleteDatabaseTwice(cmp) {
             var completed = false;
             var dbName = "browserdb";
 
@@ -601,16 +623,26 @@
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(dbName));
                     completed = true;
-                }, die);
+                }, cmp._die);
 
             $A.test.addWaitFor(true, function(){ return completed; });
-        }
+        }]
     },
 
     testDeleteAndRecreateDatabase: {
         test: [
+        function waitForDatabaseInitialize(cmp) {
+            // Wait for an arbritrary command to complete so we know DB is initialized
+            // This is necessary only on slower browsers when the first command we run is a delete
+            cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+            var completed = false;
+            
+            $A.storageService.getStorage("browserdb").getSize()
+                .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        },
         function deleteAndRecreateDatabase(cmp) {
-            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
             cmp._dbName = "browserdb";
 
@@ -622,7 +654,7 @@
                 .then(function() {
                     $A.test.assertDefined($A.storageService.getStorage(cmp._dbName));
                     completed = true;
-                }, die);
+                }, cmp._die);
 
             $A.test.addWaitFor(true, function(){ return completed; });
         },

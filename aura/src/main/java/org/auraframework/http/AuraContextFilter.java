@@ -40,7 +40,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
@@ -53,10 +52,6 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.test.Resettable;
-import org.auraframework.test.TestContext;
-import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -65,31 +60,30 @@ import org.auraframework.util.json.JsonReader;
 import com.google.common.collect.Maps;
 
 public class AuraContextFilter implements Filter {
-    private static final boolean isProduction = Aura.getConfigAdapter().isProduction();
 
-    public static final EnumParam<AuraContext.Mode> mode = new EnumParam<AuraContext.Mode>(AuraServlet.AURA_PREFIX
+    public static final EnumParam<AuraContext.Mode> mode = new EnumParam<>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
 
     public static final BooleanParam isDebugToolEnabled = new BooleanParam(AuraServlet.AURA_PREFIX
             + "debugtool", false);
 
-    private static final EnumParam<Format> format = new EnumParam<Format>(AuraServlet.AURA_PREFIX + "format", false,
+    private static final EnumParam<Format> format = new EnumParam<>(AuraServlet.AURA_PREFIX + "format", false,
             Format.class);
 
-    private static final EnumParam<Authentication> access = new EnumParam<Authentication>(AuraServlet.AURA_PREFIX
+    private static final EnumParam<Authentication> access = new EnumParam<>(AuraServlet.AURA_PREFIX
             + "access", false,
             Authentication.class);
 
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
-    private static final StringParam test = new StringParam(AuraServlet.AURA_PREFIX + "test", 0, false);
-    private static final BooleanParam testReset = new BooleanParam(AuraServlet.AURA_PREFIX + "testReset", false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
     private String componentDir = null;
 
     private static final Log LOG = LogFactory.getLog(AuraContextFilter.class);
 
+    private static final AuraTestFilter testFilter = new AuraTestFilter();
+    
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
     IOException {
@@ -107,7 +101,7 @@ public class AuraContextFilter implements Filter {
             loggingService.setValue(LoggingService.REQUEST_METHOD, request.getMethod());
             loggingService.setValue(LoggingService.AURA_REQUEST_URI, request.getRequestURI());
             loggingService.setValue(LoggingService.AURA_REQUEST_QUERY, request.getQueryString());
-            chain.doFilter(req, res);
+            testFilter.doFilter(req, res, chain);
         } catch (InvalidParamException e) {
             HttpServletResponse response = (HttpServletResponse) res;
             response.setStatus(500);
@@ -194,52 +188,10 @@ public class AuraContextFilter implements Filter {
             }
 
             @SuppressWarnings("unchecked")
-            Map<String, Object> gvp = (Map<String,Object>) configMap.get("globals");
+            Map<String, Object> gvp = (Map<String, Object>) configMap.get("globals");
             if (gvp != null) {
-                for (Map.Entry<String,Object> entry : gvp.entrySet()) {
+                for (Map.Entry<String, Object> entry : gvp.entrySet()) {
                     context.setGlobal(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-
-        if (!isProduction) {
-            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
-            if (testContextAdapter != null) {
-                String testName = null;
-                // config takes precedence over param because the value is not expected to change during a test and it
-                // is less likely to have been modified unintentionally when from the config
-                if (configMap != null) {
-                    testName = (String) configMap.get("test");
-                }
-                if (testName == null) {
-                    testName = test.get(request);
-                }
-                if (testName != null) {
-                    TestContext testContext = testContextAdapter.getTestContext(testName);
-                    if (testContext != null) {
-                        MasterDefRegistry registry = context.getDefRegistry();
-                        Set<Definition> mocks = testContext.getLocalDefs();
-                        if (mocks != null) {
-                            boolean error = false;
-                            boolean doReset = testReset.get(request);
-                            for (Definition def : mocks) {
-                                try {
-                                    if (doReset && def instanceof Resettable) {
-                                        ((Resettable) def).reset();
-                                    }
-                                    registry.addLocalDef(def);
-                                } catch (Throwable t) {
-                                    LOG.error("Failed to add mock "+def, t);
-                                    error = true;
-                                }
-                            }
-                            if (error) {
-                                testContextAdapter.release();
-                            }
-                        }
-                    }
-                } else {
-                    testContextAdapter.clear();
                 }
             }
         }
@@ -381,5 +333,6 @@ public class AuraContextFilter implements Filter {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(dirConfig)) {
             componentDir = filterConfig.getServletContext().getRealPath("/") + dirConfig;
         }
+        testFilter.init(filterConfig);
     }
 }

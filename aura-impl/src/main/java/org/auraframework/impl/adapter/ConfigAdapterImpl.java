@@ -188,6 +188,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public boolean isTestAllowed() {
+        return !isProduction();
+    }
+    
+    @Override
     public Set<Mode> getAvailableModes() {
         return allModes;
     }

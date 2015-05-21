@@ -1769,7 +1769,6 @@ AuraClientService.prototype.processActions = function() {
     return processedActions;
 };
 
-
 AuraClientService.prototype.allowAccess = function(definition, component) {
     //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
     if(this.currentlyInSideEffectMode){
@@ -1778,7 +1777,6 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
     if(definition&&definition.getDescriptor){
         var context;
         var currentAccess;
-        var targetNamespace;
         switch(definition.access){
             case 'G':
                 // GLOBAL means accessible from anywhere
@@ -1791,29 +1789,26 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
             default:
                 // INTERNAL, PUBLIC, or absence of value means "same namespace only".
                 context=$A.getContext();
-                currentAccess=context&&context.getCurrentAccess();
-                targetNamespace=definition.getDescriptor().getNamespace();
+                currentAccess=(context&&context.getCurrentAccess())||component;
                 if(currentAccess){
+                    var targetNamespace=definition.getDescriptor().getNamespace();
                     var accessNamespace=currentAccess.getDef().getDescriptor().getNamespace();
                     var accessFacetNamespace=currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace();
                     // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
                     // if(definition.access!=="P"){
-                        // INTERNAL / DEFAULT
-                        if(this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace)){
-                            // Privileged Namespace
-                            return true;
-                        }
+                    // INTERNAL / DEFAULT
+                    if(this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace)){
+                        // Privileged Namespace
+                        return true;
+                    }
                     //}
                     // Not a privileged namespace or explicitly set to PUBLIC
                     return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
-                }else if(component){
-                    return targetNamespace===component.getDef().getDescriptor().getNamespace();
                 }
         }
     }
     return false;
 };
-
 
 exp(AuraClientService.prototype,
     "initHost", AuraClientService.prototype.initHost,

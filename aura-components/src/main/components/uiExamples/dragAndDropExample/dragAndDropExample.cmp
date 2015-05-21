@@ -19,7 +19,7 @@
 	
 	<aura:attribute name="_context1" access="private" type="Object"/>
 	<aura:attribute name="_context2" access="private" type="Object"/>
-	<aura:attribute name="_accessibilityComponent" access="private" type="Aura.Component[]"/>
+	<aura:attribute name="_accessibilityComponent" access="private" type="String"/>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	

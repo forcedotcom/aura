@@ -29,6 +29,8 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.testdata.LocalizationServiceTestData;
 import org.auraframework.test.AuraTestCase;
+import org.auraframework.util.date.DateConverter;
+import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.number.AuraNumberFormat;
 
 import com.google.common.collect.ImmutableMap;
@@ -61,8 +63,9 @@ public class LocalizationServiceImplTest extends AuraTestCase {
             String actualEN = localizationService.formatDate(dateEN, Locale.GERMAN, TimeZone.getTimeZone("CEST"),
                     DateFormat.FULL);
             LocalizationAdapter adaptor = Aura.getLocalizationAdapter();
-            String localizationAdaptor = adaptor.getClass().toString();
-            assertEquals(String.format("Failed to convert date from English to German locale, LocalizationAdaptorUsed: %s", localizationAdaptor), expectedDE, actualEN);
+            DateConverter dateStyleConvertor = DateServiceImpl.get().getDateStyleConverter(Locale.GERMAN, DateFormat.FULL);
+            String formattedDate = dateStyleConvertor.format(dateEN, TimeZone.getTimeZone("CEST"));
+            assertEquals(String.format("Failed to convert date from English to German locale,  LocalizationAdaptorUsed: %s, dateStyleConvertorUsed: %s, formattedDate: %s", adaptor.toString(), dateStyleConvertor.toString(), formattedDate), expectedDE, actualEN);
         }
         // Locale: English -> Simplified Chinese
         {

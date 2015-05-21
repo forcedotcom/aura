@@ -205,6 +205,7 @@ public enum JavascriptWriter {
 
     /**
      * Compress source file and generate associated sourcemap.
+     * 
      * @param sourceFileReader source Javascrpt file reader
      * @param compressedFileWriter Compressed Javascript file writer
      * @param sourceMapWriter Source map writer
@@ -213,14 +214,15 @@ public enum JavascriptWriter {
      * @return
      * @throws IOException
      */
-    public List<JavascriptProcessingError> compress(Reader sourceFileReader, Writer compressedFileWriter, Writer sourceMapWriter,  String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
+    public List<JavascriptProcessingError> compress(Reader sourceFileReader, Writer compressedFileWriter,
+            Writer sourceMapWriter, String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
         SourceFile input = SourceFile.fromReader(filename, sourceFileReader);
         return compress(input, compressedFileWriter, sourceMapWriter, filename, sourceMapLocationMapping);
     }
 
     /**
      * InputStream base compression
-     *
+     * 
      * @param in source stream
      * @param compressedFileWriter Compressed Javascript file writer
      * @param filename Source javascript file name
@@ -235,22 +237,24 @@ public enum JavascriptWriter {
     /**
      * Does the actual compression work.
      */
-    private List<JavascriptProcessingError> compress(SourceFile in, Writer out, Writer sourceMapWriter, String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
+    private List<JavascriptProcessingError> compress(SourceFile in, Writer out, Writer sourceMapWriter,
+            String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
         List<JavascriptProcessingError> msgs = new ArrayList<>();
         // Do some actual closure variation:
         Compiler c = new Compiler();
 
         Compiler.setLoggingLevel(Level.WARNING);
         CompilerOptions options = new CompilerOptions();
-        if(sourceMapWriter != null) {
+        if (sourceMapWriter != null) {
             options.sourceMapFormat = SourceMap.Format.V3;
             options.sourceMapOutputPath = filename;
         }
 
-        //Add source file mapping, useful for relocating source files on a server or removing repeated values in the “sources” entry
-        if(sourceMapLocationMapping != null && !sourceMapLocationMapping.isEmpty()) {
+        // Add source file mapping, useful for relocating source files on a server or removing repeated values in the
+        // “sources” entry
+        if (sourceMapLocationMapping != null && !sourceMapLocationMapping.isEmpty()) {
             options.sourceMapLocationMappings = new ArrayList<>();
-            for(Map.Entry<String, String> entry : sourceMapLocationMapping.entrySet()) {
+            for (Map.Entry<String, String> entry : sourceMapLocationMapping.entrySet()) {
                 options.sourceMapLocationMappings.add(new SourceMap.LocationMapping(entry.getKey(), entry.getValue()));
             }
         }
@@ -260,7 +264,7 @@ public enum JavascriptWriter {
         // Disable reporting non-standard jsdoc comments as warnings. Should have been able to do:
         // options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         options.addWarningsGuard(NON_STANDARD_JSDOC_GUARD);
-        
+
         Result result = c.compile(externs, Lists.<SourceFile> newArrayList(in), options);
 
         if (isSelfScoping()) {
@@ -277,8 +281,8 @@ public enum JavascriptWriter {
             out.append("})();");
         }
 
-        //Write sourcemap
-        if(result != null && sourceMapWriter != null) {
+        // Write sourcemap
+        if (result != null && sourceMapWriter != null) {
             StringBuilder sb = new StringBuilder();
             result.sourceMap.validate(true);
             result.sourceMap.appendTo(sb, filename);
@@ -307,10 +311,14 @@ public enum JavascriptWriter {
                     .equals(error.description)) {
                 return CheckLevel.OFF;
             }
+            if ("Parse error. illegal use of unknown JSDoc tag \"platform\"; ignoring it"
+                    .equals(error.description)) {
+                return CheckLevel.OFF;
+            }
             return error.getDefaultLevel();
         }
     };
-    
+
     private static final List<SourceFile> externs;
 
     static {

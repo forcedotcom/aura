@@ -25,10 +25,10 @@ var ServerActionsMetricsPlugin = function ServerActionsMetricsPlugin(config) {
 
 ServerActionsMetricsPlugin.NAME = "serverActions";
 ServerActionsMetricsPlugin.prototype = {
-    initialize: function (metricsCollector) {
-        this.collector = metricsCollector;
+    initialize: function (metricsService) {
+        this.collector = metricsService;
         if (this["enabled"]) {
-            this.bind(metricsCollector);
+            this.bind(metricsService);
         }
     },
     enable: function () {
@@ -43,12 +43,12 @@ ServerActionsMetricsPlugin.prototype = {
             this.unbind(this.collector);
         }
     },
-    bind: function (metricsCollector) {
+    bind: function (metricsService) {
         var method       = 'getServerActions',
             actionHook   = function () {
                 var original = Array.prototype.shift.apply(arguments),
                     action   = arguments[0],
-                    markEnd  = metricsCollector.markEnd(ServerActionsMetricsPlugin.NAME, 'dispatch');
+                    markEnd  = metricsService.markEnd(ServerActionsMetricsPlugin.NAME, 'dispatch');
 
                 markEnd["context"] = {
                     "id"          : action.getId(),
@@ -72,7 +72,7 @@ ServerActionsMetricsPlugin.prototype = {
                         var success     = action.getCallback('SUCCESS'),
                             error       = action.getCallback('ERROR'),
                             incomplete  = action.getCallback('INCOMPLETE'),
-                            actionStart = metricsCollector.markStart(ServerActionsMetricsPlugin.NAME, 'dispatch');
+                            actionStart = metricsService.markStart(ServerActionsMetricsPlugin.NAME, 'dispatch');
 
                         actionStart["context"] = {
                             "id"         : action.getId(),
@@ -101,7 +101,7 @@ ServerActionsMetricsPlugin.prototype = {
                 startMark["context"] = {"ids": ids};
             };
 
-        metricsCollector["instrument"](
+        metricsService.instrument(
             $A["clientService"]["ActionQueue"].prototype,
             method, 
             ServerActionsMetricsPlugin.NAME,
@@ -162,8 +162,8 @@ ServerActionsMetricsPlugin.prototype = {
         }); // filter the serverActions which have not resolve any of its children
     },
     // #end
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"](
+    unbind: function (metricsService) {
+        metricsService["unInstrument"](
            $A["clientService"]["ActionQueue"].prototype/*host*/, 'getServerActions'/*method*/
         );
     }

@@ -21,6 +21,7 @@ if (typeof Aura != 'undefined') {
     Aura._Aura = Aura;
 }
 var Aura = {};
+window["Aura"] = Aura; 
 
 // -- Namespaces ------------------------------------------------------------
 Aura.Utils      = {};
@@ -55,6 +56,7 @@ window['$A'] = {};
 // -- Polyfills --------------------------------------------------------
 // #include aura.polyfill.Array
 // #include aura.polyfill.Function
+// #include aura.polyfill.RequestAnimationFrame
 // #include aura.polyfill.Json
 // #include aura.polyfill.Promise
 
@@ -1078,11 +1080,8 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
     $A.metricsService.bootstrapMark("frameworkReady");
 })();
 
-// TODO(fabbott): Remove the legacy 'aura' top-level name.
+// TODO: Remove the legacy 'aura' top-level name.
 window['aura'] = window['$A'];
-
-// Move to the bottom and remove
-window["Aura"] = Aura; 
 
 // -- Storage Adapters -------------------------------------------------
 // #include aura.storage.adapters.MemoryAdapter

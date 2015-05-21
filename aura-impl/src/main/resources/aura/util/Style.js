@@ -16,16 +16,17 @@
 /**
  * 
  * @constructor
+ * @export
  */
-function Style (){
+Aura.Utils.Style = function Style() {
     this.head = null;
-}
+};
 
 /**
  * Gets the head element of the HTML document.
  * @returns {Object}
  */
-Style.prototype.getHead = function(){
+Aura.Utils.Style.prototype.getHead = function(){
     var ret = this.head;
     if(!ret){
         this.head = document.getElementsByTagName("head")[0];
@@ -42,7 +43,7 @@ Style.prototype.getHead = function(){
  * @returns {Object} The style element
  * @private
  */
-Style.prototype.apply = function(styleText) {
+Aura.Utils.Style.prototype.apply = function(styleText) {
     //FIXME - This should see if it's already been applied
     var styleElement = document.createElement('style');
     styleElement.setAttribute('type', 'text/css');
@@ -69,8 +70,9 @@ Style.prototype.apply = function(styleText) {
  * Returns the HTML link element.
  * @param {String} href Defines the location of the style sheet.
  * @returns {Object} The link element
+ * @export
  */
-Style.prototype.include = function(href) {
+Aura.Utils.Style.prototype.include = function(href) {
     //FIXME - This should see if it's already been included
     var styleElement = document.createElement('link');
     styleElement.setAttribute('href', href);
@@ -85,8 +87,9 @@ Style.prototype.include = function(href) {
  * IE8 will use "backgroundColor", IE9+ are good with "background-color". 
  * @param {HTMLElement} el The HTML element
  * @param {String} cssprop The CSS property to be retrieved
+ * @export
  */
-Style.prototype.getCSSProperty = function(el, cssprop) {
+Aura.Utils.Style.prototype.getCSSProperty = function(el, cssprop) {
     var elcsIE = el.currentStyle;
     if (elcsIE){ //IE
         if(elcsIE[cssprop]!=undefined) {//IE8
@@ -106,7 +109,3 @@ Style.prototype.getCSSProperty = function(el, cssprop) {
         return el.style[cssprop];
     }
 };
-
-Aura.Utils.Style = Style;
-
-//#include aura.util.Style_export

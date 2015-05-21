@@ -22,7 +22,16 @@ Function.RegisterNamespace("Test.Aura.BrowserSupportedUtilTest");
 
 [Fixture]
 Test.Aura.BrowserSupportedUtilTest = function() {
-    var Aura = {Utils: {}};
+    var Aura = {
+        Utils: {
+            Json:function() {},
+            Transport:function() {},
+            Style:function() {},
+            Bitset:{},
+            NumberFormat:{},            
+        }
+    };
+    
     [Fixture]
     function browserSupportedTests() {
         var MockObject = {};

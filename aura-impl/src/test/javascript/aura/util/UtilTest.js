@@ -17,7 +17,14 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.UtilTest = function() {
-    var Aura = {Utils:{}};
+    var Aura = {Utils:{
+        Json:function() {},
+            Transport:function() {},
+            Style:function() {},
+            SizeEstimator: function () {},
+            Bitset:{},
+            NumberFormat:{},
+    }};
     var auraMock = function(delegate) {
         Mocks.GetMocks(Object.Global(),{
             exp:function() {},

@@ -26,12 +26,12 @@ function Util() {
     this.trash = [];
     this.json = new Json();
     this["json"] = this.json;
-    this.transport = new Transport();
+    this.transport = new Aura.Utils.Transport();
     this["transport"] = this.transport;
-    this.style = new Style();
+    this.style = new Aura.Utils.Style();
     this["style"] = this.style;
-    this["Bitset"] = Bitset;
-    this["NumberFormat"] = NumberFormat;
+    this["Bitset"] = Aura.Utils.Bitset;
+    this["NumberFormat"] = Aura.Utils.NumberFormat;
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};

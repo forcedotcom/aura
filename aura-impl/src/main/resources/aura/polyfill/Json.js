@@ -228,4 +228,7 @@ Json.prototype.encodeFunction = function(value) {
     }
     return value;
 };
-// #include aura.polyfill.Json_export
+
+Json.prototype["encode"] = Json.prototype.encode;
+Json.prototype["resolveRefs"] = Json.prototype.resolveRefs;
+

@@ -59,8 +59,13 @@ Test.Aura.BrowserUnsupportedUtilTest=function() {
                 Style:function() {},
                 Bitset:{},
                 NumberFormat:{},            
-                $A:{ns:{}},
-                "Aura": {"Utils":{}},
+                Aura: {Utils: {
+                    Json:function() {},
+                    Transport:function() {},
+                    Style:function() {},
+                    Bitset:{},
+                    NumberFormat:{}
+                }},
                 navigator:{userAgent:''},
                 Array: override === MockArray ? override : Array,
                 Function: override === MockFunction ? override : Function

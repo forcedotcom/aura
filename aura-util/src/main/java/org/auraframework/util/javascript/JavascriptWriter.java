@@ -120,6 +120,7 @@ public enum JavascriptWriter {
             options.reserveRawExports = true;
             options.variableRenaming = VariableRenamingPolicy.OFF;
             options.propertyRenaming = PropertyRenamingPolicy.ALL_UNQUOTED;
+            options.generateExports = true;
         }
 
         @Override
@@ -133,6 +134,7 @@ public enum JavascriptWriter {
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
             options.aliasAllStrings = true;
+            options.generateExports = true;
         }
 
         @Override

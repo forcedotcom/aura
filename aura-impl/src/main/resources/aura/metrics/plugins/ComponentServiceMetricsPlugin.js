@@ -25,11 +25,11 @@ var ComponentServiceMetricsPlugin = function ComponentServiceMetricsPlugin(confi
 
 ComponentServiceMetricsPlugin.NAME = "componentService";
 ComponentServiceMetricsPlugin.prototype = {
-    initialize: function (metricsCollector) {
-        this.collector = metricsCollector;
+    initialize: function (metricsService) {
+        this.collector = metricsService;
 
         if (this["enabled"]) {
-            this.bind(metricsCollector);
+            this.bind(metricsService);
         }
     },
     enable: function () {
@@ -44,7 +44,7 @@ ComponentServiceMetricsPlugin.prototype = {
             this.unbind(this.collector);
         }
     },
-    bind: function (metricsCollector) {
+    bind: function (metricsService) {
         var method      = 'newComponentDeprecated',
             beforeHook  = function (startMark, config, avp, lc, f) {
                 var descriptor;
@@ -58,7 +58,7 @@ ComponentServiceMetricsPlugin.prototype = {
                 };
             };
 
-        metricsCollector["instrument"](
+        metricsService.instrument(
             $A.componentService,
             method,
             ComponentServiceMetricsPlugin.NAME,
@@ -71,8 +71,8 @@ ComponentServiceMetricsPlugin.prototype = {
         return [];
     },
     // #end
-    unbind: function (metricsCollector) {
-        metricsCollector["unInstrument"]($A.componentService, 'newComponentDeprecated');
+    unbind: function (metricsService) {
+        metricsService["unInstrument"]($A.componentService, 'newComponentDeprecated');
     }
 };
 

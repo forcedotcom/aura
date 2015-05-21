@@ -20,8 +20,9 @@
  * Symbols is an optional map of localized symbols to use, otherwise it will use the current locale's symbols
  * 
  * @constructor
+ * @export
  */
-function NumberFormat(format, symbols) {
+Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
     this.originalFormat = format;
     this.symbols = symbols || {"decimalSeparator": $A.get("$Locale.decimal"),
                                "groupingSeparator": $A.get("$Locale.grouping"),
@@ -29,7 +30,7 @@ function NumberFormat(format, symbols) {
                                "currencyCode": $A.get("$Locale.currencyCode"),
                                "zeroDigit": $A.get("$Locale.zero")};
     // default values for any format
-    this.zeroCharCodeOffset = this.symbols["zeroDigit"].charCodeAt(0) - NumberFormat.ZERO.charCodeAt(0);
+    this.zeroCharCodeOffset = this.symbols["zeroDigit"].charCodeAt(0) - Aura.Utils.NumberFormat.ZERO.charCodeAt(0);
     this.hasCurrency = false;
     this.multiplier = 0;
     this.minDigits = 1;
@@ -66,7 +67,7 @@ function NumberFormat(format, symbols) {
         var c = posPattern.charAt(i);
         switch (parsePhase) {
         case 0:
-            if (c === "#" || c === NumberFormat.ZERO || c === "." || c === ",") {
+            if (c === "#" || c === Aura.Utils.NumberFormat.ZERO || c === "." || c === ",") {
                 // on to the pattern phase
                 parsePhase = 1;
                 prefixEnd = i;
@@ -89,7 +90,7 @@ function NumberFormat(format, symbols) {
                     group++;
                 }
                 break;
-            case NumberFormat.ZERO:
+            case Aura.Utils.NumberFormat.ZERO:
                 if (rightNumbers > 0) {
                     this.parseError("'0's must be sequential");
                 }
@@ -168,11 +169,11 @@ function NumberFormat(format, symbols) {
         }
     }
     this.replaceCurrencies();
-}
+};
 
-NumberFormat.ZERO = "0";
+Aura.Utils.NumberFormat.ZERO = "0";
 
-NumberFormat.prototype.parseError = function(s) {
+Aura.Utils.NumberFormat.prototype.parseError = function(s) {
     throw new Error("Invalid pattern: " + this.originalFormat + "\n" + s);
 };
 
@@ -180,7 +181,7 @@ NumberFormat.prototype.parseError = function(s) {
  * Helper method to track special characters.
  * @private
  */
-NumberFormat.prototype.checkForSpecialChar = function(c) {
+Aura.Utils.NumberFormat.prototype.checkForSpecialChar = function(c) {
     var mult;
     switch (c) {
     case "\u00a4":
@@ -209,7 +210,7 @@ NumberFormat.prototype.checkForSpecialChar = function(c) {
  * Replaces currency markers with the local currency symbol.
  * @private
  */
-NumberFormat.prototype.replaceCurrencies = function() {
+Aura.Utils.NumberFormat.prototype.replaceCurrencies = function() {
     if (this.hasCurrency) {
         this.prefix = this.replaceCurrency(this.prefix);
         this.suffix = this.replaceCurrency(this.suffix);
@@ -221,7 +222,7 @@ NumberFormat.prototype.replaceCurrencies = function() {
 /**
  * @private
  */
-NumberFormat.prototype.replaceCurrency = function(str) {
+Aura.Utils.NumberFormat.prototype.replaceCurrency = function(str) {
     if (str) {
         return str.replace(/\u00a4\u00a4/g, this.symbols["currencyCode"]).replace(/\u00a4/g, this.symbols["currency"]);
     }
@@ -231,7 +232,7 @@ NumberFormat.prototype.replaceCurrency = function(str) {
 /**
  * @private
  */
-NumberFormat.prototype.translateDigits = function(charArray) {
+Aura.Utils.NumberFormat.prototype.translateDigits = function(charArray) {
     if (this.zeroCharCodeOffset) {
         for (var i = 0; i < charArray.length; i++) {
             charArray[i] = String.fromCharCode(charArray[i].charCodeAt(0) + this.zeroCharCodeOffset);
@@ -244,8 +245,9 @@ NumberFormat.prototype.translateDigits = function(charArray) {
  * Format a number into a string. Accepts a string of the format "#.#" for formatting numbers
  * requiring greater than double precision.
  * @param {Number|String} number The number to be formatted.
+ * @export
  */
-NumberFormat.prototype.format = function(number) {
+Aura.Utils.NumberFormat.prototype.format = function(number) {
     var ns;
     if ($A.util.isString(number)) {
         ns = number;
@@ -274,11 +276,11 @@ NumberFormat.prototype.format = function(number) {
     // apply multiplier
     decimalPos += this.multiplier;
     while (decimalPos > charArray.length) {
-        charArray.push(NumberFormat.ZERO);
+        charArray.push(Aura.Utils.NumberFormat.ZERO);
     }
 
     // strip leading zeros off for numbers like 000.01
-    while (charArray[0] === NumberFormat.ZERO) {
+    while (charArray[0] === Aura.Utils.NumberFormat.ZERO) {
         charArray.shift();
         decimalPos--;
     }
@@ -295,7 +297,7 @@ NumberFormat.prototype.format = function(number) {
                 // done rounding
                 round = false;
             } else {
-                charArray[rounderIndex] = NumberFormat.ZERO;
+                charArray[rounderIndex] = Aura.Utils.NumberFormat.ZERO;
             }
         }
         // might need an extra 1 at the beginning
@@ -324,7 +326,7 @@ NumberFormat.prototype.format = function(number) {
 
     for (var i = 0; i < zeroPad; i++) {
         // too short, add 0s
-        charArray.unshift(NumberFormat.ZERO);
+        charArray.unshift(Aura.Utils.NumberFormat.ZERO);
         decimalPos++;
     }
     
@@ -360,6 +362,3 @@ NumberFormat.prototype.format = function(number) {
     
     return result.join("");
 };
-Aura.Utils.NumberFormat = NumberFormat;
-
-//#include aura.util.NumberFormat_export

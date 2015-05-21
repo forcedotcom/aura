@@ -67,7 +67,7 @@ IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
     this.tableName = "keyStore";
 
     // Set version number on open call to avoid weirdness when deleting/recreating DBs of the same name
-    var dbRequest = window.indexedDB.open(this.instanceName, "1");
+    var dbRequest = window.indexedDB.open(this.instanceName, 1);
     dbRequest.onupgradeneeded = function (e) {
         that.createTables(e.target.result);
     };
@@ -595,6 +595,10 @@ IndexedDBStorageAdapter.prototype.deleteStorage = function() {
 
 IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, error) {
     var that = this;
+
+    // IE and Safari need to be explicitly closed otherwise may end up stuck in a blocked state
+    this.db.close();
+
     var dbRequest = window.indexedDB.deleteDatabase(this.instanceName);
     dbRequest.onerror = function(event) {
         error("IndexedDBStorageAdapter.deleteStorage: Database failed to be deleted");
@@ -604,8 +608,9 @@ IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, erro
         success();
     };
     dbRequest.onblocked = function(event) {
-        error("IndexedDBStorageAdapter.deleteStorage: Database blocked from being deleted");
-    };
+        // Cannot error here because IE may come to this callback before success
+        that.log("blocked from being deleted");
+    }; 
 };
 
 // Only register this adapter if the IndexedDB API is present

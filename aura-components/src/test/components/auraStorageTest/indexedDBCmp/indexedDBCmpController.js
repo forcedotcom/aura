@@ -8,8 +8,8 @@
         cmp._storage.clear()
             .then(function() {
                 cmp.set("v.status", "Done Resetting");
-            }, function() {
-                cmp.set("v.status", "Error during reset");
+            }, function(error) {
+                cmp.set("v.status", "Error during reset: " + error);
             });
     },
 
@@ -20,8 +20,8 @@
             .then(function(item) {
                 cmp.set("v.return", item.value);
                 cmp.set("v.status", "Done Getting");
-            }, function() {
-                cmp.set("v.status", "Error during get");
+            }, function(error) {
+                cmp.set("v.status", "Error during get: " + error);
             });
     },
 
@@ -32,8 +32,8 @@
         cmp._storage.put(key, value)
             .then(function(){
                 cmp.set("v.status", "Done Adding");
-            }, function() {
-                cmp.set("v.status", "Error during add");
+            }, function(error) {
+                cmp.set("v.status", "Error during add: " + error);
             });
     },
 
@@ -42,8 +42,8 @@
         $A.storageService.deleteStorage("indexedDBCmp")
             .then(function() {
                 cmp.set("v.status", "Done Deleting");
-            }, function() {
-                cmp.set("v.status", "Error during delete of storage")
+            }, function(error) {
+                cmp.set("v.status", "Error during delete of storage: " + error);
             });
     }
 })

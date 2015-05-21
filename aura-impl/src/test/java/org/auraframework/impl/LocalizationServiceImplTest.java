@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.testdata.LocalizationServiceTestData;
 import org.auraframework.test.AuraTestCase;
@@ -59,7 +60,9 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                     DateFormat.FULL);
             String actualEN = localizationService.formatDate(dateEN, Locale.GERMAN, TimeZone.getTimeZone("CEST"),
                     DateFormat.FULL);
-            assertEquals("Failed to convert date from English to German locale", expectedDE, actualEN);
+            LocalizationAdapter adaptor = Aura.getLocalizationAdapter();
+            String localizationAdaptor = adaptor.getClass().toString();
+            assertEquals(String.format("Failed to convert date from English to German locale, LocalizationAdaptorUsed: %s", localizationAdaptor), expectedDE, actualEN);
         }
         // Locale: English -> Simplified Chinese
         {

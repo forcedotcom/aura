@@ -42,10 +42,14 @@ Test.Aura.Controller.ActionQueueTest = function() {
                     encode : function(val) {
                         return val;
                     }
+                },
+                sortObject: function(obj) {
+                    return obj;
                 }
             },
             log : function() {
             }
+
         }
     });
 
@@ -558,4 +562,4 @@ Test.Aura.Controller.ActionQueueTest = function() {
             Assert.Equal([ server, client ], target.actions);
         }
     }
-}
+};

@@ -82,6 +82,7 @@ p["includeScript"] = p.includeScript;
 p["isExpression"] = p.isExpression;
 p["createHtmlElement"] = p.createHtmlElement;
 p["clearNode"] = p.clearNode;
+p["sortObject"] = p.sortObject;
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 p["getDebugToolComponent"] = p.getDebugToolComponent;

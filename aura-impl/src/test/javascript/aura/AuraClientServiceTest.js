@@ -639,7 +639,10 @@ Test.Aura.AuraClientServiceTest = function() {
                         map: function(array, transformer, that) {
                             return array.map(transformer, that);
                         },
-                        keys: Object.keys
+                        keys: Object.keys,
+                        sortObject: function(obj) {
+                            return obj
+                        }
                     },
                     run : function (cb) {
                         cb();
@@ -892,7 +895,7 @@ Test.Aura.AuraClientServiceTest = function() {
             window:{
                 "applicationCache": mockApplicationCache,
                 "localStorage": mockStorage,
-                "sessionStorage": mockStorage,
+                "sessionStorage": mockStorage
             },
             Aura: Aura,
             location: mockLocation

@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 ({
+	DIRECTION_TOGGLE_MAP: {
+		'ascending' : 'descending',
+		'descending' : 'ascending'
+	},
+
 	intialize: function (cmp) {
 		this.intializeDefaultOutputComponent(cmp);
 	},
@@ -59,22 +64,14 @@
 	toggleSort: function (cmp) {
 		var name = cmp.get('v.name'),
 			direction = cmp.get('v.direction'),
-			initialDirection = cmp.get('v.initialDirection'),
+			initialDirOnSort = cmp.get('v.initialDirectionOnSort') || 'ascending',
 			onsortchange = cmp.get('v.onsortchange'),
 			newValue;
 		
-		if (direction === 'descending') {
-			newValue = 'ascending';
-		} else if (direction === 'ascending') {
-			newValue = 'descending';	
+		newValue = $A.util.isEmpty(direction) ? initialDirOnSort : this.DIRECTION_TOGGLE_MAP[direction];
+
+		if (newValue === 'descending') {
 			name = '-' + name;
-		} else if (initialDirection === 'ascending') {
-			newValue = initialDirection;
-		} else if (initialDirection === 'descending') {
-			newValue = initialDirection;
-			name = '-' + name;
-		} else {
-			newValue = 'ascending';
 		}
 
 		cmp.set('v.direction', newValue);

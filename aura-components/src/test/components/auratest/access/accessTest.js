@@ -20,7 +20,7 @@
 
             var actual=$A.test.getTextByComponent(cmp.find("local"));
 
-            $A.test.assertEquals(expected,actual);
+            $A.test.assertEqualsIgnoreWhitespace(expected,actual);
         }
     },
 
@@ -100,7 +100,7 @@
 
             var actual=$A.test.getTextByComponent(cmp.find("remote"));
 
-            $A.test.assertEquals(expected,actual);
+            $A.test.assertEqualsIgnoreWhitespace(expected,actual);
         }
     }
 })

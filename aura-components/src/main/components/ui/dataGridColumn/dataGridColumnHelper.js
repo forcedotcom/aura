@@ -64,7 +64,7 @@
 	toggleSort: function (cmp) {
 		var name = cmp.get('v.name'),
 			direction = cmp.get('v.direction'),
-			initialDirOnSort = cmp.get('v.initialDirectionOnSort') || 'ascending',
+			initialDirOnSort = cmp.get('v.initialDirectionOnSort'),
 			onsortchange = cmp.get('v.onsortchange'),
 			newValue;
 		

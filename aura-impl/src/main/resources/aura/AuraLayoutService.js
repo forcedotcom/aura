@@ -211,6 +211,19 @@ var AuraLayoutService = function() {
          */
         layout : function(name, params, noTrack) {
             var layout = layouts.getLayout(name);
+            var actionCount = 0, i;
+            var actionSet = {};
+            var finishedCallback = function(finished) {
+                    if (!actionSet[finished.getId()] || --actionCount) {
+                        actionSet[finished.getId()] = undefined;
+                        return;
+                    }
+                    fireLayoutChangeEvent();
+                    $A.Perf.endMark("Layout Actions Callback Complete");
+
+                    $A.finishInit();
+                    fireOnload();
+                };
 
             if (!layout) {
                 layout = layouts.getCatchall();
@@ -231,6 +244,8 @@ var AuraLayoutService = function() {
                         container._layoutItem = item;
                         var defaultAction = function() {
                             var action = item.getAction(cmp);
+                            actionCount += 1;
+                            actionSet[action.getId()] = action;
 
                             action.setStorable();
 
@@ -256,7 +271,11 @@ var AuraLayoutService = function() {
                                         layoutErrorFired = true;
                                     }
                                 }
+                                finishedCallback(a);
                             });
+                            action.setCallback(this, function(a) {
+                                finishedCallback(a);
+                            }, "ABORTED");
 
                             actions.push(action);
                         };
@@ -301,22 +320,9 @@ var AuraLayoutService = function() {
 
             if (actions.length > 0 || config.length > 0) {
                 window.scrollTo(0, 0);
-                $A.clientService.runActions(actions, cmp, function(msg) {
-                    /**
-                     * This function gets called in
-                     * AuraClientService.runActions(). After all server actions
-                     * are batched and sent to server, the response is handled
-                     * in actionResponse(). This 'callback' argument in
-                     * AuraClientService.runActions() refers to this function.
-                     */
-                    if (!msg["errors"] || msg["errors"].length === 0) {
-                        fireLayoutChangeEvent();
-                    }
-                    $A.Perf.endMark("Layout Actions Callback Complete");
-
-                    $A.finishInit();
-                    fireOnload();
-                });
+                for (i = 0; i < actions.length; i++) {
+                    $A.enqueueAction(actions[i]);
+                }
             }
         },
 

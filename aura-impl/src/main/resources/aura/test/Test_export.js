@@ -37,6 +37,7 @@ TestInstance.prototype["assertAccessible"] = TestInstance.prototype.assertAccess
 
 // utils
 TestInstance.prototype["compareValues"] = TestInstance.prototype.compareValues;
+TestInstance.prototype["areActionsComplete"] = TestInstance.prototype.areActionsComplete;
 
 // test flow/state
 TestInstance.prototype["fail"] = TestInstance.prototype.fail;
@@ -102,7 +103,6 @@ TestInstance.prototype["releaseForegroundRequests"] = TestInstance.prototype.rel
 TestInstance.prototype["releaseBackgroundRequests"] = TestInstance.prototype.releaseBackgroundRequests;
 TestInstance.prototype["getSentRequestCount"] = TestInstance.prototype.getSentRequestCount;
 TestInstance.prototype["enqueueAction"] = TestInstance.prototype.enqueueAction;
-TestInstance.prototype["runActionsAsTransaction"] = TestInstance.prototype.runActionsAsTransaction;
 TestInstance.prototype["clearAndAssertComponentConfigs"] = TestInstance.prototype.clearAndAssertComponentConfigs;
 TestInstance.prototype["setServerReachable"] = TestInstance.prototype.setServerReachable;
 TestInstance.prototype["getActionQueue"] = TestInstance.prototype.getActionQueue;

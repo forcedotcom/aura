@@ -120,17 +120,20 @@
             var a = cmp.get("c.resetCounter");
             a.setParams({ testName: "testActionScopedGlobalID" }),
             $A.test.enqueueAction(a);
-            $A.test.runAfterIf(function() { return a.getState() === "SUCCESS"; },
+            $A.test.runAfterIf(function() { return $A.test.areActionsComplete([a]); },
                 function() {
+                    $A.test.assertEquals("SUCCESS", a.getState());
                     $A.test.blockRequests();
-                    $A.test.runActionsAsTransaction([action1], cmp, function(){cmp._testCounter--;});
-                    $A.test.runActionsAsTransaction([action2], cmp, function(){cmp._testCounter--;});
+                    $A.run(function() { $A.enqueueAction(action1); });
+                    $A.run(function() { $A.enqueueAction(action2); });
                     $A.test.releaseRequests();
                 });
             cmp.test = this;
             $A.test.runAfterIf(function() {
-                    return cmp._testCounter == 0;
+                    return $A.test.areActionsComplete([action1, action2]);
                 }, function(){
+                    $A.test.assertEquals("ABORTED", action1.getState());
+                    $A.test.assertEquals("SUCCESS", action2.getState());
                     var teamActionNum = cmp.test.getActionNumberFromPage(cmp)[0];
                     cmp.test.verifyTeamFacet(cmp, teamActionNum);
                 });
@@ -185,8 +188,9 @@
             a.setStorable();
             $A.test.enqueueAction(a);
             cmp.test = this;
-            $A.test.addWaitFor("SUCCESS", function(){return a.getState()},
+            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([a]); },
                 function(){
+                    $A.test.assertEquals("SUCCESS", a.getState());
                     $A.test.assertTrue(a.isFromStorage(), "Action should have been from storage");
                     var playerActionNum = cmp.test.getActionNumberFromPage(cmp)[0];
                     cmp.test.verifyPlayersFacet(cmp, playerActionNum);

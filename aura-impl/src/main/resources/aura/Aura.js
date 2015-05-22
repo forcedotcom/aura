@@ -145,7 +145,6 @@ window['$A'] = {};
 // #include aura.controller.ControllerDef
 // #include aura.controller.ControllerDefRegistry
 // #include aura.controller.ActionDefRegistry
-// #include aura.controller.ActionCallbackGroup
 // #include aura.controller.ActionQueue
 // #include aura.controller.ActionCollector
 // #include aura.controller.FlightCounter

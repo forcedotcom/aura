@@ -34,8 +34,7 @@
                 throw new Error("this is intentional");
             });
             $A.run(function() { $A.enqueueAction(a); });
-            $A.test.addWaitFor(true, function() { return a.getState() != "NEW" && a.getState() != "RUNNING"; },
-                    function() {});
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }
     },
 
@@ -45,21 +44,8 @@
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
                 throw new Error("this is intentional");
             });
-            $A.clientService.runActions([ a ], cmp, function() { });
-            $A.test.addWaitFor(true, function() { return a.getState() != "NEW" && a.getState() != "RUNNING"; },
-                    function() {});
-        }
-    },
-
-    testRunActionsGroupCallbackJavascriptError : {
-        test : function(cmp) {
-            $A.test.expectAuraError("Uncaught error in actionCallback : this is intentional");
-            var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() { });
-            $A.clientService.runActions([ a ], cmp, function() {
-                throw new Error("this is intentional");
-            });
-            $A.test.addWaitFor(true, function() { return a.getState() != "NEW" && a.getState() != "RUNNING"; },
-                    function() {});
+            $A.enqueueAction(a);
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }
     },
 
@@ -69,7 +55,7 @@
                       function(action) {
                           cmp.set("v.errorMessage", action.error[0].message);
                       });
-                $A.clientService.runActions([ a ], cmp);
+                $A.enqueueAction(a);
                 $A.test.addWaitFor(true, function() {
                         return !!cmp.get("v.errorMessage");
                     });

@@ -197,6 +197,22 @@ TestInstance.prototype.getSentRequestCount = function () {
 };
 
 /**
+ * Check to see if an array of actions have all completed.
+ */
+TestInstance.prototype.areActionsComplete = function(actions) {
+    var state;
+
+    this.assertTrue($A.util.isArray(actions), "actions must be an array");
+    for (i = 0; i < actions.length; i++) {
+        state = actions[i].getState();
+        if (state === "NEW" || state === "RUNNING") {
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
  * Get the current ActionQueue.
  */
 TestInstance.prototype.getActionQueue = function() {
@@ -234,21 +250,6 @@ TestInstance.prototype.getAction = function(component, name, params, callback){
         }
     }
     return action;
-};
-
-/**
- * Run a set of actions as a transaction.
- *
- * This is a wrapper around runActions allowing a test to safely run a set of actions as a
- * single transaction with a callback.
- *
- * @param {Array} actions A list of actions to run.
- * @param {Object} scope The scope for the callback.
- * @param {Function} callback The callback
- */
-TestInstance.prototype.runActionsAsTransaction = function(actions, scope, callback) {
-    $A.assert(!$A.services.client.inAuraLoop(), "runActionsAsTransaction called from inside Aura call stack");
-    $A.run(function() { $A.services.client.runActions(actions, scope, callback); });
 };
 
 /**
@@ -433,52 +434,45 @@ TestInstance.prototype.callServerAction = function(action, doImmediate){
     }
     //Increment 'inProgress' to indicate that a asynchronous call is going to be initiated, selenium will
     //wait till 'inProgress' comes down to 0 which indicates all asynchronous calls were complete
-    this.inProgress++;
     var actions = $A.util.isArray(action) ? action : [action];
     var cmp = $A.getRoot();
+    var finished = false;
+    var i;
     var that = this;
-    try {
-        if (!!doImmediate) {
-            var requestConfig = {
-                "url": $A["clientService"]._host + '/aura',
-                "method": 'POST',
-                "scope" : cmp,
-                "callback" :function(response) {
-                    var msg = $A["clientService"].checkAndDecodeResponse(response);
-                    if ($A.util.isUndefinedOrNull(msg)) {
-                        for ( var k = 0; k < actions.length; k++) {
-                            that.logError("Unable to execute action", actions[k]);
-                        }
+    if (!!doImmediate) {
+        var requestConfig = {
+            "url": $A["clientService"]._host + '/aura',
+            "method": 'POST',
+            "scope" : cmp,
+            "callback" :function(response) {
+                var msg = $A["clientService"].checkAndDecodeResponse(response);
+                if ($A.util.isUndefinedOrNull(msg)) {
+                    for ( var k = 0; k < actions.length; k++) {
+                        that.logError("Unable to execute action", actions[k]);
                     }
-                    var serverActions = msg["actions"];
-                    for (var i = 0; i < serverActions.length; i++) {
-                        for ( var j = 0; j < serverActions[i]["error"].length; j++) {
-                            that.logError("Error during action", serverActions[i]["error"][j]);
-                        }
+                }
+                var serverActions = msg["actions"];
+                for (var i = 0; i < serverActions.length; i++) {
+                    for ( var j = 0; j < serverActions[i]["error"].length; j++) {
+                        that.logError("Error during action", serverActions[i]["error"][j]);
                     }
-                    that.inProgress--;
-                },
-                "params" : {
-                    "message": $A.util.json.encode({"actions" : actions}),
-                    "aura.token" : $A["clientService"]._token,
-                    "aura.context" : $A.getContext().encodeForServer(),
-                    "aura.num" : 0
                 }
-            };
-            $A.util.transport.request(requestConfig);
-        } else {
-            $A.clientService.runActions(actions, cmp , function(msg) {
-                for(var i=0;i<msg["errors"].length;i++){
-                    that.logError("Error during action", msg["errors"][i]);
-                }
-                that.inProgress--;
-            });
+                finished = true;
+            },
+            "params" : {
+                "message": $A.util.json.encode({"actions" : actions}),
+                "aura.token" : $A["clientService"]._token,
+                "aura.context" : $A.getContext().encodeForServer(),
+                "aura.num" : 0
+            }
+        };
+        this.addWaitFor(true, function() {return finished;});
+        $A.util.transport.request(requestConfig);
+    } else {
+        for (i = 0; i < actions.length; i++) {
+            $A.enqueueAction(actions[i]);
         }
-    }catch(e){
-        // If trying to runAction() fails with an error, catch that error, signal that the attempt to run
-        // server action was complete and throw error.
-        this.inProgress--;
-        throw e;
+        this.addWaitFor(true, function() {return that.areActionsComplete(actions);});
     }
 };
 

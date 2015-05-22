@@ -1070,23 +1070,6 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
 };
 
 /**
- * Load an app by calling loadComponent.
- *
- * @param {DefDescriptor}
- *            descriptor The key for a definition with a qualified name
- *            of the format prefix://namespace:name.
- * @param {Map}
- *            attributes The configuration data to use in the app
- * @param {function}
- *            callback The callback function to run
- * @memberOf AuraClientService
- * @private
- */
-AuraClientService.prototype.loadApplication = function(descriptor, attributes, callback) {
-    this.loadComponent(descriptor, attributes, callback, "APPLICATION");
-};
-
-/**
  * Load a component.
  *
  * @param {DefDescriptor}
@@ -1335,30 +1318,7 @@ AuraClientService.prototype.resetToken = function(newToken) {
 };
 
 /**
- * Create an action group with a callback.
- *
- * The callback will be called when all actions are complete within the group.
- *
- * @param actions
- *      {Array.<Action>} the array of actions.
- * @param scope
- *      {Object} the scope for the function.
- * @param callback
- *      {function} The callback function
- */
-AuraClientService.prototype.makeActionGroup = function(actions, scope, callback) {
-    var group = undefined;
-    $A.assert($A.util.isArray(actions), "makeActionGroup expects a list of actions, but instead got: " + actions);
-    if (callback !== undefined) {
-        $A.assert($A.util.isFunction(callback),
-                "makeActionGroup expects the callback to be a function, but instead got: " + callback);
-        group = new ActionCallbackGroup(actions, scope, callback);
-    }
-    return group;
-};
-
-/**
- * Run the actions.
+ * [DEPRECATED] Run the actions.
  *
  * This function effectively attempts to submit all pending actions immediately (if
  * there is room in the outgoing request queue). If there is no way to immediately queue
@@ -1373,14 +1333,22 @@ AuraClientService.prototype.makeActionGroup = function(actions, scope, callback)
  * @param {function}
  *            callback The callback function to run
  * @memberOf AuraClientService
+ * @deprecated
  * @public
  */
 AuraClientService.prototype.runActions = function(actions, scope, callback) {
     var i;
+    var count = actions.length;
+    var completion = function() {
+        count -= 1;
+        if (count == 0) {
+            callback.call(scope);
+        }
+    };
 
-    this.makeActionGroup(actions, scope, callback);
     for (i = 0; i < actions.length; i++) {
         this.actionQueue.enqueue(actions[i]);
+        actions[i].setCompletion(completion);
     }
     this.processActions();
 };
@@ -1610,7 +1578,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
 };
 
 /**
- * Defer the action by returning a Promise object.
+ * [DEPRECATED] [DOES NOT WORK] [DO NOT USE] Defer the action by returning a Promise object.
  * Configure your action excluding the callback prior to deferring.
  * The Promise is a thenable, meaning it exposes a 'then' function for consumers to chain updates.
  *
@@ -1619,6 +1587,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
  * @return {Promise} a promise which is resolved or rejected depending on the state of the action
  */
 AuraClientService.prototype.deferAction = function (action) {
+    $A.warning("$A.deferAction is broken, do not use it!");
     var acs = this;
     var promise = new Promise(function(success, error) {
 
@@ -1812,15 +1781,14 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
 };
 
 exp(AuraClientService.prototype,
+    // FIXME: initHost is used in a single UI test in SFDC.
     "initHost", AuraClientService.prototype.initHost,
     "init", AuraClientService.prototype.init,
     "initDefs", AuraClientService.prototype.initDefs,
-    "loadApplication", AuraClientService.prototype.loadApplication,
-    "loadComponent", AuraClientService.prototype.loadComponent,
     "enqueueAction", AuraClientService.prototype.enqueueAction,
+    //FIXME: deferAction is broken, should never have existed, and needs to die.
     "deferAction", AuraClientService.prototype.deferAction,
     "runActions", AuraClientService.prototype.runActions,
-    "throwExceptionEvent", AuraClientService.prototype.throwExceptionEvent,
     "resetToken", AuraClientService.prototype.resetToken,
     "hardRefresh", AuraClientService.prototype.hardRefresh,
     "setOutdated", AuraClientService.prototype.setOutdated,

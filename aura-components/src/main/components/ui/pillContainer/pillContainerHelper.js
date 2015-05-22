@@ -17,6 +17,23 @@
     handleItemSelected: function(cmp, newItemList) {
         if (!$A.util.isEmpty(newItemList) && $A.util.isArray(newItemList)) {
             this.insertItems(cmp, newItemList);
+
+
+            // when we've reached max pills
+            // allow the iteration to rerender the pills before setting focus to th last pill
+            // this only happens when pill selection comes from input
+            var itemsLength = cmp.get("v.items").length
+            var maxAllowed = cmp.get("v.maxAllowed");
+            if (itemsLength >= maxAllowed) {
+                window.setTimeout(function () {
+                    $A.run(function () {
+                        var pillItems = cmp.find('pill');
+                        if (!$A.util.isEmpty(pillItems)) {
+                            pillItems[pillItems.length-1].focus();
+                        }
+                    })
+                }, 0);
+            }
         }
     },
 

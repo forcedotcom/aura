@@ -26,8 +26,8 @@
                 // Verify the token in storage gets updated
                 storage.adapter.getItem("$AuraClientService.token$").then(
                     function(value) {
-                        if(value && value.token) {
-                            actual = value.token;
+                        if(value && value.value && value.value.token) {
+                            actual = value.value.token
                         }
                     }, function() {
                         fail("Failed to get value from storage.");

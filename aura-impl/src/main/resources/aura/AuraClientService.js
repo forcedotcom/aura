@@ -887,7 +887,8 @@ AuraClientService.prototype.saveTokenToStorage = function() {
     // fire-and-forget style, matching action response persistence.
     var storage = Action.prototype.getStorage();
     if (storage && this._token) {
-        var value = { "token": this._token };
+        // certain storage adapters require token object be wrapped in "value" object for indexing
+        var value = { "value": { "token": this._token } };
         storage.adapter.setItem(this._tokenStorageKey, value).then(
             this.NOOP,
             function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }
@@ -1125,8 +1126,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                         var key = action.getStorageKey();
                         acs.loadTokenFromStorage()
                             .then(function(value) {
-                                if (value && value["token"]) {
-                                    this._token = value["token"];
+                                if (value && value.value && value.value["token"]) {
+                                    this._token = value.value["token"];
                                 }
                             }, function(err) {
                                 // So this isn't good: we don't have the CSRF token so if we go back online the server

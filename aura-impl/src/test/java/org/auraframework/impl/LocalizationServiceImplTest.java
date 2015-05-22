@@ -29,6 +29,7 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.testdata.LocalizationServiceTestData;
 import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.date.DateConverter;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.number.AuraNumberFormat;
@@ -51,6 +52,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     /**
      * Tests to verify Date parser across different Locale
      */
+    @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
     public void testDateTimeParserChangeLocale() throws Exception {
         // API: parseDate(String Date, Locale locale, TimeZone timeZone, int
         // DateStyle)
@@ -109,6 +111,8 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     // or DateServiceImpl.JodaDateConverter.parse(...)
     // same thing apply to any call of LocalizationService.parseDate(...), parseTime(...), 
     // parseDateTime(...), formatDate(...), formatTime(...), formatDateTime(...)
+    //TODO: W-2603913
+    @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
     public void testDateTimeParserExceptions() throws IllegalArgumentException {
         // Test invalid date strings in format DateFormat.MEDIUM
         {

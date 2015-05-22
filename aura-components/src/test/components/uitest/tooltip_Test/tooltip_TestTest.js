@@ -53,7 +53,7 @@
 		attributes : {"renderItem" : "advancedPositioning"},
 		test: function(component) {
 			var trigger = component.find('tooltip1-trigger').getElement();
-			trigger.focus();
+			$A.test.fireDomEvent(trigger, "focus");
 			var tt = component.find('tooltip1');
 			$A.test.assertEquals('Hello world', $A.test.getText(tt._tooltip));
 			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(tt._tooltip,"visible");}, "The tooltip has the visible class");
@@ -64,12 +64,12 @@
 		attributes : {"renderItem" : "advancedPositioning"},
 		test: function(component) {
 			var trigger = component.find('tooltip1-trigger').getElement();
-			trigger.focus();
+			$A.test.fireDomEvent(trigger, "focus");
 			
 			var tt = component.find('tooltip1');
 			$A.test.assertEquals('Hello world', $A.test.getText(tt._tooltip));
 			setTimeout(function() {
-				trigger.blur();
+				$A.test.fireDomEvent(trigger, "blur");
 			}, 10);
 			$A.test.addWaitFor(true, function(){
 				return tt._tooltip.className.match(/visible/) ? false : true;

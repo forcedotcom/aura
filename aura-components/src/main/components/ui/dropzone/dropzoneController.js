@@ -38,8 +38,10 @@
 	
 	fireDrop: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		
-		// Note: can only handle one dragComponent for now
-		helper.fireDrop(component, params.dragComponents[0], component, params.isInAccessibilityMode);
+		$A.util.forEach(params.dragComponents, function(dragComponent) {
+			if (dragComponent.isValid()) {
+				helper.fireDrop(component, dragComponent.get("v.type"), dragComponent.get("v.dataTransfer"), dragComponent, component, params.isInAccessibilityMode);
+			}	
+		});
 	}
 })

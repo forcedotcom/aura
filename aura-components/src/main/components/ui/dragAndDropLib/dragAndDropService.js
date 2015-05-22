@@ -109,6 +109,10 @@ function (w) {
      * @return {Aura.Component} context component or null/ undefined if there is none
      */
     DragAndDropService.prototype.getContext = function(component) {
+    	if ($A.util.isUndefinedOrNull(component)) {
+    		return null;
+    	}
+    	
     	var context = component.get("v.inContextOf");
     	if (context) {
     		if ($A.util.isComponent(context)) {

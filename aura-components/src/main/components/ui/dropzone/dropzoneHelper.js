@@ -113,25 +113,38 @@
 		// Check for supported drop operation
 		var supportedTypes = component.get("v.types");
 		var operationType = event.dataTransfer.effectAllowed;
-		if (operationType === "all" || supportedTypes.indexOf(operationType) > -1) {			
-			this.fireDrop(component, dragComponent, $A.componentService.getRenderingComponentForElement(event.target), false);
+		if (operationType === "all" || supportedTypes.indexOf(operationType) > -1) {	
+			var dataTransfer = {};
+			if (!$A.util.isUndefinedOrNull(dragComponent) && dragComponent.isValid()) {
+				dataTransfer = dragComponent.get("v.dataTransfer");
+			} else {
+				var dataTransferTypes = event.dataTransfer.types;
+				for (var i = 0; i < dataTransferTypes.length; i++) {
+					var dataTransferType = dataTransferTypes[i];
+					if (dataTransferType !== "aura/id") {
+						dataTransfer[dataTransferType] = event.dataTransfer.getData(dataTransferType);
+					}
+				}
+			}
+			
+			this.fireDrop(component, operationType, dataTransfer, dragComponent, $A.componentService.getRenderingComponentForElement(event.target), false);
 		}
 		
 		// Prevent default browser action, such as redirecting
 		return false;
 	},
 	
-	fireDrop: function(component, dragComponent, targetComponent, isInAccessibilityMode) {
+	fireDrop: function(component, operationType, dataTransfer, dragComponent, targetComponent, isInAccessibilityMode) {
 		// reset onDragOver class
 		this.resetCssClass(component);
 		
 		var dragEvent = component.getEvent("drop");
 		dragEvent.setParams({
-			"type": dragComponent.get("v.type"),
+			"type": operationType,
 			"dragComponent": dragComponent,
 			"dropComponent": component,
 			"dropComponentTarget": targetComponent,
-			"data": dragComponent.get("v.dataTransfer"),
+			"data": dataTransfer,
 			"isInAccessibilityMode": isInAccessibilityMode
 		});
 		dragEvent.fire();

@@ -38,7 +38,7 @@
 									  dataTransfer="{!item}"
 									  class="sampleCard"
 									  dragClass="dragging"
-									  accessibilityComponent="{!v._accessibilityComponent[0]}">
+									  accessibilityComponent="{!v._accessibilityComponent}">
 							<p>{!item}</p>
 						</ui:draggable>
 					</li>

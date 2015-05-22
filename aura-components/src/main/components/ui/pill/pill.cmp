@@ -44,7 +44,7 @@
 
     <a aura:id="link" aura:flavorable="true" class="pill">
         <aura:if isTrue="{!!empty(v.iconUrl)}">
-            <ui:image src="{!v.iconUrl}" class="pillIcon" imageType="decorative"/>
+            <ui:image aura:id="icon" src="{!v.iconUrl}" class="pillIcon" imageType="decorative" onerror="{!c.onIconError}"/>
         </aura:if>
         <span aura:id="label" class="pillText"/>
         <aura:if isTrue="{!v.showDelete}">

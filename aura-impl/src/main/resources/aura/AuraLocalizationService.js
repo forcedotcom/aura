@@ -97,7 +97,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
         
          */
         getNumberFormat : function(format, symbols) {
-            return new NumberFormat(format, symbols);
+            return new Aura.Utils.NumberFormat(format, symbols);
         },
 
         /**
@@ -114,7 +114,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
 
         getDefaultNumberFormat : function() {
             if (!numberFormat) {
-                numberFormat = new NumberFormat($A.get("$Locale.numberFormat"));
+                numberFormat = new Aura.Utils.NumberFormat($A.get("$Locale.numberFormat"));
             }
             return numberFormat;
         },
@@ -133,7 +133,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         getDefaultPercentFormat : function() {
             if (!percentFormat) {
-                percentFormat = new NumberFormat($A.get("$Locale.percentFormat"));
+                percentFormat = new Aura.Utils.NumberFormat($A.get("$Locale.percentFormat"));
             }
             return percentFormat;
         },
@@ -151,7 +151,7 @@ var AuraLocalizationService = function AuraLocalizationService() {
          */
         getDefaultCurrencyFormat : function() {
             if (!currencyFormat) {
-                currencyFormat = new NumberFormat($A.get("$Locale.currencyFormat"));
+                currencyFormat = new Aura.Utils.NumberFormat($A.get("$Locale.currencyFormat"));
             }
             return currencyFormat;
         },

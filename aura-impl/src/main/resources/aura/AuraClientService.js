@@ -1790,7 +1790,8 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 // INTERNAL, PUBLIC, or absence of value means "same namespace only".
                 context=$A.getContext();
                 currentAccess=(context&&context.getCurrentAccess())||component;
-                if(currentAccess){
+                // FIXME: goliver - the isValid is a hack... something is deeply wrong here.
+                if(currentAccess && currentAccess.isValid()){
                     var targetNamespace=definition.getDescriptor().getNamespace();
                     var accessNamespace=currentAccess.getDef().getDescriptor().getNamespace();
                     var accessFacetNamespace=currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace();

@@ -2276,9 +2276,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var targetSymbols = '###';
     		var mockNumberFormat = {};
 
-            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(format, symbols){
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "Aura", { "Utils" : {"NumberFormat": function(format, symbols){
         		if(format == targetNumberFormat && symbols == targetSymbols) return mockNumberFormat;
-        	});
+        	}}});
 
             // Act
             mockNumberFormatConstructor(function(){
@@ -2299,9 +2299,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     		var actual;
     		var mockNumberFormat = {};
 
-            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(val){
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "Aura", { "Utils" : {"NumberFormat": function(val){
         		if(val == targetNumberFormat) return mockNumberFormat;
-        	});
+        	}}});
 
             // Act
             mockUtil(function(){
@@ -2320,9 +2320,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     		var actual;
     		var mockNumberFormat = {};
 
-            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(val){
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "Aura", { "Utils" : {"NumberFormat": function(val){
         		if(val == targetPercentFormat) return mockNumberFormat;
-        	});
+        	}}});
 
             // Act
             mockUtil(function(){
@@ -2341,9 +2341,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     		var actual;
     		var mockNumberFormat = {};
 
-            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "NumberFormat", function(val){
+            var mockNumberFormatConstructor = Mocks.GetMock(Object.Global(), "Aura", { "Utils" : {"NumberFormat": function(val){
         		if(val == targetCurrencyFormat) return mockNumberFormat;
-        	});
+        	}}});
 
             // Act
             mockUtil(function(){

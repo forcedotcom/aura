@@ -32,5 +32,9 @@
 
     focus: function(component, event, helper) {
         helper.setFocus(component);
+    },
+
+    onIconError: function(component, event, helper) {
+        $A.util.addClass(component.find("icon").getElement(), 'invisible');
     }
 })

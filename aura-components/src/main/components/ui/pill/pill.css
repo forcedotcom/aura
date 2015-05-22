@@ -15,3 +15,7 @@
  */
 .THIS {
 }
+
+.THIS .invisible {
+    display: none;
+}

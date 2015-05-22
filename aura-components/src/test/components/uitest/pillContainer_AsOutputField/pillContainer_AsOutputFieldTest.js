@@ -217,6 +217,18 @@
         }
     },
 
+    testBrokenIcon: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems( [{id:'pill01',label:"Test Pill 01",icon: {url:'notfound.gif'}}] );
+            var icon = $A.test.select(".pillIcon")[0].parentElement;
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return that._isDisplayNone( icon);
+            }, "icon should not be visible with broken icon");
+        }
+    },
+
     _validatePillIsFocused: function(cmp) {
         $A.test.assertTrue($A.util.hasClass(cmp.getElement(), "focused"), "The pill is not focused");
 
@@ -256,7 +268,12 @@
         var innerHTML = $A.test.getText(cmp.getElement());
         var indexOf = innerHTML.indexOf(label);
         return indexOf != -1;
-    }
+    },
+
+    _isDisplayNone: function (element) {
+        var display = element.currentStyle ? element.currentStyle.display : getComputedStyle(element, null).display;
+        return display === "none";
+    },
 
 
 })

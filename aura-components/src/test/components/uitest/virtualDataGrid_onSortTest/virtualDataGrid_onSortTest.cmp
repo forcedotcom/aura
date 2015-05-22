@@ -22,7 +22,7 @@
 		    <aura:set attribute="headerColumns">
 			    <ui:dataGridColumn name="id" label="Id"	sortable="true"/>
 			    <ui:dataGridColumn name="name" label="Name"	sortable="true"/>
-			    <ui:dataGridColumn name="gender" label="Gender" sortable="true"/>
+			    <ui:dataGridColumn name="gender" label="Gender" sortable="true" initialDirectionOnSort="ascending"/>
 			    <ui:dataGridColumn name="age" label="Age" sortable="true"/>
 			    <ui:dataGridColumn name="grade" label="Grade" />
 		    </aura:set>

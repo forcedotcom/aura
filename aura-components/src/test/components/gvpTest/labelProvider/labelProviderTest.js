@@ -18,16 +18,15 @@
                 false,
                 $A.test.isActionPending,
                 function () {
-
+                    var label = "$Label.DOESNT.EXIST";
                     var sv2 = cmp.get("v.simplevalue2");
 
                     $A.test.assertTrue(
                         sv2 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
-                        sv2 === "PropertyFile - section DOESNT not found.",
-                        "Failed to get expected error message");
+                        sv2.indexOf(label + " does not exist") !== -1,
+                        "Failed to get expected error message: " + sv2);
                 }
             );
-
         }
     },
 
@@ -37,13 +36,13 @@
                 false,
                 $A.test.isActionPending,
                 function () {
-
+                    var label = "$Label.Related_Lists.DOESNTEXIST";
                     var sv3 = cmp.get("v.simplevalue3");
 
                     $A.test.assertTrue(
                         sv3 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
-                        sv3 === "__MISSING LABEL__ PropertyFile - val DOESNTEXIST not found in section Related_Lists",
-                        "Failed to get expected error message");
+                        sv3.indexOf(label + " does not exist") !== -1,
+                        "Failed to get expected error message: " + sv3);
                 }
             );
 
@@ -76,7 +75,6 @@
             }
         ]
     },
-
 
     testPartialLabelExpressions: {
         test: [
@@ -116,54 +114,54 @@
     /**
      * General tests for Global Value Providers
      */
-
     testGetWithCallback: {
         test: [
             //Fetch a new label from server
             function (cmp) {
-                $A.get("$Label.Related_Lists.FooBar",
-                    function (label) {
+                var label = "$Label.Related_Lists.FooBar";
+                $A.get(label,
+                    function (value) {
                         cmp._callBack = true;
-                        cmp._label = label;
+                        cmp._label = value;
                     });
                 $A.test.addWaitForWithFailureMessage(
                     true,
                     function () {
-                        return cmp._callBack
+                        return cmp._callBack;
                     },
                     "Failed to run call back after fetching label from server",
                     function () {
                         $A.test.assertTrue(
                             cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
-                            cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
-                            "$Label.Related_Lists." + "FooBar should have error value"
+                            cmp._label.indexOf(label + " does not exist") !== -1,
+                            "$Label.Related_Lists.FooBar should have error value: " + cmp._label
                         );
-                    })
+                    });
             },
             //Fetch existing GVPs at client
             function (cmp) {
+                var label = "$Label.Related_Lists.FooBar";
                 cmp._callBack = false;
-                $A.get("$Label.Related_Lists.FooBar",
-                    function (label) {
+                $A.get(label,
+                    function (value) {
                         cmp._callBack = true;
-                        cmp._label = label;
+                        cmp._label = value;
                     });
                 //No need to wait for unlike previous case, call backs are immediate as value is available at client
                 $A.test.assertTrue(cmp._callBack);
                 $A.test.assertTrue(
                     cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
-                        cmp._label === "__MISSING LABEL__ PropertyFile - val FooBar not found in section Related_Lists",
-                    "$Label.Related_Lists." + "FooBar should have error value"
+                    cmp._label.indexOf(label + " does not exist") !== -1,
+                    "$Label.Related_Lists.FooBar should have error value: " + cmp._label
                 );
             }
         ]
     },
 
     testGetWithNonFunctionCallback: {
-    	test : function (cmp) {
+        test : function (cmp) {
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
-    	}
+        }
     }
-    
 })

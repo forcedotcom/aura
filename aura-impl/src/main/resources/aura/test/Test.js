@@ -1574,6 +1574,17 @@ TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextCompo
         "Editor was not initialized", callback);
 };
 
+/**
+ * Reload the Global Value Providers on the client by calling the GlobalValueProviders.js constructor.
+ * 
+ * @param {Object} gvp an optional serialized GVP to load.
+ * @param {Function} initCallback an optional callback invoked after the GVP has finished its
+ *  asynchronous initialization.
+ */
+TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
+    $A.getContext().globalValueProviders = new Aura.Provider.GlobalValueProviders(gvp, callback);
+};
+
 Aura.Test.Test = TestInstance;
 
 //#include aura.test.Test_export

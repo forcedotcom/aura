@@ -17,8 +17,4 @@
 var p = GlobalValueProviders.prototype;
 exp(p,
     "get", p.get
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    	,"loadFromStorage", p.loadFromStorage 
-    	,"clearValueProvider", p.clearValueProvider
-    //#end
 );

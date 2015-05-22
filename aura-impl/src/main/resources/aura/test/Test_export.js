@@ -117,4 +117,8 @@ TestInstance.prototype["dummyFunction"] = TestInstance.prototype.dummyFunction;
 
 // appcache
 TestInstance.prototype["getAppCacheEvents"] = TestInstance.prototype.getAppCacheEvents;
+
+// framework call-throughs
+TestInstance.prototype["reloadGlobalValueProviders"] = TestInstance.prototype.reloadGlobalValueProviders;
+
 // //#end

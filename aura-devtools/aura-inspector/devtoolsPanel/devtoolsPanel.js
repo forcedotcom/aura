@@ -4,7 +4,7 @@
         panel.init();
 
     // Probably the default we want
-    AuraInspectorOptions.getAll({ "activePanel": "component-tree" }, function(options) {
+    AuraInspectorOptions.getAll({ "activePanel": "transaction" }, function(options) {
         panel.showPanel(options["activePanel"]);
     });
 

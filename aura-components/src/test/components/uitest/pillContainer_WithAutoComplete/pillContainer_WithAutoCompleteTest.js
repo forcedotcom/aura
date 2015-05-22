@@ -192,6 +192,23 @@
         }
     },
 
+    testFocusOnPillAfterMaxReached: {
+        attributes: {
+            maxAllowed: 2
+        },
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            var textInput = this._getInput(cmp);
+            this._inputPill(textInput, this.PILLS[0].label);
+            this._inputPill(textInput, this.PILLS[1].label);
+
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var secondPill = pillContainer.find("pill")[1];
+                return document.activeElement===secondPill.getElement();
+            }, "second pill should be focused");
+        }
+    },
+
     _getInput: function(cmp) {
         return cmp.find("autocomplete").getSuper().find("input");
     },

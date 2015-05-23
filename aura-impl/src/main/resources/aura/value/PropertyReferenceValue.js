@@ -124,13 +124,6 @@ PropertyReferenceValue.prototype.getReference = function(path) {
     return valueProvider.getReference(expression + "." + path);
 };
 
-/**
- * Sets the isDefined flag to true.
- */
-PropertyReferenceValue.prototype.isDefined = function() {
-    return true;
-};
-
 PropertyReferenceValue.prototype.equals = function (target){
     return target instanceof PropertyReferenceValue && target.valueProvider === this.valueProvider && target.expression === this.expression;
 };

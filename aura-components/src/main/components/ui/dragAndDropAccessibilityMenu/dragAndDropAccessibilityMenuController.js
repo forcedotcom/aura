@@ -13,40 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.container {
-	display: flex;
-	display: -webkit-flex;
-}
-
-.THIS .sampleList ul {
-	padding: 0;
-	flex: 1;
-	-webkit-flex: 1;
-	width: 15em;
-	list-style-type: none;
-}
-
-.THIS .sampleList.dragOver {
-	background-color: #f1f1f1;
-}
-
-.THIS .sampleList .listContent {
-	height: 100vh;
-	border-left: #f5f6f7 1px solid;
-}
-
-.THIS .sampleList:last-of-type .listContent {
-	border-right: #f5f6f7 1px solid;
-}
-
-.THIS .sampleCard {
-	position: relative;
-	margin: .5rem;
-	padding: .5rem;
-	border: #f5f6f7 1px solid;
-	border-radius: .3125rem;
-}
-
-.THIS .sampleCard.dragging {
-	border: 2px dashed #000;
-}
+({
+	handleMenuCollapse: function (component, event, helper) {
+		helper.handleMenuCollapse(component);
+	},
+	
+	handleMenuFocusChange: function (component, event, helper) {
+		var previousItem = event.getParam("previousItem");
+		var currentItem = event.getParam("currentItem");
+		helper.handleMenuFocusChange(previousItem, currentItem);
+	},
+	
+	handleMenuSelect: function (component, event, helper) {
+		helper.handleMenuSelect(component, event);
+	}
+})

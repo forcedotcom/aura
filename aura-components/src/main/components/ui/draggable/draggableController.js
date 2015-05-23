@@ -20,5 +20,10 @@
 	
 	handleDropComplete: function (component, event, helper) {
 		helper.handleDropComplete(component, event);
+	},
+	
+	fireDragEnd: function (component, event, helper) {
+		var params = event.getParam("arguments");
+		helper.fireDragEnd(component, params.isValid, params.isInAccessibilityMode);
 	}
 })

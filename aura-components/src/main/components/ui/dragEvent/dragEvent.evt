@@ -22,4 +22,5 @@
 	<aura:attribute name="dropComponentTarget" type="Aura.Component[]" description="Target event component receiving drop."/>
 	<aura:attribute name="data" type="Object" description="Data that is being transferred during a drag and drop operation."/>
 	<aura:attribute name="dropComplete" type="Boolean" description="Set to true if drop operation has been completed or false otherwise. The value should only be set when drop operation is performed."/>
+	<aura:attribute name="isInAccessibilityMode" type="Boolean" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 </aura:event>

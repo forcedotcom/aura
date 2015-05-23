@@ -27,16 +27,18 @@
         	helper.handleDragEnd(component, event);
         }, false);
         
+        draggable.addEventListener("keypress", function(event) {
+        	helper.handleKeyPress(component, event);
+        }, false);
+        
         // Component registration
         $A.dragAndDropService.register([component.get("v.type")], component);
-        
-        return ret;
     },
     
     unrender: function(component, helper) {
     	// Component deregistration
-        $A.dragAndDropService.deregister([component.get("v.type")], component);
-        
+    	$A.dragAndDropService.deregister([component.get("v.type")], component);
+    	
     	this.superUnrender();
     }
 })

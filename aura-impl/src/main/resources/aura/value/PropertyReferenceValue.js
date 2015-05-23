@@ -114,7 +114,7 @@ PropertyReferenceValue.prototype.getReference = function(path) {
     if(!path) {
         return this;
     }
-    
+
     var valueProvider=this.valueProvider;
     var expression = this.expression;
     while(valueProvider instanceof PassthroughValue){
@@ -142,13 +142,13 @@ PropertyReferenceValue.prototype.isDirty = function() {
     var valueProvider = this.valueProvider;
     var expression = this.expression;
 
-    // KRIS: HALO: I'm really unsure if I want this here or not, do we check against the component if it's dirty? 
-    // Why would we care if the passthrough value is dirty? I would think the 
+    // KRIS: HALO: I'm really unsure if I want this here or not, do we check against the component if it's dirty?
+    // Why would we care if the passthrough value is dirty? I would think the
     while(valueProvider instanceof PassthroughValue){
         expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
-    
+
     // Check Render service, since the value it could be referencing is dirty.
     return $A.renderingService.isDirtyValue(expression, valueProvider);
 };
@@ -159,13 +159,6 @@ PropertyReferenceValue.prototype.isDirty = function() {
  */
 PropertyReferenceValue.prototype.isLiteral = function() {
     return false;
-};
-
-/**
- * Sets the isExpression flag to true to denote an expression.
- */
-PropertyReferenceValue.prototype.isExpression = function() {
-    return true;
 };
 
 /**

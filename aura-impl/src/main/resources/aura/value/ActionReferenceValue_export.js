@@ -21,7 +21,6 @@ exp(p,
     "isDefined", p.isDefined,
     "isDirty", p.isDirty,
     "isLiteral", p.isLiteral,
-    "isExpression", p.isExpression,
     "destroy", p.destroy,
     "toString", p.toString
 );

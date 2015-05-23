@@ -17,12 +17,6 @@
 /*jslint sub: true */
 
 (function(){
-
-    //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-    $A.logger.subscribe("WARNING", $A.test.auraWarning.bind($A.test));
-    $A.logger.subscribe("ERROR", $A.test.auraError.bind($A.test));
-    //#end
-
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Prints log to both the console (if available), and to the aura debug component unless in production

@@ -1601,20 +1601,23 @@ JsonTestInstance.prototype.orderedEncode = function(obj) {
 TestInstance.prototype.json = new JsonTestInstance();
 
 //#include aura.test.Test_export
+
+Aura.Test = {};
 Aura.Test.Test = TestInstance;
 
 /**
- * Various framework modifications for testing purposes
+ * @export
  */
-// #if {"excludeModes" : ["DOC"]}
-// External references are not handled by xUnit framework js generation
-AuraInstance.prototype["test"] = new TestInstance();
+$A.test = new TestInstance();
+
+$A.logger.subscribe("WARNING", $A.test.auraWarning.bind($A.test));
+$A.logger.subscribe("ERROR", $A.test.auraError.bind($A.test));
 
 //Should try to remove this hack
 (function(originalDestroy){
     Component.prototype.destroy = function() {
         return originalDestroy.call(this, false);
-    }
+    };
 })(Component.prototype.destroy);
 
 // For Selenium
@@ -1627,4 +1630,4 @@ AuraLayoutService.fireOnload = function() {
         frame.dispatchEvent(loadEvent);
     }
 };
-//#end
+

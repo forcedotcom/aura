@@ -44,7 +44,6 @@ Aura.Attribute  = {};
 Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
-Aura.Test       = {};
 
 /**
  * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. 
@@ -1110,7 +1109,6 @@ AuraInstance.prototype.addValueProvider=function(type,valueProvider){
 // #include aura.util.PerfShim
 AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 
-// #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}
 // #include aura.Aura_export
 
 // At this point, Aura has been defined with all our types on it, but $A itself
@@ -1136,3 +1134,5 @@ window['aura'] = window['$A'];
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}
 
 // #include aura.Logging
+
+//#include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}

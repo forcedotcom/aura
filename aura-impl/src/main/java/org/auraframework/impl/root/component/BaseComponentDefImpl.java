@@ -55,7 +55,6 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
@@ -67,7 +66,6 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -95,7 +93,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final DefDescriptor<ModelDef> modelDefDescriptor;
     private final DefDescriptor<T> extendsDescriptor;
     private final DefDescriptor<ComponentDef> templateDefDescriptor;
-    private final DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
     private final DefDescriptor<StyleDef> styleDescriptor;
     private final DefDescriptor<FlavoredStyleDef> flavorDescriptor;
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
@@ -159,7 +156,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.isAbstract = builder.isAbstract;
         this.isExtensible = builder.isExtensible;
         this.isTemplate = builder.isTemplate;
-        this.testSuiteDefDescriptor = builder.testSuiteDefDescriptor;
         this.facets = AuraUtil.immutableList(builder.facets);
         this.dependencies = AuraUtil.immutableList(builder.dependencies);
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
@@ -923,6 +919,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * Gets all the component class definitions for this component definition.
      * Returns a string of all the client component classes wrapped in a closure for later execution.
      */
+    @SuppressWarnings("null")
     @Override
     public String getComponentClass() throws QuickFixException, IOException {
 
@@ -962,8 +959,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             AuraContext context = Aura.getContextService().getCurrentContext();
             boolean preloaded = context.isPreloaded(getDescriptor());
             boolean preloading = context.isPreloading();
-            final Mode mode = context.getMode();
-
             if (preloaded) {
                 json.writeValue(descriptor);
             } else {
@@ -1161,10 +1156,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return def;
     }
 
-    public TestSuiteDef getTestSuiteDef() throws QuickFixException {
-        return testSuiteDefDescriptor == null ? null : testSuiteDefDescriptor.getDef();
-    }
-
     /**
      * @see ComponentDef#getLocalModelDefDescriptor()
      */
@@ -1260,7 +1251,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public DefDescriptor<ModelDef> modelDefDescriptor;
         public DefDescriptor<T> extendsDescriptor;
         public DefDescriptor<ComponentDef> templateDefDescriptor;
-        public DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
         public DefDescriptor<ThemeDef> cmpThemeDescriptor;
         public DefDescriptor<FlavoredStyleDef> flavorDescriptor;

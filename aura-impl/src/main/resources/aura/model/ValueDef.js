@@ -23,8 +23,6 @@ function ValueDef(config){
     this.name = config["name"];
 }
 
-ValueDef.prototype.auraType = "ValueDef";
-
 /**
  * Returns the name of the ValueDef instance.
  */

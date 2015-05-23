@@ -17,7 +17,7 @@
 /**
  * @description The Action Definition including the name, descriptor, action type, method, and parameter definitions. An
  *            ActionDef instance is created as part of the ControllerDef initialization.
- * 
+ *
  * @constructor
  * @param {Object}
  *            config
@@ -62,13 +62,8 @@ function ActionDef(config) {
 }
 
 /**
- * @export
- */
-ActionDef.prototype.auraType = "ActionDef";
-
-/**
  * Gets the name of this Action. The name is the unique identifier that the component can use to call this Action.
- * 
+ *
  * @returns {String}
  * @export
  */
@@ -78,7 +73,7 @@ ActionDef.prototype.getName = function() {
 
 /**
  * Gets the Action Descriptor.
- * 
+ *
  * @returns {Object}
  * @private
  */
@@ -88,7 +83,7 @@ ActionDef.prototype.getDescriptor = function() {
 
 /**
  * Gets the Action type, which can either be "CLIENT" or "SERVER".
- * 
+ *
  * @returns {String} Possible values are "CLIENT" or "SERVER".
  * @private
  */
@@ -98,7 +93,7 @@ ActionDef.prototype.getActionType = function() {
 
 /**
  * Returns true if the Action type is client-side, or false otherwise.
- * 
+ *
  * @public
  * @returns {!boolean}
  * @export
@@ -109,7 +104,7 @@ ActionDef.prototype.isClientAction = function() {
 
 /**
  * Returns true if the Action type is server-side, or false otherwise.
- * 
+ *
  * @public
  * @returns {!boolean}
  * @export
@@ -138,7 +133,7 @@ ActionDef.prototype.isCaboose = function() {
 
 /**
  * Returns a new Action instance.
- * 
+ *
  * @param {Object}
  *            cmp The component associated with the Action.
  * @returns {Action}

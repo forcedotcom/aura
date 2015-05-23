@@ -30,8 +30,6 @@ function FlavorAssortmentDef(config) {
     }
 }
 
-FlavorAssortmentDef.prototype.auraType = "FlavorAssortmentDef";
-
 /**
  * Returns a flavor for the given component descriptor.
  * @param {DefDescriptor} componentDescriptor The component descriptor.

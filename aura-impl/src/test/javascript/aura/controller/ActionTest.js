@@ -18,7 +18,7 @@ Function.RegisterNamespace("Test.Aura.Controller");
 [ Fixture, Skip("JBUCH: FIXME") ]
 Test.Aura.Controller.ActionTest = function() {
     // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    
+
     Mocks.GetMocks(Object.Global(), {
         "exp": function() {},
         "$A": {ns:{}},
@@ -2132,7 +2132,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             mockContext(function() {
                 target.setParentAction({
-                    auraType : "Action",
                     abortable : true,
                     abortableId : expected
                 });
@@ -2198,7 +2197,6 @@ Test.Aura.Controller.ActionTest = function() {
 
                 actual = Record.Exception(function() {
                     target.setParentAction({
-                        auraType : "Action",
                         abortable : false
                     });
                 })
@@ -2218,7 +2216,6 @@ Test.Aura.Controller.ActionTest = function() {
 
                 actual = Record.Exception(function() {
                     target.setParentAction({
-                        auraType : "Action",
                         abortable : true
                     });
                 })
@@ -2239,7 +2236,6 @@ Test.Aura.Controller.ActionTest = function() {
 
                 actual = Record.Exception(function() {
                     target.setParentAction({
-                        auraType : "Action",
                         abortable : true,
                         abortableId : "value"
                     });

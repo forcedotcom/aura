@@ -38,8 +38,6 @@ function LayoutsDef(config){
     }
 }
 
-LayoutsDef.prototype.auraType = "LayoutsDef";
-
 /**
  * Returns the Layout based on the given name.
  * @param {String} name The name of the Layout.

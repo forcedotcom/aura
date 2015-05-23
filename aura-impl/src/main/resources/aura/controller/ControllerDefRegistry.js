@@ -23,8 +23,6 @@ function ControllerDefRegistry(){
     this.controllerDefs = {};
 }
 
-ControllerDefRegistry.prototype.auraType = "ControllerDefRegistry";
-
 /**
  * Returns a ControllerDef instance from registry
  * @param {String} descriptor descriptor of a ControllerDef.

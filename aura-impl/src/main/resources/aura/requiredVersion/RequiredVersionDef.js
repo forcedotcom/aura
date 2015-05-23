@@ -25,8 +25,6 @@ function RequiredVersionDef(config){
     this.version = config["version"];
 }
 
-RequiredVersionDef.prototype.auraType = "RequiredVersionDef";
-
 /**
  * Gets the descriptor. Returns a DefDescriptor object that contains the metadata for the attribute.
  * @returns {DefDescriptor} The qualified name for a DefDescriptor object has the format <code>prefix://namespace:name</code>.

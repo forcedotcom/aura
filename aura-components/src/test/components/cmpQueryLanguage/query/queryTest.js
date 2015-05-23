@@ -17,7 +17,7 @@
     // Checks if undefined variable message is correct. Message varies across browsers.
     checkUndefinedMsg : function(variable, msg) {
         var chromeMsg = variable + " is not defined";
-        var ieMsg = "\'" + variable + "\' is undefined";       
+        var ieMsg = "\'" + variable + "\' is undefined";
         var ieOldMsg= "The value of the property \'" + variable + "\' is null or undefined, not a Function object"
         var iosMsg = "Can't find variable: " + variable;
 
@@ -27,7 +27,7 @@
             return false;
         }
     },
-    
+
     /**
      * Verify that $A.getQueryStatement().query() by default queries on components and selects
      * all fields on the component object.
@@ -45,8 +45,8 @@
             $A.test.assertEquals(2, rows.length, "Unexpected number of rows in result set.");
 
             // Verify that by default the query returned components
-            $A.test.assertEquals("Component", rows[0].auraType, "Expected to see root component in the result set.");
-            $A.test.assertEquals("Component", rows[1].auraType, "Expected to see super component in the result set.");
+            $A.test.assertTrue($A.util.isComponent(rows[0]), "Expected to see root component in the result set.");
+            $A.test.assertTrue($A.util.isComponent(rows[1]), "Expected to see super component in the result set.");
 
             // Verify that the components
             $A.test.assertEquals("markup://cmpQueryLanguage:query", rows[0].getDef().getDescriptor().getQualifiedName(),
@@ -98,20 +98,20 @@
 
             var result = $A.getQueryStatement().from("componentDef").query();
             this.verifyQueryResultCount(result, $A.componentService.getRegisteredComponentDescriptors().length);
-            $A.test.assertEquals("ComponentDef" , result.rows[0].auraType);
+            $A.test.assertAuraType("ComponentDef", result.rows[0]);
 
             // Verify all supported views
             var views = {"controllerDef" : "ControllerDef",
-                         "modelDef" :"ModelDef",
+                         "modelDef" : "ModelDef",
                          "providerDef" : "ProviderDef",
                          "rendererDef" : "RendererDef",
                          "helperDef" : "HelperDef"
-                         }
+                         };
             for(var view in views){
                 result = $A.getQueryStatement().from(view).query();
                 $A.test.assertTruthy(result);
                 $A.test.assertTrue(result.rowCount>0, "from('"+view+"').query() returned no rows in result set.");
-                $A.test.assertEquals(views[view] , result.rows[0].auraType);
+                $A.test.assertAuraType(views[view], result.rows[0]);
             }
 
             // Verify that specifying invalid field or undefined field will
@@ -154,13 +154,12 @@
 
         // 3. Multiple fields (one for get function and one for is function)
         // with repetition
-            result = $A.getQueryStatement().field('globalId').field('Concrete').field('auraType').field('globalId').query();
+            result = $A.getQueryStatement().field('globalId').field('Concrete').field('globalId').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(3, $A.test.objectKeys(row).length, "Query with 3 field specification returned extra fields in result set.");
+            $A.test.assertEquals(2, $A.test.objectKeys(row).length, "Query with 2 field specification returned extra fields in result set.");
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertEquals(cmp.isConcrete(), row.Concrete);
-            $A.test.assertEquals(cmp.auraType, row.auraType);
         },
         // Boundary cases for individual fields
         function(cmp){
@@ -384,10 +383,10 @@
      * Only 1 field is supported with groupBy caluse
      */
     testGroupBy:{
-        test:[function(cmp){      	
+        test:[function(cmp){
             var whereClause = "nameSpace == 'aura'";
             var result = $A.getQueryStatement().from('componentDef').field('nameSpace','getDescriptor().getNamespace()').where(whereClause).groupBy('nameSpace').query()
-                            
+
             $A.test.assertEquals(1, result.groupCount);
         },
         function(cmp){

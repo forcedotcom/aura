@@ -302,7 +302,7 @@ var ComponentPriv = (function() { // Scoping priv
             for (var index = 0; index < facetConfig.length; index++) {
                 var config = facetConfig[index];
 
-                if (config && config.auraType === "Component") {
+                if (config instanceof Component) {
                     components.push(config);
                 } else if (config && config["componentDef"]) {
                     if (action) {
@@ -861,7 +861,7 @@ if(!this.concreteComponentId) {
             var self = this;
             var setProvided = function(realComponentDef, attributes) {
 
-                $A.assert(realComponentDef && realComponentDef.auraType === "ComponentDef",
+                $A.assert(realComponentDef instanceof ComponentDef,
                     "No definition for provided component: " + componentDef);
                 $A.assert(!realComponentDef.isAbstract(),
                     "Provided component cannot be abstract: " + realComponentDef);
@@ -972,13 +972,10 @@ if(!this.concreteComponentId) {
                 serialized.push(value);
             }
 
-            if(value.auraType) {
-                var type = value.auraType;
-                if (type === "Component") {
-                    return this.outputComponent(value, serialized, depth);
-                } else if (type === "Action") {
-                    return "Action";
-                }
+            if(value instanceof Component) {
+                return this.outputComponent(value, serialized, depth);
+            } else if(value instanceof Action) {
+                return "Action";
             }else{
                 if(isArray){
                     return this.outputArrayValue(value, avp, serialized, depth);
@@ -1132,26 +1129,6 @@ function Component(config, localCreation, creatingPrototype) {
 
     this.fire("init");
 }
-
-/**
- * The Component type.
- * <p>
- * Examples:
- * </p>
- * <p>
- * <code>//Checks if the component value is of this type<br />obj.auraType === "Component"</code>
- * </p>
- * <p>
- * <code>//Checks if the elements in the body is of this type<br />
- * var body = cmp.get("v.body");<br />
- * var child = body[i];<br />
- * if (child.auraType === "Component") { //do something }
- * </code>
- * </p>
- *
- * @public
- */
-Component.prototype.auraType = "Component";
 
 /**
  * Gets the ComponentDef Shorthand: <code>get("def")</code>
@@ -2133,12 +2110,7 @@ Component.prototype.setAttributeValueProvider = function (avp) {
  */
 Component.prototype.getComponentValueProvider = function() {
     var valueProvider = this.priv.attributeValueProvider||this.priv.facetValueProvider;
-    if (!valueProvider) {
-        return undefined;
-    }
-
-    return valueProvider.auraType !== Component.prototype.auraType && $A.util.isFunction(valueProvider.getComponent) ?
-        valueProvider.getComponent() : valueProvider;
+    return !(valueProvider instanceof Component) && $A.util.isFunction(valueProvider.getComponent) ? valueProvider.getComponent() : valueProvider;
 };
 
 /**

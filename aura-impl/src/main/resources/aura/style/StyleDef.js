@@ -25,8 +25,6 @@ function StyleDef(config){
     this.descriptor = new DefDescriptor(config["descriptor"]);
 }
 
-StyleDef.prototype.auraType = "StyleDef";
-
 /**
  * Applies style to element. If this StyleDef's style has not been added to the DOM, add it to the DOM.
  */

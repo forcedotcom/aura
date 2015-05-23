@@ -28,7 +28,7 @@
                     "Expected aura:valueInit to trigger component init");
 
             var value = cmp._testCmpInitEvt.getParam("value");
-            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertTrue($A.util.isComponent(value));
             //Verify that value parameter of event is the current component
             $A.test.assertEquals(cmp, value, "aura:valueInit was expected to provider current component as 'value' param.");
         }
@@ -54,7 +54,7 @@
                     "Expected aura:valueInit to trigger facet component init");
 
             var value = facet._testFacetCmpInitEvt.getParam("value");
-            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertTrue($A.util.isComponent(value));
             //Verify that value parameter of event is the facet component
             $A.test.assertEquals(facet, value, "aura:valueInit was expected to provider facet as 'value' param.");
         }
@@ -94,7 +94,7 @@
                     $A.test.assertTrue(newCmp._testNewCmpInitFlag);
                     $A.test.assertTruthy(newCmp._testNewCmpInitEvt);
                     var value = newCmp._testNewCmpInitEvt.getParam("value");
-                    $A.test.assertEquals("Component", value.auraType);
+                    $A.test.assertTrue($A.util.isComponent(value));
                     //Verify that value parameter of event is the new component that was just created.
                     $A.test.assertEquals(newCmp, value, "aura:valueInit was expected to provider current component as 'value' param.");
                 });

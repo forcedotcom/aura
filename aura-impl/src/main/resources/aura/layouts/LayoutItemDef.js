@@ -27,8 +27,6 @@ function LayoutItemDef(config){
     this.action = config["action"];
 }
 
-LayoutItemDef.prototype.auraType = "LayoutItemDef";
-
 /**
  * Returns the container.
  */

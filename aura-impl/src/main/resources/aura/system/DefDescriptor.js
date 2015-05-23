@@ -48,12 +48,6 @@ DefDescriptor.normalize=function(descriptor){
     return descriptor;
 };
 
-// Prototype Members
-/**
- * @export
- */
-DefDescriptor.prototype.auraType = "DefDescriptor";
-
 /**
  * Gets the qualified name.
  * @returns {String}

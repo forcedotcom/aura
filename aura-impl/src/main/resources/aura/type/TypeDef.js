@@ -15,15 +15,13 @@
  */
 /*jslint sub: true */
 /**
- * 
+ *
  * @constructor
  */
 function TypeDef(config) {
     this.descriptor = new DefDescriptor(config["descriptor"]);
     this.array = config["descriptor"].endsWith("[]");
 }
-
-TypeDef.prototype.auraType = "TypeDef";
 
 TypeDef.prototype.getDescriptor = function() {
     return this.descriptor;

@@ -42,8 +42,6 @@ function FunctionCallValue(config, valueProvider){
 //#end
 }
 
-FunctionCallValue.prototype.auraType = "Value";
-
 /**
  * Sets the isDirty flag to false.
  * @export

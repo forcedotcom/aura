@@ -20,8 +20,8 @@
 var valueFactory = {
     create: function create(valueConfig, def, component) {
         if (aura.util.isObject(valueConfig)) {
-            if (valueConfig.auraType) {
-                if (valueConfig.auraType === "ActionDef") {
+            if (!aura.util.isPlainObject(valueConfig)) {
+                if (valueConfig instanceof ActionDef) {
                     return new ActionReferenceValue(valueConfig, def, component);
                 }
             } else if (valueConfig["exprType"] === "PROPERTY") {

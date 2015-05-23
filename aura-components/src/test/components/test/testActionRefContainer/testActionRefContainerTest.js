@@ -28,21 +28,21 @@
         }, function(component){
         	var getButton = component.find("getButton");
             getButton.get("e.press").fire();
-            mar = component.get("v.myActionRef");
-            $A.test.assertEquals("Action", mar.auraType, "there should be an actionref");
-        }, function(component) {     
+            var mar = component.get("v.myActionRef");
+            $A.test.assertTrue($A.util.isAction(mar), "there should be an actionref");
+        }, function(component) {
             component.find("runButton").get("e.press").fire();
-        }, function(component) {           
+        }, function(component) {
         	//Check that the previous Action (firing the button, changed the correct elements)
-        	var text = component.find("actionref").getElements()[1];       	
+        	var text = component.find("actionref").getElements()[1];
         	$A.test.assertEquals("1", text.nodeValue, "action was not called");
-        	
+
         	component.find("runButton").get("e.press").fire();
-        }, function(component) {  
+        }, function(component) {
         	//Check that the previous Action (firing the button, changed the correct elements)
         	var text = component.find("actionref").getElements()[1];
             $A.test.assertEquals("2", text.nodeValue, "action should have been called twice");
-            
+
             component.find("runButton").get("e.press").fire();
         }, function(component) {
         	//Check that the previous Action (firing the button, changed the correct elements)

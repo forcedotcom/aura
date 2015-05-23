@@ -32,8 +32,6 @@ function Event(config) {
     this.componentEvent = false;
 }
 
-Event.prototype.auraType = "Event";
-
 /**
  * Gets the source component that fired this component event.
  * This method doesn't work for application events.
@@ -67,7 +65,7 @@ Event.prototype.stopPropagation = function() {
 
 /**
  * Sets the event as a "componentEvent" (won't bubble)
- * This type of event was used historically as a construct to call an action of a child 
+ * This type of event was used historically as a construct to call an action of a child
  * Since the advent of "methods", this type of event communication is discouraged and a "method" is preferred.
  * NOTE: Calling events on a child is discouraged and will be deprecated
  * @export

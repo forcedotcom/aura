@@ -36,8 +36,6 @@ function LayoutDef(config){
     }
 }
 
-LayoutDef.prototype.auraType = "LayoutDef";
-
 /**
  * Returns the name of the Layout.
  */

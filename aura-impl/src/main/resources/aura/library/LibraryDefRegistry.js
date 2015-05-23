@@ -23,8 +23,6 @@ function LibraryDefRegistry() {
     this.libraryDefs = {};
 }
 
-LibraryDefRegistry.prototype.auraType = "LibraryDefRegistry";
-
 /**
  * Returns a library from registry
  * @param {String} descriptor name of a library.
@@ -65,7 +63,7 @@ LibraryDefRegistry.prototype.define = function(/*var args*/) {
         if (LibraryDefRegistry.isLocator(arg)) {
             return this.require(arg);
         }
-        
+
         return this.require(identifier.library + ":" + arg);
     }, this);
     this.libraryDefs[identifier.library] = this.libraryDefs[identifier.library] || {};

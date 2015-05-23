@@ -22,8 +22,6 @@ function RendererDefRegistry(){
     this.rendererDefs = {};
 }
 
-RendererDefRegistry.prototype.auraType = "RendererDefRegistry";
-
 /**
  * Returns a RendererDef instance from registry
  * @param {String} descriptor component definition descriptor to lookup on the RendererDef

@@ -67,7 +67,7 @@
                 $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
                 $A.test.fail("ERROR: Expecting exception when provider return non-loaded componentDef");
             } catch (e){
-                $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : undefined", e.message);
+                $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : false", e.message);
             }
         }
     },
@@ -154,7 +154,7 @@
                 $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
                 $A.test.fail("Expected error to be thrown during new component creation");
             } catch (e){
-                $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : undefined", e.message);
+                $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : false", e.message);
             }
         }
     },

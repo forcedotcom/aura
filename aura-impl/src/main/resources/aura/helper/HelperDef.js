@@ -32,7 +32,7 @@ function HelperDef(componentDef, libraries){
         $A.util.forEach($A.util.keys(libraries), function(importName) {
             var definition = libraries[importName];
             functions.constructor.prototype[importName] = {};
-            
+
             $A.util.forEach($A.util.keys(definition || []), function(key) {
                 functions.constructor.prototype[importName][key] = definition[key];
             });
@@ -41,11 +41,6 @@ function HelperDef(componentDef, libraries){
 
     this.functions = functions;
 }
-
-/**
- * @export
- */
-HelperDef.prototype.auraType = "HelperDef";
 
 /**
  * Returns the functions for HelperDef.

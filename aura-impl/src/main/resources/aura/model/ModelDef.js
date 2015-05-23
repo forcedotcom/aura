@@ -31,11 +31,6 @@ function ModelDef(config){
 }
 
 /**
- * @export
- */
-ModelDef.prototype.auraType = "ModelDef";
-
-/**
  * Gets the descriptor. (e.g. markup://foo:bar)
  * @returns {DefDescriptor}
  */

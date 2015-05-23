@@ -15,14 +15,12 @@
  */
 /*jslint sub: true */
 /**
- * 
+ *
  * @constructor
  */
 function TypeDefRegistry(){
     this.typeDefs = {};
 }
-
-TypeDefRegistry.prototype.auraType = "TypeDefRegistry";
 
 TypeDefRegistry.prototype.getDef = function(config) {
     aura.assert(config, "TypeDef Config required for registration");

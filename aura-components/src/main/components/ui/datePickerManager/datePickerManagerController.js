@@ -39,10 +39,10 @@
 		var selected = cmp._onselected;
 
 		// Invoke onselected if it's a function; otherwise, assume Aura.Action.
-		if (selected && $A.util.isFunction(selected)) {
+		if ($A.util.isFunction(selected)) {
 			selected.call({}, evt);
 		}
-		else if (selected.auraType === 'Action') {
+		else if ($A.util.isAction(selected)) {
 			selected.runDeprecated(evt);
 		}
 	}

@@ -34,11 +34,6 @@ function ControllerDef(config){
 }
 
 /**
- * @export
- */
-ControllerDef.prototype.auraType = "ControllerDef";
-
-/**
  * Gets the Controller Descriptor with the format <code>markup://aura:component</code>.
  * @returns {Object}
  */

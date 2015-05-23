@@ -55,7 +55,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
     private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of(
             "markup://ui:inputDate" // server side dependency
             , "markup://ui:action" // this should be abstract
-            , "markup://perf:dummyPerf"
+            , "markup://perfTest:dummyPerf"
             );
 
     private static final Logger LOG = Logger.getLogger(ComponentPerfSuiteTest.class.getSimpleName());

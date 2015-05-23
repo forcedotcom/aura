@@ -108,10 +108,10 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
                 AuraTextUtil.urldecode(currentDriver.findElement(By.cssSelector(".uiLabel")).getText()));
     }
 
-    // perf:dummyPerf
+    // perfTest:dummyPerf
 
     public void testDummyPerf() throws Exception {
-        runWithPerfApp(getDefDescriptor("perf:dummyPerf"));
+        runWithPerfApp(getDefDescriptor("perfTest:dummyPerf"));
     }
 
     private void verifyDummyPerf(PerfMetrics actual) {

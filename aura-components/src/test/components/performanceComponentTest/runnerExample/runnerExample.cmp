@@ -1,0 +1,9 @@
+<aura:component implements="performance:test">
+    <aura:attribute name="loaded" type="Boolean"/>
+    <section>
+        <div style="margin: 10px; padding:10px; border: 1px solid black">
+            <p>Runner Example Performance Test!</p>
+            <p>Loaded async component:  <span style="color:green">{!v.loaded}</span> </p>
+        </div>
+    </section>
+</aura:component>

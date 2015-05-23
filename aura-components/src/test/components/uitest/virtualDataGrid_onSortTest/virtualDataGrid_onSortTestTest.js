@@ -136,7 +136,7 @@
 			  $A.test.clickOrTouch(headerCols[3]);
 			  $A.test.addWaitForWithFailureMessage("age", function() {
 				    return $A.test.getText(output);
-		      }, "The sort order should be age asending");
+		      }, "The sort order should be age ascending");
 	      }, function(cmp) {
 			  //click on id header again (sort on -id)
 			  var headerCols = $A.test.getElementByClass("toggle");
@@ -160,7 +160,15 @@
 	    	  $A.test.addWaitForWithFailureMessage("descending", function() {
 				  return that.getColumnDirection(1).toLowerCase();
 		      }, "Method sort does not work correctly");	
-	      }]
+	      }, function(cmp) {
+			  // test initialDirectionOnSort on gender
+			  var headerCols = $A.test.getElementByClass("toggle");
+			  var output = cmp.find("sortBy").getElement();
+			  $A.test.clickOrTouch(headerCols[2]);
+			  $A.test.addWaitForWithFailureMessage("gender", function() {
+				    return $A.test.getText(output);
+		      }, "The sort order should be gender ascending");
+		  }]
   }
   
 })

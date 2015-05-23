@@ -145,6 +145,35 @@
             $A.test.assertEquals("I will be merged with me and me!", array1.join(" "));
         }
     },
+
+    testJsonOrderedEncode: {
+        test : function() {
+            var obj = {
+                z: "z",
+                b: "b",
+                k: "k",
+                o: {
+                    l: "l",
+                    e: "e",
+                    f8: "f8",
+                    fa: "fa",
+                    f3: "f3",
+                    f5: "f5",
+                    bob: {
+                        b: "b",
+                        t: 2,
+                        s: 7
+                    }
+                },
+                a: "a",
+                n: 9
+            };
+
+            var expected = '{"a":"a","b":"b","k":"k","n":9,"o":{"bob":{"b":"b","s":7,"t":2},"e":"e","f3":"f3","f5":"f5","f8":"f8","fa":"fa","l":"l"},"z":"z"}';
+            var actual = $A.test.json.orderedEncode(obj);
+            $A.test.assertEquals(expected, actual, "Object was not serialized in alphabetical order");
+        }
+    },
     
     validateArray: function(array) {
         var i;

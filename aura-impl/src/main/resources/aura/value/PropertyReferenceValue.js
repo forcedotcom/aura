@@ -147,14 +147,6 @@ PropertyReferenceValue.prototype.isDirty = function() {
 };
 
 /**
- * Sets the isLiteral flag to false to denote that the property reference can be
- * changed.
- */
-PropertyReferenceValue.prototype.isLiteral = function() {
-    return false;
-};
-
-/**
  * Destroys the path.
  */
 PropertyReferenceValue.prototype.destroy = function() {

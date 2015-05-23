@@ -53,13 +53,6 @@ ActionReferenceValue.prototype.isDirty = function(){
 };
 
 /**
- * Returns false as this is not a literal.
- */
-ActionReferenceValue.prototype.isLiteral = function(){
-    return false;
-};
-
-/**
  * Destroys the component and its action definition.
  */
 ActionReferenceValue.prototype.destroy = function(){

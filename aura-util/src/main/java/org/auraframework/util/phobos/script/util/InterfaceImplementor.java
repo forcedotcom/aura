@@ -68,6 +68,7 @@ public class InterfaceImplementor {
             this.thiz = thiz;
         }
 
+        @Override
         public Object invoke(Object proxy , Method method, Object[] args)
         throws java.lang.Throwable {
             // give chance to convert input args

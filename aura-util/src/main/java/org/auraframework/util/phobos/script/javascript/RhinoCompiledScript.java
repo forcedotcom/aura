@@ -60,6 +60,7 @@ final class RhinoCompiledScript extends CompiledScript {
         this.script = script;
     }
 
+    @Override
     public Object eval(ScriptContext context) throws ScriptException {
 
         Object result = null;
@@ -88,6 +89,7 @@ final class RhinoCompiledScript extends CompiledScript {
         return result;
     }
 
+    @Override
     public ScriptEngine getEngine() {
         return engine;
     }

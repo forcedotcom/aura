@@ -54,21 +54,25 @@ public abstract class BindingsBase extends AbstractMap<String, Object>
         implements Bindings {
 
     //AbstractMap methods
+    @Override
     public Object get(Object name) {
         checkKey(name);
         return getImpl((String)name);
     }
 
+    @Override
     public Object remove(Object key) {
         checkKey(key);
         return removeImpl((String)key);
     }
 
+    @Override
     public Object put(String key, Object value) {
         checkKey(key);
         return putImpl(key, value);
     }
 
+    @Override
     public void putAll(Map<? extends String, ? extends Object> toMerge) {
         for (Map.Entry<? extends String, ? extends Object> entry : toMerge.entrySet()) {
             String key = entry.getKey();

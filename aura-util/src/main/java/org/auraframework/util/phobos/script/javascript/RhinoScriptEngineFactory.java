@@ -66,18 +66,22 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         this.listener = listener;
     }
 
+    @Override
     public List<String> getExtensions() {
         return extensions;
     }
 
+    @Override
     public List<String> getMimeTypes() {
         return mimeTypes;
     }
 
+    @Override
     public List<String> getNames() {
         return names;
     }
 
+    @Override
     public Object getParameter(String key) {
         if (key.equals(ScriptEngine.NAME)) {
             return "javascript";
@@ -96,6 +100,7 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         }
     }
 
+    @Override
     public ScriptEngine getScriptEngine() {
         RhinoScriptEngine ret = new RhinoScriptEngine();
         ret.setEngineFactory(this);
@@ -107,6 +112,7 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
             if ("true".equals(getProperty(USE_INTERPRETER_SYSTEM_PROPERTY))) {
                 if (!ContextFactory.hasExplicitGlobal()) {
                     ContextFactory.initGlobal(new ContextFactory() {
+                        @Override
                         protected Context makeContext() {
                             Context cx = super.makeContext();
                             cx.setOptimizationLevel(-1);
@@ -151,6 +157,7 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         return (s == null ? defaultValue : s);
     }
 
+    @Override
     public String getMethodCallSyntax(String obj, String method, String... args) {
 
         String ret = obj + "." + method + "(";
@@ -171,10 +178,12 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         return ret;
     }
 
+    @Override
     public String getOutputStatement(String toDisplay) {
         return "print(" + toDisplay + ")";
     }
 
+    @Override
     public String getProgram(String... statements) {
         int len = statements.length;
         String ret = "";

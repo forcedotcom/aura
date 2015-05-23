@@ -29,7 +29,6 @@ exp(p,
         ,
         "getNum", p.getNum,
         "getLoaded", p.getLoaded,
-        "getPreloadedNamespaces", p.getPreloadedNamespaces,
-        "clearGlobalValueProvider", p.clearGlobalValueProvider
+        "getPreloadedNamespaces", p.getPreloadedNamespaces
     //#end
 );

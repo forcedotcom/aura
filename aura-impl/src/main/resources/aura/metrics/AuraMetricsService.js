@@ -437,7 +437,7 @@ Aura.Services.MetricsService.prototype.setClearCompletedTransactions = function 
 **/
 Aura.Services.MetricsService.prototype.signalBeacon = function (beacon, transaction) {
     if (beacon) {
-        beacon["sendData"](payload["id"], transaction);
+        beacon["sendData"](transaction["id"], transaction);
     }
 };
 

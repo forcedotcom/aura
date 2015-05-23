@@ -86,10 +86,6 @@ function AuraContext(config, initCallback) {
     this.contextGlobals = this.globalValueProviders.getValueProvider("Global");
 }
 
-AuraContext.prototype.clearGlobalValueProvider = function(loadFromStorage) {
-    this.globalValueProviders.clearValueProvider(loadFromStorage);
-};
-
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
  * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.

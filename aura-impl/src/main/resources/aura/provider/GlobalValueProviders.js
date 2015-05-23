@@ -197,23 +197,6 @@ GlobalValueProviders.prototype.getValueProvider = function(type) {
 };
 
 /**
- * This function is for test only. Call this to simulate offline situation:
- * when we start the app offline, the server is not avalable, 
- * all we have is whatever we get from persist storage.
- */
-GlobalValueProviders.prototype.clearValueProvider = function(loadFromStorage) {
-	this.valueProviders = {
-	        "$Browser" : new Aura.Provider.ObjectValueProvider(),
-	        "$Label": new Aura.Provider.LabelValueProvider(),
-	        "$Locale": new Aura.Provider.ObjectValueProvider(),
-	        "$Global": new Aura.Provider.ContextValueProvider()
-	};
-	if(loadFromStorage) {
-		this.loadFromStorage();
-	}
-};
-
-/**
  * Calls getValue for Value Object. Unwraps and calls callback if provided.
  *
  * @param {String} expression

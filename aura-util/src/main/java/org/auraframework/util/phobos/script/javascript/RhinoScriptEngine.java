@@ -150,6 +150,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
 
         //construct object used to implement getInterface
         implementor = new InterfaceImplementor(this) {
+                @Override
                 protected Object convertResult(Method method, Object res)
                                             throws ScriptException {
                     Class desiredType = method.getReturnType();
@@ -162,6 +163,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         };
     }
 
+    @Override
     public Object eval(Reader reader, ScriptContext ctxt)
     throws ScriptException {
         Object ret;
@@ -206,6 +208,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         return unwrapReturnValue(ret);
     }
 
+    @Override
     public Object eval(String script, ScriptContext ctxt) throws ScriptException {
         if (script == null) {
             throw new NullPointerException("null script");
@@ -213,6 +216,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         return eval(preProcessScriptSource(new StringReader(script)) , ctxt);
     }
 
+    @Override
     public ScriptEngineFactory getFactory() {
         if (factory != null) {
             return factory;
@@ -221,16 +225,19 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         }
     }
 
+    @Override
     public Bindings createBindings() {
         return new SimpleBindings();
     }
 
     //Invocable methods
+    @Override
     public Object invokeFunction(String name, Object... args)
     throws ScriptException, NoSuchMethodException {
         return invokeMethod(null, name, args);
     }
 
+    @Override
     public Object invokeMethod(Object thiz, String name, Object... args)
     throws ScriptException, NoSuchMethodException {
 
@@ -277,6 +284,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         }
     }
 
+    @Override
     public <T> T getInterface(Class<T> clasz) {
         try {
             return implementor.getInterface(null, clasz);
@@ -285,6 +293,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         }
     }
 
+    @Override
     public <T> T getInterface(Object thiz, Class<T> clasz) {
         if (thiz == null) {
             throw new IllegalArgumentException("script object can not be null");
@@ -334,10 +343,12 @@ public class RhinoScriptEngine extends AbstractScriptEngine
 
 
     //Compilable methods
+    @Override
     public CompiledScript compile(String script) throws ScriptException {
         return compile(preProcessScriptSource(new StringReader(script)));
     }
 
+    @Override
     public CompiledScript compile(java.io.Reader script) throws ScriptException {
         CompiledScript ret = null;
         Context cx = enterContext();

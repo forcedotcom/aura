@@ -58,6 +58,7 @@ public class EmbeddedRhinoScriptEngine extends RhinoScriptEngine {
                                     ");\n");
     }
 
+    @Override
     protected Reader preProcessScriptSource(Reader reader) throws ScriptException {
         try {
             String s = detagifier.parse(reader);

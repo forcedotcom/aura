@@ -58,10 +58,12 @@ public class BindingsEntrySet extends AbstractSet<Map.Entry<String, Object>> {
         keys = base.getNames();
     }
 
+    @Override
     public int size() {
         return keys.length;
     }
 
+    @Override
     public Iterator<Map.Entry<String, Object>> iterator() {
         return new BindingsIterator();
     }
@@ -72,14 +74,17 @@ public class BindingsEntrySet extends AbstractSet<Map.Entry<String, Object>> {
             this.key = key;
         }
 
+        @Override
         public Object setValue(Object value) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public String getKey() {
             return key;
         }
 
+        @Override
         public Object getValue() {
             return base.get(key);
         }
@@ -91,15 +96,18 @@ public class BindingsEntrySet extends AbstractSet<Map.Entry<String, Object>> {
         private int current = 0;
         private boolean stale = false;
 
+        @Override
         public boolean hasNext() {
             return (current < keys.length);
         }
 
+        @Override
         public BindingsEntry next() {
             stale = false;
             return new BindingsEntry(keys[current++]);
         }
 
+        @Override
         public void remove() {
             if (stale || current == 0) {
                 throw new IllegalStateException();

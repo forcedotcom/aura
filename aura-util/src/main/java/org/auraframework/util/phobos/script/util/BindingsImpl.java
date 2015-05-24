@@ -67,10 +67,12 @@ public abstract class BindingsImpl extends BindingsBase {
         local = n;
     }
 
+    @Override
     public  Set<Map.Entry<String, Object>> entrySet() {
         return new BindingsEntrySet(this);
     }
 
+    @Override
     public Object get(Object key) {
         checkKey(key);
 
@@ -90,6 +92,7 @@ public abstract class BindingsImpl extends BindingsBase {
         }
     }
 
+    @Override
     public Object remove(Object key) {
         checkKey(key);
         Object ret = get(key);

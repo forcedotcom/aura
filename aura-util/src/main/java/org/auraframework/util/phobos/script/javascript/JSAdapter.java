@@ -100,10 +100,12 @@ public final class JSAdapter implements Scriptable, Function {
                 ScriptableObject.DONTENUM);
     }
 
+    @Override
     public String getClassName() {
         return "JSAdapter";
     }
 
+    @Override
     public Object get(String name, Scriptable start) {
         Function func = getAdapteeFunction(GET_PROP);
         if (func != null) {
@@ -114,6 +116,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public Object get(int index, Scriptable start) {
         Function func = getAdapteeFunction(GET_PROP);
         if (func != null) {
@@ -124,6 +127,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public boolean has(String name, Scriptable start) {
         Function func = getAdapteeFunction(HAS_PROP);
         if (func != null) {
@@ -135,6 +139,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public boolean has(int index, Scriptable start) {
         Function func = getAdapteeFunction(HAS_PROP);
         if (func != null) {
@@ -146,6 +151,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public void put(String name, Scriptable start, Object value) {
         if (start == this) {
             Function func = getAdapteeFunction(PUT_PROP);
@@ -160,6 +166,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public void put(int index, Scriptable start, Object value) {
         if (start == this) {
             Function func = getAdapteeFunction(PUT_PROP);
@@ -174,6 +181,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public void delete(String name) {
         Function func = getAdapteeFunction(DEL_PROP);
         if (func != null) {
@@ -183,6 +191,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public void delete(int index) {
         Function func = getAdapteeFunction(DEL_PROP);
         if (func != null) {
@@ -192,22 +201,27 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public Scriptable getPrototype() {
         return prototype;
     }
 
+    @Override
     public void setPrototype(Scriptable prototype) {
         this.prototype = prototype;
     }
 
+    @Override
     public Scriptable getParentScope() {
         return parent;
     }
 
+    @Override
     public void setParentScope(Scriptable parent) {
         this.parent = parent;
     }
 
+    @Override
     public Object[] getIds() {
         Function func = getAdapteeFunction(GET_PROPIDS);
         if (func != null) {
@@ -244,6 +258,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public boolean hasInstance(Scriptable scriptable) {
         if (scriptable instanceof JSAdapter) {
             return true;
@@ -257,10 +272,12 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public Object getDefaultValue(Class hint) {
         return getAdaptee().getDefaultValue(hint);
     }
 
+    @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj,
             Object[] args)
             throws RhinoException {
@@ -276,6 +293,7 @@ public final class JSAdapter implements Scriptable, Function {
         }
     }
 
+    @Override
     public Scriptable construct(Context cx, Scriptable scope, Object[] args)
     throws RhinoException {
         if (isPrototype) {

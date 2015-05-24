@@ -55,18 +55,22 @@ public class EmbeddedRhinoScriptEngineFactory extends ScriptEngineFactoryBase {
     public EmbeddedRhinoScriptEngineFactory() {
     }
 
+    @Override
     public List<String> getExtensions() {
         return extensions;
     }
 
+    @Override
     public List<String> getMimeTypes() {
         return mimeTypes;
     }
 
+    @Override
     public List<String> getNames() {
         return names;
     }
 
+    @Override
     public Object getParameter(String key) {
         if (key.equals(ScriptEngine.NAME)) {
             return "embedded-javascript";
@@ -89,12 +93,14 @@ public class EmbeddedRhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         this.properties = properties;
     }
 
+    @Override
     public ScriptEngine getScriptEngine() {
         EmbeddedRhinoScriptEngine ret = new EmbeddedRhinoScriptEngine();
         ret.setEngineFactory(this);
         return ret;
     }
 
+    @Override
     public String getMethodCallSyntax(String obj, String method, String... args) {
 
         String ret = obj + "." + method + "(";
@@ -115,10 +121,12 @@ public class EmbeddedRhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         return ret;
     }
 
+    @Override
     public String getOutputStatement(String toDisplay) {
         return "print(" + toDisplay + ")";
     }
 
+    @Override
     public String getProgram(String... statements) {
         int len = statements.length;
         String ret = "";

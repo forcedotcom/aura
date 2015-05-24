@@ -54,18 +54,22 @@ public abstract class ScriptEngineFactoryBase implements ScriptEngineFactory {
         return (String)getParameter(ScriptEngine.NAME);
     }
 
+    @Override
     public String getEngineName() {
         return (String)getParameter(ScriptEngine.ENGINE);
     }
 
+    @Override
     public String getEngineVersion() {
         return (String)getParameter(ScriptEngine.ENGINE_VERSION);
     }
 
+    @Override
     public String getLanguageName() {
         return (String)getParameter(ScriptEngine.LANGUAGE);
     }
 
+    @Override
     public String getLanguageVersion() {
         return (String)getParameter(ScriptEngine.LANGUAGE_VERSION);
     }

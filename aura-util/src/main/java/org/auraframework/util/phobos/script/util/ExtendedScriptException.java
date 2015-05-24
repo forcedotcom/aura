@@ -83,6 +83,7 @@ public class ExtendedScriptException extends ScriptException {
         super(message, fileName, lineNumber, columnNumber);
     }
 
+    @Override
     public Throwable getCause() {
         return cause;
     }

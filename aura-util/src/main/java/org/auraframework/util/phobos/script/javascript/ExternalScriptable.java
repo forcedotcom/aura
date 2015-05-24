@@ -99,6 +99,7 @@ final class ExternalScriptable implements Scriptable {
     /**
      * Return the name of the class.
      */
+    @Override
     public String getClassName() {
         return "Global";
     }
@@ -113,6 +114,7 @@ final class ExternalScriptable implements Scriptable {
      * @param start the object in which the lookup began
      * @return the value of the property (may be null), or NOT_FOUND
      */
+    @Override
     public synchronized Object get(String name, Scriptable start) {
         if (isEmpty(name)) {
             if (indexedProps.containsKey(name)) {
@@ -140,6 +142,7 @@ final class ExternalScriptable implements Scriptable {
      * @param start the object in which the lookup began
      * @return the value of the property (may be null), or NOT_FOUND
      */
+    @Override
     public synchronized Object get(int index, Scriptable start) {
         Integer key = new Integer(index);
         if (indexedProps.containsKey(index)) {
@@ -156,6 +159,7 @@ final class ExternalScriptable implements Scriptable {
      * @param start the object in which the lookup began
      * @return true if and only if the property was found in the object
      */
+    @Override
     public synchronized boolean has(String name, Scriptable start) {
         if (isEmpty(name)) {
             return indexedProps.containsKey(name);
@@ -173,6 +177,7 @@ final class ExternalScriptable implements Scriptable {
      * @param start the object in which the lookup began
      * @return true if and only if the property was found in the object
      */
+    @Override
     public synchronized boolean has(int index, Scriptable start) {
         Integer key = new Integer(index);
         return indexedProps.containsKey(key);
@@ -185,6 +190,7 @@ final class ExternalScriptable implements Scriptable {
      * @param start the object whose property is being set
      * @param value value to set the property to
      */
+    @Override
     public void put(String name, Scriptable start, Object value) {
         if (start == this) {
             synchronized (this) {
@@ -212,6 +218,7 @@ final class ExternalScriptable implements Scriptable {
      * @param start the object whose property is being set
      * @param value value to set the property to
      */
+    @Override
     public void put(int index, Scriptable start, Object value) {
         if (start == this) {
             synchronized (this) {
@@ -229,6 +236,7 @@ final class ExternalScriptable implements Scriptable {
      *
      * @param name the name of the property
      */
+    @Override
     public synchronized void delete(String name) {
         if (isEmpty(name)) {
             indexedProps.remove(name);
@@ -249,6 +257,7 @@ final class ExternalScriptable implements Scriptable {
      *
      * @param index the numeric index for the property
      */
+    @Override
     public void delete(int index) {
         indexedProps.remove(new Integer(index));
     }
@@ -257,6 +266,7 @@ final class ExternalScriptable implements Scriptable {
      * Get the prototype of the object.
      * @return the prototype
      */
+    @Override
     public Scriptable getPrototype() {
         return prototype;
     }
@@ -265,6 +275,7 @@ final class ExternalScriptable implements Scriptable {
      * Set the prototype of the object.
      * @param prototype the prototype to set
      */
+    @Override
     public void setPrototype(Scriptable prototype) {
         this.prototype = prototype;
     }
@@ -273,6 +284,7 @@ final class ExternalScriptable implements Scriptable {
      * Get the parent scope of the object.
      * @return the parent scope
      */
+    @Override
     public Scriptable getParentScope() {
         return parent;
     }
@@ -281,6 +293,7 @@ final class ExternalScriptable implements Scriptable {
      * Set the parent scope of the object.
      * @param parent the parent scope to set
      */
+    @Override
     public void setParentScope(Scriptable parent) {
         this.parent = parent;
     }
@@ -294,6 +307,7 @@ final class ExternalScriptable implements Scriptable {
      * @return an array of Objects. Each entry in the array is either
      *         a java.lang.String or a java.lang.Number
      */
+    @Override
     public synchronized Object[] getIds() {
         String[] keys = getAllKeys();
         int size = keys.length + indexedProps.size();
@@ -320,6 +334,7 @@ final class ExternalScriptable implements Scriptable {
      * @param hint the type hint
      * @return the default value
      */
+    @Override
     public Object getDefaultValue(Class typeHint) {
         for (int i=0; i < 2; i++) {
             boolean tryToString;
@@ -412,6 +427,7 @@ final class ExternalScriptable implements Scriptable {
      * @return true if "this" appears in value's prototype chain
      *
      */
+    @Override
     public boolean hasInstance(Scriptable instance) {
         // Default for JS objects (other than Function) is to do prototype
         // chasing.

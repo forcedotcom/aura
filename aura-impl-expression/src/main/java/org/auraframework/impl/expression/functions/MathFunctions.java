@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.auraframework.expression.Expression;
 
 /**
  * functions that do mathy stuff
@@ -76,6 +79,15 @@ public class MathFunctions {
         public String[] getKeys() {
             return new String[] { "sub", "subtract" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("-");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class Multiply extends BinaryNumberFunction {
@@ -93,6 +105,15 @@ public class MathFunctions {
         @Override
         public String[] getKeys() {
             return new String[] { "mult", "multiply" };
+        }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("*");
+        	args.get(1).compile(out);
+        	out.append(")");
         }
     }
 
@@ -112,6 +133,15 @@ public class MathFunctions {
         public String[] getKeys() {
             return new String[] { "div", "divide" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("/");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class Modulus extends BinaryNumberFunction {
@@ -130,6 +160,15 @@ public class MathFunctions {
         public String[] getKeys() {
             return new String[] { "mod", "modulus" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("%");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class Negate implements Function {
@@ -146,6 +185,13 @@ public class MathFunctions {
         public String[] getKeys() {
             return new String[] { "neg", "negate" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(-");
+        	args.get(0).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class Absolute implements Function {
@@ -161,6 +207,13 @@ public class MathFunctions {
         @Override
         public String[] getKeys() {
             return new String[] { "abs" };
+        }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("Math.abs(");
+        	args.get(0).compile(out);
+        	out.append(")");
         }
     }
 }

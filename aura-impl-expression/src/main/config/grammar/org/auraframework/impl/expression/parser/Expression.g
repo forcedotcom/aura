@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 /*
  * the grammar for auras expression engine
  */
@@ -224,14 +224,14 @@ valuePath returns [List<String> path]
 }
     : maybeArray[path] (DOT maybeArray[path])*
     ;
-    
+
 maybeArray [List<String> path]
     : ID { path.add($ID.getText()); }(LBRAK INT RBRAK  { path.add($INT.getText()); })*
     ;
 
 literal returns [Expression expr]
-    : INT { $expr = this.factory.createNumber($INT.text); }
-      | FLOAT { $expr = factory.createNumber($FLOAT.text); }
+    : INT { $expr = this.factory.createInteger($INT.text); }
+      | FLOAT { $expr = factory.createFloat($FLOAT.text); }
       | BOOL { $expr = factory.createBool($BOOL.text); }
       | NULL { $expr = factory.createNull(); }
       | STRING { $expr = factory.createString($STRING.text); }
@@ -289,7 +289,7 @@ AND : '&&' ;
 NOT :  '!' ;
 
 EQ : '==' | 'eq' ;
- 
+
 NEQ : '!=' | 'ne' ;
 
 LT : '<' | 'lt';

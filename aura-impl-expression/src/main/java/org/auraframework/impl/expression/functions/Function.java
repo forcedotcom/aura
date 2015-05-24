@@ -15,17 +15,30 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+
+import org.auraframework.expression.Expression;
 
 /**
  * the thing that actually executes some function in the formula engine
  */
 public interface Function extends Serializable {
 
+    static final String JS_FN_EQUAL = "fn.eq";
+    static final String JS_FN_NOT_EQUAL = "fn.ne";
+    static final String JS_FN_ADD = "fn.add";
+    static final String JS_FN_EMPTY = "fn.empty";
+    static final String JS_FN_FORMAT = "fn.format";
+
+    static final String JS_EMPTY = "\"\"";
+
     String[] getKeys();
 
     // void validate(List<TypeDef> types);
 
     Object evaluate(List<Object> args);
+
+	void compile(Appendable out, List<Expression> args) throws IOException;
 }

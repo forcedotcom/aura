@@ -13,154 +13,119 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * client implementations of all the expression functions
- */
 /*jslint sub: true */
-var expressionFunctions = {
-    "eq": function equals(args) {
-        var a = args[0];
-        var b = args[1];
-        if (aura.util.isUndefinedOrNull(a)) {
-            return aura.util.isUndefinedOrNull(b);
-        }
-        return a === b;
-    },
+/**
+ * @class ExpressionFunctions.
+ *
+ * client implementations of the expression functions
+ *
+ * @constructor
+ * @protected
+ * @export
+ */
+function ExpressionFunctions() {}
 
-    "ne": function notequals(args) {
-        return !expressionFunctions["eq"](args);
-    },
+/**
+ * Performs a strict comparison while avoiding "null" and "undefined" to be equal.
+ *
+ * @param {Object} a The first argument.
+ * @param {Object} b The second argument.
+ * @return {Object} True if both arguments are equal, or if "null" or "undefined".
+ * @export
+ */
+ExpressionFunctions.prototype.eq = function(a, b) {
 
-    "if": function ternary(args) {
-        var a = args[0];
-        return a ? args[1] : args[2];
-    },
-
-    // add also is string concatenate
-    "add": function add(args) {
-        var a = args[0];
-        var b = args[1];
-        if (aura.util.isUndefinedOrNull(a)) {
-            if (aura.util.isString(b)) {
-                return b;
-            } else if (aura.util.isUndefinedOrNull(b)) {
-                return "";
-            }
-        } else if (aura.util.isUndefinedOrNull(b) && aura.util.isString(a)) {
-            return a;
-        }
-        return a + b;
-    },
-
-    "sub": function subtract(args) {
-        var a = args[0];
-        var b = args[1];
-        return a - b;
-    },
-
-    "mult": function multiply(args) {
-        var a = args[0];
-        var b = args[1];
-        return a * b;
-    },
-
-    "div": function divide(args) {
-        var a = args[0];
-        var b = args[1];
-        return a / b;
-    },
-
-    "mod": function modulus(args) {
-        var a = args[0];
-        var b = args[1];
-        return a % b;
-    },
-
-    "neg": function negate(args) {
-        var a = args[0];
-        return -a;
-    },
-
-    "abs": function absolutevalue(args) {
-        var a = args[0];
-        return Math.abs(a);
-    },
-
-    "gt": function greaterthan(args) {
-        var a = args[0];
-        var b = args[1];
-        return a > b;
-    },
-
-    "lt": function lessthan(args) {
-        var a = args[0];
-        var b = args[1];
-        return a < b;
-    },
-
-    "ge": function greaterthanorequalto(args) {
-        var a = args[0];
-        var b = args[1];
-        return a >= b;
-    },
-
-    "le": function lessthanorequalto(args) {
-        var a = args[0];
-        var b = args[1];
-        return a <= b;
-    },
-
-    "and": function and(args) {
-        var a = args[0];
-        var b = args[1];
-        return a && b;
-    },
-
-    "or": function or(args) {
-        var a = args[0];
-        var b = args[1];
-        return a || b;
-    },
-
-    "not": function not(args) {
-        var a = args[0];
-        return !a;
-    },
-
-    "empty": function empty(args) {
-        var a = args[0];
-        return aura.util.isEmpty(a);
-    },
-
-    /**
-     * Preprocess the arguments of format() so they make sense in
-     * a UI context, where the expressions are used. Prevent the
-     * output of null and undefined but still allow for any missing
-     * placeholders to be seen in developement mode.
-     */
-
-    "format": function format(args) {
-        if (args.length === 0) {
-            return "";
-        }
-
-        var a0 = args[0];
-        if (a0 === undefined || a0 === null) {
-            return "";
-        }
-
-        if (args.length === 1) {
-            return a0 + '';
-        }
-
-        var formatArguments = [];
-        for (var i = 0; i < args.length; i++) {
-            var ai = args[i];
-            formatArguments[i] = (ai === undefined || ai === null) ? "" : ai;
-        }
-
-        return aura.util.format.apply(aura.util.format, formatArguments);
+    if (a === undefined || a === null) {
+        return (b === undefined || b === null);
     }
+
+    return a === b;
 };
 
-Aura.Value.ExpressionFunctions = expressionFunctions;
+/**
+ * Performs a strict negative comparison while avoiding "null" and "undefined" to be equal.
+ *
+ * @param {Object} a The first argument.
+ * @param {Object} b The second argument.
+ * @return {Object} True if both arguments are equal, or if "null" or "undefined".
+ * @export
+ */
+ExpressionFunctions.prototype.ne = function(a, b) {
+
+    if (a === undefined || a === null) {
+        return (b !== undefined && b !== null);
+    }
+
+    return a !== b;
+};
+
+/**
+ * Performs string concatenations and numeric additions while avoiding concatenating
+ * "null" or "undefined" when one or both arguments are undefined or null.
+ *
+ * @param {Object} a The first argument.
+ * @param {Object} b The second argument.
+ * @return {Object} The sum (numbers) or the concatenation (string) of the arguments.
+ * @export
+ */
+ExpressionFunctions.prototype.add = function(a, b) {
+
+    if (a === undefined || a === null) {
+        if (typeof b === "string") {
+            return b;
+        } else if (b === undefined || b === null) {
+            return "";
+        }
+    }
+
+    if (b === undefined || b === null) {
+        if (typeof a === "string") {
+            return a;
+        }
+    }
+
+    return a + b;
+};
+
+/**
+ * Passthrough to $A.util.isEmpty
+ * @export
+ */
+ExpressionFunctions.prototype.empty = Aura.Utils.Util.prototype.isEmpty;
+
+
+/**
+ * Preprocess the arguments of format() so they make sense in
+ * a UI context, where the expressions are used. Prevent the
+ * output of null and undefined but still allow for any missing
+ * placeholders to be seen in developement mode.
+ * @export
+ */
+ExpressionFunctions.prototype.format = function() {
+
+    // Guard for missing argument.
+    if (arguments.length === 0) {
+        return "";
+    }
+
+    // Guard for "null" or "undefined", just like we do for add.
+    var a0 = arguments[0];
+    if (a0 === undefined || a0 === null) {
+        return "";
+    }
+
+    // With one argument, format returns a string.
+    if (arguments.length === 1) {
+        return a0 + "";
+    }
+
+    var formatArguments = [];
+    for (var i = 0; i < arguments.length; i++) {
+        var ai = arguments[i];
+        formatArguments[i] = (ai === undefined || ai === null) ? "" : ai;
+    }
+
+    return $A.util.format.apply($A.util, formatArguments);
+};
+
+Aura.Value.ExpressionFunctions = ExpressionFunctions;

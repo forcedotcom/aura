@@ -45,6 +45,7 @@
     "ControllerDefRegistry": true,
     "DefDescriptor": true,
     "EventDefRegistry": true,
+    "ExpressionFunctions": true,
     "exp": true,
     "expressionService": true,
     "expressionFunctions": true,
@@ -90,7 +91,7 @@
     "valueFactory": true,
     "ValueDef": true,
     "WallTime": true,
-    
+
   },
 
   "rules": {

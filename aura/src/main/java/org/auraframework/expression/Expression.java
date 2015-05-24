@@ -15,6 +15,7 @@
  */
 package org.auraframework.expression;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -28,7 +29,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * An expression that can be evaluated on the server or the client.
  */
 public interface Expression extends Serializable {
-    /*
+
+    static final String JS_GLOBAL_GET = "$A.get";
+    static final String JS_LOCAL_GET = "cmp.get";
+
+	/*
     * Specify whether this expression should be passed by value, or bound bi-directionally.
     * */
     void setByValue(boolean byValue);
@@ -38,6 +43,12 @@ public interface Expression extends Serializable {
      * against the passed in value provider.
      */
     Object evaluate(ValueProvider vp) throws QuickFixException;
+
+    /**
+     * Convert this expression to JavaScript.
+     * @throws IOException
+     */
+    void compile(Appendable out) throws IOException;
 
     /**
      * @return the enum of the type of this expression
@@ -59,7 +70,7 @@ public interface Expression extends Serializable {
 
     /**
      * Gathers up all the property references in this expression
-     * 
+     *
      * @param propRefs set to add them to
      */
     void gatherPropertyReferences(Set<PropertyReference> propRefs);

@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import org.auraframework.expression.Expression;
+
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -22,11 +25,12 @@ import java.util.List;
  * An implementation of utility functions to mimic Util.js.
  */
 public class UtilFunctions {
+
 	public static final Function EMPTY = new Empty();
 	public static final Function FORMAT = new Format();
 
 	/**
-	 * Checks if the object is empty. An empty object's value is undefined (only
+	 * Checks if the object is empty. An empty object"s value is undefined (only
 	 * in JS), null, an empty array, or empty string. An object with no native
 	 * properties is not considered empty at this time.
 	 */
@@ -53,6 +57,14 @@ public class UtilFunctions {
 		public Object evaluate(List<Object> args) {
 			return Boolean.valueOf(isEmpty(args.get(0)));
 		}
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append(JS_FN_EMPTY);
+        	out.append("(");
+        	args.get(0).compile(out);
+        	out.append(")");
+        }
 
 		@Override
 		public String[] getKeys() {
@@ -85,19 +97,45 @@ public class UtilFunctions {
 				return "";
 			}
 
-			String formatString = JavascriptHelpers.stringify(a0);
+            String formatString = JavascriptHelpers.stringify(a0);
 			if (size == 1) {
 				return formatString;
 			}
 
 			Object[] formatArguments = new Object[size - 1];
-			for (int index = 0; index < size - 1; index ++) {
-				Object ai = args.get(index + 1);
-				formatArguments[index] = ai == null ? "" : JavascriptHelpers.stringify(ai);
+			for (int index = 1; index < size; index++) {
+				Object ai = args.get(index);
+				formatArguments[index - 1] = (ai == null) ? "" : JavascriptHelpers.stringify(ai);
 			}
 
 			return MessageFormat.format(formatString, formatArguments);
 		}
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+
+        	int size = args.size();
+			if (size == 0) {
+	        	out.append(JS_EMPTY);
+	        	return;
+			} 
+
+			Object a0 = args.get(0);
+			if (a0 == null) {
+	        	out.append(JS_EMPTY);
+	        	return;
+			} 
+			
+			out.append(JS_FN_FORMAT);
+        	out.append("(");
+			for (int index = 0; index < size; index++) {
+				if (index > 0) {
+		        	out.append(",");
+				}
+				args.get(index).compile(out);
+			}
+        	out.append(")");
+        }
 
 		@Override
 		public String[] getKeys() {

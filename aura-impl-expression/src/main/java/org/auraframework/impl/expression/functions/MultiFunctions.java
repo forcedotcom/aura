@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.auraframework.expression.Expression;
 
 /**
  * functions that can have multiple different types of arguments
@@ -74,7 +77,7 @@ public class MultiFunctions {
                 return JavascriptHelpers.getNumber(((Number) a1).doubleValue() + ((Number) a2).doubleValue());
             } else {
                 return JavascriptHelpers.stringify(a1)+JavascriptHelpers.stringify(a2);
-            } 
+            }
         }
 
         @Override
@@ -82,6 +85,15 @@ public class MultiFunctions {
             return new String[] { "add", "concat" };
         }
 
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append(JS_FN_ADD);
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append(",");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class Equals implements Function {
@@ -106,6 +118,16 @@ public class MultiFunctions {
         public String[] getKeys() {
             return new String[] { "eq", "equals" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append(JS_FN_EQUAL);
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append(",");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class NotEquals implements Function {
@@ -119,6 +141,16 @@ public class MultiFunctions {
         @Override
         public String[] getKeys() {
             return new String[] { "ne", "notequals" };
+        }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append(JS_FN_NOT_EQUAL);
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append(",");
+        	args.get(1).compile(out);
+        	out.append(")");
         }
     }
 
@@ -134,6 +166,15 @@ public class MultiFunctions {
         public String[] getKeys() {
             return new String[] { "gt", "greaterthan" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append(">");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class GreaterThanOrEqual extends BinaryComparisonFunction {
@@ -147,6 +188,15 @@ public class MultiFunctions {
         @Override
         public String[] getKeys() {
             return new String[] { "ge", "greaterthanorequal" };
+        }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append(">=");
+        	args.get(1).compile(out);
+        	out.append(")");
         }
     }
 
@@ -162,6 +212,15 @@ public class MultiFunctions {
         public String[] getKeys() {
             return new String[] { "lt", "lessthan" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("<");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     public static class LessThanOrEqual extends BinaryComparisonFunction {
@@ -175,6 +234,15 @@ public class MultiFunctions {
         @Override
         public String[] getKeys() {
             return new String[] { "le", "lessthanorequal" };
+        }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("<=");
+        	args.get(1).compile(out);
+        	out.append(")");
         }
     }
 }

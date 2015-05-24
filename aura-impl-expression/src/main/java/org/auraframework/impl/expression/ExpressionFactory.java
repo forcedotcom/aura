@@ -102,7 +102,11 @@ public class ExpressionFactory {
         return new LiteralImpl(Boolean.valueOf(s), l);
     }
 
-    public Expression createNumber(String s) {
+    public Expression createInteger(String s) {
+        return new LiteralImpl(Long.parseLong(s), l);
+    }
+
+    public Expression createFloat(String s) {
         return new LiteralImpl(Double.parseDouble(s), l);
     }
 

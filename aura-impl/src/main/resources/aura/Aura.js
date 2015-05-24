@@ -45,7 +45,7 @@ Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
 
-/*
+/**
  * @description This, $A, is supposed to be our ONLY window-polluting top-level variable.
  * Everything else in Aura is attached to it.
  */
@@ -176,7 +176,7 @@ window['$A'] = {};
  * @class Aura
  * @classdesc The Aura framework. Default global instance name is $A.
  * @constructor
- * 
+ *
  * @borrows Aura.Services.AuraClientService#enqueueAction as enqueueAction
  * @borrows Aura.Services.AuraClientService#deferAction as deferAction
  * @borrows Aura.Services.AuraRenderingService#render as render
@@ -199,24 +199,24 @@ function AuraInstance () {
     this.displayErrors        = true;
 
     this.logger               = new Aura.Utils.Logger();
-    
-    /** 
+
+    /**
      * Collection of basic utility methods to operate on the DOM and Aura Components. <br/>
      * See the documentation for <a href="#reference?topic=api:Util">Util</a> for the members.
      *
      * @type $A.ns.Util
-     * @platform 
+     * @platform
      */
     this.util                 = new Aura.Utils.Util();
     this["util"]              = this.util; //Move this? (check prod mangling)
 
     this.auraError            = Aura.Errors.AuraError;
     this.auraFriendlyError    = Aura.Errors.AuraFriendlyError;
-    
+
     /**
      * Instance of the AuraLocalizationService which provides utility methods for localizing data or getting formatters for numbers, currencies, dates, etc.<br/>
      * See the documentation for <a href="#reference?topic=api:AuraLocalizationService">AuraLocalizationService</a> for the members.
-     * 
+     *
      * @type AuraLocalizationService
      * @platform
      */
@@ -528,7 +528,7 @@ function AuraInstance () {
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
-          
+
     //
     // we don't handle components that come back here. This is used in the case where there
     // are none.
@@ -1033,7 +1033,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
     /**
      * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
      *            attached to it.
-     * 
+     *
      * @platform
      * @namespace
      * @alias $A
@@ -1065,7 +1065,6 @@ window['aura'] = window['$A'];
 // -- Storage Adapters -------------------------------------------------
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
-
 
 // -- Metrics Plugins --------------------------------------------------
 // #include aura.metrics.plugins.TransportMetricsPlugin

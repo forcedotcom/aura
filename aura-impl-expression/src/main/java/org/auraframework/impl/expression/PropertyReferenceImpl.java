@@ -40,9 +40,8 @@ import com.google.common.collect.ImmutableList;
  */
 public class PropertyReferenceImpl implements PropertyReference {
 
-    /**
-     */
     private static final long serialVersionUID = -6332112591620619082L;
+
     private final List<String> pieces;
     private final Location l;
     private boolean byValue=false;
@@ -80,6 +79,25 @@ public class PropertyReferenceImpl implements PropertyReference {
             }
         }
         return ret;
+    }
+
+    @Override
+    public void compile(Appendable out) throws IOException {
+
+        // All global value providers have a "$" prefix.
+        String root = pieces.get(0);
+
+        out.append(root.startsWith("$") ? JS_GLOBAL_GET : JS_LOCAL_GET);        
+        out.append("(");
+        out.append('"');
+		for (int index = 0; index < pieces.size(); index++) {
+			if (index > 0) {
+	        	out.append(".");
+			}
+        	out.append(pieces.get(index));
+		}
+        out.append('"');
+        out.append(")");
     }
 
     @Override
@@ -169,5 +187,4 @@ public class PropertyReferenceImpl implements PropertyReference {
             json.writeString(value.toString(true));
         }
     }
-
 }

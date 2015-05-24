@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.auraframework.expression.Expression;
 
 /**
  * An implementation of the boolean functions to mimic JS.
@@ -68,6 +71,15 @@ public class BooleanFunctions {
         public String[] getKeys() {
             return new String[] { "and" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("&&");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     /**
@@ -92,6 +104,15 @@ public class BooleanFunctions {
         public String[] getKeys() {
             return new String[] { "or" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("(");
+        	args.get(0).compile(out);
+           	out.append("||");
+        	args.get(1).compile(out);
+        	out.append(")");
+        }
     }
 
     /**
@@ -111,6 +132,13 @@ public class BooleanFunctions {
         public String[] getKeys() {
             return new String[] { "not" };
         }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	out.append("!(");
+        	args.get(0).compile(out);
+        	out.append(")");
+        }
     }
 
     /**
@@ -124,12 +152,47 @@ public class BooleanFunctions {
 
         @Override
         public Object evaluate(List<Object> args) {
-            return isTruthy(args.get(0)) ? args.get(1) : args.get(2);
+            // Both the ternary operator and the if() function map here so we need to guard against invalid index.
+            int size = args.size();
+            if (size == 2) {
+                return isTruthy(args.get(0)) ? args.get(1) : null;
+            }
+            if (size == 3) {
+                return isTruthy(args.get(0)) ? args.get(1) : args.get(2);
+            }
+            return null;
         }
 
         @Override
         public String[] getKeys() {
             return new String[] { "if" };
+        }
+
+        @Override
+    	public void compile(Appendable out, List<Expression> args) throws IOException {
+        	int size = args.size();
+
+        	// Both the ternary operator and the if() function map here so we need to guard against invalid index.
+        	if (size == 2) {
+            	out.append("(");
+            	args.get(0).compile(out);
+            	out.append("?");
+            	args.get(1).compile(out);
+            	out.append(":");
+            	out.append(JS_EMPTY);
+            	out.append(")");
+        	}
+        	else if (size == 3) {
+            	out.append("(");
+            	args.get(0).compile(out);
+            	out.append("?");
+            	args.get(1).compile(out);
+            	out.append(":");
+            	args.get(2).compile(out);
+            	out.append(")");
+        	} else {
+        		out.append(JS_EMPTY);
+        	}
         }
     }
 

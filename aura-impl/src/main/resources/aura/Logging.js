@@ -19,22 +19,8 @@
 (function(){
 
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-    /**
-     * Allow testing for warnings
-     */
-    function testingWarningLog(level, msg, error) {
-        $A.test.auraWarning(msg);
-    };
-
-    /**
-     * Allow testing for errors
-     */
-    function testingErrorLog(level, msg, error) {
-        $A.test.auraError(msg);
-    };
-
-    $A.logger.subscribe("WARNING", testingWarningLog);
-    $A.logger.subscribe("ERROR", testingErrorLog);
+    $A.logger.subscribe("WARNING", $A.test.auraWarning.bind($A.test));
+    $A.logger.subscribe("ERROR", $A.test.auraError.bind($A.test));
     //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

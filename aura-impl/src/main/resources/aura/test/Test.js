@@ -253,6 +253,21 @@ TestInstance.prototype.getAction = function(component, name, params, callback){
 };
 
 /**
+ * Run a set of actions as a transaction.
+ *
+ * This is a wrapper around runActions allowing a test to safely run a set of actions as a
+ * single transaction with a callback.
+ *
+ * @param {Array} actions A list of actions to run.
+ * @param {Object} scope The scope for the callback.
+ * @param {Function} callback The callback
+ */
+TestInstance.prototype.runActionsAsTransaction = function(actions, scope, callback) {
+    $A.assert(!$A.services.client.inAuraLoop(), "runActionsAsTransaction called from inside Aura call stack");
+    $A.run(function() { $A.services.client.runActions(actions, scope, callback); });
+};
+
+/**
  * Enqueue an action, ensuring that it is safely inside an aura call.
  *
  * @param {Action} action
@@ -421,6 +436,7 @@ TestInstance.prototype.clearComplete = function(name) {
  * Invoke a server action.  At the end of current test case stage, the
  * test will wait for any actions to complete before continuing to the
  * next stage of the test case.
+ * 
  * @param {Action} action
  *            The action to invoke
  * @param {Boolean} doImmediate
@@ -434,45 +450,49 @@ TestInstance.prototype.callServerAction = function(action, doImmediate){
     }
     //Increment 'inProgress' to indicate that a asynchronous call is going to be initiated, selenium will
     //wait till 'inProgress' comes down to 0 which indicates all asynchronous calls were complete
+    this.inProgress++;
     var actions = $A.util.isArray(action) ? action : [action];
     var cmp = $A.getRoot();
-    var finished = false;
-    var i;
     var that = this;
-    if (!!doImmediate) {
-        var requestConfig = {
-            "url": $A["clientService"]._host + '/aura',
-            "method": 'POST',
-            "scope" : cmp,
-            "callback" :function(response) {
-                var msg = $A["clientService"].checkAndDecodeResponse(response);
-                if ($A.util.isUndefinedOrNull(msg)) {
-                    for ( var k = 0; k < actions.length; k++) {
-                        that.logError("Unable to execute action", actions[k]);
+    try {
+        if (!!doImmediate) {
+            var requestConfig = {
+                "url": $A["clientService"]._host + '/aura',
+                "method": 'POST',
+                "scope" : cmp,
+                "callback" :function(response) {
+                    var msg = $A.clientService.checkAndDecodeResponse(response);
+                    if ($A.util.isUndefinedOrNull(msg)) {
+                        for ( var k = 0; k < actions.length; k++) {
+                            that.logError("Unable to execute action", actions[k]);
+                        }
                     }
-                }
-                var serverActions = msg["actions"];
-                for (var i = 0; i < serverActions.length; i++) {
-                    for ( var j = 0; j < serverActions[i]["error"].length; j++) {
-                        that.logError("Error during action", serverActions[i]["error"][j]);
+                    var serverActions = msg["actions"];
+                    for (var i = 0; i < serverActions.length; i++) {
+                        for ( var j = 0; j < serverActions[i]["error"].length; j++) {
+                            that.logError("Error during action", serverActions[i]["error"][j]);
+                        }
                     }
+                    that.inProgress--;
+                },
+                "params" : {
+                    "message": $A.util.json.encode({"actions" : actions}),
+                    "aura.token" : $A["clientService"]._token,
+                    "aura.context" : $A.getContext().encodeForServer(),
+                    "aura.num" : 0
                 }
-                finished = true;
-            },
-            "params" : {
-                "message": $A.util.json.encode({"actions" : actions}),
-                "aura.token" : $A["clientService"]._token,
-                "aura.context" : $A.getContext().encodeForServer(),
-                "aura.num" : 0
-            }
-        };
-        this.addWaitFor(true, function() {return finished;});
-        $A.util.transport.request(requestConfig);
-    } else {
-        for (i = 0; i < actions.length; i++) {
-            $A.enqueueAction(actions[i]);
+            };
+            $A.util.transport.request(requestConfig);
+        } else {
+            $A.clientService.runActions(actions, cmp , function() {
+                that.inProgress--;
+            });
         }
-        this.addWaitFor(true, function() {return that.areActionsComplete(actions);});
+    }catch(e){
+        // If trying to runAction() fails with an error, catch that error, signal that the attempt to run
+        // server action was complete and throw error.
+        this.inProgress--;
+        throw e;
     }
 };
 
@@ -588,9 +608,9 @@ TestInstance.prototype.print = function(value) {
  * @param {Object|String} e the error object or message.
  * @private
  */
-TestInstance.prototype.auraError = function(e) {
-    if (!this.putMessage(this.preErrors, this.expectedErrors, e)) {
-        this.fail(e);
+TestInstance.prototype.auraError = function(level, msg, error) {
+    if (!this.putMessage(this.preErrors, this.expectedErrors, msg)) {
+        this.fail(msg);
     }
 };
 
@@ -610,12 +630,12 @@ TestInstance.prototype.expectAuraError = function(e) {
  * @param {String} w The warning message.
  * @private
  */
-TestInstance.prototype.auraWarning = function(w) {
-    if (!this.putMessage(this.preWarnings, this.expectedWarnings, w)) {
+TestInstance.prototype.auraWarning = function(level, msg, error) {
+    if (!this.putMessage(this.preWarnings, this.expectedWarnings, msg)) {
         if(this.failOnWarning) {
-            this.fail("Unexpected warning = "+w);
+            this.fail("Unexpected warning = "+msg);
         }
-        $A.log("Unexpected warning = "+w);
+        $A.log("Unexpected warning = "+msg);
         return false;
     }
     return true;
@@ -1585,6 +1605,14 @@ TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
     $A.getContext().globalValueProviders = new Aura.Provider.GlobalValueProviders(gvp, callback);
 };
 
+TestInstance.prototype.getCreationPath = function(cmp) {
+    return cmp.priv.creationPath;
+};
+
+TestInstance.prototype.createHttpRequest = function() {
+    return $A.util.transport.createHttpRequest();
+};
+
 /**
  * Json instance for test. Used to export Json methods for testing.
  *
@@ -1607,6 +1635,34 @@ JsonTestInstance.prototype.orderedEncode = function(obj) {
  */
 TestInstance.prototype.json = new JsonTestInstance();
 
+//#include aura.test.Test_export
 Aura.Test.Test = TestInstance;
 
-//#include aura.test.Test_export
+/**
+ * Various framework modifications for testing purposes
+ */
+// #if {"excludeModes" : ["DOC"]}
+// External references are not handled by xUnit framework js generation
+AuraInstance.prototype["test"] = new TestInstance();
+
+//Still used for overriding by metricsPluginTest:transport
+Aura.Utils.Transport.prototype["createHttpRequest"] = Aura.Utils.Transport.prototype.createHttpRequest;
+
+//Should try to remove this hack
+(function(originalDestroy){
+    Component.prototype.destroy = function() {
+        return originalDestroy.call(this, false);
+    }
+})(Component.prototype.destroy);
+
+// For Selenium
+AuraLayoutService.fireOnload = function() {
+    window.console.log("AuraLayoutService.fireOnload");
+    var frame = window.frameElement;
+    if (frame && document.createEvent) {
+        var loadEvent = document.createEvent('HTMLEvents');
+        loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
+        frame.dispatchEvent(loadEvent);
+    }
+};
+//#end

@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 ({
-	createHttpRequest: function(cmp) {
-		if (window.XMLHttpRequest) {
-		    cmp.set("v.xmlHttpRequestDebug",cmp.get("v.xmlHttpRequestDebug")+"window.XMLHttpRequest exist, return one; ");
-			return new XMLHttpRequest();   
-           } else if (window.ActiveXObject) { // code for IE6, IE5
-        	   try { 
-        		   return new ActiveXObject("Msxml2.XMLHTTP");
-        	   } catch (e) {  
-        		   try {   
-        			   return new ActiveXObject("Microsoft.XMLHTTP"); 
-        		    } catch (ignore) { }   
-               }   
-           }   
-           return null;   
-    },
-    
     request: function(cmp, url) {
-            var request = this.createHttpRequest(cmp);   
+            var request = $A.test.createHttpRequest();   
             if(request != null) {
 	            request.open("GET", url, true);   
 	            request["onreadystatechange"] = function() {   

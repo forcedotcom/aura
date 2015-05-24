@@ -1128,11 +1128,6 @@ function Component(config, localCreation, creatingPrototype) {
     this.priv = new ComponentPriv(config, this, localCreation);
     this._destroying = false;
 
-    // #if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG",
-    // "AUTOTESTINGDEBUG"]}
-    this["creationPath"] = this.priv.creationPath;
-    // #end
-
     this.fire("init");
 }
 
@@ -1515,23 +1510,17 @@ Component.prototype.finishDestroy = function() {
  *
  * @param {Boolean}
  *            async Set to true if component should be destroyed asynchronously.
- *            The default value is true.
+ *            The default value is false.
  * @public
  * @platform
  */
 Component.prototype.destroy = function(async) {
     var concrete = this.getConcreteComponent();
     if (concrete && this !== concrete && concrete.isValid()) {
-        concrete.destroy(async);
-        return;
+        return concrete.destroy(async);
     }
     
     this.fire("destroy");
-
-    // #if {"modes" : ["TESTING", "TESTINGDEBUG", "AUTOTESTING",
-    // "AUTOTESTINGDEBUG"]}
-    async = false; // Force synchronous destroy when in testing modes
-    // #end
 
     if (this.priv && !this._destroying) {
         // DCHASMAN TODO W-1879487 Reverted in 188 because of hard to diagnose
@@ -1555,10 +1544,12 @@ Component.prototype.destroy = function(async) {
         if (async) {
             this._scheduledForAsyncDestruction = true;
 
-            for (var i=0;i<this.priv.elements.length;i++) {
-                var element = this.priv.elements[i];
-                if (element && element.style) {
-                    element.style.display = "none";
+            if (this.priv.elements) {
+                for (var i = 0; i < this.priv.elements.length; i++) {
+                    var element = this.priv.elements[i];
+                    if (element && element.style) {
+                        element.style.display = "none";
+                    }
                 }
             }
 

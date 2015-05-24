@@ -178,7 +178,6 @@ window['$A'] = {};
 
 // -- Mode injection ------------------------------------------------------
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
-// #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
 
 /**
  * @class Aura
@@ -209,11 +208,6 @@ function AuraInstance () {
     this.storageService       = new Aura.Services.AuraStorageService();
     this.styleService         = new Aura.Services.AuraStyleService();
     this.metricsService       = new Aura.Services.MetricsService();
-
-    //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
-    this.test = new Aura.Test.Test();
-    this["test"] = this.test;
-    //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
@@ -1070,6 +1064,7 @@ AuraInstance.prototype.addValueProvider=function(type,valueProvider){
 // #include aura.util.PerfShim
 AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 
+// #include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}
 // #include aura.Aura_export
 
 // At this point, Aura has been defined with all our types on it, but $A itself

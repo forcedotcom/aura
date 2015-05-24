@@ -37,7 +37,6 @@ TestInstance.prototype["assertAccessible"] = TestInstance.prototype.assertAccess
 
 // utils
 TestInstance.prototype["compareValues"] = TestInstance.prototype.compareValues;
-TestInstance.prototype["areActionsComplete"] = TestInstance.prototype.areActionsComplete;
 
 // test flow/state
 TestInstance.prototype["fail"] = TestInstance.prototype.fail;
@@ -106,6 +105,8 @@ TestInstance.prototype["enqueueAction"] = TestInstance.prototype.enqueueAction;
 TestInstance.prototype["clearAndAssertComponentConfigs"] = TestInstance.prototype.clearAndAssertComponentConfigs;
 TestInstance.prototype["setServerReachable"] = TestInstance.prototype.setServerReachable;
 TestInstance.prototype["getActionQueue"] = TestInstance.prototype.getActionQueue;
+TestInstance.prototype["getCreationPath"] = TestInstance.prototype.getCreationPath;
+TestInstance.prototype["areActionsComplete"] = TestInstance.prototype.areActionsComplete;
 
 // events
 TestInstance.prototype["addEventHandler"] = TestInstance.prototype.addEventHandler;
@@ -119,6 +120,7 @@ TestInstance.prototype["dummyFunction"] = TestInstance.prototype.dummyFunction;
 TestInstance.prototype["getAppCacheEvents"] = TestInstance.prototype.getAppCacheEvents;
 
 // framework call-throughs
+TestInstance.prototype["createHttpRequest"] = TestInstance.prototype.createHttpRequest;
 TestInstance.prototype["reloadGlobalValueProviders"] = TestInstance.prototype.reloadGlobalValueProviders;
 
 // //#end

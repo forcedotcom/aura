@@ -30,10 +30,10 @@
     <aura:registerEvent name="onActivated" type="ui:tabsetEvent" description="The event fired when the tab is activated."/>
     <aura:registerEvent name="setActive" type="ui:tabsetEvent" description="The event fired from ui:tabset to set this tab as active or deactive."/>
 
-	<aura:handler name="setActive" action="{!c.setActive}" />
-
-    <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">
+    <aura:handler name="setActive" action="{!c.setActive}" />
+ 
+    <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '') + (v.active ? ' active' : '')}" area-expanded="{!v.active ? 'true' : 'false'}" aura:id="tabBody" role="tabpanel">
         {!v.body}
     </section>
-
+       
 </aura:component>

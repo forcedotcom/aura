@@ -117,7 +117,7 @@
     <aura:if isTrue="{! v.renderItem == 'tab' || v.renderItem == 'all'}">
 	    <div class="block">    
 	        <h1 class="header">Basic Tabs</h1>
-	        <uitest:tabset_extendsTest aura:id="tabset2" class="tabset1" lazyRenderTabs="{!v.lazyRender}">
+	        <uitest:tabset_extendsTest aura:id="tabset3" class="tabset1" lazyRenderTabs="{!v.lazyRender}">
 	            <ui:tab title="Accounts" aura:id="inputForActivateByIndex" closable="{!v.closable}">
 	                     <ui:inputText aura:id="inputTabTitle" class="inputTabTitle" placeholder="title" />
 	            </ui:tab>

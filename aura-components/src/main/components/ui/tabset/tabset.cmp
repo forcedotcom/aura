@@ -20,7 +20,7 @@
     <aura:attribute name="tabItems" access="private" type="List" description="Use internally for passing a list of tab items to ui:tabBar component." />
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
     <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated." />
-    
+
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
     <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
     <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate a tab." />
@@ -41,11 +41,10 @@
     <div class="{!v.class}" aura:id="tabContainer">
         <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"
            onTabActivated="{!c.onTabActivated}"
-           onTabClosed="{!c.onTabClosed}" 
-        />
+           onTabClosed="{!c.onTabClosed}"/>
+
         <aura:if isTrue="{!v.lazyRenderTabs == false}">
             {!v.body}
         </aura:if>
-          
     </div>
 </aura:component>

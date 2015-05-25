@@ -54,16 +54,16 @@
 	 * This action is invoked when the tabItem is clicked
 	 */
 	onTabActivated: function(cmp, evt, helper) {
-		var tab = evt.getSource(), 
-			index = cmp._tabItems.indexOf(tab),
+		var tab = evt.getSource(),
+			index = helper.getTabItems(cmp).indexOf(tab),
 			oldTab = cmp._activeTab && cmp._activeTab.isValid() ? cmp._activeTab : null,
-			e = cmp.get('e.onTabActivated');
+			e = cmp.get("e.onTabActivated");
 		
 		e.setParams({"index": index, "oldTab": oldTab}).fire();
 	},
 	
 	onTabClosed: function(cmp, evt, helper) {
-		var tabItems = cmp._tabItems, item = evt.getSource(),
+		var tabItems = helper.getTabItems(cmp), item = evt.getSource(),
 			index = tabItems.indexOf(item);
 
 		helper.closeTab(cmp, index);

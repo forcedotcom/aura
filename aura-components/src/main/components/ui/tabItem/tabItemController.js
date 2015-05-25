@@ -16,7 +16,7 @@
 
 ({
 	/**
-	 * Handler for event that's fired programtically
+	 * Handler for event that's fired programatically
 	 */
 	activateTab: function(cmp, evt, helper) {
 		helper.setActive(cmp, evt.getParam("active"), evt.getParam("focus"));
@@ -25,7 +25,7 @@
 	 * Handler for event that's fired when user clicks on tab to activate
 	 */
 	onTabActivated: function(cmp, evt, helper) {
-		if(!cmp._isActive) {
+		if($A.util.getBooleanValue("v.active")) {
 		    cmp.get('e.onActivate').fire();
 		}
 	},

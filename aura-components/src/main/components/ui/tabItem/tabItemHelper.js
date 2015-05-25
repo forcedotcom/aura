@@ -15,31 +15,15 @@
  */
 
 ({
-	setActive: function(cmp, active, focus) {
-		var containerEl = cmp.find("li").getElement(),
-			itemEl = cmp.find("tabItem").getElement(),
-			closeEl = cmp.find("close").getElement();
-		
-		cmp._isActive = active;
-		
-		if (active) {			
-			$A.util.addClass(containerEl, "active");
-			itemEl.setAttribute("aria-selected", true);
-			itemEl.setAttribute("tabindex", 0);
-			if (closeEl) {
-			    closeEl.setAttribute("tabindex", 0);
-			}
-			if (focus) {
-			    itemEl.focus();
-			}
-		} else {
-			$A.util.removeClass(containerEl, "active");
-			itemEl.setAttribute("aria-selected", false);
-			itemEl.setAttribute("tabindex", -1);
-			if (closeEl) {
-                closeEl.setAttribute("tabindex", -1);
+    setActive: function (cmp, active, focus) {
+        cmp.set("v.active", active);
+
+        if (active) {
+            var itemEl = cmp.find("tabItem").getElement();
+            if (focus) {
+                itemEl.focus();
             }
-		}
+        }
 	},
 	
 	handleHoverEvent: function(cmp, eventName) {

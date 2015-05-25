@@ -21,7 +21,7 @@
         var closable = true;
         var active = true;
         var e = cmp.find('tabset2').get("e.addTab");
-        
+
         e.setParams({tab: {
             "title": title,
             "closable": closable,
@@ -32,8 +32,9 @@
                     "values": {
                         "value": content
                     }
-            }
-        }]}, index: -1});
+                }
+            }],
+            }, index: -1});
         e.fire();
         cmp._counter++;
     },

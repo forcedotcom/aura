@@ -15,27 +15,27 @@
  */
 
 ({
-	render: function(cmp, helper) {
-		var ret = this.superRender();
-		helper.renderTabItems(cmp);
-		return ret;
-	},
+    render: function (cmp, helper) {
+        helper.setTabItems(cmp);
+        return this.superRender();
+    },
 
-//    // JBUCH: HALO: TODO: REWRITE THIS ENTIRE COMPONENT
-//    rerender:function(cmp,helper){
-//        var ret=this.superRerender();
-//        helper.renderTabItems(cmp);
-//        return ret;
-//    },
-//
-	unrender: function (cmp) {
-		var items = cmp._tabItems;
-		try {
-			for (var i = 0, len = items.length; i < len; i++) {			
-				items[i].destroy(true);
-			}
-		} finally {
-			this.superUnrender();
-		}
-	}
+    rerender: function (cmp, helper) {
+        if (cmp.isDirty("v.tabs")) {
+            helper.setTabItems(cmp);
+        }
+
+        return this.superRerender();
+    },
+
+    unrender: function (cmp, helper) {
+        var items = helper.getTabItems(cmp);
+        try {
+            for (var i = 0, len = items.length; i < len; i++) {
+                items[i].destroy(true);
+            }
+        } finally {
+            this.superUnrender();
+        }
+    }
 })

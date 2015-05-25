@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 ({
-    setActive: function(cmp, active) {
+    setActive: function (cmp, active) {
         var tabEl = cmp.find('tabBody').getElement();
         if (!tabEl) {
             return;
         }
-        if (active) {
-            $A.util.addClass(tabEl, 'active');
-            tabEl.setAttribute("aria-expanded", "true");
-        } else {
-            $A.util.removeClass(tabEl, 'active');
-            tabEl.setAttribute("aria-expanded", "false");
-        }
+        cmp.set("v.active", active);
     }
+
 })

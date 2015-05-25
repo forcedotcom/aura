@@ -19,6 +19,8 @@
         {id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,ff88cc?l=2&f=FFFFFF'}},
         {id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,88cc88?l=3&f=FFFFFF'}}],
     PILLS_CASEINSENSITIVE: [{id:'pill01',label:"TEST PILL 01"},{id:'pill02',label:"TEST PILL 02"},{id:'pill03',label:"Test PILL 03"}],
+    PILLS_WITHLONGLENGTH: [
+                           {id:'pill01',label:"Pills can be used to provide text for categories or tags, and provide text selection in an auto-complete field",icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF'}}],
     
     browsers: ["GOOGLECHROME", "IPHONE", "IPAD", "FIREFOX", "IE9", "IE10", "SAFARI", "ANDROID_PHONE", "ANDROID_TABLET"],
     doNotWrapInAuraRun: true,
@@ -31,12 +33,24 @@
 
     testInsert: {
         test: function (cmp) {
-            var pillContainer = cmp.find("pillContainer");
-            pillContainer.insertItems( [this.PILLS[0]] );
-            var actualNumberOfPills = $A.test.select(".pill").length;
-            $A.test.assertEquals(1, actualNumberOfPills, "Incorrect number of pills displayed.");
-            this._validateIconURLIsPresent(cmp, actualNumberOfPills);
+        	this._insertPill(cmp, this.PILLS[0], false)
         }
+    },
+    
+    testInsertWithLongPillText: {
+        test: function (cmp) {
+        	this._insertPill(cmp, this.PILLS_WITHLONGLENGTH[0], true)
+        }
+    },
+    
+    _insertPill: function(cmp, pill, isTitlePresent) {
+    	var pillContainer = cmp.find("pillContainer");
+        pillContainer.insertItems( [pill] );
+        var pillItem = $A.test.select(".pill");
+        var actualNumberOfPills = pillItem.length;
+        $A.test.assertEquals(1, actualNumberOfPills, "Incorrect number of pills displayed.");
+        this._validateIconURLIsPresent(cmp, actualNumberOfPills);
+        this._validateTitlePresentInPill(pillItem[0], isTitlePresent, pill.label);
     },
     
     testDoNotDisplayDeleteIconInPills: {
@@ -275,5 +289,17 @@
         return display === "none";
     },
 
+    _validateTitlePresentInPill: function(pill, isTitlePresent, label){
+    	var pillTitle = $A.test.getElementAttributeValue(pill,"title")
+    	if(!isTitlePresent){
+    		$A.test.assertFalsy(pillTitle,"Title attribute should not be present on the pill")
+    	}
+    	else{
+    		$A.test.assertTruthy(pillTitle,"Title attribute should be present on the pill")
+        	$A.test.assertEquals(label, pillTitle, "Title attribute set is incorrect");
+    		var pillText = $A.test.getText($A.test.select(".pillText")[0]);
+    		$A.test.assertEquals(label.substring(0,30) + "…", pillText, "Pill text should be truncated to 30 characters");
+    	}
+    }
 
 })

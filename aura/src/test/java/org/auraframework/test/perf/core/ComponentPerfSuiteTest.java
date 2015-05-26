@@ -111,7 +111,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
      */
     protected TestCase patchPerfComponentTestCase(ComponentPerfAbstractTestCase test,
             DefDescriptor<ComponentDef> descriptor) throws Exception {
-        test.setTestName("perf_" + test.getClass().getSimpleName() + '_' + descriptor.getDescriptorName());
+        test.setTestName("perf_" + descriptor.getDescriptorName());
         return test;
     }
 

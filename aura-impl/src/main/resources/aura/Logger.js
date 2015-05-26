@@ -23,6 +23,7 @@
  *
  * @namespace
  * @constructor
+ * @export
  */
 function Logger() {
     this.subscribers = [];

@@ -21,8 +21,7 @@
  * @protected
  * @class AuraContext
  * @param {Object} config the 'founding' config for the context from the server.
- * @param {Function} initCallback an optional callback invoked after the config has finished its
- *  asynchronous initialization.
+ * @param {Function} initCallback an optional callback invoked after the config has finished its asynchronous initialization.
  * @export
  */
 Aura.Context.AuraContext = function AuraContext(config, initCallback) {
@@ -492,6 +491,7 @@ Aura.Context.AuraContext.prototype.getStorage = function() {
  * Servlet container context path
  * @return {String} Servlet container context path
  * @private
+ * @export
  */
 Aura.Context.AuraContext.prototype.getContextPath = function() {
     return this.contextPath;

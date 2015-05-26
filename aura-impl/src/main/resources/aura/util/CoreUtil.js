@@ -1333,7 +1333,7 @@ Aura.Utils.CoreUtil.prototype.attachToDocumentBody = function(element) {
         body.appendChild(element);
     }
 };
-/*
+/**
 * Check for substrings at the end
 * @export
 */

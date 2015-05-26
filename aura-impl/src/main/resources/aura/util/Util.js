@@ -20,8 +20,9 @@
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
  * @platform
+ * @export
  */
-function Util() {
+Aura.Utils.Util = function Util() {
     this.trashcan = document.createDocumentFragment();
     this.trash = [];
     this.json = new Json();
@@ -37,10 +38,6 @@ function Util() {
     this.dataAttributeCache = {};
     this.debugToolWindow = undefined;
     this.sizeEstimator = new SizeEstimator();
-}
+};
 
-Aura.Utils.CoreUtil.prototype.apply(Util.prototype, Aura.Utils.CoreUtil.prototype);
-
-Aura.Utils.Util = Util;
-
-//#include aura.util.Util_export
+Aura.Utils.CoreUtil.prototype.apply(Aura.Utils.Util.prototype, Aura.Utils.CoreUtil.prototype);

@@ -43,6 +43,7 @@ function Logger() {
  *
  * @param {String} info message
  * @param {Error} [error] error
+ * @export
  */
 Logger.prototype.info = function(info, error) {
     this.log(this.INFO, info, error);
@@ -53,6 +54,7 @@ Logger.prototype.info = function(info, error) {
  *
  * @param {String} warning message
  * @param {Error} [error] error
+ * @export
  */
 Logger.prototype.warning = function(warning, error) {
     this.log(this.WARNING, warning, error);
@@ -63,6 +65,7 @@ Logger.prototype.warning = function(warning, error) {
  *
  * @param {Boolean} condition check
  * @param {String} assertMessage message when assertion fails
+ * @export
  */
 Logger.prototype.assert = function(condition, assertMessage) {
     if (!condition) {
@@ -76,6 +79,7 @@ Logger.prototype.assert = function(condition, assertMessage) {
  *
  * @param {String} msg error message
  * @param {Error} [e] error
+ * @export
  */
 Logger.prototype.error = function(msg, e){
     var logMsg = msg || "";
@@ -251,6 +255,7 @@ Logger.prototype.notify = function(level, msg, error) {
  * @param {Error} e error
  * @param {Number} [remove]
  * @returns {String|null} stack
+ * @export
  */
 Logger.prototype.getStackTrace = function(e, remove) {
     var stack = undefined;
@@ -293,6 +298,7 @@ Logger.prototype.getStackTrace = function(e, remove) {
  * @param {Error} error
  * @param {Array} trace
  * @returns {String} string log
+ * @export
  */
 Logger.prototype.stringVersion = function(logMsg, error, trace) {
     var stringVersion = !$A.util.isUndefinedOrNull(logMsg) ? logMsg : "" ;
@@ -311,6 +317,7 @@ Logger.prototype.stringVersion = function(logMsg, error, trace) {
  *
  * @param {String} level log level
  * @param {Function} callback function
+ * @export
  */
 Logger.prototype.subscribe = function(level, callback) {
     level = level.toUpperCase();
@@ -328,6 +335,7 @@ Logger.prototype.subscribe = function(level, callback) {
  *
  * @param {String} level log level
  * @param {Function} callback function
+ * @export
  */
 Logger.prototype.unsubscribe = function(level, callback) {
     level = level.toUpperCase();
@@ -387,6 +395,7 @@ Logger.prototype.isValidLevel = function(level) {
  *
  * @param {String} level
  * @returns {boolean} Whether there are subscriptions to given level
+ * @export
  */
 Logger.prototype.hasSubscriptions = function(level) {
     level = level.toUpperCase();
@@ -394,16 +403,5 @@ Logger.prototype.hasSubscriptions = function(level) {
         return this.subscriptions[level] > 0;
     }
 };
-
-// Exports to delete once we fix closure compiler
-Logger.prototype["getStackTrace"] = Logger.prototype.getStackTrace;
-Logger.prototype["stringVersion"] = Logger.prototype.stringVersion;
-Logger.prototype["subscribe"] = Logger.prototype.subscribe;
-Logger.prototype["unsubscribe"] = Logger.prototype.unsubscribe;
-Logger.prototype["hasSubscriptions"] = Logger.prototype.hasSubscriptions;
-Logger.prototype["info"] = Logger.prototype.info;
-Logger.prototype["warning"] = Logger.prototype.warning;
-Logger.prototype["error"] = Logger.prototype.error;
-Logger.prototype["assert"] = Logger.prototype.assert;
 
 Aura.Utils.Logger = Logger;

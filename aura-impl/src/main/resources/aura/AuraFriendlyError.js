@@ -22,13 +22,12 @@
  * @param {Object} data
  * @param {Component} component
  * @returns {Function}
+ * @export
  */
-function AuraFriendlyError() {
+Aura.Errors.AuraFriendlyError = function AuraFriendlyError() {
     Aura.Errors.AuraError.apply(this,arguments);
     this.name = "AuraFriendlyError";
-}
+};
 
-AuraFriendlyError.prototype = new Aura.Errors.AuraError();
-AuraFriendlyError.prototype.constructor = AuraFriendlyError;
-
-Aura.Errors.AuraFriendlyError = AuraFriendlyError;
+Aura.Errors.AuraFriendlyError.prototype = new Aura.Errors.AuraError();
+Aura.Errors.AuraFriendlyError.prototype.constructor = Aura.Errors.AuraFriendlyError;

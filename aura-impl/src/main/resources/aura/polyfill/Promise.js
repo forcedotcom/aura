@@ -23,4 +23,4 @@ if (window['ES6Promise']) {
 	ES6Promise['polyfill']();
 }
 
-//#include aura.polyfill.Promise_export
+Promise.prototype.then = Promise.prototype['then'];

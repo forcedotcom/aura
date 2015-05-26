@@ -34,11 +34,11 @@ function FunctionCallValue(config, valueProvider){
 //#if {"modes" : ["STATS"]}
     valueFactory.index(this);
 //#end
-    
+
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	this.key = config["key"];
-//#end    
+//#end
 }
 
 FunctionCallValue.prototype.auraType = "Value";
@@ -129,14 +129,6 @@ FunctionCallValue.prototype.isLiteral = function(){
 };
 
 /**
- * Sets the isExpression flag to true to denote that the element is an expression.
- * @returns {Boolean} true
- */
-FunctionCallValue.prototype.isExpression = function(){
-    return true;
-};
-
-/**
  * Destroys the value wrapper.
  */
 FunctionCallValue.prototype.destroy = function(){
@@ -166,7 +158,7 @@ FunctionCallValue.prototype.toString = function(){
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     return this.args.join(" " + this.key + " ");
 //#end
-    
+
     return "FunctionCallValue";
 };
 

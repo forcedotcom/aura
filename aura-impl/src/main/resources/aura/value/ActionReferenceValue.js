@@ -67,13 +67,6 @@ ActionReferenceValue.prototype.isLiteral = function(){
 };
 
 /**
- * Returns false as this is not an expression.
- */
-ActionReferenceValue.prototype.isExpression = function(){
-    return false;
-};
-
-/**
  * Destroys the component and its action definition.
  */
 ActionReferenceValue.prototype.destroy = function(){

@@ -19,21 +19,26 @@
  * Util methods provide utility functions for browsers in addition to
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
+ * @export
  */
-function CoreUtil() {}
+Aura.Utils.CoreUtil = function CoreUtil() {
+
+};
 
 /**
  * Browser check for all supported versions of Internet Explorer, does the validation using the userAgent.
  *
  * @returns {Boolean} true if Internet Explorer detected
+ * @export
  */
-CoreUtil.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || (navigator.userAgent.indexOf("Trident/") != -1);
+Aura.Utils.CoreUtil.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || (navigator.userAgent.indexOf("Trident/") != -1);
 
 /**
  * Whether IOS7 UIWebView
  * @returns {boolean} true if IOS UIWebView
+ * @export
  */
-CoreUtil.prototype.isIOSWebView = function() {
+Aura.Utils.CoreUtil.prototype.isIOSWebView = function() {
     if (this._isIOSWebView === undefined) {
         var ua = window.navigator.userAgent;
         this._isIOSWebView = /(iPad|iPhone|iPod);.*CPU.*OS 7_\d.*AppleWebKit/i.test(ua) && ua.indexOf("Safari") == -1;
@@ -46,7 +51,7 @@ CoreUtil.prototype.isIOSWebView = function() {
  *
  * @private
  */
-CoreUtil.prototype.globalEval = CoreUtil.prototype.isIE ? function(src) {
+Aura.Utils.CoreUtil.prototype.globalEval = Aura.Utils.CoreUtil.prototype.isIE ? function(src) {
     // use assignment to variable so that the newlines in src are not actually treated as the end of the line
     return new Function("var a = " + src + "; return a;")();
 } : function(src) {
@@ -59,8 +64,9 @@ CoreUtil.prototype.globalEval = CoreUtil.prototype.isIE ? function(src) {
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is an array, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
+Aura.Utils.CoreUtil.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
     return obj instanceof Array;
 };
 
@@ -71,8 +77,9 @@ CoreUtil.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid object, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isObject = function(obj){
+Aura.Utils.CoreUtil.prototype.isObject = function(obj){
     return typeof obj === "object" && obj !== null && !this.isArray(obj);
 };
 
@@ -83,8 +90,9 @@ CoreUtil.prototype.isObject = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid error, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isError = function(obj){
+Aura.Utils.CoreUtil.prototype.isError = function(obj){
     return !!obj && this.objToString.apply(obj) === '[object Error]';
 };
 
@@ -95,8 +103,9 @@ CoreUtil.prototype.isError = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid function, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isFunction = function(obj){
+Aura.Utils.CoreUtil.prototype.isFunction = function(obj){
     return !!obj && this.objToString.apply(obj) === '[object Function]';
 };
 
@@ -105,8 +114,9 @@ CoreUtil.prototype.isFunction = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type string, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isString = function(obj){
+Aura.Utils.CoreUtil.prototype.isString = function(obj){
     return typeof obj === 'string';
 };
 
@@ -115,8 +125,9 @@ CoreUtil.prototype.isString = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type number, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isNumber = function(obj){
+Aura.Utils.CoreUtil.prototype.isNumber = function(obj){
     return typeof obj === 'number';
 };
 
@@ -125,8 +136,9 @@ CoreUtil.prototype.isNumber = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a finite number, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isFiniteNumber = function(obj){
+Aura.Utils.CoreUtil.prototype.isFiniteNumber = function(obj){
     return this.isNumber(obj) && isFinite(obj);
 };
 
@@ -135,8 +147,9 @@ CoreUtil.prototype.isFiniteNumber = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type boolean, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isBoolean = function(obj){
+Aura.Utils.CoreUtil.prototype.isBoolean = function(obj){
     return typeof obj === 'boolean';
 };
 
@@ -145,8 +158,9 @@ CoreUtil.prototype.isBoolean = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isUndefined = function(obj){
+Aura.Utils.CoreUtil.prototype.isUndefined = function(obj){
     return obj === undefined;
 };
 
@@ -155,8 +169,9 @@ CoreUtil.prototype.isUndefined = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined or null, or return false otherwise.
+ * @export
  */
-CoreUtil.prototype.isUndefinedOrNull = function(obj){
+Aura.Utils.CoreUtil.prototype.isUndefinedOrNull = function(obj){
     return obj === undefined || obj === null;
 };
 
@@ -167,8 +182,9 @@ CoreUtil.prototype.isUndefinedOrNull = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is empty, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isEmpty = function(obj){
+Aura.Utils.CoreUtil.prototype.isEmpty = function(obj){
     return this.isUndefinedOrNull(obj) || obj === '' || (this.isArray(obj) && obj.length === 0) || (this.isObject(obj) && this.keys(obj).length === 0);
 };
 
@@ -177,8 +193,9 @@ CoreUtil.prototype.isEmpty = function(obj){
  *
  * @param {Object} val The object to check.
  * @returns {Boolean} True if the object is truthy, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.getBooleanValue = function (val) {
+Aura.Utils.CoreUtil.prototype.getBooleanValue = function (val) {
     return val !== undefined && val !== null && val !== false && val !== 0 && val !== "false" && val !== "" && val !== "f";
 };
 
@@ -189,8 +206,9 @@ CoreUtil.prototype.getBooleanValue = function (val) {
  * @param {Map} attributes A map of attributes that the element will have
  *   (e.g. {src: 'foo.img', alt: 'Some text'}
  * @returns (HTMLElement) the newly created element
+ * @export
  */
-CoreUtil.prototype.createHtmlElement = function (tagName, attributes) {
+Aura.Utils.CoreUtil.prototype.createHtmlElement = function (tagName, attributes) {
     var node = document.createElement(tagName);
 
     for (var attributeName in attributes) {
@@ -210,8 +228,9 @@ CoreUtil.prototype.createHtmlElement = function (tagName, attributes) {
  * Removes all children of a node, effectively clearing its body.
  *
  * @param {HTMLElement} node The node to be cleared.
+ * @export
  */
-CoreUtil.prototype.clearNode = function (node) {
+Aura.Utils.CoreUtil.prototype.clearNode = function (node) {
     var last = node.lastChild;
     while (last) {
         node.removeChild(last);
@@ -224,8 +243,9 @@ CoreUtil.prototype.clearNode = function (node) {
  *
  * @param {String} id The corresponding id of the DOM element.
  * @returns {Object} The element with the matching id, or null if none is found.
+ * @export
  */
-CoreUtil.prototype.getElement = function(id){
+Aura.Utils.CoreUtil.prototype.getElement = function(id){
     return document.getElementById(id);
 };
 
@@ -236,7 +256,7 @@ CoreUtil.prototype.getElement = function(id){
  * @param {Object} value The value for which to return a comparable copy.
  * @returns {Object} The comparable copy of the value supplied.
  */
-CoreUtil.prototype.copy = function(value){
+Aura.Utils.CoreUtil.prototype.copy = function(value){
     if(this.isArray(value)){
         return value.slice();
     }
@@ -256,7 +276,7 @@ CoreUtil.prototype.copy = function(value){
  * @param {Object} actual The target value to compare.
  * @returns {Object} The result of the comparison, with reasons.
  */
-CoreUtil.prototype.compareValues = function(expected, actual){
+Aura.Utils.CoreUtil.prototype.compareValues = function(expected, actual){
     var result={
         match:true,
         reasons:[]
@@ -310,8 +330,9 @@ CoreUtil.prototype.compareValues = function(expected, actual){
  * @param {Object} element The element to check for.
  * @param {String} className The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.hasClass = function(element, className){
+Aura.Utils.CoreUtil.prototype.hasClass = function(element, className){
     var oldClass='';
     if(this.isComponent(element)){
         if(element.isInstanceOf("ui:elementInterface") || element.isInstanceOf("ui:visible")) {
@@ -333,9 +354,9 @@ CoreUtil.prototype.hasClass = function(element, className){
  *
  * @param {Object} element The element to apply the class on.
  * @param {String} clz The CSS class to be applied on the element.
- *
+ * @export
  */
-CoreUtil.prototype.addClass = function(element, newClass){
+Aura.Utils.CoreUtil.prototype.addClass = function(element, newClass){
     this.setClass(element,newClass,false);
 };
 
@@ -344,8 +365,9 @@ CoreUtil.prototype.addClass = function(element, newClass){
  *
  * @param {Object} element The element to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.
+ * @export
  */
-CoreUtil.prototype.removeClass = function(element, newClass){
+Aura.Utils.CoreUtil.prototype.removeClass = function(element, newClass){
     this.setClass(element,newClass,true);
 };
 
@@ -354,8 +376,9 @@ CoreUtil.prototype.removeClass = function(element, newClass){
  *
  * @param {Object} element The element to add or remove the class from.
  * @param {String} className The CSS class to be added or removed from the class.
+ * @export
  */
-CoreUtil.prototype.toggleClass = function(element, className, condition){
+Aura.Utils.CoreUtil.prototype.toggleClass = function(element, className, condition){
     if(condition===undefined){
         condition=!this.hasClass(element, className);
     }
@@ -374,8 +397,9 @@ CoreUtil.prototype.toggleClass = function(element, className, condition){
  * @param {Object} element The element to be processed.
  * @param {String} oldClass The class to remove from the element.
  * @param {String} newClass The class to add to the element.
+ * @export
  */
-CoreUtil.prototype.swapClass = function(element, oldClass, newClass){
+Aura.Utils.CoreUtil.prototype.swapClass = function(element, oldClass, newClass){
     oldClass = this.isArray(oldClass)?oldClass:[oldClass];
     newClass = this.isArray(newClass)?newClass:[newClass];
     for(var i=0;i<oldClass.length;i++){
@@ -386,7 +410,7 @@ CoreUtil.prototype.swapClass = function(element, oldClass, newClass){
     }
 };
 
-CoreUtil.prototype.setClass=function(element,newClass,remove){
+Aura.Utils.CoreUtil.prototype.setClass=function(element,newClass,remove){
     var constructedClass='';
     if(this.isComponent(element)){
         var attribute=null;
@@ -423,7 +447,7 @@ CoreUtil.prototype.setClass=function(element,newClass,remove){
     }
 };
 
-CoreUtil.prototype.buildClass=function(oldClass, newClass, remove){
+Aura.Utils.CoreUtil.prototype.buildClass=function(oldClass, newClass, remove){
     if(this.isUndefinedOrNull(oldClass)) {
         oldClass='';
     }
@@ -456,8 +480,9 @@ CoreUtil.prototype.buildClass=function(oldClass, newClass, remove){
  *
  * @param {Object} cmp The DefDescriptor of the component being flavored.
  * @returns {String} flavor The flavor name.
+ * @export
  */
-CoreUtil.prototype.buildFlavorClass = function(cmp, flavor) {
+Aura.Utils.CoreUtil.prototype.buildFlavorClass = function(cmp, flavor) {
     $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "StyleDef not set for component");
 
     if (this.isEmpty(flavor)) {
@@ -482,8 +507,9 @@ CoreUtil.prototype.buildFlavorClass = function(cmp, flavor) {
  *
  * @param {String} markup The markup from which to generate dom nodes
  * @returns {Array} An array of the elements that were generated.
+ * @export
  */
-CoreUtil.prototype.createElementsFromMarkup=function(markup){
+Aura.Utils.CoreUtil.prototype.createElementsFromMarkup=function(markup){
     if(!this.isUndefinedOrNull(markup)) {
         var tmpNode = document.createElement("span");
         tmpNode.innerHTML = markup;
@@ -498,8 +524,9 @@ CoreUtil.prototype.createElementsFromMarkup=function(markup){
  * @param {Object} newE1 The new element to insert.
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
+ * @export
  */
- CoreUtil.prototype.insertFirst = function(newEl, referenceEl){
+ Aura.Utils.CoreUtil.prototype.insertFirst = function(newEl, referenceEl){
     if (this.isArray(newEl)) {
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
@@ -522,8 +549,9 @@ CoreUtil.prototype.createElementsFromMarkup=function(markup){
  * @param {Object} newE1 The new element to insert.
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
+ * @export
  */
-CoreUtil.prototype.insertBefore = function(newEl, referenceEl) {
+Aura.Utils.CoreUtil.prototype.insertBefore = function(newEl, referenceEl) {
     if (this.isArray(newEl)) {
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
@@ -544,8 +572,9 @@ CoreUtil.prototype.insertBefore = function(newEl, referenceEl) {
  * @param {Object} newE1 The new element to insert.
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
+ * @export
  */
-CoreUtil.prototype.insertAfter = function(newEl, referenceEl) {
+Aura.Utils.CoreUtil.prototype.insertAfter = function(newEl, referenceEl) {
     if (this.isArray(newEl)) {
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
@@ -573,7 +602,7 @@ CoreUtil.prototype.insertAfter = function(newEl, referenceEl) {
  * @param {Object} referenceE1 The existing element
  * @returns {Object} The new element that was added
  */
-CoreUtil.prototype.appendChild = function(newEl, referenceEl) {
+Aura.Utils.CoreUtil.prototype.appendChild = function(newEl, referenceEl) {
     if (referenceEl.canHaveChildren===false){
         return;
     }
@@ -604,8 +633,9 @@ CoreUtil.prototype.appendChild = function(newEl, referenceEl) {
  * able to add optimizations.
  *
  * @param {Object} element The element to be removed.
+ * @export
  */
-CoreUtil.prototype.removeElement = function(element) {
+Aura.Utils.CoreUtil.prototype.removeElement = function(element) {
     if (element && !(element.parentNode === this.trashcan)) {
         if (element.parentNode) {
             //
@@ -669,8 +699,9 @@ CoreUtil.prototype.removeElement = function(element) {
  *
  * @param {String} url The URL string to be decoded.
  * @returns {Object} The decoded URL.
+ * @export
  */
-CoreUtil.prototype.urlDecode = function(url){
+Aura.Utils.CoreUtil.prototype.urlDecode = function(url){
     var ret = {};
     var pairs = url.split("&");
     for (var i = 0; i < pairs.length; i++) {
@@ -685,8 +716,9 @@ CoreUtil.prototype.urlDecode = function(url){
  *
  * @param {String} value The string to be trimmed.
  * @returns {String}
+ * @export
  */
-CoreUtil.prototype.trim = function(value){
+Aura.Utils.CoreUtil.prototype.trim = function(value){
     return (value || "").replace(/^\s+|\s+$/g, '');
 };
 
@@ -696,8 +728,9 @@ CoreUtil.prototype.trim = function(value){
  * @param {String} formatString The string to be formatted.
  * @param {String} arg1...argN The list of arguments to splice into formatString.
  * @returns {String}
+ * @export
  */
-CoreUtil.prototype.format=function(formatString,arg1,arg2,argN){
+Aura.Utils.CoreUtil.prototype.format=function(formatString,arg1,arg2,argN){
     $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);
     return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index,position){
@@ -719,8 +752,9 @@ CoreUtil.prototype.format=function(formatString,arg1,arg2,argN){
  * @param {Boolean} ellipsis If set to true, an ellipsis is added to the truncated string.
  * @param {Boolean} truncateByWord If set to true, checks that no truncation occurs in the middle of a word.
  * @returns {String} The truncated string.
+ * @export
  */
-CoreUtil.prototype.truncate = function(st, len, ellipsis, truncateByWord){
+Aura.Utils.CoreUtil.prototype.truncate = function(st, len, ellipsis, truncateByWord){
     ellipsis = !!ellipsis;
     truncateByWord = !!truncateByWord;
 
@@ -767,8 +801,9 @@ CoreUtil.prototype.truncate = function(st, len, ellipsis, truncateByWord){
  *          The tolerance duration in milliseconds.
  * @returns {Function} The function to invoke in order to trigger a start/reset
  *          of the tolerance period.
+ * @export
  */
-CoreUtil.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
+Aura.Utils.CoreUtil.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
     $A.assert(!$A.util.isUndefinedOrNull(callback) && $A.util.isFunction(callback), "Invalid callback");
     $A.assert(toleranceMillis > 0, "Must use a positive tolerance period.");
 
@@ -819,8 +854,9 @@ CoreUtil.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
  * @param {Boolean} useCapture Whether to use event capturing.
  * @param {Number} timeout Optional timeout (in milliseconds) that will delay the handler execution.
  * @returns {Object} Either a function (success) or null (fail)
+ * @export
  */
-CoreUtil.prototype.on = (function() {
+Aura.Utils.CoreUtil.prototype.on = (function() {
     if (window["addEventListener"]) {
         return function(element, eventName, handler, useCapture, timeout) {
             var originalHandler = handler;
@@ -901,8 +937,9 @@ CoreUtil.prototype.on = (function() {
  * @param {String} eventName The name of the DOM event, minus the "on" prefix (e.g. "click", "focus", "blur", etc.).
  * @param {Function} listener The JS listener function to remove.
  * @param {Boolean} useCapture Whether to use event capturing.
+ * @export
  */
-CoreUtil.prototype.removeOn = function(element, eventName, listener, useCapture) {
+Aura.Utils.CoreUtil.prototype.removeOn = function(element, eventName, listener, useCapture) {
     if (listener.registeredAuraHandler) {
         listener = listener.registeredAuraHandler;
     }
@@ -922,8 +959,9 @@ CoreUtil.prototype.removeOn = function(element, eventName, listener, useCapture)
  *
  * @param {Object} form
  * @returns {Object} The map containing the values from the form input.
+ * @export
  */
-CoreUtil.prototype.formToMap = function(form) {
+Aura.Utils.CoreUtil.prototype.formToMap = function(form) {
     var map = {};
 
     for (var i=0; i<form.length; i++) {
@@ -967,8 +1005,9 @@ CoreUtil.prototype.formToMap = function(form) {
  *
  * @param {Object} select
  * @returns {Object} A list of selected options.
+ * @export
  */
-CoreUtil.prototype.getSelectValue = function(select) {
+Aura.Utils.CoreUtil.prototype.getSelectValue = function(select) {
 
     if (select.options.length === 0) {
         return null;
@@ -997,8 +1036,9 @@ CoreUtil.prototype.getSelectValue = function(select) {
  * @param {Object} inputMap The input map to be processed.
  * @param {String} key The data key whose value is to be added to the input map.
  * @param {Object} value The value of the data to add to the input map.
+ * @export
  */
-CoreUtil.prototype.addValueToMap = function(inputMap, key, value) {
+Aura.Utils.CoreUtil.prototype.addValueToMap = function(inputMap, key, value) {
     if (key.indexOf(".") > 0) {
         var inputName = key.substring(0, key.indexOf("."));
         var subMapKey = key.substring(key.indexOf(".") + 1, key.length);
@@ -1036,8 +1076,9 @@ CoreUtil.prototype.addValueToMap = function(inputMap, key, value) {
  * @param {String} key The data key whose value is to be added to the input map.
  * @param {Object} value The value of the data to add to the input map.
  * @param {String} subMapKey
+ * @export
  */
-CoreUtil.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) {
+Aura.Utils.CoreUtil.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) {
     var subMap = inputMap[key];
     if (!subMap) {
         subMap = {};
@@ -1054,8 +1095,9 @@ CoreUtil.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) 
  * @param {String} qname
  *          The qualified name to search for
  * @returns {Boolean} true if qualified name is found in defs hierarchy
+ * @export
  */
-CoreUtil.prototype.isSubDef = function(def, qname) {
+Aura.Utils.CoreUtil.prototype.isSubDef = function(def, qname) {
     while (def) {
         if (def.getDescriptor().getQualifiedName() === qname) {
             return true;
@@ -1085,7 +1127,7 @@ CoreUtil.prototype.isSubDef = function(def, qname) {
  * @param {Boolean} [forceCopy] If the property already exists, should we still copy the member? false by default
  * @param {Boolean} [deepCopy] Should we continue to navigate child objects if we don't overwrite them? false by default
  */
-CoreUtil.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
+Aura.Utils.CoreUtil.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
     if(members) {
         var value=null;
         for (var property in members) {
@@ -1116,7 +1158,7 @@ CoreUtil.prototype.apply = function(/* Object|Function */ baseObject, /* Object|
     return baseObject;
 };
 
-CoreUtil.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
+Aura.Utils.CoreUtil.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
 
 /**
  * Converts camelCase to hyphens.
@@ -1124,7 +1166,7 @@ CoreUtil.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
  * @param {String} str The string to be converted.
  * @returns {String} The string containing hyphens that replaces the camelCase.
  */
-CoreUtil.prototype.camelCaseToHyphens = function(str) {
+Aura.Utils.CoreUtil.prototype.camelCaseToHyphens = function(str) {
     return str.replace(this.CAMEL_CASE_TO_HYPHENS_REGEX, "-$1").toLowerCase();
 };
 
@@ -1134,7 +1176,7 @@ CoreUtil.prototype.camelCaseToHyphens = function(str) {
  * @param {String} str The string to be converted.
  * @returns {String} The string in camelCase.
  */
-CoreUtil.prototype.hyphensToCamelCase = function(str) {
+Aura.Utils.CoreUtil.prototype.hyphensToCamelCase = function(str) {
     function hyphensToCamelCaseHelper(s, group) {
         return group.toUpperCase();
     }
@@ -1147,7 +1189,7 @@ CoreUtil.prototype.hyphensToCamelCase = function(str) {
  * @description A map of nodeNames that cannot accept custom data attributes.
  * @private
  */
-CoreUtil.prototype.noData = {
+Aura.Utils.CoreUtil.prototype.noData = {
     "embed": true,
     "object": "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000", // flash
     "applet": true,
@@ -1161,7 +1203,7 @@ CoreUtil.prototype.noData = {
  * @param {HTMLElement} element The element to check for custom data attribute support.
  * @returns {Boolean} Whether element accepts custom data attributes.
  */
-CoreUtil.prototype.acceptsData = function(element) {
+Aura.Utils.CoreUtil.prototype.acceptsData = function(element) {
     if (!this.isElement(element)) {
         return false;
     }
@@ -1181,8 +1223,9 @@ CoreUtil.prototype.acceptsData = function(element) {
  *
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} attributeName The name of attribute to look up on element.
+ * @export
  */
-CoreUtil.prototype.getElementAttributeValue = function(element,attributeName){
+Aura.Utils.CoreUtil.prototype.getElementAttributeValue = function(element,attributeName){
     var attrValue = element.getAttribute(attributeName);
     //For browser Compatibility - getAttribute doesn't always work in IE
     if($A.util.isUndefinedOrNull(attrValue)){
@@ -1208,8 +1251,9 @@ CoreUtil.prototype.getElementAttributeValue = function(element,attributeName){
  * For more information on custom data attributes, see http://html5doctor.com/html5-custom-data-attributes/
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to look up on element.
+ * @export
  */
-CoreUtil.prototype.getDataAttribute = function(element, key) {
+Aura.Utils.CoreUtil.prototype.getDataAttribute = function(element, key) {
     if (!this.acceptsData(element) || this.isUndefined(key)) {
         return null;
     }
@@ -1225,8 +1269,9 @@ CoreUtil.prototype.getDataAttribute = function(element, key) {
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to add to element.
  * @param {String} value The value of the data to add to an element. If value is undefined, the key data attribute will be removed from element.
+ * @export
  */
-CoreUtil.prototype.setDataAttribute = function(element, key, value) {
+Aura.Utils.CoreUtil.prototype.setDataAttribute = function(element, key, value) {
     if (!this.acceptsData(element) || this.isUndefined(key)) {
         return null;
     }
@@ -1243,7 +1288,7 @@ CoreUtil.prototype.setDataAttribute = function(element, key, value) {
 /**
  * @private
  */
-CoreUtil.prototype.getDataAttributeName = function(key) {
+Aura.Utils.CoreUtil.prototype.getDataAttributeName = function(key) {
     var name = this.dataAttributeCache[key];
     if (!name) {
         name = "data-" + this.camelCaseToHyphens(key);
@@ -1258,8 +1303,9 @@ CoreUtil.prototype.getDataAttributeName = function(key) {
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to look up on element.
  * @returns {Boolean} true if element has data attribute
+* @export
  */
-CoreUtil.prototype.hasDataAttribute = function(element, key) {
+Aura.Utils.CoreUtil.prototype.hasDataAttribute = function(element, key) {
     return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
 };
 
@@ -1268,7 +1314,7 @@ CoreUtil.prototype.hasDataAttribute = function(element, key) {
  * @param {Object} obj
  * @returns {Boolean} True if the object is an HTMLElement object, or false otherwise.
  */
-CoreUtil.prototype.isElement = function(obj) {
+Aura.Utils.CoreUtil.prototype.isElement = function(obj) {
     if (typeof HTMLElement === "object") {
         return obj instanceof HTMLElement;
     } else {
@@ -1279,15 +1325,19 @@ CoreUtil.prototype.isElement = function(obj) {
 /**
  * Attach the element to the HTML body
  * @param {DOMElement} element
+ * @export
  */
-CoreUtil.prototype.attachToDocumentBody = function(element) {
+Aura.Utils.CoreUtil.prototype.attachToDocumentBody = function(element) {
     if (element) {
         var body = document.getElementsByTagName("body")[0];
         body.appendChild(element);
     }
 };
-
-CoreUtil.prototype.stringEndsWith = function(fullstr, substr) {
+/**
+* Check for substrings at the end
+* @export
+*/
+Aura.Utils.CoreUtil.prototype.stringEndsWith = function(fullstr, substr) {
     var lastIndex = fullstr.lastIndexOf(substr);
     return (lastIndex !== -1) && (lastIndex + substr.length === fullstr.length);
 };
@@ -1300,12 +1350,12 @@ CoreUtil.prototype.stringEndsWith = function(fullstr, substr) {
  * @returns {Function} a new function that invokes the provided function instance with bound arguments.
  */
 if (!!Function.prototype.bind) {
-    CoreUtil.prototype.bind = function(method /*, this, bind arguments*/) {
+    Aura.Utils.CoreUtil.bind = function(method /*, this, bind arguments*/) {
         var args = Array.prototype.slice.call(arguments, 1);
         return Function.prototype.bind.apply(method, args);
     };
 } else {
-    CoreUtil.prototype.bind = function(method /*, this, bind arguments*/) {
+    Aura.Utils.CoreUtil.bind = function(method /*, this, bind arguments*/) {
         var args = Array.prototype.slice.call(arguments, 1),
             that = args.shift(),
             util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
@@ -1326,13 +1376,16 @@ if (!!Function.prototype.bind) {
     };
 }
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.bind = Aura.Utils.CoreUtil.bind;
+
 /**
  * Returns the map's keys as an array.
  * @param {Object} map to extract keys from.
  * @returns {Array} of key {String}s.
  */
 if (!!(Object && Object.keys)) {
-    CoreUtil.prototype.keys = function(object, excludeFunctions) {
+    Aura.Utils.CoreUtil.keys = function(object, excludeFunctions) {
         var allKeys = Object.keys(object);
         var keys = [];
         for (var n = 0; n < allKeys.length; n++) {
@@ -1345,7 +1398,7 @@ if (!!(Object && Object.keys)) {
         return keys;
     };
 } else {
-    CoreUtil.prototype.keys = function(object, excludeFunctions) {
+    Aura.Utils.CoreUtil.keys = function(object, excludeFunctions) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         var isAnyObjectType = !util.isObject(object)
@@ -1366,6 +1419,9 @@ if (!!(Object && Object.keys)) {
     };
 }
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.keys = Aura.Utils.CoreUtil.keys;
+
 /**
  * Performs a series of 'safe' sequential lookup of nested properies.
  *
@@ -1383,8 +1439,9 @@ if (!!(Object && Object.keys)) {
  * @param {Object} root object or array to sequentially lookup properties from.
  * @param {String} var-args of string property names.
  * @return {Any} the looked-up property or undefined if any properties along the way were not found.
+ * @export
  */
-CoreUtil.prototype.lookup = function(object /*, var-args of arrays*/) {
+Aura.Utils.CoreUtil.prototype.lookup = function(object /*, var-args of arrays*/) {
     var properties = Array.prototype.slice.call(arguments, 1),
         util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
@@ -1399,8 +1456,9 @@ CoreUtil.prototype.lookup = function(object /*, var-args of arrays*/) {
  * @param {Array} array to receive the elements of subsequent arrays.
  * @param {Array} var-args of arrays that will have their elements copied into the first.
  * @returns {Array} the first array (which has been modified in-place).
+ * @export
  */
-CoreUtil.prototype.merge = function(first /*, var-args of arrays*/) {
+Aura.Utils.CoreUtil.prototype.merge = function(first /*, var-args of arrays*/) {
     var arrays = Array.prototype.slice.call(arguments, 1),
         util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
@@ -1429,7 +1487,7 @@ CoreUtil.prototype.merge = function(first /*, var-args of arrays*/) {
 
 /** forEach: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.forEach) {
-    CoreUtil.prototype.forEach = function(array, method, that) {
+    Aura.Utils.CoreUtil.forEach = function(array, method, that) {
         array.forEach(method, that);
     };
 } else {
@@ -1439,7 +1497,7 @@ if (!!Array.prototype.forEach) {
      * @param {Function} method to call for each element.
      * @param {Any} the 'this' instance inside the scope of provided method.
      */
-    CoreUtil.prototype.forEach = function(array, method, that) {
+    Aura.Utils.CoreUtil.forEach = function(array, method, that) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
@@ -1457,9 +1515,12 @@ if (!!Array.prototype.forEach) {
     };
 }
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.forEach = Aura.Utils.CoreUtil.forEach;
+
 /** map: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.map) {
-    CoreUtil.prototype.map = function(array, method, that) {
+    Aura.Utils.CoreUtil.map = function(array, method, that) {
         return array.map(method, that);
     };
 } else {
@@ -1471,7 +1532,7 @@ if (!!Array.prototype.map) {
      * @returns {Array} where every element is a result of the transformation function
      * applied to the element (at the same index) from the input array.
      */
-    CoreUtil.prototype.map = function(array, method, that) {
+    Aura.Utils.CoreUtil.map = function(array, method, that) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
@@ -1489,10 +1550,12 @@ if (!!Array.prototype.map) {
         return result;
     };
 }
+/** @export */
+Aura.Utils.CoreUtil.prototype.map = Aura.Utils.CoreUtil.map;
 
 /** reduce: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.reduce) {
-    CoreUtil.prototype.reduce = function(array, method, initial) {
+    Aura.Utils.CoreUtil.reduce = function(array, method, initial) {
         return array.reduce(method, initial);
     };
 } else {
@@ -1505,7 +1568,7 @@ if (!!Array.prototype.reduce) {
      * @param {Any} the initial object passed to the first element in the array's reduction method.
      * @returns {Any} the final value returned from calling the reduction method on the last element.
      */
-    CoreUtil.prototype.reduce = function(array, method, initial) {
+    Aura.Utils.CoreUtil.reduce = function(array, method, initial) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
@@ -1524,9 +1587,12 @@ if (!!Array.prototype.reduce) {
     };
 }
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.reduce = Aura.Utils.CoreUtil.reduce;
+
 /** every: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.every) {
-    CoreUtil.prototype.every = function(array, predicate, that) {
+    Aura.Utils.CoreUtil.every = function(array, predicate, that) {
         return array.every(predicate, that);
     };
 } else {
@@ -1537,7 +1603,7 @@ if (!!Array.prototype.every) {
      * @param {Any} the 'this' instance inside the scope of provided transformation method.
      * @returns {Boolean} true if all elements of the array satisfy the predicate.
      */
-    CoreUtil.prototype.every = function(array, predicate, that) {
+    Aura.Utils.CoreUtil.every = function(array, predicate, that) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
@@ -1558,9 +1624,12 @@ if (!!Array.prototype.every) {
     };
 }
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.every = Aura.Utils.CoreUtil.every;
+
 /** some: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.some) {
-    CoreUtil.prototype.some = function(array, predicate, that) {
+    Aura.Utils.CoreUtil.some = function(array, predicate, that) {
         return array.some(predicate, that);
     };
 } else {
@@ -1571,7 +1640,7 @@ if (!!Array.prototype.some) {
      * @param {Any} the 'this' instance inside the scope of provided transformation method.
      * @returns {Boolean} true if any of the elements of the array satisfy the predicate.
      */
-    CoreUtil.prototype.some = function(array, predicate, that) {
+    Aura.Utils.CoreUtil.some = function(array, predicate, that) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
@@ -1592,9 +1661,12 @@ if (!!Array.prototype.some) {
     };
 }
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.some = Aura.Utils.CoreUtil.some;
+
 /** filter: see documentation below (attached to last definition so that it is picked up for doc generation). */
 if (!!Array.prototype.filter) {
-    CoreUtil.prototype.filter = function(array, predicate, that) {
+    Aura.Utils.CoreUtil.filter = function(array, predicate, that) {
         return array.filter(predicate, that);
     };
 } else {
@@ -1605,7 +1677,7 @@ if (!!Array.prototype.filter) {
      * @param {Any} the 'this' instance inside the scope of provided predicate.
      * @returns {Array} ordered array of elements that pass the predicate.
      */
-    CoreUtil.prototype.filter = function(array, predicate, that) {
+    Aura.Utils.CoreUtil.filter = function(array, predicate, that) {
         var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
 
         if (!util.isArray(array)) {
@@ -1625,13 +1697,17 @@ if (!!Array.prototype.filter) {
         return result;
     };
 }
+
+/** @export */
+Aura.Utils.CoreUtil.prototype.filter = Aura.Utils.CoreUtil.filter;
+
 /**
  * Schedules the specified component to be asynchronously destroyed.
  * @param {Component} cmp
  *          The component to be destroyed.
  * @private
  */
-CoreUtil.prototype.destroyAsync = function(cmp) {
+Aura.Utils.CoreUtil.prototype.destroyAsync = function(cmp) {
     if (this.componentGCProcessing) {
         // We're in the middle of emptying the component trash and something just async to destroy another
         // component async so finish the destroy now
@@ -1660,26 +1736,6 @@ CoreUtil.prototype.destroyAsync = function(cmp) {
 };
 
 /**
- * Declares a "child" type to be derived from a "parent" type.  This replicates
- * the parent prototype entry into the child prototype (i.e. method
- * inheritance), and sets a "superclass" attribute used by Util.instanceOf.
- *
- * Call this after declaring the child constructor function, but before setting
- * child methods onto the prototype, so that the child methods can override the
- * inherited ones.
- *
- * @private
- */
-CoreUtil.derivePrototype = function(child, parent) {
-    for (var method in parent.prototype) {
-        if (method !== "constructor") {
-            child.prototype[method] = parent.prototype[method];
-        }
-    }
-    child.prototype.superclass = parent.prototype;
-};
-
-/**
  * Returns whether "instance" is, directly or indirectly, an instance of
  * "constructor."  An object is indirectly an instance if derivePrototypeFrom was
  * used to make the child type derive from the parent type.
@@ -1691,8 +1747,9 @@ CoreUtil.derivePrototype = function(child, parent) {
  * @param instance The object to test
  * @param constructor  The object to test against
  * @returns {Boolean} Returns true if instance is an instance of constructor.
+ * @export
  */
-CoreUtil.prototype.instanceOf = function(instance, constructor) {
+Aura.Utils.CoreUtil.prototype.instanceOf = function(instance, constructor) {
     if (instance === null || instance === undefined || constructor === null || constructor === undefined) {
         return false;
     }
@@ -1715,7 +1772,7 @@ CoreUtil.prototype.instanceOf = function(instance, constructor) {
  * Destroys any components currently in the trashcan.
  * @private
  */
-CoreUtil.prototype.emptyComponentTrash = function() {
+Aura.Utils.CoreUtil.prototype.emptyComponentTrash = function() {
     var length = this.trashedComponentQueue.length;
     if (length > 0) {
         for (var i = 0; i < length; i++){
@@ -1738,8 +1795,9 @@ CoreUtil.prototype.emptyComponentTrash = function() {
  * @param {HTMLElement} container The element you think is the outermost container.
  * @param {HTMLElement} element The element you think is buried inside the container.
  * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
+* @export
  */
-CoreUtil.prototype.contains = function(container, element) {
+Aura.Utils.CoreUtil.prototype.contains = function(container, element) {
     if ($A.util.isElement(container) && $A.util.isElement(element)) {
         if (container === element) {
             return true;
@@ -1762,8 +1820,9 @@ CoreUtil.prototype.contains = function(container, element) {
 
  * @param {UIEvent} event the DOM event to squash
  * @param {Boolean} preventDefault if preventDefault() should also be called
+ * @export
  */
-CoreUtil.prototype.squash = function(event, preventDefault) {
+Aura.Utils.CoreUtil.prototype.squash = function(event, preventDefault) {
     event = event || window.event;
     if(event.stopPropagation) {
         event.stopPropagation();
@@ -1784,8 +1843,9 @@ CoreUtil.prototype.squash = function(event, preventDefault) {
  * @param {String} input the input html codes
  * @param {Array} tags the html tag names to be removed
  * @return {String} an output string without those specified tags
+ * @export
  */
-CoreUtil.prototype.stripTags = function(input, tags) {
+Aura.Utils.CoreUtil.prototype.stripTags = function(input, tags) {
     if (this.isUndefinedOrNull(input) || this.isEmpty(input)) {
         return;
     }
@@ -1813,8 +1873,9 @@ CoreUtil.prototype.stripTags = function(input, tags) {
  * both width and height.
  *
  * @return {Object} JS object with the fields "width" and "height"
+ * @export
  */
-CoreUtil.prototype.getWindowSize = function() {
+Aura.Utils.CoreUtil.prototype.getWindowSize = function() {
     return {
         width : window.innerWidth || document.body.clientWidth || 0,
         height : window.innerHeight || document.body.clientHeight || 0
@@ -1826,8 +1887,9 @@ CoreUtil.prototype.getWindowSize = function() {
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is a component, or return false otherwise.
+ * @export
  */
-CoreUtil.prototype.isComponent = function(obj) {
+Aura.Utils.CoreUtil.prototype.isComponent = function(obj) {
     return obj instanceof Component;
 };
 
@@ -1836,8 +1898,9 @@ CoreUtil.prototype.isComponent = function(obj) {
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is an expression, or false otherwise.
+ * @export
  */
-CoreUtil.prototype.isExpression = function (obj) {
+Aura.Utils.CoreUtil.prototype.isExpression = function (obj) {
     return obj instanceof PropertyReferenceValue || obj instanceof FunctionCallValue;
 };
 
@@ -1846,8 +1909,9 @@ CoreUtil.prototype.isExpression = function (obj) {
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is a component, or return false otherwise.
+ * @export
  */
-CoreUtil.prototype.isValue = function(obj) {
+Aura.Utils.CoreUtil.prototype.isValue = function(obj) {
     return (obj && obj.auraType === 'Value')||false;
 };
 
@@ -1855,8 +1919,9 @@ CoreUtil.prototype.isValue = function(obj) {
  * Checks if touch events are supported. Cache the result, it shouldn't change.
  *
  * @returns {Boolean} True if touch events are supported.
- */
-CoreUtil.prototype.supportsTouchEvents = function() {
+ * @export
+*/
+Aura.Utils.CoreUtil.prototype.supportsTouchEvents = function() {
 
     /*
     * NOTE:
@@ -1891,8 +1956,9 @@ CoreUtil.prototype.supportsTouchEvents = function() {
  * Estimate the amount of space that will be utilized by an object or primitive.
  *
  * @param {Object} item The object or primitive whose size to estimate.
+ * @export
  */
-CoreUtil.prototype.estimateSize = function(obj) {
+Aura.Utils.CoreUtil.prototype.estimateSize = function(obj) {
     return this.sizeEstimator.estimateSize(obj);
 };
 
@@ -1903,7 +1969,7 @@ CoreUtil.prototype.estimateSize = function(obj) {
  * Cannot always use Array.prototype.slice.call(), since it doesn't work in IE6/7/8 on NodeLists.
  * @returns An empty array if you pass a null or undefined value to collection.
  */
-CoreUtil.prototype.toArray = function(collection) {
+Aura.Utils.CoreUtil.prototype.toArray = function(collection) {
     if(this.isUndefinedOrNull(collection)) {
         return [];
     }
@@ -1926,8 +1992,9 @@ CoreUtil.prototype.toArray = function(collection) {
     /**
      * Gets the aura debug tool component whether in an iframe or not.
      * @returns {Object} The debug tool component.
+     * @export
      */
-    CoreUtil.prototype.getDebugToolComponent = function(){
+    Aura.Utils.CoreUtil.prototype.getDebugToolComponent = function(){
         if (!this.isUndefinedOrNull(this.debugToolWindow)) {
             var debugElem = this.debugToolWindow.document.getElementById('__aura_debug_tool');
             if (!this.isUndefinedOrNull(debugElem)) {
@@ -1940,8 +2007,9 @@ CoreUtil.prototype.toArray = function(collection) {
      * Gets the aura instance of debug tool which has been opened in a child window
      *
      * @returns {Object} Aura instance
+     * @export
      */
-    CoreUtil.prototype.getDebugToolsAuraInstance = function(){
+    Aura.Utils.CoreUtil.prototype.getDebugToolsAuraInstance = function(){
         if (!this.isUndefinedOrNull(this.debugToolWindow)) {
             return this.debugToolWindow["aura"];
         } else {
@@ -1951,8 +2019,9 @@ CoreUtil.prototype.toArray = function(collection) {
 
     /**
      * Set the aura debug tool handle when opened in a popup.
+     * @export
      */
-    CoreUtil.prototype.setDebugToolWindow = function(debugWindow){
+    Aura.Utils.CoreUtil.prototype.setDebugToolWindow = function(debugWindow){
         if (!this.isUndefinedOrNull(debugWindow)) {
             this.debugToolWindow = debugWindow;
         }
@@ -1962,8 +2031,9 @@ CoreUtil.prototype.toArray = function(collection) {
      * Grab windows url, if debug tool is a child window get url of parent
      *
      * @returns {String} URL of the window
+     * @export
      */
-    CoreUtil.prototype.getUrl = function(){
+    Aura.Utils.CoreUtil.prototype.getUrl = function(){
         if (this.isUndefinedOrNull(opener)) {
             return window.location.href;
         } else {
@@ -1977,8 +2047,9 @@ CoreUtil.prototype.toArray = function(collection) {
      * @param {Node} node
      *             The node to get the text content from
      * @returns {String} The text content of the DOM node
+     * @export
      */
-    CoreUtil.prototype.getText = function(node) {
+    Aura.Utils.CoreUtil.prototype.getText = function(node) {
         var t;
         //text nodes
         if(node.nodeType === 3){
@@ -2003,8 +2074,8 @@ CoreUtil.prototype.toArray = function(collection) {
         return t;
     };
 
-
-    CoreUtil.prototype.setText = function(node, text) {
+    /** @export */
+    Aura.Utils.CoreUtil.prototype.setText = function(node, text) {
         if (node.textContent !== undefined) {
             //webkit & ff
             node.textContent = text;
@@ -2014,12 +2085,12 @@ CoreUtil.prototype.toArray = function(collection) {
         }
     };
 
-
-    CoreUtil.prototype.errorBasedOnMode = function(msg) {
+    /** @export */
+    Aura.Utils.CoreUtil.prototype.errorBasedOnMode = function(msg) {
         $A.error(msg);
     };
-
-    CoreUtil.prototype.includeScript = function(url, callback) {
+    /** @export */
+    Aura.Utils.CoreUtil.prototype.includeScript = function(url, callback) {
         if (this.isUndefined(this.includeScript.cache)) {
             this.includeScript.cache = {};
         }
@@ -2051,5 +2122,3 @@ CoreUtil.prototype.toArray = function(collection) {
         }
     };
 //#end
-
-Aura.Utils.CoreUtil = CoreUtil;

@@ -21,10 +21,10 @@
  * @protected
  * @class AuraContext
  * @param {Object} config the 'founding' config for the context from the server.
- * @param {Function} initCallback an optional callback invoked after the config has finished its
- *  asynchronous initialization.
+ * @param {Function} initCallback an optional callback invoked after the config has finished its asynchronous initialization.
+ * @export
  */
-function AuraContext(config, initCallback) {
+Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.mode = config["mode"];
     this.loaded = config["loaded"];
     if (this.loaded === undefined) {
@@ -84,19 +84,20 @@ function AuraContext(config, initCallback) {
         }
     });
     this.contextGlobals = this.globalValueProviders.getValueProvider("Global");
-}
+};
 
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
  * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.
  *
  * @return {string} the mode from the server.
+ * @export
  */
-AuraContext.prototype.getMode = function() {
+Aura.Context.AuraContext.prototype.getMode = function() {
     return this.mode;
 };
 
-AuraContext.prototype.getCurrentAccess=function(){
+Aura.Context.AuraContext.prototype.getCurrentAccess=function(){
     var access=this.accessStack[this.accessStack.length-1];
     while(access instanceof PassthroughValue){
         access=access.getComponent();
@@ -104,11 +105,11 @@ AuraContext.prototype.getCurrentAccess=function(){
     return access;
 };
 
-AuraContext.prototype.setCurrentAccess=function(component){
+Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
     return this.accessStack.push(component?component:this.getCurrentAccess());
 };
 
-AuraContext.prototype.releaseCurrentAccess=function(){
+Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
     this.accessStack.pop();
 };
 
@@ -118,7 +119,7 @@ AuraContext.prototype.releaseCurrentAccess=function(){
  * @param valueProvider The valueProvider to add.
  * @private
  */
-AuraContext.prototype.addGlobalValueProvider = function(type,valueProvider) {
+Aura.Context.AuraContext.prototype.addGlobalValueProvider = function(type,valueProvider) {
     this.globalValueProviders.addValueProvider(type,valueProvider);
 };
 
@@ -129,7 +130,7 @@ AuraContext.prototype.addGlobalValueProvider = function(type,valueProvider) {
  * @return {GlobalValueProviders}
  * @private
  */
-AuraContext.prototype.getGlobalValueProvider = function(type) {
+Aura.Context.AuraContext.prototype.getGlobalValueProvider = function(type) {
     return this.globalValueProviders.getValueProvider(type);
 };
 
@@ -141,7 +142,7 @@ AuraContext.prototype.getGlobalValueProvider = function(type) {
  * @return {String} json representation
  * @private
  */
-AuraContext.prototype.encodeForServer = function() {
+Aura.Context.AuraContext.prototype.encodeForServer = function() {
     return aura.util.json.encode({
         "mode" : this.mode,
         "loaded" : this.loaded,
@@ -155,11 +156,10 @@ AuraContext.prototype.encodeForServer = function() {
 };
 
 /**
- * @param {Object}
- *      otherContext the context from the server to join in to this one.
- * @private
+ * @param {Object} otherContext the context from the server to join in to this one.
+ * @export
  */
-AuraContext.prototype.merge = function(otherContext) {
+Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     var i, defs;
 
     if (otherContext["mode"] !== this.getMode()) {
@@ -205,15 +205,16 @@ AuraContext.prototype.merge = function(otherContext) {
  * 
  * @return {number} the 'num' for this context
  * @private
+ * @export
  */
-AuraContext.prototype.getNum = function() {
+Aura.Context.AuraContext.prototype.getNum = function() {
     return this.num;
 };
 
 /**
  * @private
  */
-AuraContext.prototype.incrementNum = function() {
+Aura.Context.AuraContext.prototype.incrementNum = function() {
     this.num = this.num + 1;
     this.lastGlobalId = 0;
     return this.num;
@@ -222,7 +223,7 @@ AuraContext.prototype.incrementNum = function() {
 /**
  * @private
  */
-AuraContext.prototype.incrementRender = function() {
+Aura.Context.AuraContext.prototype.incrementRender = function() {
     this.renderNum = this.renderNum + 1;
     return this.renderNum;
 };
@@ -230,8 +231,9 @@ AuraContext.prototype.incrementRender = function() {
 /**
  * @return {Number} incremented transaction number
  * @private
+ * @export
  */
-AuraContext.prototype.incrementTransaction = function() {
+Aura.Context.AuraContext.prototype.incrementTransaction = function() {
     this.transaction = this.transaction + 1;
     return this.transaction;
 };
@@ -240,14 +242,14 @@ AuraContext.prototype.incrementTransaction = function() {
  * @return {Number} gets the number of the current transaction
  * @private
  */
-AuraContext.prototype.getTransaction = function() {
+Aura.Context.AuraContext.prototype.getTransaction = function() {
     return this.transaction;
 };
 
 /**
  * @private
  */
-AuraContext.prototype.updateTransactionName = function(_transactionName) {
+Aura.Context.AuraContext.prototype.updateTransactionName = function(_transactionName) {
     if (_transactionName) {
         this.transactionName =  (this.trasactionName !== "") ? (this.transactionName + "-" + _transactionName) : _transactionName;
     }
@@ -257,14 +259,14 @@ AuraContext.prototype.updateTransactionName = function(_transactionName) {
  * @return {String} gets the name of the transaction
  * @private
  */
-AuraContext.prototype.getTransactionName = function() {
+Aura.Context.AuraContext.prototype.getTransactionName = function() {
     return this.transactionName;
 };
 
 /**
  * @private
  */
-AuraContext.prototype.clearTransactionName = function() {
+Aura.Context.AuraContext.prototype.clearTransactionName = function() {
     this.transactionName = "";
 };
 
@@ -272,7 +274,7 @@ AuraContext.prototype.clearTransactionName = function() {
  * @return {Number} Next global ID
  * @private
  */
-AuraContext.prototype.getNextGlobalId = function() {
+Aura.Context.AuraContext.prototype.getNextGlobalId = function() {
     this.lastGlobalId = this.lastGlobalId + 1;
     return this.lastGlobalId;
 };
@@ -283,7 +285,7 @@ AuraContext.prototype.getNextGlobalId = function() {
  * @return {Boolean} Whether creation path is in component configs
  * @private
  */
-AuraContext.prototype.containsComponentConfig = function(creationPath) {
+Aura.Context.AuraContext.prototype.containsComponentConfig = function(creationPath) {
     return this.componentConfigs.hasOwnProperty(creationPath);
 };
 
@@ -291,7 +293,7 @@ AuraContext.prototype.containsComponentConfig = function(creationPath) {
  * @param {string} creationPath the creation path to look up.
  * @private
  */
-AuraContext.prototype.getComponentConfig = function(creationPath) {
+Aura.Context.AuraContext.prototype.getComponentConfig = function(creationPath) {
     var componentConfigs = this.componentConfigs;
     var ret = componentConfigs[creationPath];
     return ret;
@@ -303,7 +305,7 @@ AuraContext.prototype.getComponentConfig = function(creationPath) {
  * @param {String} creationPath is the components creationPath that we are operating on.
  * @private
  */
-AuraContext.prototype.removeComponentConfig = function(creationPath) {
+Aura.Context.AuraContext.prototype.removeComponentConfig = function(creationPath) {
     if(creationPath in this.componentConfigs) {
         delete this.componentConfigs[creationPath];
     }
@@ -311,8 +313,9 @@ AuraContext.prototype.removeComponentConfig = function(creationPath) {
 
 /**
  * Returns the app associated with the request.
+ * @export
  */
-AuraContext.prototype.getApp = function() {
+Aura.Context.AuraContext.prototype.getApp = function() {
     return this.app;
 };
 
@@ -323,7 +326,7 @@ AuraContext.prototype.getApp = function() {
  *      actionId the id of the action that we are joining in (used to amend the creationPath).
  * @private
  */
-AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
+Aura.Context.AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
     var cP, idx, config, def;
     if (otherComponentConfigs) {
         //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
@@ -350,7 +353,7 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, act
  * @return {number} the count of component configs removed.
  * @private
  */
-AuraContext.prototype.internalClear = function(actionId, logit) {
+Aura.Context.AuraContext.prototype.internalClear = function(actionId, logit) {
     var count = 0;
     var removed = 0;
     var error = "";
@@ -400,7 +403,7 @@ AuraContext.prototype.internalClear = function(actionId, logit) {
  * @param {string} actionId the action id that we should clear.
  * @private
  */
-AuraContext.prototype.finishComponentConfigs = function(actionId) {
+Aura.Context.AuraContext.prototype.finishComponentConfigs = function(actionId) {
     this.internalClear(actionId, true);
 };
 
@@ -414,15 +417,16 @@ AuraContext.prototype.finishComponentConfigs = function(actionId) {
  * @public
  * @param {string} actionId the action id that we should clear.
  * @return {number} the count of component configs removed.
+ * @export
  */
-AuraContext.prototype.clearComponentConfigs = function(actionId) {
+Aura.Context.AuraContext.prototype.clearComponentConfigs = function(actionId) {
     return this.internalClear(actionId, false);
 };
 
 /**
  * @private
  */
-AuraContext.prototype.joinLoaded = function(loaded) {
+Aura.Context.AuraContext.prototype.joinLoaded = function(loaded) {
     if (this.loaded === undefined) {
         this.loaded = {};
     }
@@ -444,15 +448,17 @@ AuraContext.prototype.joinLoaded = function(loaded) {
  * This should be private but is needed for testing... ideas?
  *
  * ... should move to $A.test.
+ * @export
  */
-AuraContext.prototype.getLoaded = function() {
+Aura.Context.AuraContext.prototype.getLoaded = function() {
     return this.loaded;
 };
 
 /**
  * DCHASMAN Will be private again soon as part of the second phase of W-1450251
+ * @export
  */
-AuraContext.prototype.setCurrentAction = function(action) {
+Aura.Context.AuraContext.prototype.setCurrentAction = function(action) {
     var previous = this.currentAction;
     this.currentAction = action;
     return previous;
@@ -462,15 +468,16 @@ AuraContext.prototype.setCurrentAction = function(action) {
  * EBA - temporarily made public for helpers to obtain action - return to private when current visibility is determined
  * @public
  * @return {Action} the current action.
+ * @export
  */
-AuraContext.prototype.getCurrentAction = function() {
+Aura.Context.AuraContext.prototype.getCurrentAction = function() {
     return this.currentAction;
 };
 
 /**
  * @private
  */
-AuraContext.prototype.getStorage = function() {
+Aura.Context.AuraContext.prototype.getStorage = function() {
     var storage = $A.storageService.getStorage("actions");
     if (!storage) {
         return undefined;
@@ -484,15 +491,13 @@ AuraContext.prototype.getStorage = function() {
  * Servlet container context path
  * @return {String} Servlet container context path
  * @private
+ * @export
  */
-AuraContext.prototype.getContextPath = function() {
+Aura.Context.AuraContext.prototype.getContextPath = function() {
     return this.contextPath;
 };
 
-AuraContext.prototype.setContextPath = function(path) {
+/** @export */
+Aura.Context.AuraContext.prototype.setContextPath = function(path) {
     this.contextPath = path;
 };
-
-Aura.Context.AuraContext = AuraContext;
-
-//#include aura.context.AuraContext_export

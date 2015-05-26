@@ -22,6 +22,7 @@
  * @param {Object} data
  * @param {Component} component
  * @returns {Function}
+ * @export
  */
 function AuraError() {
     this.name       = "AuraError";

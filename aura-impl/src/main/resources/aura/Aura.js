@@ -643,7 +643,7 @@ AuraInstance.prototype.initAsync = function(config) {
     // we don't handle components that come back here. This is used in the case where there
     // are none.
     //
-    $A.context = new AuraContext(config["context"], function() {
+    $A.context = new Aura.Context.AuraContext(config["context"], function() {
         $A.clientService.initHost(config["host"]);
         $A.metricsService.initialize();
         $A.clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
@@ -672,7 +672,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         $A.clientService.initHost(config["host"]);
         // creating context.
-        $A.context = new AuraContext(config["context"]);
+        $A.context = new Aura.Context.AuraContext(config["context"]);
         this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices, doNotCallUIPerfOnLoad);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
         $A.context.setCurrentAction(null);

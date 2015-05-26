@@ -22,7 +22,7 @@
     },
 
     handleClick: function(component, event, helper) {
-        var targetCmp = helper.getEventSourceComponent(component, event);
+        var targetCmp = helper.getEventSourceOptionComponent(component, event);
         var selectEvt = component.get("e.selectListOption");
         selectEvt.setParams({
             option: targetCmp

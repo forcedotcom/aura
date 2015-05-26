@@ -1988,6 +1988,17 @@ Aura.Utils.CoreUtil.prototype.toArray = function(collection) {
     }
 };
 
+/** @export */
+Aura.Utils.CoreUtil.prototype.setText = function(node, text) {
+    if (node.textContent !== undefined) {
+        //webkit & ff
+        node.textContent = text;
+    } else if (styleElement.innerText !== undefined) {
+        //chrome, safari, IE
+        node.innerText = text;
+    }
+};
+
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.
@@ -2072,17 +2083,6 @@ Aura.Utils.CoreUtil.prototype.toArray = function(collection) {
             }
         }
         return t;
-    };
-
-    /** @export */
-    Aura.Utils.CoreUtil.prototype.setText = function(node, text) {
-        if (node.textContent !== undefined) {
-            //webkit & ff
-            node.textContent = text;
-        } else if (styleElement.innerText !== undefined) {
-            //chrome, safari, IE
-            node.innerText = text;
-        }
     };
 
     /** @export */

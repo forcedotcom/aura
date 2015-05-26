@@ -46,7 +46,10 @@
             if (this._hasReachedMax(cmp, curItems)) {
                 break;
             }
-            if (!this._itemExists(curItems, newItems[i])) {
+            if (!newItems[i].hasOwnProperty("label")) {
+                $A.error("Can't insert pill. New pill items must have label property.");
+            }
+            else if (!this._itemExists(curItems, newItems[i])) {
                 itemsIsUpdated = true;
                 curItems.push(newItems[i]);
                 cmp.get("e.pillInserted").fire();

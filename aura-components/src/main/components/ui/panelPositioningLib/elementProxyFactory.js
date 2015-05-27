@@ -41,7 +41,6 @@ function (elementProxy, win) {
 
 
     function release(prx) {
-
         var proxy = proxyCache[prx.id];
         if(proxy) {
             --proxy.refCount;
@@ -54,7 +53,7 @@ function (elementProxy, win) {
     }
 
     function elementProxyFactory(el) {
-        var key;
+        var key, newProxy;
         
         if(el !== w && !el.id) {
             el.id = w.$A.getComponent(el).getGlobalId();
@@ -68,8 +67,11 @@ function (elementProxy, win) {
             proxyCache[key].refCount++;
             return proxyCache[key].el;
         } else {
+            newProxy = new ElementProxy(el, el.id);
+            newProxy.setReleaseCallback(release, newProxy);
+
             proxyCache[key] = {
-                el: new ElementProxy(el, el.id),
+                el: newProxy,
                 refCount : 1
             }
         }

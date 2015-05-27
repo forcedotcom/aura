@@ -28,10 +28,51 @@
 	buildTooltip: function(component) {
 
 		var node = component.find('tooltip').getElement();
+		var direction = component.get('v.direction');
 		var ttbodyNode = component.find('tooltipbody').getElement();
 		var pointer = node.querySelector('.pointer');
 		var target = component.getElement();
 		var lib = this.lib.panelPositioning;
+		var bbDirections;
+
+		var targetAlign, align;
+
+		switch (direction) {
+            case 'north':
+                align = 'center bottom';
+                targetAlign = 'center top';
+                bbDirections = {
+                    left:true,
+                    right:true
+                };
+                break;
+            case 'south':
+                align = 'center top';
+                targetAlign = 'center bottom';
+                bbDirections = {
+                    left:true,
+                    right:true
+                };
+                break;
+            case 'west':
+                align = 'right center';
+                targetAlign = 'left center';
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
+                break;
+            case 'east':
+                align = 'left center';
+                targetAlign = 'right center';
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
+                break;
+		}
+
+
 		if(!component._tooltip) {
 			component._tooltip = node;
 			component._tooltip.style.display = 'block';
@@ -39,9 +80,8 @@
 			lib.createRelationship({
 				element:ttbodyNode,
 				target:component._trigger,
-				align:'center bottom',
-				targetAlign: 'center top',
-				weight: 'medium',
+				align:align,
+				targetAlign:targetAlign,
 				enable: true,
 				pad: 10
 			});
@@ -58,12 +98,36 @@
 			lib.createRelationship({
 				element:pointer,
 				target:target,
-				align:'center bottom',
-				targetAlign: 'center top',
+				align:align,
+				targetAlign: targetAlign,
 				weight: 'medium',
 				enable: true,
 				pad: 0
 			});
+
+			if(direction === 'east') {
+                lib.createRelationship({
+                    element:pointer,
+                    target:ttbodyNode,
+                    align: 'right center',
+                    targetAlign: 'left center',
+                    enable: true,
+                    pad: 0
+                });
+            }
+
+            if(direction === 'west') {
+                lib.createRelationship({
+                    element:pointer,
+                    target:ttbodyNode,
+                    align: 'left center',
+                    targetAlign: 'right center',
+                    enable: true,
+                    pad: 15
+                });
+            }
+            
+
 
 			lib.createRelationship({
 				element:pointer,
@@ -71,6 +135,7 @@
 				type: 'bounding box',
 				weight: 'medium',
 				enable: true,
+				boxDirections: bbDirections,
 				pad: 5
 			});
 

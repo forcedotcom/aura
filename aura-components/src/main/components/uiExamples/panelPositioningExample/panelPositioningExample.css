@@ -15,7 +15,8 @@
  */
 .THIS.dragger,
 .THIS.panel,
-.THIS.pointer {
+.THIS.pointer, 
+.THIS .pointer {
 	z-index: 1;
 	position: absolute;
 	top: 0px;
@@ -49,11 +50,12 @@
 	background: black;
 }
 
-.THIS.pointer {
+.THIS.pointer,
+.THIS .pointer  {
 	z-index: 10;
 	position: absolute;
-	top: 0;
-	left: 0;
+	left: 0px;
+	top:0px;
 	width: 10px;
 	height: 10px;
 	padding: 0;

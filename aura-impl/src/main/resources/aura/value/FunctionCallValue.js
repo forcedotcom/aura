@@ -143,14 +143,6 @@ FunctionCallValue.prototype.destroy = function(){
 };
 
 /**
- * Sets the isDefined flag to true.
- * @returns {Boolean} true
- */
-FunctionCallValue.prototype.isDefined = function(){
-    return true;
-};
-
-/**
  * Helpful for logging/debugging.  Prints String value of the wrapped object.
  * @returns {String} FunctionCallValue
  */

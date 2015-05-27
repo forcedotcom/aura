@@ -121,14 +121,6 @@ FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
 };
 
 /**
- * Sets the isLiteral flag to false to denote that the element can be changed.
- * @returns {Boolean} false
- */
-FunctionCallValue.prototype.isLiteral = function(){
-    return false;
-};
-
-/**
  * Destroys the value wrapper.
  */
 FunctionCallValue.prototype.destroy = function(){

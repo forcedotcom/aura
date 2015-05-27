@@ -18,7 +18,6 @@ var p = PropertyReferenceValue.prototype;
 exp(p,
     "isDirty", p.isDirty,
     "isGlobal", p.isGlobal,
-    "isLiteral", p.isLiteral,
     "destroy", p.destroy,
     "toString", p.toString,
     "addChangeHandler", p.addChangeHandler,

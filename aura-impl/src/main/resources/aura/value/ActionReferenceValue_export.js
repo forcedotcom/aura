@@ -19,7 +19,6 @@ exp(p,
     "auraType", p.auraType,
     "getAction", p.getAction,
     "isDirty", p.isDirty,
-    "isLiteral", p.isLiteral,
     "destroy", p.destroy,
     "toString", p.toString
 );

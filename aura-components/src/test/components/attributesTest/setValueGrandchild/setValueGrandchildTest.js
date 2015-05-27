@@ -77,8 +77,8 @@
                 function(cmp) {
                     var actual = cmp.get("v.arrayAttributeWithDefaultValue");
                     $A.test.assertEquals(false, actual[0]);
-                    $A.test.assertEquals(true, actual[1]);
-                    $A.test.assertEquals(false, actual[2]);
+                    $A.test.assertEquals('true', actual[1]);
+                    $A.test.assertEquals(true, actual[2]);
                 }
             ]
     },
@@ -89,7 +89,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.longDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(456, actual);
+                    $A.test.assertEquals(9007199254740991, actual);
                 }
             ]
     },
@@ -100,7 +100,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.integerDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(456, actual);    
+                    $A.test.assertEquals(2147483647, actual);    
                 }
             ]
     },
@@ -111,7 +111,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.doubleDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(456, actual);    
+                    $A.test.assertEquals(9007199254740991, actual);    
                 }
             ]
     },
@@ -122,7 +122,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.decimalDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(456.789, actual);    
+                    $A.test.assertEquals(9.99999999999999, actual);    
                 }
             ]
     },

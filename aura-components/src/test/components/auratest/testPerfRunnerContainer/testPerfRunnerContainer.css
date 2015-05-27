@@ -44,8 +44,17 @@
     border-style: solid;
     padding: 0.5em;
     font-size: 15px;
-    width: 180px;
+    width: 450px;
     margin: 0 20px 0 10px;
+}
+
+
+.THIS .menu select.search-ops{
+	border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 0.5em;
+    font-size: 15px;
 }
 
 
@@ -66,19 +75,27 @@
 .THIS button.run {
     background: #CF5C60;
     font-size: 20px;
+    width:200px;
 }
 
-.THIS button.select {
+.THIS button.toggle_select_all {
     background: #F3AE4E;
     margin-right: 10px;
 }
 
-.THIS button.integ {
-    background: #717ECD;
+
+.THIS button.toggle_failed {
+    background: #339933;
+    margin-right: 10px;
 }
 
-.THIS button.integ[data-selected="true"],
-.THIS button.failed[data-selected="true"] {
+.THIS button.toggle_test_type{
+	background: #717ECD;
+    margin-right:10px;
+	
+}
+
+.THIS button.toggle_failed[data-selected="true"] {
     opacity: .5;
 }
 
@@ -107,7 +124,9 @@
 
 .THIS li {
     background: #F0F1F2;
+    border-bottom:1px solid #ddd;
 }
+
 .THIS li .parts {
     height: 50px;
     display: flex;
@@ -116,11 +135,6 @@
 .THIS li .icon {
     padding: 0 5px;
 }
-
-.THIS li:nth-child(odd) {
-    background: #fff
-}
-
 
 .THIS li:not([data-jsc]) .jsConsole {
     display: none;
@@ -227,4 +241,70 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+
+.THIS li .test-type{
+	width:50px;
+	display: flex;
+    justify-content: center;
+    align-items: center;
+    color:green;
+    text-shadow: 1px 1px 1px #000;
+}
+
+
+.THIS li[data-integ] .test-type{
+	color:yellow;
+}
+
+.THIS li .test-type:before{
+	content:'Unit';
+}
+
+
+.THIS li[data-integ] .test-type:before{
+	content:'Integ';
+}
+
+
+
+.THIS .container_header_row{
+	display:flex;
+	height:30px;
+	flex-direction: row;
+	background-color: #fff;
+	color:tomato;
+	font-weight:bold;
+}
+
+.THIS .container_header_row div{
+	height:30px;
+	vertical-align:middle;
+	display:flex;
+    align-items: center;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+.THIS .container_header_row .test_type{
+	width:60px;
+	padding-left:5px;
+}
+
+.THIS .container_header_row .chk{
+	width:40px;
+}
+
+.THIS .container_header_row .test_name{
+
+}
+
+.THIS .hl-row{
+	background-color:#ace;
+}
+
+.THIS .scroll_to_top{
+	margin-left:auto;
+	background-color:#000;
 }

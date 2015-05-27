@@ -19,29 +19,52 @@
 	model="java://org.auraframework.test.testsetrunner.TestSetRunnerModel" 
 	controller="java://org.auraframework.test.testsetrunner.TestSetRunnerController">
 	
-<aura:attribute name="scope" type="String"/>
-
+	<aura:attribute name="scope" type="String"/>
+	<aura:attribute name="keyword" type="String"/>
+	
 	<section class="content">
 		<div class="menu">
 			<p class="search-bar">
 				<span>Search:</span>
-				<input class="search" type="text" placeholder="Type to filter tests"/>
-				<button class="select">
-					<input type="checkbox" name="select"/>
-					<span>Select all</span>
-				</button>
-				<button class="integ">
-					<input type="checkbox" name="select"/>
-					<span>Hide Integ</span>
-				</button>
-				<button class="failed">
-					<input disabled="true" type="checkbox" name="select"/>
-					<span>Show only failed</span>
+				<select class="search-ops">
+					<option>AND</option>
+					<option>OR</option>
+				</select>
+				<input class="search" type="text" placeholder="Type to filter tests (multiple searches: keyword1, keyword2)" value="{!v.keyword}" />
+				<button class="search-case-sensitive" title="Case Sensitive">
+					<input type="checkbox" name="select" />
+					<span title="Case sensitive">Sensitive</span>
 				</button>
 			</p>
-			<button class="run">
-				<span>Run!</span>
+			<button class="run" title="Run Selected Tests">
+				<span>Run <span id="count_selected"></span></span>
 			</button>
+		</div>
+		<div class="menu">
+			<button class="toggle_select_all" title="Select all visible tests">
+				<input type="checkbox" name="toggle_select_all"/>
+				<span>Select all</span>
+			</button>
+			<button class="toggle_test_type" title="Show/Hide Integration and Unit tests">
+				<input type="checkbox" name="select" class="test_integ" checked="true" />
+				<span for="test_integ">Integ</span>
+				<input type="checkbox" name="select" class="test_unit" checked="true" />
+				<span for="test_unit">Unit</span>
+			</button>
+			<button class="toggle_failed" title="Show only test failure">
+				<input disabled="true" type="checkbox" name="show_fail_only"/>
+				<span>Show only failed</span>
+			</button>
+			
+			
+			<button class="scroll_to_top" title="Scroll To Top">
+				<span>^</span>
+			</button>
+		</div>
+		<div class="container_header_row">
+			<div class="test_type">Type</div>
+			<div class="chk"></div>
+			<div class="test_name">Test Name</div>
 		</div>
 	</section>
 </aura:component>

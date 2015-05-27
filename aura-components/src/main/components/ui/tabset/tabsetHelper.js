@@ -32,12 +32,11 @@
         }
         if (tab && this.fireBeforeActiveEvent(cmp, {"tab": tab, "oldTab": this.getActiveTab(cmp)}, tab)) {
             // set active tabItem
-            var e = cmp.find('tabBar').get('e.setActive');
-            e.setParams({"index": index, "active": active, "focus": option.focus}).setComponentEvent().fire();
+            cmp.find("tabBar").get("e.setActive").fire({"index": index, "active": active, "focus": option.focus});
             // activate body
             this.setActiveTabBody(cmp, {"index": index, "active": active, "tab": tab});
             //fire tabset onActivate event
-            cmp.get("e.onActivate").setParams({"tab": tab}).setComponentEvent().fire();
+            cmp.get("e.onActivate").fire({"tab": tab, "index": option.index});
         }
     },
     /**
@@ -99,7 +98,7 @@
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
         var oldTab = typeof params.oldTab === "number" ? cmp._tabCollection.getTab(params.oldTab) : params.oldTab;
 
-        target.get("e.beforeActivate").setParams({"tab": tab, "oldTab": oldTab, "callback": callback}).setComponentEvent().fire();
+        target.get("e.beforeActivate").fire({"tab": tab, "oldTab": oldTab, "callback": callback});
 
         return activate;
     },
@@ -130,16 +129,15 @@
         if (option.active) {
             //deactivate current tabBody
             if (cmp._activeTab && cmp._activeTab.isValid()) {
-                evt = cmp._activeTab.get("e.setActive");
-                evt.setParams({"active": false}).setComponentEvent().fire();
+                cmp._activeTab.get("e.setActive").fire({"active": false});
             }
             //fire event to curent tab to update status
-            tab.get('e.setActive').setParams({active: true}).setComponentEvent().fire();
+            tab.get("e.setActive").fire({"active": true});
             //save current active tab
             cmp._activeTab = tab;
         } else if (option.active === false && cmp._activeTab === tab) {
             //deactivate tab
-            tab.get('e.setActive').setParams({active: false}).setComponentEvent().fire();
+            tab.get("e.setActive").fire({"active": false});
             cmp._activeTab = null;
         }
     },
@@ -350,18 +348,18 @@
      * Render tab component to tabContainer
      * @private
      */
-    renderTabBody: function(cmp, tabComponent) {
+    renderTabBody: function (cmp, tabComponent) {
 //JBUCH: HALO: TODO: WHY CAN'T THIS WHOLE METHOD JUST BE:
 //cmp.find("tabContainer").set("v.body",tabComponent);
 //???
-    	var container = cmp.find("tabContainer").getElement(),
-    		docFrag = document.createDocumentFragment();
+        var container = cmp.find("tabContainer").getElement(),
+            docFrag = document.createDocumentFragment();
 
-    	$A.render(tabComponent, docFrag);
-		$A.afterRender(tabComponent);
-		container.appendChild(docFrag);
-     },
-     /**
+        $A.render(tabComponent, docFrag);
+        $A.afterRender(tabComponent);
+        container.appendChild(docFrag);
+    },
+    /**
      * Clean up
      * @private
      */

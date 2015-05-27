@@ -50,7 +50,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      */
     public void testRerenderMarksHaveComponentName() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
-        open("/performanceTest/ui_button.cmp", Mode.CADENCE);
+        open("/miscTest/ui_button.cmp", Mode.CADENCE);
         clearUIPerfStats();
         WebElement button = getDriver().findElement(By.cssSelector("button[class~='uiButton']"));
         button.click();
@@ -76,7 +76,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
      */
     public void testRerenderMarksHaveAllComponentNames() throws Exception {
         Map<String, String> logStats = Maps.newHashMap();
-        open("/performanceTest/perfApp.app", Mode.CADENCE);
+        open("/miscTest/perfApp.app", Mode.CADENCE);
         clearUIPerfStats();
 
         // Mark an attribute as dirty at the root component

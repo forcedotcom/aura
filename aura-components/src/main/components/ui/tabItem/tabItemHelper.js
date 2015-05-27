@@ -20,7 +20,7 @@
 
         if (active) {
             var itemEl = cmp.find("tabItem").getElement();
-            if (focus) {
+            if (itemEl && focus) {
                 itemEl.focus();
             }
         }

@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component access="GLOBAL">
+    <aura:attribute name="cmpToCreate" type="String"/>
+    <aura:attribute name="completed" type="Boolean" default="false"/>
+    <aura:attribute name="attrName" type="String" default="attr"/>
+
+    <!-- Add components we will client-side create as dependencies to avoid server trip -->
+    <aura:dependency resource="auratest:accessGlobalComponent" />
+    <aura:dependency resource="auratest:accessPublicComponent" />
+
+    <div aura:id="output" class="output"/>
+
+    <ui:button label="Get attribute" press="{!c.getAttribute}" class="getAttribute"/>
+    <ui:button label="testComponentAccess" press="{!c.testComponentAccess}" class="testComponentAccess"/>
+    <br/>
+    Component creation completed: <span class="completed">{!v.completed}</span>
+    <br/>
+    Attribute value: <span aura:id="attrValue" class="attrValue"></span>
+</aura:component>

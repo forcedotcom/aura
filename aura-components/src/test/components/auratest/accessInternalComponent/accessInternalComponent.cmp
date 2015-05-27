@@ -15,13 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT"
-            extends="ui:command"
-            access="GLOBAL"
-            description="Test Global Event.">
-
-    <aura:attribute name="Private" type="String" access="PRIVATE" default="PRIVATE"/>
-    <aura:attribute name="Public" type="String" access="PUBLIC" default="PUBLIC"/>
-    <aura:attribute name="Internal" type="String" access="INTERNAL" default="INTERNAL"/>
-    <aura:attribute name="Global" type="String" access="GLOBAL" default="GLOBAL"/>
-</aura:event>
+<aura:component access="INTERNAL">
+    <div>auratest:accessInternalComponent</div>
+</aura:component>

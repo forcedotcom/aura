@@ -17,6 +17,7 @@ package org.auraframework.impl.adapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,8 +37,8 @@ import com.google.common.collect.ImmutableSortedSet;
 
 /**
  * ConfigAdapter for Aura tests.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
@@ -135,6 +136,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Boolean validateCss = null;
     private ContentSecurityPolicy csp;
     private String csrfToken = null;
+    private final Set<String> unprivilegedNamespaces = new HashSet<>();
 
     public MockConfigAdapterImpl() {
         super();
@@ -151,6 +153,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         isAuraJSStatic = null;
         validateCss = null;
         csrfToken = null;
+        unprivilegedNamespaces.clear();
     }
 
     @Override
@@ -208,7 +211,23 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     }
 
     @Override
+    public void setUnprivilegedNamespace(String namespace) {
+        unprivilegedNamespaces.add(namespace);
+    }
+
+    @Override
+    public Set<String> getPrivilegedNamespaces() {
+        Set<String> namespaces = super.getPrivilegedNamespaces();
+        namespaces.removeAll(unprivilegedNamespaces);
+        return namespaces;
+    }
+
+    @Override
     public boolean isPrivilegedNamespace(String namespace) {
+        if (unprivilegedNamespaces.contains(namespace)) {
+            return false;
+        }
+
         if (StringSourceLoader.getInstance().isPrivilegedNamespace(namespace)
                 || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isPrivilegedNamespace(namespace)) {
             return true;

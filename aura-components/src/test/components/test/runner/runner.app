@@ -17,7 +17,7 @@
 <aura:application>
 	<aura:attribute name="scope" type="String"/>
 	<aura:attribute name="keyword" type="String"/>
-	
+
 	<div class="viewport">
 		<header>
 			<span class="icon-rocket"></span>

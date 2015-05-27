@@ -15,11 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" description="An abstract component that provides a basic layout for the ui:list component.">
+<aura:component access="GLOBAL" extensible="true">
     <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
-    <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>
-    <aura:attribute name="Internal" type="String" access="INTERNAL" description="private" default="INTERNAL"/>
-    <aura:attribute name="Global" type="String" access="GLOBAL" description="private" default="GLOBAL"/>
+    <aura:attribute name="Public" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
+    <aura:attribute name="Internal" type="String" access="INTERNAL" description="internal" default="INTERNAL"/>
+    <aura:attribute name="Global" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
+    
+    <aura:registerEvent name="globalEvent" type="auratest:accessGlobalEvent"/>
+    <aura:registerEvent name="publicEvent" type="auratest:accessPublicEvent"/>
+    <aura:registerEvent name="internalEvent" type="auratest:accessInternalEvent"/>
+    <aura:registerEvent name="privateEvent" type="auratest:accessPrivateEvent"/>
+
     <div>
         {!v.Private}<br/>
         {!v.Public}<br/>

@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.perf.custom;
-
-import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-
-public final class DatePickerComponentTest extends CustomPerfAbstractTestCase {
-
-    public DatePickerComponentTest(String name) {
-        super(name);
-
-        setComponentDef(getDefDescriptor("miscTest:ui_datePicker"));
+({
+    createCmpWithComplexAttributes: function(cmp, evt, helper){
+        helper.createComponentAndPushToBody(cmp, 
+                {componentDef: "markup://miscTest:ui_infiniteList",
+                       attributes:{
+                       values:{
+                            multiplier: 5
+                       }
+                       }
+                });
     }
-
-    public void TODO_testChangeYear() throws Throwable {
-        // Change calendar year.
-        WebElement element = currentDriver.findElement(By.cssSelector(".nextYear"));
-        element.click();
-    }
-}
+})

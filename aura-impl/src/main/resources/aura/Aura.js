@@ -155,6 +155,10 @@ window['$A'] = {};
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet
 
+// -- RequiredVersion ----------------------------------------------------------
+// #include aura.requiredVersion.RequiredVersionDef
+// #include aura.requiredVersion.RequiredVersionDefSet
+
 // -- L10n ---------------------------------------------------------------
 // #include aura.l10n.AuraLocalizationContext
 

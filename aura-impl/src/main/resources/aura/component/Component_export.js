@@ -73,6 +73,8 @@ exp(p,
     "superRerender", p.superRerender,
     "superUnrender", p.superUnrender,
 
+    "getVersion", p.getVersion,
+
     // DCHASMAN TODO Kill these once we figure out how to replace them in Halo
     "getAttributeValueProvider", p.getAttributeValueProvider,
     "getComponentValueProvider", p.getComponentValueProvider,

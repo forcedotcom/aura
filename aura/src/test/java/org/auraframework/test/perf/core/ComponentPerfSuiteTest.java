@@ -74,7 +74,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
      * @return the list of namespaces to create tests for
      */
     protected List<String> getNamespaces() {
-        return ImmutableList.of("ui", "perf");
+        return ImmutableList.of("ui", "perfTest");
     }
 
     /**

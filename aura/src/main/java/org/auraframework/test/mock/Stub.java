@@ -17,6 +17,8 @@ package org.auraframework.test.mock;
 
 import java.util.List;
 
+import org.auraframework.throwable.AuraRuntimeException;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -61,10 +63,12 @@ public class Stub<T> {
 	 * @return the Answer for the current method invocation
 	 */
     public Answer<T> getNextAnswer() {
-        Answer<T> ret = answers.get(answerIndex);
-        if (answerIndex < answers.size() - 1) {
+        if (answerIndex <= answers.size() - 1) {
+        	Answer<T> ret = answers.get(answerIndex);
             answerIndex++;
+            return ret;
+        } else {
+        	throw new AuraRuntimeException("You have "+answers.size()+" answers for mocking, but they are all exhausted");
         }
-        return ret;
     }
 }

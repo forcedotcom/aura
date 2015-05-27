@@ -20,6 +20,7 @@
     border:1px solid #CCCCCC;
     border-radius:5px;
     position:relative;
+    min-width:200px;
 }
 
 .THIS.noinput {

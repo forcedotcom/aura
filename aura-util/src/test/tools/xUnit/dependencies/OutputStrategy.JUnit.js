@@ -215,11 +215,12 @@ Test.Tools.Aura.Output.OutputStrategy.JUnit = function () {
         if(!skipped||!skipped.length)return;
         for(var i=0;i<skipped.length;i++){
             output.push(String.Format(
-                '\n\t<skippedtestcase classname="{0}" name="{1}" notes="{2}"/>',
-                encode(getClassname(skipped[i].Component)),
-                encode(getTestname(skipped[i].Component)),
-                encode(skipped[i].State.Message || "[no message]")
-            ));
+                    '\n\t<testcase classname="{0}" name="{1}" time="{2}"><skipped message="{3}"/></testcase>',
+                    encode(getClassname(skipped[i].Component)),
+                    encode(getTestname(skipped[i].Component)),
+                    encode(skipped[i].Component.duration/1000),
+                    encode(skipped[i].Component.State.Message || "[no message]")
+                ));
         }
     }
 

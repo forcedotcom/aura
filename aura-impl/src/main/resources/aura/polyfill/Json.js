@@ -264,7 +264,9 @@ Json.prototype.orderedEncode = (function () {
                 // customized to sort keys during serialization
                 for(var j = 0; j < len; j++) {
                     var key = sortedKeys[j];
-                    tmp.push(stringify(key) + ':' + stringify(value[key]));
+                    if (value[key] !== undefined) {
+                        tmp.push(stringify(key) + ':' + stringify(value[key]));
+                    }
                 }
                 return '{' + tmp.join(',') + '}';
             }

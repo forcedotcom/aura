@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-({  
-    testAttributeSetOnComponents: {
+({
+	testAttributeSetOnComponents: {
         test: [
                 function(cmp) {
                     $A.test.assertTrue($A.util.isArray(cmp.get("v.componentDefault")));
+                    $A.test.assertTrue($A.util.isComponent(cmp.get("v.componentDefault")[0]), "v.componentDefault should be a component");
                 },
                 function(cmp) {
                     var expected = "setValueChild";
@@ -26,13 +27,6 @@
                     $A.test.assertEquals(expected, actual);
                 }
             ]
-    },
-    testAttributeSetOnComponents2: {
-        test: function(cmp) {
-            var expected = "setValueGrandchild";
-            var actual = cmp.get("v.componentDefault2")[0].get("v.value").trim();
-            $A.test.assertEquals(expected, actual);
-        }
     },
     testAttributeSetOnMap: {
         test: [
@@ -50,7 +44,9 @@
         test: [
                 function(cmp) {
                     // It's a string because the attribute is of type "Object" which is a base type of String
-                    $A.test.assertTrue(typeof cmp.get("v.objAttributeWithDefaultValue") == "string");
+                	var objAttr = cmp.get("v.objAttributeWithDefaultValue");
+                	$A.test.assertFalse($A.util.isObject(objAttr), "Object with default value is type String, not Object");
+                    $A.test.assertTrue(typeof objAttr == "string", "Object with default value has type String");
                 },
                 function(cmp) {
                     var actual = cmp.get("v.objAttributeWithDefaultValue");
@@ -72,13 +68,14 @@
     testAttributeSetOnBooleanArray: {
         test: [
                 function(cmp) {
-                    $A.test.assertTrue($A.util.isArray(cmp.get("v.arrayAttributeWithDefaultValue")));
+                    $A.test.assertTrue($A.util.isArray(cmp.get("v.arrayAttributeWithDefaultValue")), 
+                    		"v.arrayAttributeWithDefaultValue is suppose to be an Array");
                 },
                 function(cmp) {
                     var actual = cmp.get("v.arrayAttributeWithDefaultValue");
-                    $A.test.assertEquals(false, actual[0]);
-                    $A.test.assertEquals('true', actual[1]);
-                    $A.test.assertEquals(true, actual[2]);
+                    $A.test.assertEquals(false, actual[0], "v.arrayAttributeWithDefaultValue[0] should be false");
+                    $A.test.assertEquals("true", actual[1], "v.arrayAttributeWithDefaultValue[1] should be 'true', we set it to String");
+                    $A.test.assertEquals(true, actual[2], "v.arrayAttributeWithDefaultValue[2] should be true");
                 }
             ]
     },
@@ -89,7 +86,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.longDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(9007199254740991, actual);
+                    $A.test.assertEquals(9007199254740991, actual);//9007199254740991 is the max int for javascirpt, 53bit only
                 }
             ]
     },
@@ -100,7 +97,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.integerDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(2147483647, actual);    
+                    $A.test.assertEquals(2147483647, actual);//2147483647 is the max for int for Java side
                 }
             ]
     },
@@ -111,7 +108,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.doubleDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(9007199254740991, actual);    
+                    $A.test.assertEquals(9007199254740991, actual);//9007199254740991 is the max int for javascript, 53bit only
                 }
             ]
     },
@@ -122,7 +119,7 @@
                 },
                 function(cmp) {
                     var actual = cmp.get("v.decimalDefaultWithStringPositiveInt");
-                    $A.test.assertEquals(9.99999999999999, actual);    
+                    $A.test.assertEquals(9.99999999999999, actual); //that's the max digit a float can hold in javascript, 53bit only
                 }
             ]
     },

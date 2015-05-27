@@ -56,14 +56,14 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         button.click();
         waitForElementTextPresent(getDriver().findElement(By.cssSelector("div[class~='changeCount']")), "1");
 
-        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-2: ['markup://performanceTest:ui_button']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-2: ['markup://miscTest:ui_button']")));
         assertTrue("Did not find UIPerf marks with component information for Rerender cycle.",
                 logStats.isEmpty());
         logStats.clear();
 
         button.click();
         waitForElementTextPresent(getDriver().findElement(By.cssSelector("div[class~='changeCount']")), "2");
-        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://performanceTest:ui_button']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://miscTest:ui_button']")));
         assertTrue("Did not mark multiple Rerender of same component.",
                 logStats.isEmpty());
     }
@@ -84,7 +84,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
         button.click();
         waitForElementAppear(By.cssSelector("tr[class~='grey']"));
 
-        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://performanceTest:perfApp']")));
+        logStats.putAll(getUIPerfStats(Lists.newArrayList("Rerendering-3: ['markup://miscTest:perfApp']")));
         assertTrue("Rerender of root component not marked in UIPerf.",
                 logStats.isEmpty());
         logStats.clear();
@@ -97,7 +97,7 @@ public class RerenderMarksUITest extends PerfMetricsTestCase {
                 By.xpath("//div[@class='performanceTestIterateBasicData']/table/tr[11]"));
         // Changing iteration end index only rerenders iterations with number of items greater than new end index
         logStats.putAll(getUIPerfStats(Lists
-                .newArrayList("Rerendering-4: ['markup://performanceTest:perfApp','markup://aura:iteration','markup://aura:iteration']")));
+                .newArrayList("Rerendering-4: ['markup://miscTest:perfApp','markup://aura:iteration','markup://aura:iteration']")));
         assertTrue("Multiple component Rerender should be marked with all componentNames.",
                 logStats.isEmpty());
         logStats.clear();

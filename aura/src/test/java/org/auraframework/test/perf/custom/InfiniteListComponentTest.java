@@ -26,7 +26,7 @@ public final class InfiniteListComponentTest extends CustomPerfAbstractTestCase 
     public InfiniteListComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:ui_infiniteList"));
+        setComponentDef(getDefDescriptor("miscTest:ui_infiniteList"));
     }
 
     public void TODO_testShowMore() throws Throwable {

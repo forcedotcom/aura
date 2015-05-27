@@ -20,7 +20,7 @@ import org.auraframework.test.perf.core.CustomPerfAbstractTestCase;
 public final class IfComponentTest extends CustomPerfAbstractTestCase {
 
     public IfComponentTest(String name) {
-        super(name, getDefDescriptor("performanceTest:aura_if"));
+        super(name, getDefDescriptor("miscTest:aura_if"));
     }
 
     public void testIf() throws Throwable {

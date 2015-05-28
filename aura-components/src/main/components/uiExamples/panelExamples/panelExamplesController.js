@@ -32,11 +32,7 @@
                 useTransition: false,
                 body  : body,
                 direction: 'south'
-            },
-            onCreate: function (panel) {
-                console.log('createPanel ' + panel);
             }
-
         }).fire();
     },
 
@@ -69,9 +65,6 @@
                 title: 'Panel Header',
                 flavor: 'full-screen',
                 body  : body
-            },
-            onCreate: function (panel) {
-                console.log('createPanel ' + panel);
             }
 
         }).fire();
@@ -108,11 +101,7 @@
                 flavor: 'large',
                 body  : body,
                 footer: footer
-            },
-            onCreate: function (panel) {
-                console.log('createmodal ' + panel);
             }
-
         }).fire();
     },
 
@@ -134,5 +123,124 @@
             }
 
         }).fire();
-    }
+    },
+    openPanel1: function(cmp){
+        if (cmp._panel1) {
+            return;
+        }
+        var refEl = '.uiExamplesPanelExamples .panel1';
+        var body = $A.newCmp({componentDef: 'uiExamples:panelContent', attributes: {values:{'class': 'yellow'}}});
+        var header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                header: 'panel 1',
+                referenceElementSelector: refEl,
+                closeOnClickOut: false,
+                showCloseButton: false,
+                useTransition: false,
+                body  : body,
+                header: header,
+                direction: 'south'
+            },
+            onCreate: function (panel) {
+                header.setAttributeValueProvider(panel);
+                cmp._panel1 = panel;
+            },
+            onDestroy: function() {
+                delete cmp._panel1;
+            }
+        }).fire();
+    },
+    hidePanel1: function(cmp){
+        if (cmp._panel1 && cmp._panel1.isValid()) {
+            cmp._panel1.hide(function(){
+            });
+        }
+    },
+    showPanel1: function(cmp){
+        if (cmp._panel1 && cmp._panel1.isValid()) {
+            cmp._panel1.show();
+        }
+    },
+    openPanel2: function(cmp){
+        if (cmp._panel2) {
+            return;
+        }
+        var refEl = '.uiExamplesPanelExamples .panel2';
+        var body = $A.newCmp({componentDef: 'uiExamples:panelContent', attributes: {values:{'class': 'blue'}}});
+        var header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                header: 'panel 2',
+                referenceElementSelector: refEl,
+                closeOnClickOut: false,
+                useTransition: false,
+                showCloseButton: false,
+                body  : body,
+                header: header,
+                direction: 'south'
+            },
+            onCreate: function (panel) {
+                header.setAttributeValueProvider(panel);
+                cmp._panel2 = panel;
+            },
+            onDestroy: function() {
+                delete cmp._panel2;
+            }
+
+        }).fire();
+    },
+    hidePanel2: function(cmp){
+        if (cmp._panel2 && cmp._panel2.isValid()) {
+            cmp._panel2.hide();
+        }
+    },
+    showPanel2: function(cmp){
+        if (cmp._panel2 && cmp._panel2.isValid()) {
+            cmp._panel2.show();
+        }
+    },
+    openPanel3: function(cmp){
+        if (cmp._panel3) {
+            return;
+        }
+        var refEl = '.uiExamplesPanelExamples .panel3';
+        var body = $A.newCmp({componentDef: 'uiExamples:panelContent', attributes: {values:{'class': 'green'}}});
+        var header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                header: 'panel 3',
+                referenceElementSelector: refEl,
+                closeOnClickOut: false,
+                useTransition: false,
+                showCloseButton: false,
+                header: header,
+                body  : body,
+                direction: 'south'
+            },
+            onCreate: function (panel) {
+                header.setAttributeValueProvider(panel);
+                cmp._panel3 = panel;
+            },
+            onDestroy: function() {
+                delete cmp._panel3;
+            }
+        }).fire();
+    },
+    hidePanel3: function(cmp){
+        if (cmp._panel3 && cmp._panel3.isValid()) {
+            cmp._panel3.hide();
+        }
+    },
+    showPanel3: function(cmp){
+        if (cmp._panel3 && cmp._panel3.isValid()) {
+            cmp._panel3.show();
+        }
+    },
 })

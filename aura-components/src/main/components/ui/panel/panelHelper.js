@@ -16,8 +16,8 @@
 ({
     init: function(cmp, event) {
         //handler for closeOnEsc and closeOnTabOut
-        cmp._windowKeyHandler = this.lib.panelLib.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true});
-        cmp._mouseEventHandler = this.lib.panelLib.getMouseEventListener(cmp, {closeOnClickOut: true});
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true});
+        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: true});
     },
 
     show: function (cmp, callback) {
@@ -34,7 +34,7 @@
 
         var self = this;
 
-        this.lib.panelLib.show(cmp, {
+        this.lib.panelLibCore.show(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'movefrom' + cmp.get('v.animation'),
             autoFocus: cmp.get('v.autoFocus'),
@@ -73,7 +73,7 @@
 
     hide: function (cmp, callback) {
         var panelEl = cmp.getElement();
-        this.lib.panelLib.hide(cmp, {
+        this.lib.panelLibCore.hide(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'moveto' + cmp.get('v.animation'),
             onFinish: function() {

@@ -34,7 +34,7 @@
     },
 
     setActive: function(cmp, event, helper) {
-        helper.lib.panelLib.setActive(cmp, event.getParam('arguments').active);
+        helper.lib.panelLibCore.setActive(cmp, event.getParam('arguments').active);
     },
 
     onNotify: function(cmp, event) {

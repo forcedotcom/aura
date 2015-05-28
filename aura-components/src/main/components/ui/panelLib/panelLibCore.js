@@ -145,8 +145,8 @@ function () {
 
             //need to notify panel manager to de-activate other panels;
             cmp.getEvent('notify').setParams({
-                action: 'deActivatePanels',
-                typeOf: 'ui:showPanel',
+                action: 'beforeShow',
+                typeOf: 'ui:panel',
                 payload: { panelInstance: cmp.getGlobalId() }
             }).fire();
 
@@ -156,8 +156,7 @@ function () {
                     $A.util.removeClass(animEl, 'transitioning ' + animName);
                     animEl.removeEventListener(animEnd, finishHandler);
                 }
-                // This is use by the WebDriver test to detect that the sliding animation is done.
-                $A.util.addClass(panel, 'active panelReady');
+                $A.util.addClass(panel, 'active');
 
                 if (config.autoFocus) {
                     me.setFocus(cmp);
@@ -193,7 +192,9 @@ function () {
                     panel.removeEventListener(animEl, finishHandler);
                     $A.util.removeClass(animEl, 'transitioning ' + animName);
                 }
-                $A.util.removeClass(panel, 'open active panelReady');
+                $A.util.removeClass(panel, 'open');
+                $A.util.removeClass(panel, 'active');
+
                 config.onFinish && config.onFinish();
             };
 

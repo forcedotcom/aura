@@ -35,7 +35,7 @@
 
     setActive: function(cmp, event, helper) {
         var callback = event.getParam && event.getParam('arguments').callback;
-        helper.lib.panelLib.setActive(cmp, event.getParam('arguments').active);
+        helper.lib.panelLibCore.setActive(cmp, event.getParam('arguments').active);
         callback && callback();
     },
 
@@ -45,7 +45,7 @@
 
     update: function(cmp, event, helper){
         var args = event.getParam && event.getParam('arguments');
-        helper.lib.panelLib.updatePanel(cmp, args.body, args.callback);
+        helper.lib.panelLibCore.updatePanel(cmp, args.body, args.callback);
     },
 
     onNotify: function(cmp, event) {

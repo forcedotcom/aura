@@ -61,7 +61,8 @@ public final class PerfWebDriverUtil {
         // NOTE: need to create single LoggingPreferences object to be reused as LoggingPreferences
         // doesn't implement hashCode()/equals() correctly
         PERFORMANCE_LOGGING_PREFS = new LoggingPreferences();
-        PERFORMANCE_LOGGING_PREFS.enable(LogType.PERFORMANCE, Level.INFO);
+        PERFORMANCE_LOGGING_PREFS.enable(LogType.PERFORMANCE, Level.ALL);
+        
         // logPrefs.enable(LogType.BROWSER, Level.ALL);
         // Level.FINE for LogType.DRIVER shows all dev tools requests and responses
         // logPrefs.enable(LogType.DRIVER, Level.WARNING);
@@ -139,6 +140,7 @@ public final class PerfWebDriverUtil {
             return driver.manage().logs().get(type).getAll();
         } catch (WebDriverException ignore) {
             // i.e. log type 'profiler' not found
+            ignore.printStackTrace();
         } catch (Exception e) {
             LOG.log(Level.WARNING, type, e);
         }

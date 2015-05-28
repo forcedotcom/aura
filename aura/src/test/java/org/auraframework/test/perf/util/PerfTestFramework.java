@@ -15,11 +15,10 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.util.List;
+import java.util.Map;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.json.JSONArray;
 
 /**
  * @author mvijayakumar
@@ -31,10 +30,8 @@ import org.json.JSONArray;
  */
 public interface PerfTestFramework {
 
-    public List<DefDescriptor<ComponentDef>> discoverTests();
+    public Map<DefDescriptor<ComponentDef>, PerfConfig> discoverTests();
 
-    public void runTests(List<DefDescriptor<ComponentDef>> defs) throws Exception;
-
-    public JSONArray publishResults(JSONArray metrics);
+    public void runTests(Map<DefDescriptor<ComponentDef>, PerfConfig> tests) throws Exception;
 
 }

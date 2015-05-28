@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.auraframework.util.test.diff.PerfGoldFilesUtil;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableSortedSet;
@@ -173,6 +174,13 @@ public final class PerfMetrics {
             }
         }
         return sb.toString();
+    }
+    
+    public JSONObject toJSONObject () throws JSONException {
+    	JSONArray metricsList = toJSONArrayWithoutDetails();
+    	JSONObject metrics = new JSONObject();
+    	metrics.put("metrics", metricsList);
+    	return metrics;
     }
 
     public JSONArray toJSONArrayWithoutDetails() {

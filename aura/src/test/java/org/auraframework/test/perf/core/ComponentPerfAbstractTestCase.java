@@ -22,7 +22,7 @@ import org.auraframework.util.test.annotation.PerfCmpTest;
 /**
  * Base class for Aura WebDriver tests.
  */
-@PerfCmpTest
+//@PerfCmpTest
 public abstract class ComponentPerfAbstractTestCase extends AbstractPerfTestCase {
 
     protected DefDescriptor<ComponentDef> descriptor;

@@ -1,4 +1,6 @@
 function PerfRunner(COQL, Memory) {
+    var TIMESTAMP = (console && console.timeStamp) ? console.timeStamp.bind(console) : function () {};
+
     return (function () {
         var CONFIG = {},
             classFinishTest = 'testFinish',
@@ -131,8 +133,10 @@ function PerfRunner(COQL, Memory) {
             startMetricsCollection: function () {
                 $A.metricsService.transactionStart('PERFRUNNER', 'run');
                 COQL.snapshot('start');
+                TIMESTAMP('perfRunner:start');
             },
             stopMetricsCollection: function () {
+                TIMESTAMP('perfRunner:end');
                 var transaction;
                 COQL.snapshot('end');
                 $A.metricsService.transactionEnd('PERFRUNNER', 'run', function (t) {
@@ -140,7 +144,7 @@ function PerfRunner(COQL, Memory) {
                 }); // sync
 
                 if (COQL.enabled) {
-                    this.results.coql = COQL.diff('end', 'start');
+                    this.results.coql = COQL.getResults('end', 'start');
                 }
 
                 this.results.transaction = transaction;

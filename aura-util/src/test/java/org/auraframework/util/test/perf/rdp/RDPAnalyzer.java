@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 
 /**
  * Analyzes the raw RDP notifications
@@ -42,6 +43,10 @@ public final class RDPAnalyzer {
     private final List<RDPNotification> filteredNotifications;
     private final List<JSONObject> filteredFlattenedTimelineEvents;
     private Map<String, TimelineEventStats> timelineEventsStats;
+    private final List<JSONObject> filteredFlattenedTraceEvents;
+    private Map<String, TraceEventStats> traceEventsMap;
+    private List<JSONObject> flattenedTraceEvents;
+    
 
     public RDPAnalyzer(List<RDPNotification> notifications, String startMarker, String endMarker) {
         this.notifications = notifications;
@@ -50,9 +55,14 @@ public final class RDPAnalyzer {
         List<JSONObject> flattenedTimelineEvents = RDPUtil.flattenedTimelineEvents(notifications);
         this.filteredFlattenedTimelineEvents = RDPUtil
                 .filteredTimeline(flattenedTimelineEvents, startMarker, endMarker);
-
-        LOG.info("num timeline events: " + flattenedTimelineEvents.size() + ", num filtered: "
-                + this.filteredFlattenedTimelineEvents.size());
+        
+        flattenedTraceEvents = RDPUtil.flattenedTraceEvents(notifications);
+        this.filteredFlattenedTraceEvents = RDPUtil
+                .filteredTimeline(flattenedTraceEvents, startMarker, endMarker);
+        
+        LOG.info("num trace events: " + flattenedTraceEvents.size() 
+        		+ ", num filtered: "
+                + this.filteredFlattenedTraceEvents.size());
     }
 
     public List<RDPNotification> getFilteredNotifications() {
@@ -81,7 +91,83 @@ public final class RDPAnalyzer {
         }
         return timelineEventsStats;
     }
+    
+    /**
+     * Collects statistics on all the "Tracing.dataCollected" events
+     */
+    public synchronized Map<String, TraceEventStats> analyzeTraceDomain() {
+        if (traceEventsMap != null) {
+            return traceEventsMap;
+        }
 
+        traceEventsMap = Maps.newHashMap();
+        for (JSONObject traceEvent : filteredFlattenedTraceEvents) {
+            try {
+                collectTraceEvent(traceEvent);
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, String.valueOf(traceEvent), e);
+            }
+        }
+        return traceEventsMap;
+    }
+
+    /**
+     * @param trace event, see
+     *            https://sites.google.com/a/chromium.org/chromedriver/logging/performance-log
+     *            eg: {"tts":118019,"cat":"disabled-by-default-devtools.timeline","ts":1.089338730489E12,"args":{},"name":"Program","pid":1447,"tid":1299,"ph":"B"}
+     * @throws Exception 
+     */
+    private void collectTraceEvent(JSONObject traceEvent) throws Exception {
+    	Gson gson = new Gson();
+    	TraceEvent event = gson.fromJson(traceEvent.toString(), TraceEvent.class);
+    	String name = event.getName();
+
+    	TraceEventStats stats = traceEventsMap.get(name);
+        if (stats == null) {
+            stats = new TraceEventStats(event);
+            traceEventsMap.put(name, stats);
+        }
+
+        if (event.getType().equals(TraceEvent.Type.Complete)) {
+        	stats.updateTotalMicros(event.getDuration());
+        } else if (event.getType().equals(TraceEvent.Type.Duration)) {
+        	handleDurationEvent(event, stats);
+        } else if(event.getType().equals(TraceEvent.Type.Instant)) {
+        	handleInstantEvent(event, stats);
+        } else {
+        	// handle unsupported event type
+        	//throw new Exception("Unsupported Event Type : " + event.getType());
+        }
+    }
+    
+    private void handleInstantEvent(TraceEvent event, TraceEventStats stats){
+    	// Slight difference in handling of memory counters
+    	if(event.getName().equals("UpdateCounters")){
+    		try {
+				stats.updateMemoryCounters(event.getData());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}    		
+    	// TODO handle other type of instant events
+    }
+    
+    private void handleDurationEvent(TraceEvent event, TraceEventStats stats){
+    	Long currTimeStamp = event.getTimeStamp();
+    	Long prevTimeStamp = stats.getEvent().getTimeStamp();
+    	
+    	if(event.getPhase().equals("B")){
+    		stats.setStartTime(currTimeStamp);
+    	} else {       	
+        	if(currTimeStamp > prevTimeStamp) {
+        		long elapsedMicros = (long) ((new Double(currTimeStamp) - new Double(prevTimeStamp)) * 1000);
+        		stats.updateTotalMicros(elapsedMicros);
+        		stats.resetTime();
+        	}
+    	}
+    }
+    
     /**
      * @param timeline event, see
      *            https://developers.google.com/chrome-developer-tools/docs/protocol/tot/timeline#type-TimelineEvent
@@ -209,8 +295,8 @@ public final class RDPAnalyzer {
     public List<JSONObject> getDevToolsLog() {
         List<JSONObject> devToolsLog = Lists.newArrayList();
         for (RDPNotification notification : notifications) {
-            if (notification.isTimelineEvent()) {
-                devToolsLog.add(notification.getTimelineEvent());
+            if (notification.isTraceEvent()) {
+            	devToolsLog.add(notification.getTraceEvent());
             }
         }
         return devToolsLog;
@@ -222,8 +308,8 @@ public final class RDPAnalyzer {
     public List<JSONObject> getFilteredDevToolsLog() {
         List<JSONObject> devToolsLog = Lists.newArrayList();
         for (RDPNotification notification : filteredNotifications) {
-            if (notification.isTimelineEvent()) {
-                devToolsLog.add(notification.getTimelineEvent());
+            if (notification.isTraceEvent()) {
+                devToolsLog.add(notification.getTraceEvent());
             }
         }
         return devToolsLog;

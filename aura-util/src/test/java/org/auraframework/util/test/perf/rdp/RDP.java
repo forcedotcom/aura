@@ -23,7 +23,7 @@ package org.auraframework.util.test.perf.rdp;
 public interface RDP {
 
     enum Domain {
-        Network, Timeline, Page;
+        Network, Timeline, Page, Tracing;
     }
 
     interface Network {
@@ -42,5 +42,10 @@ public interface RDP {
     interface Page {
         String domContentEventFired = "Page.domContentEventFired";
         String loadEventFired = "Page.loadEventFired";
+    }
+    
+    interface Tracing {
+    	String dataCollected = "Tracing.dataCollected";
+    	String bufferUsage = "Tracing.bufferUsage";
     }
 }

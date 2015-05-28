@@ -16,7 +16,9 @@
 package org.auraframework.test.perf.util;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,21 +31,22 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 import org.json.JSONArray;
 
+
 @UnAdaptableTest
 @PerfTestSuite
-public class PerfEngineTest<T> extends TestSuite implements PerfTestFramework {
+public class PerfEngineTest extends TestSuite implements PerfTestFramework {
 
     private PerfConfigUtil perfConfigUtil;
-    //private PerfMetricsUtil perfMetricsUtil;
 
     private static final Logger LOG = Logger.getLogger(PerfEngineTest.class.getSimpleName());
 
     public static TestSuite suite() throws Exception {
-        return new PerfEngineTest<>();
+        return new PerfEngineTest();
     }
 
     public PerfEngineTest() throws Exception {
@@ -58,38 +61,50 @@ public class PerfEngineTest<T> extends TestSuite implements PerfTestFramework {
 
     private void init() throws Exception {
         perfConfigUtil = new PerfConfigUtil();
-        runTests(discoverTests());
-        // publishResults(new JSONArray());
+        Map<DefDescriptor<ComponentDef>, PerfConfig> tests = discoverTests();
+        runTests(tests);
     }
 
     @Override
-    public void runTests(List<DefDescriptor<ComponentDef>> defs) throws Exception {
-        for (DefDescriptor<ComponentDef> def : defs)
-            addTest(new ComponentSuiteTest(def));
+    public void runTests(Map<DefDescriptor<ComponentDef>, PerfConfig> tests) throws Exception {
+    	// Map component def to component config options.
+    	for(Map.Entry<DefDescriptor<ComponentDef>, PerfConfig> entry: tests.entrySet()){
+    		addTest(new ComponentSuiteTest(entry.getKey(), entry.getValue()));
+    	}
+    	
     }
 
     @Override
-    public List<DefDescriptor<ComponentDef>> discoverTests() {
+    public Map<DefDescriptor<ComponentDef>, PerfConfig> discoverTests() {
         return perfConfigUtil.getComponentTestsToRun();
     }
 
-    @Override
-    public JSONArray publishResults(JSONArray metrics) {
-        // TODO Publish results via a JSONArray Response object
-        // System.out.println("Publish metrics");
-        return null;
+    public List<DefDescriptor<ComponentDef>> getComponentDefs(Map<DefDescriptor<ComponentDef>, PerfConfig> configMap){
+    	List<DefDescriptor<ComponentDef>> defs = new ArrayList<>();
+    	for(DefDescriptor<ComponentDef> def: configMap.keySet())
+    		defs.add(def);
+    	return defs;
     }
-
+    
     private class ComponentSuiteTest extends TestSuite {
-        ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor) {
+        ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor, final PerfConfig config) {
             super(descriptor.getName());
             TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
             Vector<Class<? extends Test>> testClasses = inventory.getTestClasses(Type.PERFCMP);
 
             for (Class<? extends Test> testClass : testClasses) {
                 try {
-                    Constructor<? extends Test> constructor = testClass.getConstructor(DefDescriptor.class);
-                    PerfExecutorTest test = (PerfExecutorTest)constructor.newInstance(descriptor);
+                    Constructor<? extends Test> constructor = testClass.getConstructor(DefDescriptor.class, PerfConfig.class);
+                    PerfExecutorTest test = (PerfExecutorTest)constructor.newInstance(descriptor, config);
+                    test.setPerfMetricsComparator(new PerfMetricsComparator() {
+                    	protected int getAllowedVariability(String metricName) {
+                            if (config.getVariability(metricName)!=null) {
+                                return config.getVariability(metricName);
+                            }
+                            // Use default variability, if variability is not set in config
+                            return super.getAllowedVariability(metricName);
+                        }
+                    });
                     // addTest(patchPerfComponentTestCase(test, descriptor));
                     addTest(test);
                 } catch (Exception e) {

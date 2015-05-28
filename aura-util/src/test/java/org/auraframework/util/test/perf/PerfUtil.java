@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
 
+import org.auraframework.util.test.annotation.PerfCmpTest;
 import org.auraframework.util.test.annotation.PerfTest;
 
 public final class PerfUtil {
@@ -34,6 +35,17 @@ public final class PerfUtil {
             Class<? extends TestCase> testClass = test.getClass();
             Method method = testClass.getMethod(test.getName());
             return method.getAnnotation(PerfTest.class) != null || testClass.getAnnotation(PerfTest.class) != null;
+        } catch (NoSuchMethodException ignore) {
+            // happens for automatically generated tests
+            return false;
+        }
+    }
+    
+    public static boolean hasPerfCmpTestAnnotation(TestCase test) {
+        try {
+            Class<? extends TestCase> testClass = test.getClass();
+            Method method = testClass.getMethod(test.getName());
+            return method.getAnnotation(PerfCmpTest.class) != null || testClass.getAnnotation(PerfCmpTest.class) != null;
         } catch (NoSuchMethodException ignore) {
             // happens for automatically generated tests
             return false;

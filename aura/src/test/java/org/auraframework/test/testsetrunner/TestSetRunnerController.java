@@ -26,6 +26,7 @@ import junit.framework.TestResult;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.perf.util.PerfExecutorTest;
 import org.auraframework.test.util.TestExecutor;
 import org.auraframework.test.util.TestExecutor.TestRun;
 
@@ -89,6 +90,7 @@ public class TestSetRunnerController {
         @Override
         public TestResult call() throws Exception {
             TestSetRunnerState testRunnerState = TestSetRunnerState.getInstance();
+            boolean finished = false;
             assert (test != null) : "Encountered an unknown test: " + testName;
             testRunnerState.setTestProp(testName, "status", "RUNNING");
 
@@ -97,7 +99,9 @@ public class TestSetRunnerController {
             // Gather the results.
             if (result.wasSuccessful()) {
                 testRunnerState.setTestProp(testName, "status", "PASSED");
+                finished = true;
             } else {
+            	finished = true;
                 testRunnerState.setTestProp(testName, "status", "FAILED");
                 StringBuffer res = new StringBuffer("Failures:\n");
                 for (Enumeration<TestFailure> fs = result.failures(); fs.hasMoreElements();) {
@@ -114,6 +118,14 @@ public class TestSetRunnerController {
                 }
                 System.out.println(res.toString());
             }
+            
+            // Perf special handling
+            // @dval: This makes no sense here because it exposes a perf Class
+            // Remove all this once we refactor the perfRunner.
+            if (finished && test instanceof PerfExecutorTest) {
+            	testRunnerState.setTestProp(testName, "perfInfo", ((PerfExecutorTest)test).getLastCollectedMetrics().toString());
+            }
+            
             return result;
         }
     }

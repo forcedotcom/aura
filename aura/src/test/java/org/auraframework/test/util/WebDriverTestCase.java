@@ -17,6 +17,7 @@ package org.auraframework.test.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,6 +60,7 @@ import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
+import org.auraframework.test.perf.util.PerfExecutorTest;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
@@ -67,6 +70,7 @@ import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.eclipse.jetty.util.log.Log;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -75,11 +79,17 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasTouchScreen;
 import org.openqa.selenium.interactions.touch.FlickAction;
 import org.openqa.selenium.interactions.touch.TouchActions;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.ScreenshotException;
@@ -323,9 +333,16 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * See https://sites.google.com/a/chromium.org/chromedriver/logging/performance-log
      */
     private void addPerfCapabilities(DesiredCapabilities capabilities) {
-        if (isPerfTest()) {
-            PerfWebDriverUtil.addLoggingCapabilities(capabilities);
-        }
+    	if(PerfUtil.hasPerfCmpTestAnnotation(this)) {
+	        LoggingPreferences performance_prefs = new LoggingPreferences();
+	        performance_prefs.enable(LogType.PERFORMANCE, Level.ALL);
+	        capabilities.setCapability(CapabilityType.LOGGING_PREFS, performance_prefs);
+	        Map<String, Object> prefs = new HashMap<String, Object>();
+	        prefs.put("traceCategories", "disabled-by-default-devtools.timeline");
+	        ChromeOptions options = new ChromeOptions();
+	        options.setExperimentalOption("perfLoggingPrefs", prefs);
+	        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+    	}
     }
 
     private void runPerfTests() throws Throwable {
@@ -530,7 +547,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public String getPerfEndMarker() {
         return "PERF:end";
     }
-
+    
+    public JSONArray getLastCollectedMetrics () {
+    	return null;
+    }
     // UIPerf: note that UIPerf is only loaded in PTEST (and CADENCE) modes.
 
     protected void clearUIPerfStats() {
@@ -618,6 +638,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 description.append(msg);
             }
         }
+        
+
         description.append(String.format("\nBrowser: %s", currentBrowserType));
         if (auraUITestingUtil != null) {
             description.append("\nUser-Agent: " + auraUITestingUtil.getUserAgent());
@@ -625,6 +647,12 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         if (currentDriver == null) {
             description.append("\nTest failed before WebDriver was initialized");
         } else {
+        	
+        	if (this instanceof PerfExecutorTest) {
+            	JSONArray json = this.getLastCollectedMetrics();
+            	description.append("\nPerfMetrics: " + json + ';');
+            }
+
             description
                     .append("\nWebDriver: " + currentDriver);
             description.append("\nJS state: ");
@@ -811,24 +839,24 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             if (isPerfTest()) {
                 reuseBrowser = false;
             }
-            capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser);
-
+            capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser); 
             addPerfCapabilities(capabilities);
-
-            Dimension windowSize = getWindowSize();
+            
+            /*Dimension windowSize = getWindowSize();
             if (currentBrowserType == BrowserType.GOOGLECHROME) {
                 WebDriverUtil.addChromeOptions(capabilities, windowSize);
-            }
+            }*/
 
             logger.info(String.format("Requesting: %s", capabilities));
             setCurrentDriver(provider.get(capabilities));
+            
             if (currentDriver == null) {
                 fail("Failed to get webdriver for " + currentBrowserType);
             }
 
-            if (windowSize != null) {
+            /*if (windowSize != null) {
                 currentDriver.manage().window().setSize(windowSize);
-            }
+            }*/
 
             String driverInfo = "Received: " + currentDriver;
             if (SauceUtil.areTestsRunningOnSauce()) {
@@ -840,6 +868,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }
         return currentDriver;
+    }
+    
+    public AuraUITestingUtil getAuraUITestingUtil(){
+    	return auraUITestingUtil;
     }
     
     protected void setCurrentDriver(WebDriver currentDriver) {

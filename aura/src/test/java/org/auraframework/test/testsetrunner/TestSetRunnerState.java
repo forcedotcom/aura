@@ -30,6 +30,7 @@ import junit.framework.TestSuite;
 
 import org.auraframework.test.ComponentJSTest.ComponentTestCase;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
+import org.auraframework.test.perf.util.PerfExecutorTest;
 import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;
@@ -163,11 +164,16 @@ public class TestSetRunnerState {
                 testWithProps.put("exception", "");
                 testWithProps.put("isHidden", "");
                 testWithProps.put("isInteg", t instanceof IntegrationTestCase);
-                testWithProps.put("isPerf", t instanceof AbstractPerfTestCase);
+                testWithProps.put("isPerf", t instanceof PerfExecutorTest);
+                testWithProps.put("perfInfo", "");
                 
                 String url = "";
                 if (t instanceof ComponentTestCase) {
                     url = ((ComponentTestCase) t).getTestUrlForManualRun();
+                }
+                
+                if (t instanceof PerfExecutorTest) {
+                	url = ((PerfExecutorTest) t).generateUrl();
                 }
 
                 testWithProps.put("jsConsole", url);

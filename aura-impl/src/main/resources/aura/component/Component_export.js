@@ -60,6 +60,7 @@ exp(p,
     "addValueHandler", p.addValueHandler,
     "removeValueHandler", p.removeValueHandler,
     "getFacets", p.getFacets,
+    "setAttributeValueProvider", p.setAttributeValueProvider,
 
     "isFlavorable", p.isFlavorable,
     "getFlavor", p.getFlavor,

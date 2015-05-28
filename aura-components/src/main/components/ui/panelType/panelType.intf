@@ -1,0 +1,41 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:interface support="GA">
+    <aura:attribute name="alias" type="String"/>
+    <aura:attribute name="activatable" type="Boolean" default="true" description="panel can be activated or deactivated when other panels are shown or closed."/>
+
+    <aura:registerEvent name="notify" type="ui:notify" />
+
+    <aura:method name="show" description="makes the panel visible (transitions can apply)">
+        <aura:attribute name="callback" type="Object"/>
+    </aura:method>
+    <aura:method name="hide" description="makes the panel invisible (transitions can apply)">
+        <aura:attribute name="callback" type="Object"/>
+    </aura:method>
+    <aura:method name="update" description="Updates the body of the panel">
+        <aura:attribute name="body" type="Aura.Component[]" description="content to update" />
+        <aura:attribute name="callback" type="Object"/>
+    </aura:method>
+    <aura:method name="close" description="hides and fires destroy">
+        <aura:attribute name="callback" type="Object"/>
+    </aura:method>
+    <aura:method name="setActive" description="set panel active or not">
+        <aura:attribute name="active" type="Boolean" />
+        <aura:attribute name="callback" type="Object"/>
+    </aura:method>
+</aura:interface>

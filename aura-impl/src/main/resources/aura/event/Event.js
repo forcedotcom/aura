@@ -89,7 +89,7 @@ Event.prototype.getName = function(){
  */
 Event.prototype.setParams = function(config) {
     if (this.fired) {
-        $A.assert(false, "Event.setParams(): cannot modify an event that has already been fired.");
+        $A.assert(false, "Event.setParams(): cannot modify all params in an event that has already been fired.");
     }
 
     if (config) {
@@ -114,8 +114,8 @@ Event.prototype.setParams = function(config) {
  * @platform
  */
 Event.prototype.setParam = function(key, value) {
-    if (this.fired) {
-        $A.assert(false, "Event.setParam(): cannot modify an event that has already been fired.");
+    if (this.fired && this.componentEvent) {
+        $A.assert(false, "Event.setParam(): cannot modify a component event that has already been fired.");
     }
     if (this.eventDef.getAttributeDefs()[key]) {
         this.params[key] = value;

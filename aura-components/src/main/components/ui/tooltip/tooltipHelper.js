@@ -26,70 +26,68 @@
 
 
 	buildTooltip: function(component) {
-		var node = component.getElement();
+
+		var node = component.find('tooltip').getElement();
+		var ttbodyNode = component.find('tooltipbody').getElement();
+		var pointer = node.querySelector('.pointer');
+		var target = component.getElement();
+		var lib = this.lib.panelPositioning;
 		if(!component._tooltip) {
-			component._tooltip = node.querySelector('.tooltip-advanced');
+			component._tooltip = node;
 			component._tooltip.style.display = 'block';
-			document.body.appendChild(component._tooltip);
+			document.body.appendChild(node);
+			lib.createRelationship({
+				element:ttbodyNode,
+				target:component._trigger,
+				align:'center bottom',
+				targetAlign: 'center top',
+				weight: 'medium',
+				enable: true,
+				pad: 10
+			});
+
+			lib.createRelationship({
+				element:ttbodyNode,
+				target:window,
+				type:'bounding box',
+				weight: 'medium',
+				enable: true,
+				pad: 2
+			});
+
+			lib.createRelationship({
+				element:pointer,
+				target:target,
+				align:'center bottom',
+				targetAlign: 'center top',
+				weight: 'medium',
+				enable: true,
+				pad: 0
+			});
+
+			lib.createRelationship({
+				element:pointer,
+				target:ttbodyNode,
+				type: 'bounding box',
+				weight: 'medium',
+				enable: true,
+				pad: 5
+			});
+
 		}
 
 		return component._tooltip;
 	},
 
 	_doUpdatePosition: function(component) {
-		var tt = component._tooltip;
-		var ttContent = tt.querySelector('.content');
-		
-		var box = component._trigger.getBoundingClientRect();
-
-		var topPos = box.top + window.scrollY;
-		var leftPos = box.left + box.width/2;
-		var ttBox = ttContent.getBoundingClientRect();
-		var halfWidth = ttBox.width/2;
-		
-		var pad = 0;
-		if(leftPos - halfWidth < 0) {
-			pad = Math.abs(leftPos - halfWidth) + 10;
-		}
-
-		if(leftPos + halfWidth  > window.innerWidth - 15) {
-			
-			//extra for hiding scroll bars on mac laptops
-			// pad = ttBox.right + window.innerWidth;
-			pad = -(leftPos + halfWidth - window.innerWidth + 25);
-		}
-
-		if(pad > halfWidth - 15) {
-			pad = halfWidth - 15;
-		} else if (pad < -halfWidth+15) {
-			console.log(true);
-			pad = -halfWidth+20;
-		}
-
-		tt.style.top = topPos + 'px';
-		tt.style.left = leftPos + 'px';
-		this.setTransform(ttContent, 'translateX('+(pad)+'px)');
+		this.lib.panelPositioning.reposition();
 	},
 
 	_handlePositionEvents: function(ev, component) {
 		this.updatePosition(component, true);
 	},
 
-	_bindEvent: function(el, eventName, handler, component) {
-		var self = this;
 
-		var h = function(e) {
-			handler.call(self, e, component);
-		};
-
-		el.addEventListener(eventName, h);
-
-		return {
-			detach: function() {
-				el.removeEventListener(eventName, h);
-			}
-		};
-	},
 
 	_canFocus: function() {
 
@@ -101,9 +99,7 @@
 		var tt = this.buildTooltip(component);
 		this.updatePosition(component, false);
 		component.set('v.isVisible', true, false);
-		
-		component.resizeHandler = this._bindEvent(window, 'resize', this._handlePositionEvents, component);
-		component.scrollHandler = this._bindEvent(window, 'scroll', this._handlePositionEvents, component);
+		tt.classList.add('visible');
 		requestAnimationFrame(function() {
 			tt.classList.add('visible');
 		});
@@ -129,8 +125,6 @@
 		var tt = this.buildTooltip(component);
 		tt.classList.remove('visible');
 		component.set('v.isVisible', false, false);
-		component.scrollHandler.detach();
-		component.resizeHandler.detach();
 	},
 
 	toggle: function(component) {

@@ -16,39 +16,41 @@
 
 -->
 <aura:component>
-    <aura:attribute name="tooltipBody" type="String" default="false" description="The message to display in the tooltip"/>
-    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
-    <aura:attribute name="advanced" type="Boolean" default="false" description="Uses JavaScript positioning. The default is &quot;false&quot;."/>
-    <aura:attribute name="trigger" type="String" default="hover" description="The event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;."/>
-    <aura:attribute name="triggerClass" type="String" description="The CSS class for the trigger element"/>
-    <aura:attribute name="isVisible" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
-    <aura:attribute name="fadeIn" type="Boolean" description="Specifies whether fading animation is used to display the tooltip. The default is &quot;false&quot;." default="false"/>
-    <aura:attribute name="fadeOut" type="Boolean" description="Specifies whether fading animation is used to hide the tooltip. The default is &quot;false&quot;." default="false"/>
+    <aura:import library="ui:panelPositioningLib" property="lib" />
+    <aura:attribute name="tooltipBody" type="String" access="INTERNAL" default="false" description="The message to display in the tooltip"/>
+    <aura:attribute name="disabled" type="Boolean" access="INTERNAL" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
+    <aura:attribute access="INTERNAL" name="advanced" type="Boolean" default="false" description="Uses JavaScript positioning. The default is &quot;false&quot;."/>
+    <aura:attribute access="INTERNAL" name="trigger" type="String" default="hover" description="The event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;."/>
+    <aura:attribute name="triggerClass" type="String" access="INTERNAL" description="The CSS class for the trigger element"/>
+    <aura:attribute name="isVisible" access="INTERNAL" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
 
     <!-- fadeOut and fadeIn duration must be the same for simple tooltips -->
-    <aura:attribute name="fadeOutDuration" type="Integer" description="Fade out duration in ms"/>
-    <aura:attribute name="fadeInDuration" type="Integer" description="Fade in duration in ms"/>
-    <aura:attribute name="delay" type="Integer" description="Appearance delay in ms" />
-    <aura:attribute name="class" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
-     <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
-    <aura:method name="show" />
-    <aura:method name="hide" />
+    <aura:attribute name="fadeOut" access="INTERNAL" default="0" type="Boolean" description="Fade out"/>
+    <aura:attribute name="fadeIn" access="INTERNAL" default="0" type="Boolean" description="Fade in"/>
+    <aura:attribute name="fadeOutDuration" access="INTERNAL" default="0" type="Integer" description="Fade out duration in ms"/>
+    <aura:attribute name="fadeInDuration" access="INTERNAL" default="0" type="Integer" description="Fade in duration in ms"/>
+    <aura:attribute name="delay" default="0" access="INTERNAL" type="Integer" description="Appearance delay in ms" />
+    <aura:attribute name="class" type="String" access="INTERNAL" default="" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
+     <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
+    <aura:method name="show" access="INTERNAL"/>
+    <aura:method name="hide" access="INTERNAL"/>
     <aura:if isTrue="{!v.advanced}">
         <div class="tooltip-trigger" aria-describedby="{!v.domId}">
             {!v.body}
-            <div aura:id="tooltip" aria-hidden="{!!v.isVisible}" class="{!(v.fadeIn == true ? 'fade-in ' : '') + 'uiTooltip tooltip tooltip-advanced' + (v.fadeOut == true ? ' fade-out' : '')  }">
-                <span class="wrapper" style="{!v.delay ? 'transition-delay: '+ v.delay +'ms' : ''}">
-                    <span role="tooltip" id="{!v.domId}" class="content">{!v.tooltipBody}</span>
-                    <span class="pointer"></span>
-                </span>
+            <div class="uiTooltip advanced-wrapper" aura:id="tooltip" aria-hidden="{!!v.isVisible}">
+                <div class="tooltip">
+                    <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body" id="{!v.domId}">{!v.tooltipBody}</div>
+                    <div class="pointer pointer-advanced"></div>
+                </div>
             </div>
+            
         </div>
         <aura:set attribute="else">
-            <div aura:id="tooltip" aria-describedby="{!v.domId}" class="{!(v.fadeIn == true ? 'fade-in ' : '') + 'tooltip-trigger tooltip-wrapper tooltip-basic' + (v.fadeOut == true ? ' fade-out' : '')  }">
+            <div aura:id="tooltip" aria-describedby="{!v.domId}" class="tooltip-trigger tooltip-basic">
                 {!v.body}
-                <span class="wrapper" role="tooltip" style="{!(v.delay ? 'transition-delay: '+ v.delay +'ms' : '') +(v.fadeInDuration ? 'transition: opacity '+ v.fadeInDuration +'ms ease-in-out' : '')}">
-                    <span class="content" id="{!v.domId}" role="tooltip">{!v.tooltipBody}</span>
-                    <span class="pointer"></span>
+                <span class="{!v.classList}" role="tooltip" style="{!v.tooltipStyle}">
+                    <span class="tooltip-body body-basic" id="{!v.domId}" role="tooltip">{!v.tooltipBody}</span>
+                    <span class="pointer pointer-basic"></span>
                 </span>
             </div>
         </aura:set>

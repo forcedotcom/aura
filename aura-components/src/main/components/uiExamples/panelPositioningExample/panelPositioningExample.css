@@ -1,0 +1,88 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS.dragger,
+.THIS.panel,
+.THIS.pointer {
+	z-index: 1;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	padding: 40px;
+	margin:0;
+	border-radius: 5px;
+	background: #fff;
+	box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+    border: 3px solid black;
+    transform-origin: top left;
+}
+
+.THIS.dragger {
+	width: 200px;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.THIS.panel {
+	width: 100px;
+}
+
+.THIS.mark {
+	z-index: 1;
+	position: absolute;
+	top: 0;
+	left: 200px;
+	height: 100%;
+	width: 1px;
+	background: black;
+}
+
+.THIS.pointer {
+	z-index: 10;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 10px;
+	height: 10px;
+	padding: 0;
+	border-radius: 0;
+	-webkit-transform-origin: 50% 50%;
+	transform-origin: 50% 50%;
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+.THIS.pointer::after {
+	content:'';
+	z-index: 11;
+	position: absolute;
+	top: -7px;
+	left: -14px;
+	width: 25px;
+	height: 14px;
+	padding: 0;
+	border-radius: 0;
+	background: #fff;
+	transform: rotate(-45deg);
+}
+
+.THIS.bb {
+	position: absolute;
+	left: 200px;
+	top: 200px;
+	width: 600px;
+	height: 600px;
+	background: green;
+}

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 /**
  * @description A registry for ProviderDefs.
  * @constructor
@@ -25,19 +26,30 @@ function ProviderDefRegistry(){
 ProviderDefRegistry.prototype.auraType = "ProviderDefRegistry";
 
 /**
- * Returns a ProviderDef instance or config after adding to the registry.
- * Throws an error if componentDefDesciptor is not provided.
- * @param {Object} componentDefDescriptor Required. The component definition descriptor to lookup on the providerDefs.
- * @param {Object} config Passes in a config, a ProviderDef, or the name of a ProviderDef.
+ * Returns a ProviderDef instance from registry
+ * @param {String} descriptor component definition descriptor to lookup on the providerDef
+ * @returns {ProviderDef} ProviderDef from registry
  */
-ProviderDefRegistry.prototype.getDef = function(componentDefDescriptor, config){
-    aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");
-    var ret = this.providerDefs[componentDefDescriptor];
-    if(!ret && config){
-        ret = new ProviderDef(config);
-        this.providerDefs[componentDefDescriptor] = ret;
+ProviderDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No component descriptor specified");
+    return this.providerDefs[descriptor];
+};
+
+/**
+ * Returns a ProviderDef after creating and adding to the registry.
+ * @param {String} componentDescriptor descriptor of component
+ * @param {object} config config of a ProviderDef.
+ * @returns {ProviderDef}
+ */
+ProviderDefRegistry.prototype.createDef = function(componentDescriptor, config) {
+    $A.assert(componentDescriptor, "Component descriptor is required to create ProviderDef");
+    $A.assert(config, "ProviderDef Config required for registration");
+    var def = this.getDef(componentDescriptor);
+    if (!def) {
+        def = new ProviderDef(config);
+        this.providerDefs[componentDescriptor] = def;
     }
-    return ret;
+    return def;
 };
 
 

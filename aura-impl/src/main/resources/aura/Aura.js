@@ -545,7 +545,7 @@ function AuraInstance () {
      * @param {Component|Array} cmp
      * @borrows AuraEventService.newEvent
      */
-    this.getEvt = this.eventService.newEvent;
+    this.getEvt = this.eventService.newEvent.bind(this.eventService);
 
     this.Component = Component;
 
@@ -610,7 +610,7 @@ function AuraInstance () {
         "c", {
                 get: function(name) {
                     var path = (name||'').split('.');
-                    return services.cmp.getControllerDef({descriptor : path.shift()}).get(path.shift());
+                    return services.cmp.getControllerDef(path.shift()).get(path.shift());
                 }
             }
     );
@@ -712,7 +712,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
                 $A.layoutService.init(cmp);
             }
 
-            // restore component definitions from AuraStorage into memory and localStorage
+            // restore component definitions from AuraStorage into memory
             $A.componentService.registry.restoreAllFromStorage();
             $A.initialized = true;
         }

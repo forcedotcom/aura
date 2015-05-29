@@ -17,7 +17,7 @@
 /**
  * @description Creates a HelperDef instance.
  * @constructor
- * @private
+ * @protected
  */
 function HelperDef(componentDef, libraries){
     var functions = [];

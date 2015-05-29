@@ -18,7 +18,6 @@
  * @constructor
  * @protected
  */
-/*jslint sub: true*/
 function RendererDefRegistry(){
     this.rendererDefs = {};
 }
@@ -26,19 +25,28 @@ function RendererDefRegistry(){
 RendererDefRegistry.prototype.auraType = "RendererDefRegistry";
 
 /**
- * Returns a RendererDef instance or config after adding to the registry.
- * Throws an error if componentDefDescriptor is not provided.
- * @param {Object} componentDefDescriptor Required. The component definition descriptor to lookup on the providerDefs.
- * @param {Object} config Passes in a config, ComponentDef, or the name of a ComponentDef.
+ * Returns a RendererDef instance from registry
+ * @param {String} descriptor component definition descriptor to lookup on the RendererDef
+ * @returns {RendererDef} RendererDef from registry
  */
-RendererDefRegistry.prototype.getDef = function(componentDefDescriptor){
-    aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");
-    var ret = this.rendererDefs[componentDefDescriptor];
-    if(!ret){
-        ret = new RendererDef(componentDefDescriptor.getQualifiedName());
-        this.rendererDefs[componentDefDescriptor] = ret;
+RendererDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No descriptor specified");
+    return this.rendererDefs[descriptor];
+};
+
+/**
+ * Returns a RendererDef after creating and adding to the registry.
+ * @param {String} componentDescriptor descriptor of component
+ * @returns {RendererDef}
+ */
+RendererDefRegistry.prototype.createDef = function(componentDescriptor) {
+    $A.assert(componentDescriptor, "Component descriptor is required to create ProviderDef");
+    var def = this.getDef(componentDescriptor);
+    if (!def) {
+        def = new RendererDef(componentDescriptor);
+        this.rendererDefs[componentDescriptor] = def;
     }
-    return ret;
+    return def;
 };
 
 Aura.Renderer.RendererDefRegistry = RendererDefRegistry;

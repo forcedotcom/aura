@@ -18,6 +18,7 @@
 /**
  * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
  * @constructor
+ * @export
  */
 function AuraComponentService () {
     this.registry = new ComponentDefRegistry();
@@ -30,6 +31,7 @@ function AuraComponentService () {
     this.libraryDefRegistry = new LibraryDefRegistry();
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
+    this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
 
     // KRIS:
     // We delay the creation of the definition of a class till it's requested.
@@ -48,10 +50,10 @@ function AuraComponentService () {
  *
  * @public
  * @deprecated use getComponent instead
+ * @export
  */
 AuraComponentService.prototype.get =  function(globalId) {
-    var ret = this.indexes.globalId[globalId];
-    return ret;
+    return this.indexes.globalId[globalId];
 };
 
 /**
@@ -59,6 +61,7 @@ AuraComponentService.prototype.get =  function(globalId) {
  * @param {Object} identifier that is either a globalId or an element.
  *
  * @public
+ * @export
  */
 AuraComponentService.prototype.getComponent = function(identifier) {
     return this.get(identifier) || this.getRenderingComponentForElement(identifier);
@@ -68,7 +71,8 @@ AuraComponentService.prototype.getComponent = function(identifier) {
  * Gets the rendering component for the provided element recursively.
  * @param {Object} element The element that is used to find the rendering component
  * @memberOf AuraComponentService
- * @private
+ * @public
+ * @export
  */
 AuraComponentService.prototype.getRenderingComponentForElement = function(element) {
     if ($A.util.isUndefinedOrNull(element)) { return null;}
@@ -117,6 +121,7 @@ AuraComponentService.prototype.newComponentArray = function(config, attributeVal
  * @param {Function} callback The method to call, to which it returns the newly created component.
  *
  * @public
+ * @export
  */
 AuraComponentService.prototype.createComponent = function(type, attributes, callback){
     $A.assert($A.util.isString(type), "ComponentService.createComponent(): 'type' must be a valid String.");
@@ -188,6 +193,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
  * @param {Function} callback The method to call, to which it returns the newly created components.
  *
  * @public
+ * @export
  */
 AuraComponentService.prototype.createComponents = function(components, callback) {
     $A.assert($A.util.isArray(components), "ComponentService.createComponents(): 'components' must be a valid Array.");
@@ -223,6 +229,7 @@ AuraComponentService.prototype.createComponents = function(components, callback)
  *
  * @public
  * @deprecated use createComponent instead
+ * @export
  */
 AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
     return this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
@@ -236,6 +243,7 @@ AuraComponentService.prototype.newComponent = function(config, attributeValuePro
  * @param {Object} attributeValueProvider The value provider for the attributes
  *
  * @deprecated use createComponent instead
+ * @export
  */
 AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
@@ -286,10 +294,13 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
             }
         };
     }else{
+        // var currentAccess = $A.getContext().getCurrentAccess();
         // Server should handle the case of an unknown def fetched "lazily"
-        if(!$A.clientService.allowAccess(def)) {
+        if(!$A.clientService.allowAccess(def) /* && currentAccess  */) {
             // #if {"modes" : ["DEVELOPMENT"]}
-            $A.warning("Access Check Failed! AuraComponentService.newComponentDeprecated(): '"+(def&&def.getDescriptor().getQualifiedName())+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+            $A.warning("Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
+                (def&&def.getDescriptor().getQualifiedName()) + "' is not visible to '" +
+                $A.getContext().getCurrentAccess() + "'.");
             // #end
             // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
             //return null;
@@ -369,9 +380,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
 
     var classConstructor = this.getComponentClass(desc) || Component;
 
-    var instance = new classConstructor(config, localCreation);
-
-    return instance;
+    return new classConstructor(config, localCreation);
 };
 
 /**
@@ -379,6 +388,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
  * @param {String} descriptor Uses the pattern of namespace:componentName.  
  * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
+ * @export
  */
 AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
     if(descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
@@ -392,6 +402,7 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, classCon
  * Get the class constructor for the specified component. 
  * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
  * @returns Either the class that defines the component you are requesting, or null if not found.
+ * @export
  */
 AuraComponentService.prototype.getComponentClass = function(descriptor) {
 	descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
@@ -421,11 +432,7 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
 AuraComponentService.prototype.hasComponentClass = function(descriptor) {
     descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
 
-    if(descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
-        return true;
-    }
-
-    return false;
+    return !!(descriptor in this.classConstructorExporter || descriptor in this.classConstructors);
 };
 
 /**
@@ -441,6 +448,7 @@ AuraComponentService.prototype.hasComponentClass = function(descriptor) {
  * @param {Boolean} [forceServer] Whether to force server side creation
  *
  * @deprecated use createComponent instead
+ * @export
  */
 AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
     $A.assert(config, "ComponentService.newComponentAsync(): 'config' must be a valid Object.");
@@ -598,12 +606,12 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
  *
  * @param {Object} valueObj Value Object
  * @param {Object} valueProvider value provider
- * @param {Boolean} raw
  *
  * @returns {*}
+ * @export
  */
 AuraComponentService.prototype.computeValue = function(valueObj, valueProvider) {
-    if(aura.util.isExpression(valueObj)){
+    if ($A.util.isExpression(valueObj)) {
         return valueObj.evaluate(valueProvider);
     }
     return valueObj;
@@ -656,12 +664,18 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
     }
     
     // Resolve the definition and descriptor.
-    def = this.registry.getDef(configuration["componentDef"], true);
+    var componentDef = configuration["componentDef"];
+    def = this.getDef(componentDef);
+
+    if (!def && componentDef["attributeDefs"]) {
+        // create definition if it doesn't current exist and component definition config provided
+        def = this.createDef(componentDef);
+    }
 
     if (def) {
         desc = def.getDescriptor().toString();
     } else {
-        desc = configuration["componentDef"]["descriptor"] ? configuration["componentDef"]["descriptor"] : configuration["componentDef"];
+        desc = componentDef["descriptor"] ? componentDef["descriptor"] : componentDef;
     }
     
     return {
@@ -682,22 +696,17 @@ AuraComponentService.prototype.index = function(component){
 /**
  * Gets the component definition from the registry.
  *
- * @param {Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
+ * @param {String|Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
  * @returns {ComponentDef} The metadata of the component
  *
  * @public
+ * @export
  */
-AuraComponentService.prototype.getDef = function(config, noInit){
-    var def = this.registry.getDef(config, noInit);
-    if (!noInit) {
-        if (!def) {
-            $A.error("Unknown component: "+config["descriptor"]);
-            throw new Error("Unknown component: "+config["descriptor"]);
-        }
-    }
-    if (!$A.clientService.allowAccess(def)) {
+AuraComponentService.prototype.getDef = function(config){
+    var def = this.registry.getDef(config);
+    if (def && !$A.clientService.allowAccess(def)) {
         // #if {"modes" : ["DEVELOPMENT"]}
-        $A.warning("Access Check Failed! ComponentService.getDef():'" + config["descriptor"] + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
+        $A.warning("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
         // #end
 
         // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
@@ -706,56 +715,135 @@ AuraComponentService.prototype.getDef = function(config, noInit){
     return def;
 };
 
+AuraComponentService.prototype.createDef = function(config) {
+    return this.registry.createDef(config);
+};
+
 /**
  * Gets the component's controller definition from the registry.
+ * @param {String} descriptor controller descriptor
+ * @returns {ControllerDef} ControllerDef from registry
  * @private
  */
-AuraComponentService.prototype.getControllerDef = function(config){
-    return this.controllerDefRegistry.getDef(config);
+AuraComponentService.prototype.getControllerDef = function(descriptor) {
+    return this.controllerDefRegistry.getDef(descriptor);
+};
+
+/**
+ * Creates and returns ControllerDef
+ * @param {Object} config Configuration for ControllerDef
+ * @returns {ControllerDef} ControllerDef from registry
+ * @private
+ */
+AuraComponentService.prototype.createControllerDef = function(config) {
+    return this.controllerDefRegistry.createDef(config);
 };
 
 /**
  * Gets the action definition from the registry.
+ * @param {String} descriptor actionDef descriptor
+ * @returns {ActionDef} ActionDef from registry
  * @private
  */
-AuraComponentService.prototype.getActionDef = function(config){
-    return this.actionDefRegistry.getDef(config);
+AuraComponentService.prototype.getActionDef = function(descriptor) {
+    return this.actionDefRegistry.getDef(descriptor);
+};
+
+/**
+ * Creates and returns ActionDef
+ * @param {Object} config Configuration for ActionDef
+ * @returns {ActionDef} ControllerDef from registry
+ * @private
+ */
+AuraComponentService.prototype.createActionDef = function(config) {
+    return this.actionDefRegistry.createDef(config);
 };
 
 /**
  * Gets the model definition from the registry.
+ * @param {String} descriptor ModelDef descriptor
+ * @returns {ModelDef} ModelDef from registry
  * @private
  */
-AuraComponentService.prototype.getModelDef = function(config){
-    return this.modelDefRegistry.getDef(config);
+AuraComponentService.prototype.getModelDef = function(descriptor) {
+    return this.modelDefRegistry.getDef(descriptor);
+};
+
+/**
+ * Creates and returns ModelDef
+ * @param {Object} config Configuration for ModelDef
+ * @returns {ModelDef} ModelDef from registry
+ * @private
+ */
+AuraComponentService.prototype.createModelDef = function(config) {
+    return this.modelDefRegistry.createDef(config);
 };
 
 /**
  * Gets the provider definition from the registry. A provider enables an abstract component definition to be used directly in markup.
+ * @param {String} descriptor component descriptor for ProviderDef
+ * @returns {ProviderDef} ProviderDef of component
  * @private
  */
-AuraComponentService.prototype.getProviderDef = function(providerDefDescriptor, config){
-    return this.providerDefRegistry.getDef(providerDefDescriptor, config);
+AuraComponentService.prototype.getProviderDef = function(descriptor) {
+    return this.providerDefRegistry.getDef(descriptor);
+};
+
+/**
+ * Creates and returns ProviderDef
+ * @param {String} componentDescriptor descriptor of component
+ * @param {Object} config Configuration for ProviderDef
+ * @returns {ProviderDef} ProviderDef from registry
+ * @private
+ */
+AuraComponentService.prototype.createProviderDef = function(componentDescriptor, config) {
+    return this.providerDefRegistry.createDef(componentDescriptor, config);
 };
 
 /**
  * Gets the renderer definition from the registry.
+ * @param {String} componentDefDescriptor component descriptor for ProviderDef
+ * @returns {RendererDef} RendererDef of component
  * @private
  */
-AuraComponentService.prototype.getRendererDef = function(componentDefDescriptor, config){
-    return this.rendererDefRegistry.getDef(componentDefDescriptor, config);
+AuraComponentService.prototype.getRendererDef = function(componentDefDescriptor){
+    return this.rendererDefRegistry.getDef(componentDefDescriptor);
+};
+
+/**
+ * Creates and returns RendererDef
+ * @param {String} descriptor component descriptor for RendererDef
+ * @private
+ */
+AuraComponentService.prototype.createRendererDef = function(descriptor) {
+    return this.rendererDefRegistry.createDef(descriptor);
 };
 
 /**
  * Gets the helper definition from the registry.
+ * @param {String} componentDescriptor component descriptor for ProviderDef
+ * @returns {HelperDef} RendererDef of component
  * @private
  */
-AuraComponentService.prototype.getHelperDef = function(componentDefDescriptor, config, componentDef, libraries){
-    return this.helperDefRegistry.getDef(componentDefDescriptor, config, componentDef, libraries);
+AuraComponentService.prototype.getHelperDef = function(componentDescriptor) {
+    return this.helperDefRegistry.getDef(componentDescriptor);
 };
 
 /**
- * Gets the helper module from the registry.
+ * Creates and returns HelperDef
+ * @param {ComponentDef} componentDef component definition
+ * @param {Object} libraries library defs map
+ * @returns {HelperDef}
+ * @private
+ */
+AuraComponentService.prototype.createHelperDef = function(componentDef, libraries) {
+    return this.helperDefRegistry.createDef(componentDef, libraries);
+};
+
+/**
+ * Gets library from the registry.
+ * @param {String} descriptor library descriptor
+ * @returns {Object} library from registry
  * @private
  */
 AuraComponentService.prototype.getLibraryDef = function(descriptor, libraryDef){
@@ -763,11 +851,21 @@ AuraComponentService.prototype.getLibraryDef = function(descriptor, libraryDef){
 };
 
 /**
+ * Creates and returns library
+ * @param {Object} config config for library
+ * @returns {Object} library from registry
+ * @private
+ */
+AuraComponentService.prototype.createLibraryDef = function(config) {
+    return this.libraryDefRegistry.createDef(config);
+};
+
+/**
  * Destroys the components.
  * @private
  */
 AuraComponentService.prototype.destroy = function(components){
-    if (!aura.util.isArray(components)) {
+    if (!$A.util.isArray(components)) {
         components = [components];
     }
 
@@ -790,6 +888,8 @@ AuraComponentService.prototype.deIndex = function(globalId){
 /**
  * Returns the descriptors of all components known to the registry.
  * @memberOf AuraComponentService
+ * @public
+ * @export
  */
 AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
     var ret = [];
@@ -798,14 +898,6 @@ AuraComponentService.prototype.getRegisteredComponentDescriptors = function(){
     var componentDefs = this.registry.componentDefs;
     for (name in componentDefs) {
         ret.push(name);
-    }
-
-    // Union in any locally cached component defs
-    var catalog = this.registry.getLocalCacheCatalog();
-    for (name in catalog) {
-        if (!componentDefs[name]) {
-            ret.push(name);
-        }
     }
 
     return ret;
@@ -820,7 +912,7 @@ AuraComponentService.prototype.getDynamicNamespaces = function(){
 
 /**
  * @memberOf AuraComponentService
- * @private
+ * @export
  */
 AuraComponentService.prototype.getIndex = function(){
     var ret = "";
@@ -859,25 +951,3 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
 };
 
 Aura.Services.AuraComponentService = AuraComponentService;
-
-exp(AuraComponentService.prototype,
-    "addComponentClass", AuraComponentService.prototype.addComponentClass,
-    "get", AuraComponentService.prototype.get,
-    "getComponent", AuraComponentService.prototype.getComponent,
-    "getComponentClass", AuraComponentService.prototype.getComponentClass,
-    "getRenderingComponentForElement", AuraComponentService.prototype.getRenderingComponentForElement,
-    "getAttributeProviderForElement", AuraComponentService.prototype.getAttributeProviderForElement,
-
-    "createComponent", AuraComponentService.prototype.createComponent,
-    "createComponents", AuraComponentService.prototype.createComponents,
-
-    "newComponent", AuraComponentService.prototype.newComponent,
-    "newComponentDeprecated", AuraComponentService.prototype.newComponentDeprecated,
-    "newComponentAsync", AuraComponentService.prototype.newComponentAsync,
-
-    "getDef", AuraComponentService.prototype.getDef,
-    "getRegisteredComponentDescriptors", AuraComponentService.prototype.getRegisteredComponentDescriptors,
-    "getIndex", AuraComponentService.prototype.getIndex,
-    "renderedBy", AuraComponentService.prototype.renderedBy,
-    "computeValue", AuraComponentService.prototype.computeValue
-);

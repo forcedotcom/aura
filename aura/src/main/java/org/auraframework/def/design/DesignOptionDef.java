@@ -29,4 +29,10 @@ public interface DesignOptionDef extends Definition {
      * @return a string value, can be null
      */
     public String getValue();
+
+    /**
+     * Get the value of the access attribute
+     * @return a string value, can be null
+     */
+    public String getAccessString();
 }

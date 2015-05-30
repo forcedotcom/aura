@@ -17,7 +17,30 @@
 	$dropOperationStatus$: null,
 	
 	resetCssClass: function(component) {
-		component.set("v.theClass", component.get("v.class"));
+		var cssClass = component.get("v.class");
+		var dragClass = component.get("v.dragClass");
+		var dragAccessibilityClass = component.get("v.dragAccessibilityClass");
+		
+		if (!$A.util.isEmpty(dragClass)) {
+			cssClass = cssClass.replace(dragClass, "");
+		}
+		
+		if (!$A.util.isEmpty(dragAccessibilityClass)) {
+			cssClass = cssClass.replace(dragAccessibilityClass, "");
+		}
+		
+		component.set("v.class", cssClass);
+	},
+	
+	setDragClass: function(component, isInAccessibilityMode) {
+		var dragClass = component.get("v.dragClass");
+		if (isInAccessibilityMode) {
+			var dragAccessibilityClass = component.get("v.dragAccessibilityClass");
+			if (!$A.util.isEmpty(dragAccessibilityClass)) {
+				dragClass = dragAccessibilityClass;
+			}
+		}
+		component.set("v.class", component.get("v.class") + " " + dragClass);
 	},
 	
 	/**
@@ -175,16 +198,7 @@
 	 */
 	enterDragOperation: function(component, isInAccessibilityMode) {
 		this.$dropOperationStatus$ = null;
-		
-		// set onDrag class
-		var onDragClass = component.get("v.dragClass");
-		if (isInAccessibilityMode) {
-			var onDragAccessibilityClass = component.get("v.dragAccessibilityClass");
-			if (!$A.util.isEmpty(onDragAccessibilityClass)) {
-				onDragClass = onDragAccessibilityClass;
-			}
-		}
-		component.set("v.theClass", component.get("v.class") + " " + onDragClass);
+		this.setDragClass(component, isInAccessibilityMode);
 		
 		// Set aria-describe
 		component.set("v.ariaGrabbed", true);

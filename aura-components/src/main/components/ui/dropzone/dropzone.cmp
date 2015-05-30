@@ -23,16 +23,13 @@
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to the component."/>
 	<aura:attribute name="dragOverClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged over."/>
 	<aura:attribute name="dragOverAccessibilityClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged over in accessibility mode. It's defaulted to dragOverClass attribute if it's unspecified."/>
-	<aura:attribute name="theClass" type="String" default="" access="private" description="Computed CSS style to be applied to this component."/>
 	<aura:attribute name="label" type="String" description="Label for this component. It's primarily used for accessibility."/>
 	<aura:attribute name="ariaDropEffect" type="String" default="none" access="private" description="Indicate what operation this component is capable of receiving."/>
 	
 	<aura:registerEvent name="dragEnter" type="ui:dragEvent" description="Event fired when a dragged component enters this drop target."/>
 	<aura:registerEvent name="dragLeave" type="ui:dragEvent" description="Event fired when a dragged component leaves this drop target."/>
 	<aura:registerEvent name="drop" type="ui:dragEvent" description="Event fired when a component is dropped on this drop target."/>
-	
-	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
-	
+		
 	<aura:method name="enterDragOperation" action="{!c.enterDragOperation}" access="public"/>
 	<aura:method name="exitDragOperation" action="{!c.exitDragOperation}" access="public"/>
 	
@@ -49,7 +46,7 @@
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
-	<div aria-dropeffect="{!v.ariaDropEffect}" class="{!v.theClass}">
+	<div aria-dropeffect="{!v.ariaDropEffect}" class="{!v.class}">
 		{!v.body}
 	</div>
 	

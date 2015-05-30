@@ -15,7 +15,30 @@
  */
 ({
 	resetCssClass: function(component) {
-		component.set("v.theClass", component.get("v.class"));
+		var cssClass = component.get("v.class");
+		var dragOverClass = component.get("v.dragOverClass");
+		var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
+		
+		if (!$A.util.isEmpty(dragOverClass)) {
+			cssClass = cssClass.replace(dragOverClass, "");
+		}
+		
+		if (!$A.util.isEmpty(dragOverAccessibilityClass)) {
+			cssClass = cssClass.replace(dragOverAccessibilityClass, "");
+		}
+		
+		component.set("v.class", cssClass);
+	},
+	
+	setDragOverClass: function(component, isInAccessibilityMode) {
+		var dragOverClass = component.get("v.dragOverClass");
+		if (isInAccessibilityMode) {
+			var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
+			if (!$A.util.isEmpty(dragOverAccessibilityClass)) {
+				dragOverClass = dragOverAccessibilityClass;
+			}
+		}
+		component.set("v.class", component.get("v.class") + " " + dragOverClass);
 	},
 	
 	/**
@@ -29,14 +52,7 @@
 	
 	fireDragEnter: function(component, targetComponent, isInAccessibilityMode) {
 		// Set onDragOver class
-		var onDragOverClass = component.get("v.dragOverClass");
-		if (isInAccessibilityMode) {
-			var onDragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
-			if (!$A.util.isEmpty(onDragOverAccessibilityClass)) {
-				onDragOverClass = onDragOverAccessibilityClass;
-			}
-		}
-		component.set("v.theClass", component.get("v.class") + " " + onDragOverClass);
+		this.setDragOverClass(component, isInAccessibilityMode);
 		
 		var dragEvent = component.getEvent("dragEnter");
 		dragEvent.setParams({

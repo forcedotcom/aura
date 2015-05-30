@@ -50,5 +50,3 @@ RequiredVersionDef.prototype.getNamespace = function(){
 RequiredVersionDef.prototype.getVersion = function(){
     return $A.util.copy(this.version);
 };
-
-//#include aura.requiredVersion.RequiredVersionDef_export

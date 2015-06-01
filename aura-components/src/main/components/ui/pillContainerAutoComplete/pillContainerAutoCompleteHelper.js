@@ -61,5 +61,20 @@
             input.set("v.value", "");
             onItemSelected.setParams({ value : onItemSelectedPrams }).fire();
         }
+    },
+
+    initFetchParameters: function() {
+        this._fetchParameters = {};
+    },
+
+    handleParameterChange: function(component, parameters) {
+        for (var i = 0; i < parameters.length; i++) {
+            this._fetchParameters[parameters[i].name] = parameters[i].value;
+        }
+        var fetchDataEvt = component.get("e.fetchData");
+        fetchDataEvt.setParams({
+            parameters: this._fetchParameters
+        });
+        fetchDataEvt.fire();
     }
 })

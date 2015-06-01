@@ -17,17 +17,11 @@
     init : function(component, event, helper) {
         component.addHandler("inputChange", component, "c.handleInputChange");
         component.addHandler("selectListOption", component, "c.onSelect");
+        helper.initFetchParameters();
     },
 
     handleInputChange: function(component, event, helper) {
-        var keyword = event.getParam("value");
-        var fetchDataEvt = component.get("e.fetchData");
-        var options = {};
-        options.keyword = keyword;
-        fetchDataEvt.setParams({
-            parameters: options
-        });
-        fetchDataEvt.fire();
+        helper.handleParameterChange(component, [{name:"keyword", value:event.getParam("value")}]);
     },
 
     onSelect: function (component, event, helper) {
@@ -58,6 +52,13 @@
         var inputElement = component.getSuper().find('input');
         if (inputElement) {
             inputElement.getElement().focus();
+        }
+    },
+
+    updateParameters: function (component, event, helper) {
+        var parameters = event.getParam('arguments').parameters;
+        if (parameters) {
+            helper.handleParameterChange(component, parameters);
         }
     }
 

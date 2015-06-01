@@ -18,5 +18,8 @@
 <aura:component extends="ui:autocomplete" implements="ui:pillContainerInput"
                 description="Auto complete component for use in a ui:pillContainer" extensible="true" support="PROTO">
     <aura:attribute name="allowNew" type="Boolean" default="true" description="Allows new items to be added that are not returned from the data provider"/>
+    <aura:method name="updateParameters" description="Updates additional parameters used to filter data. Parameters is a list of name/value pairs [{name:'',value:''}]">
+        <aura:attribute name="parameters" type="List"/>
+    </aura:method>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 </aura:component>

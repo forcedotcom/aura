@@ -75,7 +75,7 @@ import com.google.common.collect.Sets;
 public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B extends Builder<T>> extends RootTagHandler<T> {
 
     private static final String ATTRIBUTE_RENDER = "render";
-    private static final String ATTRIBUTE_TEMPLATE = "template";
+    protected static final String ATTRIBUTE_TEMPLATE = "template";
     private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_EXTENSIBLE = "extensible";
     private static final String ATTRIBUTE_ABSTRACT = "abstract";

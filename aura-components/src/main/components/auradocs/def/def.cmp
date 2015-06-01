@@ -70,8 +70,10 @@
             </aura:if>
         </auradocs:stretchTab>
 
-        <auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
-
+		<aura:if isTrue="{!m.showSource}">
+        	<auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+       	</aura:if>
+ 
         <aura:iteration items="{!m.defs}" var="def">
             <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
         </aura:iteration>

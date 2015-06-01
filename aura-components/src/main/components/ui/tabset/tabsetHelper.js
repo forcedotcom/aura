@@ -32,11 +32,15 @@
         }
         if (tab && this.fireBeforeActiveEvent(cmp, {"tab": tab, "oldTab": this.getActiveTab(cmp)}, tab)) {
             // set active tabItem
-            cmp.find("tabBar").get("e.setActive").fire({"index": index, "active": active, "focus": option.focus});
+            cmp.find("tabBar").get("e.setActive").setComponentEvent().fire({
+                "index": index,
+                "active": active,
+                "focus": option.focus
+            });
             // activate body
             this.setActiveTabBody(cmp, {"index": index, "active": active, "tab": tab});
             //fire tabset onActivate event
-            cmp.get("e.onActivate").fire({"tab": tab, "index": option.index});
+            cmp.get("e.onActivate").setComponentEvent().fire({"tab": tab, "index": option.index});
         }
     },
     /**
@@ -98,7 +102,7 @@
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
         var oldTab = typeof params.oldTab === "number" ? cmp._tabCollection.getTab(params.oldTab) : params.oldTab;
 
-        target.get("e.beforeActivate").fire({"tab": tab, "oldTab": oldTab, "callback": callback});
+        target.get("e.beforeActivate").setComponentEvent().fire({"tab": tab, "oldTab": oldTab, "callback": callback});
 
         return activate;
     },
@@ -119,25 +123,26 @@
      * @private
      */
     setActiveTabBody: function (cmp, option) {
-        // set active tab body;
-        var tab = option.tab, evt;
+        var tab = option.tab;
 
-        if (!tab.isRendered() && option.active) {
-            // manually render tab component instead of setting v.body to avoid rerendering of all the tabs
-            this.renderTabBody(cmp, tab);
-        }
         if (option.active) {
+            if (!tab.isRendered()) {
+                var renderedTabs = cmp.get("v.body");
+                renderedTabs.push(tab);
+                cmp.set("v.body", renderedTabs);
+            }
+
             //deactivate current tabBody
             if (cmp._activeTab && cmp._activeTab.isValid()) {
-                cmp._activeTab.get("e.setActive").fire({"active": false});
+                cmp._activeTab.get("e.setActive").setComponentEvent().fire({"active": false});
             }
             //fire event to curent tab to update status
-            tab.get("e.setActive").fire({"active": true});
+            tab.get("e.setActive").setComponentEvent().fire({"active": true});
             //save current active tab
             cmp._activeTab = tab;
         } else if (option.active === false && cmp._activeTab === tab) {
             //deactivate tab
-            tab.get("e.setActive").fire({"active": false});
+            tab.get("e.setActive").setComponentEvent().fire({"active": false});
             cmp._activeTab = null;
         }
     },
@@ -166,6 +171,9 @@
         } else {
             this.getTabsFromBody(cmp);
         }
+        if ($A.util.getBooleanValue(cmp.get("v.lazyRenderTabs"))) {
+            cmp.set("v.body", []);
+        }
     },
 
     finishInit: function (cmp, result) {
@@ -180,7 +188,7 @@
     createTabsFromAttribute: function (cmp, tabConfigs) {
         //construct tabs from pass-in tab objects
         var tabComponents = [], tabIds = [], tabItems = [], tabNames = [], activeIndex = 0,
-            lazyRendering = cmp.get("v.lazyRenderTabs"),
+            lazyRendering = $A.util.getBooleanValue(cmp.get("v.lazyRenderTabs")),
             count = 0, total = tabConfigs.length - 1;
 
         var callback = function (newTab) {
@@ -345,25 +353,11 @@
         }
     },
     /**
-     * Render tab component to tabContainer
-     * @private
-     */
-    renderTabBody: function (cmp, tabComponent) {
-//JBUCH: HALO: TODO: WHY CAN'T THIS WHOLE METHOD JUST BE:
-//cmp.find("tabContainer").set("v.body",tabComponent);
-//???
-        var container = cmp.find("tabContainer").getElement(),
-            docFrag = document.createDocumentFragment();
-
-        $A.render(tabComponent, docFrag);
-        $A.afterRender(tabComponent);
-        container.appendChild(docFrag);
-    },
-    /**
      * Clean up
      * @private
      */
     unrender: function (cmp) {
+        // Probably unnecessary since we have auto destroy by default now?
         cmp._tabCollection.destroy();
         delete cmp._tabCollection;
     },

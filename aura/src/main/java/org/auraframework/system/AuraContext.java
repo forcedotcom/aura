@@ -560,4 +560,12 @@ public interface AuraContext {
      * @param style the encoding style for the context that we need.
      */
     String getEncodedURL(EncodingStyle style);
+
+    /**
+     * Get the accessible version for a component.
+     * 
+     * Use this to toggle logic based on what version of the component is being requested.
+     * This returns null if no requiredVersionDef or no version is found.
+     */
+    String getAccessVersion() throws QuickFixException;
 }

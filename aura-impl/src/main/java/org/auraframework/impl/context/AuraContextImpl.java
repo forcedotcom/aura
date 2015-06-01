@@ -38,6 +38,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.theme.ThemeListImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -870,5 +871,30 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String getEncodedURL(EncodingStyle style) {
         return AuraTextUtil.urlencode(serialize(style));
+    }
+
+    @Override
+    public String getAccessVersion() throws QuickFixException {
+        // only valid for component retrieving actions
+        DefDescriptor<?> desc = this.getCurrentCallingDescriptor();
+        if (desc == null) {
+            desc = this.getCurrentDescriptor();
+        }
+
+        // for non component retrieval action, use appDesc instead
+        if (desc == null) {
+            desc = this.getApplicationDescriptor();
+        }
+
+        if (desc.getDefType() == DefType.COMPONENT) {
+            BaseComponentDef def = (BaseComponentDef) Aura.getDefinitionService().getDefinition(desc);
+            for (RequiredVersionDef rvd : def.getRequiredVersionDefs().values()) {
+                if (rvd.getName().equals(desc.getNamespace())) {
+                    return rvd.getVersion();
+                }
+            }
+        }
+
+        return null;
     }
 }

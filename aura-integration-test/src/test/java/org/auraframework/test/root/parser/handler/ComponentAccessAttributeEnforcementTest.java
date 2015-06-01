@@ -27,7 +27,15 @@ public class ComponentAccessAttributeEnforcementTest extends BaseAccessAttribute
 	}
 	
 	/**
-	 * Verify Creating an Component works with abstract='true'
+	 * Verify Creating a Component works with isTemplate='true'
+	 * @throws Exception
+	 */
+	public void testIsTemplate() throws Exception {
+		verifyIsTemplate();
+    }
+	
+	/**
+	 * Verify Creating a Component works with abstract='true'
 	 * @throws Exception
 	 */
 	public void testAbstract() throws Exception {
@@ -35,7 +43,7 @@ public class ComponentAccessAttributeEnforcementTest extends BaseAccessAttribute
     }
 	
 	/**
-	 * Verify Creating an Component works with extends='true'
+	 * Verify Creating a Component works with extends='true'
 	 * @throws Exception
 	 */
 	public void testExtends() throws Exception {
@@ -43,7 +51,7 @@ public class ComponentAccessAttributeEnforcementTest extends BaseAccessAttribute
     }
 	
 	/**
-	 * Verify Creating an Component works
+	 * Verify Creating a Component works
 	 * @throws Exception
 	 */
 	public void testAccess() throws Exception {

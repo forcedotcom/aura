@@ -105,15 +105,21 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 	}
 	
 	protected void verifyExtensible() throws Exception {	
-		verifyExtension("extensible");
+		testConsumer = testResource;
+		verifyAttributeTestCase("extensible");
 	}
 	
 	protected void verifyAbstract() throws Exception {	
-		verifyExtension("abstract");
+		testConsumer = testResource;
+		verifyAttributeTestCase("abstract");
 	}
 	
-	private void verifyExtension(String attribute) throws Exception {	
-		testConsumer = testResource;
+	protected void verifyIsTemplate() throws Exception {	
+		testConsumer = TestResource.Application;
+		verifyAttributeTestCase("isTemplate");
+	}
+	
+	private void verifyAttributeTestCase(String attribute) throws Exception {	
 		String[] values ={"false","true"};
 		ArrayList<String> failures = new ArrayList<>();
 
@@ -125,7 +131,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			
 				for(String val : values){
 					try {
-						runExtensionTestCase(attribute, val);
+						runAttributeTestCase(attribute, val);
 					} catch (Throwable e) {
 						failures.add(e.getMessage());
 					}	
@@ -145,7 +151,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			fail("Test failed with " + failures.size() + " errors:" + message);
 		}
 	}
-
+	
 	protected void runTestCase() throws Exception {								
         if(Aura.getContextService().isEstablished()){
             Aura.getContextService().endContext();
@@ -223,7 +229,7 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		}
 	}
 	
-	protected void runExtensionTestCase(String attribute, String attributeValue) throws Exception {
+	protected void runAttributeTestCase(String attribute, String attributeValue) throws Exception {
 	    if(Aura.getContextService().isEstablished()){
 	        Aura.getContextService().endContext();
 	    }
@@ -232,10 +238,13 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
         // target
 		String resourceSource;
 		if(attribute.equals("abstract")){
-			resourceSource =  getAbstractResourceSource(testResource, attributeValue);
+			resourceSource = getAbstractResourceSource(testResource, attributeValue);
+		}
+		else if(attribute.equals("extensible")){
+			resourceSource = getExtensibleResourceSource(testResource, attributeValue);
 		}
 		else{
-			resourceSource =  getExtensibleResourceSource(testResource, attributeValue);
+			resourceSource = getTemplateResourceSource(testResource, attributeValue);
 		}
 		
 		DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testResource), resourceSource,
@@ -247,8 +256,11 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		if(attribute.equals("abstract")){
 			consumerSource= getAbstractResourceConsumerSource(descriptor.getName());
 		}
-		else{
+		else if(attribute.equals("extensible")){
 			consumerSource = getConsumerSource(descriptor.getName());
+		}
+		else {
+			consumerSource = getTemplateResourceConsumerSource(descriptor.getName());
 		}
 		
 		DefDescriptor<? extends Definition> descriptorConsumer = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(testConsumer), consumerSource,
@@ -277,6 +289,11 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 						+ testConsumerNamespace + "." + testConsumer);
 			}
 			
+			if (attribute.equals("isTemplate") && attributeValue.equals("false")) {
+				fail("Should have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and used in "
+						+ testConsumerNamespace + "." + testConsumer);
+			}
+			
 		} catch (InvalidDefinitionException e) {
 			if (attribute.equals("abstract") && attributeValue.equals("false")) {
 				fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and instantiated in "
@@ -285,6 +302,11 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 			
 			if (attribute.equals("extensible") && attributeValue.equals("true")) {
 				fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and extended in "
+						+ testConsumerNamespace + "." + testConsumer);
+			}
+			
+			if (attribute.equals("isTemplate") && attributeValue.equals("true")) {
+				fail("Should not have thrown Exception when " + testResourceNamespace + "." + testResource + " has "+attribute+"=" + attributeValue + " and used in "
 						+ testConsumerNamespace + "." + testConsumer);
 			}
 		}
@@ -398,6 +420,13 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		String source = "<aura:" + resource + attributeVal + " access='GLOBAL'/>";		 
 		return source;
 	}
+	
+	private String getTemplateResourceSource(TestResource testResource, String value) {
+		String resource = testResource.toString().toLowerCase();		
+		String attributeVal = " isTemplate='"+value+"'";  
+		String source = "<aura:" + resource + attributeVal + " access='GLOBAL'/>";		 
+		return source;
+	}
 
 	private String getConsumerSource(String targetName) {
 		String resourceName = testConsumer.toString().toLowerCase();
@@ -407,7 +436,9 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		String source = null;
 		String extendsClause = " extends='" + targetNamespace + ":" + targetName + "'";
 		if (testResource == TestResource.Application) {
-			source = "<aura:" + resourceName + extendsClause + " /> ";
+			if (testConsumer == TestResource.Application) {
+				source = "<aura:" + resourceName + extendsClause + " /> ";
+			}
 		} else if (testResource == TestResource.Component) {	
 			if (testConsumer == TestResource.Application) {
 				source = "<aura:" + resourceName + "> ";
@@ -451,6 +482,13 @@ public abstract class BaseAccessAttributeEnforcementTest extends AuraImplTestCas
 		String source  = "<aura:" + resourceName + "> ";
 		source += "<" + targetNamespace + ":" + targetName + " /> ";
 		source += "</aura:" + resourceName + "> ";	
+		return source;
+	}
+	
+	private String getTemplateResourceConsumerSource(String targetName) {
+		String resourceName = testConsumer.toString().toLowerCase();
+		String targetNamespace = getNamespaceValue(testResourceNamespace);		
+		String source = "<aura:" + resourceName + " template='" + targetNamespace + ":" + targetName + "' /> ";	
 		return source;
 	}
 

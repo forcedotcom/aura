@@ -15,9 +15,9 @@
  */
 ({
 	resetCssClass: function(component) {
-		var cssClass = component.get("v.class");
-		var dragOverClass = component.get("v.dragOverClass");
-		var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
+		var cssClass = component.get("v.class").trim();
+		var dragOverClass = component.get("v.dragOverClass").trim();
+		var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass").trim();
 		
 		if (!$A.util.isEmpty(dragOverClass)) {
 			cssClass = cssClass.replace(dragOverClass, "");
@@ -38,7 +38,7 @@
 				dragOverClass = dragOverAccessibilityClass;
 			}
 		}
-		component.set("v.class", component.get("v.class") + " " + dragOverClass);
+		component.set("v.class", component.get("v.class").trim() + " " + dragOverClass.trim());
 	},
 	
 	/**

@@ -17,9 +17,9 @@
 	$dropOperationStatus$: null,
 	
 	resetCssClass: function(component) {
-		var cssClass = component.get("v.class");
-		var dragClass = component.get("v.dragClass");
-		var dragAccessibilityClass = component.get("v.dragAccessibilityClass");
+		var cssClass = component.get("v.class").trim();
+		var dragClass = component.get("v.dragClass").trim();
+		var dragAccessibilityClass = component.get("v.dragAccessibilityClass").trim();
 		
 		if (!$A.util.isEmpty(dragClass)) {
 			cssClass = cssClass.replace(dragClass, "");
@@ -40,7 +40,7 @@
 				dragClass = dragAccessibilityClass;
 			}
 		}
-		component.set("v.class", component.get("v.class") + " " + dragClass);
+		component.set("v.class", component.get("v.class").trim() + " " + dragClass.trim());
 	},
 	
 	/**

@@ -18,6 +18,8 @@
         var concreteCmp = component.getConcreteComponent();
         //var concreteHelper = concreteCmp.helper || concreteCmp.getDef().getHelper();
         var concreteHelper = concreteCmp.helper;
-        concreteHelper.focus(concreteCmp);
+        if (concreteHelper.focus) {
+        	concreteHelper.focus(concreteCmp);
+        }
     }
 })

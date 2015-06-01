@@ -49,9 +49,11 @@
     },
     
     onTabActivated: function(cmp, evt, helper) {
-        var index = evt.getParam("index");
+        var index = evt.getParam("index"),
+        	focus = evt.getParam("focus");
+        
         if (helper.fireBeforeActiveEvent(cmp, evt.getParams())) {
-            helper.setActive(cmp, {"index": index, "focus": true});
+            helper.setActive(cmp, {"index": index, "focus": $A.util.isUndefinedOrNull(focus) || focus});
         }
     },
     

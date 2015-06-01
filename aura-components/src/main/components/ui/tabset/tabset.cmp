@@ -21,6 +21,11 @@
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
     <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated." />
 
+	<aura:attribute name="useOverflowMenu" type="Boolean" default="false" description=""/>
+    <aura:attribute name="barWidth" type="Integer" description=""/>
+    <aura:attribute name="tabItemWidth" type="Integer" description=""/>
+    <aura:attribute name="overflowLabel" type="String" default="More" description=""/>
+
     <!-- These should be aura methods instead -->
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
     <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
@@ -42,8 +47,9 @@
 
     <div class="{!v.class}" aura:id="tabContainer">
         <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"
-           onTabActivated="{!c.onTabActivated}"
-           onTabClosed="{!c.onTabClosed}"/>
+           onTabActivated="{!c.onTabActivated}" onTabClosed="{!c.onTabClosed}"
+           useOverflowMenu="{!v.useOverflowMenu}" barWidth="{!v.barWidth}"
+           tabItemWidth="{!v.tabItemWidth}" overflowLabel="{!v.overflowLabel}"/>
 
         {!v.body}
     </div>

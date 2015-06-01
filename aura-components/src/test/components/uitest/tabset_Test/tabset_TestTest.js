@@ -77,8 +77,6 @@
         	 this.matchSectionAndAnchor(cmp.find("dashboard").get("v.title"), "tab 7 contents");
         }]
 	},
-	
-
 
 	testLazyRendering_renderedState : {
 			attributes : {"renderItem" : "tab_lazyCustomTab"},
@@ -167,8 +165,6 @@
 	    	)
 		},
 
-	
-	
 	/*************************************************************************************************************
      * HELPER FUNCTIONS
      ************************************************************************************************************/
@@ -180,7 +176,7 @@
 	    
 		     for(var i = 0; i < elements.length; i++){
 		        if(elements[i].tagName != "!"){
-		        	elementArray.push(chldrn[i]);
+		        	elementArray.push(elements[i]);
 		        }
 		     }
 	    	return elementArray;		 

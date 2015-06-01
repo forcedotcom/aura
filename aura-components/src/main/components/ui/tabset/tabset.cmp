@@ -21,10 +21,12 @@
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
     <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated." />
 
+    <!-- These should be aura methods instead -->
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
     <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
     <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate a tab." />
     <aura:registerevent name="getActiveTab" type="ui:tabsetEvent" description="Get the currently active tab." />
+
     <aura:registerevent name="beforeActivate" type="ui:tabsetEvent" description="The event is triggered before the tab is activated. Can be canceled to prevent the tab from activating." />
     <aura:registerevent name="onActivate" type="ui:tabsetEvent" description="The event is triggered when the tab is activated."/>
 
@@ -43,8 +45,6 @@
            onTabActivated="{!c.onTabActivated}"
            onTabClosed="{!c.onTabClosed}"/>
 
-        <aura:if isTrue="{!v.lazyRenderTabs == false}">
-            {!v.body}
-        </aura:if>
+        {!v.body}
     </div>
 </aura:component>

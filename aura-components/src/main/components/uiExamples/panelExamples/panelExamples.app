@@ -37,6 +37,13 @@
             <ui:button label="Create panelType: Modal" press="{!c.createModal}"/>
             <ui:button label="Create panelType: Large Modal" press="{!c.createLargeModal}"/>
             <ui:button label="Create panel with lazy load" press="{!c.lazyLoadPanel}"/>
+            <!--
+            <div class="panels">
+                <div class="panel1">panel 1: <ui:button press="{!c.openPanel1}" label="open" /> <ui:button press="{!c.hidePanel1}" label="hide" /> <ui:button press="{!c.showPanel1}" label="show" /></div>
+                <div class="panel2">panel 2: <ui:button press="{!c.openPanel2}" label="open" /> <ui:button press="{!c.hidePanel2}" label="hide" /> <ui:button press="{!c.showPanel2}" label="show" /></div>
+                <div class="panel3">panel 3: <ui:button press="{!c.openPanel3}" label="open" /> <ui:button press="{!c.hidePanel3}" label="hide" /> <ui:button press="{!c.showPanel3}" label="show" /></div>
+            </div>
+            -->
         </div>
         <footer>
         </footer>

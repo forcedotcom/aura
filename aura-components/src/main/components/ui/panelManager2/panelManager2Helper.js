@@ -57,7 +57,7 @@
         // Save instance config
         this.PANELS_INSTANCE[panel.getGlobalId()] = {
             panel           : panel,
-            zindex          : panel._zIndex, 
+            zIndex          : panel._zIndex,
             destroyCallback : config.onDestroy
         };
 
@@ -121,6 +121,17 @@
         return panel;
     },
 
+    beforeShow: function(cmp, config) {
+        var panelParam = config.panelInstance,
+            panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
+            panelObj   = this.PANELS_INSTANCE[panelId],
+            panel      = panelObj.panel;
+
+        $A.assert(panelObj, 'Couldnt find instance to show');
+        //de-active all other panels except the one currently shown
+        this.deactivateAllPanelInstances(cmp, panel);
+    },
+
     /*
     * Destroy panel instance
     * @private
@@ -148,8 +159,8 @@
 
         // Notify the destroy
         config.onDestroy && config.onDestroy();
-        if (panelObj.onDestroy) {
-            panelObj.onDestroy(panelId);
+        if (panelObj.destroyCallback) {
+            panelObj.destroyCallback(panelId);
         }
         this.activateNextPanel(cmp);
     },
@@ -174,10 +185,10 @@
      * De-activate all the panels except the active one
      * @param cmp
      */
-    deActivateAllPanelInstances: function(cmp, activePanel) {
+    deactivateAllPanelInstances: function(cmp, activePanel) {
         for (var panel, i = this.PANELS_STACK.length - 1; i >= 0; i--) {
             panel = this.PANELS_STACK[i];
-            if (panel && panel.isValid() && panel.get('v.activatable') && panel !== activePanel) {
+            if (panel && panel.isValid() && !panel.get('v.activatable') && panel !== activePanel) {
                 panel.setActive(false);
             }
         }
@@ -185,8 +196,8 @@
 
     /*
     * Rendering the panel
-    * We call $A.render because we want to render the component inmediately
-    * so we can send it back syncronously to the user
+    * We call $A.render because we want to render the component immediately
+    * so we can send it back synchronously to the user
     * @private
     */
     renderPanel: function (cmp, panel) {

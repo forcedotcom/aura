@@ -16,7 +16,7 @@
 ({
     init: function(cmp) {
         //handler for tab key to trap the focus within the modal
-        cmp._windowKeyHandler = this.lib.panelLib.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
     },
 
     show: function(cmp, callback) {
@@ -25,7 +25,7 @@
 
         this.mask(cmp);
 
-        this.lib.panelLib.show(cmp, {
+        this.lib.panelLibCore.show(cmp, {
             useTransition: $A.util.getBooleanValue(cmp.get('v.useTransition')),
             animationName: 'movefrom' + cmp.get('v.animation'),
             animationEl: panel,
@@ -57,7 +57,7 @@
         mask.style.opacity = '0';
         panel.style.opacity = '0';
 
-        this.lib.panelLib.hide(cmp, {
+        this.lib.panelLibCore.hide(cmp, {
             useTransition: $A.util.getBooleanValue(cmp.get('v.useTransition')),
             animationName: 'moveto' + cmp.get('v.animation'),
             animationEl: panel,

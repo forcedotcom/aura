@@ -19,3 +19,7 @@
     flex-direction: row;
     justify-content: flex-end;
 }
+
+.THIS a {
+    padding-left: 10px;
+}

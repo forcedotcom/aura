@@ -30,14 +30,8 @@
         if (action === 'destroyPanel' && intf === 'ui:destroyPanel') {
             helper.destroyPanelInstance(cmp, event.getParam('payload'));
         }
-        else if (action === 'deActivatePanels' && intf === 'ui:showPanel') {
-            //de-active all other panels except the one currently shown
-            var panelParam = event.getParam('payload').panelInstance,
-                panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
-                panelObj   = helper.PANELS_INSTANCE[panelId],
-                panel      = panelObj.panel;
-
-            helper.deActivateAllPanelInstances(cmp, panel);
+        else if (action === 'beforeShow' && intf === 'ui:panel') {
+            helper.beforeShow(cmp, event.getParam('payload'));
         } else {
             helper.broadcastNotify(cmp, event.getSource(), event.getParams());
         }

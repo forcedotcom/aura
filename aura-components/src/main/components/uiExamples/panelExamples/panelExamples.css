@@ -45,3 +45,29 @@
     width: 100%;
     height: 100%;
 }
+
+.THIS .panels {
+    position: absolute;
+}
+
+.THIS .panels a {
+    padding: 0 10px;
+}
+
+.THIS .panel1 {
+    position: relative;
+    left: 0px;
+    top: 0;
+}
+
+.THIS .panel2 {
+    position: relative;
+    left: 400px;
+    top: 200px;
+}
+
+.THIS .panel3 {
+    position: relative;
+    left: 700px;
+    top: 400px;
+}

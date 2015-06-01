@@ -31,14 +31,17 @@
     <aura:attribute name="fadeInDuration" access="INTERNAL" default="0" type="Integer" description="Fade in duration in ms"/>
     <aura:attribute name="delay" default="0" access="INTERNAL" type="Integer" description="Appearance delay in ms" />
     <aura:attribute name="class" type="String" access="INTERNAL" default="" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
+
+     <aura:attribute name="direction" type="String" access="INTERNAL" default="north" description="The direction in which the tooltip should go"/>
+   
      <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
     <aura:method name="show" access="INTERNAL"/>
     <aura:method name="hide" access="INTERNAL"/>
     <aura:if isTrue="{!v.advanced}">
-        <div class="tooltip-trigger" aria-describedby="{!v.domId}">
+        <div class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger'}" aria-describedby="{!v.domId}">
             {!v.body}
             <div class="uiTooltip advanced-wrapper" aura:id="tooltip" aria-hidden="{!!v.isVisible}">
-                <div class="tooltip">
+                <div class="{!v.classList}">
                     <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body" id="{!v.domId}">{!v.tooltipBody}</div>
                     <div class="pointer pointer-advanced"></div>
                 </div>
@@ -46,7 +49,7 @@
             
         </div>
         <aura:set attribute="else">
-            <div aura:id="tooltip" aria-describedby="{!v.domId}" class="tooltip-trigger tooltip-basic">
+            <div aura:id="tooltip" aria-describedby="{!v.domId}" class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger tooltip-basic'}">
                 {!v.body}
                 <span class="{!v.classList}" role="tooltip" style="{!v.tooltipStyle}">
                     <span class="tooltip-body body-basic" id="{!v.domId}" role="tooltip">{!v.tooltipBody}</span>

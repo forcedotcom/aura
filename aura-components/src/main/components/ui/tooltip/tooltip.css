@@ -79,6 +79,12 @@
 	border-top: 13px solid #16325c;
 }
 
+.THIS .east .pointer {
+	border-right: 13px solid #16325c;
+	border-bottom: 13px solid transparent;
+	border-top: 13px solid transparent;
+}
+
 .THIS.tooltip-basic .tooltip {
 	pointer-events: none;
 	opacity: 0;

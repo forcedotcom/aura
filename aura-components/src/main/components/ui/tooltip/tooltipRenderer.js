@@ -23,7 +23,10 @@
         }
         var fadeInDuration = component.get('v.fadeInDuration');
         var fadeOutDuration = component.get('v.fadeOutDuration');
+        var triggerClass = component.get('v.triggerClass');
+        var extraClass = component.get('v.class');
         var delay = component.get('v.delay');
+        var direction = component.get('v.direction');
         if(!fadeInDuration) {
             fadeInDuration = 0;
         }
@@ -34,6 +37,14 @@
 
         
         var classList = ['tooltip'];
+
+        if(extraClass) {
+            classList.push(extraClass);
+        }
+
+        if(direction) {
+            classList.push(direction);
+        }
 
         if(fadeInDuration > 0) {
             classList.push('fade-in');

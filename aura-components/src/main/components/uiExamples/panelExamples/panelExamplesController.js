@@ -31,7 +31,8 @@
                 closeOnClickOut: true,
                 useTransition: false,
                 body  : body,
-                direction: 'south'
+                direction: 'south',
+                showPointer: true
             }
         }).fire();
     },

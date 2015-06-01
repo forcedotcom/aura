@@ -38,8 +38,9 @@
     -->
     </div>
     <div aura:id="bb" class="bb"></div>
-    <div aura:id="pointer" id="pointer" class="pointer"></div>
+    
     <div aura:id="panel" id="panel" class="panel" style="visibility: hidden">
         <p>I am centered</p>
+        <div aura:id="pointer" id="pointer" class="pointer"></div>
     </div>
 </aura:component>

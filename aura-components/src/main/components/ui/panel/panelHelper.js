@@ -86,6 +86,11 @@
 
     close: function (cmp, callback) {
         cmp.hide(function () {
+            if(cmp.constraints) {
+                cmp.constraints.forEach(function(constraint) {
+                    constraint.destroy();
+                });
+            }
             cmp.getEvent('notify').setParams({
                 action: 'destroyPanel',
                 typeOf: 'ui:destroyPanel',
@@ -96,43 +101,112 @@
 
     position: function(cmp, referenceEl) {
 
-        var direction = cmp.get('v.direction'), align, targetAlign;
+        var direction = cmp.get('v.direction'), 
+            align, 
+            targetAlign, 
+            pointer,
+            bbDirections,
+            pointerPad;
+        
+        cmp.getElement().classList.add('positioned');
+        cmp.getElement().classList.add(direction);
+        pointer = cmp.find('pointer').getElement();
 
         switch (direction) {
             case 'north':
                 align = 'center bottom';
                 targetAlign = 'center top';
+                bbDirections = {
+                    left:true,
+                    right:true
+                };
                 break;
             case 'south':
                 align = 'center top';
                 targetAlign = 'center bottom';
+                bbDirections = {
+                    left:true,
+                    right:true
+                };
                 break;
             case 'west':
                 align = 'right center';
                 targetAlign = 'left center';
+                pointerPad = -15;
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
                 break;
             case 'east':
                 align = 'left center';
                 targetAlign = 'right center';
+                pointerPad = -15;
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
                 break;
         }
 
-        if(!cmp.constraint) {
-            cmp.constraint = this.positioningLib.panelPositioning.createRelationship({
+        if(!cmp.constraints) {
+            cmp.constraints = [];
+            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                 element:cmp.getElement(),
                 target:referenceEl,
                 align:align,
                 targetAlign: targetAlign,
                 enable: true,
-                pad: 5
-            });
-            cmp.bbox = this.positioningLib.panelPositioning.createRelationship({
+                pad: 15
+            }));
+            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                 element:cmp.getElement(),
                 target:window,
                 type: 'bounding box',
                 enable: true,
                 pad: 5
-            });
+            }));
+
+            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                element:pointer,
+                target:referenceEl,
+                align: align,
+                targetAlign: targetAlign,
+                enable: true,
+                pad: pointerPad
+            }));
+
+            if(direction === 'east') {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    align: 'right center',
+                    targetAlign: 'left center',
+                    enable: true,
+                    pad: pointerPad
+                }));
+            }
+
+            if(direction === 'west') {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    align: 'left center',
+                    targetAlign: 'right center',
+                    enable: true,
+                    pad: pointerPad
+                }));
+            }
+            
+            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                element:pointer,
+                target:cmp.getElement(),
+                type:'bounding box',
+                enable: true,
+                boxDirections: bbDirections,
+                pad: 5
+            }));
+
             this.positioningLib.panelPositioning.reposition();
         } else {
             this.positioningLib.panelPositioning.reposition();

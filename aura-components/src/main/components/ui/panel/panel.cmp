@@ -32,6 +32,7 @@
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="referenceElementSelector" type="String" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel" />
+    <aura:attribute name="showPointer" type="Boolean" default="false" description="Show a pointer that points to the referenceElement" />
     <aura:attribute name="header" type="Aura.Component[]" />
     <aura:attribute name="footer" type="Aura.Component[]" />
 
@@ -75,5 +76,8 @@
             </footer>
 
         </div>
+        <aura:if isTrue="{!v.showPointer}">
+            <div aura:id="pointer" class="pointer"></div>
+        </aura:if>
     </div>
 </aura:component>

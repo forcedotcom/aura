@@ -92,7 +92,27 @@ function (constraint, elementProxyFactory) {
     return {
 
 
-            
+        /**
+         * Create a positioning relationship
+         * @param  {Object} config
+         * @property {HTMLElement} config.element The element being positioned
+         * @property {HTMLElement} config.target The target element
+         * @property {Sring} config.type The type of constraint, options: 
+         *                               default: position the element based on align and target align properties
+         *                               bounding box: position the elment inside the target
+         * @property {Number} config.pad A number (in pixels) to pad the constraint. (default is 0)
+         * @property {Boolean} config.enable If enable is false the constraint will have no effect. (default is true)
+         * @property {String} config.align How to align the element being positioned. This can have one or two words the first specifies
+         *                          the vertical alignment, the second the horizontal alignments.
+         *                          acceptable values: right, left, center
+         * @property {String} config.targetAlign where on the target to align to.
+         * 
+         * @return {Object} constraintHandle
+         * @property {Function} constraintHandle.disable Disable the constraint
+         * @property {Function} constraintHandle.enable Enable the constraint
+         * @property {Function} constraintHandle.destroy Destroy the constraint, cleaning up 
+         *                                               element references. 
+         */
     	createRelationship: function(config) {
 
             if(!eventsBound) {
@@ -127,6 +147,7 @@ function (constraint, elementProxyFactory) {
 
 
                 return {
+
                     disable: function() {
                         
                         constraintList.forEach(function(constraint) {

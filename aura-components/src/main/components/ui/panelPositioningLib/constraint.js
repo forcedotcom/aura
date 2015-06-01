@@ -196,8 +196,8 @@ function(w) {
      * Compute the new position
      */
     Constraint.prototype.destroy = function() {
-        elementProxyFactory.release(this._el);
-        elementProxyFactory.release(this._targetElement);
+        this._el.release();
+        this._targetElement.release();
         this._disabled = true;
     }
 

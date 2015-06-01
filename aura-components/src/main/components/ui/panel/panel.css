@@ -27,6 +27,52 @@
     display: block;
 }
 
+.THIS.positioned {
+    border: 1px solid #d8dde6;
+    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+}
+
+.THIS.positioned .panel-header {
+    border: none;
+}
+
+.THIS.positioned .panel-content {
+    padding:0.5rem 1rem 1rem 1rem;
+}
+
+
+.THIS .pointer {
+    width: calc(1.25rem + .0625rem);
+    height: calc(1.25rem + .0625rem);
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    border-top: 1px solid #d8dde6;
+    border-left: 1px solid #d8dde6;
+    background: #fff;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.THIS.east .pointer {
+    border:0;
+    border-left: 1px solid #d8dde6;
+    border-bottom: 1px solid #d8dde6;
+}
+
+.THIS.west .pointer {
+    border:0;
+    border-right: 1px solid #d8dde6;
+    border-top: 1px solid #d8dde6;
+}
+
+.THIS.north .pointer {
+    border:0;
+    border-bottom: 1px solid #d8dde6;
+    border-right: 1px solid #d8dde6;
+}
 
 .THIS div[role=document] {
     overflow: hidden;

@@ -48,10 +48,19 @@
         }
     },
 
-    getEventSourceComponent: function(component, event) {
+    getEventSourceOptionComponent: function(component, event) {
+        //option could be a compound component so look for the right option
         var element = event.target || event.srcElement;
-        var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
-        return htmlCmp.getComponentValueProvider().getConcreteComponent();
+        var targetCmp;
+        do {
+            var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
+            if ($A.util.isUndefinedOrNull(htmlCmp)) {
+                return null;
+            }
+            targetCmp = htmlCmp.getComponentValueProvider().getConcreteComponent();
+            element = targetCmp.getElement().parentElement;
+        } while (!targetCmp.isInstanceOf("ui:autocompleteOptionTemplate"));
+        return targetCmp;
     },
 
     getNextVisibleOption: function(iters, k) {

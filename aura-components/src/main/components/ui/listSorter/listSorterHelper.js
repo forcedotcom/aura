@@ -19,7 +19,7 @@
 	doInit : function(cmp) {
 		this.initSorterTrigger(cmp);
 		this.initDataProvider(cmp);
-		this.initItems(cmp, cmp.get('v.items'), cmp.get('v.defaultSelectedItem'));
+		this.initItems(cmp, cmp.get('v.items'), cmp.get('v.defaultSelectedItems'));
 	},
 	
 	initSorterTrigger : function(cmp) {		

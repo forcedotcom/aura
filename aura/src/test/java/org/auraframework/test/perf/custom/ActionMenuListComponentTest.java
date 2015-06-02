@@ -24,7 +24,7 @@ public final class ActionMenuListComponentTest extends CustomPerfAbstractTestCas
     public ActionMenuListComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:ui_menu_actionMenu"));
+        setComponentDef(getDefDescriptor("miscTest:ui_menu_actionMenu"));
     }
 
     public void TODO_testChangeMenuItem() throws Throwable {

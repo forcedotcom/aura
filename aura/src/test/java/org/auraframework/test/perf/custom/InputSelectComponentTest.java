@@ -25,7 +25,7 @@ public final class InputSelectComponentTest extends CustomPerfAbstractTestCase {
     public InputSelectComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:ui_inputSelect"));
+        setComponentDef(getDefDescriptor("miscTest:ui_inputSelect"));
     }
 
     public void TODO_testSelectOption() throws Throwable {

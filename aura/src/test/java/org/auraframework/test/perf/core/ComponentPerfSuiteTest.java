@@ -74,7 +74,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
      * @return the list of namespaces to create tests for
      */
     protected List<String> getNamespaces() {
-        return ImmutableList.of("ui", "perf");
+        return ImmutableList.of("ui", "perfTest");
     }
 
     /**
@@ -111,7 +111,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
      */
     protected TestCase patchPerfComponentTestCase(ComponentPerfAbstractTestCase test,
             DefDescriptor<ComponentDef> descriptor) throws Exception {
-        test.setTestName("perf_" + test.getClass().getSimpleName() + '_' + descriptor.getDescriptorName());
+        test.setTestName("perf_" + descriptor.getDescriptorName());
         return test;
     }
 

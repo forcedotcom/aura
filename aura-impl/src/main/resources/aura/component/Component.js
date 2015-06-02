@@ -217,6 +217,7 @@ var ComponentPriv = (function() { // Scoping priv
      */
     ComponentPriv.prototype.setupValueProviders = function(customValueProviders, cmp) {
         var vp=this.valueProviders;
+
         vp["v"]=this.attributes;
         vp["m"]=this.model;
         vp["c"]=this.createActionValueProvider(cmp);
@@ -227,6 +228,7 @@ var ComponentPriv = (function() { // Scoping priv
         vp["style"]=this.createStyleValueProvider(cmp);
         vp["super"]=this.superComponent;
         vp["null"]=null;
+        vp["version"] = cmp.getVersion();
 
         for (var key in customValueProviders) {
             cmp.addValueProvider(key,customValueProviders[key]);
@@ -2119,6 +2121,10 @@ Component.prototype.getAttributeValueProvider = function() {
     return this.priv.attributeValueProvider||this;
 };
 
+Component.prototype.setAttributeValueProvider = function (avp) {
+    this.priv.attributeValueProvider = avp;
+};
+
 /**
  * Returns the value provider of the component.
  *
@@ -2144,7 +2150,7 @@ Component.prototype.getComponentValueProvider = function() {
  */
 Component.prototype.addValueProvider=function(key,valueProvider){
     $A.assert($A.util.isString(key),"Component.addValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,".indexOf(","+key.toLowerCase()+",")==-1,"Component.addValueProvider(): '"+key+"' is a reserved valueProvider.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")==-1,"Component.addValueProvider(): '"+key+"' is a reserved valueProvider.");
     $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"Component.addValueProvider(): 'valueProvider' is required.");
     this.priv.valueProviders[key]=valueProvider;
 };
@@ -2156,7 +2162,7 @@ Component.prototype.addValueProvider=function(key,valueProvider){
  */
 Component.prototype.removeValueProvider=function(key){
     $A.assert($A.util.isString(key),"Component.removeValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,".indexOf(","+key.toLowerCase()+",")==-1,"Component.removeValueProvider(): '"+key+"' is a reserved valueProvider and can not be removed.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")==-1,"Component.removeValueProvider(): '"+key+"' is a reserved valueProvider and can not be removed.");
     delete this.priv.valueProviders[key];
 };
 
@@ -2430,6 +2436,22 @@ Component.prototype.afterRender = function() {
 Component.prototype.unrender = function() {
     var superComponent = this.getSuper();
     return superComponent ? superComponent["unrender"]() : undefined;
+};
+
+Component.prototype.getVersion = function() {
+    var context = $A.getContext();
+    var ns = this.getDef().getDescriptor().getNamespace();
+    var ret = null;
+    if (context) {
+        ret = context.getAccessVersion(ns);
+    }
+
+    // when currentAccess is not available, fall back to component itself
+    if (!ret) {
+        ret = this.getDef().getRequiredVersionDefs().getDef(ns);
+    }
+
+    return ret ? ret.getVersion() : null;
 };
 
 Aura.Component.ComponentPriv = ComponentPriv;

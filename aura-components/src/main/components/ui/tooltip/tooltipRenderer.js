@@ -21,8 +21,55 @@
         if(!domId) {
             domId = component.getConcreteComponent().getGlobalId();
         }
+        var fadeInDuration = component.get('v.fadeInDuration');
+        var fadeOutDuration = component.get('v.fadeOutDuration');
+        var triggerClass = component.get('v.triggerClass');
+        var extraClass = component.get('v.class');
+        var delay = component.get('v.delay');
+        var direction = component.get('v.direction');
+        if(!fadeInDuration) {
+            fadeInDuration = 0;
+        }
 
+        if(!fadeOutDuration) {
+            fadeOutDuration = 0;
+        }
+
+        
+        var classList = ['tooltip'];
+
+        if(extraClass) {
+            classList.push(extraClass);
+        }
+
+        if(direction) {
+            classList.push(direction);
+        }
+
+        if(fadeInDuration > 0) {
+            classList.push('fade-in');
+        }
+        if(fadeOutDuration > 0) {
+            classList.push('fade-out');
+        }
+
+        if(fadeInDuration > fadeOutDuration) {
+            fadeOutDuration = fadeInDuration;
+        } else {
+            fadeInDuration = fadeOutDuration;
+        }
+
+        var styleDeclaration = [
+            '-webkit-transtion-duration:' + fadeInDuration + 'ms',
+            'transition-duration:' + fadeInDuration  + 'ms',
+            '-webkit-transition-delay:' + delay  + 'ms', 
+            'transition-delay:' + delay  + 'ms'
+        ];
+
+        component.set('v.tooltipStyle', styleDeclaration.join(';'));
         component.set('v.domId', domId);
+        component.set('v.classList', classList.join(' '));
+
         return this.superRender();
     },
 

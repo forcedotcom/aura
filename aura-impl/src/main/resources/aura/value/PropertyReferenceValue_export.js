@@ -16,11 +16,8 @@
 /*jslint sub: true */
 var p = PropertyReferenceValue.prototype;
 exp(p,
-    "isDefined", p.isDefined,
     "isDirty", p.isDirty,
     "isGlobal", p.isGlobal,
-    "isLiteral", p.isLiteral,
-    "isExpression", p.isExpression,
     "destroy", p.destroy,
     "toString", p.toString,
     "addChangeHandler", p.addChangeHandler,

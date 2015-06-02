@@ -36,6 +36,6 @@
     <div class="container" aura:id="container">
         <aside aura:id="sidebar" class="sidebar"></aside>
         <article aura:id="content" class="content"></article>
-        <footer>Copyright &copy; 2014 salesforce.com, inc.</footer>
+        <footer>Copyright &copy; 2015 salesforce.com, inc.</footer>
     </div>
 </aura:application>

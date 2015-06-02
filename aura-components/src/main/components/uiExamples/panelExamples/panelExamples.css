@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS.viewport {
+    position: absolute;
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.THIS.viewport header {
+    background: #304a62;
+    display: flex;
+    justify-content: flex-end;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    padding: 0.75em 1rem;
+}
+
+.THIS.viewport .controls {
+    flex: 1;
+}
+
+.THIS.viewport footer {
+    background: #304a62;
+    padding: 0.75em 1rem;
+}
+
+.THIS.manager {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.THIS .panels {
+    position: absolute;
+}
+
+.THIS .panels a {
+    padding: 0 10px;
+}
+
+.THIS .panel1 {
+    position: relative;
+    left: 0px;
+    top: 0;
+}
+
+.THIS .panel2 {
+    position: relative;
+    left: 400px;
+    top: 200px;
+}
+
+.THIS .panel3 {
+    position: relative;
+    left: 700px;
+    top: 400px;
+}

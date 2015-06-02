@@ -60,6 +60,7 @@ exp(p,
     "addValueHandler", p.addValueHandler,
     "removeValueHandler", p.removeValueHandler,
     "getFacets", p.getFacets,
+    "setAttributeValueProvider", p.setAttributeValueProvider,
 
     "isFlavorable", p.isFlavorable,
     "getFlavor", p.getFlavor,
@@ -72,6 +73,8 @@ exp(p,
     "superAfterRender", p.superAfterRender,
     "superRerender", p.superRerender,
     "superUnrender", p.superUnrender,
+
+    "getVersion", p.getVersion,
 
     // DCHASMAN TODO Kill these once we figure out how to replace them in Halo
     "getAttributeValueProvider", p.getAttributeValueProvider,

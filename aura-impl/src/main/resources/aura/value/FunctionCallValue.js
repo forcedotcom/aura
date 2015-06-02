@@ -34,11 +34,11 @@ function FunctionCallValue(config, valueProvider){
 //#if {"modes" : ["STATS"]}
     valueFactory.index(this);
 //#end
-    
+
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	this.key = config["key"];
-//#end    
+//#end
 }
 
 FunctionCallValue.prototype.auraType = "Value";
@@ -121,22 +121,6 @@ FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
 };
 
 /**
- * Sets the isLiteral flag to false to denote that the element can be changed.
- * @returns {Boolean} false
- */
-FunctionCallValue.prototype.isLiteral = function(){
-    return false;
-};
-
-/**
- * Sets the isExpression flag to true to denote that the element is an expression.
- * @returns {Boolean} true
- */
-FunctionCallValue.prototype.isExpression = function(){
-    return true;
-};
-
-/**
  * Destroys the value wrapper.
  */
 FunctionCallValue.prototype.destroy = function(){
@@ -151,14 +135,6 @@ FunctionCallValue.prototype.destroy = function(){
 };
 
 /**
- * Sets the isDefined flag to true.
- * @returns {Boolean} true
- */
-FunctionCallValue.prototype.isDefined = function(){
-    return true;
-};
-
-/**
  * Helpful for logging/debugging.  Prints String value of the wrapped object.
  * @returns {String} FunctionCallValue
  */
@@ -166,7 +142,7 @@ FunctionCallValue.prototype.toString = function(){
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     return this.args.join(" " + this.key + " ");
 //#end
-    
+
     return "FunctionCallValue";
 };
 

@@ -59,7 +59,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
     public static TestSuite suite() throws Exception {
         TestSuite suite = new NamespaceTestSuite("*");
-        suite.setName("JS component tests");
+        suite.setName("JS Component Tests");
         return suite;
     }
 
@@ -176,9 +176,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
     public static class ComponentTestCase extends WebDriverTestCase {
         private ComponentTestCase(ComponentTestSuite suite, TestCaseDef caseDef) {
-            super("testRun");
-            this.name = String.format("%s$%s", suite.descriptor.getQualifiedName().replaceAll("://", "_"),
-                    caseDef.getName());
+            super(String.format("%s$%s", suite.getName(), caseDef.getName()));
             this.suite = suite;
             this.caseDef = caseDef;
             for (String browser : caseDef.getBrowsers()) {
@@ -198,6 +196,12 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             }
         }
 
+        @Override
+        public String toString() {
+            return getName() + "(" + suite.descriptor.getName() + "Test.js)";
+        }
+
+
         private String getUrl() {
             DefType defType = caseDef.getDefType();
             String baseUrl = suite.getUrl(defType);
@@ -211,9 +215,9 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                     String key = entry.getKey();
                     String value;
                     if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
-                    	value = Json.serialize(entry.getValue());
+                        value = Json.serialize(entry.getValue());
                     } else {
-                    	value = entry.getValue().toString();
+                        value = entry.getValue().toString();
                     }
                     if (key.equals("__layout")) {
                         hash = value;
@@ -230,17 +234,14 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         }
 
         @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
         public String getQualifiedName() {
             String btype = getBrowserTypeString();
             return caseDef.getDescriptor().getQualifiedName() + btype;
         }
 
-        public void testRun() throws Throwable {
+        // Override superRunTest() to be invoked in parent class runTest()
+        @Override
+        protected void superRunTest() throws Throwable {
             String validationError = "";
 
             try {
@@ -260,7 +261,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             if (ret != null && !"null".equals(ret)) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> e = (Map<String, Object>) new JsonReader()
-                        .read(ret);
+                .read(ret);
                 fail((String) e.get("message"));
             }
             // Actions run on servers need special handling because their call
@@ -291,7 +292,6 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         private final ComponentTestSuite suite;
         private final TestCaseDef caseDef;
-        private final String name;
         private final Set<BrowserType> targetBrowsers = EnumSet.noneOf(BrowserType.class);
         private final Set<BrowserType> excludedBrowsers = EnumSet.noneOf(BrowserType.class);
     }

@@ -26,7 +26,7 @@ public final class RenderIfComponentTest extends CustomPerfAbstractTestCase {
     public RenderIfComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:aura_renderif"));
+        setComponentDef(getDefDescriptor("miscTest:aura_renderif"));
     }
 
     public void TODO_testChangeCount() throws Throwable {

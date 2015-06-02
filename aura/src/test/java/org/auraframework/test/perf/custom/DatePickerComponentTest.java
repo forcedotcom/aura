@@ -24,7 +24,7 @@ public final class DatePickerComponentTest extends CustomPerfAbstractTestCase {
     public DatePickerComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:ui_datePicker"));
+        setComponentDef(getDefDescriptor("miscTest:ui_datePicker"));
     }
 
     public void TODO_testChangeYear() throws Throwable {

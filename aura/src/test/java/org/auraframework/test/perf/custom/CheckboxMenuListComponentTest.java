@@ -24,7 +24,7 @@ public final class CheckboxMenuListComponentTest extends CustomPerfAbstractTestC
     public CheckboxMenuListComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:ui_menu_checkBox"));
+        setComponentDef(getDefDescriptor("miscTest:ui_menu_checkBox"));
     }
 
     public void TODO_testChangeMenuItem() throws Throwable {

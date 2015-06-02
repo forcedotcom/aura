@@ -15,8 +15,9 @@
  */
 ({
 
-	handleClick: function(component) {
+	handleClick: function(component,evt, helper) {
 		var tt = component.find('theTip');
+		console.log('h', helper.lib);
 
 		if(tt.get('v.isVisible')) {
 			tt.hide();

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive">
+<aura:component extends="ui:interactive" implements="ui:autocompleteOptionTemplate">
 	<aura:attribute name="value" type="String"/>
 	<aura:attribute name="visible" type="Boolean"/>
 	

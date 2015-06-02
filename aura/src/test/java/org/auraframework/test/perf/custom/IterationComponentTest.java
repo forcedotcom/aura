@@ -26,7 +26,7 @@ public final class IterationComponentTest extends CustomPerfAbstractTestCase {
     public IterationComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:aura_iteration"));
+        setComponentDef(getDefDescriptor("miscTest:aura_iteration"));
     }
 
     public void TODO_testChangeItemValue() throws Throwable {

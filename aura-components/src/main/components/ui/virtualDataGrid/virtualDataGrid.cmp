@@ -51,7 +51,7 @@
 
 	<aura:registerEvent name="onsort" type="ui:sort"/>
 
-    <table aura:id="table" class="{! v.class + ' ' + v.mode }">
+    <table aura:id="table" class="{!v.class}">
         <thead aura:id="thead">
             <tr aura:id="headerRow">{!v.headerColumns}</tr>
         </thead>

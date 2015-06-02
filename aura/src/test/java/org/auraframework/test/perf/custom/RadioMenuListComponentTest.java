@@ -24,7 +24,7 @@ public final class RadioMenuListComponentTest extends CustomPerfAbstractTestCase
     public RadioMenuListComponentTest(String name) {
         super(name);
 
-        setComponentDef(getDefDescriptor("performanceTest:ui_menu_radioMenu"));
+        setComponentDef(getDefDescriptor("miscTest:ui_menu_radioMenu"));
     }
 
     public void TODO_testChangeMenuItem() throws Throwable {

@@ -7,7 +7,7 @@
     POLL_TIME : 3000,
     _parseTestName: function (name) {
         //return name.match(/\:?(\w+)\(/)[1];
-        return name.match(/([^_]+\:?\w+)\(/)[1];
+        return name.match(/([^_$]+\:?\w+)\(/)[1];
     },
     _parseTestNameSpace: function (ns) {
         return ns;

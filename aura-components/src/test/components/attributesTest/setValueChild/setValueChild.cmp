@@ -24,11 +24,11 @@
     <aura:set attribute="mapAttributeWithDefaultValue" value="{ b: 2, c: 3 }"/>
     <aura:set attribute="objAttributeWithDefaultValue" value="['grey','silver','slate']"/>
     <aura:set attribute="listAttributeWithDefaultValue" value="['grey','silver','slate']"/>
-    <aura:set attribute="arrayAttributeWithDefaultValue" value="[false,true,false]"/>
-    <aura:set attribute="longDefaultWithStringPositiveInt" value="456"/>
-    <aura:set attribute="integerDefaultWithStringPositiveInt" value="456"/>
-    <aura:set attribute="doubleDefaultWithStringPositiveInt" value="456"/>
-    <aura:set attribute="decimalDefaultWithStringPositiveInt" value="456.789"/>
+    <aura:set attribute="arrayAttributeWithDefaultValue" value="[false,'true',true]"/>
+    <aura:set attribute="longDefaultWithStringPositiveInt" value="9007199254740991"/>
+    <aura:set attribute="integerDefaultWithStringPositiveInt" value="2147483647"/>
+    <aura:set attribute="doubleDefaultWithStringPositiveInt" value="9007199254740991"/>
+    <aura:set attribute="decimalDefaultWithStringPositiveInt" value="9.99999999999999"/>
     <aura:set attribute="dateTimeDefaultWithString" value="1430517159503"/>
     <aura:set attribute="dateDefaultWithString" value="2015-02-05"/>
     <aura:set attribute="stringDefaultWithString" value="test string2"/>

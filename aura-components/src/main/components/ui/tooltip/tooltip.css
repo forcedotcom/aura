@@ -13,108 +13,118 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 .THIS.tooltip-trigger {
-	cursor: pointer;
 	display: inline;
 	position: relative;
 }
 
-.THIS.tooltip-wrapper {
-	display: inline;
-	position: relative;
-}
-
-.THIS.tooltip-basic {
-	position: relative;
-}
-
-.THIS.tooltip-advanced {
-	display: none;
-}
-
-.THIS.tooltip {
-	width: intrinsic;
-  	width: -moz-max-content;   
-  	width: -webkit-max-content;
-  	position: absolute;
-  	pointer-events: none;
-}
-
-.THIS .wrapper {
-	box-sizing: border-box;
+.THIS .tooltip-body {
+	display: block;
 	position: absolute;
-	display: block;
-	visibility: hidden;
-	bottom: 100%;
-	left: 50%;
+	max-width: 300px;
 	width: intrinsic;
-  	width: -moz-max-content;   
-  	width: -webkit-max-content;
-  	max-width: 300px;
-  	transform-origin: bottom left;
-  	transform: translateX(-50%) translateY(-18px);
-  	pointer-events: none;
-  	text-indent: 0;
+	width: -moz-max-content;
+	width: -webkit-max-content;
+
 }
 
-.THIS.tooltip-basic.fade-out .wrapper,
-.THIS.tooltip.fade-out .wrapper {
-	opacity: 0;
-	visibility: visible;
+.THIS .body-basic {
+	bottom:100%;
+	left:50%;
+	transform-origin: bottom left;
+	transform: translateX(-50%) translateY(-10px);
 }
 
-.THIS .content {
-	padding: 12px;
-	box-sizing: border-box;
-	border-radius: 5px;
-	background-color: #16325c;
-	color: white;
-	display: block;
+.THIS.advanced-wrapper {
+	position: inherit;
+}
+
+.THIS .tooltip-advanced {
 	pointer-events: none;
-
-	/* overrides necessary because parent might mess this all up */
-	font-family: SalesforceSans-Regular;
-	font-weight: normal;
-	line-height: 1.5em;
-	font-size: 12px;
-	text-indent: 0;
-	
+	position: absolute;
+	top:0;
+	left: 0;
 }
 
-.THIS.tooltip-basic:hover .wrapper,
-.THIS.tooltip.visible .wrapper {
-	visibility: visible;
-	opacity: 1;
-}
-
-.THIS.tooltip-basic.fade-in .wrapper,
-.THIS.tooltip.fade-in .wrapper {
+.THIS.advanced-wrapper .tooltip {
 	opacity: 0;
 }
 
-.THIS.tooltip-basic.fade-out .wrapper,
-.THIS.tooltip.fade-out .wrapper {
-	transition: opacity 0.5s ease-out;
+
+.THIS.advanced-wrapper.visible .tooltip {
+	opacity: 0.999;
 }
 
-.THIS.tooltip-basic.fade-out:hover .wrapper,
-.THIS.tooltip.fade-out.visible .wrapper {
-	transition: none;
+.THIS .pointer-advanced {
+	display: block;
+	position: absolute;
+	top:0;
+	left: 0;
 }
 
-.THIS.tooltip-basic.fade-in:hover .wrapper,
-.THIS.tooltip.fade-in.visible .wrapper {
-	opacity: 1;
-	transition: opacity 0.5s ease-out;
+.THIS .pointer-basic {
+	display: block;
+	position: absolute;
+	width: 0; 
+	height: 0; 
+	bottom:100%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-3px);
 }
 
 .THIS .pointer {
-	position: absolute;
-	width: 14px;
-	height: 14px;
-	transform-origin: center center;
+	border-left: 13px solid transparent;
+	border-right: 13px solid transparent;
+	border-top: 13px solid #16325c;
+}
+
+.THIS .east .pointer {
+	border-right: 13px solid #16325c;
+	border-bottom: 13px solid transparent;
+	border-top: 13px solid transparent;
+}
+
+.THIS.tooltip-basic .tooltip {
+	pointer-events: none;
+	opacity: 0;
+}
+
+.THIS .tooltip.fade-out {
+	transition: 500ms opacity;
+}
+
+.THIS .tooltip.fade-in {
+	transition: none;
+}
+
+.THIS .tooltip.fade-in.fade-out {
+	transition: 500ms opacity;
+}
+
+
+.THIS.tooltip-basic:hover .tooltip {
+	opacity: 0.999;
+}
+
+.THIS.tooltip-trigger:hover .fade-out.tooltip {
+	transition: none;
+}
+
+
+.THIS.tooltip-trigger:hover .fade-in.tooltip {
+	transition: 500ms opacity;
+}
+
+.THIS.tooltip-trigger:hover .fade-in.fade-out.tooltip {
+	transition: 500ms opacity;
+}
+
+
+.THIS .tooltip-body {
+	padding: 12px;
+	border-radius: 5px;
 	background-color: #16325c;
-	left: 50%;
-	bottom: 0;
-	transform: translateX(-50%) translateY(7px) rotate(-45deg);
+	color: white;
+	font-size: 12px;
 }

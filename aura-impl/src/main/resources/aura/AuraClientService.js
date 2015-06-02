@@ -1762,19 +1762,22 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 currentAccess=(context&&context.getCurrentAccess())||component;
                 // FIXME: goliver - the isValid is a hack... something is deeply wrong here.
                 if(currentAccess && currentAccess.isValid()){
-                    var targetNamespace=definition.getDescriptor().getNamespace();
-                    var accessNamespace=currentAccess.getDef().getDescriptor().getNamespace();
-                    var accessFacetNamespace=currentAccess.getComponentValueProvider().getDef().getDescriptor().getNamespace();
-                    // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
-                    // if(definition.access!=="P"){
-                    // INTERNAL / DEFAULT
-                    if(this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace)){
-                        // Privileged Namespace
-                        return true;
+                    var accessFacetValueProvider = currentAccess.getComponentValueProvider();
+                    if (accessFacetValueProvider && accessFacetValueProvider.isValid()) {
+                        var accessNamespace=currentAccess.getDef().getDescriptor().getNamespace();
+                        var accessFacetNamespace=accessFacetValueProvider.getDef().getDescriptor().getNamespace();
+                        // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
+                        // if(definition.access!=="P"){
+                        // INTERNAL / DEFAULT
+                        if(this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace)){
+                            // Privileged Namespace
+                            return true;
+                        }
+                        //}
+                        // Not a privileged namespace or explicitly set to PUBLIC
+                        var targetNamespace=definition.getDescriptor().getNamespace();
+                        return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
                     }
-                    //}
-                    // Not a privileged namespace or explicitly set to PUBLIC
-                    return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
                 }
         }
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2013 John Buchanan 
+// Copyright (c) 2006-2015 John Buchanan 
 // Permission is hereby granted, free of charge, to any person obtaining  
 // a copy of this software and associated documentation files (the "Software"),  
 // to deal in the Software without restriction, including without limitation the  
@@ -969,7 +969,14 @@ xUnit.js.Assert=new function(){
         if(Object.Implements(expected,actual))return;
         if(Object.IsType(expected,actual))return;
         throw new xUnit.js.Model.AssertError("Assert.AssignableFrom: 'actual' is not assignable from 'expected'");
-    };    
+    };
+
+    this.Compare=function(expected,actual,comparator){
+        if(!Object.IsType(Function,comparator))throw new xUnit.js.Model.AssertError("Assert.Compare: 'comparator' must be a valid Function pointer.");
+        if(!comparator(expected,actual)){
+            throw new xUnit.js.Model.AssertError(String.Format("Assert.Compare: 'comparator' failed the comparison. Expected '{0}', found '{1}', comparator '{2}'.",expected,actual,comparator));
+        }
+    };
 
     this.Contains=function(expected,actual){
         this.Calls++;
@@ -1122,7 +1129,6 @@ xUnit.js.Engine=function(){
 
     // Public members
     this.Events;
-    this.SingleAssert=true;
 
     // ctor
     function Engine(){
@@ -1156,7 +1162,6 @@ xUnit.js.Engine=function(){
         if(!Object.IsType(xUnit.js.Model.Fact,fact))throw new Error("xUnit.js.Engine.RegisterFact: 'fact' must be an instance of 'xUnit.js.Model.Fact'.");
         fact.Events.Add("AfterRun",Fact_AfterRun);
         fact.Events.Add("BeforeRun",Fact_BeforeRun);
-        fact.SingleAssert=this.SingleAssert;
         var parentFixture=resolveFixture(path);
         parentFixture.RegisterFact(fact);
     };
@@ -1433,6 +1438,7 @@ xUnit.js.Model.ISkippable=new function(){
 Function.RegisterNamespace("xUnit.js.Model");
 
 xUnit.js.Model.Result={
+    Warning:-2,
     Error:-1,
     Failure:0,
     Success:1,
@@ -1511,7 +1517,6 @@ xUnit.js.Model.Fact=function(method,name){
     this.Parent;
     this.State;
     this.States;
-    this.SingleAssert=true;
 
     // ctor
     function Fact(method,name,parent){
@@ -1568,8 +1573,8 @@ xUnit.js.Model.Fact=function(method,name){
                 }
                 processRun(this,context,parameters,false,dataIndex,this.Method);
                 if(this.Asynchronous){
-                    if(this.SingleAssert&&(Assert.Calls!=asserts)){
-                        throw new xUnit.js.Model.AssertError(String.Format("Single-Assert violation. Found {0} Asserts in main thread. Asserts in asynchronous Facts must be made in the delegate passed to the callback method provided to ensure synchronization, e.g.:\n  function {1}(callback){\n    callback(function(){\n      Assert.True(true);\n    });\n  }",Assert.Calls-asserts,this.Name));
+                    if(Assert.Calls!=asserts){
+                        throw new xUnit.js.Model.Warning(String.Format("Single-Assert violation. Found {0} Asserts in main thread. Asserts in asynchronous Facts must be made in the delegate passed to the callback method provided to ensure synchronization, e.g.:\n  function {1}(callback){\n    callback(function(){\n      Assert.True(true);\n    });\n  }",Assert.Calls-asserts,this.Name));
                     }
                     this.States[dataIndex].Result=xUnit.js.Model.Result.Waiting;
                 }
@@ -1601,8 +1606,8 @@ xUnit.js.Model.Fact=function(method,name){
             if(fact.Asynchronous&&!inCallback){
                 return runNext(fact);
             }
-            if(fact.SingleAssert&&(Assert.Calls-asserts)!=1){
-                throw new xUnit.js.Model.AssertError(String.Format("Single-Assert violation. Found {0} Asserts.",Assert.Calls-asserts));
+            if((Assert.Calls-asserts)!=1){
+                throw new xUnit.js.Model.Warning(String.Format("Single-Assert violation. Found {0} Asserts.",Assert.Calls-asserts));
             }
             fact.States[dataIndex].Result=xUnit.js.Model.Result.Success;
         }catch(e){
@@ -1617,6 +1622,8 @@ xUnit.js.Model.Fact=function(method,name){
         fact.States[dataIndex].Message=error;
         if(error instanceof xUnit.js.Model.AssertError){
             fact.States[dataIndex].Result=xUnit.js.Model.Result.Failure;
+        }else if(error instanceof xUnit.js.Model.Warning){
+            fact.States[dataIndex].Result=xUnit.js.Model.Result.Warning;
         }else{
             fact.States[dataIndex].Result=xUnit.js.Model.Result.Error;
         }
@@ -1754,6 +1761,50 @@ xUnit.js.Model.Fixture=function(){
 xUnit.js.Model.Fixture.Implement(xUnit.js.Model.ICompositeFixture,"xUnit.js.Model.Fixture");
 xUnit.js.Model.Fixture.Implement(xUnit.js.Model.IRunnable,"xUnit.js.Model.Fixture");
 xUnit.js.Model.Fixture.Implement(xUnit.js.Model.ISkippable,"xUnit.js.Model.Fixture"); 
+ 
+Function.RegisterNamespace("xUnit.js.Model");  
+
+xUnit.js.Model.Warning=function(){
+    // Public Properties
+    this.name="Warning";
+    this.message="";
+    this.stackTrace="";
+
+    // ctor
+    function Warning(message){
+        if(message==null)message='';
+        if(Object.IsType(Function,message.toString))message=message.toString();
+        var error=new Error(message);
+        error.name=this.name;
+        this.lineNumber=error.lineNumber;
+        this.number=error.number;
+        this.message=message;
+        this.stackTrace=error.stack||error.getStack&&error.getStack()||getStack(this);
+    }
+    Warning.apply(this,arguments);
+
+    // Private Methods
+    function getStack(error){
+        var map={};
+        var stack=[String.Format("{0}: {1}",error.name,error.message)];
+        var caller=getStack.caller&&getStack.caller.caller;
+        while(caller){
+            if(map[caller]){
+                stack.push(String.Format("{0} (Recursion Entry Point)",Function.GetName(caller)));
+                break;
+            }
+            if(caller.caller==System.Script.Attributes.DecoratedFunction){
+                stack.push(Function.GetName(caller.arguments[0]));
+            }else stack.push(Function.GetName(caller));
+            map[caller]=true;
+            caller=caller.caller;
+        }
+        return stack.join('\n\tat ');
+    }
+};
+
+xUnit.js.Model.Warning.prototype=new Error();
+xUnit.js.Model.Warning.prototype.constructor=xUnit.js.Model.Warning; 
 
 // System.js.Script 
  
@@ -4543,8 +4594,11 @@ xUnit.js.Console.Runner=function(){
         errors:[],
         failures:[],
         skipped:[],
-        success:[]
+        success:[],
+        warnings:[]
     }
+
+    this.Output=null;
     
     // ctor
     function Runner(){
@@ -4554,7 +4608,7 @@ xUnit.js.Console.Runner=function(){
         _scriptLoader.Events.Add("Loading",ScriptLoader_Loading);
         _scriptLoader.Events.Add("Success",ScriptLoader_Success);
         _scriptLoader.Events.Add("Error",ScriptLoader_Error);
-        _output=xUnit.js.Console.Output.OutputFormatter;
+        this.Output=_output=new xUnit.js.Console.Output.OutputFormatter();
         _engine=xUnit.js.Attributes.Engine.Instance;
         _engine.Events.Add("AfterRun",Component_AfterRun);
         _engine.Events.Add("BeforeRun",Component_BeforeRun);
@@ -4565,10 +4619,10 @@ xUnit.js.Console.Runner=function(){
     // IRunnable Members
     this.Run=function(){
         try{
+            resetRun();
             var parameters=System.Environment.GetParameters();
             _isStrict=parameters.named.strict!="false";
             _isVerbose=parameters.named.verbose=="true";
-            _engine.SingleAssert=_isStrict;
             if(parameters.unnamed.length>0){
                 loadDependency(parameters.named.dependency);
                 _output.SetLevel(_output.OutputLevels[_isVerbose&&"verbose"]);
@@ -4604,7 +4658,7 @@ xUnit.js.Console.Runner=function(){
     }    
 
     function completeRun(includeEpilogue,error){
-        if(!error)_output.CompleteRun(_results.success,_results.failures,_results.errors,_results.skipped,new Date()-_startTime);
+        if(!error)_output.CompleteRun(_results.success,_results.failures,_results.errors,_results.warnings,_results.skipped,new Date()-_startTime);
         if(includeEpilogue)_output.Epilogue();
         if(error)System.Environment.WriteError(error);
         System.Environment.Exit(_exitCode);
@@ -4633,15 +4687,19 @@ xUnit.js.Console.Runner=function(){
                 _results.skipped.push(run);
                 break;
             case xUnit.js.Model.Result.Success:
-                if(_isStrict){
-                    var pollution=findPollution();
-                    if(pollution.length){
-                        fact.State.Result=xUnit.js.Model.Result.Error;
-                        fact.State.Message=String.Format("Global state pollution detected: {0}", pollution.join(', '));
-                        return factCompleted(fact);
-                    }
+                var pollution=findPollution();
+                if(pollution.length){
+                    fact.State.Result=xUnit.js.Model.Result.Warning;
+                    fact.State.Message=new xUnit.js.Model.Warning(String.Format("Global state pollution detected. Found new global variable{0}: {1}",pollution.length>1?'s':'',pollution.join(', ')));
+                    return factCompleted(fact);
                 }
                 _results.success.push(run);
+                break;
+            case xUnit.js.Model.Result.Warning:
+                _results.warnings.push(run);
+                if(_isStrict){
+                    _exitCode=0xB00; // WARN: Your test violates best practices. Stop it.
+                }
                 break;
         }
     }
@@ -4703,6 +4761,10 @@ xUnit.js.Console.Runner=function(){
         }
         _output.CompleteFileLoad(scriptList,new Date()-timeStamp);
     }
+
+    function resetRun(){
+        _durations.length=_results.success.length=_results.failures.length=_results.errors.length=_results.warnings.length=_results.skipped.length=0;
+    }
     
     function runAction(action,target,trait,negativeTrait){
         if(!Object.IsType(String,action))action='';
@@ -4719,7 +4781,6 @@ xUnit.js.Console.Runner=function(){
         
     function runTests(target,trait,negativeTrait){
         _startTime=new Date();
-        _durations.length=_results.success.length=_results.failures.length=_results.errors.length=_results.skipped.length=0;
         _output.BeginRun();
         try{
             _engine.Run(target,trait,negativeTrait);
@@ -4729,12 +4790,10 @@ xUnit.js.Console.Runner=function(){
     }
     
     function setGlobalState(){
-        if(_isStrict){
-            var keys=collectState();
-            for(var i=0;i<keys.length;i++){
-                _globalState[keys[i]]=true;
-            }
-        }    
+        var keys=collectState();
+        for(var i=0;i<keys.length;i++){
+            _globalState[keys[i]]=true;
+        }
     }
 
     function usage(){
@@ -4837,7 +4896,7 @@ xUnit.js.Console.Runner=function(){
 
     function ScriptLoader_Error(context){
         _exitCode=0x10AD; // LOAD: script failed to load.
-        var errorMessage=String.Format("xUnit.js.Console.ScriptLoader.js: There was an error loading script {2}'{0}'.\nError: {1}\n",context.Path,context.Error,_loadingDependency?"dependency ":'');
+        var errorMessage=String.Format("xUnit.js.Console.ScriptLoader.js: There was an error loading script {2}'{0}'.\nError: {1}\n",context.Path,context.Error.toString(_isVerbose),_loadingDependency?"dependency ":'');
         if(_loadingDependency)throw new Error(errorMessage);
         _output.Error(new Error(errorMessage));
     }
@@ -4848,11 +4907,9 @@ xUnit.js.Console.Runner=function(){
 
     function ScriptLoader_Success(context){
         if(_loadingDependency)return;
-        if(_isStrict){
-            var pollution=findPollution();
-            if(pollution.length){
-                _output.Error(String.Format("Global state pollution detected in {0}: {1}", context.Path, pollution.join(', ')));
-            }
+        var pollution=findPollution();
+        if(pollution.length){
+            _results.warnings.push({Component:{File:context.Path,GetPath:function(){return "Global.Runtime"}},State:{Result:xUnit.js.Model.Result.Warning,Message:new xUnit.js.Model.Warning(String.Format("Global state pollution detected while loading '{0}'. Found new global variable{1}: {2}",context.Path,pollution.length>1?'s':'',pollution.join(', ')))}});
         }
         _output.FileLoadSuccess(context.Path,context.Duration);
     }
@@ -5065,15 +5122,15 @@ xUnit.js.Console.IO.DirectoryStrategy.Jsdb=function(){
     };
 
     this.GetFiles=function(path){
-		var files=system.files(System.IO.Path.Combine(path,'*.*'));
-		for(var i=0;i<files.length;i++)files[i]=System.IO.Path.Combine(path,files[i]);
-		return files;
+        var files=system.files(System.IO.Path.Combine(path,'*.*'));
+        for(var i=0;i<files.length;i++)files[i]=System.IO.Path.Combine(path,files[i]);
+        return files;
     };
     
     this.GetDirectories=function(path){
-		var directories=system.folders(System.IO.Path.Combine(path,'*'));
-		for(var i=0;i<directories.length;i++)directories[i]=System.IO.Path.Combine(path,directories[i]);
-		return directories;
+        var directories=system.folders(System.IO.Path.Combine(path,'*'));
+        for(var i=0;i<directories.length;i++)directories[i]=System.IO.Path.Combine(path,directories[i]);
+        return directories;
     };
 
     this.IsSatisfiedBy=function(candidate){
@@ -5324,17 +5381,17 @@ xUnit.js.Console.IO.FileStrategy.Stream=function(){
             var file=new Stream(path);
             if(file){
                 fileText=file.readText();
- 		        fileText=decode(fileText);
+                fileText=decode(fileText);
             }
         }catch(e){}
         return fileText;
     };
         
     this.SaveFile=function(path,text){
-		var file=new Stream(path,"wt+");
-		if(file){
-		    file.write(text);
-		}
+        var file=new Stream(path,"wt+");
+        if(file){
+            file.write(text);
+        }
     };
 
     // IStrategySpecification Members
@@ -5361,7 +5418,7 @@ xUnit.js.Console.Output.IOutputStrategy=new function(){
     this.CompleteFileLoad=function(files,duration){};
 
     this.BeginRun=function(){};
-    this.CompleteRun=function(successes,failures,errors,skipped,duration){};
+    this.CompleteRun=function(successes,failures,errors,warnings,skipped,duration){};
 
     this.BeginComponent=function(component){};
     this.CompleteComponent=function(component,duration){};
@@ -5372,22 +5429,16 @@ xUnit.js.Console.Output.IOutputStrategy=new function(){
  
 Function.RegisterNamespace("xUnit.js.Console.Output");
 
-xUnit.js.Console.Output.OutputFormatter=new function(){
+xUnit.js.Console.Output.OutputFormatter=function(){
     // Private Members
     var _candidate;
     var _level;
-    var _levels={
-        compact:"compact",
-        verbose:"verbose"
-    };
+    var _levels=xUnit.js.Console.Output.OutputFormatter.OutputLevels;
     var _strategyManager;
-    var _types={
-        json:"json",
-        text:"text",
-        xml:"xml"
-    };
+    var _types=xUnit.js.Console.Output.OutputFormatter.OutputTypes;
 
     // Public Members
+    this.OutputLevel;
     this.OutputLevels;
     this.OutputTypes;
     this.Strategies;
@@ -5399,6 +5450,11 @@ xUnit.js.Console.Output.OutputFormatter=new function(){
         this.OutputLevels=_levels;
         this.OutputTypes=_types;
         this.Strategies=_strategyManager=new System.Script.Strategy.StrategyManager();
+        if(xUnit.js.Console.Output.OutputStrategy){
+            _strategyManager.Add(xUnit.js.Console.Output.OutputStrategy.Json);
+            _strategyManager.Add(xUnit.js.Console.Output.OutputStrategy.Text);
+            _strategyManager.Add(xUnit.js.Console.Output.OutputStrategy.Xml);
+        };
     }
     OutputFormatter.apply(this,arguments);
 
@@ -5442,8 +5498,8 @@ xUnit.js.Console.Output.OutputFormatter=new function(){
         return getOutputStrategy().BeginRun();
     };
 
-    this.CompleteRun=function(successes,failures,errors,skipped,duration){
-        return getOutputStrategy().CompleteRun(successes,failures,errors,skipped,duration);
+    this.CompleteRun=function(successes,failures,errors,warnings,skipped,duration){
+        return getOutputStrategy().CompleteRun(successes,failures,errors,warnings,skipped,duration);
     };
 
     this.BeginComponent=function(component){
@@ -5469,22 +5525,43 @@ xUnit.js.Console.Output.OutputFormatter=new function(){
 
 };
 
-xUnit.js.Console.Output.OutputFormatter.constructor.Implement(xUnit.js.Console.Output.IOutputStrategy,'xUnit.js.Console.Output.OutputFormatter'); 
+xUnit.js.Console.Output.OutputFormatter.OutputLevels={
+    compact:"compact",
+    verbose:"verbose"
+}
+
+xUnit.js.Console.Output.OutputFormatter.OutputTypes={
+    json:"json",
+    text:"text",
+    xml:"xml"
+};
+
+xUnit.js.Console.Output.OutputFormatter.Implement(xUnit.js.Console.Output.IOutputStrategy,'xUnit.js.Console.Output.OutputFormatter'); 
  
 Function.RegisterNamespace("xUnit.js.Console.Output.OutputStrategy");
 
 xUnit.js.Console.Output.OutputStrategy.Json=function(){
     // Private Members
+    var _errors;
     var _output;
 
     // IOutputStrategy Members
     this.OutputLevel="";
 
     this.Prologue=function(){
+        _errors=[];
         _output={
-            errors:[],
             files:[],
-            facts:[]
+            facts:[],
+            run:{
+                count:0,
+                errorCount:0,
+                failureCount:0,
+                warningCount:0,
+                skippedCount:0,
+                duration:0,
+                timestamp:0            
+            }
         };
     };
 
@@ -5492,41 +5569,54 @@ xUnit.js.Console.Output.OutputStrategy.Json=function(){
         System.Environment.Write(new System.Script.ObjectSerializer().Serialize(_output));
     };
 
-    this.BeginFileLoad=function(){};
+    this.BeginFileLoad=function(){
+        _output.files.length=0;
+    };
 
-    this.FileLoadSuccess=function(file,duration){};
+    this.FileLoadSuccess=function(file,duration){
+    };
 
     this.CompleteFileLoad=function(files,duration){
         Array.ForEach(files,listFile);
-        _output.files.duration=duration/1000;
+        //_output.files.duration=duration/1000;
     };
 
     this.BeginRun=function(){
         _output.facts.length=0;
-        _output.run={
-            count:0,
-            errors:0,
-            failures:0,
-            skipped:0,
-            duration:0,
-            timestamp:new Date()
-        };
+        _output.run.count=_output.run.errorCount=_output.run.failureCount=_output.run.skippedCount=_output.run.warningCount=_output.run.duration=0;
+        _output.run.timestamp=new Date();
+        delete _output.run.errors;
+        delete _output.run.failures;
+        delete _output.run.warnings;
+        delete _output.run.skipped;
     };
 
-    this.CompleteRun=function(successes,failures,errors,skipped,duration){
-        var count=successes.length+failures.length+errors.length+skipped.length;
+    this.CompleteRun=function(successes,failures,errors,warnings,skipped,duration){
+        var count=successes.length+failures.length+errors.length+warnings.length+skipped.length;
         _output.run.count=count;
-        _output.run.failures=failures.length;
-        _output.run.errors=errors.length;
-        _output.run.skipped=skipped.length;
+        _output.run.failureCount=failures.length;
+        _output.run.errorCount=errors.length+_errors.length;
+        _output.run.warningCount=warnings.length;
+        _output.run.skippedCount=skipped.length;
         _output.run.duration=duration/1000;
+        if(failures.length){
+            _output.run.failures=[];
+            Array.ForEach(failures,listFailure);
+        }
         if(errors.length){
             _output.run.errors=[];
             Array.ForEach(errors,listError);
         }
-        if(failures.length){
-            _output.run.failures=[];
-            Array.ForEach(failures,listFailure);
+        if(_errors.length){
+            if(!_output.run.errors){
+                _output.run.errors=_errors;
+            }else{
+                _output.run.errors=_output.run.errors.concat(_errors);
+            }
+        }
+        if(warnings.length){
+            _output.run.warnings=[];
+            Array.ForEach(warnings,listWarning);
         }
         if(skipped.length){
             _output.run.skipped=[];
@@ -5555,14 +5645,7 @@ xUnit.js.Console.Output.OutputStrategy.Json=function(){
     };
 
     this.Error=function(error){
-        var output={message:error+''};
-        if(error&&isVerbose()){
-            if(error.lineNumber)output.lineNumber=error.lineNumber;
-            if(error.number)output.number=error.number;
-            if(error.toSource)output.source=error.toSource();
-            if(error.stackTrace||error.stack||error.getStack)output.stack=error.stackTrace||error.stack||error.getStack();
-        }
-        _output.errors.push(output);
+        _errors.push({message:formatError(error)});
     }
     
     // IStrategySpecification Members
@@ -5571,6 +5654,10 @@ xUnit.js.Console.Output.OutputStrategy.Json=function(){
     };
     
     // Private Methods
+    function formatError(error){
+        return error&&error.toString(isVerbose())||"[No Message]";
+    }
+    
     function getPath(fact){
         return fact.GetPath().split('.').slice(1).join('.');
     }
@@ -5585,6 +5672,10 @@ xUnit.js.Console.Output.OutputStrategy.Json=function(){
                 return "Skipped";
             case xUnit.js.Model.Result.Success:
                 return "Success";
+            case xUnit.js.Model.Result.Warning:
+                return "Warning";
+            default:
+                return "???";
         }
         return '';
     }
@@ -5595,13 +5686,15 @@ xUnit.js.Console.Output.OutputStrategy.Json=function(){
     isVerbose=Function.GetDelegate(isVerbose,this);
     
     function listError(run,context){
-        _output.run.errors.push({
-            "file":run.Component.File,
-            index:run.State.Index,
-            path:getPath(run.Component),
-            type:run.State.Message&&run.State.Message.name||"Exception",
-            message:run.State.Message||"[no message]"
-        });
+        listMessage(run,context,_output.run.errors);
+    }
+
+    function listFailure(run,context){
+        listMessage(run,context,_output.run.failures);
+    }
+
+    function listWarning(run,context){
+        listMessage(run,context,_output.run.warnings);
     }
 
     function listFile(file,context){
@@ -5610,29 +5703,26 @@ xUnit.js.Console.Output.OutputStrategy.Json=function(){
         });
     }
 
-    function listFailure(run,context){
-        _output.run.failures.push({
-            "file":run.Component.File,
-            index:run.State.Index,
-            path:getPath(run.Component),
-            type:run.State.Message&&run.State.Message.name||"Exception",
-            message:run.State.Message||"[no message]"
-        });
-    }
-
     function listSkipped(run,context){
-        _output.run.failures.push({
+        _output.run.skipped.push({
             path:getPath(run.Component),
             message:run.State.Message||"[no message]"
         });
     }    
+
+    function listMessage(run,context,collection){
+        collection.push({
+            "file":run.Component.File,
+            index:run.State.Index,
+            path:getPath(run.Component),
+            type:run.State.Message&&run.State.Message.name||"Exception",
+            message:formatError(run.State.Message)
+        });
+    }
 };
 
 xUnit.js.Console.Output.OutputStrategy.Json.Implement(xUnit.js.Console.Output.IOutputStrategy,'xUnit.js.Console.Output.OutputStrategy.Json');
-xUnit.js.Console.Output.OutputStrategy.Json.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.Output.OutputStrategy.Json');
-
-xUnit.js.Console.Output.OutputFormatter.Strategies.Add(xUnit.js.Console.Output.OutputStrategy.Json);
- 
+xUnit.js.Console.Output.OutputStrategy.Json.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.Output.OutputStrategy.Json'); 
  
 Function.RegisterNamespace("xUnit.js.Console.Output.OutputStrategy");
 
@@ -5669,7 +5759,7 @@ xUnit.js.Console.Output.OutputStrategy.Text=function(){
         System.Environment.Write("\nRunning tests:\n\n");    
     };
     
-    this.CompleteRun=function(successes,failures,errors,skipped,duration){
+    this.CompleteRun=function(successes,failures,errors,warnings,skipped,duration){
         System.Environment.Write("\n");
         if(failures.length){
             System.Environment.Write("\nFailed Tests:\n");
@@ -5679,6 +5769,10 @@ xUnit.js.Console.Output.OutputStrategy.Text=function(){
             System.Environment.Write("\nErrored Tests:\n");
             Array.ForEach(errors,reportFailure);            
         }
+        if(warnings.length){
+            System.Environment.Write("\nWarnings:\n");
+            Array.ForEach(warnings,reportFailure);
+        }
         if(_errors.length){
             System.Environment.Write("\nScript Errors:\n");
             Array.ForEach(_errors,reportError);            
@@ -5687,10 +5781,10 @@ xUnit.js.Console.Output.OutputStrategy.Text=function(){
             System.Environment.Write("\nSkipped Tests:\n");
             Array.ForEach(skipped,reportSkipped);            
         }
-        var count=successes.length+failures.length+errors.length+skipped.length;
-        var issues=failures.length+errors.length+_errors.length;
+        var count=successes.length+failures.length+errors.length+warnings.length+skipped.length;
+        var issues=failures.length+errors.length+warnings.length+_errors.length;
         if(issues==0)System.Environment.Write("\n");
-        System.Environment.Write(String.Format("Total tests: {0}, Errors: {1}, Failures: {2}, Skipped: {3}, Time: {4}\n\n",count,errors.length+_errors.length,failures.length,skipped.length,formatDuration(duration)));
+        System.Environment.Write(String.Format("Total tests: {0}, Errors: {1}, Failures: {2}, Warnings: {3}, Skipped: {4}, Time: {5}\n\n",count,errors.length+_errors.length,failures.length,warnings.length,skipped.length,formatDuration(duration)));
     };
     
     this.BeginComponent=function(component){};
@@ -5710,6 +5804,12 @@ xUnit.js.Console.Output.OutputStrategy.Text=function(){
                 break;
             case xUnit.js.Model.Result.Success:
                 result='.';
+                break;
+            case xUnit.js.Model.Result.Warning:
+                result='W';
+                break;
+            default:
+                result='?';
                 break;
         }
         System.Environment.Write(result);
@@ -5798,9 +5898,7 @@ xUnit.js.Console.Output.OutputStrategy.Text=function(){
 };
 
 xUnit.js.Console.Output.OutputStrategy.Text.Implement(xUnit.js.Console.Output.IOutputStrategy,'xUnit.js.Console.Output.OutputStrategy.Text');
-xUnit.js.Console.Output.OutputStrategy.Text.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.Output.OutputStrategy.Text');
-
-xUnit.js.Console.Output.OutputFormatter.Strategies.Add(xUnit.js.Console.Output.OutputStrategy.Text); 
+xUnit.js.Console.Output.OutputStrategy.Text.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.Output.OutputStrategy.Text'); 
  
 Function.RegisterNamespace("xUnit.js.Console.Output.OutputStrategy");
 
@@ -5833,13 +5931,13 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
         System.Environment.Write("<facts>");
     };
 
-    this.CompleteRun=function(successes,failures,errors,skipped,duration){
+    this.CompleteRun=function(successes,failures,errors,warnings,skipped,duration){
         System.Environment.Write("</facts>");
-        var count=successes.length+failures.length+errors.length+skipped.length;
-        System.Environment.Write(String.Format("<run count=\"{0}\" failures=\"{1}\" errors=\"{2}\" skipped=\"{3}\" duration=\"{4}\" timestamp=\"{5}\"",count,failures.length,errors.length+_errors.length,skipped.length,duration/1000,new Date()));
-        if(failures.length||skipped.length){
+        var count=successes.length+failures.length+errors.length+warnings.length+skipped.length;
+        System.Environment.Write(String.Format("<run count=\"{0}\" failures=\"{1}\" errors=\"{2}\" warnings=\"{3}\" skipped=\"{4}\" duration=\"{5}\" timestamp=\"{6}\"",count,failures.length,errors.length+_errors.length,warnings.length,skipped.length,duration/1000,new Date()));
+        if(count!=successes.length){
             System.Environment.Write(">");
-            if(errors.length){
+            if(errors.length||_errors.length){
                 System.Environment.Write("<errors>");
                 Array.ForEach(errors,listFailure);
                 Array.ForEach(_errors,listError);
@@ -5849,6 +5947,11 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
                 System.Environment.Write("<failures>");
                 Array.ForEach(failures,listFailure);
                 System.Environment.Write("</failures>");
+            }
+            if(warnings.length){
+                System.Environment.Write("<warnings>");
+                Array.ForEach(warnings,listFailure);
+                System.Environment.Write("</warnings>");
             }
             if(skipped.length){
                 System.Environment.Write("<skipped>");
@@ -5886,6 +5989,10 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
         return value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
     
+    function formatError(error){
+        return error&&error.toString(isVerbose())||"[No Message]";
+    }
+
     function getPath(fact){
         return fact.GetPath().split('.').slice(1).join('.');
     }
@@ -5900,9 +6007,19 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
                 return "Skipped";
             case xUnit.js.Model.Result.Success:
                 return "Success";
+            case xUnit.js.Model.Result.Warning:
+                return "Warning";
+            default:
+                return "???";            
         }
         return '';
     }
+
+    function isVerbose(){
+        return this.OutputLevel==xUnit.js.Console.Output.OutputFormatter.OutputLevels.verbose;
+    }
+    isVerbose=Function.GetDelegate(isVerbose,this);
+
 
     function listError(error,context){
         var output=String.Concat(
@@ -5910,7 +6027,7 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
                 error.lineNumber?String.Format(" lineNumber=\"{0}\"",encode(error.lineNumber)):'',
                 error.number?String.Format(" number=\"{0}\"",encode(error.number)):'',
             ">",
-            "<message>",encode(error),"</message>",
+            "<message>",encode(formatError(error)),"</message>",
             error.toSource?String.Format("<source>{0}</source>",encode(error.toSource())):'',
             error.stackTrace||error.stack?String.Format("<stack>{0}</stack>",encode(error.stackTrace||error.stack)):'',
             "</error>"
@@ -5923,31 +6040,27 @@ xUnit.js.Console.Output.OutputStrategy.Xml=function(){
     }
     
     function listFailure(run,context){
-        System.Environment.Write(String.Format("<fact path=\"{0}\" type=\"{1}\" message=\"{2}\" index=\"{3}\"/>",encode(getPath(run.Component)),encode(run.State.Message&&run.State.Message.name||"Exception"),encode(run.State.Message||"[no message]"),run.State.Index));
+        System.Environment.Write(String.Format("<fact path=\"{0}\" type=\"{1}\" message=\"{2}\" index=\"{3}\"/>",encode(getPath(run.Component)),encode(run.State.Message&&run.State.Message.name||"Exception"),encode(run.State.Message||"[No Message]"),run.State.Index));
     }
 
     function listSkipped(run,context){
-        System.Environment.Write(String.Format("<fact path=\"{0}\" message=\"{1}\" />",encode(getPath(run.Component)),encode(run.State.Message||"[no message]")));
+        System.Environment.Write(String.Format("<fact path=\"{0}\" message=\"{1}\" />",encode(getPath(run.Component)),encode(run.State.Message||"[No Message]")));
     }
 };
 
 xUnit.js.Console.Output.OutputStrategy.Xml.Implement(xUnit.js.Console.Output.IOutputStrategy,'xUnit.js.Console.Output.OutputStrategy.Xml');
-xUnit.js.Console.Output.OutputStrategy.Xml.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.Output.OutputStrategy.Xml');
-
-xUnit.js.Console.Output.OutputFormatter.Strategies.Add(xUnit.js.Console.Output.OutputStrategy.Xml);
- 
+xUnit.js.Console.Output.OutputStrategy.Xml.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.Output.OutputStrategy.Xml'); 
  
 Function.RegisterNamespace('xUnit.js.Console');
 
-xUnit.js.Console.Program=function(){
+xUnit.js.Console.Program=new function(){
     this.Application;
 
     // Application Entry Point
     function Program(){
+        xUnit.js.Console.Program=this;
         this.Application=new xUnit.js.Console.Runner();
         this.Application.Run();
     }
     Program.apply(this,arguments);
-
-};
-xUnit.js.Console.Program=new xUnit.js.Console.Program(); 
+}; 

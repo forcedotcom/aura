@@ -46,30 +46,9 @@ ActionReferenceValue.prototype.getAction = function(){
 };
 
 /**
- * Returns true if the value is not undefined.
- */
-ActionReferenceValue.prototype.isDefined = function(){
-    return true;
-};
-
-/**
  * Always returns false as the object is immutable.
  */
 ActionReferenceValue.prototype.isDirty = function(){
-    return false;
-};
-
-/**
- * Returns false as this is not a literal.
- */
-ActionReferenceValue.prototype.isLiteral = function(){
-    return false;
-};
-
-/**
- * Returns false as this is not an expression.
- */
-ActionReferenceValue.prototype.isExpression = function(){
     return false;
 };
 

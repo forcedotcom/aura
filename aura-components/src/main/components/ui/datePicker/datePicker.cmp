@@ -27,11 +27,14 @@
     <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
     <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
+    <aura:attribute name="dimension" type="String" default="large" description="The size of date picker. We support large/medium/small for now."/>
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '') + ($Browser.isPhone == true ? ' phone' : '')}">
+    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible' : '') + 
+                                                 ($Browser.isPhone == true ? ' phone' : '') + 
+                                                 (or(v.dimension == 'medium', v.dimension == 'small') ? ' ' + v.dimension : '')}">
         <div class="scroller" aura:id="scroller">
             <aura:if isTrue="{!v.hasTime}">
                 <div class="headerBar">
@@ -73,10 +76,14 @@
                     </aura:set>
                 </aura:if>
             </div>
-            <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
+            <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" 
+                                              dimension="{!v.dimension}"
+                                              hide="{!c.hide}" 
+                                              selectDate="{!c.selectDate}" 
+                                              updateCalendarTitle="{!c.updateCalendarTitle}"/>
             <aura:if isTrue="{!v.hasTime}">
                 <div class="timeBar">
-                    <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}"/>
+                    <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}" dimension="{!v.dimension}"/>
                 </div>
                 <aura:set attribute="else">
                     <div class="buttonBar">

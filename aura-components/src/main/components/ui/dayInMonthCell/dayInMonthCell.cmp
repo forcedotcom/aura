@@ -19,5 +19,8 @@
     <aura:attribute name="ariaSelected" type="Boolean" default="false" description="The date highlighted."/>
     <aura:attribute name="tabIndex" type="Integer" default="-1" description="The tab index of the anchor element."/>
     <aura:attribute name="value" type="Date" description="The date this component renders."/>
-    <a class="{!v.class + ($Browser.formFactor == 'DESKTOP' ? ' desktop' : '')}" aria-selected="{!v.ariaSelected}" tabindex="{!v.tabIndex}">{!v.label}</a>
+    <aura:attribute name="dimension" type="String" default="large" description="The size of date picker. We support large/medium/small for now."/>
+    <a aura:flavorable="true" class="{!v.class + ($Browser.formFactor == 'DESKTOP' ? ' desktop' : '') + (or(v.dimension == 'medium', v.dimension == 'small') ? ' ' + v.dimension : '')}"
+       aria-selected="{!v.ariaSelected}" 
+       tabindex="{!v.tabIndex}">{!v.label}</a>
 </aura:component>

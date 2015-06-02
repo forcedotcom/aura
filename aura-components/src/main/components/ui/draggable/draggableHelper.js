@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 ({
-	$dropOperationStatus$: null,
-	
 	resetCssClass: function(component) {
 		var cssClass = component.get("v.class").trim();
 		var dragClass = component.get("v.dragClass").trim();
@@ -78,14 +76,20 @@
 		
 		// Set aura-id of this draggable component so that 
 		// we can pass this component to the dropzone
-		event.dataTransfer.setData("aura/id", component.getGlobalId());
+		var auraId = component.getGlobalId();
 		
 		// Set data to be transferred between drag component and drop component
 		var dataTransfer = component.get("v.dataTransfer");
 		if (!$A.util.isUndefinedOrNull(dataTransfer)) {
 			if($A.util.isString(dataTransfer)) {
-				event.dataTransfer.setData("text/plain", dataTransfer);
+				dataTransfer = { "text/plain": dataTransfer};
+			}
+			
+			if ($A.util.isIE) {
+				dataTransfer["aura/id"] = auraId;
+				event.dataTransfer.setData("Text", JSON.stringify(dataTransfer));
 			} else {
+				event.dataTransfer.setData("aura/id", auraId);
 				for (var key in dataTransfer) {
 					if (key !== "aura/id" && dataTransfer.hasOwnProperty(key)) {
 						event.dataTransfer.setData(key, dataTransfer[key]);
@@ -111,6 +115,25 @@
 		});
 		dragEvent.fire();
 	},
+	
+	isDropEventSuccessful: function(component, event) {
+		if (!component.isValid()) {
+			return false;
+		}
+		
+		var dropEffect = event.dataTransfer.dropEffect;
+		if (dropEffect === "none") {
+			// Don't return false right away, since IE always 
+			// have "none" even though the drop has been performed
+			// successfully. This is not the right way to check
+			// for whether or not drop has been performed since
+			// this doesn't cross different context, e.g. dropping on
+			// different browser.
+			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();			
+		} 
+		
+		return dropEffect === component.get("v.type");
+	},
 
 	/**
 	 * Handle dragend event.
@@ -118,8 +141,8 @@
 	 * @param {Event} event - HTML DOM Event for dragend
 	 */
 	handleDragEnd: function(component, event) {
-		var dropEffect = event.dataTransfer.dropEffect;
-		this.fireDragEnd(component, dropEffect === component.get("v.type"), false);
+		var isSuccess = this.isDropEventSuccessful(component, event);
+		this.fireDragEnd(component, isSuccess, false);
 	},
 	
 	fireDragEnd: function(component, isValid, isInAccessibilityMode) {
@@ -158,35 +181,41 @@
 	 * @param {Aura.Event} [event] - the Aura event for dropComplete
 	 */
 	updateDropOperationStatus: function(component, eventType, event) {
-		if (this.$dropOperationStatus$ == null) {
-			this.$dropOperationStatus$ = {
-				"dragEnd": null,
-				"dropComplete": null,
+		var dragOperationStatus = null
+		var dragOperation = component.$dragOperation$;
+		if ($A.util.isUndefinedOrNull(dragOperation)) {
+			// This could happen when drag and drop is performed in different
+			// context, i.e. drag and drop between windows
+			dragOperationStatus = this.newDropOperationStatus();
+			component.$dragOperation$ = {
+				"$dropOperationStatus$": dragOperationStatus
 			};
+		} else {
+			dragOperationStatus = component.$dragOperation$.$dropOperationStatus$;
 		}
 		
 		if (eventType === "dragEnd") {
-			this.$dropOperationStatus$["dragEnd"] = {
+			dragOperationStatus.setDragEndStatus({
 				"type": component.get("v.type")
-			};
+			});
 		} else if (eventType === "dropComplete") {
-			this.$dropOperationStatus$["dropComplete"] = {
+			dragOperationStatus.setDropStatus(true);
+			dragOperationStatus.setDropCompleteStatus({
 				"dropComponent": event.getParam("dropComponent"),
 				"status": event.getParam("dropComplete")
-			};
+			});
 		}
 		
-		// Ultimately this should be implemented with either Promise
-		// or Object.observe() instead of dirty checking. However,
-		// IE doesn't support either of those.
-		if (this.$dropOperationStatus$["dragEnd"] !== null && this.$dropOperationStatus$["dropComplete"] !== null) {
+		var dragEndStatus = dragOperationStatus.getDragEndStatus();
+		var dragCompleteStatus = dragOperationStatus.getDropCompleteStatus();
+		if (dragEndStatus !== null && dragCompleteStatus !== null) {
 			var dragEvent = component.getEvent("dragEnd");
 			dragEvent.setParams({
-				"type": this.$dropOperationStatus$["dragEnd"]["type"],
+				"type": dragEndStatus["type"],
 				"dragComponent": component,
-				"dropComponent": this.$dropOperationStatus$["dropComplete"]["dropComponent"],
+				"dropComponent": dragCompleteStatus["dropComponent"],
 				"data": component.get("v.dataTransfer"),
-				"dropComplete": this.$dropOperationStatus$["dropComplete"]["status"]
+				"dropComplete": dragCompleteStatus["status"]
 			});
 			dragEvent.fire();
 		}
@@ -197,11 +226,27 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	enterDragOperation: function(component, isInAccessibilityMode) {
-		this.$dropOperationStatus$ = null;
+		component.$dragOperation$ = {
+			"$dropOperationStatus$": this.newDropOperationStatus()
+		};
 		this.setDragClass(component, isInAccessibilityMode);
 		
 		// Set aria-describe
 		component.set("v.ariaGrabbed", true);
+	},
+	
+	newDropOperationStatus: function() {
+		return {
+			"dragEnd": null,
+			"dropSuccessful": false,
+			"dropComplete": null,
+			"setDragEndStatus": function(status) { this["dragEnd"] = status; },
+			"setDropStatus": function(isSuccessful) { this["dropSuccessful"] = isSuccessful; },
+			"setDropCompleteStatus": function(status) { this["dropComplete"] = status; },
+			"getDragEndStatus": function() { return this["dragEnd"]; },
+			"getDropStatus": function() { return this["dropSuccessful"]; },
+			"getDropCompleteStatus": function() { return this["dropComplete"]; },
+		};
 	},
 	
 	/**

@@ -18,6 +18,13 @@
 		helper.handleDropComplete(component, event);
 	},
 	
+	setDropStatus: function (component, event, helper) {
+		var params = event.getParam("arguments");
+		if (component.$dragOperation$) {
+			component.$dragOperation$.$dropOperationStatus$.setDropStatus(params.isSuccessful);
+		}
+	},
+	
 	fireDragEnd: function (component, event, helper) {
 		var params = event.getParam("arguments");
 		helper.fireDragEnd(component, params.isValid, params.isInAccessibilityMode);

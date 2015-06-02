@@ -20,14 +20,14 @@
 		var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass").trim();
 		
 		if (!$A.util.isEmpty(dragOverClass)) {
-			cssClass = cssClass.replace(dragOverClass, "");
+			cssClass = cssClass.replace(new RegExp(dragOverClass, "g"), "");
 		}
 		
 		if (!$A.util.isEmpty(dragOverAccessibilityClass)) {
-			cssClass = cssClass.replace(dragOverAccessibilityClass, "");
+			cssClass = cssClass.replace(new RegExp(dragOverAccessibilityClass, "g"), "");
 		}
 		
-		component.set("v.class", cssClass);
+		component.set("v.class", cssClass.trim());
 	},
 	
 	setDragOverClass: function(component, isInAccessibilityMode) {

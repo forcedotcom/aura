@@ -32,6 +32,10 @@
             this._createPillByAutoComplete(cmp);
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
             $A.test.assertTrue($A.test.getText(($A.test.select(".pill")[0])).indexOf(this.PILLS[1].label) > -1, "The wrong pill was created");
+            $A.test.assertTrue(this._validateAutocompleteList(this.PILLS[1].label), this.PILLS[1].label + "should be part of autocomplete list");
+            $A.test.assertTrue(this._validateAutocompleteList(this.PILLS[3].label), this.PILLS[3].label + "should be part of autocomplete list");
+            $A.test.assertFalse(this._validateAutocompleteList(this.PILLS[0].label), this.PILLS[0].label + "should not be part of autocomplete list");
+            $A.test.assertFalse(this._validateAutocompleteList(this.PILLS[2].label), this.PILLS[2].label + "should not be part of autocomplete list");
         }
     },
 
@@ -43,6 +47,10 @@
             this._createPillByAutoComplete(cmp);
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
             $A.test.assertTrue($A.test.getText(($A.test.select(".pill")[0])).indexOf(this.PILLS[0].label) > -1, "The wrong pill was created");
+            $A.test.assertTrue(this._validateAutocompleteList(this.PILLS[0].label), this.PILLS[0].label + "should be part of autocomplete list");
+            $A.test.assertTrue(this._validateAutocompleteList(this.PILLS[2].label), this.PILLS[2].label + "should be part of autocomplete list");
+            $A.test.assertFalse(this._validateAutocompleteList(this.PILLS[1].label), this.PILLS[1].label + "should not be part of autocomplete list");
+            $A.test.assertFalse(this._validateAutocompleteList(this.PILLS[3].label), this.PILLS[3].label + "should not be part of autocomplete list");
         }
     },
 
@@ -81,4 +89,12 @@
             inputChangeEvt.fire();
         }
     },
+    
+    _validateAutocompleteList: function(label) {
+    	var listContent = $A.test.select(".listContent")[0];
+    	var list = listContent.getElementsByTagName("ul")[0];
+    	var lengthOfList = list.childElementCount;
+        var indexOf = $A.test.getText(list).indexOf(label);
+        return indexOf != -1;
+    }
 })

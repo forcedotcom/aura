@@ -72,8 +72,8 @@ Test.Aura.BrowserUnsupportedUtilTest=function() {
             })(function(){
                 var CurrentObject = window.Object;
                 window.Object = override === MockObject ? MockObject : window.Object;
-                // #import aura.util.CoreUtil
-                // #import aura.util.Util
+                [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
+                [Import("aura-impl/src/main/resources/aura/util/Util.js")]
                 try {
                     delegate(new Aura.Utils.Util());
                 } finally {

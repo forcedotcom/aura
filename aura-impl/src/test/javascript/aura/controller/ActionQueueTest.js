@@ -24,12 +24,8 @@ Test.Aura.Controller.ActionQueueTest = function() {
         "$A": {ns:{}},
         "Aura": {Controller: {}}
     })(function() {
-	// Action objects are used for tests here
-	// #import aura.controller.Action
-	
-	//This file is testing the implementation for ActionQueue, so import that
-    // #import aura.controller.ActionQueue
-	
+        [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
+        [Import("aura-impl/src/main/resources/aura/controller/ActionQueue.js")]
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {

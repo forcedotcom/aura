@@ -21,7 +21,7 @@ Test.Ui.OutputText.HelperTest = function(){
 	var targetHelper;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("ui.outputText.outputTextHelper",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/outputText/outputTextHelper.js",function(path,result){
 		targetHelper=result;
 	});
 	

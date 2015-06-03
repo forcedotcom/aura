@@ -23,8 +23,8 @@ Test.Aura.Controller.ActionDefTest = function() {
 		"$A": {ns:{}},
 		"Aura": {Controller: {}}
 	})(function() {
-		// #import aura.controller.ActionDef
-		// #import aura.controller.Action
+        [Import("aura-impl/src/main/resources/aura/controller/ActionDef.js")]
+        [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
 	});
 
 	[ Fixture ]

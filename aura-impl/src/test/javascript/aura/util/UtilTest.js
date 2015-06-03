@@ -40,8 +40,8 @@ Test.Aura.UtilTest = function() {
             $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
             navigator:{userAgent:''}
         })(function(){
-            // #import aura.util.CoreUtil
-            // #import aura.util.Util
+            [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
+            [Import("aura-impl/src/main/resources/aura/util/Util.js")]
             delegate();
         });
     };
@@ -289,8 +289,8 @@ Test.Aura.UtilTest = function() {
                 Aura: Aura,
                 navigator:{userAgent : userAgentOverride }
             })(function(){
-                // #import aura.util.CoreUtil
-                // #import aura.util.Util
+                [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
+                [Import("aura-impl/src/main/resources/aura/util/Util.js")]
                 delegate();
             });
         }

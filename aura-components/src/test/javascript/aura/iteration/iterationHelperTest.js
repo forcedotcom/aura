@@ -20,7 +20,7 @@ Test.Aura.Iteration.HelperTest = function() {
 	var targetHelper;
 
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("aura.iteration.iterationHelper", function(path, result) {
+	ImportJson("aura-components/src/main/components/aura/iteration/iterationHelper.js", function(path, result) {
 		targetHelper = result;
 	});
 }

@@ -39,7 +39,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             },
             navigator: { userAgent:'' }
         })(function(){
-            // #import aura.storage.adapters.SizeEstimator
+            [Import("aura-impl/src/main/resources/aura/storage/adapters/SizeEstimator.js")]
             delegate();
         });
     }

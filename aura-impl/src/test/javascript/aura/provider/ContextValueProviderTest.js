@@ -24,7 +24,7 @@ Test.Aura.ContextValueProviderTest = function() {
         exp: function(){},
         "$A":$A, 
         Aura: Aura })(function(){
-        // #import aura.provider.ContextValueProvider
+        [Import("aura-impl/src/main/resources/aura/provider/ContextValueProvider.js")]
     });
 
     var mockDollarA = function(isExpression) {

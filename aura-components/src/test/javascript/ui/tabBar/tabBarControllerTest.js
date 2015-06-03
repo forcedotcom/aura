@@ -19,7 +19,7 @@ Function.RegisterNamespace("Test.Components.Ui.TabBar");
 [Fixture]
 Test.Components.Ui.TabBar = function() {
     var targetController = null;
-    ImportJson("ui.tabBar.tabBarController", function(path, result){
+    ImportJson("aura-components/src/main/components/ui/tabBar/tabBarController.js", function(path, result){
         targetController = result;
     });
     

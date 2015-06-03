@@ -22,7 +22,7 @@ Test.Aura.AuraErrorTest = function() {
     Mocks.GetMocks(Object.Global(), { 
         Aura: Aura
     })(function() {
-        // #import aura.AuraError
+        [Import("aura-impl/src/main/resources/aura/AuraError.js")]
     });
 
     [Fixture]

@@ -20,7 +20,7 @@ Test.Aura.LoggerTest = function() {
     var Aura = {Utils:{}};
 
     Mocks.GetMocks(Object.Global(), {Aura: Aura })(function(){
-        // #import aura.Logger
+        [Import("aura-impl/src/main/resources/aura/Logger.js")]
     });
 
     var messageCalled = false,

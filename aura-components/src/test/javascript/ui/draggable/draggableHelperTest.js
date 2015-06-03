@@ -92,7 +92,7 @@ Test.Components.Ui.Draggable = function(){
 			},
 			get : function(expression){
 				if(expression == "v.type"){return "move";}
-				if(expression == "v.class"){return {trim : function() {}}}
+				if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
 				if(expression == "v.dragClass"){return {trim : function() {}}}
 				if(expression == "v.dragAccessibilityClass"){return {trim : function() {}}}
 			},

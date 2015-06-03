@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.2357-SNAPSHOT</version>
+    <version>0.2361-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>http://www.auraframework.org</url>
@@ -45,11 +45,10 @@
           xunit.js.auraImpl the path to the aura implementation libraries (if not unpacked, override)
           xunit.js.engine the engine to use.
         -->
-        <xunit.js.testPath />
+        <xunit.js.testPath>${project.basedir}/src/test/javascript</xunit.js.testPath>
         <xunit.js.auraImpl>${project.build.directory}/tools/src/main/resources/</xunit.js.auraImpl>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
         <xunit.js.engine>rhino</xunit.js.engine>
-        <xunit.js.console>${project.build.directory}/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
         <xunit.js.format>junit</xunit.js.format>
         <xunit.js.verbose>false</xunit.js.verbose>
     </properties>
@@ -118,90 +117,90 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
                 <type>sources</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-tools</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-resources</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>auradocs-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-osgi-api</artifactId>
-                <version>0.2357-SNAPSHOT</version>
+                <version>0.2361-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -727,25 +726,18 @@
                             <configuration>
                                 <target>
                                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
-                                    <echo>Generating Aura framework resources for xUnit.js</echo>
-                                    <java classname="org.auraframework.test.javascript.GenerateXUnitJS" classpathref="maven.test.classpath" fork="true" failonerror="true">
-                                        <jvmarg value="-Daura.home=${basedir}/.." />
-                                        <arg value="${basedir}/src/test/javascript" />
-                                        <arg value="${xunit.js.auraImpl}" />
-                                        <arg value="${project.build.directory}/xunitjs" />
-                                        <arg value="xunitTests" />
-                                    </java>
+                                    <mkdir dir="${project.build.directory}/xunitjs/" />
                                     <echo>Executing tests</echo>
                                     <switch value="${xunit.js.engine}">
                                         <case value="rhino">
                                             <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="false" resultproperty="xunit.returnvalue" output="${project.build.directory}/xunitjs/rawresults.xml">
                                                 <jvmarg value="-Daura.home=${basedir}/.." />
-                                                <arg value="${xunit.js.console}" />
+                                                <arg value="${basedir}/../aura-util/src/test/tools/xUnit/xUnit.js.Console.js" />
                                                 <arg value="/output:${xunit.js.format}" />
                                                 <arg value="/strict:false" />
                                                 <arg value="/verbose:${xunit.js.verbose}" />
-                                                <arg value="/dependency:${project.build.directory}/tools/xUnit/dependencies/" />
-                                                <arg value="${project.build.directory}/xunitjs/xunitTests/${xunit.js.testPath}" />
+                                                <arg value="/dependency:${basedir}/../aura-util/src/test/tools/xUnit/dependencies/" />
+                                                <arg value="${xunit.js.testPath}" />
                                             </java>
                                         </case>
                                         <default>

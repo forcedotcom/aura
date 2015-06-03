@@ -1,2 +1,9 @@
 #!/bin/sh
-mvn install -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text -DskipComponentCompile -Dxunit.js.verbose=true
+
+hash node &> /dev/null
+if [ $? -eq 1 ];
+then
+    mvn install -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text -DskipComponentCompile -Dxunit.js.verbose=true
+else
+    node aura-util/src/test/tools/xUnit/xUnit.js.Console.js /dependency:aura-util/src/test/tools/xUnit/dependencies /strict:false /verbose:false aura-impl/src/test/javascript/ aura-components/src/test/javascript
+fi

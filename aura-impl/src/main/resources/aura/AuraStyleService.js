@@ -158,7 +158,7 @@ var AuraStyleService = function() {
                         if (errors && errors[0] && errors[0].message) {
                             $A.error(errors[0].message);
                         } else {
-                            $A.error("Unable to apply theme, action state = " + state);
+                            $A.error("Unable to apply theme, action state = " + a.getState());
                         }
                     }
 

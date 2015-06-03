@@ -19,7 +19,7 @@
  * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
  * @constructor
  */
-function AuraComponentService (actions, finishedCallback) {
+function AuraComponentService () {
     this.registry = new ComponentDefRegistry();
     this.controllerDefRegistry = new ControllerDefRegistry();
     this.actionDefRegistry = new ActionDefRegistry();
@@ -139,7 +139,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
         "descriptor": desc
     };
 
-    if (!def && desc.indexOf("layout://") == 0) {
+    if (!def && desc.indexOf("layout://") === 0) {
         // clear dynamic namespaces so that the server can send it back.
         this.registry.dynamicNamespaces = [];
         // throw error instead of trying to requestComponent from server which is prohibited
@@ -202,7 +202,7 @@ AuraComponentService.prototype.createComponents = function(components, callback)
         return function(component, status, statusMessage) {
             created[index] = component;
             statusList[index] = {"status":status,"message":statusMessage};
-            if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!="ERROR")) {
+            if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!=="ERROR")) {
                 overallStatus = status;
             }
             if (++collected === components.length) {
@@ -458,7 +458,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     function collectComponent(newComponent,status,statusMessage,index){
         components[index]=newComponent;
         statusList[index] = status;
-        if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!="ERROR")) {
+        if(status==="ERROR"||(status==="INCOMPLETE"&&overallStatus!=="ERROR")) {
             overallStatus = status;
         }
         if(++collected===config.length){
@@ -489,7 +489,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                 "descriptor": desc
             };
 
-            if (!def && desc.indexOf("layout://") == 0) {
+            if (!def && desc.indexOf("layout://") === 0) {
                 // clear dynamic namespaces so that the server can send it back.
                 $A.componentService.registry.dynamicNamespaces = [];
                 // throw error instead of trying to requestComponent from server which is prohibited

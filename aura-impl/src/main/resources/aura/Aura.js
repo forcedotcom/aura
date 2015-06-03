@@ -17,7 +17,7 @@
 
 // -- Aura Bootstrap ------------------------------------------------------------
 
-if (typeof Aura != 'undefined') {
+if (typeof Aura !== 'undefined') {
     Aura._Aura = Aura;
 }
 var Aura = {};
@@ -1027,7 +1027,7 @@ AuraInstance.prototype.trace = function() {
  */
 AuraInstance.prototype.setMode = function(mode) {
     this.mode = mode;
-    this.enableAssertions = (mode != 'PROD' && mode != 'PTEST');
+    this.enableAssertions = (mode !== 'PROD' && mode !== 'PTEST');
 };
 
 /**
@@ -1053,7 +1053,7 @@ AuraInstance.prototype.getValueProvider = function(type) {
 AuraInstance.prototype.addValueProvider=function(type,valueProvider){
     $A.assert($A.util.isString(type),"$A.addValueProvider(): 'type' must be a valid String.");
     $A.assert(type.charAt(0)==='$',"$A.addValueProvider(): 'type' must start with '$'.");
-    $A.assert(",$browser,$label,$locale,".indexOf(","+type.toLowerCase()+",")==-1,"$A.addValueProvider(): '"+type+"' is a reserved valueProvider.");
+    $A.assert(",$browser,$label,$locale,".indexOf(","+type.toLowerCase()+",")===-1,"$A.addValueProvider(): '"+type+"' is a reserved valueProvider.");
     $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"$A.addValueProvider(): 'valueProvider' is required.");
     var context=this.getContext();
     if(context){

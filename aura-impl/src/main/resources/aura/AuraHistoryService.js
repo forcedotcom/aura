@@ -175,7 +175,7 @@ AuraHistoryService.prototype.init = function() {
     // Check for HTML5 window.history.pushState support
     var that = this;
     if (this.usePushState()) {
-        window.addEventListener("popstate", function(e) {
+        window.addEventListener("popstate", function() {
             that.changeHandler();
         });
     } else {

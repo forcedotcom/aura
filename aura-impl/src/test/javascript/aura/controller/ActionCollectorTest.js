@@ -44,7 +44,7 @@ Test.Aura.Controller.ActionCollectorTest = function(){
         "$A": $A, 
         Aura: Aura
     })(function(){
-        //#import aura.controller.ActionCollector
+        [Import("aura-impl/src/main/resources/aura/controller/ActionCollector.js")]
     });
 
     [Fixture]

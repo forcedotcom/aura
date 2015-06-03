@@ -20,7 +20,7 @@ Function.RegisterNamespace("Test.Components.Ui.CarouselPage");
 Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
 	var targetHelper = null;
 
-	ImportJson("ui.carouselPageDeprecated.carouselPageDeprecatedHelper",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/carouselPageDeprecated/carouselPageDeprecatedHelper.js",function(path,result){
 		targetHelper=result;
 	});
 

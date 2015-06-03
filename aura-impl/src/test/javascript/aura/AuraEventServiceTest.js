@@ -21,7 +21,7 @@ Test.Aura.AuraTest = function() {
         "exp": function() {},
         Aura: {Services:{}}
     })(function() {
-		// #import aura.AuraEventService
+		[Import("aura-impl/src/main/resources/aura/AuraEventService.js")]
 	});
 	
 	function getStubMethod(args, returnValue){

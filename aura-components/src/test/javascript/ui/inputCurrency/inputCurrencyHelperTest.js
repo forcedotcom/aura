@@ -20,7 +20,7 @@ Function.RegisterNamespace("Test.Components.Ui.InputCurrency");
 Test.Components.Ui.InputCurrency.InputCurrencyHelperTest=function(){
 	var targetHelper = null;
 	
-	ImportJson("ui.inputCurrency.inputCurrencyHelper",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/inputCurrency/inputCurrencyHelper.js",function(path,result){
 		targetHelper=result;
 	});
 	

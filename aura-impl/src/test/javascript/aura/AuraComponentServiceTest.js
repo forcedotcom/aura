@@ -39,9 +39,9 @@ Test.Aura.AuraComponentServiceTest = function(){
         "$A": $A,
         "window": function(){}, 
         "Components": function(){},
-        Aura: NS,
+        Aura: NS
     })(function(){
-        // #import aura.AuraComponentService
+        [Import("aura-impl/src/main/resources/aura/AuraComponentService.js")]
     });
 
     // Mocks necessary to create a new AuraComponentService Object

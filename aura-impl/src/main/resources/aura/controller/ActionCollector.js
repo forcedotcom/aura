@@ -68,33 +68,33 @@ ActionCollector.prototype.process = function() {
     var action;
     var that = this;
 
-    var checkForCachedResponse = function(action, index) {
+    var checkForCachedResponse = function(actionPassedIn, index) {
         //
         // For cacheable actions check the storage service to see if we already have a viable cached action
         // response we can complete immediately. In this case, we get a callback, so we create a callback
         // for each one (ugh, this could have been handled via passing an additional param to the action,
         // but we don't have that luxury now.)
         //
-        var storage = action.getStorage();
-        if (action.isStorable() && storage) {
-            key = action.getStorageKey();
+        var storage = actionPassedIn.getStorage();
+        if (actionPassedIn.isStorable() && storage) {
+            key = actionPassedIn.getStorageKey();
             // using storage so callbacks *must* be in an aura loop
             storage.get(key).then(
                 function(value) {
                     $A.run(function() {
                         // FIXME: (from KV) - do we want to reject expired values?
-                        that.collectAction(action, value ? value.value : null, index);
+                        that.collectAction(actionPassedIn, value ? value.value : null, index);
                     });
                 },
                 function() {
                     // error fetching from storage so go to the server
                     $A.run(function() {
-                        that.collectAction(action, null, index);
+                        that.collectAction(actionPassedIn, null, index);
                     });
                 }
             );
         } else {
-            that.collectAction(action, null, index);
+            that.collectAction(actionPassedIn, null, index);
         }
     };
 

@@ -111,8 +111,18 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
 
     @Override
     public void serialize(Json json) throws IOException {
-        // TODONM: add support for async loading via serialize method (same behavior as regular style def, probably just
-        // abstract that).
+        json.writeMapBegin();
+        json.writeMapEntry("descriptor", descriptor);
+
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
+            // TODONM: revisit this after removing theme from aura context
+            if (context.getThemeList().isEmpty()) {
+                context.addAppThemeDescriptors();
+            }
+            json.writeMapEntry("code", getCode());
+        }
+        json.writeMapEnd();
     }
 
     public static class Builder extends AbstractStyleDef.Builder<FlavoredStyleDef> implements FlavoredStyleDefBuilder {

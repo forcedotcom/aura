@@ -1,0 +1,7 @@
+<aura:component description="test case for bug where the parent flavor is applied to a nested element on rerender (W-2601493)">
+    <aura:attribute name="count" type="String" default="0" required="true"/>
+
+    <button aura:id="parent" aura:flavorable="true" class="{!'parent_' + v.count}" onclick="{!c.click}">
+        <span aura:id="child" class="child">Button Clicked {!v.count} time(s)</span>
+    </button>
+</aura:component>

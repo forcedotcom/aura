@@ -1,7 +1,0 @@
-<aura:component>
-    <aura:attribute name="flav" type="String" default="info"/>
-
-    <div>
-    <flavorTest:sampleCmp1 aura:id="child" aura:flavor="{!v.flav}">test</flavorTest:sampleCmp1>
-    </div>
-</aura:component>

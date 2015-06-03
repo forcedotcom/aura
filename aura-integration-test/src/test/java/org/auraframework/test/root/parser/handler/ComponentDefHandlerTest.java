@@ -174,6 +174,25 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         assertTrue(cd.hasFlavorableChild());
     }
 
+    public void testInheritsFlavorableChildFalse() throws Exception {
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true'>{!v.body}</aura:component>");
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'/>", parent.getDescriptorName()));
+        assertFalse(cmp.getDef().inheritsFlavorableChild());
+    }
+
+    public void testInheritsFlavorableChildTrue() throws Exception {
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'/>", parent.getDescriptorName()));
+        assertTrue(cmp.getDef().inheritsFlavorableChild());
+    }
+
+    public void testInheritsFlavorableChildTrueDeep() throws Exception {
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");
+        DefDescriptor<ComponentDef> parent2 = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s' extensible='true'/>", parent.getDescriptorName()));
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'/>", parent2.getDescriptorName()));
+        assertTrue(cmp.getDef().inheritsFlavorableChild());
+    }
+
     public void testHasDefaultFlavor() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(descriptor,

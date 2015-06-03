@@ -1,0 +1,3 @@
+<aura:component defaultFlavor="explicitDefault" description="test helper component: a component that sets an explicit default flavor">
+    <div aura:id="sample" aura:flavorable="true">Sample Component With Default Flavor {!v.body}</div>
+</aura:component>

@@ -70,7 +70,11 @@ public final class AuraFlavorPlugin implements DependentPlugin {
 
         if (selector.name().startsWith(THIS)) {
             if (selector.name().startsWith(FLAVORED_THIS)) {
-                knownFlavors.add(selector.name().substring(FLAVORED_THIS.length()));
+                // don't include flavor (modifier) elements, e.g., THIS--flavor__element
+                // this matches the pattern fastest, but isn't the most robust way to check
+                if (!selector.name().contains("_")) {
+                    knownFlavors.add(selector.name().substring(FLAVORED_THIS.length()));
+                }
             }
 
             String replacement = selector.name().replaceFirst(THIS, componentClass);

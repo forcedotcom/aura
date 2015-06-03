@@ -1,4 +1,0 @@
-<aura:flavors>
-    <aura:use source="flavorTestAlt:flavors"/>
-    <aura:flavor component="flavorTest:sampleCmp1" default="amazing"/>
-</aura:flavors>

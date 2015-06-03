@@ -1,0 +1,5 @@
+<aura:component description="test helper component: the flavor element is nested">
+    <div aura:id="sampleParent" class="parent">
+        <span aura:id="sampleChild" aura:flavorable="true" class="child">{!v.body}</span>
+    </div>
+</aura:component>

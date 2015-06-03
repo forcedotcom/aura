@@ -15,15 +15,15 @@
  */
 .THIS {
     display: none;
-}
-
-.THIS.open {
-    display: flex;
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+}
+
+.THIS.open {
+    display: flex;
 }
 
 .THIS .modal-glass {
@@ -46,45 +46,41 @@
 
 .THIS header {
     position: relative;
-    border-top-right-radius: 0.25rem;
-    border-top-left-radius: 0.25rem;
-    border-bottom: 2px solid #e0e5ee;
-    padding: 1.5rem 1rem;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .THIS header .titles {
+    padding: 1.5rem 1rem;
     font-size: 1.5rem;
     font-weight: 300;
     line-height: 1.25;
 }
 
 .THIS footer {
-    border-top: 2px solid #e0e5ee;
-    border-bottom-right-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-    padding: 0.75rem 1rem;
+    flex-shrink: 0;
 }
 
 .THIS .body {
     padding: 1px 14px;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .THIS .panel {
     position: relative;
+    display: flex;
+    flex-direction: column;
     margin: auto;
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
+    border-radius: 0.25rem;
     background-color: #FFFFFF;
     overflow: visible;
-    z-index: 21;
-
-    max-width: 70%;
+    max-height: 85%;
 }
 
 .THIS .container{
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .THIS .uiButton.closeBtn {

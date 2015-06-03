@@ -21,6 +21,7 @@
 
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility" />
+    <aura:attribute name="class" type="String" description="CSS class" />
     <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
     <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog"/>
     <aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
@@ -33,7 +34,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
 
-    <div aura:flavorable="true">
+    <div aura:flavorable="true" class="{!v.class}">
 
         <div aura:id='modal-glass' class="modal-glass hidden"  tabindex="-1"></div>
 
@@ -52,6 +53,14 @@
                             <h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
                         </div>
                     </aura:If>
+                    {!v.header}
+                    <aura:if isTrue="{!v.showCloseButton}">
+                        <ui:button class="closeBtn" press="{!c.onCloseBtnPressed}"
+                                   label="{!v.closeDialogLabel}"
+                                   buttonTitle="{!v.closeDialogLabel}"
+                                   labelDisplay="false"
+                                >&times;</ui:button>
+                    </aura:if>
                 </header>
 
                 <div aura:id="body" class="body">
@@ -61,14 +70,6 @@
                 <footer>
                     {!v.footer}
                 </footer>
-
-                <aura:if isTrue="{!v.showCloseButton}">
-                    <ui:button class="closeBtn" press="{!c.onCloseBtnPressed}"
-                               label="{!v.closeDialogLabel}"
-                               buttonTitle="{!v.closeDialogLabel}"
-                               labelDisplay="false"
-                            >&times;</ui:button>
-                </aura:if>
             </div>
         </div>
     </div>

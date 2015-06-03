@@ -225,7 +225,7 @@
 			}
 		} else if(!disabled && trigger === 'click') {
 			node.addEventListener('click', self.toggle.bind(self, component));
-		} else if(disabled || trigger !== 'none') {
+		} else if(!disabled || trigger !== 'none') {
 			node.addEventListener(showTrigger, function() {
 				self.show.call(self, component);
 			});
@@ -233,7 +233,6 @@
 				self.hide.call(self, component);
 			});
 		}
-
 		component._trigger = node;
 		this.buildTooltip(component);
 	}

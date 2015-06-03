@@ -32,7 +32,7 @@ Resistentiam quiescentibus et Impetum moventibus tribuit; sed motus et
 quies, uti vulgo concipiuntur, respectu solo distinguuntur ab invicem, neq;
 semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
         <p>This tooltip trigger can be...</p>
-        <p><ui:tooltip advanced="true" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">At the edge of the viewport</ui:tooltip></p>
+        <p><ui:tooltip advanced="true" triggerClass="my-trigger-class" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">At the edge of the viewport</ui:tooltip></p>
         <p style="text-align: right">The other <ui:tooltip advanced="true" tooltipBody="This is another one">edge</ui:tooltip></p>
         </div>
         <div class="section form">
@@ -41,12 +41,12 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                 <p><ui:tooltip tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
                 <form>
                     <p>
-                        <ui:tooltip fadeOutDuration="500" triggerClass="tooltip-trigger" tooltipBody="Please?">
+                        <ui:tooltip disabled="true" fadeOutDuration="500" triggerClass="my-trigger-class" tooltipBody="Please?">
                             <span>Fade out only</span>
                         </ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip fadeInDuration="500" triggerClass="tooltip-trigger" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
+                        <ui:tooltip fadeInDuration="500" triggerClass="my-trigger-class" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
                             <span>Fade in only</span>
                         </ui:tooltip>
                     </p>
@@ -58,7 +58,7 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                         <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this"><ui:inputText placeholder="Show tooltip on focus" type="text" aura:id="mrfocus"/></ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
+                        <ui:tooltip advanced="true" disabled="true" trigger="focus" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
                     </p>
                 </form>
             </div>

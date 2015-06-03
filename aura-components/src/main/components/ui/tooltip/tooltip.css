@@ -107,6 +107,10 @@
 	opacity: 0.999;
 }
 
+.THIS.tooltip-basic:hover .tooltip.disabled {
+	display: none;
+}
+
 .THIS.tooltip-trigger:hover .fade-out.tooltip {
 	transition: none;
 }

@@ -22,14 +22,14 @@
 		var dragAccessibilityClass = component.get("v.dragAccessibilityClass").trim();
 		
 		if (!$A.util.isEmpty(dragClass)) {
-			cssClass = cssClass.replace(dragClass, "");
+			cssClass = cssClass.replace(new RegExp(dragClass, "g"), "");
 		}
 		
 		if (!$A.util.isEmpty(dragAccessibilityClass)) {
-			cssClass = cssClass.replace(dragAccessibilityClass, "");
+			cssClass = cssClass.replace(new RegExp(dragAccessibilityClass, "g"), "");
 		}
 		
-		component.set("v.class", cssClass);
+		component.set("v.class", cssClass.trim());
 	},
 	
 	setDragClass: function(component, isInAccessibilityMode) {

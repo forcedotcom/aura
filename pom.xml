@@ -661,7 +661,7 @@
                                     <resource>
                                         <directory>${aura.home}/aura-util/src/test</directory>
                                         <includes>
-                                            <include>tools/*</include>
+                                            <include>tools/xUnit/*</include>
                                         </includes>
                                     </resource>
                                 </resources>
@@ -669,6 +669,31 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.7</version>
+                    <executions>
+                        <execution>
+                            <id>copy-jstest</id>
+                            <phase>disabled</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${aura.home}/aura-util/src/test</directory>
+                                        <includes>
+                                            <include>tools/jstest/*</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>                
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr3-maven-plugin</artifactId>

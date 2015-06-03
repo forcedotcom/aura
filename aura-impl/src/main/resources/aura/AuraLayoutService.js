@@ -65,6 +65,9 @@ var AuraLayoutService = function() {
         }
     }
 
+    function fireOnload() {
+    }
+    
     function fireLayoutChangeEvent(pre) {
         var curr = peek();
         var prev = peekLast();
@@ -85,10 +88,7 @@ var AuraLayoutService = function() {
 
         fireOnload();
     }
-
-    function fireOnload() {
-    }
-
+    
     var layoutService = {
         /**
          * @private
@@ -320,7 +320,7 @@ var AuraLayoutService = function() {
         /**
          * @private
          */
-        layoutCallback : function(components, layoutItem, layout, params, noTrack) {
+        layoutCallback : function(components, layoutItem, layout, params) {
             if (components === null || components === undefined) {
                 components = [];
             } else if (!$A.util.isArray(components)) {

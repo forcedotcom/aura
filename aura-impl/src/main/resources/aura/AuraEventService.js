@@ -66,7 +66,7 @@ var AuraEventService = function() {
          */
         dispatchEventHandlers: function (handlers, evt) {
             for (var i = 0; i < handlers.length; i++) {
-                handlers[j](evt);
+                handlers[i](evt);
             }
         },
         /**

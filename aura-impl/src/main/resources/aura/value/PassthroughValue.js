@@ -108,7 +108,7 @@ PassthroughValue.prototype.fireChangeEvent = function(key, oldValue, value, inde
     var observers=[];
     var keypath = key+".";
     for(var handler in handlers){
-        if(handler == key || handler.indexOf(keypath)===0 || key.indexOf(handler+".")===0){
+        if(handler === key || handler.indexOf(keypath) === 0 || key.indexOf(handler+".") === 0){
             observers=observers.concat(handlers[handler]);
         }
     }

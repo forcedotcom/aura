@@ -1529,11 +1529,11 @@ AuraClientService.prototype.addComponentHandlers = function(component, actionEve
         var containerValueProvider = {
             get : function(functionName) {
                 return {
-                    run : function(evt) {
-                        window[functionName](evt);
+                    run : function(event) {
+                        window[functionName](event);
                     },
-                    runDeprecated : function(evt) {
-                        window[functionName](evt);
+                    runDeprecated : function(event) {
+                        window[functionName](event);
                     }
                 };
             }

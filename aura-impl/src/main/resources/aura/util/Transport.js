@@ -30,11 +30,12 @@ Aura.Utils.Transport.prototype.createHttpRequest = function() {
         return new XMLHttpRequest();
     } else if (window.ActiveXObject) {
         try {
-            return new ActiveXObject("Msxml2.XMLHTTP");
+            return new window.ActiveXObject("Msxml2.XMLHTTP");
         } catch (e) {
             try {
-                return new ActiveXObject("Microsoft.XMLHTTP");
+                return new window.ActiveXObject("Microsoft.XMLHTTP");
             } catch (ignore) {
+            	//we ingore the error here
             }
         }
     }
@@ -91,6 +92,7 @@ Aura.Utils.Transport.prototype.request = function(config) {
     var method = config["method"] || "GET";
     var qs;
     var processed = false;
+    var aura_num;
     if (config["params"]) {
         qs = this.buildParams(config["params"]);
     }
@@ -101,15 +103,15 @@ Aura.Utils.Transport.prototype.request = function(config) {
     }
     request["open"](method, url, true);
     request["onreadystatechange"] = function() {
-        if (request["readyState"] == 4 && processed === false) {
+        if (request["readyState"] === 4 && processed === false) {
             processed = true;
-            var aura_num = config["params"]["aura.num"];
+            aura_num = config["params"]["aura.num"];
             $A.Perf.endMark("Received Response - XHR " + aura_num + (config["markDescription"] || ""));
             config["callback"].call(config["scope"] || window, request);
             $A.Perf.endMark("Callback Complete - XHR " + aura_num);
         }
     };
-    var aura_num = config["params"]["aura.num"];
+    aura_num = config["params"]["aura.num"];
     $A.Perf.mark("Received Response - XHR " + aura_num + (config["markDescription"] || ""));
     $A.Perf.mark("Completed Action Callback - XHR " + aura_num);
     $A.Perf.mark("Callback Complete - XHR " + aura_num);

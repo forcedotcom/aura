@@ -25,7 +25,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
         "$A":$A, 
         Aura: Aura})
     (function(){
-        // #import aura.AuraHistoryService
+        [Import("aura-impl/src/main/resources/aura/AuraHistoryService.js")]
     });
     
     var mockIsIOSWebViewTrue = Mocks.GetMock(Object.Global(), "$A", {

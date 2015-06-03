@@ -25,7 +25,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         Aura: Aura
     })
     (function () {
-        // #import aura.component.ComponentDefRegistry
+        [Import("aura-impl/src/main/resources/aura/component/ComponentDefRegistry.js")]
     });
 
     var makeDefDescriptor = function (name) {

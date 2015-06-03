@@ -19,7 +19,7 @@ Function.RegisterNamespace("Test.Components.Ui.asyncComponentManager");
 [Fixture]
 Test.Components.Ui.asyncComponentManager.asyncComponentManagerHelperTest=function(){
     var targetHelper=null;
-    ImportJson("ui.asyncComponentManager.asyncComponentManagerHelper", function(path, result){
+    ImportJson("aura-components/src/main/components/ui/asyncComponentManager/asyncComponentManagerHelper.js", function(path, result){
         targetHelper = result;
     });
 

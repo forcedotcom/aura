@@ -20,7 +20,7 @@ Function.RegisterNamespace("Test.Components.Ui.Button");
 Test.Components.Ui.Button.ButtonControllerTest=function(){
 	var targetController = null;
 
-	ImportJson("ui.button.buttonController",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/button/buttonController.js",function(path,result){
 		targetController=result;
 	});
 

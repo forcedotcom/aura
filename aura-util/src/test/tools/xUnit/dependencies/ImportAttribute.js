@@ -17,15 +17,8 @@ Function.RegisterNamespace("Test.Tools.Aura.Attributes");
 
 Test.Tools.Aura.Attributes.ImportAttribute=function(groupName, callback){
     var root=System.IO.Path.GetRoot();
-    System.IO.Path.SetRoot(Test.Tools.Aura.Attributes.ImportAttribute.BuildDirectory);
-    groupName = groupName.replace(/\./g,'/');
-    var args=[String.Format("target/xunitjs/{0}.js",groupName)];
-    if(Object.IsType(Function,callback))args.push(callback);
-    System.Script.ScriptLoader.Attributes.ImportAttribute.apply(this,args);
+    System.IO.Path.SetRoot(Test.Tools.Aura.BuildDirectory);
+    System.Script.ScriptLoader.Attributes.ImportAttribute.apply(this,arguments);
     System.IO.Path.SetRoot(root);
 }
 
-Test.Tools.Aura.Attributes.ImportAttribute.BuildDirectory=(System.Environment&&System.Environment.GetWorkingDirectory() || "");
-
-//Global Convenience Mappings
-Import = Test.Tools.Aura.Attributes.ImportAttribute;

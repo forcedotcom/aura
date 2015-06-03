@@ -24,10 +24,10 @@ Test.Components.Ui.Scroller.Helpers=function(){
 
 	windowMock(function(){
 		var callback = function (path, fn) {fn();};
-		ImportJson("ui.scrollerLib.bootstrap", callback);
-		ImportJson("ui.scrollerLib.helpers", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/bootstrap.js", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/helpers.js", callback);
 
-		ImportJson("ui.scroller.scrollerHelper",function(path,result){
+		ImportJson("aura-components/src/main/components/ui/scroller/scrollerHelper.js",function(path,result){
 			targetHelper=result;
 		});
 		helpers = targetHelper.getScrollerNamespace().helpers;

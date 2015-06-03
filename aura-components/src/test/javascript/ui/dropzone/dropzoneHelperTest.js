@@ -42,7 +42,8 @@ Test.Components.Ui.Dropzone = function(){
 				},
 				get : function(expression){
 					if(expression == "v.dragOverClass"){return {trim : function() { }}}
-					if(expression == "v.class"){return {trim : function() { }}}
+					if(expression == "v.dragOverAccessibilityClass"){return {trim : function() { }}}
+					if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
 				},
 				set : function(expression, value){
 					if(expression == "v.theClass"){}
@@ -157,7 +158,7 @@ Test.Components.Ui.Dropzone = function(){
 					if(expression == "dragLeave"){return dragEvent;}
 				},
 				get : function(expression){
-					if(expression == "v.class"){return {trim : function() {}}}
+					if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
 					if(expression == "v.dragOverClass"){return {trim : function() {}}}
 					if(expression == "v.dragOverAccessibilityClass"){return {trim : function() {}}}
 				},
@@ -208,7 +209,7 @@ Test.Components.Ui.Dropzone = function(){
 		var targetComponent = {
 			get : function(expression){
 				if(expression == "v.types"){return supportTypes;}
-				if(expression == "v.class"){return {trim : function() {}}}
+				if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
 				if(expression == "v.dragOverClass"){return {trim : function() {}}}
 				if(expression == "v.dragOverAccessibilityClass"){return {trim : function() {}}}
 			},
@@ -330,7 +331,7 @@ Test.Components.Ui.Dropzone = function(){
 			var targetComponent = {
 				get : function(expression){
 					if(expression == "v.type"){return "move";}
-					if(expression == "v.class"){return {trim : function() {}}}
+					if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
 					if(expression == "v.dragOverClass"){return {trim : function() {}}}
 					if(expression == "v.dragOverAccessibilityClass"){return {trim : function() {}}}
 				},

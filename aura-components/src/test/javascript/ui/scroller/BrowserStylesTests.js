@@ -23,10 +23,10 @@ Test.Components.Ui.Scroller.BrowserStyles=function(){
 		windowMock=Test.Mocks.NeededMocks.getWindowMock();
 
 	windowMock(function(){
-		ImportJson("ui.scrollerLib.bootstrap",function (path, fn) {fn();});
-		ImportJson("ui.scrollerLib.browserSupport", function (path, fn) {fn();});
-		ImportJson("ui.scrollerLib.browserStyles", function (path, fn) {fn();});
-		ImportJson("ui.scroller.scrollerHelper", function(path, result) {
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/bootstrap.js",function (path, fn) {fn();});
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/browserSupport.js", function (path, fn) {fn();});
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/browserStyles.js", function (path, fn) {fn();});
+		ImportJson("aura-components/src/main/components/ui/scroller/scrollerHelper.js", function(path, result) {
 			targetHelper=result;
 		});
 

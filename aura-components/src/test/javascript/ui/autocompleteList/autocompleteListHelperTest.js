@@ -23,7 +23,7 @@ Function.RegisterNamespace("Test.Components.Ui.AutocompleteList");
 Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 	var targetHelper = null;
 	
-	ImportJson("ui.autocompleteList.autocompleteListHelper",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/autocompleteList/autocompleteListHelper.js",function(path,result){
 		targetHelper=result;
 	});
 	

@@ -23,7 +23,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         "exp": function() {}, 
         Aura: {Services: {}}
     })(function() {
-		// #import aura.AuraLocalizationService
+        [Import("aura-impl/src/main/resources/aura/AuraLocalizationService.js")]
 	});
 
 	var mockGlobal = Mocks.GetMocks(Object.Global(), {

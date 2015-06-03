@@ -112,9 +112,12 @@
         // The startPoint will indicate the first date displayed at the top-left
         // corner of the calendar. Negative dates in JS will subtract days from
         // the 1st of the given month
-        var startOfWeek = 0;
-        var startPoint = startOfWeek - d.getDay() + 1;
-        d.setDate(startPoint);
+        var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1; // In Java, week day is 1 - 7
+        var startDay = d.getDay();
+        while (startDay != firstDayOfWeek) {
+            d.setDate(d.getDate() - 1);
+            startDay = d.getDay();
+        }   
         for (var i = 0; i < 42; i++) {
             var cellCmp = component.find(i);
             if (cellCmp) {

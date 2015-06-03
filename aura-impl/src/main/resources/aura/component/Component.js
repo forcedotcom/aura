@@ -17,7 +17,7 @@
 var ComponentPriv = (function() { // Scoping priv
     var nextClientCreatedComponentId = 0;
 
-    var ComponentPriv = function ComponentPriv(config, cmp, localCreation) {
+    var ComponentPrivInner = function ComponentPriv(config, cmp, localCreation) {
         cmp.priv = this;
 
         // setup some basic things
@@ -168,7 +168,7 @@ var ComponentPriv = (function() { // Scoping priv
         }
     };
 
-    ComponentPriv.prototype.nextGlobalId = function(localCreation) {
+    ComponentPrivInner.prototype.nextGlobalId = function(localCreation) {
         if (!localCreation) {
             var context = $A.getContext();
             var currentAction = context.getCurrentAction();
@@ -192,7 +192,7 @@ var ComponentPriv = (function() { // Scoping priv
     /**
      * The globally unique id of this component
      */
-    ComponentPriv.prototype.setupGlobalId = function(globalId, localCreation) {
+    ComponentPrivInner.prototype.setupGlobalId = function(globalId, localCreation) {
         if (!globalId || !localCreation) {
             globalId = this.nextGlobalId(localCreation);
         }
@@ -205,7 +205,7 @@ var ComponentPriv = (function() { // Scoping priv
         this.globalId = globalId;
     };
 
-    ComponentPriv.prototype.getValueProvider = function(key, cmp) {
+    ComponentPrivInner.prototype.getValueProvider = function(key, cmp) {
         if (!$A.util.isString(key)) {
             $A.error("ComponentPriv.getValueProvider(): 'key' must be a valid String.");
         }
@@ -215,7 +215,7 @@ var ComponentPriv = (function() { // Scoping priv
     /**
      * Create the value providers
      */
-    ComponentPriv.prototype.setupValueProviders = function(customValueProviders, cmp) {
+    ComponentPrivInner.prototype.setupValueProviders = function(customValueProviders, cmp) {
         var vp=this.valueProviders;
 
         vp["v"]=this.attributes;
@@ -235,7 +235,7 @@ var ComponentPriv = (function() { // Scoping priv
         }
     };
 
-    ComponentPriv.prototype.createActionValueProvider = function(cmp) {
+    ComponentPrivInner.prototype.createActionValueProvider = function(cmp) {
         var controllerDef = this.componentDef.getControllerDef();
         if (controllerDef) {
             return {
@@ -256,7 +256,7 @@ var ComponentPriv = (function() { // Scoping priv
         }
     };
 
-    ComponentPriv.prototype.createStyleValueProvider = function(cmp) {
+    ComponentPrivInner.prototype.createStyleValueProvider = function(cmp) {
         return {
             get: function(key) {
                 if (key === "name") {
@@ -278,13 +278,13 @@ var ComponentPriv = (function() { // Scoping priv
     /**
      * A reference to the ComponentDefinition for this instance
      */
-    ComponentPriv.prototype.setupComponentDef = function(config) {
+    ComponentPrivInner.prototype.setupComponentDef = function(config) {
         var componentDef = $A.componentService.getDef(config["componentDef"]);
         $A.assert(componentDef, "componentDef is required");
         this.componentDef = componentDef;
     };
 
-    ComponentPriv.prototype.createComponentStack = function(facets,valueProvider,localCreation){
+    ComponentPrivInner.prototype.createComponentStack = function(facets,valueProvider,localCreation){
         var facetStack={};
         for (var i = 0; i < facets.length; i++) {
             var facet = facets[i];
@@ -329,7 +329,7 @@ var ComponentPriv = (function() { // Scoping priv
     };
 
 
-    ComponentPriv.prototype.setupSuper = function(cmp, configAttributes, localCreation) {
+    ComponentPrivInner.prototype.setupSuper = function(cmp, configAttributes, localCreation) {
         var superDef = this.componentDef.getSuperDef();
         if (superDef) {
             var superConfig = {};
@@ -359,13 +359,13 @@ var ComponentPriv = (function() { // Scoping priv
         }
     };
 
-    ComponentPriv.prototype.setSuperComponent = function(component) {
+    ComponentPrivInner.prototype.setSuperComponent = function(component) {
         if(component){
             this.superComponent = component;
         }
     };
 
-    ComponentPriv.prototype.setupAttributes = function(cmp, config, localCreation) {
+    ComponentPrivInner.prototype.setupAttributes = function(cmp, config, localCreation) {
         //JBUCH: HALO: TODO: NOTE TO SELF: I THINK THERE IS SOMETHING STILL WRONG HERE.
         // I THINK THAT THE ORDER OF THE VALUES IS INCORRECT NOW
         // THIS MIGHT ALSO BE WHERE WE NEED TO DEREFERENCE CONFIG COPIES
@@ -511,7 +511,7 @@ if(!this.concreteComponentId) {
     };
 
 
-    ComponentPriv.prototype.validatePartialConfig=function(config, partialConfig){
+    ComponentPrivInner.prototype.validatePartialConfig=function(config, partialConfig){
         var partialConfigO = partialConfig["original"];
         var partialConfigCD;
         var configCD = config["componentDef"]["descriptor"];
@@ -551,7 +551,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
+    ComponentPrivInner.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
         var observer=this.getActionCaller(valueProvider,action||("c."+name));
         return function(param1,param2,paramN){
             var eventDef = $A.get("e").getEventDef("aura:methodCall");
@@ -584,7 +584,7 @@ if(!this.concreteComponentId) {
         };
     };
 
-    ComponentPriv.prototype.getActionCaller = function(valueProvider, actionExpression) {
+    ComponentPrivInner.prototype.getActionCaller = function(valueProvider, actionExpression) {
         if(!valueProvider&&$A.util.isExpression(actionExpression)){
             valueProvider=actionExpression.valueProvider;
         }
@@ -613,7 +613,7 @@ if(!this.concreteComponentId) {
         };
     };
 
-    ComponentPriv.prototype.getEventDispatcher = function(cmp) {
+    ComponentPrivInner.prototype.getEventDispatcher = function(cmp) {
         if (!this.eventDispatcher && cmp) {
             var dispatcher = {
                 "get": function(key) {
@@ -626,7 +626,7 @@ if(!this.concreteComponentId) {
         return this.eventDispatcher;
     };
 
-    ComponentPriv.prototype.setupComponentEvents = function(cmp, config) {
+    ComponentPrivInner.prototype.setupComponentEvents = function(cmp, config) {
         var dispatcher;
         if (!this.concreteComponentId) {
             var events = this.componentDef.getAllEvents();
@@ -684,7 +684,7 @@ if(!this.concreteComponentId) {
         };
     }
 
-    ComponentPriv.prototype.setupApplicationEventHandlers = function(cmp) {
+    ComponentPrivInner.prototype.setupApplicationEventHandlers = function(cmp) {
         // Handle application-level events
         var handlerDefs = this.componentDef.getAppHandlerDefs();
         if (handlerDefs) {
@@ -699,7 +699,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.setupValueEventHandlers = function(cmp) {
+    ComponentPrivInner.prototype.setupValueEventHandlers = function(cmp) {
         // Handle value-level events
         var handlerDefs = this.componentDef.getValueHandlerDefs();
         if (handlerDefs) {
@@ -718,7 +718,7 @@ if(!this.concreteComponentId) {
      * Adds a handler for the specified type of event. Currently only supports
      * 'change'.
      */
-    ComponentPriv.prototype.addValueHandler = function(cmp,config) {
+    ComponentPrivInner.prototype.addValueHandler = function(cmp,config) {
         var component=this.concreteComponentId?cmp.getConcreteComponent().priv:this;
         var event = config["event"];
         var handlers = component.handlers[event];
@@ -746,7 +746,7 @@ if(!this.concreteComponentId) {
      * Removes a handler for the specified type of event. Currently only supports
      * 'change'.
      */
-    ComponentPriv.prototype.removeValueHandler = function(cmp,config) {
+    ComponentPrivInner.prototype.removeValueHandler = function(cmp,config) {
         var component = this.concreteComponentId ? cmp.getConcreteComponent().priv : this;
         var event = config["event"];
         var handlers = component.handlers[event];
@@ -769,7 +769,7 @@ if(!this.concreteComponentId) {
      /**
      * Fires handlers registered for the specified key when the value changes
      */
-    ComponentPriv.prototype.fireChangeEvent = function(cmp, key, oldValue, value, index) {
+    ComponentPrivInner.prototype.fireChangeEvent = function(cmp, key, oldValue, value, index) {
         var component=this.concreteComponentId?cmp.getConcreteComponent().priv:this;
         var handlers = component.handlers["change"];
         var observers=[];
@@ -798,7 +798,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.setupMethods = function(config, cmp) {
+    ComponentPrivInner.prototype.setupMethods = function(config, cmp) {
         var defs = this.componentDef.methodDefs;
         if (defs) {
             var method;
@@ -809,7 +809,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.setupModel = function(config, cmp) {
+    ComponentPrivInner.prototype.setupModel = function(config, cmp) {
         var def = this.componentDef.getModelDef();
         if (def) {
             if (!config && this.partialConfig) {
@@ -819,7 +819,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.doIndex = function(cmp) {
+    ComponentPrivInner.prototype.doIndex = function(cmp) {
         var localId = this.localId;
         if (localId) {
             // JBUCH: HALO: TODO: MOVE THIS INTO PASSTHROUGHVALUE.
@@ -836,7 +836,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.deIndex = function(cmp) {
+    ComponentPrivInner.prototype.deIndex = function(cmp) {
         var localId = this.localId;
         if (localId) {
             var valueProvider=cmp.getAttributeValueProvider();
@@ -847,7 +847,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.injectComponent = function(config, cmp, localCreation) {
+    ComponentPrivInner.prototype.injectComponent = function(config, cmp, localCreation) {
 
         var componentDef = this.componentDef;
         if ((componentDef.isAbstract() || componentDef.getProviderDef()) && !this.concreteComponentId) {
@@ -905,7 +905,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.setupRenderer = function(cmp) {
+    ComponentPrivInner.prototype.setupRenderer = function(cmp) {
         var rd = this.componentDef.getRenderingDetails();
         $A.assert(rd !== undefined, "Instantiating " + this.componentDef.getDescriptor() + " which has no renderer");
         var renderable = cmp;
@@ -941,7 +941,7 @@ if(!this.concreteComponentId) {
         this.renderer = renderer;
     };
 
-    ComponentPriv.prototype.associateRenderedBy = function(cmp, element) {
+    ComponentPrivInner.prototype.associateRenderedBy = function(cmp, element) {
         // attach a way to get back to the rendering component, the first time
         // we call associate on an element
         if (!$A.util.hasDataAttribute(element, $A.componentService.renderedBy)) {
@@ -949,7 +949,7 @@ if(!this.concreteComponentId) {
         }
     };
 
-    ComponentPriv.prototype.output = function(value, avp, serialized, depth) {
+    ComponentPrivInner.prototype.output = function(value, avp, serialized, depth) {
         if (serialized === undefined) {
             serialized = [];
             depth = 0;
@@ -999,7 +999,7 @@ if(!this.concreteComponentId) {
         return value ? value.toString() : value;
     };
 
-    ComponentPriv.prototype.outputMapValue = function(map, avp, serialized, depth) {
+    ComponentPrivInner.prototype.outputMapValue = function(map, avp, serialized, depth) {
         var ret = {};
         var that = this;
         for(var key in map){
@@ -1023,7 +1023,7 @@ if(!this.concreteComponentId) {
         return ret;
     };
 
-    ComponentPriv.prototype.outputArrayValue = function(array, avp, serialized, depth) {
+    ComponentPrivInner.prototype.outputArrayValue = function(array, avp, serialized, depth) {
         var ret = [];
         for (var i = 0; i < array.length; i++) {
             ret.push(this.output(array[i], avp, serialized, depth));
@@ -1032,7 +1032,7 @@ if(!this.concreteComponentId) {
         return ret;
     };
 
-    ComponentPriv.prototype.outputComponent = function(cmp, serialized, depth) {
+    ComponentPrivInner.prototype.outputComponent = function(cmp, serialized, depth) {
         /*jslint reserved: true */
         if (cmp) {
             var ret = {
@@ -1105,7 +1105,7 @@ if(!this.concreteComponentId) {
         return null;
     };
 
-    return ComponentPriv;
+    return ComponentPrivInner;
 
 }());
 /**

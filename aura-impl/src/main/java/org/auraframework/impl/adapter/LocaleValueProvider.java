@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String MONTH_NAME = "nameOfMonths";
     public static String TODAY_LABEL = "labelForToday";
     public static String WEEKDAY_NAME = "nameOfWeekdays";
+    public static String FIRST_DAY_OF_WEEK = "firstDayOfWeek";
 
     public static String NUMBER_FORMAT = "numberFormat";
     public static String PERCENT_FORMAT = "percentFormat";
@@ -105,6 +107,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
         } catch (QuickFixException qfe) {
             // Ignore
         }
+        
+        builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(al.getTimeZone(), userLocale).getFirstDayOfWeek());
 
         // using java DateFormat because the year pattern "MMM d, y" (although valid) isn't understood by moment.js
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, dateLocale);

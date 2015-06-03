@@ -42,7 +42,7 @@ function AuraError() {
             return name || "[anonymous]";
         }
 
-        function getStack(error) {
+        function getStack() {
             var map = {};
             var stack = [];
             var caller = getStack.caller && getStack.caller.caller;
@@ -58,12 +58,12 @@ function AuraError() {
             return stack.join('\n\tat ');
         }
 
-        function getStackTrace(error) {
+        function getStackTrace(err) {
             var stack;
-            if (error.stack) {
-                stack = error.stack;
+            if (err.stack) {
+                stack = err.stack;
                 // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.
-                var chromeStart = error.name + ": " + error.message;
+                var chromeStart = err.name + ": " + err.message;
                 if (stack && stack.indexOf(chromeStart) === 0) {
                     stack = stack.substring(chromeStart.length + 1);
                 }

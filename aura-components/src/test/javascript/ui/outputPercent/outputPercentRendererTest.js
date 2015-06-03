@@ -21,7 +21,7 @@ Test.Ui.OutputPercent.RendererTest = function(){
 	var targetRenderer;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("ui.outputPercent.outputPercentRenderer",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/outputPercent/outputPercentRenderer.js",function(path,result){
 		targetRenderer=result;
 	});
 	

@@ -27,19 +27,23 @@ Test.Aura.AuraClientServiceTest = function() {
     });
 
     Importer(function () {
-        // #import aura.controller.ActionQueue
+        [Import("aura-impl/src/main/resources/aura/controller/ActionQueue.js")]
     });
 
     Importer(function () {
-        // #import aura.controller.ActionCollector
+        [Import("aura-impl/src/main/resources/aura/controller/ActionCollector.js")]
     });
 
     Importer(function () {
-        // #import aura.controller.FlightCounter
+        [Import("aura-impl/src/main/resources/aura/controller/FlightCounter.js")]
     });
 
     Importer(function () {
-        // #import aura.AuraClientService
+        [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
+    });
+
+    Importer(function () {
+        [Import("aura-impl/src/main/resources/aura/AuraClientService.js")]
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
@@ -506,8 +510,6 @@ Test.Aura.AuraClientServiceTest = function() {
                 exp: function() {},
                 window: Object.Global()
             })(function() {
-                // #import aura.AuraClientService
-                // #import aura.controller.Action
                 mockActionStorage.clear()
                     .then(function() { delegate(new Aura.Services.AuraClientService(), mockActionStorage); });
             });
@@ -638,7 +640,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
                 // Assert
                 var expected = "myToken";
-                actual = service._token;
+                var actual = service._token;
                 Assert.Equal(expected, actual);
             });
         }

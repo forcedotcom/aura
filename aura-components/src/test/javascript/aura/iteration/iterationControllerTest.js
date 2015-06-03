@@ -20,7 +20,7 @@ Test.Aura.Iteration.ControllerTest = function(){
 	var targetController;
 
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("aura.iteration.iterationController",function(path,result){
+	ImportJson("aura-components/src/main/components/aura/iteration/iterationController.js",function(path,result){
 		targetController=result;
 	});
 }

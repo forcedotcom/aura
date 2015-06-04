@@ -99,7 +99,7 @@ var AuraStorageService = function(){
         createAdapter : function(adapter, name, maxSize, debugLoggingEnabled) {
             var config = adapters[adapter];
             if (!config) {
-                $A.error("StorageService.createAdapter() unknown adapter '" + implementation + "'!");
+                $A.error("StorageService.createAdapter() unknown adapter '" + adapter + "'!");
             }
 
             var AdapterClass = config["adapterClass"];
@@ -168,7 +168,7 @@ var AuraStorageService = function(){
             var storage = this.getStorage(name);
             if (!storage) {
                 // Nothing to delete, just call success callback
-                return new Promise(function(success, error) {
+                return new Promise(function(success) {
                     success();
                 });
             }

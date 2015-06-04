@@ -214,7 +214,7 @@ Logger.prototype.reportError = function(e, action, id){
         "clientError": e.toString(),
         "clientStack": e.stackTrace || e.stack   // Note that stack is non-standard, and even if present, may be obfuscated
     });
-    reportAction.setCallback(this, function(a) { /* do nothing */ });
+    reportAction.setCallback(this, function() { /* do nothing */ });
     $A.clientService.enqueueAction(reportAction);
     e["reported"] = true;
 };

@@ -81,7 +81,7 @@ IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
         message += (e.target.error && e.target.error.message) ? ": "+e.target.error.message : "";
         that.log(message);
     };
-    dbRequest.onblocked = function(e) {
+    dbRequest.onblocked = function() {
         that.log("open() - Blocked from opening DB, most likely by another open browser tab");
     };
 };
@@ -109,7 +109,7 @@ IndexedDBStorageAdapter.prototype.getName = function() {
 IndexedDBStorageAdapter.prototype.getSize = function() {
     var that = this;
     if (this.sizeAge < 50) {
-        return new Promise(function(success, error) {
+        return new Promise(function(success) {
             success(that.sizeGuess);
         });
     } else {
@@ -399,7 +399,7 @@ IndexedDBStorageAdapter.prototype.setItemInternal = function(key, item, success,
     transaction.onabort = function(event) {
         error("IndexedDBStorageAdapter.setItem: Transaction aborted: "+event.error);
     };
-    objectStoreRequest.onsuccess = function(event) {
+    objectStoreRequest.onsuccess = function() {
         success();
     };
     transaction.onerror = function(event) {
@@ -423,7 +423,7 @@ IndexedDBStorageAdapter.prototype.removeItemInternal = function(key, success, er
     transaction.onabort = function(event) {
         error("IndexedDBStorageAdapter.removeItem: Transaction aborted: "+event.error);
     };
-    removeRequest.onsuccess = function(event) {
+    removeRequest.onsuccess = function() {
         success();
     };
     transaction.onerror = function(event) {
@@ -445,7 +445,7 @@ IndexedDBStorageAdapter.prototype.clearInternal = function(success, error) {
     transaction.onabort = function(event) {
         error("IndexedDBStorageAdapter.clear: Transaction aborted: "+event.error);
     };
-    transaction.oncomplete = function(event) {
+    transaction.oncomplete = function() {
         success();
     };
     transaction.onerror = function(event) {
@@ -600,10 +600,10 @@ IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, erro
     this.db.close();
 
     var dbRequest = window.indexedDB.deleteDatabase(this.instanceName);
-    dbRequest.onerror = function(event) {
+    dbRequest.onerror = function() {
         error("IndexedDBStorageAdapter.deleteStorage: Database failed to be deleted");
     };
-    dbRequest.onsuccess = function(event) {
+    dbRequest.onsuccess = function() {
         that.log("deleted successfully");
         success();
     };

@@ -205,7 +205,7 @@ var ComponentPriv = (function() { // Scoping priv
         this.globalId = globalId;
     };
 
-    ComponentPrivInner.prototype.getValueProvider = function(key, cmp) {
+    ComponentPrivInner.prototype.getValueProvider = function(key) {
         if (!$A.util.isString(key)) {
             $A.error("ComponentPriv.getValueProvider(): 'key' must be a valid String.");
         }
@@ -873,7 +873,7 @@ if(!this.concreteComponentId) {
                 self.attributes.merge(attributes, realComponentDef.getAttributeDefs());
 
                  // KRIS: IN THE MIDDLE OF THIS FOR PROVIDED COMPONENTS
-                var classConstructor =  $A.componentService.getComponentClass(realComponentDef.getDescriptor().getQualifiedName()) || Component;
+                var classConstructor =  $A.componentService.getComponentClass(realComponentDef.getDescriptor().getQualifiedName());
                 if (classConstructor && cmp["constructor"] != classConstructor) {
                     // Doesn't do a whole lot, but good for debugging, not sure what the stack trace looks like.
                     cmp["constructor"] = classConstructor;

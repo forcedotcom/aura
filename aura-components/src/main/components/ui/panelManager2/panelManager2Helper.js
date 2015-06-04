@@ -206,6 +206,7 @@
             dom       = container.getElement();
 
         $A.render(panel, dom);
+        $A.afterRender(panel);
         children.push(panel);
         panel.getElement().style.cssText += ' z-index:' + panel._zIndex;
         container.set('v.body', children, true/*dont mark it dirty for rendering*/);

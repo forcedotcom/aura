@@ -41,6 +41,7 @@ Test.Components.Ui.Dropzone = function(){
 					if(expression == "dragEnter"){return dragEvent;}
 				},
 				get : function(expression){
+					if(expression == "v.types"){return "move";}
 					if(expression == "v.dragOverClass"){return {trim : function() { }}}
 					if(expression == "v.dragOverAccessibilityClass"){return {trim : function() { }}}
 					if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
@@ -49,7 +50,10 @@ Test.Components.Ui.Dropzone = function(){
 					if(expression == "v.theClass"){}
 				}
 			};
-			var targetEvent = {target : null};
+			var targetEvent = {
+				target : null,
+				dataTransfer : {effectAllowed : "move", dropEffect : null}
+			};
 			var auraMock = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({},{
 				 componentService : {
 					 getRenderingComponentForElement : function(value){
@@ -202,7 +206,7 @@ Test.Components.Ui.Dropzone = function(){
 		var supportTypes = "";
 		var expectedOperationType = "move";
 		var expectedRenderingComponent = "someComponent";
-		var expectedDataTransfer = "someDataTransfer";
+		var expectedDataTransfer = {};
 		var fired;
 		var propagationStopped;
 		var actual;
@@ -252,7 +256,7 @@ Test.Components.Ui.Dropzone = function(){
 			},
 			util : {
 				forEach : function(value, func){},
-				isUndefinedOrNull : function(expression) {},
+				isUndefinedOrNull : function(expression) {return true;},
 				isEmpty : function(value) {return true;}
 			}
 		});

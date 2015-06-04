@@ -157,6 +157,8 @@ Test.Components.Ui.Draggable = function(){
 		var expectedDropComponent = "dropComponent";
 		var expectedDropComplete = true;
 		var expectedDataTransfer = "data";	
+		var actual;
+		var fired;
 		var targetComponent = {
 			getEvent:function(expression){
 				if(expression == "dragEnd"){return dragEvent;}
@@ -179,56 +181,45 @@ Test.Components.Ui.Draggable = function(){
 				if(expression == "dropComplete"){return expectedDropComplete;}
 			}
 		};
+		var isDragOperationNull = true;
+		var auraMock$A = Mocks.GetMock(Object.Global(), "$A", {
+			util : {
+				isUndefinedOrNull : function(value) {return isDragOperationNull;}
+			}
+		});
 		
 		[Fact]
-        function testDropOperationWhenDropOperationStatusIsNull(){
+		function testDropOperationWhenDragOperationStatusIsNotNull(){
 			//Arrange
-			targetHelper.$dropOperationStatus$ = null;
-			var targetEventType = "nonMatch";
 			var expected = {
-				dragEnd : null,
-				dropComplete : null
+				getDragEndStatus : function() {return null;},
+				getDropCompleteStatus : function() {return null;}
 			};
+			targetComponent.$dragOperation$ = {$dropOperationStatus$ : expected};
+			var targetEventType = "nonMatch";		
 			var actual;
+			isDragOperationNull = false;
 			//Act
-			targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
-			actual = targetHelper.$dropOperationStatus$;
+			auraMock$A(function(){
+				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+				actual = targetComponent.$dragOperation$.$dropOperationStatus$;
+			});			
 			//Assert
 			Assert.Equal(expected, actual);
 		}
 		
 		[Fact]
-        function testDropOperationStatusWhenEventTypeDragEnd(){
+		function testDropOperationWhenDragOperationStatusIsNull(){
 			//Arrange
-			targetHelper.$dropOperationStatus$ = null;
-			var targetEventType = "dragEnd";
-			var expected = {
-				type : expectedDropEffect
-			};
+			var expected = targetHelper.newDropOperationStatus();
+			var targetEventType = "nonMatch";		
 			var actual;
+			isDragOperationNull = true;
 			//Act
-			targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
-			actual = targetHelper.$dropOperationStatus$["dragEnd"];
-			//Assert
-			Assert.Equal(expected, actual);
-		}
-		
-		[Fact]
-        function testDropOperationStatusWhenEventTypeDropComplete(){
-			//Arrange
-			targetHelper.$dropOperationStatus$ = null;
-			var targetEventType = "dropComplete";
-			var expected = {
-				dragEnd : null,
-				dropComplete : {
-					dropComponent : expectedDropComponent,
-					status : expectedDropComplete
-				}
-			};
-			var actual;
-			//Act
-			targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
-			actual = targetHelper.$dropOperationStatus$;
+			auraMock$A(function(){
+				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+				actual = targetComponent.$dragOperation$.$dropOperationStatus$;
+			});			
 			//Assert
 			Assert.Equal(expected, actual);
 		}
@@ -236,10 +227,9 @@ Test.Components.Ui.Draggable = function(){
 		[Fact]
         function testDragEventParamsWhenDragEndAndDropCompleteOperationStatusAreNotNull(){
 			//Arrange
-			targetHelper.$dropOperationStatus$ = null;
 			var expectedDataTransfer = "data";
-			var targetEventType = "dragEnd";
 			var targetComponent = {
+				$dragOperation$ : null,
 				getEvent:function(expression){
 					if(expression == "dragEnd"){return dragEvent;}
 				},
@@ -248,10 +238,6 @@ Test.Components.Ui.Draggable = function(){
 					if(expression == "v.type"){return expectedDropEffect;}
 				}
 			};
-			var dragEvent = {
-				setParams:function(arg){actual = arg;},
-				fire:function(){fired = true;}
-			};
 			var expected = {
 				type : expectedDropEffect,
 				dragComponent : targetComponent,
@@ -259,12 +245,18 @@ Test.Components.Ui.Draggable = function(){
 				data : expectedDataTransfer,
 				dropComplete : expectedDropComplete
 			};
-			var actual;
-			var fired;
+			var auraMock$A = Mocks.GetMock(Object.Global(), "$A", {
+				util : {
+					isUndefinedOrNull : function(value) {return targetComponent.$dragOperation$ == null;}
+				}
+			});
 			//Act
-			targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
-			targetEventType = "dropComplete";
-			targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+			auraMock$A(function(){
+				var targetEventType = "dragEnd";
+				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+				targetEventType = "dropComplete";
+				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+			});
 			//Assert
 			Assert.Equal(expected, actual);
 			Assert.True(fired);

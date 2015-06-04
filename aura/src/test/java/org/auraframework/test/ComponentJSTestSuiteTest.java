@@ -205,13 +205,13 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         private String getUrl() {
             DefType defType = caseDef.getDefType();
             String baseUrl = suite.getUrl(defType);
-            Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
-            if (attributes.isEmpty()) {
+            Map<String, Object> attributes = caseDef.getAttributeValues();
+            if (attributes == null || attributes.isEmpty()) {
                 return baseUrl;
             } else {
                 String hash = "";
                 List<NameValuePair> newParams = Lists.newArrayList();
-                for (Entry<String, Object> entry : attributes) {
+                for (Entry<String, Object> entry : attributes.entrySet()) {
                     String key = entry.getKey();
                     String value;
                     if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {

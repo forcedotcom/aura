@@ -229,7 +229,7 @@
                 // We explicitly disable IE as there are issues with it and fastclick.
                 // Instead, "touch-action: manipulation;" (IE11) and "-ms-touch-action: manipulation" (IE10)
                 // should be used on the components that we want no touch-delay on.
-                var attachFastClick = !$A.util.isIE;
+                var attachFastClick = window.$A &amp;&amp; !$A.util.isIE;
                 if (attachFastClick) {
                   // To support older browsers
                   if (window.addEventListener) {

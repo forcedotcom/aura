@@ -63,7 +63,7 @@ public class ObjectSerializationTest extends AuraImplTestCase {
         assertEquals("testActionString", newtest.getName());
         assertEquals("js://auratest.jsmock/TESTCASE$testActionString", newtest.getDescriptor().getQualifiedName());
         assertEquals(DefType.COMPONENT, newtest.getDefType());
-        assertTrue(newtest.getAttributeValues().isEmpty());
+        assertNull(newtest.getAttributeValues());
         assertEquals(test.getOwnHash(), newtest.getOwnHash());
         assertEquals(null, newtest.getAPIVersion());
         assertEquals(null, newtest.getDescription());

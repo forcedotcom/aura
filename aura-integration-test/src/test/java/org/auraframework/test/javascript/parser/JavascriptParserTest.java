@@ -478,7 +478,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
                         ((DefinitionImpl<?>) o).getDescriptor()
                                 .getQualifiedName());
             } else if (testCaseDef.getName().equals("testHelloWorld3")) {
-                assertTrue(attributes.size() == 0);
+                assertNull(attributes);
                 // OBject that is to be verified, Qualified name
                 assertEquals(
                         "unexpected qualifiedName of testHelloWorld3",

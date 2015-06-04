@@ -20,9 +20,11 @@
 	<aura:import library="ui:dragAndDropLib" property="lib" />
 	
 	<aura:attribute name="types" type="String[]" default="move" description="Supported operation types: can be either copy, link, or move."/>
+	
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to the component."/>
 	<aura:attribute name="dragOverClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged over."/>
 	<aura:attribute name="dragOverAccessibilityClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged over in accessibility mode. It's defaulted to dragOverClass attribute if it's unspecified."/>
+	
 	<aura:attribute name="label" type="String" description="Label for this component. It's primarily used for accessibility."/>
 	<aura:attribute name="ariaDropEffect" type="String" default="none" access="private" description="Indicate what operation this component is capable of receiving."/>
 	

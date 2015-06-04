@@ -47,6 +47,14 @@
 	border-radius: .3125rem;
 }
 
+.THIS .sampleCard:active {
+	outline: none; /* since this will interfere with dragImage in drag and drop operation */
+}
+
 .THIS .sampleCard.dragging {
 	border: 2px dashed #000;
+}
+
+.THIS .dragImage {
+	background-color: #e9967a;
 }

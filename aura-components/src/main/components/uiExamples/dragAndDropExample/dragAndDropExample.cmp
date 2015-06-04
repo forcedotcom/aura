@@ -43,6 +43,7 @@
 									  dragEnd="{!c.handleDragEnd}"
 									  class="sampleCard"
 									  dragClass="dragging"
+									  dragImageClass="dragImage"
 									  accessibilityComponent="{!v._accessibilityComponent}">
 							<p>{!item}</p>
 						</ui:draggable>

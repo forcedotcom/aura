@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+	isCustomDragImageSupported: function() {
+		var browser = $A.get("$Browser");
+		if (browser.isWEBKIT || browser.isFIREFOX) {
+			return true;
+		}
+		return false;
+	},
+	
 	resetCssClass: function(component) {
 		var cssClass = component.get("v.class").trim();
 		var dragClass = component.get("v.dragClass").trim();
@@ -98,6 +106,18 @@
 			}
 		}
 		
+		// Set custom dragImage
+		if (this.isCustomDragImageSupported()) {
+			var dragImageClass = component.get("v.dragImageClass");
+			if (!$A.util.isEmpty(dragImageClass)) {
+				if (typeof event.dataTransfer.setDragImage === "function") {
+					var offsetX = 15, offsetY = 15;
+					var dragImage = this.createDragImage(component, event.pageX, event.pageY, offsetX, offsetY);
+					event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+				}
+			}
+		}
+		
 		this.fireDragStart(component, false);
 	},
 	
@@ -114,6 +134,43 @@
 			"isInAccessibilityMode": isInAccessibilityMode
 		});
 		dragEvent.fire();
+	},
+	
+	/**
+	 * Create custom drag image.
+	 * @param {Aura.Component} component - this component
+	 * @param {int} x - the x coordinate where this dragImage will be positioned
+	 * @param {int} y - the y coordinate where this dragImage will be positioned
+	 * @param {int} offsetX - the x coordinate offset relative to mouse pointer
+	 * @param {int} offsetY - the y coordinate offset relative to mouse pointer
+	 */
+	createDragImage: function(component, x, y, offsetX, offsetY) {
+		var theElement = component.getElement();
+		
+		// Clone a copy of original draggable element and use it as a dragImage
+		var dragImage = document.createElement("div");
+		$A.util.addClass(dragImage, component.get("v.class"));
+		$A.util.addClass(dragImage, component.get("v.dragImageClass"));
+		
+		for (var i = 0; i < theElement.childNodes.length; i++) {
+			dragImage.appendChild(theElement.childNodes[i].cloneNode(true));
+		}
+		
+		dragImage.style.position = "fixed";
+		dragImage.style.width = theElement.clientWidth + "px";
+		dragImage.style.top = (y - offsetY) + "px";
+		dragImage.style.left = (x - offsetX) + "px";
+		dragImage.style.zIndex = "-1";
+		
+		// In order for dragImage to render properly, dragImage must be visible 
+		// to use (i.e. putting it off the screen won't work). But we can remove 
+		// the dragImage element right after the dragImage is rendered.
+		setTimeout(function() {
+			dragImage.parentNode.removeChild(dragImage);
+		});
+		
+		theElement.parentNode.insertBefore(dragImage, theElement.nextSibling);
+		return dragImage;
 	},
 	
 	isDropEventSuccessful: function(component, event) {

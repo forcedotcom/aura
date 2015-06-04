@@ -27,7 +27,7 @@
     testVersionExpression: {
         test: [function(cmp) {
             var target = cmp.find('testbtn');
-            $A.test.assertEquals("1.0", target.getElement().textContent);
+            $A.test.assertEquals("", target.getElement().textContent);
         }]
     }
 })

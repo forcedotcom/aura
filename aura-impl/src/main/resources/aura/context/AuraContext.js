@@ -107,6 +107,14 @@ Aura.Context.AuraContext.prototype.getCurrentAccess=function(){
     return access;
 };
 
+Aura.Context.AuraContext.prototype.getCurrentAccessCaller=function(){
+    var access=this.accessStack[this.accessStack.length-2];
+    while(access instanceof PassthroughValue){
+        access=access.getComponent();
+    }
+    return access;
+};
+
 Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
     return this.accessStack.push(component?component:this.getCurrentAccess());
 };
@@ -116,9 +124,9 @@ Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
 };
 
 Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
-    var currentAccess = this.getCurrentAccess();
-    if (currentAccess) {
-        return currentAccess.getDef().getRequiredVersionDefs().getDef(name);
+    var currentAccessCaller = this.getCurrentAccessCaller();
+    if (currentAccessCaller) {
+        return currentAccessCaller.getDef().getRequiredVersionDefs().getDef(name);
     }
 
     return null;

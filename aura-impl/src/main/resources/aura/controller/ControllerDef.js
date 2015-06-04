@@ -27,7 +27,7 @@ function ControllerDef(config){
 
     for(var i=0;i<actionDefs.length;i++){
         var actionDefConfig = actionDefs[i];
-        var actionDef = $A.services.component.getActionDef(actionDefConfig);
+        var actionDef = $A.componentService.createActionDef(actionDefConfig);
         this.actionDefs[actionDef.getName()] = actionDef;
     }
 }

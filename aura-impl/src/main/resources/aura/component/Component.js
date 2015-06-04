@@ -279,7 +279,7 @@ var ComponentPriv = (function() { // Scoping priv
      * A reference to the ComponentDefinition for this instance
      */
     ComponentPrivInner.prototype.setupComponentDef = function(config) {
-        var componentDef = $A.componentService.getDef(config["componentDef"]);
+        var componentDef = $A.componentService.registry.getDef(config["componentDef"]);
         $A.assert(componentDef, "componentDef is required");
         this.componentDef = componentDef;
     };
@@ -862,7 +862,7 @@ if(!this.concreteComponentId) {
             var setProvided = function(realComponentDef, attributes) {
 
                 $A.assert(realComponentDef && realComponentDef.auraType === "ComponentDef",
-                    "No definition for provided component:" + componentDef);
+                    "No definition for provided component: " + componentDef);
                 $A.assert(!realComponentDef.isAbstract(),
                     "Provided component cannot be abstract: " + realComponentDef);
                 $A.assert(!realComponentDef.hasRemoteDependencies() || (realComponentDef.hasRemoteDependencies() && self.partialConfig),

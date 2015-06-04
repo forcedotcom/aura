@@ -25,21 +25,28 @@ function ModelDefRegistry(){
 ModelDefRegistry.prototype.auraType = "ModelDefRegistry";
 
 /**
- * Returns a ModelDef instance or config after adding to the registry.
- * Throws an error if config is not provided.
- * @param {Object} config Passes in a config, a ModelDef, or the name of a ModelDef.
- * @returns {ModelDef} A ModelDef instance or config after adding to the registry
+ * Returns a ModelDef instance from registry
+ * @param {String} descriptor name of a ModelDef.
+ * @returns {ModelDef} ModelDef from registry
  */
-ModelDefRegistry.prototype.getDef = function(config){
-    aura.assert(config, "ModelDef Config required for registration");
-    // We don't re-register (or modify in any way) once we've registered
-    var descriptor = config["descriptor"];
-    var ret = this.modelDefs[descriptor];
-    if (!ret) {
-        ret = new ModelDef(config);
-        this.modelDefs[ret.getDescriptor().toString()] = ret;
+ModelDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No ModelDef descriptor specified");
+    return this.modelDefs[descriptor];
+};
+
+/**
+ * Returns a ModelDef after creating and adding to the registry.
+ * @param {object} config config of a ModelDef.
+ * @returns {ModelDef}
+ */
+ModelDefRegistry.prototype.createDef = function(config) {
+    $A.assert(config && config["descriptor"], "ModelDef Config required for registration");
+    var def = this.getDef(config["descriptor"]);
+    if (!def) {
+        def = new ModelDef(config);
+        this.modelDefs[def.getDescriptor().toString()] = def;
     }
-    return ret;
+    return def;
 };
 
 Aura.Model.ModelDefRegistry = ModelDefRegistry;

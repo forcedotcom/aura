@@ -104,7 +104,7 @@
 
     $A.logger.subscribe("INFO", devDebugConsoleLog);
     $A.logger.subscribe("WARNING", devDebugConsoleLog);
-    // $A.logger.subscribe("ERROR", devDebugConsoleLog);
+    $A.logger.subscribe("ERROR", devDebugConsoleLog);
     $A.logger.subscribe("ASSERT", devAssertError);
 
     //#end

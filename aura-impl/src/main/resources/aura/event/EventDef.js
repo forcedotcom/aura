@@ -69,8 +69,8 @@ EventDef.prototype.getSuperDef = function() {
  */
 EventDef.prototype.initSuperDef = function(config) {
     if (config["superDef"]) {
-        return $A.eventService.getEventDef(config["superDef"]);
-    }else{
+        return $A.eventService.createEventDef(config["superDef"]);
+    } else {
         return null;
     }
 };

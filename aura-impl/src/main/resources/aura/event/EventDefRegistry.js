@@ -23,32 +23,35 @@ function EventDefRegistry() {
 }
 
 /**
- * Returns an EventDef instance from registry or config after adding to the registry.
- * Throws an error if config is not provided.
- * @param {Object} config Passes in a config, an EventDef, or the name of an EventDef.
- * @returns a EventDef instance from registry, or config after adding to the registry
+ * Returns an EventDef instance from registry.
+ * @param {String} name descriptor name of an EventDef.
+ * @returns {EventDef} EventDef instance from registry, or config after adding to the registry
  */
-EventDefRegistry.prototype.getEventDef = function(config) {
-    aura.assert(config, "No EventDef specified");
-    if (aura.util.isObject(config)) {
-        aura.assert(config, "EventDef config required for registration");
-        // We don't re-register (or modify in any way) once we've registered
-        var descriptor = config["descriptor"];
-        if(!descriptor && config["getDescriptor"]){
-            descriptor = config.getDescriptor();
-        }
-        var ret = this.eventDefs[descriptor];
-        if (!ret) {
-            ret = new EventDef(config);
-            this.eventDefs[ret.getDescriptor().toString()] = ret;
-        }
-        return ret;
-    }else{
-        if(config.indexOf("://") == -1){
-            config = "markup://"+config;
-        }
-        return this.eventDefs[config];
+EventDefRegistry.prototype.getDef = function(name) {
+    $A.assert(name, "No EventDef specified");
+    if(name.indexOf("://") == -1){
+        name = "markup://" + name;
     }
+    return this.eventDefs[name];
+};
+
+/**
+ * Creates and saves EventDef into registry
+ * @param {Object} config config for EventDef
+ * @returns {EventDef} instance from registry
+ */
+EventDefRegistry.prototype.createDef = function(config) {
+    $A.assert($A.util.isObject(config), "EventDef config required for registration");
+    var descriptor = config["descriptor"];
+    if(!descriptor && config["getDescriptor"]){
+        descriptor = config.getDescriptor();
+    }
+    var def = this.getDef(descriptor);
+    if (!def) {
+        def = new EventDef(config);
+        this.eventDefs[def.getDescriptor().toString()] = def;
+    }
+    return def;
 };
 
 Aura.Event.EventDefRegistry = EventDefRegistry;

@@ -636,7 +636,7 @@
                 $A.newCmpAsync(this, function(){},config);
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
-                $A.test.assertEquals("ComponentDef Config required for registration",e.message);
+                $A.test.assertEquals("Assertion Failed!: No ComponentDef descriptor specified : undefined", e.message);
             }
         }
     },

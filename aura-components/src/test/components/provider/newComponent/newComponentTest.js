@@ -19,7 +19,7 @@
     createComponent : function(cmp){
         cmp.get('c.createComponent').runDeprecated();
     },
-    
+
     getLocallyCreatedComponent:function(cmp){
         var body = cmp.get('v.body');
         $A.test.assertEquals(1, body.length);
@@ -40,7 +40,7 @@
             $A.test.assertEquals("ui:inputText", creation.getElement().value);
         }]
     },
-    
+
     /**
      * Create client-side provided component with descriptor. attributesTest:simpleValue is not preloaded, we add it as dependency
      */
@@ -54,7 +54,7 @@
             $A.test.assertEquals("button", creation.getElement().getAttribute('type'));
         }]
     },
-    
+
     /**
      * Create client-side provided component with descriptor. attributesTest:parent is not preloaded.
      * this is different from the test for "arrested:development" down there as attributesTest:parent does exist
@@ -63,16 +63,15 @@
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider",
                            attributes:{ values:{ value:'attributesTest:parent'} } };
-            $A.test.expectAuraError("Unknown component: markup://attributesTest:parent");
             try{
                 $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
                 $A.test.fail("ERROR: Expecting exception when provider return non-loaded componentDef");
             } catch (e){
-                $A.test.assertEquals("Unknown component: markup://attributesTest:parent", e.message);
+                $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : undefined", e.message);
             }
         }
     },
-      
+
     /**
      * Create client-side provided component with prefixed descriptor.
      */
@@ -86,8 +85,8 @@
             $A.test.assertEquals("markup://ui:outputText", $A.test.getText(creation.getElement()));
         }]
     },
-    
-    
+
+
 
     /**
      * Create client-side provided provider component.  Luckily, this provider is a concrete component, as the provided provider will not provide again.
@@ -151,12 +150,11 @@
     testClientProvidedUnknownDescriptor:{
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'arrested:development'} } };
-            $A.test.expectAuraError("Unknown component: markup://arrested:development");
             try{
                 $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
                 $A.test.fail("Expected error to be thrown during new component creation");
             } catch (e){
-                $A.test.assertEquals("Unknown component: markup://arrested:development", e.message);
+                $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : undefined", e.message);
             }
         }
     },

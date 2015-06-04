@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 /**
- * @description A registry for ControllerDefs.
+ * @description A registry for ActionDef.
  * @constructor
  * @protected
  */
@@ -25,26 +26,28 @@ function ActionDefRegistry(){
 ActionDefRegistry.prototype.auraType = "ActionDefRegistry";
 
 /**
- * Returns an ActionDef instance from the registry. 
- * Throws an error if config is not provided.
- * @param {Object} config The descriptor of an ActionDef.
+ * Returns an ActionDef instance from registry
+ * @param {String} descriptor name of an ActionDef.
+ * @returns {ActionDef} ActionDef from registry
  */
-ActionDefRegistry.prototype.getDef = function(config){
-    aura.assert(config, "ActionDef Config required for registration");
-    
-    // We don't re-register (or modify in any way) once we've registered
-    var descriptor = config.descriptor;
-    var ret = this.actionDefs[descriptor];
-    if (!ret) {
-        ret = new ActionDef(config);
-        
-        // Only track server actions to save space
-        if (ret.isServerAction()) {
-        	this.actionDefs[ret.getDescriptor().toString()] = ret;
-        }
+ActionDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No ActionDef descriptor specified");
+    return this.actionDefs[descriptor];
+};
+
+/**
+ * Returns an ActionDef after creating and adding to the registry.
+ * @param {object} config config of a ActionDef.
+ * @return {ActionDef}
+ */
+ActionDefRegistry.prototype.createDef = function(config) {
+    $A.assert(config && config["descriptor"], "ActionDef Config required for registration");
+    var def = this.getDef(config["descriptor"]);
+    if(!def) {
+        def = new ActionDef(config);
+        this.actionDefs[def.getDescriptor().toString()] = def;
     }
-    
-    return ret;
+    return def;
 };
 
 Aura.Controller.ActionDefRegistry = ActionDefRegistry;

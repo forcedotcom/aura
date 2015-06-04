@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@
     testValueEmpty: {
         attributes : {value: ""},
         test: function(component){
-            aura.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
+            $A.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
 //            component.set("v.value", "newness");
 //            $A.renderingService.rerender(component);
 //            aura.test.assertEquals("newness", $A.test.getText(component.getElement()), "value not expected");
@@ -33,7 +33,7 @@
     testValueString: {
         attributes : {value: "easy peasy"},
         test: function(component){
-            aura.test.assertEquals("easy peasy", $A.test.getText(component.getElement()), "value not expected");
+            $A.test.assertEquals("easy peasy", $A.test.getText(component.getElement()), "value not expected");
 //            component.set("v.value", "");
 //            $A.renderingService.rerender(component);
 //            aura.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
@@ -46,7 +46,7 @@
     testValueWithTokens: {
         attributes : {value: "In a galaxy {0} {0} away..."},
         test: function(component){
-            aura.test.assertEquals("In a galaxy {0} {0} away...", $A.test.getText(component.getElement()), "value not expected");
+            $A.test.assertEquals("In a galaxy {0} {0} away...", $A.test.getText(component.getElement()), "value not expected");
         }
     },
 
@@ -56,7 +56,7 @@
     testValueOfTokenOnly: {
         attributes : {value: "{0}"},
         test: function(component){
-            aura.test.assertEquals("{0}", $A.test.getText(component.getElement()), "value not expected");
+            $A.test.assertEquals("{0}", $A.test.getText(component.getElement()), "value not expected");
         }
     }
 })

@@ -39,7 +39,7 @@
 		if (!$A.util.isUndefinedOrNull(results)) {
 			output += results.rows.length + "\n";
 		} else {
-			output += "Could not retrieve statistics.\n"
+			output += "Could not retrieve statistics.\n";
 		}
 
 		return output;

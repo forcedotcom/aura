@@ -23,7 +23,7 @@
         }
     },
 
-    init: function(component, evt, helper) {
+    init: function(component, evt) {
         var facets=[component.get("v.body"),component.get("v.else")];
         for(var i=0;i<facets.length;i++){
             for(var j=0;j<facets[i].length;j++){
@@ -32,7 +32,7 @@
         }
     },
 
-    destroy:function(component,event,helper){
+    destroy:function(component,event){
         var facets=[component.get("v.body"),component.get("v.else")];
         for(var i=0;i<facets.length;i++){
             for(var j=0;j<facets[i].length;j++){

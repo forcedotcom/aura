@@ -148,7 +148,7 @@
             }
         } else {
             var isSpecialBoolean = this.SPECIAL_BOOLEANS.hasOwnProperty(lowerName);
-            if (aura.util.isExpression(attribute)) {
+            if ($A.util.isExpression(attribute)) {
                 attribute.addChangeHandler(component, "HTMLAttributes." + name);
                 value = attribute.evaluate();
             } else {
@@ -169,7 +169,7 @@
             if (lowerName === "href" && element.tagName === "A" && value && (isHash || $A.util.supportsTouchEvents())) {
                 var HTMLAttributes = component.get("v.HTMLAttributes");
                 var target = HTMLAttributes["target"];
-                if (aura.util.isExpression(target)) {
+                if ($A.util.isExpression(target)) {
                     target = target.evaluate();
                 }
                 this.addNamedClickHandler(element, function () {
@@ -229,15 +229,17 @@
                 // Honestly, I can't see how this wasn't blowing up Pre-halo
                 if ($A.util.isIE && element.tagName === "INPUT" && lowerName === "type") {
                     try { element.setAttribute("type", value); }
-                    catch(e){}
+                    catch(e){
+                    	return undefined;	
+                    }
                 }
                 // as long as we have a valid value at this point, set
                 // it as an attribute on the DOM node
                 // IE renders null value as string "null" for input (text)
                 // element, we have to work around that.
-                else if (!aura.util.isUndefined(value) && !($A.util.isIE && element.tagName === "INPUT" && lowerName === "value" && value === null)) {
+                else if (!$A.util.isUndefined(value) && !($A.util.isIE && element.tagName === "INPUT" && lowerName === "value" && value === null)) {
                     var casedAttribute = this.caseAttribute(lowerName);
-                    var lowerName = name.toLowerCase();
+                    lowerName = name.toLowerCase();
                     if (lowerName === "style" && $A.util.isIE) {
                         element.style.cssText = value;
                     } else if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) {

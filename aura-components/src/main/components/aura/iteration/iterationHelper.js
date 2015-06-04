@@ -97,7 +97,7 @@
             function getCollector(index){
                 return function(itemComponents){
                     collector[index]=itemComponents;
-                    if(++currentCall==expectedCalls){
+                    if(++currentCall===expectedCalls){
                         var components=[];
                         for(var i=0;i<collector.length;i++){
                             components=components.concat(collector[i]);

@@ -204,9 +204,8 @@
     /**
      * Show or update the error messages.
      */
-    updateError : function(component) {
+    updateError : function(component, errors) {
 
-        var errors = component.get("v.errors");
         var errorCmp = component.get("v.errorComponent")[0];
 
         if (errorCmp) {

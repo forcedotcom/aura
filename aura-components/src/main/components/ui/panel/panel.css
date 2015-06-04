@@ -97,9 +97,6 @@
 
 .THIS .panel-header {
     position: relative;
-    border-top-right-radius: 0.25rem;
-    border-top-left-radius: 0.25rem;
-    border-bottom: 2px solid #e0e5ee;
 }
 
 .THIS .panel-header .titles {

@@ -122,15 +122,15 @@
 		}
 		
 		var dropEffect = event.dataTransfer.dropEffect;
-		if (dropEffect === "none") {
+		if ($A.util.isIE && dropEffect === "none") {
 			// Don't return false right away, since IE always 
-			// have "none" even though the drop has been performed
+			// returns "none" even though the drop has been performed
 			// successfully. This is not the right way to check
-			// for whether or not drop has been performed since
-			// this doesn't cross different context, e.g. dropping on
-			// different browser.
-			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();			
-		} 
+			// whether or not drop has been performed since this
+			// doesn't handle drag and draop cross different context, 
+			// e.g. dropping on different browser windows.
+			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();		
+		}
 		
 		return dropEffect === component.get("v.type");
 	},

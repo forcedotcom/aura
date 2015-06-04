@@ -29,15 +29,13 @@
             <ui:button class="btn" label="Destroy all Constraints" press="{!c.destroy}"></ui:button>
         </p>
          <p><ui:inputCheckbox aura:id="stayinwindow" label="Stay in window?" value="true" change="{!c.toggleBox}"/></p>
-        <!--
-       
-        <p><ui:button class="btn" label="Toggle Panel" press="{!c.alignLeft}"/></p>
-        <ui:button class="btn" label="Left" press="{!c.alignLeft}"/>
-        <ui:button class="btn" label="Middle" press="{!c.alignMiddle}"/>
-        <ui:button class="btn" label="Right" press="{!c.alignRight}"/>
-    -->
+
     </div>
     <div aura:id="bb" class="bb"></div>
+    <div aura:id="insideBox" class="inside-box"></div>
+    <div aura:id="insidePanel" class="inside-panel panel">
+        <p>I am pinned</p>
+    </div>
     
     <div aura:id="panel" id="panel" class="panel" style="visibility: hidden">
         <p>I am centered</p>

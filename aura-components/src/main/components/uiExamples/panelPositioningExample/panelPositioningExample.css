@@ -30,6 +30,15 @@
     transform-origin: top left;
 }
 
+.THIS.inside-box {
+	height:800px;
+	width: 400px;
+	display: block;
+	background: red;
+	margin-top: 350px;
+	margin-left: 800px;
+}
+
 .THIS.dragger {
 	width: 200px;
 	-webkit-user-select: none;
@@ -82,7 +91,7 @@
 
 .THIS.bb {
 	position: absolute;
-	left: 200px;
+	left: 10px;
 	top: 200px;
 	width: 600px;
 	height: 600px;

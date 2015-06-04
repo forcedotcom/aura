@@ -85,6 +85,8 @@
     	var panel = cmp.find('panel').getElement();
         var pointer = cmp.find('pointer').getElement();
 		var bb = cmp.find('bb').getElement();    	
+        var pinned = cmp.find('insidePanel').getElement();
+        var pinBox = cmp.find('insideBox').getElement();
 
     	if(!cmp.northConstraint) {
     		cmp.northConstraint = lib.createRelationship({
@@ -92,20 +94,17 @@
 				target:el,
 				align:'center bottom',
 				targetAlign: 'center top',
-				weight: 'medium',
+				
 				enable: true,
 				pad: 15
 			});
-
-
-			
 
 			cmp.southConstraint = lib.createRelationship({
 				element:panel,
 				target:el,
 				align:'center top',
 				targetAlign: 'center bottom',
-				weight: 'medium',
+				
 				enable: false,
 				pad: 15
 			});
@@ -113,11 +112,11 @@
             cmp.eastConstraint = lib.createRelationship({
                 element:panel,
                 target:el,
-                align:'left center',
-                targetAlign:'right center',
-                weight: 'medium',
+                align:'left top',
+                targetAlign:'right top',
+                
                 enable: false,
-                pad: 15
+                pad: 0
             });
 
             cmp.westConstraint = lib.createRelationship({
@@ -125,19 +124,16 @@
                 target:el,
                 align:'right center',
                 targetAlign:'left center',
-                weight: 'medium',
+                
                 enable: false,
                 pad: 15
             });
-
-
-
 
             cmp.bbConstraint = lib.createRelationship({
                 element:panel,
                 target:bb,
                 type: 'bounding box',
-                weight: 'medium',
+                
                 enable: true,
                 pad: 15,
                 boxDirections: {
@@ -173,6 +169,27 @@
 				type:'below',
 				pad: -10
 			});
+
+            cmp.pinConstraint = lib.createRelationship({
+                element:pinned,
+                target:pinBox,
+                align: 'right top',
+                targetAlign: 'right top'
+            });
+
+            cmp.pinBbConstraint = lib.createRelationship({
+                element:pinned,
+                target:window,
+                type: 'bounding box',
+                enable: true,
+                boxDirections: {
+                    left: false,
+                    right: false,
+                    top: true,
+                    bottom: true
+                }
+            });
+
 
     	}
 

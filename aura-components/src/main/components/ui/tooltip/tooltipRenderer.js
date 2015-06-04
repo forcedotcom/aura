@@ -27,6 +27,7 @@
         var extraClass = component.get('v.class');
         var delay = component.get('v.delay');
         var direction = component.get('v.direction');
+        var disabled = component.get('v.disabled');
         if(!fadeInDuration) {
             fadeInDuration = 0;
         }
@@ -53,6 +54,10 @@
             classList.push('fade-out');
         }
 
+        if(disabled) {
+            classList.push('disabled');
+        }
+
         if(fadeInDuration > fadeOutDuration) {
             fadeOutDuration = fadeInDuration;
         } else {
@@ -76,7 +81,7 @@
     afterRender: function(component, helper) {
         var ret = this.superAfterRender();
         var el;
-        if(component.get('v.advanced') || component.get('v.disabled')) {
+        if(component.get('v.advanced')) {
             helper.makeTrigger(component);
         }
         

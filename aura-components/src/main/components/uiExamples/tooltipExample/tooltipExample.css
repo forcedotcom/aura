@@ -60,9 +60,15 @@
 	background: #fff;
 }
 
+
 .THIS .tooltip-trigger {
-	text-decoration: underline;;
+	text-decoration: overline underline;
 }
+
+.THIS .my-trigger-class {
+	text-decoration: underline;
+}
+
 
 .THIS input{
   padding: 12px;

@@ -895,6 +895,19 @@
                                         <execute />
                                     </action>
                                 </pluginExecution>
+                                <pluginExecution>
+                									<pluginExecutionFilter>
+                										<groupId>org.apache.maven</groupId>
+                										<artifactId>maven-plugin-plugin</artifactId>
+                										<goals>
+                											<goal>descriptor</goal>
+                										</goals>
+                										<versionRange>[1.0,)</versionRange>
+                									</pluginExecutionFilter>
+                									<action>
+                										<execute />
+                									</action>
+              								</pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>

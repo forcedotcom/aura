@@ -99,6 +99,8 @@ public class AuraServlet extends AuraBaseServlet {
     protected final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
     private static final EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
             DefType.class);
+    private final static StringParam formatAdapterParam = new StringParam(AURA_PREFIX + "formatAdapter", 0, false);
+
     private final static StringParam messageParam = new StringParam("message", 0, false);
     private final static StringParam beaconParam = new StringParam("beaconData", 0, false);
 
@@ -235,10 +237,6 @@ public class AuraServlet extends AuraBaseServlet {
                 return;
             }
 
-            if (context.getFormat() != Format.HTML) {
-                throw new AuraRuntimeException("Invalid request, GET must use HTML");
-            }
-
             defDescriptor = definitionService.getDefDescriptor(tagName,
                     defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
         } catch (RequestParam.InvalidParamException ipe) {
@@ -251,7 +249,7 @@ public class AuraServlet extends AuraBaseServlet {
             handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
-        // typing
+        
         internalGet(request, response, defDescriptor, context, definitionService);
     }
 
@@ -302,7 +300,8 @@ public class AuraServlet extends AuraBaseServlet {
             out.write("\n    ");
             @SuppressWarnings("unchecked")
             Class<T> clazz = (Class<T>) def.getDescriptor().getDefType().getPrimaryInterface();
-            serializationService.write(def, getComponentAttributes(request), clazz, out);
+            String formatAdapter = formatAdapterParam.get(request);
+			serializationService.write(def, getComponentAttributes(request), clazz, out, formatAdapter);
         } catch (Throwable e) {
             handleServletException(e, false, context, request, response, true);
         } finally {

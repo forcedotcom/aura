@@ -99,14 +99,13 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 if(mode != Mode.PROD && mode != Mode.PRODDEBUG &&
                         Aura.getContextService().getCurrentContext().getIsDebugToolEnabled()) {
                     attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
-
-
                 }
 
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
                     auraInit.put("attributes", componentAttributes);
                 }
+
                 auraInit.put("descriptor", value.getDescriptor());
                 auraInit.put("deftype", value.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);

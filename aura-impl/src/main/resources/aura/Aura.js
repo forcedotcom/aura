@@ -672,7 +672,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
     config = $A.util.json.resolveRefs(config);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
-        $A.clientService.initHost(config["host"]);
+        $A.clientService.initHost(config["host"], config["sid"]);
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"]);
         this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices, doNotCallUIPerfOnLoad);

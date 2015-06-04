@@ -224,6 +224,7 @@ public class IntegrationImpl implements Integration {
         } else {
             context = contextService.getCurrentContext();
         }
+
         String cuid = context.getLoaded().get(applicationDescriptor);
         String uid = context.getDefRegistry().getUid(cuid, applicationDescriptor);
         context.addLoaded(applicationDescriptor, uid);

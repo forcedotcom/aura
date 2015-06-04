@@ -94,12 +94,42 @@
 				event.preventDefault(); 
 			}
 			
+			// Throttle and fire dragOver
+			var dragOverInterval = component.get("v.dragOverInterval");
+			if (!$A.util.isNumber(dragOverInterval) || dragOverInterval < 100) {
+				dragOverInterval = 500;
+			}
+			
+			if (!component.$dragOperation$) {
+				component.$dragOperation$ = {
+					"$dragOverTimeout$": false
+				};
+			}
+			
+			if (!component.$dragOperation$.$dragOverTimeout$) {
+				component.$dragOperation$.$dragOverTimeout$ = true;
+				setTimeout(function() {
+					component.$dragOperation$.$dragOverTimeout$ = false;
+				}, dragOverInterval);
+				this.fireDragOver(component, $A.componentService.getRenderingComponentForElement(event.target));
+			}
+			
 			// Prevent default behavior in certain browser such as
 			// navigate to link when the dropzone is an anchor element
 			return false;
 		}
 		
 		return true;
+	},
+	
+	fireDragOver: function(component, targetComponent) {
+		var dragEvent = component.getEvent("dragOver");
+		dragEvent.setParams({
+			"dropComponent": component,
+			"dropComponentTarget": targetComponent,
+			"isInAccessibilityMode": false	// no dragOver in accessibility mode
+		});
+		dragEvent.fire();
 	},
 	
 	/**

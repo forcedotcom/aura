@@ -46,7 +46,7 @@ ComponentServiceMetricsPlugin.prototype = {
     },
     bind: function (metricsService) {
         var method      = 'newComponentDeprecated',
-            beforeHook  = function (startMark, config, avp, lc, f) {
+            beforeHook  = function (startMark, config) {
                 var descriptor;
                 if ($A.util.isString(config)) {
                     descriptor = config;
@@ -67,7 +67,7 @@ ComponentServiceMetricsPlugin.prototype = {
         );
     },
     //#if {"excludeModes" : ["PRODUCTION"]}
-    postProcess: function (transportMarks) {
+    postProcess: function () {
         return [];
     },
     // #end

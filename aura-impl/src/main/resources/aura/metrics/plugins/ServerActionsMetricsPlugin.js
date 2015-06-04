@@ -61,7 +61,7 @@ ServerActionsMetricsPlugin.prototype = {
 
                 return original.apply(this, arguments);
             },
-            beforeHook = function (startMark, config) {
+            beforeHook = function (startMark) {
                 startMark["phase"] = 'stamp'; //mark as a stamp metric
                 var actions = this.getQueuedActions(),
                     ids     = [];

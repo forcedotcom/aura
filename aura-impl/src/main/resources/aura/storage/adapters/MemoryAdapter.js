@@ -83,7 +83,7 @@ MemoryStorageAdapter.prototype.getSize = function() {
  */
 MemoryStorageAdapter.prototype.getItem = function(key) {
     var that = this;
-    var promise = new Promise(function(success, error) {
+    var promise = new Promise(function(success) {
         var value = that.backingStore[key];
         if (!$A.util.isUndefinedOrNull(value)) {
             // Update the MRU
@@ -103,7 +103,7 @@ MemoryStorageAdapter.prototype.getItem = function(key) {
  */
 MemoryStorageAdapter.prototype.getAll = function() {
     var that = this;
-    var promise = new Promise(function(success, error) {
+    var promise = new Promise(function(success) {
         var store = that.backingStore;
         var values = [];
         for (var key in store) {
@@ -185,7 +185,7 @@ MemoryStorageAdapter.prototype.setItem = function(key, item) {
  */
 MemoryStorageAdapter.prototype.removeItem = function(key) {
     var that = this;
-    var promise = new Promise(function(success, error) {
+    var promise = new Promise(function(success) {
         // Update the MRU
         var value = that.backingStore[key];
 
@@ -212,7 +212,7 @@ MemoryStorageAdapter.prototype.removeItem = function(key) {
  */
 MemoryStorageAdapter.prototype.clear = function() {
     var that = this;
-    var promise = new Promise(function(success, error) {
+    var promise = new Promise(function(success) {
         that.backingStore = {};
         that.cachedSize = 0;
 
@@ -228,7 +228,7 @@ MemoryStorageAdapter.prototype.clear = function() {
  */
 MemoryStorageAdapter.prototype.getExpired = function() {
     var that = this;
-    var promise = new Promise(function(success, error) {
+    var promise = new Promise(function(success) {
         var now = new Date().getTime();
         var expired = [];
 
@@ -254,7 +254,7 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
     var that = this;
     var spaceReclaimed = 0;
 
-    var promise = new Promise(function(success, failure) {
+    var promise = new Promise(function(success) {
         if (spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
             success();
             return;
@@ -291,7 +291,7 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
  */
 MemoryStorageAdapter.prototype.getMRU = function() {
     var that = this;
-    return new Promise(function(success, error) {
+    return new Promise(function(success) {
         success(that.mru);
     });
 };

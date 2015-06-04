@@ -86,7 +86,7 @@
     /**
      * Throws error and show error dialog for failed assertion unless in production
      */
-    function devAssertError(level, message, e) {
+    function devAssertError(level, message) {
         $A.trace();
         
         if ($A.showErrors()) {

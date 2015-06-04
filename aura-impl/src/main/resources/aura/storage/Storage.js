@@ -303,7 +303,7 @@ AuraStorage.prototype.deleteStorage = function() {
     if (this.adapter.deleteStorage) {
         return this.adapter.deleteStorage();
     } else {
-        return new Promise(function(success, error) {
+        return new Promise(function(success) {
             that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement a deleteStorage, returning success");
             success();
         });

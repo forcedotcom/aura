@@ -73,7 +73,7 @@ ContextValueProvider.prototype.serializeForServer = function () {
  * @param {Object} values the new set of values to merge
  */
 ContextValueProvider.prototype.merge = function(values) {
-    for (key in values) {
+    for (var key in values) {
         if (values.hasOwnProperty(key)) {
             var value = values[key];
             var old = undefined;
@@ -114,10 +114,9 @@ ContextValueProvider.prototype.get = function(key) {
  * @public
  * @param {string} key - the name of the key (must exist and be writable)
  * @param {Object} value - the value to set
- * @param {Boolean} ignoreChanges - should we ignore changes for change notification.
  * @return {Object} the value that was set.
  */
-ContextValueProvider.prototype.set = function(key, value, ignoreChanges) {
+ContextValueProvider.prototype.set = function(key, value) {
     $A.assert(key.indexOf('.') == -1, "Unable to set value for key '" + key + "', did you add an extra '.'?");
     if ($A.util.isExpression(value)) {
         throw new Error("Unable to set global value '"+key+"' to the expression '"+value+"'. Global items must be constants");

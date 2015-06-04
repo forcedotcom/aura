@@ -25,7 +25,7 @@ function ObjectValueProvider() {
 /**
  * returns $GVP values
  */
-ObjectValueProvider.prototype.getValues = function(values) {
+ObjectValueProvider.prototype.getValues = function() {
     return this.values;
 };
 

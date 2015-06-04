@@ -40,14 +40,14 @@ InvalidComponent.prototype.getDef = function() {
 /**
  * @protected
  */
-InvalidComponent.prototype.index = function(localId, globalId){
+InvalidComponent.prototype.index = function(){
     this.raiseInvalidComponentError("index", arguments);
 };
 
 /**
  * @protected
  */
-InvalidComponent.prototype.deIndex = function(localId, globalId){
+InvalidComponent.prototype.deIndex = function(){
     // Unfortunately, there are some bizarre loops with deIndex and destroy.
     // For the moment, we don't enforce that this is a valid component until
     // we can track down _why_ it is being called on already destroyed components
@@ -57,14 +57,14 @@ InvalidComponent.prototype.deIndex = function(localId, globalId){
 /**
  * @public
  */
-InvalidComponent.prototype.find = function(name){
+InvalidComponent.prototype.find = function(){
     this.raiseInvalidComponentError("find", arguments);
 };
 
 /**
  * @private
  */
-InvalidComponent.prototype.findInstancesOf = function(type, ret, cmp){
+InvalidComponent.prototype.findInstancesOf = function(){
     this.raiseInvalidComponentError("findInstancesOf", arguments);
 };
 
@@ -79,11 +79,11 @@ InvalidComponent.prototype.getSuperest = function(){
  *
  * @private
  */
-InvalidComponent.prototype.findInstanceOf = function(type){
+InvalidComponent.prototype.findInstanceOf = function(){
     this.raiseInvalidComponentError("findInstanceOf", arguments);
 };
 
-InvalidComponent.prototype.isInstanceOf = function(name){
+InvalidComponent.prototype.isInstanceOf = function(){
     this.raiseInvalidComponentError("isInstanceOf", arguments);
 };
 
@@ -91,21 +91,21 @@ InvalidComponent.prototype.isInstanceOf = function(name){
  * @param {Object} type Applies the type to its definition.
  * @private
  */
-InvalidComponent.prototype.implementsDirectly = function(type){
+InvalidComponent.prototype.implementsDirectly = function(){
     this.raiseInvalidComponentError("implementsDirectly", arguments);
 };
 
 /**
  * @public
  */
-InvalidComponent.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert){
+InvalidComponent.prototype.addHandler = function(){
     this.raiseInvalidComponentError("addHandler", arguments);
 };
 
 /**
  * @public
  */
-InvalidComponent.prototype.addValueHandler = function(config){
+InvalidComponent.prototype.addValueHandler = function(){
     this.raiseInvalidComponentError("addValueHandler", arguments);
 };
 
@@ -118,7 +118,7 @@ InvalidComponent.prototype.finishDestroy = function(){
 /**
  * @public
  */
-InvalidComponent.prototype.destroy = function(async){
+InvalidComponent.prototype.destroy = function(){
 };
 
 /**
@@ -131,7 +131,7 @@ InvalidComponent.prototype.isRendered = function() {
 /**
  * @private
  */
-InvalidComponent.prototype.setUnrendering = function(unrendering) {
+InvalidComponent.prototype.setUnrendering = function() {
     this.raiseInvalidComponentError("setUnrendering", arguments);
 };
 
@@ -146,7 +146,7 @@ InvalidComponent.prototype.isUnrendering = function() {
 /**
  * @protected
  */
-InvalidComponent.prototype.setRendered = function(rendered) {
+InvalidComponent.prototype.setRendered = function() {
     this.raiseInvalidComponentError("setRendered", arguments);
 };
 
@@ -186,7 +186,7 @@ InvalidComponent.prototype.getSuper = function(){
 /**
  * @protected
  */
-InvalidComponent.prototype.associateElement = function(config){
+InvalidComponent.prototype.associateElement = function(){
     this.raiseInvalidComponentError("associateElement", arguments);
 };
 
@@ -207,14 +207,14 @@ InvalidComponent.prototype.getElement = function(){
 /**
  * @public
  */
-InvalidComponent.prototype.get = function(key){
+InvalidComponent.prototype.get = function(){
     this.raiseInvalidComponentError("get", arguments);
 };
 
 /**
  * @public
  */
-InvalidComponent.prototype.set = function (key, value) {
+InvalidComponent.prototype.set = function () {
     this.raiseInvalidComponentError("set", arguments);
 };
 
@@ -249,21 +249,21 @@ InvalidComponent.prototype.getModel = function(){
 /**
  * @public
  */
-InvalidComponent.prototype.getEvent = function(name) {
+InvalidComponent.prototype.getEvent = function() {
     this.raiseInvalidComponentError("getEvent", arguments);
 };
 
 /**
  * @protected
  */
-InvalidComponent.prototype.getEventByDescriptor = function(descriptor) {
+InvalidComponent.prototype.getEventByDescriptor = function() {
     this.raiseInvalidComponentError("getEventByDescriptor", arguments);
 };
 
 /**
  * @private
  */
-InvalidComponent.prototype.fire = function(name) {
+InvalidComponent.prototype.fire = function() {
     this.raiseInvalidComponentError("fire", arguments);
 };
 

@@ -20,7 +20,7 @@
 	<aura:import library="ui:dragAndDropLib" property="lib" />
 	
 	<aura:attribute name="types" type="String[]" default="move" description="Supported operation types: can be either copy, link, or move."/>
-	<aura:attribute name="dragOverInterval" type="Integer"  default="500" description="Interval in milliseconds for how often dragOver event will be fired."/>
+	<aura:attribute name="dragOverInterval" type="Integer" default="500" description="Interval in milliseconds for how often dragOver event will be fired."/>
 	
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to the component."/>
 	<aura:attribute name="dragOverClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged over."/>

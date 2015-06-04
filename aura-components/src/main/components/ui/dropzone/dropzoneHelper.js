@@ -97,7 +97,7 @@
 			// Throttle and fire dragOver
 			var dragOverInterval = component.get("v.dragOverInterval");
 			if (!$A.util.isNumber(dragOverInterval) || dragOverInterval < 100) {
-				dragOverInterval = 500;
+				dragOverInterval = 100;
 			}
 			
 			if (!component.$dragOperation$) {

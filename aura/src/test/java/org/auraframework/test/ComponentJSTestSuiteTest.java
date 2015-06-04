@@ -133,7 +133,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         private final DefDescriptor<TestSuiteDef> descriptor;
 
         private ComponentTestSuite(TestSuiteDef suiteDef) {
-            super(String.format("%s:%s", suiteDef.getDescriptor().getNamespace(), suiteDef.getDescriptor().getName()));
+            super(String.format("%s.%s", suiteDef.getDescriptor().getNamespace(), suiteDef.getDescriptor().getName()));
 
             this.descriptor = suiteDef.getDescriptor();
             for (TestCaseDef caseDef : suiteDef.getTestCaseDefs()) {

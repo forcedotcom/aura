@@ -91,7 +91,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                     ComponentConfig config = providerDef.provide(intfDescriptor);
                     if (config != null) {
                         ProviderDef remoteProviderDef = root.getProviderDef();
-                        if (remoteProviderDef == null || remoteProviderDef.isLocal()) {
+                        if (remoteProviderDef == null || remoteProviderDef.isLocal() || config.getShouldSerializeToClient()) {
                             hasLocalDependencies = true;
                         }
 

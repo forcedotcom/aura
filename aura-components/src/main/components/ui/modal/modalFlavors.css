@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-.THIS .panel {
+.THIS .modal-container {
     width: 50%;
     max-width: 640px;
     min-width: 480px;
 }
 
-.THIS--large .panel {
+.THIS .modal-header .title {
+    padding: 1.5rem 1rem;
+}
+
+.THIS--large .modal-container {
     width: 90%;
     max-width: 960px;
     min-width: 640px;

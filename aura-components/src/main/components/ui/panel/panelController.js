@@ -33,6 +33,11 @@
         helper.close(cmp, callback);
     },
 
+    update: function(cmp, event, helper) {
+        var args = event.getParam && event.getParam('arguments');
+        helper.lib.panelLibCore.updatePanel(cmp, args.body, args.callback);
+    },
+
     setActive: function(cmp, event, helper) {
         helper.lib.panelLibCore.setActive(cmp, event.getParam('arguments').active);
     },

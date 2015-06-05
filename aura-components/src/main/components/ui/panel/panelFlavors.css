@@ -13,6 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+.THIS.positioned {
+    border: 1px solid #d8dde6;
+    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+}
+
+.THIS .panel-header .title {
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
 .THIS--full-screen {
     position: fixed;
     top: 0;

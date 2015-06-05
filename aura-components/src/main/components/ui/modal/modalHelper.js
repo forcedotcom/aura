@@ -68,12 +68,6 @@
         });
     },
 
-    update: function(cmp, content, callback) {
-        //TODO: need more work
-        cmp.set('v.body', content);
-        callback && callback();
-    },
-
     mask: function(cmp) {
         var mask = cmp.find('modal-glass').getElement();
         $A.util.addClass(mask, 'fadeIn');

@@ -105,21 +105,21 @@ public class ClientComponentClass {
     }
 
     private void writeComponentClass(BaseComponentDef def, Appendable out) throws IOException, QuickFixException {
-        final DefDescriptor<? extends BaseComponentDef> descriptor = def.getDescriptor();
-        final DefDescriptor<? extends BaseComponentDef> extendsDescriptor = def.getExtendsDescriptor();
-        final String className = escapeStringForScript(String.format("%s$%s", descriptor.getNamespace(), descriptor.getName()));
-        BaseComponentDef superDef = null;
-
-        if(extendsDescriptor != null) {
-            superDef = extendsDescriptor.getDef();
-        } else if(!def.getDescriptor().getQualifiedName().equals("markup://aura:component")) {
-            superDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
-        }
-
-        DefDescriptor<? extends BaseComponentDef> superDescriptor = superDef != null ? superDef.getDescriptor() : null;
-        String superClassName = superDescriptor != null ? escapeStringForScript(String.format("%s$%s", superDescriptor.getNamespace(), superDescriptor.getName())) : "$A.Component";
-
-        // DCHASMAN TODO Find the closest non-empty implementation of each method and jump directly to that to reduce call stack depth
+    	final DefDescriptor<? extends BaseComponentDef> descriptor = def.getDescriptor();
+    	final DefDescriptor<? extends BaseComponentDef> extendsDescriptor = def.getExtendsDescriptor();
+		final String className = escapeStringForScript(String.format("%s$%s", descriptor.getNamespace(), descriptor.getName()));
+		BaseComponentDef superDef = null;
+		
+		if(extendsDescriptor != null) {
+			superDef = extendsDescriptor.getDef();
+		} else if(!def.getDescriptor().getQualifiedName().equals("markup://aura:component")) {
+			superDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
+		}
+		
+    	DefDescriptor<? extends BaseComponentDef> superDescriptor = superDef != null ? superDef.getDescriptor() : null;
+		final String superClassName = superDescriptor != null ? escapeStringForScript(String.format("%s$%s", superDescriptor.getNamespace(), superDescriptor.getName())) : "$A.Component";
+		final String superFullyQualifiedDescriptor = superDescriptor != null ? superDescriptor.getQualifiedName() : "markup://aura:component";
+		// DCHASMAN TODO Find the closest non-empty implementation of each method and jump directly to that to reduce call stack depth 
 
         final String[] methodNames = new String[] { "render", "rerender", "afterRender", "unrender" };
         final List<JsFunction> renderMethods = Lists.newArrayList();
@@ -186,6 +186,8 @@ public class ClientComponentClass {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradev:componentClass", ComponentDef.class);
         Map<String, Object> attributes = Maps.newHashMap();
+        attributes.put("fullyQualifiedName", descriptor.getQualifiedName());
+        attributes.put("superFullyQualifiedName", superFullyQualifiedDescriptor);
         attributes.put("className", className);
         attributes.put("superClassName", superClassName);
         attributes.put("helperProperties", !helperProperties.isEmpty() ? helperProperties : null);

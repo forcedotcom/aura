@@ -23,7 +23,7 @@
 	
 	testRenderDefAreTheSame : {
 		test: function(testCmp) {
-			var cc = $A.componentService.getComponentClass("auratest$componentClassParent");
+			var cc = $A.componentService.getComponentClass("markup://auratest:componentClassParent");
 			var cmpDef = testCmp.getDef();
 			var fromComponentClass = cc.prototype.render;
 			var fromComopnentDef = cmpDef.getRendererDef()["renderMethod"];
@@ -34,7 +34,7 @@
 	
 	testReRenderDefAreTheSame : { 
 		test: function(testCmp) {
-			var cc = $A.componentService.getComponentClass("auratest$componentClassParent");
+			var cc = $A.componentService.getComponentClass("markup://auratest:componentClassParent");
 			var cmpDef = testCmp.getDef();
 			
 			var fromComponentClass = cc.prototype.rerender;
@@ -46,7 +46,7 @@
 	
 	testAfterRenderDefAreTheSame : { 
 		test: function(testCmp) {
-			var cc = $A.componentService.getComponentClass("auratest$componentClassParent");
+			var cc = $A.componentService.getComponentClass("markup://auratest:componentClassParent");
 			var cmpDef = testCmp.getDef();
 			
 			var fromComponentClass = cc.prototype.afterrerender;
@@ -58,7 +58,7 @@
 	
 	testUnRenderDefAreTheSame : { 
 		test: function(testCmp) {
-			var cc = $A.componentService.getComponentClass("auratest$componentClassParent");
+			var cc = $A.componentService.getComponentClass("markup://auratest:componentClassParent");
 			var cmpDef = testCmp.getDef();
 			
 			var fromComponentClass = cc.prototype.unrender;
@@ -71,7 +71,7 @@
 	//check component from $A.createComponent is instanceof what we get from componentClass
 	testCreateComponentReturnCorrectType : {
 		test: function(testCmp) {
-			var type="aura:text";
+			var type="markup://aura:text";
 			var attributes = null;
             $A.createComponent(type, attributes, function(targetComponent){
             	var cmpFromComponentClass = $A.componentService.getComponentClass(type);
@@ -83,7 +83,7 @@
 	//get a component with server dependency via $A.createComponent
 	testCreateComponentServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="auradev:quickFixButton"; 
+			var type="markup://auradev:quickFixButton"; 
 			var attributes = null;
 			var done = false;
 			var newComponent;
@@ -107,7 +107,7 @@
 	
 	testCreateComponentsReturnCorrectType : {
 		test: function(testCmp) {
-			var type="aura:text";
+			var type="markup://aura:text";
 			var attributes = null;
 			$A.createComponents([
 			                     [type, attributes],
@@ -127,7 +127,7 @@
 	
 	testNewComponentReturnCorrectType : {
 		test: function(testCmp) {
-			var type="aura:text";
+			var type="markup://aura:text";
 			var config = {
 	                componentDef: type,
 	                attributes: {
@@ -144,7 +144,7 @@
 	
 	testNewComponentServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="auradev:quickFixButton";
+			var type="markup://auradev:quickFixButton";
 			var config = {
 	                componentDef: type,
 	            }
@@ -173,7 +173,7 @@
 	
 	testNewComponentDeprecatedReturnCorrectType : {
 		test: function(testCmp) {
-			var type="aura:text";
+			var type="markup://aura:text";
 			var config = {
 	                componentDef: type,
 	                attributes: {
@@ -190,7 +190,7 @@
 	
 	testNewComponentDeprecatedServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-        	var type="auradev:quickFixButton";
+        	var type="markup://auradev:quickFixButton";
 			var config = {
 	                componentDef: type,
 	            }
@@ -219,7 +219,7 @@
 	
 	testNewComponentAsyncReturnCorrectType : {
 		test: function(testCmp) {
-			var type="aura:text";
+			var type="markup://aura:text";
 			$A.componentService.newComponentAsync(
 	                this,
 	                function(newCmp){
@@ -233,7 +233,7 @@
 	
 	testNewComponentAsyncServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="auradev:quickFixButton";
+			var type="markup://auradev:quickFixButton";
 			var done = false;
 			var newComponent;
 			$A.test.addWaitForWithFailureMessage(true,

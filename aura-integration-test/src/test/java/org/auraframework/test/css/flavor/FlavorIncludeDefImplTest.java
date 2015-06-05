@@ -45,16 +45,14 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
     }
 
     public void testComputeFilterMatches() throws Exception {
-        FlavorIncludeDef fi = source("<aura:use source='flavorTestAlt:flavorsAlt'/>");
+        FlavorIncludeDef fi = source("<aura:use source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
         Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> mapping = fi.computeFlavorMapping();
 
-        DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
-        DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp2", ComponentDef.class);
-        DefDescriptor<ComponentDef> sample3 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp3", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
 
-        DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorsAlt");
-        DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorsAlt");
-        DefDescriptor<FlavoredStyleDef> sample3Flavor = Flavors.customFlavorDescriptor(sample3, "flavorTestAlt", "flavorsAlt");
+        DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorIncludeDefTestFlavors");
+        DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorIncludeDefTestFlavors");
 
         assertEquals(3, mapping.row(sample1).size());
         assertEquals(sample1Flavor, mapping.get(sample1, "default"));
@@ -62,29 +60,23 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         assertEquals(sample1Flavor, mapping.get(sample1, "default3"));
 
         assertEquals(1, mapping.row(sample2).size());
-        assertEquals(sample2Flavor, mapping.get(sample2, "s1"));
-
-        assertEquals(1, mapping.row(sample3).size());
-        assertEquals(sample3Flavor, mapping.get(sample3, "neutral"));
-        assertNull(mapping.get(sample3, "default"));
+        assertEquals(sample2Flavor, mapping.get(sample2, "neutral"));
+        assertNull(mapping.get(sample2, "default"));
     }
 
     public void testAppendsDependencies() throws Exception {
-        FlavorIncludeDef fi = source("<aura:use source='flavorTestAlt:flavorsAlt'/>");
+        FlavorIncludeDef fi = source("<aura:use source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         fi.appendDependencies(dependencies);
 
-        DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
-        DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp2", ComponentDef.class);
-        DefDescriptor<ComponentDef> sample3 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp3", ComponentDef.class);
-        DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorsAlt");
-        DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorsAlt");
-        DefDescriptor<FlavoredStyleDef> sample3Flavor = Flavors.customFlavorDescriptor(sample3, "flavorTestAlt", "flavorsAlt");
+        DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
+        DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorIncludeDefTestFlavors");
+        DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorIncludeDefTestFlavors");
 
-        assertEquals(3, dependencies.size());
+        assertEquals(2, dependencies.size());
         assertTrue(dependencies.contains(sample1Flavor));
         assertTrue(dependencies.contains(sample2Flavor));
-        assertTrue(dependencies.contains(sample3Flavor));
     }
 
     public void testErrorsInInvalidSource() throws Exception {

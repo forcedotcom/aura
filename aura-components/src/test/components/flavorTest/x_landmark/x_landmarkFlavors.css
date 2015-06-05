@@ -1,0 +1,29 @@
+.THIS {
+  color: #777;
+}
+
+.THIS--flavorA { /* flavor */
+  color: red;
+}
+
+.THIS--flavorB { /* flavor */
+  color: green;
+}
+
+.THIS--flavorC { /* flavor */
+  color: blue;
+}
+
+.THIS--flavorD {  /* flavor */
+  color: yellow;
+}
+
+.THIS--flavorC__element {}
+
+.THIS--flavorC-special {} /* flavor */
+
+.THIS-something {}
+
+.THIS__element {}
+
+.THIS__element--modifier {}

@@ -1,3 +1,0 @@
-<aura:component>
-    <flavorTest:sampleCmp1 aura:id="target" aura:flavor="info, promotion"/>
-</aura:component>

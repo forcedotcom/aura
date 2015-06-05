@@ -39,7 +39,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
 
     /** basic loading of a standard flavor within the component bundle */
     public void testLoadStandardFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
         assertTrue("expected to find bundle flavor def", flavor.exists());
         flavor.getDef(); // no errors with loading
@@ -47,7 +47,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
 
     /** basic loading of a custom flavor within another namespace */
     public void testLoadCustomFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
         assertTrue("expected to find namespace flavor def", flavor.exists());
         flavor.getDef(); // no errors with loading
@@ -55,29 +55,44 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
 
     /** test that flavor names are found in the css file and stored */
     public void testGetFlavorNamesFromStandardFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
         Set<String> flavorNames = flavor.getDef().getFlavorNames();
 
-        assertEquals(5, flavorNames.size());
+        assertEquals("didn't get expected flavor names, found: " + flavorNames, 4, flavorNames.size());
         assertTrue(flavorNames.contains("default"));
-        assertTrue(flavorNames.contains("promotion"));
-        assertTrue(flavorNames.contains("info"));
-        assertTrue(flavorNames.contains("warning"));
-        assertTrue(flavorNames.contains("error"));
+        assertTrue(flavorNames.contains("flavorA"));
+        assertTrue(flavorNames.contains("flavorB"));
+        assertTrue(flavorNames.contains("flavorC"));
     }
 
     /** test that flavor names are found in the css file and stored */
     public void testGetFlavorNamesFromCustomFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
         Set<String> flavorNames = flavor.getDef().getFlavorNames();
 
-        assertEquals(4, flavorNames.size());
+        assertEquals("didn't get expected flavor names, found: " + flavorNames, 5, flavorNames.size());
         assertTrue(flavorNames.contains("default"));
-        assertTrue(flavorNames.contains("alternative"));
-        assertTrue(flavorNames.contains("amazing"));
-        assertTrue(flavorNames.contains("test"));
+        assertTrue(flavorNames.contains("flavorX"));
+        assertTrue(flavorNames.contains("flavorY"));
+        assertTrue(flavorNames.contains("flavorZ"));
+        assertTrue(flavorNames.contains("flavor0"));
+    }
+
+    /** test that we don't get confused from non-flavor class names */
+    public void testGetFlavorNamesVariations() throws Exception {
+        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
+        DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
+        Set<String> flavorNames = flavor.getDef().getFlavorNames();
+
+        assertEquals("didn't get expected flavor names, found: " + flavorNames, 6, flavorNames.size());
+        assertTrue(flavorNames.contains("default"));
+        assertTrue(flavorNames.contains("flavorA"));
+        assertTrue(flavorNames.contains("flavorB"));
+        assertTrue(flavorNames.contains("flavorC"));
+        assertTrue(flavorNames.contains("flavorC-special"));
+        assertTrue(flavorNames.contains("flavorD"));
     }
 
     /** references to a theme var add the namespace theme to the deps */

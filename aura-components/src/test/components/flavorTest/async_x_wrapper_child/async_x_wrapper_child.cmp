@@ -1,0 +1,5 @@
+<aura:component extends="flavorTest:async_x_wrapper">
+    <div>
+        Async Wrapper - Child
+    </div>
+</aura:component>

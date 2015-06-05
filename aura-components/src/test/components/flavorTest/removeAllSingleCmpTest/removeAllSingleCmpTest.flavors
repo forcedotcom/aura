@@ -1,3 +1,0 @@
-<aura:flavors>
-    <aura:flavor component="flavorTest:sampleCmp1" default="{!remove}"/>
-</aura:flavors>

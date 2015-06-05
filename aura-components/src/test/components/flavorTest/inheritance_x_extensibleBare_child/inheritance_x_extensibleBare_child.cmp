@@ -1,0 +1,3 @@
+<aura:component extends="flavorTest:inheritance_x_extensibleBare" description="inheritance test helper component: extends a cmp with no elements but has a flavorable element of its own">
+    <div aura:flavorable="true">Extensible Bare - Child</div>
+</aura:component>

@@ -140,7 +140,8 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         if (flavor != null) {
             // component must be flavorable (and by implication can't be an interface then)
             if (intfDescriptor == null) {
-                if (!descriptor.getDef().hasFlavorableChild()) {
+                ComponentDef def = descriptor.getDef();
+                if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild()) {
                     throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
                 }
             } else {

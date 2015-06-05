@@ -1,0 +1,5 @@
+<aura:component>
+    <div class="wrapper">
+        <div aura:flavorable="true">Overrides - flavor C only</div>
+    </div>
+</aura:component>

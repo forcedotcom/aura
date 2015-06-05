@@ -1,0 +1,3 @@
+<aura:component extends="flavorTest:inheritance_x_extensibleWrapper" description="inheritance test helper component: extends a cmp with a flavorable element but doesn't have any elements itself">
+    <!-- some components extend a parent but don't change markup (e.g., set attributes, add controller/rendering logic/etc...) -->
+</aura:component>

@@ -34,6 +34,7 @@ function ComponentDef(config) {
 
     this.superDef = this.initSuperDef(config["superDef"]);
     this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;
+    this.flavoredStyleDef = config["flavoredStyleDef"] ? new StyleDef(config["flavoredStyleDef"]) : undefined;
 
     this.controllerDef = config["controllerDef"] ? $A.componentService.createControllerDef(config["controllerDef"]) : undefined;
     this.modelDef = config["modelDef"] ? $A.componentService.createModelDef(config["modelDef"]) : undefined;
@@ -293,6 +294,16 @@ ComponentDef.prototype.getAllStyleDefs = function() {
 };
 
 /**
+ * Gets all the FlavoredStyleDef objects, including inherited ones, for this
+ * ComponentDef.
+ *
+ * @returns {StyleDef}
+ */
+ComponentDef.prototype.getAllFlavoredStyleDefs = function() {
+    return this.allFlavoredStyleDefs;
+};
+
+/**
  * Gets the CSS class name to use for Components of this type. Includes the
  * class names from all StyleDefs, including inherited ones, associated with
  * this ComponentDef. If multiple class names are found, the return value is a
@@ -319,6 +330,16 @@ ComponentDef.prototype.getStyleClassName = function() {
 
         }
         this.styleClassName = className;
+
+        // also load flavored styles if necessary
+        if (!this.isCSSPreloaded) {
+            var flavoredStyleDefs = this.getAllFlavoredStyleDefs();
+            if (flavoredStyleDefs) {
+                for (var i = 0, len = flavoredStyleDefs.length; i < len; i++) {
+                    flavoredStyleDefs[i].apply();
+                }
+            }
+        }
     }
     return className;
 };
@@ -593,6 +614,8 @@ ComponentDef.prototype.initRenderer = function() {
         rendererDef : this.rendererDef
     };
     this.allStyleDefs = [];
+    this.allFlavoredStyleDefs = [];
+
     var s = this.superDef;
     if (s) {
         if (!this.rendererDef) {
@@ -607,9 +630,16 @@ ComponentDef.prototype.initRenderer = function() {
         if (superStyles) {
             this.allStyleDefs = this.allStyleDefs.concat(superStyles);
         }
+        var superFlavoredStyles = s.getAllFlavoredStyleDefs();
+        if (superFlavoredStyles) {
+            this.allFlavoredStyleDefs = this.allFlavoredStyleDefs.concat(superFlavoredStyles);
+        }
     }
     if (this.styleDef) {
         this.allStyleDefs.push(this.styleDef);
+    }
+    if (this.flavoredStyleDef) {
+        this.allFlavoredStyleDefs.push(this.flavoredStyleDef);
     }
     if (!rd.rendererDef) {
         //

@@ -40,7 +40,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
-import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
@@ -58,7 +57,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -75,7 +74,6 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.InvalidValueSetTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -125,7 +123,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<ClientLibraryDef> clientLibraries;
     private final boolean hasFlavorableChild;
     private final String defaultFlavor;
-    
+
     private String clientComponentClass;
 
     private final int hashCode;
@@ -230,7 +228,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (ImportDef def : imports) {
             def.validateDefinition();
         }
-        
+
         for(MethodDef def : this.methodDefs.values()) {
         	def.validateDefinition();
         }
@@ -370,12 +368,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         			facet.parseValue(facetAttributeDef.getTypeDef());
         		} catch(InvalidExpressionException exception) {
                     // Kris:
-                    // This is going to fail a good handfull of things at the moment, I need to 
+                    // This is going to fail a good handfull of things at the moment, I need to
                     // Uncomment and test against the app before trying to check this in.
         			// Mode mode = Aura.getContextService().getCurrentContext().getMode();
         			// if(mode.isDevMode() || mode.isTestMode()) {
 	          //       	throw new InvalidValueSetTypeException(
-	          //       			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()), 
+	          //       			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()),
 	          //       			exception.getLocation());
         			// }
                 }
@@ -802,6 +800,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
+    public FlavoredStyleDef getFlavoredStyleDef() throws QuickFixException {
+        return flavorDescriptor == null ? null : flavorDescriptor.getDef();
+    }
+
+    @Override
     public DefDescriptor<T> getExtendsDescriptor() {
         return extendsDescriptor;
     }
@@ -960,7 +963,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             boolean preloaded = context.isPreloaded(getDescriptor());
             boolean preloading = context.isPreloading();
             final Mode mode = context.getMode();
-            
+
             if (preloaded) {
                 json.writeValue(descriptor);
             } else {
@@ -984,6 +987,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 */
 
                 json.writeMapEntry("styleDef", getStyleDef());
+                if (flavorDescriptor != null) {
+                    json.writeMapEntry("flavoredStyleDef", getFlavoredStyleDef());
+                }
+
                 json.writeMapEntry("controllerDef", getControllerDef());
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
@@ -1205,6 +1212,20 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public boolean hasFlavorableChild() {
         return hasFlavorableChild;
+    }
+
+
+    @Override
+    public boolean inheritsFlavorableChild() throws QuickFixException {
+        DefDescriptor<? extends BaseComponentDef> parent = this.extendsDescriptor;
+        while (parent != null) {
+            BaseComponentDef parentDef = parent.getDef();
+            if (parentDef.hasFlavorableChild()) {
+                return true;
+            }
+            parent = parentDef.getExtendsDescriptor();
+        }
+        return false;
     }
 
     @Override

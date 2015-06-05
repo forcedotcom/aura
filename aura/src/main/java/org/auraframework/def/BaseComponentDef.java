@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.def.design.DesignDef;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -87,6 +86,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     StyleDef getStyleDef() throws QuickFixException;
 
+    FlavoredStyleDef getFlavoredStyleDef() throws QuickFixException;
+
     List<AttributeDefRef> getFacets();
 
     Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;
@@ -147,14 +148,22 @@ public interface BaseComponentDef extends RootDefinition {
     DefDescriptor<ThemeDef> getCmpTheme();
 
     /**
-     * Returns true if this component has a child component def ref html element that has aura:flavorable.
+     * Returns true if this component has a child component def ref html element that has aura:flavorable. To check
+     * whether a parent component has a flavorable child, use {@link #inheritsFlavorableChild()} instead (or as well).
      *
      * @see FlavoredStyleDef
      */
     boolean hasFlavorableChild();
 
     /**
-     * Returns the default flavor name.
+     * Returns true if any super component has a child component def ref html element that has aura:flavorable. To check
+     * this component itself use {@link #hasFlavorableChild()} instead (or as well).
+     * @throws QuickFixException If there is a problem loading a parent def.
+     */
+    boolean inheritsFlavorableChild() throws QuickFixException;
+
+    /**
+     * Returns the explicitly specified default flavor name.
      *
      * @see FlavoredStyleDef
      *

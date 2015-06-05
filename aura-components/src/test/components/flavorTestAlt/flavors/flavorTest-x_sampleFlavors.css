@@ -1,0 +1,15 @@
+.THIS--default, .THIS--flavorX {
+  background: red;
+}
+
+.THIS--flavorY {
+  background: green;
+}
+
+.THIS--flavorZ, .THIS--flavor0 {
+  background: blue;
+}
+
+.THIS__icon { /* not a flavor but still allowed */
+  padding-left: 7px;
+}

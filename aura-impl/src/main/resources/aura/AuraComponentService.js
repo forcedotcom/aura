@@ -32,6 +32,7 @@ function AuraComponentService () {
     this.indexes = { globalId : {} };
     this.renderedBy = "auraRenderedBy";
     this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
+    this.flavorable = "auraFlavorable";
 
     // KRIS:
     // We delay the creation of the definition of a class till it's requested.

@@ -25,8 +25,8 @@ import org.auraframework.def.DefDescriptor;
 public class ComponentConfig {
 
     private DefDescriptor<ComponentDef> descriptor;
-
     private Map<String, Object> attributes;
+    private boolean shouldSerializeToClient = false;
 
     public void setDescriptor(DefDescriptor<ComponentDef> descriptor) {
         this.descriptor = descriptor;
@@ -48,4 +48,18 @@ public class ComponentConfig {
     public String toString() {
         return String.format("%s(%s)", this.getClass(), this.descriptor);
     }
+
+	public boolean getShouldSerializeToClient() {
+		return shouldSerializeToClient;
+	}
+
+	/**
+	 * Indicates that the component should always be serialized to the client when it's created on the server
+	 * regardless of whether or not it's client-side creatable. 
+	 * 
+	 * @param shouldSerializeToClient true if the component should be serialized to the client
+	 */
+	public void setShouldSerializeToClient(boolean shouldSerializeToClient) {
+		this.shouldSerializeToClient = shouldSerializeToClient;
+	}
 }

@@ -179,7 +179,7 @@
 		}
 		
 		var dropEffect = event.dataTransfer.dropEffect;
-		if ($A.util.isIE && dropEffect === "none") {
+		if (dropEffect === "none" && $A.util.isIE) {
 			// Don't return false right away, since IE always 
 			// returns "none" even though the drop has been performed
 			// successfully. This is not the right way to check

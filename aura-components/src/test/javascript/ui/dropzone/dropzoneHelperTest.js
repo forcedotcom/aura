@@ -87,6 +87,7 @@ Test.Components.Ui.Dropzone = function(){
 		var targetComponent = {
 			get : function(expression){
 				if(expression == "v.types"){return expectedTypes;}
+				if(expression == "v.dragOverInterval"){return 500;}
 			}
 		};
 		var targetEvent = {
@@ -98,6 +99,16 @@ Test.Components.Ui.Dropzone = function(){
 			preventDefault : function(){fired = true;}
 		};
 		var fired;
+		var mock$A = Mocks.GetMock(Object.Global(),"$A",{
+			util : {
+				isNumber : function(value) {return true;}
+			},
+			componentService : {
+				getRenderingComponentForElement : function(element) {return null;}
+			} 
+		});
+		var setTimeoutMock = Mocks.GetMock(Object.Global(), "setTimeout", function(callback, interval) {});
+		var fireDragOverMock = Mocks.GetMock(targetHelper, "fireDragOver", function(targetComponent, element) {});
 		
 		[Fact]
         function testResultDropzoneTypeEqualsAll(){
@@ -105,7 +116,14 @@ Test.Components.Ui.Dropzone = function(){
 			var expectedEffectAllowed = "all";
 			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
 			//Act
-			var result = targetHelper.handleDragOver(targetComponent, targetEvent);
+			var result;
+			mock$A(function() {
+				setTimeoutMock(function() {
+					fireDragOverMock(function() {
+						result = targetHelper.handleDragOver(targetComponent, targetEvent);
+					});
+				});
+			});
 			//Assert
 			Assert.False(result);
 			Assert.Equal(targetEvent.dataTransfer.dropEffect, expectedEffectAllowed);
@@ -117,7 +135,14 @@ Test.Components.Ui.Dropzone = function(){
 			var expectedEffectAllowed = "match";
 			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
 			//Act
-			var result = targetHelper.handleDragOver(targetComponent, targetEvent);
+			var result;
+			mock$A(function() {
+				setTimeoutMock(function() {
+					fireDragOverMock(function() {
+						result = targetHelper.handleDragOver(targetComponent, targetEvent);
+					});
+				});
+			});
 			//Assert
 			Assert.False(result);
 			Assert.Equal(targetEvent.dataTransfer.dropEffect, expectedEffectAllowed);
@@ -129,7 +154,14 @@ Test.Components.Ui.Dropzone = function(){
 			var expectedEffectAllowed = "match";
 			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
 			//Act
-			targetHelper.handleDragOver(targetComponent, targetEvent);
+			var result;
+			mock$A(function() {
+				setTimeoutMock(function() {
+					fireDragOverMock(function() {
+						result = targetHelper.handleDragOver(targetComponent, targetEvent);
+					});
+				});
+			});
 			//Assert
 			Assert.True(fired);
 		}
@@ -140,7 +172,14 @@ Test.Components.Ui.Dropzone = function(){
 			var expectedEffectAllowed = "different";
 			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
 			//Act
-			var result = targetHelper.handleDragOver(targetComponent, targetEvent);
+			var result;
+			mock$A(function() {
+				setTimeoutMock(function() {
+					fireDragOverMock(function() {
+						result = targetHelper.handleDragOver(targetComponent, targetEvent);
+					});
+				});
+			});
 			//Assert
 			Assert.True(result);
 		}		

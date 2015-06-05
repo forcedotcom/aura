@@ -44,14 +44,12 @@
              role="dialog"
              aria-labeledby="{!'title_' + globalId}">
 
-            <div aura:id="content" role="document" class="container">
+            <div aura:id="content" role="document" class="modal-container">
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
-                <header>
-                    <aura:If isTrue="{! v.title != '' &amp;&amp; v.title != null}">
-                        <div class="titles">
-                            <h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
-                        </div>
+                <header class="modal-header">
+                    <aura:If isTrue="{!!empty(v.title)}">
+                        <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                     </aura:If>
                     {!v.header}
                     <aura:if isTrue="{!v.showCloseButton}">
@@ -63,11 +61,11 @@
                     </aura:if>
                 </header>
 
-                <div aura:id="body" class="body">
+                <div aura:id="body" class="modal-body">
                     {!v.body}
                 </div>
 
-                <footer>
+                <footer class="modal-footer">
                     {!v.footer}
                 </footer>
             </div>

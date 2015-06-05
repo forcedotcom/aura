@@ -50,20 +50,19 @@
             <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
            	<header class="panel-header">
-                <aura:If isTrue="{! v.title != '' &amp;&amp; v.title != null}">
-                    <div class="titles">
-                        <h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
-                    </div>
+                <aura:If isTrue="{!!empty(v.title)}">
+                    <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                 </aura:If>
 
                  {!v.header}
 
                 <aura:if isTrue="{!v.showCloseButton}">
-                    <ui:button class="closeBtn" press="{!c.onCloseBtnPressed}"
+                    <ui:button class="closeBtn"
+                               press="{!c.onCloseBtnPressed}"
                                label="{!v.closeDialogLabel}"
                                buttonTitle="{!v.closeDialogLabel}"
-                               labelDisplay="false"
-                            >&times;</ui:button>
+                               labelDisplay="false">&times;
+                    </ui:button>
                 </aura:if>
             </header>
                 

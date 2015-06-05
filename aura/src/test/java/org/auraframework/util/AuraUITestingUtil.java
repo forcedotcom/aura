@@ -125,6 +125,24 @@ public class AuraUITestingUtil {
         String msg = "Element with locator \'" + locator.toString() + "\' never appeared";
         return waitForElement(msg, locator);
     }
+    
+    /**
+     * Waits for element to be not present
+     * @param locator By of element waiting to disapear
+     * @return 
+     */
+    public boolean waitForElementNotPresent(String msg, final By locator) {
+    	WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
+        return wait.withMessage(msg)
+                .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {
+
+                    @Override
+                    public Boolean apply(WebDriver d) {
+                        WebElement element = driver.findElement(locator);
+                        return element == null ? true : false;
+                    }
+                });
+    }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {
         String locatorTemplate = "input[class*='%s']";

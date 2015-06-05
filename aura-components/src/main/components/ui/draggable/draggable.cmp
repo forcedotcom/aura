@@ -27,6 +27,7 @@
 	<aura:attribute name="dragAccessibilityClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged in accessibility mode. It's defaulted to dragClass attribute if it's unspecified."/>
 	<aura:attribute name="dragImageClass" type="String" default="" description="Additional CSS style to be attached to drag image. This is only supported on Webkit based browsers and Firefox. Note that different browser will render differently."/>
 	
+	<aura:attribute name="disable" type="Boolean" default="false" description="Set to true to disable draggable or false otherwise."/>
 	<aura:attribute name="ariaGrabbed" type="boolean" default="false" access="private" description="Indicate a draggable component."/>
 	<aura:attribute name="accessibilityComponent" type="String" description="Accessibility component's global Id for this draggable component. Must be of type ui:dragAndDropAccessibility."/>
 	
@@ -45,7 +46,7 @@
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
-    <div draggable="true" aria-grabbed="{!v.ariaGrabbed}" class="{!v.class}" tabIndex="0">
+    <div draggable="{!not(v.disable)}" aria-grabbed="{!v.ariaGrabbed}" class="{!v.class}" tabIndex="0">
 	    {!v.body}
     </div>
     

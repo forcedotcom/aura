@@ -53,10 +53,10 @@ Test.Components.Ui.Draggable = function(){
 			getGlobalId : function(){}
 		};
 		var enterDragOperationMock = Mocks.GetMock(targetHelper, "enterDragOperation", function(targetComponent) {});
-		var isCustomDragImageSupported = Mocks.GetMock(targetHelper, "isCustomDragImageSupported", function() { return false; });
 		var mock$A = Mocks.GetMock(Object.Global(),"$A",{
 			util : {
-				isUndefinedOrNull : function(value) {return true;}
+				isUndefinedOrNull : function(value) {return true;},
+				isEmpty: function(value) {return true;}
 			}
 		});
 
@@ -71,10 +71,8 @@ Test.Components.Ui.Draggable = function(){
 			};		
 			//Act
 			mock$A(function() {
-				isCustomDragImageSupported(function() {
-					enterDragOperationMock(function() {
-						targetHelper.handleDragStart(targetComponent, targetEvent);
-					});
+				enterDragOperationMock(function() {
+					targetHelper.handleDragStart(targetComponent, targetEvent);
 				});
 			});
 			//Assert

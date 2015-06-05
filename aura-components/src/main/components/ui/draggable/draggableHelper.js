@@ -13,15 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	isCustomDragImageSupported: function() {
-		var browser = $A.get("$Browser");
-		if (browser.isWEBKIT || browser.isFIREFOX) {
-			return true;
-		}
-		return false;
-	},
-	
+({	
 	resetCssClass: function(component) {
 		var cssClass = component.get("v.class").trim();
 		var dragClass = component.get("v.dragClass").trim();
@@ -107,14 +99,12 @@
 		}
 		
 		// Set custom dragImage
-		if (this.isCustomDragImageSupported()) {
-			var dragImageClass = component.get("v.dragImageClass");
-			if (!$A.util.isEmpty(dragImageClass)) {
-				if (typeof event.dataTransfer.setDragImage === "function") {
-					var offsetX = 15, offsetY = 15;
-					var dragImage = this.createDragImage(component, event.pageX, event.pageY, offsetX, offsetY);
-					event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
-				}
+		var dragImageClass = component.get("v.dragImageClass");
+		if (!$A.util.isEmpty(dragImageClass)) {
+			if (typeof event.dataTransfer.setDragImage === "function") {
+				var offsetX = 15, offsetY = 15;
+				var dragImage = this.createDragImage(component, event.pageX, event.pageY, offsetX, offsetY);
+				event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 			}
 		}
 		

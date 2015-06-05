@@ -25,7 +25,7 @@
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
 	<aura:attribute name="dragClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged."/>
 	<aura:attribute name="dragAccessibilityClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged in accessibility mode. It's defaulted to dragClass attribute if it's unspecified."/>
-	<aura:attribute name="dragImageClass" type="String" default="" description="Additional CSS style to be attached to drag image. This is only supported on Webkit based browsers and Firefox. Note that different browser will render differently."/>
+	<aura:attribute name="dragImageClass" type="String" default="" description="Additional CSS style to be attached to drag image. Note that different browsers will render differently."/>
 	
 	<aura:attribute name="disable" type="Boolean" default="false" description="Set to true to disable draggable or false otherwise."/>
 	<aura:attribute name="ariaGrabbed" type="boolean" default="false" access="private" description="Indicate a draggable component."/>

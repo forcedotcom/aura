@@ -110,6 +110,7 @@
     position: function(cmp, referenceEl) {
 
         var direction = cmp.get('v.direction'), 
+            showPointer = cmp.get('v.showPointer'),
             align, 
             targetAlign, 
             pointer,
@@ -118,7 +119,9 @@
         
         cmp.getElement().classList.add('positioned');
         cmp.getElement().classList.add(direction);
-        pointer = cmp.find('pointer').getElement();
+        if(showPointer) {
+            pointer = cmp.find('pointer').getElement();
+        }
 
         switch (direction) {
             case 'north':
@@ -175,16 +178,18 @@
                 pad: 5
             }));
 
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                element:pointer,
-                target:referenceEl,
-                align: align,
-                targetAlign: targetAlign,
-                enable: true,
-                pad: pointerPad
-            }));
+            if(pointer) {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:referenceEl,
+                    align: align,
+                    targetAlign: targetAlign,
+                    enable: true,
+                    pad: pointerPad
+                }));
+            }
 
-            if(direction === 'east') {
+            if(pointer && direction === 'east') {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:pointer,
                     target:cmp.getElement(),
@@ -195,7 +200,7 @@
                 }));
             }
 
-            if(direction === 'west') {
+            if(pointer && direction === 'west') {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:pointer,
                     target:cmp.getElement(),
@@ -206,14 +211,17 @@
                 }));
             }
             
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                element:pointer,
-                target:cmp.getElement(),
-                type:'bounding box',
-                enable: true,
-                boxDirections: bbDirections,
-                pad: 5
-            }));
+            if(pointer) {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    type:'bounding box',
+                    enable: true,
+                    boxDirections: bbDirections,
+                    pad: 5
+                }));
+            }
+            
 
             this.positioningLib.panelPositioning.reposition();
         } else {

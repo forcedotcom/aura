@@ -267,3 +267,203 @@ div.THIS.phone .scroller {
         text-align: right;
     }
 }
+
+/* medium size on desktop */
+div.THIS.medium {
+	max-width: 300px;
+}
+
+.THIS.medium .headerBar {
+    box-shadow: 0 1px 2px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.21);
+    border-radius: 6px 6px 0 0;
+    font-size: 10px;
+    height: 30px;
+}
+
+.THIS.medium .headerBar a {    
+    margin-top: 5px;
+    padding: 0 10px;
+}
+
+.THIS.medium .headerBar .calCancel {
+    margin-left: 8px;
+    height: 20px;
+    line-height: 22px !important;
+}
+
+.THIS.medium .headerBar .calSet {
+    margin-right: 8px;
+    height: 20px;
+    line-height: 22px !important;
+}
+
+.THIS.medium .headerBar a.button {
+	border-radius: 4px;
+}
+
+.THIS.medium .dateBar .navLink {
+    height: 15px;    
+    width: 19px;    
+}
+
+.THIS.medium .dateBar {
+    padding: 10px 10px 5px 10px;
+}
+
+.THIS.medium .dateBar .prevYear {
+    background-position: 4px 4px;
+    margin-left: 4px;
+}
+
+.THIS.medium .dateBar .navLink.prevYear:hover,
+.THIS.medium .dateBar .navLink.prevYear:focus {
+    background-position: 4px -26px;
+}
+
+.THIS.medium .dateBar .navLink.prevMonth:hover,
+.THIS.medium .dateBar .navLink.prevMonth:focus {
+    background-position: -29px -26px;
+}
+
+.THIS.medium .dateBar .prevMonth {
+    background-position: -29px 4px;
+}
+
+.THIS.medium .dateBar .nextMonth {
+    background-position: -66px 4px;
+}
+
+.THIS.medium .dateBar .navLink.nextMonth:hover,
+.THIS.medium .dateBar .navLink.nextMonth:focus {
+    background-position: -66px -26px;
+}
+
+.THIS.medium .dateBar .navLink.nextYear:hover,
+.THIS.medium .dateBar .navLink.nextYear:focus {
+    background-position: -98px -26px;
+}
+
+.THIS.medium .dateBar .nextYear {
+	background-position: -98px 4px;
+    margin-right: 4px;
+}
+
+.THIS.medium .dateBar .monthYear, .THIS .dateBar .monthYear span {
+    font-size: 13px;    
+    line-height: 18px !important;
+}
+
+.THIS.medium .dateBar select {
+	font-size: 13px;
+	line-height: 18px !important;
+	padding: 0 0 0 4x;
+}
+
+.THIS.medium .buttonBar {    
+    padding: 5px;
+}
+
+.THIS.medium .buttonBar .calToday {
+    font-size: 13px;
+	line-height: 18px !important;
+}
+
+/* small size on desktop */
+div.THIS.small {
+	max-width: 200px;
+}
+
+.THIS.small .headerBar {
+    box-shadow: 0 1px 1px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.21);
+    border-radius: 4px 4px 0 0;
+    font-size: 8px;
+    height: 20px;
+}
+
+.THIS.small .headerBar a {    
+    margin-top: 3px;
+    padding: 0 8px;
+}
+
+.THIS.small .headerBar .calCancel {
+    margin-left: 6px;
+    height: 13px;
+    line-height: 15px !important;
+}
+
+.THIS.small .headerBar .calSet {
+    margin-right: 6px;
+    height: 13px;
+    line-height: 15px !important;
+}
+
+.THIS.small .headerBar a.button {
+	border-radius: 2px;
+}
+
+.THIS.small .dateBar .navLink {
+    height: 12px;    
+    width: 16px;    
+}
+
+.THIS.small .dateBar {
+    padding: 6px 6px 3px 6px;
+}
+
+.THIS.small .dateBar .prevYear {
+    background-position: 3px 2px;
+    margin-left: 2px;
+}
+
+.THIS.small .dateBar .navLink.prevYear:hover,
+.THIS.small .dateBar .navLink.prevYear:focus {
+    background-position: 3px -28px;
+}
+
+.THIS.small .dateBar .prevMonth {
+    background-position: -30px 2px;
+}
+
+.THIS.small .dateBar .navLink.prevMonth:hover,
+.THIS.small .dateBar .navLink.prevMonth:focus {
+    background-position: -30px -27px;
+}
+
+.THIS.small .dateBar .nextMonth {
+    background-position: -69px 2px;
+}
+
+.THIS.small .dateBar .navLink.nextMonth:hover,
+.THIS.small .dateBar .navLink.nextMonth:focus {
+    background-position: -69px -28px;
+}
+
+.THIS.small .dateBar .nextYear {
+	background-position: -100px 2px;
+    margin-right: 2px;
+}
+
+.THIS.small .dateBar .navLink.nextYear:hover,
+.THIS.small .dateBar .navLink.nextYear:focus {
+    background-position: -100px -28px;
+}
+
+.THIS.small .dateBar .monthYear, .THIS .dateBar .monthYear span {
+    font-size: 10px;    
+    line-height: 15px !important;
+}
+
+.THIS.small .dateBar select {
+	font-size: 10px;
+	line-height: 15px !important;
+	padding: 0 0 0 3x;
+}
+
+.THIS.small .buttonBar {    
+    padding: 3px;
+}
+
+.THIS.small .buttonBar .calToday {
+    font-size: 10px;
+	line-height: 15px !important;
+}

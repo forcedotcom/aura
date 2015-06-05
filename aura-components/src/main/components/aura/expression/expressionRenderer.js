@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	render : function(component, helper) {
+	render : function(component) {
 		var value = component.get("v.value");
         if($A.util.isUndefinedOrNull(value)){
             value = "";
@@ -26,7 +26,7 @@
         return $A.renderingService.renderFacet(component,value);
 	},
 
-	rerender : function(component, helper) {
+	rerender : function(component) {
         var ret=[];
 		if (component.isRendered()) {
             var value = component.get("v.value");
@@ -48,7 +48,7 @@
         return ret;
     },
 
-	unrender : function(component, helper) {
+	unrender : function(component) {
         $A.renderingService.unrenderFacet(component);
         if (component._lastRenderedValue) {
             component._lastRenderedValue.destroy();
@@ -56,7 +56,7 @@
         }
 	},
 
-	afterRender : function(component, helper) {
+	afterRender : function(component) {
 		var value = component.get("v.value");
 		if ($A.util.isComponent(value)||$A.util.isArray(value)) {
 			$A.afterRender(value);

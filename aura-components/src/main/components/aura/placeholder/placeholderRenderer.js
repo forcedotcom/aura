@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 ({
-    render:function(cmp){
+    render:function(){
         var ret=this.superRender();
         return ret;
     },
 
-    rerender:function(cmp){
+    rerender:function(){
         return this.superRerender();
     },
 

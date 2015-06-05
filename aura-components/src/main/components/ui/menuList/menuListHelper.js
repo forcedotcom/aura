@@ -15,15 +15,17 @@
  */
 ({
     setEventHandlersOnChildren: function(component) {
+    	var concrete = component.getConcreteComponent();
         var children = [];
-        this.setHandlersOnMenuItems(component, component.get("v.body"), children);
+
+        this.setHandlersOnMenuItems(concrete, concrete.get("v.body"), children);
 
         var items = component.find("item");
         if (items && $A.util.isArray(items)) {
-            this.setHandlersOnMenuItems(component, items, children);
+            this.setHandlersOnMenuItems(concrete, items, children);
         }
 
-        component.set("v.childMenuItems", children);
+        concrete.set("v.childMenuItems", children);
     },
 
     setHandlersOnMenuItems: function(component, items, children) {
@@ -103,23 +105,23 @@
     	var helper = this;
     	if (!component._keyboardEventHandler) {
     		component._keyboardEventHandler = function(event) {
-		        var concreteCmp = component.getConcreteComponent();
-		        if (event.type === "keydown") {
-		            if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
-		                event.preventDefault();
-		                helper.setFocusToNextItem(concreteCmp, event);
-		            } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
-		                event.preventDefault();
-		                helper.setFocusToPreviousItem(concreteCmp, event);
-		            } else if (event.keyCode === 27) {  // Esc key
-		                event.stopPropagation();
-		                helper.handleEsckeydown(concreteCmp, event);
-		            } else if (event.keyCode === 9) {  // tab key: dismiss the menu
-		                helper.handleTabkeydown(concreteCmp, event);
-		            } else {
-		                helper.setFocusToTypingChars(concreteCmp, event);
-		            }
-		        }
+    			var concreteCmp = component.getConcreteComponent();
+    			if (event.type === "keydown") {
+    				if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
+    					event.preventDefault();
+    					helper.setFocusToNextItem(concreteCmp, event);
+    				} else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
+    					event.preventDefault();
+    					helper.setFocusToPreviousItem(concreteCmp, event);
+    				} else if (event.keyCode === 27) {  // Esc key
+    					event.stopPropagation();
+    					helper.handleEsckeydown(concreteCmp, event);
+    				} else if (event.keyCode === 9) {  // tab key: dismiss the menu
+    					helper.handleTabkeydown(concreteCmp, event);
+    				} else {
+    					helper.setFocusToTypingChars(concreteCmp, event);
+    				}
+    			}
     		}
     	}
     	return component._keyboardEventHandler;

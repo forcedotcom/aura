@@ -15,12 +15,14 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.setKeyboardEventHandlers(component);
-        helper.setEventHandlersOnChildren(component);
+    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+        
+    	_helper.setKeyboardEventHandlers(component);
+        _helper.setEventHandlersOnChildren(component);
 
         var ret = this.superAfterRender();
 
-        helper.setFocus(component, false);
+        _helper.setFocus(component, false);
 
         return ret;
     },
@@ -41,7 +43,8 @@
     },
 
     unrender: function(component, helper) {
-    	helper.removeKeyboardEventHandlers(component);
+    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+    	_helper.removeKeyboardEventHandlers(component);
         return this.superUnrender();
     }
 })

@@ -14,35 +14,11 @@
  * limitations under the License.
  */
 ({
-	init : function(cmp) {
-		if (cmp.get("v.panelHeader").length == 0) {
-			var defaultCustomHeader = $A.newCmp({
-	    		componentDef: "markup://ui:outputText",
-	    		attributes: {
-	    			values: {
-	    				"class": "defaultCustomPanelHeader",
-	    				value: "This is a default custom panel header"
-	    			}
-	    		}
-			});
-			cmp.set("v.panelHeader", defaultCustomHeader);
-		}
-		
-		if (cmp.get("v.panelFooter").length == 0) {
-			var defaultCustomFooter = $A.newCmp({
-	    		componentDef: "markup://ui:outputText",
-	    		attributes: {
-	    			values: {
-	    				"class": "defaultCustomPanelFooter",
-	    				value: "This is a default custom panel footer"
-	    			}
-	    		}
-			});
-			cmp.set("v.panelFooter", defaultCustomFooter);
-		}
+	init : function(cmp, event, helper) {
+		helper.createHeaderFooterInstance(cmp);
 	},
 	
-	createPanel : function(cmp) {
+	createPanel : function(cmp, event, helper) {
 		var config = {};
 		var type = cmp.get("v.panelType");
 		var panelTitle = cmp.get("v.title")
@@ -82,7 +58,7 @@
 		config["autoFocus"] = $A.util.getBooleanValue(cmp.get("v.autoFocus"));
 		config["class"] = cmp.get("v.class");
 		config["flavor"] = cmp.get("v.flavor");
-		       
+		helper.createHeaderFooterInstance(cmp, true);
 		var useHeader = $A.util.getBooleanValue(cmp.get("v.useHeader"));
 		var panelHeader = cmp.get("v.panelHeader");
 		if (useHeader && panelHeader.length > 0) {
@@ -122,7 +98,6 @@
 			}]);
 		}
 		config["body"] = panelBody;
-		
 		// create panel
 		$A.get("e.ui:createPanel").setParams({
 			panelType: type,

@@ -17,11 +17,11 @@
 Function.RegisterNamespace("Test.Components.Ui.Draggable");
 
 [Fixture]
-Test.Components.Ui.Draggable = function(){
+Test.Components.Ui.Draggable.HelperTest = function(){
 	var targetHelper;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("ui.draggable.draggableHelper",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/draggable/draggableHelper.js",function(path,result){
 		targetHelper=result;
 	});
 	

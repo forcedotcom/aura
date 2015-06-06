@@ -17,11 +17,11 @@
 Function.RegisterNamespace("Test.Components.Ui.Dropzone");
 
 [Fixture]
-Test.Components.Ui.Dropzone = function(){
+Test.Components.Ui.Dropzone.HelperTest = function(){
 	var targetHelper;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("ui.dropzone.dropzoneHelper",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/dropzone/dropzoneHelper.js",function(path,result){
 		targetHelper=result;
 	});
 	

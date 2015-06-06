@@ -29,6 +29,6 @@
             &lt;/aura:set>
         &lt;/ui:panelManager2>
 &lt;/aura:component></pre>     
-    <p>To customize the dialog body, create your own component and pass it in the <code>body</code> attribute, or create a component dynamically. Display the dialog by firing the <code>ui:openPanel</code> event and set its parameters. See <code>ui:panelDialog</code> for more information.</p>   
+    <p> See <code>ui:panel</code> for more information.</p>   
   </aura:description>
 </aura:documentation>

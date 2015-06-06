@@ -16,8 +16,8 @@
 
 -->
 <aura:interface support="GA">
-    <aura:attribute name="alias" type="String"/>
-    <aura:attribute name="activatable" type="Boolean" default="true" description="panel can be activated or deactivated when other panels are shown or closed."/>
+    <aura:attribute name="alias" type="String" description="The registered name of panel"/>
+    <aura:attribute name="activatable" type="Boolean" default="true" description="Determines if panel can be activated or deactivated when other panels are shown or closed. The default is true."/>
 
     <aura:registerEvent name="notify" type="ui:notify" />
 

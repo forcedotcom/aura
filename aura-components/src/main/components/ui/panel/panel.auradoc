@@ -1,0 +1,154 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<aura:documentation>
+    <aura:description>
+        <p><code>ui:​panel</code>​ represents a panel that's modal or non-modal. A modal panel doesn't allow any other interaction on the screen when the panel is opened.
+        A non-modal panel can be full screen or non full screen. You can control the positioning of the panel relative to an element.
+        In non full screen mode, the panel aligns to the center of a parent DOM container and closes when you click outside the boundaries of the panel.
+        </p>
+        <p>Include one instance of <code>ui:panelManager2</code> to handle and control visibility of all panels in your component or app.
+         Use events such as <code>ui:createPanel</code> and <code>ui:destroyPanel</code> to display or destroy your panels.
+         You can customize a panel's styling, header, body, footer. You can also customize the close button with your own logic.
+        </p>
+        <p>This example creates a panel by using a custom header and firing <code>ui:createPanel</code>.</p>
+<pre>createPanelWithHeader: function (cmp, event, helper) {
+    var body = $A.newCmp({componentDef: 'uiExamples:panelContent'}),
+        header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+    $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                referenceElementSelector: '.uiExamplesPanelExamples .customer-header-button',
+                showPointer: true,
+                direction: 'south',
+                useTransition: false,
+                showCloseButton: false,
+                flavor: 'custom',
+                header: header,
+                body  : body
+            },
+            onCreate: function (panel) {
+                header.setAttributeValueProvider(panel);
+            }
+
+        }).fire();
+       
+    }</pre>  
+        <h4>Positioning Panels</h4>
+        <p>Position your panels using the <code>ui:panelPositioningLib</code> library, which creates positioning constraints for elements.</p> 
+<pre>//Import library
+&lt;aura:import library="ui:panelPositioningLib" property="lib" /></pre>
+         <p>Two types of constraints are supported:
+        <code>default</code> and <code>bounding box</code>. A <code>default</code> constraint positions the element relative to the target.
+        </p>
+        <p>
+        A <code>bounding box</code> constraint keeps the element within the target. Elements can have multiple constraints, and a positioning element can also be a target element.
+        To create a constraint, call <code>positioningLib.createRelationship(config)</code> with the configuration options below.</p>
+        <table>
+        <thead>
+		    <tr>
+		      <th>Name</th>
+		      <th>Type</th>
+		      <th>Description</th>
+		    </tr>
+		  </thead>
+		  <tr>
+		    <td>config.element</td>
+		    <td>HTMLElement</td>
+		    <td>The element being positioned</td>
+		  </tr>
+		  <tr>
+		    <td>config.target</td>
+		    <td>HTMLElement</td>
+		    <td>The target element</td>
+		  </tr>
+		  <tr>
+		    <td>config.type</td>
+		    <td>String</td>
+		    <td>The target element</td>
+		  </tr>
+		  <tr>
+		  	<td>config.pad</td>
+		  	<td>Number</td>
+		  	<td>A number (in pixels) to pad the constraint. The default is 0.</td>
+		  </tr>
+		  <tr>
+		  	<td>config.enable</td>
+		  	<td>Boolean</td>
+		  	<td>Determines if the constraint is enabled. The default is true.</td>
+		  </tr>
+		  <tr>
+			  <td>config.align</td>
+			  <td>String</td>
+			  <td>The horizontal and vertical alignments of the element. For example, <code>'center bottom'</code>. Horizontal values: right, left, center. Vertical values: top, bottom.</td>
+		</tr>
+		<tr>
+			<td>config.targetAlign</td>
+			<td>String</td>
+			<td>The alignment relative to the target. For example, <code>'right center'</code>. To position an element west of a target element, set <code>targetAlign</code> to <code>'left center'</code> and <code>align</code> to <code>'right center'</code>.</td>
+		</tr>
+		<tr>
+			<td>config.boxDirections</td>
+			<td>Object</td>
+			<td>An object that defines which sides of the box are enabled. Properties are top, right, left and bottom. All are booleans. By default top and bottom are false and left and bottom are true.</td> 
+		</tr>
+		<tr>
+			<td>constraintHandle.disable</td>
+			<td>function</td>
+			<td>Disables the constraint</td>
+		</tr>
+		<tr>
+			<td>constraintHandle.enable</td>
+			<td>function</td>
+			<td>Enables the constraint</td>
+		</tr>
+		<tr>
+			<td>constraintHandle.destroy</td>
+			<td>function</td>
+			<td>Destroys the constraint, cleaning up element references.</td>
+		</tr>
+		</table>
+		<p>This is an example that sets up a constraint that positions an element north of a target element.</p>		
+<pre>var el = cmp.find('myDiv').getElement();
+var panel = cmp.find('panel').getElement();
+lib.createRelationship({
+	element:panel,
+	target:el,
+	align:'center bottom',
+	targetAlign: 'center top',
+	pad: 15
+});</pre>     
+    <p>Multiple constraints are applied in the order they are added. If a later constraint conflicts with an earlier constraint, the later constraint will take precedence.   
+    </p>
+    <h4>Repositioning Methods</h4>
+    <p><b>reposition()</b></p>
+    <p>When the window is resized or scrolled, the library automatically updates the position of the constrained element. You can use <code>reposition()</code> to force the position of all elements to be updated.
+    Repositioning might take slightly longer if you have a large number of elements.</p>
+    <p><b>disable()</b></p>
+    <p>To temporarily disable a constraint, call <code>disable().</code></p>
+    <p><b>enable()</b></p>
+    <p>If you have disabled a constraint, you can enable it using <code>enable()</code>.</p>
+    <p><b>destroy()</b></p>
+    <p>When you are finished with a constraint, use <code>destroy()</code> to destroy it.</p>
+     </aura:description>
+   
+  <aura:example name="panelPositioning" ref="uiExamples:panelPositioningExample" label="Positioning Panels using the panelPositioning Library">
+    	<p></p>
+	   </aura:example>
+</aura:documentation>

@@ -24,14 +24,14 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 
 	windowMock(function(){
 		var callback = function (path, fn) {fn();};
-		ImportJson("ui.scrollerLib.bootstrap", callback);
-		ImportJson("ui.scrollerLib.browserSupport", callback);
-		ImportJson("ui.scrollerLib.browserStyles", callback);
-		ImportJson("ui.scrollerLib.CubicBezier", callback);
-		ImportJson("ui.scrollerLib.ScrollerJS", callback);
-		ImportJson("ui.scrollerLib.EndlessPlugin", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/bootstrap.js", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/browserSupport.js", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/browserStyles.js", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/CubicBezier.js", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/ScrollerJS.js", callback);
+		ImportJson("aura-components/src/main/components/ui/scrollerLib/EndlessPlugin.js", callback);
 		
-		ImportJson("ui.scroller.scrollerHelper",function(path,result){
+		ImportJson("aura-components/src/main/components/ui/scroller/scrollerHelper.js",function(path,result){
 			targetHelper=result;
 		});
 		plugins=targetHelper.getScrollerNamespace().plugins;

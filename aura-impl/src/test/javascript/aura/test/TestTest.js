@@ -18,7 +18,7 @@ Function.RegisterNamespace("Test.Aura.Test");
 [Fixture]
 Test.Aura.TestTest = function() {
     var $A = { ns : {} };
-    var Aura = { Test:{} };
+    var Aura = { Test:{}, Utils:{Transport:function(){}} };
     var window = {};
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
@@ -26,9 +26,12 @@ Test.Aura.TestTest = function() {
         exp: function(){}, 
         "$A": $A, 
         "window": window,
-        Aura: Aura
+        Aura: Aura,
+        AuraInstance:function(){},
+        AuraLayoutService:{}
     })(function(){
-        // #import aura.test.Test
+        [Import("aura-impl/src/main/resources/aura/test/Test.js")]
+        [Import("aura-impl/src/main/resources/aura/test/Test_private.js")]
     });
 
     [Fixture]

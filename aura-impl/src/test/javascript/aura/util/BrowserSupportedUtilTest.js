@@ -28,7 +28,7 @@ Test.Aura.BrowserSupportedUtilTest = function() {
             Transport:function() {},
             Style:function() {},
             Bitset:{},
-            NumberFormat:{},            
+            NumberFormat:{}
         }
     };
     
@@ -67,7 +67,8 @@ Test.Aura.BrowserSupportedUtilTest = function() {
                 Transport:function() {},
                 Style:function() {},
                 Bitset:{},
-                NumberFormat:{},            
+                NumberFormat:{},
+                SizeEstimator:function(){},
                 $A:{ns:{}},
                 Aura: Aura,
                 navigator:{userAgent:''},
@@ -76,8 +77,8 @@ Test.Aura.BrowserSupportedUtilTest = function() {
             })(function(){
                 var CurrentObject = window.Object;
                 window.Object = override === MockObject ? MockObject : window.Object;
-                // #import aura.util.CoreUtil
-                // #import aura.util.Util
+                [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
+                [Import("aura-impl/src/main/resources/aura/util/Util.js")]
                 try {
                     delegate(new Aura.Utils.Util());
                 } finally {

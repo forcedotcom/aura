@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.Iteration");
+({
 
-[Fixture, Skip("Rewrite")]
-Test.Aura.Iteration.ControllerTest = function(){
-	var targetController;
 
-	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("aura-components/src/main/components/aura/iteration/iterationController.js",function(path,result){
-		targetController=result;
-	});
-}
+    init: function(component, event, helper) {
+        helper.updateSelectValue(component);
+    },
+
+    onSelectChange: function(component, event, helper) {
+        helper.updateSelectValue(component);
+    }
+
+})

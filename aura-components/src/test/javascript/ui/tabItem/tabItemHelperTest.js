@@ -19,7 +19,7 @@ Function.RegisterNamespace("Test.Components.Ui.TabItem");
 [Fixture]
 Test.Components.Ui.TabItem = function() {
     var targetHelper = null;
-    ImportJson("ui.tabItem.tabItemHelper", function(path, result){
+    ImportJson("aura-components/src/main/components/ui/tabItem/tabItemHelper.js", function(path, result){
         targetHelper = result;
     });
     

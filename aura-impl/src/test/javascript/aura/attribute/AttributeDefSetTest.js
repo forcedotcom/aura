@@ -19,7 +19,7 @@ Function.RegisterNamespace("Test.Aura.Attribute");
 Test.Aura.Attribute.AttributeDefSetTest = function(){
     Mocks.GetMock(Object.Global(), "exp", function() {
     })(function() {
-        // #import aura.attribute.AttributeDefSet
+        [Import("aura-impl/src/main/resources/aura/attribute/AttributeDefSet.js")]
     });
 
     var configItem = function(param) {

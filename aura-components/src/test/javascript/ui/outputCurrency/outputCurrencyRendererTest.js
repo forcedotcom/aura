@@ -21,7 +21,7 @@ Test.Ui.OutputCurrency.RendererTest = function(){
 	var targetRenderer;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("ui.outputCurrency.outputCurrencyRenderer",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/outputCurrency/outputCurrencyRenderer.js",function(path,result){
 		targetRenderer=result;
 	});
 	

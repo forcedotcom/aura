@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.Iteration");
+({
 
-[Fixture, Skip("Rewrite")]
-Test.Aura.Iteration.ControllerTest = function(){
-	var targetController;
 
-	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("aura-components/src/main/components/aura/iteration/iterationController.js",function(path,result){
-		targetController=result;
-	});
-}
+    updateSelectValue: function(component) {
+        var autoComplete = component.find("autocomplete");
+        var select = component.find("select");
+        autoComplete.updateParameters([{name:"evenOrOdd",value:select.get("v.value")}]);
+    }
+
+})

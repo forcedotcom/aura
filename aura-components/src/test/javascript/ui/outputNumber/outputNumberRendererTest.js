@@ -21,7 +21,7 @@ Test.Ui.OutputNumber.RendererTest = function(){
 	var targetRenderer;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("ui.outputNumber.outputNumberRenderer",function(path,result){
+	ImportJson("aura-components/src/main/components/ui/outputNumber/outputNumberRenderer.js",function(path,result){
 		targetRenderer=result;
 	});
 	

@@ -1,0 +1,23 @@
+<aura:component>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <div style="margin:20px; width:400px;">
+    <ui:pillContainer aura:id="pillContainer">
+        <aura:set attribute="pillInput">
+            <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row">
+                <aura:set attribute="header">
+                    <ui:inputSelect aura:id="select" change="{!c.onSelectChange}">
+                        <ui:inputSelectOption text="Even" label="Even"/>
+                        <ui:inputSelectOption text="Odd"  label="Odd"/>
+                    </ui:inputSelect>
+                </aura:set>
+                <aura:set attribute="dataProvider">
+                    <uitest:pillContainerAutoCompleteDataProvider/>
+                </aura:set>
+                <aura:set attribute="listOption">
+                    <ui:pillContainerAutoCompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row}" visible="{!row.visible}" iconUrl="{!row.icon.url}"/>
+                </aura:set>
+            </ui:pillContainerAutoComplete>
+        </aura:set>
+    </ui:pillContainer>
+    </div>
+</aura:component>

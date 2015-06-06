@@ -140,7 +140,7 @@ var AuraDevToolService = function() {
         },
 
         "filters" : {
-            "noop" : function(row){
+            "noop" : function(){
                 return true;
             }
         },
@@ -180,7 +180,7 @@ var AuraDevToolService = function() {
             var rawRows = view();
             var rows = this.filterFields(fields, derivedFields, rawRows);
             rows = this.applyFilter(filter, rows, rawRows);
-            ret = this.applyGroupBy(groupBy, rows.rows, rows.rawRows);
+            var ret = this.applyGroupBy(groupBy, rows.rows, rows.rawRows);
 
             return ret;
         },
@@ -358,6 +358,7 @@ var AuraDevToolService = function() {
                 for(var i = 0; i< panels.length; i++){
                     panelObj = panels[i];
                     activePanel = panelObj["activeElm"];
+                    var panelWithAriaHidden;
                     
                     if(panelObj.hasOwnProperty("ariaHidden")){
                         panelWithAriaHidden = panelObj["ariaHidden"];
@@ -451,7 +452,7 @@ var AuraDevToolService = function() {
                      if(!$A.util.isUndefinedOrNull(tagIds)){
                     	 tagIds = tagIds.trim().split(/\s+/);
                     	 for(var j = 0; j < tagIds.length; j++){                   	
-	                    	 if(tagIds[j].indexOf(id) == 0){
+	                    	 if(tagIds[j].indexOf(id) === 0){
 	                             return true;
 	                         } 
                     	 }
@@ -602,7 +603,7 @@ var AuraDevToolService = function() {
                     if(!$A.util.isEmpty(type) && inputTypes.indexOf(type)> -1){
                         continue;
                     }
-                    else if (type == "image"){
+                    else if (type === "image"){
                         var alt = $A.util.getElementAttributeValue(inputTag, "alt");
                         if($A.util.isEmpty(alt) || alt.replace(/[\s\t\r\n]/g,'') === ""){
                             errorArray.push(inputTag); 
@@ -671,7 +672,7 @@ var AuraDevToolService = function() {
                 
                 //Keep going up until we hit the either the BODY or HTML tag
                 while(!$A.util.isUndefinedOrNull(tag) && tag.tagName.toLowerCase() !== "body" && tag.tagName.toLowerCase() !== "html"){
-                    data_aura_rendered_by = $A.util.getElementAttributeValue(tag, "data-aura-rendered-by");
+                    var data_aura_rendered_by = $A.util.getElementAttributeValue(tag, "data-aura-rendered-by");
         
                     //Make sure it has a rendered by value
                     if(!$A.util.isEmpty(data_aura_rendered_by)){
@@ -859,10 +860,9 @@ var AuraDevToolService = function() {
                /**
                 * Method that goes through all tables present on the page and makes sure the tags underneath them have either an id or scope associated with them
                 * @param   tables        - The tags to find 
-                * @param   tableErrorMsg - The error message to show when errors are found
                 * @returns Array         - The error array
                 */
-                checkTables : function(tables, tableErrorMsg){
+                checkTables : function(tables){
                     var headerDict = {};
                     var ths = [];
                     var scopeVal = "";
@@ -875,7 +875,6 @@ var AuraDevToolService = function() {
                         ths = tables[index].getElementsByTagName("th");
                         //Reset Variables
                         headerDict = {};
-                        allThsHaveScope = [];
                         skipTDCheck = false;
                          
                          //If we have no headers, tds wont be a problem
@@ -911,7 +910,7 @@ var AuraDevToolService = function() {
                        
                        
                          //Phase 2: If all <th> within a <table> contain "id" and all <td> contain "headers" attribute, and each id listed in header attribute matches id attribute of a <th>, then pass test.
-                         tds = tables[index].getElementsByTagName("td");
+                         var tds = tables[index].getElementsByTagName("td");
                          
                          //Don't need this I believe
                          if(tds.length === 0){
@@ -1135,7 +1134,7 @@ var AuraDevToolService = function() {
                          legends = fieldSets[i].getElementsByTagName('legend');
                          fieldSetSytle = fieldSets[i].style.display;
                     
-                         if(!$A.util.isUndefinedOrNull(fieldSetSytle) && fieldSetSytle == "none"){
+                         if(!$A.util.isUndefinedOrNull(fieldSetSytle) && fieldSetSytle === "none"){
                              continue;
                          }
 
@@ -1204,7 +1203,7 @@ var AuraDevToolService = function() {
                      var panelSlide   = "section.stage.panelSlide";
                      var panelSliderOverlay = "div.forcePanelSlider";
                      //Get all panels
-                     panels = []; 
+                     var panels = []; 
                      accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(modalOverlay));
                      accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelOverlay)); 
                      accessAideFuncs.nodeListToObjectArray(panels, domElem.querySelectorAll(panelSlide));

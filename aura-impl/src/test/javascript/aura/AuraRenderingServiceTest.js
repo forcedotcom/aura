@@ -30,7 +30,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
         "$A":$A,
         Aura: Aura
     })(function(){
-        // #import aura.AuraRenderingService
+        [Import("aura-impl/src/main/resources/aura/AuraRenderingService.js")]
     });
 
     // Mocks necessary to create a new AuraComponentService Object
